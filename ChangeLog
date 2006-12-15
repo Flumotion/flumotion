@@ -1,3 +1,5 @@
+=== release 0.3.2 ===
+
 2006-12-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/componentui.py

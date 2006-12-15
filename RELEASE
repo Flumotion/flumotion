@@ -1,5 +1,5 @@
 
-Release notes for Flumotion 0.3.1 "La Merce"
+Release notes for Flumotion 0.3.2 "Flight JL 412"
         
 
 The Flumotion team is happy to announce
@@ -20,21 +20,76 @@ with ease of use.
   
 Features of this release
     
-      * dropped support for GStreamer 0.10
-      * dropped support for Twisted 1.3.0
-      * workers only expose one TCP port for feeds now
-      * porter component allows sharing one TCP port for all streamers
-      * added plugs and sockets for finer-grained extensibility
-      * added a static file serving component
-      * workers and jobs reconnect on network failures
-      * components reconnect feeds on network failures
-      * added integration test framework
+      * Greatly improved and more flexible http burst-on-connect
+      * Allow setting a maximum duration for http connections
+      * Add simple icecast-stream relaying component
+      * Add component that takes GDP-payloaded data from a unix socket
+      * ICal based bouncer, to specify that clients may only connect during a 
+        specific time of day
+      * Restarting a manager while a flow is running now works reliably
+      * The disker component can now be remotely controlled to start/stop 
+        recording, and to automatically maintain symlinks to the latest 
+        recording
+      * Many component propertiess were renamed to make them more consistent
+      * The http-server component is now more reliable, and has GTK UI
+      * Components in the GTK UI now show information about their feeders
+      * Network clock synchronisation now works in more cases
+      * Workers and their jobs can now have their logs rotated
 
 Bugs fixed in this release
     
-      * 327 : Clock slaves can start up before the clock provider
-      * 332 : Patch for valgrinding jobs
-      * 359 : Components that fail to start can't be restarted later
+      * 50 : when modules get renamed, and you do a new make install, you end 
+             up with two components of the same name
+      * 88 : automatically restart workers on connection trouble
+      * 89 : possibility for external (software) sources.
+      * 131 : a manager restart with a running worker config causes worker to 
+              lose its old children that get overwritten with new info
+      * 232 : go over all component properties in registry and unify naming
+      * 298 : Changing to a different connection and failing leaves the UI in 
+              a grayed-out state
+      * 315 : stopping all and starting all makes all components sad
+      * 352 : theora encoder uses bitrate in kbit/sec, unlike most other 
+              encoders
+      * 411 : result of <debug></port>
+      * 412 : Restarting a manager doesn't work properly
+      * 414 : flumotion-admin's name lookup doesn't always work correctly
+      * 438 : core dump by flumotion-job
+      * 440 : flow with an audio-source fails
+      * 441 : looper component stays waking forever if file does not exist
+      * 449 : workers that have their port range specified as x-x (to use only 
+              one port) make things go wrong
+      * 454 : reconnect when upstream components restart causes a bad stream, 
+              gdp issue
+      * 462 : Burst-on-connect by time
+      * 471 : empty .connections file breaks the greeter, creating a gtk.Label 
+              instead of the custom Connections
+      * 477 : we seem to be leaking file descriptors on reconnect
+      * 479 : leak in feedserver
+      * 480 : after component that is clock master reconnects, it is told to 
+              be a clock master again
+      * 481 : merge mike-http-improvements-1 
+      * 484 : worker does not create job for a sleeping component that has a 
+              moodPending, also moodPending should get reset when stopping a 
+              sad or lost component 
+      * 485 : add ability to stop recording to a disker
+      * 486 : disker should allow schedulable recordings
+      * 502 : make sure log rotation works both in the manager and in workers
+      * 507 : feed components should track information of the eaters connected 
+              to them
+      * 510 : every reconnect causes a new feeder to be added in UI for 
+              "plumbing"
+      * 513 : The BaseAdminGtkNode don't have setitem and delitem vmethod
+      * 515 : The Plumbing GtkNode is alway instantiated and failed when the 
+              component is not a FeedComponent
+      * 518 : Admin prints tracebacks for non-feed-components
+      * 519 : tracebacks in  admin when  stopping a component
+      * 524 : disker admin UI bug
+      * 525 : When the audiotest component admin interface is loaded it set 
+              the frequency to 1 making it "silent"
+      * 530 : admin's open connection, quit, and about menu items appear as 
+              gtk-open, etc
+      * 531 : flumotion-admin screws the pooch if it can't connect to the 
+              manager
 
 Download
 
@@ -63,6 +118,7 @@ Contributors to this release
     
       * Andy Wingo
       * Michael Smith
+      * Sebastien Merle
       * Thomas Vander Stichele
       * Zaheer Merali
  
