@@ -1,6 +1,7 @@
 * Choose release name:
   - a bar for micro version
   - a restaurant for minor version
+* add a revision to the .doap file
 * Check for milestone bugs
 * Edit NEWS and add the tickets fixed for this milestone; for example:
   https://core.fluendo.com/flumotion/trac/report/16?format=tab&MILESTONE=0.1.2
