@@ -3,8 +3,17 @@
   - a restaurant for minor version
 * add a revision to the .doap file
 * Check for milestone bugs
-* Edit NEWS and add the tickets fixed for this milestone; for example:
+  example:
   https://core.fluendo.com/flumotion/trac/report/16?format=tab&MILESTONE=0.1.2
+* create the release notes in the flumotion.net modules:
+  - in src/htdocs/releases/flumotion, create a new file
+  - add it to Makefile.am
+  - update list of features by going through the ChangeLog
+  - update list of bugs fixed by pasting in the previous list of bugs
+  - update list of contributors
+* copy the generated text version to the RELEASE file
+* Edit NEWS and add the tickets fixed for this milestone, as well as the
+  new features
 * bump nano in configure.ac
 * edit ChangeLog and add === release 0.1.2 ===
 * commit to SVN
