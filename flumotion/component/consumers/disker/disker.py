@@ -190,7 +190,16 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 time.localtime()), ext)
         self.location = os.path.join(self.directory, filename)
 
-        self.file_fd = open(self.location, 'a')
+        try:
+            self.file_fd = open(self.location, 'a')
+        except IOError, e:
+            self.warning("Failed to open output file %s: %s", 
+                       self.location, log.getExceptionMessage(e))
+            m = messages.Error(T_(N_("Failed to open output file "
+                                       "%s. Check your permissions."
+                                       % (self.location,))))
+            self.addMessage(m)
+            return
         sink.emit('add', self.file_fd.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)

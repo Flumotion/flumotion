@@ -231,8 +231,9 @@ class ManagerComponentState(flavors.StateCacheable):
 
         @type jobState: L{ManagerJobState}
         """
+        proxiedKeys = _jobStateKeys + _jobStateListKeys
         self._jobState = jobState
-        for key in _jobStateKeys:
+        for key in proxiedKeys:
             # only set non-None values
             v = jobState.get(key)
             if v != None:
@@ -242,7 +243,7 @@ class ManagerComponentState(flavors.StateCacheable):
         # are ignored for example
         def proxy(attr):
             def event(state, key, value):
-                if key in _jobStateKeys:
+                if key in proxiedKeys:
                     getattr(self, attr)(key, value)
             return event
 

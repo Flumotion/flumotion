@@ -1095,6 +1095,7 @@ class Window(log.Loggable, gobject.GObject):
                    'Thomas Vander Stichele',
                    'Wim Taymans',
                    'Zaheer Abbas Merali',
+                   'Sébastien Merle'
         )
         text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:
