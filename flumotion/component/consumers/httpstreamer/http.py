@@ -680,6 +680,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             # If we've changed paths, we must do some extra work.
             if path != self._porterPath:
+                self.debug("Changing porter login to use \"%s\"", path)
                 self._porterPath = path
                 self._pbclient.stopTrying() # Stop trying to connect with the
                                             # old connector.
@@ -722,7 +723,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
 
-            self.debug("Starting porter login!")
+            self.debug("Starting porter login at \"%s\"", self._porterPath)
             # This will eventually cause d2 to fire
             reactor.connectWith(
                 fdserver.FDConnector, self._porterPath, 
