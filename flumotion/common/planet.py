@@ -232,16 +232,21 @@ class ManagerComponentState(flavors.StateCacheable):
 
         @type jobState: L{ManagerJobState}
         """
-        proxiedKeys = _jobStateKeys + _jobStateListKeys
         self._jobState = jobState
-        for key in proxiedKeys:
+        for key in _jobStateKeys:
             # only set non-None values
             v = jobState.get(key)
             if v != None:
                 self.set(key, v)
+        for key in _jobStateListKeys:
+            list = jobState.get(key)
+            if list != None:
+                for v in list:
+                    self.append(key, v)
                 
         # only proxy keys we want proxied; eaterNames and feederNames
         # are ignored for example
+        proxiedKeys = _jobStateKeys + _jobStateListKeys
         def proxy(attr):
             def event(state, key, value):
                 if key in proxiedKeys:
