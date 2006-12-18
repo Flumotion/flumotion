@@ -34,6 +34,7 @@ from xml.parsers import expat
 from twisted.python import reflect 
 
 from flumotion.common import log, errors, common, registry, fxml
+from flumotion.configure import configure
 
 from errors import ConfigError, ComponentWorkerConfigError
 
@@ -418,10 +419,9 @@ class FlumotionConfigXML(BaseConfigParser):
                 raise ComponentWorkerConfigError("<component> version not"
                                                  " parseable")
 
-        # version was introduced in 0.2.0, default to this if we couldn't find 
-        # or version had the wrong length
+        # If we don't have a version at all, use the current version
         if not version:
-            version = (0,2,0,0)
+            version = configure.versionNum
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))

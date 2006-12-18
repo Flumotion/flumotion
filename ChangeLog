@@ -1,5 +1,10 @@
 2006-12-18  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/config.py:
+	  Assume versionless components are the current version.
+
+2006-12-18  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/common/planet.py:
 	  Fix some out of date comments
 
