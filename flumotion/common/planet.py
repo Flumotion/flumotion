@@ -188,12 +188,13 @@ class ManagerComponentState(flavors.StateCacheable):
 
     I have the following keys of my own:
 
-     - name:              str; name of the component, unique in the parent
+     - name:              str, name of the component, unique in the parent
      - parent:            L{ManagerFlowState} or L{ManagerAtmosphereState}
      - type:              str, type of the component
      - moodPending:       int, the mood value the component is being set to
      - workerRequested:   str, name of the worker this component is
                           requested to be started on.
+     - config:            dict, the configuration dict for this component
 
     It also has a special key, 'mood'. This acts as a proxy for the mood
     in the L{WorkerJobState}, when there is a job attached (the job's copy
@@ -201,7 +202,7 @@ class ManagerComponentState(flavors.StateCacheable):
     other times.
 
     I proxy the following keys from the serialized L{WorkerJobState}:
-      - mood, ip, pid, workerName, cpu
+      - mood, manager-ip, pid, workerName, cpu
       - messages (list)
     """
  

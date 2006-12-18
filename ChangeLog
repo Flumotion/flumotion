@@ -1,3 +1,8 @@
+2006-12-18  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/planet.py:
+	  Fix some out of date comments
+
 2006-12-18  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/consumers/disker/disker.py: 
@@ -11,6 +16,16 @@
 	
 	* flumotion/admin/gtk/client.py: 
 	Added me in the Admin's About dialog :)
+
+2006-12-18  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	  Back to dev.
+
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	  Permit a rotate-type of 'none' to disable rotation.
+	  Fixes #534.
 
 2006-12-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
