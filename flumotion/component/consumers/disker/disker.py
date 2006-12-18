@@ -93,10 +93,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.setSizeRotate(properties['size'])
         elif rotateType == 'time':
             self.setTimeRotate(properties['time'])
-        else:
+        elif rotateType != 'none':
             m = messages.Error(T_(N_(
                 "The configuration property 'rotate-type' should be set to "
-                "'size' or 'time', not '%s'.  Please fix the configuration."),
+                "'size', time', or 'none', not '%s'. "
+                "Please fix the configuration."),
                     rotateType), id='rotate-type')
             self.addMessage(m)
         # FIXME: should add a way of saying "do first cycle at this time"
