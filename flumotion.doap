@@ -7,7 +7,7 @@
 
  <name>Flumotion</name>
  <shortname>flumotion</shortname>
- <homepage rdf:resource="https://thomas.apestaart.org/thomas/trac/wiki/projects/moap" />
+ <homepage rdf:resource="http://www.flumotion.net/" />
  <created>2004-04-22</created>
  <shortdesc xml:lang="en">
 Flumotion is a Free Software streaming server developed by Fluendo.
