@@ -1,5 +1,11 @@
 2006-12-18  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/test/test_manager_manager.py:
+	  Add 'messages' key to our ManagerJobState in FakeComponentMind;
+	  tests pass again now.
+
+2006-12-18  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/common/config.py:
 	  Assume versionless components are the current version.
 

@@ -329,7 +329,8 @@ class FakeComponentMind(FakeMind):
             'manager-ip': '0.0.0.0',
             'workerName': workerName,
             'feederNames': [],
-            'eaterNames': [] }
+            'eaterNames': [],
+            'messages': [] }
         self.state = state
 
     def remote_getState(self):
