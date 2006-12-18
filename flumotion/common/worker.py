@@ -100,7 +100,7 @@ class ProcessProtocol(protocol.ProcessProtocol):
                     if os.path.exists(corepath):
                         obj.info("Core file is probably '%s'." % corepath)
                         message.add(T_(N_(
-                            "The core dump is '%s' on the host running  '%s'."),
+                            "The core dump is '%s' on the host running '%s'."),
                             corepath, self.where))
                         # FIXME: add an action that runs gdb and produces a
                         # backtrace; or produce it here and attach to the

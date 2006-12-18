@@ -1,3 +1,10 @@
+2006-12-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/redhat/flumotion:
+	  source a sysconfig file if it exists
+	* flumotion/common/worker.py:
+	  remove a space
+
 === release 0.3.2 ===
 
 2006-12-14  Andy Wingo  <wingo@pobox.com>
