@@ -1,5 +1,13 @@
 2006-12-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  switch around to root:flumotion for ownership of various directories,
+	  allowing users in the flumotion group to see logs and config
+	  remove flumotion cache/home dir contents
+	  clean up commenting in manager config
+
+2006-12-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Do not raise on a failure to parse the registry.
 

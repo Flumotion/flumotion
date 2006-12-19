@@ -151,10 +151,13 @@ then
   <manager>
     <!-- <debug>3</debug> -->
     <host>localhost</host>
-    <!-- certificate path os relative to $sysconfdir/flumotion, or absolute -->
 <!--
     <port>7531</port>
     <transport>ssl</transport>
+-->
+    <!-- certificate path can be relative to $sysconfdir/flumotion,
+         or absolute -->
+<!--
     <certificate>default.pem</certificate>
 -->
     <component name="manager-bouncer" type="htpasswdcrypt">
@@ -179,8 +182,8 @@ then
   <!-- <debug>3</debug> -->
 
   <manager>
-<!--
     <host>localhost</host>
+<!--
     <port>7531</port>
 -->
   </manager>
@@ -205,6 +208,10 @@ then
 
   rm -rf %{_localstatedir}/lock/flumotion*
   rm -rf %{_localstatedir}/run/flumotion*
+
+  # clean out the cache/home dir too, without deleting it or the user
+  rm -rf %{_localstatedir}/cache/flumotion/*
+  rm -rf %{_localstatedir}/cache/flumotion/.[^.]*
 
   /sbin/chkconfig --del flumotion
 fi
@@ -243,13 +250,19 @@ fi
 %{_datadir}/flumotion/make-dummy-cert
 %{_datadir}/flumotion/*.xsl
 
-%attr(750,flumotion,root) %{_sysconfdir}/flumotion
-%attr(750,flumotion,root) %{_localstatedir}/run/flumotion
-%attr(750,flumotion,root) %{_localstatedir}/log/flumotion
-%attr(750,flumotion,root) %{_localstatedir}/cache/flumotion
+%attr(750,root,flumotion) %{_sysconfdir}/flumotion
+%attr(750,root,flumotion) %{_localstatedir}/run/flumotion
+%attr(750,root,flumotion) %{_localstatedir}/log/flumotion
+%attr(750,root,flumotion) %{_localstatedir}/cache/flumotion
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Tue Dec 19 2006 Thomas Vander Stichele <thomas at apestaart dot org>
+- switch around to root:flumotion for ownership of various directories,
+  allowing users in the flumotion group to see logs and config
+- remove flumotion cache/home dir contents
+- clean up commenting in manager config
+
 * Sun Jun 18 2006 Thomas Vander Stichele <thomas at apestaart dot org>
 - only create default worker if there is not /etc/flumotion/workers
 - only create default manager if there is not /etc/flumotion/managers
