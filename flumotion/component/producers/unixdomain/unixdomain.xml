@@ -2,15 +2,17 @@
 
   <components>
   
-    <component type="unixdomain" base="flumotion/component/producers/unixdomain">
-      <source location="flumotion.component.producers.unixdomain.unixdomain"/>
-      <feeder name="default"/>
+    <component type="unixdomain-producer"
+               base="flumotion/component/producers/unixdomain">
+      <source location="flumotion.component.producers.unixdomain.unixdomain" />
+      <feeder name="default" />
       <entries>
         <entry type="component" location="unixdomain.py"
-               function="UnixDomainProvider"/>
+               function="UnixDomainProvider" />
       </entries>
       <properties>
-        <property name="path" type="string"/>
+        <property name="path" type="string" required="yes"
+                  description="path to the unix domain socket" />
       </properties>
     </component>
  

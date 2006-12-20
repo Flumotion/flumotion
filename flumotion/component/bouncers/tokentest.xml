@@ -1,6 +1,6 @@
 <registry>
   <components>
-    <component type="tokentestbouncer"
+    <component type="tokentest-bouncer"
                base="flumotion/component/bouncers"
                description="A test bouncer that only allows one token.">
 

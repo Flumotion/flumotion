@@ -1,17 +1,18 @@
 <registry>
   <components>
-    <component type="icalbouncer"
+    <component type="ical-bouncer"
                base="flumotion/component/bouncers">
 
-      <source location="flumotion.component.bouncers.icalbouncer"/>
+      <source location="flumotion.component.bouncers.icalbouncer" />
 
       <entries>
         <entry type="component" location="icalbouncer.py"
-               function="IcalBouncer"/>
+               function="IcalBouncer" />
       </entries>
 
       <properties>
-        <property name="ics-file" type="string" required="True"/>
+        <property name="file" type="string" required="yes"
+                  description="path to iCal file to use" />
       </properties>
     </component>
   </components>
