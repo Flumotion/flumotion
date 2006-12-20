@@ -1017,13 +1017,13 @@ class ComponentRegistry(log.Loggable):
             self.info('Parsing registry: %s' % self.filename)
             try:
                 self._parser.parseRegistry(self.filename)
-            except XmlParserError, e:
+            except fxml.ParserError, e:
                 # this can happen for example if we upgraded to a new version,
                 # ran, then downgraded again; the registry can then contain
                 # XML keys that are not understood by this version.
                 # This is non-fatal, and gets fixed due to a re-scan
                 self.warning('Could not parse registry %s.' % self.filename)
-                self.debug('XmlParserError: %s' % log.getExceptionMessage(e))
+                self.debug('fxml.ParserError: %s' % log.getExceptionMessage(e))
 
         self.verify()
     
