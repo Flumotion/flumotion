@@ -1,3 +1,8 @@
+2006-12-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/enums.py:
+	  Add some more sample rates to soundcard.
+
 2006-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/registry.py:

@@ -106,8 +106,11 @@ SoundcardInput = enum.EnumClass('SoundcardInput',
                            ('Line in', 'Microphone', 'CD'))
 SoundcardChannels = enum.EnumClass('SoundcardChannels', ('Stereo', 'Mono'),
                               intvalue=(2, 1))
-SoundcardSamplerate = enum.EnumClass('SoundcardSamplerate', ('44100',
+SoundcardSamplerate = enum.EnumClass('SoundcardSamplerate', ('48000',
+                                                        '44100',
+                                                        '32000',
                                                         '22050',
+                                                        '16000',
                                                         '11025',
                                                         '8000'))
 SoundcardBitdepth = enum.EnumClass('SoundcardBitdepth', ('16', '8'),
