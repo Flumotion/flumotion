@@ -4,6 +4,7 @@
 	(Avatar.mindCallRemote, Avatar.mindCallRemoteLogging.errback)
 	(Avatar.mindCallRemoteLogging.callback)
 	(Avatar.mindCallRemoteLogging): Floggulate.
+	(Avatar.disconnect): Don't error if we're already disconnected.
 
 	* flumotion/common/medium.py (PingingMedium._ping): PONG
 
