@@ -5,6 +5,9 @@
 	for the log level.
 	(BaseMedium.callRemote): Call callRemoteLogging with level=DEBUG.
 	(PingingMedium._ping): Use callRemoteLogging with level=LOG.
+	(BaseMedium.callRemoteLogging): Add an arg for the stack depth,
+	since this function can be called with different stacks.
+	(BaseMedium.callRemote): Use stack depth.
 
 2006-12-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 

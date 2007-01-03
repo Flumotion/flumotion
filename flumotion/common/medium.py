@@ -93,12 +93,20 @@ class BaseMedium(fpb.Referenceable):
         """
         return self.remote != None
 
-    def callRemoteLogging(self, level, name, *args, **kwargs):
+    def callRemoteLogging(self, level, stackDepth, name, *args, **kwargs):
         """
         Call the given method with the given arguments remotely on the
         server-side avatar.
 
         Gets serialized to server-side perspective_ methods.
+
+        @param level: the level we should log at (log.DEBUG, log.INFO, etc)
+        @type  level: int
+        @param stackDepth: the number of stack frames to go back to get
+        file and line information, negative or zero.
+        @type  stackDepth: non-positive int
+        @param name: name of the remote method
+        @type  name: str
         """
         if level is not None:
             debugClass = str(self.__class__).split(".")[-1].upper()
@@ -106,7 +114,8 @@ class BaseMedium(fpb.Referenceable):
             format, debugArgs = log.getFormatArgs(
                 '%s --> %s: callRemote(%s, ', startArgs,
                 ')', (), args, kwargs)
-            logKwArgs = self.doLog(level, -2, format, *debugArgs)
+            logKwArgs = self.doLog(level, stackDepth - 1,
+                                   format, *debugArgs)
 
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
@@ -139,7 +148,8 @@ class BaseMedium(fpb.Referenceable):
 
         Gets serialized to server-side perspective_ methods.
         """
-        return self.callRemoteLogging(log.DEBUG, name, *args, **kwargs)
+        return self.callRemoteLogging(log.DEBUG, -1, name, *args,
+                                      **kwargs)
 
     def runBundledFunction(self, module, function, *args, **kwargs):
         """
