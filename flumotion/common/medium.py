@@ -247,7 +247,7 @@ class PingingMedium(BaseMedium):
 
         if self.remote:
             self.log('pinging')
-            d = self.callRemoteLogging(log.LOG, 'ping')
+            d = self.callRemoteLogging(log.LOG, 0, 'ping')
             d.addCallback(pingback)
         else:
             self.info('tried to ping, but disconnected yo')

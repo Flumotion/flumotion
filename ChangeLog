@@ -1,5 +1,7 @@
 2007-01-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/medium.py (PingingMedium._ping): PONG
+
 	* flumotion/twisted/pb.py (Avatar.__init__, Avatar.setMind): Add
 	support in the base avatar for setting self.mind. This interface
 	is orthogonal to that in flumotion.manager.base, because I don't
