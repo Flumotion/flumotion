@@ -1,5 +1,10 @@
 2007-01-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/pb.py: Import common.
+	(Avatar.mindCallRemote, Avatar.mindCallRemoteLogging.errback)
+	(Avatar.mindCallRemoteLogging.callback)
+	(Avatar.mindCallRemoteLogging): Floggulate.
+
 	* flumotion/common/medium.py (PingingMedium._ping): PONG
 
 	* flumotion/twisted/pb.py (Avatar.__init__, Avatar.setMind): Add

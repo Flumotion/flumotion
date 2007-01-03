@@ -35,7 +35,7 @@ from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
 from flumotion.configure import configure
-from flumotion.common import keycards, interfaces
+from flumotion.common import keycards, interfaces, common
 from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials
@@ -677,7 +677,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         if level is not None:
             debugClass = str(self.__class__).split(".")[-1].upper()
             startArgs = [self.remoteLogName, debugClass, name]
-            format, debugArgs = log.getFormatArgs(
+            format, debugArgs = flog.getFormatArgs(
                 '%s --> %s: callRemote(%s, ', startArgs,
                 ')', (), args, kwargs)
             logKwArgs = self.doLog(level, stackDepth - 1, format,
@@ -689,14 +689,14 @@ class Avatar(pb.Avatar, flog.Loggable):
             return defer.fail(errors.NotConnectedError())
 
         def callback(result):
-            format, debugArgs = log.getFormatArgs(
+            format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (log.ellipsize(result), ), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
 
         def errback(failure):
-            format, debugArgs = log.getFormatArgs(
+            format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s', startArgs,
                 '): %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
@@ -714,7 +714,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         @param name: name of the remote method
         @type  name: str
         """
-        return self.mindCallRemoteLogging(log.DEBUG, -1, name, *args,
+        return self.mindCallRemoteLogging(flog.DEBUG, -1, name, *args,
                                           **kwargs)
 
     def disconnect(self):
