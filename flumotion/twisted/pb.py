@@ -35,7 +35,7 @@ from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
 from flumotion.configure import configure
-from flumotion.common import keycards, interfaces, common
+from flumotion.common import keycards, interfaces, common, errors
 from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials

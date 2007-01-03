@@ -1,5 +1,8 @@
 2007-01-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/pb.py: Import errors, thanks distributed
+	pychecker
+	
 	* flumotion/twisted/pb.py: Import common.
 	(Avatar.mindCallRemote, Avatar.mindCallRemoteLogging.errback)
 	(Avatar.mindCallRemoteLogging.callback)
