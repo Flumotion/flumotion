@@ -1,5 +1,15 @@
 2007-01-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/pb.py (Avatar.__init__, Avatar.setMind): Add
+	support in the base avatar for setting self.mind. This interface
+	is orthogonal to that in flumotion.manager.base, because I don't
+	want to change that implementation right now, and because there's
+	no need for avatar.detached() given mind.notifyOnDisconnect().
+	(Avatar.mindCallRemoteLogging, Avatar.mindCallRemote): Add support
+	for mindCallRemote[Logging] in the base class, so that all avatars
+	can easily support logging. Again this does not affect manager
+	avatars because they override this implementation.
+
 	* flumotion/common/medium.py (BaseMedium.callRemoteLogging): New
 	method, contains the guts of callRemote, but with an extra param
 	for the log level.

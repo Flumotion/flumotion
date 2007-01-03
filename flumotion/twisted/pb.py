@@ -573,6 +573,12 @@ class Avatar(pb.Avatar, flog.Loggable):
     logCategory = 'avatar'
     remoteLogName = 'remote'
 
+    def __init__(self, avatarId):
+        self.avatarId = avatarId
+        self.logName = avatarId
+        self.mind = None
+        self.debug("created new Avatar with id %s", avatarId)
+
     # a referenceable that logs receiving remote messages
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args)
@@ -631,6 +637,86 @@ class Avatar(pb.Avatar, flog.Loggable):
 
         return broker.serialize(state, self, method, args, kwargs)
 
+    def setMind(self, mind):
+        """
+        Tell the avatar that the given mind has been attached.
+        This gives the avatar a way to call remotely to the client that
+        requested this avatar.
+        This is scheduled by the portal after the client has logged in.
+
+        @type mind: L{twisted.spread.pb.RemoteReference}
+        """
+        self.mind = mind
+        def nullMind(x):
+            self.debug('%r: disconnected from %r' % (self, self.mind))
+            self.mind = None
+        self.mind.notifyOnDisconnect(nullMind)
+
+        transport = self.mind.broker.transport
+        tarzan = transport.getHost()
+        jane = transport.getPeer()
+        if tarzan and jane:
+            self.debug("PB client connection seen by me is from me %s to %s" % (
+                common.addressGetHost(tarzan),
+                common.addressGetHost(jane)))
+        self.log('Client attached is mind %s', mind)
+
+    def mindCallRemoteLogging(self, level, stackDepth, name, *args,
+                              **kwargs):
+        """
+        Call the given remote method, and log calling and returning nicely.
+
+        @param level: the level we should log at (log.DEBUG, log.INFO, etc)
+        @type  level: int
+        @param stackDepth: the number of stack frames to go back to get
+        file and line information, negative or zero.
+        @type  stackDepth: non-positive int
+        @param name: name of the remote method
+        @type  name: str
+        """
+        if level is not None:
+            debugClass = str(self.__class__).split(".")[-1].upper()
+            startArgs = [self.remoteLogName, debugClass, name]
+            format, debugArgs = log.getFormatArgs(
+                '%s --> %s: callRemote(%s, ', startArgs,
+                ')', (), args, kwargs)
+            logKwArgs = self.doLog(level, stackDepth - 1, format,
+                                   *debugArgs)
+
+        if not self.mind:
+            self.warning('Tried to mindCallRemote(%s), but we are '
+                         'disconnected', name)
+            return defer.fail(errors.NotConnectedError())
+
+        def callback(result):
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s, ', startArgs,
+                '): %r', (log.ellipsize(result), ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return result
+
+        def errback(failure):
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s', startArgs,
+                '): %r', (failure, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return failure
+
+        d = self.mind.callRemote(name, *args, **kwargs)
+        if level is not None:
+            d.addCallbacks(callback, errback)
+        return d
+
+    def mindCallRemote(self, name, *args, **kwargs):
+        """
+        Call the given remote method, and log calling and returning nicely.
+
+        @param name: name of the remote method
+        @type  name: str
+        """
+        return self.mindCallRemoteLogging(log.DEBUG, -1, name, *args,
+                                          **kwargs)
+
 class PingableAvatar(Avatar):
     _pingCheckInterval = configure.heartbeatInterval * 2.5
 
@@ -657,3 +743,19 @@ class PingableAvatar(Avatar):
         if self._pingCheckDC:
             self._pingCheckDC.cancel()
         self._pingCheckDC = None
+
+    def setMind(self, mind):
+        # chain up
+        Avatar.setMind(self, mind)
+
+        def stopPingCheckingCb(x):
+            self.debug('stop pinging')
+            self.stopPingChecking()
+        self.mind.notifyOnDisconnect(stopPingCheckingCb)
+
+        # Now we have a remote reference, so start checking pings.
+        def _disconnect():
+            if self.mind:
+                self.mind.broker.transport.loseConnection()
+        self.startPingChecking(_disconnect)
+
