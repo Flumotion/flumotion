@@ -1,3 +1,11 @@
+2007-01-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/medium.py (BaseMedium.callRemoteLogging): New
+	method, contains the guts of callRemote, but with an extra param
+	for the log level.
+	(BaseMedium.callRemote): Call callRemoteLogging with level=DEBUG.
+	(PingingMedium._ping): Use callRemoteLogging with level=LOG.
+
 2006-12-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/enums.py:

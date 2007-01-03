@@ -93,21 +93,20 @@ class BaseMedium(fpb.Referenceable):
         """
         return self.remote != None
 
-    def callRemote(self, name, *args, **kwargs):
+    def callRemoteLogging(self, level, name, *args, **kwargs):
         """
         Call the given method with the given arguments remotely on the
         server-side avatar.
 
         Gets serialized to server-side perspective_ methods.
         """
-        level = log.DEBUG
-        if name == "ping": level = log.LOG
-        debugClass = str(self.__class__).split(".")[-1].upper()
-        startArgs = [self.remoteLogName, debugClass, name]
-        format, debugArgs = log.getFormatArgs(
-            '%s --> %s: callRemote(%s, ', startArgs,
-            ')', (), args, kwargs)
-        logKwArgs = self.doLog(level, -2, format, *debugArgs)
+        if level is not None:
+            debugClass = str(self.__class__).split(".")[-1].upper()
+            startArgs = [self.remoteLogName, debugClass, name]
+            format, debugArgs = log.getFormatArgs(
+                '%s --> %s: callRemote(%s, ', startArgs,
+                ')', (), args, kwargs)
+            logKwArgs = self.doLog(level, -2, format, *debugArgs)
 
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
@@ -129,9 +128,18 @@ class BaseMedium(fpb.Referenceable):
             return failure
 
         d = self.remote.callRemote(name, *args, **kwargs)
-        d.addCallback(callback)
-        d.addErrback(errback)
+        if level is not None:
+            d.addCallbacks(callback, errback)
         return d
+
+    def callRemote(self, name, *args, **kwargs):
+        """
+        Call the given method with the given arguments remotely on the
+        server-side avatar.
+
+        Gets serialized to server-side perspective_ methods.
+        """
+        return self.callRemoteLogging(log.DEBUG, name, *args, **kwargs)
 
     def runBundledFunction(self, module, function, *args, **kwargs):
         """
@@ -229,7 +237,7 @@ class PingingMedium(BaseMedium):
 
         if self.remote:
             self.log('pinging')
-            d = self.callRemote('ping')
+            d = self.callRemoteLogging(log.LOG, 'ping')
             d.addCallback(pingback)
         else:
             self.info('tried to ping, but disconnected yo')
