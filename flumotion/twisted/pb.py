@@ -717,6 +717,12 @@ class Avatar(pb.Avatar, flog.Loggable):
         return self.mindCallRemoteLogging(log.DEBUG, -1, name, *args,
                                           **kwargs)
 
+    def disconnect(self):
+        """
+        Disconnect the remote PB client.
+        """
+        self.mind.broker.transport.loseConnection()
+
 class PingableAvatar(Avatar):
     _pingCheckInterval = configure.heartbeatInterval * 2.5
 

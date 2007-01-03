@@ -9,6 +9,7 @@
 	for mindCallRemote[Logging] in the base class, so that all avatars
 	can easily support logging. Again this does not affect manager
 	avatars because they override this implementation.
+	(Avatar.disconnect): New method.
 
 	* flumotion/common/medium.py (BaseMedium.callRemoteLogging): New
 	method, contains the guts of callRemote, but with an extra param
