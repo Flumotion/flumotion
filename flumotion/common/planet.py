@@ -235,6 +235,8 @@ class ManagerComponentState(flavors.StateCacheable):
         self._jobState = jobState
         for key in _jobStateKeys:
             # only set non-None values
+            if key == 'mood':
+                continue
             v = jobState.get(key)
             if v != None:
                 self.set(key, v)
@@ -243,6 +245,8 @@ class ManagerComponentState(flavors.StateCacheable):
             if list != None:
                 for v in list:
                     self.append(key, v)
+        # set mood last; see #552
+        self.set('mood', jobState.get('mood'))
                 
         # only proxy keys we want proxied; eaterNames and feederNames
         # are ignored for example

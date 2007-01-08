@@ -1,5 +1,8 @@
 2007-01-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/planet.py (ManagerComponentState.setJobState):
+	Make sure mood is proxied last, fixes #552.
+
 	* flumotion/manager/component.py (ComponentAvatar._setMood): use
 	setMood.
 	(ComponentAvatar.detached): Actually unlink the jobstate and
