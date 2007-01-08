@@ -404,7 +404,7 @@ class Vishnu(log.Loggable):
         state.set('name', conf.name)
         state.set('type', conf.getType())
         state.set('workerRequested', conf.worker)
-        state.set('mood', moods.sleeping.value)
+        state.setMood(moods.sleeping.value)
         state.set('config', conf.getConfigDict())
 
         state.set('parent', parent)
@@ -491,7 +491,7 @@ class Vishnu(log.Loggable):
                 N_("The component is misconfigured.")),
                     debug=debug)
             state.append('messages', message)
-            state.set('mood', moods.sad.value)
+            state.setMood(moods.sad.value)
             raise e
 
         return added
@@ -623,12 +623,12 @@ class Vishnu(log.Loggable):
             # moodPending is happy
             if componentState.get('mood') == moods.sad.value:
                 self.debug('asked to stop a sad component without avatar')
-                componentState.set('mood', moods.sleeping.value)
+                componentState.setMood(moods.sleeping.value)
                 componentState.set('moodPending', None)
                 return defer.succeed(None)
             if componentState.get('mood') == moods.lost.value:
                 self.debug('asked to stop a lost component without avatar')
-                componentState.set('mood', moods.sleeping.value)
+                componentState.setMood(moods.sleeping.value)
                 componentState.set('moodPending', None)
                 return defer.succeed(None)
 
@@ -639,15 +639,19 @@ class Vishnu(log.Loggable):
 
         d = avatar.mindCallRemote('stop')
         def cleanupAndDisconnectComponent(result):
-            if componentState.get('mood') == moods.sad.value:
-                self.debug('clearing sad mood after stopping component')
-                componentState.set('mood', moods.sleeping.value)
             avatar._starting = False
             avatar._beingSetup = False
-
             return avatar.disconnect()
 
+        def setSleeping(result):
+            if componentState.get('mood') == moods.sad.value:
+                self.debug('clearing sad mood after having stopped component')
+                componentState.setMood(moods.sleeping.value)
+
+            return result
+
         d.addCallback(cleanupAndDisconnectComponent)
+        d.addCallback(setSleeping)
 
         return d
 
@@ -666,7 +670,7 @@ class Vishnu(log.Loggable):
         m.state.append('messages', message)
         if message.level == messages.ERROR:
             self.debug('Error message makes component sad')
-            m.state.set('mood', moods.sad.value)
+            m.state.setMood(moods.sad.value)
         
     # FIXME: unify naming of stuff like this
     def workerAttached(self, workerAvatar):
@@ -709,7 +713,7 @@ class Vishnu(log.Loggable):
                 # distinguish between a newly-started component and a lost 
                 # component logging back in.
                 compState.set('moodPending', None)
-                compState.set('mood', moods.sleeping.value)
+                compState.setMood(moods.sleeping.value)
 
             allComponents = components + lostComponents
 
@@ -793,15 +797,19 @@ class Vishnu(log.Loggable):
                   % (state.get('name'), log.getFailureMessage(failure)))
 
         if failure.check(errors.ComponentAlreadyRunningError):
-            self.info('component eappears to be running already; '
-                      'treating it as lost')
-            state.set('mood', moods.lost.value)
+            if self._componentMappers[state].jobState:
+                self.info('component appears to have logged in in the '
+                          'meantime')
+            else:
+                self.info('component appears to be running already; '
+                          'treating it as lost until it logs in')
+                state.setMood(moods.lost.value)
         else:
             message = messages.Error(T_(
                 N_("The component could not be started.")),
                 debug=log.getFailureMessage(failure))
 
-            state.set('mood', moods.sad.value)
+            state.setMood(moods.sad.value)
             state.append('messages', message)
 
         return None
@@ -894,11 +902,6 @@ class Vishnu(log.Loggable):
 
         # make sure the component is in the depgraph
         self._depgraph.addComponent(m.state)
-
-        # Now that the JobState is attached, it might have overridden our
-        # mood to sleeping; we MUST be waking; so we reset it here if required.
-        if m.state.get('mood') == moods.sleeping.value:
-            m.state.set('mood', moods.waking.value)
 
         m.avatar = avatar
         self._componentMappers[m.avatar] = m

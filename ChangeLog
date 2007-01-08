@@ -1,3 +1,35 @@
+2007-01-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar._setMood): use
+	setMood.
+	(ComponentAvatar.detached): Actually unlink the jobstate and
+	componentstate when the job logs out; was not being done before.
+
+	* flumotion/manager/manager.py (Vishnu._getComponentState):
+	Because of the change in BaseComponentMedium.remote_getState, we
+	know we will have a non-sleeping component mood, so we can remove
+	this manual mood munge.
+	(Vishnu.componentAddMessage)
+	(Vishnu.workerAttached.workerAvatarComponentListReceived)
+	(Vishnu._addComponent, Vishnu._updateStateFromConf): Use setMood.
+	(Vishnu.componentStop.setSleeping): Set the component's mood to
+	sleeping after the disconnect deferred fires, should be enough
+	time for the component state to unlink from the job state.
+	(Vishnu._createErrback): A failed component start because a job is
+	already running only marks a component as lost if it did not log
+	in in the meantime. Fixes #551. Also use setMood.
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_getState): Make sure that the mood
+	that we return is not sleeping. If it is sleeping, warn real loud
+	and set the mood to waking.
+
+	* flumotion/common/planet.py (ManagerComponentState.setMood): New
+	method, sets the mood only if we are not listening to a jobState.
+	The intention is that all sets of mood go through this function so
+	as to prevent bad mood-proxy bugs like #551. The exception is that
+	the manager is allowed to mark the mood as sad.
+
 2007-01-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/pb.py: Import errors, thanks distributed

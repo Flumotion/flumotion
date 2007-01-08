@@ -112,7 +112,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         if not self.componentState.get('mood') == mood.value:
             self.debug('Setting mood to %r' % mood)
-            self.componentState.set('mood', mood.value)
+            self.componentState.setMood(mood.value)
 
     def _setMoodValue(self, moodValue):
         mood = moods.get(moodValue)
@@ -170,6 +170,8 @@ class ComponentAvatar(base.ManagerAvatar):
         self.heaven.unregisterComponent(self)
 
         self.info('component "%s" logged out' % self.avatarId)
+
+        self.componentState.clearJobState()
 
         # Now, we're detached: set our state to sleeping (or lost). 
         # Do this before vishnu.componentDetached() severs our association 

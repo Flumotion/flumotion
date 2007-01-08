@@ -29,7 +29,7 @@ from twisted.internet import defer
 
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements
-from flumotion.common import enum
+from flumotion.common import enum, log
 
 class ManagerPlanetState(flavors.StateCacheable):
     """
@@ -255,6 +255,16 @@ class ManagerComponentState(flavors.StateCacheable):
 
         jobState.addListener(self, proxy('set'), proxy('append'),
                              proxy('remove'))
+
+    def setMood(self, moodValue):
+        log.debug('componentstate', 'told to change mood from %s to %d',
+                  self.get('mood'), moodValue)
+        if self._jobState and moodValue != moods.sad.value:
+            log.warning('componentstate', 'cannot set component mood to '
+                        'something other than sad when we have a '
+                        'jobState -- fix your code!')
+        else:
+            self.set('mood', moodValue)
 
     def clearJobState(self):
         """
