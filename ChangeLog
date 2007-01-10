@@ -1,3 +1,11 @@
+2007-01-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py (BaseComponent.init): Create
+	the jobstate with a mood of waking, because a component that is
+	running is in at least the waking state by definition.
+	(BaseComponentMedium.remote_getState): Remove mood check, as we
+	initialize the mood correctly now.
+
 2007-01-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/planet.py (ManagerComponentState.setJobState):

@@ -206,11 +206,6 @@ class BaseComponentMedium(medium.PingingMedium):
         # we can only get the IP after we have a remote reference, so add it
         # here
         self.comp.state.set('manager-ip', self.getManagerIP())
-        if self.comp.state.get('mood') == moods.sleeping.value:
-            self.warning('Badness, it should not be possible for a '
-                         'running component to have sleeping mood!')
-            self.warning('Setting mood to waking')
-            self.comp.state.set('mood', moods.waking.value)
         return self.comp.state
         
     def remote_getConfig(self):
@@ -341,6 +336,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         
         #self.state.set('name', name)
         self.state.set('pid', os.getpid())
+        self.state.set('mood', moods.waking.value)
 
         self.medium = None # the medium connecting us to the manager's avatar
  
