@@ -723,7 +723,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         do nothing.
         """
         if self.mind:
-            self.mind.broker.transport.loseConnection()
+            return self.mind.broker.transport.loseConnection()
 
 class PingableAvatar(Avatar):
     _pingCheckInterval = configure.heartbeatInterval * 2.5

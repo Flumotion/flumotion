@@ -1,3 +1,11 @@
+2007-01-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/pb.py (Avatar.disconnect): Return the result
+	of loseConnection().
+
+	* flumotion/common/server.py (Server.startTCP, Server.startSSL):
+	Return the port we create.
+
 2007-01-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/admin_gtk.py:

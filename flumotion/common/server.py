@@ -86,6 +86,9 @@ class Server(log.Loggable):
         """
         Listen as the given host and on the given port using SSL.
         Use the given .pem file, or look for it in the config directory.
+
+        @returns: {twisted.internet.interfaces.IListeningPort} on which
+        we are listening; call .stopListening() to stop.
         """
         # if no path in pemFile, then look for it in the config directory
         if not os.path.split(pemFile)[0]:
@@ -102,15 +105,19 @@ class Server(log.Loggable):
         if not host == "":
             self.info('Listening as host %s' % host)
         self._servable.setConnectionInfo(host, port, True)
-        reactor.listenSSL(port, self._servable.getFactory(), ctxFactory,
-            interface=host)
+        return reactor.listenSSL(port, self._servable.getFactory(),
+                                 ctxFactory, interface=host)
 
     def startTCP(self, host, port):
         """
         Listen as the given host and on the given port using normal TCP.
+
+        @returns: {twisted.internet.interfaces.IListeningPort} on which
+        we are listening; call .stopListening() to stop.
         """
         self.info('Starting on port %d using TCP' % port)
         if not host == "":
             self.info('Listening as host %s' % host)
         self._servable.setConnectionInfo(host, port, False)
-        reactor.listenTCP(port, self._servable.getFactory(), interface=host)
+        return reactor.listenTCP(port, self._servable.getFactory(),
+                                 interface=host)
