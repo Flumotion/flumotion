@@ -33,6 +33,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)
         self.shown = False
+        self._stats = None
 
     def setStats(self, stats):
         # Set _stats regardless of if condition

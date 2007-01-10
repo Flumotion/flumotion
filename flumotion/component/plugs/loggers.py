@@ -35,6 +35,10 @@ class Logger(base.ComponentPlug):
         if handler:
             handler(args)
 
+    def rotate(self):
+        # do nothing by default
+        pass
+
 def _http_session_completed_to_apache_log(args):
     # ident is something that should in theory come from identd but in
     # practice is never there
@@ -51,7 +55,7 @@ class ApacheLogger(Logger):
     filename = None
     file = None
 
-    def start(self, component):
+    def start(self, component=None):
         self.filename = self.args['properties']['logfile']
         try:
             self.file = open(self.filename, 'a')
@@ -60,7 +64,7 @@ class ApacheLogger(Logger):
                                          'for writing (%s)'
                                          % (self.filename, data[1]))
 
-    def stop(self, component):
+    def stop(self, component=None):
         if self.file:
             self.file.close()
             self.file = None
@@ -68,3 +72,7 @@ class ApacheLogger(Logger):
     def event_http_session_completed(self, args):
         self.file.write(_http_session_completed_to_apache_log(args))
         self.file.flush()
+
+    def rotate(self):
+        self.stop()
+        self.start()

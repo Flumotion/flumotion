@@ -113,6 +113,9 @@ class HTTPFileMedium(component.BaseComponentMedium):
     def remote_updatePorterDetails(self, path, username, password):
         return self.comp.updatePorterDetails(path, username, password)
 
+    def remote_rotateLog(self):
+        return self.comp.rotateLog()
+
 class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication, 
     log.Loggable):
     implements(interfaces.IStreamingComponent)
@@ -395,4 +398,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         # TODO: implement this properly.
         self.warning ("Expiring clients is not implemented for static "
             "fileserving")
+
+    def rotateLog(self):
+        """
+        Close the logfile, then reopen using the previous logfilename
+        """
+        for logger in self.loggers:
+            self.debug('rotating logger %r' % logger)
+            logger.rotate()
 
