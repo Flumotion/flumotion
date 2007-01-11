@@ -1,5 +1,9 @@
 2007-01-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py (AdminClientFactory.gotDeferredLogin):
+	Untested patch to respect tenacity if the login fails after the
+	tcp connection is made.
+
 	* flumotion/admin/multi.py (MultiAdminModel.addManager): Take an
 	optional tenacity argument, to pass on to AdminMode.connectToHost.
 

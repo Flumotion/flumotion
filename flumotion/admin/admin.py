@@ -107,8 +107,18 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         yield d
 
         try:
-            result = d.value()
-            assert result
+            try:
+                result = d.value()
+                assert result
+            except Exception, e:
+                if self.extraTenacious:
+                    self.debug('connection problem: %s', 
+                               log.getExceptionMessage(e))
+                    self.debug('we are tenacious, so trying again later')
+                    self.disconnect()
+                    yield
+                else:
+                    raise
             # if it's not a reference, we need to respond to a
             # challenge...
             if not isinstance(result, pb.RemoteReference):
