@@ -94,7 +94,8 @@ class MultiAdminModel(log.Loggable):
         self.listeners.append(obj)
 
     # Public
-    def addManager(self, host, port, use_insecure, authenticator):
+    def addManager(self, host, port, use_insecure, authenticator,
+                   tenacious=False):
         def connected_cb(admin):
             planet = admin.planet
             self.info('Connected to manager %s (planet %s)'
@@ -118,7 +119,7 @@ class MultiAdminModel(log.Loggable):
 
         a = admin.AdminModel(authenticator)
 
-        a.connectToHost(host, port, use_insecure)
+        a.connectToHost(host, port, use_insecure, keep_trying=tenacious)
         a.connect('connected', connected_cb)
         a.connect('disconnected', disconnected_cb)
         a.connect('connection-refused', connection_refused_cb)
