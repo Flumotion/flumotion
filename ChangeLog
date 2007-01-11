@@ -1,5 +1,11 @@
 2007-01-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/job/job.py (JobMedium.shutdownHandler): Wait for both
+	calls to complete (either with success or failure), as they are
+	independent, i.e. a failure on one does not mean the other will
+	fail or fail to complete. Fixes components showing up as lost
+	occasionally when a worker is control-C'd.
+
 	* flumotion/manager/manager.py
 	(Vishnu._getComponentState.verifyExistingComponentState): If a
 	component logs in with stale configuration, update our

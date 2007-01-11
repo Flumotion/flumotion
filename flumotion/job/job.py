@@ -154,7 +154,7 @@ class JobMedium(medium.BaseMedium):
                 dlist.append(medium.callRemote("cleanShutdown"))
 
         # might call back immediately if we aren't connected to anything
-        return defer.DeferredList(dlist, fireOnOneErrback=True)
+        return defer.DeferredList(dlist, fireOnOneErrback=False)
 
     ### our methods
     def shutdown(self):
