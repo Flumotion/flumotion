@@ -116,7 +116,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                                log.getExceptionMessage(e))
                     self.debug('we are tenacious, so trying again later')
                     self.disconnect()
-                    yield
+                    yield None
                 else:
                     raise
             # if it's not a reference, we need to respond to a
