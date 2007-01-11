@@ -837,9 +837,15 @@ class Vishnu(log.Loggable):
             if conf and state.get('config') != conf:
                 message = messages.Warning(T_(
                     N_("Component logged in with stale configuration. "
-                       "Consider restarting this component.")),
-                    debug=("Expected\n%r\n, but got\n%r" %
+                       "Consider stopping this component and restarting "
+                       "the manager.")),
+                    debug=("Expected\n%r\n, but got\n%r;\n"
+                           "updating internal state accordingly." %
                            (state.get('config'), conf)))
+                self.warning('updating internal component state for %r '
+                             '(changing config from %r to %r)', state,
+                             state.get('config'), conf)
+                state.set('config', conf)
                 state.append('messages', message)
             # if conf is None, then we just created the component and
             # it's not set up yet

@@ -1,5 +1,14 @@
 2007-01-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py
+	(Vishnu._getComponentState.verifyExistingComponentState): If a
+	component logs in with stale configuration, update our
+	configuration instead of maintaining a difference between our
+	config and what is actually running on the component. This kinda
+	sucks, but fixes some cases between porters and streamers, whereby
+	restarting a porter can cause the streamers to not be able to
+	connect any more.
+
 	* flumotion/admin/admin.py (AdminClientFactory.gotDeferredLogin):
 	Untested patch to respect tenacity if the login fails after the
 	tcp connection is made.
