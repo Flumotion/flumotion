@@ -1,6 +1,9 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	reviewed by: <delete if not using a buddy>
+	* flumotion/component/effects/volume/volume.glade:
+	  Fix a small UI glitch.
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	  Respect the component protocol, return the .setup deferred
