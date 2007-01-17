@@ -1,5 +1,14 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/admin_gtk.py:
+	  Don't use the word Plumbing, but Feeders.  Make the name
+	  translatable.  Don't show the tab if there are no feeders
+	  (consumers for example).
+	* po/POTFILES.in:
+	  Mark for translation.
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/effects/volume/volume.glade:
 	  Fix a small UI glitch.
 
@@ -7,7 +16,7 @@
 
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	  Respect the component protocol, return the .setup deferred
-	* flumotion/component/base/admin_gtk.py:
+	* flumotion/admin/gtk/client.py:
 	  Clean up F0.2 TODO's.
 	  Add _instanceSetup method so that we properly handle errors in
 	  components in both cases.
