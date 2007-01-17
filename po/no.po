@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-12-07 15:20+0100\n"
+"POT-Creation-Date: 2007-01-17 22:10+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -14,111 +14,112 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/admin.py:442
+#: flumotion/admin/admin.py:430
 msgid "Internal error in component."
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:161
+#: flumotion/admin/gtk/client.py:159
 msgid "Not connected"
 msgstr "Ingen tilknyttning"
 
-#: flumotion/admin/gtk/client.py:191
+#: flumotion/admin/gtk/client.py:189
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Tilknyttet til %s:%s"
 
-#: flumotion/admin/gtk/client.py:273 flumotion/admin/gtk/client.py:348
+#: flumotion/admin/gtk/client.py:274 flumotion/admin/gtk/client.py:358
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Laster UI for %s ..."
 
-#: flumotion/admin/gtk/client.py:311
+#: flumotion/admin/gtk/client.py:312 flumotion/admin/gtk/client.py:340
+#: flumotion/admin/gtk/client.py:392
 #, fuzzy
 msgid "This component has a UI bug."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/admin/gtk/client.py:363
+#: flumotion/admin/gtk/client.py:373
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Laster tab %s for %s ..."
 
-#: flumotion/admin/gtk/client.py:389
+#: flumotion/admin/gtk/client.py:410
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s har ikke noe UI enda"
 
-#: flumotion/admin/gtk/client.py:404
+#: flumotion/admin/gtk/client.py:425
 #, fuzzy, python-format
 msgid "This component has a UI bug in the %s tab."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/admin/gtk/client.py:553
+#: flumotion/admin/gtk/client.py:578
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administrasjon"
 
-#: flumotion/admin/gtk/client.py:569
+#: flumotion/admin/gtk/client.py:594
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
-#: flumotion/admin/gtk/client.py:589
+#: flumotion/admin/gtk/client.py:614
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Forbindelsen til manager %s var ikke godkjent."
 
-#: flumotion/admin/gtk/client.py:591
+#: flumotion/admin/gtk/client.py:616
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
-#: flumotion/admin/gtk/client.py:604
+#: flumotion/admin/gtk/client.py:629
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Forbindelsen til manager %s feilet (%s)."
 
-#: flumotion/admin/gtk/client.py:730
+#: flumotion/admin/gtk/client.py:755
 #, fuzzy, python-format
 msgid "Component %s is sad"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:737
+#: flumotion/admin/gtk/client.py:762
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Viser grafisk grensesnitt for %s"
 
-#: flumotion/admin/gtk/client.py:771
+#: flumotion/admin/gtk/client.py:791
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:773
+#: flumotion/admin/gtk/client.py:793
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Anmoder of grafisk grensesnitt for %s ..."
 
-#: flumotion/admin/gtk/client.py:826
+#: flumotion/admin/gtk/client.py:846
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
 
-#: flumotion/admin/gtk/client.py:867
+#: flumotion/admin/gtk/client.py:887
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Omlaster komponent kode for %s"
 
-#: flumotion/admin/gtk/client.py:898
+#: flumotion/admin/gtk/client.py:918
 msgid "No component selected."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/admin/gtk/client.py:915
+#: flumotion/admin/gtk/client.py:935
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Feilet å %s komponent %s"
 
-#: flumotion/admin/gtk/client.py:942
+#: flumotion/admin/gtk/client.py:962
 msgid "Import Configuration..."
 msgstr "Importer konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:955
+#: flumotion/admin/gtk/client.py:975
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -126,11 +127,11 @@ msgstr ""
 "Filen eksisterer allerede.\n"
 "Overskriv?"
 
-#: flumotion/admin/gtk/client.py:977
+#: flumotion/admin/gtk/client.py:997
 msgid "Export Configuration..."
 msgstr "Eksporter konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:1024
+#: flumotion/admin/gtk/client.py:1044
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -139,35 +140,35 @@ msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1034
+#: flumotion/admin/gtk/client.py:1054
 msgid "Reloading ..."
 msgstr "Laster om..."
 
-#: flumotion/admin/gtk/client.py:1035
+#: flumotion/admin/gtk/client.py:1055
 msgid "Reloading client code"
 msgstr "Laster om klient kode"
 
-#: flumotion/admin/gtk/client.py:1037
+#: flumotion/admin/gtk/client.py:1057
 #, python-format
 msgid "Reloading %s code"
 msgstr "Laster om %s kode"
 
-#: flumotion/admin/gtk/client.py:1066
+#: flumotion/admin/gtk/client.py:1086
 msgid "About Flumotion"
 msgstr "Om Flumotion"
 
-#: flumotion/admin/gtk/client.py:1085
+#: flumotion/admin/gtk/client.py:1105
 #, fuzzy
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
-"(C) 2004, 2005, 2006 Fluendo S.L."
+"Â© 2004, 2005, 2006, 2007 Fluendo S.L."
 msgstr ""
 "Flumotion er en streaming media server.\n"
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1094
+#: flumotion/admin/gtk/client.py:1115
 msgid "Authors"
 msgstr "Forfattere"
 
@@ -366,21 +367,21 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 
-#: flumotion/component/component.py:475 flumotion/manager/component.py:840
-#: flumotion/manager/component.py:968
+#: flumotion/component/component.py:488 flumotion/manager/component.py:842
+#: flumotion/manager/component.py:970
 #, fuzzy
 msgid "Could not setup component."
 msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/component/component.py:621
+#: flumotion/component/component.py:634
 msgid ""
 "Your configuration uses deprecated properties.  Please update your "
 "configuration and correct them.\n"
 msgstr ""
 
-#: flumotion/component/component.py:626
+#: flumotion/component/component.py:639
 #, python-format
 msgid "Please rename '%s' to '%s'.\n"
 msgstr ""
@@ -396,6 +397,10 @@ msgstr ""
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 
+#: flumotion/component/base/admin_gtk.py:421
+msgid "Feeders"
+msgstr ""
+
 #: flumotion/component/consumers/httpstreamer/http.py:319
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
@@ -408,7 +413,7 @@ msgstr ""
 msgid "Please upgrade '%s' to version %s."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.py:745
+#: flumotion/component/consumers/httpstreamer/http.py:746
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
@@ -473,6 +478,40 @@ msgstr "<b>Klient forbruk</b>"
 msgid "Web URL:"
 msgstr ""
 
+#: flumotion/component/effects/volume/volume.glade:7
+#: data/glade/authenticate.glade:8 data/glade/connections.glade:8
+#: data/glade/greeter-authenticate.glade:8
+#: data/glade/greeter-connect_to_existing.glade:7
+#: data/glade/greeter-initial.glade:8
+#: data/glade/greeter-load_connection.glade:8
+#: data/glade/open-connection.glade:7 data/glade/wizard_audio_encoder.glade:7
+#: data/glade/wizard_audiotest.glade:8 data/glade/wizard_consumption.glade:7
+#: data/glade/wizard_disk.glade:8 data/glade/wizard_encoding.glade:8
+#: data/glade/wizard_firewire.glade:7 data/glade/wizard_http.glade:8
+#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_license.glade:7
+#: data/glade/wizard_overlay.glade:7 data/glade/wizard_overview.glade:8
+#: data/glade/wizard_smoke.glade:8 data/glade/wizard_soundcard.glade:8
+#: data/glade/wizard_source.glade:8 data/glade/wizard_summary.glade:8
+#: data/glade/wizard_testsource.glade:8 data/glade/wizard_theora.glade:8
+#: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
+#: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
+msgid "window1"
+msgstr "window1"
+
+#: flumotion/component/effects/volume/volume.glade:33
+#, fuzzy
+msgid "Volume level:"
+msgstr "_Volum:"
+
+#: flumotion/component/effects/volume/volume.glade:79
+#, fuzzy
+msgid "_Change volume:"
+msgstr "_Kanaler:"
+
+#: flumotion/component/effects/volume/volume.glade:107
+msgid "_Allow increasing the volume"
+msgstr ""
+
 #: flumotion/component/muxers/checks.py:38
 #: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
 #, python-format
@@ -491,9 +530,26 @@ msgid "Volume"
 msgstr "_Volum:"
 
 #: flumotion/component/producers/audiotest/admin_gtk.py:91
+#: flumotion/component/producers/audiotest/audiotest.glade:8
 #, fuzzy
 msgid "Audio Test"
 msgstr "Audio og Video"
+
+#: flumotion/component/producers/audiotest/audiotest.glade:106
+msgid ""
+"Sine\n"
+"Square\n"
+"Saw"
+msgstr ""
+
+#: flumotion/component/producers/audiotest/audiotest.glade:125
+#, fuzzy
+msgid "_Frequency:"
+msgstr "F_rekvens:"
+
+#: flumotion/component/producers/audiotest/audiotest.glade:154
+msgid "_Wave form:"
+msgstr ""
 
 #: flumotion/component/producers/videotest/admin_gtk.py:39
 #, fuzzy
@@ -505,31 +561,31 @@ msgstr "_Mønster:"
 msgid "Pattern"
 msgstr "_Mønster:"
 
-#: flumotion/manager/component.py:401 flumotion/manager/component.py:888
+#: flumotion/manager/component.py:403 flumotion/manager/component.py:890
 #, fuzzy
 msgid "Could not start component."
 msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/manager/component.py:726
+#: flumotion/manager/component.py:728
 #, fuzzy
 msgid "Configuration problem."
 msgstr "Importer konfigurasjon..."
 
-#: flumotion/manager/component.py:753
+#: flumotion/manager/component.py:755
 #, fuzzy, python-format
 msgid "Could not connect component to %s:%d for feed %s."
 msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/manager/component.py:778
+#: flumotion/manager/component.py:780
 #, python-format
 msgid "Could not connect to %s:%d for feed %s."
 msgstr ""
 
-#: flumotion/manager/component.py:916
+#: flumotion/manager/component.py:918
 #, fuzzy
 msgid "Could not setup component's master clock."
 msgstr ""
@@ -539,8 +595,8 @@ msgstr ""
 #: flumotion/manager/manager.py:416
 #, python-format
 msgid ""
-"This component is configured for Flumotion version %r, but you are running %"
-"r.\n"
+"This component is configured for Flumotion version %r, but you are running "
+"version %r.\n"
 msgstr ""
 
 #: flumotion/manager/manager.py:491
@@ -548,14 +604,14 @@ msgstr ""
 msgid "The component is misconfigured."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/manager/manager.py:801
+#: flumotion/manager/manager.py:809
 msgid "The component could not be started."
 msgstr ""
 
-#: flumotion/manager/manager.py:831
+#: flumotion/manager/manager.py:839
 msgid ""
-"Component logged in with stale configuration. Consider restarting this "
-"component."
+"Component logged in with stale configuration. Consider stopping this "
+"component and restarting the manager."
 msgstr ""
 
 #: flumotion/worker/checks/check.py:45
@@ -681,77 +737,90 @@ msgstr ""
 msgid "uh oh"
 msgstr ""
 
-#: data/glade/admin.glade:8
+#: data/glade/admin.glade:7
 msgid "Flumotion Administration"
 msgstr "Flumotion Administrasjon"
 
-#: data/glade/admin.glade:35
+#: data/glade/admin.glade:38
 msgid "_Connection"
 msgstr "_Forbindelse"
 
-#: data/glade/admin.glade:59
+#: data/glade/admin.glade:47
+msgid "_Open"
+msgstr ""
+
+#: data/glade/admin.glade:74
 msgid "_Import Configuration..."
 msgstr "Importer konfigurasjon..."
 
-#: data/glade/admin.glade:68
+#: data/glade/admin.glade:83
 msgid "_Export Configuration..."
 msgstr "_Eksporter Konfigurasjon..."
 
-#: data/glade/admin.glade:96
+#: data/glade/admin.glade:98
+#, fuzzy
+msgid "_Quit"
+msgstr "_Kvalitet:"
+
+#: data/glade/admin.glade:123
 msgid "_Manage"
 msgstr "_Administrer"
 
-#: data/glade/admin.glade:105
+#: data/glade/admin.glade:132
 msgid "S_tart Component"
 msgstr "S_tart Komponent"
 
-#: data/glade/admin.glade:126
+#: data/glade/admin.glade:153
 msgid "St_op Component"
 msgstr "St_op Komponent"
 
-#: data/glade/admin.glade:153
+#: data/glade/admin.glade:180
 msgid "Start _All"
 msgstr "Start _Alt"
 
-#: data/glade/admin.glade:162
+#: data/glade/admin.glade:189
 msgid "Stop A_ll"
 msgstr "Stop A_lt"
 
-#: data/glade/admin.glade:171
+#: data/glade/admin.glade:198
 msgid "_Clear All"
 msgstr "Hvis _Alt"
 
-#: data/glade/admin.glade:198
+#: data/glade/admin.glade:225
 msgid "Run _Wizard"
 msgstr "_Kjør Veiviser"
 
-#: data/glade/admin.glade:223
+#: data/glade/admin.glade:250
 msgid "_Debug"
 msgstr "_Debugg"
 
-#: data/glade/admin.glade:232
+#: data/glade/admin.glade:259
 msgid "Reload _Manager"
 msgstr "Last om _Manager"
 
-#: data/glade/admin.glade:253
+#: data/glade/admin.glade:280
 #, fuzzy
 msgid "Reload _Admin"
 msgstr "Last om_Alt"
 
-#: data/glade/admin.glade:274
+#: data/glade/admin.glade:301
 #, fuzzy
 msgid "Reload A_ll"
 msgstr "Last om_Alt"
 
-#: data/glade/admin.glade:295
+#: data/glade/admin.glade:322
 msgid "Start _Shell"
 msgstr "_Shell Oppstart"
 
-#: data/glade/admin.glade:320
+#: data/glade/admin.glade:347
 msgid "_Help"
 msgstr "_Hjelp"
 
-#: data/glade/admin.glade:357
+#: data/glade/admin.glade:356
+msgid "_About"
+msgstr ""
+
+#: data/glade/admin.glade:396
 msgid "Open a stored configuration"
 msgstr "Åpn en lagret konfigurasjon"
 
@@ -762,25 +831,6 @@ msgstr "Flumotion Konfigurasjons Veiviser"
 #: data/glade/admin-wizard.glade:43
 msgid "Name of step"
 msgstr "Navn på steg"
-
-#: data/glade/authenticate.glade:8 data/glade/connections.glade:8
-#: data/glade/greeter-authenticate.glade:8
-#: data/glade/greeter-connect_to_existing.glade:7
-#: data/glade/greeter-initial.glade:8
-#: data/glade/greeter-load_connection.glade:8
-#: data/glade/open-connection.glade:7 data/glade/wizard_audio_encoder.glade:7
-#: data/glade/wizard_audiotest.glade:8 data/glade/wizard_consumption.glade:7
-#: data/glade/wizard_disk.glade:8 data/glade/wizard_encoding.glade:8
-#: data/glade/wizard_firewire.glade:7 data/glade/wizard_http.glade:8
-#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_license.glade:7
-#: data/glade/wizard_overlay.glade:8 data/glade/wizard_overview.glade:8
-#: data/glade/wizard_smoke.glade:8 data/glade/wizard_soundcard.glade:8
-#: data/glade/wizard_source.glade:8 data/glade/wizard_summary.glade:8
-#: data/glade/wizard_testsource.glade:8 data/glade/wizard_theora.glade:8
-#: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
-#: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
-msgid "window1"
-msgstr "window1"
 
 #: data/glade/authenticate.glade:32
 msgid "_Password"
@@ -1020,12 +1070,13 @@ msgstr ""
 "GNU FDL\n"
 "Kommersiel"
 
-#: data/glade/wizard_overlay.glade:33
+#: data/glade/wizard_overlay.glade:34
 msgid "Show _text in upper left corner:"
 msgstr "Vis _tekst i det øvre venstre hjørne:"
 
-#: data/glade/wizard_overlay.glade:55
-msgid "Show _logo in bottom left corner:"
+#: data/glade/wizard_overlay.glade:57
+#, fuzzy
+msgid "Show _logos in bottom left corner"
 msgstr "Vis _logo i det nedre venstre hjørne:"
 
 #: data/glade/wizard_smoke.glade:32

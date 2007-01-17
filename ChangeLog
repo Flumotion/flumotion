@@ -1,5 +1,21 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	  Fix up a string.
+	* flumotion/component/effects/volume/volume.glade:
+	* flumotion/component/producers/audiotest/audiotest.glade:
+	* po/POTFILES.in:
+	  Make more things translatable.
+	* po/ca.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	* po/pt_BR.po:
+	  Translate them.
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  So this is the new year.
 
