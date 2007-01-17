@@ -1,5 +1,13 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/plumbing.glade:
+	  Rename file.
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/base/plumbing.glade:
 	  Rename and clean up as mentioned in #540.

@@ -414,8 +414,7 @@ class StateWatcher(object):
             self.state = None
 
 class FeedersAdminGtkNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'base',
-                              'plumbing.glade')
+    glade_file = os.path.join('flumotion', 'component', 'base', 'feeders.glade')
 
     def __init__(self, state, admin):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Feeders"))
