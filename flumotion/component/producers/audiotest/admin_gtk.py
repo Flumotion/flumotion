@@ -90,4 +90,4 @@ class AudioTestAdminGtk(admin_gtk.BaseAdminGtk):
         audiotest = AudioTestAdminGtkNode(self.state, self.admin,
                                           title=_("Audio Test"))
         self.nodes['Audio Test'] = audiotest
-        admin_gtk.BaseAdminGtk.setup(self)
+        return admin_gtk.BaseAdminGtk.setup(self)

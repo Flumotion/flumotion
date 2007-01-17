@@ -36,6 +36,8 @@ from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 
+from gettext import gettext as _
+
 class BaseAdminGtk(log.Loggable):
     """
     I am a base class for all GTK+-based Admin views.
@@ -119,10 +121,9 @@ class BaseAdminGtk(log.Loggable):
         self.debug('BaseAdminGtk.setup()')
 
         config = self.state.get('config') 
-        if config['feed'] or config.get('source', None):
-            self.debug("Let us show a plumbing node")
-            self.nodes['Plumbing'] = PlumbingAdminGtkNode(self.state,
-                                                          self.admin)
+        if config['feed']:
+            self.debug("Component has feeders, show Feeders node")
+            self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
 
         # set up translations
         if not hasattr(self, 'gettext_domain'):
@@ -412,12 +413,12 @@ class StateWatcher(object):
             self.state.removeListener(self)
             self.state = None
 
-class PlumbingAdminGtkNode(BaseAdminGtkNode):
+class FeedersAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'base',
                               'plumbing.glade')
 
     def __init__(self, state, admin):
-        BaseAdminGtkNode.__init__(self, state, admin, 'Plumbing')
+        BaseAdminGtkNode.__init__(self, state, admin, title=_("Feeders"))
         self.treemodel = None
         self.treeview = None
         self.selected = None
