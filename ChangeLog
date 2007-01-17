@@ -1,3 +1,8 @@
+2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/depgraph.py:
+	  fix docstring
+
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/admin_gtk.py:

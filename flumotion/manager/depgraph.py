@@ -190,9 +190,9 @@ class DepGraph(log.Loggable):
         so I can add edges to the DAG for each feed from the
         feeding component to the eating component.
 
-        @raises L{errors.ComponentConfigError}: if a component is
-                                                misconfigured and eats from
-                                                a non-existant component
+        @raise errors.ComponentConfigError: if a component is
+                                            misconfigured and eats from
+                                            a non-existant component
         """
         toSetup = self._dag.getAllNodesByType("COMPONENTSETUP")
         
