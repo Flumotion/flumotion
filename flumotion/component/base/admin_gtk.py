@@ -434,13 +434,13 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             self.selected = None
 
     def setFeederName(self, state, value):
-        self.labels['feeder-name'].set_markup('Feeder <b>%s</b>' % value)
+        self.labels['feeder-name'].set_markup(_('Feeder <b>%s</b>') % value)
 
     def setFeederClientName(self, state, value):
-        self.labels['feeder-name'].set_markup('Feeding to <b>%s</b>'
+        self.labels['feeder-name'].set_markup(_('Feeding to <b>%s</b>')
                                               % value)
     def setFeederClientBytesRead(self, state, value):
-        txt = value and (common.formatStorage(value)+'Byte') or ''
+        txt = value and (common.formatStorage(value) + _('Byte')) or ''
         self.labels['feeder-client-bytesread'].set_text(txt)
     def setFeederClientBuffersDropped(self, state, value):
         self.labels['feeder-client-buffersdropped'].set_text(str(value))
@@ -495,7 +495,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def haveWidgetTree(self):
         self.labels = {}
-        self.widget = self.wtree.get_widget('plumbing-widget')
+        self.widget = self.wtree.get_widget('feeders-widget')
         self.treeview = self.wtree.get_widget('treeview-feeders')
         self.treemodel = gtk.TreeStore(str, object, object)
         self.treeview.set_model(self.treemodel)
