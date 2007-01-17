@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-17 22:10+0100\n"
+"POT-Creation-Date: 2007-01-17 23:20+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: nl\n"
@@ -395,8 +395,36 @@ msgstr ""
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:421
+#: flumotion/component/base/admin_gtk.py:420
 msgid "Feeders"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:436
+#, python-format
+msgid "Feeder <b>%s</b>"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:439
+#, python-format
+msgid "Feeding to <b>%s</b>"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:442
+msgid "Byte"
+msgstr ""
+
+#: flumotion/component/base/feeders.glade:7
+#: flumotion/component/consumers/httpstreamer/http.glade:7
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
+msgid "Statistics"
+msgstr "Estadísticas"
+
+#: flumotion/component/base/feeders.glade:67
+msgid "Bytes fed: "
+msgstr ""
+
+#: flumotion/component/base/feeders.glade:91
+msgid "Buffers dropped: "
 msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.py:319
@@ -415,11 +443,6 @@ msgstr ""
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
-
-#: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
-msgid "Statistics"
-msgstr "Estadísticas"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:33
 msgid "<b>Stream</b>"

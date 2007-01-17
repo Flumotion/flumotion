@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-17 22:22+0100\n"
-"PO-Revision-Date: 2007-01-17 22:23+0100\n"
+"POT-Creation-Date: 2007-01-17 23:20+0100\n"
+"PO-Revision-Date: 2007-01-18 00:25+0100\n"
 "Last-Translator: Thomas Vander Stichele <thomas@apestaart.org>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
@@ -412,23 +412,37 @@ msgstr ""
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "GStreamer-fout: kon de component-pijplijn niet verwerken."
 
-#: flumotion/component/base/admin_gtk.py:421
+#: flumotion/component/base/admin_gtk.py:420
 msgid "Feeders"
 msgstr "Voeders"
 
-#: flumotion/component/base/admin_gtk.py:437
+#: flumotion/component/base/admin_gtk.py:436
 #, python-format
 msgid "Feeder <b>%s</b>"
 msgstr "Voeder <b>%s</b>"
 
-#: flumotion/component/base/admin_gtk.py:440
+#: flumotion/component/base/admin_gtk.py:439
 #, python-format
 msgid "Feeding to <b>%s</b>"
 msgstr "Voedt <b>%s</b>"
 
-#: flumotion/component/base/admin_gtk.py:443
+#: flumotion/component/base/admin_gtk.py:442
 msgid "Byte"
 msgstr "Byte"
+
+#: flumotion/component/base/feeders.glade:7
+#: flumotion/component/consumers/httpstreamer/http.glade:7
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
+msgid "Statistics"
+msgstr "Statistieken"
+
+#: flumotion/component/base/feeders.glade:67
+msgid "Bytes fed: "
+msgstr "Bytes gevoed: "
+
+#: flumotion/component/base/feeders.glade:91
+msgid "Buffers dropped: "
+msgstr "Buffers verloren:"
 
 #: flumotion/component/consumers/httpstreamer/http.py:319
 #, python-format
@@ -447,11 +461,6 @@ msgstr "Gelieve '%s' te vernieuwen naar versie %s."
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
-
-#: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
-msgid "Statistics"
-msgstr "Statistieken"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:33
 msgid "<b>Stream</b>"
