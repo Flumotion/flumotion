@@ -321,26 +321,35 @@ class Window(log.Loggable, gobject.GObject):
         # instantiate the GUIClass
         instance = klass(state, self.admin)
         self.debug("Created entry instance %r" % instance)
-        d = instance.setup()
-        # F0.2: setup should return a deferred
+        self._instanceSetup(instance, name)
+
+    def _instanceSetup(self, instance, name):
+        self.debug('Setting up instance %r' % instance)
+        msg = None
+        try:
+            d = instance.setup()
+        except Exception, e:
+            msg = log.getExceptionMessage(e)
+        self.debug('Setup instance %r' % instance)
         if not d:
-            d = defer.succeed(None)
+            msg = "%r.setup() should return a deferred" % klass
+
+        if msg:
+            self.warning('Component UI bug: %s' % msg)
+            m = messages.Error(T_(
+                N_("This component has a UI bug.")),
+                    debug=msg,
+                    id=name)
+            self._messages_view.add_message(m)
+            return
+
         d.addCallback(self._setupCallback, name, instance)
+        d.addErrback(self._setupErrback, name)
 
     def _setupCallback(self, result, name, instance):
         notebook = gtk.Notebook()
         nodeWidgets = {}
         nodes = instance.getNodes()
-
-        print instance, nodes
-
-        # F0.2
-        for nodeName, node in nodes.items():
-            if not node.title:
-                self.warning('Node %s does not have a title, please fix' %
-                    nodeName)
-                node.title = nodeName
-
         self.statusbar.clear('main')
         # create pages for all nodes, and just show a loading label for
         # now
@@ -373,6 +382,17 @@ class Window(log.Loggable, gobject.GObject):
 
         d.callback(None)
         return d
+
+    def _setupErrback(self, failure, name):
+        self.warning('Could not setup component %s' % name)
+        msg = 'Could not setup component %s: %s' % (name,
+            log.getFailureMessage(failure))
+        self.debug(msg)
+        m = messages.Error(T_(
+                N_("This component has a UI bug.")),
+                    debug=msg,
+                    id=name)
+        self._messages_view.add_message(m)
 
     # called when one node gets rendered
     def _nodeRenderCallback(self, widget, nodeName, nodeWidgets, mid):
@@ -762,12 +782,7 @@ class Window(log.Loggable, gobject.GObject):
             # make a generic ui
             from flumotion.component.base import admin_gtk
             instance = admin_gtk.BaseAdminGtk(state, self.admin)
-            d = instance.setup()
-            # F0.2: setup should return a deferred
-            if not d:
-                d = defer.succeed(None)
-            d.addCallback(self._setupCallback, state.get('name'),
-                          instance)
+            self._instanceSetup(instance, name)
 
         def gotEntrySleepingComponentErrback(failure):
             failure.trap(errors.SleepingComponentError)
