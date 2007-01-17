@@ -1,5 +1,14 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/admin_gtk.py:
+	  cosmetics
+	* flumotion/component/base/feeders.glade:
+	  downgrade
+	* po/POTFILES.in:
+	  add feeders.glade file
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/Makefile.am:
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/base/base.xml:

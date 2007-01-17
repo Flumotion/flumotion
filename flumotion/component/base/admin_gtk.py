@@ -508,13 +508,15 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             self.select(i and model.get_value(i, 2))
         sel.connect('changed', sel_changed)
         def set_label(name):
-            self.labels[name] = self.wtree.get_widget('label-'+name)
+            self.labels[name] = self.wtree.get_widget('label-' + name)
             self.labels[name].set_text('')
-        for type in ('name',):
+        for type in ('name', ):
             set_label('feeder-' + type)
         for type in ('bytesread', 'buffersdropped'):
             set_label('feeder-client-' + type)
-        self.widget.show_all()
+
+        # do not show all; hide bytes fed and buffers dropped until something
+        # is selected
         return self.widget
 
 class EffectAdminGtkNode(BaseAdminGtkNode):
