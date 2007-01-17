@@ -1,5 +1,10 @@
 2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  So this is the new year.
+
+2007-01-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	  Don't use the word Plumbing, but Feeders.  Make the name
 	  translatable.  Don't show the tab if there are no feeders
