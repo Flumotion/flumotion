@@ -1,5 +1,12 @@
 2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  pass klass for debugging
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	  return deferred from setup
+
+2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/worker.py:
 	  properly get the interpolatable strings translated
 

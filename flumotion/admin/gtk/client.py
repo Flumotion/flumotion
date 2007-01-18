@@ -321,9 +321,9 @@ class Window(log.Loggable, gobject.GObject):
         # instantiate the GUIClass
         instance = klass(state, self.admin)
         self.debug("Created entry instance %r" % instance)
-        self._instanceSetup(instance, name)
+        self._instanceSetup(instance, klass, name)
 
-    def _instanceSetup(self, instance, name):
+    def _instanceSetup(self, instance, klass, name):
         self.debug('Setting up instance %r' % instance)
         msg = None
         try:
@@ -782,7 +782,7 @@ class Window(log.Loggable, gobject.GObject):
             # make a generic ui
             from flumotion.component.base import admin_gtk
             instance = admin_gtk.BaseAdminGtk(state, self.admin)
-            self._instanceSetup(instance, name)
+            self._instanceSetup(instance, admin_gtk.BaseAdminGtk, name)
 
         def gotEntrySleepingComponentErrback(failure):
             failure.trap(errors.SleepingComponentError)
