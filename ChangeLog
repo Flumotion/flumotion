@@ -1,5 +1,12 @@
 2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  update config
+	* flumotion/twisted/portal.py:
+	  give an error if there is no bouncer configured
+
+2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/depgraph.py:
 	  fix docstring
 

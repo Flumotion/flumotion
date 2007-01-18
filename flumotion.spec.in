@@ -160,7 +160,7 @@ then
 <!--
     <certificate>default.pem</certificate>
 -->
-    <component name="manager-bouncer" type="htpasswdcrypt">
+    <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
       <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
 ]]></property>

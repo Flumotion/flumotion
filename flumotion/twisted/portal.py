@@ -59,6 +59,8 @@ class BouncerPortal(log.Loggable):
 
         @rtype: L{defer.Deferred} firing list of str
         """
+        if not self.bouncer:
+            self.error('No bouncer configured, no logins possible')
         list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
         return defer.succeed(list)
             
