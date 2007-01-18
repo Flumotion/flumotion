@@ -10,6 +10,8 @@ flumotion/wizard/wizard.py
 flumotion/wizard/steps.py
 flumotion/wizard/step.py
 
+flumotion/common/worker.py
+
 flumotion/component/component.py
 flumotion/component/feedcomponent.py
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-17 23:20+0100\n"
-"PO-Revision-Date: 2007-01-18 00:25+0100\n"
+"POT-Creation-Date: 2007-01-18 06:16+0100\n"
+"PO-Revision-Date: 2007-01-18 06:17+0100\n"
 "Last-Translator: Thomas Vander Stichele <thomas@apestaart.org>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
@@ -384,6 +384,25 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
+#: flumotion/common/worker.py:71
+#, python-format
+msgid "The %s was killed.\n"
+msgstr "De component '%s' is vermoord.\n"
+
+#: flumotion/common/worker.py:74
+#, python-format
+msgid "The %s crashed.\n"
+msgstr "De component %s is neergestort.\n"
+
+#: flumotion/common/worker.py:94
+msgid "However, no core dump was generated. You may need to configure the environment if you want to further debug this problem."
+msgstr "Er werd geen zwarte doos gegenereerd. Misschien moet de omgeving aangepast worden als u dit probleem verder wil onderzoeken."
+
+#: flumotion/common/worker.py:103
+#, python-format
+msgid "The core dump is '%s' on the host running '%s'."
+msgstr "De zwarte doos is '%s' op de computer met werker '%s'."
+
 #: flumotion/component/component.py:488
 #: flumotion/manager/component.py:842
 #: flumotion/manager/component.py:970
@@ -442,7 +461,7 @@ msgstr "Bytes gevoed: "
 
 #: flumotion/component/base/feeders.glade:91
 msgid "Buffers dropped: "
-msgstr "Buffers verloren:"
+msgstr "Buffers verloren: "
 
 #: flumotion/component/consumers/httpstreamer/http.py:319
 #, python-format
@@ -1312,14 +1331,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Het ffmpegcolorspace-element is te oud. Gelieve gst-plugins aan te passen "
 #~ "naar versie 0.8.5."
-#~ msgid ""
-#~ "However, no core dump was generated. You may need to configure the "
-#~ "environment if you want to further debug this problem."
-#~ msgstr ""
-#~ "Er werd geen zwarte doos gegenereerd. Misschien moet de omgeving "
-#~ "aangepast worden als u dit probleem verder wil onderzoeken."
-#~ msgid "The core dump is '%s' on worker '%s'."
-#~ msgstr "De zwarte doos is '%s' op werker '%s'."
 #~ msgid "Could not start the component."
 #~ msgstr ""
 #~ "Kon component niet herladen:\n"
