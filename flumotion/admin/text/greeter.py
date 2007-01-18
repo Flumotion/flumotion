@@ -127,7 +127,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     except ValueError:
                         port = 7531
                     info = fconnection.PBConnectionInfo(self.inputs[1], port, 
-                      self.inputs[3] == 'No', fpb.Authenticator(
+                      self.inputs[3] == 'Yes', fpb.Authenticator(
                         username=self.inputs[4], password=self.inputs[5]))
 
                     connection.connect_to_manager(self.stdscr, info)
