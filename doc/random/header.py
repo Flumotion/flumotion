@@ -4,7 +4,7 @@
 # doc/random/header.py: template header
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
