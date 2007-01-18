@@ -68,11 +68,11 @@ class ProcessProtocol(protocol.ProcessProtocol):
         if signum is not None:
             if signum == signal.SIGKILL:
                 obj.warning("Child with pid %d killed.", self.pid)
-                message = messages.Error(T_(N_("The %s was killed.\n"
-                                               % self.processType)))
+                message = messages.Error(T_(N_("The %s was killed.\n"),
+                                               self.processType))
             else:
-                message = messages.Error(T_(N_("The %s crashed.\n"
-                                                % self.processType)),
+                message = messages.Error(T_(N_("The %s crashed.\n"),
+                                                self.processType),
                     debug='Terminated with signal number %d' % signum)
 
                 # use some custom logging depending on signal

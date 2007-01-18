@@ -1,5 +1,10 @@
 2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/worker.py:
+	  properly get the interpolatable strings translated
+
+2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/POTFILES.in:
 	* po/nl.po:
 	  Pick up another forgotten file for translation
