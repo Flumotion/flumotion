@@ -22,8 +22,8 @@
 
 
 from flumotion.admin import connections
-from flumotion.common import log
-from flumotion.twisted import flavors, reflect
+from flumotion.common import log, connection as fconnection
+from flumotion.twisted import flavors, reflect, pb as fpb
 from flumotion.twisted.compat import implements
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
@@ -47,57 +47,59 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.entries = [ '', 'Hostname', 'Port', 'Secure?', 'Username', 'Password' ]
         self.inputs = [ '', 'localhost', '7531', 'Yes', 'user', '' ]
 
-
-        
     def show(self):
         self.stdscr.addstr(0, 0, "Please choose a connection:")
 
         cury = 3
+        maxyx = self.stdscr.getmaxyx()
+        self.debug("mayx: %d, %d", maxyx[0], maxyx[1])
         for c in self.connections:
-            if cury-3 == self.current_connection:
+            self.debug("cury: %d", cury)
+            if cury - 3 == self.current_connection:
                 self.stdscr.addstr(cury, 10, c['name'], curses.A_REVERSE)
             else:
                 self.stdscr.addstr(cury, 10, c['name'])
+            if cury + 10 > maxyx[0]:
+                break
             cury = cury + 1
-        if cury-3 == self.current_connection:
-            self.stdscr.addstr(cury+1, 10, "New connection...", curses.A_REVERSE)
+        self.displayed_connections = cury - 3
+        if cury - 3 == self.current_connection:
+            self.stdscr.addstr(cury + 1, 10, "New connection...", curses.A_REVERSE)
         else:
-            self.stdscr.addstr(cury+1, 10, "New connection...")
+            self.stdscr.addstr(cury + 1, 10, "New connection...")
         self.stdscr.refresh()
 
 
     def display_current_input_line(self):
-        cury = len(self.connections)+5+self.state
+        cury = self.displayed_connections + 5 + self.state
         if self.state > 0 and self.state < 5:
-            self.stdscr.addstr(cury,10,"%s: %s" % (self.entries[self.state],self.current_input))
+            self.stdscr.addstr(cury, 10, "%s: %s" % (self.entries[self.state],self.current_input))
         elif self.state == 5:
             # password entry
-            self.stdscr.addstr(cury,10,"%s: " % self.entries[self.state])
+            self.stdscr.addstr(cury, 10, "%s: " % self.entries[self.state])
         else:
             self.stdscr.move(cury,10)
         self.stdscr.clrtobot()
         self.stdscr.refresh()
 
     def doRead(self):
-        
         c= self.stdscr.getch()
-
         if self.state == 0:
             if c == curses.KEY_DOWN:
-                if self.current_connection >= len(self.connections) :
+                if self.current_connection >= self.displayed_connections :
                     self.current_connection = 0
                 else:
                     self.current_connection = self.current_connection + 1
                 self.show()
             elif c == curses.KEY_UP:
                 if self.current_connection == 0:
-                    self.current_connection = len(self.connections) 
+                    self.current_connection = self.displayed_connections 
                 else:
                     self.current_connection = self.current_connection - 1
                 self.show()
             elif c == curses.KEY_ENTER or c == 10:
                 # if new connection, ask for username, password, hostname etc.
-                if self.current_connection == len(self.connections):
+                if self.current_connection == self.displayed_connections:
                     curses.curs_set(1)
                     self.current_input = self.inputs[1]
                     self.state = 1
@@ -106,16 +108,9 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     # ok a recent connection has been selected
                     curses.curs_set(1)
                     c = self.connections[self.current_connection]
-                    state = c['state']
-                    
+                    info = c['info']
                     reactor.removeReader(self)
-                    connection.connect_to_manager(self.stdscr, state['host'], state['port'], state['use_insecure'], state['user'], state['passwd'])
-                    
-                    
-
-            
-
-        
+                    connection.connect_to_manager(self.stdscr, info)
         else:
             if c == curses.KEY_ENTER or c == 10:
                 if self.state < 6:
@@ -123,7 +118,6 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 if self.state < 5:
                     self.current_input = self.inputs[self.state+1]
                     self.state = self.state + 1
-                    
                     self.display_current_input_line()
                 else:
                     # connect
@@ -132,29 +126,25 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         port = int(self.inputs[2])
                     except ValueError:
                         port = 7531
-                    connection.connect_to_manager(self.stdscr, self.inputs[1], port, self.inputs[3] == 'No', self.inputs[4], self.inputs[5])
+                    info = fconnection.PBConnectionInfo(self.inputs[1], port, 
+                      self.inputs[3] == 'No', fpb.Authenticator(
+                        username=self.inputs[4], password=self.inputs[5]))
+
+                    connection.connect_to_manager(self.stdscr, info)
                     pass
-                    
-            
             elif c == curses.KEY_BACKSPACE or c == 127:
                 self.current_input = self.current_input[:-1]
                 self.display_current_input_line()
-
             elif c == curses.KEY_UP:
                 if self.state > 0:
                     self.current_input = self.inputs[self.state-1]
                     self.state = self.state - 1
-
                 if self.state == 0:
                     # turn off cursor
                     curses.curs_set(0)
-
-                    
                 self.display_current_input_line()
             elif c == curses.KEY_DOWN:
                 pass
-            
-                
             else:
                 self.current_input = self.current_input + chr(c)
                 self.display_current_input_line()

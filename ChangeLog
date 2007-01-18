@@ -1,3 +1,11 @@
+2007-01-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/text/connection.py:
+	* flumotion/admin/text/greeter.py:
+	Clean up whitespace and initial port to 0.4 branch of text
+	admin.  Fix issue where too many recent connections
+	appear causing writes past bottom of screen.
+
 2007-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

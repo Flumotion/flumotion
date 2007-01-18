@@ -26,15 +26,14 @@ from flumotion.common import errors
 
 from twisted.internet import reactor
 
-def connect_to_manager(stdscr, hostname, port, insecure, username, password):
-    stdscr.addstr(0,0,"Connecting to %s:%d with username %s " % 
-                  (hostname, port, username))
+def connect_to_manager(stdscr, info):
+    stdscr.addstr(0,0,"Connecting to %s" % 
+                  info)
     stdscr.clrtobot()
     stdscr.refresh()
 
-    authenticator = fpb.Authenticator(username=username, password=password)
-    model = AdminModel(authenticator)
-    d = model.connectToHost(hostname, port, insecure)
+    model = AdminModel(info.authenticator)
+    d = model.connectToHost(info.host, info.port, not info.use_ssl)
 
     def outputError(str):
         print str
