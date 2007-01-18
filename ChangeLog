@@ -1,5 +1,10 @@
 2007-01-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/text/greeter.py:
+	Fix stupid issue with new connection swapping ssl and tcp.
+
+2007-01-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/text/connection.py:
 	* flumotion/admin/text/greeter.py:
 	Clean up whitespace and initial port to 0.4 branch of text
