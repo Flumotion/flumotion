@@ -29,14 +29,12 @@ msgstr "Niet verbonden"
 msgid "Connecting to %s:%s"
 msgstr "Aan het verbinden met %s:%s"
 
-#: flumotion/admin/gtk/client.py:274
-#: flumotion/admin/gtk/client.py:358
+#: flumotion/admin/gtk/client.py:274 flumotion/admin/gtk/client.py:358
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "UI aan het laden voor %s ..."
 
-#: flumotion/admin/gtk/client.py:312
-#: flumotion/admin/gtk/client.py:340
+#: flumotion/admin/gtk/client.py:312 flumotion/admin/gtk/client.py:340
 #: flumotion/admin/gtk/client.py:392
 msgid "This component has a UI bug."
 msgstr "De component heeft een bug in de gebruikersinterface."
@@ -102,7 +100,8 @@ msgstr "UI aan het opvragen voor %s ..."
 
 #: flumotion/admin/gtk/client.py:846
 msgid "The wizard cannot be run because no workers are logged in."
-msgstr "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
+msgstr ""
+"De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
 #: flumotion/admin/gtk/client.py:887
 #, python-format
@@ -184,8 +183,7 @@ msgstr "Fout"
 msgid "Warning"
 msgstr "Waarschuwing"
 
-#: flumotion/admin/gtk/message.py:36
-#: flumotion/test/test_common_messages.py:62
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:62
 #: flumotion/test/test_common_messages.py:156
 #: flumotion/test/test_common_messages.py:172
 msgid "Note"
@@ -231,8 +229,7 @@ msgstr "Gelieve uit de volgende authenticatiemethodes te kiezen."
 msgid "Recent connections"
 msgstr "Recente verbindingen"
 
-#: flumotion/admin/gtk/greeter.py:115
-#: data/glade/connection-dialog.glade:84
+#: flumotion/admin/gtk/greeter.py:115 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
 msgstr "Kies een verbinding uit de onderstaande lijst."
 
@@ -240,8 +237,7 @@ msgstr "Kies een verbinding uit de onderstaande lijst."
 msgid "Mood"
 msgstr "Humeur"
 
-#: flumotion/admin/gtk/parts.py:176
-#: flumotion/admin/gtk/parts.py:423
+#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:423
 msgid "Component"
 msgstr "Component"
 
@@ -293,8 +289,7 @@ msgstr ""
 "Alle workers zijn afgemeld.\n"
 "Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
 
-#: flumotion/wizard/wizard.py:352
-#: flumotion/wizard/steps.py:499
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:499
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -304,13 +299,14 @@ msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
 #: flumotion/wizard/wizard.py:357
 msgid ""
 "\n"
-"Please install the necessary GStreamer plug-ins that provide these elements and restart the worker."
+"Please install the necessary GStreamer plug-ins that provide these elements "
+"and restart the worker."
 msgstr ""
 "\n"
-"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen en de worker te herstarten."
+"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
+"en de worker te herstarten."
 
-#: flumotion/wizard/wizard.py:360
-#: flumotion/wizard/wizard.py:416
+#: flumotion/wizard/wizard.py:360 flumotion/wizard/wizard.py:416
 msgid ""
 "\n"
 "\n"
@@ -379,8 +375,7 @@ msgstr ""
 "\n"
 "Klik Volgende om verder te gaan zonder transparante overleg."
 
-#: flumotion/wizard/step.py:127
-#: flumotion/wizard/step.py:152
+#: flumotion/wizard/step.py:127 flumotion/wizard/step.py:152
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
@@ -395,23 +390,30 @@ msgid "The %s crashed.\n"
 msgstr "De component %s is neergestort.\n"
 
 #: flumotion/common/worker.py:94
-msgid "However, no core dump was generated. You may need to configure the environment if you want to further debug this problem."
-msgstr "Er werd geen zwarte doos gegenereerd. Misschien moet de omgeving aangepast worden als u dit probleem verder wil onderzoeken."
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
+msgstr ""
+"Er werd geen zwarte doos gegenereerd. Misschien moet de omgeving aangepast "
+"worden als u dit probleem verder wil onderzoeken."
 
 #: flumotion/common/worker.py:103
 #, python-format
 msgid "The core dump is '%s' on the host running '%s'."
 msgstr "De zwarte doos is '%s' op de computer met werker '%s'."
 
-#: flumotion/component/component.py:488
-#: flumotion/manager/component.py:842
+#: flumotion/component/component.py:488 flumotion/manager/component.py:842
 #: flumotion/manager/component.py:970
 msgid "Could not setup component."
 msgstr "Kon component niet instellen."
 
 #: flumotion/component/component.py:634
-msgid "Your configuration uses deprecated properties.  Please update your configuration and correct them.\n"
-msgstr "Uw configuratie gebruikt verouderde eigenschappen.  Gelieve uw configuratiete vernieuwen en de eigenschappen te verbeteren.\n"
+msgid ""
+"Your configuration uses deprecated properties.  Please update your "
+"configuration and correct them.\n"
+msgstr ""
+"Uw configuratie gebruikt verouderde eigenschappen.  Gelieve uw "
+"configuratiete vernieuwen en de eigenschappen te verbeteren.\n"
 
 #: flumotion/component/component.py:639
 #, python-format
@@ -470,8 +472,7 @@ msgstr "Versie %s van de '%s' GStreamer-plug-in is te oud.\n"
 
 #: flumotion/component/consumers/httpstreamer/http.py:321
 #: flumotion/component/muxers/checks.py:43
-#: flumotion/worker/checks/encoder.py:45
-#: flumotion/worker/checks/encoder.py:66
+#: flumotion/worker/checks/encoder.py:45 flumotion/worker/checks/encoder.py:66
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s."
@@ -537,34 +538,22 @@ msgid "Web URL:"
 msgstr "Web-URL:"
 
 #: flumotion/component/effects/volume/volume.glade:7
-#: data/glade/authenticate.glade:8
-#: data/glade/connections.glade:8
+#: data/glade/authenticate.glade:8 data/glade/connections.glade:8
 #: data/glade/greeter-authenticate.glade:8
 #: data/glade/greeter-connect_to_existing.glade:7
 #: data/glade/greeter-initial.glade:8
 #: data/glade/greeter-load_connection.glade:8
-#: data/glade/open-connection.glade:7
-#: data/glade/wizard_audio_encoder.glade:7
-#: data/glade/wizard_audiotest.glade:8
-#: data/glade/wizard_consumption.glade:7
-#: data/glade/wizard_disk.glade:8
-#: data/glade/wizard_encoding.glade:8
-#: data/glade/wizard_firewire.glade:7
-#: data/glade/wizard_http.glade:8
-#: data/glade/wizard_jpeg.glade:7
-#: data/glade/wizard_license.glade:7
-#: data/glade/wizard_overlay.glade:7
-#: data/glade/wizard_overview.glade:8
-#: data/glade/wizard_smoke.glade:8
-#: data/glade/wizard_soundcard.glade:8
-#: data/glade/wizard_source.glade:8
-#: data/glade/wizard_summary.glade:8
-#: data/glade/wizard_testsource.glade:8
-#: data/glade/wizard_theora.glade:8
-#: data/glade/wizard_tvcard.glade:8
-#: data/glade/wizard_vorbis.glade:8
-#: data/glade/wizard_webcam.glade:8
-#: data/glade/wizard_welcome.glade:7
+#: data/glade/open-connection.glade:7 data/glade/wizard_audio_encoder.glade:7
+#: data/glade/wizard_audiotest.glade:8 data/glade/wizard_consumption.glade:7
+#: data/glade/wizard_disk.glade:8 data/glade/wizard_encoding.glade:8
+#: data/glade/wizard_firewire.glade:7 data/glade/wizard_http.glade:8
+#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_license.glade:7
+#: data/glade/wizard_overlay.glade:7 data/glade/wizard_overview.glade:8
+#: data/glade/wizard_smoke.glade:8 data/glade/wizard_soundcard.glade:8
+#: data/glade/wizard_source.glade:8 data/glade/wizard_summary.glade:8
+#: data/glade/wizard_testsource.glade:8 data/glade/wizard_theora.glade:8
+#: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
+#: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
 msgid "window1"
 msgstr "window1"
 
@@ -581,15 +570,18 @@ msgid "_Allow increasing the volume"
 msgstr "_Sta toe het volume te verhogen"
 
 #: flumotion/component/muxers/checks.py:38
-#: flumotion/worker/checks/encoder.py:39
-#: flumotion/worker/checks/encoder.py:60
+#: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
 msgstr "Versie %s van de '%s' GStreamer-plug-in heeft een fout.\n"
 
 #: flumotion/component/muxers/checks.py:41
-msgid "The generated Ogg stream will not be fully compliant, and possibly not even play correctly.\n"
-msgstr "De gegenereerde Ogg-stroom zal niet volledig correct zijn, en misschien zelfs niet afspelen.\n"
+msgid ""
+"The generated Ogg stream will not be fully compliant, and possibly not even "
+"play correctly.\n"
+msgstr ""
+"De gegenereerde Ogg-stroom zal niet volledig correct zijn, en misschien "
+"zelfs niet afspelen.\n"
 
 #: flumotion/component/producers/audiotest/admin_gtk.py:88
 msgid "Volume"
@@ -626,8 +618,7 @@ msgstr "Patroon:"
 msgid "Pattern"
 msgstr "Patroon"
 
-#: flumotion/manager/component.py:403
-#: flumotion/manager/component.py:890
+#: flumotion/manager/component.py:403 flumotion/manager/component.py:890
 msgid "Could not start component."
 msgstr "Kon component niet starten."
 
@@ -651,8 +642,12 @@ msgstr "Kon de meesterklok van de component niet instellen."
 
 #: flumotion/manager/manager.py:416
 #, python-format
-msgid "This component is configured for Flumotion version %r, but you are running version %r.\n"
-msgstr "Deze component is geconfigureerd voor Flumotion versie %r, maar u gebruikt versie %r.\n"
+msgid ""
+"This component is configured for Flumotion version %r, but you are running "
+"version %r.\n"
+msgstr ""
+"Deze component is geconfigureerd voor Flumotion versie %r, maar u gebruikt "
+"versie %r.\n"
 
 #: flumotion/manager/manager.py:491
 msgid "The component is misconfigured."
@@ -663,13 +658,20 @@ msgid "The component could not be started."
 msgstr "De component kon niet gestart worden."
 
 #: flumotion/manager/manager.py:839
-msgid "Component logged in with stale configuration. Consider stopping this component and restarting the manager."
-msgstr "De component is ingelogd met oude configuratiegegevens.  Eventueel stopt u best de component en herstart u de manager."
+msgid ""
+"Component logged in with stale configuration. Consider stopping this "
+"component and restarting the manager."
+msgstr ""
+"De component is ingelogd met oude configuratiegegevens.  Eventueel stopt u "
+"best de component en herstart u de manager."
 
 #: flumotion/worker/checks/check.py:45
 #, python-format
-msgid "Could not open device '%s' for reading.  Check permissions on the device."
-msgstr "Kan toestel '%s' niet openen om te lezen.  Verifieer toelatingen op het toestel."
+msgid ""
+"Could not open device '%s' for reading.  Check permissions on the device."
+msgstr ""
+"Kan toestel '%s' niet openen om te lezen.  Verifieer toelatingen op het "
+"toestel."
 
 #: flumotion/worker/checks/check.py:48
 #, python-format
@@ -686,8 +688,7 @@ msgstr "Toestel '%s' is al in gebruik."
 msgid "Device '%s' did not accept the requested settings."
 msgstr "Toestel '%s' weigerde de gevraagde instellingen."
 
-#: flumotion/worker/checks/check.py:60
-#: flumotion/worker/checks/check.py:64
+#: flumotion/worker/checks/check.py:60 flumotion/worker/checks/check.py:64
 msgid "Internal GStreamer error."
 msgstr "Interne GStreamer-fout."
 
@@ -701,8 +702,7 @@ msgstr "Kon toestel '%s' niet onderzoeken."
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: flumotion/worker/checks/encoder.py:43
-#: flumotion/worker/checks/encoder.py:64
+#: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Synchronisatie tussen audio en video kan mogelijks fout zijn.\n"
 
@@ -711,41 +711,44 @@ msgid "Device node /dev/raw1394 does not exist."
 msgstr "Apparaat /dev/raw1394 bestaat niet."
 
 #: flumotion/worker/checks/video010.py:197
-msgid "Could not find or open the Firewire device. Check the device node and its permissions."
-msgstr "Kan Firewire-toestel niet vinden of openen.  Verifieer het apparaat en de toelatingen ervan."
+msgid ""
+"Could not find or open the Firewire device. Check the device node and its "
+"permissions."
+msgstr ""
+"Kan Firewire-toestel niet vinden of openen.  Verifieer het apparaat en de "
+"toelatingen ervan."
 
 #: flumotion/worker/checks/video010.py:201
 msgid "No Firewire device found."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
 #: flumotion/worker/checks/video010.py:204
-msgid "Could not open Firewire device for reading. Check permissions on the device."
-msgstr "Kan Firewire-toestel niet openen om te lezen.  Verifieer toelatingen op het toestel."
+msgid ""
+"Could not open Firewire device for reading. Check permissions on the device."
+msgstr ""
+"Kan Firewire-toestel niet openen om te lezen.  Verifieer toelatingen op het "
+"toestel."
 
 #: flumotion/worker/checks/video010.py:211
 msgid "Could not probe Firewire device."
 msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 
-#: flumotion/test/test_i18n.py:57
-#: flumotion/test/test_i18n.py:94
+#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94
 msgid "I am a translatable string"
 msgstr "Ik ben een vertaalbare string"
 
-#: flumotion/test/test_i18n.py:58
-#: flumotion/test/test_i18n.py:95
+#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:95
 msgid "I am a translated string"
 msgstr "Ik ben een vertaalde string"
 
-#: flumotion/test/test_i18n.py:111
-#: flumotion/test/test_i18n.py:116
+#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
 msgid_plural "I can translate %d things"
 msgstr[0] "Ik kan %d ding vertalen"
 msgstr[1] "Ik kan %d dingen vertalen"
 
-#: flumotion/test/test_i18n.py:114
-#: flumotion/test/test_i18n.py:118
+#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
 msgid "I translated %d thing"
 msgid_plural "I translated %d things"
@@ -870,8 +873,7 @@ msgstr "I_nfo"
 msgid "Open a stored configuration"
 msgstr "Opgeslagen configuratie openen"
 
-#: data/glade/admin-wizard.glade:8
-#: data/glade/wizard.glade:8
+#: data/glade/admin-wizard.glade:8 data/glade/wizard.glade:8
 msgid "Flumotion Configuration Wizard"
 msgstr "Flumotion Configuratie Wizard"
 
@@ -927,14 +929,12 @@ msgstr "_Poort"
 msgid "_Secure connection via SSL"
 msgstr "V_eilige verbinding via SSL"
 
-#: data/glade/wizard_audio_encoder.glade:31
-#: data/glade/wizard_theora.glade:102
+#: data/glade/wizard_audio_encoder.glade:31 data/glade/wizard_theora.glade:102
 #: data/glade/wizard_vorbis.glade:102
 msgid "Bit _rate:"
 msgstr "Bit_snelheid:"
 
-#: data/glade/wizard_audio_encoder.glade:78
-#: data/glade/wizard_theora.glade:32
+#: data/glade/wizard_audio_encoder.glade:78 data/glade/wizard_theora.glade:32
 #: data/glade/wizard_vorbis.glade:32
 msgid "kbit/s"
 msgstr "kbit/s"
@@ -1000,18 +1000,15 @@ msgstr "_Roteer opslag elke"
 msgid "Record at startup"
 msgstr "Opnemen bij het starten"
 
-#: data/glade/wizard_encoding.glade:83
-#: data/glade/wizard_testsource.glade:120
+#: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
 msgstr "F_ormaat:"
 
-#: data/glade/wizard_encoding.glade:108
-#: data/glade/wizard_source.glade:92
+#: data/glade/wizard_encoding.glade:108 data/glade/wizard_source.glade:92
 msgid "_Video:"
 msgstr "V_ideo:"
 
-#: data/glade/wizard_encoding.glade:133
-#: data/glade/wizard_source.glade:33
+#: data/glade/wizard_encoding.glade:133 data/glade/wizard_source.glade:33
 msgid "_Audio:"
 msgstr "_Audio:"
 
@@ -1019,8 +1016,7 @@ msgstr "_Audio:"
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
 
-#: data/glade/wizard_firewire.glade:77
-#: data/glade/wizard_firewire.glade:522
+#: data/glade/wizard_firewire.glade:77 data/glade/wizard_firewire.glade:522
 msgid "<b>Camera settings</b>"
 msgstr "<b>Camera-instellingen</b>"
 
@@ -1056,8 +1052,7 @@ msgstr "_Opvullen tot een veelvoud van 8 pixels"
 msgid "<b>Width correction</b>"
 msgstr "<b>Breedtecorrectie</b>"
 
-#: data/glade/wizard_firewire.glade:448
-#: data/glade/wizard_jpeg.glade:56
+#: data/glade/wizard_firewire.glade:448 data/glade/wizard_jpeg.glade:56
 msgid "Frame _rate:"
 msgstr "Beeld_snelheid:"
 
@@ -1101,8 +1096,7 @@ msgstr "_Mountpunt:"
 msgid "Bu_rst on connect"
 msgstr "Uitba_rsten bij verbinding"
 
-#: data/glade/wizard_jpeg.glade:31
-#: data/glade/wizard_theora.glade:124
+#: data/glade/wizard_jpeg.glade:31 data/glade/wizard_theora.glade:124
 #: data/glade/wizard_vorbis.glade:124
 msgid "_Quality:"
 msgstr "_Kwaliteit:"
@@ -1153,8 +1147,7 @@ msgstr "_Sleutelbeeldafstand: elke"
 msgid "frames"
 msgstr "beelden"
 
-#: data/glade/wizard_soundcard.glade:32
-#: data/glade/wizard_tvcard.glade:261
+#: data/glade/wizard_soundcard.glade:32 data/glade/wizard_tvcard.glade:261
 #: data/glade/wizard_webcam.glade:32
 msgid "_Device:"
 msgstr "T_oestel:"
@@ -1199,8 +1192,7 @@ msgstr ""
 msgid "Sound _system:"
 msgstr "Geluids_systeem"
 
-#: data/glade/wizard_soundcard.glade:292
-#: data/glade/wizard_webcam.glade:213
+#: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
 msgid "Name:"
 msgstr "Naam:"
 
@@ -1231,27 +1223,26 @@ msgid ""
 "Congratulations ! You are now ready to use \n"
 "your streaming server.\n"
 "\n"
-"When you press \"Apply\", your configuration will be automatically loaded on your network.  This will take some time."
+"When you press \"Apply\", your configuration will be automatically loaded on "
+"your network.  This will take some time."
 msgstr ""
 "Proficiat ! U bent nu klaar om uw \n"
 "streaming server te gebruiken.\n"
 "\n"
-"Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen worden op uw netwerk.  Dit zal enige tijd duren."
+"Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
+"worden op uw netwerk.  Dit zal enige tijd duren."
 
-#: data/glade/wizard_testsource.glade:33
-#: data/glade/wizard_tvcard.glade:72
+#: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
 #: data/glade/wizard_webcam.glade:166
 msgid "_Width:"
 msgstr "_Breedte:"
 
-#: data/glade/wizard_testsource.glade:62
-#: data/glade/wizard_tvcard.glade:97
+#: data/glade/wizard_testsource.glade:62 data/glade/wizard_tvcard.glade:97
 #: data/glade/wizard_webcam.glade:119
 msgid "_Height:"
 msgstr "_Hoogte:"
 
-#: data/glade/wizard_testsource.glade:91
-#: data/glade/wizard_tvcard.glade:166
+#: data/glade/wizard_testsource.glade:91 data/glade/wizard_tvcard.glade:166
 #: data/glade/wizard_webcam.glade:72
 msgid "F_ramerate:"
 msgstr "B_eeldsnelheid:"
@@ -1300,14 +1291,17 @@ msgstr "TV _norm:"
 msgid ""
 "Welcome to the Flumotion configuration wizard.\n"
 "\n"
-"This wizard will guide you through the required steps to help you configure your streaming media server."
+"This wizard will guide you through the required steps to help you configure "
+"your streaming media server."
 msgstr ""
 "Welkom bij de Flumotion configuratiewizard.\n"
 "\n"
-"Deze wizard zal u door de nodige stappen leiden om u te helpen bij de configuratie van uw streaming media server."
+"Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
+"configuratie van uw streaming media server."
 
 #~ msgid "No UI for component %s"
 #~ msgstr "Geen UI voor component %s"
+
 #~ msgid ""
 #~ "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 #~ "Please consider upgrading if your output video has a\n"
@@ -1316,85 +1310,121 @@ msgstr ""
 #~ "De ffmpegcolorspace-plugin op deze worker is ouder dan 0.8.5.\n"
 #~ "Gelieve te overwegen om deze te vernieuwen als uw video een\n"
 #~ "diagonale lijn in het beeld bevat."
+
 #~ msgid "Could not check features of the 'ffmpegcolorspace' element."
 #~ msgstr ""
 #~ "Kon eigenschappen van het 'ffmpegcolorspace'-element niet controleren."
+
 #~ msgid "GStreamer error."
 #~ msgstr "GStreamer-fout."
+
 #~ msgid "Component lost feed, reconnecting..."
 #~ msgstr "Component is voeding verloren, aan het herverbinden..."
+
 #~ msgid "Log"
 #~ msgstr "Log"
+
 #~ msgid ""
 #~ "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 #~ "version 0.8.5."
 #~ msgstr ""
 #~ "Het ffmpegcolorspace-element is te oud. Gelieve gst-plugins aan te passen "
 #~ "naar versie 0.8.5."
+
 #~ msgid "Could not start the component."
 #~ msgstr ""
 #~ "Kon component niet herladen:\n"
 #~ "%s."
+
 #~ msgid "device node /dev/raw1394 does not exist"
 #~ msgstr "apparaat /dev/raw1394 bestaat niet"
+
 #~ msgid "GStreamer error while probing webcam."
 #~ msgstr "GStreamer-fout bij het onderzoeken van de webcam."
+
 #~ msgid "Failed to probe webcam."
 #~ msgstr "Kon webcam niet onderzoeken."
+
 #~ msgid "Welcome"
 #~ msgstr "Welkom"
+
 #~ msgid "Source"
 #~ msgstr "Bron"
+
 #~ msgid "Production"
 #~ msgstr "Productie"
+
 #~ msgid "TV Card"
 #~ msgstr "TV-kaart"
+
 #~ msgid "Firewire"
 #~ msgstr "Vuurdraad"
+
 #~ msgid "Webcam"
 #~ msgstr "Webcam"
+
 #~ msgid "Test Video Source"
 #~ msgstr "Testvideobron"
+
 #~ msgid "Overlay"
 #~ msgstr "Overlay"
+
 #~ msgid "Soundcard"
 #~ msgstr "Geluidskaart"
+
 #~ msgid "Test Audio Source"
 #~ msgstr "Test-audiobron"
+
 #~ msgid "Encoding"
 #~ msgstr "Encodering"
+
 #~ msgid "Conversion"
 #~ msgstr "Conversie"
+
 #~ msgid "Consumption"
 #~ msgstr "Consumptie"
+
 #~ msgid "HTTP Streamer (audio & video)"
 #~ msgstr "HTTP Streamer (audio & video)"
+
 #~ msgid "HTTP audio/video"
 #~ msgstr "HTTP audio/video"
+
 #~ msgid "HTTP Streamer (audio only)"
 #~ msgstr "HTTP Streamer (enkel audio)"
+
 #~ msgid "HTTP audio"
 #~ msgstr "HTTP audio"
+
 #~ msgid "HTTP Streamer (video only)"
 #~ msgstr "HTTP Streamer (enkel video)"
+
 #~ msgid "HTTP video"
 #~ msgstr "HTTP video"
+
 #~ msgid "Disk (audio & video)"
 #~ msgstr "Schijf (audio & video)"
+
 #~ msgid "Disk audio/video"
 #~ msgstr "Schijf audio/video"
+
 #~ msgid "Disk (audio only)"
 #~ msgstr "Schijf (enkel audio)"
+
 #~ msgid "Disk audio"
 #~ msgstr "Schijf audio"
+
 #~ msgid "Disk (video only)"
 #~ msgstr "Schijf (enkel video)"
+
 #~ msgid "Disk video"
 #~ msgstr "Schijf video"
+
 #~ msgid "Content License"
 #~ msgstr "Inhoudslicensie"
+
 #~ msgid "License"
 #~ msgstr "Licensie"
+
 #~ msgid "Summary"
 #~ msgstr "Samenvatting"
-

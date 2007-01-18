@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-17 23:20+0100\n"
+"POT-Creation-Date: 2007-01-18 06:16+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: nl\n"
@@ -363,6 +363,27 @@ msgstr ""
 
 #: flumotion/wizard/step.py:127 flumotion/wizard/step.py:152
 msgid "Internal error: could not run check code on worker."
+msgstr ""
+
+#: flumotion/common/worker.py:71
+#, python-format
+msgid "The %s was killed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:74
+#, python-format
+msgid "The %s crashed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:94
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
+msgstr ""
+
+#: flumotion/common/worker.py:103
+#, python-format
+msgid "The core dump is '%s' on the host running '%s'."
 msgstr ""
 
 #: flumotion/component/component.py:488 flumotion/manager/component.py:842

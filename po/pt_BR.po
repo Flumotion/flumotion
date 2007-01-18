@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-17 23:20+0100\n"
+"POT-Creation-Date: 2007-01-18 06:16+0100\n"
 "PO-Revision-Date: 2006-04-21 11:36-0300\n"
 "Last-Translator: Pablo Lorenzzoni <spectra@debian.org>\n"
 "Language-Team: pt_BR <spectra@debian.org>\n"
@@ -380,6 +380,29 @@ msgstr ""
 #: flumotion/wizard/step.py:127 flumotion/wizard/step.py:152
 msgid "Internal error: could not run check code on worker."
 msgstr "Erro interno: não pode executar código no worker."
+
+#: flumotion/common/worker.py:71
+#, python-format
+msgid "The %s was killed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:74
+#, python-format
+msgid "The %s crashed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:94
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
+msgstr ""
+"Contudo, nenhum core-dump foi gerado. Você pode ter de configurar o ambiente "
+"se você quiser maiores informações de debug deste problema."
+
+#: flumotion/common/worker.py:103
+#, fuzzy, python-format
+msgid "The core dump is '%s' on the host running '%s'."
+msgstr "O core-dump é '%s' no worker '%s'."
 
 #: flumotion/component/component.py:488 flumotion/manager/component.py:842
 #: flumotion/manager/component.py:970
@@ -1301,13 +1324,3 @@ msgstr ""
 #~ msgstr ""
 #~ "O elemento ffmpegcolorspace é muito antigo. Por favor, atualize o gst-"
 #~ "plugins paraversão 0.8.5."
-
-#~ msgid ""
-#~ "However, no core dump was generated. You may need to configure the "
-#~ "environment if you want to further debug this problem."
-#~ msgstr ""
-#~ "Contudo, nenhum core-dump foi gerado. Você pode ter de configurar o "
-#~ "ambiente se você quiser maiores informações de debug deste problema."
-
-#~ msgid "The core dump is '%s' on worker '%s'."
-#~ msgstr "O core-dump é '%s' no worker '%s'."
