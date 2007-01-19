@@ -1,9 +1,10 @@
-This is Flumotion 0.3.2, "Flight JL 412".
+This is Flumotion 0.4.0, "Camp Nou".
 
-IMPORTANT NOTE:
+Bugs fixed since 0.3.2:
 
-This is an unstable version of Flumotion on the 0.3 development branch.
-If you are looking for a stable Flumotion, use one of the 0.2 releases.
+523	when disk is full, disker goes sad, but without any message in the admin ui
+551	manager restart makes component marked as lost by mistake
+552	components logging back in from lost proxy jobstate keys in incorrect order
 
 Features since 0.3.1:
  - Greatly improved and more flexible http burst-on-connect

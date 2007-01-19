@@ -1,6 +1,6 @@
 AC_INIT(README)
 
-AS_VERSION(flumotion, FLUMOTION, 0, 3, 2, 1)
+AS_VERSION(flumotion, FLUMOTION, 0, 4, 0, 0)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
 AC_SUBST_FILE(AUTHORS)
@@ -161,7 +161,7 @@ AM_CONDITIONAL(HAVE_PYCHECKER, test "x$PYCHECKER" = "xyes")
 dnl check for Twisted
 AS_PYTHON_IMPORT(twisted,
   [
-  AC_MSG_CHECKING(for Twisted >= 1.3.0)
+  AC_MSG_CHECKING(for Twisted >= 2.0.1)
   prog="
 import sys
 import twisted.copyright

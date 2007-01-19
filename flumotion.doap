@@ -220,4 +220,13 @@ it.
   </Version>
  </release>
 
+ <release>
+  <Version>
+   <revision>0.4.0</revision>
+   <branch>0.4</branch>
+   <name>Camp Nou</name>
+   <created>2007-01-19</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.0.tar.bz2" />
+  </Version>
+ </release>
 </Project>
