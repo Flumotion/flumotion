@@ -11,12 +11,12 @@ Features since 0.3.1:
  - Allow setting a maximum duration for http connections
  - Add simple icecast-stream relaying component
  - Add component that takes GDP-payloaded data from a unix socket
- - ICal based bouncer, to specify that clients may only connect during a 
+ - iCal based bouncer, to specify that clients may only connect during a 
    specific time of day
  - Restarting a manager while a flow is running now works reliably
  - The disker component can now be remotely controlled to start/stop recording,
    and to automatically maintain symlinks to the latest recording
- - Many component propertiess were renamed to make them more consistent
+ - Many component properties were renamed to make them more consistent
  - The http-server component is now more reliable, and has GTK UI
  - Components in the GTK UI now show information about their feeders
  - Network clock synchronisation now works in more cases
