@@ -317,7 +317,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if version < (0, 10, 9, 1):
             m = messages.Error(T_(N_(
                 "Version %s of the '%s' GStreamer plug-in is too old.\n"),
-                    ".".join(version), 'multifdsink'))
+                    ".".join(map(str, version)), 'multifdsink'))
             m.add(T_(N_("Please upgrade '%s' to version %s."),
                 'gst-plugins-base', '0.10.10'))
             self.addMessage(m)
