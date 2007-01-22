@@ -183,11 +183,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         filename = ""
         if not filenameTemplate:
-            date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
-            filename = '%s.%s.%s' % (self.getName(), date, ext)
-        else:
-            filename = "%s.%s" % (time.strftime(filenameTemplate,
-                time.localtime()), ext)
+            filenameTemplate = self._defaultFilenameTemplate
+        filename = "%s.%s" % (time.strftime(filenameTemplate,
+            time.localtime()), ext)
         self.location = os.path.join(self.directory, filename)
 
         try:
@@ -287,6 +285,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.symlink_to_current_recording = \
             properties.get('symlink-to-current-recording', None)
         self._recordAtStart = properties.get('start-recording', True)
+        self._defaultFilenameTemplate = properties.get('filename', 
+            '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
         icalfn = properties.get('ical-schedule')
         if icalfn:
             ical = open(icalfn, "rb").read()
