@@ -116,6 +116,10 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/run/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 
+# Install the logrotate entry
+%{__install} -m 0644 -D doc/redhat/flumotion.logrotate \
+    %{buildroot}%{_sysconfdir}/logrotate.d/flumotion
+
 %find_lang flumotion
 
 %clean

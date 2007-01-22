@@ -1,0 +1,10 @@
+/var/log/flumotion/* {
+    missingok
+    notifempty
+    postrotate
+        find /var/run/flumotion -print | while read f; do
+            /usr/bin/kill -HUP `cat $f` 2>/dev/null || true
+        done
+    endscript
+}
+

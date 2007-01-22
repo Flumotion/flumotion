@@ -1,3 +1,9 @@
+2007-01-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion.spec.in:
+	* doc/Makefile.am (EXTRA_DIST): 
+	* doc/redhat/flumotion.logrotate: Install a logrotate file.
+
 2007-01-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
@@ -10,6 +16,7 @@
 	* flumotion.spec.in: Make log, run, and cache dirs root:flumotion
 	770 so that flumotion can rotate logs, manage its PID file, and
 	also the registry cache.
+	(user): 
 
 2007-01-21  Andy Wingo  <wingo@pobox.com>
 
