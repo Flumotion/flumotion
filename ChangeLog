@@ -1,5 +1,9 @@
 2007-01-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/log.py (reopenOutputFiles): Open both files in
+	the same way -- since we don't go through the streams layer
+	there's no need to think about buffering.
+
 	* doc/redhat/flumotion.logrotate: Add some more logrotate options.
 
 	* flumotion/common/log.py (reopenOutputFiles): When rotating,
