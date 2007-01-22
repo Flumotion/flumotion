@@ -1,3 +1,9 @@
+2007-01-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion.spec.in: Make log, run, and cache dirs root:flumotion
+	770 so that flumotion can rotate logs, manage its PID file, and
+	also the registry cache.
+
 2007-01-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py

@@ -251,12 +251,22 @@ fi
 %{_datadir}/flumotion/*.xsl
 
 %attr(750,root,flumotion) %{_sysconfdir}/flumotion
-%attr(750,root,flumotion) %{_localstatedir}/run/flumotion
-%attr(750,root,flumotion) %{_localstatedir}/log/flumotion
-%attr(750,root,flumotion) %{_localstatedir}/cache/flumotion
+%attr(770,root,flumotion) %{_localstatedir}/run/flumotion
+%attr(770,root,flumotion) %{_localstatedir}/log/flumotion
+%attr(770,root,flumotion) %{_localstatedir}/cache/flumotion
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Mon Jan 22 2006 Andy Wingo <wingo at pobox.com>
+- Make the run, log, and cache directories group-writable, so that
+  processes can manage their own pid, log files, and registry caches.
+
+* Tue Dec 19 2006 Thomas Vander Stichele <thomas at apestaart dot org>
+- switch around to root:flumotion for ownership of various directories,
+  allowing users in the flumotion group to see logs and config
+- remove flumotion cache/home dir contents
+- clean up commenting in manager config
+
 * Tue Dec 19 2006 Thomas Vander Stichele <thomas at apestaart dot org>
 - switch around to root:flumotion for ownership of various directories,
   allowing users in the flumotion group to see logs and config
