@@ -257,7 +257,7 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
-* Mon Jan 22 2006 Andy Wingo <wingo at pobox.com>
+* Mon Jan 22 2007 Andy Wingo <wingo at pobox.com>
 - Make the run, log, and cache directories group-writable, so that
   processes can manage their own pid, log files, and registry caches.
 
