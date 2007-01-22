@@ -231,6 +231,7 @@ fi
 %doc ChangeLog COPYING README AUTHORS flumotion.doap
 %doc doc/reference/html
 %doc conf
+%config %{_sysconfdir}/logrotate.d/flumotion
 %{_bindir}/flumotion-manager
 %{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
