@@ -3,6 +3,8 @@
 	* flumotion/common/log.py (reopenOutputFiles): Open both files in
 	the same way -- since we don't go through the streams layer
 	there's no need to think about buffering.
+	(reopenOutputFiles): A final try to get the perms right, I seem to
+	be stupid
 
 	* doc/redhat/flumotion.logrotate: Add some more logrotate options.
 

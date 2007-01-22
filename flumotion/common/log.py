@@ -585,11 +585,16 @@ def reopenOutputFiles():
         debug('log', 'told to reopen log files, but log files not set')
         return
 
-    so = os.open(_stdout, os.O_APPEND|os.O_CREAT, 0640)
-    se = os.open(_stderr, os.O_APPEND|os.O_CREAT, 0640)
+    oldmask = os.umask(0026)
+    try:
+        so = open(_stdout, 'a+') 
+        se = open(_stderr, 'a+', 0)
+    finally:
+        os.umask(oldmask)
 
-    os.dup2(so, sys.stdout.fileno())
-    os.dup2(se, sys.stderr.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno()) 
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
     debug('log', 'opened log %r', _stderr)
 
 def outputToFiles(stdout, stderr):
