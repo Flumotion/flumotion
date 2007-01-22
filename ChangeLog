@@ -1,5 +1,10 @@
 2007-01-22  Andy Wingo  <wingo@pobox.com>
 
+	* doc/redhat/flumotion.logrotate: Add some more logrotate options.
+
+	* flumotion/common/log.py (reopenOutputFiles): When rotating,
+	create files with a 0640 mask.
+
 	* flumotion.spec.in:
 	* doc/Makefile.am (EXTRA_DIST): 
 	* doc/redhat/flumotion.logrotate: Install a logrotate file.

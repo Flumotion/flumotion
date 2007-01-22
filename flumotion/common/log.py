@@ -585,10 +585,18 @@ def reopenOutputFiles():
         debug('log', 'told to reopen log files, but log files not set')
         return
 
-    so = open(_stdout, 'a+')
-    se = open(_stderr, 'a+', 0)
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
+    so = os.open(_stdout, os.O_APPEND|os.O_CREAT, 0640)
+
+    # Attempt to make stderr unbuffered while still keeping 640 perms if
+    # we create a new file. Would do this a different way if setvbuf(2)
+    # were available directly in python...
+    if _stdout == _stderr:
+        se = open(_stderr, 'a+', 0).fileno()
+    else:
+        se = os.open(_stderr, os.O_APPEND|os.O_CREAT, 0640)
+
+    os.dup2(so, sys.stdout.fileno())
+    os.dup2(se, sys.stderr.fileno())
     debug('log', 'opened log %r', _stderr)
 
 def outputToFiles(stdout, stderr):
