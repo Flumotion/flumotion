@@ -1,3 +1,8 @@
+2007-01-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* doc/man/flumotion-worker.1:
+	Fix man page, fixes #546.
+
 2007-01-23  Andy Wingo  <wingo@pobox.com>
 
 	* doc/redhat/flumotion: Lockfiles are only used if they have the
