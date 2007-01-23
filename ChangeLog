@@ -1,3 +1,8 @@
+2007-01-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/worker.py:
+	Appease pychecker and make comment.
+
 2007-01-23  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/component.py: 

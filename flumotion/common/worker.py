@@ -57,7 +57,13 @@ class ProcessProtocol(protocol.ProcessProtocol):
         # status.value.status is the os.WAIT-like status value
         message = None
         obj = self.loggable
-        pid = (self.pid or "unknown") or str(self.pid)
+        pid = None
+        # if we have a pid, then set pid to string value of pid
+        # otherwise set to "unknown"
+        if self.pid:
+            pid = str(self.pid)
+        else:
+            pid = "unknown"
         if status.value.exitCode is not None:
             obj.info("Reaped child with pid %s, exit value %d.",
                      pid, status.value.exitCode)
