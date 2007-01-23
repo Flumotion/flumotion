@@ -1,3 +1,13 @@
+2007-01-23  Andy Wingo  <wingo@pobox.com>
+
+	* doc/redhat/flumotion: Lockfiles are only used if they have the
+	same name as the init script, so set flumotion.lock iff a call to
+	the init script succeeded and flumotion processes are running.
+	(start, stop): Parse type and name more robustly, fixes names like
+	foo@bar. Change so that a call to "flumotion stop worker foo"
+	always tries to stop the worker; the logic of which workers to
+	stop is now to check the PID files in $rundir.
+
 2007-01-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/worker.py:
