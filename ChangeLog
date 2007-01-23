@@ -1,5 +1,12 @@
 2007-01-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  add docstring
+	* flumotion/configure/configure.py:
+	  privatize and remove type from variable name
+
+2007-01-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/configure/configure.py:
 	  Rename parseVersion and make it private to make sure no one uses
 	  it outside of this module.

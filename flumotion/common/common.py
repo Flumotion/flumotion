@@ -631,6 +631,12 @@ def versionTupleToString(versionTuple):
     """
     Converts a version tuple to a string.  If the tuple has a zero nano number,
     it is dropped from the string.
+
+    @since: 0.4.1
+
+    @type versionTuple: tuple
+
+    @rtype: str
     """
     if len(versionTuple) == 4 and versionTuple[3] == 0:
         versionTuple = versionTuple[:3]

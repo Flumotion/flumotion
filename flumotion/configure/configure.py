@@ -82,32 +82,32 @@ __thisdir = os.path.dirname(os.path.abspath(__file__))
 
 if os.path.exists(os.path.join(__thisdir, 'uninstalled.py')):
     from flumotion.configure import uninstalled
-    config_dict = uninstalled.get()
+    _config = uninstalled.get()
 else:
     from flumotion.configure import installed
-    config_dict = installed.get()
+    _config = installed.get()
 
 # default values for ports
-config_dict['defaultTCPManagerPort'] = 8642
-config_dict['defaultSSLManagerPort'] = 7531
-config_dict['defaultStreamPortRange'] = range(8800, 8844 + 1)
-config_dict['defaultGstPortRange'] = range(8600, 8639 + 1)
+_config['defaultTCPManagerPort'] = 8642
+_config['defaultSSLManagerPort'] = 7531
+_config['defaultStreamPortRange'] = range(8800, 8844 + 1)
+_config['defaultGstPortRange'] = range(8600, 8639 + 1)
 
 # default values for service-related stuff
 # how long to wait before timing out term and kill signals
-config_dict['processTermWait'] = 5
-config_dict['processKillWait'] = 5
+_config['processTermWait'] = 5
+_config['processKillWait'] = 5
 
 # default value for component heartbeat interval, in seconds
-config_dict['heartbeatInterval'] = 5
+_config['heartbeatInterval'] = 5
 
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))
     if len (t) < 4:
         t = t + (0,)
     return t
-config_dict['versionTuple'] = _versionStringToTuple(config_dict['version'])
+_config['versionTuple'] = _versionStringToTuple(_config['version'])
 
-for key, value in config_dict.items():
+for key, value in _config.items():
     dictionary = locals()
     dictionary[key] = value
