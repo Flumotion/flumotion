@@ -483,7 +483,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addCallback(lambda r: self.do_setup())
         def setupErrback(failure):
             if failure.check(errors.ComponentSetupHandledError):
-                failure.raiseException()
+                return failure
             else:
                 self.warning('Could not set up component: %s',
                          log.getFailureMessage(failure))
