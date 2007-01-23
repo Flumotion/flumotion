@@ -421,7 +421,7 @@ class FlumotionConfigXML(BaseConfigParser):
 
         # If we don't have a version at all, use the current version
         if not version:
-            version = configure.versionNum
+            version = configure.versionTuple
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))

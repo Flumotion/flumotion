@@ -137,6 +137,13 @@ class TestVersion(unittest.TestCase):
     def testVersion(self):
         self.failUnless(common.version('abinary'))
 
+    def test_versionTupleToString(self):
+        self.assertEquals(common.versionTupleToString((1, )), "1")
+        self.assertEquals(common.versionTupleToString((1, 2, )), "1.2")
+        self.assertEquals(common.versionTupleToString((1, 2, 3, )), "1.2.3")
+        self.assertEquals(common.versionTupleToString((1, 2, 3, 0,)), "1.2.3")
+        self.assertEquals(common.versionTupleToString((1, 2, 3, 1,)), "1.2.3.1")
+
 class TestArgRepr(unittest.TestCase):
     def testEmpty(self):
         self.assertEqual(common.argRepr(), '')

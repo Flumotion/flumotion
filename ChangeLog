@@ -1,3 +1,19 @@
+2007-01-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/configure/configure.py:
+	  Rename parseVersion and make it private to make sure no one uses
+	  it outside of this module.
+	  Don't call a tuple a Num.
+	* flumotion/common/config.py:
+	  replace with versionTuple
+	* flumotion/common/common.py:
+	  add versionTupleToString
+	* flumotion/test/test_common.py:
+	  and a test for it
+	* flumotion/manager/manager.py:
+	  Don't ever ever show a user a tuple! Also, provide a hint as to
+	  what to do to fix the problem.
+
 2007-01-22  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/log.py (reopenOutputFiles): Open both files in

@@ -627,6 +627,16 @@ def compareVersions(first, second):
 
     return 0
 
+def versionTupleToString(versionTuple):
+    """
+    Converts a version tuple to a string.  If the tuple has a zero nano number,
+    it is dropped from the string.
+    """
+    if len(versionTuple) == 4 and versionTuple[3] == 0:
+        versionTuple = versionTuple[:3]
+
+    return ".".join([str(i) for i in versionTuple])
+
 def _uniq(l, key=lambda x: x):
     """
     Filters out duplicate entries in a list.

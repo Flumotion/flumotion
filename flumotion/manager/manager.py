@@ -412,10 +412,12 @@ class Vishnu(log.Loggable):
 
         avatarId = conf.getConfigDict()['avatarId']
 
-        if conf.getConfigDict()['version'] != configure.versionNum:
+        if conf.getConfigDict()['version'] != configure.versionTuple:
             m = messages.Warning(T_(N_("This component is configured for "
-                "Flumotion version %r, but you are running version %r.\n"), 
-                conf.getConfigDict()['version'], configure.versionNum))
+                "Flumotion version %s, but you are running version %s.\n"
+                "Please update the configuration of the component.\n"), 
+                common.versionTupleToString(conf.getConfigDict()['version']),
+                configure.version))
             state.append('messages', m)
 
         # add to mapper
