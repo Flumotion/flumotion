@@ -466,7 +466,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         def checkErrorCallback(result):
             # if the mood is now sad, it means an error was encountered
             # during check, and we should return a failure here.
-            current = self.state.get('mood')
+            current = self.state.get('mood')            
             if current == moods.sad.value:
                 self.warning('Running checks made the component sad.')
                 raise errors.ComponentSetupError()
@@ -482,16 +482,19 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
         def setupErrback(failure):
-            self.warning('Could not set up component: %s',
+            if failure.check(errors.ComponentSetupHandledError):
+                failure.raiseException()
+            else:
+                self.warning('Could not set up component: %s',
                          log.getFailureMessage(failure))
-            m = messages.Error(T_(
-                N_("Could not setup component.")),
-                debug=log.getFailureMessage(failure),
-                id="component-setup-%s" % self.name)
-            self.state.append('messages', m)
-            self.setMood(moods.sad)
-            raise errors.ComponentSetupHandledError(
-                'Could not set up component')
+                m = messages.Error(T_(
+                    N_("Could not setup component.")),
+                    debug=log.getFailureMessage(failure),
+                    id="component-setup-%s" % self.name)
+                self.state.append('messages', m)
+                self.setMood(moods.sad)
+                raise errors.ComponentSetupHandledError(
+                    'Could not set up component')
 
         d.addErrback(setupErrback)
         return d

@@ -1,3 +1,13 @@
+2007-01-23  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/component.py: 
+	Trap ComponentSetupHandledError after component setup.
+	Fixes #548
+	* flumotion/common/worker.py: 
+	On special cases, the PID is None when processEnded is called,
+	it failed trying to log it. Changed the ProcessProtocol
+	to handle this case properly.
+
 2007-01-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

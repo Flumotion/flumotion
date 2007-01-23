@@ -57,9 +57,10 @@ class ProcessProtocol(protocol.ProcessProtocol):
         # status.value.status is the os.WAIT-like status value
         message = None
         obj = self.loggable
+        pid = (self.pid or "unknown") or str(self.pid)
         if status.value.exitCode is not None:
-            obj.info("Reaped child with pid %d, exit value %d.",
-                     self.pid, status.value.exitCode)
+            obj.info("Reaped child with pid %s, exit value %d.",
+                     pid, status.value.exitCode)
         signum = status.value.signal
 
         # SIGKILL is an explicit kill, and never generates a core dump.
@@ -67,7 +68,7 @@ class ProcessProtocol(protocol.ProcessProtocol):
         # and warn if not.
         if signum is not None:
             if signum == signal.SIGKILL:
-                obj.warning("Child with pid %d killed.", self.pid)
+                obj.warning("Child with pid %s killed.", pid)
                 message = messages.Error(T_(N_("The %s was killed.\n"),
                                                self.processType))
             else:
@@ -77,15 +78,15 @@ class ProcessProtocol(protocol.ProcessProtocol):
 
                 # use some custom logging depending on signal
                 if signum == signal.SIGSEGV:
-                    obj.warning("Child with pid %d segfaulted.", self.pid)
+                    obj.warning("Child with pid %s segfaulted.", pid)
                 elif signum == signal.SIGTRAP:
                     # SIGTRAP occurs when registry is corrupt
-                    obj.warning("Child with pid %d received a SIGTRAP.",
-                                self.pid)
+                    obj.warning("Child with pid %s received a SIGTRAP.",
+                                pid)
                 else:
                     # if we find any of these, possibly special-case them too
-                    obj.info("Reaped child with pid %d signaled by "
-                             "signal %d.", self.pid, signum)
+                    obj.info("Reaped child with pid %s signaled by "
+                             "signal %d.", pid, signum)
                     
                 if not os.WCOREDUMP(status.value.status):
                     obj.warning("No core dump generated. "
@@ -96,7 +97,7 @@ class ProcessProtocol(protocol.ProcessProtocol):
                         "if you want to further debug this problem.")))
                 else:
                     obj.info("Core dumped.")
-                    corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
+                    corepath = os.path.join(os.getcwd(), 'core.%s' % pid)
                     if os.path.exists(corepath):
                         obj.info("Core file is probably '%s'." % corepath)
                         message.add(T_(N_(
