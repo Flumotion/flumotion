@@ -9,7 +9,13 @@ UI
 
 API DOCS
 --------
-- We use epydoc and epydoc markup for API docs
+- We use epydoc and epydoc markup for API docs (see http://epydoc.sf.net/)
+
+- all public methods should be documented, along with parameters and
+  return values
+  @param, @type, @returns, @rtype
+- public instance vars should be documented
+  @ivar, @type
 - list @param before @type: what it actually does is more useful to know
   than the type
 - align the var/param name:
