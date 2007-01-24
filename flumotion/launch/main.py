@@ -65,9 +65,19 @@ import sys
 from twisted.python import reflect
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common, registry, errors
+from flumotion.common import log, common, registry, errors, messages
+from flumotion.twisted import flavors
 
 from flumotion.launch import parse
+
+from gettext import gettext as _
+
+_headings = {
+    messages.ERROR:   _('Error'),
+    messages.WARNING: _('Warning'),
+    messages.INFO:    _('Note')
+}
+
 
 def err(x):
     sys.stderr.write(x + '\n')
@@ -98,7 +108,24 @@ class ComponentWrapper(object):
 
     def instantiate(self):
         self.component = self.procedure()
-        return self.component.setup(self.config)
+        # since we cannot listen to a StateCacheable, we monkeypatch the
+        # append method so we can intercept messages
+        def append(instance, key, value):
+            if key == 'messages':
+                print "%s:" % _headings[value.level]
+                translator = messages.Translator()
+                print translator.translate(value)
+            flavors.StateCacheable.append(instance, key, value)
+
+        import new
+        self.component.state.append = new.instancemethod(append,
+            self.component.state)
+        d = self.component.setup(self.config)
+        def handledEb(failure):
+            failure.trap(errors.ComponentSetupHandledError)
+            os._exit(1)
+        d.addErrback(handledEb)
+        return d
 
     def provideMasterClock(self, port):
         d = self.component.provide_master_clock(port)

@@ -482,19 +482,19 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
         def setupErrback(failure):
+            # pass through handled errors
             if failure.check(errors.ComponentSetupHandledError):
                 return failure
-            else:
-                self.warning('Could not set up component: %s',
-                         log.getFailureMessage(failure))
-                m = messages.Error(T_(
-                    N_("Could not setup component.")),
-                    debug=log.getFailureMessage(failure),
-                    id="component-setup-%s" % self.name)
-                self.state.append('messages', m)
-                self.setMood(moods.sad)
-                raise errors.ComponentSetupHandledError(
-                    'Could not set up component')
+
+            self.warning('Could not set up component: %s',
+                log.getFailureMessage(failure))
+            m = messages.Error(T_(N_("Could not setup component.")),
+                debug=log.getFailureMessage(failure),
+                id="component-setup-%s" % self.name)
+            self.state.append('messages', m)
+            self.setMood(moods.sad)
+            raise errors.ComponentSetupHandledError(
+                'Could not set up component')
 
         d.addErrback(setupErrback)
         return d

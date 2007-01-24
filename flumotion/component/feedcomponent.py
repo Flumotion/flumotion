@@ -243,8 +243,7 @@ class ParseLaunchComponent(FeedComponent):
                 "Please install the necessary plug-in and restart "
                 "the component.\n"), e.args[0]))
             self.state.append('messages', m)
-            # FIXME: different error ?
-            raise errors.PipelineParseError(e)
+            raise errors.ComponentSetupHandledError(e)
         
         self.pipeline_string = self.parse_pipeline(unparsed)
 

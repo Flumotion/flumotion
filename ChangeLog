@@ -1,3 +1,13 @@
+2007-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/component.py:
+	  ignore already handled setup errors
+	* flumotion/component/feedcomponent.py:
+	  raise a handled error when we fail to parse a pipeline
+	* flumotion/launch/main.py:
+	  make sure we show messages
+	  exit on handled setup errors
+
 2007-01-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* doc/man/flumotion-worker.1:
