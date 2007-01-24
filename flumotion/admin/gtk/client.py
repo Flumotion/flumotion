@@ -469,16 +469,12 @@ class Window(log.Loggable, gobject.GObject):
     def setPlanetState(self, planetState):
         def flowStateAppend(state, key, value):
             self.debug('flow state append: key %s, value %r' % (key, value))
-            if state.get('name') != 'default':
-                return
             if key == 'components':
                 self._components[value.get('name')] = value
                 # FIXME: would be nicer to do this incrementally instead
                 self.update_components()
 
         def flowStateRemove(state, key, value):
-            if state.get('name') != 'default':
-                return
             if key == 'components':
                 self._remove_component(value)
 
@@ -494,9 +490,11 @@ class Window(log.Loggable, gobject.GObject):
 
         def planetStateAppend(state, key, value):
             if key == 'flows':
-                if value.get('name') != 'default':
+                if value != state.get('flows')[0]:
+                    self.warning('flumotion-admin can only handle one '
+                                 'flow, ignoring /%s', value.get('name'))
                     return
-                self.debug('default flow started')
+                self.debug('%s flow started', value.get('name'))
                 value.addListener(self, append=flowStateAppend,
                                   remove=flowStateRemove)
                 for c in value.get('components'):
@@ -521,7 +519,7 @@ class Window(log.Loggable, gobject.GObject):
             atmosphereStateAppend(a, 'components', c)
             
         for f in planetState.get('flows'):
-            planetStateAppend(f, 'flows', f)
+            planetStateAppend(planetState, 'flows', f)
  
     def stateSet(self, state, key, value):
         # called by model when state of something changes
