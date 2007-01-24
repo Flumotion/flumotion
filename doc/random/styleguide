@@ -1,9 +1,21 @@
 FLUMOTION STYLE GUIDE
 ---------------------
 
+CODE
+----
+
+The style of all python code should honor the recommendations in the
+Style Guide for Python Code [1] document.
+
+[1]: http://www.python.org/peps/pep-0008.html
+
+ChangeLog
+---------
+All checkins should add an appropriate entry in the ChangeLog.
+Exceptions for repository ignore files and metadata.
+
 UI
 --
-
 - use kbit/s and Mbit/s
 - provide accelerators for controls
 
@@ -33,6 +45,43 @@ API DOCS
 - defer_generator_method screws up the docs for private methods, causing
   private methods to be listed in the public API.  Avoid using
   defer_generator_method in private methods.
+
+TESTS
+-----
+To be able to achieve good quality of the code, all major checkins
+should also add an appropriate test in the testsuite. It's not okay
+to have any tests in a non-working tests when checking in. The testsuite
+should *always* run with no failing tests and ideally with no output.
+This also makes it easier to refactor code.
+
+If large changes are made over many places in the tree which can't make
+the whole testsuite run, then it should be made on a separate branch and
+not be merged with the main trunk before everything passes and it has been
+reviewed.
+
+NAMING
+------
+
+- classes should be named with CapitalizedWords
+- methods, functions and attributes should be named in the same style as the
+  libraries on the same interface level
+  e.g. GStreamer, GObject and GTK+ subclasses with underscore_method,
+  but Twisted-style classes with lowerCamelCaseMethod
+  When these two conflict:
+  - prefer lowerCamelCaseMethod
+  - prefer the outward interface you present
+    (ie, if you use GStreamer internally, but present a GStreamer-agnostic
+     abstraction to your users, then use the Twisted style)
+  In general, Flumotion follows Twisted style: lowerCamelCaseMethod
+  This goes for regular functions and variables too
+- some Twisted-style methods have a special form of (action)_lowerCamelCase;
+  e.g. perspective_, remote_, do_
+- Twisted coding standard:
+  http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
+
+MODULES
+-------
+- the docstring should come before imports; otherwise it does not work
 
 COMPONENTS
 ----------
