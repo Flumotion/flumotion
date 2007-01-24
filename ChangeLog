@@ -1,5 +1,9 @@
 2007-01-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/commands.py
+	(_parse_typed_args._do_parse_typed_args): Parse dicts and bools.
+	For example, {(sb)(is)} foo true 3 bar => {'foo': True, 3=>'bar'}.
+
 	* flumotion/admin/gtk/client.py (Window.setPlanetState): Accept
 	the first flow instead of rejecting any flow not named 'default'.
 

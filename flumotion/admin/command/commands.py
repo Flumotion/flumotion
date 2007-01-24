@@ -23,7 +23,7 @@ import os
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
-from flumotion.common import errors, log, componentui
+from flumotion.common import errors, log, componentui, common
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements
 from twisted.internet import defer
@@ -173,10 +173,14 @@ def _parse_typed_args(spec, args):
         accum = []
         while spec:
             argtype = spec.pop(0)
-            parsers = {'i': int, 's': str}
+            parsers = {'i': int, 's': str, 'b': common.strToBool}
             if argtype == ')':
                 return tuple(accum)
             elif argtype == '(':
+                accum.append(_do_parse_typed_args(spec, args))
+            elif argtype == '}':
+                return dict(accum)
+            elif argtype == '{':
                 accum.append(_do_parse_typed_args(spec, args))
             elif argtype not in parsers:
                 raise ParseException('Unknown argument type: %r'
