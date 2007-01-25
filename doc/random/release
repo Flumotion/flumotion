@@ -9,7 +9,9 @@
   - in src/htdocs/releases/flumotion, create a new file
   - add it to Makefile.am
   - update list of features by going through the ChangeLog
-  - update list of bugs fixed by pasting in the previous list of bugs
+  - update list of bugs fixed by pasting in the output of:
+    moap doap bug query -q "milestone=0.2.0" -f "<bug><id>%(id)s</id><summary>%(summary)s</summary></bug>"
+
   - update list of contributors
 * copy the generated text version to the RELEASE file
 * Edit NEWS and add the tickets fixed for this milestone, as well as the
