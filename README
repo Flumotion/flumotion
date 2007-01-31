@@ -33,7 +33,8 @@ For 0.10.x:
   GStreamer python bindings 0.10.1 or higher
 
 PyGTK - 2.4.0 or higher
-Twisted - 1.3.0 or higher
+Python - 2.3 or higher
+Twisted - 2.0 or higher
 Python Imaging Library
 
 And depending on what codecs you want to use:
