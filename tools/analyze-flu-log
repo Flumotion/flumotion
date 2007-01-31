@@ -102,6 +102,9 @@ class TracebackAnalyzer(StatsAnalyzer):
         if line['level'] is None:
             if self.current_traceback is None:
                 self.current_traceback = []
+            elif line['message'].rstrip() == 'Twisted traceback:':
+                self.finish_traceback()
+                self.current_traceback = []
             self.current_traceback.append(line['message'].rstrip())
         else:
             if self.current_traceback is not None:
@@ -111,9 +114,10 @@ class TracebackAnalyzer(StatsAnalyzer):
         print
         print '%d tracebacks found' % len(self.tracebacks)
         print
-        tbs = [(count, tb) for tb, count in self.tracebacks.items()]
+        tbs = [(count, len(tb), tb) for tb, count in self.tracebacks.items()]
         tbs.sort()
-        for count, tb in tbs:
+        for count, _, tb in tbs:
+            print '='*80
             print 'Seen %d times:' % count
             print tb
             print

@@ -4,6 +4,9 @@
 	finds unique tracebacks, printing them in order of how many times
 	they were seen.
 	(analyze, main): Add support for --tracebacks.
+	(TracebackAnalyzer.linein): Break on 'Twisted traceback:' also.
+	(TracebackAnalyzer.print_summary): Sort by count and length of
+	traceback.
 
 	* flumotion/test/test_twisted_compat.py: Remove tests for
 	deprecated behavior, and enable tests that didn't work on T1.3.
