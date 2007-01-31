@@ -867,6 +867,7 @@ class Vishnu(log.Loggable):
                 conf = {'name': compName,
                         'parent': flowName,
                         'type': 'unknown-component',
+                        'avatarId': avatar.avatarId,
                         'properties': {}}
 
             state.set('name', compName)
