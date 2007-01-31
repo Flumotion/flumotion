@@ -41,23 +41,6 @@ class TestComponentsWarning(unittest.TestCase):
     def tearDown(self):
         warnings.showwarning = self.showwarning
 
-    # test a known 1.3 Deprecation warning
-    def test13PerspectiveBrokerFactoryWarning(self):
-        def myshowwarning(message, category, filename, lineno, file=None):
-            self.warned = True
-
-        self.warned = False
-        warnings.showwarning = myshowwarning
-
-        p = pb.BrokerFactory('astring')
-        self.failUnless(self.warned)
-        self.warned = False
-
-        compat.filterWarnings(exceptions, 'DeprecationWarning')
-        
-        p = pb.BrokerFactory('astring')
-        self.failIf(self.warned)
-
 class AnInterface(compat.Interface):
     pass
 
@@ -91,29 +74,26 @@ class TestImplements(unittest.TestCase):
         inheritedInstance = AnInheritedClass()
         self.failUnless(compat.implementsInterface(
             inheritedInstance,AnInterface))
-    # These fail on twisted 1.3 so have commented out
-    # Until we deprecate twisted 1.3, we will have to use mergeImplements
-    # when doing multiple inheritance of interface implementing classes
 
-    #def testAMultipleInheritedClassObjectImplementsAnInterface(self):
-    #    multipleInheritedInstance = AMultipleInheritedClass()
-    #    self.failUnless(compat.implementsInterface(
-    #        multipleInheritedInstance, AnInterface))
-    #
-    #def testAMultipleInheritedClassObjectImplementsAnotherInterface(self):
-    #    multipleInheritedInstance = AMultipleInheritedClass()
-    #    self.failUnless(compat.implementsInterface(
-    #        multipleInheritedInstance, AnotherInterface))
-    #
-    #def testAMultipleheritedClassObjectImplementsWowAnotherInterface(self):
-    #    multipleInheritedInstance = AMultipleInheritedClass()
-    #    self.failUnless(compat.implementsInterface(
-    #        multipleInheritedInstance, WowAnotherInterface))
-    #
-    #def testANewMultipleInheritedClassObjectImplementsAnInterface(self):
-    #    multipleInheritedInstance = ANewMultipleInheritedClass()
-    #    self.failUnless(compat.implementsInterface(
-    #        multipleInheritedInstance, AnInterface))
+    def testAMultipleInheritedClassObjectImplementsAnInterface(self):
+        multipleInheritedInstance = AMultipleInheritedClass()
+        self.failUnless(compat.implementsInterface(
+            multipleInheritedInstance, AnInterface))
+    
+    def testAMultipleInheritedClassObjectImplementsAnotherInterface(self):
+        multipleInheritedInstance = AMultipleInheritedClass()
+        self.failUnless(compat.implementsInterface(
+            multipleInheritedInstance, AnotherInterface))
+    
+    def testAMultipleheritedClassObjectImplementsWowAnotherInterface(self):
+        multipleInheritedInstance = AMultipleInheritedClass()
+        self.failUnless(compat.implementsInterface(
+            multipleInheritedInstance, WowAnotherInterface))
+    
+    def testANewMultipleInheritedClassObjectImplementsAnInterface(self):
+        multipleInheritedInstance = ANewMultipleInheritedClass()
+        self.failUnless(compat.implementsInterface(
+            multipleInheritedInstance, AnInterface))
     
     def testANewMultipleInheritedClassObjectImplementsAnotherInterface(self):
         multipleInheritedInstance = ANewMultipleInheritedClass()

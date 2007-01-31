@@ -1,3 +1,14 @@
+2007-01-31  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_twisted_compat.py: Remove tests for
+	deprecated behavior, and enable tests that didn't work on T1.3.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.eatFromFD, FeedComponent.feedToFD): If we don't
+	have a pipeline yet, just close the fd and return, assuming that
+	the other element will eventually reconnect when we are fully set
+	up.
+
 2007-01-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/commands.py

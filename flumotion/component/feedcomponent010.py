@@ -702,6 +702,11 @@ class FeedComponent(basecomponent.BaseComponent):
         status['lastConnectD'] = d
 
     def get_element(self, element_name):
+        """Get an element out of the pipeline.
+
+        If it is possible that the component has not yet been set up,
+        the caller needs to check if self.pipeline is actually set.
+        """
         assert self.pipeline
         element = self.pipeline.get_by_name(element_name)
         return element
@@ -755,6 +760,15 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         self.debug('FeedToFD(%s, %d)' % (feedName, fd))
         feedId = common.feedId(self.name, feedName)
+
+        if not self.pipeline:
+            self.warning('told to feed %s to fd %d, but pipeline not '
+                         'running yet', feedId, fd)
+            cleanup(fd)
+            # can happen if we are restarting but the other component is
+            # happy; assume other side will reconnect later
+            return
+
         elementName = "feeder:%s" % feedId
         element = self.get_element(elementName)
         if not element:
@@ -799,6 +813,15 @@ class FeedComponent(basecomponent.BaseComponent):
         @type  fd:     int
         """
         self.debug('EatFromFD(%s, %d)' % (feedId, fd))
+
+        if not self.pipeline:
+            self.warning('told to eat %s from fd %d, but pipeline not '
+                         'running yet', feedId, fd)
+            # can happen if we are restarting but the other component is
+            # happy; assume other side will reconnect later
+            os.close(fd)
+            return
+
         eaterName = "eater:%s" % feedId
         self.debug('looking up element %s' % eaterName)
         element = self.get_element(eaterName)
