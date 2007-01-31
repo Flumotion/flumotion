@@ -87,6 +87,37 @@ class BasicStatsAnalyzer(StatsAnalyzer):
                    % (level_name, self.numlevel[levels[level_name]]))
         print '      Unrecognized: %d' % self.numlevel[None]
 
+class TracebackAnalyzer(StatsAnalyzer):
+    def __init__(self):
+        self.tracebacks = {}
+        self.current_traceback = None
+
+    def finish_traceback(self):
+        tb = '\n'.join(self.current_traceback)
+        current_count = self.tracebacks.get(tb, 0)
+        self.tracebacks[tb] = current_count + 1
+        self.current_traceback = None
+
+    def linein(self, line):
+        if line['level'] is None:
+            if self.current_traceback is None:
+                self.current_traceback = []
+            self.current_traceback.append(line['message'].rstrip())
+        else:
+            if self.current_traceback is not None:
+                self.finish_traceback()
+
+    def print_summary(self):
+        print
+        print '%d tracebacks found' % len(self.tracebacks)
+        print
+        tbs = [(count, tb) for tb, count in self.tracebacks.items()]
+        tbs.sort()
+        for count, tb in tbs:
+            print 'Seen %d times:' % count
+            print tb
+            print
+
 class HistogramAnalyzer(StatsAnalyzer):
     BUCKETSIZE = datetime.timedelta(minutes=30)
 
@@ -146,7 +177,7 @@ class HistogramAnalyzer(StatsAnalyzer):
                       (bucket['numlines']/starsize)*'*'))
             t += self.BUCKETSIZE
 
-def analyze(f, basic_stats=False, histogram=False):
+def analyze(f, basic_stats=False, histogram=False, tracebacks=False):
     f.seek(0)
 
     analyzers = []
@@ -154,6 +185,8 @@ def analyze(f, basic_stats=False, histogram=False):
         analyzers.append(BasicStatsAnalyzer())
     if histogram:
         analyzers.append(HistogramAnalyzer())
+    if tracebacks:
+        analyzers.append(TracebackAnalyzer())
     if not analyzers:
         print >>sys.stderr, \
               "No analyzers specified, try %s --help" % (sys.argv[0],)
@@ -175,6 +208,9 @@ def main(args):
     parser.add_option('', '--histogram',
                       action="store_true", dest="histogram",
                       help="output a histogram of debug statements")
+    parser.add_option('', '--tracebacks',
+                      action="store_true", dest="tracebacks",
+                      help="analyze the tracebacks found in the log")
     options, args = parser.parse_args(args)
 
     if len(args) != 2:
@@ -190,7 +226,8 @@ def main(args):
 
     analyze(log,
             basic_stats=options.basic_stats,
-            histogram=options.histogram)
+            histogram=options.histogram,
+            tracebacks=options.tracebacks)
     
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

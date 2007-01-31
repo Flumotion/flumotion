@@ -1,5 +1,10 @@
 2007-01-31  Andy Wingo  <wingo@pobox.com>
 
+	* tools/analyze-flu-log (TracebackAnalyzer): New log analyzer,
+	finds unique tracebacks, printing them in order of how many times
+	they were seen.
+	(analyze, main): Add support for --tracebacks.
+
 	* flumotion/test/test_twisted_compat.py: Remove tests for
 	deprecated behavior, and enable tests that didn't work on T1.3.
 
