@@ -1,5 +1,12 @@
 2007-01-31  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/portal.py (BouncerPortal._authenticateCallback): 
+	* flumotion/worker/feed.py (getKeycardClassesCb): Debug
+	improvements.
+	(_WorkerFeedDispatcher.requestAvatar): Prevent a race condition if
+	the remote side shuts down the socket right after authenticating.
+	See #566.
+
 	* tools/analyze-flu-log (TracebackAnalyzer.finish_traceback)
 	(TracebackAnalyzer.print_summary): OK finally order them by when
 	we first saw the tracebacks, and print a summary.

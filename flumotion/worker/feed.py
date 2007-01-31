@@ -58,7 +58,7 @@ class ProxyManagerBouncer(log.Loggable):
         """
         def getKeycardClassesCb(classes):
             self.keycardClasses = [reflect.namedObject(n) for n in classes]
-            self.debug('set proxied keycardClasses to %r' % self.keycardClasses)
+            self.log('set proxied keycardClasses to %r', self.keycardClasses)
             return classes
 
         d = self._remote.callRemote('getKeycardClasses')
@@ -186,24 +186,22 @@ class _WorkerFeedDispatcher(log.Loggable):
 
     ### IRealm methods
 
-    # requestAvatar gets called through ClientFactory.login()
-    # An optional second argument can be passed to login, which should be
-    # a L{twisted.spread.flavours.Referenceable}
-    # A L{twisted.spread.pb.RemoteReference} to it is passed to
-    # requestAvatar as mind.
-
-    # So in short, the mind is a reference to the client passed in login()
-    # on the peer, allowing any object that has the mind to call back
-    # to the piece that called login(),
-    # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
         avatar = FeedAvatar(self._brain, avatarId)
         # schedule a perspective attached for after this function
         # FIXME: there needs to be a way to not have to do a callLater
         # blindly so cleanup can be guaranteed
-        reactor.callLater(0, avatar.attached, mind)
+        dc = reactor.callLater(0, avatar.attached, mind)
 
-        return (pb.IPerspective, avatar, avatar.detached)
+        # FIXME FIXME: Need to fix #566; this is a workaround for the
+        # race condition until a proper cleanup can be fully tested
+        def logout():
+            if dc.active():
+                dc.cancel()
+            else:
+                avatar.detached()
+
+        return (pb.IPerspective, avatar, logout)
 
 def feedServerFactory(brain, unsafeTracebacks=0):
         """
