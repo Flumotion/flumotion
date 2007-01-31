@@ -89,14 +89,17 @@ class BasicStatsAnalyzer(StatsAnalyzer):
 
 class TracebackAnalyzer(StatsAnalyzer):
     def __init__(self):
+        self.tb_count = 0
         self.tracebacks = {}
         self.current_traceback = None
 
     def finish_traceback(self):
         tb = '\n'.join(self.current_traceback)
-        current_count = self.tracebacks.get(tb, 0)
-        self.tracebacks[tb] = current_count + 1
+        if tb.rstrip():
+            current_count, time = self.tracebacks.get(tb, (0, self.tb_count))
+            self.tracebacks[tb] = current_count + 1, time
         self.current_traceback = None
+        self.tb_count += 1
 
     def linein(self, line):
         if line['level'] is None:
@@ -112,11 +115,23 @@ class TracebackAnalyzer(StatsAnalyzer):
 
     def print_summary(self):
         print
-        print '%d tracebacks found' % len(self.tracebacks)
+        print '%d tracebacks found.' % len(self.tracebacks)
+        print 'Printing tracebacks in the order of when they were first seen.'
         print
-        tbs = [(count, len(tb), tb) for tb, count in self.tracebacks.items()]
+        tbs = [(time, tb, count)
+               for tb, (count, time) in self.tracebacks.items()]
         tbs.sort()
-        for count, _, tb in tbs:
+
+        def last_line(s):
+            return filter(None, map(str.rstrip, s.split('\n')))[-1]
+
+        print "Summary:"
+        for time, tb, count in tbs:
+            print '%d times: %s' % (count, last_line(tb))
+
+        print
+        print "Details:"
+        for time, tb, count in tbs:
             print '='*80
             print 'Seen %d times:' % count
             print tb

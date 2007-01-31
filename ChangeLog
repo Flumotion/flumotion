@@ -1,3 +1,9 @@
+2007-01-31  Andy Wingo  <wingo@pobox.com>
+
+	* tools/analyze-flu-log (TracebackAnalyzer.finish_traceback)
+	(TracebackAnalyzer.print_summary): OK finally order them by when
+	we first saw the tracebacks, and print a summary.
+	
 2007-01-31  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
