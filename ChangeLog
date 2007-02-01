@@ -1,5 +1,11 @@
 2007-02-01  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Since a mount-point of / doesn't work, issue a clear failure message
+	  for that case.
+
+2007-02-01  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/component.py:
 	  Always exit after calling stop(), even if the component stop fails
 	  for some reason (otherwise the component will be upstoppable).

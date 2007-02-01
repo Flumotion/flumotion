@@ -299,6 +299,10 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 return defer.fail(errors.ConfigError(msg))
 
         if props.get('mount-point', None) is not None: 
+            if props['mount-point'] == '/':
+                return defer.fail(errors.ConfigError(
+                    "A mount-point of / is not supported in this release"))
+
             path = props.get('path', None) 
             if path is None: 
                 msg = "missing required property 'path'"
