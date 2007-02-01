@@ -236,7 +236,9 @@ class BaseComponentMedium(medium.PingingMedium):
     def remote_stop(self):
         self.info('Stopping job')
         d = self.comp.stop()
-        d.addCallback(self._destroyCallback)
+        # We want to stop the process even if the component stop fails for some
+        # reason - otherwise we end up unstoppable. 
+        d.addBoth(self._destroyCallback)
 
         return d
 
