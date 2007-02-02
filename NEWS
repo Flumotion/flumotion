@@ -1,4 +1,15 @@
-This is Flumotion 0.4.0, "Camp Nou".
+This is Flumotion 0.4.1, "Nubaa".
+
+Bugs fixed since 0.4.0:
+
+546     Worker-Manual is Wrong!
+535     The admin don't receive component's messages
+548     Component don't trap ComponentSetupHandledError after do_setup
+563     [disker] need ability to specify filename in strftime syntax in config
+
+Features since 0.4.0:
+ - Improved log rotation support
+ - Improved reconnection reliability
 
 Bugs fixed since 0.3.2:
 

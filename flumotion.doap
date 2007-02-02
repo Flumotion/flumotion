@@ -229,4 +229,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.0.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.4.1</revision>
+   <branch>0.4</branch>
+   <name>Nubaa</name>
+   <created>2007-02-02</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.1.tar.bz2" />
+  </Version>
+ </release>
 </Project>

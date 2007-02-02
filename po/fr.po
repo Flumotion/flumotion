@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-18 06:16+0100\n"
+"POT-Creation-Date: 2007-02-02 13:27+0100\n"
 "PO-Revision-Date: 2006-03-03 18:02+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -57,73 +57,73 @@ msgstr "%s n'a pas encore d'interface graphique"
 msgid "This component has a UI bug in the %s tab."
 msgstr "Aucun composant sélectionné."
 
-#: flumotion/admin/gtk/client.py:578
+#: flumotion/admin/gtk/client.py:576
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administration de Flumotion"
 
-#: flumotion/admin/gtk/client.py:594
+#: flumotion/admin/gtk/client.py:592
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
-#: flumotion/admin/gtk/client.py:614
+#: flumotion/admin/gtk/client.py:612
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "La connexion au contremaître sur %s a été refusée."
 
-#: flumotion/admin/gtk/client.py:616
+#: flumotion/admin/gtk/client.py:614
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Connection à %s refusée."
 
-#: flumotion/admin/gtk/client.py:629
+#: flumotion/admin/gtk/client.py:627
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connection au contremaître sur %s a echouée (%s)."
 
-#: flumotion/admin/gtk/client.py:755
+#: flumotion/admin/gtk/client.py:753
 #, python-format
 msgid "Component %s is sad"
 msgstr "Le composant %s est malheureux"
 
-#: flumotion/admin/gtk/client.py:762
+#: flumotion/admin/gtk/client.py:760
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Affichage de l'interface graphique pour %s"
 
-#: flumotion/admin/gtk/client.py:791
+#: flumotion/admin/gtk/client.py:789
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Le composant %s est encore en train de dormir"
 
-#: flumotion/admin/gtk/client.py:793
+#: flumotion/admin/gtk/client.py:791
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Demande de l'interface graphique pour %s ..."
 
-#: flumotion/admin/gtk/client.py:846
+#: flumotion/admin/gtk/client.py:844
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "L'assistant ne peut être executé car aucun ouvrier n'est connecté."
 
-#: flumotion/admin/gtk/client.py:887
+#: flumotion/admin/gtk/client.py:885
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Re-chargement du code de composant pour %s"
 
-#: flumotion/admin/gtk/client.py:918
+#: flumotion/admin/gtk/client.py:916
 msgid "No component selected."
 msgstr "Aucun composant sélectionné."
 
-#: flumotion/admin/gtk/client.py:935
+#: flumotion/admin/gtk/client.py:933
 #, python-format
 msgid "Failed to %s component %s"
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:962
+#: flumotion/admin/gtk/client.py:960
 msgid "Import Configuration..."
 msgstr "Charger Configuration..."
 
-#: flumotion/admin/gtk/client.py:975
+#: flumotion/admin/gtk/client.py:973
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -131,11 +131,11 @@ msgstr ""
 "Le fichier existe déjà.\n"
 "Ecrire par dessus ?"
 
-#: flumotion/admin/gtk/client.py:997
+#: flumotion/admin/gtk/client.py:995
 msgid "Export Configuration..."
 msgstr "Exporter la configuration..."
 
-#: flumotion/admin/gtk/client.py:1044
+#: flumotion/admin/gtk/client.py:1042
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -144,35 +144,35 @@ msgstr ""
 "Impossible de relancer le composant:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1054
+#: flumotion/admin/gtk/client.py:1052
 msgid "Reloading ..."
 msgstr "Re-chargement"
 
-#: flumotion/admin/gtk/client.py:1055
+#: flumotion/admin/gtk/client.py:1053
 msgid "Reloading client code"
 msgstr "Re-chargement du code du client"
 
-#: flumotion/admin/gtk/client.py:1057
+#: flumotion/admin/gtk/client.py:1055
 #, python-format
 msgid "Reloading %s code"
 msgstr "Re-chargement du code de %s"
 
-#: flumotion/admin/gtk/client.py:1086
+#: flumotion/admin/gtk/client.py:1084
 msgid "About Flumotion"
 msgstr "A propos de Flumotion"
 
-#: flumotion/admin/gtk/client.py:1105
+#: flumotion/admin/gtk/client.py:1103
 #, fuzzy
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
-"Â© 2004, 2005, 2006, 2007 Fluendo S.L."
+"© 2004, 2005, 2006, 2007 Fluendo S.L."
 msgstr ""
 "Flumotion est un serveur de diffusion de médias.\n"
 "\n"
 "(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1115
+#: flumotion/admin/gtk/client.py:1113
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -381,40 +381,40 @@ msgid "Internal error: could not run check code on worker."
 msgstr ""
 "Erreur interne: impossible d'éxécuter le code de vérification sur l'ouvrier"
 
-#: flumotion/common/worker.py:71
+#: flumotion/common/worker.py:78
 #, python-format
 msgid "The %s was killed.\n"
 msgstr ""
 
-#: flumotion/common/worker.py:74
+#: flumotion/common/worker.py:81
 #, python-format
 msgid "The %s crashed.\n"
 msgstr ""
 
-#: flumotion/common/worker.py:94
+#: flumotion/common/worker.py:101
 msgid ""
 "However, no core dump was generated. You may need to configure the "
 "environment if you want to further debug this problem."
 msgstr ""
 
-#: flumotion/common/worker.py:103
+#: flumotion/common/worker.py:110
 #, python-format
 msgid "The core dump is '%s' on the host running '%s'."
 msgstr ""
 
-#: flumotion/component/component.py:488 flumotion/manager/component.py:842
+#: flumotion/component/component.py:493 flumotion/manager/component.py:842
 #: flumotion/manager/component.py:970
 #, fuzzy
 msgid "Could not setup component."
 msgstr "Impossible de relancer le composant:"
 
-#: flumotion/component/component.py:634
+#: flumotion/component/component.py:639
 msgid ""
 "Your configuration uses deprecated properties.  Please update your "
 "configuration and correct them.\n"
 msgstr ""
 
-#: flumotion/component/component.py:639
+#: flumotion/component/component.py:644
 #, fuzzy, python-format
 msgid "Please rename '%s' to '%s'.\n"
 msgstr "Veuillez mettre à jour '%s' vers la version %s."
@@ -428,7 +428,7 @@ msgstr ""
 "L'élément '%s' n'est pas installé pour l'ouvrier.\n"
 "Veuillez installer le plug-in requis et redémarrer le composant.\n"
 
-#: flumotion/component/feedcomponent.py:267
+#: flumotion/component/feedcomponent.py:266
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
 
@@ -648,20 +648,21 @@ msgstr "Impossible de relancer le composant:"
 #: flumotion/manager/manager.py:416
 #, python-format
 msgid ""
-"This component is configured for Flumotion version %r, but you are running "
-"version %r.\n"
+"This component is configured for Flumotion version %s, but you are running "
+"version %s.\n"
+"Please update the configuration of the component.\n"
 msgstr ""
 
-#: flumotion/manager/manager.py:491
+#: flumotion/manager/manager.py:493
 #, fuzzy
 msgid "The component is misconfigured."
 msgstr "Aucun composant sélectionné."
 
-#: flumotion/manager/manager.py:809
+#: flumotion/manager/manager.py:811
 msgid "The component could not be started."
 msgstr "Le composant n'a pas pu être démarré."
 
-#: flumotion/manager/manager.py:839
+#: flumotion/manager/manager.py:841
 msgid ""
 "Component logged in with stale configuration. Consider stopping this "
 "component and restarting the manager."

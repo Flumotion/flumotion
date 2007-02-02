@@ -1,5 +1,5 @@
 
-Release notes for Flumotion 0.4.0 "Camp Nou"
+Release notes for Flumotion 0.4.1 "Nubaa"
         
 
 The Flumotion team is happy to announce
@@ -16,38 +16,15 @@ with ease of use.
   
 Features of this release
     
-      * dropped support for GStreamer 0.8
-      * dropped support for Twisted 1.3.0
-      * workers only expose one TCP port for feeds now
-      * porter component allows sharing one TCP port for all streamers
-      * added plugs and sockets for finer-grained extensibility
-      * added a static file serving component
-      * workers and jobs reconnect on network failures
-      * components reconnect feeds on network failures
-      * added integration test framework
-      * Greatly improved and more flexible http burst-on-connect
-      * Allow setting a maximum duration for http connections
-      * Add simple icecast-stream relaying component
-      * Add component that takes GDP-payloaded data from a unix socket
-      * iCal based bouncer, to specify that clients may only connect during a
-        specific time of day
-      * Restarting a manager while a flow is running now works reliably
-      * The disker component can now be remotely controlled to start/stop
-        recording, and to automatically maintain symlinks to the latest
-        recording
-      * Many component properties were renamed to make them more consistent
-      * The http-server component is now more reliable, and has GTK UI
-      * Components in the GTK UI now show information about their feeders
-      * Network clock synchronisation now works in more cases
-      * Workers and their jobs can now have their logs rotated
+      * Improved log rotation support
+      * Improved reconnection reliability
 
 Bugs fixed in this release
     
-      * 523 : when disk is full, disker goes sad, but without any message
-              in the admin ui
-      * 551 : manager restart makes component marked as lost by mistake
-      * 552 : components logging back in from lost proxy jobstate keys in
-              incorrect order
+      * 546 : Worker-Manual is Wrong!
+      * 535 : The admin don't receive component's messages
+      * 548 : Component don't trap ComponentSetupHandledError after do_setup
+      * 563 : [disker] need ability to specify filename in strftime syntax in config
 
 Download
 
