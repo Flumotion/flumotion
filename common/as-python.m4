@@ -165,11 +165,11 @@ except ImportError:
 except SystemExit:
     raise
 except Exception, e:
-    print '  Error while trying to import $1:'
-    print '    %r: %s' % (e, e)
+    sys.stderr.write('  Error while trying to import $1:\n')
+    sys.stderr.write('    %r: %s\n' % (e, e))
     sys.exit(1)"
 
-if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+if $PYTHON -c "$prog" 2>&AC_FD_CC
 then
     AC_MSG_RESULT(found)
     ifelse([$2], , :, [$2])
