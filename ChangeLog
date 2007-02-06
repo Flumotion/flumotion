@@ -1,3 +1,12 @@
+2007-02-06  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: When running python code from the source tree, add
+	srcdir to the pythonpath. Fixes builddir != srcdir.
+
+	* common/as-python.m4: Make it so that a negative result of a
+	check is reported by python itself; allows multiple failure modes
+	to be reported properly.
+	
 2007-02-06  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/boot.py:

@@ -148,10 +148,11 @@ AC_DEFUN([AS_PYTHON_IMPORT],
   dnl Check if we can import a given module.
   dnl Requires AS_PATH_PYTHON to be called before.
   dnl PREAMBLE and POSTAMBLE, if given, is code executed right before and after
-  dnl the import
+  dnl the import; stdout is rerouted to config.log, and stderr to the console.
 
   AC_MSG_CHECKING([for python module $1])
 
+  changequote(<<, >>)dnl
   prog="
 import sys
 
@@ -160,21 +161,24 @@ try:
     import $1
     $5
     sys.exit(0)
-except ImportError:
-    sys.exit(1)
-except SystemExit:
+except ImportError, e:
+    raise SystemExit(*e.args)
+except SystemExit, e:
+    if not e.args or (e.args[0] != 0 and not isinstance(e.args[0], str)):
+        raise SystemExit('Unknown error')
     raise
 except Exception, e:
-    sys.stderr.write('  Error while trying to import $1:\n')
-    sys.stderr.write('    %r: %s\n' % (e, e))
+    print '  Error while trying to import $1:'
+    print '    %r: %s' % (e, e)
     sys.exit(1)"
+  changequote([, ])dnl
 
-if $PYTHON -c "$prog" 2>&AC_FD_CC
+if $PYTHON -c "$prog" 1>&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_FD
 then
     AC_MSG_RESULT(found)
     ifelse([$2], , :, [$2])
 else
-    AC_MSG_RESULT(not found)
+    dnl python has already printed a message on the message fd
     ifelse([$3], , :, [$3])
 fi
 ])

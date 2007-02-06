@@ -51,6 +51,10 @@ AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, [
   AC_MSG_ERROR([You need to install the Python development packages.])
 ])
 
+as_save_PYTHONPATH=$PYTHONPATH
+PYTHONPATH=$srcdir:$PYTHONPATH
+export PYTHONPATH
+
 dnl check for pygtk
 AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject()])
@@ -58,6 +62,9 @@ AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
 dnl check for gstreamer
 AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])
+
+PYTHONPATH=$as_save_PYTHONPATH
+export PYTHONPATH
 
 PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
 dnl check stuff we can generate the tray icon with
