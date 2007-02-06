@@ -22,24 +22,16 @@
 import os
 import sys
 
-PYGTK_DIR = '@PYGTK_DIR@'
+PYGTK_REQ = (2, 6, 3)
 
-PYGTK_BASE_REQ = '@PYGTK_010_REQ@'
-
-GST_010_SUPPORTED = '@GST_010_SUPPORTED@'
-PYGST_010_DIR = '@PYGST_010_DIR@'
-PYGTK_010_REQ = '@PYGTK_010_REQ@'
+GST_REQ = {'0.10': {'gstreamer': (0, 10, 0, 1),
+                    'gst-python': (0, 10, 0, 1)}}
 
 def init_gobject():
     """
-    I setup paths for pygtk from configure and
-    make sure that the installed version of pygtk
-    is sane enough to be usable by us
+    Initialize pygobject. A missing or too-old pygobject will cause a
+    SystemExit exception to be raised.
     """
-    
-    if not PYGTK_DIR in sys.path:
-        sys.path.insert(0, PYGTK_DIR)
-
     try:
         import pygtk
         pygtk.require('2.0')
@@ -48,73 +40,80 @@ def init_gobject():
     except ImportError:
         raise SystemExit('ERROR: PyGTK could not be found')
 
-    if gobject.pygtk_version < PYGTK_BASE_REQ.split('.'):
-        raise SystemExit(
-            'ERROR: PyGTK %s or higher is required' % PYGTK_BASE_REQ)
+    if gobject.pygtk_version < PYGTK_REQ:
+        raise SystemExit('ERROR: PyGTK %s or higher is required'
+                         % '.'.join(map(str, PYGTK_REQ)))
 
-    # To be able to have other threads emitting signals connected
-    # python callbacks we need to use the new PyGILThread_STATE API
-    # Which in PyGTK 2.4.0 only can be turned on by using an
-    # environment variable
-    os.environ['PYGTK_USE_GIL_STATE_API'] = ''
     gobject.threads_init()
+
+def _init_gst_version(gst_majorminor):
+    if gst_majorminor not in GST_REQ:
+        raise SystemExit('ERROR: Invalid FLU_GST_VERSION: %r (expected '
+                         'one of %r)' % (gst_majorminor, GST_REQ.keys()))
+    
+    pygst_req = GST_REQ[gst_majorminor]['gst-python']
+    gst_req = GST_REQ[gst_majorminor]['gstreamer']
+
+    try:
+        import pygst
+        pygst.require(gst_majorminor)
+        import gst
+    except ImportError, AssertionError:
+        return False
+
+    try:
+        gst_version = gst.get_gst_version()
+        pygst_version = gst.get_pygst_version()
+    except AttributeError:
+        # get_foo_version() added in 0.10.4, fall back
+        gst_version = gst.gst_version
+        pygst_version = gst.pygst_version
+
+    if gst_req[:2] != gst_version[:2]:
+        raise SystemExit('ERROR: Expected GStreamer %s, but got incompatible %s'
+                         % (gst_majorminor, tup2version(gst_version[:2])))
+    
+    if gst_version < gst_req:
+        raise SystemExit('ERROR: GStreamer %s too old; install %s or newer'
+                         % (tup2version(gst_version), tup2version(gst_req)))
+
+    if pygst_version < pygst_req:
+        raise SystemExit('ERROR: gst-python %s too old; install %s or newer'
+                         % (tup2version(pygst_version), tup2version(pygst_req)))
+
+    return True
 
 def init_gst():
     """
-    I setup paths for gst-python from configure and
-    make sure that the installed version of gst-python
-    is sane enough to be usable by us
+    Initialize pygst. A missing or too-old pygst will cause a
+    SystemExit exception to be raised.
     """
-
-    default_version = GST_010_SUPPORTED == 'yes' and '0.10'
-    gst_version = os.getenv('FLU_GST_VERSION', default_version)
-
-    if gst_version == '0.10':
-        pygst_dir = PYGST_010_DIR
-        pygtk_req = PYGTK_010_REQ
-    else:
-        raise SystemExit(
-            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.10" expected)'
-            % gst_version)
-
     assert 'gobject' in sys.modules, "Run init_gobject() first"
 
-    import gobject
+    def tup2version(tup):
+        return '.'.join(map(str, tup))
 
-    if gobject.pygtk_version < pygtk_req.split('.'):
-        raise SystemExit(
-            'ERROR: PyGTK %s or higher is required for FLU_GST_VERSION=%s'
-            % (pygtk_req, gst_version))
+    gst_majorminor = os.getenv('FLU_GST_VERSION')
 
-    if pygst_dir != PYGTK_DIR:
-        if pygst_dir in sys.path:
-            sys.path.remove(pygst_dir)
+    if gst_majorminor:
+        if not _init_gst_version(gst_majorminor):
+            raise SystemExit('ERROR: requested GStreamer version %s '
+                             'not available' % gst_majorminor)
+    else:
+        majorminors = GST_REQ.keys()
+        majorminors.sort()
+        while majorminors:
+            majorminor = majorminors.pop()
+            if _init_gst_version(majorminor):
+                gst_majorminor = majorminor
+                break
+        if not gst_majorminor:
+            raise SystemExit('ERROR: no GStreamer available '
+                             '(looking for versions %r)' % (GST_REQ.keys(),))
 
-        sys.path.insert(0, pygst_dir)
-        
-    if gst_version == '0.10':
-        try:
-            import pygst
-            pygst.require('0.10')
-        except ImportError:
-            raise SystemExit('ERROR: Could not load gst-python 0.10')
-
-    try:
-        import gst
-    except ImportError:
-        raise SystemExit('ERROR: gst-python could not be found')
-    
-    if not (gst.pygst_version[1] == 8 and gst_version == '0.8'
-            or gst.pygst_version[1] >= 10 and gst_version == '0.10'
-            or gst.pygst_version[1] == 9 and gst.pygst_version[2] >= 7 
-               and gst_version == '0.10'):
-        raise SystemExit(
-            'ERROR: Expected gst-python version %s in %s, but found %r'
-            % (gst_version, pygst_dir, gst.pygst_version))
-    
     # store our gst version for later logging
     from flumotion.configure import configure
-    configure.gst_version = gst_version
+    configure.gst_version = gst_majorminor
 
 def boot(path, gtk=False, gst=True, installReactor=True):
     from flumotion.twisted import compat

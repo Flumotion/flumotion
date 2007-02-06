@@ -5,5 +5,4 @@ flumotiondir=${libdir}/flumotion/python
 
 Name: Flumotion
 Description: Streaming media server
-@FLU_PKG_CONFIG_REQUIRES@
 Version: @VERSION@

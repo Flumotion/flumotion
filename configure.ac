@@ -51,71 +51,15 @@ AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, [
   AC_MSG_ERROR([You need to install the Python development packages.])
 ])
 
-dnl check for GStreamer
-PKG_CHECK_MODULES(GST_010, gstreamer-0.10 >= $GST_010_REQ,
-    [GST_010_SUPPORTED=yes], [AC_MSG_RESULT([$GST_010_PKG_ERRORS]); GST_010_SUPPORTED=no])
+dnl check for pygtk
+AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
+    [from flumotion.common import boot; boot.init_gobject()])
 
-if test $GST_010_SUPPORTED = "no"; then
-  AC_MSG_ERROR([No GStreamer development packages found.
-Please install GStreamer development packages for version 0.10.
-Also, check your PKG_CONFIG_PATH.])
-fi  
+dnl check for gstreamer
+AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
+    [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])
 
-export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
-PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_010_REQ)
-PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
-AC_SUBST(PYGTK_DIR)
-AC_MSG_NOTICE(Using pygtk installed in $PYGTK_DIR)
-PYGTK_VERSION="`$PKG_CONFIG --modversion pygtk-2.0`"
-
-if test "x$PYGTK_VERSION" = "x2.5.2"
-then
-  AC_MSG_ERROR([PyGTK 2.5.2 contains known bugs, please install other version])
-fi
-
-if test "x$DISPLAY" != "x"; then
-  AS_PYTHON_IMPORT([gtk.glade],,
-                   AC_MSG_ERROR([You need to have python libglade bindings installed]))
-else
-  AC_MSG_NOTICE([Not trying to import gtk.glade because DISPLAY is unset])
-fi
-
-if test $GST_010_SUPPORTED = "no"; then
-  AC_MSG_ERROR([No appropriate version of PyGTK installed. Correct the above
-errors and try again.])
-fi
-
-dnl checks for gst-python
-if test $GST_010_SUPPORTED = "yes"; then
-  PKG_CHECK_MODULES(PYGST_010, gst-python-0.10 >= $PYGST_010_REQ,
-      [PYGST_010_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.10`"
-       AC_SUBST(PYGST_010_DIR)
-       AC_MSG_NOTICE(Using gstreamer-python 0.10 installed in $PYGST_010_DIR)],
-      [AC_MSG_RESULT([$PYGST_010_PKG_ERRORS])
-       GST_010_SUPPORTED=no])
-
-  if test $GST_010_SUPPORTED = "yes"; then
-    saved_PYTHONPATH=$PYTHONPATH
-    export PYTHONPATH=$PYGST_010_DIR:$PYTHONPATH
-    AS_PYTHON_IMPORT([gst],,
-                     [AC_MSG_NOTICE([Unable to import gst-python 0.10 -- check your PYTHONPATH?])
-                      GST_010_SUPPORTED=no],
-                     [import pygst; pygst.require('0.10')],
-                     [assert gst.pygst_version[[1]] == 10 or (gst.pygst_version[[1]] == 9 and gst.pygst_version[[2]] >= 7)])
-
-  fi
-fi
-
-if test $GST_010_SUPPORTED = "no"; then
-  AC_MSG_ERROR([No suitable gstreamer-python versions found. Correct the above
-errors and try again.])
-fi  
-
-AC_SUBST(GST_010_SUPPORTED)
-
-FLU_PKG_CONFIG_REQUIRES="gstreamer-0.10 >= $GST_010_REQ"
-AC_SUBST(FLU_PKG_CONFIG_REQUIRES)
-
+PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
 dnl check stuff we can generate the tray icon with
 AC_MSG_CHECKING(for pygtk codegen)
 PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"
@@ -216,7 +160,6 @@ flumotion/admin/command/Makefile
 flumotion/admin/gtk/Makefile
 flumotion/admin/text/Makefile
 flumotion/common/Makefile
-flumotion/common/boot.py
 flumotion/component/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile

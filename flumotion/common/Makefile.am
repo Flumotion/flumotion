@@ -2,11 +2,6 @@ include $(top_srcdir)/common/python.mk
                                                                                 
 flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
-BUILT_SOURCES = boot.py
-
-nodist_flumotion_PYTHON = \
-	boot.py
-
 flumotion_PYTHON = \
 	__init__.py \
 	boot.py \
@@ -45,5 +40,3 @@ ETAGS_ARGS = --lang=python $(flumotion_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo
-
-EXTRA_DIST = boot.py.in
