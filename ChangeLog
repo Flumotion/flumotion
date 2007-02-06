@@ -1,5 +1,8 @@
 2007-02-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/boot.py (init_gst, boot): Fix so that checking
+	the version doesn't require a built installed/uninstalled.py.
+
 	* configure.ac: When running python code from the source tree, add
 	srcdir to the pythonpath. Fixes builddir != srcdir.
 

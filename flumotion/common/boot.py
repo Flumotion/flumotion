@@ -114,9 +114,7 @@ def init_gst():
             raise SystemExit('ERROR: no GStreamer available '
                              '(looking for versions %r)' % (GST_REQ.keys(),))
 
-    # store our gst version for later logging
-    from flumotion.configure import configure
-    configure.gst_version = gst_majorminor
+    return gst_majorminor
 
 def boot(path, gtk=False, gst=True, installReactor=True):
     from flumotion.twisted import compat
@@ -124,7 +122,8 @@ def boot(path, gtk=False, gst=True, installReactor=True):
         init_gobject()
 
     if gst:
-        init_gst()
+        from flumotion.configure import configure
+        configure.gst_version = init_gst()
 
     # installing the reactor could override our packager's import hooks ...
     if installReactor:
