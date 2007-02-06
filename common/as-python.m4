@@ -36,26 +36,18 @@ dnl $Id: as-python.m4,v 1.3 2006/02/28 16:49:31 thomasvs Exp $
 
 AC_DEFUN([AS_PATH_PYTHON],
  [
-  dnl Find a version of Python.  I could check for python versions 1.4
-  dnl or earlier, but the default installation locations changed from
-  dnl $prefix/lib/site-python in 1.4 to $prefix/lib/python1.5/site-packages
-  dnl in 1.5, and I don't want to maintain that logic.
+  dnl Find a version of Python.  Only checks for python 2.2 or newer.
 
   dnl should we do the version check?
   ifelse([$1],[],
-         [AC_PATH_PROG(PYTHON, python python2.1 python2.0 python1.6 python1.5)],
+         [AC_PATH_PROG(PYTHON, python python2.5 python2.4 python2.3 python2.2)],
          [
      AC_MSG_NOTICE(Looking for Python version >= $1)
     changequote(<<, >>)dnl
     prog="
-import sys, string
-minver = '$1'
-pyver = string.split(sys.version)[0]  # first word is version string
-# split strings by '.'. just compare textually to allow for versions like
-# 2.4.1a0
-minver = string.split(minver, '.')
-pyver = string.split(pyver, '.')
-# we can now do comparisons on the two lists:
+import sys
+minver = tuple(map(int,'$1'.split('.'))) + ('final', 0)
+pyver = sys.version_info
 if pyver >= minver:
 	sys.exit(0)
 else:
@@ -63,7 +55,7 @@ else:
     changequote([, ])dnl
 
     python_good=false
-    for python_candidate in python python2.2 python2.1 python2.0 python2 python1.6 python1.5; do
+    for python_candidate in python python2.5 python2.4 python2.3 python2.2; do
       unset PYTHON
       AC_PATH_PROG(PYTHON, $python_candidate) 1> /dev/null 2> /dev/null
 
@@ -87,13 +79,10 @@ else:
 
   AC_MSG_CHECKING([local Python configuration])
 
-  dnl Query Python for its version number.  Getting [:3] seems to be
-  dnl the best way to do this; it's what "site.py" does in the standard
-  dnl library.  Need to change quote character because of [:3]
-
+  dnl Need to change quote character because of [:2]
   AC_SUBST(PYTHON_VERSION)
   changequote(<<, >>)dnl
-  PYTHON_VERSION=`$PYTHON -c "import sys; print sys.version[:3]"`
+  PYTHON_VERSION=`$PYTHON -c "import sys; print '.'.join(map(str,sys.version_info[:2]))"`
   changequote([, ])dnl
 
 
