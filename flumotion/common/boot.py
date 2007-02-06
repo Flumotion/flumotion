@@ -47,6 +47,10 @@ def init_gobject():
     gobject.threads_init()
 
 def _init_gst_version(gst_majorminor):
+
+    def tup2version(tup):
+        return '.'.join(map(str, tup))
+
     if gst_majorminor not in GST_REQ:
         raise SystemExit('ERROR: Invalid FLU_GST_VERSION: %r (expected '
                          'one of %r)' % (gst_majorminor, GST_REQ.keys()))
@@ -58,7 +62,9 @@ def _init_gst_version(gst_majorminor):
         import pygst
         pygst.require(gst_majorminor)
         import gst
-    except ImportError, AssertionError:
+    except ImportError:
+        return False
+    except AssertionError:
         return False
 
     try:
@@ -89,9 +95,6 @@ def init_gst():
     SystemExit exception to be raised.
     """
     assert 'gobject' in sys.modules, "Run init_gobject() first"
-
-    def tup2version(tup):
-        return '.'.join(map(str, tup))
 
     gst_majorminor = os.getenv('FLU_GST_VERSION')
 

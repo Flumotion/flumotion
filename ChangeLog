@@ -1,3 +1,9 @@
+2007-02-06  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/boot.py:
+	  Move tup2version() to where it needs to be to work.
+	  Fix except call that pychecker didn't like.
+
 2007-02-06  Andy Wingo  <wingo@pobox.com>
 
 	* common/as-python.m4: Allow stdout of the test program to hit the
