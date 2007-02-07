@@ -1,5 +1,11 @@
 2007-02-07  Andy Wingo  <wingo@pobox.com>
 
+	* common/trial.mk (TRIAL_ENV): Make the environment that we run
+	our tests in configurable, defaulting to top_srcdir.
+
+	* flumotion/test/Makefile.am (TRIAL_ENV): Flumotion generates the
+	env script, so set TRIAL_ENV to top_builddir.
+
 	* common/trial.mk (trial): Use the env script instead of mucking
 	with pythonpath. Other flumotion modules might need to add an env
 	script.

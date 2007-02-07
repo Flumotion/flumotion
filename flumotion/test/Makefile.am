@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 include $(top_srcdir)/common/trial.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/test
 
 flumotion_PYTHON =			\
@@ -55,4 +55,5 @@ EXTRA_DIST = 				\
 	test_wizard.py 			\
 	test_workerconfig.py
 
+TRIAL_ENV=$(top_builddir)/env
 check-local: trial

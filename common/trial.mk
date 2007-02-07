@@ -1,8 +1,10 @@
 # add a trial target
 # include from flumotion/test/Makefile.am
 
+TRIAL_ENV=$(top_srcdir)/env
+
 trial: rm-trial-test-log
-	$(top_srcdir)/env trial flumotion.test 2>&1			\
+	$(TRIAL_ENV) trial flumotion.test 2>&1				\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\
