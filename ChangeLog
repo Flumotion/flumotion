@@ -1,3 +1,12 @@
+2007-02-07  Andy Wingo  <wingo@pobox.com>
+
+	* common/trial.mk (trial): Use the env script instead of mucking
+	with pythonpath. Other flumotion modules might need to add an env
+	script.
+
+	* env.in (src_dir): Properly subst in @top_srcdir@, which is
+	relative to top_builddir.
+
 2007-02-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/boot.py (init_gst, boot): Fix so that checking
