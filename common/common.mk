@@ -23,6 +23,10 @@ show-coverage:
 fixme:
 	tools/fixme | less -R
 
+# remove any cache written in distcheck	
+dist-hook:
+	rm -rf cache
+
 release: dist
 	make $(PACKAGE)-$(VERSION).tar.bz2.md5
 
