@@ -106,10 +106,8 @@
   </xsl:template>
 
   <!-- fix up theora bitrate to be in bps instead of kbps -->
-  <xsl:template match="//planet/*/component/property[@name='bitrate']" priority="9">
-      <xsl:if test="../@type = 'theora-encoder' and number(text()) &lt; 10000">
-        <property name="bitrate"><xsl:value-of select="." />000</property>
-      </xsl:if>
+  <xsl:template match="//planet/*/component[@type='theora-encoder']/property[@name='bitrate' and number(text()) &lt; 10000]/text()" priority="9">
+      <xsl:value-of select="." /><xsl:text>000</xsl:text>
   </xsl:template>
 
   <!-- Copy all the other nodes -->

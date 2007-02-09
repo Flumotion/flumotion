@@ -1,3 +1,9 @@
+2007-02-09  Michael Smith  <msmith@fluendo.com>
+
+	* data/upgrade-to-0.4.1.xsl:
+	  Rewrite theora bitrate rule to be more specific and elegent.
+	  Fixes problem where all other bitrate props were being deleted.
+
 2007-02-08  Andy Wingo  <wingo@pobox.com>
 
 	* common/common.mk (dist-hook): Add a dist hook to remove the
