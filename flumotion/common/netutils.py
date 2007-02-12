@@ -99,8 +99,7 @@ def ipv4StringToInt(s):
 def ipv4IntToString(n):
     l = []
     for i in range(4):
-        l.append(n % 256)
-        n >>= 8
+        l.append((n>>(i*8)) % 256)
     l.reverse()
     return '.'.join(map(str, l))
 

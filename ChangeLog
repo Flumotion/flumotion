@@ -1,5 +1,8 @@
 2007-02-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/netutils.py (ipv4IntToString): Change the
+	algorithm to appease pychecker?
+	
 	* flumotion/common/netutils.py (Network._parseSubnet)
 	(Network.addSubnet, Network.removeSubnet): 
 	* flumotion/test/test_common_netutils.py
