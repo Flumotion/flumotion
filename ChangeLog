@@ -1,3 +1,15 @@
+2007-02-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/netutils.py (ipv4StringToInt, ipv4IntToString):
+	New functions. We could use inet_pton and the like from socket,
+	but the interface seems more error-prone.
+	(Network): New object, a named set of subnets. Has a match()
+	method to test if an ipv4 address falls within the set.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_common_netutils.py: New tests, test ipv4
+	parsing and the Network subnet set object.
+
 2007-02-09  Michael Smith  <msmith@fluendo.com>
 
 	* data/upgrade-to-0.4.1.xsl:

@@ -89,3 +89,50 @@ def guess_public_hostname():
     except:
         return ip
 
+def ipv4StringToInt(s):
+    ret = 0
+    for n in map(int, s.split('.')):
+        ret <<= 8
+        ret += n
+    return ret
+
+def ipv4IntToString(n):
+    l = []
+    for i in range(4):
+        l.append(n % 256)
+        n >>= 8
+    l.reverse()
+    return '.'.join(map(str, l))
+
+class Network(set):
+    def __init__(self, name=None):
+        self.name = name
+
+    def _parseSubnet(self, ipv4String, prefixLen, netmask):
+        if netmask is not None:
+            netmask = ipv4StringToInt(netmask)
+        else:
+            netmask = ~((1 << (32 - prefixLen)) - 1)
+            if netmask < 0:
+                # so that netmasks made from this function are the same
+                # as those made by ipv4StringToInt
+                netmask += 1<<32
+        
+        ip = ipv4StringToInt(ipv4String)
+
+        return ip, netmask
+
+    def addSubnet(self, ipv4String, prefixLen=32, netmask=None):
+        self.add(self._parseSubnet(ipv4String, prefixLen, netmask))
+
+    def removeSubnet(self, ipv4String, prefixLen=32, netmask=None):
+        self.remove(self._parseSubnet(ipv4String, prefixLen, netmask))
+
+    def match(self, ipv4String):
+        ip = ipv4StringToInt(ipv4String)
+
+        for net, netmask in self:
+            if ip & netmask == net:
+                return True
+
+        return False
