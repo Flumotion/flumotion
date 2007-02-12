@@ -108,25 +108,15 @@ class Network(set):
     def __init__(self, name=None):
         self.name = name
 
-    def _parseSubnet(self, ipv4String, prefixLen, netmask):
-        if netmask is not None:
-            netmask = ipv4StringToInt(netmask)
-        else:
-            netmask = ~((1 << (32 - prefixLen)) - 1)
-            if netmask < 0:
-                # so that netmasks made from this function are the same
-                # as those made by ipv4StringToInt
-                netmask += 1<<32
-        
-        ip = ipv4StringToInt(ipv4String)
+    def _parseSubnet(self, ipv4String, maskBits):
+        return (ipv4StringToInt(ipv4String),
+                ~((1 << (32 - maskBits)) - 1))
 
-        return ip, netmask
+    def addSubnet(self, ipv4String, maskBits=32):
+        self.add(self._parseSubnet(ipv4String, maskBits))
 
-    def addSubnet(self, ipv4String, prefixLen=32, netmask=None):
-        self.add(self._parseSubnet(ipv4String, prefixLen, netmask))
-
-    def removeSubnet(self, ipv4String, prefixLen=32, netmask=None):
-        self.remove(self._parseSubnet(ipv4String, prefixLen, netmask))
+    def removeSubnet(self, ipv4String, maskBits=32):
+        self.remove(self._parseSubnet(ipv4String, maskBits))
 
     def match(self, ipv4String):
         ip = ipv4StringToInt(ipv4String)

@@ -62,16 +62,6 @@ class TestNetwork(unittest.TestCase):
         net.removeSubnet('192.168.1.0', 24)
         self.assertEquals(len(net), 0)
         
-        net.addSubnet('192.168.0.0', netmask='255.255.255.0')
-        self.assertEquals(len(net), 1)
-        net.removeSubnet('192.168.0.0', netmask='255.255.255.0')
-        self.assertEquals(len(net), 0)
-
-        net.addSubnet('192.168.0.0', netmask='255.255.255.0')
-        self.assertEquals(len(net), 1)
-        net.removeSubnet('192.168.0.0', 24)
-        self.assertEquals(len(net), 0)
-
     def testMatch(self):
         net = Network()
 
