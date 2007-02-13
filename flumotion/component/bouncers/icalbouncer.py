@@ -52,7 +52,7 @@ class IcalBouncer(bouncer.Bouncer):
                 config.ConfigError(
                     "Please install icalendar and dateutil modules"))
         props = self.config['properties']
-        self._icsfile = props['ics-file']
+        self._icsfile = props['file']
         return self.parse_ics()
 
     def parse_ics(self):

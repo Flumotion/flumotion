@@ -1,3 +1,8 @@
+2007-02-13  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	  Thomas broke ANOTHER THING WITH HIS DAMN RENAMING.
+
 2007-02-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/netutils.py (ipv4IntToString): Change the
