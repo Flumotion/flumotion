@@ -24,7 +24,7 @@ import common
 from twisted.trial import unittest
 
 from flumotion.common.netutils import ipv4StringToInt, ipv4IntToString
-from flumotion.common.netutils import Network
+from flumotion.common.netutils import RoutingTable
 
 
 class TestIpv4Parse(unittest.TestCase):
@@ -48,46 +48,44 @@ class TestIpv4Parse(unittest.TestCase):
         self.assertEquals(ipv4StringToInt('0.1.0.0'), 1<<16)
         self.assertEquals(ipv4StringToInt('1.0.0.0'), 1<<24)
 
-class TestNetwork(unittest.TestCase):
-    def testName(self):
-        self.assertEquals(Network().name, None)
-        self.assertEquals(Network('foo').name, 'foo')
-
+class TestRoutingTable(unittest.TestCase):
     def testAddRemove(self):
-        net = Network()
-        net.addSubnet('192.168.0.0', 24)
-        net.addSubnet('192.168.1.0', 24)
+        net = RoutingTable()
+        net.addSubnet('foo', '192.168.0.0', 24)
+        net.addSubnet('foo', '192.168.1.0', 24)
         self.assertEquals(len(net), 2)
-        net.removeSubnet('192.168.0.0', 24)
-        net.removeSubnet('192.168.1.0', 24)
+        net.removeSubnet('foo', '192.168.0.0', 24)
+        net.removeSubnet('foo', '192.168.1.0', 24)
         self.assertEquals(len(net), 0)
         
-    def testMatch(self):
-        net = Network()
+    def testRoute(self):
+        net = RoutingTable()
 
-        self.failIf(net.match('192.168.1.0'))
+        def ar(ip, route):
+            self.assertEquals(net.route(ip), route)
+
+        ar('192.168.1.0', None)
         
-        net.addSubnet('192.168.1.0', 24)
+        net.addSubnet('foo', '192.168.1.0', 24)
 
-        self.failUnless(net.match('192.168.1.0'))
-        self.failUnless(net.match('192.168.1.10'))
-        self.failUnless(net.match('192.168.1.255'))
-        
-        self.failIf(net.match('192.168.0.255'))
-        self.failIf(net.match('192.168.2.0'))
+        ar('192.168.1.0', 'foo')
+        ar('192.168.1.10', 'foo')
+        ar('192.168.1.255', 'foo')
 
-        net.addSubnet('192.168.2.0', 24)
+        ar('192.168.0.255', None)
+        ar('192.168.2.0', None)
 
-        self.failIf(net.match('192.168.0.255'))
-        self.failUnless(net.match('192.168.1.255'))
-        self.failUnless(net.match('192.168.2.0'))
+        net.addSubnet('foo', '192.168.2.0', 24)
 
-        net.removeSubnet('192.168.1.0', 24)
-        net.removeSubnet('192.168.2.0', 24)
+        ar('192.168.0.255', None)
+        ar('192.168.1.255', 'foo')
+        ar('192.168.2.0', 'foo')
 
-        self.failIf(net.match('192.168.1.0'))
-        self.failIf(net.match('192.168.1.10'))
-        self.failIf(net.match('192.168.1.255'))
-        
-        self.failIf(net.match('192.168.0.255'))
-        self.failIf(net.match('192.168.2.0'))
+        net.removeSubnet('foo', '192.168.1.0', 24)
+        net.removeSubnet('foo', '192.168.2.0', 24)
+
+        ar('192.168.1.0', None)
+        ar('192.168.1.10', None)
+        ar('192.168.1.255', None)
+        ar('192.168.0.255', None)
+        ar('192.168.2.0', None)

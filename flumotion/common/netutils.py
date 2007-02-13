@@ -27,6 +27,7 @@ import socket
 import fcntl
 import struct
 import array
+import avltree
 
 # Thanks to Paul Cannon, see 
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439093
@@ -103,25 +104,44 @@ def ipv4IntToString(n):
     l.reverse()
     return '.'.join(map(str, l))
 
-class Network(set):
-    def __init__(self, name=None):
-        self.name = name
+def countTrailingZeroes32(n):
+    tz = 0
+    if n == 0:
+        # max of 32 bits
+        tz = 32
+    else:
+        while not (n & (1<<tz)):
+            tz += 1
+    return tz
+
+class RoutingTable(object):
+    def __init__(self):
+        self.avltree = avltree.AVLTree()
 
     def _parseSubnet(self, ipv4String, maskBits):
         return (ipv4StringToInt(ipv4String),
                 ~((1 << (32 - maskBits)) - 1))
 
-    def addSubnet(self, ipv4String, maskBits=32):
-        self.add(self._parseSubnet(ipv4String, maskBits))
+    def addSubnet(self, route, ipv4String, maskBits=32):
+        ipv4Int, mask = self._parseSubnet(ipv4String, maskBits)
+        self.avltree.insert((mask, ipv4Int, route))
 
-    def removeSubnet(self, ipv4String, maskBits=32):
-        self.remove(self._parseSubnet(ipv4String, maskBits))
+    def removeSubnet(self, route, ipv4String, maskBits=32):
+        ipv4Int, mask = self._parseSubnet(ipv4String, maskBits)
+        self.avltree.delete((mask, ipv4Int, route))
 
-    def match(self, ipv4String):
-        ip = ipv4StringToInt(ipv4String)
+    def __iter__(self):
+        return iter(self.avltree)
 
-        for net, netmask in self:
+    def __len__(self):
+        return len(self.avltree)
+
+    def route(self, ip):
+        if isinstance(ip, str):
+            ip = ipv4StringToInt(ip)
+
+        for netmask, net, route in self:
             if ip & netmask == net:
-                return True
+                return route
 
-        return False
+        return None

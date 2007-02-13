@@ -4,6 +4,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
 flumotion_PYTHON = \
 	__init__.py \
+	avltree.py \
 	boot.py \
 	bundle.py \
 	bundleclient.py \
