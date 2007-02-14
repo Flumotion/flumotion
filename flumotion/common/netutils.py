@@ -124,6 +124,9 @@ class RoutingTable(object):
 
     def addSubnet(self, route, ipv4String, maskBits=32):
         ipv4Int, mask = self._parseSubnet(ipv4String, maskBits)
+        if not ipv4Int & mask == ipv4Int:
+            raise ValueError('Net %s too specific for mask with %d bits'
+                             % (ipv4String, maskBits))
         self.avltree.insert((mask, ipv4Int, route))
 
     def removeSubnet(self, route, ipv4String, maskBits=32):
@@ -131,7 +134,7 @@ class RoutingTable(object):
         self.avltree.delete((mask, ipv4Int, route))
 
     def __iter__(self):
-        return iter(self.avltree)
+        return self.avltree.iterreversed()
 
     def __len__(self):
         return len(self.avltree)

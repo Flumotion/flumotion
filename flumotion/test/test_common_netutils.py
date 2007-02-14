@@ -58,7 +58,7 @@ class TestRoutingTable(unittest.TestCase):
         net.removeSubnet('foo', '192.168.1.0', 24)
         self.assertEquals(len(net), 0)
         
-    def testRoute(self):
+    def testBasicRouting(self):
         net = RoutingTable()
 
         def ar(ip, route):
@@ -89,3 +89,22 @@ class TestRoutingTable(unittest.TestCase):
         ar('192.168.1.255', None)
         ar('192.168.0.255', None)
         ar('192.168.2.0', None)
+
+    def testRoutingPrecedence(self):
+        net = RoutingTable()
+
+        def ar(ip, route):
+            self.assertEquals(net.route(ip), route)
+
+        net.addSubnet('foo', '192.168.1.0', 32)
+        net.addSubnet('bar', '192.168.1.0', 24)
+
+        self.assertRaises(ValueError,
+                          net.addSubnet,
+                          'baz', '192.168.1.0', 16)
+
+        net.addSubnet('baz', '192.168.0.0', 16)
+
+        ar('192.168.1.0', 'foo')
+        ar('192.168.1.1', 'bar')
+        ar('192.168.2.1', 'baz')

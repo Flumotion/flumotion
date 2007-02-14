@@ -254,6 +254,17 @@ def iterate(tree):
         for x in iterate(r):
             yield x
 
+def iteratereversed(tree):
+    """Iterate over an AVL tree, starting with the highest-ordered
+    value."""
+    if tree is not None:
+        l, v, r, b = tree
+        for x in iteratereversed(r):
+            yield x
+        yield v
+        for x in iteratereversed(l):
+            yield x
+
 class AVLTree(object):
     def __init__(self, seq=()):
         self._len = len(seq)
@@ -275,3 +286,6 @@ class AVLTree(object):
 
     def __iter__(self):
         return iterate(self.tree)
+
+    def iterreversed(self):
+        return iteratereversed(self.tree)

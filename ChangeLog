@@ -1,5 +1,18 @@
 2007-02-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/netutils.py (RoutingTable.addSubnet): Sanity
+	check: net should not be too specific for mask.
+	(RoutingTable.__iter__): Iterate the tree in reverse order, so we
+	get most specific netmasks first.
+
+	* flumotion/common/avltree.py (iteratereversed)
+	(AVLTree.__iter__): Implement reverse iteration.
+
+	* flumotion/test/test_common_netutils.py
+	(TestRoutingTable.testBasicRouting): Rename from testRouting.
+	(TestRoutingTable.testBasicRouting): New test, tests that more
+	specific matching netmasks have precedence.
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): 
 	* flumotion/test/test_common_avltree.py: Add test for all kinds of
 	insertion/deletion patterns. Hopefully comprehensive.
