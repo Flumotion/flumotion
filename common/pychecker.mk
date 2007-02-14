@@ -35,8 +35,8 @@ pychecker_all_files = $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER
 pychecker_010_files = $(filter %010.py,$(pychecker_all_files))
 pychecker_indep_files = $(filter-out $(pychecker_010_files),$(pychecker_all_files))
 
-pychecker_indep = PYTHONPATH=$(OUR_PATH) $(pychecker)
-pychecker_010 = PYTHONPATH=$(PYGST_010_DIR):$(OUR_PATH) FLU_GST_VERSION=0.10 $(pychecker)
+pychecker_indep = PYTHONPATH=$(OUR_PATH):$$PYTHONPATH $(pychecker)
+pychecker_010 = PYTHONPATH=$(OUR_PATH):$$PYTHONPATH FLU_GST_VERSION=0.10 $(pychecker)
 
 pychecker_if_010 = if test "x$(GST_010_SUPPORTED)" = "xyes"; then 
 pychecker_fi = else echo "passing, gstreamer version not supported"; fi

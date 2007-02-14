@@ -211,6 +211,7 @@ class BaseAdminGtkNode(log.Loggable):
         self.wtree = None
         self.widget = None
         self.uiState = None
+        self.gladefile = None
         
     def status_push(self, str):
         if self.statusbar:
@@ -260,6 +261,7 @@ class BaseAdminGtkNode(log.Loggable):
                     gladeFile, path))
             self.debug("Switching glade text domain to %s" % domain)
             self.debug("loading widget tree from %s" % path)
+            self.gladefile = path
             old = gtk.glade.textdomain()
             gtk.glade.textdomain(domain)
             self.wtree = gtk.glade.XML(path)
@@ -279,6 +281,20 @@ class BaseAdminGtkNode(log.Loggable):
         if not widget:
             self.warning('Could not get widget %s' % name)
 
+        return widget
+
+    def createWidget(self, name):
+        """
+        Create a new widget instance from the glide file.
+        Can be used to make multiple instances of the same widget.
+        """
+        if not self.gladefile:
+            raise IndexError
+        wtree = gtk.glade.XML(self.gladefile, name)
+        widget = wtree.get_widget(name)
+        if not widget:
+            self.warning('Could not create widget %s' % name)
+        
         return widget
 
     def haveWidgetTree(self):
