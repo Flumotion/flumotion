@@ -15,6 +15,7 @@ EXTRA_DIST = 				\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
+	test_common_avltree.py	 	\
 	test_common_componentui.py 	\
 	test_common_connection.py 	\
 	test_common_gstreamer.py 	\

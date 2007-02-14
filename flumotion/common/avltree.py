@@ -42,7 +42,7 @@ def height(tree):
         if b <= 0:
             return height(l) + 1
         else:
-            return height(l) + 1
+            return height(r) + 1
 
 def debug(tree, level=0):
     """Print out a debugging representation of an AVL tree."""
@@ -68,16 +68,22 @@ def _balance(hdiff, l, v, r, b):
     if b < -1:
         # rotate right
         ll, lv, lr, lb = l
-        if lb <= 0:
-            # easy case, lv is new root; 0 can happen in deletion
+        if lb == -1:
+            # easy case, lv is new root
             new = node(ll, lv, node(lr, v, r, 0), 0)
-            if hdiff < 0:
+            if hdiff <= 0:
                 # deletion; maybe we decreased in height
                 old = node(l, v, r, b)
-                hdiff = height(new) - height(old)
+                hdiff += height(new) - height(old)
             else:
                 # we know that for insertion we don't increase in height
                 hdiff = 0
+            return hdiff, new
+        elif lb == 0:
+            # can only happen in deletion
+            new = node(ll, lv, node(lr, v, r, -1), +1)
+            old = node(l, v, r, b)
+            hdiff += height(new) - height(old)
             return hdiff, new
         else: # lb == +1
             # lrv will be the new root
@@ -90,23 +96,36 @@ def _balance(hdiff, l, v, r, b):
             else: # lrb == +1
                 newleftb = -1
                 newrightb = 0
-            return new, node(node(ll, lv, lrl, newleftb),
-                             lrv,
-                             node(lrr, v, r, newrightb),
-                             0)
+            new = node(node(ll, lv, lrl, newleftb), lrv,
+                       node(lrr, v, r, newrightb), 0)
+            if hdiff <= 0:
+                # deletion; maybe we decreased in height
+                old = node(l, v, r, b)
+                hdiff += height(new) - height(old)
+            else:
+                # we know that for insertion we don't increase in height
+                hdiff = 0 
+
+            return hdiff, new
     elif b > 1:
         # rotate left
         rl, rv, rr, rb = r
-        if rb >= 0:
-            # easy case, rv is new root; 0 can happen in deletion
+        if rb == +1:
+            # easy case, rv is new root
             new = node(node(l, v, rl, 0), rv, rr, 0)
-            if hdiff < 0:
+            if hdiff <= 0:
                 # deletion; maybe we decreased in height
                 old = node(l, v, r, b)
-                hdiff = height(new) - height(old)
+                hdiff += height(new) - height(old)
             else:
                 # we know that for insertion we don't increase in height
                 hdiff = 0
+            return hdiff, new
+        elif rb == 0:
+            # can only happen in deletion
+            new = node(node(l, v, rl, +1), rv, rr, -1)
+            old = node(l, v, r, b)
+            hdiff += height(new) - height(old)
             return hdiff, new
         else: # rb == -1
             # rlv will be the new root
@@ -119,10 +138,16 @@ def _balance(hdiff, l, v, r, b):
             else: # rlb == -1
                 newleftb = 0
                 newrightb = +1
-            return 0, node(node(l, v, rll, newleftb),
-                           rlv,
-                           node(rlr, rv, rr, newrightb),
-                           0)
+            new = node(node(l, v, rll, newleftb), rlv,
+                       node(rlr, rv, rr, newrightb), 0)
+            if hdiff <= 0:
+                # deletion; maybe we decreased in height
+                old = node(l, v, r, b)
+                hdiff += height(new) - height(old)
+            else:
+                # we know that for insertion we don't increase in height
+                hdiff = 0 
+            return hdiff, new
     else:
         return hdiff, node(l, v, r, b)
 
@@ -135,10 +160,18 @@ def insert(tree, value):
         l, v, r, b = tree
         if value < v:
             hdiff, newl = insert(l, value)
-            return _balance(hdiff, newl, v, r, b - hdiff)
+            if hdiff > 0:
+                if b > 0:
+                    hdiff = 0
+                b -= 1
+            return _balance(hdiff, newl, v, r, b)
         elif value > v:
             hdiff, newr = insert(r, value)
-            return _balance(hdiff, l, v, newr, b + hdiff)
+            if hdiff > 0:
+                if b < 0:
+                    hdiff = 0
+                b += 1
+            return _balance(hdiff, l, v, newr, b)
         else:
             raise ValueError('tree already has value %r' % value)
 

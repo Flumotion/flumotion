@@ -1,3 +1,15 @@
+2007-02-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_common_avltree.py: Add test for all kinds of
+	insertion/deletion patterns. Hopefully comprehensive.
+
+	* flumotion/common/avltree.py (height): Fix copynpasteo.
+	(_balance): Fix balance factors and hdiff returns in a number of
+	cases, brought out by the test suite.
+	(insert): Only report an increase in height if the balance factor
+	was even or tilted towards the inserted side.
+
 2007-02-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/firewire/firewire.py:
