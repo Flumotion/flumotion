@@ -86,12 +86,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         else:
             pad_pipe = ''
 
-        # Scale down to half size and back again to lose interlacing
-        # artifacts.
-        if height > 288:
-            interlaced_height = 576
-        else:
-            interlaced_height = 288
+        # Always scale down to half size to lose interlacing artifacts.
+        # FIXME: handle this better when GStreamer provides facilities for it.
+        interlaced_height = 288
             
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
