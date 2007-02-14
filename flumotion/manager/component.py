@@ -1044,6 +1044,19 @@ class ComponentHeaven(base.ManagerHeaven):
         workerName = componentAvatar.getWorkerName()
         port = self.vishnu.reservePortsOnWorker(workerName, 1)[0]
 
+        def failedToProvideMasterClock(failure):
+            # check if we actually did provide master clock and failed
+            # to give to a waiting component or we actually failed to
+            # provide a master clock
+            if avatarId in self._masterClockInfo:
+                self.warning('Failed to provide master clock info to a '
+                    'component waiting for it')
+            else:
+                self.warning('Failed to provide master clock itself')
+                self.debug('Going to release port')
+                self.vishnu.releasePortsOnWorker(workerName, [port])
+            self.warning(failure.getErrorMessage())
+
         if avatarId in self._masterClockInfo:
             self.warning('component %s already has master clock info: %r'
                          % (avatarId, self._masterClockInfo[avatarId]))
@@ -1051,6 +1064,7 @@ class ComponentHeaven(base.ManagerHeaven):
         d = componentAvatar.mindCallRemote('provideMasterClock', port)
         d.addCallback(setMasterClockInfo)
         d.addCallback(wakeClockMasterWaiters)
+        d.addErrback(failedToProvideMasterClock)
         return d
 
     def removeMasterClock(self, componentAvatar):

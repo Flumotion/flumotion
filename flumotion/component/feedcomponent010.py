@@ -401,6 +401,17 @@ class FeedComponent(basecomponent.BaseComponent):
                     gerror.message, gerror.domain, gerror.code, debug),
                 id=id, priority=40)
             self.state.append('messages', m)
+            # if we have a state change defer to paused that has not yet
+            # fired, we should errback it
+            change = gst.STATE_CHANGE_READY_TO_PAUSED
+            if change in self._stateChangeDeferreds:
+                self.log("We have an error, going to errback pending state "
+                    "change defers")
+                dlist = self._stateChangeDeferreds[change]
+                for d in dlist:
+                    d.errback(errors.ComponentStartHandledError(gerror.message))
+                del self._stateChangeDeferreds[change]
+
         elif t == gst.MESSAGE_EOS:
             name = src.get_name()
             if name in ['eater:' + n for n in self.eater_names]:
