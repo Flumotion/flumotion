@@ -1,3 +1,8 @@
+2007-02-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/avltree.py (insert, delete): Fix string
+	splicing.
+
 2007-02-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py:
@@ -10,6 +15,9 @@
 	Fixes #568.
 
 2007-02-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/avltree.py (insert, delete): Fix string
+	splicing.
 
 	* flumotion/common/netutils.py (RoutingTable.addSubnet): Sanity
 	check: net should not be too specific for mask.

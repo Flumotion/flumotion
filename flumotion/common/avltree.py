@@ -173,7 +173,7 @@ def insert(tree, value):
                 b += 1
             return _balance(hdiff, l, v, newr, b)
         else:
-            raise ValueError('tree already has value %r' % value)
+            raise ValueError('tree already has value %r' % (value,))
 
 def delete(tree, value):
     """Delete a value from an AVL tree. Like L{insert}, returns a tuple
@@ -193,7 +193,7 @@ def delete(tree, value):
             return (minv,) + _balance(hdiff, newl, v, r, b)
 
     if tree is None:
-        raise ValueError('tree has no value %r' % value)
+        raise ValueError('tree has no value %r' % (value,))
     else:
         l, v, r, b = tree
         if value < v:
