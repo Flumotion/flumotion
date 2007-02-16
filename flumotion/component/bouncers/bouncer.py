@@ -24,14 +24,18 @@ Base class and implementation for bouncer components, who perform
 authentication services for other components.
 """
 
+import md5
+import random
+
 from twisted.python import components
-from twisted.cred import credentials
+from twisted.internet import defer
+from twisted.cred import error
 
 from flumotion.common import interfaces, keycards
 from flumotion.common.componentui import WorkerComponentUIState
 
 from flumotion.component import component
-from flumotion.twisted import flavors
+from flumotion.twisted import flavors, credentials
 
 __all__ = ['Bouncer']
 
@@ -59,12 +63,8 @@ class BouncerMedium(component.BaseComponentMedium):
         """
         return self.comp.expireKeycardId(keycardId)
 
-       
-    ### FIXME: having these methods means we need to properly separate
-    # more component-related stuff
-    def remote_link(self, eatersData, feadersData):
-        self.warning("FIXME: remote_link should only be called for feedComponent")
-        return []
+    def remote_setEnabled(self, enabled):
+        return self.comp.setEnabled(enabled)
 
 class Bouncer(component.BaseComponent):
     """
@@ -84,6 +84,8 @@ class Bouncer(component.BaseComponent):
         self._keycards = {} # keycard id -> Keycard
         self._keycardDatas = {} # keycard id -> data in uiState
         self.uiState.addListKey('keycards')
+
+        self.enabled = True
         
     def setDomain(self, name):
         self.domain = name
@@ -97,22 +99,37 @@ class Bouncer(component.BaseComponent):
         in the bouncer's keycardClasses variable.
         """
         return isinstance(keycard, self.keycardClasses)
-         
-    # FIXME: do we need this at all in the base class ?
+
+    def setEnabled(self, enabled):
+        if not enabled and self.enabled:
+            # If we were enabled and are being set to disabled, eject the warp
+            # core^w^w^w^wexpire all existing keycards
+            self.expireAllKeycards()
+
+        self.enabled = enabled
+
     def authenticate(self, keycard):
+        if not self.typeAllowed(keycard):
+            self.warning('keycard %r is not an allowed keycard class', keycard)
+            return None
+
+        if self.enabled:
+            return self.do_authenticate(keycard)
+        else:
+            self.debug("Bouncer disabled, refusing authentication")
+            return None
+         
+    def do_authenticate(self, keycard):
         """
+        Must be overridden by subclasses.
+
         Authenticate the given keycard.
-        Can be overridden by subclasses.
         Return the keycard with state AUTHENTICATED to authenticate,
         with state REQUESTING to continue the authentication process,
-        or None to deny the keycard.
+        or None to deny the keycard, or a deferred which should have the same
+        eventual value.
         """
-        if not components.implements(keycard, credentials.ICredentials):
-            self.warning('keycard %r does not implement ICredentials', keycard)
-            raise AssertionError
-
-        self.info('keycard %r refused because the base authenticate() should be overridden' % keycard)
-        return None
+        raise NotImplementedError("authenticate not overridden")
 
     def hasKeycard(self, keycard):
         return keycard in self._keycards.values()
@@ -156,6 +173,10 @@ class Bouncer(component.BaseComponent):
         keycard = self._keycards[id]
         self.removeKeycard(keycard)
 
+    def expireAllKeycards(self):
+        return defer.DeferredList(
+            [self.expireKeycardId(id) for id in self._keycards])
+
     def expireKeycardId(self, id):
         self.debug("expiring keycard with id %r" % id)
         if not self._keycards.has_key(id):
@@ -169,3 +190,99 @@ class Bouncer(component.BaseComponent):
         # by the requester when the client is definately gone
 
         return d
+
+class TrivialBouncer(Bouncer):
+    """
+    A very trivial bouncer implementation.
+
+    Useful as a concrete bouncer class for which all users are accepted whenever
+    the bouncer is enabled.
+    """
+    keycardClasses = (keycards.KeycardGeneric,)
+
+    def do_authenticate(self, keycard):
+        keycard.state = keycards.AUTHENTICATED
+
+        return keycard
+    
+class ChallengeResponseBouncer(Bouncer):
+    """
+    A base class for Challenge-Response bouncers
+    """
+
+    challengeResponseClasses = ()
+
+    def init(self):
+        self._checker = None
+        self._challenges = {}
+        self._db = {}
+
+    def setChecker(self, checker):
+        self._checker = checker
+
+    def addUser(self, user, salt, *args):
+        self._db[user] = salt
+        self._checker.addUser(user, *args)
+
+    def _requestAvatarIdCallback(self, PossibleAvatarId, keycard):
+        # authenticated, so return the keycard with state authenticated
+        keycard.state = keycards.AUTHENTICATED
+        self.addKeycard(keycard)
+        if not keycard.avatarId:
+            keycard.avatarId = PossibleAvatarId
+        self.info('authenticated login of "%s"' % keycard.avatarId)
+        self.debug('keycard %r authenticated, id %s, avatarId %s' % (
+            keycard, keycard.id, keycard.avatarId))
+        
+        return keycard
+
+    def _requestAvatarIdErrback(self, failure, keycard):
+        failure.trap(error.UnauthorizedLogin)
+        # FIXME: we want to make sure the "None" we return is returned
+        # as coming from a callback, ie the deferred
+        self.removeKeycard(keycard)
+        self.info('keycard %r refused, Unauthorized' % keycard)
+        return None
+    
+    def do_authenticate(self, keycard):
+        # at this point we add it so there's an ID for challenge-response
+        self.addKeycard(keycard)
+
+        # check if the keycard is ready for the checker, based on the type
+        if isinstance(keycard, self.challengeResponseClasses):
+            # Check if we need to challenge it
+            if not keycard.challenge:
+                self.debug('putting challenge on keycard %r' % keycard)
+                keycard.challenge = credentials.cryptChallenge()
+                if keycard.username in self._db:
+                    keycard.salt = self._db[keycard.username]
+                else:
+                    # random-ish salt, otherwise it's too obvious
+                    string = str(random.randint(pow(10,10), pow(10, 11)))
+                    md = md5.new()
+                    md.update(string)
+                    keycard.salt = md.hexdigest()[:2]
+                    self.debug("user not found, inventing bogus salt")
+                self.debug("salt %s, storing challenge for id %s" % (
+                    keycard.salt, keycard.id))
+                # we store the challenge locally to verify against tampering
+                self._challenges[keycard.id] = keycard.challenge
+                return keycard
+
+            if keycard.response:
+                # Check if the challenge has been tampered with
+                if self._challenges[keycard.id] != keycard.challenge:
+                    self.removeKeycard(keycard)
+                    self.info('keycard %r refused, challenge tampered with' %
+                        keycard)
+                    return None
+                del self._challenges[keycard.id]
+
+        # use the checker
+        self.debug('submitting keycard %r to checker' % keycard)
+        d = self._checker.requestAvatarId(keycard)
+        d.addCallback(self._requestAvatarIdCallback, keycard)
+        d.addErrback(self._requestAvatarIdErrback, keycard)
+        return d
+
+

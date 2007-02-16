@@ -88,7 +88,7 @@ class IcalBouncer(bouncer.Bouncer):
         else:
             return defer.fail(config.ConfigError("No ics file configured"))
 
-    def authenticate(self, keycard):
+    def do_authenticate(self, keycard):
         self.debug('authenticating keycard')
 
         # need to check if inside an event time
@@ -101,7 +101,7 @@ class IcalBouncer(bouncer.Bouncer):
                 keycard.duration = durationSecs
                 self.addKeycard(keycard)
                 self.info("autheticated login")
-                return defer.succeed(keycard)
+                return keycard
             elif "recur" in event:
                 # check if in a recurrence of this event
                 recurRule = event["recur"]
@@ -115,6 +115,7 @@ class IcalBouncer(bouncer.Bouncer):
                     keycard.duration = durationSecs
                     self.addKeycard(keycard)
                     self.info("authenticated login")
-                    return defer.succeed(keycard)
+                    return keycard
         self.info("failed in authentication, outside hours")
-        return defer.succeed(None)
+        return None
+

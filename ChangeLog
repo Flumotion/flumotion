@@ -1,3 +1,23 @@
+2007-02-16  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
+	  Refactor base bouncer class to split 'authenticate' into a base
+	  method that enforces keycard classes and enabled/disabled state, and
+	  a new 'do_authenticate' method for subclasses to implement their
+	  specific behaviour, mirroring the setup/start/stop API.
+	  Make base bouncer class have 'enabled' state, and remote method to
+	  change it.
+	  Add a trivial bouncer example that only acts on that state.
+	  Add a subclass for challenge-response bouncers.
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	  Move to using ChallengeResponseBouncer class.
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/tokentest.py:
+	  Clean up now that new API does more for us.
+
 2007-02-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/avltree.py (insert, delete): Fix string

@@ -28,7 +28,6 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardToken
-from flumotion.twisted.credentials import IToken
 from flumotion.twisted import compat
 
 __all__ = ['TokenTestBouncer']
@@ -43,16 +42,7 @@ class TokenTestBouncer(bouncer.Bouncer):
         self._authtoken = props['authorized-token']
         return defer.succeed(None)
    
-    def authenticate(self, keycard):
-        # FIXME: move checks up in the base class ?
-        if not compat.implementsInterface(keycard, IToken):
-            self.warning('keycard %r does not implement IToken' % keycard)
-            return defer.succeed(None)
-        if not self.typeAllowed(keycard):
-            self.warning('keycard %r not in type list %r' % (
-                keycard, self.keycardClasses))
-            return defer.succeed(None)
-
+    def do_authenticate(self, keycard):
         keycard_data = keycard.getData()
         self.debug('authenticating keycard from requester %s with token %s' % (
             keycard_data['address'], keycard_data['token']))
@@ -65,8 +55,9 @@ class TokenTestBouncer(bouncer.Bouncer):
                 (keycard.token, keycard.address) )
             self.debug('keycard %r authenticated, token %s ip address %s' % 
                 (keycard, keycard.token, keycard.address))
-            return defer.succeed(keycard)
+            return keycard
 
         else:
             self.info('keycard %r unauthorized, returning None')
-            return defer.succeed(None)
+            return None
+

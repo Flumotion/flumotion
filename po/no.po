@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-06 15:36+0100\n"
+"POT-Creation-Date: 2007-02-08 15:26+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -649,11 +649,11 @@ msgstr ""
 msgid "The component is misconfigured."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/manager/manager.py:811
+#: flumotion/manager/manager.py:813
 msgid "The component could not be started."
 msgstr ""
 
-#: flumotion/manager/manager.py:841
+#: flumotion/manager/manager.py:843
 msgid ""
 "Component logged in with stale configuration. Consider stopping this "
 "component and restarting the manager."
