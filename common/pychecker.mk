@@ -38,7 +38,10 @@ pychecker_indep_files = $(filter-out $(pychecker_010_files),$(pychecker_all_file
 pychecker_indep = PYTHONPATH=$(OUR_PATH):$$PYTHONPATH $(pychecker)
 pychecker_010 = PYTHONPATH=$(OUR_PATH):$$PYTHONPATH FLU_GST_VERSION=0.10 $(pychecker)
 
-pychecker_if_010 = if test "x$(GST_010_SUPPORTED)" = "xyes"; then 
+# We could check at runtime if 0.10 is supported, but since it always should
+# be at this point, we just let this be true always
+# pychecker_if_010 = if test "x$(GST_010_SUPPORTED)" = "xyes"; then 
+pychecker_if_010 = if test "xyes" = "xyes"; then 
 pychecker_fi = else echo "passing, gstreamer version not supported"; fi
 
 # we redirect stderr so we don't get messages like
