@@ -1,5 +1,10 @@
 2007-02-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/bouncers/icalbouncer.py:
+	  a stray tab was breaking trial --coverage; expand it
+
+2007-02-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/pychecker.mk:
 	  Andy removed the configure-time GStreamer version checking,
 	  so pychecker does not check 0.10 code anymore.  

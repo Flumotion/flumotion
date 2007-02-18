@@ -34,7 +34,7 @@ __all__ = ['IcalBouncer']
 
 try:
     # icalendar and dateutil modules needed for ical parsing
-	from icalendar import Calendar
+    from icalendar import Calendar
     from dateutil import rrule
     HAS_ICAL = True
 except:
