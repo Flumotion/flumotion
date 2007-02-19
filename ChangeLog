@@ -1,3 +1,9 @@
+2007-02-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/encoders/theora/theora.py:
+	Repeat after me, do not modify the config dict!
+	Fixes #571
+
 2007-02-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/launch/main.py:
