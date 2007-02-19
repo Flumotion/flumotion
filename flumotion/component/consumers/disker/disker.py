@@ -31,7 +31,7 @@ import time
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer, pygobject, messages
+from flumotion.common import log, gstreamer, pygobject, messages, errors
 
 # proxy import
 from flumotion.component.component import moods
@@ -88,18 +88,33 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         self.fixRenamedProperties(properties, [('rotateType', 'rotate-type')])
 
-        rotateType = properties['rotate-type']
-        if rotateType == 'size':
-            self.setSizeRotate(properties['size'])
-        elif rotateType == 'time':
-            self.setTimeRotate(properties['time'])
-        elif rotateType != 'none':
+        rotateType = properties.get('rotate-type', 'none')
+
+        # validate rotate-type and size/time properties first
+        if not rotateType in ['none', 'size', 'time']:
             m = messages.Error(T_(N_(
                 "The configuration property 'rotate-type' should be set to "
                 "'size', time', or 'none', not '%s'. "
                 "Please fix the configuration."),
                     rotateType), id='rotate-type')
             self.addMessage(m)
+            raise errors.ComponentSetupHandledError()
+
+        # size and time types need the property specified
+        if rotateType in ['size', 'time']:
+            if rotateType not in properties.keys():
+                m = messages.Error(T_(N_(
+                    "The configuration property '%s' should be set. "
+                    "Please fix the configuration."),
+                        rotateType), id='rotate-type')
+                self.addMessage(m)
+                raise errors.ComponentSetupHandledError()
+
+        # now act on the properties
+        if rotateType == 'size':
+            self.setSizeRotate(properties['size'])
+        elif rotateType == 'time':
+            self.setTimeRotate(properties['time'])
         # FIXME: should add a way of saying "do first cycle at this time"
 
         return self.pipe_template

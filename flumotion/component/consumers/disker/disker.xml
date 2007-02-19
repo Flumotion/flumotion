@@ -18,8 +18,8 @@
       
       <properties>
         <property name="directory" type="string" required="yes" />
-        <property name="rotate-type" type="string" required="yes"
-                  description="'size', 'time', or 'none'"/>
+        <property name="rotate-type" type="string" required="no"
+                  description="'size', 'time', or 'none' (default 'none')" />
         <property name="size" type="long"
                   description="Maximum size of each file (in bytes)" />
         <property name="time" type="long"
