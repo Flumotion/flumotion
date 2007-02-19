@@ -112,9 +112,11 @@ class ComponentWrapper(object):
         # append method so we can intercept messages
         def append(instance, key, value):
             if key == 'messages':
-                print "%s:" % _headings[value.level]
                 translator = messages.Translator()
-                print translator.translate(value)
+                print "%s: %s" % (_headings[value.level],
+                    translator.translate(value))
+                if value.debug:
+                    print "Debug information:", value.debug
             flavors.StateCacheable.append(instance, key, value)
 
         import new
