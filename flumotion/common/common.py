@@ -241,6 +241,15 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     # from now on I should keep running until killed, whatever happens
     path = writePidFile(processType, processName)
     log.debug(processType, 'written pid file %s', path)
+
+    # import inside function so we avoid affecting startup
+    from twisted.internet import reactor
+    def deletePidFile():
+        log.debug(processType, 'deleting pid file')
+        common.deletePidFile(processType)
+    reactor.addSystemEventTrigger('after', 'shutdown',
+                                  deletePidFile)
+
     
 def argRepr(args=(), kwargs={}, max=-1):
     """
