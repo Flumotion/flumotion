@@ -2,6 +2,8 @@
 
 	* flumotion/common/common.py (daemonizeHelper): Install a
 	post-shutdown hook to delete the PID file.
+	(daemonizeHelper): Fix the post-shutdown hook, and make it so that
+	if we run and there's a stale PID file, we are more tenacious.
 
 2007-02-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 

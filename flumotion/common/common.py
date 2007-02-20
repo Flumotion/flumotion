@@ -217,10 +217,18 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     ensureDir(configure.logdir, "log file")
     ensureDir(configure.rundir, "run file")
 
-    if getPid(processType, processName):
-        raise SystemError(
-            "A %s service named '%s' is already running"
-            % (processType, processName or processType))
+    pid = getPid(processType, processName):
+    if pid:
+        if checkPidRunning(pid):
+            raise SystemError(
+                "A %s service named '%s' is already running with pid %d"
+                % (processType, processName or processType, pid))
+        else:
+            log.warning(processType,
+                        "A %s service named '%s' should have been "
+                        "running with pid %d.  Restarting.", processType,
+                        processName or processType, pid)
+            deletePidFile(processName)
 
     log.info(processType, "%s service named '%s' daemonizing",
              processType, processName)
@@ -246,7 +254,7 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     from twisted.internet import reactor
     def deletePidFile():
         log.debug(processType, 'deleting pid file')
-        common.deletePidFile(processType)
+        deletePidFile(processType)
     reactor.addSystemEventTrigger('after', 'shutdown',
                                   deletePidFile)
 
