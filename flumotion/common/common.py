@@ -217,7 +217,7 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     ensureDir(configure.logdir, "log file")
     ensureDir(configure.rundir, "run file")
 
-    pid = getPid(processType, processName):
+    pid = getPid(processType, processName)
     if pid:
         if checkPidRunning(pid):
             raise SystemError(
