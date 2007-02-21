@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import common
+import StringIO
 
 from twisted.trial import unittest
 
@@ -108,3 +109,49 @@ class TestRoutingTable(unittest.TestCase):
         ar('192.168.1.0', 'foo')
         ar('192.168.1.1', 'bar')
         ar('192.168.2.1', 'baz')
+
+    def assertParseFailure(self, string):
+        f = StringIO.StringIO(string)
+        self.assertRaises(ValueError, RoutingTable.fromFile, f)
+        f.close()
+        
+    def assertParseEquals(self, string, routes):
+        f = StringIO.StringIO(string)
+        net = RoutingTable.fromFile(f)
+        f.close()
+
+        expectednet = RoutingTable()
+        for route in routes:
+            expectednet.addSubnet(*route)
+        self.assertEquals(list(iter(net)),
+                          list(iter(expectednet)))
+        
+    def testParseFromFile(self):
+        self.assertParseFailure('bad line')
+        self.assertParseFailure('# comment\n'
+                                'bad line')
+        self.assertParseFailure('bad line\n'
+                                '# comment')
+        self.assertParseFailure('192.168.1.1/10')
+        self.assertParseFailure('192.168.1.1/10  ')
+        self.assertParseFailure('192.168.1.1/100 foo')
+        self.assertParseFailure('192.168.1.1000/32 foo')
+        self.assertParseFailure('192.168.1.0/32 good\n'
+                                '192.168.2.0/32')
+
+        self.assertParseEquals('',
+                               [])
+        self.assertParseEquals('#comment\n'
+                               '  ',
+                               [])
+        self.assertParseEquals('#comment\n'
+                               '  \n'
+                               '192.168.1.1/32 foo',
+                               [('foo', '192.168.1.1', 32)])
+        self.assertParseEquals('#comment\n'
+                               '  \n'
+                               '192.168.1.1/32 foo\n'
+                               '#general\n'
+                               '0.0.0.0/0 general',
+                               [('foo', '192.168.1.1', 32),
+                                ('general', '0.0.0.0', 0)])

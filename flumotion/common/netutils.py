@@ -27,7 +27,9 @@ import socket
 import fcntl
 import struct
 import array
-import avltree
+import re
+
+from flumotion.common import avltree
 
 # Thanks to Paul Cannon, see 
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439093
@@ -115,6 +117,40 @@ def countTrailingZeroes32(n):
     return tz
 
 class RoutingTable(object):
+    def fromFile(klass, f):
+        """Make a new routing table, populated from entries in an open
+        file object.
+
+        The entries are expected to have the form:
+          IP-ADDRESS/MASK-BITS ROUTE-NAME
+
+        The `#' character denotes a comment. Empty lines are allowed.
+
+        @param f: file from whence to read a routing table
+        @type  f: open file object
+        """
+        comment = re.compile(r'^\s*#')
+        empty = re.compile(r'^\s*$')
+        entry = re.compile(r'^\s*'
+                           r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+                           r'/'
+                           r'(\d{1,2})'
+                           r'\s+(.*)\s*$')
+        ret = klass()
+        n = 0
+        for line in f:
+            n += 1
+            if comment.match(line) or empty.match(line):
+                continue
+            m = entry.match(line)
+            if not m:
+                raise ValueError('While loading routing table from file'
+                                 ' %s: line %d: invalid syntax: %r'
+                                 % (f, n, line))
+            ret.addSubnet(m.group(3), m.group(1), int(m.group(2)))
+        return ret
+    fromFile = classmethod(fromFile)
+
     def __init__(self):
         self.avltree = avltree.AVLTree()
 
