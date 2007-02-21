@@ -1,3 +1,10 @@
+2007-02-21  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/worker.py:
+	  If we have previously successfully logged in to the manager, an
+	  authentication failure should be non-fatal; it's probably a
+	  transient fault.
+
 2007-02-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/common.py (daemonizeHelper): Install a

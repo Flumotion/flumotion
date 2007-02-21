@@ -65,6 +65,8 @@ class WorkerClientFactory(factoryClass):
         factoryClass.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
+        # Authentication errors are fatal unless this is true
+        self._previously_connected = False
         
     def clientConnectionFailed(self, connector, reason):
         """
@@ -90,6 +92,7 @@ class WorkerClientFactory(factoryClass):
         def loginCallback(reference):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
+            self._previously_connected = True
            
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
@@ -131,6 +134,9 @@ class WorkerClientFactory(factoryClass):
             
     # override log.Loggable method so we don't traceback
     def error(self, message):
+        if self._previously_connected:
+            return log.Loggable.error(self, message)
+            
         self.warning('Shutting down worker because of error:')
         self.warning(message)
         print >> sys.stderr, 'ERROR: %s' % message
