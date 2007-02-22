@@ -401,16 +401,29 @@ class FeedComponent(basecomponent.BaseComponent):
                     gerror.message, gerror.domain, gerror.code, debug),
                 id=id, priority=40)
             self.state.append('messages', m)
-            # if we have a state change defer to paused that has not yet
+            # if we have a state change defer that has not yet
             # fired, we should errback it
-            change = gst.STATE_CHANGE_READY_TO_PAUSED
-            if change in self._stateChangeDeferreds:
-                self.log("We have an error, going to errback pending state "
-                    "change defers")
-                dlist = self._stateChangeDeferreds[change]
-                for d in dlist:
-                    d.errback(errors.ComponentStartHandledError(gerror.message))
-                del self._stateChangeDeferreds[change]
+            changes = [gst.STATE_CHANGE_NULL_TO_READY, 
+                gst.STATE_CHANGE_READY_TO_PAUSED,
+                gst.STATE_CHANGE_PAUSED_TO_PLAYING]
+            # get current state and add downward state changes from states
+            # higher than current element state
+            curstate = self.pipeline.get_state()
+            if curstate == gst.STATE_NULL:
+                changes.append(gst.STATE_CHANGE_READY_TO_NULL)
+            if curstate <= gst.STATE_PAUSED:
+                changes.append(gst.STATE_CHANGE_PLAYING_TO_PAUSED)
+            if curstate <= gst.STATE_READY:
+                changes.append(gst.STATE_CHANGE_PAUSED_TO_READY)
+            for change in changes:
+                if change in self._stateChangeDeferreds:
+                    self.log("We have an error, going to errback pending "
+                        "state change defers")
+                    dlist = self._stateChangeDeferreds[change]
+                    for d in dlist:
+                        d.errback(errors.ComponentStartHandledError(
+                            gerror.message))
+                    del self._stateChangeDeferreds[change]
 
         elif t == gst.MESSAGE_EOS:
             name = src.get_name()
