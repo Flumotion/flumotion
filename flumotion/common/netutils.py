@@ -93,9 +93,16 @@ def guess_public_hostname():
         return ip
 
 def ipv4StringToInt(s):
+    try:
+        b1, b2, b3, b4 = map(int, s.split('.'))
+    except TypeError:
+        raise ValueError(s)
+
     ret = 0
-    for n in map(int, s.split('.')):
+    for n in b1, b2, b3, b4:
         ret <<= 8
+        if n < 0 or n > 255:
+            raise ValueError(s)
         ret += n
     return ret
 

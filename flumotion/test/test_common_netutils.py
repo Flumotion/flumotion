@@ -33,6 +33,9 @@ class TestIpv4Parse(unittest.TestCase):
         self.assertEquals(ipv4IntToString(ipv4StringToInt(ipv4String)),
                           ipv4String)
 
+    def assertParseFails(self, ipv4String):
+        self.assertRaises(ValueError, ipv4StringToInt, ipv4String)
+
     def testIpv4Parse(self):
         self.assertParseInvariant('0.0.0.1')
         self.assertParseInvariant('0.0.1.0')
@@ -48,6 +51,11 @@ class TestIpv4Parse(unittest.TestCase):
         self.assertEquals(ipv4StringToInt('0.0.1.0'), 1<<8)
         self.assertEquals(ipv4StringToInt('0.1.0.0'), 1<<16)
         self.assertEquals(ipv4StringToInt('1.0.0.0'), 1<<24)
+
+        self.assertParseFails('1.1.1.1.1')
+        self.assertParseFails('1.1.1')
+        self.assertParseFails('1.1.1.256')
+        self.assertParseFails('1.1.1.-3')
 
 class TestRoutingTable(unittest.TestCase):
     def testAddRemove(self):
