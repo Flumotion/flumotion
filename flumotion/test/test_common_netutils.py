@@ -99,6 +99,15 @@ class TestRoutingTable(unittest.TestCase):
         ar('192.168.0.255', None)
         ar('192.168.2.0', None)
 
+    def testIterHumanReadable(self):
+        routes = [('foo', '192.168.1.0', 32),
+                  ('bar', '192.168.1.0', 24)]
+        net = RoutingTable()
+        for route, ip, mask in routes:
+            net.addSubnet(route, ip, mask)
+        for expected, actual in zip(routes, net.iterHumanReadable()):
+            self.assertEquals(expected, actual)
+
     def testRoutingPrecedence(self):
         net = RoutingTable()
 

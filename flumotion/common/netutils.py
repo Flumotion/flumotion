@@ -179,6 +179,10 @@ class RoutingTable(object):
     def __iter__(self):
         return self.avltree.iterreversed()
 
+    def iterHumanReadable(self):
+        for mask, net, route in self:
+            yield route, ipv4IntToString(net), 32-countTrailingZeroes32(mask)
+
     def __len__(self):
         return len(self.avltree)
 
