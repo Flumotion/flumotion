@@ -1,5 +1,8 @@
 2007-02-22  Andy Wingo  <wingo@pobox.com>
 
+	* bin/flumotion-tester.in (main): Fix bogus log statement, thanks
+	to edrz for the tip.
+
 	* flumotion/common/netutils.py (RoutingTable.iterHumanReadable):
 	New method, iterate the routes as the route, network IP as a
 	string, and prefix length as an int.

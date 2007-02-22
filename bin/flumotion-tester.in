@@ -78,7 +78,7 @@ def main(args):
     factory = clientfactory.ClientFactory(loop, options)
     gobject.idle_add(factory.run)
 
-    log.log("going into main loop")
+    log.log('info', "going into main loop")
     loop.run()
 
     # we're done, print some info
