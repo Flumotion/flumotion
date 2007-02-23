@@ -1,5 +1,10 @@
 2007-02-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/main.py:
+	  break out a createParser function
+
+2007-02-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  log where we try to get the pid from
 	* flumotion/service/service.py:
