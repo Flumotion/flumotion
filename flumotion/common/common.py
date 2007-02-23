@@ -164,6 +164,16 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
 
     The fork will switch to the given directory.
     '''
+    # Redirect standard file descriptors.
+    si = open(stdin, 'r')
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    try:
+        log.outputToFiles(stdout, stderr)
+    except IOError, e:
+        if e.errno == errno.EACCES:
+            print dir(e)
+            log.error('common', 'Permission denied writing to log file %s.',
+                e.filename)
 
     # first fork
     try: 
@@ -194,12 +204,9 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
         sys.exit(1)
 
     # Now I am a daemon!
+    # don't add stuff here that can fail, because from now on the program
+    # will keep running regardless of tracebacks
     
-    # Redirect standard file descriptors.
-    si = open(stdin, 'r')
-    os.dup2(si.fileno(), sys.stdin.fileno())
-    log.outputToFiles(stdout, stderr)
-
 def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """
     Daemonize a process, writing log files and PID files to conventional

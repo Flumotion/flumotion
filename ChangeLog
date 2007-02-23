@@ -1,3 +1,9 @@
+2007-02-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	  Catch permission denied when not able to write to the log file.
+	  Make sure we exit for that before we fork.
+
 2007-02-22  Andy Wingo  <wingo@pobox.com>
 
 	* bin/flumotion-tester.in (main): Fix bogus log statement, thanks
