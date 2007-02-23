@@ -95,6 +95,8 @@ def main(args):
         return servicer.stop(args[2:]) + servicer.start(args[2:])
     elif command == "status":
         return servicer.status(args[2:])
+    elif command == "create":
+        return servicer.create(args[2:])
     elif command == "clean":
         return servicer.clean(args[2:])
 

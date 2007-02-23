@@ -220,6 +220,120 @@ class Servicer(log.Loggable):
                         pid, type, name))
                     print "deleting stale pid file for %s %s" % (type, name)
                     common.deletePidFile(type, name)
+
+    def create(self, args):
+        # TODO: Andy suggested we should be able to customize the
+        # configuration this generates.
+        # For that we maybe first want to use the Command class way of
+        # writing the service script.
+        """
+        Create a default manager or worker config.
+        """
+        if len(args) == 0:
+            raise errors.SystemError, \
+                "Please specify 'manager' or 'worker' to create."
+        type = args[0]
+        if len(args) == 1:
+            raise errors.SystemError, \
+                "Please specify name of %s to create." % type
+        name = args[1]
+
+        port = 7531
+        if len(args) == 3:
+            port = int(args[2])
+
+        if type == 'manager':
+            self.createManager(name, port)
+        elif type == 'worker':
+            self.createWorker(name, managerPort=port)
+        else:
+            raise errors.SystemError, \
+                "Please specify 'manager' or 'worker' to create."
+
+    def createManager(self, name, port=7531):
+        """
+        Create a sample manager.
+
+        @returns: whether or not the config was created.
+        """
+        self.info("Creating manager %s" % name)
+        managerDir = os.path.join(self.managersDir, name)
+        if os.path.exists(managerDir):
+            raise errors.SystemError, \
+                "Manager directory %s already exists" % managerDir
+        os.makedirs(managerDir)
+
+        planetFile = os.path.join(managerDir, 'planet.xml')
+
+        # generate the file
+        handle = open(planetFile, 'w')
+        handle.write("""<planet>
+  <manager>
+    <!-- <debug>3</debug> -->
+    <host>localhost</host>
+    <port>%(port)d</port>
+    <transport>ssl</transport>
+    <!-- certificate path can be relative to $sysconfdir/flumotion,
+         or absolute -->
+<!--
+    <certificate>default.pem</certificate>
+-->
+    <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
+      <property name="data"><![CDATA[
+user:PSfNpHTkpTx1M
+]]></property>
+    </component>
+  </manager>
+</planet>
+""" % locals())
+        handle.close()
+
+        # create a default.pem file if it doesn't exist yet
+        pemFile = os.path.join(configure.configdir, 'default.pem')
+        if not os.path.exists(pemFile):
+            os.system("%s %s" % (
+                os.path.join(configure.datadir, 'make-dummy-cert'), pemFile))
+
+        return True
+
+    def createWorker(self, name, managerPort=7531):
+        """
+        Create a sample worker.
+
+        @returns: whether or not the config was created.
+        """
+        self.info("Creating worker %s" % name)
+        workerFile = os.path.join(self.workersDir, "%s.xml" % name)
+        if os.path.exists(workerFile):
+            raise errors.SystemError, \
+                "Worker file %s already exists." % workerFile
+
+        # generate the file
+        handle = open(workerFile, 'w')
+        handle.write("""<worker>
+
+  <!-- <debug>3</debug> -->
+
+  <manager>
+    <host>localhost</host>
+<!--
+    <port>%(managerPort)s</port>
+-->
+  </manager>
+
+  <authentication type="plaintext">
+    <username>user</username>
+    <password>test</password>
+  </authentication>
+
+  <!-- <feederports>8600-8639</feederports> -->
+
+</worker>
+""" % locals())
+        handle.close()
+
+        return True
+
  
     def startManager(self, name, flowNames):
         """

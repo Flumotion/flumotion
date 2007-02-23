@@ -41,6 +41,8 @@ different configdir, logdir and rundir.
 @type configdir:     string
 @var  daemondir:     directory where daemonized programs should run
 @type daemondir:     string
+@var  datadir:       directory where data files are stored
+@type datadir:       string
 @var  gladedir:      directory where glade files are stored
 @type gladedir:      string
 @var  logdir:        directory where log files are stored
