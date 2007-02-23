@@ -31,14 +31,22 @@ class Servicer(log.Loggable):
     
     logCategory = 'servicer'
 
-    def __init__(self, configDir):
+    def __init__(self, configDir=None, logDir=None, runDir=None):
         """
         @type  configDir: string
-        @param configDir: path to the configuration directory
+        @param configDir: overridden path to the configuration directory.
+        @type  logDir:    string
+        @param logDir:    overridden path to the log directory.
+        @type  runDir:    string
+        @param runDir:    overridden path to the run directory.
         """
-        self.configDir = configDir
-        self.managersDir = os.path.join(self.configDir, 'managers')
-        self.workersDir = os.path.join(self.configDir, 'workers')
+        self.managersDir = os.path.join(configure.configdir, 'managers')
+        self.workersDir = os.path.join(configure.configdir, 'workers')
+        self._overrideDir = {
+            'configdir': configDir,
+            'logdir': logDir,
+            'rundir': runDir,
+        }
 
     def _parseManagersWorkers(self, command, args):
         # parse the given args and return two lists;
@@ -72,6 +80,17 @@ class Servicer(log.Loggable):
             workers = [name, ]
             
         return (managers, workers)
+
+    def _getDirOptions(self):
+        """
+        Return a list of override directories for configure.configure
+        suitable for appending to a command line.
+        """
+        args = []
+        for key, value in self._overrideDir.items():
+            if value:
+                args.append('--%s=%s' % (key, value))
+        return " ".join(args)
 
     def getManagers(self):
         """
@@ -237,9 +256,11 @@ class Servicer(log.Loggable):
                 raise errors.SystemError, \
                     "Manager %s is dead (stale pid %d)" % (name, pid)
             
-        command = "flumotion-manager -D --daemonize-to %s " \
+        dirOptions = self._getDirOptions()
+        command = "flumotion-manager %s -D --daemonize-to %s " \
             "--service-name %s %s %s" % (
-            configure.daemondir, name, planetFile, " ".join(flowFiles))
+            dirOptions, configure.daemondir, name, planetFile,
+            " ".join(flowFiles))
         self.debug("starting process %s" % command)
         retval = self.startProcess(command)
 
@@ -282,9 +303,11 @@ class Servicer(log.Loggable):
         # we are sure the worker is not running and there's no pid file
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker -D --daemonize-to %s " \
+        dirOptions = self._getDirOptions()
+        command = "flumotion-worker %s -D --daemonize-to %s " \
             "--service-name %s %s" % (
-                configure.daemondir, name, workerFile)
+                dirOptions, configure.daemondir, name, workerFile)
+        self.debug("Running %s" % command)
         retval = self.startProcess(command)
 
         if retval == 0:

@@ -312,10 +312,12 @@ def getPidPath(type, name=None):
     """
     Get the full path to the pid file for the given process type and name.
     """
+    path = os.path.join(configure.rundir, '%s.pid' % type)
     if name:
-        return os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
-    else:
-        return os.path.join(configure.rundir, '%s.pid' % type)
+        path = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+    log.debug('common', 'getPidPath for type %s, name %r: %s' % (
+        type, name, path))
+    return path
  
 def writePidFile(type, name=None):
     """

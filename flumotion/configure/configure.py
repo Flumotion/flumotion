@@ -28,6 +28,10 @@ Code should run
 and then access the variables from the configure module.  For example:
     >>> print configure.gladedir
 
+The values are decided at ./configure time.  They can be overridden at startup
+by programs based on environment or options.  This allows running with
+different configdir, logdir and rundir.
+
 @var  isinstalled: whether an installed version is being run
 @type isinstalled: boolean
 

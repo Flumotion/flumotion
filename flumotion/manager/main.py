@@ -126,10 +126,27 @@ def main(args):
     group.add_option('', '--daemonize-to',
                      action="store", dest="daemonizeTo",
                      help="what directory to run from when daemonizing")
+
+    parser.add_option('-L', '--logdir',
+                      action="store", dest="logdir",
+                      help="flumotion log directory (default: %s)" %
+                        configure.logdir)
+    parser.add_option('-R', '--rundir',
+                      action="store", dest="rundir",
+                      help="flumotion run directory (default: %s)" %
+                        configure.rundir)
+    
     parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
+
+    # Force options down configure's throat
+    for d in ['logdir', 'rundir']:
+        o = getattr(options, d, None)
+        if o:
+            log.debug('manager', 'Setting configure.%s to %s' % (d, o))
+            setattr(configure, d, o)
 
     # verbose overrides --debug
     if options.verbose:

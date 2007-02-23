@@ -1,6 +1,24 @@
 2007-02-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
+	  log where we try to get the pid from
+	* flumotion/service/service.py:
+	  allow setting different logdir and rundir, and pass it on to
+	  managers and workers we start
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  add logdir and rundir options ...
+	* flumotion/service/main.py:
+	  ... and a configdir option
+	* flumotion/configure/configure.py:
+	  document that we're fine with the programs poking values into this
+	  module
+	  This allows a user to run an installed flumotion with the service
+	  binary, without touching the system-installed directories.
+
+2007-02-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
 	  Catch permission denied when not able to write to the log file.
 	  Make sure we exit for that before we fork.
 

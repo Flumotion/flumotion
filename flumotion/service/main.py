@@ -32,17 +32,30 @@ def main(args):
                       default=False,
                       help="show version information")
 
-    parser.add_option('-c', '--configdir',
-                      action="store", dest="configdir",
-                      help="flumotion configuration directory")
     parser.add_option('-l', '--logfile',
                       action="store", dest="logfile",
                       help="flumotion service log file")
+    parser.add_option('-C', '--configdir',
+                      action="store", dest="configdir",
+                      help="flumotion configuration directory (default: %s)" %
+                        configure.configdir)
+    parser.add_option('-L', '--logdir',
+                      action="store", dest="logdir",
+                      help="flumotion log directory (default: %s)" %
+                        configure.logdir)
+    parser.add_option('-R', '--rundir',
+                      action="store", dest="rundir",
+                      help="flumotion run directory (default: %s)" %
+                        configure.rundir)
 
     options, args = parser.parse_args(args)
 
-    if not options.configdir:
-        options.configdir = configure.configdir
+    # Force options down configure's throat
+    for d in ['configdir', 'logdir', 'rundir']:
+        o = getattr(options, d, None)
+        if o:
+            log.debug('service', 'Setting configure.%s to %s' % (d, o))
+            setattr(configure, d, o)
 
     if options.version:
         print common.version("flumotion")
@@ -64,7 +77,8 @@ def main(args):
         os.dup2(out.fileno(), sys.stdout.fileno())
         os.dup2(err.fileno(), sys.stderr.fileno())
 
-    servicer = service.Servicer(options.configdir)
+    servicer = service.Servicer(options.configdir, options.logdir,
+        options.rundir)
     try:
         command = args[1]
     except IndexError:

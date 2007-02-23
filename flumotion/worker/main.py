@@ -70,6 +70,15 @@ def _createParser():
                      action="store", dest="daemonizeTo",
                      help="what directory to run from when daemonizing")
 
+    parser.add_option('-L', '--logdir',
+                      action="store", dest="logdir",
+                      help="flumotion log directory (default: %s)" %
+                        configure.logdir)
+    parser.add_option('-R', '--rundir',
+                      action="store", dest="rundir",
+                      help="flumotion run directory (default: %s)" %
+                        configure.rundir)
+
     group.add_option('-u', '--username',
                      action="store", type="string", dest="username",
                      default="",
@@ -91,6 +100,13 @@ def main(args):
     parser = _createParser()
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
+
+    # Force options down configure's throat
+    for d in ['logdir', 'rundir']:
+        o = getattr(options, d, None)
+        if o:
+            log.debug('worker', 'Setting configure.%s to %s' % (d, o))
+            setattr(configure, d, o)
 
     # verbose overrides --debug; is only a command-line option
     if options.verbose:
@@ -223,10 +239,11 @@ def main(args):
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
 
-        if common.getPid('worker', options.serviceName):
+        pid = common.getPid('worker', options.serviceName)
+        if pid:
             raise errors.SystemError(
-                "A worker service '%s' is already running" %
-                    options.serviceName)
+                "A worker service '%s' is already running (with pid %d)" % (
+                    options.serviceName, pid))
 
         log.info('worker', "Worker service '%s' daemonizing" %
             options.serviceName) 
