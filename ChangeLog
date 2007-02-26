@@ -1,5 +1,10 @@
 2007-02-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/wizard.py:
+	  Document and comment.  subclass log.Loggable.
+
+2007-02-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/ui/glade.py:
 	  Some easy refactoring.  Create a common GladeBacked class to
 	  avoid repeating and diverging code.  Remove an experimental

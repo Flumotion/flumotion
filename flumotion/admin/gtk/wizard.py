@@ -30,7 +30,7 @@ import gtk.glade
 
 from flumotion.configure import configure
 
-from flumotion.common import pygobject
+from flumotion.common import pygobject, log
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -81,16 +81,9 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 # in the example above. STEP1... are the WizardStep specialized classes (not
 # instances).
 #
-# The wizard is run with the run() method. It returns the state object
-# accumulated by the pages, or None if the user closes the wizard window.
-#
-# w = Wizard('foo', 'first-step', FirstStep)
-# w.show()
-# w.run() => {'bank-account': 'foo'}
-
 
 # fixme: doc vmethods
-class WizardStep(GladeWidget):
+class WizardStep(GladeWidget, log.Loggable):
     # all values filled in by subclasses
     name = None
     title = None
@@ -99,8 +92,14 @@ class WizardStep(GladeWidget):
     next_pages = None
     # also, all widgets from the glade file will become attributes
     page = None # filled from glade
+    wizard = None # set by wizard
+    logCategory = "wizardstep"
 
     def __init__(self, glade_prefix=''):
+        """
+        @type  glade_prefix: str
+        @param glade_prefix: prefix used for glade files for the step
+        """
         self.glade_file = glade_prefix + self.name + '.glade'
         GladeWidget.__init__(self)
 
@@ -112,10 +111,17 @@ class WizardStep(GladeWidget):
         pass
 
 class Wizard(GladeWindow):
-    '''
+    """
     A generic wizard.
-    '''
 
+    This wizard runs its own GObject main loop.
+    The wizard is run with the run() method.
+    
+    Example:
+      w = Wizard('foo', 'first-step', FirstStep)
+      w.show()
+      w.run() => {'bank-account': 'foo'}
+    """
     # should by filled by subclasses
     name = None
     steps = []
@@ -130,15 +136,21 @@ class Wizard(GladeWindow):
     gsignal('finished')
 
     def __init__(self, initial_page):
+        """
+        @type  initial_page: str
+        @param initial_page: name of the WizardStep to start on
+        """
         GladeWindow.__init__(self)
 
         # these should be filled by subclasses
         assert self.name
         assert self.steps
 
-        for x in self.steps:
-            p = self.pages[x.name] = x(self.name+'-')
-            p.show()
+        # instantiate steps
+        for cls in self.steps:
+            page = cls(self.name + '-')
+            self.pages[cls.name] = page
+            page.show()
 
         self.loop = gobject.MainLoop()
         self._setup_ui()
@@ -222,6 +234,13 @@ class Wizard(GladeWindow):
         self.window.set_sensitive(is_sensitive)
 
     def run(self):
+        """
+        Run the main loop to run the wizard.  This call blocks for as long
+        as the user is interacting with the wizard.
+
+        @returns: the state dict accumulated by the pages
+        @rtype:   dict or None
+        """
         assert self.window
         self.set_sensitive(True)
         self.show()
