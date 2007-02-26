@@ -43,7 +43,6 @@ class Servicer(log.Loggable):
         self.managersDir = os.path.join(configure.configdir, 'managers')
         self.workersDir = os.path.join(configure.configdir, 'workers')
         self._overrideDir = {
-            'configdir': configDir,
             'logdir': logDir,
             'rundir': runDir,
         }
