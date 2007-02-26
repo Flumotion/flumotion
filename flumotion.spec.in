@@ -31,7 +31,7 @@ Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
 %else
 Requires:	%{gstreamer}-plugins >= %{gstp_minver}
 %endif
-Requires:	python-twisted >= 1.3.0
+Requires:	python-twisted-core >= 2.4.0
 Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
 Requires:	pyOpenSSL
@@ -42,7 +42,7 @@ Requires(post):	openssl
 
 BuildRequires:	%{gstreamer}-devel >= %{gst_minver}
 BuildRequires:	%{gstreamer}-python >= %{gstpy_minver}
-BuildRequires:	python-twisted >= 1.3.0
+BuildRequires:	python-twisted-core >= 2.4.0
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel
@@ -98,12 +98,6 @@ desktop-file-install \
   $RPM_BUILD_ROOT%{_datadir}/applications/flumotion-admin.desktop
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion
-
-# install make-dummy-cert script
-install -d $RPM_BUILD_ROOT%{_datadir}/flumotion
-install -m 644 \
-	doc/redhat/make-dummy-cert \
-	$RPM_BUILD_ROOT%{_datadir}/flumotion
 
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
