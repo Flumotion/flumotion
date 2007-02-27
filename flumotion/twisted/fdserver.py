@@ -28,15 +28,21 @@ from twisted.spread import pb
 import errno
 import os
 import socket
+import struct
 
 # Heavily based on 
 # http://twistedmatrix.com/trac/browser/sandbox/exarkun/copyover/server.py
 # and client.py
 # Thanks for the inspiration!
 
+# 16 byte long randomly-generated magic signature
+MAGIC_SIGNATURE = "\xfd\xfc\x8e\x7f\x07\x47\xb9\xea" \
+                  "\xa1\x75\xee\xd8\xdc\x36\xc8\xa3"
+
 class FDServer(unix.Server):
-    def sendFileDescriptor(self, fileno, data="\0"):
-        return fdpass.writefds(self.fileno(), [fileno], data)
+    def sendFileDescriptor(self, fileno, data=""):
+        message = struct.pack("@16sI", MAGIC_SIGNATURE, len(data)) + data
+        return fdpass.writefds(self.fileno(), [fileno], message)
 
 class FDPort(unix.Port):
     transport = FDServer
@@ -57,7 +63,24 @@ class FDClient(unix.Client):
                 return main.CONNECTION_DONE
 
             if len(fds) > 0:
-                return self.protocol.fileDescriptorsReceived(fds, message)
+                offset = message.find(MAGIC_SIGNATURE)
+                if offset < 0:
+                    raise TypeError("Bad signature")
+                elif offset > 0:
+                    ret = self.protocol.dataReceived(message[0:offset])
+                    if ret:
+                        return ret
+
+                msglen = struct.unpack("@I", message[offset+16:offset+20])[0]
+                offset += 20
+                ret = self.protocol.fileDescriptorsReceived(fds, 
+                    message[offset:offset+msglen])
+                if ret:
+                    return ret
+
+                if offset+msglen < len(message):
+                    return self.protocol.dataReceived(message[offset+msglen:])
+                return ret
             else:
                 return self.protocol.dataReceived(message)
 

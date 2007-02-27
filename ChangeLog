@@ -1,5 +1,15 @@
 2007-02-27  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/twisted/fdserver.py:
+	  Stream sockets don't guarantee us message boundaries. We can't
+	  switch to datagram sockets as they're unreliable. So, provide
+	  protocol-level message boundaries for our FD-passing messsages, and
+	  strip them out before passing on to PB.
+	  Prevents protocol errors when connecting to the feed server under
+	  load.
+
+2007-02-27  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  Ensure we chain up to our parent when stopping!
 	  Possibly fixes some shutdown races.
