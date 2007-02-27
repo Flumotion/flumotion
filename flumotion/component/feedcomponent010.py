@@ -609,6 +609,7 @@ class FeedComponent(basecomponent.BaseComponent):
                     feedId)
             self._add_buffer_probe(pad, feedId, firstTime=True)
 
+        self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
     def _feeder_probe_calllater(self):
@@ -815,6 +816,7 @@ class FeedComponent(basecomponent.BaseComponent):
         multifdsink.
         This will call the registered callable on the fd.
         """
+        self.debug("removing client for fd %d", fd)
         feedId = ':'.join(sink.get_name().split(':')[1:])
         self._feeders[feedId].removeClient(fd)
         if fd in self._fdCleanup:

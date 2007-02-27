@@ -658,7 +658,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._updateCallLaterId = None
 
         if self.type == 'slave' and self._pbclient:
-            return self._pbclient.deregisterPath(self.mountPoint)
+            d1 = self._pbclient.deregisterPath(self.mountPoint)
+            d2 = feedcomponent.ParseLaunchComponent.do_stop(self)
+            return defer.DeferredList([d1,d2])
         else:
             return feedcomponent.ParseLaunchComponent.do_stop(self)
 
