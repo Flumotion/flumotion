@@ -256,6 +256,7 @@ class ParseLaunchComponent(FeedComponent):
                 self.feeder_names)
             for feeder in feeder_element_names:
                 element = pipeline.get_by_name(feeder)
+                element.connect('client-removed', self.removeClientCallback)
                 element.connect('client-fd-removed', self.removeFDCallback)
                 self.debug("Connected %s to removeFDCallback", feeder)
 

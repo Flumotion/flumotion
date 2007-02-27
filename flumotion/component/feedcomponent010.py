@@ -810,15 +810,21 @@ class FeedComponent(basecomponent.BaseComponent):
         element.emit('add', fd)
         self._feeders[feedId].addClient(eaterId or ('client-%d' % fd), fd)
 
+    def removeClientCallback(self, sink, fd):
+        """
+        Called as a signal callback when the FD should no longer be used, but
+        before it may be closed
+        """
+        self.debug("removing client for fd %d", fd)
+        feedId = ':'.join(sink.get_name().split(':')[1:])
+        self._feeders[feedId].removeClient(fd)
+
     def removeFDCallback(self, sink, fd):
         """
         Called (as a signal callback) when the FD is no longer in use by
         multifdsink.
         This will call the registered callable on the fd.
         """
-        self.debug("removing client for fd %d", fd)
-        feedId = ':'.join(sink.get_name().split(':')[1:])
-        self._feeders[feedId].removeClient(fd)
         if fd in self._fdCleanup:
             self.debug("calling cleanup func")
             self._fdCleanup[fd](fd)
