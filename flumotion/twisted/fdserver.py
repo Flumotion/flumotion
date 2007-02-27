@@ -35,7 +35,11 @@ import struct
 # and client.py
 # Thanks for the inspiration!
 
-# 16 byte long randomly-generated magic signature
+# Since we're doing this over a stream socket, our file descriptor messages
+# aren't guaranteed to be received alone; they could arrive along with some
+# unrelated data.
+# So, we prefix the message with a 16 byte magic signature, and a length,
+# and if we receive file descriptors decode based on this.
 MAGIC_SIGNATURE = "\xfd\xfc\x8e\x7f\x07\x47\xb9\xea" \
                   "\xa1\x75\xee\xd8\xdc\x36\xc8\xa3"
 
@@ -63,6 +67,12 @@ class FDClient(unix.Client):
                 return main.CONNECTION_DONE
 
             if len(fds) > 0:
+                # Look for our magic cookie in (possibly) the midst of other
+                # data. Pass surrounding chunks, if any, onto dataReceived(), 
+                # which (undocumentedly) must return None unless a failure 
+                # occurred.
+                # Pass the actual FDs and their message to 
+                # fileDescriptorsReceived()
                 offset = message.find(MAGIC_SIGNATURE)
                 if offset < 0:
                     raise TypeError("Bad signature")

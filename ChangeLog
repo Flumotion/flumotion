@@ -1,5 +1,10 @@
 2007-02-27  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/twisted/fdserver.py:
+	  Comments to make wingo weep a little less.
+
+2007-02-27  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/feedcomponent010.py:
 	  Split removeFDCallback into removeClientCallback and
