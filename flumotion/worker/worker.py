@@ -41,6 +41,7 @@ from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium, messages, worker
 from flumotion.twisted import checkers, fdserver, compat
 from flumotion.twisted import pb as fpb
+from flumotion.twisted import defer as fdefer
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 from flumotion.configure import configure
@@ -540,13 +541,6 @@ class WorkerBrain(log.Loggable):
         self.workerClientFactory = WorkerClientFactory(self)
 
         self._port = None # port for unix domain socket, set from _setup
-        self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
-
-        # we used to ignore SIGINT from here on down, but actually
-        # the reactor catches these properly in both 1.3 and 2.0,
-        # and in 2.0 setting it to ignore first will make the reactor
-        # not catch it (because it compares to the default int handler)
-        # signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         self._jobServerFactory, self._jobServerPort = self._setupJobServer()
         self._feedServerFactory = feed.feedServerFactory(self)
@@ -629,34 +623,11 @@ class WorkerBrain(log.Loggable):
     def callRemote(self, methodName, *args, **kwargs):
         return self.medium.callRemote(methodName, *args, **kwargs)
 
-    # FIXME: this isn't necessary, we can just connect to the shutdown
-    # event on the reactor, reducing a lot of complexity here...
-    def installSIGTERMHandler(self):
-        """
-        Install our own signal handler for SIGTERM.
-        This will call the currently installed one first, then shut down
-        jobs.
-        """
-        self.debug("Installing SIGTERM handler")
-        handler = signal.signal(signal.SIGTERM, self._SIGTERMHandler)
-        if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
-            self._oldSIGTERMHandler = handler
-
-    def _SIGTERMHandler(self, signum, frame):
-        self.info("Worker daemon received TERM signal, shutting down")
-        self.debug("handling SIGTERM")
-        self.debug("_SIGTERMHandler: shutting down jobheaven")
+    def shutdownHandler(self):
+        self.info("Reactor shutting down, stopping jobHeaven")
         d = self.jobHeaven.shutdown()
-
-        if self._oldSIGTERMHandler:
-            if d:
-                self.debug("chaining Twisted handler")
-                d.addCallback(lambda result: self._oldSIGTERMHandler(signum, frame))
-            else:
-                self.debug("calling Twisted handler")
-                self._oldSIGTERMHandler(signum, frame)
-
-        self.debug("_SIGTERMHandler: done")
+        # Don't fire this other than from a callLater
+        return fdefer.defer_call_later(d)
 
     def deferredCreate(self, avatarId):
         """

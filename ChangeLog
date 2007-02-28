@@ -1,5 +1,20 @@
 2007-02-28  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/twisted/defer.py:
+	  Add a utility method to wrap a deferred with another deferred that
+	  will fire in response to the first deferred firing, but only from a
+	  callLater
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  Remove old manual sigterm handling in favour of using a reactor
+	  shutdown hook. Use new fdefer.defer_call_later to fire the returned
+	  value from a callLater
+	* flumotion/job/job.py:
+	  Don't fire shutdown-hook deferreds other than in a callLater; needed
+	  for PB correctness.
+
+2007-02-28  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/component.py:
 	* flumotion/twisted/fdserver.py:
 	* flumotion/worker/worker.py:

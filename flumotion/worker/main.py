@@ -303,8 +303,8 @@ def main(args):
     )
     brain.login(authenticator)
 
-    reactor.addSystemEventTrigger('after', 'startup',
-        brain.installSIGTERMHandler)
+    reactor.addSystemEventTrigger('before', 'shutdown',
+        brain.shutdownHandler)
     log.debug('worker', 'Starting reactor')
     reactor.run()
 

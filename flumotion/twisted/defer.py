@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 from twisted.python import reflect
 
 # FIXME: this is for HandledException - maybe it should move here instead ?
@@ -126,6 +126,16 @@ def defer_generator(proc):
 def defer_generator_method(proc):
     return lambda self, *args, **kwargs: \
         defer_generator(proc)(self, *args, **kwargs)
+
+def defer_call_later(deferred):
+    """
+    Return a deferred which will fire from a callLater after d fires
+    """
+    def fire(result, d):
+        reactor.callLater(0, d.callback, result)
+    res = defer.Deferred()
+    deferred.addCallback(fire, res)
+    return res
 
 class Resolution:
     """

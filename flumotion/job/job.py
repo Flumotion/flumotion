@@ -44,6 +44,7 @@ from flumotion.component import component
 
 from flumotion.twisted import fdserver
 from flumotion.twisted import pb as fpb
+from flumotion.twisted import defer as fdefer
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
@@ -162,8 +163,10 @@ class JobMedium(medium.BaseMedium):
             if medium.hasRemoteReference():
                 dlist.append(medium.callRemote("cleanShutdown"))
 
-        # might call back immediately if we aren't connected to anything
-        return defer.DeferredList(dlist, fireOnOneErrback=False)
+        # We mustn't fire the deferred returned from here except from a 
+        # callLater.
+        dl = defer.DeferredList(dlist, fireOnOneErrback=False)
+        return fdefer.defer_call_later(dl)
 
     ### our methods
     def shutdown(self):
