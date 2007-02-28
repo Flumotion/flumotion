@@ -74,6 +74,8 @@ class JobMedium(medium.BaseMedium):
         self._managerKeycard = None
         self._componentClientFactory = None # from component to manager
 
+        self._hasStoppedReactor = False
+
     ### pb.Referenceable remote methods called on by the WorkerBrain
     def remote_bootstrap(self, workerName, host, port, transport, authenticator,
             packagePaths):
@@ -137,11 +139,18 @@ class JobMedium(medium.BaseMedium):
 
         self.component = self._createComponent(avatarId, type, moduleName,
             methodName, nice)
+        self.component.setShutdownHook(self._componentStopped)
+
+    def _componentStopped(self):
+        # stop reactor from a callLater so remote methods finish nicely
+        reactor.callLater(0, self.shutdown)
 
     def remote_stop(self):
-        # stop reactor from a callLater so this remote method finishes
-        # nicely
-        reactor.callLater(0, self.shutdown)
+        if self.component:
+            self.debug('stopping component and shutting down')
+            self.component.stop()
+        else:
+            reactor.callLater(0, self.shutdown)
 
     def shutdownHandler(self):
         dlist = []
@@ -162,18 +171,12 @@ class JobMedium(medium.BaseMedium):
         Shut down the job process completely, cleaning up the component
         so the reactor can be left from.
         """
-        reactorAlreadyStopped = False
-        if self.component:
-            self.debug('stopping component')
-            self.component.stop()
-            if self.component.medium and self.component.medium.reactor_stopped:
-                reactorAlreadyStopped = True
-            self.debug('stopped component')
-
-        if not reactorAlreadyStopped:
-            self.debug('stopping reactor')
+        if self._hasStoppedReactor:
+            self.debug("Not stopping reactor again, already shutting down")
+        else:
+            self._hasStoppedReactor = True
+            self.info("Stopping reactor in job process")
             reactor.stop()
-            self.debug('reactor stopped, exiting process')
 
     def _setNice(self, nice):
         if not nice:
@@ -310,7 +313,7 @@ class JobClientBroker(pb.Broker, log.Loggable):
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     I am a client factory that logs in to the WorkerBrain.
-    I live in the flumotion-worker job process.
+    I live in the flumotion-job process spawned by the worker.
 
     @cvar medium: the medium for the JobHeaven to access us through
     @type medium: L{JobMedium}
@@ -365,3 +368,4 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.debug('shutting down medium')
         self.medium.shutdown()
         self.debug('shut down medium')
+

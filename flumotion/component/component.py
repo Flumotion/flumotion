@@ -149,8 +149,6 @@ class BaseComponentMedium(medium.PingingMedium):
         self.comp = component
         self.authenticator = None
 
-        self.reactor_stopped = False
-        
     ### our methods
     def setup(self, config):
         pass
@@ -234,22 +232,8 @@ class BaseComponentMedium(medium.PingingMedium):
         return self.comp.start(*args, **kwargs)
        
     def remote_stop(self):
-        self.info('Stopping job')
-        d = self.comp.stop()
-        # We want to stop the process even if the component stop fails for some
-        # reason - otherwise we end up unstoppable. 
-        d.addBoth(self._destroyCallback)
-
-        return d
-
-    def _destroyCallback(self, result):
-        self.debug('_destroyCallback: scheduling destroy')
-        reactor.callLater(0, self._destroyCallLater)
-
-    def _destroyCallLater(self):
-        self.debug('_destroyCalllater: stopping reactor')
-        self.reactor_stopped = True
-        reactor.stop()
+        self.info('Stopping component')
+        return self.comp.stop()
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
@@ -354,6 +338,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         # Start the cpu-usage updating.
         self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
+
+        self._shutdownHook = None
 
     def do_check(self):
         """
@@ -531,6 +517,13 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             self.debug("Exception during component do_start: %s" % 
                 log.getExceptionMessage(e))
             return defer.fail(e)
+
+    def setShutdownHook(self, shutdownHook):
+        """
+        Set the shutdown hook for this component (replacing any previous hook).
+        When a component is stopped, then this hook will be fired.
+        """
+        self._shutdownHook = shutdownHook
         
     def stop(self):
         """
@@ -547,6 +540,11 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                     plug.stop(self)
             return ret
 
+        def fireShutdownHook(ret):
+            if self._shutdownHook:
+                self.debug('_stoppedCallback: firing shutdown hook')
+                self._shutdownHook()
+
         self.setMood(moods.waking)
         for message in self.state.get('messages'):
             self.state.remove('messages', message)
@@ -557,6 +555,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         d = self.do_stop()
         d.addCallback(stop_plugs)
+        d.addBoth(fireShutdownHook)
         return d
 
     ### GObject methods

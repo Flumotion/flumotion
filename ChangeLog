@@ -1,5 +1,15 @@
 2007-02-28  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/component.py:
+	* flumotion/job/job.py:
+	  Rewrite component/job shutdown to have a clean shutdown path going
+	  only through the job.
+	  Ensure through this path that we only ever stop the reactor once.
+	  Should fix a variety of shutdown races triggered by calling
+	  reactor.stop() from a reactor shutdown hook.
+
+2007-02-28  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent010.py:
 	  client-removed has an extra argument; make sure we have it.
 
