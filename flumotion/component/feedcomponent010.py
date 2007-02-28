@@ -810,7 +810,7 @@ class FeedComponent(basecomponent.BaseComponent):
         element.emit('add', fd)
         self._feeders[feedId].addClient(eaterId or ('client-%d' % fd), fd)
 
-    def removeClientCallback(self, sink, fd):
+    def removeClientCallback(self, sink, fd, _):
         """
         Called as a signal callback when the FD should no longer be used, but
         before it may be closed
