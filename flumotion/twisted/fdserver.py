@@ -51,7 +51,12 @@ class FDServer(unix.Server):
 class FDPort(unix.Port):
     transport = FDServer
 
-class FDClient(unix.Client):
+class FDClient(unix.Client): #, log.Loggable):
+
+    #def connectionLost(self, *args, **kwargs):
+    #    self.debug("connectionLost on FDClient")
+    #    return unix.Client.connectionLost(self, *args, **kwargs)
+
     def doRead(self):
         if not self.connected:
             return
@@ -67,6 +72,7 @@ class FDClient(unix.Client):
                 return main.CONNECTION_DONE
 
             if len(fds) > 0:
+     #           self.debug("received one or more FDs")
                 # Look for our magic cookie in (possibly) the midst of other
                 # data. Pass surrounding chunks, if any, onto dataReceived(), 
                 # which (undocumentedly) must return None unless a failure 
@@ -92,6 +98,7 @@ class FDClient(unix.Client):
                     return self.protocol.dataReceived(message[offset+msglen:])
                 return ret
             else:
+              #  self.debug("No FDs, passing to dataReceived")
                 return self.protocol.dataReceived(message)
 
 class FDConnector(unix.Connector):

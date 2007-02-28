@@ -71,9 +71,14 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         #self.interfaces = self.medium.__class__.__implements__
 
         self.logName = component.name
+
+        self._previously_connected = False
         
     # override log.Loggable method so we don't traceback
     def error(self, format, *args):
+        if self._previously_connected:
+            return self.warning(format, *args)
+
         if args:
             message = format % args
         else:
@@ -82,8 +87,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         print >> sys.stderr, 'ERROR: [%d] %s' % (os.getpid(), message)
         # FIXME: do we need to make sure that this cannot shut down the
         # manager if it's the manager's bouncer ?
-        reactor.stop()
-        self.component.setMood(moods.sad)
+        self.component.stop()
 
     # vmethod implementation
     def gotDeferredLogin(self, d):
@@ -97,6 +101,8 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         def loginCallback(reference):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
+            self._previously_connected = True
+        
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 

@@ -135,7 +135,7 @@ class WorkerClientFactory(factoryClass):
     # override log.Loggable method so we don't traceback
     def error(self, message):
         if self._previously_connected:
-            return log.Loggable.error(self, message)
+            return self.warning(message)
             
         self.warning('Shutting down worker because of error:')
         self.warning(message)

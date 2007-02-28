@@ -1,6 +1,17 @@
 2007-02-28  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/component.py:
+	* flumotion/twisted/fdserver.py:
+	* flumotion/worker/worker.py:
+	  Clean up more shutdown logic.
+	  Ensure a failed login to the manager (other than initially) doesn't
+	  cause a reactor shutdown.
+	  Don't set our mood to sad when we just stopped the reactor; it isn't
+	  useful.
+
+2007-02-28  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
 	* flumotion/job/job.py:
 	  Rewrite component/job shutdown to have a clean shutdown path going
 	  only through the job.
