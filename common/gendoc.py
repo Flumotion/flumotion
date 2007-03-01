@@ -12,8 +12,8 @@ except ImportError:
 from flumotion.common import boot
 boot.init_gobject()
 boot.init_gst()
-from flumotion.twisted import compat
-compat.install_reactor()
+from twisted.internet import gtk2reactor
+gtk2reactor.install(useGtk=False)
 
 # monkey patching twisted doc errors
 from twisted.spread import pb

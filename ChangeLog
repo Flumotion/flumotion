@@ -1,5 +1,10 @@
 2007-03-01  Michael Smith  <msmith@fluendo.com>
 
+	* common/gendoc.py:
+	  Docs stuff needs a reactor too.
+
+2007-03-01  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/common/boot.py:
 	* flumotion/common/common.py:
 	* flumotion/worker/main.py:
