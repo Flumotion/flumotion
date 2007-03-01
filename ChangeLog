@@ -1,3 +1,11 @@
+2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/job/main.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  Make logging of start and stop of worker/manager uniform so
+	  we can easily find those points in the log.
+
 2007-02-28  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/twisted/defer.py:

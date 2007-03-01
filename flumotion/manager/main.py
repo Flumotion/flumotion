@@ -249,6 +249,9 @@ def main(args):
     # register package path
     setup.setupPackagePath()
     
+    # log our standardized starting marker
+    log.info('manager', "Starting manager '%s'" % options.name)
+
     log.debug('manager', 'Running Flumotion version %s' %
         configure.version)
     import twisted.copyright
@@ -278,8 +281,6 @@ def main(args):
             e.port, e.socketError.args[1])
         raise errors.SystemError, message
 
-    log.info('manager', 'Starting manager "%s"' % options.name)
-
     if options.daemonizeTo and not options.daemonize:
         sys.stderr.write(
             'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
@@ -289,8 +290,6 @@ def main(args):
         sys.stderr.write(
             'ERROR: --service-name can only be used with -D/--daemonize.\n')
         return 1
-
-    log.info('manager', "Manager '%s' starting" % options.name)
 
     if options.daemonize:
         if not options.serviceName:
@@ -323,8 +322,9 @@ def main(args):
         path = common.writePidFile('manager', options.serviceName)
         log.debug('manager', 'written pid file %s' % path)
 
+    # log our standardized started marker
     # go into the reactor main loop
-    log.info('manager', 'Started manager "%s"' % options.name)
+    log.info('manager', "Started manager '%s'" % options.name)
 
     # let SystemError be handled normally, without exiting or tracebacking
     try:
@@ -333,11 +333,15 @@ def main(args):
         print "THOMAS WAS HERE"
         raise
 
+    # log our standardized stopping marker
+    log.info('manager', "Stopping manager '%s'" % options.name)
+
     # we exited, so we're done
     if options.daemonize:
         path = common.deletePidFile('manager', options.serviceName)
         log.debug('manager', 'deleted pid file %s' % path)
 
-    log.info('manager', "Stopping manager '%s'" % options.name)
+    # log our standardized stopped marker
+    log.info('manager', "Stopped manager '%s'" % options.name)
 
     return 0

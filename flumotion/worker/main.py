@@ -230,7 +230,8 @@ def main(args):
             'ERROR: --service-name can only be used with -D/--daemonize.\n')
         return 1
 
-    log.info('worker', "Worker '%s' starting" % options.name) 
+    # log our standardized starting marker
+    log.info('worker', "Starting worker '%s'" % options.name)
 
     if options.daemonize:
         if not options.serviceName:
@@ -269,12 +270,12 @@ def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
 
-    log.debug('manager', 'Running Flumotion version %s' %
+    log.debug('worker', 'Running Flumotion version %s' %
         configure.version)
     import twisted.copyright
-    log.debug('manager', 'Running against Twisted version %s' %
+    log.debug('worker', 'Running against Twisted version %s' %
         twisted.copyright.version)
-    log.debug('manager', 'Running against GStreamer version %s' %
+    log.debug('worker', 'Running against GStreamer version %s' %
         configure.gst_version)
 
     # create a brain and have it remember the manager to direct jobs to
@@ -305,8 +306,15 @@ def main(args):
 
     reactor.addSystemEventTrigger('before', 'shutdown',
         brain.shutdownHandler)
-    log.debug('worker', 'Starting reactor')
+
+    # log our standardized started marker
+    # go into the reactor main loop
+    log.info('worker', "Started worker '%s'" % options.name) 
+
     reactor.run()
+
+    # log our standardized stopping marker
+    log.info('worker', "Stopping worker '%s'" % options.name)
 
     # for now, if we are a daemon, we keep living until we get killed
     # obviously it'd be nicer to handle error conditions that involve startup
@@ -343,6 +351,7 @@ def main(args):
         path = common.deletePidFile('worker', options.serviceName)
         log.debug('worker', 'deleted pid file %s' % path)
 
-    log.info('worker', "Stopping worker '%s'" % options.name)
+    # log our standardized stopped marker
+    log.info('worker', "Stopped worker '%s'" % options.name)
 
     return 0

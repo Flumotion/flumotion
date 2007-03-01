@@ -40,15 +40,19 @@ def main(args):
 
     # handle all options
     if options.version:
-        print common.version("flumotion-worker")
+        print common.version("flumotion-job")
         return 0
 
     # check if a config file was specified; if so, parse config and copy over
     if len(args) != 3:
-        parser.error("must pass an avatarId and a path to the socket: %r" % args)
+        parser.error("must pass an avatarId and a path to the socket: %r" %
+            args)
     avatarId = args[1]
     socket = args[2]
         
+    # log our standardized starting marker
+    log.info('job', "Starting job '%s'" % avatarId)
+
     # register all package paths (FIXME: this should go away when
     # components and all deps come from manager)
     # this is still necessary so that code from other projects can be imported
@@ -60,7 +64,6 @@ def main(args):
     job_factory = job.JobClientFactory(avatarId)
     reactor.connectWith(fdserver.FDConnector, socket, job_factory,
         10, checkPID=False)
-    log.info('job', 'Started job on pid %d' % os.getpid())
 
     # should probably move this to boot
     if 'FLU_PROFILE' in os.environ:
@@ -82,9 +85,14 @@ def main(args):
     reactor.addSystemEventTrigger('before', 'shutdown', 
         job_factory.medium.shutdownHandler)
     
-    log.debug('job', 'Starting reactor')
+    # log our standardized started marker
+    log.info('job', "Started job '%s'" % avatarId)
+
     reactor.run()
 
-    log.debug('job', 'Reactor stopped')
+    # log our standardized stopping marker
+    log.info('job', "Stopping job '%s'" % avatarId)
+    # log our standardized stopped marker
+    log.info('job', "Stopped job '%s'" % avatarId)
 
     return 0
