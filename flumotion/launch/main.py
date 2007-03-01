@@ -238,11 +238,11 @@ def main(args):
     log.debug('manager', 'Running Flumotion version %s' %
         configure.version)
     import twisted.copyright
-    log.debug('manager', 'Running against Twisted version %s' %
+    log.debug('launch', 'Running against Twisted version %s' %
         twisted.copyright.version)
     from flumotion.project import project
     for p in project.list():
-        log.debug('manager', 'Registered project %s version %s' % (
+        log.debug('launch', 'Registered project %s version %s' % (
             p, project.get(p, 'version')))
 
     parser = optparse.OptionParser()
