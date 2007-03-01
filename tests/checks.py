@@ -37,8 +37,8 @@ import gst
 
 import debugslider
 
-from flumotion.twisted import compat
-compat.install_reactor()    
+from twisted.internet import gtk2reactor
+gtk2reactor.install(useGtk=False)
 from twisted.internet import reactor
 
 

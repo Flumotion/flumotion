@@ -229,7 +229,7 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
     reactor.addSystemEventTrigger('before', 'shutdown',
                                   shutdownStarted)
     reactor.addSystemEventTrigger('after', 'shutdown',
-                                  shutdownStarted)
+                                  shutdownEnded)
     
 def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """

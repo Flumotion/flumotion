@@ -12,7 +12,8 @@ e = gst.element_factory_make('fakesrc')
 
 from flumotion.twisted import compat
 
-compat.install_reactor(gtk=True)
+from twisted.internet import gtk2reactor
+gtk2reactor.install(useGtk=True)
 
 import pyexpat
 

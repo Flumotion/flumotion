@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import errno
 import optparse
 import os
 import sys

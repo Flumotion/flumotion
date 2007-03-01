@@ -117,7 +117,6 @@ def init_gst():
     return gst_majorminor
 
 def boot(path, gtk=False, gst=True, installReactor=True):
-    from flumotion.twisted import compat
     if gtk or gst:
         init_gobject()
 

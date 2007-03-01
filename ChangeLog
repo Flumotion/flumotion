@@ -1,5 +1,16 @@
 2007-03-01  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/boot.py:
+	* flumotion/common/common.py:
+	* flumotion/worker/main.py:
+	  Pychecker fixes.
+
+	* misc/pycheckerhelp.py:
+	* tests/checks.py:
+	  Update for removal of compat reactor code.
+
+2007-03-01  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/twisted/compat.py:
 	* flumotion/twisted/gtk2reactor.py:
 	* flumotion/twisted/Makefile.am:
