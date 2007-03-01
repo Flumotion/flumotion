@@ -246,8 +246,4 @@ class GladeWindow(gobject.GObject, GladeBacked):
             return blocked
         return blocker
 
-    def destroy(self):
-        self.window.destroy()
-        del self.window
-
 pygobject.type_register(GladeWindow)
