@@ -1,5 +1,11 @@
 2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/ui/glade.py:
+	  Put back an experimental generator that was used by
+	  flowtester.
+
+2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/main.py:
 	  Factor out a method to read the config.
 

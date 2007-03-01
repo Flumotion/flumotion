@@ -228,4 +228,26 @@ class GladeWindow(gobject.GObject, GladeBacked):
         proc = lambda *x: getattr(self, attr)()
         return self.widgets[widget_name].connect(signal, proc)
         
+    # somewhat experimental decorator
+    # this is only used by flowtester
+    # FIXME: if this wants to stay a public method, it should be commented
+    # and get an example so non-Andy people understand this code.
+    def with_blocked_signal(self, widget_name, signal):
+        w = self.widgets[widget_name]
+        hid = self.__signals[(widget_name, signal)]
+        def blocker(proc):
+            def blocked(*args, **kwargs):
+                w.handler_block(hid)
+                try:
+                    ret = proc(*args, **kwargs)
+                finally:
+                    w.handler_unblock(hid)
+                return ret
+            return blocked
+        return blocker
+
+    def destroy(self):
+        self.window.destroy()
+        del self.window
+
 pygobject.type_register(GladeWindow)
