@@ -95,6 +95,58 @@ def _createParser():
     parser.add_option_group(group)
 
     return parser
+
+def _readConfig(workerFile, options):
+    log.info('worker', 'Reading configuration from %s' % workerFile)
+    try:
+        cfg = config.WorkerConfigXML(workerFile)
+    except config.ConfigError, value:
+        raise errors.SystemError(
+            "Could not load configuration from %s: %s" % (
+            workerFile, value))
+    except IOError, e:
+        raise errors.SystemError(
+            "Could not load configuration from %s: %s" % (
+            workerFile, e.strerror))
+
+    # now copy over stuff from config that is not set yet
+    if not options.name and cfg.name:
+        log.debug('worker', 'Setting worker name %s' % cfg.name)
+        options.name = cfg.name
+
+    # manager
+    if not options.host and cfg.manager.host:
+        options.host = cfg.manager.host
+        log.debug('worker', 'Setting manager host to %s' % options.host)
+    if not options.port and cfg.manager.port:
+        options.port = cfg.manager.port
+        log.debug('worker', 'Setting manager port to %s' % options.port)
+    if not options.transport and cfg.manager.transport:
+        options.transport = cfg.manager.transport
+        log.debug('worker', 'Setting manager transport to %s' %
+            options.transport)
+
+    # authentication
+    if not options.username and cfg.authentication.username:
+        options.username = cfg.authentication.username
+        log.debug('worker', 'Setting username %s' % options.username)
+    if not options.password and cfg.authentication.password:
+        options.password = cfg.authentication.password
+        log.debug('worker',
+            'Setting password [%s]' % ("*" * len(options.password)))
+
+    # feederports: list of allowed ports
+    # XML could specify it as empty, meaning "don't use any"
+    if not options.feederports and cfg.feederports is not None:
+        options.feederports = cfg.feederports
+    if options.feederports is not None:
+        log.debug('worker', 'Using feederports %r' % options.feederports)
+
+    # general
+    # command-line debug > environment debug > config file debug
+    if not options.debug and cfg.fludebug \
+        and not os.environ.has_key('FLU_DEBUG'):
+        options.debug = cfg.fludebug
     
 def main(args):
     parser = _createParser()
@@ -127,57 +179,8 @@ def main(args):
     # check if a config file was specified; if so, parse config and copy over
     if len(args) > 1:
         workerFile = args[1]
-        log.info('worker', 'Reading configuration from %s' % workerFile)
-        try:
-            cfg = config.WorkerConfigXML(workerFile)
-        except config.ConfigError, value:
-            raise errors.SystemError(
-                "Could not load configuration from %s: %s" % (
-                workerFile, value))
-        except IOError, e:
-            raise errors.SystemError(
-                "Could not load configuration from %s: %s" % (
-                workerFile, e.strerror))
+        _readConfig(workerFile, options)
 
-        # now copy over stuff from config that is not set yet
-        if not options.name and cfg.name:
-            log.debug('worker', 'Setting worker name %s' % cfg.name)
-            options.name = cfg.name
-
-        # manager
-        if not options.host and cfg.manager.host:
-            options.host = cfg.manager.host
-            log.debug('worker', 'Setting manager host to %s' % options.host)
-        if not options.port and cfg.manager.port:
-            options.port = cfg.manager.port
-            log.debug('worker', 'Setting manager port to %s' % options.port)
-        if not options.transport and cfg.manager.transport:
-            options.transport = cfg.manager.transport
-            log.debug('worker', 'Setting manager transport to %s' %
-                options.transport)
-
-        # authentication
-        if not options.username and cfg.authentication.username:
-            options.username = cfg.authentication.username
-            log.debug('worker', 'Setting username %s' % options.username)
-        if not options.password and cfg.authentication.password:
-            options.password = cfg.authentication.password
-            log.debug('worker',
-                'Setting password [%s]' % ("*" * len(options.password)))
-
-        # feederports: list of allowed ports
-        # XML could specify it as empty, meaning "don't use any"
-        if not options.feederports and cfg.feederports is not None:
-            options.feederports = cfg.feederports
-        if options.feederports is not None:
-            log.debug('worker', 'Using feederports %r' % options.feederports)
-
-        # general
-        # command-line debug > environment debug > config file debug
-        if not options.debug and cfg.fludebug \
-            and not os.environ.has_key('FLU_DEBUG'):
-            options.debug = cfg.fludebug
-        
     # set default values for all unset options
     if not options.host:
         options.host = 'localhost'

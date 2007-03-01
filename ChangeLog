@@ -1,5 +1,10 @@
 2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/main.py:
+	  Factor out a method to read the config.
+
+2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/job/main.py:
 	* flumotion/manager/main.py:
 	* flumotion/worker/main.py:
