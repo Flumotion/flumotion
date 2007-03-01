@@ -312,9 +312,7 @@ def main(args):
     log.info('worker', "Started worker '%s'" % options.name) 
 
     reactor.run()
-
-    # log our standardized stopping marker
-    log.info('worker', "Stopping worker '%s'" % options.name)
+    log.debug('worker', 'Reactor stopped')
 
     # for now, if we are a daemon, we keep living until we get killed
     # obviously it'd be nicer to handle error conditions that involve startup
@@ -324,7 +322,8 @@ def main(args):
         common.waitForTerm()
         log.info('worker', 'I was killed so I wake up')
 
-    log.debug('worker', 'Reactor stopped')
+    # log our standardized stopping marker
+    log.info('worker', "Stopping worker '%s'" % options.name)
 
     pids = [kid.pid for kid in brain.kindergarten.getKids()]
     
