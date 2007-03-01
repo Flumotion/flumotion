@@ -165,12 +165,9 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_shutdown(self):
         """
         Shut down the manager.
-
-        @raise SystemExit: always
         """
-        print 'SHUTTING DOWN'
+        self.warning("Shutdown requested, shutting down...")
         reactor.stop()
-        raise SystemExit
 
     def perspective_componentStart(self, componentState):
         """

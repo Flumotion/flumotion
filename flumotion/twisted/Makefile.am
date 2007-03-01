@@ -10,7 +10,6 @@ flumotion_PYTHON = \
 	defer.py \
 	fdserver.py \
 	flavors.py \
-	gtk2reactor.py \
 	http.py \
 	integration.py \
 	pb.py \

@@ -127,7 +127,22 @@ def boot(path, gtk=False, gst=True, installReactor=True):
 
     # installing the reactor could override our packager's import hooks ...
     if installReactor:
-        compat.install_reactor(gtk)
+        from twisted.internet import gtk2reactor
+        gtk2reactor.install(useGtk=gtk)
+        # this monkeypatched var exists to let reconnecting factories know
+        # when they should warn about a connection being closed, and when
+        # they shouldn't because the system is shutting down.
+        # 
+        # there is no race condition here -- the reactor doesn't handle
+        # signals until it is run().
+        from twisted.internet import reactor
+        reactor.killed = False
+        def setkilled(killed):
+            reactor.killed = killed
+        reactor.addSystemEventTrigger('before', 'startup', setkilled, False)
+        reactor.addSystemEventTrigger('before', 'shutdown', setkilled, True)
+
+
 
     # ... so we install them again here to be safe
     from flumotion.common import package

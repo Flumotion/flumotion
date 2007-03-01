@@ -233,40 +233,12 @@ def main(args):
             'ERROR: --service-name can only be used with -D/--daemonize.\n')
         return 1
 
-    # log our standardized starting marker
-    log.info('worker', "Starting worker '%s'" % options.name)
-
+    name = options.name
     if options.daemonize:
-        if not options.serviceName:
-            options.serviceName = options.name
+        if options.serviceName:
+            name = options.serviceName
 
-        common.ensureDir(configure.logdir, "log file")
-        common.ensureDir(configure.rundir, "run file")
-
-        pid = common.getPid('worker', options.serviceName)
-        if pid:
-            raise errors.SystemError(
-                "A worker service '%s' is already running (with pid %d)" % (
-                    options.serviceName, pid))
-
-        log.info('worker', "Worker service '%s' daemonizing" %
-            options.serviceName) 
-
-        logPath = os.path.join(configure.logdir,
-            'worker.%s.log' % options.serviceName)
-        log.debug('worker', 'Further logging will be done to %s' % logPath)
-
-        # here we daemonize; so we also change our pid
-        if not options.daemonizeTo:
-            options.daemonizeTo = '/'
-        common.daemonize(stdout=logPath, stderr=logPath,
-            directory=options.daemonizeTo)
-
-        log.info('worker', 'Started daemon')
-
-        # from now on I should keep running until killed, whatever happens
-        path = common.writePidFile('worker', options.serviceName)
-        log.debug('worker', 'written pid file %s' % path)
+    common.startup("worker", name, options.daemonize, options.daemonizeTo)
 
     # register all package paths (FIXME: this should go away when
     # components come from manager)
@@ -310,50 +282,7 @@ def main(args):
     reactor.addSystemEventTrigger('before', 'shutdown',
         brain.shutdownHandler)
 
-    # log our standardized started marker
     # go into the reactor main loop
-    log.info('worker', "Started worker '%s'" % options.name) 
-
     reactor.run()
-    log.debug('worker', 'Reactor stopped')
-
-    # for now, if we are a daemon, we keep living until we get killed
-    # obviously it'd be nicer to handle error conditions that involve startup
-    # better, or be reconnecting, or something, instead of sleeping forever.
-    if options.daemonize and not reactor.killed:
-        log.info('worker', 'Since I am a daemon, I will sleep until killed')
-        common.waitForTerm()
-        log.info('worker', 'I was killed so I wake up')
-
-    # log our standardized stopping marker
-    log.info('worker', "Stopping worker '%s'" % options.name)
-
-    pids = [kid.pid for kid in brain.kindergarten.getKids()]
-    
-    if pids:
-        log.info('worker', 'Waiting for %d jobs to finish' % len(pids))
-        log.debug('worker', 'pids %r' % pids)
-
-    while pids:
-        try:
-            pid = os.wait()[0]
-        except OSError, e:
-            if e.errno == errno.ECHILD:
-                log.warning('worker',
-                    'No children left, but list of pids is %r' % pids)
-                break
-            else:
-                raise
-        
-        log.info('worker', 'Job with pid %d finished' % pid)
-        pids.remove(pid)
-
-    # we exited, so we're done
-    if options.daemonize:
-        path = common.deletePidFile('worker', options.serviceName)
-        log.debug('worker', 'deleted pid file %s' % path)
-
-    # log our standardized stopped marker
-    log.info('worker', "Stopped worker '%s'" % options.name)
 
     return 0

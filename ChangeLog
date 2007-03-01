@@ -1,3 +1,47 @@
+2007-03-01  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/compat.py:
+	* flumotion/twisted/gtk2reactor.py:
+	* flumotion/twisted/Makefile.am:
+	  We no longer support twisted 1.3, so we don't need a private copy of
+	  the gtk2reactor. Also delete the code that picked which reactor to
+	  install.
+
+	* flumotion/common/boot.py:
+	  Install a gtk2 reactor here unconditionally (moved from compat.py)
+
+	* flumotion/common/common.py:
+	  Add a utility function to set up our standard log messages and
+	  optionally daemonize. 
+	  When daemonizing, a stale pid file is an error, always.
+
+	* flumotion/component/component.py:
+	  Don't call self.error, as it tracebacks if we don't override it.
+	  Don't override self.error to do silly things like stopping the
+	  reactor unconditionally.
+
+	* flumotion/job/job.py:
+	  Do not call self.error
+
+	* flumotion/manager/admin.py:
+	  Don't raise SystemExit on a remote stop() call, just stop the
+	  reactor. 
+
+	* flumotion/manager/main.py:
+	  Use new startup helper for logging and daemonizing. Do not wrap
+	  reactor.run in try/except. Do not print THOMAS WAS HERE, because
+	  possibly thomas wasn't here.
+
+	* flumotion/worker/worker.py:
+	  Don't call self.error, or override it, as above.
+	  Add some API to Kindergarten to set a deferred to fire when our last
+	  child terminates.
+	  When shutting down, wait until children actually terminate.
+
+	* flumotion/worker/main.py:
+	  Use new startup helper for logging and daemonizing. Do not wait for
+	  pids after the reactor exits.
+
 2007-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/ui/glade.py:

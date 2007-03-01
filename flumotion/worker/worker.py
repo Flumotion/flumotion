@@ -66,8 +66,6 @@ class WorkerClientFactory(factoryClass):
         factoryClass.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
-        # Authentication errors are fatal unless this is true
-        self._previously_connected = False
         
     def clientConnectionFailed(self, connector, reason):
         """
@@ -85,7 +83,7 @@ class WorkerClientFactory(factoryClass):
         # add some of our own to it
         def remoteDisconnected(remoteReference):
             if reactor.killed:
-                self.log('Connection to manager lost due to SIGINT shutdown')
+                self.log('Connection to manager lost due to shutdown')
             else:
                 self.warning('Lost connection to manager, '
                              'will attempt to reconnect')
@@ -93,30 +91,29 @@ class WorkerClientFactory(factoryClass):
         def loginCallback(reference):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
-            self._previously_connected = True
            
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def alreadyConnectedErrback(failure):
             failure.trap(errors.AlreadyConnectedError)
-            self.error('A worker with the name "%s" is already connected.' %
+            self.warning('A worker with the name "%s" is already connected.' %
                 failure.value)
 
         def accessDeniedErrback(failure):
             failure.trap(twisted.cred.error.UnauthorizedLogin)
-            self.error('Access denied.')
+            self.warning('Access denied.')
             
         def connectionRefusedErrback(failure):
             failure.trap(twisted.internet.error.ConnectionRefusedError)
-            self.error('Connection to %s:%d refused.' % (self._managerHost,
+            self.warning('Connection to %s:%d refused.' % (self._managerHost,
                                                          self._managerPort))
                                                           
         def NoSuchMethodErrback(failure):
             failure.trap(twisted.spread.flavors.NoSuchMethod)
             # failure.value is a str
             if failure.value.find('remote_getKeycardClasses') > -1:
-                self.error(
+                self.warning(
                     "Manager %s:%d is older than version 0.3.0.  "
                     "Please upgrade." % (self._managerHost, self._managerPort))
                 return
@@ -124,7 +121,7 @@ class WorkerClientFactory(factoryClass):
             return failure
 
         def loginFailedErrback(failure):
-            self.error('Login failed, reason: %s' % str(failure))
+            self.warning('Login failed, reason: %s' % str(failure))
 
         d.addCallback(loginCallback)
         d.addErrback(accessDeniedErrback)
@@ -133,16 +130,6 @@ class WorkerClientFactory(factoryClass):
         d.addErrback(NoSuchMethodErrback)
         d.addErrback(loginFailedErrback)
             
-    # override log.Loggable method so we don't traceback
-    def error(self, message):
-        if self._previously_connected:
-            return self.warning(message)
-            
-        self.warning('Shutting down worker because of error:')
-        self.warning(message)
-        print >> sys.stderr, 'ERROR: %s' % message
-        reactor.stop()
-
 class WorkerMedium(medium.PingingMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
@@ -391,6 +378,9 @@ class Kindergarten(log.Loggable):
         """
         self.brain = brain
         self.options = options
+            
+        self._onShutdown = None # If set, a deferred to fire when our last child
+                                # process exits
 
         self._kids = {} # avatarId -> Kid
         self._socketPath = socketPath
@@ -456,6 +446,15 @@ class Kindergarten(log.Loggable):
             Kid(process.pid, avatarId, type, moduleName, methodName, nice,
                 bundles)
 
+    def setOnShutdown(self, d):
+        """
+        Set a deferred to fire when we have no children
+        """
+        if not self._kids:
+            d.callback(None)
+        else:
+            self._onShutdown = d
+
     def getKid(self, avatarId):
         return self._kids[avatarId]
     
@@ -478,6 +477,10 @@ class Kindergarten(log.Loggable):
                 self.debug('Removing kid with name %s and pid %d' % (
                     path, pid))
                 del self._kids[path]
+                if not self._kids and self._onShutdown:
+                    self.debug("Last child exited")
+                    self._onShutdown.callback(None)
+
                 return True
 
         self.warning('Asked to remove kid with pid %d but not found' % pid)
@@ -613,21 +616,17 @@ class WorkerBrain(log.Loggable):
         d.addCallback(lambda r: self._feedServerPort.stopListening())
         return d
 
-    # override log.Loggable method so we don't traceback
-    def error(self, message):
-        self.warning('Shutting down worker because of error:')
-        self.warning(message)
-        print >> sys.stderr, 'ERROR: %s' % message
-        reactor.stop()
-
     def callRemote(self, methodName, *args, **kwargs):
         return self.medium.callRemote(methodName, *args, **kwargs)
 
     def shutdownHandler(self):
         self.info("Reactor shutting down, stopping jobHeaven")
         d = self.jobHeaven.shutdown()
+        d2 = defer.Deferred()
+        self.kindergarten.setOnShutdown(d2)
+        dl = defer.DeferredList([d, d2])
         # Don't fire this other than from a callLater
-        return fdefer.defer_call_later(d)
+        return fdefer.defer_call_later(dl)
 
     def deferredCreate(self, avatarId):
         """

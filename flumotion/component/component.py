@@ -72,28 +72,11 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
 
         self.logName = component.name
 
-        self._previously_connected = False
-        
-    # override log.Loggable method so we don't traceback
-    def error(self, format, *args):
-        if self._previously_connected:
-            return self.warning(format, *args)
-
-        if args:
-            message = format % args
-        else:
-            message = format
-        self.warning('Shutting down because of %s' % message)
-        print >> sys.stderr, 'ERROR: [%d] %s' % (os.getpid(), message)
-        # FIXME: do we need to make sure that this cannot shut down the
-        # manager if it's the manager's bouncer ?
-        self.component.stop()
-
     # vmethod implementation
     def gotDeferredLogin(self, d):
         def remoteDisconnected(remoteReference):
             if reactor.killed:
-                self.log('Connection to manager lost due to SIGINT shutdown')
+                self.log('Connection to manager lost due to shutdown')
             else:
                 self.warning('Lost connection to manager, '
                              'will attempt to reconnect')
@@ -108,19 +91,19 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
 
         def accessDeniedErrback(failure):
             failure.trap(crederror.UnauthorizedLogin)
-            self.error('Access denied.')
+            self.warning('Access denied.')
             
         def connectionRefusedErrback(failure):
             failure.trap(error.ConnectionRefusedError)
-            self.error('Connection to manager refused.')
+            self.warning('Connection to manager refused.')
                                                           
         def alreadyLoggedInErrback(failure):
             failure.trap(errors.AlreadyConnectedError)
-            self.error('Component with id %s is already logged in.',
+            self.warning('Component with id %s is already logged in.',
                 self.medium.authenticator.avatarId)
                                                           
         def loginFailedErrback(failure):
-            self.error('Login failed, reason: %s' % failure)
+            self.warning('Login failed, reason: %s' % failure)
 
         d.addCallback(loginCallback)
         d.addErrback(accessDeniedErrback)

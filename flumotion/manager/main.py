@@ -291,57 +291,15 @@ def main(args):
             'ERROR: --service-name can only be used with -D/--daemonize.\n')
         return 1
 
+    name = options.name
+
     if options.daemonize:
-        if not options.serviceName:
-            options.serviceName = options.name
+        if options.serviceName:
+            name = options.serviceName
 
-        common.ensureDir(configure.logdir, "log file")
-        common.ensureDir(configure.rundir, "run file")
-                
-        if common.getPid('manager', options.serviceName):
-            raise errors.SystemError(
-                "A manager service '%s' is already running" %
-                    options.serviceName)
+    common.startup("manager", name, options.daemonize, 
+        options.daemonizeTo)
 
-        log.info('manager', "Manager service '%s' daemonizing" %
-            options.serviceName)
-
-        logPath = os.path.join(configure.logdir,
-            'manager.%s.log' % options.serviceName)
-        log.debug('manager', 'Further logging will be done to %s' % logPath)
-
-        # here we daemonize; so we also change our pid
-        if not options.daemonizeTo:
-            options.daemonizeTo = '/'
-        common.daemonize(stdout=logPath, stderr=logPath,
-            directory=options.daemonizeTo)
-
-        log.info('manager', 'Started daemon')
-
-        # from now on I should keep running, whatever happens
-        path = common.writePidFile('manager', options.serviceName)
-        log.debug('manager', 'written pid file %s' % path)
-
-    # log our standardized started marker
-    # go into the reactor main loop
-    log.info('manager', "Started manager '%s'" % options.name)
-
-    # let SystemError be handled normally, without exiting or tracebacking
-    try:
-        reactor.run()
-    except:
-        print "THOMAS WAS HERE"
-        raise
-
-    # log our standardized stopping marker
-    log.info('manager', "Stopping manager '%s'" % options.name)
-
-    # we exited, so we're done
-    if options.daemonize:
-        path = common.deletePidFile('manager', options.serviceName)
-        log.debug('manager', 'deleted pid file %s' % path)
-
-    # log our standardized stopped marker
-    log.info('manager', "Stopped manager '%s'" % options.name)
+    reactor.run()
 
     return 0

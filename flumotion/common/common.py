@@ -206,6 +206,30 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     # Now I am a daemon!
     # don't add stuff here that can fail, because from now on the program
     # will keep running regardless of tracebacks
+
+def startup(processType, processName, daemonize=False, daemonizeTo='/'):
+    """
+    Prepare a process for starting, logging appropriate standarised messages.
+    First daemonizes the process, if daemonize is true.
+    """
+    log.info(processType, "Starting %s '%s'", processType, processName)
+
+    if daemonize:
+        daemonizeHelper(processType, daemonizeTo, processName)
+
+    log.info(processType, "Started %s '%s'", processType, processName)
+
+    def shutdownStarted():
+        log.info(processType, "Stopping %s '%s'", processType, processName)
+    def shutdownEnded():
+        log.info(processType, "Stopped %s '%s'", processType, processName)
+
+    # import inside function so we avoid affecting startup
+    from twisted.internet import reactor
+    reactor.addSystemEventTrigger('before', 'shutdown',
+                                  shutdownStarted)
+    reactor.addSystemEventTrigger('after', 'shutdown',
+                                  shutdownStarted)
     
 def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """
@@ -221,24 +245,18 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     disambiguate different instances of the same daemon.
     @type  processName: str
     """
+
     ensureDir(configure.logdir, "log file")
     ensureDir(configure.rundir, "run file")
 
     pid = getPid(processType, processName)
     if pid:
-        if checkPidRunning(pid):
-            raise SystemError(
-                "A %s service named '%s' is already running with pid %d"
-                % (processType, processName or processType, pid))
-        else:
-            log.warning(processType,
-                        "A %s service named '%s' should have been "
-                        "running with pid %d.  Restarting.", processType,
-                        processName or processType, pid)
-            deletePidFile(processName)
+        raise SystemError(
+            "A %s service named '%s' is already running with pid %d"
+            % (processType, processName or processType, pid))
 
-    log.info(processType, "%s service named '%s' daemonizing",
-             processType, processName)
+    log.debug(processType, "%s service named '%s' daemonizing", 
+        processType, processName)
 
     if processName:
         logPath = os.path.join(configure.logdir,
@@ -251,7 +269,7 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     # here we daemonize; so we also change our pid
     daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
 
-    log.info(processType, 'Started daemon')
+    log.debug(processType, 'Started daemon')
 
     # from now on I should keep running until killed, whatever happens
     path = writePidFile(processType, processName)

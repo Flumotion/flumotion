@@ -269,7 +269,7 @@ class JobMedium(medium.BaseMedium):
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, managerClientFactory)
         else:
-            self.error('Unknown transport protocol %s' % self._managerTransport)
+            self.warning('Unknown transport protocol %s' % self._managerTransport)
 
         return comp
         
