@@ -1,5 +1,10 @@
 2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_feedcomponent010.py:
+	  Fix test after I renamed methods at the last moment.
+
+2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/base/feeders.glade:
 	* flumotion/component/feedcomponent010.py:
