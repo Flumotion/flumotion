@@ -499,6 +499,11 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             self._lastDisconnect = value
             self.updateDisconnectionTime()
 
+    def setFeederClientLastActivity(self, state, value):
+        if value:
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['last-activity'].set_text(text)
+
     def setFeederClientFD(self, state, value):
         if value == None:
             # disconnected
@@ -556,6 +561,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             'reconnects':            self.setFeederClientReconnects,
             'lastConnect':           self.setFeederClientLastConnect,
             'lastDisconnect':        self.setFeederClientLastDisconnect,
+            'lastActivity':          self.setFeederClientLastActivity,
             'fd':                    self.setFeederClientFD,
         }, {}, {})
         self.treemodel.set(i, 2, w, 3, 'client')
@@ -613,7 +619,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             'connected-since', 'connection-time',
             'disconnected-since', 'disconnection-time',
             'bytes-read-total', 'buffers-dropped-total',
-            'connections-total',
+            'connections-total', 'last-activity',
             ):
             set_label(type)
 

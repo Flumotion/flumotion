@@ -1,5 +1,13 @@
 2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/feeders.glade:
+	* flumotion/component/feedcomponent010.py:
+	  Also show when the last buffer was read, to debug longer
+	  connection problems.
+
+2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  Move fd out of the constructor for FeederClient, since it
 	  is something that can change or be None during its lifetime.

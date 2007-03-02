@@ -116,6 +116,7 @@ class FeederClient:
             'reconnects',            # number of connections made by this client
             'lastConnect',           # last client connection, in epoch seconds
             'lastDisconnect',        # last client disconnect, in epoch seconds
+            'lastActivity',          # last time client read or connected
             ):
             self.uiState.addKey(key)
             self.uiState.set(key, 0)
@@ -132,7 +133,7 @@ class FeederClient:
         #timeAdded = stats[1]
         #timeRemoved = stats[2]
         #timeActive = stats[3]
-        #timeLastActivity = stats[4]
+        timeLastActivity = float(stats[4]) / gst.SECOND
         if len(stats) > 5:
             # added in gst-plugins-base 0.10.11
             buffersDropped = stats[5]
@@ -142,6 +143,7 @@ class FeederClient:
         self.uiState.set('bytesReadCurrent', bytesSent)
         self.uiState.set('buffersDroppedCurrent', buffersDropped)
         self.uiState.set('bytesReadTotal', self._bytesReadBefore + bytesSent)
+        self.uiState.set('lastActivity', timeLastActivity)
         self.uiState.set('buffersDroppedTotal',
             self._buffersDroppedBefore + buffersDropped)
 
@@ -685,12 +687,14 @@ class FeedComponent(basecomponent.BaseComponent):
         for feedId, feeder in self._feeders.items():
             feederElement = self.get_element("feeder:%s" % feedId)
             for client in feeder.getClients().values():
-                array = feederElement.emit('get-stats', client.fd)
-                if len(array) == 0:
-                    self.warning('Feeder element for feed %s does not know '
-                        'client fd %d' % (feedId, client.fd))
-                    return
-                client.setStats(array)
+                # a disconnect client will have fd None
+                if client.fd:
+                    array = feederElement.emit('get-stats', client.fd)
+                    if len(array) == 0:
+                        self.warning('Feeder element for feed %s does not know '
+                            'client fd %d' % (feedId, client.fd))
+                    else:
+                        client.setStats(array)
         self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
             self._feeder_probe_calllater)
 
