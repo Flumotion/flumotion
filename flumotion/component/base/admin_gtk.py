@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_feedcomponent010 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -24,6 +24,7 @@ Base classes for component UI's using GTK+
 """
 
 import os
+import time
 
 import gtk
 import gtk.glade
@@ -381,8 +382,8 @@ class BaseAdminGtkNode(log.Loggable):
         yield self.widget
     render = defer_generator_method(render)
 
-# this class is a bit of an experiment, and is private, dudes and ladies
-class StateWatcher(object):
+# this class is a bit of an experiment
+class _StateWatcher(object):
     def __init__(self, state, setters, appenders, removers):
         self.state = state
         self.setters = setters
@@ -434,10 +435,14 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def __init__(self, state, admin):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Feeders"))
+        # tree model is a model of id, uiState, _StateWatcher, type
+        # tree model contains feeders and their feeder clients
         self.treemodel = None
         self.treeview = None
         self.selected = None
         self.labels = {}
+        self._lastConnect = 0
+        self._lastDisconnect = 0
 
     def select(self, watcher):
         if self.selected:
@@ -454,38 +459,102 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
     def setFeederClientName(self, state, value):
         self.labels['feeder-name'].set_markup(_('Feeding to <b>%s</b>')
                                               % value)
-    def setFeederClientBytesRead(self, state, value):
+
+    def setFeederClientBytesReadCurrent(self, state, value):
         txt = value and (common.formatStorage(value) + _('Byte')) or ''
-        self.labels['feeder-client-bytesread'].set_text(txt)
-    def setFeederClientBuffersDropped(self, state, value):
-        self.labels['feeder-client-buffersdropped'].set_text(str(value))
+        self.labels['bytes-read-current'].set_text(txt)
+        self.updateConnectionTime()
+        self.updateDisconnectionTime()
+
+    def setFeederClientBuffersDroppedCurrent(self, state, value):
+        self.labels['buffers-dropped-current'].set_text(str(value))
+        self.updateConnectionTime()
+        self.updateDisconnectionTime()
+
+    def setFeederClientBytesReadTotal(self, state, value):
+        txt = value and (common.formatStorage(value) + _('Byte')) or ''
+        self.labels['bytes-read-total'].set_text(txt)
+
+    def setFeederClientBuffersDroppedTotal(self, state, value):
+        self.labels['buffers-dropped-total'].set_text(str(value))
+
+    def setFeederClientReconnects(self, state, value):
+        self.labels['connections-total'].set_text(str(value))
+
+    def setFeederClientLastConnect(self, state, value):
+        if value:
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['connected-since'].set_text(text)
+            self._lastConnect = value
+            self.updateConnectionTime()
+
+    def setFeederClientLastDisconnect(self, state, value):
+        if value:
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['disconnected-since'].set_text(text)
+            self._lastDisconnect = value
+            self.updateDisconnectionTime()
+
+    def setFeederClientFD(self, state, value):
+        if value == None:
+            # disconnected
+            self._table_connected.hide()
+            self._table_disconnected.show()
+        else:
+            self._table_disconnected.hide()
+            self._table_connected.show()
+
+    # FIXME: add a timeout to update this ?
+    def updateConnectionTime(self):
+        if self._lastConnect:
+            text = common.formatTime(time.time() - self._lastConnect)
+            self.labels['connection-time'].set_text(text)
+
+    # FIXME: add a timeout to update this ?
+    def updateDisconnectionTime(self):
+        if self._lastDisconnect:
+            text = common.formatTime(time.time() - self._lastDisconnect)
+            self.labels['disconnection-time'].set_text(text)
 
     def addFeeder(self, uiState, state):
+        """
+        @param uiState: the component's uiState
+        @param state:   the feeder's uiState
+        """
         feederId = state.get('feedId')
         i = self.treemodel.append(None)
         self.treemodel.set(i, 0, feederId, 1, state)
-        w = StateWatcher(state,
+        w = _StateWatcher(state,
                          {'feedId': self.setFeederName},
                          {'clients': self.addFeederClient},
                          {'clients': self.removeFeederClient})
-        self.treemodel.set(i, 2, w)
+        self.treemodel.set(i, 2, w, 3, 'feeder')
         self.treeview.expand_all()
 
     def addFeederClient(self, feederState, state):
+        """
+        @param uiState: the component's uiState
+        @param state:   the feeder client's uiState
+        """
+
         clientId = state.get('clientId')
         for row in self.treemodel:
             if self.treemodel.get_value(row.iter, 1) == feederState:
                 break
         i = self.treemodel.append(row.iter)
         self.treemodel.set(i, 0, clientId, 1, state)
-        w = StateWatcher(state,
-                         {'clientId': self.setFeederClientName,
-                          'bytesRead': self.setFeederClientBytesRead,
-                          'buffersDropped':
-                          self.setFeederClientBuffersDropped},
-                         {},
-                         {})
-        self.treemodel.set(i, 2, w)
+        w = _StateWatcher(state, {
+            'clientId':              self.setFeederClientName,
+            'bytesReadCurrent':      self.setFeederClientBytesReadCurrent,
+            'buffersDroppedCurrent': self.setFeederClientBuffersDroppedCurrent,
+            'bytesReadTotal':        self.setFeederClientBytesReadTotal,
+            'buffersDroppedTotal':   self.setFeederClientBuffersDroppedTotal,
+            'reconnects':            self.setFeederClientReconnects,
+            'lastConnect':           self.setFeederClientLastConnect,
+            'lastDisconnect':        self.setFeederClientLastDisconnect,
+            'fd':                    self.setFeederClientFD,
+        }, {}, {})
+        self.treemodel.set(i, 2, w, 3, 'client')
         self.treeview.expand_all()
 
     def removeFeederClient(self, feederState, state):
@@ -512,7 +581,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.labels = {}
         self.widget = self.wtree.get_widget('feeders-widget')
         self.treeview = self.wtree.get_widget('treeview-feeders')
-        self.treemodel = gtk.TreeStore(str, object, object)
+        self.treemodel = gtk.TreeStore(str, object, object, str)
         self.treeview.set_model(self.treemodel)
         col = gtk.TreeViewColumn('Feeder', gtk.CellRendererText(),
                                  text=0)
@@ -522,17 +591,40 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         def sel_changed(sel):
             model, i = sel.get_selected()
             self.select(i and model.get_value(i, 2))
+            # don't show the feeder client stuff for a feeder
+            if model.get_value(i, 3) == 'feeder':
+                self._table_feedclient.hide()
+            else:
+                self._table_feedclient.show()
+
         sel.connect('changed', sel_changed)
         def set_label(name):
             self.labels[name] = self.wtree.get_widget('label-' + name)
+            # zeroes out all value labels
             self.labels[name].set_text('')
-        for type in ('name', ):
-            set_label('feeder-' + type)
-        for type in ('bytesread', 'buffersdropped'):
-            set_label('feeder-client-' + type)
 
-        # do not show all; hide bytes fed and buffers dropped until something
-        # is selected
+        set_label('feeder-name')
+        for type in (
+            'bytes-read-current', 'buffers-dropped-current',
+            'connected-since', 'connection-time',
+            'disconnected-since', 'disconnection-time',
+            'bytes-read-total', 'buffers-dropped-total',
+            'connections-total',
+            ):
+            set_label(type)
+
+        self._table_connected = self.wtree.get_widget('table-current-connected')
+        self._table_disconnected = self.wtree.get_widget(
+            'table-current-disconnected')
+        self._table_feedclient = self.wtree.get_widget('table-feedclient')
+        self._table_connected.hide()
+        self._table_disconnected.hide()
+        self._table_feedclient.hide()
+        self.wtree.get_widget('box-right').hide()
+
+        # FIXME: do not show all;
+        # hide bytes fed and buffers dropped until something is selected
+        # see #575
         return self.widget
 
 class EffectAdminGtkNode(BaseAdminGtkNode):

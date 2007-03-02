@@ -51,31 +51,53 @@ class Feeder:
         self.uiState.addKey('feedId')
         self.uiState.set('feedId', feedId)
         self.uiState.addListKey('clients')
-        self._clients = {}
+        self._fdToClient = {} # fd -> FeederClient
+        self._clients = {} # id -> FeederClient
 
-    def addClient(self, clientId, fd):
+
+    def clientConnected(self, clientId, fd):
         """
+        The given client has connected on the given file descriptor.
+
         @param clientId: id of the client of the feeder
-        @param fd: file descriptor representing the client
+        @param fd:       file descriptor representing the client
         """
-        client = FeederClient(clientId, fd)
-        self._clients[fd] = client
-        self.uiState.append('clients', client.uiState)
+        if clientId not in self._clients.keys():
+            # first time we see this client, create an object
+            client = FeederClient(clientId, fd)
+            self._clients[clientId] = client
+            self.uiState.append('clients', client.uiState)
+
+        client = self._clients[clientId]
+        self._fdToClient[fd] = client
+
+        client.connected(fd)
+
         return client
 
-    def removeClient(self, fd):
+    def clientDisconnected(self, fd):
         """
+        Called when the client disconnects.
+        The client object stays around so we can track over multiple
+        connections.
+        
         @type fd: file descriptor
         """
-        client = self._clients.pop(fd)
-        self.uiState.remove('clients', client.uiState)
+        client = self._fdToClient.pop(fd)
+        client.disconnected()
 
     def getClients(self):
-        return self._clients
+        """
+        @rtype: dict of int -> L{FeederClient}
+        """
+        return self._fdToClient
 
 class FeederClient:
     """
     This class groups information related to the client of a feeder.
+    The client is identified by an id.
+    The information remains valid for the lifetime of the feeder, so it
+    can track reconnects of the client.
 
     @ivar clientId: id of the client of the feeder
     @ivar fd:       file descriptor representing the client
@@ -85,8 +107,22 @@ class FeederClient:
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('clientId', clientId)
         self.uiState.addKey('fd', fd)
-        self.uiState.addKey('bytesRead')
-        self.uiState.addKey('buffersDropped')
+
+        for key in (
+            'bytesReadCurrent',      # bytes dropped over current connection
+            'buffersDroppedCurrent', # buffers dropped over current connection
+            'bytesReadTotal',        # bytes dropped over all connections
+            'buffersDroppedTotal',   # buffers dropped over all connections
+            'reconnects',            # number of connections made by this client
+            'lastConnect',           # last client connection, in epoch seconds
+            'lastDisconnect',        # last client disconnect, in epoch seconds
+            ):
+            self.uiState.addKey(key)
+            self.uiState.set(key, 0)
+
+        # internal state allowing us to track global numbers
+        self._buffersDroppedBefore = 0
+        self._bytesReadBefore = 0
 
     def setStats(self, stats):
         """
@@ -103,9 +139,40 @@ class FeederClient:
         else:
             buffersDropped = None
 
-        self.uiState.set('bytesRead', bytesSent)
-        self.uiState.set('buffersDropped', buffersDropped)
+        self.uiState.set('bytesReadCurrent', bytesSent)
+        self.uiState.set('buffersDroppedCurrent', buffersDropped)
+        self.uiState.set('bytesReadTotal', self._bytesReadBefore + bytesSent)
+        self.uiState.set('buffersDroppedTotal',
+            self._buffersDroppedBefore + buffersDropped)
 
+    def connected(self, fd, when=None):
+        """
+        The client has connected.
+        Update related stats.
+        """
+        if not when:
+            when = time.time()
+        self.uiState.set('fd', fd)
+        self.uiState.set('lastConnect', when)
+        self.uiState.set('reconnects', self.uiState.get('reconnects', 0) + 1)
+
+    def disconnected(self, when=None):
+        """
+        The client has disconnected.
+        Update related stats.
+        """
+        if not when:
+            when = time.time()
+        self.uiState.set('fd', None)
+        self.uiState.set('lastDisconnect', when)
+
+        # update our internal counters
+        self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
+        self._buffersDroppedBefore += self.uiState.get('buffersDroppedCurrent')
+
+        # reset the current ones to zero
+        self.uiState.set('bytesReadCurrent', 0)
+        self.uiState.set('buffersDroppedCurrent', 0)
 
 class FeedComponent(basecomponent.BaseComponent):
     """
@@ -808,16 +875,16 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("fdcleanup registered")
         self._fdCleanup[fd] = cleanup
         element.emit('add', fd)
-        self._feeders[feedId].addClient(eaterId or ('client-%d' % fd), fd)
+        self._feeders[feedId].clientConnected(eaterId or ('client-%d' % fd), fd)
 
     def removeClientCallback(self, sink, fd, _):
         """
-        Called as a signal callback when the FD should no longer be used, but
-        before it may be closed
+        Called as a signal callback from multifdsink when the FD should no
+        longer be used, but before it may be closed.
         """
         self.debug("removing client for fd %d", fd)
         feedId = ':'.join(sink.get_name().split(':')[1:])
-        self._feeders[feedId].removeClient(fd)
+        self._feeders[feedId].clientDisconnected(fd)
 
     def removeFDCallback(self, sink, fd):
         """
