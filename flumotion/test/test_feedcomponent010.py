@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import time
+
 from twisted.trial import unittest
 
 import common
@@ -50,7 +52,7 @@ class TestFeeder(unittest.TestCase):
         self.clientAssertStats(c, 0, 0, 0, 0, 1)
 
         # read 10 bytes, drop 1 buffer
-        c.setStats((10, None, None, None, None, 1))
+        c.setStats((10, None, None, None, time.time(), 1))
         self.clientAssertStats(c, 10, 1, 10, 1, 1)
 
         # disconnect
@@ -62,7 +64,7 @@ class TestFeeder(unittest.TestCase):
         self.clientAssertStats(c, 0, 0, 10, 1, 2)
 
         # read 20 bytes, drop 2 buffers
-        c.setStats((20, None, None, None, None, 2))
+        c.setStats((20, None, None, None, time.time(), 2))
         self.clientAssertStats(c, 20, 2, 30, 3, 2)
 
     def clientAssertEquals(self, client, key, value):
