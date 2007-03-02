@@ -88,7 +88,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         # changed in 0.1.9.1 to be int so we can localize time
         peakTime = state.get('clients-peak-time')
         if not isinstance(peakTime, str):
-            peakTime = time.strftime ("%c", time.localtime(peakTime))
+            peakTime = time.strftime("%c", time.localtime(peakTime))
             
         self.labels['clients-peak-time'].set_text(peakTime)
         
