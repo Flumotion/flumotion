@@ -1,3 +1,9 @@
+2007-03-02  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py: 
+	Added more comments and changed a class variable name
+	to make it less ambiguous.
+
 2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_feedcomponent010.py:
