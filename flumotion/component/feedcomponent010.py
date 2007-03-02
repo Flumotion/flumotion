@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_feedcomponent010 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -64,7 +64,7 @@ class Feeder:
         """
         if clientId not in self._clients.keys():
             # first time we see this client, create an object
-            client = FeederClient(clientId, fd)
+            client = FeederClient(clientId)
             self._clients[clientId] = client
             self.uiState.append('clients', client.uiState)
 
@@ -100,13 +100,13 @@ class FeederClient:
     can track reconnects of the client.
 
     @ivar clientId: id of the client of the feeder
-    @ivar fd:       file descriptor representing the client
+    @ivar fd:       file descriptor the client is currently using, or None.
     """
-    def __init__(self, clientId, fd):
-        self.fd = fd
+    def __init__(self, clientId):
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('clientId', clientId)
-        self.uiState.addKey('fd', fd)
+        self.fd = None
+        self.uiState.addKey('fd', None)
 
         for key in (
             'bytesReadCurrent',      # bytes dropped over current connection
@@ -152,6 +152,7 @@ class FeederClient:
         """
         if not when:
             when = time.time()
+        self.fd = fd
         self.uiState.set('fd', fd)
         self.uiState.set('lastConnect', when)
         self.uiState.set('reconnects', self.uiState.get('reconnects', 0) + 1)
@@ -163,6 +164,7 @@ class FeederClient:
         """
         if not when:
             when = time.time()
+        self.fd = None
         self.uiState.set('fd', None)
         self.uiState.set('lastDisconnect', when)
 
@@ -684,6 +686,10 @@ class FeedComponent(basecomponent.BaseComponent):
             feederElement = self.get_element("feeder:%s" % feedId)
             for client in feeder.getClients().values():
                 array = feederElement.emit('get-stats', client.fd)
+                if len(array) == 0:
+                    self.warning('Feeder element for feed %s does not know '
+                        'client fd %d' % (feedId, client.fd))
+                    return
                 client.setStats(array)
         self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
             self._feeder_probe_calllater)

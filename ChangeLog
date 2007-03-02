@@ -1,3 +1,12 @@
+2007-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  Move fd out of the constructor for FeederClient, since it
+	  is something that can change or be None during its lifetime.
+	  Make sure we actually set .fd as well to be correct.
+	  get-client-stats can return a 0-length array if the fd is invalid,
+	  so warn better when that happens.
+
 2007-03-02  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py: 
