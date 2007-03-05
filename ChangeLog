@@ -1,3 +1,9 @@
+2007-03-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  Don't traceback with older plugins base for the uiState
+	  calculations.
+
 2007-03-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/common.py (daemonizeHelper._deletePidFile): Fix

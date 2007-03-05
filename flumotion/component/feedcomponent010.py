@@ -138,7 +138,9 @@ class FeederClient:
             # added in gst-plugins-base 0.10.11
             buffersDropped = stats[5]
         else:
-            buffersDropped = None
+            # We don't know, but we cannot use None
+            # since that would break integer addition below
+            buffersDropped = 0
 
         self.uiState.set('bytesReadCurrent', bytesSent)
         self.uiState.set('buffersDroppedCurrent', buffersDropped)
