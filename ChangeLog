@@ -1,5 +1,8 @@
 2007-03-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/common.py (daemonizeHelper._deletePidFile): Fix
+	very broken deletePidFile.
+
 	* flumotion.spec.in (BuildRequires): Require python-twisted-web
 	and -names.
 

@@ -277,11 +277,11 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
 
     # import inside function so we avoid affecting startup
     from twisted.internet import reactor
-    def deletePidFile():
+    def _deletePidFile():
         log.debug(processType, 'deleting pid file')
-        deletePidFile(processType)
+        deletePidFile(processType, processName)
     reactor.addSystemEventTrigger('after', 'shutdown',
-                                  deletePidFile)
+                                  _deletePidFile)
 
     
 def argRepr(args=(), kwargs={}, max=-1):
