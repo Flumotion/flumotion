@@ -5,4 +5,5 @@ EXTRA_DIST = 						\
 	managers/default/managerlifecycleprinter.xml	\
 	managers/default/planet.xml			\
 	managers/default/flows/ogg-test-theora.xml	\
-	workers/default.xml
+	workers/default.xml 				\
+	examples/twores.xml

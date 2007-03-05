@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+
+<!-- This example flow shows how you can use the same audio and video source
+     to produce a higher-bitrate higher-resolution stream for archiving and
+     a lower-bitrate lower-resolution stream for streaming.
+     The overlay-video feed is scaled down using a pipeline-converter,
+     then encoded and remuxed with the encoded audio stream.
+-->
+
+<planet>
+  <flow name="default">
+    <component name="producer-video" project="flumotion" type="videotest-producer" version="0.4.1" worker="localhost">
+
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+
+    <component name="overlay-video" project="flumotion" type="overlay-converter" version="0.4.1" worker="localhost">
+      <source>producer-video</source>
+
+      <property name="cc-logo">True</property>
+      <property name="fluendo-logo">True</property>
+      <property name="height">240</property>
+      <property name="show-text">True</property>
+      <property name="text">Fluendo</property>
+      <property name="width">320</property>
+      <property name="xiph-logo">True</property>
+    </component>
+
+    <!-- create a scaled down copy of the overlayed video for streaming -->
+    <component name="overlay-video-small" project="flumotion" type="pipeline-converter" version="0.4.1" worker="localhost">
+      <source>overlay-video</source>
+
+      <property name="pipeline">videoscale ! video/x-raw-yuv,width=160,height=120</property>
+    </component>
+
+    <component name="encoder-video" project="flumotion" type="theora-encoder" version="0.4.1" worker="localhost">
+      <source>overlay-video</source>
+
+      <property name="bitrate">400000</property>
+    </component>
+
+    <component name="encoder-video-small" project="flumotion" type="theora-encoder" version="0.4.1" worker="localhost">
+      <source>overlay-video-small</source>
+
+      <property name="bitrate">150000</property>
+    </component>
+
+    <component name="producer-audio" project="flumotion" type="audiotest-producer" version="0.4.1" worker="localhost">
+
+      <property name="frequency">440</property>
+      <property name="rate">8000</property>
+      <property name="volume">1.0</property>
+    </component>
+
+    <component name="encoder-audio" project="flumotion" type="vorbis-encoder" version="0.4.1" worker="localhost">
+      <source>producer-audio</source>
+
+      <property name="quality">0.5</property>
+    </component>
+
+    <component name="muxer-audio-video" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
+      <source>encoder-video</source>
+      <source>encoder-audio</source>
+    </component>
+
+    <component name="muxer-audio-video-small" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
+      <source>encoder-video-small</source>
+      <source>encoder-audio</source>
+    </component>
+
+    <component name="http-audio-video" project="flumotion" type="http-streamer" version="0.4.1" worker="localhost">
+      <source>muxer-audio-video-small</source>
+
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="client-limit">1024</property>
+      <property name="mount-point">/</property>
+      <property name="port">8800</property>
+    </component>
+
+    <component name="disk-audio-video" project="flumotion" type="disk-consumer" version="0.4.1" worker="localhost">
+      <source>muxer-audio-video</source>
+
+      <property name="directory">/tmp</property>
+      <property name="rotate-type">time</property>
+      <property name="start-recording">True</property>
+      <property name="time">43200</property>
+    </component>
+
+  </flow>
+</planet>

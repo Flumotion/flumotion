@@ -1,5 +1,11 @@
 2007-03-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/Makefile.am:
+	* conf/examples/twores.xml:
+	  Add an example of streaming and recording at different resolutions.
+
+2007-03-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  Don't traceback with older plugins base for the uiState
 	  calculations.
