@@ -43,6 +43,8 @@ Requires(post):	openssl
 BuildRequires:	%{gstreamer}-devel >= %{gst_minver}
 BuildRequires:	%{gstreamer}-python >= %{gstpy_minver}
 BuildRequires:	python-twisted-core >= 2.4.0
+BuildRequires:	python-twisted-names
+BuildRequires:	python-twisted-web
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel
