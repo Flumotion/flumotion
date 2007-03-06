@@ -108,6 +108,8 @@ class FeederClient:
         self.fd = None
         self.uiState.addKey('fd', None)
 
+        # these values can be set to None, which would mean
+        # Unknown, not supported
         for key in (
             'bytesReadCurrent',      # bytes dropped over current connection
             'buffersDroppedCurrent', # buffers dropped over current connection
@@ -118,8 +120,7 @@ class FeederClient:
             'lastDisconnect',        # last client disconnect, in epoch seconds
             'lastActivity',          # last time client read or connected
             ):
-            self.uiState.addKey(key)
-            self.uiState.set(key, 0)
+            self.uiState.addKey(key, None)
 
         # internal state allowing us to track global numbers
         self._buffersDroppedBefore = 0
@@ -146,8 +147,9 @@ class FeederClient:
         self.uiState.set('buffersDroppedCurrent', buffersDropped)
         self.uiState.set('bytesReadTotal', self._bytesReadBefore + bytesSent)
         self.uiState.set('lastActivity', timeLastActivity)
-        self.uiState.set('buffersDroppedTotal',
-            self._buffersDroppedBefore + buffersDropped)
+        if buffersDropped is not None:
+            self.uiState.set('buffersDroppedTotal',
+                self._buffersDroppedBefore + buffersDropped)
 
     def connected(self, fd, when=None):
         """
@@ -172,13 +174,13 @@ class FeederClient:
         self.uiState.set('fd', None)
         self.uiState.set('lastDisconnect', when)
 
-        # update our internal counters
+        # update our internal counters and reset current counters to 0
         self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
-        self._buffersDroppedBefore += self.uiState.get('buffersDroppedCurrent')
-
-        # reset the current ones to zero
         self.uiState.set('bytesReadCurrent', 0)
-        self.uiState.set('buffersDroppedCurrent', 0)
+        if self.uiState.get('buffersDroppedCurrent') is not None:
+            self._buffersDroppedBefore += self.uiState.get(
+                'buffersDroppedCurrent')
+            self.uiState.set('buffersDroppedCurrent', 0)
 
 class FeedComponent(basecomponent.BaseComponent):
     """

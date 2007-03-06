@@ -471,6 +471,9 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.updateDisconnectionTime()
 
     def setFeederClientBuffersDroppedCurrent(self, state, value):
+        if value is None:
+            # no support for counting dropped buffers
+            value = _("Unknown")
         self.labels['buffers-dropped-current'].set_text(str(value))
         self.updateConnectionTime()
         self.updateDisconnectionTime()
@@ -480,6 +483,9 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.labels['bytes-read-total'].set_text(txt)
 
     def setFeederClientBuffersDroppedTotal(self, state, value):
+        if value is None:
+            # no support for counting dropped buffers
+            value = _("Unknown")
         self.labels['buffers-dropped-total'].set_text(str(value))
 
     def setFeederClientReconnects(self, state, value):

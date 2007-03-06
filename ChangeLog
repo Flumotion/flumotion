@@ -1,3 +1,10 @@
+2007-03-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/feedcomponent010.py:
+	  Use None for uiState values to indicate "component has no support
+	  for reporting this" so we can show "Unknown" in the UI
+
 2007-03-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/Makefile.am:
