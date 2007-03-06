@@ -49,7 +49,7 @@ class TestFeeder(unittest.TestCase):
         c = self.feeder.clientConnected(clientId, 3)
 
         # verify some stuff
-        self.clientAssertStats(c, 0, 0, 0, 0, 1)
+        self.clientAssertStats(c, 0, None, 0, None, 1)
 
         # read 10 bytes, drop 1 buffer
         c.setStats((10, None, None, None, time.time(), 1))

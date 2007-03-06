@@ -110,15 +110,20 @@ class FeederClient:
 
         # these values can be set to None, which would mean
         # Unknown, not supported
+        # these are supported
         for key in (
             'bytesReadCurrent',      # bytes dropped over current connection
-            'buffersDroppedCurrent', # buffers dropped over current connection
             'bytesReadTotal',        # bytes dropped over all connections
-            'buffersDroppedTotal',   # buffers dropped over all connections
             'reconnects',            # number of connections made by this client
             'lastConnect',           # last client connection, in epoch seconds
             'lastDisconnect',        # last client disconnect, in epoch seconds
             'lastActivity',          # last time client read or connected
+            ):
+            self.uiState.addKey(key, 0)
+        # these are possibly unsupported
+        for key in (
+            'buffersDroppedCurrent', # buffers dropped over current connection
+            'buffersDroppedTotal',   # buffers dropped over all connections
             ):
             self.uiState.addKey(key, None)
 

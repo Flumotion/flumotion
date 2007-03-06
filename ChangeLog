@@ -1,5 +1,12 @@
 2007-03-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/test/test_feedcomponent010.py:
+	  Set the keys we know we support to 0, the others to None.
+	  Update the test for it.
+
+2007-03-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/feedcomponent010.py:
 	  Use None for uiState values to indicate "component has no support
