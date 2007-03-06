@@ -239,7 +239,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = []   # list of feedName
         self.feeder_names = [] # list of feedId
 
-        self._unconnectedEaters = [] # list of feedId's
+        self._inactiveEaters = [] # list of feedId's
         # feedId -> dict of lastTime, lastConnectTime, lastConnectD,
         # checkEaterDC,
         self._eaterStatus = {}
@@ -264,8 +264,8 @@ class FeedComponent(basecomponent.BaseComponent):
         # this sets self.eater_names
         self.parseEaterConfig(eater_config)
 
-        # all eaters start out unconnected
-        self._unconnectedEaters = self.eater_names[:]
+        # all eaters start out inactive
+        self._inactiveEaters = self.eater_names[:]
 
         for name in self.eater_names:
             d = {
@@ -287,7 +287,7 @@ class FeedComponent(basecomponent.BaseComponent):
                                  self._feeders[feederName].uiState)
 
         self.debug('setup() with %d eaters and %d feeders waiting' % (
-            len(self._unconnectedEaters), self.feedersWaiting))
+            len(self._inactiveEaters), self.feedersWaiting))
 
         pipeline = self.create_pipeline()
         self.set_pipeline(pipeline)
@@ -315,33 +315,33 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline = pipeline
         self.setup_pipeline()
  
-    def eaterDisconnected(self, feedId):
+    def eaterSetInactive(self, feedId):
         """
-        The eater for the given feedId was disconnected.
+        The eater for the given feedId is no longer active
         By default, the component will go hungry.
         """
-        self.info('Eater of %s is disconnected' % feedId)
-        if feedId in self._unconnectedEaters:
-            self.warning('Eater of %s was already unconnected' % feedId)
+        self.info('Eater of %s is inactive' % feedId)
+        if feedId in self._inactiveEaters:
+            self.warning('Eater of %s was already inactive' % feedId)
         else:
-            self._unconnectedEaters.append(feedId)
+            self._inactiveEaters.append(feedId)
         self.setMood(moods.hungry)
 
-    def eaterConnected(self, feedId):
+    def eaterSetActive(self, feedId):
         """
-        The eater for the given feedId was connected.
-        By default, the component will go happy if all eaters are connected.
+        The eater for the given feedId is now active and producing data.
+        By default, the component will go happy if all eaters are active.
         """
-        self.info('Eater of %s is connected' % feedId)
-        if feedId not in self._unconnectedEaters:
-            self.warning('Eater of %s was already connected' % feedId)
+        self.info('Eater of %s is active' % feedId)
+        if feedId not in self._inactiveEaters:
+            self.warning('Eater of %s was already active' % feedId)
         else:
-            self._unconnectedEaters.remove(feedId)
-        if not self._unconnectedEaters:
+            self._inactiveEaters.remove(feedId)
+        if not self._inactiveEaters:
             self.setMood(moods.happy)
     # FIXME: it may make sense to have an updateMood method, that can be used
     # by the two previous methods, but also in other places, and then
-    # overridden.  That would make us have to publicize unconnectedEaters
+    # overridden.  That would make us have to publicize inactiveEaters
 
     ### FeedComponent methods
     def addEffect(self, effect):
@@ -510,7 +510,7 @@ class FeedComponent(basecomponent.BaseComponent):
             if name in ['eater:' + n for n in self.eater_names]:
                 self.info('End of stream in eater %s' % src.get_name())
                 feedId = name[len('eater:'):]
-                self.eaterDisconnected(feedId)
+                self.eaterSetInactive(feedId)
                 # start reconnection
                 self._reconnectEater(feedId)
         else:
@@ -717,6 +717,19 @@ class FeedComponent(basecomponent.BaseComponent):
             feedId, firstTime)
 
     def _buffer_probe_cb(self, pad, buffer, feedId, firstTime=False):
+        """
+        Periodically scheduled buffer probe, that ensures that we're currently
+        actually having dataflow through our eater elements.
+
+        Called from GStreamer threads.
+
+        @param pad       The gst.Pad srcpad for one eater in this component.
+        @param buffer    A gst.Buffer that has arrived on this pad
+        @param feedId    The feedId for the feed we're eating on this pad
+        @param firstTime Boolean, true if this is the first time this buffer 
+                         probe has been added for this eater.
+        """
+
         # log info about first incoming buffer for this check interval,
         # then remove ourselves
         method = self.log
@@ -742,14 +755,16 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         Check that buffers are being received by the eater.
         If no buffer was received for more than BUFFER_TIME_THRESHOLD on
-        a connected feed, I call eaterDisconnected.
-        Likewise, if a buffer was received on an unconnected feed, I call
-        eaterConnected.
+        a connected feed, I call eaterSetInactive.
+        Likewise, if a buffer was received on an inactive feed, I call
+        eaterSetActive.
 
         I am used both as a callLater and as a direct method.
         """
         status = self._eaterStatus[feedId]
-        # a callLater is not active anymore while it's being executed
+        # a callLater is not active anymore while it's being executed,
+        # cancel deferred call if there's one pending (i.e. if we were called
+        # by something other than the deferred call)
         if status['checkEaterDC'] and status['checkEaterDC'].active():
             status['checkEaterDC'].cancel()
 
@@ -762,24 +777,27 @@ class FeedComponent(basecomponent.BaseComponent):
         if status['lastTime'] > 0:
             delta = currentTime - status['lastTime']
 
-            if feedId not in self._unconnectedEaters \
+            if feedId not in self._inactiveEaters \
             and delta > self.BUFFER_TIME_THRESHOLD:
                 self.debug(
-                    'No data received for %r seconds, feed %s disconnected' % (
+                    'No data received for %r seconds, feed %s inactive' % (
                         self.BUFFER_TIME_THRESHOLD, feedId))
-                self.eaterDisconnected(feedId)
+                self.eaterSetInactive(feedId)
+                # TODO: we never actually disconnect the eater explicitly, but 
+                # a successful reconnect will cause the old fd to be closed. 
+                # Maybe we should change this?
                 # start reconnection
                 self._reconnectEater(feedId)
 
             # mark as connected if recent data received
-            elif feedId in self._unconnectedEaters \
+            elif feedId in self._inactiveEaters \
             and delta < self.BUFFER_TIME_THRESHOLD:
-                self.debug('Received data, feed %s connected' % feedId)
-                self.eaterConnected(feedId)
+                self.debug('Received data, feed %s active' % feedId)
+                self.eaterSetActive(feedId)
 
         # retry a connect call if it has been too long since the
         # last and we still don't have data
-        if feedId in self._unconnectedEaters \
+        if feedId in self._inactiveEaters \
         and status['lastConnectTime'] > 0:
             connectDelta = currentTime - status['lastConnectTime']
             if connectDelta > self.BUFFER_TIME_THRESHOLD:
@@ -990,6 +1008,11 @@ class FeedComponent(basecomponent.BaseComponent):
         pass
 
     def _eater_event_probe_cb(self, pad, event, feedId):
+        """
+        An event probe used to consume unwanted EOS events on eaters.
+
+        Called from GStreamer threads.
+        """
         if event.type == gst.EVENT_EOS:    
             self.info(
                 'End of stream on feed %s, disconnect will be triggered' %
@@ -1001,6 +1024,11 @@ class FeedComponent(basecomponent.BaseComponent):
         return True
 
     def _depay_eater_event_probe_cb(self, pad, event, feedId):
+        """
+        An event probe used to consume unwanted duplicate newsegment events.
+
+        Called from GStreamer threads.
+        """
         if event.type == gst.EVENT_NEWSEGMENT:
             # We do this because we know gdppay/gdpdepay screw up on 2nd
             # newsegments

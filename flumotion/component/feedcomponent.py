@@ -250,8 +250,8 @@ class ParseLaunchComponent(FeedComponent):
         try:
             pipeline = gst.parse_launch(self.pipeline_string)
 
-            # Connect to the client-fd-removed signal on each feeder, so we
-            # can clean up properly.
+            # Connect to the client-removed and client-fd-removed signals on 
+            # each feeder, so we can clean up properly on removal.
             feeder_element_names = map(lambda n: "feeder:" + n, 
                 self.feeder_names)
             for feeder in feeder_element_names:
@@ -546,10 +546,13 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         # queue size to its original value. Doing this in a thread-safe manner
         # is rather tricky...
         def _block_cb(pad, blocked):
+            # This is called from streaming threads, but we don't do anything
+            # here so it's safe.
             pass
         def _underrun_cb(element):
-            # The queue lock isn't held when this is called, so we block our
-            # sinkpad, then re-check the current level.
+            # Called from a streaming thread. The queue element does not hold
+            # the queue lock when this is called, so we block our sinkpad, 
+            # then re-check the current level.
             pad = element.get_pad("sink")
             pad.set_blocked_async(True, _block_cb)
             level = element.get_property("current-level-buffers")

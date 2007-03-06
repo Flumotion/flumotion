@@ -1,3 +1,13 @@
+2007-03-06  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent.py:
+	  Add some comments.
+	* flumotion/component/feedcomponent010.py:
+	  Add comments.
+	  Rename eaterConnected and eaterDisconnected to eaterSetActive,
+	  eaterSetInactive, to more accurately reflect what they actually do.
+	  Rename internal variables to match.
+
 2007-03-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:
