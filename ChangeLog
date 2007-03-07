@@ -1,5 +1,13 @@
 2007-03-07  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	  Rename file_fd to file; it's not an fd.
+	  Where we claim to close the file, close it.
+	  Don't call reactor methods from non-reactor threads; use
+	  callFromThread.
+
+2007-03-07  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  Remove now-unused import to prevent complaints from pychecker.
 

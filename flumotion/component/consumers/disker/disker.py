@@ -71,7 +71,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     componentMediumClass = DiskerMedium
     pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
-    file_fd = None
+    file = None
     directory = None
     location = None
     caps = None
@@ -188,10 +188,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
 
-        if self.file_fd:
-            self.file_fd.flush()
-            sink.emit('remove', self.file_fd.fileno())
-            self.file_fd = None
+        if self.file:
+            self.file.flush()
+            sink.emit('remove', self.file.fileno())
+            self.file = None
             if self.symlink_to_last_recording:
                 self.update_symlink(self.location,
                                     self.symlink_to_last_recording)
@@ -204,7 +204,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.location = os.path.join(self.directory, filename)
 
         try:
-            self.file_fd = open(self.location, 'a')
+            self.file = open(self.location, 'a')
         except IOError, e:
             self.warning("Failed to open output file %s: %s", 
                        self.location, log.getExceptionMessage(e))
@@ -213,7 +213,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                                        % (self.location,))))
             self.addMessage(m)
             return
-        sink.emit('add', self.file_fd.fileno())
+        sink.emit('add', self.file.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
     
@@ -248,10 +248,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
 
-        if self.file_fd:
-            self.file_fd.flush()
-            sink.emit('remove', self.file_fd.fileno())
-            self.file_fd = None
+        if self.file:
+            self.file.flush()
+            sink.emit('remove', self.file.fileno())
+            self.file = None
             self.uiState.set('filename', None)
             self.uiState.set('recording', False)
             if self.symlink_to_last_recording:
@@ -282,16 +282,19 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def _client_removed_cb(self, element, arg0, client_status):
         # check if status is error
         if client_status == 4:
-            # close file descriptor
-            self.file_fd.flush()
-            # make element sad
-            self.setMood(moods.sad)
-            id = "error-writing-%s" % self.location
-            m = messages.Error(T_(N_(
-                "Error writing to file %s.  Maybe disk is full." % (
-                    self.location))),
-                id=id, priority=40)
-            self.state.append('messages', m)
+            reactor.callFromThread(self._client_error_cb)
+
+    def _client_error_cb(self):
+        self.file.close()
+        self.file = None
+        # make element sad
+        self.setMood(moods.sad)
+        id = "error-writing-%s" % self.location
+        m = messages.Error(T_(N_(
+            "Error writing to file %s.  Maybe disk is full." % (
+            self.location))),
+            id=id, priority=40)
+        self.state.append('messages', m)
 
     def configure_pipeline(self, pipeline, properties):
         self.debug('configure_pipeline for disker')
