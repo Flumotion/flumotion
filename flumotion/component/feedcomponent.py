@@ -250,15 +250,14 @@ class ParseLaunchComponent(FeedComponent):
         try:
             pipeline = gst.parse_launch(self.pipeline_string)
 
-            # Connect to the client-removed and client-fd-removed signals on 
-            # each feeder, so we can clean up properly on removal.
+            # Connect to the client-fd-removed signals on each feeder, so we 
+            # can clean up properly on removal.
             feeder_element_names = map(lambda n: "feeder:" + n, 
                 self.feeder_names)
             for feeder in feeder_element_names:
                 element = pipeline.get_by_name(feeder)
-                element.connect('client-removed', self.removeClientCallback)
-                element.connect('client-fd-removed', self.removeFDCallback)
-                self.debug("Connected %s to removeFDCallback", feeder)
+                element.connect('client-fd-removed', self.removeClientCallback)
+                self.debug("Connected %s to removeClientCallback", feeder)
 
             return pipeline
         except gobject.GError, e:

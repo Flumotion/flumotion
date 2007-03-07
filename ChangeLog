@@ -1,5 +1,23 @@
 2007-03-06  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Move fd cleanup logic into the Feeder class.
+	  Only close fds from the reactor thread; doing otherwise causes a
+	  race.
+	  Don't call get-stats unless we have plugins-base 0.10.11, because
+	  an unavoidable race can cause segfaults in earlier versions.
+	  Don't use the client-removed signal from multifdsink, since it's not
+	  needed any more; we can't avoid the race we were trying to avoid.
+	  Make getClients() return a list of FeederClients rather than a dict.
+
+	* flumotion/component/feedcomponent.py:
+	  Don't attach client-removed signal.
+
+	* flumotion/test/test_feedcomponent010.py:
+	  Update for API changes.
+
+2007-03-06  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent.py:
 	  Add some comments.
 	* flumotion/component/feedcomponent010.py:

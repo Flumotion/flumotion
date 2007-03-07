@@ -36,17 +36,16 @@ class TestFeeder(unittest.TestCase):
 
     def test_clientConnected(self):
         clientId = '/default/muxer-video'
-        self.feeder.clientConnected(clientId, 3)
+        client = self.feeder.clientConnected(clientId, 3, lambda _: None)
         clients = self.feeder.getClients()
-        self.failUnless(3 in clients.keys())
-        client = clients[3]
+        self.failUnless(client in clients)
         self.assertEquals(client.uiState.get('clientId'), clientId)
 
     def testReconnect(self):
         clientId = '/default/muxer-video'
 
         # connect
-        c = self.feeder.clientConnected(clientId, 3)
+        c = self.feeder.clientConnected(clientId, 3, lambda _: None)
 
         # verify some stuff
         self.clientAssertStats(c, 0, None, 0, None, 1)
@@ -55,12 +54,12 @@ class TestFeeder(unittest.TestCase):
         c.setStats((10, None, None, None, time.time(), 1))
         self.clientAssertStats(c, 10, 1, 10, 1, 1)
 
-        # disconnect
+        # remove client
         self.feeder.clientDisconnected(3)
         self.clientAssertStats(c, 0, 0, 10, 1, 1)
 
         # connect again
-        self.feeder.clientConnected(clientId, 3)
+        self.feeder.clientConnected(clientId, 3,lambda _: None)
         self.clientAssertStats(c, 0, 0, 10, 1, 2)
 
         # read 20 bytes, drop 2 buffers

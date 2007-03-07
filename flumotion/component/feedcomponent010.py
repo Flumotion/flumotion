@@ -51,25 +51,27 @@ class Feeder:
         self.uiState.addKey('feedId')
         self.uiState.set('feedId', feedId)
         self.uiState.addListKey('clients')
-        self._fdToClient = {} # fd -> FeederClient
+        self._fdToClient = {} # fd -> (FeederClient, cleanupfunc)
         self._clients = {} # id -> FeederClient
 
-
-    def clientConnected(self, clientId, fd):
+    def clientConnected(self, clientId, fd, cleanup):
         """
-        The given client has connected on the given file descriptor.
+        The given client has connected on the given file descriptor, and is
+        being added to multifdsink. This is called solely from the reactor 
+        thread.
 
         @param clientId: id of the client of the feeder
         @param fd:       file descriptor representing the client
+        @param cleanup:  callable to be called when the given fd is removed
         """
-        if clientId not in self._clients.keys():
+        if clientId not in self._clients:
             # first time we see this client, create an object
             client = FeederClient(clientId)
             self._clients[clientId] = client
             self.uiState.append('clients', client.uiState)
 
         client = self._clients[clientId]
-        self._fdToClient[fd] = client
+        self._fdToClient[fd] = (client, cleanup)
 
         client.connected(fd)
 
@@ -77,20 +79,29 @@ class Feeder:
 
     def clientDisconnected(self, fd):
         """
-        Called when the client disconnects.
+        The client has been entirely removed from multifdsink, and we may
+        now close its file descriptor.
         The client object stays around so we can track over multiple
         connections.
-        
+
+        Called from GStreamer threads.
+
         @type fd: file descriptor
         """
-        client = self._fdToClient.pop(fd)
+        (client, cleanup) = self._fdToClient.pop(fd)
         client.disconnected()
+
+        # To avoid races between this thread (a GStreamer thread) closing the
+        # FD, and the reactor thread reusing this FD, we only actually perform
+        # the close in the reactor thread.
+        reactor.callFromThread(cleanup, fd)
 
     def getClients(self):
         """
-        @rtype: dict of int -> L{FeederClient}
+        @rtype: list of all L{FeederClient}s ever seen, including currently 
+                disconnected clients
         """
-        return self._fdToClient
+        return self._clients.values()
 
 class FeederClient:
     """
@@ -158,8 +169,10 @@ class FeederClient:
 
     def connected(self, fd, when=None):
         """
-        The client has connected.
+        The client has connected on this fd.
         Update related stats.
+
+        Called only from the reactor thread.
         """
         if not when:
             when = time.time()
@@ -172,6 +185,8 @@ class FeederClient:
         """
         The client has disconnected.
         Update related stats.
+
+        Called from GStreamer threads.
         """
         if not when:
             when = time.time()
@@ -249,7 +264,9 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self._gotFirstNewSegment = {}
 
-        self._fdCleanup = {} # fd -> callable mapping for multifdsink
+        # multifdsink's get-stats signal had critical bugs before this version
+        tcppluginversion = gstreamer.get_plugin_version('tcp')
+        self._get_stats_supported = tcppluginversion >= (0, 10, 11, 0)
 
     def do_setup(self):
         """
@@ -542,9 +559,19 @@ class FeedComponent(basecomponent.BaseComponent):
             status['checkEaterDC'] = reactor.callLater(
                 self.BUFFER_CHECK_FREQUENCY, self._checkEater, feedId)
 
-        # start checking feeders
-        self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
-            self._feeder_probe_calllater)
+        # start checking feeders, if we have a sufficiently recent multifdsink
+        if self._get_stats_supported:
+            self._feeder_probe_cl = reactor.callLater(
+                self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
+        else:
+            self.warning("Feeder statistics unavailable, your "
+                "gst-plugins-base is too old")
+            self.addMessage(
+                messages.Warning(T_(N_(
+                    "Your gst-plugins-base is too old (older than 0.10.11), so "
+                    "feeder statistics will be unavailable. Please upgrade to "
+                    "the most recent gst-plugins-base release.")), 
+                    id='multifdsink'))
 
     def pipeline_stop(self):
         if not self.pipeline:
@@ -695,12 +722,19 @@ class FeedComponent(basecomponent.BaseComponent):
     def _feeder_probe_calllater(self):
         for feedId, feeder in self._feeders.items():
             feederElement = self.get_element("feeder:%s" % feedId)
-            for client in feeder.getClients().values():
-                # a disconnect client will have fd None
-                if client.fd:
+            for client in feeder.getClients():
+                # a currently disconnected client will have fd None
+                if client.fd is not None:
                     array = feederElement.emit('get-stats', client.fd)
                     if len(array) == 0:
-                        self.warning('Feeder element for feed %s does not know '
+                        # There is an unavoidable race here: we can't know 
+                        # whether the fd has been removed from multifdsink.
+                        # However, if we call get-stats on an fd that 
+                        # multifdsink doesn't know about, we just get a 0-length
+                        # array. We ensure that we don't reuse the FD too soon
+                        # so this can't result in calling this on a valid but 
+                        # WRONG fd
+                        self.debug('Feeder element for feed %s does not know '
                             'client fd %d' % (feedId, client.fd))
                     else:
                         client.setStats(array)
@@ -909,32 +943,22 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning(msg)
             return False
 
-        self.debug("fdcleanup registered")
-        self._fdCleanup[fd] = cleanup
+        clientId = eaterId or ('client-%d' % fd)
+
         element.emit('add', fd)
-        self._feeders[feedId].clientConnected(eaterId or ('client-%d' % fd), fd)
+        self._feeders[feedId].clientConnected(clientId, fd, cleanup)
 
-    def removeClientCallback(self, sink, fd, _):
-        """
-        Called as a signal callback from multifdsink when the FD should no
-        longer be used, but before it may be closed.
-        """
-        self.debug("removing client for fd %d", fd)
-        feedId = ':'.join(sink.get_name().split(':')[1:])
-        self._feeders[feedId].clientDisconnected(fd)
-
-    def removeFDCallback(self, sink, fd):
+    def removeClientCallback(self, sink, fd):
         """
         Called (as a signal callback) when the FD is no longer in use by
         multifdsink.
         This will call the registered callable on the fd.
+
+        Called from GStreamer threads.
         """
-        if fd in self._fdCleanup:
-            self.debug("calling cleanup func")
-            self._fdCleanup[fd](fd)
-            del self._fdCleanup[fd]
-        else:
-            self.debug("No cleanup func!")
+        self.debug("cleaning up fd %d", fd)
+        feedId = ':'.join(sink.get_name().split(':')[1:])
+        self._feeders[feedId].clientDisconnected(fd)
 
     def eatFromFD(self, feedId, fd):
         """
