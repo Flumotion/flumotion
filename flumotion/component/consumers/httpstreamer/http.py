@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 import time
-import thread
 
 import gobject
 import gst
