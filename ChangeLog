@@ -1,6 +1,20 @@
 2007-03-07  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
+	  client-added is called only from the reactor thread, so we don't
+	  need a decoupling queue.
+
+	  cliend-fd-removed is called by non-reactor threads, so handle this 
+	  with reactor.callFromThread() rather than reinventing that via a 
+	  periodic callLater checking a queue.
+
+	  Everything that wants to update UIStates is now done in the reactor
+	  thread, so just call update_ui_state, rather than setting a flag and
+	  checking it periodically.
+
+2007-03-07  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
 	  Don't update uiState objects from non-reactor threads.
 
 2007-03-07  Michael Smith  <msmith@fluendo.com>

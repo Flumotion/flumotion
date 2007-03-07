@@ -110,17 +110,23 @@ class Stats:
         self.no_clients -= 1
         self.clients_removed_count +=1
 
-    def updateLoadDeltas(self):
+    def _updateStats(self):
+        """
+        Periodically, update our statistics on load deltas, and update the 
+        UIState with new values for total bytes, bitrate, etc.
+        """
+
         oldtime, oldadd, oldremove = self._load_deltas_ongoing
         add, remove = self.clients_added_count, self.clients_removed_count
         now = time.time()
         diff = float(now - oldtime)
             
-        # we can be called very often, but only update the loaddeltas
-        # once every period
-        if diff > self._load_deltas_period:
-            self.load_deltas = [(add-oldadd)/diff, (remove-oldremove)/diff]
-            self._load_deltas_ongoing = [now, add, remove]
+        self.load_deltas = [(add-oldadd)/diff, (remove-oldremove)/diff]
+        self._load_deltas_ongoing = [now, add, remove]
+
+        self.update_ui_state()
+
+        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
 
     def getBytesSent(self):
         return self.sink.get_property('bytes-served')
@@ -256,18 +262,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # We listen on this interface, if set.
         self.iface = None
 
-        # handle regular updating
-        self.needsUpdate = False
-        self._tenSecondCount = 10
-
-        # handle added and removed queue
-        self._added_lock = thread.allocate_lock()
-        self._added_queue = []
-        self._removed_lock = thread.allocate_lock()
-        self._removed_queue = []
-
         self._updateCallLaterId = None
-        self._queueCallLaterId = None
 
         self._pending_removals = {}
 
@@ -402,8 +397,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
 
-        self._updateCallLaterId = reactor.callLater(1, self._checkUpdate)
-        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
+        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
 
         mountPoint = properties.get('mount-point', '')
         if not mountPoint.startswith('/'):
@@ -437,11 +431,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.setup_burst_mode(sink)
 
-        # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
 
         # these are made threadsafe using idle_add in the handler
-        sink.connect('client-added', self._client_added_cb)
+        sink.connect('client-added', self._client_added_handler)
 
         # We now require a sufficiently recent multifdsink anyway that we can
         # use the new client-fd-removed signal
@@ -484,35 +477,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
-    # UI code
-    def _checkUpdate(self):
-        self._tenSecondCount -= 1
-        self.updateLoadDeltas()
-        if self.needsUpdate or self._tenSecondCount <= 0:
-            self._tenSecondCount = 10
-            self.needsUpdate = False
-            self.update_ui_state()
-        self._updateCallLaterId = reactor.callLater(1, self._checkUpdate)
-
     def getMaxClients(self):
         return self.resource.maxclients
 
-    def _notify_caps_cb(self, element, pad, param):
-        caps = pad.get_negotiated_caps()
-        if caps == None:
-            return
-        
-        caps_str = gstreamer.caps_repr(caps)
-        self.debug('Got caps: %s' % caps_str)
-        
-        if not self.caps == None:
-            self.warning('Already had caps: %s, replacing' % caps_str)
-
-        self.debug('Storing caps: %s' % caps_str)
-        self.caps = caps
-        
-        reactor.callFromThread(self.update_ui_state)
-        
     def get_mime(self):
         if self.caps:
             return self.caps.get_structure(0).get_name()
@@ -576,60 +543,37 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # without the hack above
         self.updateState(set)
 
-    # handle the thread deserializing queues
-    def _handleQueue(self):
-        # handle added clients; added first because otherwise removed fd's
-        # are re-used before we handle added
-        self._added_lock.acquire()
-
-        while self._added_queue:
-            (sink, fd) = self._added_queue.pop()
-            self._added_lock.release()
-            self._client_added_handler(sink, fd)
-            self._added_lock.acquire()
-
-        self._added_lock.release()
-
-        # handle removed clients
-        self._removed_lock.acquire()
-
-        while self._removed_queue:
-            (sink, fd, reason, stats) = self._removed_queue.pop()
-            self._removed_lock.release()
-            self._client_removed_handler(sink, fd, reason, stats)
-            self._removed_lock.acquire()
-
-        self._removed_lock.release()
-         
-        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
-
     def _client_added_handler(self, sink, fd):
-        self.log('[fd %5d] client_added_handler from thread %d' % 
-            (fd, thread.get_ident())) 
+        self.log('[fd %5d] client_added_handler', fd)
         Stats.clientAdded(self)
-        # FIXME: GIL problem, don't update UI for now
-        self.needsUpdate = True
-        #self.update_ui_state()
+        self.update_ui_state()
         
     def _client_removed_handler(self, sink, fd, reason, stats):
-        self.log('[fd %5d] client_removed_handler from thread %d, reason %s' %
-            (fd, thread.get_ident(), reason)) 
+        self.log('[fd %5d] client_removed_handler, reason %s', fd, reason)
         if reason.value_name == 'GST_CLIENT_STATUS_ERROR':
             self.warning('[fd %5d] Client removed because of write error' % fd)
 
         self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
-        # FIXME: GIL problem, don't update UI for now
-        self.needsUpdate = True
-        #self.update_ui_state()
+        self.update_ui_state()
 
-    ### START OF THREAD-AWARE CODE
+    ### START OF THREAD-AWARE CODE (called from non-reactor threads)
 
-    # this can be called from both application and streaming thread !
-    def _client_added_cb(self, sink, fd):
-        self._added_lock.acquire()
-        self._added_queue.append((sink, fd))
-        self._added_lock.release()
+    def _notify_caps_cb(self, element, pad, param):
+        caps = pad.get_negotiated_caps()
+        if caps == None:
+            return
+        
+        caps_str = gstreamer.caps_repr(caps)
+        self.debug('Got caps: %s' % caps_str)
+        
+        if not self.caps == None:
+            self.warning('Already had caps: %s, replacing' % caps_str)
+
+        self.debug('Storing caps: %s' % caps_str)
+        self.caps = caps
+        
+        reactor.callFromThread(self.update_ui_state)
 
     # We now use both client-removed and client-fd-removed. We call get-stats
     # from the first callback ('client-removed'), but don't actually start
@@ -642,17 +586,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     # this can be called from both application and streaming thread !
     def _client_fd_removed_cb(self, sink, fd):
-        self._removed_lock.acquire()
         (stats, reason) = self._pending_removals.pop(fd)
-        self._removed_queue.append((sink, fd, reason, stats))
-        self._removed_lock.release()
+
+        reactor.callFromThread(self._client_removed_handler, sink, fd, 
+            reason, stats)
 
     ### END OF THREAD-AWARE CODE
 
     def do_stop(self):
-        if self._queueCallLaterId:
-            self._queueCallLaterId.cancel()
-            self._queueCallLaterId = None
         if self._updateCallLaterId:
             self._updateCallLaterId.cancel()
             self._updateCallLaterId = None
