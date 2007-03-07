@@ -1,5 +1,11 @@
 2007-03-07  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/worker/worker.py:
+	  After some timeout (this should be made configurable somehow), if
+	  a job has refused to shut down, SIGKILL it.
+
+2007-03-07  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/disker/disker.py:
 	  Rename file_fd to file; it's not an fd.
 	  Where we claim to close the file, close it.

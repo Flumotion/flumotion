@@ -47,6 +47,8 @@ from flumotion.twisted.compat import implements
 from flumotion.configure import configure
 from flumotion.worker import feed
 
+JOB_SHUTDOWN_TIMEOUT = 5
+
 factoryClass = fpb.ReconnectingFPBClientFactory
 class WorkerClientFactory(factoryClass):
     """
@@ -464,6 +466,12 @@ class Kindergarten(log.Loggable):
     def getKidAvatarIds(self):
         return self._kids.keys()
 
+    def terminateAll(self):
+        self.warning("Killing all children immediately")
+        for kid in self.getKids():
+            self.debug("Sending SIGKILL to pid %d", kid.pid)
+            common.killPid(kid.pid)
+
     def removeKidByPid(self, pid):
         """
         Remove the kid from the kindergarten based on the pid.
@@ -621,6 +629,11 @@ class WorkerBrain(log.Loggable):
 
     def shutdownHandler(self):
         self.info("Reactor shutting down, stopping jobHeaven")
+
+        # If they fail to shut down nicely within the time, shut them down
+        # less nicely
+        reactor.callLater(JOB_SHUTDOWN_TIMEOUT, self.kindergarten.terminateAll)
+
         d = self.jobHeaven.shutdown()
         d2 = defer.Deferred()
         self.kindergarten.setOnShutdown(d2)
@@ -879,7 +892,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
             return defer.succeed(None)
         
         return self._mind.callRemote('stop')
-        
+
     def remote_ready(self):
         pass
 
