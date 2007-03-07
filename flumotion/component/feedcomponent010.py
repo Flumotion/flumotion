@@ -191,16 +191,19 @@ class FeederClient:
         if not when:
             when = time.time()
         self.fd = None
-        self.uiState.set('fd', None)
-        self.uiState.set('lastDisconnect', when)
 
-        # update our internal counters and reset current counters to 0
-        self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
-        self.uiState.set('bytesReadCurrent', 0)
-        if self.uiState.get('buffersDroppedCurrent') is not None:
-            self._buffersDroppedBefore += self.uiState.get(
-                'buffersDroppedCurrent')
-            self.uiState.set('buffersDroppedCurrent', 0)
+        def updateUIState():
+            self.uiState.set('fd', None)
+            self.uiState.set('lastDisconnect', when)
+
+            # update our internal counters and reset current counters to 0
+            self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
+            self.uiState.set('bytesReadCurrent', 0)
+            if self.uiState.get('buffersDroppedCurrent') is not None:
+                self._buffersDroppedBefore += self.uiState.get(
+                    'buffersDroppedCurrent')
+                self.uiState.set('buffersDroppedCurrent', 0)
+        reactor.callFromThread(updateUIState)
 
 class FeedComponent(basecomponent.BaseComponent):
     """
@@ -770,18 +773,24 @@ class FeedComponent(basecomponent.BaseComponent):
         if firstTime: method = self.debug
         method('buffer probe on eater %s has timestamp %.3f' % (
             feedId, float(buffer.timestamp) / gst.SECOND))
+        # We carefully only use atomic (w.r.t. the GIL) operations on the dicts
+        # here: we pop things from _probe_ids, and only set things in 
+        # self._eaterStatus[feedId].
+
         # now store the last buffer received time
         self._eaterStatus[feedId]['lastTime'] = time.time()
-        if self._probe_ids[feedId]:
-            pad.remove_buffer_probe(self._probe_ids[feedId])
-            self._probe_ids[feedId] = None
+        probeid = self._probe_ids.pop(feedId, None)
+        if probeid:
+            pad.remove_buffer_probe(probeid)
+
             # add buffer probe every BUFFER_PROBE_ADD_FREQUENCY seconds
-            reactor.callLater(self.BUFFER_PROBE_ADD_FREQUENCY,
+            reactor.callFromThread(reactor.callLater, 
+                self.BUFFER_PROBE_ADD_FREQUENCY,
                 self._add_buffer_probe, pad, feedId)
 
         # since we've received a buffer, it makes sense to call _checkEater,
         # allowing us to revert to go back to happy as soon as possible
-        self._checkEater(feedId)
+        reactor.callFromThread(self._checkEater, feedId)
 
         return True
 

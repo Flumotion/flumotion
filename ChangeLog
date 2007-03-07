@@ -1,3 +1,23 @@
+2007-03-07  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Do not update UI state objects from non-reactor threads; doing so is
+	  very unsafe.
+
+	  Ensure we only operate on the FeedComponent._probe_ids dict with
+	  'atomic' python operations.
+	  
+	  Do not call any reactor methods other than reactor.callFromThread
+	  from non-reactor threads. _checkEater calls many reactor threads and
+	  also mutates other internal state; call this through
+	  reactor.callFromThread too.
+
+	  Eater reconnection should now be threadsafe.
+
+	* flumotion/test/test_feedcomponent010.py:
+	  Rearrange test now that some updating is only done from a
+	  reactor.callFromThread call, so we can't check it immediately.
+
 2007-03-06  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

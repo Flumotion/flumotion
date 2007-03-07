@@ -26,7 +26,7 @@ from twisted.trial import unittest
 import common
 
 from twisted.python import failure
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 
 from flumotion.component import feedcomponent010 as fc
 
@@ -44,6 +44,23 @@ class TestFeeder(unittest.TestCase):
     def testReconnect(self):
         clientId = '/default/muxer-video'
 
+        # This needed because disconnecting clients only updates the stats in 
+        # a callFromThread (which is roughly the same as a callLater).
+        d = defer.Deferred()
+
+        def checkClientDisconnected():
+            self.clientAssertStats(c, 0, 0, 10, 1, 1)
+        
+            # connect again
+            self.feeder.clientConnected(clientId, 3, lambda _: None)
+            self.clientAssertStats(c, 0, 0, 10, 1, 2)
+
+            # read 20 bytes, drop 2 buffers
+            c.setStats((20, None, None, None, time.time(), 2))
+            self.clientAssertStats(c, 20, 2, 30, 3, 2)
+
+            d.callback(None)
+
         # connect
         c = self.feeder.clientConnected(clientId, 3, lambda _: None)
 
@@ -56,15 +73,10 @@ class TestFeeder(unittest.TestCase):
 
         # remove client
         self.feeder.clientDisconnected(3)
-        self.clientAssertStats(c, 0, 0, 10, 1, 1)
 
-        # connect again
-        self.feeder.clientConnected(clientId, 3,lambda _: None)
-        self.clientAssertStats(c, 0, 0, 10, 1, 2)
+        reactor.callLater(0, checkClientDisconnected)
 
-        # read 20 bytes, drop 2 buffers
-        c.setStats((20, None, None, None, time.time(), 2))
-        self.clientAssertStats(c, 20, 2, 30, 3, 2)
+        return d
 
     def clientAssertEquals(self, client, key, value):
         self.assertEquals(client.uiState.get(key), value)
