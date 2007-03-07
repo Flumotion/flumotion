@@ -511,7 +511,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
         
-        self.update_ui_state()
+        reactor.callFromThread(self.update_ui_state)
         
     def get_mime(self):
         if self.caps:

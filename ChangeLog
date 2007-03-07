@@ -1,5 +1,10 @@
 2007-03-07  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Don't update uiState objects from non-reactor threads.
+
+2007-03-07  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent010.py:
 	  Do not update UI state objects from non-reactor threads; doing so is
 	  very unsafe.
