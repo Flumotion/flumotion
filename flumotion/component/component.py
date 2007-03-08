@@ -443,10 +443,12 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         def checkErrorCallback(result):
             # if the mood is now sad, it means an error was encountered
             # during check, and we should return a failure here.
+            # since the checks are responsible for adding a message,
+            # this is a handled error.
             current = self.state.get('mood')            
             if current == moods.sad.value:
                 self.warning('Running checks made the component sad.')
-                raise errors.ComponentSetupError()
+                raise errors.ComponentSetupHandledError()
 
         self.debug("setup() called with config %r", config)
         self.setMood(moods.waking)
