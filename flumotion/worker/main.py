@@ -232,17 +232,19 @@ def main(args):
             'ERROR: --service-name can only be used with -D/--daemonize.\n')
         return 1
 
+    brain = worker.WorkerBrain(options)
+
+    # Now bind and listen to our unix and tcp sockets
+    if not brain.listen():
+        sys.stderr.write('ERROR: Failed to listen on worker ports.\n')
+        return 1
+
     name = options.name
     if options.daemonize:
         if options.serviceName:
             name = options.serviceName
 
     common.startup("worker", name, options.daemonize, options.daemonizeTo)
-
-    # register all package paths (FIXME: this should go away when
-    # components come from manager)
-    from flumotion.common import setup
-    setup.setupPackagePath()
 
     log.debug('worker', 'Running Flumotion version %s' %
         configure.version)
@@ -252,9 +254,12 @@ def main(args):
     log.debug('worker', 'Running against GStreamer version %s' %
         configure.gst_version)
 
-    # create a brain and have it remember the manager to direct jobs to
-    brain = worker.WorkerBrain(options)
+    # register all package paths (FIXME: this should go away when
+    # components come from manager)
+    from flumotion.common import setup
+    setup.setupPackagePath()
 
+    # create a brain and have it remember the manager to direct jobs to
     # connect the brain to the manager
     if options.transport == "tcp":
         reactor.connectTCP(options.host, options.port,
@@ -278,8 +283,7 @@ def main(args):
     )
     brain.login(authenticator)
 
-    reactor.addSystemEventTrigger('before', 'shutdown',
-        brain.shutdownHandler)
+    reactor.addSystemEventTrigger('before', 'shutdown', brain.shutdownHandler)
 
     # go into the reactor main loop
     reactor.run()

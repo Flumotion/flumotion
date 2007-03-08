@@ -1,3 +1,14 @@
+2007-03-08  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/worker.py:
+	  WorkerBrain now only binds sockets in listen(), not in __init__,
+	  which returns False if it fails.
+	  Make sure various functions don't fail if we didn't call listen()
+
+	* flumotion/worker/main.py:
+	  Create WorkerBrain and call listen() on it before daemonizing.
+	  If listen() fails, print an error and exit; this is fatal.
+
 2007-03-07  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/worker.py:

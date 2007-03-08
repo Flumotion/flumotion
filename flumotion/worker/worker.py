@@ -35,7 +35,7 @@ from twisted.cred import portal
 from twisted.internet import defer, reactor
 from twisted.spread import pb
 import twisted.cred.error
-import twisted.internet.error
+from twisted.internet import error
 
 from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium, messages, worker
@@ -166,8 +166,8 @@ class WorkerMedium(medium.PingingMedium):
         """
         Return the TCP port the Feed Server is listening on.
 
-        @rtype:  int
-        @return: TCP port number
+        @rtype:  int, or NoneType
+        @return: TCP port number, or None if there is no feed server
         """
         port = self.brain.feedServerPort
         return port
@@ -553,18 +553,39 @@ class WorkerBrain(log.Loggable):
 
         self._port = None # port for unix domain socket, set from _setup
 
-        self._jobServerFactory, self._jobServerPort = self._setupJobServer()
+        self._jobServerFactory = None
+        self._jobServerPort = None
         self._feedServerFactory = feed.feedServerFactory(self)
 
-        # set up feed server if we have the feederports for it
         self._feedServerPort = None # twisted port
         self.feedServerPort = None # port number
-        self._setupFeedServer()
 
         self._createDeferreds = {} # avatarId => deferred that will fire
                                    # when the job attaches
         self._shutdownDeferreds = {} # avatarId => deferred for shutting
                                    # down jobs; fires when job is reaped
+
+    def listen(self):
+        """
+        Start listening on FeedServer (incoming eater requests) and 
+        JobServer (through which we communicate with our children) ports
+
+        @returns: True if we successfully listened on both ports
+        """
+        # set up feed server if we have the feederports for it
+        try:
+            self._setupFeedServer()
+        except error.CannotListenError, e:
+            self.warning("Failed to listen on feed server port: %r", e)
+            return False
+
+        try:
+            self._jobServerFactory, self._jobServerPort = self._setupJobServer()
+        except error.CannotListenError, e:
+            self.warning("Failed to listen on job server port: %r", e)
+            return False
+
+        return True
 
     def login(self, authenticator):
         self.authenticator = authenticator
@@ -574,7 +595,6 @@ class WorkerBrain(log.Loggable):
         """
         @returns: (factory, port)
         """
-        # called from __init__
         dispatcher = JobDispatcher(self.jobHeaven)
         # FIXME: we should hand a username and password to log in with to
         # the job process instead of allowing anonymous
@@ -598,7 +618,6 @@ class WorkerBrain(log.Loggable):
         """
         @returns: (port, portNumber)
         """
-        # called from __init__
         try:
             self.feedServerPort = self.options.feederports[-1]
         except IndexError:
@@ -620,9 +639,13 @@ class WorkerBrain(log.Loggable):
                   the teardown is completed
         """
         self.debug("cleaning up port %r" % self._port)
-        d = self._jobServerPort.stopListening()
-        d.addCallback(lambda r: self._feedServerPort.stopListening())
-        return d
+        dl = []
+        if self._jobServerPort:
+            dl.append(self._jobServerPort.stopListening())
+        if self._feedServerPort:
+            dl.append(self._feedServerPort.stopListening())
+
+        return defer.DeferredList(dl)
 
     def callRemote(self, methodName, *args, **kwargs):
         return self.medium.callRemote(methodName, *args, **kwargs)
