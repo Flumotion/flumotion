@@ -21,7 +21,8 @@
 
 import gst
 
-from flumotion.common import errors, log, messages
+from twisted.internet import defer
+from flumotion.common import errors, log, messages, gstreamer
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -124,3 +125,33 @@ class CheckProcError(Exception):
 
     def __init__(self, data):
         self.data = data
+
+def checkPlugin(pluginName, packageName, minimumVersion=None):
+    """
+    Check if the given plug-in is available.
+    Return a result with an error if it is not, or not new enough.
+
+    @rtype: L{messages.Result}
+    """
+    result = messages.Result()
+    version = gstreamer.get_plugin_version(pluginName)
+    if not version:
+        m = messages.Error(T_( 
+            N_("This host is missing the '%s' GStreamer plug-in.\n"),
+                pluginName))
+        m.add(T_(N_(
+            "Please install '%s'.\n"), packageName))
+        result.add(m)
+    else:
+        if version < minimumVersion:
+            m = messages.Error(T_( 
+                N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
+                   string.join([str(x) for x in version], '.'), pluginName),
+                id = 'plugin-%s-check' % pluginName)
+            m.add(T_(N_(
+                "Please upgrade '%s' to version %s."), packageName,
+                   string.join([str(x) for x in minimumVersion], '.')))
+            result.add(m)
+
+    result.succeed(None)
+    return defer.succeed(result)
