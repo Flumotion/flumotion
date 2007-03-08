@@ -53,10 +53,6 @@ class FDPort(unix.Port):
 
 class FDClient(unix.Client): #, log.Loggable):
 
-    #def connectionLost(self, *args, **kwargs):
-    #    self.debug("connectionLost on FDClient")
-    #    return unix.Client.connectionLost(self, *args, **kwargs)
-
     def doRead(self):
         if not self.connected:
             return
@@ -72,7 +68,6 @@ class FDClient(unix.Client): #, log.Loggable):
                 return main.CONNECTION_DONE
 
             if len(fds) > 0:
-     #           self.debug("received one or more FDs")
                 # Look for our magic cookie in (possibly) the midst of other
                 # data. Pass surrounding chunks, if any, onto dataReceived(), 
                 # which (undocumentedly) must return None unless a failure 
@@ -81,7 +76,10 @@ class FDClient(unix.Client): #, log.Loggable):
                 # fileDescriptorsReceived()
                 offset = message.find(MAGIC_SIGNATURE)
                 if offset < 0:
-                    raise TypeError("Bad signature")
+                    # Old servers did not send this; be hopeful that this
+                    # doesn't have bits of other protocol (i.e. PB) mixed up 
+                    # in it.
+                    return self.protocol.fileDescriptorsReceived(fds, message)
                 elif offset > 0:
                     ret = self.protocol.dataReceived(message[0:offset])
                     if ret:

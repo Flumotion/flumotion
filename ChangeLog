@@ -1,5 +1,11 @@
 2007-03-08  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/twisted/fdserver.py:
+	  Backwards compatibility for FDClient; accept messages without our
+	  special magic cookie.
+
+2007-03-08  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/worker/worker.py:
 	  WorkerBrain now only binds sockets in listen(), not in __init__,
 	  which returns False if it fails.
