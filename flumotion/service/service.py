@@ -301,6 +301,7 @@ user:PSfNpHTkpTx1M
 
         @returns: whether or not the config was created.
         """
+        os.makedirs(self.workersDir)
         self.info("Creating worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if os.path.exists(workerFile):

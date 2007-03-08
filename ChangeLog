@@ -1,5 +1,10 @@
 2007-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/service.py:
+	  Make sure the workers directory exists.
+
+2007-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/checks/check.py:
 	  Fix pychecker error.
 
