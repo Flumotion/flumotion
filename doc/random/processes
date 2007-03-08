@@ -14,9 +14,39 @@ Some notes about process management
 - When the main worker process is told to shut down, it should also make sure
   all of its job children shut down correctly.
 
+- If the jobs fail to stop when the worker asks them to, the worker should kill
+  them after some timeout, using SIGKILL.
+
 Job processes
 -------------
 - should:
   - have a SIGINT handler that stops the component
   - have a SIGTERM handler that stops the component
   - have a worker brain-callable method to shut down nicely
+
+Daemons
+-------
+
+Daemons have specific lifetime requirements.
+
+When a daemon starts up, it will typically have a number of critical tasks to 
+perform that may fail (parsing config files, binding ports, etc.). If it fails 
+doing and of these, it should print out an error message, then exit with a 
+non-zero exit code.
+
+After performing everything that can fail in an unrecoverable manner, the daemon
+should daemonize (see flumotion.common.common.daemonize()). Once this function
+has returned, the program is a daemon.
+
+At this point, the daemon should never fail irrecoverably. Anything that might
+fail (such as connecting to a remote service) from here on should be retried, 
+forever, if it fails. 
+
+The daemon will normally terminate only with an explicit shutdown request (e.g.
+a pb shutdown message), or a signal (usually SIGTERM). On receiving either of
+these, the daemon should clean up and terminate cleanly.
+
+Any codepath that can cause (through other than explicit request as described 
+above) a shutdown of the daemon after daemonization, or permanent 
+(unrecoverable) failure of the daemon, is a bug.
+
