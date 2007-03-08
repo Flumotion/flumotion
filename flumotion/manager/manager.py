@@ -694,9 +694,10 @@ class Vishnu(log.Loggable):
         # in list given by worker
         d = workerAvatar.getComponents()
         def workerAvatarComponentListReceived(workerComponents):
-            lostComponents = [c for c in self.getComponentStates()
+            # list() is called to work around a pychecker bug. FIXME.
+            lostComponents = list([c for c in self.getComponentStates()
                               if c.get('workerRequested') == workerId and \
-                                 c.get('mood') == moods.lost.value]
+                                 c.get('mood') == moods.lost.value])
             for comp in workerComponents:
                 # comp is an avatarId string
                 # components is a list of {ManagerComponentState}

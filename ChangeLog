@@ -1,5 +1,10 @@
 2007-03-08  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  Work around a pychecker bug so I can run pychecker again.
+	  
+2007-03-08  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/twisted/fdserver.py:
 	  Backwards compatibility for FDClient; accept messages without our
 	  special magic cookie.
