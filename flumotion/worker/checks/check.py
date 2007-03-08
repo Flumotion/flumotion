@@ -146,11 +146,11 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
         if version < minimumVersion:
             m = messages.Error(T_( 
                 N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
-                   string.join([str(x) for x in version], '.'), pluginName),
+                   ".".join([str(x) for x in version]), pluginName),
                 id = 'plugin-%s-check' % pluginName)
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s."), packageName,
-                   string.join([str(x) for x in minimumVersion], '.')))
+                   ".".join([str(x) for x in minimumVersion])))
             result.add(m)
 
     result.succeed(None)

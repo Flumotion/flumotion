@@ -1,6 +1,11 @@
 2007-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/checks/check.py:
+	  Fix pychecker error.
+
+2007-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/checks/check.py:
 	  add a generic checkPlugin method to be used in checks
 
 2007-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
