@@ -52,6 +52,9 @@ def _runInterface(conf_file, options, thegreeter=None):
         # from greeter are translated
         from flumotion.admin.gtk import greeter
         g = thegreeter or greeter.Greeter()
+        
+        # the greeter runs its own gobject MainLoop, so the run call
+        # blocks until the greeter is done
         state = g.run()
         if not state:
             reactor.callLater(0, reactor.stop)
