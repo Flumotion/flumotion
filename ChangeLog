@@ -1,5 +1,19 @@
 2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/config.py:
+	  Expose BOOL_TRUE_VALUES so we can use it somewhere else
+	* flumotion/service/service.py:
+	  Set feeder ports to random by default.  We should change this in
+	  the future after using the Command classes for options.
+	* flumotion/test/test_worker_worker.py:
+	  Fix the test.
+	* flumotion/test/test_workerconfig.py:
+	  Add test for random feeder ports.
+	* flumotion/worker/config.py:
+	  Allow specifying random feeder ports in the configuration.
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/main.py:
 	* flumotion/worker/worker.py:
 	  Implement --random-feederports as per #585.

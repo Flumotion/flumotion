@@ -43,6 +43,19 @@ class TestConfig(unittest.TestCase):
         s = """<worker><invalid-name/></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
 
+    def testParseWorkerRandomFeederPorts(self):
+        s = """<worker><feederports random="yes" /></worker>"""
+        conf = parse(s)
+        self.assertEquals(conf.feederports, [])
+        self.assertEquals(conf.randomFeederports, True)
+
+    def testParseWorkerFeederPorts(self):
+        s = """<worker><feederports random="no">1000-1002</feederports></worker>"""
+        conf = parse(s)
+        self.assertEquals(conf.feederports, [1000, 1001, 1002])
+        self.assertEquals(conf.randomFeederports, False)
+
+
     def testParseManager(self):
         conf = parse("""<worker><manager>
         <host>hostname</host>

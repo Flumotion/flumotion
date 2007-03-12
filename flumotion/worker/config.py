@@ -27,7 +27,7 @@ import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common import log
+from flumotion.common import log, config
 
 class ConfigError(Exception):
     pass
@@ -54,6 +54,7 @@ class WorkerConfigXML(log.Loggable):
         self.authentication = None
         self.feederports = None
         self.fludebug = None
+        self.randomFeederports = False
 
         try:
             if filename != None:
@@ -96,7 +97,8 @@ class WorkerConfigXML(log.Loggable):
             elif node.nodeName == 'authentication':
                 self.authentication = self.parseAuthentication(node)
             elif node.nodeName == 'feederports':
-                self.feederports = self.parseFeederports(node)
+                self.feederports, self.randomFeederports = \
+                    self.parseFeederports(node)
             elif node.nodeName == 'debug':
                 self.fludebug = str(node.firstChild.nodeValue)
             else:
@@ -160,15 +162,24 @@ class WorkerConfigXML(log.Loggable):
         return ConfigEntryAuthentication(username, password)
         
     def parseFeederports(self, node):
+        """
+        Returns a list of feeder ports to use (possibly empty),
+        and whether or not to use random feeder ports.
+
+        @rtype: (list, bool)
+        """
         # returns a list of allowed port numbers
         # port := int
         # port-range := port "-" port
         # port-term := port | port-range
         # port-list := "" | port-term | port-term "," port-list
         # <feederports>port-list</feederports>
+        random = False
+        if node.hasAttribute('random'):
+            random = node.getAttribute('random') in config.BOOL_TRUE_VALUES
         ports = []
         if not node.firstChild:
-            return ports
+            return (ports, random)
         terms = str(node.firstChild.nodeValue).split(',')
         for term in terms:
             if '-' in term:
@@ -180,4 +191,4 @@ class WorkerConfigXML(log.Loggable):
                 port = int(term)
                 if port not in ports:
                     ports.append(port)
-        return ports
+        return (ports, random)

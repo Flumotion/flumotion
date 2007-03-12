@@ -64,6 +64,7 @@ class FakeOptions:
         self.port = 9999
         self.transport = 'TCP'
         self.feederports = [9998]
+        self.randomFeederports = False
         self.name = 'fakeworker'
     
 class TestWorkerClientFactory(unittest.TestCase):

@@ -244,7 +244,7 @@ class Servicer(log.Loggable):
         if type == 'manager':
             self.createManager(name, port)
         elif type == 'worker':
-            self.createWorker(name, managerPort=port)
+            self.createWorker(name, managerPort=port, randomFeederports=True)
         else:
             raise errors.SystemError, \
                 "Please specify 'manager' or 'worker' to create."
@@ -295,7 +295,7 @@ user:PSfNpHTkpTx1M
 
         return True
 
-    def createWorker(self, name, managerPort=7531):
+    def createWorker(self, name, managerPort=7531, randomFeederports=False):
         """
         Create a sample worker.
 
@@ -308,6 +308,9 @@ user:PSfNpHTkpTx1M
             raise errors.SystemError, \
                 "Worker file %s already exists." % workerFile
 
+        feederports = "  <!-- <feederports>8600-8639</feederports> -->"
+        if randomFeederports:
+            feederports = '  <feederports random="True" />'
         # generate the file
         handle = open(workerFile, 'w')
         handle.write("""<worker>
@@ -326,7 +329,7 @@ user:PSfNpHTkpTx1M
     <password>test</password>
   </authentication>
 
-  <!-- <feederports>8600-8639</feederports> -->
+%(feederports)s
 
 </worker>
 """ % locals())

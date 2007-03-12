@@ -38,6 +38,9 @@ from flumotion.configure import configure
 
 from errors import ConfigError, ComponentWorkerConfigError
 
+# all these string values should result in True
+BOOL_TRUE_VALUES = ['True', 'true', '1', 'Yes', 'yes']
+
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
     nice = 0
@@ -134,8 +137,8 @@ class BaseConfigParser(fxml.Parser):
         return [long(subnode.childNodes[0].data) for subnode in nodes]
 
     def get_bool_values(self, nodes):
-        valid = ['True', 'true', '1', 'Yes', 'yes']
-        return [subnode.childNodes[0].data in valid for subnode in nodes]
+        return [subnode.childNodes[0].data in BOOL_TRUE_VALUES \
+            for subnode in nodes]
 
     def get_string_values(self, nodes):
         values = []
