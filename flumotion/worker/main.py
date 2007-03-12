@@ -90,12 +90,17 @@ def _createParser():
     group.add_option('-F', '--feederports',
                      action="store", type="string", dest="feederports",
                      help="range of feeder ports to use")
+    group.add_option('', '--random-feederports',
+                     action="store_true",
+                     dest="randomFeederports",
+                     help="Use randomly available feeder ports")
 
     parser.add_option_group(group)
 
     return parser
 
 def _readConfig(workerFile, options):
+    # modifies options dict in-place
     log.info('worker', 'Reading configuration from %s' % workerFile)
     try:
         cfg = config.WorkerConfigXML(workerFile)
@@ -138,6 +143,9 @@ def _readConfig(workerFile, options):
     # XML could specify it as empty, meaning "don't use any"
     if not options.feederports and cfg.feederports is not None:
         options.feederports = cfg.feederports
+    if options.randomFeederports:
+        options.feederports = None
+        log.debug('worker', 'Using random feederports')
     if options.feederports is not None:
         log.debug('worker', 'Using feederports %r' % options.feederports)
 
@@ -202,7 +210,7 @@ def main(args):
             log.debug('worker', 'Setting worker name %s (from hostname)' %
                 options.name)
 
-    if options.feederports is None:
+    if options.feederports is None and not options.randomFeederports:
         options.feederports = configure.defaultGstPortRange
         log.debug('worker', 'Using default feederports %r' %
             options.feederports)

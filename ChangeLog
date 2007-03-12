@@ -1,5 +1,11 @@
 2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  Implement --random-feederports as per #585.
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/main.py:
 	  Add a comment.
 

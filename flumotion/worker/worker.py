@@ -545,7 +545,10 @@ class WorkerBrain(log.Loggable):
         
         self.authenticator = None
         # the last one is reserved for our FeedServer
-        self.medium = WorkerMedium(self, self.options.feederports[:-1])
+        ports = []
+        if not self.options.randomFeederports:
+            ports = self.options.feederports[:-1]
+        self.medium = WorkerMedium(self, ports)
         self._socketPath = _getSocketPath()
         self.kindergarten = Kindergarten(options, self._socketPath, self)
         self.jobHeaven = JobHeaven(self)
@@ -618,17 +621,25 @@ class WorkerBrain(log.Loggable):
         """
         @returns: (port, portNumber)
         """
-        try:
-            self.feedServerPort = self.options.feederports[-1]
-        except IndexError:
-            self.info('Not starting feed server because no port is configured')
-            return
+        port = None
+        if self.options.randomFeederports:
+            port = 0
+        else:
+            try:
+                port = self.options.feederports[-1]
+            except IndexError:
+                self.info(
+                    'Not starting feed server because no port is configured')
+                return
 
+        self._feedServerPort = reactor.listenWith(
+            fdserver.PassableServerPort, port,
+            self._feedServerFactory)
+
+        # jumping through hoops is fun
+        self.feedServerPort = self._feedServerPort.getHost().port
         self.debug('Listening for feed requests on TCP port %s' %
             self.feedServerPort)
-        self._feedServerPort = reactor.listenWith(
-            fdserver.PassableServerPort, self.feedServerPort, 
-            self._feedServerFactory)
 
     # FIXME: this is only called from the tests
     def teardown(self):
