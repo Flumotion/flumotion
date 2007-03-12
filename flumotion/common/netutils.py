@@ -156,8 +156,8 @@ class RoutingTable(object):
                                  % (f, n, line))
             route = m.group(3)
             ret.addSubnet(route, m.group(1), int(m.group(2)))
-            if route not in self.routeNames:
-                self.routeNames.append(route)
+            if route not in ret.routeNames:
+                ret.routeNames.append(route)
 
         return ret
     fromFile = classmethod(fromFile)

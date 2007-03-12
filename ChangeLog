@@ -1,6 +1,11 @@
 2007-03-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/netutils.py:
+	  Make parser work again.
+
+2007-03-12  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/netutils.py:
 	  Add function getRouteNames() to get a list of all named routes in
 	  the RoutingTable.
 
