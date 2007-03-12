@@ -154,12 +154,20 @@ class RoutingTable(object):
                 raise ValueError('While loading routing table from file'
                                  ' %s: line %d: invalid syntax: %r'
                                  % (f, n, line))
-            ret.addSubnet(m.group(3), m.group(1), int(m.group(2)))
+            route = m.group(3)
+            ret.addSubnet(route, m.group(1), int(m.group(2)))
+            if route not in self.routeNames:
+                self.routeNames.append(route)
+
         return ret
     fromFile = classmethod(fromFile)
 
     def __init__(self):
         self.avltree = avltree.AVLTree()
+        self.routeNames = []
+
+    def getRouteNames(self):
+        return self.routeNames
 
     def _parseSubnet(self, ipv4String, maskBits):
         return (ipv4StringToInt(ipv4String),
