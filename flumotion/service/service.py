@@ -268,7 +268,7 @@ class Servicer(log.Loggable):
         handle = open(planetFile, 'w')
         handle.write("""<planet>
   <manager>
-    <!-- <debug>3</debug> -->
+    <debug>4</debug>
     <host>localhost</host>
     <port>%(port)d</port>
     <transport>ssl</transport>
@@ -315,13 +315,11 @@ user:PSfNpHTkpTx1M
         handle = open(workerFile, 'w')
         handle.write("""<worker>
 
-  <!-- <debug>3</debug> -->
+    <debug>4</debug>
 
   <manager>
     <host>localhost</host>
-<!--
     <port>%(managerPort)s</port>
--->
   </manager>
 
   <authentication type="plaintext">

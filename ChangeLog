@@ -1,5 +1,11 @@
 2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/service.py:
+	  Don't comment out the manager port to connect to.
+	  Set to debug level 4 by default.
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/config.py:
 	  Expose BOOL_TRUE_VALUES so we can use it somewhere else
 	* flumotion/service/service.py:
