@@ -19,9 +19,21 @@
 
 # Headers in this file shall remain intact.
 
+import os
+import errno
+
+import gobject
+import gtk
+
 from gettext import gettext as _
+
+from twisted.internet import reactor, protocol, defer, error
+
+from flumotion.common.pygobject import gsignal
+from flumotion.common import log
 from flumotion.configure import configure
-from flumotion.admin.gtk import wizard, connections
+from flumotion.admin.gtk import wizard, connections, dialogs
+
 
 
 # A wizard run when the user first starts flumotion.
@@ -40,7 +52,7 @@ class Initial(wizard.WizardStep):
     text = _('Flumotion Admin needs to connect to a Flumotion manager.\n') + \
            _('Choose an option from the list and click "Forward" to begin.')
     connect_to_existing = None
-    next_pages = ['load_connection', 'connect_to_existing']
+    next_pages = ['load_connection', 'connect_to_existing', 'start_new']
 
     def on_next(self, state):
         radio_buttons = self.connect_to_existing.get_group()
@@ -51,11 +63,12 @@ class Initial(wizard.WizardStep):
         raise AssertionError
     
     def setup(self, state, available_pages):
-        radio_buttons = self.connect_to_existing.get_group()
+        # the group of radio buttons is named after the first check button
+        radio_buttons = self.load_connection.get_group()
         for w in radio_buttons:
             w.set_sensitive(w.get_name() in available_pages)
             if w.get_active() and not w.get_property('sensitive'):
-                getattr(self,available_pages[0]).set_active(True)
+                getattr(self, available_pages[0]).set_active(True)
 
 
 class ConnectToExisting(wizard.WizardStep):
@@ -127,21 +140,210 @@ class LoadConnection(wizard.WizardStep):
 
     def on_next(self, state):
         info = self.connections.get_selected()
-        for k,v in (('host', info.host), ('port', info.port),
-                    ('use_insecure', not info.use_ssl),
-                    ('user', info.authenticator.username),
-                    ('passwd', info.authenticator.password)):
+        for k, v in (('host', info.host), ('port', info.port),
+                     ('use_insecure', not info.use_ssl),
+                     ('user', info.authenticator.username),
+                     ('passwd', info.authenticator.password)):
             state[k] = v
-        print state
         return '*finished*'
 
     def setup(self, state, available_pages):
         self.connections.grab_focus()
 
+class GreeterProcessProtocol(protocol.ProcessProtocol):
+    def __init__(self):
+        # no parent init
+        self.deferred = defer.Deferred()
+
+    def processEnded(self, failure):
+        if failure.check(error.ProcessDone):
+            self.deferred.callback(None)
+        else:
+            self.deferred.callback(failure)
+
+class StartNew(wizard.WizardStep):
+    name = 'start_new'
+    title = _('Start a new manager and worker')
+    text = _("""This will start a new manager and worker for you.
+
+The manager and worker will run under your user account.
+The manager will only accept connections from the local machine.
+This mode is only useful for testing Flumotion.
+""")
+    start_worker_check = None
+    next_pages = ['start_new_error', 'start_new_success']
+    gsignal('finished', str)
+
+    _timeout_id = None
+
+    def on_has_selection(self, widget, has_selection):
+        self.button_next.set_sensitive(has_selection)
+
+    def on_next(self, state):
+        self.label_starting.show()
+        self.progressbar_starting.set_fraction(0.0)
+        self.progressbar_starting.show()
+        # start a manager first
+        import socket
+        port = 7531
+        def tryPort(port=0):
+            # tries the given port, or a random one, and return None or port
+            # number
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.debug('Binding to port %d' % port)
+
+            try:
+                s.bind(('', port))
+                port = s.getsockname()[1]
+            except socket.error, e:
+                if e.args[0] == errno.EADDRINUSE:
+                    self.debug('Port %d already in use', port)
+                    port = None
+
+            s.close()
+            return port
+
+        if tryPort(port) is None:
+            port = tryPort()
+
+        # ready to start spawning processes
+
+        def pulse():
+            self.progressbar_starting.pulse()
+            return True
+    
+        self._timeout_id = gobject.timeout_add(200, pulse)
+
+        import tempfile
+        path = tempfile.mkdtemp(suffix='.flumotion')
+        confDir = os.path.join(path, 'etc')
+        logDir = os.path.join(path, 'var', 'log')
+        runDir = os.path.join(path, 'var', 'run')
+
+        # We need to run 4 commands in a row, and each of them can fail
+        d = defer.Deferred()
+        def run(result, command, description, failMessage):
+            # run the given command
+            # show a dialog to say what we are doing
+            self.label_starting.set_text(description)
+            args = command.split(' ')
+            executable = os.path.join(configure.sbindir, 'flumotion')
+            protocol = GreeterProcessProtocol()
+            process = reactor.spawnProcess(protocol, executable, args, env=None)
+            def error(failure, failMessage):
+                self.label_starting.set_text('Failed to %s' % description)
+                # error should trigger going to next page with an overview
+                state.update({
+                    'command': command,
+                    'error': failMessage,
+                    'failure': failure,
+                })
+                self.finished('start_new_error')
+                return failure
+            protocol.deferred.addErrback(error, failMessage)
+            return protocol.deferred
+
+        command = "flumotion -C %s -L %s -R %s create manager admin %d" % (
+            confDir, logDir, runDir, port)
+        d.addCallback(run, command, _('Creating manager ...'),
+            _("Could not create manager."))
+        command = "flumotion -C %s -L %s -R %s start manager admin" % (
+            confDir, logDir, runDir)
+        d.addCallback(run, command, _('Starting manager ...'),
+            _("Could not start manager."))
+        command = "flumotion -C %s -L %s -R %s create worker admin %d" % (
+            confDir, logDir, runDir, port)
+        d.addCallback(run, command, _('Creating worker ...'),
+            _("Could not create worker."))
+        command = "flumotion -C %s -L %s -R %s start worker admin" % (
+            confDir, logDir, runDir)
+        d.addCallback(run, command, _('Starting worker ...'),
+            _("Could not start worker."))
+        d.addErrback(lambda f: None)
+
+        def done(result, state):
+            # because of the ugly call-by-reference passing of state,
+            # we have to update the existing dict, not re-bind with state =
+            state.update({
+                'host': 'localhost',
+                'port': port,
+                'use_insecure': False,
+                'user': 'user',
+                'passwd': 'test',
+                'confDir': confDir,
+                'logDir': logDir,
+                'runDir': runDir,
+            })
+            self.finished('start_new_success')
+
+        d.addCallback(done, state)
+
+        # start chain
+        d.callback(None)
+        return '*signaled*'
+
+    def finished(self, result):
+        # result: start_new_error or start_new_success
+        self.label_starting.hide()
+        self.progressbar_starting.hide()
+        gobject.source_remove(self._timeout_id)
+        self.emit('finished', result)
+
+class StartNewError(wizard.WizardStep):
+    name = 'start_new_error'
+    title = _('Failed to start')
+    text = ""
+    start_worker_check = None
+    next_pages = []
+
+    def setup(self, state, available_pages):
+        self.button_next.set_sensitive(False)
+        self.message.set_text(state['error'])
+        f = state['failure']
+        result = ""
+        if f.value.exitCode is not None:
+            result = _('The command exited with an exit code of %d.' %
+                f.value.exitCode)
+        self.more.set_markup(_("""The command that failed was:
+<i>%s</i>
+%s""") % (state['command'], result))
+
+
+class StartNewSuccess(wizard.WizardStep):
+    name = 'start_new_success'
+    title = _('Started manager and worker')
+    start_worker_check = None
+    text = ''
+    next_pages = []
+
+    def setup(self, state, available_pages):
+        executable = os.path.join(configure.sbindir, 'flumotion')
+        confDir = state['confDir']
+        logDir = state['logDir']
+        runDir = state['runDir']
+        stop = "%s -C %s -L %s -R %s stop" % (
+            executable, confDir, logDir, runDir)
+        self.message.set_markup(_(
+"""The admin client will now connect to the manager.
+
+Configuration files are stored in
+<i>%s</i>
+Log files are stored in
+<i>%s</i>
+
+You can shut down the manager and worker later with the following command:
+
+<i>%s</i>
+""") % (confDir, logDir, stop))
+
+    def on_next(self, state):
+        return '*finished*'
+
 
 class Greeter(wizard.Wizard):
     name = 'greeter'
-    steps = [Initial, ConnectToExisting, Authenticate, LoadConnection]
+    steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
+        StartNew, StartNewError, StartNewSuccess]
 
     def __init__(self):
         wizard.Wizard.__init__(self, 'initial')

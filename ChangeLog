@@ -1,3 +1,21 @@
+2007-03-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/Makefile.am:
+	* data/glade/greeter-initial.glade:
+	* data/glade/greeter-start_new.glade:
+	* data/glade/greeter-start_new_error.glade:
+	* data/glade/greeter-start_new_success.glade:
+	  Add new greeter glade files.
+	* flumotion/admin/gtk/greeter.py:
+	  Implement starting a manager and worker for the user.
+	* flumotion/admin/gtk/wizard.py:
+	  Make WizardStep take the Wizard in the constructor so .wizard
+	  actually gets set.
+	  Allow on_next to return a *signaled* return value to indicate
+	  that it will fire a signal when it is done, allowing non-blocking
+	  work to be done in the background.
+	  Handle the next button sensitivity while the wizard is doing stuff.
+
 2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/service.py:

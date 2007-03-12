@@ -61,7 +61,7 @@
       </child>
 
       <child>
-	<widget class="GtkRadioButton" id="new_manager">
+	<widget class="GtkRadioButton" id="start_new">
 	  <property name="visible">True</property>
 	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>

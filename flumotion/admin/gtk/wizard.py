@@ -95,11 +95,13 @@ class WizardStep(GladeWidget, log.Loggable):
     wizard = None # set by wizard
     logCategory = "wizardstep"
 
-    def __init__(self, glade_prefix=''):
+    def __init__(self, wizard, glade_prefix=''):
         """
+        @type  wizard:       L{Wizard}
         @type  glade_prefix: str
         @param glade_prefix: prefix used for glade files for the step
         """
+        self.wizard = wizard
         self.glade_file = glade_prefix + self.name + '.glade'
         GladeWidget.__init__(self)
 
@@ -148,7 +150,7 @@ class Wizard(GladeWindow):
 
         # instantiate steps
         for cls in self.steps:
-            page = cls(self.name + '-')
+            page = cls(self, self.name + '-')
             self.pages[cls.name] = page
             page.show()
 
@@ -207,20 +209,35 @@ class Wizard(GladeWindow):
         self.state = None
         self.loop.quit()
 
-    def on_next(self, *button):
+    def on_next(self, button):
+        button.set_sensitive(False)
         next_page = self.page.on_next(self.state)
         
         if not next_page:
             # the input is incorrect
             pass
         elif next_page == '*finished*':
+            button.set_sensitive(True)
             self.emit('finished')
+        elif next_page == '*signaled*':
+            # page wants to do more stuff and will signal us next_page when done
+            def on_finished(page, next_page):
+                button.set_sensitive(True)
+                self.page.disconnect(self._finished_id)
+                if next_page == '*finished*':
+                    self.emit('finished')
+                else:
+                    self.page_stack.append(self.page)
+                    self.set_page(next_page)
+            self._finished_id = self.page.connect('finished', on_finished)
         else:
+            button.set_sensitive(True)
             self.page_stack.append(self.page)
             self.set_page(next_page)
         
     def on_prev(self, button):
-        self.set_page(self.page_stack.pop().name)
+        page = self.page_stack.pop()
+        self.set_page(page.name)
 
     def show(self):
         self.window.show()

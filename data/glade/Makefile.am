@@ -8,6 +8,9 @@ glade_DATA = \
 	greeter-connect_to_existing.glade	\
 	greeter-authenticate.glade	\
 	greeter-load_connection.glade	\
+	greeter-start_new.glade         \
+	greeter-start_new_error.glade 	\
+	greeter-start_new_success.glade \
 	open-connection.glade		\
 	wizard.glade 			\
 	wizard_audiotest.glade		\
