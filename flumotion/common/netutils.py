@@ -203,3 +203,13 @@ class RoutingTable(object):
                 return route
 
         return None
+
+    def route_iter(self, ip):
+        if isinstance(ip, str):
+            ip = ipv4StringToInt(ip)
+        for mask, net, route in self:
+            if ip & mask == net:
+                yield route
+        # Yield the default route
+        yield None
+

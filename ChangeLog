@@ -1,3 +1,8 @@
+2007-03-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/netutils.py:
+	  Add a route iterator.
+
 2007-03-14  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/twisted/compat.py: 
