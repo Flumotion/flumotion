@@ -966,8 +966,8 @@ class FeedComponent(basecomponent.BaseComponent):
         # then remove ourselves
         method = self.log
         if firstTime: method = self.debug
-        method('buffer probe on eater %s has timestamp %.3f' % (
-            feedId, float(buffer.timestamp) / gst.SECOND))
+        method('buffer probe on eater %s has timestamp %s' % (
+            feedId, gst.TIME_ARGS(buffer.timestamp)))
         # We carefully only use atomic (w.r.t. the GIL) operations on the dicts
         # here: we pop things from _probe_ids, and only set things in 
         # self._eaterStatus[feedId].
