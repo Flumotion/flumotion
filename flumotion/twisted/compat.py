@@ -51,6 +51,12 @@ def implementedBy(object):
         from zope.interface import implementedBy
         return implementedBy(object)
 
+def isInterface(object):
+    if version[0] < '2':
+        raise NotImplementedError()
+    from zope.interface.interface import InterfaceClass
+    return isinstance(object, InterfaceClass)
+
 if version[0] < '2':
     from twisted.python.components import Interface as OurLovelyInterface
     import sys
