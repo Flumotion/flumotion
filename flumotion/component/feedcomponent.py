@@ -424,7 +424,7 @@ class ParseLaunchComponent(FeedComponent):
         if self.checkOffset:
             check += " check-imperfect-offset=1"
         if check != "":
-            check = "! identity name=%s-identity silent=TRUE %s" % (
+            check = " ! identity name=%s-identity silent=TRUE %s" % (
                 eaterName, check)
         depay = self.DEPAY_TMPL + check
         if not queue:

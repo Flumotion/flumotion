@@ -1,3 +1,9 @@
+2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  A lack of space after gdpdepay caused audio-encoder and video-overlay
+	  to go hungry then lost (but sad internally).  Fix the space.
+
 2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/base/Makefile.am:
