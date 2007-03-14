@@ -22,8 +22,11 @@
 import gst
 
 from flumotion.component import feedcomponent
-from flumotion.common import errors, gstreamer
+from flumotion.common import errors, gstreamer, messages
 from flumotion.component.effects.volume import volume
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class AudioTestMedium(feedcomponent.FeedComponentMedium):
     def remote_setFrequency(self, frequency):
@@ -59,7 +62,8 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         if not gstreamer.element_factory_exists(source):
             raise errors.MissingElementError(source)
 
-        return ('%s name=source %s ! audio/x-raw-int,rate=%d ! ' \
+        return ('%s name=source %s ! identity name=identity silent=TRUE ! ' \
+            'audio/x-raw-int,rate=%d ! ' \
             'volume name=volume volume=%f ! level name=level'
                 % (source, is_live, rate, volume))
 
@@ -73,6 +77,28 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         if properties.has_key('frequency'):
             element.set_property('freq', properties['frequency'])
             self.uiState.set('frequency', properties['frequency'])
+
+        if 'drop-probability' in properties:
+            vt = gstreamer.get_plugin_version('coreelements')
+            if not vt:
+                raise errors.MissingElementError('identity')
+            if not vt > (0, 10, 12, 0):
+                self.addMessage(
+                    messages.Warning(T_(N_(
+                        "The 'drop-probability' property is specified, but "
+                        "it only works with GStreamer core newer than 0.10.12. "
+                        "You should update your version of GStreamer."))))
+            else:
+                drop_probability = properties['drop-probability']
+                if drop_probability < 0.0 or drop_probability > 1.0:
+                    self.addMessage(
+                        messages.Warning(T_(N_(
+                            "The 'drop-probability' property can only be "
+                            "between 0.0 and 1.0."))))
+                else:
+                    identity = self.get_element('identity')
+                    identity.set_property('drop-probability',
+                        drop_probability)
 
         self.uiState.set('rate', self.rate)
         self.uiState.set('wave', int(element.get_property('wave')))

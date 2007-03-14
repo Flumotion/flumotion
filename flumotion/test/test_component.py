@@ -79,10 +79,8 @@ def pipelineFactory(pipeline, eaters=None, feeders=None):
         except Exception, e:
             d.errback(e)
     dd.addCallback(pipelineConfigCallback)
-    return d
-
-EATER = ParseLaunchComponent.EATER_TMPL
-FEEDER = ParseLaunchComponent.FEEDER_TMPL
+    # return a tuple because we need a reference to the PipelineTest object
+    return (d, t)
 
 class TestExpandElementName(unittest.TestCase):
     def setUp(self):
@@ -184,16 +182,17 @@ class TestExpandElementNames(unittest.TestCase):
         assert r == '@eater:card:default@ !  @feeder:fake:sound@' 
         
 class TestParser(unittest.TestCase):
-    def _eater(self, name):
-        return EATER % { 'name': 'eater:%s' % name }
-    def _feeder(self, name):
-        return FEEDER % { 'name': 'feeder:%s' % name }
+    def _eater(self, pipeline, name):
+        return pipeline.get_eater_template(name) % { 'name': 'eater:%s' % name }
+    def _feeder(self, pipeline, name):
+        return pipeline.get_feeder_template(name) % \
+            { 'name': 'feeder:%s' % name }
 
     def _pipelineFactoryCallback(self, result, correctresult):
         self.assertEquals(result, correctresult)
 
     def testSimpleOneElement(self):
-        d = pipelineFactory('foobar')
+        d, pipeline = pipelineFactory('foobar')
         if weHaveAnOldTwisted():
             result = unittest.deferredResult(d)
             self.assertEquals(result, 'foobar')
@@ -202,7 +201,7 @@ class TestParser(unittest.TestCase):
             return d
 
     def testSimpleTwoElements(self):
-        d = pipelineFactory('foo ! bar')
+        d, pipeline = pipelineFactory('foo ! bar')
         if weHaveAnOldTwisted():
             result = unittest.deferredResult(d)
             self.assertEquals(result, 'foo ! bar')
@@ -211,86 +210,97 @@ class TestParser(unittest.TestCase):
             return d
 
     def testOneSource(self):
-        d  = pipelineFactory('@eater:foo@ ! bar', ['foo'])
+        d, pipeline  = pipelineFactory('@eater:foo@ ! bar', ['foo'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
             self.assertEquals(res, '%s ! bar' % self._eater('foo:default'))
         else:
             d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-                self._eater('foo:default')))
+                self._eater(pipeline, 'foo:default')))
             return d
 
     def testOneSourceWithout(self):
-        d = pipelineFactory('bar', ['foo'])
+        d, pipeline = pipelineFactory('bar', ['foo'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
             self.assertEquals(res, '%s ! bar' % self._eater('foo:default'))
         else:
             d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-                self._eater('foo:default')))
+                self._eater(pipeline, 'foo:default')))
             return d
 
     def testOneFeed(self):
-        d = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
+        d, pipeline = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
-            self.assertEquals(res, 'foo ! %s' % self._feeder('fake:bar'))
+            self.assertEquals(res, 'foo ! %s' % 
+                self._feeder(pipeline, 'fake:bar'))
         else:
             d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-                self._feeder('fake:bar')))
+                self._feeder(pipeline, 'fake:bar')))
             return d
         
     def testOneFeedWithout(self):
-        d = pipelineFactory('foo', [], ['bar'])
+        d, pipeline = pipelineFactory('foo', [], ['bar'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
-            self.assertEquals(res, 'foo ! %s' % self._feeder('fake:bar'))
+            self.assertEquals(res, 'foo ! %s' % 
+                self._feeder(pipeline, 'fake:bar'))
         else:
             d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-                self._feeder('fake:bar')))
+                self._feeder(pipeline, 'fake:bar')))
             return d
 
     def testTwoSources(self):
-        d = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', ['foo', 'bar'])
+        d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
+            ['foo', 'bar'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
             self.assertEquals(res, '%s ! %s ! baz' % (
-               self._eater('foo:default'), self._eater('bar:default')))
+               self._eater(pipeline, 'foo:default'), 
+               self._eater(pipeline, 'bar:default')))
         else:
             d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
-               self._eater('foo:default'), self._eater('bar:default')))
+               self._eater(pipeline, 'foo:default'), 
+               self._eater(pipeline, 'bar:default')))
             return d
 
     def testTwoFeeds(self):
-        d = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [],
+        d, pipeline = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [],
             ['bar', 'baz'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
             self.assertEquals(res, 'foo ! %s ! %s' % (
-                self._feeder('fake:bar'), self._feeder('fake:baz')))
+                self._feeder(pipeline, 'fake:bar'), 
+                self._feeder(pipeline, 'fake:baz')))
         else:
             d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
-               self._feeder('fake:bar'), self._feeder('fake:baz')))
+               self._feeder(pipeline, 'fake:bar'), 
+               self._feeder(pipeline, 'fake:baz')))
             return d
 
     def testTwoBoth(self):
-        d = pipelineFactory(
+        d, pipeline = pipelineFactory(
             '@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
                               ['comp1', 'comp2',],
                               ['feed1', 'feed2'])
         if weHaveAnOldTwisted():
             res = unittest.deferredResult(d)
             self.assertEquals(res, '%s ! %s ! %s ! %s' % (
-                self._eater('comp1:default'), self._eater('comp2:default'),
-                self._feeder('fake:feed1'), self._feeder('fake:feed2')))
+                self._eater(pipeline, 'comp1:default'), 
+                self._eater(pipeline, 'comp2:default'),
+                self._feeder(pipeline, 'fake:feed1'), 
+                self._feeder(pipeline, 'fake:feed2')))
         else:
             d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
-                self._eater('comp1:default'), self._eater('comp2:default'),
-                self._feeder('fake:feed1'), self._feeder('fake:feed2')))
+                self._eater(pipeline, 'comp1:default'), 
+                self._eater(pipeline, 'comp2:default'),
+                self._feeder(pipeline, 'fake:feed1'), 
+                self._feeder(pipeline, 'fake:feed2')))
             return d
 
     def testErrors(self):
-        d = pipelineFactory('')
+        d, pipeline = pipelineFactory('')
         if weHaveAnOldTwisted():
             failure = unittest.deferredError(d)
             assert(isinstance(failure, failure.Failure))

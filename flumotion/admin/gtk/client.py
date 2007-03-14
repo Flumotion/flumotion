@@ -418,8 +418,10 @@ class Window(log.Loggable, gobject.GObject):
 
     def _nodeRenderErrback(self, failure, nodeName):
         self.warning('Could not render node %s' % nodeName)
-        msg = 'Could not render node %s: %s' % (nodeName,
-            log.getFailureMessage(failure))
+        debug = log.getFailureMessage(failure)
+        if failure.check(errors.NoBundleError):
+            debug = "Could not get bundle %s" % failure.value.args[0]
+        msg = 'Could not render node %s: %s' % (nodeName, debug)
         self.debug(msg)
         m = messages.Error(T_(
                 N_("This component has a UI bug in the %s tab."), nodeName),

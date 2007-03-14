@@ -296,6 +296,7 @@ def main(args):
     d = start_components(wrappers, fds, delay)
 
     def errback(failure):
+        log.debug('launch', log.getFailureMessage(failure))
         print "Error occurred: %s" % failure.getErrorMessage()
         failure.printDetailedTraceback()
         reactor.failure = True

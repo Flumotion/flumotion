@@ -68,6 +68,11 @@ class TestFormatStorage(unittest.TestCase):
         assert common.formatStorage(value, 4) == "1.1529 E"
 
 class TestFormatTime(unittest.TestCase):
+    def testFractionalSecond(self):
+        value = 1.1
+        self.assertEquals(common.formatTime(value, fractional=2),
+            "00:00:01.10")
+
     def testSecond(self):
         value = 1
         assert common.formatTime(value) == "00:00"

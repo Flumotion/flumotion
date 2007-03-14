@@ -123,8 +123,8 @@ class FeederClient:
         # Unknown, not supported
         # these are supported
         for key in (
-            'bytesReadCurrent',      # bytes dropped over current connection
-            'bytesReadTotal',        # bytes dropped over all connections
+            'bytesReadCurrent',      # bytes read over current connection
+            'bytesReadTotal',        # bytes read over all connections
             'reconnects',            # number of connections made by this client
             'lastConnect',           # last client connection, in epoch seconds
             'lastDisconnect',        # last client disconnect, in epoch seconds
@@ -205,16 +205,147 @@ class FeederClient:
                 self.uiState.set('buffersDroppedCurrent', 0)
         reactor.callFromThread(updateUIState)
 
+class Eater:
+    """
+    This class groups eater-related information as used by a Feed Component.
+
+    @ivar eaterId:  id of the feed this is eating from
+    @ivar uiState: the serializable UI State for this eater
+    """
+    def __init__(self, eaterId):
+        self.eaterId = eaterId
+        self.uiState = componentui.WorkerComponentUIState()
+        self.uiState.addKey('eaterId')
+        self.uiState.set('eaterId', eaterId)
+        # dict for the current connection
+        connectionDict = { 
+            "timeTimestampDiscont":  None,
+            "timestampTimestampDiscont":  0.0,  # ts of buffer after discont,
+                                                # in float seconds
+            "lastTimestampDiscont":  0.0,
+            "totalTimestampDiscont": 0.0,
+            "countTimestampDiscont": 0,
+            "timeOffsetDiscont":     None,
+            "offsetOffsetDiscont":   0,         # offset of buffer after discont
+            "lastOffsetDiscont":     0,
+            "totalOffsetDiscont":    0,
+            "countOffsetDiscont":    0,
+
+         }
+        self.uiState.addDictKey('connection', connectionDict)
+
+        for key in (
+            'lastConnect',           # last client connection, in epoch seconds
+            'lastDisconnect',        # last client disconnect, in epoch seconds
+            'totalConnections',      # number of connections made by this client
+            'countTimestampDiscont', # number of timestamp disconts seen
+            'countOffsetDiscont',    # number of timestamp disconts seen
+            ):
+            self.uiState.addKey(key, 0)
+        for key in (
+            'totalTimestampDiscont', # total timestamp discontinuity
+            'totalOffsetDiscont',    # total offset discontinuity
+            ):
+            self.uiState.addKey(key, 0.0)
+        self.uiState.addKey('fd', None)
+
+    def connected(self, fd, when=None):
+        """
+        The eater has been connected.
+        Update related stats.
+        """
+        if not when:
+            when = time.time()
+
+        def updateUIState():
+            self.uiState.set('lastConnect', when)
+            self.uiState.set('fd', fd)
+            self.uiState.set('totalConnections',
+                self.uiState.get('totalConnections', 0) + 1)
+
+            self.uiState.setitem("connection", "countTimestampDiscont", 0)
+            self.uiState.setitem("connection", "timeTimestampDiscont",  None)
+            self.uiState.setitem("connection", "lastTimestampDiscont",  0.0)
+            self.uiState.setitem("connection", "totalTimestampDiscont", 0.0)
+            self.uiState.setitem("connection", "countOffsetDiscont",    0)
+            self.uiState.setitem("connection", "timeOffsetDiscont",     None)
+            self.uiState.setitem("connection", "lastOffsetDiscont",     0)
+            self.uiState.setitem("connection", "totalOffsetDiscont",    0)
+
+        reactor.callFromThread(updateUIState)
+
+    def disconnected(self, when=None):
+        """
+        The eater has been disconnected.
+        Update related stats.
+        """
+        if not when:
+            when = time.time()
+
+        def updateUIState():
+            self.uiState.set('lastDisconnect', when)
+            self.uiState.set('fd', None)
+
+        reactor.callFromThread(updateUIState)
+
+    def timestampDiscont(self, seconds, timestamp):
+        """
+        @param seconds:   discont duration in seconds
+        @param timestamp: GStreamer timestamp of new buffer, in seconds.
+
+        Inform the eater of a timestamp discontinuity.
+        This is called from a bus message handler, so in the main thread.
+        """
+        uiState = self.uiState
+
+        c = uiState.get('connection') # dict
+        uiState.setitem('connection', 'countTimestampDiscont',
+            c.get('countTimestampDiscont', 0) + 1)
+        uiState.set('countTimestampDiscont',
+            uiState.get('countTimestampDiscont', 0) + 1)
+
+        uiState.setitem('connection', 'timeTimestampDiscont', time.time())
+        uiState.setitem('connection', 'timestampTimestampDiscont', timestamp)
+        uiState.setitem('connection', 'lastTimestampDiscont', seconds)
+        uiState.setitem('connection', 'totalTimestampDiscont', 
+            c.get('totalTimestampDiscont', 0) + seconds)
+        uiState.set('totalTimestampDiscont',
+            uiState.get('totalTimestampDiscont', 0) + seconds)
+
+    def offsetDiscont(self, units, offset):
+        """
+        Inform the eater of an offset discontinuity.
+        This is called from a bus message handler, so in the main thread.
+        """
+        uiState = self.uiState
+
+        c = uiState.get('connection') # dict
+        uiState.setitem('connection', 'countOffsetDiscont',
+            c.get('countOffsetDiscont', 0) + 1)
+        uiState.set('countOffsetDiscont',
+            uiState.get('countOffsetDiscont', 0) + 1)
+
+        uiState.setitem('connection', 'timeOffsetDiscont', time.time())
+        uiState.setitem('connection', 'offsetOffsetDiscont', offset)
+        uiState.setitem('connection', 'lastOffsetDiscont', units)
+        uiState.setitem('connection', 'totalOffsetDiscont', 
+            c.get('totalOffsetDiscont', 0) + units)
+        uiState.set('totalOffsetDiscont',
+            uiState.get('totalOffsetDiscont', 0) + units)
+
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
+
+    @cvar checkTimestamp: whether to check continuity of timestamps for eaters
+    @cvar checkOffset:    whether to check continuity of offsets for eaters
     """
     # keep these as class variables for the tests
     FDSRC_TMPL = 'fdsrc name=%(name)s'
-    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
-    EATER_TMPL = FDSRC_TMPL + ' ! ' + DEPAY_TMPL
+    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay ! ' + \
+        'identity name=%(name)s-identity silent=TRUE'
     FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
-
+    # EATER_TMPL is no longer used due to it being dynamic
     # how often to add the buffer probe
     BUFFER_PROBE_ADD_FREQUENCY = 5
 
@@ -230,15 +361,20 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
+    checkTimestamp = False
+    checkOffset = False
+
     ### BaseComponent interface implementations
     def init(self):
         # add extra keys to state
-        self.state.addKey('eaterNames')
-        self.state.addKey('feederNames')
+        self.state.addKey('eaterNames') # feedId of eaters
+        self.state.addKey('feederNames') # feedId of feeders
 
-        # add keys for uiState
-        self._feeders = {}
+        # add keys for eaters and feeders uiState
+        self._feeders = {} # feeder feedId -> Feeder
+        self._eaters = {} # eater feedId -> Eater
         self.uiState.addListKey('feeders')
+        self.uiState.addListKey('eaters')
 
         self.pipeline = None
         self.pipeline_signals = []
@@ -271,6 +407,20 @@ class FeedComponent(basecomponent.BaseComponent):
         tcppluginversion = gstreamer.get_plugin_version('tcp')
         self._get_stats_supported = tcppluginversion >= (0, 10, 11, 0)
 
+        # check for identity version and set checkTimestamp and checkOffset
+        # to false if too old
+        vt = gstreamer.get_plugin_version('coreelements')
+        if not vt:
+            raise errors.MissingElementError('identity')
+        if not vt > (0, 10, 12, 0):
+            self.checkTimestamp = False
+            self.checkOffset = False
+            self.addMessage(
+                messages.Warning(T_(N_(
+                    "You will get more debugging information "
+                    "if you upgrade to GStreamer 0.10.13 or later "
+                    "as and when available."))))
+
     def do_setup(self):
         """
         Sets up component.
@@ -295,7 +445,8 @@ class FeedComponent(basecomponent.BaseComponent):
                 'checkEaterDC': None
             }
             self._eaterStatus[name] = d
-
+            self._eaters[name] = Eater(name)
+            self.uiState.append('eaters', self._eaters[name].uiState)
             self._eaterReconnectDC['eater:' + name] = None
 
         # this sets self.feeder_names
@@ -363,6 +514,29 @@ class FeedComponent(basecomponent.BaseComponent):
     # by the two previous methods, but also in other places, and then
     # overridden.  That would make us have to publicize inactiveEaters
 
+    def eaterTimestampDiscont(self, feedId, prevTs, prevDuration, curTs):
+        """
+        Inform of a timestamp discontinuity for the given eater.
+        """
+        discont = curTs - (prevTs + prevDuration)
+        dSeconds = discont / float(gst.SECOND)
+        self.debug("we have a discont on feedId %s of %f s between %s and %s ", 
+            feedId, dSeconds,
+            gst.TIME_ARGS(prevTs),
+            gst.TIME_ARGS(curTs))
+        self._eaters[feedId].timestampDiscont(dSeconds, 
+            float(curTs) / float(gst.SECOND))
+
+    def eaterOffsetDiscont(self, feedId, prevOffsetEnd, curOffset):
+        """
+        Inform of a timestamp discontinuity for the given eater.
+        """
+        discont = curOffset - prevOffsetEnd
+        self.debug(
+            "we have a discont on feedId %s of %d units between %d and %d ", 
+            feedId, discont, prevOffsetEnd, curOffset)
+        self._eaters[feedId].offsetDiscont(discont, curOffset)
+         
     ### FeedComponent methods
     def addEffect(self, effect):
         self.effects[effect.name] = effect
@@ -388,7 +562,7 @@ class FeedComponent(basecomponent.BaseComponent):
             if block.find(':') == -1:
                 eater_name = block + ':default'
             eater_names.append(eater_name)
-        self.debug('parsed eater config, eaters %r' % eater_names)
+        self.debug('parsed eater config, eater feedIds %r' % eater_names)
         self.eater_names = eater_names
         self.state.set('eaterNames', self.eater_names)
             
@@ -416,7 +590,7 @@ class FeedComponent(basecomponent.BaseComponent):
     
     def get_feeder_names(self):
         """
-        Return the list of feeder names this component has.
+        Return the list of feedId's of feeders this component has.
 
         @returns: a list of "componentName:feedName" strings
         """
@@ -424,7 +598,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def get_feed_names(self):
         """
-        Return the list of feeder names this component has.
+        Return the list of feedeNames for feeds this component has.
 
         @returns: a list of "feedName" strings
         """
@@ -533,6 +707,29 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.eaterSetInactive(feedId)
                 # start reconnection
                 self._reconnectEater(feedId)
+        elif t == gst.MESSAGE_ELEMENT:
+            if message.structure.get_name() == 'imperfect-timestamp':
+                identityName = src.get_name()
+                eaterName = identityName.split("-identity")[0]
+                feedId = eaterName[len('eater:'):]
+                
+                self.log("we have an imperfect stream from %s" % src.get_name())
+                # figure out the discontinuity
+                s = message.structure
+                self.eaterTimestampDiscont(feedId, s["prev-timestamp"],
+                    s["prev-duration"], s["cur-timestamp"])
+            elif message.structure.get_name() == 'imperfect-offset':
+                identityName = src.get_name()
+                eaterName = identityName.split("-identity")[0]
+                feedId = eaterName[len('eater:'):]
+                
+                self.log("we have an imperfect stream from %s" % src.get_name())
+                # figure out the discontinuity
+                s = message.structure
+                self.eaterOffsetDiscont(feedId, s["prev-offset-end"],
+                    s["cur-offset"])
+
+
         else:
             self.log('message received: %r' % message)
 
@@ -551,7 +748,6 @@ class FeedComponent(basecomponent.BaseComponent):
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         self.bus_watch_id = bus.connect('message', self.bus_watch_func)
-
         sig_id = self.pipeline.connect('deep-notify',
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
@@ -852,6 +1048,8 @@ class FeedComponent(basecomponent.BaseComponent):
             self._checkEater, feedId)
         
     def _reconnectEater(self, feedId):
+        eater = self._eaters[feedId]
+        eater.disconnected()
         # reconnect the eater for the given feedId, updating the internal
         # status for that eater
         status = self._eaterStatus[feedId]
@@ -868,9 +1066,9 @@ class FeedComponent(basecomponent.BaseComponent):
             # FIXME: it seems fine to not errback explicitly, but we may
             # want to investigate further later
         d = self.medium.connectEater(feedId)
-        def connectEaterCb(result, status):
+        def connectEaterCb(result, status, eater):
             status['lastConnectD'] = None
-        d.addCallback(connectEaterCb, status)
+        d.addCallback(connectEaterCb, status, eater)
         status['lastConnectD'] = d
 
     def get_element(self, element_name):
@@ -1031,6 +1229,9 @@ class FeedComponent(basecomponent.BaseComponent):
             srcpad.set_blocked_async(False, _block_cb)
         else:
             element.set_property('fd', fd)
+
+        # update our eater uiState
+        self._eaters[feedId].connected(fd)
 
     def unblock_eater(self, feedId):
         """

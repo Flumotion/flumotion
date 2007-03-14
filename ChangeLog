@@ -1,3 +1,211 @@
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/common.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/eaters.glade:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/repeater/repeater.py:
+	* flumotion/component/misc/repeater/repeater.xml:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/launch/main.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_component.py:
+	* po/POTFILES.in:
+	Merge of eaters-info-1. Changelog of branch follows:
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent.py:
+	Fix the tests.
+	* flumotion/component/misc/repeater/repeater.py:
+	Repeat after me, run pychecker before committing.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Show a message if identity version is too low to show eaters
+	info.
+
+2007-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/repeater/repeater.py:
+	  import the right modules
+	* po/POTFILES.in:
+	  mark for translation
+
+2007-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/repeater/repeater.py:
+	* flumotion/component/misc/repeater/repeater.xml:
+	  Add drop-probability as well.  Allows us to test more
+	  complex dropping scenarios.
+	  Warn if drop-probability is set too low or too high.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/audiotest/audiotest.py:
+	Warn if drop-probability is set too low or too high.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/videotest/videotest.py:
+	Warn if drop-probability set too low or too high.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Remove unused variables.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Check for identity version, if too old force checkTimestamp
+	and checkOffset to False.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/videotest/videotest.py:
+	Remove bogus debug line.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/videotest/videotest.py:
+	Fix check, as (0, 10, 12, 0) is greater than (0, 10, 12).
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	'source' is not necessarily specified in config.
+
+2007-03-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	  add optional fractional argument to formatTime
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/eaters.glade:
+	* flumotion/component/feedcomponent010.py:
+	  Show timestamp and offset at each discontinuity.
+
+2007-03-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Fix state watcher so setitem/delitem hides correctly.
+	  Implement handling of offset disconts.
+	* flumotion/component/base/eaters.glade:
+	* flumotion/component/converters/overlay/overlay.py:
+	  Overlay handles raw video and thus can check timestamps
+	  and offsets.
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	  Encoders deal with raw data and thus can check offsets too.
+	* flumotion/component/feedcomponent010.py:
+	  Set zero values on some keys.
+	  Add Eater.offsetDiscont() and use it from imperfect-offset messages.
+	* flumotion/component/muxers/ogg.py:
+	  Ogg muxer should check incoming timestamps, but the offsets
+	  are used to store granule pos, so ignore them.
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  These consumers deal with muxed streams, so checking timestamps
+	  does not work, but offsets should.
+
+2007-03-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  Add an identity checking for imperfect timestamps and offsets when
+	  requested.
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/eaters.glade:
+	  Add the eaters glade file.
+	* flumotion/component/base/admin_gtk.py:
+	  Show the eaters node if there are eaters.
+	  Adapt the StateWatcher to work with setitem and delitem
+	  as well so we can handle the connection dict.
+	  Create EatersAdminGtkNode inspired by the Feeders one,
+	  but simpler.
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	  For Theora and Vorbis it makes sense to check timestamps.
+	* flumotion/component/feedcomponent010.py:
+	  Add comments.
+	  Add time/last/total/count Timestamp/Offset Discont to uiState's
+	  connection.
+	  Add last Connect/Disconnect, count/total Timestamp/Offset to
+	  uiState.
+	  Add Eater.connected/disconnected/timestampDiscont.
+	  Add FeedComponent.checkTimestamp/Offset so that FeedComponent
+	  subclasses can indicate whether it makes sense to check for
+	  the specific type of discontinuities.
+	  Check for imperfect-timestamp messages.
+
+2007-03-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/videotest/videotest.py:
+	  Fix typo to find the right plugin.
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	  Trap NoBundleError to avoid an embarassing Error message.
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/launch/main.py:
+	  Give us more information on where the problem originates by
+	  using log.getFailureMessage
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* po/POTFILES.in:
+	  mark test producers for translation
+
+2007-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	  Add drop-probability to our two test producers.
+	  Warn if GStreamer is not new enough to properly support them.
+
+2007-03-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/base/eaters.glade:
+	Add eaters glade.
+
+2007-03-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Add eater class and uiState for eaters.  Does not yet fill it.
+
+2007-03-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Duh, identity needs to be in the DEPAY_TMPL after the depayloader!
+
+2007-03-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Remove EATERS_TMPL as it is now dynamic.
+	Add identity check-perfect=true to the FDSRC_TMPL so we can
+	track stream perfection.
+	* flumotion/test/test_component.py:
+	Refactor test so that it uses the dynamic get_eater_template()
+	and get_feeder_template().
+
 2007-03-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/netutils.py:

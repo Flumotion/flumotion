@@ -25,7 +25,9 @@
         <property name="format" type="string"
                   description="Video format" />
         <property name="pattern" type="int"
-                  description="Test pattern to show (smpte/snow/black/..." />
+                  description="Test pattern to show (smpte/snow/black/...)" />
+        <property name="drop-probability" type="float"
+                  description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
   </components>

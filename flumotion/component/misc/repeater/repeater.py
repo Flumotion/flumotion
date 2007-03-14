@@ -19,9 +19,34 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import gstreamer, messages, errors
 from flumotion.component import feedcomponent
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class Repeater(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
-        return 'identity silent=true'
+        dp = ""
+        if 'drop-probability' in properties:
+            vt = gstreamer.get_plugin_version('coreelements')
+            if not vt:
+                raise errors.MissingElementError('identity')
+            if not vt > (0, 10, 12):
+                self.addMessage(
+                    messages.Warning(T_(N_(
+                        "The 'drop-probability' property is specified, but "
+                        "it only works with GStreamer core newer than 0.10.12. "
+                        "You should update your version of GStreamer."))))
+            else:
+                drop_probability = properties['drop-probability']
+                if drop_probability < 0.0 or drop_probability > 1.0:
+                    self.addMessage(
+                        messages.Warning(T_(N_(
+                            "The 'drop-probability' property can only be "
+                            "between 0.0 and 1.0."))))
+                else:
+                    dp = " drop-probability=%f" % drop_probability
+
+        return 'identity silent=true %s' % dp
 

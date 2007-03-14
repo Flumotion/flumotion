@@ -126,6 +126,10 @@ class BaseAdminGtk(log.Loggable):
             self.debug("Component has feeders, show Feeders node")
             self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
 
+        if 'source' in config:
+            self.debug("Component has eaters, show Eaters node")
+            self.nodes['Eaters'] = EatersAdminGtkNode(self.state, self.admin)
+
         # set up translations
         if not hasattr(self, 'gettext_domain'):
             yield None
@@ -387,16 +391,22 @@ class BaseAdminGtkNode(log.Loggable):
     render = defer_generator_method(render)
 
 # this class is a bit of an experiment
+# editor's note: "experiment" is an excuse for undocumented and uncommented
 class _StateWatcher(object):
-    def __init__(self, state, setters, appenders, removers):
+    def __init__(self, state, setters, appenders, removers,
+            setitemers=None, delitemers=None):
         self.state = state
         self.setters = setters
         self.appenders = appenders
         self.removers = removers
+        self.setitemers = setitemers
+        self.delitemers = delitemers
         self.shown = False
 
         state.addListener(self, set=self.onSet, append=self.onAppend,
-                          remove=self.onRemove)
+                          remove=self.onRemove, setitem=self.onSetItem,
+                          delitem=self.onDelItem)
+
         for k in appenders:
             for v in state.get(k):
                 self.onAppend(state, k, v)
@@ -408,6 +418,7 @@ class _StateWatcher(object):
             self.shown = False
 
     def show(self):
+        # "show" the watcher by triggering all the registered setters
         if not self.shown:
             self.shown = True
             for k in self.setters:
@@ -425,6 +436,14 @@ class _StateWatcher(object):
         if k in self.removers:
             self.removers[k](self.state, v)
 
+    def onSetItem(self, obj, k, sk, v):
+        if self.shown and k in self.setitemers:
+            self.setitemers[k](self.state, sk, v)
+
+    def onDelItem(self, obj, k, sk, v):
+        if self.shown and k in self.setitemers:
+            self.setitemers[k](self.state, sk, v)
+
     def unwatch(self):
         if self.state:
             self.hide()
@@ -441,6 +460,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Feeders"))
         # tree model is a model of id, uiState, _StateWatcher, type
         # tree model contains feeders and their feeder clients
+        # type is a str, 'feeder' or 'client'
         self.treemodel = None
         self.treeview = None
         self.selected = None
@@ -641,6 +661,284 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         # FIXME: do not show all;
         # hide bytes fed and buffers dropped until something is selected
         # see #575
+        return self.widget
+
+class EatersAdminGtkNode(BaseAdminGtkNode):
+    glade_file = os.path.join('flumotion', 'component', 'base', 'eaters.glade')
+
+    def __init__(self, state, admin):
+        BaseAdminGtkNode.__init__(self, state, admin, title=_("Eaters"))
+        # tree model is a model of id, uiState, _StateWatcher
+        # tree model contains eaters
+        self.treemodel = None
+        self.treeview = None
+        self._selected = None # the watcher of the currently selected row
+        self.labels = {}
+        self._lastConnect = 0
+        self._lastDisconnect = 0
+
+    def select(self, watcher):
+        if self._selected:
+            self._selected.hide()
+        if watcher:
+            self._selected = watcher
+            self._selected.show()
+        else:
+            self._selected = None
+
+    def _setEaterFD(self, state, value):
+        if value is None:
+            self._table_connected.hide()
+            self._table_disconnected.show()
+        else:
+            self._table_disconnected.hide()
+            self._table_connected.show()
+
+    def _setEaterName(self, state, value):
+        self.labels['eater-name'].set_markup(_('Eater <b>%s</b>') % value)
+
+    def _setEaterBytesReadCurrent(self, state, value):
+        txt = value and (common.formatStorage(value) + _('Byte')) or ''
+        self.labels['bytes-read-current'].set_text(txt)
+        self._updateConnectionTime()
+        self._updateDisconnectionTime()
+
+    def _setEaterConnectionItem(self, state, key, value):
+        # timestamps
+        if key == 'countTimestampDiscont':
+            self.labels['timestamp-discont-count-current'].set_text(str(value))
+            if value > 0:
+                self._expander_discont_current.show()
+        elif key == 'timeTimestampDiscont':
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['timestamp-discont-time-current'].set_text(text)
+            if value is not None:
+                self._table_timestamp_discont_current.show()
+        elif key == 'lastTimestampDiscont':
+            text = common.formatTime(value, fractional=9)
+            self.labels['timestamp-discont-last-current'].set_text(text)
+            if value > 0.0:
+                self._table_timestamp_discont_current.show()
+        elif key == 'totalTimestampDiscont':
+            text = common.formatTime(value, fractional=9)
+            self.labels['timestamp-discont-total-current'].set_text(text)
+            if value > 0.0:
+                self._table_timestamp_discont_current.show()
+        elif key == 'timestampTimestampDiscont':
+            if value is None:
+                return
+            text = common.formatTime(value, fractional=9)
+            self.labels['timestamp-discont-timestamp-current'].set_text(text)
+        # offsets
+        elif key == 'countOffsetDiscont':
+            self.labels['offset-discont-count-current'].set_text(str(value))
+            if value > 0:
+                self._expander_discont_current.show()
+        elif key == 'timeOffsetDiscont':
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['offset-discont-time-current'].set_text(text)
+            if value is not None:
+                self._table_offset_discont_current.show()
+        elif key == 'lastOffsetDiscont':
+            text = _("%d units") % value
+            self.labels['offset-discont-last-current'].set_text(text)
+            if value > 0:
+                self._table_offset_discont_current.show()
+        elif key == 'totalOffsetDiscont':
+            text = _("%d units") % value
+            self.labels['offset-discont-total-current'].set_text(text)
+            if value > 0:
+                self._table_offset_discont_current.show()
+        elif key == 'offsetOffsetDiscont':
+            if value is None:
+                return
+            text = _("%d units") % value
+            self.labels['offset-discont-offset-current'].set_text(text)
+            if value > 0:
+                self._table_offset_discont_current.show()
+
+    def _setEaterCountTimestampDiscont(self, state, value):
+        if value is None:
+            return
+        self.labels['timestamp-discont-count-total'].set_text(str(value))
+        if value > 0.0:
+            self._expander_discont_total.show()
+
+    def _setEaterTotalTimestampDiscont(self, state, value):
+        if value is None:
+            return
+        text = common.formatTime(value, fractional=9)
+        self.labels['timestamp-discont-total'].set_text(text)
+        if value > 0.0:
+            self._table_timestamp_discont_total.show()
+
+    def _setEaterCountOffsetDiscont(self, state, value):
+        if value is None:
+            return
+        self.labels['offset-discont-count-total'].set_text(str(value))
+        if value > 0:
+            self._expander_discont_total.show()
+
+    def _setEaterTotalOffsetDiscont(self, state, value):
+        if value is None:
+            return
+        text = _("%d units") % value
+        self.labels['offset-discont-total'].set_text(text)
+        if value > 0:
+            self._table_offset_discont_total.show()
+
+
+    def _setEaterLastConnect(self, state, value):
+        if value:
+            text = time.strftime("%c", time.localtime(value))
+            self.labels['connected-since'].set_text(text)
+            self._table_connected.show()
+            self._table_disconnected.hide()
+            self._lastConnect = value
+            self._updateConnectionTime()
+
+    def _setEaterTotalConnections(self, state, value):
+        self.labels['connections-total'].set_text(str(value))
+
+    # when we initially get the uiState, connection is an already set dict
+    # this makes sure we handle getting that dict initially
+    def _setEaterConnection(self, state, value):
+        # can be called with None value due to StateWatcher
+        if value is None:
+            return
+        for k, v in value.items():
+            self._setEaterConnectionItem(state, k, v)
+
+    # FIXME: add a timeout to update this ?
+    def _updateConnectionTime(self):
+        if self._lastConnect:
+            text = common.formatTime(time.time() - self._lastConnect)
+            self.labels['connection-time'].set_text(text)
+
+    # FIXME: add a timeout to update this ?
+    def _updateDisconnectionTime(self):
+        if self._lastDisconnect:
+            text = common.formatTime(time.time() - self._lastDisconnect)
+            self.labels['disconnection-time'].set_text(text)
+
+    def addEater(self, uiState, state):
+        """
+        @param uiState: the component's uiState
+        @param state:   the eater's uiState
+        """
+        eaterId = state.get('eaterId')
+        i = self.treemodel.append(None)
+        self.treemodel.set(i, 0, eaterId, 1, state)
+        w = _StateWatcher(state,
+            {
+                'fd':                    self._setEaterFD,
+                'eaterId':               self._setEaterName,
+                'lastConnect':           self._setEaterLastConnect,
+                'countTimestampDiscont': self._setEaterCountTimestampDiscont,
+                'totalTimestampDiscont': self._setEaterTotalTimestampDiscont,
+                'countOffsetDiscont':    self._setEaterCountOffsetDiscont,
+                'totalOffsetDiscont':    self._setEaterTotalOffsetDiscont,
+                'totalConnections':      self._setEaterTotalConnections,
+                # need to have a setter for connection to be able to show
+                # it initially
+                'connection':            self._setEaterConnection,
+            },
+            {},
+            {},
+            setitemers={
+                'connection':           self._setEaterConnectionItem,
+            },
+            delitemers={
+            }
+        )
+        self.treemodel.set(i, 2, w)
+
+    def setUIState(self, state):
+        # will only be called when we have a widget tree
+        BaseAdminGtkNode.setUIState(self, state)
+        #self.widget.show_all()
+        for eater in state.get('eaters'):
+            self.addEater(state, eater)
+
+    def haveWidgetTree(self):
+        self.labels = {}
+        self.widget = self.wtree.get_widget('eaters-widget')
+        self.treeview = self.wtree.get_widget('treeview-eaters')
+        # tree model is a model of id, uiState, _StateWatcher
+        self.treemodel = gtk.TreeStore(str, object, object)
+        self.treeview.set_model(self.treemodel)
+        col = gtk.TreeViewColumn('Eater', gtk.CellRendererText(),
+                                 text=0)
+        self.treeview.append_column(col)
+        sel = self.treeview.get_selection()
+        sel.set_mode(gtk.SELECTION_SINGLE)
+
+        # get to know and set labels
+        def set_label(name):
+            self.labels[name] = self.wtree.get_widget('label-' + name)
+            if self.labels[name] is None:
+                raise KeyError(name)
+            # zeroes out all value labels
+            self.labels[name].set_text('')
+
+        set_label('eater-name')
+        for type in (
+            'connected-since', 'connection-time',
+            'timestamp-discont-timestamp-current',
+            'offset-discont-offset-current',
+            'timestamp-discont-count-current', 'offset-discont-count-current',
+            'timestamp-discont-total-current', 'offset-discont-total-current',
+            'timestamp-discont-last-current',  'offset-discont-last-current',
+            'timestamp-discont-time-current',  'offset-discont-time-current',
+            'timestamp-discont-count-total',   'offset-discont-count-total',
+            'timestamp-discont-total',         'offset-discont-total',
+            'connections-total',
+            ):
+            set_label(type)
+
+        # handle selection changes on the tree widget
+        def sel_changed(sel):
+            model, i = sel.get_selected()
+            self.select(i and model.get_value(i, 2))
+            self.wtree.get_widget('box-right').show()
+
+        sel.connect('changed', sel_changed)
+
+        # manage visibility of parts of the widget
+        self._table_connected = self.wtree.get_widget('table-current-connected')
+        self._table_disconnected = self.wtree.get_widget(
+            'table-current-disconnected')
+        self._table_eater = self.wtree.get_widget('table-eater')
+        self._expander_discont_current = self.wtree.get_widget(
+            'expander-discont-current')
+        self._table_timestamp_discont_current = self.wtree.get_widget(
+            'table-timestamp-discont-current')
+        self._table_offset_discont_current = self.wtree.get_widget(
+            'table-offset-discont-current')
+
+        self._expander_discont_total = self.wtree.get_widget(
+            'expander-discont-total')
+        self._table_timestamp_discont_total = self.wtree.get_widget(
+            'table-timestamp-discont-total')
+        self._table_offset_discont_total = self.wtree.get_widget(
+            'table-offset-discont-total')
+
+        # show the tree view always
+        self.wtree.get_widget('scrolledwindow').show_all()
+
+        # hide the specifics of the eater
+        self._expander_discont_current.hide()
+        self._table_connected.hide()
+        self._table_disconnected.hide()
+        self._expander_discont_total.hide()
+
+        # show the right box only when an eater is selected
+        self.wtree.get_widget('box-right').hide()
+
+        # FIXME: do not show all;
+        # hide bytes fed and buffers dropped until something is selected
+        # see #575
+        self.widget.show()
         return self.widget
 
 class EffectAdminGtkNode(BaseAdminGtkNode):

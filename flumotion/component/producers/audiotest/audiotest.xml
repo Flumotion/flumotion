@@ -25,6 +25,8 @@
                   description="samplerate (in Hz)" />
         <property name="frequency" type="int"
                   description="frequency of test signal (in Hz)" />
+        <property name="drop-probability" type="float"
+                  description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
 

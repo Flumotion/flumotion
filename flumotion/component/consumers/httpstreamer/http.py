@@ -226,6 +226,8 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     implements(interfaces.IStreamingComponent)
 
+    checkOffset = True
+
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
     

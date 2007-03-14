@@ -26,6 +26,9 @@ from flumotion.component import feedcomponent
 from vorbisutils import get_max_sample_rate, get_preferred_sample_rate
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
+    checkTimestamp = True
+    checkOffset = True
+
     def do_check(self):
         self.debug('running Vorbis check')
         from flumotion.worker.checks import encoder

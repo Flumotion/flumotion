@@ -24,6 +24,8 @@ import gst
 from flumotion.component import feedcomponent
 
 class Ogg(feedcomponent.MultiInputParseLaunchComponent):
+    checkTimestamp = True
+
     def do_check(self):
         self.debug('running Ogg check')
         import checks

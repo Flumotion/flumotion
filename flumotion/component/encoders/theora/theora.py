@@ -26,6 +26,9 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
 class Theora(feedcomponent.ParseLaunchComponent):
+    checkTimestamp = True
+    checkOffset = True
+
     def do_check(self):
         self.debug('running Theora check')
         from flumotion.worker.checks import encoder

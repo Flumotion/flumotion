@@ -24,11 +24,15 @@ flumotion/component/consumers/httpstreamer/admin_gtk.py
 
 flumotion/component/effects/volume/volume.glade
 
+flumotion/component/misc/repeater/repeater.py
+
 flumotion/component/muxers/checks.py
 
 flumotion/component/producers/audiotest/admin_gtk.py
 flumotion/component/producers/audiotest/audiotest.glade
+flumotion/component/producers/audiotest/audiotest.py
 flumotion/component/producers/videotest/admin_gtk.py
+flumotion/component/producers/videotest/videotest.py
 
 flumotion/manager/component.py
 flumotion/manager/manager.py

@@ -418,10 +418,16 @@ class ParseLaunchComponent(FeedComponent):
 
     def get_eater_template(self, eaterName):
         queue = self.get_queue_string(eaterName)
+        check = ""
+        if self.checkTimestamp:
+            check += " check-imperfect-timestamp=1"
+        if self.checkOffset:
+            check += " check-imperfect-offset=1"
+        depay = self.DEPAY_TMPL + check
         if not queue:
-            return self.FDSRC_TMPL + ' ! ' + self.DEPAY_TMPL
+            return self.FDSRC_TMPL + ' ! ' + depay
         else:
-            return self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + self.DEPAY_TMPL
+            return self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + depay
 
     def get_feeder_template(self, eaterName):
         return self.FEEDER_TMPL

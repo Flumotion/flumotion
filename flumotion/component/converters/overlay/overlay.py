@@ -31,6 +31,8 @@ from flumotion.component.converters.overlay import genimg
 import tempfile
 
 class Overlay(feedcomponent.ParseLaunchComponent):
+    checkTimestamp = True
+    checkOffset = True
     _filename = None
 
     def get_pipeline_string(self, properties):

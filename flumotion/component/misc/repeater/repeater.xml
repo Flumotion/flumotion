@@ -11,6 +11,8 @@
                function="Repeater"/>
       </entries>
       <properties>
+        <property name="drop-probability" type="float"
+                  description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
  
