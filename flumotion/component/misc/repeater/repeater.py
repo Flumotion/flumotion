@@ -32,7 +32,7 @@ class Repeater(feedcomponent.ParseLaunchComponent):
             vt = gstreamer.get_plugin_version('coreelements')
             if not vt:
                 raise errors.MissingElementError('identity')
-            if not vt > (0, 10, 12):
+            if not vt > (0, 10, 12, 0):
                 self.addMessage(
                     messages.Warning(T_(N_(
                         "The 'drop-probability' property is specified, but "
@@ -49,4 +49,3 @@ class Repeater(feedcomponent.ParseLaunchComponent):
                     dp = " drop-probability=%f" % drop_probability
 
         return 'identity silent=true %s' % dp
-

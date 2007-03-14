@@ -416,7 +416,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.checkTimestamp = False
             self.checkOffset = False
             self.addMessage(
-                messages.Warning(T_(N_(
+                messages.Info(T_(N_(
                     "You will get more debugging information "
                     "if you upgrade to GStreamer 0.10.13 or later "
                     "as and when available."))))

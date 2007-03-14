@@ -1,5 +1,12 @@
 2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	Informational messages should not be warnings.
+	* flumotion/component/misc/repeater/repeater.py:
+	Fix version comparison.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/common.py:
 	* flumotion/component/base/admin_gtk.py:
