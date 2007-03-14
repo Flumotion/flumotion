@@ -6,4 +6,5 @@ EXTRA_DIST = 						\
 	managers/default/planet.xml			\
 	managers/default/flows/ogg-test-theora.xml	\
 	workers/default.xml 				\
-	examples/twores.xml
+	examples/twores.xml				\
+	examples/discont.xml
