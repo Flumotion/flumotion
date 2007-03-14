@@ -342,8 +342,7 @@ class FeedComponent(basecomponent.BaseComponent):
     """
     # keep these as class variables for the tests
     FDSRC_TMPL = 'fdsrc name=%(name)s'
-    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay ! ' + \
-        'identity name=%(name)s-identity silent=TRUE'
+    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
     FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
     # EATER_TMPL is no longer used due to it being dynamic
     # how often to add the buffer probe

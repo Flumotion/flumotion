@@ -1,5 +1,13 @@
 2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/base/Makefile.am:
+	dist the eaters.glade
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	Only add identity if we're actually checking disconts.
+
+2007-03-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	Informational messages should not be warnings.
 	* flumotion/component/misc/repeater/repeater.py:
