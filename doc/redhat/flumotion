@@ -108,7 +108,23 @@ stopone() {
 
 status() {
         touch_logfile
+	if test "x$*" != "x"
+	then
+		statusone $*
+		return $?
+	fi
 	$prog status
+}
+
+statusone() {
+	type=$1
+	name=$2
+
+	touch_logfile
+
+	$prog status $type $name
+	RETVAL=$?
+	return $RETVAL
 }
 
 clean() {
@@ -137,7 +153,8 @@ case "$1" in
 	start $*
 	;;
   status)
-        status
+	shift
+	status $*
 	;;
   clean)
         clean
