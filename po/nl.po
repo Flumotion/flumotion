@@ -160,7 +160,6 @@ msgid "About Flumotion"
 msgstr "Over Flumotion"
 
 #: flumotion/admin/gtk/client.py:1103
-#, fuzzy
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -642,7 +641,6 @@ msgid "Could not setup component's master clock."
 msgstr "Kon de meesterklok van de component niet instellen."
 
 #: flumotion/manager/manager.py:416
-#, fuzzy, python-format
 msgid ""
 "This component is configured for Flumotion version %s, but you are running "
 "version %s.\n"
@@ -650,6 +648,7 @@ msgid ""
 msgstr ""
 "Deze component is geconfigureerd voor Flumotion versie %r, maar u gebruikt "
 "versie %r.\n"
+"Gelieve de configuratie van de component aan te passen.\n"
 
 #: flumotion/manager/manager.py:493
 msgid "The component is misconfigured."
