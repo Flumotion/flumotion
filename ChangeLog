@@ -1,5 +1,11 @@
 2007-03-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* doc/random/synchronization:
+	Update doc for renaming of components.
+	Fix spelling mistake.
+
+2007-03-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	Output a warning when we get an EOS message from something
 	other than an eater.  Should only happen on producer components

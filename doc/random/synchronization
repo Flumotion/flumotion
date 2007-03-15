@@ -6,7 +6,7 @@ the data has correct timestamps, then a muxer will be able to combine
 streams in the proper order, ensuring proper muxing, and when the stream
 is played back it the timestamps will be correct as well.
 
-To understanp how to produce timestamps, one must know how GStreamer
+To understand how to produce timestamps, one must know how GStreamer
 timestamps its data:
   
   timestamp = clock time - base time
@@ -29,7 +29,7 @@ all soundcard producers, for example, need to have their clocks
 synchronized with other capture streams. Thus this property belongs in
 the registry. We choose to represent this as
 
-  <synchronization required="yes"/>
+  <synchronization required="yes" />
 
 in the component XML node, so that when the full registry is written out
 there can be required="no" lines for components that do not need
@@ -44,7 +44,7 @@ specified in the configuration XML (rather than the registry XML).
 
 In the configuration XML, it might look like this:
 
-  <component name="audio-source" type="audiotest" worker="localhost">
+  <component name="audio-source" type="audiotest-producer" worker="localhost">
     <clock-master>yes</clock-master>
     ...
   </component>
