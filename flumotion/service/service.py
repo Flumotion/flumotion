@@ -205,7 +205,7 @@ class Servicer(log.Loggable):
 
     def clean(self, args):
         """
-        Clean up dead processes as given in the args.
+        Clean up dead process pid files as given in the args.
         """
         (managers, workers) = self._parseManagersWorkers('clean', args)
         self.debug("Clean managers %r and workers %r" % (managers, workers))
@@ -213,6 +213,9 @@ class Servicer(log.Loggable):
             for name in list:
                 pid = common.getPid(type, name)
                 if not pid:
+                    # may be a file that contains bogus data
+                    print "deleting bogus pid file for %s %s" % (type, name)
+                    common.deletePidFile(type, name)
                     continue
                 if not common.checkPidRunning(pid):
                     self.debug("Cleaning up stale pid %d for %s %s" % (

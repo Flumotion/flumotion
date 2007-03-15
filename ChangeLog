@@ -1,3 +1,9 @@
+2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/service/service.py:
+	  A .pid file could be empty or contain garbage.  Clean it up in
+	  that case.
+
 2007-03-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* doc/random/synchronization:
