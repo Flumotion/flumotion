@@ -24,9 +24,9 @@ from flumotion.twisted import integration
 audioTestXML="""<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="audio-source" project="flumotion" type="audiotest" version="0.3.0.1" worker="default">
+    <component name="audio-source" project="flumotion" type="audiotest-producer" version="0.3.0.1" worker="default">
 
-      <property name="freq">440</property>
+      <property name="frequency">440</property>
       <property name="rate">8000</property>
       <property name="volume">1.0</property>
     </component>
@@ -43,18 +43,18 @@ audioTestXML="""<?xml version="1.0" ?>
     <component name="http-audio" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
       <property name="port">%d</property>
-      <property name="user_limit">1024</property>
+      <property name="client-limit">1024</property>
     </component>
 
-    <component name="disk-audio" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+    <component name="disk-audio" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
       <property name="directory">%s</property>
-      <property name="rotateType">time</property>
+      <property name="rotate-type">time</property>
       <property name="time">43200</property>
     </component>
 

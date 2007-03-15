@@ -23,9 +23,9 @@ from flumotion.twisted import integration
 httpFileXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component type="httpfile" name="httpfile" worker="default">
+    <component type="http-server" name="httpfile" worker="default">
       <property name="port">%d</property>
-      <property name="mount_point">/blah</property>
+      <property name="mount-point">/blah</property>
       <property name="path">%s</property>
       <property name="type">master</property>
     </component>
@@ -35,7 +35,7 @@ httpFileXML = """<?xml version="1.0" ?>
 videoTestNoOverlayXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -46,7 +46,7 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
     <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-source</source>
       <!-- properties -->
-      <property name="bitrate">400</property>
+      <property name="bitrate">400000</property>
     </component>
     <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
       <source>video-encoder</source>
@@ -54,17 +54,17 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
     <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
       <property name="port">%d</property>
-      <property name="user_limit">1024</property>
+      <property name="client-limit">1024</property>
     </component>
-    <component name="disk-video" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+    <component name="disk-video" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
       <property name="directory">%s</property>
-      <property name="rotateType">time</property>
+      <property name="rotate-type">time</property>
       <property name="time">43200</property>
     </component>
   </flow>
@@ -73,12 +73,12 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
 videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
 <planet>
   <atmosphere>
-    <component name="tokenbouncer" project="flumotion" type="tokentestbouncer" version="0.3.0.1" worker="default">
+    <component name="tokenbouncer" project="flumotion" type="tokentest-bouncer" version="0.3.0.1" worker="default">
       <property name="authorized-token">test</property>
     </component>
   </atmosphere>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -89,7 +89,7 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
     <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-source</source>
       <!-- properties -->
-      <property name="bitrate">400</property>
+      <property name="bitrate">400000</property>
     </component>
     <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
       <source>video-encoder</source>
@@ -97,12 +97,12 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
     <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
       <property name="port">%d</property>
-      <property name="user_limit">1024</property>
-      <property name="issuer">HTTPTokenIssuer</property>
+      <property name="client-limit">1024</property>
+      <property name="issuer-class">HTTPTokenIssuer</property>
       <property name="bouncer">tokenbouncer</property>
     </component>
   </flow>
@@ -111,9 +111,9 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
 audioTestXML="""<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="audio-source" project="flumotion" type="audiotest" version="0.3.0.1" worker="default">
+    <component name="audio-source" project="flumotion" type="audiotest-producer" version="0.3.0.1" worker="default">
 
-      <property name="freq">440</property>
+      <property name="frequency">440</property>
       <property name="rate">8000</property>
       <property name="volume">1.0</property>
     </component>
@@ -130,18 +130,18 @@ audioTestXML="""<?xml version="1.0" ?>
     <component name="http-audio" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
       <property name="port">%d</property>
-      <property name="user_limit">1024</property>
+      <property name="client-limit">1024</property>
     </component>
 
-    <component name="disk-audio" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+    <component name="disk-audio" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
       <property name="directory">%s</property>
-      <property name="rotateType">time</property>
+      <property name="rotate-type">time</property>
       <property name="time">43200</property>
     </component>
 
@@ -151,7 +151,7 @@ audioTestXML="""<?xml version="1.0" ?>
 videoTestXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
 
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -160,22 +160,22 @@ videoTestXML = """<?xml version="1.0" ?>
       <property name="width">160</property>
     </component>
 
-    <component name="video-overlay" project="flumotion" type="overlay" version="0.3.0.1" worker="default">
+    <component name="video-overlay" project="flumotion" type="overlay-converter" version="0.3.0.1" worker="default">
       <source>video-source</source>
 
-      <property name="cc_logo">True</property>
-      <property name="fluendo_logo">True</property>
+      <property name="cc-logo">True</property>
+      <property name="fluendo-logo">True</property>
       <property name="height">240</property>
-      <property name="show_text">True</property>
+      <property name="show-text">True</property>
       <property name="text">Fluendo</property>
       <property name="width">320</property>
-      <property name="xiph_logo">True</property>
+      <property name="xiph-logo">True</property>
     </component>
 
     <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-overlay</source>
 
-      <property name="bitrate">400</property>
+      <property name="bitrate">400000</property>
     </component>
 
     <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
@@ -185,18 +185,18 @@ videoTestXML = """<?xml version="1.0" ?>
     <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
 
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
       <property name="port">%d</property>
-      <property name="user_limit">1024</property>
+      <property name="client-limit">1024</property>
     </component>
 
-    <component name="disk-video" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+    <component name="disk-video" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
 
       <property name="directory">%s</property>
-      <property name="rotateType">time</property>
+      <property name="rotate-type">time</property>
       <property name="time">43200</property>
     </component>
 

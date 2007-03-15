@@ -1,3 +1,11 @@
+2007-03-15  Michael Smith  <msmith@fluendo.com>
+
+	* tests/integration/common.py:
+	* tests/integration/test_qa.py:
+	* tests/integration/test_torture.py:
+	  Integration tests have been failing for months, yay.
+	  Fix up for yet-more-incomplete-parts of The Great Renaming.
+
 2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/admin_gtk.py:

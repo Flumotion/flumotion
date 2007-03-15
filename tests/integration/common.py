@@ -50,7 +50,7 @@ managerXML = """<!-- -*- Mode: XML -*- -->
     <!-- <host></host> -->
     <debug>4</debug>
     <port>%d</port>
-    <component name="manager-bouncer" type="htpasswdcrypt">
+    <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
       <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
 ]]></property>
