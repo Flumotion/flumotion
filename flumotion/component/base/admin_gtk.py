@@ -635,10 +635,6 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
         sel.connect('changed', sel_changed)
 
-        # A size group allows us to make sure all labels managed by us have
-        # the same width.  We cannot do this from glade though.
-        group = gtk.SizeGroup(gtk.SIZE_GROUP_BOTH)
-
         def set_label(name):
             self.labels[name] = self.wtree.get_widget('label-' + name)
             # zeroes out all value labels
@@ -653,8 +649,6 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             'connections-total', 'last-activity',
             ):
             set_label(type)
-            group.add_widget(self.labels[type])
-        print group.get_widgets()
 
         self._table_connected = self.wtree.get_widget('table-current-connected')
         self._table_disconnected = self.wtree.get_widget(
