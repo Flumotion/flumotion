@@ -1,3 +1,10 @@
+2007-03-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Output a warning when we get an EOS message from something
+	other than an eater.  Should only happen on producer components
+	that only run for a finite time, such as dvb with a file.
+
 2007-03-15  Michael Smith  <msmith@fluendo.com>
 
 	* tests/integration/common.py:

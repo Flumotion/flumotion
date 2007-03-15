@@ -706,6 +706,8 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.eaterSetInactive(feedId)
                 # start reconnection
                 self._reconnectEater(feedId)
+            else:
+                self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
             if message.structure.get_name() == 'imperfect-timestamp':
                 identityName = src.get_name()
