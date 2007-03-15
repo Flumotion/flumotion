@@ -1,3 +1,8 @@
+2007-03-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* doc/random/synchronization:
+	Add some blurb about timestamps, offsets and a couple of producers.
+
 2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/redhat/flumotion:
