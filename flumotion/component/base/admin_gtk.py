@@ -634,6 +634,11 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
                 self._table_feedclient.show()
 
         sel.connect('changed', sel_changed)
+
+        # A size group allows us to make sure all labels managed by us have
+        # the same width.  We cannot do this from glade though.
+        group = gtk.SizeGroup(gtk.SIZE_GROUP_BOTH)
+
         def set_label(name):
             self.labels[name] = self.wtree.get_widget('label-' + name)
             # zeroes out all value labels
@@ -648,6 +653,8 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             'connections-total', 'last-activity',
             ):
             set_label(type)
+            group.add_widget(self.labels[type])
+        print group.get_widgets()
 
         self._table_connected = self.wtree.get_widget('table-current-connected')
         self._table_disconnected = self.wtree.get_widget(
@@ -713,17 +720,17 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             text = time.strftime("%c", time.localtime(value))
             self.labels['timestamp-discont-time-current'].set_text(text)
             if value is not None:
-                self._table_timestamp_discont_current.show()
+                self._vbox_timestamp_discont_current.show()
         elif key == 'lastTimestampDiscont':
             text = common.formatTime(value, fractional=9)
             self.labels['timestamp-discont-last-current'].set_text(text)
             if value > 0.0:
-                self._table_timestamp_discont_current.show()
+                self._vbox_timestamp_discont_current.show()
         elif key == 'totalTimestampDiscont':
             text = common.formatTime(value, fractional=9)
             self.labels['timestamp-discont-total-current'].set_text(text)
             if value > 0.0:
-                self._table_timestamp_discont_current.show()
+                self._vbox_timestamp_discont_current.show()
         elif key == 'timestampTimestampDiscont':
             if value is None:
                 return
@@ -738,24 +745,24 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             text = time.strftime("%c", time.localtime(value))
             self.labels['offset-discont-time-current'].set_text(text)
             if value is not None:
-                self._table_offset_discont_current.show()
+                self._vbox_offset_discont_current.show()
         elif key == 'lastOffsetDiscont':
             text = _("%d units") % value
             self.labels['offset-discont-last-current'].set_text(text)
             if value > 0:
-                self._table_offset_discont_current.show()
+                self._vbox_offset_discont_current.show()
         elif key == 'totalOffsetDiscont':
             text = _("%d units") % value
             self.labels['offset-discont-total-current'].set_text(text)
             if value > 0:
-                self._table_offset_discont_current.show()
+                self._vbox_offset_discont_current.show()
         elif key == 'offsetOffsetDiscont':
             if value is None:
                 return
             text = _("%d units") % value
             self.labels['offset-discont-offset-current'].set_text(text)
             if value > 0:
-                self._table_offset_discont_current.show()
+                self._vbox_offset_discont_current.show()
 
     def _setEaterCountTimestampDiscont(self, state, value):
         if value is None:
@@ -770,7 +777,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         text = common.formatTime(value, fractional=9)
         self.labels['timestamp-discont-total'].set_text(text)
         if value > 0.0:
-            self._table_timestamp_discont_total.show()
+            self._vbox_timestamp_discont_total.show()
 
     def _setEaterCountOffsetDiscont(self, state, value):
         if value is None:
@@ -785,7 +792,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         text = _("%d units") % value
         self.labels['offset-discont-total'].set_text(text)
         if value > 0:
-            self._table_offset_discont_total.show()
+            self._vbox_offset_discont_total.show()
 
 
     def _setEaterLastConnect(self, state, value):
@@ -911,17 +918,17 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self._table_eater = self.wtree.get_widget('table-eater')
         self._expander_discont_current = self.wtree.get_widget(
             'expander-discont-current')
-        self._table_timestamp_discont_current = self.wtree.get_widget(
-            'table-timestamp-discont-current')
-        self._table_offset_discont_current = self.wtree.get_widget(
-            'table-offset-discont-current')
+        self._vbox_timestamp_discont_current = self.wtree.get_widget(
+            'vbox-timestamp-discont-current')
+        self._vbox_offset_discont_current = self.wtree.get_widget(
+            'vbox-offset-discont-current')
 
         self._expander_discont_total = self.wtree.get_widget(
             'expander-discont-total')
-        self._table_timestamp_discont_total = self.wtree.get_widget(
-            'table-timestamp-discont-total')
-        self._table_offset_discont_total = self.wtree.get_widget(
-            'table-offset-discont-total')
+        self._vbox_timestamp_discont_total = self.wtree.get_widget(
+            'vbox-timestamp-discont-total')
+        self._vbox_offset_discont_total = self.wtree.get_widget(
+            'vbox-offset-discont-total')
 
         # show the tree view always
         self.wtree.get_widget('scrolledwindow').show_all()

@@ -1,5 +1,11 @@
 2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/eaters.glade:
+	  Clean up UI for eaters so all settable labels are aligned
+
+2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py:
 	  A lack of space after gdpdepay caused audio-encoder and video-overlay
 	  to go hungry then lost (but sad internally).  Fix the space.
