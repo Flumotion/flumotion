@@ -1,3 +1,10 @@
+2007-03-15  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  If we fail to create an Avatar for a new connection, then drop the
+	  connection after sending an appropriate failure to the client.
+	  Fixes #588.
+
 2007-03-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/message.py:

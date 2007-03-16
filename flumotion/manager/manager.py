@@ -122,8 +122,12 @@ class Dispatcher(log.Loggable):
             reactor.callLater(0, avatar.attached, mind)
             return (pb.IPerspective, avatar, cleanup)
         def got_error(failure):
-            failure.trap(errors.AlreadyConnectedError)
-            self.info("component with id %s already logged in" % (avatarId))
+            # If we failed for some reason, we want to drop the connection.
+            # However, we want the failure to get to the client, so we don't
+            # call loseConnection() immediately - we return the failure first.
+            # loseConnection() will then not drop the connection until it has
+            # finished sending the current data to the client.
+            reactor.callLater(0, mind.broker.transport.loseConnection)
             return failure
 
         host = common.addressGetHost(mind.broker.transport.getPeer())
