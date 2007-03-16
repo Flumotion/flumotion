@@ -1019,7 +1019,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
             if feedId not in self._inactiveEaters \
             and delta > self.BUFFER_TIME_THRESHOLD:
-                self.debug(
+                self.info(
                     'No data received for %r seconds, feed %s inactive' % (
                         self.BUFFER_TIME_THRESHOLD, feedId))
                 self.eaterSetInactive(feedId)

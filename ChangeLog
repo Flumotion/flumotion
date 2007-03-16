@@ -1,3 +1,8 @@
+2007-03-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	No data being received should be an info message.
+
 2007-03-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/eaters.glade:
