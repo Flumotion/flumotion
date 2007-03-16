@@ -1,3 +1,10 @@
+2007-03-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/message.py:
+	* flumotion/common/messages.py:
+	  Add a timestamp to messages so we can correlate them to other
+	  events in the log.
+
 2007-03-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py:

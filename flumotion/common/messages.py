@@ -23,11 +23,12 @@
 support for serializable translatable messages from component/manager to admin
 """
 
+import time
+import gettext
+
 from flumotion.common import log
 from twisted.spread import pb
 from twisted.python import util
-
-import gettext
 
 ERROR = 1
 WARNING = 2
@@ -209,9 +210,11 @@ class Message(pb.Copyable, pb.RemoteCopy, util.FancyEqMixin):
     I am a message to be shown in a UI.
     """
 
-    compareAttributes = ["level", "translatables", "debug", "id", "priority"]
+    compareAttributes = ["level", "translatables", "debug", "id", "priority",
+        "timestamp"]
 
-    def __init__(self, level, translatable, debug=None, id=None, priority=50):
+    def __init__(self, level, translatable, debug=None, id=None, priority=50,
+        timestamp=None):
         """
         @param level:        ERROR, WARNING or INFO
         @param translatable: a translatable possibly with markup for
@@ -220,12 +223,16 @@ class Message(pb.Copyable, pb.RemoteCopy, util.FancyEqMixin):
                              always shown
         @param priority:     priority compared to other messages of the same
                              level
+        @param timestamp:    time since epoch at which the message was
+                             generated, in seconds.
         """
         self.level = level
         self.translatables = []
         self.debug = debug
         self.id = id
         self.priority = priority
+        self.timestamp = timestamp or time.time() 
+
         self.add(translatable)
 
     def __repr__(self):

@@ -25,6 +25,7 @@ from flumotion.configure import configure
 from gettext import gettext as _
 
 import os
+import time
 import gtk
 
 _stock_icons = {messages.ERROR: gtk.STOCK_DIALOG_ERROR,
@@ -134,12 +135,16 @@ class MessagesView(gtk.VBox):
             # FIXME: it would be good to have a "Debug" button when
             # applicable, instead of always showing the text
             text = self._translator.translate(m)
+            # F0.4: timestamp was added in 0.4.2
+            if hasattr(m, 'timestamp'):
+                text += _("\nPosted on %s.\n") % time.strftime(
+                    "%c", time.localtime(m.timestamp))
             if m.debug:
                 text += "\n\n" + _("Debug information:\n") + m.debug
             buf.set_text(text)
             self.textview.set_buffer(buf)
-            self.label.set_markup('<b>%s</b>'
-                                  % _headings.get(m.level, _('Message')))
+            self.label.set_markup('<b>%s</b>' % 
+                _headings.get(m.level, _('Message')))
 
         # FIXME:this clears all messages with the same id as the new one.
         # effectively replacing.  Is this what we want ?
