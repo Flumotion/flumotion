@@ -1,3 +1,12 @@
+2007-03-19  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  If we don't have a fully-logged-in component when it gets detached,
+	  don't throw an exception, so that we can clean up fully.
+	  Prevents a race condition from leaving a heaven with an entry for an
+	  avatar that isn't present, thus stopping the component from ever
+	  logging back in.
+
 2007-03-15  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

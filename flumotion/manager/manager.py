@@ -974,6 +974,11 @@ class Vishnu(log.Loggable):
         self.debug('unregisterComponent(%r): cleaning up state' %
             componentAvatar)
 
+        if componentAvatar not in self._componentMappers:
+            self.warning("Component logging out that was incompletely logged "
+                " in, ignoring")
+            return
+
         m = self._componentMappers[componentAvatar]
 
         # unmap jobstate
