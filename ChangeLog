@@ -1,3 +1,11 @@
+2007-03-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	Remove whitespace.  Thomas loves me.
+	Firewire seems to give us offset disconts of -1 from time to time
+	so > 0 should be changed to != 0 to decide whether to show
+	offsets on UI.
+
 2007-03-19  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

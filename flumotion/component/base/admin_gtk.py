@@ -777,7 +777,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         if value is None:
             return
         self.labels['offset-discont-count-total'].set_text(str(value))
-        if value > 0:
+        if value != 0:
             self._expander_discont_total.show()
 
     def _setEaterTotalOffsetDiscont(self, state, value):
@@ -785,9 +785,8 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             return
         text = _("%d units") % value
         self.labels['offset-discont-total'].set_text(text)
-        if value > 0:
+        if value != 0:
             self._vbox_offset_discont_total.show()
-
 
     def _setEaterLastConnect(self, state, value):
         if value:
