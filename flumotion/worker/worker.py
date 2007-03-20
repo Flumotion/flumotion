@@ -341,18 +341,21 @@ class JobProcessProtocol(worker.ProcessProtocol):
 
         kg.removeKidByPid(self.pid)
 
-        if signum is not None:
-            # we need to trigger a failure on the create deferred 
-            # if the job received a signal before logging in to the worker;
-            # otherwise the manager still thinks it's starting up when it's
-            # dead.  If the job already attached to the worker however,
-            # the create deferred will already have callbacked.
-            if kg.brain.deferredCreateRegistered(self.avatarId):
-                text = "Component '%s' has received signal %d.  " \
-                       "This is sometimes triggered by a corrupt " \
-                       "GStreamer registry." % (self.avatarId, signum)
-                kg.brain.deferredCreateFailed(self.avatarId, 
-                    errors.ComponentCreateError(text))
+        # we need to trigger a failure on the create deferred 
+        # if the job failed before logging in to the worker;
+        # otherwise the manager still thinks it's starting up when it's
+        # dead.  If the job already attached to the worker however,
+        # the create deferred will already have callbacked.
+        if kg.brain.deferredCreateRegistered(self.avatarId):
+            if signum:
+                reason = "received signal %d" % signum
+            else:
+                reason = "unknown reason"
+            text = "Component '%s' has exited early (%s).  " \
+                   "This is sometimes triggered by a corrupt " \
+                   "GStreamer registry." % (self.avatarId, reason)
+            kg.brain.deferredCreateFailed(self.avatarId, 
+                errors.ComponentCreateError(text))
 
         kg.brain.jobHeaven.lostAvatar(self.avatarId)
         if kg.brain.deferredShutdownRegistered(self.avatarId):

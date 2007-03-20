@@ -1,3 +1,13 @@
+2007-03-20  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/worker.py:
+	  Because gstreamer now forks to regenerate the registry, this failure
+	  mode results in the error propagating as a RuntimeError, not a
+	  signal terminating our process. However, we must cope with it in the
+	  same way, otherwise an early failure to start can cause us to end up
+	  with an unstoppable component.
+	  Fixes #592.
+
 2007-03-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/base/admin_gtk.py:
