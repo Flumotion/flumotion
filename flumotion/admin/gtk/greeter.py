@@ -222,19 +222,23 @@ This mode is only useful for testing Flumotion.
 
         # We need to run 4 commands in a row, and each of them can fail
         d = defer.Deferred()
-        def run(result, command, description, failMessage):
+        def run(result, args, description, failMessage):
             # run the given command
             # show a dialog to say what we are doing
             self.label_starting.set_text(description)
-            args = command.split(' ')
-            executable = os.path.join(configure.sbindir, 'flumotion')
+            args[0] = os.path.join(configure.sbindir, args[0])
             protocol = GreeterProcessProtocol()
-            process = reactor.spawnProcess(protocol, executable, args, env=None)
+            env = os.environ.copy()
+            paths = env['PATH'].split(os.pathsep)
+            if configure.bindir not in paths:
+                paths.insert(0, configure.bindir)
+            env['PATH'] = os.pathsep.join(paths)
+            process = reactor.spawnProcess(protocol, args[0], args, env=env)
             def error(failure, failMessage):
                 self.label_starting.set_text('Failed to %s' % description)
                 # error should trigger going to next page with an overview
                 state.update({
-                    'command': command,
+                    'command': ' '.join(args),
                     'error': failMessage,
                     'failure': failure,
                 })
@@ -243,22 +247,29 @@ This mode is only useful for testing Flumotion.
             protocol.deferred.addErrback(error, failMessage)
             return protocol.deferred
 
-        command = "flumotion -C %s -L %s -R %s create manager admin %d" % (
-            confDir, logDir, runDir, port)
-        d.addCallback(run, command, _('Creating manager ...'),
-            _("Could not create manager."))
-        command = "flumotion -C %s -L %s -R %s start manager admin" % (
-            confDir, logDir, runDir)
-        d.addCallback(run, command, _('Starting manager ...'),
-            _("Could not start manager."))
-        command = "flumotion -C %s -L %s -R %s create worker admin %d" % (
-            confDir, logDir, runDir, port)
-        d.addCallback(run, command, _('Creating worker ...'),
-            _("Could not create worker."))
-        command = "flumotion -C %s -L %s -R %s start worker admin" % (
-            confDir, logDir, runDir)
-        d.addCallback(run, command, _('Starting worker ...'),
-            _("Could not start worker."))
+        def chain(args, description, failMessage):
+            d.addCallback(run, args, description, failMessage)
+
+        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+               "create", "manager", "admin", str(port)],
+              _('Creating manager ...'),
+              _("Could not create manager."))
+
+        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+               "start", "manager", "admin"],
+              _('Starting manager ...'),
+              _("Could not start manager."))
+
+        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+               "create", "worker", "admin", str(port)],
+              _('Creating worker ...'),
+              _("Could not create worker."))
+
+        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+               "start", "worker", "admin"],
+              _('Starting worker ...'),
+              _("Could not start worker."))
+
         d.addErrback(lambda f: None)
 
         def done(result, state):
