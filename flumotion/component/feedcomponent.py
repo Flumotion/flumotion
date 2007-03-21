@@ -89,6 +89,33 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
 
+    def remote_setGstDebug(self, debug):
+        """
+        Sets the GStreamer debugging levels based on the passed debug string.
+        """
+        self.debug('Setting GStreamer debug level to %s' % debug)
+        if not debug:
+            return
+
+        for part in debug.split(','):
+            glob = None
+            value = None
+            pair = part.split(':')
+            if len(pair) == 1:
+                # assume only the value
+                value = int(pair[0])
+            elif len(pair) == 2:
+                glob, value = pair
+            else:
+                self.warning("Cannot parse GStreamer debug setting '%s'." %
+                    part) 
+                continue
+
+            if glob:
+                gst.debug_set_threshold_for_name(glob, value)
+            else:
+                gst.debug_set_default_threshold(value)
+
     def remote_eatFrom(self, fullFeedId, host, port):
         """
         Tell the component the host and port for the FeedServer through which

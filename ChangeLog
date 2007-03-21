@@ -1,3 +1,10 @@
+2007-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py
+	  (FeedComponentMedium.remote_setGstDebug):
+	  add remote method that allows us to set a GST_DEBUG string at
+	  runtime on a component.
+
 2007-03-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py (FeedComponent.init):
