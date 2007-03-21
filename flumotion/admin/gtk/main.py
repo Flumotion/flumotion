@@ -26,7 +26,7 @@ import sys
 import gettext
 import gtk.glade
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from flumotion.admin import connections
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
@@ -35,63 +35,52 @@ from flumotion.common import log, errors
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
-def _runInterface(conf_file, options, thegreeter=None):
-    if conf_file:
-        # load the conf file here
-        raise NotImplementedError()
+def Greeter():
+    # We do the import here so gettext has been set up and class strings
+    # from greeter are translated
+    from flumotion.admin.gtk import greeter
+    return greeter.Greeter()
 
-    d = None
-    g = None
-    if options and options.manager:
-        info = connections.parsePBConnectionInfo(options.manager,
-                                                 not options.no_ssl)
-        model = AdminModel(info.authenticator)
-        d = model.connectToHost(info.host, info.port, not info.use_ssl)
-    else:
-        # We do the import here so gettext has been set up and class strings
-        # from greeter are translated
-        from flumotion.admin.gtk import greeter
-        g = thegreeter or greeter.Greeter()
-        
-        # the greeter runs its own gobject MainLoop, so the run call
-        # blocks until the greeter is done
-        state = g.run()
-        if not state:
-            reactor.callLater(0, reactor.stop)
-            return
-        g.set_sensitive(False)
-
+def startAdminFromGreeter(greeter):
+    def got_state(state):
+        greeter.set_sensitive(False)
         authenticator = fpb.Authenticator(username=state['user'],
                                           password=state['passwd'])
         model = AdminModel(authenticator)
-        d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
+        return model.connectToHost(state['host'], state['port'],
+                                   state['use_insecure'])
 
-    def connected(model, greeter):
-        if greeter:
-            greeter.destroy()
-        Window(model).show()
-
-    def refused(failure, greeter):
+    def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
-        if greeter:
-            dret = dialogs.connection_refused_message(state['host'],
-                                                      greeter.window)
-            dret.addCallback(lambda _: _runInterface(None, None, greeter))
-        else:
-            log.error("Manager refused connection.")
+        dret = dialogs.connection_refused_message(state['host'],
+                                                  greeter.window)
+        dret.addCallback(lambda _: startAdminFromGreeter(greeter))
+        return dret
 
-    def failed(failure, greeter):
+    def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
-        if greeter:
-            dret = dialogs.connection_failed_message(message, greeter.window)
-            dret.addCallback(lambda _: _runInterface(None, None, greeter))
-        else:
-            log.error("Connection to manager failed: %s", message)
+        dret = dialogs.connection_failed_message(message, greeter.window)
+        dret.addCallback(lambda _: startAdminFromGreeter(greeter))
+        return dret
 
-    d.addCallback(connected, g)
-    d.addErrback(refused, g)
-    d.addErrback(failed, g)
+    def connected(model):
+        greeter.destroy()
+        return model
+
+    d = greeter.run_async()
+    d.addCallback(got_state)
+    d.addErrback(refused)
+    d.addErrback(failed)
+    d.addCallback(connected)
+    return d
+
+def startAdminFromManagerString(managerString, useSSL):
+    info = connections.parsePBConnectionInfo(managerString, useSSL)
+    model = AdminModel(info.authenticator)
+    d = model.connectToHost(info.host, info.port, not info.use_ssl)
+    d.addErrback(failure)
+    return d
 
 def main(args):
     parser = optparse.OptionParser()
@@ -133,15 +122,23 @@ def main(args):
     gtk.glade.bindtextdomain('flumotion', localedir)
     gtk.glade.textdomain('flumotion')
 
-    conf_files = args[1:]
-
-    if conf_files and len(conf_files) > 1:
+    if len(args) > 1:
         log.error('flumotion-admin',
-            'too many configuration files: %r' % conf_files)
+                  'too many argument: %r' % (args[1:],))
 
-    elif conf_files:
-        _runInterface(conf_files[0], options)
+    if options.manager:
+        d = startAdminFromManagerString(options.managers,
+                                        not options.no_ssl)
     else:
-        _runInterface(None, options)
+        d = startAdminFromGreeter(Greeter())
+
+    def failure(failure):
+        message = "".join(failure.value.args)
+        log.warning('admin', "Failed to connect: %s",
+                    log.getFailureMessage(failure))
+        sys.stderr.write("Connection to manager failed: %s\n" % message)
+        reactor.stop()
+
+    d.addCallbacks(lambda model: Window(model).show(), failure)
 
     reactor.run()

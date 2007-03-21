@@ -82,6 +82,9 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 # instances).
 #
 
+class WizardCancelled(Exception):
+    pass
+
 # fixme: doc vmethods
 class WizardStep(GladeWidget, log.Loggable):
     # all values filled in by subclasses
@@ -154,7 +157,6 @@ class Wizard(GladeWindow):
             self.pages[cls.name] = page
             page.show()
 
-        self.loop = gobject.MainLoop()
         self._setup_ui()
         self.set_page(initial_page)
 
@@ -207,7 +209,7 @@ class Wizard(GladeWindow):
 
     def on_delete_event(self, *window):
         self.state = None
-        self.loop.quit()
+        self.emit('finished')
 
     def on_next(self, button):
         button.set_sensitive(False)
@@ -239,33 +241,43 @@ class Wizard(GladeWindow):
         page = self.page_stack.pop()
         self.set_page(page.name)
 
-    def show(self):
-        self.window.show()
-
-    def destroy(self):
-        assert hasattr(self, 'window')
-        self.window.destroy()
-        del self.window
-
     def set_sensitive(self, is_sensitive):
         self.window.set_sensitive(is_sensitive)
 
     def run(self):
         """
-        Run the main loop to run the wizard.  This call blocks for as long
-        as the user is interacting with the wizard.
+        Run in a recursive main loop. Will block until the user finishes
+        or closes the wizard.
+        """
+        loop = gobject.MainLoop()
+        d = self.run_async()
+        def async_done(_):
+            loop.quit()
+        d.addCallbacks(async_done, async_done)
+        loop.run()
+        return self.state
 
-        @returns: the state dict accumulated by the pages
-        @rtype:   dict or None
+    def run_async(self):
+        """
+        Show the wizard. Returns a deferred that fires when the user has
+        closed the wizard, either via completing the process or has
+        cancelled somehow.
+
+        @returns: a deferred that will fire the state dict accumulated
+        by the pages, or None on cancel
         """
         assert self.window
         self.set_sensitive(True)
         self.show()
+        from twisted.internet import defer
+        d = defer.Deferred()
         def finished(x):
             self.disconnect(i)
-            self.loop.quit()
+            if self.state:
+                d.callback(self.state)
+            else:
+                d.errback(WizardCancelled())
         i = self.connect('finished', finished)
-        self.loop.run()
-        return self.state
+        return d
 
 pygobject.type_register(Wizard)

@@ -1,3 +1,18 @@
+2007-03-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/main.py: Make it so the greeter doesn't run
+	a recursive main loop and just uses the reactor. Seems to work but
+	will need some testing.
+
+	* flumotion/admin/gtk/wizard.py (WizardCancelled): New exception,
+	errbacked by Wizard.run_async() if the user cancels the wizard.
+	(Wizard.show, Wizard.destroy): Removed, GladeWindow does this for
+	us.
+	(Wizard.on_delete_event): Emit finished instead of stopping a main loop.
+	(Wizard.run_async): New method. Returns a deferred that will fire
+	when the user has decided on something.
+	(Wizard.run): Implement using run_async.
+
 2007-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/base.py (ManagerAvatar._mindCallRemoteErrback):
