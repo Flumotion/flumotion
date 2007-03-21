@@ -1,5 +1,10 @@
 2007-03-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	Check for existence of property rather than version.
+
+2007-03-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	Someone forgot to add queues after the demuxer.  Not having queues
 	breaks functionality with GStreamer >= 0.10.13.

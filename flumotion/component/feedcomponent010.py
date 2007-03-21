@@ -411,7 +411,8 @@ class FeedComponent(basecomponent.BaseComponent):
         vt = gstreamer.get_plugin_version('coreelements')
         if not vt:
             raise errors.MissingElementError('identity')
-        if not vt > (0, 10, 12, 0):
+        if not gstreamer.element_factory_has_property('identity', 
+            'check-imperfect-timestamp'):
             self.checkTimestamp = False
             self.checkOffset = False
             self.addMessage(
