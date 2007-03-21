@@ -171,7 +171,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
                 debug=log.getFailureMessage(f))
 
         self.debug("Failure on remote call %s: %r, %s" % (name,
-             f, f.getErrorMessage()))
+             f, log.getFailureMessage(f)))
         return f
 
     def attached(self, mind):

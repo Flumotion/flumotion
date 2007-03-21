@@ -1,5 +1,10 @@
 2007-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/base.py (ManagerAvatar._mindCallRemoteErrback):
+	  Use a better failure logging method.
+
+2007-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py
 	  (FeedComponentMedium.remote_setGstDebug):
 	  add remote method that allows us to set a GST_DEBUG string at
