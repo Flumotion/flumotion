@@ -1,3 +1,9 @@
+2007-03-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/firewire/firewire.py:
+	Someone forgot to add queues after the demuxer.  Not having queues
+	breaks functionality with GStreamer >= 0.10.13.
+
 2007-03-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/worker.py:

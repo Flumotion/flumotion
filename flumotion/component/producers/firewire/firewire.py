@@ -97,7 +97,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         template = ('dv1394src'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
-                    '  demux. ! dvdec drop-factor=%(df)d'
+                    '  demux. ! queue ! dvdec drop-factor=%(df)d'
                     '    ! video/x-raw-yuv,format=(fourcc)YUY2'
                     '    ! videorate ! videoscale'
                     '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
@@ -105,7 +105,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
                     '    %(pp)s'
                     '    ! @feeder::video@'
-                    '  demux. ! audio/x-raw-int ! volume name=setvolume'
+                    '  demux. ! queue ! audio/x-raw-int ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder::audio@'
                     % dict(df=drop_factor, ih=interlaced_height,
