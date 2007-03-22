@@ -1,3 +1,10 @@
+2007-03-22  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/client.py:
+	  Don't use undefined variables if setup() raises.
+	* flumotion/component/producers/looper/admin_gtk.py:
+	  The admin told me this had a bug, so fix it.
+
 2007-03-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/greeter.py (StartNew.on_next): Make sure

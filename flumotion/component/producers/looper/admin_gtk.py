@@ -23,6 +23,8 @@ from gettext import gettext as _
 
 import os
 import gst
+from twisted.internet import defer
+
 from flumotion.common import errors
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
@@ -120,5 +122,7 @@ class LooperAdminGtk(BaseAdminGtk):
     def setup(self):
         looper = LooperNode(self.state, self.admin, title=_("Looper"))
         self.nodes['Looper'] = looper
+
+        return BaseAdminGtk.setup(self)
 
 GUIClass = LooperAdminGtk

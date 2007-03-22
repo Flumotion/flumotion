@@ -326,6 +326,7 @@ class Window(log.Loggable, gobject.GObject):
     def _instanceSetup(self, instance, klass, name):
         self.debug('Setting up instance %r' % instance)
         msg = None
+        d = None
         try:
             d = instance.setup()
         except Exception, e:
