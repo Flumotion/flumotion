@@ -1,5 +1,10 @@
 2007-03-22  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/admin/gtk/main.py:
+	  Fix specifying admin on command line.
+
+2007-03-22  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/admin/gtk/client.py:
 	  Don't use undefined variables if setup() raises.
 	* flumotion/component/producers/looper/admin_gtk.py:

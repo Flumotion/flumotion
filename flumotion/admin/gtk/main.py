@@ -79,7 +79,6 @@ def startAdminFromManagerString(managerString, useSSL):
     info = connections.parsePBConnectionInfo(managerString, useSSL)
     model = AdminModel(info.authenticator)
     d = model.connectToHost(info.host, info.port, not info.use_ssl)
-    d.addErrback(failure)
     return d
 
 def main(args):
@@ -127,7 +126,7 @@ def main(args):
                   'too many argument: %r' % (args[1:],))
 
     if options.manager:
-        d = startAdminFromManagerString(options.managers,
+        d = startAdminFromManagerString(options.manager,
                                         not options.no_ssl)
     else:
         d = startAdminFromGreeter(Greeter())
