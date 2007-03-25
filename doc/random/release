@@ -10,7 +10,7 @@
   - add it to Makefile.am
   - update list of features by going through the ChangeLog
   - update list of bugs fixed by pasting in the output of:
-    moap doap bug query -q "milestone=0.2.0" -f "<bug><id>%(id)s</id><summary>%(summary)s</summary></bug>"
+    moap doap bug query -f "<bug><id>%(id)s</id><summary>%(summary)s</summary></bug>" milestone=0.2.0
 
   - update list of contributors
 * copy the generated text version to the RELEASE file
