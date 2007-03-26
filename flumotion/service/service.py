@@ -48,14 +48,16 @@ class Servicer(log.Loggable):
         }
 
     def _parseManagersWorkers(self, command, args):
-        # parse the given args and return two lists;
+        # parse the given args and return two sorted lists;
         # one of manager names to act on and one of worker names
         managers = []
         workers = []
 
         if not args:
             managers = self.getManagers().keys()
+            managers.sort()
             workers = self.getWorkers()
+            workers.sort()
             return (managers, workers)
 
         which = args[0]
@@ -130,6 +132,7 @@ class Servicer(log.Loggable):
             filename = os.path.split(workerFile)[1]
             name = filename.split(".xml")[0]
             workers.append(name)
+        workers.sort()
         return workers
 
     def start(self, args):
