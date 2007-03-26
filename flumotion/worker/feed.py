@@ -204,23 +204,23 @@ class _WorkerFeedDispatcher(log.Loggable):
         return (pb.IPerspective, avatar, logout)
 
 def feedServerFactory(brain, unsafeTracebacks=0):
-        """
-        Create and return an FPB server factory.
+    """
+    Create and return an FPB server factory.
 
-        @param brain: L{flumotion.worker.worker.WorkerBrain}
-        """
-        # create a Dispatcher which will hand out avatars to clients
-        # connecting to me
-        dispatcher = _WorkerFeedDispatcher(brain)
+    @param brain: L{flumotion.worker.worker.WorkerBrain}
+    """
+    # create a Dispatcher which will hand out avatars to clients
+    # connecting to me
+    dispatcher = _WorkerFeedDispatcher(brain)
 
-        # create a portal so that I can be connected to, through our dispatcher
-        # implementing the IRealm and a bouncer
-        # FIXME: decide if we allow anonymous login in this small (?) window
-        bouncer = ProxyManagerBouncer(brain)
-        portal = ProxyManagerBouncerPortal(dispatcher, bouncer)
-        #unsafeTracebacks = 1 # for debugging tracebacks to clients
-        factory = pb.PBServerFactory(portal, unsafeTracebacks=unsafeTracebacks)
-        return factory
+    # create a portal so that I can be connected to, through our dispatcher
+    # implementing the IRealm and a bouncer
+    # FIXME: decide if we allow anonymous login in this small (?) window
+    bouncer = ProxyManagerBouncer(brain)
+    portal = ProxyManagerBouncerPortal(dispatcher, bouncer)
+    #unsafeTracebacks = 1 # for debugging tracebacks to clients
+    factory = pb.PBServerFactory(portal, unsafeTracebacks=unsafeTracebacks)
+    return factory
 
 class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
     """
@@ -233,7 +233,6 @@ class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
     def __init__(self, medium):
         fpb.FPBClientFactory.__init__(self)
         self.medium = medium
-
 
 # not a BaseMedium because we are going to do strange things to the transport
 class FeedMedium(fpb.Referenceable):

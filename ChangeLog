@@ -1,3 +1,8 @@
+2007-03-26  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/feed.py:
+	  Change indentation to 4 columns rather than 8 for one method.
+
 2007-03-22  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/main.py:
