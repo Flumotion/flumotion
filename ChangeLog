@@ -1,3 +1,10 @@
+2007-03-27  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	  Apply patch to getEntry to not use deferred generator, which was
+	  mysteriously breaking things.
+	  Fixes #596.
+
 2007-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/service.py (Servicer._parseManagersWorkers,
