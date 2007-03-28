@@ -1,3 +1,11 @@
+2007-03-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_common_netutils.py
+	(TestRoutingTable.testParseFromFile): Add a couple tests.
+
+	* flumotion/common/netutils.py (RoutingTable.fromFile): Make route
+	names optional. Trim trailing whitespace.
+
 2007-03-27  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:

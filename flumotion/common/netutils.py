@@ -124,7 +124,7 @@ def countTrailingZeroes32(n):
     return tz
 
 class RoutingTable(object):
-    def fromFile(klass, f):
+    def fromFile(klass, f, requireNames=True, defaultRouteName='*default*'):
         """Make a new routing table, populated from entries in an open
         file object.
 
@@ -135,6 +135,12 @@ class RoutingTable(object):
 
         @param f: file from whence to read a routing table
         @type  f: open file object
+        @param requireNames: whether to require route names in the file
+        @type  requireNames: boolean, default to True
+        @param defaultRouteName: default name to give to a route if it
+                                 does not have a name in the file; only
+                                 used if requireNames is False
+        @type  defaultRouteName: anything, defaults to '*default*'
         """
         comment = re.compile(r'^\s*#')
         empty = re.compile(r'^\s*$')
@@ -142,7 +148,7 @@ class RoutingTable(object):
                            r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
                            r'/'
                            r'(\d{1,2})'
-                           r'\s+(.*)\s*$')
+                           r'(\s+([^\s](.*[^\s])?))?\s*$')
         ret = klass()
         n = 0
         for line in f:
@@ -154,7 +160,13 @@ class RoutingTable(object):
                 raise ValueError('While loading routing table from file'
                                  ' %s: line %d: invalid syntax: %r'
                                  % (f, n, line))
-            route = m.group(3)
+            route = m.group(4)
+            if route is None:
+                if requireNames:
+                    raise ValueError('%s:%d: Missing required route name: %r'
+                                     % (f, n, line))
+                else:
+                    route = defaultRouteName
             ret.addSubnet(route, m.group(1), int(m.group(2)))
             if route not in ret.routeNames:
                 ret.routeNames.append(route)

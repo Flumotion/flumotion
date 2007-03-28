@@ -127,14 +127,15 @@ class TestRoutingTable(unittest.TestCase):
         ar('192.168.1.1', 'bar')
         ar('192.168.2.1', 'baz')
 
-    def assertParseFailure(self, string):
+    def assertParseFailure(self, string, **kwargs):
         f = StringIO.StringIO(string)
-        self.assertRaises(ValueError, RoutingTable.fromFile, f)
+        self.assertRaises(ValueError, RoutingTable.fromFile, f,
+                          **kwargs)
         f.close()
         
-    def assertParseEquals(self, string, routes):
+    def assertParseEquals(self, string, routes, **kwargs):
         f = StringIO.StringIO(string)
-        net = RoutingTable.fromFile(f)
+        net = RoutingTable.fromFile(f, **kwargs)
         f.close()
 
         expectednet = RoutingTable()
@@ -165,6 +166,13 @@ class TestRoutingTable(unittest.TestCase):
                                '  \n'
                                '192.168.1.1/32 foo',
                                [('foo', '192.168.1.1', 32)])
+        self.assertParseEquals('#comment\n'
+                               '  \n'
+                               '192.168.1.1/32 foo  bar   ',
+                               [('foo  bar', '192.168.1.1', 32)])
+        self.assertParseEquals('192.168.1.1/32',
+                               [('foo', '192.168.1.1', 32)],
+                               requireNames=False, defaultRouteName='foo')
         self.assertParseEquals('#comment\n'
                                '  \n'
                                '192.168.1.1/32 foo\n'
