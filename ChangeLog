@@ -1,3 +1,10 @@
+2007-03-29  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/main.py:
+	  Reorder callbacks/errbacks in greeter to avoid double-destroying a
+	  greeter and hence failing badly if we initially failed to connect to
+	  a manager.
+
 2007-03-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_common_netutils.py

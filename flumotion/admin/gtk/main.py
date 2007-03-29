@@ -70,9 +70,9 @@ def startAdminFromGreeter(greeter):
 
     d = greeter.run_async()
     d.addCallback(got_state)
+    d.addCallback(connected)
     d.addErrback(refused)
     d.addErrback(failed)
-    d.addCallback(connected)
     return d
 
 def startAdminFromManagerString(managerString, useSSL):
