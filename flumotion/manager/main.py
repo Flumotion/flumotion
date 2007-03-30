@@ -183,6 +183,8 @@ def main(args):
         sys.stderr.write("ERROR: %s\n" % e.args[0])
         return 1
 
+    configDir = os.path.abspath(os.path.dirname(planetFile))
+
     # now copy over stuff from config that is not set yet
     if cfg.manager:
         if not options.host and cfg.manager.host:
@@ -262,7 +264,7 @@ def main(args):
         log.debug('manager', 'Registered project %s version %s' % (
             p, project.get(p, 'version')))
 
-    vishnu = manager.Vishnu(options.name)
+    vishnu = manager.Vishnu(options.name, configDir=configDir)
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)

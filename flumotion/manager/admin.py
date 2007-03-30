@@ -31,8 +31,6 @@ from twisted.internet import reactor, defer
 from twisted.spread import pb
 from twisted.python import failure
 
-from flumotion.configure import configure
-
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry
 
@@ -354,16 +352,14 @@ class AdminAvatar(base.ManagerAvatar):
         """
         self.vishnu.adminAction(self.remoteIdentity,
                                 '_saveFlowFile', (), {})
-        def ensure_sane(name):
-            if not re.match('^[a-zA-Z0-9_-]+$', name):
+        def ensure_sane(name, extra=''):
+            if not re.match('^[a-zA-Z0-9_' + extra + '-]+$', name):
                 raise errors.ConfigError, \
                       'Invalid planet or saveAs name: %s' % name
         
-        planetName = self.vishnu.state.get('name')
-        ensure_sane(planetName)
+        ensure_sane(self.vishnu.configDir, '/')
         ensure_sane(filename)
-        dir = os.path.join(configure.configdir, "managers",
-                           planetName, "flows")
+        dir = os.path.join(self.vishnu.configDir, "flows")
         self.debug('told to save flow as %s/%s.xml', dir, filename)
         try: 
             os.makedirs(dir, 0770) 

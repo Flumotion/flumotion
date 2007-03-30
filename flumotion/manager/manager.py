@@ -32,6 +32,8 @@ API Stability: semi-stable
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
 
+import os
+
 from twisted.internet import reactor, defer
 from twisted.cred import error
 from twisted.python import components, failure
@@ -224,7 +226,7 @@ class Vishnu(log.Loggable):
 
     logCategory = "vishnu"
 
-    def __init__(self, name, unsafeTracebacks=0):
+    def __init__(self, name, unsafeTracebacks=0, configDir=None):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
         self.dispatcher = Dispatcher(self.computeIdentity)
@@ -236,6 +238,12 @@ class Vishnu(log.Loggable):
         self.adminHeaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
         
+        if configDir is not None:
+            self.configDir = configDir
+        else:
+            self.configDir = os.path.join(configure.configdir,
+                                          "managers", name)
+
         self.bouncer = None # used by manager to authenticate worker/component
         
         self.bundlerBasket = registry.getRegistry().makeBundlerBasket()

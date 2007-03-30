@@ -1,3 +1,15 @@
+2007-03-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/main.py (main): Pass along the configDir when
+	making Vishnu.
+
+	* flumotion/manager/manager.py (Vishnu.__init__): New optional
+	argument, configDir, defaulting to configdir/managers/NAME/.
+
+	* flumotion/manager/admin.py (AdminAvatar._saveFlowFile): Save to
+	flows/ within the directory from which the original flow file was
+	loaded; i.e. don't guess at that dir's name.
+
 2007-03-29  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/main.py:
