@@ -1,3 +1,8 @@
+2007-04-02  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/effects/volume/volume.py (Volume.setUIState):
+	Admin UI code expects a list, do not set to just a value.
+
 2007-03-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/main.py (main): Pass along the configDir when

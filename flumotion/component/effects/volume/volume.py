@@ -51,7 +51,7 @@ class Volume(feedcomponent.Effect):
         feedcomponent.Effect.setUIState(self, state)
         if state:
             for k in 'peak', 'decay', 'rms':
-                state.addKey('volume-%s' % k, -100.0)
+                state.addKey('volume-%s' % k, [-100.0])
             state.addKey('volume-volume', self.effect_getVolume())
 
     def _bus_message_received_cb(self, bus, message):
