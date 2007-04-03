@@ -220,11 +220,14 @@ class StateCacheable(pb.Cacheable):
 # particular kinds of RemoteCache objects might have other ways
 # (e.g. component removed from flow).
 #
-# However after some thought, it's probably not a good idea to expose
-# 'invalidate' directly as a RemoveCache callback, because the program
-# semantics would be dependent on the order in which it would be called
-# relative to any other notifyOnDisconnect methods, which would likely
-# lead to heisenbugs.
+# We support listening for invalidation events. However, in order to
+# ensure predictable program behavior, we can't do a notifyOnDisconnect
+# directly on the broker. If we did that, program semantics would be
+# dependent on the call order of the notifyOnDisconnect methods, which
+# would likely lead to heisenbugs.
+#
+# Instead, invalidation will only be performed by the application, if at
+# all, via an explicit call to invalidate().
 
 class StateRemoteCache(pb.RemoteCache):
     """
@@ -262,10 +265,12 @@ class StateRemoteCache(pb.RemoteCache):
         # when this is created through serialization from a JobCS,
         # __init__ does not seem to get called, so create self._listeners
         if not hasattr(self, '_listeners'):
+            # fixme: this means that callbacks will be fired in
+            # arbitrary order; should be fired in order of connecting.
             self._listeners = {}
 
     def addListener(self, listener, set=None, append=None, remove=None,
-                    setitem=None, delitem=None):
+                    setitem=None, delitem=None, invalidate=None):
         """
         Adds a listener to the remote cache.
 
@@ -294,8 +299,11 @@ class StateRemoteCache(pb.RemoteCache):
         @param delitem: A procedure to call when a value is removed
                        from a dict.
         @type  delitem: procedure(object, key, subkey, value) -> None
+        @param invalidate: A procedure to call when this cache has been
+                       invalidated.
+        @type  invalidate: procedure(object) -> None
         """
-        if not (set or append or remove or setitem or delitem):
+        if not (set or append or remove or setitem or delitem or invalidate):
             print ("Warning: Use of deprecated %r.addListener(%r) without "
                    "explicit event handlers" % (self, listener))
             set = listener.stateSet
@@ -305,7 +313,9 @@ class StateRemoteCache(pb.RemoteCache):
         if listener in self._listeners:
             raise KeyError, listener
         self._listeners[listener] = [set, append, remove, setitem,
-                                     delitem]
+                                     delitem, invalidate]
+        if invalidate and hasattr(self, '_cache_invalid'):
+            invalidate(self)
 
     def removeListener(self, listener):
         self._ensureListeners()
@@ -393,3 +403,23 @@ class StateRemoteCache(pb.RemoteCache):
             stateDelitem = self._listeners[l][4]
             if stateDelitem: 
                 stateDelitem(self, key, subkey, value)
+
+    def invalidate(self):
+        """Invalidate this StateRemoteCache.
+
+        Calling this method will result in the invalidate callback being
+        called for all listeners that passed an invalidate handler to
+        addListener. This method is not called automatically; it is
+        provided as a convenience to applications.
+        """
+        assert not hasattr(self, '_cache_invalid'), \
+               'object has already been invalidated'
+        # if we also subclass from Cacheable, there is currently no way
+        # to remotely invalidate the cache. that's ok though, because
+        # double-caches are currently only used by the manager, which
+        # does not call invalidate() on its caches.
+        setattr(self, '_cache_invalid', True)
+        for l in self._listeners:
+            invalidate = self._listeners[l][5]
+            if invalidate: 
+                invalidate(self)

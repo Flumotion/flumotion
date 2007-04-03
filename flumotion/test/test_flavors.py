@@ -374,6 +374,35 @@ class TestFullListener(unittest.TestCase):
         d.addCallback(check_append_results_and_stop)
         return d
 
+    def testInvalidate(self):
+        calls = []
+        def check_invalidation(state):
+            def invalidate(obj):
+                calls.append(('invalidate', obj))
+            def unused(*args):
+                assert False, 'should not be reached'
+            self.assertEquals(calls, [])
+            state.addListener(1, invalidate=invalidate)
+            state.invalidate()
+            # basic invalidation
+            self.assertEquals(calls, [('invalidate', state)])
+
+            # connecting after invalidation
+            state.addListener(2, invalidate=invalidate)
+            self.assertEquals(calls, [('invalidate', state),
+                                      ('invalidate', state)])
+            
+            state.addListener(3, set=unused)
+            self.assertEquals(calls, [('invalidate', state),
+                                      ('invalidate', state)])
+
+            return self.stopClient()
+
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+        d.addCallback(check_invalidation)
+        return d
+
 
 class TestState(unittest.TestCase):
     def testStateAddKey(self):
