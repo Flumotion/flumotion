@@ -22,7 +22,6 @@
 import common
 import testclasses
 import twisted
-import twisted.copyright #T1.3
 
 from twisted.trial import unittest
 
@@ -30,9 +29,6 @@ from twisted.internet import reactor, defer
 from twisted.spread import pb
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version < '2.0.0'
 
 class TestStateCacheable(flavors.StateCacheable):
     pass
@@ -93,8 +89,6 @@ class TestStateSet(unittest.TestCase):
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
-        if weHaveAnOldTwisted():
-            reactor.iterate()
         return d
         #.addCallbacks(self.connected, self.notConnected)
         # self.id = reactor.callLater(10, self.timeOut)
@@ -136,10 +130,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(set_state)
         d.addCallback(check_name)
         d.addCallback(lambda _: self.stopClient())
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testStateAppendRemove(self):
         # start everything
@@ -173,10 +164,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_second_kid_and_give_away)
         d.addCallback(check_after_adopt_and_bear_again)
         d.addCallback(check_third_kid_and_stop)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testStateWrongListener(self):
         # start everything
@@ -189,10 +177,7 @@ class TestStateSet(unittest.TestCase):
             return self.stopClient()
 
         d.addCallback(got_state_and_stop)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def listen(self, state):
         def event(type):
@@ -220,10 +205,7 @@ class TestStateSet(unittest.TestCase):
 
         d.addCallback(add_listener_and_set_name)
         d.addCallback(check_results)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testStateAppendRemoveListener(self):
         # start everything and get the state
@@ -254,10 +236,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_append_results_and_adopt_kid)
         d.addCallback(check_remove_results_and_bear_child)
         d.addCallback(check_append_results_and_stop)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testStateDictListener(self):
         # start everything and get the state
@@ -292,10 +271,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_set_results_and_emigrate)
         d.addCallback(check_set_results_and_coup_de_etat)
         d.addCallback(check_remove_results_and_stop)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 class TestFullListener(unittest.TestCase):
     def setUp(self):
@@ -311,8 +287,6 @@ class TestFullListener(unittest.TestCase):
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
-        if weHaveAnOldTwisted():
-            reactor.iterate()
         return d
         #.addCallbacks(self.connected, self.notConnected)
         # self.id = reactor.callLater(10, self.timeOut)
@@ -359,10 +333,7 @@ class TestFullListener(unittest.TestCase):
 
         d.addCallback(add_listener_and_set_name)
         d.addCallback(check_results)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testStateAppendRemoveListener(self):
         # start everything and get the state
@@ -401,10 +372,7 @@ class TestFullListener(unittest.TestCase):
         d.addCallback(check_append_results_and_adopt_kid)
         d.addCallback(check_remove_results_and_bear_child)
         d.addCallback(check_append_results_and_stop)
-        if weHaveAnOldTwisted(): #T1.3
-            return unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 
 class TestState(unittest.TestCase):

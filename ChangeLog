@@ -1,5 +1,7 @@
 2007-04-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_flavors.py: Remove twisted 1.3 crufties.
+
 	* flumotion/twisted/flavors.py: Add a comment.
 
 2007-04-02  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
