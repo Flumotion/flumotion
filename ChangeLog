@@ -1,3 +1,7 @@
+2007-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/flavors.py: Add a comment.
+
 2007-04-02  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/effects/volume/volume.py (Volume.setUIState):

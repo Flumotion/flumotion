@@ -215,6 +215,17 @@ class StateCacheable(pb.Cacheable):
     def stoppedObserving(self, perspective, observer):
         self._observers.remove(observer)
 
+# At some point, a StateRemoteCache will become invalid. The normal way
+# would be losing the connection to the RemoteCacheable, although
+# particular kinds of RemoteCache objects might have other ways
+# (e.g. component removed from flow).
+#
+# However after some thought, it's probably not a good idea to expose
+# 'invalidate' directly as a RemoveCache callback, because the program
+# semantics would be dependent on the order in which it would be called
+# relative to any other notifyOnDisconnect methods, which would likely
+# lead to heisenbugs.
+
 class StateRemoteCache(pb.RemoteCache):
     """
     I am a remote cache of a state object.
