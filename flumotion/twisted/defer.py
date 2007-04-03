@@ -85,7 +85,7 @@ def defer_generator(proc):
 
         def errback(failure, d):
             def raise_error():
-                # failure.type will be the exception class for local
+                # failure.parents[-1] will be the exception class for local
                 # failures and the string name of the exception class
                 # for remote failures (which might not exist in our
                 # namespace)
@@ -99,7 +99,7 @@ def defer_generator(proc):
                 # exception class is in our namespace, and it only takes
                 # one string argument. if either condition is not true,
                 # we wrap the strings in a default Exception.
-                k, v = failure.type, failure.value
+                k, v = failure.parents[-1], failure.value
                 if isinstance(k, str):
                     k = reflect.namedClass(k)
                 try:

@@ -599,21 +599,19 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                  fileName:  the relative location of the bundled file
                 methodName: the method to instantiate with
         """
-        def gotBundle(res, fileName, methodName):
-            name, bundlePath = res[-1]
-            return (bundlePath, fileName, methodName)
-
-        def gotEntry(res):
-            fileName, methodName = res
-            
-            self.debug("entry for %r of type %s is in file %s and method %s" % (
-                componentState, type, fileName, methodName))
-            d = self.bundleLoader.getBundles(fileName=fileName)
-            d.addCallback(gotBundle, fileName,  methodName)
-            return d
         d = self.callRemote('getEntryByType', componentState, type)
-        d.addCallback(gotEntry)
-        return d
+        yield d
+
+        fileName, methodName = d.value()
+            
+        self.debug("entry for %r of type %s is in file %s and method %s" % (
+            componentState, type, fileName, methodName))
+        d = self.bundleLoader.getBundles(fileName=fileName)
+        yield d
+
+        name, bundlePath = d.value()[-1]
+        yield (bundlePath, fileName, methodName)
+    getEntry = defer_generator_method(getEntry)
 
     ## worker remote methods
     def checkElements(self, workerName, elements):

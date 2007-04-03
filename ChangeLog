@@ -1,3 +1,17 @@
+2007-04-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/defer.py:
+	  With python 2.5, CopyableFailures have a type attribute that doesn't
+	  have the form expected by our defer_generator.
+	  Instead, use the parents attribute, which is guaranteed to work the
+	  way we want it to.
+
+	  Fixes conversion of remote failures to exceptions in defer_generator
+	  under python 2.5.
+
+	* flumotion/admin/admin.py:
+	  Revert patch from #596, as it's no longer needed.
+
 2007-04-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_flavors.py
