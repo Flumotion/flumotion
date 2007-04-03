@@ -24,9 +24,6 @@ Features since 0.4.1:
  - With sufficiently recent GStreamer, components now provide much more information about errors in the data stream
  - Error resilience is drastically improved compared to older versions
 
-
-This is Flumotion 0.4.1, "Nubaa".
-
 Bugs fixed since 0.4.0:
 
 546     Worker-Manual is Wrong!
