@@ -1,3 +1,8 @@
+2007-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.invalidate):
+	Iterate over a copy of the keys list.
+
 2007-04-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:

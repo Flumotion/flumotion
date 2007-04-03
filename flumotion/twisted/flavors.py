@@ -421,7 +421,8 @@ class StateRemoteCache(pb.RemoteCache):
         setattr(self, '_cache_invalid', True)
 
         self._ensureListeners()
-        for l in self._listeners:
+        # copy of keys, because dict could change during iteration
+        for l in self._listeners.keys():
             invalidate = self._listeners[l][5]
             if invalidate: 
                 invalidate(self)
