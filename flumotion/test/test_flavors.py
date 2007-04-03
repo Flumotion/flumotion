@@ -75,7 +75,7 @@ class TestRoot(testclasses.TestManagerRoot):
     def remote_haveAdopted(self, name):
         return self.state.remove('children', name)
 
-class TestStateSet(unittest.TestCase):
+class StateTest(unittest.TestCase):
     def setUp(self):
         self.changes = []
         self.runServer()
@@ -83,15 +83,12 @@ class TestStateSet(unittest.TestCase):
     def tearDown(self):
         return self.stopServer()
         
-    # helper functions to start PB comms
     def runClient(self):
         f = pb.PBClientFactory()
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
         return d
-        #.addCallbacks(self.connected, self.notConnected)
-        # self.id = reactor.callLater(10, self.timeOut)
 
     def clientConnected(self, perspective):
         self.perspective = perspective
@@ -110,9 +107,10 @@ class TestStateSet(unittest.TestCase):
         self.port = self.sport.getHost().port
 
     def stopServer(self):
-        return self.sport.stopListening()
+        d = self.sport.stopListening()
+        return d
 
-    # actual tests
+class TestStateSet(StateTest):
     def testStateSet(self):
         d = self.runClient()
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
@@ -273,45 +271,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_remove_results_and_stop)
         return d
 
-class TestFullListener(unittest.TestCase):
-    def setUp(self):
-        self.changes = []
-        self.runServer()
-
-    def tearDown(self):
-        return self.stopServer()
-        
-    # helper functions to start PB comms
-    def runClient(self):
-        f = pb.PBClientFactory()
-        self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
-        d = f.getRootObject()
-        d.addCallback(self.clientConnected)
-        return d
-        #.addCallbacks(self.connected, self.notConnected)
-        # self.id = reactor.callLater(10, self.timeOut)
-
-    def clientConnected(self, perspective):
-        self.perspective = perspective
-        self._dDisconnect = defer.Deferred()
-        perspective.notifyOnDisconnect(
-            lambda r: self._dDisconnect.callback(None))
-
-    def stopClient(self):
-        self.cport.disconnect()
-        return self._dDisconnect
-
-    def runServer(self):
-        factory = pb.PBServerFactory(TestRoot())
-        factory.unsafeTracebacks = 1
-        self.sport = reactor.listenTCP(0, factory, interface="127.0.0.1")
-        self.port = self.sport.getHost().port
-
-    def stopServer(self):
-        d = self.sport.stopListening()
-        return d
-
-    # listener tests
+class TestFullListener(StateTest):
     def testStateSetListener(self):
         # start everything and get the state
         d = self.runClient()

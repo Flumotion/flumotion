@@ -81,7 +81,14 @@ class AdminPlanetState(flavors.StateRemoteCache):
     I represent the state of a planet in an admin client.
     See L{ManagerPlanetState}.
     """
-    pass
+    def invalidate(self):
+        for flow in self.get('flows'):
+            flow.invalidate()
+
+        self.get('atmosphere').invalidate()
+
+        flavors.StateRemoteCache.invalidate(self)
+
 pb.setUnjellyableForClass(ManagerPlanetState, AdminPlanetState)
 
 class ManagerAtmosphereState(flavors.StateCacheable):
@@ -118,7 +125,11 @@ class AdminAtmosphereState(flavors.StateRemoteCache):
     I represent the state of an atmosphere in an admin client.
     See L{ManagerAtmosphereState}.
     """
-    pass
+    def invalidate(self):
+        for component in self.get('components'):
+            component.invalidate()
+
+        flavors.StateRemoteCache.invalidate(self)
 
 pb.setUnjellyableForClass(ManagerAtmosphereState, AdminAtmosphereState)
 
@@ -160,7 +171,11 @@ class AdminFlowState(flavors.StateRemoteCache):
     I represent the state of a flow in an admin client.
     See L{ManagerFlowState}.
     """
-    pass
+    def invalidate(self):
+        for component in self.get('components'):
+            component.invalidate()
+
+        flavors.StateRemoteCache.invalidate(self)
 
 pb.setUnjellyableForClass(ManagerFlowState, AdminFlowState)
 

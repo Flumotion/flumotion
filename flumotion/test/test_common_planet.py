@@ -71,6 +71,33 @@ class AllComponentStateTest(unittest.TestCase):
         self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
         self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
+class InvalidateTest(unittest.TestCase):
+    def testInvalidate(self):
+        mcomp = planet.ManagerComponentState()
+        mflow = planet.ManagerFlowState()
+        mstate = planet.ManagerPlanetState()
+
+        mflow.append('components', mcomp)
+        mstate.append('flows', mflow)
+
+        astate = jelly.unjelly(jelly.jelly(mstate))
+        self.failUnless(isinstance(astate, planet.AdminPlanetState))
+
+        aflow, = astate.get('flows')
+        acomp, = aflow.get('components')
+
+        invalidates = []
+        def invalidate(obj):
+            invalidates.append(obj)
+
+        astate.addListener(self, invalidate=invalidate)
+        aflow.addListener(self, invalidate=invalidate)
+        acomp.addListener(self, invalidate=invalidate)
+
+        self.assertEquals(invalidates, [])
+        astate.invalidate()
+        self.assertEquals(invalidates, [acomp, aflow, astate])
+        
 # FIXME: this test doesn't do anything since unjelly(jelly()) creates a
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first

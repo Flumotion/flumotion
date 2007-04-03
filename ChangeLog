@@ -1,3 +1,20 @@
+2007-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/planet.py (AdminFlowState)
+	(AdminAtmosphereState, AdminPlanetState): Extend invalidate() to
+	recurse into kids before chaining up.
+
+	* flumotion/test/test_common_planet.py (InvalidateTest): New test
+	that invalidating a planet does a depth-first invalidate on its
+	kids.
+
+	* flumotion/test/test_flavors.py (TestState): Factor out a base
+	test case class.
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.invalidate):
+	_ensureListeners() before accessing _listeners(). I tried for
+	about 20 minutes to make a test case for this but failed.
+
 2007-04-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/twisted/defer.py:
