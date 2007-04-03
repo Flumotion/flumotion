@@ -157,12 +157,15 @@ class ComponentAvatar(base.ManagerAvatar):
         
         d = self.vishnu.componentAttached(self)
 
-        # If we're already set to happy, ensure that we trigger our deferreds
-        if self.jobState.get('mood') == moods.happy.value:
-            for d in self._happydefers:
-                d.callback(True)
-            self._happydefers = []
+        def checkInitialMood(_):
+            # If we're already set to happy, ensure that we trigger our 
+            # deferreds
+            if self.jobState.get('mood') == moods.happy.value:
+                for d in self._happydefers:
+                    d.callback(True)
+                self._happydefers = []
 
+        d.addCallback(checkInitialMood)
         # listen to the mood so we can tell the depgraph
         d.addCallback(lambda _: self.jobState.addListener(self,
                                                           set=self.stateSet))

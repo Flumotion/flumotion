@@ -1,6 +1,11 @@
 2007-04-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:
+	  Do this after jobState is attached.
+
+2007-04-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/component.py:
 	  If a component logs in while happy, trigger any deferreds that were
 	  waiting for it to be happy.
 	  Prevents stale moodPending entries from remaining forever.
