@@ -239,4 +239,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.1.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.4.2</revision>
+   <branch>0.4</branch>
+   <name>Belchica Strikes Back</name>
+   <created>2007-04-03</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.2.tar.bz2" />
+  </Version>
+ </release>
 </Project>

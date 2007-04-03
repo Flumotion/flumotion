@@ -35,7 +35,6 @@ Bugs fixed in this release
       * 590 : add timestamps to messages
       * 592 : GStreamer errors can cause the manager to have inconsistent state
       * 596 : default admin pages not working
-      * 601 : FLAC and Speex support in Cortado
       * 603 : Admin failed to load UI bundle after update to feisty (Python 2.5?)
 
 Download
