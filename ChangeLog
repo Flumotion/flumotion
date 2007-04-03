@@ -1,6 +1,14 @@
 2007-04-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/twisted/defer.py:
+	  Remove reflect.namedClass call inside try block, so that a failed
+	  call will result in us constructing a readable/useful generic
+	  Exception, rather than a useless, truncated, ImportError from deep
+	  in the reflection code.
+
+2007-04-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/defer.py:
 	  With python 2.5, CopyableFailures have a type attribute that doesn't
 	  have the form expected by our defer_generator.
 	  Instead, use the parents attribute, which is guaranteed to work the

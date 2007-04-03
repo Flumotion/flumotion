@@ -100,9 +100,9 @@ def defer_generator(proc):
                 # one string argument. if either condition is not true,
                 # we wrap the strings in a default Exception.
                 k, v = failure.parents[-1], failure.value
-                if isinstance(k, str):
-                    k = reflect.namedClass(k)
                 try:
+                    if isinstance(k, str):
+                        k = reflect.namedClass(k)
                     if isinstance(v, tuple):
                         e = k(*v)
                     else:
