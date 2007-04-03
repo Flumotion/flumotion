@@ -1,3 +1,30 @@
+This is Flumotion 0.4.2 "Belchica Strikes Back"
+
+Bugs fixed since 0.4.1:
+
+500     fix flumotion's configure.ac to use runtime tests, not pkg-config
+568     when master clock provider goes sad, starting it again compains about not able to reserve ports
+571     theora encoder reporting bogus info about bitrate even though manager config has it in correct units
+573     Rewrite daemonisation and shutdown code some more
+577     FeedComponent, HTTP streamer are not threadsafe
+583     clean up the worker's error handling
+588     The manager don't close the connection of a worker if its name is already used
+590     add timestamps to messages
+592     GStreamer errors can cause the manager to have inconsistent state
+596     default admin pages not working
+601     FLAC and Speex support in Cortado
+603     Admin failed to load UI bundle after update to feisty (Python 2.5?)
+
+Features since 0.4.1:
+
+ - Full support for running under Python 2.5
+ - The GTK admin can now start a manager and worker for you automatically
+ - Messages now have timestamps to allow better diagnosis of failures
+ - Improvements for service scripts to allow better recovery from failure states
+ - With sufficiently recent GStreamer, components now provide much more information about errors in the data stream
+ - Error resilience is drastically improved compared to older versions
+
+
 This is Flumotion 0.4.1, "Nubaa".
 
 Bugs fixed since 0.4.0:
