@@ -327,18 +327,21 @@ class StateRemoteCache(pb.RemoteCache):
     def setCopyableState(self, dict):
         self._dict = dict
         
+    def _notifyListeners(self, index, *args):
+        # notify our local listeners; compute set of procs first, so as
+        # to allow the listeners set to change during the calls
+        self._ensureListeners()
+        for proc in [tup[index] for tup in self._listeners.values()]:
+            if proc:
+                proc(self, *args)
+        
     def observe_set(self, key, value):
         self._dict[key] = value
         # if we also subclass from Cacheable, then we're a proxy, so proxy
         if hasattr(self, 'set'):
             StateCacheable.set(self, key, value)
 
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            stateSet = self._listeners[l][0]
-            if stateSet: 
-                stateSet(self, key, value)
+        self._notifyListeners(0, key, value)
 
     def observe_append(self, key, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -347,12 +350,7 @@ class StateRemoteCache(pb.RemoteCache):
         else:
             self._dict[key].append(value)
 
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            stateAppend = self._listeners[l][1]
-            if stateAppend: 
-                stateAppend(self, key, value)
+        self._notifyListeners(1, key, value)
 
     def observe_remove(self, key, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -365,12 +363,7 @@ class StateRemoteCache(pb.RemoteCache):
                 raise ValueError("value %r not under key %r with values %r" %
                     (value, key, self._dict[key]))
 
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            stateRemove = self._listeners[l][2]
-            if stateRemove: 
-                stateRemove(self, key, value)
+        self._notifyListeners(2, key, value)
 
     def observe_setitem(self, key, subkey, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -379,12 +372,7 @@ class StateRemoteCache(pb.RemoteCache):
         else:
             self._dict[key][subkey] = value
 
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            stateSetitem = self._listeners[l][3]
-            if stateSetitem: 
-                stateSetitem(self, key, subkey, value)
+        self._notifyListeners(3, key, subkey, value)
 
     def observe_delitem(self, key, subkey, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -397,12 +385,7 @@ class StateRemoteCache(pb.RemoteCache):
                 raise KeyError("key %r not in dict %r for state dict %r" %
                     (subkey, self._dict[key], self._dict))
 
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            stateDelitem = self._listeners[l][4]
-            if stateDelitem: 
-                stateDelitem(self, key, subkey, value)
+        self._notifyListeners(4, key, subkey, value)
 
     def invalidate(self):
         """Invalidate this StateRemoteCache.
@@ -420,9 +403,4 @@ class StateRemoteCache(pb.RemoteCache):
         # does not call invalidate() on its caches.
         setattr(self, '_cache_invalid', True)
 
-        self._ensureListeners()
-        # copy of keys, because dict could change during iteration
-        for l in self._listeners.keys():
-            invalidate = self._listeners[l][5]
-            if invalidate: 
-                invalidate(self)
+        self._notifyListeners(5)

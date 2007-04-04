@@ -1,5 +1,10 @@
 2007-04-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/flavors.py
+	(StateRemoteCache._notifyListeners): Factor out the notification
+	code into a method. Allow the set of listeners to change during
+	the emission.
+
 	* flumotion/ui/glade.py (flumotion_glade_custom_handler): Add a
 	comment.
 
