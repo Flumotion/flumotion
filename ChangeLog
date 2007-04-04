@@ -1,3 +1,8 @@
+2007-04-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/ui/glade.py (flumotion_glade_custom_handler): Add a
+	comment.
+
 2007-04-04  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/common.py:

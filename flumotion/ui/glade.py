@@ -63,6 +63,11 @@ def flumotion_glade_custom_handler(xml, proc, name, *args):
         raise RuntimeError('Failed call %s in module %s: %s'
                            % (code, module, msg))
     w.set_name(name)
+    # using custom widgets seems to bypass all property settings from
+    # the xml, so widgets are created as hidden. this show() call was
+    # added as a convenience, but sometimes it is irritating. end
+    # result, if you want to have an initially-hidden widget, hide it
+    # just after calling GladeBacked.__init__().
     w.show()
     return w
 # FIXME: what does this do ?
