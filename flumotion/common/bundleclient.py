@@ -41,20 +41,12 @@ class BundleLoader(log.Loggable):
     remote = None
     _unbundler = None
 
-    def __init__(self, remote):
+    def __init__(self, callRemote):
         """
-        @type  remote: L{twisted.spread.pb.RemoteReference}
+        @type  callRemote: callable
         """
-        self.remote = remote
+        self.callRemote = callRemote
         self._unbundler = bundle.Unbundler(configure.cachedir)
-
-    def _callRemote(self, methodName, *args, **kwargs):
-        """
-        Call the given remote method on the manager-side Avatar.
-        """
-        if not self.remote:
-            raise errors.ManagerNotConnectedError
-        return self.remote.callRemote(methodName, *args, **kwargs)
 
     def getBundles(self, **kwargs):
         # FIXME: later on, split out this method into getBundles which does
@@ -71,7 +63,7 @@ class BundleLoader(log.Loggable):
                   for this package.
         """
         # get sums for all bundles we need
-        d = self._callRemote('getBundleSums', **kwargs)
+        d = self.callRemote('getBundleSums', **kwargs)
         yield d
 
         # sums is a list of name, sum tuples, highest to lowest
@@ -95,7 +87,7 @@ class BundleLoader(log.Loggable):
                 toFetch.append(name)
 
         # ask for the missing bundles
-        d = self._callRemote('getBundleZips', toFetch)
+        d = self.callRemote('getBundleZips', toFetch)
         yield d
 
         # unpack the new bundles

@@ -268,23 +268,25 @@ class AdminAvatar(base.ManagerAvatar):
             return failure.Failure(errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e)))
         
-    def perspective_getEntryByType(self, componentState, type):
+    def perspective_getEntryByType(self, componentState=None, type=None,
+                                   componentType=None):
         """
         Get the entry point for a piece of bundled code by the type.
 
         Returns: a (filename, methodName) tuple, or raises a Failure
         """
-        m = self.vishnu.getComponentMapper(componentState)
-        componentName = componentState.get('name')
+        if componentType is None:
+            assert componentState is not None
+            m = self.vishnu.getComponentMapper(componentState)
+            componentName = componentState.get('name')
+            if not m.avatar:
+                self.debug('component %s not logged in yet, no entry',
+                           componentName)
+                raise errors.SleepingComponentError(componentName)
+            componentType = m.avatar.getType()
 
-        if not m.avatar:
-            self.debug('component %s not logged in yet, no entry' %
-                componentName)
-            raise errors.SleepingComponentError(componentName)
-
-        componentType = m.avatar.getType()
-        self.debug('getting entry of type %s for component %s of type %s' % (
-            type, componentName, componentType))
+        self.debug('getting entry of type %s for component type %s',
+                   type, componentType)
         try:
             componentRegistryEntry = registry.getRegistry().getComponent(
                 componentType)

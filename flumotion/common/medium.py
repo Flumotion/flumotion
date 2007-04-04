@@ -71,7 +71,7 @@ class BaseMedium(fpb.Referenceable):
             self.remote = None
         self.remote.notifyOnDisconnect(nullRemote)
 
-        self.bundleLoader = bundleclient.BundleLoader(self.remote)
+        self.bundleLoader = bundleclient.BundleLoader(self.callRemote)
 
         # figure out connection addresses if it's an internet address
         tarzan = None
@@ -151,27 +151,23 @@ class BaseMedium(fpb.Referenceable):
         return self.callRemoteLogging(log.DEBUG, -1, name, *args,
                                       **kwargs)
 
-    def runBundledFunction(self, module, function, *args, **kwargs):
+    def getBundledFunction(self, module, function):
         """
-        Runs the given function in the given module with the given arguments.
+        Returns the given function in the given module, loading the
+        module from a bundle.
         
         If we can't find the bundle for the given module, or if the
         given module does not contain the requested function, we will
         raise L{flumotion.common.errors.RemoteRunError} (perhaps a
-        poorly chosen error). If importing the module or running the
-        function raises an exception, that exception will be passed
-        through unmodified.
-
-        Callers that expect to return their result over a PB connection
-        should catch nonserializable exceptions so as to prevent nasty
-        backtraces in the logs.
+        poorly chosen error). If importing the module raises an
+        exception, that exception will be passed through unmodified.
 
         @param module:   module the function lives in
         @type  module:   str
         @param function: function to run
         @type  function: str
 
-        @returns: the return value of the given function in the module.
+        @returns: a callable, the given function in the given module.
         """
         self.debug('remote runFunction(%r, %r)' % (module, function))
         d = self.bundleLoader.loadModule(module)
@@ -189,11 +185,37 @@ class BaseMedium(fpb.Referenceable):
             raise
 
         try:
-            proc = getattr(mod, function)
+            yield getattr(mod, function)
         except AttributeError:
             msg = 'No procedure named %s in module %s' % (function, module)
             self.warning(msg)
             raise errors.RemoteRunError(msg)
+    getBundledFunction = defer_generator_method(getBundledFunction)
+
+    def runBundledFunction(self, module, function, *args, **kwargs):
+        """
+        Runs the given function in the given module with the given
+        arguments.
+        
+        This method calls getBundledFunction and then invokes the
+        function. Any error raised by getBundledFunction or by invoking
+        the function will be passed through unmodified.
+
+        Callers that expect to return their result over a PB connection
+        should catch nonserializable exceptions so as to prevent nasty
+        backtraces in the logs.
+
+        @param module:   module the function lives in
+        @type  module:   str
+        @param function: function to run
+        @type  function: str
+
+        @returns: the return value of the given function in the module.
+        """
+        self.debug('remote runFunction(%r, %r)' % (module, function))
+        d = self.getBundledFunction(module, function)
+        yield d
+        proc = d.value()
 
         try:
             self.debug('calling %s.%s(%r, %r)' % (

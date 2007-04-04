@@ -278,6 +278,8 @@ class BaseAdminGtkNode(log.Loggable):
             gtk.glade.textdomain(old)
             return self.wtree
 
+        # FIXME: this does needless roundtrips; should instead be
+        # loading from the already-downloaded paths
         self.debug("requesting bundle for glade file %s" % gladeFile)
         d = self.admin.bundleLoader.getFile(gladeFile)
         d.addCallback(_getBundledFileCallback, gladeFile)

@@ -1,3 +1,25 @@
+2007-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtkNode.loadGladeFile): Add a comment.
+
+	* flumotion/common/medium.py (BaseMedium.setRemoteReference):
+	Update for new bundleclient interface.
+
+	* flumotion/common/bundleclient.py (BundleLoader.__init__): Take a
+	callRemote function instead of a remote reference. Allows us to
+	hook into the logging from medium.Medium. Update callers to use
+	self.callRemote.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_getEntryByType): Allow the caller to
+	specify the componentType, instead of requiring it to come from a
+	non-sleeping component state.
+
+	* flumotion/common/medium.py (BaseMedium.getBundledFunction):
+	Split out of runBundledFunction.
+	(BaseMedium.runBundledFunction): Use getBundledFunction.
+
 === release 0.4.2 ===
 
 2007-04-03  Andy Wingo  <wingo@pobox.com>
