@@ -119,8 +119,8 @@ def parse_commands(args):
     return command
 
 def setup_reactor(info):
-    model = AdminModel(info.authenticator)
-    d = model.connectToHost(info.host, info.port, not info.use_ssl)
+    model = AdminModel()
+    d = model.connectToManager(info)
 
     def failed(failure):
         if failure.check(errors.ConnectionRefusedError):

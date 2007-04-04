@@ -21,7 +21,7 @@
 
 
 from flumotion.twisted import pb as fpb
-from flumotion.common import log, planet
+from flumotion.common import log, planet, connection
 from flumotion.admin import admin
 
 
@@ -117,9 +117,14 @@ class MultiAdminModel(log.Loggable):
         def connection_failed_cb(admin, string):
             self.info('Connection to %s:%d failed: %s' % (host, port, string))
 
-        a = admin.AdminModel(authenticator)
+        info = connection.PBConnectionInfo(host, port, not use_insecure,
+                                           authenticator)
 
-        a.connectToHost(host, port, use_insecure, keep_trying=tenacious)
+        if str(info) in self.admins:
+            raise KeyError('Already connected to %s' % info)
+
+        a = admin.AdminModel()
+        a.connectToManager(info, tenacious)
         a.connect('connected', connected_cb)
         a.connect('disconnected', disconnected_cb)
         a.connect('connection-refused', connection_refused_cb)

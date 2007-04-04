@@ -184,8 +184,8 @@ class Window(log.Loggable, gobject.GObject):
 
     def on_open_connection(self, connectionInfo):
         i = connectionInfo
-        model = AdminModel(i.authenticator)
-        d = model.connectToHost(i.host, i.port, not i.use_ssl)
+        model = AdminModel()
+        d = model.connectToManager(i)
         self._trayicon.set_tooltip(_("Connecting to %s:%s") %
             (i.host, i.port))
 

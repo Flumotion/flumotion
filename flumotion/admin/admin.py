@@ -51,13 +51,13 @@ T_ = messages.gettexter('flumotion')
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     perspectiveInterface = interfaces.IAdminMedium
 
-    def __init__(self, medium, extraTenacious=False):
+    def __init__(self, medium, extraTenacious=False, maxDelay=20):
         """
         @type medium:   AdminModel
         """
         fpb.ReconnectingFPBClientFactory.__init__(self)
         self.medium = medium
-        self.maxDelay = 20
+        self.maxDelay = maxDelay
 
         self.extraTenacious = extraTenacious
         self.hasBeenConnected = 0
@@ -181,59 +181,48 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     # Public instance variables (read-only)
     planet = None
 
-    def __init__(self, authenticator):
+    def __init__(self):
         self.__gobject_init__()
         
         # All of these instance variables are private. Cuidado cabrones!
-        self.authenticator = authenticator
-        self.host = self.port = self.use_insecure = None
+        self.connectionInfo = None
+        self.keepTrying = None
 
         self.managerId = '<uninitialized>'
 
         self.state = 'disconnected'
-        self.clientFactory = self._makeFactory(authenticator)
-        # 20 secs max for an admin to reconnect
-        self.clientFactory.maxDelay = 20
+        self.clientFactory = None
 
         self._components = {} # dict of components
         self.planet = None
         self._workerHeavenState = None
         
-    # a method so mock testing frameworks can override it
-    def _makeFactory(self, authenticator):
-        # FIXME: this needs further refactoring, so we only ever pass
-        # an authenticator.  For that we need to fix all users of this
-        # class too
-        factory = AdminClientFactory(self)
-        factory.startLogin(authenticator)
-        return factory
-
-    def connectToHost(self, host, port, use_insecure=False,
-                      keep_trying=False):
+    def connectToManager(self, connectionInfo, keepTrying=False):
         'Connect to a host.'
-        self.host = host
-        self.port = port
-        self.use_insecure = use_insecure
+        assert self.clientFactory is None
 
-        # the intention here is to give an id unique to the manager --
-        # if a program is adminning multiple managers, this id should
-        # tell them apart (and identify duplicates)
-        info = connection.PBConnectionInfo(host, port, not use_insecure,
-                                           self.authenticator)
-        self.managerId = str(info)
+        self.connectionInfo = connectionInfo
+
+        # give the admin an id unique to the manager -- if a program is
+        # adminning multiple managers, this id should tell them apart
+        # (and identify duplicates)
+        self.managerId = str(connectionInfo)
 
         self.info('Connecting to manager %s with %s',
-                  self.managerId, use_insecure and 'TCP' or 'SSL')
-        if keep_trying:
-            self.info('AdminClientFactory, now with extra tenacity')
-            self.clientFactory.extraTenacious = True
+                  self.managerId, connectionInfo.use_ssl and 'SSL' or 'TCP')
 
-        if use_insecure:
-            reactor.connectTCP(host, port, self.clientFactory)
-        else:
+        self.clientFactory = AdminClientFactory(self,
+                                                extraTenacious=keepTrying,
+                                                maxDelay=20)
+        self.clientFactory.startLogin(connectionInfo.authenticator)
+
+        if connectionInfo.use_ssl:
             from twisted.internet import ssl
-            reactor.connectSSL(host, port, self.clientFactory,
-                               ssl.ClientContextFactory())
+            reactor.connectSSL(connectionInfo.host, connectionInfo.port,
+                               self.clientFactory, ssl.ClientContextFactory())
+        else:
+            reactor.connectTCP(connectionInfo.host, connectionInfo.port,
+                               self.clientFactory)
 
         def connected(model, d, ids):
             map(model.disconnect, ids)
@@ -262,6 +251,20 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                                 connection_error, d, ids))
         return d
 
+    def shutdown(self):
+        self.debug('shutting down')
+        if self.clientFactory is not None:
+            self.clientFactory.disconnect()
+            self.clientFactory.stopTrying()
+            self.clientFactory = None
+
+    def reconnect(self, keepTrying=False):
+        """Close any existing connection to the manager and
+        reconnect."""
+        self.debug('asked to log in again')
+        self.shutdown()
+        return self.connectToManager(self.connectionInfo, keepTrying)
+
     # default Errback
     # FIXME: we can set it up with a list of types not to warn for ?
     def _defaultErrback(self, failure):
@@ -269,34 +272,31 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             failure, failure.getErrorMessage()))
         return failure
 
-    def reconnect(self):
-        self.debug('asked to log in again')
-        self.clientFactory.stopTrying()
-        # this also makes it try to connect again
-        self.clientFactory.resetDelay()
-        self.connectToHost(self.host, self.port, self.use_insecure)
-
     # FIXME: give these three sensible names
     def adminInfoStr(self):
         return self.managerId
 
     def connectionInfoStr(self):
-        return '%s:%s (%s)' % (self.host, self.port,
-                               self.use_insecure and 'http' or 'https')
+        return '%s:%s (%s)' % (self.connectionInfo.host,
+                               self.connectionInfo.port,
+                               self.connectionInfo.use_ssl
+                               and 'https' or 'http')
 
     # used in fgc
     def managerInfoStr(self):
         assert self.planet
-        return '%s (%s:%s)' % (self.planet.get('name'), self.host, self.port)
+        return '%s (%s)' % (self.planet.get('name'), self.managerId)
 
     def connectionFailed(self, failure):
         # called by client factory
         if failure.check(error.DNSLookupError):
-            message = "Could not look up host '%s'." % self.host
+            message = ("Could not look up host '%s'."
+                       % self.connectionInfo.host)
         elif (failure.check(error.ConnectionRefusedError)
               or failure.check(error.ConnectionRefusedError)):
             message = ("Could not connect to host '%s' on port %d."
-                       % (self.host, self.port))
+                       % (self.connectionInfo.host,
+                          self.connectionInfo.port))
         else:
             message = ("Unexpected failure.\nDebug information: %s"
                        % log.getFailureMessage (failure))
@@ -307,18 +307,19 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference %r" % remoteReference)
         def writeConnection():
-            if not (self.authenticator.username
-                    and self.authenticator.password):
+            i = self.connectionInfo
+            if not (i.authenticator.username
+                    and i.authenticator.password):
                 self.log('not caching connection information')
                 return
             s = ''.join(['<connection>',
-                         '<host>%s</host>' % self.host,
+                         '<host>%s</host>' % i.host,
                          '<manager>%s</manager>' % self.planet.get('name'),
-                         '<port>%d</port>' % self.port,
-                         '<use_insecure>%d</use_insecure>' 
-                         % (self.use_insecure and 1 or 0),
-                         '<user>%s</user>' % self.authenticator.username,
-                         '<passwd>%s</passwd>' % self.authenticator.password,
+                         '<port>%d</port>' % i.port,
+                         '<use_insecure>%d</use_insecure>'
+                         % ((not i.use_ssl) and 1 or 0),
+                         '<user>%s</user>' % i.authenticator.username,
+                         '<passwd>%s</passwd>' % i.authenticator.password,
                          '</connection>'])
             
             import os
@@ -385,12 +386,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     # FIXME: what is this crap ? strings as enums ?
     def isConnected(self):
         return self.state == 'connected'
-
-    def shutdown(self):
-        self.debug('shutting down')
-        if self.state != 'disconnected':
-            self.clientFactory.disconnect()
-        self.clientFactory.stopTrying()
 
     ## generic remote call methods
     def componentCallRemote(self, componentState, methodName, *args, **kwargs):

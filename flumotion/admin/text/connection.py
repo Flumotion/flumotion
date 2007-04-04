@@ -32,8 +32,8 @@ def connect_to_manager(stdscr, info):
     stdscr.clrtobot()
     stdscr.refresh()
 
-    model = AdminModel(info.authenticator)
-    d = model.connectToHost(info.host, info.port, not info.use_ssl)
+    model = AdminModel()
+    d = model.connectToManager(info)
 
     def outputError(str):
         print str

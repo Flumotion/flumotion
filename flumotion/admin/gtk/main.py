@@ -31,7 +31,7 @@ from flumotion.admin import connections
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
 from flumotion.admin.gtk.client import Window
-from flumotion.common import log, errors
+from flumotion.common import log, errors, connection
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
@@ -46,13 +46,15 @@ def startAdminFromGreeter(greeter):
         greeter.set_sensitive(False)
         authenticator = fpb.Authenticator(username=state['user'],
                                           password=state['passwd'])
-        model = AdminModel(authenticator)
-        return model.connectToHost(state['host'], state['port'],
-                                   state['use_insecure'])
+        info = connection.PBConnectionInfo(state['host'], state['port'],
+                                           not state['use_insecure'],
+                                           authenticator)
+        model = AdminModel()
+        return model.connectToManager(info)
 
     def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
-        dret = dialogs.connection_refused_message(state['host'],
+        dret = dialogs.connection_refused_message(greeter.state['host'],
                                                   greeter.window)
         dret.addCallback(lambda _: startAdminFromGreeter(greeter))
         return dret
@@ -77,9 +79,8 @@ def startAdminFromGreeter(greeter):
 
 def startAdminFromManagerString(managerString, useSSL):
     info = connections.parsePBConnectionInfo(managerString, useSSL)
-    model = AdminModel(info.authenticator)
-    d = model.connectToHost(info.host, info.port, not info.use_ssl)
-    return d
+    model = AdminModel()
+    return model.connectToManager(info)
 
 def main(args):
     parser = optparse.OptionParser()

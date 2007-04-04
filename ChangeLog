@@ -1,5 +1,28 @@
 2007-04-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py (setup_reactor): 
+	* flumotion/admin/gtk/main.py (startAdminFromGreeter.got_state)
+	(startAdminFromManagerString, startAdminFromGreeter.refused): 
+	* flumotion/admin/gtk/client.py (Window.on_open_connection): 
+	* flumotion/admin/text/connection.py (connect_to_manager): 
+	* flumotion/admin/multi.py (MultiAdminModel.addManager): Use the
+	new admin connection interface.
+
+	* flumotion/admin/admin.py (AdminClientFactory.__init__): Take
+	maxDelay as an optional keyword argument.
+	(AdminModel.__init__): Incompatible change: no authenticator arg
+	to __init__, and ...
+	(AdminModel.connectToManager): Renamed from connectToHost (so as
+	to catch bugs), and take a PBConnectionInfo, including the
+	authenticator.
+	(AdminModel.shutdown): More robust implementation.
+	(AdminModel.reconnect): Don't much with clientFactory, just call
+	shutdown() and then connectToManager().
+	(AdminModel.connectionInfoStr, AdminModel.managerInfoStr)
+	(AdminModel.connectionFailed, AdminModel.setRemoteReference):
+	Update code that assumed presence of self.host, self.port, and
+	self.use_insecure.
+
 	* flumotion/twisted/flavors.py
 	(StateRemoteCache._notifyListeners): Factor out the notification
 	code into a method. Allow the set of listeners to change during
