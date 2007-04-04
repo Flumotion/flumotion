@@ -1,3 +1,8 @@
+2007-04-04  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/common.py:
+	  This function is deprecated, not depreciated.
+
 2007-04-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/admin_gtk.py
