@@ -293,10 +293,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 if not 'porter-' + k in props:
                     msg = 'slave mode, missing required property porter-%s' % k
                     return defer.fail(errors.ConfigError(msg))
-        else:
-            if not 'port' in props:
-                msg = "master mode, missing required property 'port'"
-                return defer.fail(errors.ConfigError(msg))
 
         if props.get('mount-point', None) is not None: 
             if props['mount-point'] == '/':

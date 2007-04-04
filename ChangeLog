@@ -1,3 +1,19 @@
+2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py (formatStorage):
+	  function def fix
+	* flumotion/component/misc/httpfile/admin_gtk.py
+	  (StatisticsAdminGtkNode.setStats,
+	  StatisticsAdminGtkNode.registerLabel,
+	  StatisticsAdminGtkNode.updateLabels,
+	  StatisticsAdminGtkNode.haveWidgetTree, HTTPFileAdminGtk.setup):
+	  Add translated title to UI page, so admin displays it.
+	  Format total bytes consumed.
+	* flumotion/component/misc/httpfile/httpfile.py
+	  (HTTPFileStreamer.do_check):
+	  http-streamer doesn't require a port, so http-server shouldn't
+	  either.
+
 2007-04-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/main.py (setup_reactor): 

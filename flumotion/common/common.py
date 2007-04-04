@@ -40,7 +40,7 @@ from flumotion.common import log
 #       really know what you're doing.
 from flumotion.configure import configure
 
-def formatStorage(units, precision = 2):
+def formatStorage(units, precision=2):
     """
     Nicely formats a storage size using SI units.
     See Wikipedia and other sources for rationale.

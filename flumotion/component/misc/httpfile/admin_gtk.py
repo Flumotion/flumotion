@@ -24,6 +24,7 @@ import gtk
 
 from gettext import gettext as _
 
+from flumotion.common import common
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
@@ -59,7 +60,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         if widget:
             self.labels[name] = widget
         else:
-            print "FIXME: no widget %s" % name
+            self.warning("FIXME: no widget %s" % name)
 
     def hideLabels(self):
         for name in self.labels.keys():
@@ -71,9 +72,9 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         
         for name in self.labels.keys():
             text = state.get(name)
-            if text == None:
-                text = ''
-            else:
+            if text is not None:
+                if name == 'bytes-transferred':
+                    text = common.formatStorage(int(text)) + _('Byte')
                 self.labels[name].set_text(str(text))
         
     def haveWidgetTree(self):
@@ -83,6 +84,10 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         for type in ('bytes-transferred', 'connected-clients'):
             self.registerLabel(type)
 
+        self.updateLabels({
+            'bytes-transferred': 0,
+            'connected-clients': 0,
+        })
         if self._stats:
             self.shown = True
             self.updateLabels(self._stats)
@@ -92,7 +97,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
 class HTTPFileAdminGtk(BaseAdminGtk):
     def setup(self):
-        statistics = StatisticsAdminGtkNode(self.state, self.admin)
+        statistics = StatisticsAdminGtkNode(self.state, self.admin,
+            _("Statistics"))
         self.nodes['Statistics'] = statistics
         # FIXME: maybe make a protocol instead of overriding
         return BaseAdminGtk.setup(self)
