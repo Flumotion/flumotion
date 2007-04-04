@@ -57,5 +57,4 @@ EXTRA_DIST = 				\
 	test_wizard.py 			\
 	test_workerconfig.py
 
-TRIAL_ENV=$(top_builddir)/env
 check-local: trial

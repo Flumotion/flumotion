@@ -3,8 +3,12 @@
 
 TRIAL_ENV=$(top_srcdir)/env
 
+# FIXME: doing "trial flumotion.test" from this directory causes the
+# base package flumotion tests to run always, instead of
+# the current package
+
 trial: rm-trial-test-log
-	$(TRIAL_ENV) trial flumotion.test 2>&1				\
+	$(TRIAL_ENV) trial test_*.py 2>&1				\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\

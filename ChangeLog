@@ -1,5 +1,14 @@
 2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/trial.mk:
+	  Fix up the way we invoke trial to work for other projects too.
+	* env.in:
+	  Use common shell construct to prepend to PATH variables.
+	* flumotion/test/Makefile.am:
+	  Remove TRIAL_ENV var already set in trial.mk
+
+2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/Makefile.am:
 	* conf/examples/ondemand.xml:
 	  Add an ondemand example.
