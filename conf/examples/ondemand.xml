@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<!-- This example flow will serve your /tmp directory as ondemand on port 8800
+  -->
+
+<planet>
+  <atmosphere>
+    <component name="ondemand" project="flumotion" type="http-server" worker="localhost">
+
+      <property name="path">/tmp</property>
+      <property name="port">8800</property>
+    </component>
+
+ </atmosphere>
+</planet>

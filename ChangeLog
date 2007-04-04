@@ -1,5 +1,11 @@
 2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/Makefile.am:
+	* conf/examples/ondemand.xml:
+	  Add an ondemand example.
+
+2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py (formatStorage):
 	  function def fix
 	* flumotion/component/misc/httpfile/admin_gtk.py
