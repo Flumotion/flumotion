@@ -232,7 +232,8 @@ class RTSPRequest(http.Request, flog.Loggable):
                 self.render(er)
         except Exception, e:
             self.warning('failed to process %s: %s' % 
-                (lines[0], flog.getExceptionMessage(e)))
+                (lines and lines[0] or "[No headers]",
+                    flog.getExceptionMessage(e)))
             self.processingFailed(failure.Failure())
 
     def _processPath(self):

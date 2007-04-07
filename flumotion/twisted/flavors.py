@@ -401,6 +401,6 @@ class StateRemoteCache(pb.RemoteCache):
         # to remotely invalidate the cache. that's ok though, because
         # double-caches are currently only used by the manager, which
         # does not call invalidate() on its caches.
-        setattr(self, '_cache_invalid', True)
+        self._cache_invalid = True
 
         self._notifyListeners(5)

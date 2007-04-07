@@ -1,5 +1,13 @@
 2007-04-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/flavors.py (StateRemoteCache.invalidate):
+	  Don't use setattr if we don't need to.
+	* flumotion/twisted/rtsp.py (RTSPRequest.process):
+	  Don't trigger and IndexError when there are no headers in the
+	  request.
+
+2007-04-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py (FeedComponent.init,
 	  FeedComponent.bus_message_received_cb, FeedComponent.setup_pipeline,
 	  FeedComponent.cleanup):
