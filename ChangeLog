@@ -1,3 +1,12 @@
+2007-04-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py (FeedComponent.init,
+	  FeedComponent.bus_message_received_cb, FeedComponent.setup_pipeline,
+	  FeedComponent.cleanup):
+	* flumotion/worker/checks/video010.py (BusResolution,
+	  BusResolution.cleanup, message_rcvd):
+	  bus.connect returns signal handler id's, not watch id's.
+
 2007-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/trial.mk:

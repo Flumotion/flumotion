@@ -377,7 +377,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.pipeline = None
         self.pipeline_signals = []
-        self.bus_watch_id = None
+        self.bus_signal_id = None
         self.files = []
         self.effects = {}
         self._probe_ids = {} # eater name -> probe handler id
@@ -633,7 +633,7 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             return 0
        
-    def bus_watch_func(self, bus, message):
+    def bus_message_received_cb(self, bus, message):
         t = message.type
         src = message.src
 
@@ -740,7 +740,7 @@ class FeedComponent(basecomponent.BaseComponent):
     # FIXME: privatize
     def setup_pipeline(self):
         self.debug('setup_pipeline()')
-        assert self.bus_watch_id == None
+        assert self.bus_signal_id == None
 
         # disable the pipeline's management of base_time -- we're going
         # to set it ourselves.
@@ -749,7 +749,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
-        self.bus_watch_id = bus.connect('message', self.bus_watch_func)
+        self.bus_signal_id = bus.connect('message',
+            self.bus_message_received_cb)
         sig_id = self.pipeline.connect('deep-notify',
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
@@ -793,11 +794,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_stop()
         # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
-        self.pipeline.get_bus().disconnect(self.bus_watch_id)
+        self.pipeline.get_bus().disconnect(self.bus_signal_id)
         self.pipeline.get_bus().remove_signal_watch()
         self.pipeline = None
         self.pipeline_signals = []
-        self.bus_watch_id = None
+        self.bus_signal_id = None
 
         if self._feeder_probe_cl:
             self._feeder_probe_cl.cancel()

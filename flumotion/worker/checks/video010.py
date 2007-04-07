@@ -37,14 +37,14 @@ T_ = messages.gettexter('flumotion')
     
 class BusResolution(fdefer.Resolution):
     pipeline = None
-    watch_id = None
+    signal_id = None
 
     def cleanup(self):
         if self.pipeline:
-            if self.watch_id:
+            if self.signal_id:
                 self.pipeline.get_bus().remove_signal_watch()
-                self.pipeline.get_bus().disconnect(self.watch_id)
-                self.watch_id = None
+                self.pipeline.get_bus().disconnect(self.signal_id)
+                self.signal_id = None
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
@@ -124,9 +124,9 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
 
     bus = pipeline.get_bus()
     bus.add_signal_watch()
-    watch_id = bus.connect('message', message_rcvd, pipeline, resolution)
+    signal_id = bus.connect('message', message_rcvd, pipeline, resolution)
 
-    resolution.watch_id = watch_id
+    resolution.signal_id = signal_id
     resolution.pipeline = pipeline
     log.debug('check', 'setting state to playing')
     if set_state_deferred:
