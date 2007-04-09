@@ -1,3 +1,12 @@
+2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.provide_master_clock, FeedComponent.pipelinePaused):
+	  Adapt the doc string to what is actually being done.
+	  defer.succeed is shorter than doing it by hand.
+	* flumotion/launch/main.py (ComponentWrapper.provideMasterClock):
+	  Add comment.
+
 2007-04-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/flavors.py (StateRemoteCache.invalidate):

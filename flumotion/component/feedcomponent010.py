@@ -830,7 +830,7 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         Tell the component to provide a master clock on the given port.
 
-        @returns: (ip, port, base_time) triple.
+        @returns: a deferred firing a (ip, port, base_time) triple.
         """
         def pipelinePaused(r):
             clock = self.pipeline.get_clock()
@@ -881,9 +881,7 @@ class FeedComponent(basecomponent.BaseComponent):
             # Just return the already set up info, as a fired deferred
             ip = self.state.get('manager-ip')
             base_time = self.pipeline.get_base_time()
-            d = defer.Deferred()
-            d.callback((ip, port, base_time))
-            return d
+            return defer.succeed((ip, port, base_time))
 
     # FIXME: rename, since this just starts the pipeline,
     # and linking is done by the manager

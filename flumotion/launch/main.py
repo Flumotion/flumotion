@@ -130,6 +130,7 @@ class ComponentWrapper(object):
         return d
 
     def provideMasterClock(self, port):
+        # rtype: defer.Deferred
         d = self.component.provide_master_clock(port)
         return d
 
