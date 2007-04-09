@@ -20,9 +20,9 @@ ONEUPDIR=`cd $BASEDIR/.. && pwd`
 PROJECT=`basename $self | sed s/-.*//g`
 VERSION=`basename $self | sed s/.*-//g`
 
-export PYTHONPATH=$BASEDIR:$PYTHONPATH
-export PATH=$BASEDIR/bin:$PATH
-export PKG_CONFIG_PATH=$BASEDIR/pkgconfig:$PKG_CONFIG_PATH
+export PATH=$BASEDIR/bin${PATH:+:$PATH}
+export PYTHONPATH=$BASEDIR${PYTHONPATH:+:$PYTHONPATH}
+export PKG_CONFIG_PATH=$BASEDIR/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 
 # if we got a command, run it, else start a shell
 if test ! -z "$1";

@@ -1,5 +1,11 @@
 2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* env.in:
+	* misc/flu-uninstalled:
+	  Don't add empty paths to PATH variables.
+
+2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/trial.mk:
 	* flumotion/test/Makefile.am:
 	  Set TRIAL_ENV from the calling Makefile.am
