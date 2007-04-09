@@ -1,5 +1,17 @@
 2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/trial.mk:
+	* flumotion/test/Makefile.am:
+	  Set TRIAL_ENV from the calling Makefile.am
+	* flumotion/common/netutils.py (RoutingTable.fromFile):
+	* flumotion/component/base/admin_gtk.py
+	  (FeedersAdminGtkNode.addFeederClient):
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent._buffer_probe_cb):
+	  doc fixes
+
+2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py
 	  (FeedComponent.provide_master_clock, FeedComponent.pipelinePaused):
 	  Adapt the doc string to what is actually being done.

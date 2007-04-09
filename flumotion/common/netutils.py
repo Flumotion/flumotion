@@ -125,11 +125,12 @@ def countTrailingZeroes32(n):
 
 class RoutingTable(object):
     def fromFile(klass, f, requireNames=True, defaultRouteName='*default*'):
-        """Make a new routing table, populated from entries in an open
+        """
+        Make a new routing table, populated from entries in an open
         file object.
 
         The entries are expected to have the form:
-          IP-ADDRESS/MASK-BITS ROUTE-NAME
+        IP-ADDRESS/MASK-BITS ROUTE-NAME
 
         The `#' character denotes a comment. Empty lines are allowed.
 

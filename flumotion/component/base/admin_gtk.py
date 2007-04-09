@@ -570,8 +570,8 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def addFeederClient(self, feederState, state):
         """
-        @param uiState: the component's uiState
-        @param state:   the feeder client's uiState
+        @param State: the component's uiState
+        @param state: the feeder client's uiState
         """
 
         clientId = state.get('clientId')

@@ -1,14 +1,16 @@
 # add a trial target
 # include from flumotion/test/Makefile.am
-
-TRIAL_ENV=$(top_srcdir)/env
+# set TRIAL_ENV
 
 # FIXME: doing "trial flumotion.test" from this directory causes the
 # base package flumotion tests to run always, instead of
 # the current package
 
 trial: rm-trial-test-log
-	$(TRIAL_ENV) trial test_*.py 2>&1				\
+	@if test -z "$(TRIAL_ENV)"; then 				\
+	    echo "Please set the TRIAL_ENV Makefile variable."; 	\
+	    exit 1; fi
+	$(TRIAL_ENV) trial $(srcdir)/test_*.py 2>&1			\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\

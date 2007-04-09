@@ -957,11 +957,11 @@ class FeedComponent(basecomponent.BaseComponent):
 
         Called from GStreamer threads.
 
-        @param pad       The gst.Pad srcpad for one eater in this component.
-        @param buffer    A gst.Buffer that has arrived on this pad
-        @param feedId    The feedId for the feed we're eating on this pad
-        @param firstTime Boolean, true if this is the first time this buffer 
-                         probe has been added for this eater.
+        @param pad:       The gst.Pad srcpad for one eater in this component.
+        @param buffer:    A gst.Buffer that has arrived on this pad
+        @param feedId:    The feedId for the feed we're eating on this pad
+        @param firstTime: Boolean, true if this is the first time this buffer 
+                          probe has been added for this eater.
         """
 
         # log info about first incoming buffer for this check interval,
