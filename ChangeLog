@@ -1,5 +1,10 @@
 2007-04-10  Michael Smith  <msmith@fluendo.com>
 
+	* tools/httpdigesthasher.py:
+	  Add small tool to generate HTTP digest auth entries for files.
+
+2007-04-10  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/common/keycards.py:
 	* flumotion/twisted/credentials.py:
 	  Implement challenger and keycard for http digest authentication.
