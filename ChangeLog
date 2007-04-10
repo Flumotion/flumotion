@@ -1,3 +1,14 @@
+2007-04-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/dialogs.py (already_connected_message): New
+	dialog box.
+
+	* flumotion/admin/multi.py (MultiAdminModel.addManager): Maintain
+	a set of admins that we are currently connecting to. Raise an
+	AlreadyConnectedError if we are asked to connect to an
+	already-running admin, or one to which we are in the process of
+	connecting.
+
 2007-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* env.in:

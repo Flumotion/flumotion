@@ -21,7 +21,7 @@
 
 
 from flumotion.twisted import pb as fpb
-from flumotion.common import log, planet, connection
+from flumotion.common import log, planet, connection, errors
 from flumotion.admin import admin
 
 
@@ -75,6 +75,7 @@ class MultiAdminModel(log.Loggable):
         self.admins = WatchedDict() # {managerId: AdminModel}
         # private
         self.listeners = []
+        self._pending = {}
 
     # Listener implementation
     def emit(self, signal_name, *args, **kwargs):
@@ -93,6 +94,7 @@ class MultiAdminModel(log.Loggable):
         assert not obj in self.listeners
         self.listeners.append(obj)
 
+    # FIXME: should take a connectioninfo rather than separate args
     # Public
     def addManager(self, host, port, use_insecure, authenticator,
                    tenacious=False):
@@ -100,6 +102,7 @@ class MultiAdminModel(log.Loggable):
             planet = admin.planet
             self.info('Connected to manager %s (planet %s)'
                       % (admin.managerId, planet.get('name')))
+            self._pending.pop(admin.managerId)
             self.admins[admin.managerId] = admin
             self.emit('addPlanet', admin, planet)
 
@@ -112,23 +115,33 @@ class MultiAdminModel(log.Loggable):
                 self.warning('Could not find admin model %r' % admin)
 
         def connection_refused_cb(admin):
+            self._pending.pop(admin.managerId)
             self.info('Connection to %s:%d refused.' % (host, port))
 
         def connection_failed_cb(admin, string):
+            self._pending.pop(admin.managerId)
             self.info('Connection to %s:%d failed: %s' % (host, port, string))
+
+        def connection_error_cb(admin, obj):
+            self._pending.pop(admin.managerId)
+            self.info('Error connecting to %s:%d: %r' % (host, port, object))
 
         info = connection.PBConnectionInfo(host, port, not use_insecure,
                                            authenticator)
 
-        if str(info) in self.admins:
-            raise KeyError('Already connected to %s' % info)
+        # a bit of a hack: we know that str(info) is the managerId.
+        if str(info) in self.admins or str(info) in self._pending:
+            raise errors.AlreadyConnectedError('Already connected to %s'
+                                               % info)
 
         a = admin.AdminModel()
         a.connectToManager(info, tenacious)
+        self._pending[a.managerId] = a
         a.connect('connected', connected_cb)
         a.connect('disconnected', disconnected_cb)
         a.connect('connection-refused', connection_refused_cb)
         a.connect('connection-failed', connection_failed_cb)
+        a.connect('connection-error', connection_error_cb)
         return a
 
     def close_admin(self, admin):

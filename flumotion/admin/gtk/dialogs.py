@@ -114,6 +114,11 @@ def connection_failed_message(message, parent=None):
     d = ErrorDialog('Connection failed', parent, True, message)
     return d.run()
 
+def already_connected_message(info, parent=None):
+    d = ErrorDialog('Already connected to %s' % info, parent, True,
+                    "Seek your satisfaction via existing routes.")
+    return d.run()
+
 class PropertyChangeDialog(gtk.Dialog):
     """
     I am a dialog to get and set GStreamer element properties on a component.
