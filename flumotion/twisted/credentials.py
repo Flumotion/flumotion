@@ -273,3 +273,86 @@ class UsernameSha256PasswordCryptChallenger:
 
         expected = cryptRespond(self.challenge, sha256Password)
         return self.response == expected
+
+class HTTPDigestChallenger(log.Loggable):
+    _algorithm = "MD5" # MD5-sess also supported
+
+    def __init__(self, username):
+        self.username = username
+        self.nonce = None
+        self.method = None
+        self.uri = None
+
+        self.qop = None # If non-None, the next two must be set
+        self.cnonce = None
+        self.ncvalue = None
+
+        self.response = None
+
+    def checkHTTPDigestResponse(self, ha1):
+        expectedResponse = self._calculateRequestDigest(
+            self.username, ha1, self.nonce, self.cnonce,
+            self.method, self.uri, self.ncvalue, self.qop)
+
+        self.debug("Attempting to check calculated response %s against provided response %r", expectedResponse, self.response)
+        self.debug("Username %s, nonce %s, method %s, uri %s, qop %s, cnonce %s, ncvalue %s", self.username, self.nonce, self.method, self.uri, self.qop, self.cnonce, self.ncvalue)
+        self.debug("Using H(A1): %s", ha1)
+
+        if not self.response:
+            return False
+
+        return self.response == expectedResponse
+
+    def _calculateHA1(self, ha1, nonce, cnonce):
+        """
+        Calculate H(A1) as from specification (RFC2617) section 3.2.2, given
+        the initial hash H(username:realm:passwd), hex-encoded.
+
+        This basically applies the second-level hashing for MD5-sess, if 
+        required.
+        """
+        if self._algorithm == 'MD5':
+            return ha1
+        elif self._algorithm == 'MD5-sess':
+            HA1 = ha1.decode('hex')
+
+            m = md5.md5()
+            m.update(HA1)
+            m.update(':')
+            m.update(nonce)
+            m.update(':')
+            m.update(cnonce)
+            return m.digest().encode('hex')
+        else:
+            raise NotImplementedError("Unimplemented algorithm")
+
+    def _calculateHA2(self, method, uri):
+        # We don't support auth-int, otherwise we'd optionally need to do
+        # some more work here
+        m = md5.md5()
+        m.update(method)
+        m.update(':')
+        m.update(uri)
+        return m.digest().encode('hex')
+
+    def _calculateRequestDigest(self, username, ha1, nonce, cnonce, method,
+            uri, ncvalue, qop):
+        HA1 = self._calculateHA1(ha1, nonce, cnonce)
+        HA2 = self._calculateHA2(method, uri)
+
+        m = md5.md5()
+        m.update(HA1)
+        m.update(':')
+        m.update(nonce)
+        if qop:
+            m.update(':')
+            m.update(ncvalue)
+            m.update(':')
+            m.update(cnonce)
+            m.update(':') 
+            m.update(qop) # Must be 'auth', others not supported
+        m.update(':')
+        m.update(HA2)
+
+        return m.digest().encode('hex')
+

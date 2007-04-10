@@ -1,3 +1,9 @@
+2007-04-10  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/keycards.py:
+	* flumotion/twisted/credentials.py:
+	  Implement challenger and keycard for http digest authentication.
+
 2007-04-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/dialogs.py (already_connected_message): New

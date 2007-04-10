@@ -186,3 +186,23 @@ class KeycardUASPCC(Keycard, USPCC):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
+
+class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
+    def __init__(self, username):
+        credentials.HTTPDigestChallenger.__init__(self, username)
+        Keycard.__init__(self)
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['username'] = self.username
+        # Realm? Uri? 
+        return d
+
+    def __repr__(self):
+        return "<%s %s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.username,
+            self.requesterId, _statesEnum[self.state])
+
+pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)
+
+
