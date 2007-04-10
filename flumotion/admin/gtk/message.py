@@ -80,7 +80,7 @@ class MessagesView(gtk.VBox):
         s = gtk.HSeparator()
         self.pack_start(s, False, False, 6)
         sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         sw.set_shadow_type(gtk.SHADOW_NONE)
         self.pack_start(sw, True, True, 0)
 
