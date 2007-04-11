@@ -98,11 +98,20 @@ class MultiAdminModel(log.Loggable):
     # Public
     def addManager(self, host, port, use_insecure, authenticator,
                    tenacious=False):
+        def pop_pending(managerId):
+            if managerId in self._pending:
+                self._pending.pop(managerId)
+            else:
+                self.warning('tried to pop nonpending manager %r; please '
+                             'report bug', managerId)
+                self.warning('printing stack trace')
+                from flumotion.common import debug
+                debug.print_stack()
         def connected_cb(admin):
             planet = admin.planet
             self.info('Connected to manager %s (planet %s)'
                       % (admin.managerId, planet.get('name')))
-            self._pending.pop(admin.managerId)
+            pop_pending(admin.managerId)
             self.admins[admin.managerId] = admin
             self.emit('addPlanet', admin, planet)
 
@@ -115,15 +124,15 @@ class MultiAdminModel(log.Loggable):
                 self.warning('Could not find admin model %r' % admin)
 
         def connection_refused_cb(admin):
-            self._pending.pop(admin.managerId)
+            pop_pending(admin.managerId)
             self.info('Connection to %s:%d refused.' % (host, port))
 
         def connection_failed_cb(admin, string):
-            self._pending.pop(admin.managerId)
+            pop_pending(admin.managerId)
             self.info('Connection to %s:%d failed: %s' % (host, port, string))
 
         def connection_error_cb(admin, obj):
-            self._pending.pop(admin.managerId)
+            pop_pending(admin.managerId)
             self.info('Error connecting to %s:%d: %r' % (host, port, object))
 
         info = connection.PBConnectionInfo(host, port, not use_insecure,

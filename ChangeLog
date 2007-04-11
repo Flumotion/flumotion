@@ -1,5 +1,9 @@
 2007-04-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/multi.py (MultiAdminModel.addManager): Punt on
+	fixing whatever is causing _pending underflows, and make the next
+	person that sees this send me a bug report.
+
 	* flumotion/common/messages.py (FancyEqMixin): Pull in from
 	twisted.python.util, with a bugfix to allow for different versions
 	of compareAttributes.
