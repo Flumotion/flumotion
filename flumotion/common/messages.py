@@ -28,7 +28,6 @@ import gettext
 
 from flumotion.common import log
 from twisted.spread import pb
-from twisted.python import util
 
 ERROR = 1
 WARNING = 2
@@ -73,6 +72,30 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
     """
     domain = None
     
+# Taken from twisted.python.util; modified so that if compareAttributes
+# grows, but we get a message from a remote side that doesn't have one
+# of the new attributes, that we don't raise an exception
+class FancyEqMixin:
+    compareAttributes = ()
+    def __eq__(self, other):
+        if not self.compareAttributes:
+            return self is other
+        #XXX Maybe get rid of this, and rather use hasattr()s
+        if not isinstance(other, self.__class__):
+            return False
+        for attr in self.compareAttributes:
+            if hasattr(self, attr):
+                if not hasattr(other, attr):
+                    return False
+                elif not getattr(self, attr) == getattr(other, attr):
+                    return False
+            elif hasattr(other, attr):
+                return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 # NOTE: subclassing FancyEqMixin allows us to compare two
 # RemoteCopy instances gotten from the same Copyable; this allows
 # state _append and _remove to work correctly
@@ -81,7 +104,7 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
 # also pass equality
 # For our purposes, this is fine.
 
-class TranslatableSingular(Translatable, util.FancyEqMixin):
+class TranslatableSingular(Translatable, FancyEqMixin):
     """
     I represent a translatable gettext msg in the singular form.
     """
@@ -99,7 +122,7 @@ class TranslatableSingular(Translatable, util.FancyEqMixin):
         self.args = args
 pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 
-class TranslatablePlural(Translatable, util.FancyEqMixin):
+class TranslatablePlural(Translatable, FancyEqMixin):
     """
     I represent a translatable gettext msg in the plural form.
     """
@@ -205,7 +228,7 @@ class Translator(log.Loggable):
 # this might be a little heavy; we could consider only comparing
 # on id, once we verify that all id's are unique
 
-class Message(pb.Copyable, pb.RemoteCopy, util.FancyEqMixin):
+class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     """
     I am a message to be shown in a UI.
     """

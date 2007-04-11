@@ -1,3 +1,9 @@
+2007-04-11  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/messages.py (FancyEqMixin): Pull in from
+	twisted.python.util, with a bugfix to allow for different versions
+	of compareAttributes.
+
 2007-04-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/message.py (MessagesView.__init__):
