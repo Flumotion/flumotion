@@ -94,24 +94,26 @@ class MultiAdminModel(log.Loggable):
         assert not obj in self.listeners
         self.listeners.append(obj)
 
+    def _pushPendingConnection(self, admin):
+        assert admin.managerId not in self._pending
+        self._pending[admin.managerId] = admin
+
+    def _popPendingConnection(self, admin):
+        if admin.managerId in self._pending:
+            self._pending.pop(admin.managerId)
+        else:
+            self.warning('tried to pop nonpending manager %r; please '
+                         'report bug', admin.managerId)
+
     # FIXME: should take a connectioninfo rather than separate args
     # Public
     def addManager(self, host, port, use_insecure, authenticator,
                    tenacious=False):
-        def pop_pending(managerId):
-            if managerId in self._pending:
-                self._pending.pop(managerId)
-            else:
-                self.warning('tried to pop nonpending manager %r; please '
-                             'report bug', managerId)
-                self.warning('printing stack trace')
-                from flumotion.common import debug
-                debug.print_stack()
         def connected_cb(admin):
             planet = admin.planet
-            self.info('Connected to manager %s (planet %s)'
-                      % (admin.managerId, planet.get('name')))
-            pop_pending(admin.managerId)
+            self.info('Connected to manager %s (planet %s)',
+                      admin.managerId, planet.get('name'))
+            self._popPendingConnection(admin)
             self.admins[admin.managerId] = admin
             self.emit('addPlanet', admin, planet)
 
@@ -121,19 +123,23 @@ class MultiAdminModel(log.Loggable):
                 self.emit('removePlanet', admin, admin.planet)
                 del self.admins[admin.managerId]
             else:
-                self.warning('Could not find admin model %r' % admin)
+                self.warning('Could not find admin model %r', admin)
 
         def connection_refused_cb(admin):
-            pop_pending(admin.managerId)
-            self.info('Connection to %s:%d refused.' % (host, port))
+            if not tenacious:
+                self._popPendingConnection(admin)
+            self.info('Connection to %s:%d refused.', host, port)
 
         def connection_failed_cb(admin, string):
-            pop_pending(admin.managerId)
-            self.info('Connection to %s:%d failed: %s' % (host, port, string))
+            if not tenacious:
+                self._popPendingConnection(admin)
+            self.info('Connection to %s:%d failed: %s', host, port,
+                      string)
 
         def connection_error_cb(admin, obj):
-            pop_pending(admin.managerId)
-            self.info('Error connecting to %s:%d: %r' % (host, port, object))
+            if not tenacious:
+                self._popPendingConnection(admin)
+            self.warning('Error connecting to %s:%d: %r', host, port, obj)
 
         info = connection.PBConnectionInfo(host, port, not use_insecure,
                                            authenticator)
@@ -145,7 +151,7 @@ class MultiAdminModel(log.Loggable):
 
         a = admin.AdminModel()
         a.connectToManager(info, tenacious)
-        self._pending[a.managerId] = a
+        self._pushPendingConnection(a)
         a.connect('connected', connected_cb)
         a.connect('disconnected', disconnected_cb)
         a.connect('connection-refused', connection_refused_cb)
@@ -154,6 +160,9 @@ class MultiAdminModel(log.Loggable):
         return a
 
     def close_admin(self, admin):
+        if admin.managerId not in self.admins:
+            self.debug('removing admin %s from pending', admin.managerId)
+            self._popPendingConnection(admin)
         admin.shutdown()
 
     def for_each_component(self, object, proc):

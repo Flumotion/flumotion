@@ -1,5 +1,12 @@
 2007-04-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/multi.py
+	(MultiAdminModel._pushPendingConnection)
+	(MultiAdminModel._popPendingConnection)
+	(MultiAdminModel.addManager): Refactor the pending connections to
+	not pop pending status for a tenacious connect.
+	(MultiAdminModel.close_admin): Pop from pending here too.
+
 	* flumotion/admin/multi.py (MultiAdminModel.addManager): Punt on
 	fixing whatever is causing _pending underflows, and make the next
 	person that sees this send me a bug report.
