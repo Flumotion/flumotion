@@ -1,3 +1,10 @@
+2007-04-13  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/producers/firewire/firewire.py
+	  (Firewire.setVolume): Remove unnecessary whitespace.
+	  (Firewire._bus_message_received_cb): Fix bug detecting camera
+	  disconnection. Turns out gst.Structure is no longer iterable.
+	
 2007-04-11  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/multi.py

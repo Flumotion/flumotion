@@ -135,7 +135,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         @param value: float between 0.0 and 4.0
         """
         self.debug("Setting volume to %f" % (value))
-
         self.volume.set_property('volume', value)
 
     # detect camera unplugging or other cause of firewire bus reset
@@ -147,9 +146,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         if message.structure.get_name() == "ieee1394-bus-reset":
             # we have a firewire bus reset
             s = message.structure
-            # current-device-change is only in gst-plugins-good 0.10.3
-            # not yet released
-            if 'current-device-change' in s:
+            # current-device-change is only in gst-plugins-good >= 0.10.3
+            if s.has_key('current-device-change'):
                 if s['current-device-change'] != 0:
                     # we actually have a connect or disconnect of the camera
                     # so first remove all the previous messages warning about a
