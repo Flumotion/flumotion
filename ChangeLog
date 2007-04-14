@@ -1,3 +1,10 @@
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/launch/main.py (ComponentWrapper,
+	  ComponentWrapper.__init__, ComponentWrapper.feedToFD,
+	  ComponentWrapper.eatFromFD, starter):
+	  Log some more.
+
 2007-04-13  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/producers/firewire/firewire.py

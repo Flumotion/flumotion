@@ -84,7 +84,9 @@ def err(x):
     raise SystemExit(1)
 
 
-class ComponentWrapper(object):
+class ComponentWrapper(object, log.Loggable):
+    logCategory = "compwrapper"
+
     def __init__(self, config):
         self.name = config['name']
         self.config = config
@@ -141,9 +143,11 @@ class ComponentWrapper(object):
         return self.component.stop()
 
     def feedToFD(self, feedName, fd):
+        self.debug('feedToFD(feedName=%s, %d)' % (feedName, fd))
         return self.component.feedToFD(feedName, fd, os.close)
 
     def eatFromFD(self, feedId, fd):
+        self.debug('eatFromFD(feedId=%s, %d)' % (feedId, fd))
         return self.component.eatFromFD(feedId, fd)
 
 def make_pipes(wrappers):
@@ -156,6 +160,8 @@ def make_pipes(wrappers):
         for source in wrapper.config.get('source', []):
             compName, feedName = source.split(':')
             read, write = os.pipe()
+            log.debug('launch', '%s: read from fd %d, write to fd %d' % (
+                source, read, write))
             start = starter(wrappersByName[compName], feedName, write)
             fds[source] = (read, start)
     return fds
