@@ -10,7 +10,7 @@ trial: rm-trial-test-log
 	@if test -z "$(TRIAL_ENV)"; then 				\
 	    echo "Please set the TRIAL_ENV Makefile variable."; 	\
 	    exit 1; fi
-	$(TRIAL_ENV) trial $(srcdir)/test_*.py 2>&1			\
+	$(TRIAL_ENV) trial flumotion.test 2>&1				\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\

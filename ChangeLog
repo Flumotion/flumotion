@@ -1,5 +1,10 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/trial.mk:
+	  Revert patch to run trial flumotion.test always.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/videotest/videotest.py
 	  (VideoTest.get_pipeline_string):
 	* flumotion/component/producers/videotest/videotest.xml:
