@@ -7,6 +7,7 @@ try:
     from misc import setup
     setup.setup()
 except ImportError:
+    print "Not importing misc.setup"
     pass
     
 from flumotion.common import boot
@@ -14,6 +15,11 @@ boot.init_gobject()
 boot.init_gst()
 from twisted.internet import gtk2reactor
 gtk2reactor.install(useGtk=False)
+
+# reinstall our import hooks that could have been overridden by
+# pygtk/pygst ltihooks
+from flumotion.common import package
+package.getPackager().install()
 
 # monkey patching twisted doc errors
 from twisted.spread import pb
