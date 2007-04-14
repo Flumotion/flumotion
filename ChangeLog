@@ -1,5 +1,25 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/extern/Makefile.am:
+	* flumotion/extern/log/__init__.py:
+	* flumotion/extern/log/log.py (registerCategory, scrubFilename,
+	  errorObject, TwistedLogObserver, TwistedLogObserver.clearIgnores,
+	  _getTheTwistedLogObserver, addLogHandler, init, reopenOutputFiles,
+	  logTwisted, setDebug, setPackageScrubList, getExceptionMessage):
+	  Extract a log.py that can be used by other projects and is
+	  standalone.  To that end, have init() take the name of an
+	  environment variable that controls the debug level, and add
+	  setPackageScrubList method to define which packages to scrub.
+	  Also, raise SystemExit instead of a flumotion error.  Let's hope
+	  that doesn't have unwanted side effects.
+	* flumotion/common/log.py (init):
+	  Now a rather barren file with stubs and compatibility stuff.
+	* flumotion/test/test_log.py (TestLog.testLimitedError):
+	  Small fix.
+	  Fixes #594 and #595.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setup):
 	  Debug when config is not part of state.
 	  Import gettext; brought out by a test on -template.

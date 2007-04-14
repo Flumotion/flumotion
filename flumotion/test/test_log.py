@@ -21,7 +21,7 @@
 
 from twisted.trial import unittest
 
-from flumotion.common import errors, log
+from flumotion.common import log
 
 class LogTester(log.Loggable):
     logCategory = 'testlog'
@@ -95,7 +95,7 @@ class TestLog(unittest.TestCase):
         log.setFluDebug("testlog:3")
         log.addLogHandler(self.handler)
         
-        self.assertRaises(errors.SystemError, self.tester.error, "error")
+        self.assertRaises(SystemExit, self.tester.error, "error")
         assert self.category == 'testlog'
         assert self.level == log.ERROR
         assert self.message == 'error'
