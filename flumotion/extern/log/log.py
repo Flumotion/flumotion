@@ -441,7 +441,8 @@ def getExceptionMessage(exception, frame=-1, filename=None):
     # for now
     if str(exception):
         msg = ": %s" % str(exception)
-    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
+    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" \
+        % locals()
 
 def reopenOutputFiles():
     """
@@ -622,7 +623,8 @@ def getFailureMessage(failure):
 
     (func, filename, line, some, other) = failure.frames[-1]
     filename = scrubFilename(filename)
-    return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()
+    return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" \
+        % locals()
 
 def warningFailure(failure, swallow=True):
     """
@@ -723,5 +725,3 @@ class TwistedLogObserver(Loggable):
 
     def clearIgnores(self):
         self._ignoreErrors = []
-
-
