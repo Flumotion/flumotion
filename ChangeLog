@@ -1,5 +1,11 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setup):
+	  Debug when config is not part of state.
+	  Import gettext; brought out by a test on -template.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/redhat/flumotion.logrotate:
 	  Make it conform to other Fedora/Red Hat logrotate scripts.
 	* flumotion.spec.in:

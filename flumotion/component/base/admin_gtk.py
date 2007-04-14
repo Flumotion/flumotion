@@ -25,6 +25,7 @@ Base classes for component UI's using GTK+
 
 import os
 import time
+import gettext
 
 import gtk
 import gtk.glade
@@ -122,6 +123,9 @@ class BaseAdminGtk(log.Loggable):
         self.debug('BaseAdminGtk.setup()')
 
         config = self.state.get('config') 
+        if not config:
+            self.debug('self.state %r does not have config' % self.state)
+
         if config['feed']:
             self.debug("Component has feeders, show Feeders node")
             self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
