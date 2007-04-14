@@ -123,7 +123,7 @@ pipeline.
 Implementations
 ---------------
 
-FeedComponent.do_setup(self, eatersData, feedersData)
+FeedComponent.do_setup(self)
 -------------------------
 This method will instantiate a pipeline first, and set up the eaters' and
 feeders' hostnames and ports then allow the object a chance to do any further

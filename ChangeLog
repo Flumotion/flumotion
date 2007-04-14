@@ -1,5 +1,14 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/component-initialization-protocol:
+	  Small clarification.
+	* flumotion/component/feedcomponent010.py (FeedComponent,
+	  FeedComponent.do_setup, FeedComponent.get_element,
+	  FeedComponent.eatFromFD):
+	  Some debugging.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/launch/main.py (ComponentWrapper,
 	  ComponentWrapper.__init__, ComponentWrapper.feedToFD,
 	  ComponentWrapper.eatFromFD, starter):

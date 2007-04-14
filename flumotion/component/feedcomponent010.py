@@ -343,7 +343,7 @@ class FeedComponent(basecomponent.BaseComponent):
     # keep these as class variables for the tests
     FDSRC_TMPL = 'fdsrc name=%(name)s'
     DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
-    FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
+    FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
     # EATER_TMPL is no longer used due to it being dynamic
     # how often to add the buffer probe
     BUFFER_PROBE_ADD_FREQUENCY = 5
@@ -424,12 +424,15 @@ class FeedComponent(basecomponent.BaseComponent):
     def do_setup(self):
         """
         Sets up component.
+
+        Invokes the L{create_pipeline} and L{set_pipeline} vmethods,
+        which subclasses can provide.
         """
         eater_config = self.config.get('source', [])
         feeder_config = self.config.get('feed', [])
 
-        self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
-        self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
+        self.debug("FeedComponent.do_setup(): eater_config %r" % eater_config)
+        self.debug("FeedComponent.do_setup(): feeder_config %r" % feeder_config)
         
         # this sets self.eater_names
         self.parseEaterConfig(eater_config)
@@ -457,13 +460,14 @@ class FeedComponent(basecomponent.BaseComponent):
             self.uiState.append('feeders',
                                  self._feeders[feederName].uiState)
 
-        self.debug('setup() with %d eaters and %d feeders waiting' % (
+        self.debug('FeedComponent.do_setup(): '
+            '%d eaters and %d feeders waiting' % (
             len(self._inactiveEaters), self.feedersWaiting))
 
         pipeline = self.create_pipeline()
         self.set_pipeline(pipeline)
 
-        self.debug('setup() finished')
+        self.debug("FeedComponent.do_setup(): finished")
 
         return defer.succeed(None)
 
@@ -1079,6 +1083,8 @@ class FeedComponent(basecomponent.BaseComponent):
         the caller needs to check if self.pipeline is actually set.
         """
         assert self.pipeline
+        self.log('Looking up element %r in pipeline %r' % (
+            element_name, self.pipeline))
         element = self.pipeline.get_by_name(element_name)
         return element
     
@@ -1193,6 +1199,9 @@ class FeedComponent(basecomponent.BaseComponent):
         eaterName = "eater:%s" % feedId
         self.debug('looking up element %s' % eaterName)
         element = self.get_element(eaterName)
+        if not element:
+            self.warning('No element named %s in pipeline' % eaterName)
+            return
  
         # fdsrc only switches to the new fd in ready or below
         (result, current, pending) = element.get_state(0L)
