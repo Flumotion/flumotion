@@ -1,6 +1,14 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/extern/Makefile.am:
+	  Add check rule.
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_log.py:
+	  deleted.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/extern/Makefile.am:
 	* flumotion/extern/log/__init__.py:
 	* flumotion/extern/log/log.py (registerCategory, scrubFilename,
 	  errorObject, TwistedLogObserver, TwistedLogObserver.clearIgnores,
