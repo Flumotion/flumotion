@@ -1,5 +1,12 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/redhat/flumotion.logrotate:
+	  Make it conform to other Fedora/Red Hat logrotate scripts.
+	* flumotion.spec.in:
+	  make-dummy-cert moved, no need to install it anymore.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/trial.mk:
 	  Revert patch to run trial flumotion.test always.
 
