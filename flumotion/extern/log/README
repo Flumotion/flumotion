@@ -10,6 +10,7 @@ Suggested use in your project:
      to have the debug output controlled by)
   - call log.setPackageScrubList('myproject')
     to have the filename logging be relative to your myproject package/module.
+  - call log.setDebug(myDebugString) to change the logging levels.
 
 Alternatively, you can embed only the log.py file with proper svn:externals.
 
