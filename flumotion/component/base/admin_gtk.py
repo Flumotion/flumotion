@@ -25,7 +25,6 @@ Base classes for component UI's using GTK+
 
 import os
 import time
-import gettext
 
 import gtk
 import gtk.glade
@@ -153,6 +152,8 @@ class BaseAdminGtk(log.Loggable):
         localeDir = os.path.join(localedatadir, 'locale')
         self.debug("Loading locales for %s from %s" % (
             self.gettext_domain, localeDir))
+        # import done here due to defgen scoping issues
+        import gettext
         gettext.bindtextdomain(self.gettext_domain, localeDir)
         gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
         yield None
