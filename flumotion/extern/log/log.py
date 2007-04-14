@@ -1,3 +1,4 @@
+# -*- Mode: Python; test-case-name: test_log -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # This file is released under the standard PSF license.

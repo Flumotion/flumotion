@@ -1,5 +1,14 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* log.py:
+	* test_log.py (TestLog.testSetDebug, TestLog.testLimitInvisible,
+	  TestLog.testLimitedVisible, TestLog.testFormatStrings,
+	  TestLog.testLimitedError, TestLog.testLogHandlerLimitedLevels,
+	  TestLog.testLogHandler, TestOwnLogHandler.testOwnLogHandlerLimited):
+	  Move over test and adapt.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* log.py (stderrHandler, init, setDebug, setPackageScrubList, reset,
 	  addLogHandler, error, log, getExceptionMessage, reopenOutputFiles,
 	  outputToFiles, sighup, Loggable, Loggable.warningFailure,
