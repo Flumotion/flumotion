@@ -1,4 +1,8 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* README: added.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* log.py: copied and adapted from flumotion.common.log so outside
 	  projects can use it.

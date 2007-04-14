@@ -1,0 +1,17 @@
+This module does logging.
+
+Suggested use in your project:
+
+- create myproject/extern directory
+- svn propset svn:externals "log https://core.fluendo.com/svn/flumotion/trunk/flumotion/extern/log" myproject/extern
+- in your project:
+  - call log.init('MY_PROJECT_DEBUG')
+    (where MY_PROJECT_DEBUG is the name of the enviroment variable you want
+     to have the debug output controlled by)
+  - call log.setPackageScrubList('myproject')
+    to have the filename logging be relative to your myproject package/module.
+
+Alternatively, you can embed only the log.py file with proper svn:externals.
+
+If you are worried about stability, check out a specific revision by
+putting -r (revision number) in between log and https
