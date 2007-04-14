@@ -56,9 +56,13 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         
         is_live = 'is-live=true'
 
-        return "videotestsrc %s name=source ! " \
-            "identity name=identity silent=TRUE ! %s" % (
-            is_live, caps)
+        overlay = ""
+        timestamp_overlay = properties.get('timestamp-overlay', False)
+        if timestamp_overlay:
+            overlay = " timeoverlay ! "
+
+        return "videotestsrc %s name=source ! " % is_live + overlay + \
+            "identity name=identity silent=TRUE ! %s" % caps
         
     # Set properties
     def configure_pipeline(self, pipeline, properties):
