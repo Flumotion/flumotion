@@ -1,5 +1,16 @@
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* log.py (stderrHandler, init, setDebug, setPackageScrubList, reset,
+	  addLogHandler, error, log, getExceptionMessage, reopenOutputFiles,
+	  outputToFiles, sighup, Loggable, Loggable.warningFailure,
+	  Loggable.logObjectName, _getTheTwistedLogObserver, getFailureMessage,
+	  warningFailure, logTwisted, TwistedLogObserver,
+	  TwistedLogObserver.__init__, TwistedLogObserver.emit,
+	  TwistedLogObserver.ignoreErrors, TwistedLogObserver.clearIgnores):
+	  Reorder log file a little.
+
+2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* README: added.
 
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>

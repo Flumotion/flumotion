@@ -39,6 +39,10 @@ _log_handlers_limited = []
 
 _initialized = False
 
+_stdout = None
+_stderr = None
+   
+
 # public log levels
 ERROR = 1
 WARN = 2
@@ -285,6 +289,124 @@ def logObject(object, cat, format, *args):
     """
     doLog(LOG, object, cat, format, args)
 
+def stderrHandler(level, object, category, file, line, message):
+    """
+    A log handler that writes to stderr.
+
+    @type level:    string
+    @type object:   string (or None)
+    @type category: string
+    @type message:  string
+    """
+
+    o = ""
+    if object:
+        o = '"' + object + '"'
+
+    where = "(%s:%d)" % (file, line)
+
+    try:
+        # level   pid     object   cat      time
+        # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
+        sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
+            getLevelName(level), os.getpid(), o, category,
+            time.strftime("%b %d %H:%M:%S")))
+        sys.stderr.write('%-4s %s %s\n' % ("", message, where))
+
+        # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
+        #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
+        #    level, o, category, where, os.getpid(),
+        #    "", time.strftime("%b %d %H:%M:%S"), message))
+        sys.stderr.flush()
+    except IOError, e:
+        if e.errno == errno.EPIPE:
+            # if our output is closed, exit; e.g. when logging over an
+            # ssh connection and the ssh connection is closed
+            os._exit(os.EX_OSERR)
+        # otherwise ignore it, there's nothing you can do
+
+### "public" useful API
+
+# setup functions
+def init(envVarName):
+    """
+    Initialize the logging system and parse the environment variable
+    of the given name.
+    Needs to be called before starting the actual application.
+    """
+    global _initialized
+
+    if _initialized:
+        return
+
+    global _ENV_VAR_NAME
+    _ENV_VAR_NAME = envVarName
+
+    if os.environ.has_key(envVarName):
+        # install a log handler that uses the value of the environment var
+        setDebug(os.environ[envVarName])
+    addLogHandler(stderrHandler, limited=True)
+
+    _initialized = True
+
+def setDebug(string):
+    """Set the DEBUG string.  This controls the log output."""
+    global _DEBUG
+    global _ENV_VAR_NAME
+    global _categories
+    
+    _DEBUG = string
+    debug('log', "%s set to %s" % (_ENV_VAR_NAME, _DEBUG))
+
+    # reparse all already registered category levels
+    for category in _categories:
+        registerCategory(category)
+
+def setPackageScrubList(*packages):
+    """
+    Set the package names to scrub from filenames.
+    Filenames from these paths in log messages will be scrubbed to their
+    relative file path instead of the full absolute path.
+
+    @type packages: list of str
+    """
+    global _PACKAGE_SCRUB_LIST
+    _PACKAGE_SCRUB_LIST = packages
+
+def reset():
+    """
+    Resets the logging system, removing all log handlers.
+    """
+    global _log_handlers, _log_handlers_limited, _initialized
+    
+    _log_handlers = []
+    _log_handlers_limited = []
+    _initialized = False
+
+def addLogHandler(func, limited=True):
+    """
+    Add a custom log handler.
+
+    @param func:    a function object
+                    with prototype (level, object, category, message)
+                    where level is either ERROR, WARN, INFO, DEBUG, or
+                    LOG, and the rest of the arguments are strings or
+                    None. Use getLevelName(level) to get a printable
+                    name for the log level.
+    @type func:     a callable function
+    @type limited:  boolean
+    @param limited: whether to automatically filter based on the DEBUG value
+    """
+
+    if not callable(func):
+        raise TypeError, "func must be callable"
+    
+    if limited:
+        _log_handlers_limited.append(func)
+    else:
+        _log_handlers.append(func)
+ 
+# public log functions
 def error(cat, format, *args):
     errorObject(None, cat, format, *args)
 
@@ -300,18 +422,73 @@ def debug(cat, format, *args):
 def log(cat, format, *args):
     logObject(None, cat, format, *args)
 
-def warningFailure(failure, swallow=True):
+# public utility functions
+def getExceptionMessage(exception, frame=-1, filename=None):
     """
-    Log a warning about a Failure. Useful as an errback handler:
-    d.addErrback(warningFailure)
-
-    @param swallow: whether to swallow the failure or not
-    @type  swallow: bool
+    Return a short message based on an exception, useful for debugging.
+    Tries to find where the exception was triggered.
     """
-    warning('', getFailureMessage(failure))
-    if not swallow:
-        return failure
+    stack = traceback.extract_tb(sys.exc_info()[2])
+    if filename:
+        stack = [f for f in stack if f[0].find(filename) > -1]
+    #import code; code.interact(local=locals())
+    (filename, line, func, text) = stack[frame]
+    filename = scrubFilename(filename)
+    exc = exception.__class__.__name__
+    msg = ""
+    # a shortcut to extract a useful message out of most exceptions
+    # for now
+    if str(exception):
+        msg = ": %s" % str(exception)
+    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
 
+def reopenOutputFiles():
+    """
+    Reopens the stdout and stderr output files, as set by
+    L{outputToFiles}.
+    """
+    if not (_stdout and _stderr):
+        debug('log', 'told to reopen log files, but log files not set')
+        return
+
+    oldmask = os.umask(0026)
+    try:
+        so = open(_stdout, 'a+') 
+        se = open(_stderr, 'a+', 0)
+    finally:
+        os.umask(oldmask)
+
+    os.dup2(so.fileno(), sys.stdout.fileno()) 
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
+    debug('log', 'opened log %r', _stderr)
+
+def outputToFiles(stdout, stderr):
+    """
+    Redirect stdout and stderr to named files.
+
+    Records the file names so that a future call to reopenOutputFiles()
+    can open the same files. Installs a SIGHUP handler that will reopen
+    the output files.
+
+    Note that stderr is opened unbuffered, so if it shares a file with
+    stdout then interleaved output may not appear in the order that you
+    expect.
+    """
+    global _stdout, _stderr
+    _stdout, _stderr = stdout, stderr
+    reopenOutputFiles()
+
+    def sighup(signum, frame):
+        info('log', "Received SIGHUP, reopening logs")
+        reopenOutputFiles()
+
+    debug('log', 'installing SIGHUP handler')
+    import signal
+    signal.signal(signal.SIGHUP, sighup)
+
+
+# base class for loggable objects
 class Loggable:
     """
     Base class for objects that want to be able to log messages with
@@ -385,7 +562,7 @@ class Loggable:
 
     def warningFailure(self, failure, swallow=True):
         """
-        Log a warning about a Failure. Useful as an errback handler:
+        Log a warning about a Twisted Failure. Useful as an errback handler:
         d.addErrback(self.warningFailure)
 
         @param swallow: whether to swallow the failure or not
@@ -412,6 +589,82 @@ class Loggable:
                 return getattr(self, name)
 
         return None
+
+# Twisted helper stuff
+
+# private stuff
+_initializedTwisted = False
+
+# make a singleton
+__theTwistedLogObserver = None
+
+def _getTheTwistedLogObserver():
+    # used internally and in test
+    global __theTwistedLogObserver
+
+    if not __theTwistedLogObserver:
+        __theTwistedLogObserver = TwistedLogObserver()
+
+    return __theTwistedLogObserver
+
+
+# public helper methods
+def getFailureMessage(failure):
+    """
+    Return a short message based on L{twisted.python.failure.Failure}.
+    Tries to find where the exception was triggered.
+    """
+    exc = str(failure.type)
+    msg = failure.getErrorMessage()
+    if len(failure.frames) == 0:
+        return "failure %(exc)s: %(msg)s" % locals()
+
+    (func, filename, line, some, other) = failure.frames[-1]
+    filename = scrubFilename(filename)
+    return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()
+
+def warningFailure(failure, swallow=True):
+    """
+    Log a warning about a Failure. Useful as an errback handler:
+    d.addErrback(warningFailure)
+
+    @param swallow: whether to swallow the failure or not
+    @type  swallow: bool
+    """
+    warning('', getFailureMessage(failure))
+    if not swallow:
+        return failure
+
+def logTwisted():
+    """
+    Integrate twisted's logger with our logger.
+
+    This is done in a separate method because calling this imports and sets
+    up a reactor.  Since we want basic logging working before choosing a
+    reactor, we need to separate these.
+    """
+    global _initializedTwisted
+
+    if _initializedTwisted:
+        return
+
+    debug('log', 'Integrating twisted logger')
+
+    # integrate twisted's logging with us
+    from twisted.python import log as tlog
+
+    # this call imports the reactor
+    # that is why we do this in a separate method
+    from twisted.spread import pb
+
+    # we don't want logs for pb.Error types since they
+    # are specifically raised to be handled on the other side
+    observer = _getTheTwistedLogObserver()
+    observer.ignoreErrors([pb.Error,])
+    tlog.startLoggingWithObserver(observer.emit, False)
+
+    _initializedTwisted = True
+
 
 # we need an object as the observer because startLoggingWithObserver
 # expects a bound method
@@ -470,240 +723,4 @@ class TwistedLogObserver(Loggable):
     def clearIgnores(self):
         self._ignoreErrors = []
 
-# make a singleton
-__theTwistedLogObserver = None
 
-def _getTheTwistedLogObserver():
-    # used internally and in test
-    global __theTwistedLogObserver
-
-    if not __theTwistedLogObserver:
-        __theTwistedLogObserver = TwistedLogObserver()
-
-    return __theTwistedLogObserver
-
-def stderrHandler(level, object, category, file, line, message):
-    """
-    A log handler that writes to stderr.
-
-    @type level:    string
-    @type object:   string (or None)
-    @type category: string
-    @type message:  string
-    """
-
-    o = ""
-    if object:
-        o = '"' + object + '"'
-
-    where = "(%s:%d)" % (file, line)
-
-    try:
-        # level   pid     object   cat      time
-        # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
-        sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
-            getLevelName(level), os.getpid(), o, category,
-            time.strftime("%b %d %H:%M:%S")))
-        sys.stderr.write('%-4s %s %s\n' % ("", message, where))
-
-        # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
-        #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
-        #    level, o, category, where, os.getpid(),
-        #    "", time.strftime("%b %d %H:%M:%S"), message))
-        sys.stderr.flush()
-    except IOError, e:
-        if e.errno == errno.EPIPE:
-            # if our output is closed, exit; e.g. when logging over an
-            # ssh connection and the ssh connection is closed
-            os._exit(os.EX_OSERR)
-        # otherwise ignore it, there's nothing you can do
-
-def addLogHandler(func, limited=True):
-    """
-    Add a custom log handler.
-
-    @param func:    a function object
-                    with prototype (level, object, category, message)
-                    where level is either ERROR, WARN, INFO, DEBUG, or
-                    LOG, and the rest of the arguments are strings or
-                    None. Use getLevelName(level) to get a printable
-                    name for the log level.
-    @type func:     a callable function
-    @type limited:  boolean
-    @param limited: whether to automatically filter based on the DEBUG value
-    """
-
-    if not callable(func):
-        raise TypeError, "func must be callable"
-    
-    if limited:
-        _log_handlers_limited.append(func)
-    else:
-        _log_handlers.append(func)
-
-def init(envVarName):
-    """
-    Initialize the logging system and parse the environment variable
-    of the given name.
-    Needs to be called before starting the actual application.
-    """
-    global _initialized
-
-    if _initialized:
-        return
-
-    global _ENV_VAR_NAME
-    _ENV_VAR_NAME = envVarName
-
-    if os.environ.has_key(envVarName):
-        # install a log handler that uses the value of the environment var
-        setDebug(os.environ[envVarName])
-    addLogHandler(stderrHandler, limited=True)
-
-    _initialized = True
-
-_stdout = None
-_stderr = None
-def reopenOutputFiles():
-    """
-    Reopens the stdout and stderr output files, as set by
-    L{outputToFiles}.
-    """
-    if not (_stdout and _stderr):
-        debug('log', 'told to reopen log files, but log files not set')
-        return
-
-    oldmask = os.umask(0026)
-    try:
-        so = open(_stdout, 'a+') 
-        se = open(_stderr, 'a+', 0)
-    finally:
-        os.umask(oldmask)
-
-    os.dup2(so.fileno(), sys.stdout.fileno()) 
-    os.dup2(se.fileno(), sys.stderr.fileno())
-
-    debug('log', 'opened log %r', _stderr)
-
-def outputToFiles(stdout, stderr):
-    """
-    Redirect stdout and stderr to named files.
-
-    Records the file names so that a future call to reopenOutputFiles()
-    can open the same files. Installs a SIGHUP handler that will reopen
-    the output files.
-
-    Note that stderr is opened unbuffered, so if it shares a file with
-    stdout then interleaved output may not appear in the order that you
-    expect.
-    """
-    global _stdout, _stderr
-    _stdout, _stderr = stdout, stderr
-    reopenOutputFiles()
-
-    def sighup(signum, frame):
-        info('log', "Received SIGHUP, reopening logs")
-        reopenOutputFiles()
-
-    debug('log', 'installing SIGHUP handler')
-    import signal
-    signal.signal(signal.SIGHUP, sighup)
-
-_initializedTwisted = False
-
-def logTwisted():
-    """
-    Integrate twisted's logger with our logger.
-
-    This is done in a separate method because calling this imports and sets
-    up a reactor.  Since we want basic logging working before choosing a
-    reactor, we need to separate these.
-    """
-    global _initializedTwisted
-
-    if _initializedTwisted:
-        return
-
-    debug('log', 'Integrating twisted logger')
-
-    # integrate twisted's logging with us
-    from twisted.python import log as tlog
-
-    # this call imports the reactor
-    # that is why we do this in a separate method
-    from twisted.spread import pb
-
-    # we don't want logs for pb.Error types since they
-    # are specifically raised to be handled on the other side
-    observer = _getTheTwistedLogObserver()
-    observer.ignoreErrors([pb.Error,])
-    tlog.startLoggingWithObserver(observer.emit, False)
-
-    _initializedTwisted = True
-
-def reset():
-    """
-    Resets the logging system, removing all log handlers.
-    """
-    global _log_handlers, _log_handlers_limited, _initialized
-    
-    _log_handlers = []
-    _log_handlers_limited = []
-    _initialized = False
-    
-def setDebug(string):
-    """Set the DEBUG string.  This controls the log output."""
-    global _DEBUG
-    global _ENV_VAR_NAME
-    global _categories
-    
-    _DEBUG = string
-    debug('log', "%s set to %s" % (_ENV_VAR_NAME, _DEBUG))
-
-    # reparse all already registered category levels
-    for category in _categories:
-        registerCategory(category)
-
-def setPackageScrubList(*packages):
-    """
-    Set the package names to scrub from filenames.
-    Filenames from these paths in log messages will be scrubbed to their
-    relative file path instead of the full absolute path.
-
-    @type packages: list of str
-    """
-    global _PACKAGE_SCRUB_LIST
-    _PACKAGE_SCRUB_LIST = packages
-
-def getExceptionMessage(exception, frame=-1, filename=None):
-    """
-    Return a short message based on an exception, useful for debugging.
-    Tries to find where the exception was triggered.
-    """
-    stack = traceback.extract_tb(sys.exc_info()[2])
-    if filename:
-        stack = [f for f in stack if f[0].find(filename) > -1]
-    #import code; code.interact(local=locals())
-    (filename, line, func, text) = stack[frame]
-    filename = scrubFilename(filename)
-    exc = exception.__class__.__name__
-    msg = ""
-    # a shortcut to extract a useful message out of most exceptions
-    # for now
-    if str(exception):
-        msg = ": %s" % str(exception)
-    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
-
-def getFailureMessage(failure):
-    """
-    Return a short message based on L{twisted.python.failure.Failure}.
-    Tries to find where the exception was triggered.
-    """
-    exc = str(failure.type)
-    msg = failure.getErrorMessage()
-    if len(failure.frames) == 0:
-        return "failure %(exc)s: %(msg)s" % locals()
-
-    (func, filename, line, some, other) = failure.frames[-1]
-    filename = scrubFilename(filename)
-    return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()
