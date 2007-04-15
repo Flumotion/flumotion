@@ -1,5 +1,19 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/pychecker.mk (pychecker, PYCHECKER_OPTIONS):
+	  make verbose run output all warnings (or at least, 1000 of them)
+	* flumotion/manager/manager.py (Vishnu._workerCreateComponents,
+	  Vishnu._workerCreateComponentDelayed, Vishnu.componentAttached,
+	  Vishnu.getComponentStates, Vishnu._emptyPlanetCallback):
+	* flumotion/service/service.py (Servicer.status, Servicer.clean,
+	  Servicer.create):
+	* flumotion/worker/worker.py (WorkerMedium.remote_checkElements):
+	  More cleanups.
+	* misc/pycheckerrc:
+	  Admit defeat, there's too many of them.
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/extern/Makefile.am:
 	  Install correctly.
 

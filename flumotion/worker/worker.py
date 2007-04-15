@@ -247,15 +247,15 @@ class WorkerMedium(medium.PingingMedium):
         self.debug('remote_checkElements: element names to check %r' % (
             elementNames,))
 
-        list = []
+        ret = []
         for name in elementNames:
             try:
                 gst.element_factory_make(name)
-                list.append(name)
+                ret.append(name)
             except gst.PluginNotFoundError:
                 pass
-        self.debug('remote_checkElements: returning elements names %r' % list)
-        return list
+        self.debug('remote_checkElements: returning elements names %r' % ret)
+        return ret
 
     def remote_checkImport(self, moduleName):
         """

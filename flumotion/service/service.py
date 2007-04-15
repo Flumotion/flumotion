@@ -195,16 +195,16 @@ class Servicer(log.Loggable):
         """
         (managers, workers) = self._parseManagersWorkers('status', args)
         self.debug("Status managers %r and workers %r" % (managers, workers))
-        for type, list in [('manager', managers), ('worker', workers)]:
-            for name in list:
-                pid = common.getPid(type, name)
+        for kind, names in [('manager', managers), ('worker', workers)]:
+            for name in names:
+                pid = common.getPid(kind, name)
                 if not pid:
-                    print "%s %s not running" % (type, name)
+                    print "%s %s not running" % (kind, name)
                     continue
                 if common.checkPidRunning(pid):
-                    print "%s %s is running with pid %d" % (type, name, pid)
+                    print "%s %s is running with pid %d" % (kind, name, pid)
                 else:
-                    print "%s %s dead (stale pid %d)" % (type, name, pid)
+                    print "%s %s dead (stale pid %d)" % (kind, name, pid)
 
     def clean(self, args):
         """
@@ -212,19 +212,19 @@ class Servicer(log.Loggable):
         """
         (managers, workers) = self._parseManagersWorkers('clean', args)
         self.debug("Clean managers %r and workers %r" % (managers, workers))
-        for type, list in [('manager', managers), ('worker', workers)]:
-            for name in list:
-                pid = common.getPid(type, name)
+        for kind, names in [('manager', managers), ('worker', workers)]:
+            for name in names:
+                pid = common.getPid(kind, name)
                 if not pid:
                     # may be a file that contains bogus data
-                    print "deleting bogus pid file for %s %s" % (type, name)
-                    common.deletePidFile(type, name)
+                    print "deleting bogus pid file for %s %s" % (kind, name)
+                    common.deletePidFile(kind, name)
                     continue
                 if not common.checkPidRunning(pid):
                     self.debug("Cleaning up stale pid %d for %s %s" % (
-                        pid, type, name))
-                    print "deleting stale pid file for %s %s" % (type, name)
-                    common.deletePidFile(type, name)
+                        pid, kind, name))
+                    print "deleting stale pid file for %s %s" % (kind, name)
+                    common.deletePidFile(kind, name)
 
     def create(self, args):
         # TODO: Andy suggested we should be able to customize the
@@ -237,19 +237,19 @@ class Servicer(log.Loggable):
         if len(args) == 0:
             raise errors.SystemError, \
                 "Please specify 'manager' or 'worker' to create."
-        type = args[0]
+        kind = args[0]
         if len(args) == 1:
             raise errors.SystemError, \
-                "Please specify name of %s to create." % type
+                "Please specify name of %s to create." % kind
         name = args[1]
 
         port = 7531
         if len(args) == 3:
             port = int(args[2])
 
-        if type == 'manager':
+        if kind == 'manager':
             self.createManager(name, port)
-        elif type == 'worker':
+        elif kind == 'worker':
             self.createWorker(name, managerPort=port, randomFeederports=True)
         else:
             raise errors.SystemError, \

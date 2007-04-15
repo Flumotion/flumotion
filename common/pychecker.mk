@@ -19,7 +19,8 @@ PYCHECKER = pychecker
 pychecker_setup = `ls $(top_srcdir)/misc/setup.py 2> /dev/null`
 pychecker_help = `ls $(top_srcdir)/misc/pycheckerhelp.py 2> /dev/null`
 pychecker =					\
-	$(PYCHECKER) -F misc/pycheckerrc	\
+	$(PYCHECKER) $$PYCHECKER_OPTIONS 	\
+	-F misc/pycheckerrc			\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
@@ -73,8 +74,8 @@ pycheckerverbose: pycheckerverbose010 pycheckerverboseindep
 
 pycheckerverboseindep:
 	@echo "running pychecker, gstreamer-agnostic files (verbose) ..."
-	$(pychecker_indep) $(pychecker_indep_files)
+	export PYCHECKER_OPTIONS="--limit 1000" && $(pychecker_indep) $(pychecker_indep_files)
 
 pycheckerverbose010:
 	@echo "running pychecker, gstreamer 0.10-specific code (verbose) ..."
-	$(pychecker_if_010) $(pychecker_010) $(pychecker_010_files); $(pychecker_fi)
+	$(pychecker_if_010) export PYCHECKER_OPTIONS="--limit 1000" && $(pychecker_010) $(pychecker_010_files); $(pychecker_fi)

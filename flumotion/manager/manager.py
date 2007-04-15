@@ -764,12 +764,12 @@ class Vishnu(log.Loggable):
         d = defer.Deferred()
 
         for c in components:
-            type = c.get('type')
+            componentType = c.get('type')
             conf = c.get('config')
             self.debug('scheduling create of %s on %s'
                        % (conf['avatarId'], workerId))
             d.addCallback(self._workerCreateComponentDelayed,
-                workerAvatar, c, type, conf)
+                workerAvatar, c, componentType, conf)
 
         d.addCallback(lambda result: self.debug(
             '_workerCreateComponents(): completed setting up create chain'))
@@ -781,7 +781,7 @@ class Vishnu(log.Loggable):
         return d
 
     def _workerCreateComponentDelayed(self, result, workerAvatar,
-            componentState, type, conf):
+            componentState, componentType, conf):
 
         avatarId = conf['avatarId']
         nice = conf.get('nice', 0)
@@ -790,7 +790,7 @@ class Vishnu(log.Loggable):
         # asked to start once
         componentState.set('moodPending', moods.happy.value)
 
-        d = workerAvatar.createComponent(avatarId, type, nice)
+        d = workerAvatar.createComponent(avatarId, componentType, nice)
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
         d.addCallback(self._createCallback, componentState)
@@ -934,8 +934,7 @@ class Vishnu(log.Loggable):
 
     def componentAttached(self, componentAvatar):
         # called when a component logs in and gets a component avatar created
-        id = componentAvatar.avatarId
-        self.debug("%s component attached", id)
+        self.debug("%s component attached", componentAvatar.avatarId)
         d = defer.DeferredList([componentAvatar.mindCallRemote('getConfig'),
                                 componentAvatar.mindCallRemote('getState')],
                                fireOnOneErrback=True)
@@ -1006,15 +1005,15 @@ class Vishnu(log.Loggable):
         m.avatar = None
         
     def getComponentStates(self):
-        list = self.state.getComponents()
-        self.debug('getComponentStates(): %d components' % len(list))
-        for c in list:
+        cList = self.state.getComponents()
+        self.debug('getComponentStates(): %d components' % len(cList))
+        for c in cList:
             self.log(repr(c))
             mood = c.get('mood')
             if mood == None:
                 self.warning('%s has mood None' % c.get('name'))
 
-        return list
+        return cList
 
     def deleteComponent(self, componentState):
         """
@@ -1132,18 +1131,18 @@ class Vishnu(log.Loggable):
         if len(l) > 0:
             self.warning('mappers still has keys %r' % (repr(l)))
 
-        list = []
+        dList = []
 
-        list.append(self.state.get('atmosphere').empty())
+        dList.append(self.state.get('atmosphere').empty())
 
         for f in self.state.get('flows'):
             self.debug('appending deferred for emptying flow %r' % f)
-            list.append(f.empty())
+            dList.append(f.empty())
             self.debug('appending deferred for removing flow %r' % f)
-            list.append(self.state.remove('flows', f))
+            dList.append(self.state.remove('flows', f))
             self.debug('appended deferreds')
 
-        dl = defer.DeferredList(list)
+        dl = defer.DeferredList(dList)
         return dl
        
     def _getComponentsToCreate(self):

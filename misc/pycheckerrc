@@ -162,7 +162,7 @@ intDivide = 1
 shadows = 0
 
 # check if a variable shadows a builtin
-shadowBuiltins = 1
+shadowBuiltins = 0
 
 # check if input() is used
 usesInput = 1
