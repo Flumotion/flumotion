@@ -637,6 +637,13 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             return 0
        
+    def do_pipeline_playing(self):
+        """
+        Invoked when the pipeline has changed the state to playing.
+        The default implementation sets the component's mood to HAPPY.
+        """
+        self.setMood(moods.happy)
+
     def bus_message_received_cb(self, bus, message):
         t = message.type
         src = message.src
@@ -649,7 +656,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.log('state change: %r %s->%s'
                     % (src, old.value_nick, new.value_nick)) 
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
-                    self.setMood(moods.happy)
+                    self.do_pipeline_playing()
 
                 change = self._getStateChange(old,new)
                 if change in self._stateChangeDeferreds:

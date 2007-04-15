@@ -489,7 +489,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         Again, don't override this method. Thanks.
         """
-        self.debug('BaseComponent.start')
+        self.debug('BaseComponent.start()')
 
         def start_plugs():
             for socket, plugs in self.plugs.items():
@@ -502,7 +502,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             ret = self.do_start(*args, **kwargs)
             assert isinstance(ret, defer.Deferred), \
                    "do_start %r must return a deferred" % self.do_start
-            self.debug('start: returning value %s' % ret)
+            self.debug('BaseComponent.start(): returning value %s' % ret)
             return ret
         except Exception, e:
             self.debug("Exception during component do_start: %s" % 
@@ -586,6 +586,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             return
 
         self.debug('MOOD changed to %r' % mood)
+        self.doLog(log.DEBUG, -2, 'MOOD changed to %r by caller', mood)
         self.state.set('mood', mood.value)
 
     def getMood(self):
