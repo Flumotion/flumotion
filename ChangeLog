@@ -1,5 +1,17 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/videotest/admin_gtk.py
+	  (PatternNode.patternSet):
+	* flumotion/ui/fgtk.py (FComboBox.get_column_content,
+	  FComboBox.set_enum, FComboBox.set_list):
+	* flumotion/ui/glade.py (GladeBacked.__init__):
+	* flumotion/wizard/save.py (WizardSaver.handleConsumers):
+	* flumotion/wizard/steps.py (FireWire.on_update_output_format):
+	* flumotion/wizard/wizard.py (Wizard.getConfig):
+	  Various pychecker fixes.
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* flumotion/extern/Makefile.am:
 	* flumotion/extern/log/log.py (doLog, TwistedLogObserver.__init__,

@@ -303,11 +303,11 @@ class WizardSaver(log.Loggable):
         else:
             raise AssertionError
 
-        for name, type, step_name, muxer in steps:
+        for name, comp_type, step_name, muxer in steps:
             if not cons_options.has_key(name):
                 continue
             step = self.wizard[step_name]
-            consumer = Component(name, type, step.worker,
+            consumer = Component(name, comp_type, step.worker,
                                  step.get_component_properties())
             consumer.link(muxer)
             components.append(consumer)

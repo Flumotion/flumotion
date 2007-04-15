@@ -48,10 +48,10 @@ class FComboBox(gtk.ComboBox):
         return len(self.get_model())
 
     def get_column_content(self, column):
-        iter = self.get_active_iter()
-        if iter:
+        i = self.get_active_iter()
+        if i:
             model = self.get_model()
-            return model.get(iter, column)[0]
+            return model.get(i, column)[0]
         
     def get_text(self):
         return self.get_column_content(self.COLUMN_NICK)
@@ -93,8 +93,8 @@ class FComboBox(gtk.ComboBox):
             # If values are specified, filter them out
             if value_filter and not enum in value_filter:
                 continue
-            iter = model.append()
-            model.set(iter,
+            i = model.append()
+            model.set(i,
                       self.COLUMN_NAME, enum.name,
                       self.COLUMN_VALUE, enum.value,
                       self.COLUMN_NICK, enum.nick)
@@ -113,8 +113,8 @@ class FComboBox(gtk.ComboBox):
         self._init_enum_model()
         model = self.get_model()
         for value in list:
-            iter = model.append()
-            model.set(iter, 0, value, 1, value)
+            i = model.append()
+            model.set(i, 0, value, 1, value)
         self.set_active(0)
 
     def set_multi_active(self, *values): 

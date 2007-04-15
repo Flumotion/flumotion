@@ -101,12 +101,12 @@ class GladeBacked:
         try:
             assert self.glade_file, "%s.glade_file should be set" % \
                 self.__class__
-            file = os.path.join(self.glade_dir, self.glade_file)
+            file_path = os.path.join(self.glade_dir, self.glade_file)
             if self.glade_typedict:
-                wtree = gtk.glade.XML(file, typedict=self.glade_typedict)
+                wtree = gtk.glade.XML(file_path, typedict=self.glade_typedict)
             else:
                 # pygtk 2.4 doesn't like typedict={} ?
-                wtree = gtk.glade.XML(file)
+                wtree = gtk.glade.XML(file_path)
         except RuntimeError, e:
             msg = log.getExceptionMessage(e)
             raise RuntimeError('Failed to load file %s from directory %s: %s'

@@ -489,9 +489,9 @@ class Wizard(GladeWindow, log.Loggable):
         print self._save.getXML()[:-1]
 
     def getConfig(self):
-        dict = {}
+        d = {}
         for component in self._save.getComponents():
-            dict[component.name] = component
+            d[component.name] = component
 
-        return dict
+        return d
 pygobject.type_register(Wizard)

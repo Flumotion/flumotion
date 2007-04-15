@@ -247,15 +247,15 @@ class FireWire(VideoSource):
         
     def on_update_output_format(self, *args):
         # update label_camera_settings
-        type = 'Unknown'
+        standard = 'Unknown'
         aspect = 'Unknown'
         h = self.dims[1]
         if h == 576:
-            type = 'PAL'
+            standard = 'PAL'
         elif h == 480:
-            type = 'NTSC'
+            standard = 'NTSC'
         else:
-            self.warning('Unknown capture type for height %d' % h)
+            self.warning('Unknown capture standard for height %d' % h)
 
         nom = self.par[0]
         den = self.par[1]
@@ -266,7 +266,8 @@ class FireWire(VideoSource):
         else:
             self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
 
-        text = _('%s, %s (%d/%d pixel aspect ratio)') % (type, aspect, nom, den)
+        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
+            nom, den)
         self.label_camera_settings.set_text(text)
             
         # factor is a double

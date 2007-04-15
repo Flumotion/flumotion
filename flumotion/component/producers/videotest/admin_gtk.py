@@ -67,10 +67,10 @@ class PatternNode(BaseAdminGtkNode):
     def patternSet(self, value):
         self.debug("pattern changed to %r" % value)
         c = self.combobox_pattern
-        id = self.pattern_changed_id
-        c.handler_block(id)
+        hid = self.pattern_changed_id
+        c.handler_block(hid)
         c.set_active(value)
-        c.handler_unblock(id)
+        c.handler_unblock(hid)
 
     def stateSet(self, state, key, value):
         handler = self.uiStateHandlers.get(key, None)
