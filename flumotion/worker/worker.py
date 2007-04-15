@@ -440,8 +440,7 @@ class Kindergarten(log.Loggable):
         childFDs = {0: 0, 1: 1, 2: 2}
         env = {}
         env.update(os.environ)
-        # FIXME: publicize log._FLU_DEBUG ?
-        env['FLU_DEBUG'] = log._FLU_DEBUG
+        env['FLU_DEBUG'] = log.getDebug()
         process = reactor.spawnProcess(p, realexecutable, env=env, args=argv,
             childFDs=childFDs)
 

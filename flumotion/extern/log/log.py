@@ -365,6 +365,14 @@ def setDebug(string):
     for category in _categories:
         registerCategory(category)
 
+def getDebug():
+    """
+    Returns the currently active DEBUG string.
+    @rtype: str
+    """
+    global _DEBUG
+    return _DEBUG
+
 def setPackageScrubList(*packages):
     """
     Set the package names to scrub from filenames.
