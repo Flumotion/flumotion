@@ -1,5 +1,13 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/videotest/videotest.py
+	  (VideoTest.get_pipeline_string):
+	* flumotion/component/producers/videotest/videotest.xml:
+	  Booleans should be named actively.  Repent by documenting
+	  some other properties.
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/pychecker.mk (pychecker, PYCHECKER_OPTIONS):
 	  make verbose run output all warnings (or at least, 1000 of them)
 	* flumotion/manager/manager.py (Vishnu._workerCreateComponents,

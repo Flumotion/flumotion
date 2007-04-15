@@ -57,8 +57,8 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         is_live = 'is-live=true'
 
         overlay = ""
-        timestamp_overlay = properties.get('timestamp-overlay', False)
-        if timestamp_overlay:
+        overlayTimestamps = properties.get('overlay-timestamps', False)
+        if overlayTimestamps:
             overlay = " timeoverlay ! "
 
         return "videotestsrc %s name=source ! " % is_live + overlay + \
