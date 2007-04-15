@@ -4,10 +4,15 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/extern
 
 flumotion_PYTHON = \
 	__init__.py \
-	code.py \
+	code.py
+
+logdir = $(libdir)/flumotion/python/flumotion/extern/log
+
+log_PYTHON = \
 	log/__init__.py \
-	log/test_log.py \
 	log/log.py
+
+EXTRA_DIST = log/test_log.py
 
 if BUILD_TRAYICON
 PTI_DIR = pytrayicon

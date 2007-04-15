@@ -1,5 +1,10 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/extern/Makefile.am:
+	  Install correctly.
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/nl.po:
 	  Updated Dutch translation.
 
