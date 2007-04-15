@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-03 17:07+0200\n"
+"POT-Creation-Date: 2007-04-14 21:33+0200\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/admin.py:430
+#: flumotion/admin/admin.py:425
 msgid "Internal error in component."
 msgstr ""
 
@@ -162,7 +162,7 @@ msgstr "Sobre Flumotion"
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
-"© 2004, 2005, 2006, 2007 Fluendo S.L."
+"Â© 2004, 2005, 2006, 2007 Fluendo S.L."
 msgstr ""
 "Flumotion és un servidor dels mitjans que fluïxen.\n"
 "\n"
@@ -521,45 +521,45 @@ msgstr ""
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:460
+#: flumotion/component/base/admin_gtk.py:467
 msgid "Feeders"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:481
+#: flumotion/component/base/admin_gtk.py:488
 #, python-format
 msgid "Feeder <b>%s</b>"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:484
+#: flumotion/component/base/admin_gtk.py:491
 #, python-format
 msgid "Feeding to <b>%s</b>"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:488
-#: flumotion/component/base/admin_gtk.py:502
-#: flumotion/component/base/admin_gtk.py:702
+#: flumotion/component/base/admin_gtk.py:495
+#: flumotion/component/base/admin_gtk.py:509
+#: flumotion/component/base/admin_gtk.py:709
 msgid "Byte"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:496
-#: flumotion/component/base/admin_gtk.py:508
+#: flumotion/component/base/admin_gtk.py:503
+#: flumotion/component/base/admin_gtk.py:515
 msgid "Unknown"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:671
+#: flumotion/component/base/admin_gtk.py:678
 #, fuzzy
 msgid "Eaters"
 msgstr "Patró"
 
-#: flumotion/component/base/admin_gtk.py:699
+#: flumotion/component/base/admin_gtk.py:706
 #, python-format
 msgid "Eater <b>%s</b>"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:744
-#: flumotion/component/base/admin_gtk.py:749
+#: flumotion/component/base/admin_gtk.py:751
 #: flumotion/component/base/admin_gtk.py:756
-#: flumotion/component/base/admin_gtk.py:786
+#: flumotion/component/base/admin_gtk.py:763
+#: flumotion/component/base/admin_gtk.py:793
 #, python-format
 msgid "%d units"
 msgstr ""
@@ -729,7 +729,7 @@ msgstr ""
 
 #: flumotion/component/misc/repeater/repeater.py:38
 #: flumotion/component/producers/audiotest/audiotest.py:88
-#: flumotion/component/producers/videotest/videotest.py:80
+#: flumotion/component/producers/videotest/videotest.py:84
 msgid ""
 "The 'drop-probability' property is specified, but it only works with "
 "GStreamer core newer than 0.10.12. You should update your version of "
@@ -738,7 +738,7 @@ msgstr ""
 
 #: flumotion/component/misc/repeater/repeater.py:46
 #: flumotion/component/producers/audiotest/audiotest.py:96
-#: flumotion/component/producers/videotest/videotest.py:88
+#: flumotion/component/producers/videotest/videotest.py:92
 msgid "The 'drop-probability' property can only be between 0.0 and 1.0."
 msgstr ""
 
