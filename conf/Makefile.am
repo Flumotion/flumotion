@@ -7,6 +7,7 @@ EXTRA_DIST = 						\
 	managers/default/flows/ogg-test-theora.xml	\
 	workers/default.xml 				\
 	examples/twores.xml				\
+	examples/default.xml 				\
 	examples/discont.xml 				\
 	examples/ondemand.xml
 

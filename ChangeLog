@@ -1,5 +1,11 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/Makefile.am:
+	* conf/examples/default.xml:
+	  Add the default config as an example.
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/extern/log/log.py (getDebug, setPackageScrubList):
 	  add getDebug() ...
 	* flumotion/worker/worker.py (Kindergarten.play):
