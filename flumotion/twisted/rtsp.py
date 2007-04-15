@@ -417,6 +417,7 @@ class RTSPResource(resource.Resource, flog.Loggable):
         Set CSeq and Date on response to given request.
         This should be done even for errors.
         """
+        self.log('render_startCSeqDate, method %r' % method)
         cseq = request.getHeader('CSeq')
         # RFC says clients MUST have CSeq field, but we're lenient
         # in what we accept and assume 0 if not specified
