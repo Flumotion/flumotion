@@ -1,5 +1,10 @@
 2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/extern/log/log.py (doLog):
+	  file -> filePath
+
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/videotest/videotest.py
 	  (VideoTest.get_pipeline_string):
 	* flumotion/component/producers/videotest/videotest.xml:

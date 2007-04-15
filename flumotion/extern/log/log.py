@@ -227,7 +227,7 @@ def doLog(level, object, category, format, args, where=-1,
     if _log_handlers:
         if filePath is None and line is None:
             (filePath, line) = getFileLine(where=where)
-        ret['file'] = filePath
+        ret['filePath'] = filePath
         ret['line'] = line
         for handler in _log_handlers:
             try:
@@ -243,7 +243,7 @@ def doLog(level, object, category, format, args, where=-1,
         # loggers there before
         if filePath is None and line is None:
             (filePath, line) = getFileLine(where=where)
-        ret['file'] = filePath
+        ret['filePath'] = filePath
         ret['line'] = line
         try:
             handler(level, object, category, filePath, line, message)
