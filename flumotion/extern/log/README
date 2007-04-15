@@ -1,8 +1,9 @@
 This module does logging.
 
-Suggested use in your project:
+Suggested use in your project (if you are using Subversion):
 
 - create myproject/extern directory
+- svn commit myproject/extern
 - svn propset svn:externals "log https://core.fluendo.com/svn/flumotion/trunk/flumotion/extern/log" myproject/extern
 - in your project:
   - call log.init('MY_PROJECT_DEBUG')

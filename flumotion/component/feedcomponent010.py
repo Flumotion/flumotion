@@ -672,12 +672,12 @@ class FeedComponent(basecomponent.BaseComponent):
                          (src.get_path_string(), gerror, debug))
             self.setMood(moods.sad)
             # generate a unique id
-            id = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
+            mid = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
             m = messages.Error(T_(N_(
                 "Internal GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
                     gerror.message, gerror.domain, gerror.code, debug),
-                id=id, priority=40)
+                id=mid, priority=40)
             self.state.append('messages', m)
             # if we have a state change defer that has not yet
             # fired, we should errback it
@@ -1150,9 +1150,9 @@ class FeedComponent(basecomponent.BaseComponent):
         element = self.get_element(elementName)
         if not element:
             msg = "Cannot find feeder element named '%s'" % elementName
-            id = "feedToFD-%s" % feedName
+            mid = "feedToFD-%s" % feedName
             m = messages.Warning(T_(N_("Internal Flumotion error.")),
-                debug=msg, id=id, priority=40)
+                debug=msg, id=mid, priority=40)
             self.state.append('messages', m)
             self.warning(msg)
             return False
