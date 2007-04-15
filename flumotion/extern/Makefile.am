@@ -16,7 +16,10 @@ PTI_DIR =
 endif
 
 check-local:
-	trial log.test_log
+	PYTHONPATH=$(srcdir):$$PYTHONPATH trial log.test_log
+
+clean-local:
+	rm -r _trial_temp
 
 SUBDIRS = fdpass \
 	$(PTI_DIR)

@@ -153,7 +153,6 @@ class TestOwnLogHandler(unittest.TestCase):
         self.assertRaises(TypeError, log.addLogHandler, None)
   
 class TestGetExceptionMessage(unittest.TestCase):
-
     def func3(self):
         self.func2()
 
@@ -162,13 +161,6 @@ class TestGetExceptionMessage(unittest.TestCase):
 
     def func1(self):
         raise TypeError, "I am in func1"
-
-    def testLevel3(self):
-        try:
-            self.func3()
-            self.fail()
-        except TypeError, e:
-            self.verifyException(e)
 
     def testLevel2(self):
         try:

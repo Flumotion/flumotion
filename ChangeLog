@@ -1,3 +1,14 @@
+2007-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* flumotion/extern/Makefile.am:
+	* flumotion/extern/log/log.py (doLog, TwistedLogObserver.__init__,
+	  TwistedLogObserver.emit, TwistedLogObserver.ignoreErrors):
+	* flumotion/extern/log/test_log.py (TestGetExceptionMessage.func3,
+	  TestGetExceptionMessage.testLevel2):
+	* misc/pycheckerrc:
+	  Enable shadowglobals, fix distcheck.
+
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/extern/Makefile.am:

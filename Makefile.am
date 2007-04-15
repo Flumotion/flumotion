@@ -27,6 +27,7 @@ clean-local: locale-uninstalled-clean
 # same for any gtk stuff - keep it low
 
 PYCHECKER_WHITELIST = \
+	    flumotion/extern/log/*.py		\
 	    flumotion/admin/text/*.py		\
 	    flumotion/component/*.py 		\
 	    flumotion/admin/*.py		\

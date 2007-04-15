@@ -198,16 +198,18 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     return format, debugArgs
 
 def doLog(level, object, category, format, args, where=-1,
-    file=None, line=None):
+    filePath=None, line=None):
     """
-    @param where: what to log file and line number for;
-                  -1 for one frame above log.py; -2 and down for higher up;
-                  a function for a (future) code object
-    @type  where: int or callable
-    @param file:  file to show the message as coming from, if caller knows best
-    @type  file:  str
-    @param line:  line to show the message as coming from, if caller knows best
-    @type  line:  int
+    @param where:     what to log file and line number for;
+                      -1 for one frame above log.py; -2 and down for higher up;
+                      a function for a (future) code object
+    @type  where:     int or callable
+    @param filePath:  file to show the message as coming from, if caller
+                      knows best
+    @type  filePath:  str
+    @param line:      line to show the message as coming from, if caller
+                      knows best
+    @type  line:      int
 
     @return: dict of calculated variables, if they needed calculating.
              currently contains file and line; this prevents us from
@@ -223,9 +225,9 @@ def doLog(level, object, category, format, args, where=-1,
 
     # first all the unlimited ones
     if _log_handlers:
-        if file is None and line is None:
-            (file, line) = getFileLine(where=where)
-        ret['file'] = file
+        if filePath is None and line is None:
+            (filePath, line) = getFileLine(where=where)
+        ret['file'] = filePath
         ret['line'] = line
         for handler in _log_handlers:
             try:
@@ -239,12 +241,12 @@ def doLog(level, object, category, format, args, where=-1,
     for handler in _log_handlers_limited:
         # set this a second time, just in case there weren't unlimited
         # loggers there before
-        if file is None and line is None:
-            (file, line) = getFileLine(where=where)
-        ret['file'] = file
+        if filePath is None and line is None:
+            (filePath, line) = getFileLine(where=where)
+        ret['file'] = filePath
         ret['line'] = line
         try:
-            handler(level, object, category, file, line, message)
+            handler(level, object, category, filePath, line, message)
         except TypeError:
             raise SystemError, "handler %r raised a TypeError" % handler
 
@@ -678,7 +680,7 @@ class TwistedLogObserver(Loggable):
     logCategory = "logobserver"
 
     def __init__(self):
-        self._ignoreErrors = []
+        self._ignoreErrors = [] # Failure types
 
     def emit(self, eventDict):
         method = log # by default, lowest level
@@ -686,10 +688,10 @@ class TwistedLogObserver(Loggable):
         if not edm:
             if eventDict['isError'] and eventDict.has_key('failure'):
                 f = eventDict['failure']
-                for type in self._ignoreErrors:
-                    r = f.check(type)
+                for failureType in self._ignoreErrors:
+                    r = f.check(failureType)
                     if r:
-                        self.debug("Failure of type %r, ignoring" % type)
+                        self.debug("Failure of type %r, ignoring" % failureType)
                         return
                     
                 self.log("Failure %r" % f)
@@ -720,8 +722,8 @@ class TwistedLogObserver(Loggable):
         method('twisted', msgStr)
 
     def ignoreErrors(self, *types):
-        for type in types:
-            self._ignoreErrors.append(type)
+        for failureType in types:
+            self._ignoreErrors.append(failureType)
 
     def clearIgnores(self):
         self._ignoreErrors = []
