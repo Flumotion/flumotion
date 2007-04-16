@@ -21,9 +21,7 @@ if len(sys.argv) != 3:
     print "Usage: httpdigesthasher.py username password"
 else:
     username = sys.argv[1]
-    # Windows Media Encoder responds with realm="", and calculates H(A1) using
-    # that value. So, we have to do the same (suck!)
-    realm = ""
+    realm = "Flumotion Windows Media Server Component"
     password = sys.argv[2]
 
     hash = _calculateHA1MD5(username, realm, password)
