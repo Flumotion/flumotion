@@ -216,7 +216,7 @@ class Window(log.Loggable, gobject.GObject):
         kids = menu.get_children()
         while True:
             w = kids.pop()
-            if w.get_name() == 'file_quit':
+            if w.get_name() == 'connection_quit':
                 break
             else:
                 menu.remove(w)
@@ -941,13 +941,12 @@ class Window(log.Loggable, gobject.GObject):
 
         return d
  
- 
     # menubar/toolbar callbacks
     def on_have_connection(self, d, connectionInfo):
         d.destroy()
         self.on_open_connection(connectionInfo)
 
-    def file_open_cb(self, button):
+    def connection_open_recent_cb(self, button):
         d = gtkconnections.ConnectionsDialog(self.window)
         d.show()
         d.connect('have-connection', self.on_have_connection)
@@ -959,7 +958,7 @@ class Window(log.Loggable, gobject.GObject):
             self.admin.loadConfiguration(conf_xml)
         d.destroy()
 
-    def file_import_configuration_cb(self, button):
+    def connection_import_configuration_cb(self, button):
         d = gtk.FileChooserDialog(_("Import Configuration..."), self.window,
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -994,7 +993,7 @@ class Window(log.Loggable, gobject.GObject):
         else:
             d.destroy()
 
-    def file_export_configuration_cb(self, button):
+    def connection_export_configuration_cb(self, button):
         d = gtk.FileChooserDialog(_("Export Configuration..."), self.window,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -1003,7 +1002,7 @@ class Window(log.Loggable, gobject.GObject):
         d.show()
         d.connect('response', self.on_export_response)
     
-    def file_quit_cb(self, button):
+    def connection_quit_cb(self, button):
         self.close()
     
     def manage_start_component_cb(self, button):

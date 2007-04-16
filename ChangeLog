@@ -1,3 +1,17 @@
+2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py (Window._append_recent_connections,
+	  Window.connection_open_recent_cb,
+	  Window.connection_import_configuration_cb,
+	  Window.connection_export_configuration_cb,
+	  Window.connection_quit_cb):
+	Rename menu items and methods for them to be connection_
+	instead of file_.
+	Rename menu item label to "Open Recent Connection".
+	* flumotion/admin/gtk/connections.py (Connections):
+	Remove whitespace.
+
 2007-04-16  Michael Smith  <msmith@fluendo.com>
 
 	* tools/httpdigesthasher.py:

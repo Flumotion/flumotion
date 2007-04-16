@@ -33,7 +33,6 @@ from flumotion.common.pygobject import gsignal, gproperty
 
 from flumotion.admin import connections
 
-        
 class Connections(GladeWidget):
     glade_file = 'connections.glade'
 
