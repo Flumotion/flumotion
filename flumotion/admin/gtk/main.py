@@ -124,7 +124,7 @@ def main(args):
 
     if len(args) > 1:
         log.error('flumotion-admin',
-                  'too many argument: %r' % (args[1:],))
+                  'too many arguments: %r' % (args[1:],))
 
     if options.manager:
         d = startAdminFromManagerString(options.manager,

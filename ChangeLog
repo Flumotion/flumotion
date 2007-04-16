@@ -1,5 +1,10 @@
 2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/admin/gtk/main.py (main):
+	Fix grammar.
+
+2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* data/glade/admin.glade:
 	Fix open recent connection button tooltip and where it maps to.
 	Add "Open Existing Connection" menu item.
