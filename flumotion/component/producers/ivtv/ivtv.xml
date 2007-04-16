@@ -1,0 +1,37 @@
+<registry>
+
+  <components>
+    <component type="ivtv-producer"
+               base="flumotion/component/ivtv">
+      <source location="flumotion.component.ivtv.ivtv" />
+      <feeder name="video" />
+      <feeder name="audio" />
+
+      <entries>
+        <entry type="component" location="ivtv.py"
+               function="Ivtv" />
+      </entries>
+
+      <properties>
+        <property name="width" type="int" required="false" />
+        <property name="height" type="int" required="false" />
+	<property name="device" type="string" required="false" />
+      </properties>
+    </component>
+  </components>
+
+  <bundles>
+    <bundle project="ivtv" name="ivtv-component">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+        <directories>
+            <directory name="flumotion/component/ivtv">
+                <filename location="__init__.py" />
+                <filename location="ivtv.py" />
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+
+</registry> 

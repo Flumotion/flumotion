@@ -1,9 +1,9 @@
 include $(top_srcdir)/common/python.mk
                                                                                 
-consumersdir = $(libdir)/flumotion/python/flumotion/component/producers
-consumers_PYTHON = \
+producersdir = $(libdir)/flumotion/python/flumotion/component/producers
+producers_PYTHON = \
 	__init__.py checks.py
-consumers_DATA = checks.xml
+producers_DATA = checks.xml
 
 TAGS_FILES = $(component_PYTHON)
 
@@ -15,6 +15,7 @@ SUBDIRS = \
 	bttv \
 	firewire \
 	icecast \
+	ivtv \
 	pipeline \
 	soundcard \
 	videotest \
@@ -23,4 +24,4 @@ SUBDIRS = \
 	unixdomain \
 	gdp
 
-EXTRA_DIST = $(consumers_DATA)
+EXTRA_DIST = $(producers_DATA)

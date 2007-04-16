@@ -1,5 +1,16 @@
 2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* configure.ac:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/ivtv/Makefile.am:
+	* flumotion/component/producers/ivtv/__init__.py:
+	* flumotion/component/producers/ivtv/ivtv.py (Ivtv,
+	  Ivtv.get_pipeline_string):
+	* flumotion/component/producers/ivtv/ivtv.xml:
+	New ivtv-producer component.
+
+2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/admin/gtk/main.py (main):
 	Fix grammar.
 
