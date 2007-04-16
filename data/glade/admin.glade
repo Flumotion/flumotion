@@ -42,7 +42,7 @@
 		<widget class="GtkMenu" id="connection_menu_menu">
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="connection_open">
+		    <widget class="GtkImageMenuItem" id="connection_open_recent">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Open Recent Connection...</property>
 		      <property name="use_underline">True</property>
@@ -59,6 +59,15 @@
 			  <property name="ypad">0</property>
 			</widget>
 		      </child>
+		    </widget>
+		  </child>
+		  <child>
+		    <widget class="GtkImageMenuItem" id="connection_open_existing">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Open _Existing Connection...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="connection_open_existing_cb" last_modification_time="Mon, 16 Apr 2007 16:01:15 GMT"/>
+
 		    </widget>
 		  </child>
 
@@ -393,12 +402,12 @@
 	  <child>
 	    <widget class="GtkToolButton" id="tool_open">
 	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Open a stored configuration</property>
+	      <property name="tooltip" translatable="yes">Open a recent connection</property>
 	      <property name="stock_id">gtk-open</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="file_open_cb" last_modification_time="Wed, 02 Feb 2005 15:26:31 GMT"/>
+	      <signal name="clicked" handler="connection_open_recent_cb" last_modification_time="Wed, 02 Feb 2005 15:26:31 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>

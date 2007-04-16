@@ -350,7 +350,6 @@ You can shut down the manager and worker later with the following command:
     def on_next(self, state):
         return '*finished*'
 
-
 class Greeter(wizard.Wizard):
     name = 'greeter'
     steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
@@ -358,3 +357,11 @@ class Greeter(wizard.Wizard):
 
     def __init__(self):
         wizard.Wizard.__init__(self, 'initial')
+
+# This is used by the gtk admin to connect to an existing manager
+class ConnectExisting(wizard.Wizard):
+    name = 'greeter'
+    steps = [ConnectToExisting, Authenticate]
+
+    def __init__(self):
+        wizard.Wizard.__init__(self, 'connect_to_existing')

@@ -1,6 +1,20 @@
 2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* data/glade/admin.glade:
+	Fix open recent connection button tooltip and where it maps to.
+	Add "Open Existing Connection" menu item.
+	* flumotion/admin/gtk/client.py (Window.connection_open_recent_cb,
+	  Window.connection_open_existing_cb, Window.got_state,
+	  Window.on_import_response):
+	Add support for "Open Existing Connection"
+	* flumotion/admin/gtk/greeter.py (Greeter, Greeter.__init__,
+	  ConnectExisting):
+	Add new greeter wizard that just does the steps for opening
+	an existing connection.
+
+2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* data/glade/admin.glade:
 	* flumotion/admin/gtk/client.py (Window._append_recent_connections,
 	  Window.connection_open_recent_cb,
 	  Window.connection_import_configuration_cb,

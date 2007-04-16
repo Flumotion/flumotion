@@ -40,8 +40,9 @@ from flumotion.admin.gtk import dialogs, parts, message
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common, pygobject
+from flumotion.common import connection
 from flumotion.manager import admin # Register types
-from flumotion.twisted import flavors, reflect
+from flumotion.twisted import flavors, reflect, pb as fpb
 from flumotion.twisted.compat import implements
 from flumotion.ui import icons, trayicon
 
@@ -950,7 +951,23 @@ class Window(log.Loggable, gobject.GObject):
         d = gtkconnections.ConnectionsDialog(self.window)
         d.show()
         d.connect('have-connection', self.on_have_connection)
-    
+
+    def connection_open_existing_cb(self, button):
+        def got_state(state, g):
+            g.set_sensitive(False)
+            authenticator = fpb.Authenticator(username=state['user'],
+                                              password=state['passwd'])
+            info = connection.PBConnectionInfo(state['host'], state['port'],
+                                               not state['use_insecure'],
+                                               authenticator)
+            g.destroy()
+            self.on_open_connection(info)
+
+        from flumotion.admin.gtk import greeter
+        wiz = greeter.ConnectExisting()
+        d = wiz.run_async()
+        d.addCallback(got_state, wiz)
+
     def on_import_response(self, d, response):
         if response==gtk.RESPONSE_ACCEPT:
             name = d.get_filename()
