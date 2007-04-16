@@ -21,7 +21,7 @@
   </components>
 
   <bundles>
-    <bundle project="ivtv" name="ivtv-component">
+    <bundle name="ivtv-component">
         <dependencies>
             <dependency name="component-base" />
         </dependencies>
