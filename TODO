@@ -9,17 +9,10 @@
 * MEDIUM	expose a raw dv stream as a second feed on the firewire
 		producer and allow the disker to connect to it
 
-* MEDIUM	decide on style for properties in xml:
-		mount-point, mountpoint or mountPoint
-		some of these are gotten from glade file !
-
 * MEDIUM	add api for admins to "subscribe" to admin methods in the
 		manager, so only relevant commands get sent
 
 * EASY		deprecate <source> tag and require base= attribute to <comp>
-
-* EASY		rename components, files, ... to be uniform
-		(e.g. web-camera -> webcam, ...)
 
 * EASY		remove all old deprecated bundling code everywhere
 
@@ -140,6 +133,14 @@
 
 * MEDIUM	find a way for the message area to contain hyperlinks
 		and make the PIL error hyperlinked
+
+* MEDIUM        allow replacing/migrating of components
+	        for example, start a new repeater on a different machine,
+	        connect its eaters, then redirect the eaters of the original
+	        repeater to this new component
+	 	(ideally with some way to tell multifdsink exactly where you
+	 	 want to pick up, through the feedserver)
+
 - API cleanup:
 
 - manager/component.py:
