@@ -1,6 +1,11 @@
 2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/producers/ivtv/ivtv.xml:
+	Correct directory containing ivtv.
+
+2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/producers/ivtv/ivtv.xml:
 	We are no longer in our own project!
 
 2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>

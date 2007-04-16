@@ -2,8 +2,8 @@
 
   <components>
     <component type="ivtv-producer"
-               base="flumotion/component/ivtv">
-      <source location="flumotion.component.ivtv.ivtv" />
+               base="flumotion/component/producers/ivtv">
+      <source location="flumotion.component.producers.ivtv.ivtv" />
       <feeder name="video" />
       <feeder name="audio" />
 
@@ -26,7 +26,7 @@
             <dependency name="component-base" />
         </dependencies>
         <directories>
-            <directory name="flumotion/component/ivtv">
+            <directory name="flumotion/component/producers/ivtv">
                 <filename location="__init__.py" />
                 <filename location="ivtv.py" />
             </directory>
