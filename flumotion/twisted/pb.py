@@ -193,13 +193,15 @@ class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
         self._doingLogin = False
 
     def clientConnectionFailed(self, connector, reason):
-        log.msg("connection failed, reason %r" % reason)
+        log.msg("connection failed to %s, reason %r" % (
+            connector.getDestination(), reason))
         pb.PBClientFactory.clientConnectionFailed(self, connector, reason)
         RCF = protocol.ReconnectingClientFactory
         RCF.clientConnectionFailed(self, connector, reason)
 
     def clientConnectionLost(self, connector, reason):
-        log.msg("connection lost, reason %r" % reason)
+        log.msg("connection lost to %s, reason %r" % (
+            connector.getDestination(), reason))
         pb.PBClientFactory.clientConnectionLost(self, connector, reason,
                                              reconnecting=True)
         RCF = protocol.ReconnectingClientFactory

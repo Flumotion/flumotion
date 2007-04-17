@@ -1,3 +1,11 @@
+2007-04-17  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/twisted/pb.py
+	  (ReconnectingPBClientFactory.clientConnectionFailed,
+	  ReconnectingPBClientFactory.clientConnectionLost):
+	Add destination of where the connection was failed to in debug.
+	Fixes #612.
+
 2007-04-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* env.in:
