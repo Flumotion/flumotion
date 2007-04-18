@@ -1,3 +1,15 @@
+2007-04-18  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/effects/volume/admin_gtk.py
+	  (VolumeAdminGtkNode.haveWidgetTree,
+	  VolumeAdminGtkNode._createEnoughLevelWidgets,
+	  VolumeAdminGtkNode.peakSet, VolumeAdminGtkNode.decaySet,
+	  VolumeAdminGtkNode._check_toggled_cb):
+	* flumotion/component/effects/volume/volume.glade:
+	Dynamically create level meters for every channel rather than 
+	having one averaged over all channels.
+	Remove unnecessary whitespace.
+
 2007-04-17  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/admin/admin.py (AdminClientFactory.clientConnectionFailed):

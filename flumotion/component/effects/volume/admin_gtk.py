@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+from gettext import gettext as _
+
 import gtk
 import os
 import math
@@ -26,7 +28,7 @@ import math
 from flumotion.common import errors, log
 
 # import custom glade handler
-from flumotion.ui import glade
+from flumotion.ui import glade, fgtk
 
 from flumotion.component.base import admin_gtk
 
@@ -46,7 +48,7 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
 
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('volume-widget')
-        self.scale_volume = self.wtree.get_widget('level-widget')
+        self.level_widgets = []
         self._volume_set_label = self.wtree.get_widget('volume-set-label')
         self._volume_set_label.set_text('0')
         self.shown = False
@@ -69,13 +71,57 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         for k, handler in self.uiStateHandlers.items():
             handler(state.get(k))
 
+    def _createEnoughLevelWidgets(self, numchannels):
+        """
+        This method dynamically creates labels and level meters for channels
+        that currently do not have level meters. The glade file no longer
+        contains the labels or the level meters. Also the table size in the
+        glade file is set to 50 and the widgets inside the table that are
+        statically configured have a bottom y of 50 allowing about 23 channels
+        in the audio.
+
+        @param numchannels: total number of channels there is volume data for
+        """
+        if numchannels > len(self.level_widgets):
+            totalLevelWidgets = len(self.level_widgets)
+            for chan in range(totalLevelWidgets, numchannels):
+                levelWidget = fgtk.FVUMeter()
+                levelLabel = gtk.Label()
+                if chan == 0 and numchannels > 1:
+                    levelLabel.set_text(_("Left channel level:"))
+                elif numchannels == 1:
+                    levelLabel.set_text(_("Mono channel level:"))
+                elif chan == 1:
+                    levelLabel.set_text(_("Right channel level:"))
+                else:
+                    levelLabel.set_text(_("Channel %d level:") % chan)
+                levelLabel.set_property("xpad", 0)
+                levelLabel.set_property("ypad", 0)
+                levelLabel.set_property("xalign", 0)
+                levelLabel.set_property("yalign", 0.5)
+                levelLabel.set_justify(gtk.JUSTIFY_LEFT)
+                self.widget.attach(levelLabel, 0, 1, chan * 2, chan * 2 + 1,
+                    xoptions=gtk.FILL, yoptions=0, xpadding=3, ypadding=3)
+                self.widget.attach(levelWidget, 0, 1, chan * 2 + 1, 
+                    chan * 2 + 2, yoptions=gtk.FILL, 
+                    xpadding=6, ypadding=3)
+                levelLabel.show()
+                levelWidget.show()
+                self.level_widgets.append(levelWidget)
+
     def peakSet(self, peak):
-        peak = sum(peak)/len(peak)
-        self.scale_volume.set_property('peak', clamp(peak, -90.0, 0.0))
+        if len(peak) > len(self.level_widgets):
+            self._createEnoughLevelWidgets(len(peak))
+        for i in range(0, len(peak)):
+            self.level_widgets[i].set_property('peak', 
+                clamp(peak[i], -90.0, 0.0))
 
     def decaySet(self, decay):
-        decay = sum(decay)/len(decay)
-        self.scale_volume.set_property('decay', clamp(decay, -90.0, 0.0))
+        if len(decay) > len(self.level_widgets):
+            self._createEnoughLevelWidgets(len(decay))
+        for i in range(0, len(decay)):
+            self.level_widgets[i].set_property('decay', 
+                clamp(decay[i], -90.0, 0.0))
 
     # when volume has been set by another admin client
     def volumeSet(self, volume):
@@ -120,5 +166,3 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             if value > 1.0: value = 1.0
             self._hscale.set_range(0.0, 1.0)
         self.volumeSet(value)
-            
-
