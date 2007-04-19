@@ -1,3 +1,9 @@
+2007-04-19  Andy Wingo  <wingo@pobox.com>
+
+	* tools/split-flu-log: New script, splits a flumotion log into a
+	number of chunks, on line boundaries, with the date of the first
+	log statement as part of the chunked output file name.
+
 2007-04-18  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/effects/volume/admin_gtk.py

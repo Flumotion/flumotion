@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+import datetime
+import optparse
+import os
+import re
+import time
+import sys
+
+log_re = re.compile(r'^([A-Z]+) +'
+                    r'\[ *(\d+)\] +'
+                    r'("([^"]+)" +)?'
+                    r'([^ ]+) +'
+                    r'([A-Z][a-z][a-z] \d\d \d\d:\d\d:\d\d) +'
+                    r'([^ ].*)$')
+
+def line_date(l):
+    m = log_re.match(l)
+    if m:
+        g = m.groups()
+        return time.strptime(g[5], '%b %d %H:%M:%S')
+    else:
+        return None
+
+def split(f, fragment, nfragments, outhead):
+    f.seek(0, 2)
+    total = f.tell()
+    start = total * fragment / nfragments
+    print 'starting at byte %d' % start
+    f.seek(start)
+
+    date = None
+    bytes = total * (fragment + 1) / nfragments - start
+    while date is None:
+        line = f.readline()
+        if line == '':
+            raise RuntimeError('unexpected EOF on %s' % f)
+        bytes -= len(line)
+        date = line_date(line)
+
+    # we don't have the year
+    filename = outhead + time.strftime('-%m%d.%H%M%S', date)
+    print 'outputting to %s' % filename
+    out = open(outhead + time.strftime('-%m%d.%H%M%S', date), 'w')
+    
+    out.write(line)
+    for line in f:
+        bytes -= len(line)
+        out.write(line)
+        if bytes < 0:
+            break
+
+    # output until the next chunk would recognize a date
+    for line in f:
+        if line_date(line):
+            break
+        out.write(line)
+    
+    print 'wrote %d bytes' % out.tell()
+    out.close()
+
+def main(args):
+    parser = optparse.OptionParser(usage="usage: %prog [options] LOGFILE")
+    parser.add_option('-n', '--num-chunks',
+                      action="store", dest="num_chunks", default=32,
+                      type="int", help="number of chunks")
+    parser.add_option('', '--only-chunk',
+                      action="store", dest="only_chunk", default=None,
+                      type="int", help="only output specified chunk")
+    options, args = parser.parse_args(args)
+
+    if len(args) != 2:
+        print >>sys.stderr, ("usage: %s LOGFILE" % (args[0],))
+        return 1
+    filename = args[1]
+    try:
+        log = open(filename, 'r')
+    except IOError, e:
+        print >>sys.stderr, ("Error opening log file %s: %s"
+                             % (filename, e))
+        return 1
+
+    outhead = os.path.join(os.getcwd(), os.path.basename(filename))
+    if options.only_chunk is not None:
+        split(log, options.only_chunk, options.num_chunks, outhead)
+    else:
+        for i in range(options.num_chunks):
+            split(log, i, options.num_chunks, outhead)
+    
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
