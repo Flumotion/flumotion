@@ -1,3 +1,8 @@
+2007-04-20  Michael Smith  <msmith@fluendo.com>
+
+	* doc/random/playlists:
+	  Add playlist document describing scheduling format.
+
 2007-04-19  Andy Wingo  <wingo@pobox.com>
 
 	* tools/split-flu-log: New script, splits a flumotion log into a

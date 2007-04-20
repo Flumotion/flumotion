@@ -1,0 +1,43 @@
+Scheduled Playlists
+-------------------
+
+We parse a simple XML format, consisting of a top-level <playlist> element,
+containing one or more <entry> elements.
+
+Each <entry> has two mandatory and two optional attributes:
+  filename - the file to use. May be relative, in which case it will be 
+             interpreted relative to some configured location
+  time     - the time at which to start playing the file, a UTC timestamp
+             in the format YYYY-MM-DDThh:mm:ss.sZ (an ISO 8601 format), see
+             below for examples.
+  offset   - optional, defaults to zero. The offset (in seconds, fractional 
+             seconds permitted) from the start of the media file to begin
+             playback at the given time.
+  duration - optional, defaults to the length of the file minus the offset. 
+             The duration, in seconds, of playback from the file. 
+             If duration + offset is greater than the length of the actual file,
+             it will be clamped to the actual length - offset.
+
+If times and durations (explicit or implicit) cause any overlap to occur, the
+earlier entry will be truncated to allow the later ones to begin on time.
+
+Whenever any part of the timeline has no scheduled or available data, video
+will be replaced by black, audio by silence. 
+
+Timestamps:
+ ISO 8601 Combined Date/Time Format, UTC.
+ YYYY-MM-DDThh:mm:ss.sZ
+
+ Example: 19th April 2007, 3:15:20.38pm UTC is written:
+   2007-04-19T15:15:20.38Z
+ Similarly, 17th May 2007, 8:20:18am Central European Summer Time (UTC+2) is
+ written as (note the 06; we convert to UTC for this):
+   2007-05-17T06:20:18Z
+
+Sample file (single entry):
+
+<playlist>
+  <entry filename="customer/file/movie.ogg" time="2007-04-19T15:15:20.38Z" 
+         offset="0" duration="120.45"/>
+</playlist>
+
