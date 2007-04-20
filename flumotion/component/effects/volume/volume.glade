@@ -28,7 +28,7 @@
       <property name="column_spacing">0</property>
 
       <child>
-	<widget class="GtkLabel" id="label2">
+	<widget class="GtkLabel" id="volume-change-label">
 	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">_Change volume:</property>
 	  <property name="use_underline">True</property>

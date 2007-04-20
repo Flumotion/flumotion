@@ -57,10 +57,13 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         self._hscale = self.wtree.get_widget('volume-set-hscale')
         self._scale_changed_id = self._hscale.connect('value_changed',
                 self.cb_volume_set)
-
+        self._hscale.set_sensitive(False)
         # callback for checkbutton
         check = self.wtree.get_widget('volume-set-check')
+        check.set_sensitive(False)
         check.connect('toggled', self._check_toggled_cb)
+        changeLabel = self.wtree.get_widget('volume-change-label')
+        changeLabel.set_sensitive(False)
 
     def setUIState(self, state):
         admin_gtk.EffectAdminGtkNode.setUIState(self, state)
@@ -70,6 +73,16 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
                                     'volume-decay': self.decaySet}
         for k, handler in self.uiStateHandlers.items():
             handler(state.get(k))
+        # volume-allow-increase is static for lifetime of component
+        # for soundcard it is false, for others that have a gst volume
+        # element it is true
+        if state.get("volume-allow-increase"):
+            check = self.wtree.get_widget('volume-set-check')
+            check.set_sensitive(True)
+        if state.get("volume-allow-set"):
+            self._hscale.set_sensitive(True)
+            changeLabel = self.wtree.get_widget('volume-change-label')
+            changeLabel.set_sensitive(True)
 
     def _createEnoughLevelWidgets(self, numchannels):
         """
@@ -127,6 +140,7 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     def volumeSet(self, volume):
         self._hscale.handler_block(self._scale_changed_id)
         self._hscale.set_value(volume)
+        self.debug("volume: %f", volume)
         dB = "- inf"
         if volume:
             dB = "%2.2f" % (20.0 * math.log10(volume))

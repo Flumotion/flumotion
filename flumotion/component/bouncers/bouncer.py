@@ -27,7 +27,6 @@ authentication services for other components.
 import md5
 import random
 
-from twisted.python import components
 from twisted.internet import defer
 from twisted.cred import error
 

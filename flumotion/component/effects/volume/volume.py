@@ -33,10 +33,13 @@ class Volume(feedcomponent.Effect):
     """
     logCategory = "volume"
 
-    def __init__(self, name, element, pipeline):
+    def __init__(self, name, element, pipeline, allowIncrease=True,
+                 allowVolumeSet=True):
         """
         @param element: the level element
         @param pipeline: the pipeline
+        @param allowIncrease: whether the component allows > 1.0 volume level
+        @param allowVolumeSet: whether the component allows setting volume
         """
         feedcomponent.Effect.__init__(self, name)
         self._element = element
@@ -46,6 +49,9 @@ class Volume(feedcomponent.Effect):
         bus = pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect('message::element', self._bus_message_received_cb)
+        self.firstVolumeValueReceived = False
+        self.allowIncrease = allowIncrease
+        self.allowVolumeSet = allowVolumeSet
 
     def setUIState(self, state):
         feedcomponent.Effect.setUIState(self, state)
@@ -53,6 +59,8 @@ class Volume(feedcomponent.Effect):
             for k in 'peak', 'decay', 'rms':
                 state.addKey('volume-%s' % k, [-100.0])
             state.addKey('volume-volume', self.effect_getVolume())
+            state.addKey('volume-allow-increase', self.allowIncrease)
+            state.addKey('volume-allow-set', self.allowVolumeSet)
 
     def _bus_message_received_cb(self, bus, message):
         """
@@ -77,7 +85,9 @@ class Volume(feedcomponent.Effect):
             else:
                 for k, v in ('peak', peak), ('decay', decay), ('rms', rms):
                     self.uiState.set('volume-%s' % k, v)
-            
+                if not self.firstVolumeValueReceived:
+                    self.uiState.set('volume-volume', self.effect_getVolume())
+                    self.firstVolumeValueReceived = True
 
     def effect_setVolume(self, value):
         """
@@ -87,10 +97,10 @@ class Volume(feedcomponent.Effect):
 
         Returns: the actual value it was set to
         """
-        self.component.setVolume(value)
-        # notify admin clients
-        self.uiState.set('volume-volume', value)
-
+        if self.allowVolumeSet:
+            self.component.setVolume(value)
+            # notify admin clients
+            self.uiState.set('volume-volume', value)
         return value
 
     def effect_getVolume(self):
@@ -100,4 +110,7 @@ class Volume(feedcomponent.Effect):
         @return: what value the volume is set to
         @rtype:  float (between 0.0 and 4.0)
         """
-        return self.component.getVolume()
+        if self.allowVolumeSet:
+            return self.component.getVolume()
+        else:
+            return 1.0

@@ -132,12 +132,12 @@ def checkMixerTracks(source_factory, device, channels, id=None):
                   'Check permissions on the mixer device.'
             log.debug('checks', "returning failure: %s" % msg)
             raise check.CheckProcError(msg)
-
         return (element.get_property('device-name'),
                 [track.label for track in element.list_tracks()])
                 
     pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
-    d = do_element_check(pipeline, 'source', get_tracks)
+    d = do_element_check(pipeline, 'source', get_tracks, 
+        set_state_deferred = True)
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)

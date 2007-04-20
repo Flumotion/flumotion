@@ -621,9 +621,7 @@ class Soundcard(WizardStep):
         if e: channels = e.intvalue
         d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
                            enum.element, device, channels, id='soundcard-check')
-        yield d
-        try:
-            deviceName, tracks = d.value()
+        def soundcardCheckComplete(deviceName, tracks):
             self.clear_msg('soundcard-check')
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
@@ -638,12 +636,12 @@ class Soundcard(WizardStep):
 
             self.combobox_input.set_list(tracks)
             self.combobox_input.set_sensitive(True)
-        except errors.RemoteRunFailure, e:
-            pass
+    
+        d.addCallback(soundcardCheckComplete)
         # FIXME: when probing failed, do
         # self.clear_combos()
-    update_inputs = defer_generator_method(update_inputs)
-            
+        return d
+                    
     def get_state(self):
         # FIXME: this can't be called if the soundcard hasn't been probed yet
         # for example, when going through the testsuite
@@ -652,18 +650,21 @@ class Soundcard(WizardStep):
             element = self.combobox_system.get_enum().element
             bitdepth = self.combobox_bitdepth.get_string()
             samplerate = self.combobox_samplerate.get_string()
+            input = self.combobox_input.get_string()
         except AttributeError:
             # when called without enum setup
             channels = 0
             element = "fakesrc"
             bitdepth = "9"
-            samplerate = "12345"
+            samplerate = "12345" 
+            input = None
 
         d = dict(device=self.combobox_device.get_string(),
                     depth=int(bitdepth),
                     rate=int(samplerate),
-                    channels=channels,
-                    input=self.combobox_input.get_string())
+                    channels=channels)
+        if input:
+            d['input-track'] = input
         # FIXME: can a key with a dash be specified ?
         d['source-element'] = element
         return d

@@ -1,3 +1,36 @@
+2007-04-20  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/bouncers/bouncer.py:
+	Remove import that is no longer required.
+	* flumotion/component/effects/volume/admin_gtk.py
+	  (VolumeAdminGtkNode.haveWidgetTree, VolumeAdminGtkNode.setUIState,
+	  VolumeAdminGtkNode.volumeSet):
+	* flumotion/component/effects/volume/volume.glade:
+	* flumotion/component/effects/volume/volume.py (Volume.__init__,
+	  Volume.setUIState, Volume._bus_message_received_cb,
+	  Volume.effect_setVolume, Volume.effect_getVolume):
+	Allow volume effect to be configured to not allow increasing volume
+	> 1.0 and also to be configured to not allow setting the volume.
+	Soundcard's volume setting will go to 1.0 only.
+	Soundcard component without gst-python 0.10.7 or later cannot set the
+	volume.
+	Expose these configurations in uiState so admin UIs can adapt.
+	Adapt gtk admin page to make sensitive the widgets concerned with
+	setting volume/increasing volume as appropriate.
+	* flumotion/component/producers/soundcard/soundcard.py (Soundcard,
+	  Soundcard.get_pipeline_string, Soundcard.configure_pipeline,
+	  Soundcard._set_input_track, Soundcard.setVolume,
+	  Soundcard.getVolume):
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	Add new property "input-track". Implement setting of volume for
+	volume effect. Use input track and set it to record.
+	* flumotion/wizard/steps.py (Soundcard.soundcardCheckComplete,
+	  Soundcard.get_state):
+	Remove use of defer generator.  Actually pass the input track
+	so it gets added to the config for the soundcard component.
+	* flumotion/worker/checks/video.py (get_tracks):
+	Make check do state change in a thread.
+
 2007-04-20  Michael Smith  <msmith@fluendo.com>
 
 	* doc/random/playlists:

@@ -26,8 +26,10 @@ from twisted.internet import defer
 
 from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
+from flumotion.common import messages
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
-    
 class Soundcard(feedcomponent.ParseLaunchComponent):
     def do_check(self):
         self.debug('running PyGTK/PyGST checks')
@@ -49,36 +51,93 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         rate = properties.get('rate', 44100)
         depth = properties.get('depth', 16)
         channels = properties.get('channels', 2)
-
+        self.inputTrackLabel = properties.get('input-track', None)
         # FIXME: why do we not connect to state_changed_cb so correct
         # soundcard input is used?
-        
+        d = self._addStateChangeDeferred(gst.STATE_CHANGE_NULL_TO_READY)
+        d.addCallback(self._set_input_track, self.inputTrackLabel)
         # FIXME: we should find a way to figure out what the card supports,
         # so we can add in correct elements on the fly
         # just adding audioscale and audioconvert always makes the soundcard
         # open in 1000 Hz, mono
         caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (
             rate, depth, channels)
-        pipeline = '%s device=%s ! %s ! level name=volumelevel message=true' % (
+        pipeline = "%s device=%s name=src ! %s ! " \
+            "level name=volumelevel message=true" % (
             element, device, caps)
-
+        self._srcelement = None
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):
         # add volume effect
         comp_level = pipeline.get_by_name('volumelevel')
-        vol = volume.Volume('inputVolume', comp_level, pipeline)
-        self.addEffect(vol)
+        allowVolumeSet = True
+        if gst.pygst_version < (0, 10, 7):
+            allowVolumeSet = False
+            m = messages.Info(T_(
+                N_("The soundcard volume cannot be changed with this version of the 'gst-python' library.\n")), id = 'mixer-track-setting')
+            m.add(T_(N_("Please upgrade '%s' to version %s or later if you desire this functionality."),
+                'gst-python', '0.10.7'))
+            self.addMessage(m)
 
-    def state_changed_cb(self, element, old, new, trackLabel):
-        if old == gst.STATE_NULL and new == gst.STATE_READY:
-            for track in element.list_tracks():
-                element.set_record(track, track.label == trackLabel)
+        vol = volume.Volume('inputVolume', comp_level, pipeline, 
+            allowIncrease=False, allowVolumeSet=allowVolumeSet)
+        self.addEffect(vol)
+        self._srcelement = pipeline.get_by_name("src")
+
+    def _set_input_track(self, result, trackLabel=None):
+        element = self._srcelement
+        for track in element.list_tracks():
+            if trackLabel != None:
+                self.debug("Setting track %s to record", trackLabel)
+                # some low-end sound cards require the Capture track to be
+                # set to recording to get any sound, so set that track and
+                # the input track we selected
+                element.set_record(track, 
+                    (track.get_property("label") == trackLabel or 
+                     track.get_property("label") == "Capture"))
 
     def setVolume(self, value):
-        self.debug("Volume set to: %d" % (value))
-        self.warning("FIXME: soundcard.setVolume not implemented yet")
+        if gst.pygst_version < (0, 10, 7):
+            self.warning(
+                "Cannot set volume on soundcards with gst-python < 0.10.7")
+            return
+        self.debug("Volume set to: %f", value)
+        if self.inputTrackLabel and self._srcelement:
+            element = self._srcelement
+            volumeSet = False
+            for track in element.list_tracks():
+                if track.get_property("label") == self.inputTrackLabel:
+                    volumeVals = tuple(int(value/1.0 * 
+                        track.get_property("max-volume")) 
+                        for _ in xrange(0, track.get_property("num-channels")))
+                    element.set_volume(track, volumeVals)
+                    volumeSet = True
+                    break
+            if not volumeSet:
+                self.warning("could not find track %s", self.inputTrackLabel)
+        else:
+            self.warning("no input track selected, cannot set volume")
 
     def getVolume(self):
-        self.warning("FIXME: soundcard.getVolume not implemented yet")
+        if gst.pygst_version < (0, 10, 7):
+            self.warning(
+                "Cannot query volume on soundcards with gst-python < 0.10.7")
+            return 1.0
+        if self.inputTrackLabel and self._srcelement:
+            element = self._srcelement
+            for track in element.list_tracks():
+                if track.get_property("label") == self.inputTrackLabel:
+                    volumeVals = element.get_volume(track)
+                    vol = 0
+                    for k in range(0, track.get_property("num-channels")):
+                        vol = vol + volumeVals[k]
+                    vol = vol / track.get_property("num-channels")
+                    self.debug("vol: %f max vol: %d", vol, track.get_property("max-volume"))
+                    v = vol / float(track.get_property("max-volume"))
+                    self.debug("v: %f", v)
+                    return v
+            self.warning("could not find track %s", self.inputTrackLabel)
+        else:
+            self.warning("no input track selected, cannot set volume")
         return 1.0
