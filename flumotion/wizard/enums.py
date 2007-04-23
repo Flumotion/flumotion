@@ -63,7 +63,7 @@ AudioDevice = enum.EnumClass('AudioDevice',
                         step=(
                               'Test Audio Source',
                               'Soundcard',
-                              'Unused'
+                              'Firewire audio'
                              ),
                         component_type=(
                                         'audiotest-producer',

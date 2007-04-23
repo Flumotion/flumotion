@@ -549,7 +549,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkFrame" id="frame2">
+	    <widget class="GtkFrame" id="frame_output_format">
 	      <property name="visible">True</property>
 	      <property name="label_xalign">0</property>
 	      <property name="label_yalign">0.5</property>

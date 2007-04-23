@@ -1,5 +1,30 @@
 2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* data/glade/wizard_firewire.glade:
+	Change frame name to something representing the frame so it can
+	be used in the code.
+	* flumotion/wizard/enums.py:
+	Firewire audio now has a step (when not used in combination with
+	firewire video).
+	* flumotion/wizard/steps.py (Production.verify, (FireWire.run_checks,
+	  FireWireAudio, FireWireAudio.setup, FireWireAudio.set_sensitive,
+	  FireWireAudio.on_update_output_format,
+	  FireWireAudio._get_width_height, FireWireAudio.update_output_format,
+	  FireWireAudio.get_state, FireWireAudio.worker_changed,
+	  FireWireAudio.run_checks, FireWireAudio.firewireCheckDone,
+	  FireWireAudio.get_next, Webcam, Overlay.worker_changed_010,
+	  Overlay.get_next):
+	Fix logic in verify().
+	Create new FirewireAudio wizard step for use when firewire audio
+	is being used without firewire audio. Remove whitespace. This
+	class shares no code with the Firewire class because this wizard
+	code badly needs refactoring.
+	Add more stupid hardcoding in Overlay's get_next(). Refer to
+	refactoring comment above.
+	Fixes #111
+
+2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/wizard/steps.py (Soundcard.soundcardCheckComplete):
 	Fix callback to take the correct args.
 

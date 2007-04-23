@@ -120,7 +120,7 @@ class Production(WizardSection):
         video_source = self.combobox_video.get_active()
         audio_source = self.combobox_audio.get_active()
         if (has_audio and audio_source == AudioDevice.Firewire and not
-            has_video and video_source == VideoDevice.Firewire):
+            (has_video and video_source == VideoDevice.Firewire)):
             self.wizard.combobox_worker.set_sensitive(True)
         else:
             self.wizard.combobox_worker.set_sensitive(False)
@@ -361,6 +361,153 @@ class FireWire(VideoSource):
             pass
     run_checks = defer_generator_method(run_checks)
 
+
+class FireWireAudio(WizardStep):
+    name = 'Firewire audio'
+    glade_file = 'wizard_firewire.glade'
+    component_type = 'firewire'
+    icon = 'firewire.png'
+    width_corrections = ['none', 'pad', 'stretch']
+    section = 'Production'
+
+    # options detected from the device:
+    dims = None
+    factors = (1, 2, 3, 4, 6, 8)
+    input_heights = None
+    input_widths = None
+    par = None
+
+    # these are instance state variables:
+    is_square = None
+    factor_i = None             # index into self.factors
+    width_correction = None     # currently chosen item from width_corrections
+   
+    def setup(self):
+        self.frame_scaling.hide()
+        self.frame_width_correction.hide()
+        self.frame_capture.hide()
+        self.frame_output_format.hide()
+
+    def set_sensitive(self, is_sensitive):
+        self.vbox_controls.set_sensitive(is_sensitive)
+        self.wizard.block_next(not is_sensitive)
+        
+    def on_update_output_format(self, *args):
+        # update label_camera_settings
+        standard = 'Unknown'
+        aspect = 'Unknown'
+        h = self.dims[1]
+        if h == 576:
+            standard = 'PAL'
+        elif h == 480:
+            standard = 'NTSC'
+        else:
+            self.warning('Unknown capture standard for height %d' % h)
+
+        nom = self.par[0]
+        den = self.par[1]
+        if nom == 59 or nom == 10:
+            aspect = '4:3'
+        elif nom == 118 or nom == 40:
+            aspect = '16:9'
+        else:
+            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
+
+        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
+            nom, den)
+        self.label_camera_settings.set_text(text)
+            
+        # factor is a double
+        self.factor_i = self.combobox_scaled_height.get_active()
+        self.is_square = self.checkbutton_square_pixels.get_active()
+
+        self.width_correction = None
+        for i in self.width_corrections:
+            if getattr(self,'radiobutton_width_'+i).get_active():
+                self.width_correction = i
+                break
+        assert self.width_correction
+
+        self.update_output_format()
+
+    def _get_width_height(self):
+        # returns dict with sw, sh, ow, oh
+        # which are scaled width and height, and output width and height
+        sh = self.input_heights[self.factor_i]
+        sw = self.input_widths[self.factor_i]
+        par = 1. * self.par[0] / self.par[1]
+
+        if self.is_square:
+            sw = int(math.ceil(sw * par))
+            # for GStreamer element sanity, make sw an even number
+            # FIXME: check if this can now be removed
+            # sw = sw + (2 - (sw % 2)) % 2
+        
+        # if scaled width (after squaring) is not multiple of 8, present
+        # width correction
+        self.frame_width_correction.set_sensitive(sw % 8 != 0)
+
+        # actual output
+        ow = sw
+        oh = sh
+        if self.width_correction == 'pad':
+            ow = sw + (8 - (sw % 8)) % 8
+        elif self.width_correction == 'stretch':
+            ow = sw + (8 - (sw % 8)) % 8
+            sw = ow
+        
+        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
+
+    def update_output_format(self):
+        d = self._get_width_height()
+        num, den = 1, 1
+        if not self.is_square:
+            num, den = self.par[0], self.par[1]
+
+        msg = _('%dx%d, %d/%d pixel aspect ratio') % (
+                   d['ow'], d['oh'], num, den)
+        self.label_output_format.set_markup(msg)
+        
+    def get_state(self):
+        options = {} # VideoSource.get_state(self)
+        d = self._get_width_height()
+        options['height'] = d['oh']
+        options['scaled-width'] = d['sw']
+        options['width'] = d['ow']
+        options['is-square'] = self.is_square
+        options['framerate'] = \
+            _fraction_from_float(self.spinbutton_framerate.get_value(), 2)
+        return options
+
+    def worker_changed(self):
+        self.run_checks()
+        
+    def run_checks(self):
+        self.set_sensitive(False)
+        msg = messages.Info(T_(N_('Checking for Firewire device...')),
+            id='firewire-check')
+        self.add_msg(msg)
+        d = self.workerRun('flumotion.worker.checks.video', 'check1394',
+            id='firewire-check')
+        def firewireCheckDone(options):
+            self.clear_msg('firewire-check')
+            self.dims = (options['width'], options['height'])
+            self.par = options['par']
+            self.input_heights = [self.dims[1]/i for i in self.factors]
+            self.input_widths = [self.dims[0]/i for i in self.factors]
+            store = gtk.ListStore(str)
+            for i in self.input_heights:
+                store.set(store.append(), 0, '%d pixels' % i)
+            self.combobox_scaled_height.set_model(store)
+            self.combobox_scaled_height.set_active(1)
+            self.set_sensitive(True)
+            self.on_update_output_format()
+        d.addCallback(firewireCheckDone)
+        return d
+
+    def get_next(self):
+        return None
+
 class Webcam(VideoSource):
     name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
@@ -485,7 +632,6 @@ class Overlay(WizardStep):
 
     can_overlay = True
 
-
     def worker_changed_010(self):
         self.can_overlay = False
         self.set_sensitive(False)
@@ -545,11 +691,15 @@ class Overlay(WizardStep):
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-audio'):
-            audio_source = self.wizard.get_step_option('Source', 'audio')            
+            audio_source = self.wizard.get_step_option('Source', 'audio')
+            video_source = self.wizard.get_step_option('Source', 'video')
             if audio_source == AudioDevice.Soundcard:
                 return 'Soundcard'
             elif audio_source == AudioDevice.Test:
                 return 'Test Audio Source'
+            elif audio_source == AudioDevice.Firewire and not \
+                video_source == VideoDevice.Firewire:
+                return 'Firewire audio'
             
         return None
 
