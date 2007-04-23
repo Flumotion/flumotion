@@ -679,8 +679,12 @@ class Window(log.Loggable, gobject.GObject):
 
         moodname = state and moods.get(state.get('mood')).name
         can_stop = bool(moodname and moodname!='sleeping' and moodname!='lost')
+        can_delete = bool(state and not can_stop)
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)
+
+        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
+        d['toolbutton_delete_component'].set_sensitive(can_delete)
         self.debug('can start %r, can stop %r' % (can_start, can_stop))
 
     # clear the component view in the sidepane.  Called when the current
@@ -912,8 +916,19 @@ class Window(log.Loggable, gobject.GObject):
         d = self._component_stop(state)
         d.addCallback(lambda r: self._component_start(state))
         return d
-        
-    def _component_do(self, state, action, doing, done):
+    
+    def _component_delete(self, state):
+        """
+        @returns: a L{twisted.internet.defer.Deferred}
+        """
+        return self._component_do(state, '', 'Deleting', 'Deleted', 
+            'deleteComponent')
+
+    def _component_do(self, state, action, doing, done, 
+        remoteMethodPrefix="component"):
+        """
+        @param remoteMethodName: prefix for remote method to run
+        """
         if not state:
             state = self.components_view.get_selected_state()
             if not state:
@@ -925,7 +940,7 @@ class Window(log.Loggable, gobject.GObject):
             return None
 
         mid = self.statusbar.push('main', "%s component %s" % (doing, name))
-        d = self.admin.callRemote('component' + action, state)
+        d = self.admin.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)
@@ -1027,6 +1042,9 @@ class Window(log.Loggable, gobject.GObject):
         
     def manage_stop_component_cb(self, button):
         self._component_stop(None)
+
+    def manage_delete_component_cb(self, button):
+        self._component_delete(None)
         
     def manage_start_all_cb(self, button):
         for c in self._components.values():

@@ -1,5 +1,17 @@
 2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py
+	  (Window._set_stop_start_component_sensitive,
+	  Window._component_restart, Window._component_delete,
+	  Window._component_do, Window.manage_stop_component_cb,
+	  Window.manage_delete_component_cb):
+	* flumotion/admin/gtk/parts.py (ComponentMenu.__init__):
+	Add ability to delete one component.
+	Fixes #445
+
+2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* data/glade/wizard_firewire.glade:
 	Change frame name to something representing the frame so it can
 	be used in the code.

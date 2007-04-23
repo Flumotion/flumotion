@@ -434,11 +434,17 @@ class ComponentMenu(gtk.Menu):
         self._items['start'] = i
         
         i = gtk.MenuItem(_('St_op'))
-        if mood == moods.sleeping:
+        if mood == moods.sleeping or mood == moods.lost:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['stop'] = i
-        
+       
+        i = gtk.MenuItem(_('_Delete'))
+        if not (mood == moods.sleeping or mood == moods.lost):
+            i.set_property('sensitive', False)
+        self.append(i)
+        self._items['delete'] = i
+
         self.append(gtk.SeparatorMenuItem())
 
         i = gtk.MenuItem(_('Reload _code'))
