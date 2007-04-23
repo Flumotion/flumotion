@@ -1,3 +1,8 @@
+2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/wizard/steps.py (Soundcard.soundcardCheckComplete):
+	Fix callback to take the correct args.
+
 2007-04-20  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/bouncers/bouncer.py:

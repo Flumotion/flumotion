@@ -621,7 +621,7 @@ class Soundcard(WizardStep):
         if e: channels = e.intvalue
         d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
                            enum.element, device, channels, id='soundcard-check')
-        def soundcardCheckComplete(deviceName, tracks):
+        def soundcardCheckComplete((deviceName, tracks)):
             self.clear_msg('soundcard-check')
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
