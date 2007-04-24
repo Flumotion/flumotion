@@ -42,6 +42,31 @@ from flumotion.twisted.compat import implements
 from flumotion.configure import configure
 from flumotion.worker import medium, job, feedserver
 
+class ProxyBouncer(log.Loggable):
+    logCategory = "proxybouncer"
+
+    """
+    I am a bouncer that proxies authenticate calls to a remote FPB root
+    object.
+    """
+    def __init__(self, remote):
+        """
+        @param remote: an object that has .callRemote()
+        """
+        self._remote = remote
+
+    def getKeycardClasses(self):
+        """
+        Call me before asking me to authenticate, so I know what I can
+        authenticate.
+        """
+        return self._remote.callRemote('getKeycardClasses')
+
+    def authenticate(self, keycard):
+        self.debug("Authenticating keycard %r against remote bouncer",
+                   keycard)
+        return self._remote.callRemote('authenticate', None, keycard)
+
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
     """
@@ -146,7 +171,7 @@ class WorkerBrain(log.Loggable):
         else:
             port = self.options.feederports[-1]
 
-        return feedserver.FeedServer(self, port)
+        return feedserver.FeedServer(self, ProxyBouncer(self), port)
 
     def login(self, managerConnectionInfo):
         self.managerConnectionInfo = managerConnectionInfo

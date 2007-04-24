@@ -61,8 +61,12 @@ class BouncerPortal(log.Loggable):
         """
         if not self.bouncer:
             self.error('No bouncer configured, no logins possible')
-        list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
-        return defer.succeed(list)
+        if hasattr(self.bouncer, 'getKeycardClasses'):
+            # must return a deferred
+            return self.bouncer.getKeycardClasses()
+        else:
+            list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
+            return defer.succeed(list)
             
     def login(self, keycard, mind, *ifaces):
         """

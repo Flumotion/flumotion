@@ -1,3 +1,23 @@
+2007-04-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/feedserver.py (FeedServer.listen): Use a normal
+	portal, now that we can, with the modifications below.
+
+	* flumotion/worker/worker.py (ProxyBouncer): Move here from
+	feedserver.ManagerProxyBouncer, and pass to the feedserver on
+	creation. No need to qual() the classes, they are already qual()'d
+	remotely.
+
+	* flumotion/twisted/portal.py (BouncerPortal.getKeycardClasses):
+	Add some API behavior: if the bouncer has a 'getKeycardClasses'
+	attribute, call it instead of accessing the keycardClasses
+	attribute.
+
+	* flumotion/test/test_worker_feed.py (countOpenFileDescriptors):
+	Interesting function!
+	(TestFeedServer.testConnectWithoutDroppingPB): Add test, asserting
+	on the number of open file descriptors at opportune times.
+
 2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/producers/ivtv/ivtv.py

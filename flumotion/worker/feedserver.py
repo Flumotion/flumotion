@@ -37,44 +37,6 @@ from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
 
-class ProxyManagerBouncer(log.Loggable):
-    logCategory = "proxymanagerbouncer"
-    # should be set as soon as we can ask the manager's bouncer
-    keycardClasses = () 
-
-    """
-    I proxy authenticate calls to the manager's bouncer.
-    """
-    def __init__(self, remote):
-        """
-        @param remote: an object that has .callRemote()
-        """
-        self._remote = remote
-
-    def getKeycardClasses(self):
-        """
-        Call me before asking me to authenticate, so I know what I can
-        authenticate.
-        """
-        def getKeycardClassesCb(classes):
-            self.keycardClasses = [reflect.namedObject(n) for n in classes]
-            self.log('set proxied keycardClasses to %r', self.keycardClasses)
-            return classes
-
-        d = self._remote.callRemote('getKeycardClasses')
-        d.addCallback(getKeycardClassesCb)
-        return d
-
-    def authenticate(self, keycard):
-        self.debug("Authenticating keycard %r against manager" % keycard)
-        return self._remote.callRemote('authenticate', None, keycard)
-
-class ProxyManagerBouncerPortal(fportal.BouncerPortal):
-    def getKeycardClasses(self):
-        self.debug('proxy getting keycardclasses')
-        d = self.bouncer.getKeycardClasses()
-        return d
-
 class FeedServer(log.Loggable):
     """
     I am the feed server. PHEAR
@@ -84,13 +46,13 @@ class FeedServer(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, brain, portNum):
+    def __init__(self, brain, bouncer, portNum):
         """
         @param brain: L{flumotion.worker.worker.WorkerBrain}
         """
         self._brain = brain
         self._tport = None
-        self.listen(portNum)
+        self.listen(bouncer, portNum)
 
     def getPortNum(self):
         if not self._tport:
@@ -98,10 +60,8 @@ class FeedServer(log.Loggable):
             return 0
         return self._tport.getHost().port
 
-    def listen(self, portNum, unsafeTracebacks=0):
-        # first make a server factory, then listen with it.
-        bouncer = ProxyManagerBouncer(self._brain)
-        portal = ProxyManagerBouncerPortal(self, bouncer)
+    def listen(self, bouncer, portNum, unsafeTracebacks=0):
+        portal = fportal.BouncerPortal(self, bouncer)
         factory = pb.PBServerFactory(portal,
                                      unsafeTracebacks=unsafeTracebacks)
 
