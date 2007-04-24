@@ -1,3 +1,11 @@
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	Soundcard should have higher clock priority than firewire.
+	This is due to soundcard not working at all when slaved
+	to a different clock.
+	Fixes #547
+
 2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* data/glade/admin.glade:

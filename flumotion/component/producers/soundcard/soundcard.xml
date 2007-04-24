@@ -7,7 +7,7 @@
 
       <feeder name="default"/>
 
-      <synchronization required="yes" clock-priority="150"/>
+      <synchronization required="yes" clock-priority="170"/>
 
       <entries>
         <entry type="component" location="soundcard.py"
