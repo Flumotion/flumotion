@@ -27,6 +27,7 @@ from twisted.internet import reactor
 
 from flumotion.configure import configure
 from flumotion.common import log, keycards, common, errors
+from flumotion.common import connection
 from flumotion.worker import worker, config
 from flumotion.twisted import pb
 
@@ -267,31 +268,20 @@ def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
 
-    # create a brain and have it remember the manager to direct jobs to
-    # connect the brain to the manager
-    if options.transport == "tcp":
-        reactor.connectTCP(options.host, options.port,
-            brain.workerClientFactory)
-    elif options.transport == "ssl":
-        from twisted.internet import ssl
-        reactor.connectSSL(options.host, options.port,
-            brain.workerClientFactory,
-            ssl.ClientContextFactory())
+    # FIXME: why address='localhost' ?
+    authenticator = pb.Authenticator(username=options.username,
+                                     password=options.password,
+                                     address='localhost',
+                                     avatarId=options.name)
+    info = connection.PBConnectionInfo(options.host, options.port,
+                                       options.transport == "ssl",
+                                       authenticator)
+    brain.login(info)
 
     log.info('worker',
-             'Connecting to manager %s:%d using %s' % (options.host,
-                                                       options.port,
-                                                       options.transport.upper()))
+             'Connecting to manager %s using %s' % (info,
+                                                    options.transport.upper()))
 
-    authenticator = pb.Authenticator(
-        username=options.username,
-        password=options.password,
-        address='localhost', # FIXME: why localhost ?
-        avatarId=options.name
-    )
-    brain.login(authenticator)
-
-    reactor.addSystemEventTrigger('before', 'shutdown', brain.shutdownHandler)
 
     # go into the reactor main loop
     reactor.run()

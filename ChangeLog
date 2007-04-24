@@ -1,3 +1,65 @@
+2007-04-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/main.py (main): More use of PBConnectionInfo.
+
+	* flumotion/worker/feed.py: Remove server-related code; client
+	code has to stay here, because components call it.
+
+	* flumotion/worker/medium.py: Factored out of worker.py,
+	dispatches all requests to the worker brain.
+
+	* flumotion/worker/feedserver.py (FeedServer): Server code
+	factored out of flumotion.worker.feed. Synthesized a server object
+	to be the calling-point for feedserver-related operations.
+	(FeedAvatar.__init__): Take the mind directly instead of in
+	attached. Fixes #566. Use the fpb.Avatar infrastructure for
+	callremote, which gives us free logging. Remove use of crack
+	IFeedServerParent.
+
+	* flumotion/worker/job.py: Consolidate classes such that the
+	JobHeaven object acts as the one calling-point for job-related
+	functions. Factor the deferredstart code out into a separate
+	testable class. Attach mind to job components directly instead of
+	via a callLater; see #566.
+	(JobInfo): Renamed from "Kid".
+	(JobHeaven.spawn): Renamed from Kindergarten.play.
+	(JobHeaven.getJobInfo, JobHeaven.getJobInfos)
+	(JobHeaven.getJobAvatarIds): Renamed from getKid*.
+	(JobHeaven.jobStopped): New method combining lostAvatar and
+	removeKidByPid.
+	(JobHeaven.shutdown): I believe the previous
+	shutdown-but-possibly-kill code was buggy, and that this code is
+	not.
+	(JobAvatar.__init__): Take a mind directly in the init function,
+	instead of via attached/detached. Derive from fpb.Avatar.
+	(JobAvatar.setMind): Code moved here from attached(), no longer a
+	defgen.
+	(JobAvatar._sendFileDescriptor): FD sending factored into method.
+	(JobAvatar.receiveFeed): Port mind-possibly-logged-out fix here
+	from sendFeed.
+
+	* flumotion/worker/worker.py: Eviscerate. Moved medium and
+	jobheaven code out to separate files; all that is left is the
+	WorkerBrain.
+
+	* flumotion/component/consumers/preview/preview.py (Preview):
+	Disable QOS in the preview component; it's still not very usable
+	though.
+
+	* flumotion/twisted/pb.py (Avatar.setMind): Update docs to say
+	that it's best to setMind directly, not from a callLater.
+
+	* flumotion/test/realm.py: New file, some infrastructure for
+	setting up a PB realm listening on a random available port.
+
+	* flumotion/test/test_worker_medium.py: Move medium/clientfactory
+	tests here; use the testrealm infrastructure to actually connect
+	to a TCP socket.
+
+	* flumotion/test/test_worker_worker.py: Remove removeKidByPid
+	test, that code is no longer there. Add test for initing worker
+	brain.
+
 2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/producers/soundcard/soundcard.xml:

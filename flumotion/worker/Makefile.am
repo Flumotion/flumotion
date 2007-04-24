@@ -8,7 +8,10 @@ flumotion_PYTHON = \
 	__init__.py 	\
 	config.py 	\
 	feed.py 	\
+	feedserver.py 	\
+	job.py	 	\
 	main.py 	\
+	medium.py 	\
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)

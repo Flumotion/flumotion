@@ -646,7 +646,9 @@ class Avatar(pb.Avatar, flog.Loggable):
         Tell the avatar that the given mind has been attached.
         This gives the avatar a way to call remotely to the client that
         requested this avatar.
-        This is scheduled by the portal after the client has logged in.
+
+        It is best to call setMind() from within the avatar's __init__
+        method. Some old code still does this via a callLater, however.
 
         @type mind: L{twisted.spread.pb.RemoteReference}
         """

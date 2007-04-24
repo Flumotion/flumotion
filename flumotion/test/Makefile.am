@@ -8,7 +8,8 @@ flumotion_PYTHON =			\
         __init__.py			\
 	common.py			\
 	testclasses.py			\
-	gtkunit.py
+	gtkunit.py			\
+	realm.py
 
 EXTRA_DIST = 				\
 	test.xml			\
@@ -55,6 +56,8 @@ EXTRA_DIST = 				\
 	test_twisted_integration.py 	\
 	test_ui_fgtk.py 		\
 	test_wizard.py 			\
-	test_workerconfig.py
+	test_workerconfig.py		\
+	test_worker_medium.py		\
+	test_worker_worker.py
 
 check-local: trial
