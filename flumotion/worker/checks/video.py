@@ -23,7 +23,7 @@ from flumotion.worker.checks import check
 
 import gst
 
-from video010 import *
+from gst010 import *
 
 def checkTVCard(device, id='check-tvcard'):
     """
@@ -106,43 +106,3 @@ def checkWebcam(device, id):
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
-
-
-# FIXME: move to audio ?
-def checkMixerTracks(source_factory, device, channels, id=None):
-    """
-    Probe the given GStreamer element factory with the given device for
-    audio mixer tracks.
-    Return a deferred firing a result.
-
-    The result is either:
-     - succesful, with a None value: no device found
-     - succesful, with a human-readable device name and a list of mixer
-       track labels.
-     - failed
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    result = messages.Result()
-
-    def get_tracks(element):
-        # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
-        if not element.implements_interface(gst.interfaces.Mixer):
-            msg = 'Cannot get mixer tracks from the device.  '\
-                  'Check permissions on the mixer device.'
-            log.debug('checks', "returning failure: %s" % msg)
-            raise check.CheckProcError(msg)
-        return (element.get_property('device-name'),
-                [track.label for track in element.list_tracks()])
-                
-    pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
-    d = do_element_check(pipeline, 'source', get_tracks, 
-        set_state_deferred = True)
-
-    d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
-
-    return d
-
-

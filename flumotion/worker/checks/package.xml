@@ -6,7 +6,8 @@
           <filename location="check.py" />
           <filename location="encoder.py" />
           <filename location="video.py" />
-          <filename location="video010.py" />
+	  <filename location="audio.py" />
+          <filename location="gst010.py" />
         </directory>
       </directories>
     </bundle>

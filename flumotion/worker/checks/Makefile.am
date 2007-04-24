@@ -7,7 +7,8 @@ flumotion_PYTHON = \
 	check.py	\
 	encoder.py	\
 	video.py	\
-	video010.py	\
+	gst010.py	\
+	audio.py	\
 	package.xml
 
 TAGS_FILES = $(flumotion_PYTHON)
