@@ -1,5 +1,12 @@
 2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/component/producers/ivtv/ivtv.py
+	  (Ivtv.get_pipeline_string):
+	* flumotion/component/producers/ivtv/ivtv.xml:
+	Make the deinterlacer configurable.
+
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* po/POTFILES.in:
 	Remove file that no longer exists.
 

@@ -16,6 +16,7 @@
         <property name="width" type="int" required="false" />
         <property name="height" type="int" required="false" />
 	<property name="device" type="string" required="false" />
+	<property name="deinterlacer" type="string" required="false" />
       </properties>
     </component>
   </components>

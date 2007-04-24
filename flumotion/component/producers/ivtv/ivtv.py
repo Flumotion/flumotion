@@ -18,8 +18,6 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import log
-
 from flumotion.component import feedcomponent
 
 # this is a producer component for ivtv
@@ -28,13 +26,14 @@ class Ivtv(feedcomponent.ParseLaunchComponent):
         width = properties.get('width', 0)
         height = properties.get('height', 0)
         device = properties.get('device', '/dev/video0')
+        deinterlacer = properties.get('deinterlacer', '')
         if width > 0 and height > 0:
             scaling_template = (" videoscale method=1 ! "
                 "video/x-raw-yuv,width=%d,height=%d " % (width, height))
         else:
             scaling_template = ""
         return ("filesrc name=src location=%s ! decodebin name=d ! queue !  "
-                " ffdeinterlace ! %s ! ffmpegcolorspace ! video/x-raw-yuv "
+                " %s ! %s ! ffmpegcolorspace ! video/x-raw-yuv "
                 " ! @feeder::video@ d. ! queue ! audioconvert ! audio/x-raw-int "
                 " ! @feeder::audio@"
-                % (device, scaling_template))
+                % (device, deinterlacer, scaling_template))
