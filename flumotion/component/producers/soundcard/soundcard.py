@@ -52,8 +52,6 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         depth = properties.get('depth', 16)
         channels = properties.get('channels', 2)
         self.inputTrackLabel = properties.get('input-track', None)
-        # FIXME: why do we not connect to state_changed_cb so correct
-        # soundcard input is used?
         d = self._addStateChangeDeferred(gst.STATE_CHANGE_NULL_TO_READY)
         d.addCallback(self._set_input_track, self.inputTrackLabel)
         # FIXME: we should find a way to figure out what the card supports,

@@ -1,3 +1,20 @@
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/producers/soundcard/soundcard.py
+	  (Soundcard.get_pipeline_string):
+	FIXME was fixed last week.
+
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/audio.py:
+	Move checkMixerTracks to audio.py.
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/gst010.py:
+	Rename video010.py to gst010.py.
+
 2007-04-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/main.py (main): More use of PBConnectionInfo.
