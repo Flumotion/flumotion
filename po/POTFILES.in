@@ -41,7 +41,7 @@ flumotion/worker/worker.py
 
 flumotion/worker/checks/check.py
 flumotion/worker/checks/encoder.py
-flumotion/worker/checks/video010.py
+flumotion/worker/checks/gst010.py
 
 flumotion/test/test_i18n.py
 flumotion/test/test_common_messages.py

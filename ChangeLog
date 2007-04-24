@@ -1,5 +1,10 @@
 2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* po/POTFILES.in:
+	Remove file that no longer exists.
+
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/effects/volume/volume.py (Volume):
 	volume effect does volume setting for all known components
 	that use it.
