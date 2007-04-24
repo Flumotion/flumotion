@@ -22,12 +22,10 @@
 from math import frexp
 from flumotion.component import feedcomponent
 
-# FIXME: it's illogical to have to provide level, but not volume.
-
 class Volume(feedcomponent.Effect):
     """
     I am an effect that can be added to any component that has a level
-    element and a volume element.
+    element and a way of controlling volume.
 
     My component should implement setVolume() and getVolume()
     """

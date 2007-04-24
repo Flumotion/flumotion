@@ -1,5 +1,11 @@
 2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/component/effects/volume/volume.py (Volume):
+	volume effect does volume setting for all known components
+	that use it.
+
+2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/producers/soundcard/soundcard.py
 	  (Soundcard.get_pipeline_string):
 	FIXME was fixed last week.
