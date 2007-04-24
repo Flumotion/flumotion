@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_misc_httpfile -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -18,6 +18,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
 import string
 import os
 
@@ -35,9 +36,9 @@ from twisted.cred import credentials
 
 from twisted.web.static import loadMimeTypes, getTypeAndEncoding
 
-class File(resource.Resource, filepath.FilePath, log.Loggable):
-    __pychecker__ = 'no-objattrs'
+# this file is inspired by/adapted from twisted.web.static
 
+class File(resource.Resource, filepath.FilePath, log.Loggable):
     contentTypes = loadMimeTypes()
 
     defaultType = "application/octet-stream"
@@ -45,10 +46,13 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
     childNotFound = weberror.NoResource("File not found.")
 
     def __init__(self, path, component):
+        """
+        @param component: L{flumotion.component.component.BaseComponent}
+        """
         resource.Resource.__init__(self)
         filepath.FilePath.__init__(self, path)
 
-        self.component = component
+        self._component = component
 
     def getChild(self, path, request):
         self.restat()
@@ -77,31 +81,31 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         return self.getsize()
 
     def render(self, request):
+        self.debug('render request %r' % request)
         def terminateSimpleRequest(res, request):
             if res != server.NOT_DONE_YET:
                 request.finish()
 
-        d = self.component.startAuthentication(request)
+        d = self._component.startAuthentication(request)
         d.addCallback(self.renderAuthenticated, request)
         d.addCallback(terminateSimpleRequest, request)
 
         return server.NOT_DONE_YET
 
-    def renderAuthenticated(self, res, request):
-        """ 
-        Now that we're authenticated (or authentication wasn't requested), 
-        write the file (or appropriate other response) to the client.
-        We override static.File to implement Range requests, and to get access
-        to the transfer object to abort it later; the bulk of this is a direct
-        copy, though.
-        """
-        self.restat()
+    def renderAuthenticated(self, _, request):
+        # Now that we're authenticated (or authentication wasn't requested), 
+        # write the file (or appropriate other response) to the client.
+        # We override static.File to implement Range requests, and to get access
+        # to the transfer object to abort it later; the bulk of this is a direct
+        # copy of static.File.render, though.
+        # self.restat()
+        self.debug('renderAuthenticated request %r' % request)
 
         ext = os.path.splitext(self.basename())[1].lower()
         type = self.contentTypes.get(ext, self.defaultType)
 
         if not self.exists():
-            self.debug("Couldn't find resource %s", self.basename())
+            self.debug("Couldn't find resource %s", self.path)
             return self.childNotFound.render(request)
 
         if self.isdir():
@@ -131,59 +135,72 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         if request.setLastModified(self.getmtime()) is http.CACHED:
             return ''
 
-        tsize = fsize = size = self.getFileSize()
+        fileSize = self.getFileSize()
+        # first and last byte offset we will write
+        first = 0
+        last = fileSize - 1
+
         range = request.getHeader('range')
-        start = 0
         if range is not None:
-            # TODO: Add a unit test - or several - for this stuff.
-            # We have a partial-data request...
-            # Some variables... we start at byte offset 'start', end at byte 
-            # offset 'end'. fsize is the number of bytes we're sending. tsize 
-            # is the total size of the file. 'size' is the byte offset we will
-            # stop at, plus 1.
-            bytesrange = string.split(range, '=')
-            if len(bytesrange) != 2:
+            # We have a partial data request.
+            # for interpretation of range, see RFC 2068 14.36
+            # examples: bytes=500-999; bytes=-500 (suffix mode; last 500)
+            rangeKeyValue = string.split(range, '=')
+            if len(rangeKeyValue) != 2:
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
                 return ''
 
-            start, end = string.split(bytesrange[1], '-', 1)
+            if rangeKeyValue[0] != 'bytes':
+                request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
+                return ''
+
+            # ignore a set of range requests for now, only take the first
+            ranges = rangeKeyValue[1].split(',')[0]
+            l = ranges.split('-')
+            if len(l) != 2:
+                request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
+                return ''
+
+            start, end = l
+
             if start:
-                start = int(start)
-                f.seek(start)
+                # byte-range-spec
+                first = int(start)
                 if end:
-                    end = int(end)
-                else:
-                    end = size - 1
-                fsize = end - start + 1
+                    last = int(end)
             elif end:
-                lastbytes = int(end)
-                if size < lastbytes:
-                    lastbytes = size
-                start = size - lastbytes
-                f.seek(start)
-                fsize = lastbytes
-                end = size - 1
+                # suffix-byte-range-spec
+                count = int(end)
+                # we can't serve more than there are in the file
+                if count > fileSize:
+                    count = fileSize
+                first = fileSize - count
             else:
+                # need at least start or end
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
                 return ''
-            size = end + 1
 
+            # Start sending from the requested position in the file
+            f.seek(first)
+
+            # FIXME: is it still partial if the request was for the complete
+            # file ? Couldn't find a conclusive answer in the spec.
             request.setResponseCode(http.PARTIAL_CONTENT)
             request.setHeader('Content-Range', "bytes %d-%d/%d" % 
-                (start, end, tsize))
+                (first, last, fileSize))
 
-        request.setHeader("Content-Length", str(fsize))
+        request.setHeader("Content-Length", str(last - first + 1))
 
         if request.method == 'HEAD':
              return ''
            
-        request._transfer = FileTransfer(f, size, request)
+        request._transfer = FileTransfer(f, last + 1, request)
 
         return server.NOT_DONE_YET
 
     def createSimilarFile(self, path):
         self.debug("createSimilarFile at %r", path)
-        f = self.__class__(path, self.component)
+        f = self.__class__(path, self._component)
         return f
 
 class FileTransfer:

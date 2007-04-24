@@ -103,15 +103,21 @@ class TestTextFile(unittest.TestCase):
             http.REQUESTED_RANGE_NOT_SATISFIABLE, '')
         return fr.finishDeferred
 
-    def testWrongBytesRange(self):
+    def testWrongEmptyBytesRange(self):
         fr = FakeRequest(headers={'range': 'bytes=-'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
         fr.finishDeferred.addCallback(self.finishCallback, fr,
             http.REQUESTED_RANGE_NOT_SATISFIABLE, '')
         return fr.finishDeferred
 
-    # FIXME: this one should fail
-    def notestWrongTypeRange(self):
+    def testWrongNoRange(self):
+        fr = FakeRequest(headers={'range': 'bytes=5'})
+        self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
+        fr.finishDeferred.addCallback(self.finishCallback, fr,
+            http.REQUESTED_RANGE_NOT_SATISFIABLE, '')
+        return fr.finishDeferred
+
+    def testWrongTypeRange(self):
         fr = FakeRequest(headers={'range': 'seconds=5-10'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
         fr.finishDeferred.addCallback(self.finishCallback, fr,
@@ -120,6 +126,13 @@ class TestTextFile(unittest.TestCase):
 
     def testRange(self):
         fr = FakeRequest(headers={'range': 'bytes=2-5'})
+        self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
+        fr.finishDeferred.addCallback(self.finishPartialCallback, fr,
+            'text', 2, 5)
+        return fr.finishDeferred
+
+    def testRangeSet(self):
+        fr = FakeRequest(headers={'range': 'bytes=2-5,6-10'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
         fr.finishDeferred.addCallback(self.finishPartialCallback, fr,
             'text', 2, 5)

@@ -1,5 +1,24 @@
 2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpfile/file.py (File, File.__init__,
+	  File.render, File.terminateSimpleRequest, File.renderAuthenticated,
+	  File.createSimilarFile):
+	  Comment and document.
+	  Remove bogus pychecker inhibition.
+	  Privatize File._component.
+	  Instead of commenting badly named variables, use self-documenting
+	  names.
+	  Be a bit more strict about range headers we accept.
+	  Make the start/end logic shorter and easier to grok by adding
+	  first/last variables and simplifying.
+	* flumotion/test/test_misc_httpfile.py
+	  (TestTextFile.testWrongEmptyBytesRange,
+	  TestTextFile.testWrongNoRange, TestTextFile.testWrongTypeRange,
+	  TestTextFile.testRangeSet):
+	  Add two tests, fix one.
+
+2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_misc_httpfile.py:
 	  Add a test before refactoring.
