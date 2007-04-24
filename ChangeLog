@@ -1,3 +1,10 @@
+2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_misc_httpfile.py:
+	  Add a test before refactoring.
+	  Increases coverage for file.py from 19% to 79%.
+
 2007-04-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/feedserver.py (FeedServer.listen): Use a normal

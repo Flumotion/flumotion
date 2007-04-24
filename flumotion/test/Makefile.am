@@ -45,6 +45,7 @@ EXTRA_DIST = 				\
 	test_manager_depgraph.py	\
 	test_manager_manager.py 	\
 	test_manager_worker.py		\
+	test_misc_httpfile.py		\
 	test_parts.py	 		\
 	test_pb.py	 		\
 	test_pbstream.py		\
