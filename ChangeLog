@@ -1,5 +1,28 @@
 2007-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/feed.py (FeedMedium.startConnecting)
+	(FeedMedium.stopConnecting): New helper functions. You can still
+	connect using functions outside of the medium if that is your
+	thing, which is the case with older feedcomponent.py bundles.
+	(FeedMedium._doFeedTo): AUGMENT THE TERROR! (It is commented.)
+
+	* flumotion/worker/feedserver.py (FeedAvatar._sendFeedReplyCb):
+	Expand comment.
+
+	* flumotion/twisted/fdserver.py (_SocketMaybeCloser): Factor out
+	an awesome mixin, like _SocketCloser, but sometimes not.
+	(PassableServerConnection): Use the mixin.
+	(PassableClientConnection, PassableClientConnector): New classes,
+	the analogs of PassableServerConnection/Port for client-side
+	connections.
+
+	* flumotion/test/test_worker_feed.py
+	(TestFeedServer.testConnectAndFeedLegacy): Copy from
+	testConnectAndFeed, a test that existing clients continue to work.
+	(TestFeedServer.testConnectAndFeed): Use the new
+	FeedMedium.startConnecting interface, which means we use a
+	PassableClientConnector.
+
 	* flumotion/worker/feed.py (FeedMedium._doFeedTo): Add a FIXME.
 
 	* flumotion/test/test_worker_feed.py

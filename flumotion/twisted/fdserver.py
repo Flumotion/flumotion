@@ -150,15 +150,8 @@ class FDPassingBroker(pb.Broker, log.Loggable):
         else:
             self.warning("Unexpected: FD-passing message with len(fds) != 1")
 
-class PassableServerConnection(tcp.Server):
-    """
-    A subclass of tcp.Server that permits passing the FDs used to other 
-    processes (by just calling close(2) rather than shutdown(2) on them)
-    """
-
-    def __init__(self, sock, protocol, client, server, sessionno):
-        tcp.Server.__init__(self, sock, protocol, client, server, sessionno)
-        self.keepSocketAlive = False
+class _SocketMaybeCloser(tcp._SocketCloser):
+    keepSocketAlive = False
 
     def _closeSocket(self):
         # We override this (from tcp._SocketCloser) so that we can close sockets
@@ -173,5 +166,24 @@ class PassableServerConnection(tcp.Server):
         else:
             tcp.Server._closeSocket(self)
 
+class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
+    """
+    A subclass of tcp.Server that permits passing the FDs used to other 
+    processes (by just calling close(2) rather than shutdown(2) on them)
+    """
+    pass
+
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
+
+class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
+    pass
+
+class PassableClientConnector(tcp.Connector):
+    # It is unfortunate, but it seems that either we override this
+    # private-ish method or reimplement BaseConnector.connect(). This is
+    # the path that tcp.py takes, so we take it too.
+    def _makeTransport(self):
+        return PassableClientConnection(self.host, self.port,
+                                        self.bindAddress, self,
+                                        self.reactor)

@@ -23,10 +23,13 @@
 implementation of a PB Client to interface with feedserver.py
 """
 
-from twisted.internet import reactor
+import os
+
+from twisted.internet import reactor, main
+from twisted.python import failure
 
 from flumotion.common import log, common, interfaces
-from flumotion.twisted import compat
+from flumotion.twisted import compat, fdserver
 from flumotion.twisted import pb as fpb
 
 
@@ -68,7 +71,46 @@ class FeedMedium(fpb.Referenceable):
         """
         self.component = component
         self.logName = component.name
+        self._factory = None
         self._transports = {} # fullFeedId -> transport
+
+    def startConnecting(self, host, port, authenticator, timeout=30,
+                        bindAddress=None):
+        """Optional helper method to connect to a remote feed server.
+
+        This method starts a client factory connecting via a
+        L{flumotion.twisted.fdserver.PassableClientConnector}. It offers
+        the possibility of cancelling an in-progress connection via the
+        stopConnecting() method.
+
+        @param host: the remote host name
+        @type host: str
+        @param port: the tcp port on which to connect
+        @param port int
+        @param authenticator: the authenticator, normally provided by
+        the worker
+        @param authenticator: L{flumotion.twisted.pb.Authenticator}
+
+        @returns: a deferred that will fire with the remote reference,
+        once we have authenticated.
+        """
+        assert self._factory is None
+        self._factory = FeedClientFactory(self)
+        reactor.connectWith(fdserver.PassableClientConnector, host,
+                            port, self._factory, timeout, bindAddress)
+        return self._factory.login(authenticator)
+
+    def stopConnecting(self):
+        """Stop a pending or established connection made via
+        startConnecting().
+
+        Stops any established or pending connection to a remote feed
+        server started via the startConnecting() method. Safe to call
+        even if connection has not been started.
+        """
+        if self._factory:
+            self._factory.disconnect()
+            self._factory = None
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
@@ -88,25 +130,35 @@ class FeedMedium(fpb.Referenceable):
         reactor.callLater(0, self._doFeedTo, fullFeedId, t)
 
     def _doFeedTo(self, fullFeedId, t):
+        def mungeTransport(transport):
+            # see fdserver.py, i am a bad bad man
+            def _closeSocket():
+                if transport.keepSocketAlive:
+                    try:
+                        transport.socket.close()
+                    except socket.error:
+                        pass
+                else:
+                    tcp.Server._closeSocket(self)
+            transport._closeSocket = _closeSocket
+            return transport
+                        
         self.debug('flushing PB write queue')
         t.doWrite()
         self.debug('stop writing to transport')
         t.stopWriting()
-        # store the transport so a ref to the socket is kept around. If we
-        # get reconnected, this'll be overwritten, and the socket will be 
-        # collected, and closed
 
-        # FIXME: this behavior sucks, we should instead be using a
-        # PassableClientPort like the PassableServerPort of fdserver.py;
-        # that would allow us to follow the normal twisted
-        # close-transport path, passing a dup'd file descriptor on to
-        # the component, and remove the non-deterministic GC bullshit
-        # from this function.
+        # make sure shutdown() is not called on the socket
+        if not isinstance(t, fdserver._SocketMaybeCloser):
+            t = mungeTransport(t)
+        t.keepSocketAlive = True
+        
+        fd = os.dup(t.fileno())
+        # Similar to feedserver._sendFeedReplyCb, but since we are in a
+        # callLater, not doReadOrWrite, we call connectionLost directly
+        # on the transport.
+        t.connectionLost(failure.Failure(main.CONNECTION_DONE))
 
-        self._transports[fullFeedId] = t
-        self.remote.broker.transport = None
-        # pass the fd to the component to eat from
-        fd = t.fileno()
         self.debug('telling component to eat from fd %d' % fd)
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         self.component.eatFromFD(common.feedId(componentName, feedName), fd)
