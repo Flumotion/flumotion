@@ -25,6 +25,7 @@ import common
 import errno
 import os
 
+from twisted.cred import error
 from twisted.trial import unittest
 from twisted.internet import reactor, defer
 
@@ -268,6 +269,44 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
         d.addCallback(feedReadyOnServer)
         d.addCallback(checkfds)
         return d
+
+    def testBadPass(self):
+        component = FakeComponent()
+        client = feed.FeedMedium(component)
+        factory = feed.FeedClientFactory(client)
+
+        def login():
+            port = self.feedServer.getPortNum()
+            self.assertAdditionalFDsOpen(1, 'connect (socket)')
+            reactor.connectTCP('localhost', port, factory)
+            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
+            return factory.login(fpb.Authenticator(username='user',
+                                                   password='badpass'))
+
+        def loginFailed(failure):
+            failure.trap(error.UnauthorizedLogin)
+            def gotRoot(root):
+                # an idempotent method, should return a network failure if
+                # the remote side disconnects as it should
+                return root.callRemote('getKeycardClasses')
+            
+            def gotError(failure):
+                self.assertAdditionalFDsOpen(1, 'feedSent (socket)')
+
+            def gotKeycardClasses(classes):
+                raise AssertionError, 'should not get here'
+
+            failure.trap(error.UnauthorizedLogin)
+            d = factory.getRootObject() # should fire immediately
+            d.addCallback(gotRoot)
+            d.addCallbacks(gotKeycardClasses, gotError)
+
+            return d
+
+        d = login()
+        d.addErrback(loginFailed)
+        return d
+    testBadPass.skip = 'BouncerPortal does not disconnect on unauthorized login'
 
     def testRequestFeed(self):
         client = feed.FeedMedium(logName='frobby')

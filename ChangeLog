@@ -1,5 +1,8 @@
 2007-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component_feed.py
+	(TestFeedClient.testBadPass): Add failing test.
+
 	* flumotion/component/feedcomponent.py: 
 	* flumotion/component/feedcomponent010.py: Get feed from
 	flumotion.component.
