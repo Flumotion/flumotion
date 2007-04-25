@@ -95,6 +95,14 @@ class FeedMedium(fpb.Referenceable):
         # store the transport so a ref to the socket is kept around. If we
         # get reconnected, this'll be overwritten, and the socket will be 
         # collected, and closed
+
+        # FIXME: this behavior sucks, we should instead be using a
+        # PassableClientPort like the PassableServerPort of fdserver.py;
+        # that would allow us to follow the normal twisted
+        # close-transport path, passing a dup'd file descriptor on to
+        # the component, and remove the non-deterministic GC bullshit
+        # from this function.
+
         self._transports[fullFeedId] = t
         self.remote.broker.transport = None
         # pass the fd to the component to eat from

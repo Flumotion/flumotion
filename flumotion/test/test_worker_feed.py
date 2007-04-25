@@ -172,10 +172,8 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
                                                    password='test'))
 
         def sendFeed(remote):
-            print "\n\nsendFeed\n\n"
             # apparently one has to do magic to get the feed to work
             client.setRemoteReference(remote)
-            #self.debug('COMPONENT --> feedserver: sendFeed(%s)', 'frob')
             self.assertAdditionalFDsOpen(3, 'feed (socket, client, server)')
             return remote.callRemote('sendFeed', '/foo/bar:baz')
 
@@ -183,18 +181,17 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
             # either just before or just after this, we received a
             # sendFeedReply call from the feedserver. so now we're
             # waiting on the component to get its fd
-            #self.debug('COMPONENT <-- feedserver: sendFeed(%s): %r',
-            #           fullFeedId, result)
-            print "\n\nfeedSent\n\n"
             self.assertAdditionalFDsOpen(3, 'feedSent (socket, client, server)')
             return component.waitForFD()
 
         def feedReady((feedId, fd)):
             # at this point... well things are complicated. twisted
-            # still knows about the fd, because of client._transports.
-            # see the FIXME at feed.py:99. hack around it for the
-            # moment..
-            print "\n\nfeedReady\n\n"
+            # still knows about the fd, because of client._transports,
+            # but it's not in the reactor. see the FIXME at feed.py:99.
+            # ideally here the fd we receive is ours, unrelated to the
+            # socket object, which we would then close. in practice we
+            # close it because the socket object will not be closed from
+            # python in the context of this test case. Need to fix the FIXME!
             self.assertEquals(feedId, 'bar:baz')
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
             os.close(fd)
@@ -204,13 +201,12 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
         def feedReadyOnServer((componentId, feedName, fd, eaterId)):
             # this likely fires directly, not having dropped into the
             # reactor.
-            print "\n\nfeedReadyOnServer\n\n"
+
             # this fd is not ours, we should dup it if we want to hold
             # onto it
             return self.feedServer.waitForAvatarExit()
 
         def checkfds(_):
-            print "\n\checkfds\n\n"
             self.assertAdditionalFDsOpen(1, 'feedReadyOnServer (socket)')
 
         d = login()

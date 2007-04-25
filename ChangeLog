@@ -1,3 +1,11 @@
+2007-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/feed.py (FeedMedium._doFeedTo): Add a FIXME.
+
+	* flumotion/test/test_worker_feed.py
+	(TestFeedServer.testConnectAndFeed): Clean up some prints, and add
+	comments.
+
 2007-04-25  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/feedserver.py:
