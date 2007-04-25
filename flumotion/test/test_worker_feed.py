@@ -113,11 +113,10 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
         self.assertAdditionalFDsOpen(1, 'setUp (socket)')
 
     def assertAdditionalFDsOpen(self, additionalFDs=0, debug=''):
-        pass
-        #actual = countOpenFileDescriptors()
-        #self.assertEqual(self._fdCount + additionalFDs, actual,
-        #                 debug + (' (%d + %d != %d)'
-        #                          % (self._fdCount, additionalFDs, actual)))
+        actual = countOpenFileDescriptors()
+        self.assertEqual(self._fdCount + additionalFDs, actual,
+                         debug + (' (%d + %d != %d)'
+                                  % (self._fdCount, additionalFDs, actual)))
 
     def tearDown(self):
         d = self.feedServer.shutdown()
@@ -198,8 +197,8 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
             print "\n\nfeedReady\n\n"
             self.assertEquals(feedId, 'bar:baz')
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
-            #os.close(fd)
-            self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
+            os.close(fd)
+            self.assertAdditionalFDsOpen(2, 'cleanup (socket, client, server)')
             return self.brain.waitForFD()
 
         def feedReadyOnServer((componentId, feedName, fd, eaterId)):
@@ -221,4 +220,4 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
         d.addCallback(feedReadyOnServer)
         d.addCallback(checkfds)
         return d
-    testConnectAndFeed.skip = 'foo'
+

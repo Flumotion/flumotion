@@ -140,9 +140,13 @@ class FeedAvatar(fpb.Avatar):
             t.keepSocketAlive = True
 
         # We removed the transport from the reactor before sending the FD; now
-        # we want a complete and immediate cleanup of the socket, which 
-        # loseConnection() doesn't do.
-        t.connectionLost(failure.Failure(main.CONNECTION_DONE))
+        # we want a complete and immediate cleanup of the socket.
+        # We can instruct the select reactor to do this (through undocumented
+        # internals, admittedly) by setting the fileno attribute to a function
+        # that returns -1. This will cause the reactor to call connectionLost()
+        # on the transport, which will close the socket fd, with a failure of 
+        # "Filedescriptor went away".
+        t.fileno = lambda: -1 # Utterly ghetto.
 
     # TODO: receiveFeed is bitrotten. Clean it up.
     def perspective_receiveFeed(self, componentId, feedId):

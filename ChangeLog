@@ -1,3 +1,14 @@
+2007-04-25  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/feedserver.py:
+	  Calling connectionLost() on a transport is fundamentally unsafe in
+	  twisted.
+	  Instead, we can make use of some undocumented behaviour to ensure
+	  that the reactor will (safely) do it for us.
+
+	* flumotion/test/test_worker_feed.py:
+	  Unskip test, make it pass (but needs some work)
+
 2007-04-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_worker_feed.py (FakeWorkerBrain): Add method

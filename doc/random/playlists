@@ -4,7 +4,9 @@ Scheduled Playlists
 We parse a simple XML format, consisting of a top-level <playlist> element,
 containing one or more <entry> elements.
 
-Each <entry> has two mandatory and two optional attributes:
+Each <entry> has two mandatory and two optional attributes. Normally, we expect
+that the optional attributes won't be used, but they're there for advanced 
+requirements:
   filename - the file to use. May be relative, in which case it will be 
              interpreted relative to some configured location
   time     - the time at which to start playing the file, a UTC timestamp
