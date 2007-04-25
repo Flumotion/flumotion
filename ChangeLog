@@ -1,3 +1,15 @@
+2007-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_worker_feed.py (FakeWorkerBrain): Add method
+	to wait on feed server receiving FD.
+	(FakeComponent): Add method to waith on receiving fd from feed
+	medium.
+	(TestFeedServer.assertAdditionalFDsOpen): Temporarily disable
+	(TestFeedServer.testConnectWithoutDroppingPB.cleanup): Add a
+	comment.
+	(TestFeedServer.testConnectWithoutDroppingPB): New test, does not
+	yet work
+
 2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* configure.ac:
