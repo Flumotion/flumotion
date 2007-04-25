@@ -1,5 +1,10 @@
 2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/Makefile.am:
+	  Actually dist feed.py.
+
+2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feed.py:
 	  socket was missing.
 
