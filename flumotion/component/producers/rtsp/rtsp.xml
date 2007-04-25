@@ -1,0 +1,39 @@
+<registry>
+
+  <components>
+    <component type="rtsp-producer"
+               base="flumotion/component/producers/rtsp">
+      <source location="flumotion.component.producers.rtsp.rtsp" />
+      <feeder name="video" />
+      <feeder name="audio" />
+
+      <entries>
+        <entry type="component" location="rtsp.py"
+               function="Rtsp" />
+      </entries>
+
+      <properties>
+        <property name="width" type="int" required="false" />
+        <property name="height" type="int" required="false" />
+	<property name="framerate" type="fraction" required="false" />
+	<property name="has-audio" type="bool" required="false" />
+	<property name="location" type="string" required="true" />
+      </properties>
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="rtsp-component">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+        <directories>
+            <directory name="flumotion/component/producers/rtsp">
+                <filename location="__init__.py" />
+                <filename location="rtsp.py" />
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+
+</registry> 

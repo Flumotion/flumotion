@@ -1,3 +1,15 @@
+2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* configure.ac:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/rtsp/Makefile.am:
+	* flumotion/component/producers/rtsp/__init__.py:
+	* flumotion/component/producers/rtsp/rtsp.py (Rtsp,
+	  Rtsp.get_pipeline_string):
+	* flumotion/component/producers/rtsp/rtsp.xml:
+	New rtsp-producer component, for receiving streams from rtsp.
+	Tested with an Axis network camera.
+
 2007-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/file.py (File, File.__init__,

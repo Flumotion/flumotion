@@ -17,6 +17,7 @@ SUBDIRS = \
 	icecast \
 	ivtv \
 	pipeline \
+	rtsp \
 	soundcard \
 	videotest \
 	webcam \
