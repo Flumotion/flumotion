@@ -23,6 +23,7 @@
 implementation of a PB Client to interface with feedserver.py
 """
 
+import socket
 import os
 
 from twisted.internet import reactor, main, defer, tcp
