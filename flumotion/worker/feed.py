@@ -25,7 +25,7 @@ implementation of a PB Client to interface with feedserver.py
 
 import os
 
-from twisted.internet import reactor, main
+from twisted.internet import reactor, main, defer
 from twisted.python import failure
 
 from flumotion.common import log, common, interfaces
@@ -64,15 +64,18 @@ class FeedMedium(fpb.Referenceable):
 
     remote = None
 
-    def __init__(self, component):
+    def __init__(self, component=None, logName=None):
         """
         @param component: the component this is a feed client for
         @type  component: L{flumotion.component.feedcomponent.FeedComponent}
         """
-        self.component = component
-        self.logName = component.name
+        self.logName = logName or component.name
         self._factory = None
-        self._transports = {} # fullFeedId -> transport
+        self._feedToDeferred = defer.Deferred()
+        if component:
+            def gotFeed((feedId, fd), component):
+                component.eatFromFD(feedId, fd)
+            self._feedToDeferred.addCallback(gotFeed, component)
 
     def startConnecting(self, host, port, authenticator, timeout=30,
                         bindAddress=None):
@@ -99,6 +102,53 @@ class FeedMedium(fpb.Referenceable):
         reactor.connectWith(fdserver.PassableClientConnector, host,
                             port, self._factory, timeout, bindAddress)
         return self._factory.login(authenticator)
+
+    def requestFeed(self, host, port, authenticator, fullFeedId):
+        """Request a feed from a remote feed server.
+
+        This helper method calls startConnecting() to make the
+        connection and authenticate, and will return the feed file
+        descriptor or an error. A pending connection attempt can be
+        cancelled via stopConnecting().
+
+        @param host: the remote host name
+        @type host: str
+        @param port: the tcp port on which to connect
+        @type port int
+        @param authenticator: the authenticator, normally provided by
+        the worker
+        @type authenticator: L{flumotion.twisted.pb.Authenticator}
+        @param fullFeedId: the full feed id (/flow/component:feed)
+        offered by the remote side
+        @type fullFeedId: str
+
+        @returns: a deferred that, if successful, will fire with a pair
+        (feedId, fd). In an error case it will errback and close the
+        remote connection.
+        """
+        def connected(remote):
+            self.setRemoteReference(remote)
+            return remote.callRemote('sendFeed', fullFeedId)
+
+        def feedSent(res):
+            # res is None
+            # either just before or just after this, we received a
+            # sendFeedReply call from the feedserver. so now we're
+            # waiting on the component to get its fd
+            return self._feedToDeferred
+
+        def error(failure):
+            self.warning('failed to retrieve %s from %s:%d', fullFeedId,
+                         host, port)
+            self.debug('failure: %s', log.getFailureMessage(failure))
+            self.debug('closing connection')
+            self.stopConnecting()
+
+        d = self.startConnecting(host, port, authenticator)
+        d.addCallback(connected)
+        d.addCallback(feedSent)
+        d.addErrback(error)
+        return d
 
     def stopConnecting(self):
         """Stop a pending or established connection made via
@@ -159,7 +209,9 @@ class FeedMedium(fpb.Referenceable):
         # on the transport.
         t.connectionLost(failure.Failure(main.CONNECTION_DONE))
 
-        self.debug('telling component to eat from fd %d' % fd)
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
-        self.component.eatFromFD(common.feedId(componentName, feedName), fd)
+        feedId = common.feedId(componentName, feedName)
 
+        self.debug('firing deferred with feedId %s on fd %d', feedId,
+                   fd)
+        self._feedToDeferred.callback((feedId, fd))

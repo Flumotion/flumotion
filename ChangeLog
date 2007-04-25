@@ -1,5 +1,20 @@
 2007-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/feed.py (FeedMedium.__init__): Make component
+	an optional argument, only for back compatibility.
+	(FeedMedium.requestFeed): New helper method, returns a deferred as
+	the result of the whole operation: success with fds or error with
+	a failure.
+	(FeedMedium._doFeedTo): Adapt so that both the old eatFromFD and
+	the new deferred interface are supported.
+
+	* flumotion/test/test_worker_feed.py
+	(TestFeedServer.testConnectAndFeed.feedReady)
+	(TestFeedServer.testConnectAndFeedLegacy.feedReady): I fixed the
+	FIXME, so I fix the comment.
+	(TestFeedServer.testConnectAndFeed): New test for the new
+	requestFeed interface.
+
 	* flumotion/worker/feed.py (FeedMedium.startConnecting)
 	(FeedMedium.stopConnecting): New helper functions. You can still
 	connect using functions outside of the medium if that is your

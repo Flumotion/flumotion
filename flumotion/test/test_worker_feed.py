@@ -187,13 +187,7 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
             return component.waitForFD()
 
         def feedReady((feedId, fd)):
-            # at this point... well things are complicated. twisted
-            # still knows about the fd, because of client._transports,
-            # but it's not in the reactor. see the FIXME at feed.py:99.
-            # ideally here the fd we receive is ours, unrelated to the
-            # socket object, which we would then close. in practice we
-            # close it because the socket object will not be closed from
-            # python in the context of this test case. Need to fix the FIXME!
+            # this fd is ours, it's our responsibility to close it.
             self.assertEquals(feedId, 'bar:baz')
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
             os.close(fd)
@@ -246,13 +240,7 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
             return component.waitForFD()
 
         def feedReady((feedId, fd)):
-            # at this point... well things are complicated. twisted
-            # still knows about the fd, because of client._transports,
-            # but it's not in the reactor. see the FIXME at feed.py:99.
-            # ideally here the fd we receive is ours, unrelated to the
-            # socket object, which we would then close. in practice we
-            # close it because the socket object will not be closed from
-            # python in the context of this test case. Need to fix the FIXME!
+            # this fd is ours, it's our responsibility to close it.
             self.assertEquals(feedId, 'bar:baz')
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
             os.close(fd)
@@ -274,6 +262,44 @@ class TestFeedServer(unittest.TestCase, log.Loggable):
         d.addCallback(sendFeed)
         d.addCallback(feedSent)
         d.addCallback(feedReady)
+        d.addCallback(feedReadyOnServer)
+        d.addCallback(checkfds)
+        return d
+
+    def testRequestFeed(self):
+        client = feed.FeedMedium(logName='frobby')
+
+        def requestFeed():
+            port = self.feedServer.getPortNum()
+            self.assertAdditionalFDsOpen(1, 'connect (socket)')
+            d = client.requestFeed('localhost', port,
+                                   fpb.Authenticator(username='user',
+                                                     password='test'),
+                                   '/foo/bar:baz')
+            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
+            return d
+
+        def gotFeed((feedId, fd)):
+            self.assertEquals(feedId, 'bar:baz')
+            self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
+            # our responsibility to close fd
+            os.close(fd)
+            self.assertAdditionalFDsOpen(2, 'cleanup (socket, client, server)')
+            return self.brain.waitForFD()
+
+        def feedReadyOnServer((componentId, feedName, fd, eaterId)):
+            # this likely fires directly, not having dropped into the
+            # reactor.
+
+            # this fd is not ours, we should dup it if we want to hold
+            # onto it
+            return self.feedServer.waitForAvatarExit()
+
+        def checkfds(_):
+            self.assertAdditionalFDsOpen(1, 'feedReadyOnServer (socket)')
+
+        d = requestFeed()
+        d.addCallback(gotFeed)
         d.addCallback(feedReadyOnServer)
         d.addCallback(checkfds)
         return d
