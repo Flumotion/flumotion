@@ -32,6 +32,7 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
+from flumotion.component import feed
 from flumotion.common import common, interfaces, errors, log, pygobject, messages
 from flumotion.common import gstreamer
 
@@ -39,8 +40,6 @@ from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted.compat import implements
 
-# FIXME: maybe move feed to component ?
-from flumotion.worker import feed
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 

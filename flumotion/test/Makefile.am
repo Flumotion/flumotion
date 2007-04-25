@@ -28,6 +28,7 @@ EXTRA_DIST = 				\
 	test_common_pygobject.py 	\
 	test_component.py 		\
 	test_component_init.py 		\
+	test_component_feed.py		\
 	test_component_httpstreamer.py 	\
 	test_config.py 			\
 	test_credentials.py 		\

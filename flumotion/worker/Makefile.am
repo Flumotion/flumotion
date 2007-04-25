@@ -7,7 +7,6 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/worker
 flumotion_PYTHON = \
 	__init__.py 	\
 	config.py 	\
-	feed.py 	\
 	feedserver.py 	\
 	job.py	 	\
 	main.py 	\

@@ -30,6 +30,7 @@
       <directories>
         <directory name="flumotion/component">
           <filename location="component.py" />
+          <filename location="feed.py" />
           <filename location="feedcomponent.py" />
           <filename location="feedcomponent010.py" />
         </directory>

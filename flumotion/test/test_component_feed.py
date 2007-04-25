@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name:flumotion.test.test_worker_worker -*-
+# -*- Mode: Python; test-case-name:flumotion.test.test_component_feed -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -32,7 +32,8 @@ from flumotion.twisted import pb as fpb
 from flumotion.common import log
 from flumotion.component.bouncers import htpasswdcrypt
 
-from flumotion.worker import feed, feedserver
+from flumotion.worker import feedserver
+from flumotion.component import feed
 
 
 class FakeWorkerBrain(log.Loggable):
@@ -97,7 +98,9 @@ class FeedServer(feedserver.FeedServer):
         # closed
         reactor.callLater(0, self.waitForAvatarExit().callback, None)
 
-class TestFeedServer(unittest.TestCase, log.Loggable):
+# this tests both flumotion.worker.feedserver and
+# flumotion.component.feed.
+class TestFeedClient(unittest.TestCase, log.Loggable):
     bouncerconf = {'name': 'testbouncer',
                    'plugs': {},
                    # user:test

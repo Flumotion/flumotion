@@ -1,3 +1,21 @@
+2007-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent.py: 
+	* flumotion/component/feedcomponent010.py: Get feed from
+	flumotion.component.
+
+	* flumotion/component/component.xml: Add feed.py to the bundle.
+
+	* flumotion/worker/Makefile.am (flumotion_PYTHON): 
+	* flumotion/component/Makefile.am (component_PYTHON): 
+	* flumotion/component/feed.py: Moved from flumotion.worker.feed.
+	Include the fdserver stuff so that everything can be bundled and
+	old workers can enjoy new feed code.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_component_feed.py: Moved from
+	test_worker_feed.py.
+
 2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/admin/gtk/client.py

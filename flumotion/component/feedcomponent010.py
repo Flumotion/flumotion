@@ -30,7 +30,7 @@ from twisted.internet import reactor, defer
 from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, pygobject, messages
 from flumotion.common import gstreamer, componentui
-from flumotion.worker import feed
+from flumotion.component import feed
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal

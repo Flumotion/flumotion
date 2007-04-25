@@ -25,13 +25,42 @@ implementation of a PB Client to interface with feedserver.py
 
 import os
 
-from twisted.internet import reactor, main, defer
+from twisted.internet import reactor, main, defer, tcp
 from twisted.python import failure
 
 from flumotion.common import log, common, interfaces
-from flumotion.twisted import compat, fdserver
+from flumotion.twisted import compat
 from flumotion.twisted import pb as fpb
 
+
+# copied from fdserver.py so that it can be bundled
+class _SocketMaybeCloser(tcp._SocketCloser):
+    keepSocketAlive = False
+
+    def _closeSocket(self):
+        # We override this (from tcp._SocketCloser) so that we can close sockets
+        # properly in the normal case, but once we've passed our socket on via
+        # the FD-channel, we just close() it (not calling shutdown() which will
+        # close the TCP channel without closing the FD itself)
+        if self.keepSocketAlive:
+            try:
+                self.socket.close()
+            except socket.error:
+                pass
+        else:
+            tcp.Server._closeSocket(self)
+
+class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
+    pass
+
+class PassableClientConnector(tcp.Connector):
+    # It is unfortunate, but it seems that either we override this
+    # private-ish method or reimplement BaseConnector.connect(). This is
+    # the path that tcp.py takes, so we take it too.
+    def _makeTransport(self):
+        return PassableClientConnection(self.host, self.port,
+                                        self.bindAddress, self,
+                                        self.reactor)
 
 class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
     """
@@ -82,9 +111,9 @@ class FeedMedium(fpb.Referenceable):
         """Optional helper method to connect to a remote feed server.
 
         This method starts a client factory connecting via a
-        L{flumotion.twisted.fdserver.PassableClientConnector}. It offers
-        the possibility of cancelling an in-progress connection via the
-        stopConnecting() method.
+        L{PassableClientConnector}. It offers the possibility of
+        cancelling an in-progress connection via the stopConnecting()
+        method.
 
         @param host: the remote host name
         @type host: str
@@ -99,8 +128,8 @@ class FeedMedium(fpb.Referenceable):
         """
         assert self._factory is None
         self._factory = FeedClientFactory(self)
-        reactor.connectWith(fdserver.PassableClientConnector, host,
-                            port, self._factory, timeout, bindAddress)
+        reactor.connectWith(PassableClientConnector, host, port,
+                            self._factory, timeout, bindAddress)
         return self._factory.login(authenticator)
 
     def requestFeed(self, host, port, authenticator, fullFeedId):
@@ -181,7 +210,7 @@ class FeedMedium(fpb.Referenceable):
 
     def _doFeedTo(self, fullFeedId, t):
         def mungeTransport(transport):
-            # see fdserver.py, i am a bad bad man
+            # see _SocketMaybeCloser above, i am a bad bad man
             def _closeSocket():
                 if transport.keepSocketAlive:
                     try:
@@ -199,7 +228,7 @@ class FeedMedium(fpb.Referenceable):
         t.stopWriting()
 
         # make sure shutdown() is not called on the socket
-        if not isinstance(t, fdserver._SocketMaybeCloser):
+        if not isinstance(t, _SocketMaybeCloser):
             t = mungeTransport(t)
         t.keepSocketAlive = True
         
