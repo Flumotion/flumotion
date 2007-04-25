@@ -1,3 +1,12 @@
+2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/admin/gtk/client.py
+	  (Window._set_stop_start_component_sensitive):
+	* flumotion/admin/gtk/parts.py (ComponentsView.update_start_stop_props,
+	  ComponentMenu.__init__):
+	Fix ability to stop lost components.
+	Delete should only be possible on sleeping components.
+
 2007-04-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/feed.py (FeedMedium.__init__): Make component

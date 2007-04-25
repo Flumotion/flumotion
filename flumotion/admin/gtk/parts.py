@@ -301,7 +301,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         oldstop = self.get_property('can-stop-any')
         oldstart = self.get_property('can-start-any')
         moodnames = [moods.get(x[COL_MOOD_VALUE]).name for x in self._model]
-        can_stop = bool([x for x in moodnames if (x!='lost' and x!='sleeping')])
+        can_stop = bool([x for x in moodnames if (x!='sleeping')])
         can_start = bool([x for x in moodnames if (x=='sleeping')])
         if oldstop != can_stop:
             self.set_property('can-stop-any', can_stop)
@@ -434,13 +434,13 @@ class ComponentMenu(gtk.Menu):
         self._items['start'] = i
         
         i = gtk.MenuItem(_('St_op'))
-        if mood == moods.sleeping or mood == moods.lost:
+        if mood == moods.sleeping:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['stop'] = i
        
         i = gtk.MenuItem(_('_Delete'))
-        if not (mood == moods.sleeping or mood == moods.lost):
+        if not (mood == moods.sleeping):
             i.set_property('sensitive', False)
         self.append(i)
         self._items['delete'] = i
