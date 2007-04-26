@@ -65,6 +65,7 @@ class FakeRequest:
 
     def __init__(self, **kwargs):
         self.headers = {}
+        self.args = {}
         self.response = -1
         self.data = ""
 
