@@ -219,7 +219,7 @@ class FeedMedium(fpb.Referenceable):
                     except socket.error:
                         pass
                 else:
-                    tcp.Server._closeSocket(self)
+                    tcp.Server._closeSocket(transport)
             transport._closeSocket = _closeSocket
             return transport
                         

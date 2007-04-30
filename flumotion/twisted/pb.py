@@ -153,10 +153,6 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
             self.warning('Too many recursions, internal error.')
         self.debug("FPBClientFactory(): result %r" % result)
 
-        if not result:
-            self.warning('No result, raising.')
-            raise error.UnauthorizedLogin()
-
         if isinstance(result, pb.RemoteReference):
             # everything done, return reference
             self.debug('Done, returning result %r' % result)
@@ -333,33 +329,23 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
             - a L{twisted.cred.error.UnauthorizedLogin} when authentication
               is denied
         """
+        def loginResponse(result):
+            self.log("loginResponse: result=%r", result)
+            # if the result is a keycard, we're not yet ready
+            if isinstance(result, keycards.Keycard):
+                return result
+            else:
+                # authenticated, so the result is the tuple
+                interface, perspective, logout = result
+                self.broker.notifyOnDisconnect(logout)
+                return pb.AsReferenceable(perspective, "perspective")
+
         # corresponds with FPBClientFactory._cbSendKeycard
         self.log("remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces))
         interfaces = [freflect.namedAny(interface) for interface in interfaces]
         d = self.bouncerPortal.login(keycard, mind, *interfaces)
-        d.addCallback(self._authenticateCallback, mind, *interfaces)
+        d.addCallback(loginResponse)
         return d
-
-    def _authenticateCallback(self, result, mind, *interfaces):
-        self.log("_authenticateCallback(result=%r, mind=%r, interfaces=%r" % (result, mind, interfaces))
-        # FIXME: coverage indicates that "not result" does not happen,
-        # presumably because a Failure is triggered before us
-        if not result:
-            return failure.Failure(error.UnauthorizedLogin())
-
-        # if the result is a keycard, we're not yet ready
-        if isinstance(result, keycards.Keycard):
-            return result
-
-        # authenticated, so the result is the tuple
-        # FIXME: our keycard should be stored higher up since it was authd
-        # then cleaned up sometime in the future
-        # for that we probably need to pass it along
-        return self._loggedIn(result)
-
-    def _loggedIn(self, (interface, perspective, logout)):
-        self.broker.notifyOnDisconnect(logout)
-        return pb.AsReferenceable(perspective, "perspective")
 
 class Authenticator(flog.Loggable, pb.Referenceable):
     """

@@ -84,41 +84,42 @@ class BouncerPortal(log.Loggable):
         """
         self.debug("_login(keycard=%r, mind=%r, ifaces=%r)" % (
             keycard, mind, ifaces))
+
         if not self.bouncer:
             self.warning("no bouncer, refusing login")
-            return defer.succeed(None)
-        else:
-            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
-            
-        d.addCallback(self._authenticateCallback, mind, *ifaces)
+            return defer.fail(error.UnauthorizedLogin())
+
+        def bouncerResponse(result):
+            # we either got a keycard as result, or None from the
+            # bouncer; would be better if the bouncers returned failures
+            # directly, but that's not how the current interface works.
+            if not result:
+                self.info("unauthorized login for interfaces %r", ifaces)
+                return defer.fail(error.UnauthorizedLogin())
+
+            keycard = result
+            if not keycard.state == keycards.AUTHENTICATED:
+                # challenge
+                self.log('returning keycard for further authentication')
+                return keycard
+
+            # this is where we request the Avatar and can influence naming
+            self.debug('authenticated login of %r into realm %r', keycard,
+                       self.realm)
+
+            # FIXME: this is a hack
+            if interfaces.IAdminMedium in ifaces:
+                # we decide on a unique name for admin clients here
+                keycard.avatarId = "admin-%06x" % self._adminCounter
+                self._adminCounter += 1
+
+            self.log('calling %r.requestAvatar(keycard=%r, mind=%r, ifaces=%r)',
+                     self.realm, keycard, mind, ifaces)
+
+            return self.realm.requestAvatar(keycard.avatarId, keycard, mind, *ifaces)
+
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        d.addCallback(bouncerResponse)
         return d
 
-    def _authenticateCallback(self, result, mind, *ifaces):
-        # we either got a keycard as result, or None from the bouncer
-        if not result:
-            # just like a checker, we return a failure object
-            f = failure.Failure(error.UnauthorizedLogin())
-            self.info("unauthorized login for interfaces %r", ifaces)
-            return f
-
-        keycard = result
-        if not keycard.state == keycards.AUTHENTICATED:
-            # challenge
-            self.log('returning keycard for further authentication')
-            return keycard
-
-        # this is where we request the Avatar and can influence naming
-        
-        self.debug('authenticated login of %r into realm %r', keycard,
-                   self.realm)
-
-        if interfaces.IAdminMedium in ifaces:
-            # we decide on a unique name for admin clients here
-            keycard.avatarId = "admin-%06x" % self._adminCounter
-            self._adminCounter += 1
-
-        self.log('calling %r.requestAvatar(keycard=%r, mind=%r, ifaces=%r)',
-                 self.realm, keycard, mind, ifaces)
-
-        return self.realm.requestAvatar(keycard.avatarId, keycard, mind, *ifaces)
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

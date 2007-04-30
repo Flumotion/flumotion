@@ -1,3 +1,24 @@
+2007-04-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feed.py
+	(FeedMedium._doFeedTo.mungeTransport._closeSocket): Fix too-clever
+	code.
+
+	* flumotion/admin/admin.py (AdminClientFactory.gotDeferredLogin):
+	Remove old challenge-response code; base classes do it for us now.
+
+	* flumotion/twisted/portal.py (BouncerPortal.login): Return a
+	failure if no bouncer is configured instead of None. Refactor
+	slightly.
+
+	* flumotion/twisted/pb.py (FPBClientFactory._cbLoginCallback):
+	Client-side remote_login() returns will never be None; remove this
+	case.
+	(_BouncerWrapper.remote_login): The one case in which None would
+	be passed as return from BouncerPortal.login() was when no bouncer
+	was configured; since that's fixed, no need to check for None
+	here. Refactor slightly.
+
 2007-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_http.py (FakeRequest.__init__):

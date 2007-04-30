@@ -120,15 +120,6 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                     yield None
                 else:
                     raise
-            # if it's not a reference, we need to respond to a
-            # challenge...
-            if not isinstance(result, pb.RemoteReference):
-                keycard = result
-                keycard.setPassword(self.passwd)
-                self.log("_loginCallback: responding to challenge")
-                d = self.login(keycard, self.medium, interfaces.IAdminMedium)
-                yield d
-                result = d.value()
 
             self.medium.setRemoteReference(result)
 
