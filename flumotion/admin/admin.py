@@ -100,8 +100,6 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
             connector, reason)
-        # delay is now updated
-        self.debug("will try reconnect in %f seconds" % self.delay)
 
     # vmethod implementation
     def gotDeferredLogin(self, d):
@@ -246,8 +244,10 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     def shutdown(self):
         self.debug('shutting down')
         if self.clientFactory is not None:
-            self.clientFactory.disconnect()
+            # order not semantically important, but this way we avoid a
+            # "reconnecting in X seconds" in the log
             self.clientFactory.stopTrying()
+            self.clientFactory.disconnect()
             self.clientFactory = None
 
     def reconnect(self, keepTrying=False):

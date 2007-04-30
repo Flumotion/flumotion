@@ -76,6 +76,18 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     keycard = None
     medium = None
     perspectiveInterface = None # override in subclass
+    _fpbconnector = None
+
+    ## from protocol.ClientFactory
+    def startedConnecting(self, connector):
+        self._fpbconnector = connector
+        return pb.PBClientFactory.startedConnecting(self, connector)
+
+    ## from twisted.spread.pb.ClientFactory
+    def disconnect(self):
+        if self._fpbconnector:
+            self._fpbconnector.stopConnecting()
+        return pb.PBClientFactory.disconnect(self)
 
     def getKeycardClasses(self):
         """
@@ -245,6 +257,10 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
         FPBClientFactory.clientConnectionFailed(self, connector, reason)
         RCF = protocol.ReconnectingClientFactory
         RCF.clientConnectionFailed(self, connector, reason)
+        if self.continueTrying:
+            self.debug("will try reconnect in %f seconds", self.delay)
+        else:
+            self.debug("not trying to reconnect")
 
     def clientConnectionLost(self, connector, reason):
         log.msg("connection lost to %s, reason %r" % (

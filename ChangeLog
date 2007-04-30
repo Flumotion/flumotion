@@ -1,5 +1,18 @@
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py
+	(AdminClientFactory.clientConnectionFailed): Leave some logging to
+	the base class.
+	(AdminModel.shutdown): Reorder some calls to make logging nicer.
+
+	* flumotion/twisted/pb.py (FPBClientFactory.startedConnecting)
+	(FPBClientFactory.disconnect): Interestingly, there is a window in
+	which calling disconnect() and stopTrying() on a factory still
+	leaves a connection attempt pending. Plug this window, calling a
+	function that will only have effect during the window period.
+	(ReconnectingFPBClientFactory.clientConnectionFailed): Log when we
+	are going to reconnect (or not)
+
 	* flumotion/twisted/portal.py
 	(BouncerPortal.login.onErrorCloseConnection): Close the connection
 	if the login attempt fails, in all cases: database timeout, bad
