@@ -1,5 +1,8 @@
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/medium.py (BaseMedium.setRemoteReference): Not
+	every remote side is a manager.
+
 	* flumotion/admin/admin.py
 	(AdminClientFactory.clientConnectionFailed): Leave some logging to
 	the base class.

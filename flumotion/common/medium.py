@@ -83,7 +83,7 @@ class BaseMedium(fpb.Referenceable):
         except Exception, e:
             self.debug("could not get connection info, reason %r" % e)
         if tarzan and jane:
-            self.debug("connection is from me on %s to manager on %s" % (
+            self.debug("connection is from me on %s to remote on %s" % (
                 common.addressGetHost(tarzan),
                 common.addressGetHost(jane)))
 
