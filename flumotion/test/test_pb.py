@@ -21,7 +21,6 @@
 
 import common
 from twisted.trial import unittest
-import twisted.copyright #T1.3
 
 import crypt
 
@@ -50,10 +49,6 @@ saltsha256Conf = {
     'plugs': {},
     'properties': {'data': "user:iamsalt:2f826124ada2b2cdf11f4fd427c9ca48de0ed49b41476266d8df08d2cf86120e"}
 }
-
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version < '2.0.0'
 
 ### lots of fake objects to have fun with
 
@@ -136,12 +131,8 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         def wrongPasswordErrback(wrongpasserror):
             self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
 
-        if weHaveAnOldTwisted(): #T1.3
-            failure = unittest.deferredError(d)
-            failure.trap(error.UnauthorizedLogin)
-        else:
-            d.addErrback(wrongPasswordErrback)
-            return d
+        d.addErrback(wrongPasswordErrback)
+        return d
 
 ### SHINY NEW FPB
 class Test_BouncerWrapper(unittest.TestCase):
@@ -167,10 +158,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             return result
         
         d.addCallback(uacppOkCallback)
-        if weHaveAnOldTwisted(): #1.3
-            result = unittest.deferredResult(d)
-        else:
-            return d
+        return d
     
     def testUACPPWrongPassword(self):
         keycard = keycards.KeycardUACPP('user', 'tes', '127.0.0.1')
@@ -180,12 +168,8 @@ class Test_BouncerWrapper(unittest.TestCase):
         def uacppWrongPasswordErrback(wrongpasserror):
             self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
         
-        if weHaveAnOldTwisted(): #T1.3
-            failure = unittest.deferredError(d)
-            failure.trap(error.UnauthorizedLogin)
-        else:
-            d.addErrback(uacppWrongPasswordErrback)
-            return d
+        d.addErrback(uacppWrongPasswordErrback)
+        return d
 
     def testUACPCCOk(self):
         # create
@@ -208,10 +192,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             return d
         
         d.addCallback(uacpccOkCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
             
     def testUACPCCWrongUser(self):
         # create
@@ -235,11 +216,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             return d
         
         d.addCallback(uacpccWrongUserCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            result = unittest.deferredResult(d)
-            self.assertEquals(result, True)
-        else:
-            return d
+        return d
 
     def testUACPCCWrongPassword(self):
         # create
@@ -263,11 +240,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             return d
 
         d.addCallback(uacpccWrongPasswordCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            result = unittest.deferredResult(d)
-            self.assertEquals(result, True)
-        else:
-            return d
+        return d
 
     def testUACPCCTamperWithChallenge(self):
         # create challenger
@@ -294,10 +267,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             return d
 
         d.addCallback(uacpccTamperCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 class Test_FPortalRoot(unittest.TestCase):
     def setUp(self):
@@ -387,10 +357,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             return self.clientDisconnect(factory, result)
         
         d.addCallback(OkCallback)
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -410,11 +377,8 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             log.debug("trial", "got failure %r" % failure)
             c.disconnect()
             return True
-        if weHaveAnOldTwisted():
-            unittest.deferredError(d)
-        else:
-            d.addErrback(WrongPasswordErrback)
-            return d
+        d.addErrback(WrongPasswordErrback)
+        return d
         
 # FIXME: rewrite such that we can enforce a challenger, possibly
 # by setting a property on the bouncer
@@ -439,10 +403,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             return d
         
         d.addCallback(uacpccOkCallback)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testWrongUser(self):
         factory = pb.FPBClientFactory()
@@ -469,10 +430,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         d.addCallback(WrongUserCb)
         d.addErrback(WrongUserEb)
     
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def notestUACPCCWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -503,10 +461,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             return d
         
         d.addCallback(uacpccWrongPasswordCallback)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def notestUACPCCTamperWithChallenge(self):
         factory = pb.FPBClientFactory()
@@ -539,10 +494,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             d.addErrback(uacpccTamperErrback)
             return d
         d.addCallback(uacpccTamperCallback)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 # test with sha256 bouncer
 class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
@@ -564,10 +516,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             return self.clientDisconnect(factory, result)
         
         d.addCallback(OkCallback)
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -587,11 +536,8 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             log.debug("trial", "got failure %r" % failure)
             c.disconnect()
             return True
-        if weHaveAnOldTwisted():
-            unittest.deferredError(d)
-        else:
-            d.addErrback(WrongPasswordErrback)
-            return d
+        d.addErrback(WrongPasswordErrback)
+        return d
         
     def testWrongUser(self):
         factory = pb.FPBClientFactory()
@@ -618,10 +564,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         d.addCallback(WrongUserCb)
         d.addErrback(WrongUserEb)
     
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 # FIXME: do this with a fake authenticator that tampers with the challenge
     def notestUACPCCTamperWithChallenge(self):
@@ -655,10 +598,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             d.addErrback(uacpccTamperErrback)
             return d
         d.addCallback(uacpccTamperCallback)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 
 if __name__ == '__main__':

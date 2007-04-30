@@ -1,5 +1,8 @@
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_pb.py: Remove
+	ifWeHaveAnOldTwistedAndProgrammerNameEqualsZaheer invocations.
+
 	* flumotion/common/debug.py (print_stack): New kwarg "file",
 	defaulting to stdout.
 
