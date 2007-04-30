@@ -126,7 +126,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
                           for interface in interfaces]
             
         def getKeycardClassesCb(keycardClasses):
-            self.debug('supported keycard classes: %r' % keycardClasses)
+            self.log('supported keycard classes: %r' % keycardClasses)
             d = authenticator.issue(keycardClasses)
             return d
 
@@ -149,9 +149,9 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
 
         
     def _cbSendKeycard(self, root, authenticator, client, interfaces, count=0):
-        self.debug("_cbSendKeycard(root=%r, authenticator=%r, client=%r, " \
-            "interfaces=%r, count=%d" % (
-            root, authenticator, client, interfaces, count))
+        self.log("_cbSendKeycard(root=%r, authenticator=%r, client=%r, "
+                 "interfaces=%r, count=%d", root, authenticator, client,
+                 interfaces, count)
         count = count + 1
         d = root.callRemote("login", self.keycard, client, *interfaces)
         return d.addCallback(self._cbLoginCallback, root, authenticator, client,
@@ -163,18 +163,18 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         if count > 5:
             # too many recursions, server is h0rked
             self.warning('Too many recursions, internal error.')
-        self.debug("FPBClientFactory(): result %r" % result)
+        self.log("FPBClientFactory(): result %r" % result)
 
         if isinstance(result, pb.RemoteReference):
             # everything done, return reference
-            self.debug('Done, returning result %r' % result)
+            self.debug('login successful, returning %r', result)
             return result
 
         # must be a keycard
         keycard = result
         if not keycard.state == keycards.AUTHENTICATED:
-            self.debug("FPBClientFactory(): requester needs to resend %r" %
-                keycard)
+            self.log("FPBClientFactory(): requester needs to resend %r",
+                     keycard)
             d = authenticator.respond(keycard)
             def _loginAgainCb(keycard):
                 d = root.callRemote("login", keycard, client, *interfaces)
@@ -423,13 +423,13 @@ class Authenticator(flog.Loggable, pb.Referenceable):
 
         for i in keycardClasses:
             if i in supported:
-                self.debug('Keycard interface %s supported, looking up' % i)
+                self.log('Keycard interface %s supported, looking up', i)
                 name = i.split(".")[-1]
                 methodName = "issue_%s" % name
                 method = getattr(self, methodName)
                 keycard = method()
-                self.debug('Issuing keycard %r of class %s' % (
-                    keycard, name))
+                self.debug('Issuing keycard %r of class %s', keycard,
+                           name)
                 keycard.avatarId = self.avatarId
                 return defer.succeed(keycard)
 
@@ -465,12 +465,12 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         return defer.succeed(method(keycard))
 
     def respond_KeycardUACPCC(self, keycard):
-        self.debug('setting password')
+        self.log('setting password')
         keycard.setPassword(self.password)
         return keycard
 
     def respond_KeycardUASPCC(self, keycard):
-        self.debug('setting password')
+        self.log('setting password')
         keycard.setPassword(self.password)
         return keycard
 
