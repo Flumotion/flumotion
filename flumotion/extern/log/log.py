@@ -711,8 +711,19 @@ class TwistedLogObserver(Loggable):
                 # and an additional warning
                 warning('twisted', msg)
                 text = f.getTraceback()
-                print "\nTwisted traceback:\n"
-                print text
+                # as above in stderrHandler: don't screw the pooch if
+                # the log is full
+                try:
+                    sys.stderr.write("\nTwisted traceback:\n")
+                    sys.stderr.write(text + '\n')
+                    sys.stderr.flush()
+                except IOError, e:
+                    if e.errno == errno.EPIPE:
+                        # if our output is closed, exit; e.g. when
+                        # logging over an ssh connection and the ssh
+                        # connection is closed
+                        os._exit(os.EX_OSERR)
+                    # otherwise ignore it, there's nothing you can do
             elif eventDict.has_key('format'):
                 text = eventDict['format'] % eventDict
             else:

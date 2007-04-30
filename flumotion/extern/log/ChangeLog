@@ -1,3 +1,9 @@
+2007-04-30  Andy Wingo  <wingo@pobox.com>
+
+	* log.py (TwistedLogObserver.emit): Write to stderr, like the
+	stderrhandler, both for sane interleaving with normal logs and so
+	that we don't cause 100% CPU usage if the disk is full. See #613.
+
 2007-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* log.py:

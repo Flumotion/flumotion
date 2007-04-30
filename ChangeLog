@@ -1,5 +1,8 @@
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/debug.py (print_stack): New kwarg "file",
+	defaulting to stdout.
+
 	* flumotion/component/feed.py
 	(FeedMedium._doFeedTo.mungeTransport._closeSocket): Fix too-clever
 	code.

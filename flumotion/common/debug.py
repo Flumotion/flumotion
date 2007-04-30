@@ -97,7 +97,7 @@ def trace_stop():
         sys.settrace(None)
         _indent = ''
 
-def print_stack():
+def print_stack(file=None):
     f = sys._getframe(1)
     output = []
     while f:
@@ -110,13 +110,15 @@ def print_stack():
         # reversed so we can reverse() later
         if f.f_locals:
             for k, v in f.f_locals.items():
-                output.append('      %s = %r' % (k, v))
-            output.append('    Locals:')
+                output.append('      %s = %r\n' % (k, v))
+            output.append('    Locals:\n')
         if line:
-            output.append('    %s' % line.strip())
-        output.append('  File "%s", line %d, in %s' % (filename,lineno,name))
+            output.append('    %s\n' % line.strip())
+        output.append('  File "%s", line %d, in %s\n' % (filename,lineno,name))
         f = f.f_back
     output.reverse()
+    if file is None:
+        file = sys.stdout
     for line in output:
-        print line
+        file.write(line)
 
