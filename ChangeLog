@@ -7,6 +7,7 @@
 	(Authenticator.respond_KeycardUACPCC)
 	(Authenticator.respond_KeycardUASPCC): Tweak some logging back to
 	LOG.
+	(FPBClientFactory.disconnect): Error as terror, like protocol.py.
 
 	* flumotion/common/medium.py (BaseMedium.setRemoteReference): Not
 	every remote side is a manager.

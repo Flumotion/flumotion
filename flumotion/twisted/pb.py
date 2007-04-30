@@ -30,6 +30,7 @@ import time
 from twisted.cred import checkers, credentials, error
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol, defer, reactor
+from twisted.internet import error as terror
 from twisted.python import log, reflect, failure
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
@@ -86,7 +87,10 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     ## from twisted.spread.pb.ClientFactory
     def disconnect(self):
         if self._fpbconnector:
-            self._fpbconnector.stopConnecting()
+            try:
+                self._fpbconnector.stopConnecting()
+            except terror.NotConnectingError:
+                pass
         return pb.PBClientFactory.disconnect(self)
 
     def getKeycardClasses(self):
