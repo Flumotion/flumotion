@@ -89,6 +89,24 @@ class BouncerPortal(log.Loggable):
             self.warning("no bouncer, refusing login")
             return defer.fail(error.UnauthorizedLogin())
 
+        def onErrorCloseConnection(failure):
+            try:
+                host = mind.broker.transport.getHost()
+                remote = '%s:%d' % (host.host, host.port)
+            except:
+                remote = '(unknown)'
+                
+            self.warning('failed login -- closing connection to %s',
+                         remote)
+            self.debug('failure: %s', log.getFailureMessage(failure))
+            try:
+                mind.broker.transport.loseConnection()
+            except Exception, e:
+                self.info('loseConnection failed: %s',
+                          log.getExceptionMessage(e))
+                # ignore it
+            return failure
+            
         def bouncerResponse(result):
             # we either got a keycard as result, or None from the
             # bouncer; would be better if the bouncers returned failures
@@ -120,6 +138,7 @@ class BouncerPortal(log.Loggable):
 
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         d.addCallback(bouncerResponse)
+        d.addErrback(onErrorCloseConnection)
         return d
 
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

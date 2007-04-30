@@ -28,6 +28,7 @@ import os
 from twisted.cred import error
 from twisted.trial import unittest
 from twisted.internet import reactor, defer
+from twisted.python import log as tlog
 
 from flumotion.twisted import pb as fpb
 from flumotion.common import log
@@ -108,6 +109,9 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
                    'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
     def setUp(self):
+        # don't output Twisted tracebacks for PB errors we will trigger
+        log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
+
         self._fdCount = countOpenFileDescriptors()
 
         self.brain = FakeWorkerBrain()
@@ -123,6 +127,8 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
                                   % (self._fdCount, additionalFDs, actual)))
 
     def tearDown(self):
+        tlog.flushErrors(error.UnauthorizedLogin)
+        log._getTheFluLogObserver().clearIgnores()
         d = self.feedServer.shutdown()
         d.addCallback(lambda _: self._bouncer.stop())
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
@@ -283,8 +289,10 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
             return factory.login(fpb.Authenticator(username='user',
                                                    password='badpass'))
 
+        def loginOk(root):
+            raise AssertionError, 'should not get here'
+
         def loginFailed(failure):
-            failure.trap(error.UnauthorizedLogin)
             def gotRoot(root):
                 # an idempotent method, should return a network failure if
                 # the remote side disconnects as it should
@@ -292,10 +300,12 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
             
             def gotError(failure):
                 self.assertAdditionalFDsOpen(1, 'feedSent (socket)')
+                self.info('success')
 
             def gotKeycardClasses(classes):
                 raise AssertionError, 'should not get here'
 
+            self.info('loginFailed: %s', log.getFailureMessage(failure))
             failure.trap(error.UnauthorizedLogin)
             d = factory.getRootObject() # should fire immediately
             d.addCallback(gotRoot)
@@ -304,9 +314,8 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
             return d
 
         d = login()
-        d.addErrback(loginFailed)
+        d.addCallbacks(loginOk, loginFailed)
         return d
-    testBadPass.skip = 'BouncerPortal does not disconnect on unauthorized login'
 
     def testRequestFeed(self):
         client = feed.FeedMedium(logName='frobby')

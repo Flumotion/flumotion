@@ -1,5 +1,22 @@
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/portal.py
+	(BouncerPortal.login.onErrorCloseConnection): Close the connection
+	if the login attempt fails, in all cases: database timeout, bad
+	password, etc. Prevents FD leakage on reconnect if the worker
+	can't contact the manager.
+
+	* flumotion/test/test_component_feed.py (TestFeedClient.setUp)
+	(TestFeedClient.tearDown): Use some terrible code that I found in
+	test_pb.py to make trial not count UnauthorizedLogin errors as
+	test errors, since we plan to make them. Trial gets these errors
+	because Flumotion passes failures across the wire whose class is
+	not derived from pb.Error, viz.
+	twisted.cred.error.UnauthorizedLogin. We should pass
+	pb.Error-derived errors, but my brain is too weak right now to
+	handle all of the implications.
+	(TestFeedClient.testBadPass): Enable test.
+
 	* flumotion/test/test_pb.py: Remove
 	ifWeHaveAnOldTwistedAndProgrammerNameEqualsZaheer invocations.
 
