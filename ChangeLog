@@ -1,3 +1,10 @@
+2007-05-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/Makefile.am (flumotion_PYTHON): 
+	* flumotion/common/startset.py (StartSet): New data structure,
+	factored out of flumotion.worker.job.DeferredStartSet. Still need
+	to port the jobheaven to use this though.
+
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/pb.py

@@ -33,6 +33,7 @@ flumotion_PYTHON = \
 	reload.py \
 	server.py \
 	setup.py \
+	startset.py \
 	watched.py \
 	worker.py
 
