@@ -57,6 +57,9 @@ class ConnectionFailedError(ConnectionError):
 class ManagerNotConnectedError(NotConnectedError):
     "Manager not connected"
 
+class AlreadyConnectingError(ConnectionError):
+    "Already connecting"
+
 class AlreadyConnectedError(ConnectionError):
     "Already connected"
 

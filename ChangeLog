@@ -1,5 +1,17 @@
 2007-05-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/multi.py (MultiAdminModel.__init__): Use a
+	StartSet instead of our own ghetto homebrew.
+	(MultiAdminModel.addManager): API change: take a PBConnectionInfo.
+	Use the StartSet to arbitrate making only one connection per
+	managerId. Returns a deferred that will fire with the admin, or
+	error on error.
+	(MultiAdminModel.removeManager): API change: renamed from
+	close_admin. Uses the start set to cancel any connection, existing
+	or in progress.
+
+	* flumotion/common/errors.py (AlreadyConnectingError): New error.
+
 	* flumotion/admin/gtk/main.py (startAdminFromGreeter.failed): 
 	* flumotion/admin/gtk/dialogs.py (connection_failed_message): 
 	* flumotion/admin/gtk/client.py
