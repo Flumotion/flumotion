@@ -1,5 +1,8 @@
 2007-05-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/worker.py (WorkerBrain.getFeedServerPort):
+	Whoops, fix the case when we don't listen with a feedserver.
+
 	* flumotion/admin/multi.py (MultiAdminModel.__init__): Use a
 	StartSet instead of our own ghetto homebrew.
 	(MultiAdminModel.addManager): API change: take a PBConnectionInfo.

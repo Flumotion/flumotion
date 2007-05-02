@@ -223,7 +223,10 @@ class WorkerBrain(log.Loggable):
         return self.ports
 
     def getFeedServerPort(self):
-        return self.feedServer.getPortNum()
+        if self.feedServer:
+            return self.feedServer.getPortNum()
+        else:
+            return None
 
     def create(self, avatarId, type, moduleName, methodName, nice=0):
         def getBundles():
