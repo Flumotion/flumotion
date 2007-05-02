@@ -19,12 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common.pygobject import gsignal
-from flumotion.common import pygobject
-
+from gettext import gettext as _
 
 import gtk
 import gobject
+
+from flumotion.common.pygobject import gsignal
+from flumotion.common import pygobject
+
 
 class ProgressDialog(gtk.Dialog):
     def __init__(self, title, message, parent = None):
@@ -110,7 +112,9 @@ def connection_refused_message(host, parent=None):
                     % host)
     return d.run()
 
-def connection_failed_message(message, parent=None):
+def connection_failed_message(info, debug, parent=None):
+    message = (_("Connection to manager on %s failed (%s).")
+               % (str(info), debug))
     d = ErrorDialog('Connection failed', parent, True, message)
     return d.run()
 

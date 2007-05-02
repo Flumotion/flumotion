@@ -200,7 +200,7 @@ class Window(log.Loggable, gobject.GObject):
                 d = dialogs.connection_refused_message(i.host,
                                                        self.window)
             else:
-                d = dialogs.connection_failed_message(i.host,
+                d = dialogs.connection_failed_message(i, str(failure),
                                                       self.window)
             d.addCallback(lambda _: self.window.set_sensitive(True))
 

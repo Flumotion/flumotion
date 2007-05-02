@@ -42,6 +42,9 @@ def Greeter():
     return greeter.Greeter()
 
 def startAdminFromGreeter(greeter):
+    # fuck python's lexicals!
+    _info = []
+
     def got_state(state):
         greeter.set_sensitive(False)
         authenticator = fpb.Authenticator(username=state['user'],
@@ -49,6 +52,7 @@ def startAdminFromGreeter(greeter):
         info = connection.PBConnectionInfo(state['host'], state['port'],
                                            not state['use_insecure'],
                                            authenticator)
+        _info.append(info)
         model = AdminModel()
         return model.connectToManager(info)
 
@@ -62,7 +66,8 @@ def startAdminFromGreeter(greeter):
     def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
-        dret = dialogs.connection_failed_message(message, greeter.window)
+        dret = dialogs.connection_failed_message(info[0], message,
+                                                 greeter.window)
         dret.addCallback(lambda _: startAdminFromGreeter(greeter))
         return dret
 

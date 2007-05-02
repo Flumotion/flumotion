@@ -1,5 +1,11 @@
 2007-05-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/main.py (startAdminFromGreeter.failed): 
+	* flumotion/admin/gtk/dialogs.py (connection_failed_message): 
+	* flumotion/admin/gtk/client.py
+	(Window.on_open_connection.refused): Change interface to some of
+	the dialogs.
+
 	* flumotion/common/Makefile.am (flumotion_PYTHON): 
 	* flumotion/common/startset.py (StartSet): New data structure,
 	factored out of flumotion.worker.job.DeferredStartSet. Still need
