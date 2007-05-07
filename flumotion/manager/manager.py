@@ -259,7 +259,6 @@ class Vishnu(log.Loggable):
         
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
-        # FIXME: decide if we allow anonymous login in this small (?) window
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(self.portal,

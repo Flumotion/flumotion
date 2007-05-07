@@ -176,14 +176,3 @@ class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
 
-class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
-    pass
-
-class PassableClientConnector(tcp.Connector):
-    # It is unfortunate, but it seems that either we override this
-    # private-ish method or reimplement BaseConnector.connect(). This is
-    # the path that tcp.py takes, so we take it too.
-    def _makeTransport(self):
-        return PassableClientConnection(self.host, self.port,
-                                        self.bindAddress, self,
-                                        self.reactor)
