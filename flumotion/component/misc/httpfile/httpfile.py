@@ -161,7 +161,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         props = self.config['properties']
 
         # always make sure the mount point starts with /
-        mountPoint = props.get('mount-point', '')
+        mountPoint = props.get('mount-point', '/')
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
@@ -233,20 +233,27 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def do_start(self, *args, **kwargs):
         self.debug('Starting with mount point "%s"' % self.mountPoint)
-        root = resource.Resource()
-        # split path on / and add iteratively twisted.web resources
-        # Asking for '' or '/' will retrieve the root Resource's '' child,
-        # so the split on / returning a first list value '' is correct
-        children = string.split(self.mountPoint, '/')
-        parent = root
-        for child in children[:-1]:
-            res = resource.Resource()
-            self.debug("Putting Resource at %s", child)
-            parent.putChild(child, res)
-            parent = res
-        fileResource = file.File(self.filePath, self)
-        self.debug("Putting File resource at %r", children[-1:][0])
-        parent.putChild(children[-1:][0], fileResource)
+        if self.mountPoint == '/':
+            self.debug('mount point / - create File resource as root')
+            # directly create a File resource for the path
+            root = file.File(self.filePath, self)
+        else:
+            # split path on / and add iteratively twisted.web resources
+            # Asking for '' or '/' will retrieve the root Resource's '' child,
+            # so the split on / returning a first list value '' is correct
+            self.debug('mount point %s - creating root Resource and children',
+                self.mountPoint)
+            root = resource.Resource()
+            children = string.split(self.mountPoint[1:], '/')
+            parent = root
+            for child in children[:-1]:
+                res = resource.Resource()
+                self.debug("Putting Resource at %s", child)
+                parent.putChild(child, res)
+                parent = res
+            fileResource = file.File(self.filePath, self)
+            self.debug("Putting File resource at %r", children[-1])
+            parent.putChild(children[-1], fileResource)
 
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)

@@ -55,6 +55,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         self._component = component
 
     def getChild(self, path, request):
+        self.log('getChild: self %r, path %r', self, path)
         # we handle a request ending in '/' as well; this is how those come in
         if path == '':
             return self

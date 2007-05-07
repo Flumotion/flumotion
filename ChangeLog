@@ -1,5 +1,16 @@
 2007-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpfile/file.py (File.getChild):
+	* flumotion/component/misc/httpfile/httpfile.py
+	  (HTTPFileStreamer.do_setup, HTTPFileStreamer.do_start):
+	  We still need to distinguish between the root resource being the
+	  File resource directly, and a tree.  Apparently client.getPage()
+	  in the tests does not mimic correctly what something like wget would
+	  do, making it hard to test for the Root resource tree being set up
+	  correctly.
+
+2007-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpfile/httpfile.py (HTTPFileStreamer.init,
 	  HTTPFileStreamer.getDescription, HTTPFileStreamer.do_setup,
 	  HTTPFileStreamer.do_stop, HTTPFileStreamer.do_start,
