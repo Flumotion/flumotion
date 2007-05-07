@@ -1,3 +1,8 @@
+2007-05-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/extern/Makefile.am (clean-local): rm -rf _trial_temp,
+	not -r.
+
 2007-05-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/worker.py (WorkerBrain.getFeedServerPort):

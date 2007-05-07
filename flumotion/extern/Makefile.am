@@ -24,7 +24,7 @@ check-local:
 	PYTHONPATH=$(srcdir):$$PYTHONPATH trial log.test_log
 
 clean-local:
-	rm -r _trial_temp
+	rm -rf _trial_temp
 
 SUBDIRS = fdpass \
 	$(PTI_DIR)
