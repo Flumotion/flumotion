@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component_httpserver -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -22,17 +22,19 @@ import os
 import time
 import string
 
+from twisted.web import resource, static, server, http
+from twisted.web import error as weberror
+from twisted.internet import defer, reactor, error
+from twisted.cred import credentials
+
 from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils, interfaces
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
-from twisted.web import resource, static, server, http
-from twisted.web import error as weberror
-from twisted.internet import defer, reactor, error
+
 from flumotion.twisted import fdserver
 from flumotion.twisted.compat import implements
-from twisted.cred import credentials
 
 from flumotion.component.misc.httpfile import file
 
@@ -134,10 +136,10 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self.type = None
         self.port = None
         self.hostname = None
-        self.loggers = []
-        self.logfilter = None
+        self._loggers = []
+        self._logfilter = None
 
-        self.description = 'On-Demand Flumotion Stream',
+        self._description = 'On-Demand Flumotion Stream',
 
         self._singleFile = False
         self._connected_clients = []
@@ -145,16 +147,20 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
         self._pbclient = None
 
+        self._twistedPort = None
+        self._timeoutRequestsCallLater = None
+
         # store number of connected clients
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
 
     def getDescription(self):
-        return self.description
+        return self._description
 
     def do_setup(self):
         props = self.config['properties']
 
+        # always make sure the mount point starts with /
         mountPoint = props.get('mount-point', '')
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
@@ -171,8 +177,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             self._porterPath = props['porter-socket-path']
             self._porterUsername = props['porter-username']
             self._porterPassword = props['porter-password']
-        self.loggers = \
-            self.plugs['flumotion.component.plugs.loggers.Logger']
+        self._loggers = \
+            self.plugs.get('flumotion.component.plugs.loggers.Logger', [])
 
         if 'bouncer' in props:
             self.setBouncerName(props['bouncer'])
@@ -182,9 +188,15 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             filter = http.LogFilter()
             for f in props['ip-filter']:
                 filter.addIPFilter(f)
-            self.logfilter = filter
-        
+            self._logfilter = filter
+
     def do_stop(self):
+        if self._timeoutRequestsCallLater:
+            self._timeoutRequestsCallLater.cancel()
+            self._timeoutRequestsCallLater = None
+        if self._twistedPort:
+            self._twistedPort.stopListening()
+
         if self.type == 'slave' and self._pbclient:
             return self._pbclient.deregisterPath(self.mountPoint)
 
@@ -220,22 +232,24 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 "Can't specify porter details in master mode")
 
     def do_start(self, *args, **kwargs):
-        #root = HTTPRoot()
+        self.debug('Starting with mount point "%s"' % self.mountPoint)
         root = resource.Resource()
-        # TwistedWeb wants the child path to not include the leading /
-        mount = self.mountPoint[1:]
         # split path on / and add iteratively twisted.web resources
-        children = string.split(mount, '/')
-        current_resource = root
+        # Asking for '' or '/' will retrieve the root Resource's '' child,
+        # so the split on / returning a first list value '' is correct
+        children = string.split(self.mountPoint, '/')
+        parent = root
         for child in children[:-1]:
             res = resource.Resource()
-            current_resource.putChild(child, res)
-            current_resource = res
+            self.debug("Putting Resource at %s", child)
+            parent.putChild(child, res)
+            parent = res
         fileResource = file.File(self.filePath, self)
         self.debug("Putting File resource at %r", children[-1:][0])
-        current_resource.putChild(children[-1:][0], fileResource)
+        parent.putChild(children[-1:][0], fileResource)
 
-        reactor.callLater(self.REQUEST_TIMEOUT, self._timeoutRequests)
+        self._timeoutRequestsCallLater = reactor.callLater(
+            self.REQUEST_TIMEOUT, self._timeoutRequests)
 
         d = defer.Deferred()
         if self.type == 'slave':
@@ -257,10 +271,14 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         else:
             # File Streamer is standalone.
             try:
-                self.debug('Listening on %s' % self.port)
+                self.debug('Going to listen on port %d' % self.port)
                 iface = ""
-                reactor.listenTCP(self.port, Site(root, self),
-                    interface=iface)
+                # we could be listening on port 0, in which case we need
+                # to figure out the actual port we listen on
+                self._twistedPort = reactor.listenTCP(self.port,
+                    Site(root, self), interface=iface)
+                self.port = self._twistedPort.getHost().port
+                self.debug('Listening on port %d' % self.port)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
@@ -293,11 +311,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 if not 'porter-' + k in props:
                     msg = 'slave mode, missing required property porter-%s' % k
                     return defer.fail(errors.ConfigError(msg))
-
-        if props.get('mount-point', None) is not None: 
-            if props['mount-point'] == '/':
-                return defer.fail(errors.ConfigError(
-                    "A mount-point of / is not supported in this release"))
 
             path = props.get('path', None) 
             if path is None: 
@@ -334,7 +347,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()
-        if not self.logfilter or not self.logfilter.isInRange(ip):
+        if not self._logfilter or not self._logfilter.isInRange(ip):
             args = {'ip': ip,
                     'time': time.gmtime(),
                     'method': request.method,
@@ -348,7 +361,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                     'user-agent': headers.get('user-agent', None),
                     'time-connected': timeConnected}
 
-            for logger in self.loggers:
+            for logger in self._loggers:
                 logger.event('http_session_completed', args)
 
         self._connected_clients.remove(request)
@@ -369,7 +382,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         else:
             return {
                 'protocol': 'HTTP',
-                'description': self.description,
+                'description': self._description,
                 'url' : self.getUrl()
                 }
 
@@ -403,7 +416,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         """
         Close the logfile, then reopen using the previous logfilename
         """
-        for logger in self.loggers:
+        for logger in self._loggers:
             self.debug('rotating logger %r' % logger)
             logger.rotate()
-

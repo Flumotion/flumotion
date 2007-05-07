@@ -55,6 +55,10 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         self._component = component
 
     def getChild(self, path, request):
+        # we handle a request ending in '/' as well; this is how those come in
+        if path == '':
+            return self
+
         self.restat()
 
         if not self.isdir():
@@ -101,6 +105,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         # self.restat()
         self.debug('renderAuthenticated request %r' % request)
 
+        # make sure we notice changes in the file
+        self.restat()
+
         ext = os.path.splitext(self.basename())[1].lower()
         type = self.contentTypes.get(ext, self.defaultType)
 
@@ -109,6 +116,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             return self.childNotFound.render(request)
 
         if self.isdir():
+            self.debug("%s is a directory, can't be GET", self.path)
             return self.childNotFound.render(request)
 
         # Different headers not normally set in static.File...        

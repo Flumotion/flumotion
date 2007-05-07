@@ -1,3 +1,31 @@
+2007-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/httpfile.py (HTTPFileStreamer.init,
+	  HTTPFileStreamer.getDescription, HTTPFileStreamer.do_setup,
+	  HTTPFileStreamer.do_stop, HTTPFileStreamer.do_start,
+	  HTTPFileStreamer.requestFinished, HTTPFileStreamer.getStreamData):
+	  Rearrange imports.
+	  Privatize some variables.
+	  Store some variables for resources we need to clean up.
+	  Set self.port from what we're actually listening to, so we can
+	  listen to port 0 then figure out which port it chose.
+	  Make sure we can work without any loggers.
+	  Fix handling of empty and / mount points, as well as getting
+	  empty or / resources - fixes #567
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_httpserver.py (MountTest,
+	  MountTest.setUp, MountTest.tearDown, MountTest.start,
+	  MountTest.getURL, MountTest.testDirMountEmpty,
+	  MountTest.testDirMountRoot, MountTest.testDirMountOnDemand,
+	  MountTest.testFileMountEmpty, MountTest.testFileMountOnDemand):
+	  Add tests for http-server component with various mount points
+	  and serving either a directory or a file.
+	* flumotion/component/misc/httpfile/file.py (File.getChild,
+	  File.renderAuthenticated):
+	  Restat the file on every request, to make sure we handle changed
+	  lengths of files.
+	  Handle requests ending with /
+
 2007-05-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/medium.py (WorkerMedium.remote_killJob): New
