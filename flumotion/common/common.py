@@ -393,20 +393,28 @@ def getPid(type, name=None):
  
     return int(pid)
 
-def termPid(pid):
+def signalPid(pid, signum):
     """
-    Send the given process a TERM signal.
+    Send the given process a signal.
 
     @returns: whether or not the process with the given pid was running
     """
     try:
-        os.kill(pid, signal.SIGTERM)
+        os.kill(pid, signum)
         return True
     except OSError, e:
         if not e.errno == errno.ESRCH:
         # FIXME: unhandled error, maybe give some better info ?
             raise
         return False
+
+def termPid(pid):
+    """
+    Send the given process a TERM signal.
+
+    @returns: whether or not the process with the given pid was running
+    """
+    return signalPid(pid, signal.SIGTERM)
 
 def killPid(pid):
     """
@@ -414,14 +422,7 @@ def killPid(pid):
 
     @returns: whether or not the process with the given pid was running
     """
-    try:
-        os.kill(pid, signal.SIGKILL)
-        return True
-    except OSError, e:
-        if not e.errno == errno.ESRCH:
-        # FIXME: unhandled error, maybe give some better info ?
-            raise
-        return False
+    return signalPid(pid, signal.SIGKILL)
 
 def checkPidRunning(pid):
     """
@@ -429,13 +430,7 @@ def checkPidRunning(pid):
     
     @returns: whether or not a process with that pid is active.
     """
-    try:
-        os.kill(pid, 0)
-        return True
-    except OSError, e:
-        if e.errno is not errno.ESRCH:
-            raise
-    return False
+    return signalPid(pid, 0)
  
 def waitPidFile(type, name=None):
     """

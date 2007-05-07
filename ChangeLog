@@ -1,5 +1,20 @@
 2007-05-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/medium.py (WorkerMedium.remote_killJob): New
+	remote method, kills a job by avatarId, defaulting to SIGKILL.
+	Callable via flumotion-command invoke sss workerCallRemote
+	WORKERNAME killJob AVATARID. Fixes #499.
+
+	* flumotion/worker/worker.py (WorkerBrain.killJob): New function,
+	proxies to JobHeaven.killJob.
+
+	* flumotion/worker/job.py (JobHeaven.killJob): New function, kills
+	a job by avatarId.
+	(JobHeaven.kill): Use killJob.
+
+	* flumotion/common/common.py (signalPid): New function.
+	(termPid, killPid, checkPidRunning): Use signalPid.
+
 	* flumotion/manager/manager.py (Vishnu.__init__): Remove a FIXME
 	made irrelevant by [3299].
 

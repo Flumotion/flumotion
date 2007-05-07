@@ -281,3 +281,6 @@ class WorkerBrain(log.Loggable):
 
     def getComponents(self):
         return self.jobHeaven.getJobAvatarIds()
+
+    def killJob(self, avatarId, signum):
+        self.jobHeaven.killJob(avatarId, signum)

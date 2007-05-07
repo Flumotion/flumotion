@@ -23,6 +23,8 @@
 worker-side objects to handle worker clients
 """
 
+import signal
+
 from twisted.internet import reactor
 import twisted.cred.error
 from twisted.internet import error
@@ -242,3 +244,21 @@ class WorkerMedium(medium.PingingMedium):
         @returns: a list of componentAvatarIds
         """
         return self.brain.getComponents()
+
+    def remote_killJob(self, avatarId, signum=signal.SIGKILL):
+        """Kill one of the worker's jobs.
+
+        This method is intended for exceptional purposes only; a normal
+        component shutdown is performed by the manager via calling
+        remote_stop() on the component avatar.
+
+        Raises L{flumotion.common.errors.UnknownComponentError} if the
+        job is unknown.
+
+        @param avatarId: the avatar Id of the component, e.g.
+        '/default/audio-encoder'
+        @type avatarId: string
+        @param signum: Signal to send, optional. Defaults to SIGKILL.
+        @type signum: int
+        """
+        self.brain.killJob(avatarId, signum)

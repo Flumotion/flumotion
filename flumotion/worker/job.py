@@ -25,6 +25,7 @@ worker-side objects to handle worker clients
 
 import os
 import sys
+import signal
 
 from twisted.cred import portal
 from twisted.internet import defer, reactor
@@ -456,11 +457,18 @@ class JobHeaven(pb.Root, log.Loggable):
         ret.addCallback(stopListening)
         return ret
 
-    def kill(self):
+    def kill(self, signum=signal.SIGKILL):
         self.warning("Killing all children immediately")
-        for jobInfo in self.getJobInfos():
-            self.debug("Sending SIGKILL to pid %d", jobInfo.pid)
-            common.killPid(jobInfo.pid)
+        for avatarId in self.getJobAvatarIds():
+            self.killJob(avatarId, signum)
+
+    def killJob(self, avatarId, signum):
+        if avatarId not in self._jobInfos:
+            raise errors.UnknownComponentError(avatarId)
+        jobInfo = self._jobInfos[avatarId]
+        self.debug("Sending signal %d to job %s at pid %d", signum,
+                   avatarId, jobInfo.pid)
+        common.signalPid(jobInfo.pid, signum)
 
 class JobAvatar(fpb.Avatar, log.Loggable):
     """
