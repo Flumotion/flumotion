@@ -168,7 +168,6 @@ class TestTextFile(unittest.TestCase):
             'a text file', 0, 10)
         return fr.finishDeferred
 
-
     def testRangeHead(self):
         fr = FakeRequest(method='HEAD', headers={'range': 'bytes=2-5'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
@@ -176,4 +175,51 @@ class TestTextFile(unittest.TestCase):
             http.PARTIAL_CONTENT, '', 4)
         return fr.finishDeferred
 
+class TestDirectory(unittest.TestCase):
+    def setUp(self):
+        self.path = tempfile.mkdtemp()
+        h = open(os.path.join(self.path, 'test.flv'), 'w')
+        h.write('a fake FLV file')
+        h.close()
+        self.component = FakeComponent()
+        # a directory resource
+        self.resource = file.File(self.path, self.component,
+            { 'video/x-flv': file.FLVFile } )
 
+    def tearDown(self):
+        os.system('rm -r %s' % self.path)
+
+    def testGetChild(self):
+        fr = FakeRequest()
+        r = self.resource.getChild('test.flv', fr)
+        self.assertEquals(r.__class__, file.FLVFile)
+
+    def testFLV(self):
+        fr = FakeRequest()
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+        def finish(result):
+            self.assertEquals(fr.data, 'a fake FLV file')
+        fr.finishDeferred.addCallback(finish)
+
+        return fr.finishDeferred
+
+    def testFLVStart(self):
+        fr = FakeRequest(args={'start': [2]})
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+        def finish(result):
+            self.assertEquals(fr.data, file.FLVFile.header + 'fake FLV file')
+        fr.finishDeferred.addCallback(finish)
+
+        return fr.finishDeferred
+        
+    def testFLVStartZero(self):
+        fr = FakeRequest(args={'start': [0]})
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+        def finish(result):
+            self.assertEquals(fr.data, 'a fake FLV file')
+        fr.finishDeferred.addCallback(finish)
+
+        return fr.finishDeferred

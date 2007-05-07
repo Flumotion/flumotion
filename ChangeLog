@@ -1,3 +1,24 @@
+2007-05-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/file.py (File, File.__init__,
+	  File.getChild, File.renderAuthenticated, MimedFileFactory,
+	  MimedFileFactory.__init__, MimedFileFactory.create, FLVFile,
+	  FLVFile.renderAuthenticated):
+	  Add a subclass for handling FLV files.
+	  Implement handling of the start= GET parameter, just like in
+	  Apache and lighthttpd.  Fixes #618.
+	  Add a MimedFileFactory that allows us to create even the root
+	  resource as a mime-type-dependent subclass.
+	* flumotion/component/misc/httpfile/httpfile.py (HTTPFileStreamer.init,
+	  HTTPFileStreamer.do_start):
+	* flumotion/test/test_misc_httpfile.py (TestDirectory,
+	  TestDirectory.setUp, TestDirectory.tearDown,
+	  TestDirectory.testGetChild, TestDirectory.testFLV,
+	  TestDirectory.finish, TestDirectory.testFLVStart,
+	  TestDirectory.finish, TestDirectory.testFLVStartZero,
+	  TestDirectory.finish):
+	  Add tests for this.
+
 2007-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/file.py (File.getChild):

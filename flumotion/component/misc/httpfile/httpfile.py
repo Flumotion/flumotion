@@ -150,6 +150,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._twistedPort = None
         self._timeoutRequestsCallLater = None
 
+        # FIXME: maybe we want to allow the configuration to specify
+        # additional mime -> File class mapping ?
+        self._mimeToResource = {
+            'video/x-flv': file.FLVFile,
+        }
+
         # store number of connected clients
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
@@ -233,10 +239,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def do_start(self, *args, **kwargs):
         self.debug('Starting with mount point "%s"' % self.mountPoint)
+        factory = file.MimedFileFactory(self,
+            mimeToResource=self._mimeToResource)
         if self.mountPoint == '/':
             self.debug('mount point / - create File resource as root')
             # directly create a File resource for the path
-            root = file.File(self.filePath, self)
+            root = factory.create(self.filePath)
         else:
             # split path on / and add iteratively twisted.web resources
             # Asking for '' or '/' will retrieve the root Resource's '' child,
@@ -251,8 +259,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 self.debug("Putting Resource at %s", child)
                 parent.putChild(child, res)
                 parent = res
-            fileResource = file.File(self.filePath, self)
-            self.debug("Putting File resource at %r", children[-1])
+            fileResource = factory.create(self.filePath)
+            self.debug("Putting resource %r at %r", fileResource, children[-1])
             parent.putChild(children[-1], fileResource)
 
         self._timeoutRequestsCallLater = reactor.callLater(

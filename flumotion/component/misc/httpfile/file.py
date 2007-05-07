@@ -40,12 +40,11 @@ from twisted.web.static import loadMimeTypes, getTypeAndEncoding
 
 class File(resource.Resource, filepath.FilePath, log.Loggable):
     contentTypes = loadMimeTypes()
-
     defaultType = "application/octet-stream"
 
     childNotFound = weberror.NoResource("File not found.")
 
-    def __init__(self, path, component):
+    def __init__(self, path, component, mimeToResource=None):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
@@ -53,6 +52,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         filepath.FilePath.__init__(self, path)
 
         self._component = component
+        # mapping of mime type -> File subclass
+        self._mimeToResource = mimeToResource or {}
+        self._factory = MimedFileFactory(component, self._mimeToResource)
 
     def getChild(self, path, request):
         self.log('getChild: self %r, path %r', self, path)
@@ -73,7 +75,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         if not fpath.exists():
             return self.childNotFound
 
-        return self.createSimilarFile(fpath.path)
+        return self._factory.create(fpath.path)
 
     def openForReading(self):
         """Open a file and return it."""
@@ -97,7 +99,11 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         return server.NOT_DONE_YET
 
-    def renderAuthenticated(self, _, request):
+    def renderAuthenticated(self, _, request, first=0):
+        """
+        @type  first: int
+        @param first: starting byte to send from
+        """
         # Now that we're authenticated (or authentication wasn't requested), 
         # write the file (or appropriate other response) to the client.
         # We override static.File to implement Range requests, and to get access
@@ -146,7 +152,6 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         fileSize = self.getFileSize()
         # first and last byte offset we will write
-        first = 0
         last = fileSize - 1
 
         range = request.getHeader('range')
@@ -189,14 +194,15 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
                 return ''
 
-            # Start sending from the requested position in the file
-            f.seek(first)
-
             # FIXME: is it still partial if the request was for the complete
             # file ? Couldn't find a conclusive answer in the spec.
             request.setResponseCode(http.PARTIAL_CONTENT)
             request.setHeader('Content-Range', "bytes %d-%d/%d" % 
                 (first, last, fileSize))
+
+        # Start sending from the requested position in the file
+        if first:
+            f.seek(first)
 
         request.setHeader("Content-Length", str(last - first + 1))
 
@@ -207,10 +213,49 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         return server.NOT_DONE_YET
 
-    def createSimilarFile(self, path):
-        self.debug("createSimilarFile at %r", path)
-        f = self.__class__(path, self._component)
-        return f
+class MimedFileFactory(log.Loggable):
+    """
+    I create File subclasses based on the mime type of the given path.
+    """
+    contentTypes = loadMimeTypes()
+    defaultType = "application/octet-stream"
+
+    def __init__(self, component, mimeToResource=None):
+        self._component = component
+        self._mimeToResource = mimeToResource or {}
+
+    def create(self, path):
+        """
+        Creates and returns an instance of a File subclass based on the mime
+        type/extension of the given path.
+        """
+
+        self.debug("createMimedFile at %r", path)
+        ext = os.path.splitext(path)[1].lower()
+        mimeType = self.contentTypes.get(ext, self.defaultType)
+        klazz = self._mimeToResource.get(mimeType, File)
+        self.debug("mimetype %s, class %r" % (mimeType, klazz))
+        return klazz(path, self._component, mimeToResource=self._mimeToResource)
+
+class FLVFile(File):
+    """
+    I am a File resource for FLV files.
+    I can handle requests with a 'start' GET parameter.
+    This parameter represents the byte offset from where to start.
+    If it is non-zero, I will output an FLV header so the result is
+    playable.
+    """
+    header = 'FLV\x01\x01\000\000\000\x09\000\000\000\x09'
+    def renderAuthenticated(self, _, request):
+        self.debug('rendering FLV')
+        first = 0
+        # each value is a list
+        start = int(request.args.get('start', ['0'])[0])
+        if start:
+            first = start
+            request.write(self.header)
+
+        return File.renderAuthenticated(self, _, request, first=first)
 
 class FileTransfer:
     """
