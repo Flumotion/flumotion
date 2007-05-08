@@ -391,7 +391,10 @@ class FlumotionConfigXML(BaseConfigParser):
         @rtype: L{ConfigEntryComponent}
         """
         # <component name="..." type="..." worker="...">
-        #   <source>*
+        #   <source>...</source>* DEPRECATED
+        #   <eater name="...">
+        #     <feed>...</feed>
+        #   </eater>*
         #   <property name="name">value</property>*
         # </component>
         
@@ -451,7 +454,7 @@ class FlumotionConfigXML(BaseConfigParser):
                 "unknown component type: %s" % type)
         
         possible_node_names = ['source', 'clock-master', 'property',
-                               'plugs']
+                               'plugs', 'eater']
         for subnode in node.childNodes:
             if subnode.nodeType == Node.COMMENT_NODE:
                 continue
@@ -466,10 +469,23 @@ class FlumotionConfigXML(BaseConfigParser):
         # let the component know what its feeds should be called
         config['feed'] = defs.getFeeders()
 
-        sources = self._parseSources(node, defs)
-        if sources:
-            config['source'] = sources
-
+        eaters = self._parseEaters(node, defs)
+        if not eaters:
+            sources = self._parseSources(node, defs)
+            if sources:
+                config['source'] = sources
+                # assign sources up to first (and only eater)
+                # if more than one eater, parseSources would have raised
+                # a ConfigError
+                config['eater'] = {defs.getEaters()[0].getName():sources}
+        else:
+            # get sources as a list of strings from the dict of eaters
+            sources = []
+            for e in eaters:
+                sources.extend(eaters[e])
+            if sources:
+                config['source'] = sources
+            config['eater'] = eaters
         config['clock-master'] = self._parseClockMaster(node)
         config['plugs'] = self._parsePlugs(node, defs.getSockets())
 
@@ -627,19 +643,66 @@ class FlumotionConfigXML(BaseConfigParser):
             raise ConfigError("<%s> value not specified" % name)
         return value
 
+    def _parseEaters(self, node, defs):
+        # <eater name="eater-name">
+        #   <feed>feeding-component:feed-name</feed>*
+        # </eater>
+        eaters = dict([(x.getName(), x) for x in defs.getEaters()])
+
+        nodes = {}
+        hasSourceNodes = False
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'eater':
+                if subnode.hasAttribute('name'):
+                    name = subnode.getAttribute('name')
+                    if nodes.has_key(name):
+                        raise ConfigError("Component %s should not have "
+                            "multiple eater nodes configured with same name:"
+                            " %s" % (node.nodeName, name))
+                    feedNodes = []
+                    for eaterSubnode in subnode.childNodes:
+                        if eaterSubnode.nodeName == 'feed':
+                            feedNodes.append(eaterSubnode)
+                    nodes[name] = self.get_string_values(feedNodes)
+                else:
+                    raise ConfigError("Component %s has eaters specified with "
+                        "no name property." % (node.nodeName))
+            if subnode.nodeName == 'source':
+                hasSourceNodes = True
+
+        # for backwards compatibility
+        if len(nodes) == 0 and hasSourceNodes:
+            return nodes
+
+        for e in eaters:
+            if eaters[e].getRequired() and not nodes.has_key(e):
+                raise ConfigError("Component %s wants to eat on %s, but no "
+                                  "eater with name: %s specified." % (
+                                  node.nodeName, e, e))
+            if not eaters[e].getMultiple() and nodes.has_key(e):
+                if len(nodes[e]) > 1:
+                    raise ConfigError("Component %s does not support multiple "
+                        "sources feeding %s (%r)"
+                        % (node.nodeName, e, nodes[e]))
+        return nodes
+
     def _parseSources(self, node, defs):
+        # deprecated in favour of eater tag
         # <source>feeding-component:feed-name</source>
         eaters = dict([(x.getName(), x) for x in defs.getEaters()])
 
+        if len(eaters) > 1:
+            raise ConfigError("Component %s has many eater names specified "
+                "in the registry, the <source> tag cannot be used for this "
+                "and is now deprecated. Use the <eater> tag." % (node.nodeName))
         nodes = []
         for subnode in node.childNodes:
             if subnode.nodeName == 'source':
                 nodes.append(subnode)
         strings = self.get_string_values(nodes)
 
-        # at this point we don't support assigning certain sources to
-        # certain eaters -- a problem to fix later. for now take the
-        # union of the properties.
+        # assigning certain sources to certain eaters can be done
+        # with the <eater> tag, the <source> tag is now deprecated
         required = [x for x in eaters.values() if x.getRequired()]
         multiple = [x for x in eaters.values() if x.getMultiple()]
 
@@ -647,11 +710,13 @@ class FlumotionConfigXML(BaseConfigParser):
             raise ConfigError("Component %s wants to eat on %s, but no "
                               "source specified"
                               % (node.nodeName, eaters.keys()[0]))
-        elif len(strings) > 1 and not multiple:
+        if len(strings) > 1 and not multiple:
             raise ConfigError("Component %s does not support multiple "
                               "sources feeding %s (%r)"
                               % (node.nodeName, eaters.keys()[0], strings))
-
+        if len(strings) > 0:
+            self.warning("The <source> tag is deprecated. Please use the "
+                "<eater> tag now")
         return strings
             
     def _parseClockMaster(self, node):

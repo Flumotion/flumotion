@@ -1,4 +1,20 @@
-2007-05-08  Michael Smith,,,  <set EMAIL_ADDRESS environment variable>
+2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent,
+	  FlumotionConfigXML._parseEaters, FlumotionConfigXML._parseSources):
+	* flumotion/test/test_config.py
+	  (TestConfig.testParseComponentsWithEaters,
+	  TestConfig.testParseComponentsWithEatersNotSpecified,
+	  TestConfig.testParseComponentsWithEatersDeprecatedWay,
+	  TestConfig.testParseComponentsWithTwoEaters,
+	  TestConfig.testParseComponentsWithTwoEatersDeprecatedWay,
+	  TestConfig.testParseComponentsWithMultipleEater,
+	  TestConfig.testParseComponentsWithMultipleEaterDeprecatedWay,
+	  TestConfig.testGetComponentEntriesWrong):
+	Add new way of configuring eaters in the XML along with tests.
+	Fixes #200.
+
+2007-05-08  Michael Smith  <msmith@fluendo.com>
 
 	* configure.ac:
 	* flumotion/component/feedcomponent.py:

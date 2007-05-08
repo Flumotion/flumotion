@@ -51,6 +51,19 @@ regchunk = """
     <component type="test-component-sync-provider">
       <synchronization required="true" clock-priority="130"/>
     </component>
+    <component type="test-component-with-feeder">
+      <feeder name="default" />
+    </component>
+    <component type="test-component-with-one-eater">
+      <eater name="default" required="true" />
+    </component>
+    <component type="test-component-with-two-eaters">
+      <eater name="video" required="true" />
+      <eater name="audio" required="true" />
+    </component>
+    <component type="test-component-with-multiple-eater">
+      <eater name="default" multiple="true" />
+    </component>
   </components>
   <plugs>
     <plug socket="foo.bar" type="frobulator">
@@ -492,6 +505,181 @@ class TestConfig(unittest.TestCase):
         entries = conf.getComponentEntries()
         self.failUnless(entries.has_key('/atmosphere/atmocomp'))
         self.failUnless(entries.has_key('/default/flowcomp'))
+
+    def testParseComponentsWithEaters(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-one-eater"
+                           worker="foo">
+                  <eater name="default">
+                    <feed>prod:default</feed>
+                  </eater>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('eater'))
+        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless(cons['eater']['default'] == ["prod:default"])
+        self.failUnless(cons['source'] == ["prod:default"])
+
+    def testParseComponentsWithEatersNotSpecified(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="cons" type="test-component-with-one-eater"
+                           worker="foo">
+                </component>
+              </flow>
+            </planet>
+            """)
+        self.assertRaises(config.ConfigError, conf.parse)
+
+    def testParseComponentsWithEatersDeprecatedWay(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-one-eater"
+                           worker="foo">
+                  <source>prod:default</source>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('source'))
+        self.failUnless(cons['source'] == ["prod:default"])
+        self.failUnless(cons['eater']['default'] == ["prod:default"])
+
+    def testParseComponentsWithTwoEaters(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="prod2" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-two-eaters"
+                           worker="foo">
+                  <eater name="video">
+                    <feed>prod:default</feed>
+                  </eater>
+                  <eater name="audio">
+                    <feed>prod2:default</feed>
+                  </eater>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('eater'))
+        self.failUnless(cons['eater'].has_key('video'))
+        self.failUnless(cons['eater']['video'] == ["prod:default"])
+        self.failUnless(cons['eater'].has_key('audio'))
+        self.failUnless(cons['eater']['audio'] == ['prod2:default'])
+
+    def testParseComponentsWithTwoEatersDeprecatedWay(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="prod2" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-two-eaters"
+                           worker="foo">
+                  <source>prod:default</source>
+                  <source>prod2:default</source>
+                </component>
+              </flow>
+            </planet>
+            """)
+        self.assertRaises(config.ConfigError, conf.parse)
+
+    def testParseComponentsWithMultipleEater(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="prod2" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-multiple-eater"
+                           worker="foo">
+                  <eater name="default">
+                    <feed>prod:default</feed>
+                    <feed>prod2:default</feed>
+                  </eater>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('eater'))
+        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless(cons['eater']['default'] == [
+            "prod:default", "prod2:default"])
+        self.failUnless(cons.has_key('source'))
+        self.failUnless(cons['source'] == [
+            "prod:default", "prod2:default"])
+
+    def testParseComponentsWithMultipleEaterDeprecatedWay(self):
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="prod2" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-multiple-eater"
+                           worker="foo">
+                  <source>prod:default</source>
+                  <source>prod2:default</source>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('eater'))
+        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless(cons['eater']['default'] == [
+            "prod:default", "prod2:default"])
+        self.failUnless(cons.has_key('source'))
+        self.failUnless(cons['source'] == [
+            "prod:default", "prod2:default"])
 
     def testGetComponentEntriesWrong(self):
         xml = """
