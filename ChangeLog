@@ -1,5 +1,11 @@
 2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/test/test.xml:
+	Update xml flow used in tests to use new way of configuring
+	eaters.
+
+2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/common/config.py (FlumotionConfigXML._parseComponent,
 	  FlumotionConfigXML._parseEaters, FlumotionConfigXML._parseSources):
 	* flumotion/test/test_config.py

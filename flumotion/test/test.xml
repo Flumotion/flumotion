@@ -8,14 +8,18 @@
     </component>
   
     <component name="converter-ogg-theora" type="pipeline-converter" worker="worker">
-      <source>producer-video-test</source>
+      <eater name="default">
+        <feed>producer-video-test</feed>
+      </eater>
       <property name="pipeline">
   ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
       </property>
     </component>
   
     <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
-      <source>converter-ogg-theora</source>
+      <eater name="default">
+        <feed>converter-ogg-theora</feed>
+      </eater>
       <property name="port">8800</property>
       <plugs>
         <plug socket="flumotion.component.plugs.loggers.Logger"
