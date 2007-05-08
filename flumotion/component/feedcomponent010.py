@@ -584,6 +584,16 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('parsed feeder config, feeders %r' % self.feeder_names)
         self.state.set('feederNames', self.feeder_names)
 
+    def connect_feeders(self, pipeline):
+        # Connect to the client-fd-removed signals on each feeder, so we 
+        # can clean up properly on removal.
+        feeder_element_names = map(lambda n: "feeder:" + n, 
+            self.feeder_names)
+        for feeder in feeder_element_names:
+            element = pipeline.get_by_name(feeder)
+            element.connect('client-fd-removed', self.removeClientCallback)
+            self.debug("Connected %s to removeClientCallback", feeder)
+
     def get_eater_names(self):
         """
         Return the list of feeder names this component eats from.

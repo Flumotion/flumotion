@@ -1,3 +1,19 @@
+2007-05-08  Michael Smith,,,  <set EMAIL_ADDRESS environment variable>
+
+	* configure.ac:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/playlist/Makefile.am:
+	* flumotion/component/producers/playlist/__init__.py:
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlist.xml:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	* flumotion/component/producers/playlist/singledecodebin.py:
+	* flumotion/component/producers/playlist/smartscale.py:
+	  Merge playlist component back to trunk now that the basics are
+	  functional.
+
 2007-05-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/file.py (File, File.__init__,

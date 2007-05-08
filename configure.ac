@@ -195,6 +195,7 @@ flumotion/component/producers/gdp/Makefile
 flumotion/component/producers/icecast/Makefile
 flumotion/component/producers/ivtv/Makefile
 flumotion/component/producers/pipeline/Makefile
+flumotion/component/producers/playlist/Makefile
 flumotion/component/producers/rtsp/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile

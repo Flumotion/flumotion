@@ -1,0 +1,52 @@
+<registry>
+  <components>
+    <component type="playlist-producer"
+               base="flumotion/component/producers/playlist"
+               description="Produces a raw audio/video feed from a playlist of input files, scheduled for particular times.">
+      <source location="flumotion.component.producers.playlist.playlist"/>
+      <feeder name="audio"/>
+      <feeder name="video"/>
+      <entries>
+        <entry type="component" location="playlist.py"
+               function="PlaylistProducer" />
+      </entries>
+
+      <synchronization required="yes" clock-priority="110" />
+
+      <properties>
+        <property name="height" type="int"
+                  description="Scaled output height of video" />
+        <property name="width" type="int"
+                  description="Scaled output width of video" />
+        <property name="framerate" type="fraction"
+                  description="Framerate to output" />
+        <property name="samplerate" type="int"
+                  description="Samplerate to output" />
+        <property name="channels" type="int"
+                  description="Audio channels to output" />
+
+        <property name="playlist" type="string" required="yes"
+                  description="Location of the initial playlist file" />
+      </properties>
+    </component>
+  </components>
+  <bundles>
+
+    <bundle name="playlist-component">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/playlist">
+                <filename location="__init__.py" />
+                <filename location="smartscale.py" />
+                <filename location="singledecodebin.py" />
+                <filename location="playlist.py" />
+                <filename location="playlistparser.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry> 
