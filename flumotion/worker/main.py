@@ -168,9 +168,8 @@ def main(args):
             log.debug('worker', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
 
-    # verbose overrides --debug; is only a command-line option
     if options.verbose:
-        options.debug = "*:3"
+        log.setFluDebug("*:3")
  
     # apply the command-line debug level if is given through --verbose or -d
     if options.debug:

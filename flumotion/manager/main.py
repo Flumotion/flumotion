@@ -154,9 +154,9 @@ def main(args):
             log.debug('manager', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
 
-    # verbose overrides --debug
+    # verbose sets a baseline for --debug
     if options.verbose:
-        options.debug = "*:3"
+        log.setFluDebug("*:3")
 
     # Handle options that don't require a configuration file.
     if options.version:

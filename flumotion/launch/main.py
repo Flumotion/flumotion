@@ -272,7 +272,7 @@ def main(args):
 
     # verbose overrides --debug
     if options.verbose:
-        options.debug = "*:3"
+        log.setFluDebug("*:3")
  
     # handle all options
     if options.version:

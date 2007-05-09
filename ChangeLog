@@ -1,5 +1,10 @@
 2007-05-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/main.py (main): 
+	* flumotion/launch/main.py (main): 
+	* flumotion/manager/main.py (main): --verbose sets a baseline for
+	--debug, not overriding it. Fixes #82.
+
 	* flumotion/manager/component.py (ComponentAvatar.cleanup): Add a
 	comment.
 
