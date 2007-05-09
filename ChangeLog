@@ -1,6 +1,11 @@
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlistparser.py:
+	  Remove unused local to satisfy pychecker.
+
+2007-05-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
 	  Use the discoverer on files before adding them.
 
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>

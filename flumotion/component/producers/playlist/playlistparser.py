@@ -230,8 +230,6 @@ class Playlist(object, log.Loggable):
 
         timestamp = self._parseTimestamp(timestamp)
 
-        uri = 'file://'+filename
-
         self._pending_items.append((filename, timestamp, duration, offset))
 
     def _parseTimestamp(self, ts):
