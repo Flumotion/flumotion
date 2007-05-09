@@ -1,3 +1,12 @@
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.get_eater_name_for_feedid):
+	Add helper method.
+	* flumotion/manager/depgraph.py (DepGraph.mapEatersToFeeders,
+	  DepGraph.whatShouldBeStarted):
+	Migrate depgraph to use the eater key rather than the source key.
+
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlistparser.py:

@@ -1308,4 +1308,9 @@ class FeedComponent(basecomponent.BaseComponent):
                 self._gotFirstNewSegment[feedId] = True
         return True
 
+    def get_eater_name_for_feedid(self, feedId):
+        if self._eaterMapping.has_key(feedId):
+            return self._eaterMapping[feedId]
+        return None
+
 pygobject.type_register(FeedComponent)

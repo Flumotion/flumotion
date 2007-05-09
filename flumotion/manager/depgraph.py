@@ -200,46 +200,41 @@ class DepGraph(log.Loggable):
             # for this component setup, go through all the feeders in it
             config = eatingComponent.get('config')
 
-            if not config.has_key('source'):
+            if not config.has_key('eater'):
                 # no eaters
                 self.debug("Component %r has no eaters" % eatingComponent)
             else:
-                # source is a list of componentName[:feedName]
+                # eater is a dict of eaterName -> list of componentName[:feedName]
                 # with feedName defaulting to default
-                # FIXME: maybe source should really be eaters and contain
-                # a list of feedId
-                list = config['source']
+                eaters = config['eater']
 
-                # FIXME: there's a bug in config parsing - sometimes this gives
-                # us one string, and sometimes a list of one string, and
-                # sometimes a list
-                if isinstance(list, str):
-                    list = [list, ]
+                for eater in eaters:
+                    for feed in eaters[eater]:
+                        feederFound = False
+                        feederComponentName = feed.split(':')[0]
+                        # find the feeder
+                        for feedingComponent in toSetup:
+                            if feedingComponent.get("name") == feederComponentName:
+                                feederFound = True
+                                try:
+                                    self._addEdge(feedingComponent, eatingComponent,
+                                        "COMPONENTSETUP", "COMPONENTSETUP")
+                                except KeyError:
+                                    # it is possible for a component to have
+                                    # two eaters, each eating from feeders on
+                                    # one other component
+                                    pass
+                                try:
+                                    self._addEdge(feedingComponent, eatingComponent,
+                                        "COMPONENTSTART", "COMPONENTSTART")
+                                except KeyError:
+                                    pass
 
-                for source in list:
-                    feederFound = False
-                    feederComponentName = source.split(':')[0]
-                    # find the feeder
-                    for feedingComponent in toSetup:
-                        if feedingComponent.get("name") == feederComponentName:
-                            feederFound = True
-                            try:
-                                self._addEdge(feedingComponent, eatingComponent,
-                                    "COMPONENTSETUP", "COMPONENTSETUP")
-                            except KeyError:
-                                # it is possible for a component to have
-                                # two eaters, each eating from feeders on
-                                # one other component
-                                pass
-                            try:
-                                self._addEdge(feedingComponent, eatingComponent,
-                                    "COMPONENTSTART", "COMPONENTSTART")
-                            except KeyError:
-                                pass
-
-                    if not feederFound:
-                        raise errors.ComponentConfigError(eatingComponent,
-                            "No feeder exists for eater %s" % source)
+                        if not feederFound:
+                            raise errors.ComponentConfigError(eatingComponent,
+                                "No feeder exists for eater %s on component %s"
+                                " feeding from %s" % (eater, eatingComponent,
+                                feed))
 
     def whatShouldBeStarted(self):
         """
