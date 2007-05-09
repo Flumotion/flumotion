@@ -22,17 +22,19 @@
 import string
 import os
 
+from twisted.web import resource, server, http
+from twisted.web import error as weberror, static
+from twisted.internet import defer, reactor, error, abstract
+from twisted.python import filepath
+from twisted.cred import credentials
+
+from flumotion.configure import configure
 from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
-from twisted.web import resource, server, http
-from twisted.web import error as weberror, static
-from twisted.internet import defer, reactor, error, abstract
-from twisted.python import filepath
 from flumotion.twisted import fdserver
-from twisted.cred import credentials
 
 # add our own mime types to the ones parsed from /etc/mime.types
 def loadMimeTypes():
@@ -103,11 +105,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         return server.NOT_DONE_YET
 
-    def renderAuthenticated(self, _, request, first=0):
-        """
-        @type  first: int
-        @param first: starting byte to send from
-        """
+    def renderAuthenticated(self, _, request):
         # Now that we're authenticated (or authentication wasn't requested), 
         # write the file (or appropriate other response) to the client.
         # We override static.File to implement Range requests, and to get access
@@ -120,7 +118,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         self.restat()
 
         ext = os.path.splitext(self.basename())[1].lower()
-        type = self.contentTypes.get(ext, self.defaultType)
+        contentType = self.contentTypes.get(ext, self.defaultType)
 
         if not self.exists():
             self.debug("Couldn't find resource %s", self.path)
@@ -135,12 +133,14 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         # that the client must not issue further requests. 
         # We do this because future requests on this server might actually need
         # to go to a different process (because of the porter)
+        request.setHeader('Server', 'Flumotion/%s' % configure.version)
         request.setHeader('Connection', 'close')
         # We can do range requests, in bytes.
         request.setHeader('Accept-Ranges', 'bytes')
 
-        if type:
-            request.setHeader('content-type', type)
+        if contentType:
+            self.debug('content type %r' % contentType)
+            request.setHeader('content-type', contentType)
 
         try:
             f = self.openForReading()
@@ -156,6 +156,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         fileSize = self.getFileSize()
         # first and last byte offset we will write
+        first = 0
         last = fileSize - 1
 
         range = request.getHeader('range')
@@ -163,6 +164,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             # We have a partial data request.
             # for interpretation of range, see RFC 2068 14.36
             # examples: bytes=500-999; bytes=-500 (suffix mode; last 500)
+            self.log('range request, %r', range)
             rangeKeyValue = string.split(range, '=')
             if len(rangeKeyValue) != 2:
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
@@ -203,19 +205,30 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             request.setResponseCode(http.PARTIAL_CONTENT)
             request.setHeader('Content-Range', "bytes %d-%d/%d" % 
                 (first, last, fileSize))
-
-        # Start sending from the requested position in the file
-        if first:
-            f.seek(first)
-
-        request.setHeader("Content-Length", str(last - first + 1))
+            # Start sending from the requested position in the file
+            if first:
+                f.seek(first)
+          
+        self.do_prepareBody(request, f, first, last)
 
         if request.method == 'HEAD':
-             return ''
-           
+            return ''
+
         request._transfer = FileTransfer(f, last + 1, request)
 
         return server.NOT_DONE_YET
+
+    def do_prepareBody(self, request, f, first, last):
+        """
+        I am called before the body of the response gets written,
+        and after generic header setting has been done.
+
+        I set Content-Length.
+
+        Override me to send additional headers, or to prefix the body
+        with data headers.
+        """
+        request.setHeader("Content-Length", str(last - first + 1))
 
 class MimedFileFactory(log.Loggable):
     """
@@ -250,16 +263,28 @@ class FLVFile(File):
     playable.
     """
     header = 'FLV\x01\x01\000\000\000\x09\000\000\000\x09'
-    def renderAuthenticated(self, _, request):
-        self.debug('rendering FLV')
-        first = 0
+
+    def do_prepareBody(self, request, f, first, last):
+        self.log('do_prepareBody for FLV')
+        length = last - first + 1
+
+        # if there is a non-zero start get parameter, prefix the body with
+        # our FLV header
         # each value is a list
         start = int(request.args.get('start', ['0'])[0])
-        if start:
-            first = start
-            request.write(self.header)
+        # range request takes precedence over our start parsing
+        if first == 0 and start:
+            self.debug('start %d passed, seeking', start)
+            f.seek(start)
+            length = last - start + 1 + len(self.header)
 
-        return File.renderAuthenticated(self, _, request, first=first)
+        request.setHeader("Content-Length", str(length))
+
+        if request.method == 'HEAD':
+            return ''
+
+        if first == 0 and start:
+            request.write(self.header)
 
 class FileTransfer:
     """

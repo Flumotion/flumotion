@@ -82,6 +82,8 @@ class TestTextFile(unittest.TestCase):
         self.assertEquals(request.data, data)
         self.assertEquals(int(request.getHeader('Content-Length') or '0'),
             length)
+        self.assertEquals(request.getHeader('content-type'),
+            'application/octet-stream')
 
     def finishPartialCallback(self, result, request, data, start, end):
         self.finishCallback(result, request, http.PARTIAL_CONTENT, data)
@@ -199,6 +201,7 @@ class TestDirectory(unittest.TestCase):
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
         def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             self.assertEquals(fr.data, 'a fake FLV file')
         fr.finishDeferred.addCallback(finish)
 
@@ -209,7 +212,11 @@ class TestDirectory(unittest.TestCase):
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
         def finish(result):
-            self.assertEquals(fr.data, file.FLVFile.header + 'fake FLV file')
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
+            expected = file.FLVFile.header + 'fake FLV file'
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                str(len(expected)))
         fr.finishDeferred.addCallback(finish)
 
         return fr.finishDeferred
@@ -219,7 +226,21 @@ class TestDirectory(unittest.TestCase):
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
         def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             self.assertEquals(fr.data, 'a fake FLV file')
         fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
 
+    def testFLVRangeStart(self):
+        # range should take precedence over start parameter
+        fr = FakeRequest(headers={'range': 'bytes=7-'}, args={'start': [2]})
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
+            expected = 'FLV file'
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred

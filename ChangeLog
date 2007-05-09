@@ -1,3 +1,18 @@
+2007-05-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/file.py (File.renderAuthenticated,
+	  File.do_prepareBody, MimedFileFactory, FLVFile,
+	  FLVFile.do_prepareBody, FileTransfer):
+	  Make sure start= requests on FLV files give me the right mime type
+	  by not writing before all headers are set.
+	  factor out an overridable do_prepareBody in which FLV and the like
+	  can do their manipulative trickery.
+	  Re-fixes #618.
+	* flumotion/test/test_misc_httpfile.py (TestTextFile.finishCallback,
+	  TestDirectory.finish, TestDirectory.finish, TestDirectory.finish,
+	  TestDirectory.testFLVRangeStart, TestDirectory.finish):
+	  Add tests.  Be more assertive.
+
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:
