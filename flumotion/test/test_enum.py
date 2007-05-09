@@ -22,7 +22,6 @@
 from twisted.trial import unittest
 
 from flumotion.common import enum
-from twisted.spread import jelly
 
 class TestEnum(unittest.TestCase):
     def testEnumSimple(self):
@@ -119,10 +118,3 @@ class TestEnum(unittest.TestCase):
         a = enum.EnumClass('FooType', ('Foo', 'Bar'))
         self.failUnless(repr(a.Foo))
         self.failUnless(isinstance(repr(a.Foo), str))
-
-    def testJelly(self):
-        a = enum.EnumClass('FooType', ('Foo', 'Bar'))
-        self.assertEquals(jelly.unjelly(jelly.jelly(a.Foo)), a.Foo)
-        self.assertEquals(jelly.unjelly(jelly.jelly(a.Bar)), a.Bar)
-        self.assertNotEquals(jelly.unjelly(jelly.jelly(a.Foo)), a.Bar)
-        self.assertNotEquals(jelly.unjelly(jelly.jelly(a.Bar)), a.Foo)

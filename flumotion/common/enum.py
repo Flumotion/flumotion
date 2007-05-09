@@ -23,10 +23,6 @@
 Enum class implementation
 """
 
-from twisted.python.reflect import qual
-from twisted.spread import jelly
-
-_enumClassRegistry = {}
 
 class EnumMetaClass(type):
     # pychecker likes this attribute to be there since we use it in this class
@@ -45,8 +41,7 @@ class EnumMetaClass(type):
         self.__enums__[value] = enum
         setattr(self, enum.name, enum)
 
-
-class Enum(object, jelly.Jellyable, jelly.Unjellyable):
+class Enum(object):
     __metaclass__ = EnumMetaClass
     def __init__(self, value, name, nick=None):
         self.value = value
@@ -56,7 +51,6 @@ class Enum(object, jelly.Jellyable, jelly.Unjellyable):
             nick = name
             
         self.nick = nick
-        self._enumClassName = self.__class__.__name__
 
     def __repr__(self):
         return '<enum %s of type %s>' % (self.name,
@@ -69,28 +63,6 @@ class Enum(object, jelly.Jellyable, jelly.Unjellyable):
     def set(klass, value, item):
         klass[value] = item
     set = classmethod(set)
-    
-    def jellyFor(self, jellier):
-        sxp = jellier.prepare(self)
-        sxp.extend([
-            qual(Enum),
-            self._enumClassName,
-            self.value, self.name, self.nick])
-        return jellier.preserve(self, sxp)
-
-    def unjellyFor(self, unjellier, jellyList):
-        enumClassName, value, name, nick = jellyList[1:]
-        enumClass = _enumClassRegistry.get(enumClassName, None)
-        if enumClass:
-            enum = enumClass.get(value)
-            assert enum.name == name, "Inconsistent Enum Name"
-            return enum
-        self._enumClassName = enumClassName
-        self.value = value
-        self.name = name
-        self.nick = nick
-        return self
-
 
 class EnumClass(object):
     def __new__(klass, type_name, names=(), nicks=(), **extras):
@@ -118,7 +90,4 @@ class EnumClass(object):
                 setattr(enum, extra_key, extra_values[value])
             etype[value] = enum
             
-        _enumClassRegistry[type_name] = etype
         return etype
-
-jelly.setUnjellyableForClass(qual(Enum), Enum)

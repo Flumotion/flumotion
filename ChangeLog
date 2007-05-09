@@ -8,24 +8,6 @@
 	* flumotion/manager/component.py (ComponentAvatar.cleanup): Add a
 	comment.
 
-2007-03-30  Sebastien Merle  <sebastien@fluendo.com>
-
-	* flumotion/common/enum.py: 
-	Modified the Enum jellying for the enum to be unjellyed
-	even without knowing the custom enum class.
-	It allow a peer to proxy an enum value without having to 
-	know about the enum custom class.
-	In practice it allow a component to declar custom enums,
-	and an admin/ui to use it without the manager knowing about it.
-
-2007-03-29  Sebastien Merle  <sebastien@fluendo.com>
-
-	* flumotion/test/test_enum.py: 
-	* flumotion/common/enum.py: 
-	Added the ability for the enum values (not the proper enum) to
-	be jellyed and unjellyed. Now an enum value can be directly 
-	used with spread without converting to int.
-
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/test/test_manager_depgraph.py
