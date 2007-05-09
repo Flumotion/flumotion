@@ -1,5 +1,11 @@
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/test/test_manager_depgraph.py
+	  (testDepGraph._createComponent):
+	Fix tests for depgraph to use the eater key.
+
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/feedcomponent010.py
 	  (FeedComponent.get_eater_name_for_feedid):
 	Add helper method.
