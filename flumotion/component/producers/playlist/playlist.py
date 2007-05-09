@@ -91,6 +91,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.basetime = -1
         self.pipeline = None
 
+        self._hasAudio = True
+        self._hasVideo = True
+
         # The gnlcompositions for audio and video
         self.videocomp = None
         self.audiocomp = None
@@ -142,6 +145,10 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         pipeline = gst.Pipeline()
 
         for mediatype in ['audio', 'video']:
+            if (mediatype == 'audio' and not self._hasAudio) or (
+                mediatype == 'video' and not self._hasVideo):
+                continue
+
             composition = gst.element_factory_make("gnlcomposition", 
                 mediatype + "-composition")
 
@@ -183,13 +190,15 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         return pipeline
 
     def _createDefaultSources(self):
-        vsrc = videotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
-            2**31 - 1)
-        self.videocomp.add(vsrc)
+        if self._hasVideo:
+            vsrc = videotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
+                2**31 - 1)
+            self.videocomp.add(vsrc)
 
-        asrc = audiotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
-            2**31 - 1)
-        self.audiocomp.add(asrc)
+        if self._hasAudio:
+            asrc = audiotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
+                2**31 - 1)
+            self.audiocomp.add(asrc)
 
     def _setupClock(self, pipeline):
         # Configure our pipeline to use a known basetime and clock.
@@ -226,20 +235,20 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 item.duration = item.duration + start
                 start = 0
 
-        if item.hasVideo:
+        if self._hasVideo and item.hasVideo:
             item.vsrc = file_gnl_src(None, item.uri, self.videocaps,
                 start, item.duration, item.offset, 0)
             self.videocomp.add(item.vsrc)
-        if item.hasAudio:
+        if self._hasAudio and item.hasAudio:
             item.asrc = file_gnl_src(None, item.uri, self.audiocaps,
                 start, item.duration, item.offset, 0)
             self.audiocomp.add(item.asrc)
 
     def unscheduleItem(self, item):
         self.debug("Unscheduling item at uri %s", item.uri)
-        if item.hasVideo:
+        if self._hasVideo and item.hasVideo:
             self.videocomp.remove(item.vsrc)
-        if item.hasAudio: 
+        if self._hasAudio and item.hasAudio: 
             self.audiocomp.remove(item.asrc)
 
     def addPlaylist(self, data):
@@ -255,6 +264,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._framerate = props.get('framerate', (15, 1))
         self._samplerate = props.get('samplerate', 44100)
         self._channels = props.get('channels', 2)
+
+        self._hasAudio = props.get('audio', True)
+        self._hasVideo = props.get('video', True)
 
         pipeline = self._buildPipeline() 
         self._setupClock(pipeline)

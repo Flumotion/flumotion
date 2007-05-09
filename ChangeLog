@@ -1,5 +1,12 @@
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlist.xml:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Allow audio-only or video-only compositions to be configured.
+
+2007-05-09  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  Remove unused local to satisfy pychecker.
 

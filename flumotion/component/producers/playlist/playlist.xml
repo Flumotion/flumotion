@@ -14,6 +14,11 @@
       <synchronization required="yes" clock-priority="110" />
 
       <properties>
+        <property name="audio" type="boolean"
+                  description="Output audio"/>
+        <property name="video" type="boolean"
+                  description="Output video"/>
+
         <property name="height" type="int"
                   description="Scaled output height of video" />
         <property name="width" type="int"
