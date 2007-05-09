@@ -1,5 +1,10 @@
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/wizard/steps.py (Soundcard.update_inputs):
+	Commit forgotten when moving audio checks to audio.py.
+
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/feedcomponent.py
 	  (MultiInputParseLaunchComponent.get_pipeline_string):
 	* flumotion/component/feedcomponent010.py (FeedComponent.init,

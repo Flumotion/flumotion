@@ -769,7 +769,7 @@ class Soundcard(WizardStep):
         e = self.combobox_channels.get_enum()
         channels = 2
         if e: channels = e.intvalue
-        d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
+        d = self.workerRun('flumotion.worker.checks.audio', 'checkMixerTracks',
                            enum.element, device, channels, id='soundcard-check')
         def soundcardCheckComplete((deviceName, tracks)):
             self.clear_msg('soundcard-check')
