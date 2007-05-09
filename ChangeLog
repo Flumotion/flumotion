@@ -1,3 +1,8 @@
+2007-05-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Fix duration adjustment for making sources fit into timeline.
+
 2007-05-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/file.py (File.renderAuthenticated,

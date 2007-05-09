@@ -89,8 +89,8 @@ class Playlist(object, log.Loggable):
         while item:
             if item.timestamp < newitem.timestamp:
                 prev = item
-            elif (not next and item.timestamp > 
-                    newitem.timestamp + newitem.duration):
+            elif (not next and item.timestamp > newitem.timestamp and 
+                    newitem.timestamp + newitem.duration > item.timestamp):
                 next = item
                 break
             item = item.next
@@ -117,6 +117,8 @@ class Playlist(object, log.Loggable):
 
         # Duration adjustments -> Reflect into gnonlin timeline
         if prev and prev.timestamp + prev.duration > newitem.timestamp:
+            self.debug("Changing duration of previous item from %d to %d", 
+                prev.duration, newitem.timestamp - prev.timestamp)
             prev.duration = newitem.timestamp - prev.timestamp
             if prev.asrc:
                 prev.asrc.props.duration = prev.duration
@@ -124,7 +126,9 @@ class Playlist(object, log.Loggable):
             if prev.vsrc:
                 prev.vsrc.props.duration = prev.duration
                 prev.vsrc.props.media_duration = prev.duration
-        if next and timestamp + newitem.duration > next.timestamp:
+        if next and newitem.timestamp + newitem.duration > next.timestamp:
+            self.debug("Changing duration of new item from %d to %d to fit", 
+                newitem.duration, next.timestamp - newitem.timestamp)
             newitem.duration = next.timestamp - newitem.timestamp
 
         # Then we need to actually add newitem into the gnonlin timeline
