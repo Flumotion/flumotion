@@ -1,3 +1,12 @@
+2007-05-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  Fix remote method to use proper variable.
+	  
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  When truncating an existing gnlsource duration, also change the
+	  media-duration, to avoid unwanted speedups.
+
 2007-05-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/file.py (loadMimeTypes):

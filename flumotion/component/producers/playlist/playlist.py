@@ -81,7 +81,7 @@ class PlaylistProducerMedium(feedcomponent.FeedComponentMedium):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
     def remote_add_playlist(self, data):
-        self.component.addPlaylist(data)
+        self.comp.addPlaylist(data)
 
 class PlaylistProducer(feedcomponent.FeedComponent):
 

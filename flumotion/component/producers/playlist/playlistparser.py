@@ -110,6 +110,8 @@ class Playlist(object, log.Loggable):
             prev.duration = newitem.timestamp - prev.timestamp
             prev.asrc.props.duration = prev.duration
             prev.vsrc.props.duration = prev.duration
+            prev.asrc.props.media_duration = prev.duration
+            prev.vsrc.props.media_duration = prev.duration
         if next and timestamp + newitem.duration > next.timestamp:
             newitem.duration = next.timestamp - newitem.timestamp
 
