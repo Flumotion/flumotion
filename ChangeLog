@@ -1,3 +1,8 @@
+2007-05-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.cleanup): Add a
+	comment.
+
 2007-03-30  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/common/enum.py: 

@@ -99,6 +99,7 @@ class ComponentAvatar(base.ManagerAvatar):
         Clean up when detaching.
         """
         if self._ports:
+            # FIXME: doesn't seem to ever be possible
             self.vishnu.releasePortsOnWorker(self.getWorkerName(),
                                              self._ports.values())
             
