@@ -1,3 +1,8 @@
+2007-05-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/file.py (loadMimeTypes):
+	  Add .flv mime type in the code.
+
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* TODO:

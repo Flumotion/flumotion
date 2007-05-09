@@ -28,13 +28,17 @@ from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
 from twisted.web import resource, server, http
-from twisted.web import error as weberror
+from twisted.web import error as weberror, static
 from twisted.internet import defer, reactor, error, abstract
 from twisted.python import filepath
 from flumotion.twisted import fdserver
 from twisted.cred import credentials
 
-from twisted.web.static import loadMimeTypes, getTypeAndEncoding
+# add our own mime types to the ones parsed from /etc/mime.types
+def loadMimeTypes():
+    d = static.loadMimeTypes()
+    d['.flv'] = 'video/x-flv'
+    return d
 
 # this file is inspired by/adapted from twisted.web.static
 
