@@ -1,3 +1,9 @@
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* TODO:
+	* flumotion/common/config.py (FlumotionConfigXML._parseEaters):
+	Thanks Andy, using the helper method parseAttributes.
+
 2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/test/test.xml:

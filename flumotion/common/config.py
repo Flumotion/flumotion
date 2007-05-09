@@ -653,20 +653,16 @@ class FlumotionConfigXML(BaseConfigParser):
         hasSourceNodes = False
         for subnode in node.childNodes:
             if subnode.nodeName == 'eater':
-                if subnode.hasAttribute('name'):
-                    name = subnode.getAttribute('name')
-                    if nodes.has_key(name):
-                        raise ConfigError("Component %s should not have "
-                            "multiple eater nodes configured with same name:"
-                            " %s" % (node.nodeName, name))
-                    feedNodes = []
-                    for eaterSubnode in subnode.childNodes:
-                        if eaterSubnode.nodeName == 'feed':
-                            feedNodes.append(eaterSubnode)
-                    nodes[name] = self.get_string_values(feedNodes)
-                else:
-                    raise ConfigError("Component %s has eaters specified with "
-                        "no name property." % (node.nodeName))
+                name, = self.parseAttributes(subnode, ('name',))
+                if nodes.has_key(name):
+                    raise ConfigError("Component %s should not have "
+                        "multiple eater nodes configured with same name:"
+                        " %s" % (node.nodeName, name))
+                feedNodes = []
+                for eaterSubnode in subnode.childNodes:
+                    if eaterSubnode.nodeName == 'feed':
+                        feedNodes.append(eaterSubnode)
+                nodes[name] = self.get_string_values(feedNodes)
             if subnode.nodeName == 'source':
                 hasSourceNodes = True
 
