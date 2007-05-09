@@ -659,11 +659,14 @@ class FlumotionConfigXML(BaseConfigParser):
                         "multiple eater nodes configured with same name:"
                         " %s" % (node.nodeName, name))
                 feedNodes = []
-                for eaterSubnode in subnode.childNodes:
-                    if eaterSubnode.nodeName == 'feed':
-                        feedNodes.append(eaterSubnode)
-                nodes[name] = self.get_string_values(feedNodes)
-            if subnode.nodeName == 'source':
+                def parseFeed(feedNode):
+                    # <feed>feeding-component:feed-name</feed>
+                    return self.get_string_values([feedNode])
+                def addFeed(feedNode):
+                    feedNodes.extend(feedNode)
+                self.parseFromTable(subnode, {'feed': (parseFeed, addFeed)})
+                nodes[name] = feedNodes
+            elif subnode.nodeName == 'source':
                 hasSourceNodes = True
 
         # for backwards compatibility

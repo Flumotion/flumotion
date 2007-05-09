@@ -1,5 +1,12 @@
 2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/common/config.py (FlumotionConfigXML.parseFeed,
+	  FlumotionConfigXML.addFeed):
+	Used table parser to parse subnodes of eater. This guarantees
+	that only feed nodes are children of the eater node.
+
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/wizard/steps.py (Soundcard.update_inputs):
 	Commit forgotten when moving audio checks to audio.py.
 
