@@ -54,7 +54,7 @@ class TestLog(unittest.TestCase):
 
     def testLimitInvisible(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler)
+        log.addLimitedLogHandler(self.handler)
         
         # log 2 we shouldn't get
         self.tester.log("not visible")
@@ -69,7 +69,7 @@ class TestLog(unittest.TestCase):
 
     def testLimitedVisible(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler)
+        log.addLimitedLogHandler(self.handler)
         
         # log 3 we should get
         self.tester.info("visible")
@@ -84,7 +84,7 @@ class TestLog(unittest.TestCase):
   
     def testFormatStrings(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler)
+        log.addLimitedLogHandler(self.handler)
         
         self.tester.info("%d %s", 42, 'the answer')
         assert self.category == 'testlog'
@@ -93,7 +93,7 @@ class TestLog(unittest.TestCase):
   
     def testLimitedError(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler)
+        log.addLimitedLogHandler(self.handler)
         
         self.assertRaises(SystemExit, self.tester.error, "error")
         assert self.category == 'testlog'
@@ -102,7 +102,7 @@ class TestLog(unittest.TestCase):
 
     def testLogHandlerLimitedLevels(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler)
+        log.addLimitedLogHandler(self.handler)
         
         # now try debug and log again too
         log.setDebug("testlog:5")
@@ -120,7 +120,7 @@ class TestLog(unittest.TestCase):
     # test that we get all log messages
     def testLogHandler(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler, limited=False)
+        log.addLogHandler(self.handler)
 
         self.tester.log("visible")
         assert self.message == 'visible'
@@ -144,13 +144,13 @@ class TestOwnLogHandler(unittest.TestCase):
     # test if our own log handler correctly mangles the message
     def testOwnLogHandlerLimited(self):
         log.setDebug("testlog:3")
-        log.addLogHandler(self.handler, limited=False)
+        log.addLogHandler(self.handler)
         
         self.tester.log("visible")
         assert self.message == 'override visible'
   
     def testLogHandlerAssertion(self):
-        self.assertRaises(TypeError, log.addLogHandler, None)
+        self.assertRaises(TypeError, log.addLimitedLogHandler, None)
   
 class TestGetExceptionMessage(unittest.TestCase):
     def func3(self):

@@ -348,7 +348,7 @@ def init(envVarName):
     if os.environ.has_key(envVarName):
         # install a log handler that uses the value of the environment var
         setDebug(os.environ[envVarName])
-    addLogHandler(stderrHandler, limited=True)
+    addLimitedLogHandler(stderrHandler)
 
     _initialized = True
 
@@ -394,7 +394,7 @@ def reset():
     _log_handlers_limited = []
     _initialized = False
 
-def addLogHandler(func, limited=True):
+def addLogHandler(func):
     """
     Add a custom log handler.
 
@@ -405,18 +405,65 @@ def addLogHandler(func, limited=True):
                     None. Use getLevelName(level) to get a printable
                     name for the log level.
     @type func:     a callable function
-    @type limited:  boolean
-    @param limited: whether to automatically filter based on the DEBUG value
+    @raises:        TypeError if func is not a callable
     """
 
     if not callable(func):
         raise TypeError, "func must be callable"
-    
-    if limited:
-        _log_handlers_limited.append(func)
-    else:
+
+    if func not in _log_handlers:
         _log_handlers.append(func)
- 
+        
+def addLimitedLogHandler(func):
+    """
+    Add a custom log handler.
+
+    @param func:    a function object
+                    with prototype (level, object, category, message)
+                    where level is either ERROR, WARN, INFO, DEBUG, or
+                    LOG, and the rest of the arguments are strings or
+                    None. Use getLevelName(level) to get a printable
+                    name for the log level.
+    @type func:     a callable function
+    @raises:        TypeError if func is not a callable    
+    """
+    if not callable(func):
+        raise TypeError, "func must be callable"
+
+    if func not in _log_handlers_limited:
+        _log_handlers_limited.append(func)
+    
+def removeLogHandler(func):
+    """
+    Remove a registered log handler.
+
+    @param func:    a function object
+                    with prototype (level, object, category, message)
+                    where level is either ERROR, WARN, INFO, DEBUG, or
+                    LOG, and the rest of the arguments are strings or
+                    None. Use getLevelName(level) to get a printable
+                    name for the log level.
+    @type func:     a callable function
+    @raises:        ValueError if func is not registered
+    """
+    _log_handlers.remove(func)
+
+    
+def removeLimitedLogHandler(func):
+    """
+    Remove a registered limited log handler.
+
+    @param func:    a function object
+                    with prototype (level, object, category, message)
+                    where level is either ERROR, WARN, INFO, DEBUG, or
+                    LOG, and the rest of the arguments are strings or
+                    None. Use getLevelName(level) to get a printable
+                    name for the log level.
+    @type func:     a callable function
+    @raises:        ValueError if func is not registered
+    """
+    _log_handlers_limited.remove(func)
+
 # public log functions
 def error(cat, format, *args):
     errorObject(None, cat, format, *args)

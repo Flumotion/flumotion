@@ -1,3 +1,22 @@
+2007-05-09  Andy Wingo  <wingo@pobox.com>
+
+	Patch by: Philippe Normand <philippe fluendo.com>
+
+	* log.py (init): Adapt to addLimitedLogHandler.
+	(addLogHandler): Only add generic log handlers.
+	(addLimitedLogHandler): New function, splits out management of
+	limited log handlers.
+	(removeLogHandler, removeLimitedLogHandler): New functions.
+
+	* test_log.py (TestLog.testLimitInvisible)
+	(TestLog.testLimitedVisible, TestLog.testFormatStrings)
+	(TestLog.testLimitedError, TestLog.testLogHandlerLimitedLevels):
+	Limited log handlers are now managed via addLimitedLogHandler.
+	(TestLog.testLogHandler)
+	(TestOwnLogHandler.testOwnLogHandlerLimited)
+	(TestOwnLogHandler.testLogHandlerAssertion): No need for
+	limited=False.
+
 2007-04-30  Andy Wingo  <wingo@pobox.com>
 
 	* log.py (TwistedLogObserver.emit): Write to stderr, like the
