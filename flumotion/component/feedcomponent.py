@@ -549,12 +549,13 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             self.QUEUE_SIZE_BUFFERS)
 
     def get_pipeline_string(self, properties):
-        sources = self.config['source']
+        eaters = self.config['eater']
 
         pipeline = self.get_muxer_string(properties) + ' '
-        for eater in sources:
-            tmpl = '@ eater:%s @ ! muxer. '
-            pipeline += tmpl % eater
+        for e in eaters:
+            for feed in eaters[e]:
+                tmpl = '@ eater:%s @ ! muxer. '
+                pipeline += tmpl % feed
 
         pipeline += 'muxer.'
 

@@ -368,7 +368,6 @@ class FeedComponent(basecomponent.BaseComponent):
         # add extra keys to state
         self.state.addKey('eaterNames') # feedId of eaters
         self.state.addKey('feederNames') # feedId of feeders
-
         # add keys for eaters and feeders uiState
         self._feeders = {} # feeder feedId -> Feeder
         self._eaters = {} # eater feedId -> Eater
@@ -401,6 +400,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self._stateChangeDeferreds = {}
 
         self._gotFirstNewSegment = {}
+        # feedId of eater -> eater name as specified in config
+        self._eaterMapping = {}
 
         # multifdsink's get-stats signal had critical bugs before this version
         tcppluginversion = gstreamer.get_plugin_version('tcp')
@@ -428,7 +429,7 @@ class FeedComponent(basecomponent.BaseComponent):
         Invokes the L{create_pipeline} and L{set_pipeline} vmethods,
         which subclasses can provide.
         """
-        eater_config = self.config.get('source', [])
+        eater_config = self.config.get('eater', {})
         feeder_config = self.config.get('feed', [])
 
         self.debug("FeedComponent.do_setup(): eater_config %r" % eater_config)
@@ -558,16 +559,20 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
-        # they are specified under <component> as <source> elements in XML
+        # they are specified under <eater> as <feed> elements in XML
         # so if they don't specify a feed name, use "default" as the feed name
-        eater_names = []
-        for block in eater_config:
-            eater_name = block
-            if block.find(':') == -1:
-                eater_name = block + ':default'
-            eater_names.append(eater_name)
-        self.debug('parsed eater config, eater feedIds %r' % eater_names)
-        self.eater_names = eater_names
+        # there is also a deprecated way by specifying them under <component>
+        # as <source> elements in XML
+        feed_ids = []
+        for eater in eater_config:
+            for feed in eater_config[eater]:
+                feed_id = feed
+                if feed.find(':') == -1:
+                    feed_id = feed + ':default'
+                feed_ids.append(feed_id)
+                self._eaterMapping[feed_id] = eater
+        self.debug('parsed eater config, eater feedIds %r' % feed_ids)
+        self.eater_names = feed_ids
         self.state.set('eaterNames', self.eater_names)
             
     def parseFeederConfig(self, feeder_config):

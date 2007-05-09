@@ -37,14 +37,17 @@ def weHaveAnOldTwisted():
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
         self.__pipeline = pipeline
-        self._source = eaters or []
+        if eaters:
+            self._eater = {'default':eaters}
+        else:
+            self._eater = {}
         self._feed = feeders or []
 
         ParseLaunchComponent.__init__(self)
 
     def config(self):
         config = {'name': 'fake',
-                  'source': self._source,
+                  'eater': self._eater,
                   'feed': self._feed,
                   'plugs': {},
                   'properties': {}}

@@ -78,9 +78,10 @@ class Component(log.Loggable):
         s = '    <component name="%s" type="%s" ' \
             'project="flumotion" version="%s"%s>\n' % (
             self.name, self.type, configure.version, extra)
-
+        s += '     <eater name="default">\n'
         for sourceName in self.getFeeders():
-            s += "      <source>%s</source>\n" % sourceName
+            s += "      <feed>%s</feed>\n" % sourceName
+        s+= '      </eater>\n'
                     
         if self.props:
             s += "\n"

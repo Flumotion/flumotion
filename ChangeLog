@@ -1,3 +1,21 @@
+2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/feedcomponent.py
+	  (MultiInputParseLaunchComponent.get_pipeline_string):
+	* flumotion/component/feedcomponent010.py (FeedComponent.init,
+	  FeedComponent.do_setup, FeedComponent.parseEaterConfig):
+	Use the eater key not the source key for building up the
+	eaters list. Build a mapping for feedId -> name of eater so
+	we can quickly look it up in elements needing to find the eater
+	name that a feedId (hence eater's element name) corresponds to.
+	* flumotion/test/test_component.py (PipelineTest.__init__,
+	  PipelineTest.config):
+	* flumotion/test/test_component_httpstreamer.py
+	  (TestOldProperties.setUp):
+	Fix up tests to use eater key not source key.
+	* flumotion/wizard/save.py (Component.toXML):
+	Output non-deprecated config form for wizard.
+
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/Makefile.am:
