@@ -20,10 +20,14 @@
 # Headers in this file shall remain intact.
 
 import gst
+from gst.extend import discoverer
+
 import time
 from StringIO import StringIO
 
 from xml.dom import Node
+
+from twisted.internet import reactor
 
 from flumotion.common import log, fxml
 
@@ -68,12 +72,18 @@ class Playlist(object, log.Loggable):
 
         self.producer = producer
 
-    def addItem(self, timestamp, uri, offset, duration):
+        self._pending_items = []
+        self._discovering = False
+
+    def addItem(self, timestamp, uri, offset, duration, hasAudio, hasVideo):
         """
         Add an item to the playlist.
         The duration of previous and this entry may be adjusted to make it fit.
         """
         newitem = PlaylistItem(timestamp, uri, offset, duration)
+        newitem.hasAudio = hasAudio
+        newitem.hasVideo = hasVideo
+
         prev = next = None
         item = self.items
         while item:
@@ -153,25 +163,76 @@ class Playlist(object, log.Loggable):
                 self.debug("Parsing entry")
                 self._parsePlaylistEntry(parser, child)
 
+        # Now launch the discoverer for any pending items
+        if not self._discovering:
+            self._discoverPending()
+
+    def _discoverPending(self):
+        def _discovered(disc, is_media):
+            self.debug("Discovered!")
+            reactor.callFromThread(_discoverer_done, disc, is_media)
+
+        def _discoverer_done(disc, is_media):
+            if is_media:
+                self.debug("Discovery complete, media found")
+                uri = "file://" + item[0]
+                timestamp = item[1]
+                duration = item[2]
+                offset = item[3]
+
+                hasA = disc.is_audio
+                hasV = disc.is_video
+                durationDiscovered = min(disc.audiolength, 
+                    disc.videolength)
+                if not duration or duration > durationDiscovered:
+                    duration = durationDiscovered
+
+                if duration + offset > durationDiscovered:
+                    offset = 0
+
+                if duration > 0:
+                    self.addItem(timestamp, uri, offset, duration, hasA, hasV)
+                else:
+                    self.warning("Duration of item is zero, not adding")
+            else:
+                self.warning("Discover failed to find media in %s", item[0])
+    
+            self.debug("Continuing on to next file")
+            self._discoverPending()
+
+        if not self._pending_items:
+            self.debug("No more files to discover")
+            self._discovering = False
+            return
+
+        self._discovering = True
+        
+        item = self._pending_items.pop(0)
+
+        self.debug("Discovering file %s", item[0])
+        disc = discoverer.Discoverer(item[0])
+
+        disc.connect('discovered', _discovered)
+        disc.discover()
+
     def _parsePlaylistEntry(self, parser, entry):
-        # TODO: Once we use the discoverer, we should move duration to optional
-        mandatory = ['filename', 'time', 'duration']
-        optional = ['offset']
+        mandatory = ['filename', 'time']
+        optional = ['duration', 'offset']
 
         (filename, timestamp, duration, offset) = parser.parseAttributes(
             entry, mandatory, optional)
 
-        duration = int(float(duration) * gst.SECOND)
+        if duration is not None:
+            duration = int(float(duration) * gst.SECOND)
         if offset is None:
             offset = 0
-        offset = int(offset)
+        offset = int(offset) * gst.SECOND
 
         timestamp = self._parseTimestamp(timestamp)
 
         uri = 'file://'+filename
 
-        self.debug("Adding item")
-        self.addItem(timestamp, uri, offset, duration)
+        self._pending_items.append((filename, timestamp, duration, offset))
 
     def _parseTimestamp(self, ts):
         # Take TS in YYYY-MM-DDThh:mm:ssZ format, return timestamp in 
