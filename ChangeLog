@@ -1,5 +1,11 @@
 2007-05-09  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/admin/command/commands.py:
+	  Allow flumotion-command invoke arguments to include the contents of
+	  a file as a string argument using the 'F' format character.
+
+2007-05-09  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	  Fix remote method to use proper variable.
 	  

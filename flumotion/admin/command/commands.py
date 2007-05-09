@@ -169,11 +169,21 @@ class ParseException(Exception):
     pass
 
 def _parse_typed_args(spec, args):
+    def _readFile(filename):
+        try:
+            f = open(filename)
+            contents = f.read()
+            f.close()
+            return contents
+        except:
+            raise ParseException("Failed to read file %s" % (filename,))
+            
     def _do_parse_typed_args(spec, args):
         accum = []
         while spec:
             argtype = spec.pop(0)
-            parsers = {'i': int, 's': str, 'b': common.strToBool}
+            parsers = {'i': int, 's': str, 'b': common.strToBool, 
+                'F': _readFile}
             if argtype == ')':
                 return tuple(accum)
             elif argtype == '(':
