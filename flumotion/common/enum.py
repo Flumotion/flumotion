@@ -47,6 +47,7 @@ class EnumMetaClass(type):
 
 
 class Enum(object, jelly.Jellyable):
+    
     __metaclass__ = EnumMetaClass
     def __init__(self, value, name, nick=None):
         self.value = value
@@ -117,16 +118,14 @@ class EnumUnjellyer(jelly.Unjellyable):
         enumClassName, value, name, nick = jellyList[1:]
         enumClass = _enumClassRegistry.get(enumClassName, None)
         if enumClass:
+            # Retrieve the enum singleton
             enum = enumClass.get(value)
             assert enum.name == name, "Inconsistent Enum Name"
-            return enum
-        # Become a generic Enum instance
-        self.__class__ = Enum
-        self._enumClassName = enumClassName
-        self.value = value
-        self.name = name
-        self.nick = nick
-        return self
+        else:
+            # Create a generic Enum container
+            enum = Enum(value, name, nick)
+            enum._enumClassName = enumClassName
+        return enum
 
 
 jelly.setUnjellyableForClass(qual(Enum), EnumUnjellyer)
