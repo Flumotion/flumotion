@@ -1,3 +1,27 @@
+2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* configure.ac:
+	* flumotion/component/combiners/Makefile.am:
+	* flumotion/component/combiners/__init__.py:
+	* flumotion/component/combiners/switch/Makefile.am:
+	* flumotion/component/combiners/switch/__init__.py:
+	* flumotion/component/combiners/switch/admin_gtk.py (SwitchingNode,
+	  SwitchingNode.__init__, SwitchingNode.cb_toggled,
+	  SwitchingNode.setUIState, SwitchingNode.stateSet, SwitcherAdminGtk,
+	  SwitcherAdminGtk.setup):
+	* flumotion/component/combiners/switch/switch.py (SwitchMedium,
+	  SwitchMedium.remote_switchToMaster,
+	  SwitchMedium.remote_switchToBackup, Switch, Switch.init,
+	  Switch.do_check, Switch.cb, Switch.switchToMaster,
+	  Switch.switchToBackup, SingleSwitch, SingleSwitch.init,
+	  SingleSwitch.get_pipeline_string, SingleSwitch.configure_pipeline,
+	  SingleSwitch.switchToMaster, SingleSwitch.switchToBackup, AVSwitch,
+	  AVSwitch.init, AVSwitch.get_pipeline_string,
+	  AVSwitch.configure_pipeline, AVSwitch.switchToMaster,
+	  AVSwitch.switchToBackup):
+	* flumotion/component/combiners/switch/switch.xml:
+	Add switching components with very simple gtk admin for now.
+
 2007-05-10  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/common/enum.py: 

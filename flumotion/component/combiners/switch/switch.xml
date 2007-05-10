@@ -1,0 +1,84 @@
+<registry>
+
+  <components>
+    <component type="single-switch-combiner"
+               base="flumotion/component/combiners/switch"
+               description="A single stream type switching component">
+      <source location="flumotion.component.combiners.switch.switch" />
+      <eater name="master" />
+      <eater name="backup" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="switch.py"
+               function="SingleSwitch" />
+	<entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+      <properties>
+      </properties>
+    </component>
+    <component type="av-switch-combiner"
+               base="flumotion/component/combiners/switch"
+	       description="An audio/video switching component">
+      <source location="flumotion.component.combiners.switch.switch" />
+      <eater name="video-master" />
+      <eater name="video-backup" />
+      <eater name="audio-master" />
+      <eater name="audio-backup" />
+      <feeder name="video" />
+      <feeder name="audio" />
+      <entries>
+        <entry type="component" location="switch.py"
+	       function="AVSwitch" />
+	<entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+      <properties>
+      </properties>
+    </component>
+  </components>
+
+
+  <bundles>
+
+    <bundle name="switch-combiner-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/combiners/switch">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="switch-combiner-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="switch-converter-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/combiners/switch">
+                <filename location="switch.py" />
+            </directory>
+        </directories>
+    </bundle>
+    <bundle name="switch-combiner-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk"/>
+	    <dependency name="switch-combiner-base"/>
+        </dependencies>
+        
+        <directories>
+            <directory name="flumotion/component/combiners/switch">
+                <filename location="admin_gtk.py"/>
+            </directory>
+        </directories>
+    </bundle>
+
+
+  </bundles>
+
+</registry> 
