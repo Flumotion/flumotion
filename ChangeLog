@@ -1,5 +1,11 @@
 2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/component/combiners/switch/switch.py (Switch, SingleSwitch,
+	  AVSwitch):
+	Change log categories.
+
+2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/Makefile.am:
 	* flumotion/component/component.xml:
 	Fix distcheck and fix bundling of switch component.

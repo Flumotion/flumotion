@@ -30,7 +30,7 @@ class SwitchMedium(feedcomponent.FeedComponentMedium):
         return self.comp.switchToBackup()
 
 class Switch(feedcomponent.MultiInputParseLaunchComponent):
-    logCategory = 'conv-switch'
+    logCategory = 'comb-switch'
     componentMediumClass = SwitchMedium
 
     def init(self):
@@ -55,7 +55,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                                          'switchToBackup')
 
 class SingleSwitch(Switch):
-    logCategory = "conv-single-switch"
+    logCategory = "comb-single-switch"
 
     def init(self):
         Switch.init(self)
@@ -113,7 +113,7 @@ class SingleSwitch(Switch):
         self.uiState.set("active-eater", "backup")
 
 class AVSwitch(Switch):
-    logCategory = "conv-av-switch"
+    logCategory = "comb-av-switch"
 
     def init(self):
         Switch.init(self)
