@@ -17,6 +17,7 @@ clean-local:
 SUBDIRS = \
 	base \
 	bouncers \
+	combiners \
 	consumers \
 	converters \
 	effects \

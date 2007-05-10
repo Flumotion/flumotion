@@ -1,5 +1,11 @@
 2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/component/Makefile.am:
+	* flumotion/component/component.xml:
+	Fix distcheck and fix bundling of switch component.
+
+2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* configure.ac:
 	* flumotion/component/combiners/Makefile.am:
 	* flumotion/component/combiners/__init__.py:
