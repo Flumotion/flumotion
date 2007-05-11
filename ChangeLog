@@ -1,5 +1,10 @@
 2007-05-11  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_http.py:
+	  Fix a test that used an internal method in resource.py.
+
+2007-05-11  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	* flumotion/component/consumers/httpstreamer/resources.py:

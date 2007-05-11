@@ -178,7 +178,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         #assert resource.maxAllowedClients() == 974
         resource._requests = ' ' * (resource.maxclients + 1)
         
-        self.failUnless(resource.reachedMaxClients())
+        self.failUnless(resource.reachedServerLimits())
         
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
