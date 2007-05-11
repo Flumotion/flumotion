@@ -50,6 +50,9 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
+
+
+STATS_POLL_INTERVAL = 10
     
 # FIXME: generalize this class and move it out here ?
 class Stats:
@@ -66,6 +69,8 @@ class Stats:
         self.load_deltas = [0, 0]
         self._load_deltas_period = 10 # seconds
         self._load_deltas_ongoing = [time.time(), 0, 0]
+        self._currentBitrate = -1 # not known yet
+        self._lastBytesReceived = -1 # not known yet
 
         # keep track of average clients by tracking last average and its time
         self.average_client_number = 0
@@ -123,9 +128,25 @@ class Stats:
         self.load_deltas = [(add-oldadd)/diff, (remove-oldremove)/diff]
         self._load_deltas_ongoing = [now, add, remove]
 
+        bytesReceived = self.getBytesReceived()
+        if self._lastBytesReceived >= 0:
+            self._currentBitrate = ((bytesReceived - self._lastBytesReceived) *
+                 8 / STATS_POLL_INTERVAL)
+            self._lastBytesReceived = bytesReceived
+            
+        self._currentBitrate = -1 # not known yet
+        self._lastBytesSent = -1 # not known yet
+
         self.update_ui_state()
 
-        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
+        self._updateCallLaterId = reactor.callLater(STATS_POLL_INTERVAL, 
+            self._updateStats)
+
+    def getCurrentBitrate(self):
+        if self._currentBitrate >= 0:
+            return self._currentBitrate
+        else:
+            return self.getBytesReceived() * 8 / self.getUptime()
 
     def getBytesSent(self):
         return self.sink.get_property('bytes-served')
@@ -444,6 +465,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         if properties.has_key('client-limit'):
             self.resource.setUserLimit(int(properties['client-limit']))
+
+        if properties.has_key('bandwidth-limit'):
+            self.resource.setBandwidthLimit(int(properties['bandwidth-limit']))
+
+        if properties.has_key('redirect-on-overflow'):
+            self.resource.setRedirectionOnLimits(
+                properties['redirect-on-overflow'])
 
         if properties.has_key('bouncer'):
             self.resource.setBouncerName(properties['bouncer'])

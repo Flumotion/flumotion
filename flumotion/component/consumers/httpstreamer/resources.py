@@ -85,6 +85,10 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         self._requests = {}            # request fd -> Request
         
         self.maxclients = self.getMaxAllowedClients(-1)
+        self.maxbandwidth = -1 # not limited by default
+
+        # If set, a URL to redirect a user to when the limits above are reached
+        self._redirectOnFull = None
         
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
@@ -149,6 +153,13 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         self.maxclients = self.getMaxAllowedClients(limit)
         # Log what we actually managed to set it to.
         self.info('set maxclients to %d' % self.maxclients)
+
+    def setBandwidthLimit(self, limit):
+        self.maxbandwidth = limit
+        self.info("set maxbandwidth to %d", self.maxbandwidth)
+
+    def setRedirectionOnLimits(self, url):
+        self._redirectOnFull = url
 
     # FIXME: rename to writeHeaders
     """
@@ -249,8 +260,14 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         else:
             return softmax - self.__reserve_fds__
 
-    def reachedMaxClients(self):
-        return len(self._requests) >= self.maxclients and self.maxclients >= 0
+    def reachedServerLimits(self):
+        if self.maxclients >= 0 and len(self._requests) >= self.maxclients:
+            return True
+        elif self.maxbandwidth >= 0:
+            if (len(self._requests) * self.streamer.getCurrentBitrate() >= 
+                    self.maxbandwidth):
+                return True
+        return False
     
     def _addClient(self, request):
         """
@@ -338,8 +355,8 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
 
         if not self.isReady():
             return self._handleNotReady(request)
-        elif self.reachedMaxClients():
-            return self._handleMaxClients(request)
+        elif self.reachedServerLimits():
+            return self._handleServerFull(request)
 
         self.debug('_render(): asked for (possible) authentication')
         d = self.startAuthentication(request)
@@ -358,14 +375,20 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
         
-    def _handleMaxClients(self, request):
-        self.debug('Refusing clients, client limit %d reached' %
-            self.maxclients)
+    def _handleServerFull(self, request):
+        if self._redirectOnFull:
+            self.debug("Redirecting client, client limit %d reached", 
+                self.maxclients)
+            error_code = http.FOUND
+            request.setHeader('location', self._redirectOnFull)
+        else:
+            self.debug('Refusing clients, client limit %d reached' %
+                self.maxclients)
+            error_code = http.SERVICE_UNAVAILABLE
 
         request.setHeader('content-type', 'text/html')
-        request.setHeader('server', HTTP_VERSION)
         
-        error_code = http.SERVICE_UNAVAILABLE
+        request.setHeader('server', HTTP_VERSION)
         request.setResponseCode(error_code)
         
         return ERROR_TEMPLATE % {'code': error_code,

@@ -49,10 +49,14 @@
                   description="Server's host name to display" />
         <property name="domain" type="string"
                   description="Domain of server for authentication" />
+
         <property name="client-limit" type="int"
                   description="Maximum number of clients allowed" />
         <property name="bandwidth-limit" type="int"
-                  description="Maximum bandwidth usage allowed (not implemented)" />
+                  description="Maximum bandwidth usage allowed in bits per second" />
+        <property name="redirect-on-overflow" type="string"
+                  description="A URL to redirect clients to if either of the above limits have been reached" />
+
         <property name="duration" type="float"
                   description="How long to keep clients connected for (in seconds) "/>
 
