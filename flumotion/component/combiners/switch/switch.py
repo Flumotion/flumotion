@@ -84,13 +84,13 @@ class SingleSwitch(Switch):
             padPeers["sink%d" % sinkPadNumber] = sw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer().get_parent().get_name()
 
-        for feedid in self.eater_names:
-            eaterName = self.get_eater_name_for_feedid(feedid)
-            self.debug("feedid %s is mapped to eater name %s", feedid, 
+        for feedId in self.eater_names:
+            eaterName = self.get_eater_name_for_feedId(feedId)
+            self.debug("feedId %s is mapped to eater name %s", feedId, 
                 eaterName)
             if eaterName:
                 for sinkPad in padPeers:
-                    if feedid in padPeers[sinkPad]:
+                    if feedId in padPeers[sinkPad]:
                         self.switchPads[eaterName] = sinkPad
                 if not self.switchPads.has_key(eaterName):    
                     self.warning("could not find sink pad for eater %s", 
@@ -158,13 +158,13 @@ class AVSwitch(Switch):
                 asw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer().get_parent().get_name()
 
-        for feedid in self.eater_names:
-            eaterName = self.get_eater_name_for_feedid(feedid)
-            self.debug("feedid %s is mapped to eater name %s", feedid, 
+        for feedId in self.eater_names:
+            eaterName = self.get_eater_name_for_feedId(feedId)
+            self.debug("feedId %s is mapped to eater name %s", feedId, 
                 eaterName)
             if eaterName:
                 for sinkPadName, switchElement in padPeers:
-                    if feedid in padPeers[(sinkPadName, switchElement)]:
+                    if feedId in padPeers[(sinkPadName, switchElement)]:
                         self.switchPads[eaterName] = sinkPadName
                 if not self.switchPads.has_key(eaterName):
                     self.warning("could not find sink pad for eater %s", 

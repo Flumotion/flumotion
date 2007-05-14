@@ -1,5 +1,13 @@
 2007-05-14  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
+	* flumotion/component/combiners/switch/switch.py
+	  (SingleSwitch.configure_pipeline, AVSwitch.configure_pipeline):
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.get_eater_name_for_feedId):
+	s/feedid/feedId
+
+2007-05-14  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
 	* flumotion/component/combiners/switch/Makefile.am:
 	* flumotion/component/combiners/switch/basicwatchdog.py
 	  (SingleBasicWatchdog, SingleBasicWatchdog.eaterSetInactive,
