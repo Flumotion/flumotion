@@ -1,5 +1,16 @@
 2007-05-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/scheduler.py (Event.__init__): Rework a
+	bit, avoid a call to now() if possible.
+	(Event.reschedule): Add optional now argument.
+	(Event.toTuple, Event.__lt__, Event.__gt__, Event.__eq__): Compare
+	events like tuples. I'd subclass from tuple if it were earlier in
+	the day.
+
+	* flumotion/test/test_component_base_scheduler.py
+	(EventTest.testSimple, EventTest.testUpdateRecurring)
+	(EventTest.testComparison): Add some more tests.
+
 	* flumotion/component/base/Makefile.am (component_PYTHON): 
 	* flumotion/component/base/base.xml: 
 	* flumotion/component/base/scheduler.py (Event, Scheduler)

@@ -34,41 +34,44 @@ class Event(log.Loggable):
     """
 
     def __init__(self, start, end, content, recur=None, now=None):
-        from dateutil import rrule
-        self._rrulestr = rrule.rrulestr
-
         self.debug('new event, content=%r, start=%r, end=%r', start,
                    end, content)
-        self.setBounds(recur, start, end, now or datetime.now())
-        self.content = content
-        self.recur = recur
 
-    def setBounds(self, recur, start, end, now):
-        self.recur = recur
         if recur:
-            startRecurRule = self._rrulestr(recur, dtstart=start)
-            endRecurRule = self._rrulestr(recur, dtstart=end) 
+            from dateutil import rrule
+            startRecurRule = rrule.rrulestr(recur, dtstart=start)
+            endRecurRule = rrule.rrulestr(recur, dtstart=end) 
+            if now is None:
+                now = datetime.now()
             if end < now:
                 end = endRecurRule.after(now)
                 start = startRecurRule.before(end)
                 self.debug("adjusting start and end times to %r, %r",
                            start, end)
-                self.start, self.end = start, end
 
-    def reschedule(self):
+        self.start = start
+        self.end = end
+        self.content = content
+        self.recur = recur
+
+    def reschedule(self, now=None):
         if self.recur:
-            return Event(self.start, self.end, self.content, self.recur)
+            return Event(self.start, self.end, self.content, self.recur,
+                         now)
         else:
             return None
 
+    def toTuple(self):
+        return self.start, self.end, self.content, self.recur
+
     def __lt__(self, other):
-        return self.start < other.start
+        return self.toTuple() < other.toTuple()
 
     def __gt__(self, other):
-        return self.start > other.start
+        return self.toTuple() > other.toTuple()
 
     def __eq__(self, other):
-        return self.start == other.start
+        return self.toTuple() == other.toTuple()
 
 
 class Scheduler(log.Loggable):
