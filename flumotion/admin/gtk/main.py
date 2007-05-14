@@ -66,7 +66,7 @@ def startAdminFromGreeter(greeter):
     def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
-        dret = dialogs.connection_failed_message(info[0], message,
+        dret = dialogs.connection_failed_message(_info[0], message,
                                                  greeter.window)
         dret.addCallback(lambda _: startAdminFromGreeter(greeter))
         return dret

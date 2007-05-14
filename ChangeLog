@@ -1,5 +1,8 @@
 2007-05-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/main.py (startAdminFromGreeter.failed): This
+	is the bug that zapek found, yall. Remember this bug!
+
 	* flumotion/component/base/scheduler.py (Scheduler.addEvent): Add
 	a now argument.
 	(Scheduler.getCurrentEvents): New accessor.
