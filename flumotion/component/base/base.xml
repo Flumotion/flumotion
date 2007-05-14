@@ -35,5 +35,15 @@
         </directory>
       </directories>
     </bundle>
+    <bundle name="base-scheduler">
+      <dependencies>
+        <dependency name="flumotion" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/base">
+          <filename location="scheduler.py" />
+        </directory>
+      </directories>
+    </bundle>
   </bundles>
 </registry> 
