@@ -1,3 +1,18 @@
+2007-05-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog.eaterSetInactive,
+	  SingleBasicWatchdog.eaterSetActive, AVBasicWatchdog,
+	  AVBasicWatchdog.eaterSetInactive, AVBasicWatchdog.eaterSetActive,
+	  AVBasicWatchdog.isActive):
+	* flumotion/component/combiners/switch/switch.py (Switch.isActive,
+	  SingleSwitch, SingleSwitch.switchToMaster,
+	  SingleSwitch.switchToBackup, AVSwitch.switchToMaster,
+	  AVSwitch.switchToBackup, AVSwitch._setLastTimestamp):
+	Set the stop value on the switches so that the resulting stream
+	is synched if video or audio stops before the other.
+	Do not allow switching to master or backup if eaters are inactive.
+
 2007-05-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/main.py (startAdminFromGreeter.failed): This

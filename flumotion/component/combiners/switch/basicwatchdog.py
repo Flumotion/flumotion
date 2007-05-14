@@ -31,43 +31,35 @@ class SingleBasicWatchdog(switch.SingleSwitch):
 
     def eaterSetInactive(self, feedId):
         switch.SingleSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feedid(feedId)
+        eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName and self.isActive("backup"):
             self.switchToBackup()
 
     def eaterSetActive(self, feedId):
         switch.SingleSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feedid(feedId)
+        eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName:
             self.switchToMaster()
-
-    def isActive(self, eaterSubstring):
-        # eaterSubstring is "master" or "backup"
-        for eaterFeedId in self._inactiveEaters:
-            eaterName = self.get_eater_name_for_feedid(eaterFeedId)
-            if eaterSubstring in eaterName:
-                return False
-        return True
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"
 
     def eaterSetInactive(self, feedId):
         switch.AVSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feedid(feedId)
+        eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName and self.isActive("backup"):
             self.switchToBackup()
 
     def eaterSetActive(self, feedId):
         switch.AVSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feedid(feedId)
+        eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName:
             self.switchToMaster()
 
     def isActive(self, eaterSubstring):
         # eaterSubstring is "master" or "backup"
         for eaterFeedId in self._inactiveEaters:
-            eaterName = self.get_eater_name_for_feedid(eaterFeedId)
+            eaterName = self.get_eater_name_for_feedId(eaterFeedId)
             if eaterSubstring in eaterName:
                 return False
         return True

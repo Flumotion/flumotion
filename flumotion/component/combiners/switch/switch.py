@@ -54,6 +54,14 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         raise errors.NotImplementedError('subclasses should implement '
                                          'switchToBackup')
 
+    def isActive(self, eaterSubstring):
+        # eaterSubstring is "master" or "backup"
+        for eaterFeedId in self._inactiveEaters:
+            eaterName = self.get_eater_name_for_feedId(eaterFeedId)
+            if eaterSubstring in eaterName:
+                return False
+        return True
+
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"
 
@@ -103,14 +111,23 @@ class SingleSwitch(Switch):
         self.uiState.set("active-eater", "master")
 
     def switchToMaster(self):
-        self.switchElement.set_property("active-pad",
-            self.switchPads["master"])
-        self.uiState.set("active-eater", "master")
+        if self.isActive("master"):
+            self.switchElement.set_property("active-pad",
+                self.switchPads["master"])
+            self.uiState.set("active-eater", "master")
+        else:
+            self.warning("Could not switch to master because the master eater "
+                "is not active.")
         
     def switchToBackup(self):
-        self.switchElement.set_property("active-pad",
-            self.switchPads["backup"])
-        self.uiState.set("active-eater", "backup")
+        if self.isActive("backup"):
+            self.switchElement.set_property("active-pad",
+                self.switchPads["backup"])
+            self.uiState.set("active-eater", "backup")
+        else:
+            self.warning("Could not switch to backup because the backup eater "
+                "is not active.")
+    
 
 class AVSwitch(Switch):
     logCategory = "comb-av-switch"
@@ -181,15 +198,37 @@ class AVSwitch(Switch):
         self.uiState.set("active-eater", "master")
 
     def switchToMaster(self):
-        self.videoSwitchElement.set_property("active-pad",
-            self.switchPads["video-master"])
-        self.audioSwitchElement.set_property("active-pad",
-            self.switchPads["audio-master"])
-        self.uiState.set("active-eater", "master")
+        if self.isActive("master"):
+            self._setLastTimestamp()
+            self.videoSwitchElement.set_property("active-pad",
+                self.switchPads["video-master"])
+            self.audioSwitchElement.set_property("active-pad",
+                self.switchPads["audio-master"])
+            self.uiState.set("active-eater", "master")
+        else:
+            self.warning("Could not switch to master because at least "
+                "one of the master eaters is not active.")
+
         
     def switchToBackup(self):
-        self.videoSwitchElement.set_property("active-pad",
-            self.switchPads["video-backup"])
-        self.audioSwitchElement.set_property("active-pad",
-            self.switchPads["audio-backup"])
-        self.uiState.set("active-eater", "backup")
+        if self.isActive("backup"):
+            self._setLastTimestamp()
+            self.videoSwitchElement.set_property("active-pad",
+                self.switchPads["video-backup"])
+            self.audioSwitchElement.set_property("active-pad",
+                self.switchPads["audio-backup"])
+            self.uiState.set("active-eater", "backup")
+        else:
+            self.warning("Could not switch to backup because at least "
+                "one of the backup eaters is not active.")
+
+    def _setLastTimestamp(self):
+        vswTs = self.videoSwitchElement.get_property("last-timestamp")
+        aswTs = self.audioSwitchElement.get_property("last-timestamp")
+
+        if aswTs > vswTs:
+            self.videoSwitchElement.set_property("stop-value",
+                aswTs)
+        else:
+            self.audioSwitchElement.set_property("stop-value",
+                vswTs)
