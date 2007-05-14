@@ -46,7 +46,8 @@ def file_gnl_src(name, uri, caps, start, duration, offset, priority):
     return gnlsrc
 
 class PlaylistItem(object, log.Loggable):
-    def __init__(self, timestamp, uri, offset, duration):
+    def __init__(self, id, timestamp, uri, offset, duration):
+        self.id = id
         self.timestamp = timestamp
         self.uri = uri
         self.offset = offset
@@ -62,6 +63,23 @@ class PlaylistItem(object, log.Loggable):
         self.asrc = None
 
         self.next = None
+        self.prev = None
+
+    def setDuration(self, duration):
+        self.duration = duration
+        if self.asrc:
+            self.asrc.props.duration = duration
+            self.asrc.props.media_duration = duration
+        if self.vsrc:
+            self.vsrc.props.duration = duration
+            self.vsrc.props.media_duration = duration
+
+    def setTimestamp(self, timestamp):
+        self.timestamp = timestamp
+        if self.asrc:
+            self.asrc.props.start = timestamp
+        if self.vsrc:
+            self.vsrc.props.start = timestamp
 
 class Playlist(object, log.Loggable):
     def __init__(self, producer):
@@ -69,67 +87,106 @@ class Playlist(object, log.Loggable):
         Create an initially empty playlist
         """
         self.items = None # PlaylistItem linked list
+        self._itemsById = {}
 
         self.producer = producer
 
         self._pending_items = []
         self._discovering = False
 
-    def addItem(self, timestamp, uri, offset, duration, hasAudio, hasVideo):
+    def _getCurrentItem(self):
+        # TODO: improve this!
+        return None
+
+    def removeItems(self, id):
+        current = self._getCurrentItem()
+            
+        items = self._itemsById[id]
+        for item in items:
+            if (current and item.timestamp < current.timestamp + 
+                    current.duration):
+                self.debug("Not removing current item!")
+                continue
+            if item.prev:
+                item.prev.next = item.next
+            if item.next:
+                item.next.prev = item.prev
+            self.producer.unscheduleItem(item)
+
+        del self._itemsById[id]
+        
+
+    def addItem(self, id, timestamp, uri, offset, duration, hasAudio, hasVideo):
         """
         Add an item to the playlist.
         The duration of previous and this entry may be adjusted to make it fit.
         """
-        newitem = PlaylistItem(timestamp, uri, offset, duration)
+        current = self._getCurrentItem()
+        if current and timestamp < current.timestamp + current.duration:
+            self.warning("New object at uri %s starts during current object, "
+                "cannot add")
+            return
+
+        newitem = PlaylistItem(id, timestamp, uri, offset, duration)
         newitem.hasAudio = hasAudio
         newitem.hasVideo = hasVideo
 
+        if id in self._itemsById:
+            self._itemsById[id].append(newitem)
+        else:
+            self._itemsById[id] = [newitem]
+
+        # prev starts strictly before the new item
+        # next starts after the new item, and ends after the end of the new item
         prev = next = None
         item = self.items
         while item:
             if item.timestamp < newitem.timestamp:
                 prev = item
-            elif (not next and item.timestamp > newitem.timestamp and 
-                    newitem.timestamp + newitem.duration > item.timestamp):
+            else:
+                break
+            item = item.next
+
+        if item:
+            item = item.next
+        while item:
+            if (item.timestamp + item.duration > newitem.timestamp):
                 next = item
                 break
             item = item.next
 
-        if prev and next and prev.next != next:
-            # Then things between prev and next are to be deleted. Do so.
+        if prev:
+            # Then things between prev and next (next might be None) are to be 
+            # deleted. Do so.
             cur = prev.next
             while cur != next:
                 self.producer.unscheduleItem(cur)
                 cur = cur.next
-        elif prev and not next:
-            cur = prev.next
-            while cur:
-                self.producer.unscheduleItem(cur)
-                cur = cur.next
 
+        # update links.
         if prev:
             prev.next = newitem
+            newitem.prev = prev
         else:
             self.items = newitem
 
         if next:
             newitem.next = next
+            next.prev = newitem
 
         # Duration adjustments -> Reflect into gnonlin timeline
         if prev and prev.timestamp + prev.duration > newitem.timestamp:
             self.debug("Changing duration of previous item from %d to %d", 
                 prev.duration, newitem.timestamp - prev.timestamp)
-            prev.duration = newitem.timestamp - prev.timestamp
-            if prev.asrc:
-                prev.asrc.props.duration = prev.duration
-                prev.asrc.props.media_duration = prev.duration
-            if prev.vsrc:
-                prev.vsrc.props.duration = prev.duration
-                prev.vsrc.props.media_duration = prev.duration
+            item.setDuration(newitem.timestamp - prev.timestamp)
+
         if next and newitem.timestamp + newitem.duration > next.timestamp:
-            self.debug("Changing duration of new item from %d to %d to fit", 
-                newitem.duration, next.timestamp - newitem.timestamp)
-            newitem.duration = next.timestamp - newitem.timestamp
+            self.debug("Changing timestamp of next item from %d to %d to fit", 
+                newitem.timestamp, newitem.timestamp + newitem.duration)
+            ts = newitem.timestamp + newitem.duration
+            duration = next.duration - (ts - next.timestamp)
+            next.setTimestamp(ts)
+            next.setDuration(duration)
 
         # Then we need to actually add newitem into the gnonlin timeline
         self.producer.scheduleItem(newitem)
@@ -149,7 +206,11 @@ class Playlist(object, log.Loggable):
         file = StringIO(data)
         self.parseFile(file)
 
-    def parseFile(self, file):
+    def replaceFile(self, file, id):
+        self.removeItems(id)
+        self.parseFile(file, id)
+
+    def parseFile(self, file, id=None):
         """
         Parse a playlist file. Adds the contents of the file to the existing 
         playlist, overwriting any existing entries for the same time period.
@@ -167,7 +228,7 @@ class Playlist(object, log.Loggable):
             if child.nodeType == Node.ELEMENT_NODE and \
                     child.nodeName == 'entry':
                 self.debug("Parsing entry")
-                self._parsePlaylistEntry(parser, child)
+                self._parsePlaylistEntry(parser, child, id)
 
         # Now launch the discoverer for any pending items
         if not self._discovering:
@@ -185,6 +246,7 @@ class Playlist(object, log.Loggable):
                 timestamp = item[1]
                 duration = item[2]
                 offset = item[3]
+                id = item[4]
 
                 hasA = disc.is_audio
                 hasV = disc.is_video
@@ -197,7 +259,8 @@ class Playlist(object, log.Loggable):
                     offset = 0
 
                 if duration > 0:
-                    self.addItem(timestamp, uri, offset, duration, hasA, hasV)
+                    self.addItem(id, timestamp, uri, offset, duration, 
+                        hasA, hasV)
                 else:
                     self.warning("Duration of item is zero, not adding")
             else:
@@ -221,7 +284,7 @@ class Playlist(object, log.Loggable):
         disc.connect('discovered', _discovered)
         disc.discover()
 
-    def _parsePlaylistEntry(self, parser, entry):
+    def _parsePlaylistEntry(self, parser, entry, id):
         mandatory = ['filename', 'time']
         optional = ['duration', 'offset']
 
@@ -236,7 +299,7 @@ class Playlist(object, log.Loggable):
 
         timestamp = self._parseTimestamp(timestamp)
 
-        self._pending_items.append((filename, timestamp, duration, offset))
+        self._pending_items.append((filename, timestamp, duration, offset, id))
 
     def _parseTimestamp(self, ts):
         # Take TS in YYYY-MM-DDThh:mm:ssZ format, return timestamp in 

@@ -236,13 +236,19 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 start = 0
 
         if self._hasVideo and item.hasVideo:
+            self.debug("Adding video source with start %d, duration %d, "
+                "offset %d", start, item.duration, item.offset)
             item.vsrc = file_gnl_src(None, item.uri, self.videocaps,
                 start, item.duration, item.offset, 0)
             self.videocomp.add(item.vsrc)
+            self.debug("Added")
         if self._hasAudio and item.hasAudio:
+            self.debug("Adding audio source with start %d, duration %d, "
+                "offset %d", start, item.duration, item.offset)
             item.asrc = file_gnl_src(None, item.uri, self.audiocaps,
                 start, item.duration, item.offset, 0)
             self.audiocomp.add(item.asrc)
+        self.debug("Done scheduling")
 
     def unscheduleItem(self, item):
         self.debug("Unscheduling item at uri %s", item.uri)
@@ -273,6 +279,12 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
         self._createDefaultSources()
 
+        self.connect_feeders(pipeline)
+        return pipeline
+
+    def do_start(self, clocking):
+        self.link()
+
         self.playlist = playlistparser.Playlist(self)
         try:
             if self._playlistfile:
@@ -280,11 +292,6 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
 
-        self.connect_feeders(pipeline)
-        return pipeline
-
-    def do_start(self, clocking):
-        self.link()
         return defer.succeed(None)
         
     def do_stop(self):
