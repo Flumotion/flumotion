@@ -1,3 +1,13 @@
+2007-05-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/scheduler.py (Scheduler.addEvent): Add
+	a now argument.
+	(Scheduler.getCurrentEvents): New accessor.
+	(Scheduler._reschedule): Convert timedelta objects to seconds.
+
+	* flumotion/test/test_component_base_scheduler.py
+	(SchedulerTest.testSimple): Test some more scheduler bits.
+
 2007-05-14  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

@@ -80,3 +80,30 @@ class EventTest(unittest.TestCase):
 class SchedulerTest(unittest.TestCase):
     def testInstantiate(self):
         scheduler.Scheduler()
+
+    def testSimple(self):
+        now = datetime.now()
+        start = now - timedelta(hours=1)
+        end = now + timedelta(minutes=1)
+
+        calls = []
+        started = lambda c: calls.append(('started', c))
+        stopped = lambda c: calls.append(('stopped', c))
+            
+        s = scheduler.Scheduler()
+        sid = s.subscribe(started, stopped)
+
+        self.assertEquals(calls, [])
+
+        e = s.addEvent(start, end, 'foo', now=now)
+
+        self.assertEquals(calls, [('started', 'foo')])
+        self.assertEquals(s.getCurrentEvents(), ['foo'])
+
+        s.removeEvent(e)
+
+        self.assertEquals(calls, [('started', 'foo'),
+                                  ('stopped', 'foo')])
+        self.assertEquals(s.getCurrentEvents(), [])
+
+        s.unsubscribe(sid)

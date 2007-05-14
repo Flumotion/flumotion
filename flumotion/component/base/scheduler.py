@@ -89,7 +89,7 @@ class Scheduler(log.Loggable):
         self.subscribers = {}
         self.replaceEvents([])
 
-    def addEvent(self, start, end, content, recur=None):
+    def addEvent(self, start, end, content, recur=None, now=None):
         """Add a new event to the scheduler.
 
         @param start: wall-clock time of event start
@@ -105,7 +105,8 @@ class Scheduler(log.Loggable):
         so desired. The event will be removed or rescheduled
         automatically when it stops.
         """
-        now = datetime.now()
+        if now is None:
+            now = datetime.now()
         event = Event(start, end, content, recur, now)
         if event.end < now:
             self.warning('attempted to schedule event in the past: %r',
@@ -128,6 +129,9 @@ class Scheduler(log.Loggable):
         if currentEvent in self.current:
             self._eventStopped(currentEvent)
         self._reschedule()
+
+    def getCurrentEvents(self):
+        return [e.content for e in self.current]
 
     def replaceEvents(self, events):
         """Replace the set of events in the scheduler.
@@ -230,12 +234,15 @@ class Scheduler(log.Loggable):
         stop = _getNextStop()
         now = datetime.now()
 
+        def toSeconds(td):
+            return max(td.days*24*3600 + td.seconds + td.microseconds/1e6, 0)
+
         if start and (not stop or start.start < stop.end):
-            dc = reactor.callLater(max (start.start - now, 0), doStart,
-                                   start)
+            dc = reactor.callLater(toSeconds(start.start - now),
+                                   doStart, start)
         elif stop:
-            dc = reactor.callLater(max (stop.end - now, 0), doStop,
-                                   stop)
+            dc = reactor.callLater(toSeconds(stop.end - now),
+                                   doStop, stop)
         else:
             dc = None
 
