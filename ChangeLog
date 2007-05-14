@@ -1,3 +1,15 @@
+2007-05-14  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/combiners/switch/Makefile.am:
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog, SingleBasicWatchdog.eaterSetInactive,
+	  SingleBasicWatchdog.eaterSetActive, SingleBasicWatchdog.isActive,
+	  AVBasicWatchdog, AVBasicWatchdog.eaterSetInactive,
+	  AVBasicWatchdog.eaterSetActive, AVBasicWatchdog.isActive):
+	* flumotion/component/combiners/switch/switch.xml:
+	Add basic watchdogs that will automatically switch to backup if
+	master eater(s) go(es) hungry.
+
 2007-05-11  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
 
 	* flumotion/component/combiners/switch/Makefile.am:

@@ -36,6 +36,42 @@
       <properties>
       </properties>
     </component>
+    <component type="single-basic-watchdog-combiner"
+               base="flumotion/component/combiners/switch"
+               description="A basic single stream type watchdog component">
+      <source location="flumotion.component.combiners.switch.basicwatchdog" />
+      <eater name="master" />
+      <eater name="backup" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="basicwatchdog.py"
+               function="SingleBasicWatchdog" />
+	<entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+      <properties>
+      </properties>
+    </component>
+    <component type="av-basic-watchdog-combiner"
+               base="flumotion/component/combiners/switch"
+               description="A basic audio/video watchdog component">
+      <source location="flumotion.component.combiners.switch.basicwatchdog" />
+      <eater name="video-master" />
+      <eater name="video-backup" />
+      <eater name="audio-master" />
+      <eater name="audio-backup" />
+      <feeder name="video" />
+      <feeder name="audio" />
+      <entries>
+        <entry type="component" location="basicwatchdog.py"
+               function="AVBasicWatchdog" />
+	<entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+      <properties>
+      </properties>
+    </component>
+
   </components>
 
 
@@ -65,6 +101,18 @@
             </directory>
         </directories>
     </bundle>
+
+    <bundle name="switch-combiner-basic-watchdog">
+        <dependencies>
+	    <dependency name="switch-combiner-component" />
+	</dependencies>
+	<directories>
+	    <directory name="flumotion/component/combiners/switch">
+	        <filename location="basicwatchdog.py" />
+	    </directory>
+	</directories>
+    </bundle>
+
     <bundle name="switch-combiner-admin-gtk">
         <dependencies>
             <dependency name="base-admin-gtk"/>
