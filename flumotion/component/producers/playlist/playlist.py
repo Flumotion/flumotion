@@ -220,20 +220,26 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         Schedule a given playlist item in our playback compositions.
         """
         start = item.timestamp - self.basetime
-        # This works around a bug in videotestsrc and videorate. TODO! This
-        # can be removed once we upgrade to a future version of gst-plugins-base
-        #start = (start / gst.SECOND) * gst.SECOND
         self.debug("Starting item %s in %d seconds", item.uri, start/gst.SECOND)
 
-        if start < 0:
-            if start + item.duration < 0:
+        # If we schedule things to start before the current pipeline position,
+        # gnonlin will adjust this to start now. However, it does this 
+        # separately for audio and video, so we start from different points,
+        # thus we're out of sync.
+        # So, always start slightly in the future... 5 seconds seems to work
+        # fine in practice.
+        now = self.pipeline.query_position(gst.FORMAT_TIME)[0] + 5 * gst.SECOND
+
+        if start < now:
+            if start + item.duration < now:
+                self.debug("Item too late; skipping entirely")
                 return
             else:
-                # If we're not too late for part of the file to be playable,
-                # then play it!
-                item.offset = -start
-                item.duration = item.duration + start
-                start = 0
+                change = now - start
+                self.debug("Starting item with offset %d", change)
+                item.duration -= change
+                item.offset += change
+                start = now
 
         if self._hasVideo and item.hasVideo:
             self.debug("Adding video source with start %d, duration %d, "

@@ -1,3 +1,12 @@
+2007-05-15  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  Never schedule an item for the past or very recent future. Allow
+	  scheduling something 5 seconds or more in the future.
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Fix duration adjustment for inserting new items.
+
 2007-05-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/watcher.py: Update copyrights.

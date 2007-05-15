@@ -178,7 +178,7 @@ class Playlist(object, log.Loggable):
         if prev and prev.timestamp + prev.duration > newitem.timestamp:
             self.debug("Changing duration of previous item from %d to %d", 
                 prev.duration, newitem.timestamp - prev.timestamp)
-            item.setDuration(newitem.timestamp - prev.timestamp)
+            prev.setDuration(newitem.timestamp - prev.timestamp)
 
         if next and newitem.timestamp + newitem.duration > next.timestamp:
             self.debug("Changing timestamp of next item from %d to %d to fit", 
