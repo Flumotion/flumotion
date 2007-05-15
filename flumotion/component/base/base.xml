@@ -45,5 +45,15 @@
         </directory>
       </directories>
     </bundle>
+    <bundle name="base-watcher">
+      <dependencies>
+        <dependency name="flumotion" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/base">
+          <filename location="watcher.py" />
+        </directory>
+      </directories>
+    </bundle>
   </bundles>
 </registry> 

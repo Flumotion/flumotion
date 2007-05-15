@@ -1,3 +1,13 @@
+2007-05-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/base.xml: 
+	* flumotion/component/base/Makefile.am (component_PYTHON): 
+	* flumotion/component/base/watcher.py: New module, defines a file
+	monitoring object.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_component_base_watcher.py: Add a minimal test.
+
 2007-05-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py
