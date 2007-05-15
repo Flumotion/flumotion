@@ -1,3 +1,8 @@
+2007-05-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/scheduler.py (ICalScheduler.__init__):
+	Watch the ical file for changes. Untested, woo.
+
 2007-05-15  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

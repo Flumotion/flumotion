@@ -38,6 +38,7 @@
     <bundle name="base-scheduler">
       <dependencies>
         <dependency name="flumotion" />
+        <dependency name="base-watcher" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/base">

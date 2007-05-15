@@ -25,6 +25,7 @@ from datetime import datetime
 from twisted.internet import reactor
 
 from flumotion.common import log, avltree
+from flumotion.component.base import watcher
 
 
 class Event(log.Loggable):
@@ -258,10 +259,20 @@ class ICalScheduler(Scheduler):
         from icalendar import Calendar
 
         Scheduler.__init__(self)
-        cal = Calendar.from_string(fileObj.read())
-        self.parseCalendar(cal)
+
+        def parseCalendarFromFile(f):
+            cal = Calendar.from_string(f.read())
+            self.parseCalendar(cal)
+        parseCalendarFromFile(fileObj)
+
+        if hasattr(fileObj, 'name'):
+            def fileChanged(f):
+                parseCalendarFromFile(open(f,'r'))
+            self.watcher = watcher.FilesWatcher([fileObj.name])
+            self.watcher.subscribe(fileChanged=fileChanged)
 
     def parseCalendar(self, cal):
+        events = []
         for event in cal.walk('vevent'):
             start = event.decoded('dtstart', None)
             end = event.decoded('dtend', None)
@@ -269,9 +280,11 @@ class ICalScheduler(Scheduler):
             recur = event.get('rrule', None)
             if start and end:
                 if recur:
-                    self.addEvent(start, end, summary, recur.ical())
+                    e = Event(start, end, summary, recur.ical())
                 else:
-                    self.addEvent(start, end, summary)
+                    e = Event(start, end, summary)
+                events.append(e)
             else:
                 self.warning('ical has event without start or end: '
                              '%r', event)
+        self.replaceEvents(events)
