@@ -1,5 +1,7 @@
 2007-05-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/watcher.py: Update copyrights.
+
 	* flumotion/component/base/base.xml: 
 	* flumotion/component/base/Makefile.am (component_PYTHON): 
 	* flumotion/component/base/watcher.py: New module, defines a file
