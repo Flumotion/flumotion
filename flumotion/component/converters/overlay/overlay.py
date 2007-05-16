@@ -20,15 +20,19 @@
 # Headers in this file shall remain intact.
 
 import os
+import tempfile
+
 
 from twisted.internet import defer
 
-from flumotion.common import log
+from flumotion.common import log, messages
 
 from flumotion.component import feedcomponent
 from flumotion.component.converters.overlay import genimg
 
-import tempfile
+N_ = messages.N_
+T_ = messages.gettexter('flumotion')
+
 
 class Overlay(feedcomponent.ParseLaunchComponent):
     checkTimestamp = True
@@ -57,7 +61,8 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):
-        self.fixRenamedProperties(properties, [ 
+        p = properties
+        self.fixRenamedProperties(p, [ 
                 ('show_text',    'show-text'), 
                 ('fluendo_logo', 'fluendo-logo'), 
                 ('cc_logo',      'cc-logo'), 
@@ -69,15 +74,20 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         os.close(fd)
 
         text = None
-        if properties.get('show-text', False):
-            text = properties.get('text', 'set the "text" property')
-        genimg.generate_overlay(self._filename,
-                                text,
-                                properties.get('fluendo-logo', False),
-                                properties.get('cc-logo', False),
-                                properties.get('xiph-logo', False),
-                                properties['width'],
-                                properties['height'])
+        if p.get('show-text', False):
+            text = p.get('text', 'set the "text" property')
+        overflow = genimg.generate_overlay(self._filename,
+                                           text,
+                                           p.get('fluendo-logo', False), 
+                                           p.get('cc-logo', False),
+                                           p.get('xiph-logo', False),
+                                           p['width'],
+                                           p['height'])
+        if overflow:
+            m = messages.Warning(
+                T_(N_("Overlayed text '%s' too wide for the video image."),
+                   text), id = "text-too-wide")
+            self.addMessage(m)
         
         source = self.get_element('source')
         source.set_property('location', self._filename)

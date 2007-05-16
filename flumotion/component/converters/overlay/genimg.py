@@ -88,6 +88,11 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
         
     image.save(filename, 'png')
 
+    if text:
+        return (draw.textsize(text, font=font)[0] + TEXT_XOFFSET > width)
+    else:
+        return False
+
 if __name__ == '__main__':    
     #generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
     generate_overlay('test.png', 'Testing', True, True, True, 320, 240)

@@ -1,5 +1,15 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/converters/overlay/genimg.py
+	(generate_overlay): Return True if the text was too wide, False
+	otherwise.
+
+	* flumotion/component/converters/overlay/overlay.py
+	(Overlay.configure_pipeline): Warn if the text is too wide.
+	Fixes #21.
+
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
 	Patch by: Gergely Nagy
 	
 	* flumotion/component/consumers/Makefile.am (SUBDIRS): 
