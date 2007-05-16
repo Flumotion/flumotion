@@ -1,5 +1,12 @@
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Return new item from addItem (used in tests)
+	* flumotion/test/test_component_playlist.py:
+	  Add a test, randomly prod something to make buildbots maybe happier?
+
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_component_playlist.py:
 	  First round of simple tests for playlist stuff

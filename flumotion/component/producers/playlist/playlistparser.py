@@ -90,7 +90,7 @@ class Playlist(object, log.Loggable):
         if current and timestamp < current.timestamp + current.duration:
             self.warning("New object at uri %s starts during current object, "
                 "cannot add")
-            return
+            return None
 
         newitem = PlaylistItem(id, timestamp, uri, offset, duration)
         newitem.hasAudio = hasAudio
@@ -158,6 +158,8 @@ class Playlist(object, log.Loggable):
 
         # Then we need to actually add newitem into the gnonlin timeline
         self.producer.scheduleItem(newitem)
+
+        return newitem
 
     def expireOldEntries(self):
         """

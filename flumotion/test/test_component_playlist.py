@@ -28,7 +28,7 @@ from twisted.internet import defer
 
 from flumotion.component.producers.playlist import playlistparser
 
-class FakeProducer():
+class FakeProducer(object):
     def scheduleItem(self, item):
         pass
 
@@ -83,6 +83,24 @@ class TestPlaylist(unittest.TestCase):
         self.assertFalse(self.playlist._itemsById.has_key('id1'))
         self.assertTrue(self.playlist._itemsById.has_key('id2'))
         self.checkItems(1)
+
+    def testAddOverlappingItems(self):
+        first = self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, 
+            True, True)
+        self.assertEquals(first.duration, 100)
+        second = self.playlist.addItem('id1', 50, "file:///testuri", 0, 100, 
+            True, True)
+
+        self.checkItems(2)
+        # First one should have had duration adjusted
+        self.assertEquals(first.duration, 50)
+
+        third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150, 
+            True, True)
+        # Second should have been deleted
+        self.assertFalse(second in self.playlist._itemsById['id1'])
+        self.checkItems(2)
+        self.assertEquals(first.duration, 25)
 
 if __name__ == '__main__':
     unittest.main()
