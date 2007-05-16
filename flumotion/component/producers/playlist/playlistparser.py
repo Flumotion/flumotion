@@ -70,6 +70,9 @@ class Playlist(object, log.Loggable):
                 continue
             if item.prev:
                 item.prev.next = item.next
+            else:
+                self.items = item.next
+
             if item.next:
                 item.next.prev = item.prev
             self.producer.unscheduleItem(item)

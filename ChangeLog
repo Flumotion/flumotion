@@ -1,5 +1,14 @@
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_playlist.py:
+	  First round of simple tests for playlist stuff
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  First bug fixed due to tests of playlist stuff.
+
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  Refactor playlist stuff to make it more testable. Tests to come.
