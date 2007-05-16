@@ -1,3 +1,10 @@
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/steps.py (Vorbis.get_state, Speex.get_state):
+	Apparently a kilobit is 1000 bits? According to Mike?
+	(HTTP.get_state): When the user says 10 megabits, she does not
+	mean 10 bits.
+
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

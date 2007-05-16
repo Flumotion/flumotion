@@ -1054,7 +1054,7 @@ class Vorbis(AudioEncoder):
     def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
-            options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
+            options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         elif self.radiobutton_quality:
             options['quality'] = self.spinbutton_quality.get_value()
         return options
@@ -1075,7 +1075,7 @@ class Speex(AudioEncoder):
         
     def get_state(self):
         options = AudioEncoder.get_state(self)
-        options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         return options
 
 class Consumption(WizardSection):
@@ -1220,7 +1220,7 @@ class HTTP(WizardStep):
     def get_state(self):
         options = WizardStep.get_state(self)
 
-        options['bandwidth-limit'] = int(options['bandwidth-limit'])
+        options['bandwidth-limit'] = int(options['bandwidth-limit'] * 1e6)
         options['client-limit'] = int(options['client-limit'])
         options['port'] = int(options['port'])
  
