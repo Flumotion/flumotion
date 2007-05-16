@@ -31,20 +31,6 @@ from twisted.internet import reactor
 
 from flumotion.common import log, fxml
 
-import singledecodebin
-
-def file_gnl_src(name, uri, caps, start, duration, offset, priority):
-    src = singledecodebin.SingleDecodeBin(caps, uri)
-    gnlsrc = gst.element_factory_make('gnlsource', name)
-    gnlsrc.props.start = start
-    gnlsrc.props.duration = duration
-    gnlsrc.props.media_start = offset
-    gnlsrc.props.media_duration = duration
-    gnlsrc.props.priority = priority
-    gnlsrc.add(src)
-
-    return gnlsrc
-
 class PlaylistItem(object, log.Loggable):
     def __init__(self, id, timestamp, uri, offset, duration):
         self.id = id
@@ -53,33 +39,11 @@ class PlaylistItem(object, log.Loggable):
         self.offset = offset
         self.duration = duration
 
-        # Currently always set to true; later this should come from what the
-        # discoverer says.
         self.hasAudio = True
         self.hasVideo = True
 
-        # Audio and video gnlsource objects
-        self.vsrc = None
-        self.asrc = None
-
         self.next = None
         self.prev = None
-
-    def setDuration(self, duration):
-        self.duration = duration
-        if self.asrc:
-            self.asrc.props.duration = duration
-            self.asrc.props.media_duration = duration
-        if self.vsrc:
-            self.vsrc.props.duration = duration
-            self.vsrc.props.media_duration = duration
-
-    def setTimestamp(self, timestamp):
-        self.timestamp = timestamp
-        if self.asrc:
-            self.asrc.props.start = timestamp
-        if self.vsrc:
-            self.vsrc.props.start = timestamp
 
 class Playlist(object, log.Loggable):
     def __init__(self, producer):
@@ -90,9 +54,6 @@ class Playlist(object, log.Loggable):
         self._itemsById = {}
 
         self.producer = producer
-
-        self._pending_items = []
-        self._discovering = False
 
     def _getCurrentItem(self):
         # TODO: improve this!
@@ -115,11 +76,12 @@ class Playlist(object, log.Loggable):
 
         del self._itemsById[id]
         
-
     def addItem(self, id, timestamp, uri, offset, duration, hasAudio, hasVideo):
         """
         Add an item to the playlist.
-        The duration of previous and this entry may be adjusted to make it fit.
+
+        This may remove overlapping entries, or adjust timestamps/durations of
+        entries to make the new one fit.
         """
         current = self._getCurrentItem()
         if current and timestamp < current.timestamp + current.duration:
@@ -160,6 +122,9 @@ class Playlist(object, log.Loggable):
             # deleted. Do so.
             cur = prev.next
             while cur != next:
+                self._itemsById[cur.id].remove(cur)
+                if not self._itemsById[cur.id]:
+                    del self._itemsById[cur.id]
                 self.producer.unscheduleItem(cur)
                 cur = cur.next
 
@@ -178,15 +143,15 @@ class Playlist(object, log.Loggable):
         if prev and prev.timestamp + prev.duration > newitem.timestamp:
             self.debug("Changing duration of previous item from %d to %d", 
                 prev.duration, newitem.timestamp - prev.timestamp)
-            prev.setDuration(newitem.timestamp - prev.timestamp)
+            prev.duration = newitem.timestamp - prev.timestamp
 
         if next and newitem.timestamp + newitem.duration > next.timestamp:
             self.debug("Changing timestamp of next item from %d to %d to fit", 
                 newitem.timestamp, newitem.timestamp + newitem.duration)
             ts = newitem.timestamp + newitem.duration
             duration = next.duration - (ts - next.timestamp)
-            next.setTimestamp(ts)
-            next.setDuration(duration)
+            next.duration = duration
+            next.timestamp = ts
 
         # Then we need to actually add newitem into the gnonlin timeline
         self.producer.scheduleItem(newitem)
@@ -199,6 +164,13 @@ class Playlist(object, log.Loggable):
         """
         pass
 
+class PlaylistParser(object, log.Loggable):
+    def __init__(self, playlist):
+        self.playlist = playlist
+
+        self._pending_items = []
+        self._discovering = False
+
     def parseData(self, data):
         """
         Parse playlist XML document data
@@ -207,7 +179,7 @@ class Playlist(object, log.Loggable):
         self.parseFile(file)
 
     def replaceFile(self, file, id):
-        self.removeItems(id)
+        self.playlist.removeItems(id)
         self.parseFile(file, id)
 
     def parseFile(self, file, id=None):
@@ -259,7 +231,7 @@ class Playlist(object, log.Loggable):
                     offset = 0
 
                 if duration > 0:
-                    self.addItem(id, timestamp, uri, offset, duration, 
+                    self.playlist.addItem(id, timestamp, uri, offset, duration, 
                         hasA, hasV)
                 else:
                     self.warning("Duration of item is zero, not adding")

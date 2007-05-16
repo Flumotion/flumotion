@@ -1,3 +1,9 @@
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Refactor playlist stuff to make it more testable. Tests to come.
+
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/inspect.py (main): Indent all properties

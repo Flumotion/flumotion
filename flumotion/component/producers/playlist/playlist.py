@@ -101,6 +101,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.videocaps = gst.Caps("video/x-raw-yuv;video/x-raw-rgb")
         self.audiocaps = gst.Caps("audio/x-raw-int;audio/x-raw-float")
 
+        self._vsrcs = {} # { PlaylistItem -> gnlsource }
+        self._asrcs = {} # { PlaylistItem -> gnlsource }
+
     def _buildAudioPipeline(self, pipeline, queue):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
@@ -244,27 +247,30 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         if self._hasVideo and item.hasVideo:
             self.debug("Adding video source with start %d, duration %d, "
                 "offset %d", start, item.duration, item.offset)
-            item.vsrc = file_gnl_src(None, item.uri, self.videocaps,
+            vsrc = file_gnl_src(None, item.uri, self.videocaps,
                 start, item.duration, item.offset, 0)
-            self.videocomp.add(item.vsrc)
-            self.debug("Added")
+            self.videocomp.add(vsrc)
+            self._vsrcs[item] = vsrc
         if self._hasAudio and item.hasAudio:
             self.debug("Adding audio source with start %d, duration %d, "
                 "offset %d", start, item.duration, item.offset)
-            item.asrc = file_gnl_src(None, item.uri, self.audiocaps,
+            asrc = file_gnl_src(None, item.uri, self.audiocaps,
                 start, item.duration, item.offset, 0)
-            self.audiocomp.add(item.asrc)
+            self.audiocomp.add(asrc)
+            self._asrcs[item] = asrc
         self.debug("Done scheduling")
 
     def unscheduleItem(self, item):
         self.debug("Unscheduling item at uri %s", item.uri)
         if self._hasVideo and item.hasVideo:
-            self.videocomp.remove(item.vsrc)
+            vsrc = self._vsrcs.pop(item)
+            self.videocomp.remove(vsrc)
         if self._hasAudio and item.hasAudio: 
-            self.audiocomp.remove(item.asrc)
+            asrc = self._asrcs.pop(item)
+            self.audiocomp.remove(asrc)
 
     def addPlaylist(self, data):
-        self.playlist.parseData(data)
+        self.playlistparser.parseData(data)
 
     def create_pipeline(self):
         props = self.config['properties'];
@@ -291,10 +297,11 @@ class PlaylistProducer(feedcomponent.FeedComponent):
     def do_start(self, clocking):
         self.link()
 
-        self.playlist = playlistparser.Playlist(self)
+        playlist = playlistparser.Playlist(self)
+        self.playlistparser = playlistparser.PlaylistParser(playlist)
         try:
             if self._playlistfile:
-                self.playlist.parseFile(self._playlistfile)
+                self.playlistparser.parseFile(self._playlistfile)
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
 
