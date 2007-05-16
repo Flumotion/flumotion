@@ -1,5 +1,10 @@
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_component_playlist.py:
+	  Don't use twisted 2.1-and-later API in tests.
+
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	* flumotion/component/producers/playlist/playlistparser.py:
 	* flumotion/test/test_component_playlist.py:

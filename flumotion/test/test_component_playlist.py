@@ -62,7 +62,7 @@ class TestPlaylist(unittest.TestCase):
     def testAddSingleItem(self):
         self.playlist.addItem(None, 0, "file:///testuri", 0, 100, True, True)
 
-        self.assertTrue(self.playlist._itemsById.has_key(None))
+        self.assert_(self.playlist._itemsById.has_key(None))
         self.assertEquals(len(self.playlist._itemsById[None]), 1)
 
         self.checkItems(1)
@@ -72,7 +72,7 @@ class TestPlaylist(unittest.TestCase):
         self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
         self.playlist.removeItems('id1')
 
-        self.assertFalse(self.playlist._itemsById.has_key('id1'))
+        self.assert_(not self.playlist._itemsById.has_key('id1'))
 
         self.checkItems(0)
 
@@ -83,8 +83,8 @@ class TestPlaylist(unittest.TestCase):
         self.checkItems(3)
 
         self.playlist.removeItems('id1')
-        self.assertFalse(self.playlist._itemsById.has_key('id1'))
-        self.assertTrue(self.playlist._itemsById.has_key('id2'))
+        self.assert_(not self.playlist._itemsById.has_key('id1'))
+        self.assert_(self.playlist._itemsById.has_key('id2'))
         self.checkItems(1)
 
     def testAddOverlappingItems(self):
@@ -101,7 +101,7 @@ class TestPlaylist(unittest.TestCase):
         third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150, 
             True, True)
         # Second should have been deleted
-        self.assertFalse(second in self.playlist._itemsById['id1'])
+        self.assert_(second not in self.playlist._itemsById['id1'])
         self.checkItems(2)
         self.assertEquals(first.duration, 25)
 
