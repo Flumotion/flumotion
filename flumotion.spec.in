@@ -25,6 +25,7 @@ Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
 Requires:	pyOpenSSL
 Requires:	pkgconfig
+Requires:       python-crypto
 
 # for make-dummy-cert to work
 Requires(post):	openssl
@@ -254,6 +255,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Wed May 16 2007 Thomas Vander Stichele <thomas at apestaart dot org>
+- Add a python-crypto dependency for the sha256 bouncer
+
 * Mon Jan 22 2007 Andy Wingo <wingo at pobox.com>
 - Make the run, log, and cache directories group-writable, so that
   processes can manage their own pid, log files, and registry caches.
