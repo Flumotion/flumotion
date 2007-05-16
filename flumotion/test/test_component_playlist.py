@@ -35,6 +35,9 @@ class FakeProducer(object):
     def unscheduleItem(self, item):
         pass
 
+    def adjustItemScheduling(self, item):
+        pass
+
 class TestPlaylist(unittest.TestCase):
     def setUp(self):
         producer = FakeProducer()

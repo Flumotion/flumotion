@@ -147,6 +147,7 @@ class Playlist(object, log.Loggable):
             self.debug("Changing duration of previous item from %d to %d", 
                 prev.duration, newitem.timestamp - prev.timestamp)
             prev.duration = newitem.timestamp - prev.timestamp
+            self.producer.adjustItemScheduling(prev)
 
         if next and newitem.timestamp + newitem.duration > next.timestamp:
             self.debug("Changing timestamp of next item from %d to %d to fit", 
@@ -155,6 +156,7 @@ class Playlist(object, log.Loggable):
             duration = next.duration - (ts - next.timestamp)
             next.duration = duration
             next.timestamp = ts
+            self.producer.adjustItemScheduling(next)
 
         # Then we need to actually add newitem into the gnonlin timeline
         self.producer.scheduleItem(newitem)

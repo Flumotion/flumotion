@@ -1,5 +1,13 @@
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	* flumotion/test/test_component_playlist.py:
+	  Fix up reflecting changes to playlist items back into the gnonlin
+	  objects.
+
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  Return new item from addItem (used in tests)
 	* flumotion/test/test_component_playlist.py:
