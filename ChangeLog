@@ -1,3 +1,8 @@
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/parse.py (Component.as_config_dict): Make an
+	eater dict instead of a sources list, fixes flumotion-launch.
+
 2007-05-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_component_playlist.py:

@@ -168,7 +168,7 @@ class Component(object):
                'clock-master': copy.deepcopy(self.clock_master),
                'plugs': copy.deepcopy(self.plugs)}
         if self.source:
-            ret['source'] = copy.deepcopy(self.source)
+            ret['eater'] = {'default': copy.deepcopy(self.source)}
         return ret
 
 class ComponentStore:
