@@ -646,7 +646,8 @@ class Overlay(WizardStep):
             f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
                 "Worker '%s' is missing GStreamer elements '%s'.",
                 len(elements))
-            message = messages.Warning(T_(f, self.worker, "', '".join(elements)),                id='overlay')
+            message = messages.Warning(
+                T_(f, self.worker, "', '".join(elements)), id='overlay')
             message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
             self.add_msg(message)
         else:
@@ -1209,7 +1210,19 @@ class HTTP(WizardStep):
     component_type = 'http-streamer'
 
     def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'multifdsink')
+        def got_missing(missing):
+            self._missing_elements = bool(missing)
+            self.verify()
+        self._missing_elements = True
+        d = self.wizard.require_elements(self.worker, 'multifdsink')
+        d.addCallback(got_missing)
+        
+    def verify(self):
+        self.wizard.block_next(self._missing_elements or
+                               self.entry_mount_point.get_text() == '')
+        
+    def activated(self):
+        self.verify()
         
     def setup(self):
         self.spinbutton_port.set_value(self.port)
@@ -1227,10 +1240,7 @@ class HTTP(WizardStep):
         return options
 
     def on_entry_mount_point_changed(self, entry):
-        if entry.get_text() == '':
-            self.wizard.block_next(True)
-        else:
-            self.wizard.block_next(False)
+        self.verify()
 
 class HTTPBoth(HTTP):
     name = 'HTTP Streamer (audio & video)'

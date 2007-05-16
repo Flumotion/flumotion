@@ -1,5 +1,18 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py
+	(Wizard.require_elements.got_missing_elements): Return the missing
+	elements from the deferred.
+
+	* flumotion/wizard/steps.py (Overlay.worker_changed_010): Reflow.
+	(HTTP.worker_changed.got_missing, HTTP.verify, HTTP.activated)
+	(on_entry_mount_point_changed): There are two things that can
+	prevent next from being pressed, lack of multifdsink and lack of a
+	mount point. Make sure that both are necessary conditions for
+	next. Fixes #68.
+
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
 	* data/glade/Makefile.am (glade_DATA): Fix distcheck.
 
 	* flumotion/wizard/steps.py (Vorbis.get_state, Speex.get_state):

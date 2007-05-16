@@ -362,6 +362,7 @@ class Wizard(GladeWindow, log.Loggable):
                 self.block_next(True)
                 message.id = 'element' + '-'.join(elementNames)
                 self.add_msg(message)
+            return elements
         
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)
