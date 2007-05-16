@@ -1,3 +1,11 @@
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  The wizard used (and still does, actually) set bandwidth-limit to
+	  unreasonably low values, thinking it was in Mb/s (it's b/s).
+	  If the bandwidth-limit is < 1000 bps, multiply by 1e6 to make it
+	  sensible.
+
 2007-05-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.xml:

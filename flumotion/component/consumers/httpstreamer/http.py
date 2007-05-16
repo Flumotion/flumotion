@@ -467,7 +467,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.resource.setUserLimit(int(properties['client-limit']))
 
         if properties.has_key('bandwidth-limit'):
-            self.resource.setBandwidthLimit(int(properties['bandwidth-limit']))
+            limit = int(properties['bandwidth-limit'])
+            if limit < 1000:
+                # The wizard used to set this as being in Mbps, oops.
+                self.debug("Bandwidth limit set to unreasonably low %d bps, "
+                    "assuming this is meant to be Mbps", limit)
+                limit *= 1000000
+            self.resource.setBandwidthLimit(limit)
 
         if properties.has_key('redirect-on-overflow'):
             self.resource.setRedirectionOnLimits(
