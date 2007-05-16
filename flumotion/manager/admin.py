@@ -446,26 +446,7 @@ class AdminHeaven(base.ManagerHeaven):
     def __init__(self, vishnu):
         # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
-        #FIXME: don't add a log handler here until we have a good way
-        #of filtering client-side again
-        #log.addLogHandler(self.logHandler)
-        self._logcache = []
 
-    #def logHandler(self, category, type, message):
-    #    self.logcache.append((category, type, message))
-    #    for avatar in self.getAvatars():
-    #        avatar.sendLog(category, type, message)
-
-    #def sendCache(self, avatar):
-    #    if not avatar.hasRemoteReference():
-    #        reactor.callLater(0.25, self.sendCache, avatar)
-    #        return
-        
-        # FIXME: do this on request only
-        #self.debug('sending logcache to client (%d messages)' % len(self.logcache))
-        #for category, type, message in self.logcache:
-        #    avatar.sendLog(category, type, message)
-        
     ### my methods
 
     def avatarsCallRemote(self, methodName, *args, **kwargs):

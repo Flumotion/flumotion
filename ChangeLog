@@ -1,5 +1,8 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/admin.py (AdminHeaven): Fix #107: kill dead
+	code.
+
 	* flumotion/configure/uninstalled.py.in (get): 
 	* flumotion/configure/installed.py.in (get): If FLU_CACHE_DIR is
 	set, read and write our cache (bundle, connections) and registry
