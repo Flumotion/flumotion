@@ -12,6 +12,12 @@
 
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/enums.py (EncodingVideo, EncodingAudio): 
+	* flumotion/wizard/steps.py (Conversion.get_audio_page)
+	(Conversion.get_next, Theora, Smoke, JPEG, Vorbis, Speex): Make
+	the encoder pages have a header in the wizard of "Foo encoder". A
+	bit complicated because of wizard magic. Fixes #22.
+
 	* flumotion/component/converters/overlay/genimg.py
 	(generate_overlay): Return True if the text was too wide, False
 	otherwise.

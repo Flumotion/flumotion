@@ -125,12 +125,14 @@ EncodingVideo = enum.EnumClass('EncodingVideo',
                           component_type=('theora-encoder',
                                           'smoke-encoder',
                                           'jpeg-encoder'),
-                          step=('Theora', 'Smoke', 'JPEG'))
+                          step=('Theora encoder', 'Smoke encoder',
+                                'JPEG encoder'))
 EncodingAudio = enum.EnumClass('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'),
                           component_type=('vorbis-encoder',
                                           'speex-encoder',
                                           'mulaw-encoder'),
-                          step=('Vorbis', 'Speex', 'Mulaw'))
+                          step=('Vorbis encoder', 'Speex encoder',
+                                'Mulaw encoder'))
 
 # Disk writer
 RotateTime = enum.EnumClass('RotateTime',

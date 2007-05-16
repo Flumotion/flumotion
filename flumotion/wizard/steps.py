@@ -902,9 +902,9 @@ class Conversion(WizardSection):
         if self.wizard.get_step_option('Source', 'has-audio'):
             codec = self.combobox_audio.get_enum()
             if codec == EncodingAudio.Vorbis:
-                return 'Vorbis'
+                return 'Vorbis encoder'
             elif codec == EncodingAudio.Speex:
-                return 'Speex'
+                return 'Speex encoder'
             elif codec == EncodingAudio.Mulaw:
                 return None
             
@@ -914,11 +914,11 @@ class Conversion(WizardSection):
         if self.wizard.get_step_option('Source', 'has-video'):
             codec = self.combobox_video.get_enum()
             if codec == EncodingVideo.Theora:
-                return 'Theora'
+                return 'Theora encoder'
             elif codec == EncodingVideo.Smoke:
-                return 'Smoke'
+                return 'Smoke encoder'
             elif codec == EncodingVideo.JPEG:
-                return 'JPEG'
+                return 'JPEG encoder'
         elif self.wizard.get_step_option('Source', 'has-audio'):
             return self.get_audio_page()
         else:
@@ -928,7 +928,8 @@ class VideoEncoder(WizardStep):
     section = 'Conversion'
 
 class Theora(VideoEncoder):
-    name = 'Theora'
+    name = 'Theora encoder'
+    sidebar_name = 'Theora'
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
     icon = 'xiphfish.png'
@@ -970,7 +971,8 @@ class Theora(VideoEncoder):
         return options
     
 class Smoke(VideoEncoder):
-    name = 'Smoke'
+    name = 'Smoke encoder'
+    sidebar_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
     section = 'Conversion'
     component_type = 'smoke'
@@ -990,7 +992,8 @@ class Smoke(VideoEncoder):
         return options
 
 class JPEG(VideoEncoder):
-    name = 'JPEG'
+    name = 'JPEG encoder'
+    sidebar_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
     section = 'Conversion'
     component_type = 'jpeg'
@@ -1017,7 +1020,8 @@ class AudioEncoder(WizardStep):
 # Worker?
 class Vorbis(AudioEncoder):
     glade_file = 'wizard_vorbis.glade'
-    name = 'Vorbis'
+    name = 'Vorbis encoder'
+    sidebar_name = 'Vorbis'
     component_type = 'vorbis'
     icon = 'xiphfish.png'
 
@@ -1056,7 +1060,8 @@ class Vorbis(AudioEncoder):
         return options
 
 class Speex(AudioEncoder):
-    name = 'Speex'
+    name = 'Speex encoder'
+    sidebar_name = 'Speex'
     component_type = 'speex'
     icon = 'xiphfish.png'
     
