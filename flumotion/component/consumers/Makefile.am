@@ -12,4 +12,5 @@ clean-local:
 SUBDIRS = \
 	disker \
 	httpstreamer \
-	preview
+	preview \
+	shout2

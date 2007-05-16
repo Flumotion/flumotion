@@ -287,6 +287,17 @@ class WizardSaver(log.Loggable):
                 if cons_options['disk-video']:
                     steps.append(('disk-video', 'disk-consumer',
                                   'Disk (video only)', video_muxer))
+            if cons_options['shout2']:
+                if cons_options['shout2-audio-video']:
+                    steps.append(('shout2-audio-video', 'shout2-consumer',
+                                  'Icecast streamer (audio & video)',
+                                  both_muxer))
+                if cons_options['shout2-audio']:
+                    steps.append(('shout2-audio', 'shout2-consumer',
+                                  'Icecast streamer (audio only)', audio_muxer))
+                if cons_options['shout2-video']:
+                    steps.append(('shout2-video', 'shout2-consumer',
+                                  'Icecast streamer (video only)', video_muxer))
         elif has_video and not has_audio:
             if cons_options['http']:
                 steps.append(('http-video', 'http-streamer',
@@ -294,6 +305,9 @@ class WizardSaver(log.Loggable):
             if cons_options['disk']:
                 steps.append(('disk-video', 'disk-consumer',
                               'Disk (video only)', video_muxer))
+            if cons_options['shout2']:
+                steps.append(('shout2-video', 'shout2-consumer',
+                              'Icecast streamer (video only)', video_muxer))
         elif has_audio and not has_video:
             if cons_options['http']:
                 steps.append(('http-audio', 'http-streamer',
@@ -301,6 +315,9 @@ class WizardSaver(log.Loggable):
             if cons_options['disk']:
                 steps.append(('disk-audio', 'disk-consumer',
                               'Disk (audio only)', audio_muxer))
+            if cons_options['shout2']:
+                steps.append(('shout2', 'shout2-consumer',
+                              'Icecast streamer (audio only)', audio_muxer))
         else:
             raise AssertionError
 

@@ -1,5 +1,22 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	Patch by: Gergely Nagy
+	
+	* flumotion/component/consumers/Makefile.am (SUBDIRS): 
+	* flumotion/component/consumers/shout2/shout2.py: 
+	* flumotion/component/consumers/shout2/Makefile.am: 
+	* flumotion/component/consumers/shout2/__init__.py: 
+	* flumotion/component/consumers/shout2/shout2.xml: 
+	* flumotion/wizard/steps.py (Consumption.on_checkbutton_shout2_toggled)
+	(Consumption.verify, Consumption.get_next)
+	(Shout2.component_type, Shout2Both.name, Shout2Audio.name)
+	(Shout2Video.name): 
+	* flumotion/wizard/save.py (WizardSaver.handleConsumers): 
+	* data/glade/wizard_consumption.glade: 
+	* data/glade/wizard_shout2.glade: 
+	* configure.ac: Add shout2 consumer, updated from Gergely's patch.
+	Fixes #239.
+
 	* flumotion/launch/parse.py (Component.as_config_dict): Make an
 	eater dict instead of a sources list, fixes flumotion-launch.
 

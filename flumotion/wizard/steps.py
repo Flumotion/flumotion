@@ -1099,17 +1099,28 @@ class Consumption(WizardSection):
         
         self.verify()
 
+    def on_checkbutton_shout2_toggled(self, button):
+        value = self.checkbutton_shout2.get_active()
+        self.checkbutton_shout2_audio_video.set_sensitive(value)
+        self.checkbutton_shout2_audio.set_sensitive(value)
+        self.checkbutton_shout2_video.set_sensitive(value)
+
+        self.verify()
+
     def on_secondary_checkbutton_toggled(self, button):
         self.verify()
 
     def verify(self):
-        if (not self.checkbutton_disk and not self.checkbutton_http):
+        if (not self.checkbutton_disk and not self.checkbutton_http
+            and not self.checkbutton_shout2):
             self.wizard.block_next(True)
         else:
             if ((self.checkbutton_disk and not self.checkbutton_disk_audio and
                  not self.checkbutton_disk_video and not self.checkbutton_disk_audio_video) or
                 (self.checkbutton_http and not self.checkbutton_http_audio and
-                 not self.checkbutton_http_video and not self.checkbutton_http_audio_video)):
+                 not self.checkbutton_http_video and not self.checkbutton_http_audio_video) or
+                (self.checkbutton_shout2 and not self.checkbutton_shout2_audio and
+                 not self.checkbutton_shout2_video and not self.checkbutton_shout2_audio_video)):
                 self.wizard.block_next(True)
             else:
                 self.wizard.block_next(False)
@@ -1127,6 +1138,9 @@ class Consumption(WizardSection):
         self.checkbutton_disk_audio_video.set_property('visible', has_both)
         self.checkbutton_disk_audio.set_property('visible', has_both)
         self.checkbutton_disk_video.set_property('visible', has_both)
+        self.checkbutton_shout2_audio_video.set_property('visible', has_both)
+        self.checkbutton_shout2_audio.set_property('visible', has_both)
+        self.checkbutton_shout2_video.set_property('visible', has_both)
 
     def get_next(self, step=None):
         items = []
@@ -1148,16 +1162,27 @@ class Consumption(WizardSection):
                     items.append('Disk (audio only)')
                 if self.checkbutton_disk_video:
                     items.append('Disk (video only)')
+            if self.checkbutton_shout2:
+                if self.checkbutton_shout2_audio_video:
+                    items.append('Icecast streamer (audio & video)')
+                if self.checkbutton_shout2_audio:
+                    items.append('Icecast streamer (audio only)')
+                if self.checkbutton_shout2_video:
+                    items.append('Icecast streamer (video only)')
         elif has_video and not has_audio:
             if self.checkbutton_http:
                 items.append('HTTP Streamer (video only)')
             if self.checkbutton_disk:
                 items.append('Disk (video only)')
+            if self.checkbutton_shout2:
+                items.append('Icecast streamer (video only)')
         elif has_audio and not has_video:
             if self.checkbutton_http:
                 items.append('HTTP Streamer (audio only)')
             if self.checkbutton_disk:
                 items.append('Disk (audio only)')
+            if self.checkbutton_shout2:
+                items.append('Icecast streamer (audio only)')
         else:
             raise AssertionError
         
@@ -1292,6 +1317,40 @@ class DiskAudio(Disk):
 class DiskVideo(Disk):
     name = 'Disk (video only)'
     sidebar_name = 'Disk video'
+
+class Shout2(WizardStep):
+    glade_file = 'wizard_shout2.glade'
+    section = 'Consumption'
+    component_type = 'shout2'
+
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'shout2send')
+        
+    def get_next(self):
+        return self.wizard['Consumption'].get_next(self)
+
+    def get_state(self):
+        options = WizardStep.get_state(self)
+
+        options['port'] = int(options['port'])
+
+        for option in options.keys():
+            if options[option] == '':
+                del options[option]
+
+        return options
+
+class Shout2Both(Shout2):
+    name = 'Icecast streamer (audio & video)'
+    sidebar_name = 'Icecast audio/video'
+
+class Shout2Audio(Shout2):
+    name = 'Icecast streamer (audio only)'
+    sidebar_name = 'Icecast audio'
+
+class Shout2Video(Shout2):
+    name = 'Icecast streamer (video only)'
+    sidebar_name = 'Icecast video'
 
 class License(WizardSection):
     name = "Content License"

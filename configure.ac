@@ -180,6 +180,7 @@ flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/consumers/preview/Makefile
+flumotion/component/consumers/shout2/Makefile
 flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
