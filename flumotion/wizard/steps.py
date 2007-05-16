@@ -969,6 +969,13 @@ class Theora(VideoEncoder):
         elif self.radiobutton_quality:
             options['quality'] = int(self.spinbutton_quality.get_value())
 
+        options['keyframe-maxdistance'] = int(self.spinbutton_keyframe_maxdistance.get_value())
+        options['noise-sensitivity'] = \
+            max(int(self.spinbutton_noise_sensitivity.get_value()
+                    * (32768 / 100.)),
+                1)
+        options['sharpness'] = int(self.spinbutton_sharpness.get_value())
+
         return options
     
 class Smoke(VideoEncoder):

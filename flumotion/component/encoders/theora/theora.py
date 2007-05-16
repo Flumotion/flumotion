@@ -55,7 +55,8 @@ class Theora(feedcomponent.ParseLaunchComponent):
                  ('quick-compress', 'quick'),
                  ('keyframe-maxdistance', 'keyframe-freq'),
                  ('keyframe-maxdistance', 'keyframe-force'),
-                 'noise-sensitivity')
+                 'noise-sensitivity',
+                 'sharpness')
 
         # F0.6: remove this code
         # before 0.3.2, bitrate was interpreted as kbps, inconsistent

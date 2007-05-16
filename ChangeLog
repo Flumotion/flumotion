@@ -1,5 +1,17 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	Patch by: Gergely Nagy
+	
+	* flumotion/component/encoders/theora/theora.xml: 
+	* flumotion/component/encoders/theora/theora.py
+	(Theora.configure_pipeline): Add support for sharpness parameter.
+
+	* data/glade/wizard_theora.glade: 
+	* flumotion/wizard/steps.py (Theora.get_state): Add Advanced
+	settings area to the Theora encoder wizard page. Fixes #74.
+
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/wizard/wizard.py
 	(Wizard.require_elements.got_missing_elements): Return the missing
 	elements from the deferred.
