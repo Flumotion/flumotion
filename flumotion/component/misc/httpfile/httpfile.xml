@@ -76,6 +76,7 @@
         <directories>
             <directory name="flumotion/component/misc/httpfile">
                 <filename location="httpfile.py" />
+                <filename location="file.py" />
             </directory>
         </directories>
     </bundle>
