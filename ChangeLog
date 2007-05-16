@@ -1,3 +1,8 @@
+2007-05-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/inspect.py (main): Indent all properties
+	evenly.
+
 2007-05-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/scheduler.py (ICalScheduler.__init__):

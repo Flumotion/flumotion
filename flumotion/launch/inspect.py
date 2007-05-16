@@ -116,14 +116,15 @@ def main(args):
             properties.sort()
             print '\nProperties:'
             if properties:
+                indent = max([len(p[0]) for p in properties])
                 for k, v in properties:
                     desc = v.getDescription()
-                    print ('  %s: type %s, %s%s'
-                           % (k, v.getType(),
+                    print ('  %s%s: type %s, %s%s'
+                           % (' '*(indent-len(k)), k, v.getType(),
                               v.isRequired() and 'required' or 'optional',
                               v.isMultiple() and ', multiple ok' or ''))
                     if desc:
-                        print '  %s  %s' % (' ' * len(k), desc)
+                        print '  %s  %s' % (' ' * indent, desc)
             sockets = c.getSockets()
             print '\nClocking:'
             print '  Needs synchronisation: %r' % c.getNeedsSynchronization()
