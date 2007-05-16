@@ -24,6 +24,7 @@ glade_DATA = \
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_overview.glade		\
+	wizard_shout2.glade		\
 	wizard_smoke.glade		\
 	wizard_soundcard.glade		\
 	wizard_source.glade		\

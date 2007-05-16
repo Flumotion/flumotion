@@ -1,5 +1,7 @@
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* data/glade/Makefile.am (glade_DATA): Fix distcheck.
+
 	* flumotion/wizard/steps.py (Vorbis.get_state, Speex.get_state):
 	Apparently a kilobit is 1000 bits? According to Mike?
 	(HTTP.get_state): When the user says 10 megabits, she does not
