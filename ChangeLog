@@ -1,3 +1,10 @@
+2007-05-16  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Factor generic playlist parsing support code out into a separate
+	  class; add new PlaylistXMLParser class for the XML case.
+
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/converters/overlay/genimg.py

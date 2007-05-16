@@ -310,7 +310,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.link()
 
         playlist = playlistparser.Playlist(self)
-        self.playlistparser = playlistparser.PlaylistParser(playlist)
+        self.playlistparser = playlistparser.PlaylistXMLParser(playlist)
         try:
             if self._playlistfile:
                 self.playlistparser.parseFile(self._playlistfile)

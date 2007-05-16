@@ -178,41 +178,6 @@ class PlaylistParser(object, log.Loggable):
         self._pending_items = []
         self._discovering = False
 
-    def parseData(self, data):
-        """
-        Parse playlist XML document data
-        """
-        file = StringIO(data)
-        self.parseFile(file)
-
-    def replaceFile(self, file, id):
-        self.playlist.removeItems(id)
-        self.parseFile(file, id)
-
-    def parseFile(self, file, id=None):
-        """
-        Parse a playlist file. Adds the contents of the file to the existing 
-        playlist, overwriting any existing entries for the same time period.
-        """
-        parser = fxml.Parser()
-
-        root = parser.getRoot(file)
-
-        node = root.documentElement
-        self.debug("Parsing playlist from file %s", file)
-        if node.nodeName != 'playlist':
-            raise fxml.ParserError("Root node is not 'playlist'")
-
-        for child in node.childNodes:
-            if child.nodeType == Node.ELEMENT_NODE and \
-                    child.nodeName == 'entry':
-                self.debug("Parsing entry")
-                self._parsePlaylistEntry(parser, child, id)
-
-        # Now launch the discoverer for any pending items
-        if not self._discovering:
-            self._discoverPending()
-
     def _discoverPending(self):
         def _discovered(disc, is_media):
             self.debug("Discovered!")
@@ -263,6 +228,46 @@ class PlaylistParser(object, log.Loggable):
         disc.connect('discovered', _discovered)
         disc.discover()
 
+    def addItemToPlaylist(self, filename, timestamp, duration, offset, id):
+        self._pending_items.append((filename, timestamp, duration, offset, id))
+
+        # Now launch the discoverer for any pending items
+        if not self._discovering:
+            self._discoverPending()
+
+class PlaylistXMLParser(PlaylistParser):
+
+    def parseData(self, data):
+        """
+        Parse playlist XML document data
+        """
+        file = StringIO(data)
+        self.parseFile(file)
+
+    def replaceFile(self, file, id):
+        self.playlist.removeItems(id)
+        self.parseFile(file, id)
+
+    def parseFile(self, file, id=None):
+        """
+        Parse a playlist file. Adds the contents of the file to the existing 
+        playlist, overwriting any existing entries for the same time period.
+        """
+        parser = fxml.Parser()
+
+        root = parser.getRoot(file)
+
+        node = root.documentElement
+        self.debug("Parsing playlist from file %s", file)
+        if node.nodeName != 'playlist':
+            raise fxml.ParserError("Root node is not 'playlist'")
+
+        for child in node.childNodes:
+            if child.nodeType == Node.ELEMENT_NODE and \
+                    child.nodeName == 'entry':
+                self.debug("Parsing entry")
+                self._parsePlaylistEntry(parser, child, id)
+
     def _parsePlaylistEntry(self, parser, entry, id):
         mandatory = ['filename', 'time']
         optional = ['duration', 'offset']
@@ -278,7 +283,7 @@ class PlaylistParser(object, log.Loggable):
 
         timestamp = self._parseTimestamp(timestamp)
 
-        self._pending_items.append((filename, timestamp, duration, offset, id))
+        self.addItemToPlaylist(filename, timestamp, duration, offset, id)
 
     def _parseTimestamp(self, ts):
         # Take TS in YYYY-MM-DDThh:mm:ssZ format, return timestamp in 
