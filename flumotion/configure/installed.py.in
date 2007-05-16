@@ -22,27 +22,30 @@
 import os
 
 def get():
-    try:
-        homedir = os.environ['HOME']
-        registrydir = os.path.join(homedir, '.flumotion')
-        cachedir = os.path.join(homedir, '.flumotion')
-        daemondir = homedir
-        def ensure(path):
+    def ensure(path):
+        try:
             try:
                 os.listdir(path)
             except:
                 os.makedirs(path)
-        ensure(registrydir)
-        ensure(cachedir)
-    except KeyError:
-        registrydir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion',
-            '.flumotion')
+        except OSError, e:
+            print 'Error making dir %s: %s' % (e.filename, e.strerror)
+            print 'Things are probably going to break!'
+
+    if 'FLU_CACHE_DIR' in os.environ:
+        cachedir = os.path.realpath(os.environ['FLU_CACHE_DIR'])
+        daemondir = cachedir
+    elif 'HOME' in os.environ:
+        homedir = os.environ['HOME']
+        cachedir = os.path.join(homedir, '.flumotion')
+        daemondir = homedir
+    else:
         cachedir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion',
-            '.flumotion')
+                                '.flumotion')
         daemondir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
-    except OSError, e:
-        print 'Error making dir %s: %s' % (e.filename, e.strerror)
-        print 'Things are probably going to break!'
+
+    ensure(cachedir)
+    registrydir = cachedir
 
     return {
         'isinstalled':   True,
