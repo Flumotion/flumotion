@@ -1,3 +1,9 @@
+2007-05-17  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Throttle discoverer rate to avoid using too much cpu when adding a
+	  long playlist.
+
 2007-05-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py (AdminHeaven): Fix #107: kill dead

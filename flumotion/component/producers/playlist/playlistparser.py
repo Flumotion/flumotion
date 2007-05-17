@@ -210,8 +210,10 @@ class PlaylistParser(object, log.Loggable):
             else:
                 self.warning("Discover failed to find media in %s", item[0])
     
-            self.debug("Continuing on to next file")
-            self._discoverPending()
+            # We don't want to burn too much cpu discovering all the files;
+            # this throttles the discovery rate to a reasonable level
+            self.debug("Continuing on to next file in one second")
+            reactor.callLater(1, self._discoverPending)
 
         if not self._pending_items:
             self.debug("No more files to discover")
