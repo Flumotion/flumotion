@@ -297,13 +297,13 @@ class PlaylistXMLParser(PlaylistParser):
         tsmain, trailing = ts[:-4], ts[-4:]
         if trailing[0] != '.' or trailing[3] != 'Z' or \
                 not trailing[1].isdigit() or not trailing[2].isdigit():
-            raise fxml.ParserError("Invalid timestamp %s", ts)
+            raise fxml.ParserError("Invalid timestamp %s" % ts)
         format = "%Y-%m-%dT%H:%M:%S"
 
         try:
             timestruct = time.strptime(tsmain, format)
             return int(calendar.timegm(timestruct) * gst.SECOND)
         except ValueError:
-            raise fxml.ParserError("Invalid timestamp %s", ts)
+            raise fxml.ParserError("Invalid timestamp %s" % ts)
 
 
