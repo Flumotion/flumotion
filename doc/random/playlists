@@ -34,7 +34,7 @@ Timestamps:
    2007-04-19T15:15:20.38Z
  Similarly, 17th May 2007, 8:20:18am Central European Summer Time (UTC+2) is
  written as (note the 06; we convert to UTC for this):
-   2007-05-17T06:20:18Z
+   2007-05-17T06:20:18.00Z
 
 Sample file (single entry):
 
