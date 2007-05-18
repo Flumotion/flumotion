@@ -23,6 +23,7 @@ import gst
 from gst.extend import discoverer
 
 import time
+import calendar
 from StringIO import StringIO
 
 from xml.dom import Node
@@ -288,14 +289,20 @@ class PlaylistXMLParser(PlaylistParser):
         self.addItemToPlaylist(filename, timestamp, duration, offset, id)
 
     def _parseTimestamp(self, ts):
-        # Take TS in YYYY-MM-DDThh:mm:ssZ format, return timestamp in 
+        # Take TS in YYYY-MM-DDThh:mm:ss.ssZ format, return timestamp in 
         # nanoseconds since the epoch
-        format = "%Y-%m-%dT%H:%M:%SZ"
+
+        # time.strptime() doesn't handle the fractional seconds part. We ignore
+        # it entirely, after verifying that it has the right format.
+        tsmain, trailing = ts[:-4], ts[-4:]
+        if trailing[0] != '.' or trailing[3] != 'Z' or \
+                not trailing[1].isdigit() or not trailing[2].isdigit():
+            raise fxml.ParserError("Invalid timestamp %s", ts)
+        format = "%Y-%m-%dT%H:%M:%S"
 
         try:
-            timestruct = time.strptime(ts, format)
-
-            return int(time.mktime(timestruct) * gst.SECOND)
+            timestruct = time.strptime(tsmain, format)
+            return int(calendar.timegm(timestruct) * gst.SECOND)
         except ValueError:
             raise fxml.ParserError("Invalid timestamp %s", ts)
 

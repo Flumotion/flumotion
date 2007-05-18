@@ -1,3 +1,11 @@
+2007-05-18  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Parse timestamps correctly in the format we defined.
+	  Specifically: require and parse the fractional seconds part (it is
+	  discarded, however; we only schedule on whole second boundaries),
+	  and parse as UTC, not local time.
+
 2007-05-17  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlistparser.py:
