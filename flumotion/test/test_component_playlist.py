@@ -29,6 +29,8 @@ from twisted.internet import defer
 from flumotion.component.producers.playlist import playlistparser
 
 class FakeProducer(object):
+    position = -1
+
     def scheduleItem(self, item):
         pass
 
@@ -37,6 +39,9 @@ class FakeProducer(object):
 
     def adjustItemScheduling(self, item):
         pass
+
+    def getCurrentPosition(self):
+        return self.position
 
 class TestPlaylist(unittest.TestCase):
     def setUp(self):

@@ -56,9 +56,24 @@ class Playlist(object, log.Loggable):
 
         self.producer = producer
 
-    def _getCurrentItem(self):
-        # TODO: improve this!
+    def _findItem(self, position):
+        # Get the item that corresponds to position, or None
+        cur = self.items
+        while cur:
+            if cur.timestamp < position and \
+                    cur.timestamp + cur.duration > position:
+                return cur
+            if cur.timestamp > position:
+                return None # fail without having to iterate over everything
+            cur = cur.next
         return None
+
+    def _getCurrentItem(self):
+        position = self.producer.getCurrentPosition()
+        item = self._findItem(position)
+        self.debug("Item %r found as current for playback position %d", 
+            item, position)
+        return item
 
     def removeItems(self, id):
         current = self._getCurrentItem()
@@ -92,6 +107,9 @@ class Playlist(object, log.Loggable):
             self.warning("New object at uri %s starts during current object, "
                 "cannot add")
             return None
+        # We don't care about anything older than now; drop references to them
+        if current:
+            self.items = current
 
         newitem = PlaylistItem(id, timestamp, uri, offset, duration)
         newitem.hasAudio = hasAudio
@@ -164,14 +182,6 @@ class Playlist(object, log.Loggable):
 
         return newitem
 
-    def expireOldEntries(self):
-        """
-        Delete references to old playlist entries that have passed.
-        TODO: is this needed? It's to save memory, but probably not very much 
-        memory...
-        """
-        pass
-
 class PlaylistParser(object, log.Loggable):
     def __init__(self, playlist):
         self.playlist = playlist
@@ -232,6 +242,14 @@ class PlaylistParser(object, log.Loggable):
         disc.discover()
 
     def addItemToPlaylist(self, filename, timestamp, duration, offset, id):
+        # We only want to add it if it's plausibly schedulable.
+        end = timestamp
+        if duration is not None:
+            end += duration
+        if end < time.time() * gst.SECOND:
+            self.debug("Early-out: ignoring add for item in past")
+            return
+
         self._pending_items.append((filename, timestamp, duration, offset, id))
 
         # Now launch the discoverer for any pending items

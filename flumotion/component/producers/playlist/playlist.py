@@ -23,7 +23,7 @@ import gst
 import gobject
 import time
 
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 
 from flumotion.common import errors, messages, log, fxml
 from flumotion.component import feedcomponent
@@ -89,7 +89,6 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
     def init(self):
         self.basetime = -1
-        self.pipeline = None
 
         self._hasAudio = True
         self._hasVideo = True
@@ -218,6 +217,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.debug("Setting basetime of %d", self.basetime)
         pipeline.set_base_time(self.basetime)
 
+    def getCurrentPosition(self):
+        return self.pipeline.query_position(gst.FORMAT_TIME)[0]
+
     def scheduleItem(self, item):
         """
         Schedule a given playlist item in our playback compositions.
@@ -231,18 +233,26 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         # thus we're out of sync.
         # So, always start slightly in the future... 5 seconds seems to work
         # fine in practice.
-        now = self.pipeline.query_position(gst.FORMAT_TIME)[0] + 5 * gst.SECOND
+        now = self.getCurrentPosition()
+        neareststarttime = now + 5 * gst.SECOND
 
-        if start < now:
-            if start + item.duration < now:
+        if start < neareststarttime:
+            if start + item.duration < neareststarttime:
                 self.debug("Item too late; skipping entirely")
                 return
             else:
-                change = now - start
+                change = neareststarttime - start
                 self.debug("Starting item with offset %d", change)
                 item.duration -= change
                 item.offset += change
-                start = now
+                start = neareststarttime
+
+        end = start + item.duration
+        timeuntilend = end - now
+        # After the end time, remove this item from the composition, otherwise
+        # it will continue to use huge gobs of memory and lots of threads.
+        reactor.callLater(timeuntilend/gst.SECOND + 5, 
+            self.unscheduleItem, item)
 
         if self._hasVideo and item.hasVideo:
             self.debug("Adding video source with start %d, duration %d, "
@@ -316,6 +326,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 self.playlistparser.parseFile(self._playlistfile)
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
+
+        #if self._playlistdirectory:
+        #    watchdirectory(playlistdirectory, newplaylistfile, playlistfiledelted)
 
         return defer.succeed(None)
         

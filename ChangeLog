@@ -1,3 +1,18 @@
+2007-05-21  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  Add getCurrentPosition function.
+	  Don't set pipeline to None (oops!).
+	  Remove sources after they're finished, so we don't leak huge amounts
+	  of memory.
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Don't discover files that wouldn't be played anyway due to being
+	  scheduled for the past.
+	 
+	* flumotion/test/test_component_playlist.py:
+	  Adapt for API changes in playlist component
+
 2007-05-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_config.py (TestConfig.testParseManager)
