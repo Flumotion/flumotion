@@ -1,5 +1,15 @@
 2007-05-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/main.py (main): Parse the manager config with
+	the new ManagerConfigParser.
+
+	* flumotion/common/config.py (ManagerConfigParser): New config
+	parser, parses the manager configuration out of a planet file.
+	This will allow simplification of the other parser.
+
+	* flumotion/test/test_config.py: Fix some tests to test
+	ManagerConfigParser instead of the flow parser.
+
 	* flumotion/common/registry.py (RegistryParser.getComponent):
 	Raise UnknownComponentError if the component type is unknown.
 

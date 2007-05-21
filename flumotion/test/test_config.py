@@ -85,11 +85,14 @@ regchunk = """
 reg = registry.getRegistry()
 reg.addFromString(regchunk)
 
-def ConfigXML(string):
+def ConfigXML(string, parser=config.FlumotionConfigXML):
     f = StringIO(string)
-    conf = config.FlumotionConfigXML(f)
+    conf = parser(f)
     f.close()
     return conf
+
+def ManagerConfigXML(string):
+    return ConfigXML(string, config.ManagerConfigParser)
 
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
@@ -182,7 +185,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(dict.get('type'), 'test-component', dict['type'])
         
     def testParseManager(self):
-        conf = ConfigXML(
+        conf = ManagerConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -202,7 +205,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conf.manager.bouncer.name, "component-name")
 
     def testParseManagerWithPlugs(self):
-        conf = ConfigXML(
+        conf = ManagerConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -230,7 +233,7 @@ class TestConfig(unittest.TestCase):
                            []})
 
     def testParseManagerWithBogusPlug(self):
-        conf = ConfigXML(
+        conf = ManagerConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -248,6 +251,8 @@ class TestConfig(unittest.TestCase):
         conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
+
+        self.assertRaises(config.ConfigError, ManagerConfigXML, xml)
 
     def testParseComponentError(self):
         xml = """<planet>
@@ -320,7 +325,7 @@ class TestConfig(unittest.TestCase):
             <component name="first" type="test-component" worker="foo"/>
             <component name="second" type="test-component" worker="foo"/>
             </manager></planet>"""
-        conf = ConfigXML(xml)
+        conf = ManagerConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -330,7 +335,7 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            ConfigXML, xml)
+            ManagerConfigXML, xml)
 
         xml = """<planet>
                <manager name="aname">
@@ -338,7 +343,7 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            ConfigXML, xml)
+            ManagerConfigXML, xml)
   
         xml = """<planet>
                <manager name="aname">
@@ -346,7 +351,7 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            ConfigXML, xml)
+            ManagerConfigXML, xml)
    
     def testParseProperties(self):
         planet = ConfigXML(

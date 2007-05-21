@@ -171,7 +171,7 @@ def main(args):
 
     planetFile = args[1]
     try:
-        cfg = config.FlumotionConfigXML(planetFile)
+        cfg = config.ManagerConfigParser(planetFile)
     except IOError, e:
         sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %
             planetFile)
