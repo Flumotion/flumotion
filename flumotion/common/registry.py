@@ -363,7 +363,11 @@ class RegistryParser(fxml.Parser):
         return self._components.values()
 
     def getComponent(self, name):
-        return self._components[name]
+        try:
+            return self._components[name]
+        except KeyError:
+            raise errors.UnknownComponentError("unknown component type:"
+                                               " %s" % (name,))
 
     def getPlugs(self):
         return self._plugs.values()
