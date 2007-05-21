@@ -1,3 +1,11 @@
+2007-05-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/fxml.py (Parser.parserError): Allow
+	customization of the parser error exception class.
+	(Parser.getRoot, Parser.checkAttributes, Parser.parseFromTable):
+	Throw the custom exception class, defaulting to ParserError as
+	before.
+
 2007-05-18  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlistparser.py:

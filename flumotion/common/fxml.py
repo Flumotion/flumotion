@@ -69,6 +69,8 @@ class Parser(log.Loggable):
     share code.
     """
     
+    parserError = ParserError
+
     def getRoot(self, file):
         """
         Return the root of the XML tree for the the string or filename
@@ -85,8 +87,8 @@ class Parser(log.Loggable):
         try:
             return minidom.parse(file)
         except expat.ExpatError, e:
-            raise ParserError('Error parsing XML from %r: %s' % (
-                              file, log.getExceptionMessage(e)))
+            raise self.parserError('Error parsing XML from %r: %s' % (
+                file, log.getExceptionMessage(e)))
         
     def checkAttributes(self, node, required=None, optional=None):
         """
@@ -105,11 +107,11 @@ class Parser(log.Loggable):
         required = sets.Set(required or ())
         optional = sets.Set(optional or ())
         for x in attrs - required.union(optional):
-            raise ParserError("Unknown attribute in <%s>: %s"
-                              % (node.nodeName, x))
+            raise self.parserError("Unknown attribute in <%s>: %s"
+                                   % (node.nodeName, x))
         for x in required - attrs:
-            raise ParserError("Missing attribute in <%s>: %s"
-                              % (node.nodeName, x))
+            raise self.parserError("Missing attribute in <%s>: %s"
+                                   % (node.nodeName, x))
 
     def parseAttributes(self, node, required=None, optional=None):
         """
@@ -170,6 +172,6 @@ class Parser(log.Loggable):
             try:
                 parser, handler = parsers[child.nodeName]
             except KeyError:
-                raise ParserError("unexpected node in <%s>: %s"
-                                  % (parent.nodeName, child))
+                raise self.parserError("unexpected node in <%s>: %s"
+                                       % (parent.nodeName, child))
             handler(parser(child))
