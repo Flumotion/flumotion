@@ -101,8 +101,8 @@ class TestConfig(unittest.TestCase):
         self.failUnless(conf.export())
 
     def testParseWrongConfig(self):
-        self.assertRaises(config.ConfigError,
-            ConfigXML, '<somethingorother/>')
+        conf = ConfigXML('<somethingorother/>')
+        self.assertRaises(config.ConfigError, conf.parse)
 
     def testParseWrongSyntax(self):
         self.assertRaises(config.ConfigError,
@@ -116,7 +116,7 @@ class TestConfig(unittest.TestCase):
                  <component name="component-name" type="test-component"/>
                </atmosphere>
              </planet>""")
-        self.assertRaises(config.ComponentWorkerConfigError, conf.parse)
+        self.assertRaises(config.ConfigError, conf.parse)
         conf = ConfigXML(
              """
              <planet>
@@ -125,7 +125,7 @@ class TestConfig(unittest.TestCase):
                             worker=""/>
                </atmosphere>
              </planet>""")
-        self.assertRaises(config.ComponentWorkerConfigError, conf.parse)
+        self.assertRaises(config.ConfigError, conf.parse)
 
     def testParseAtmosphere(self):
         conf = ConfigXML(

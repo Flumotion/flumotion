@@ -94,7 +94,8 @@ class Parser(log.Loggable):
         """
         Checks that a given XML node has all of the required attributes,
         and no unknown attributes. Raises fxml.ParserError if unknown
-        or missing attributes are detected.
+        or missing attributes are detected. An empty attribute (e.g.
+        'foo=""') is treated as a missing attribute.
 
         @param node: An XML DOM node.
         @type node: L{xml.dom.Node}
@@ -103,7 +104,8 @@ class Parser(log.Loggable):
         @param optional: Set of optional attributes, or None.
         @type optional: Sequence (list, tuple, ...) of strings.
         """
-        attrs = sets.Set(node.attributes.keys())
+        attrs = sets.Set([k for k in node.attributes.keys()
+                          if str(node.getAttribute(k))])
         required = sets.Set(required or ())
         optional = sets.Set(optional or ())
         for x in attrs - required.union(optional):

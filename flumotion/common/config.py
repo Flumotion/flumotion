@@ -41,6 +41,9 @@ from errors import ConfigError, ComponentWorkerConfigError
 # all these string values should result in True
 BOOL_TRUE_VALUES = ['True', 'true', '1', 'Yes', 'yes']
 
+def _ignore(*args):
+    pass
+
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
     nice = 0
@@ -128,6 +131,18 @@ class BaseConfigParser(fxml.Parser):
 
     def export(self):
         return self.doc.toxml()
+
+    def parseVersionString(self, versionString):
+        if versionString:
+            try:
+                def parse(maj, min, mic, nan=0):
+                    return maj, min, mic, nan
+                return parse(*map(int, versionString.split('.')))
+            except:
+                raise ComponentWorkerConfigError("<component> version not"
+                                                 " parseable")
+        else:
+            return configure.versionTuple
 
     def get_float_values(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]
@@ -314,8 +329,6 @@ class FlumotionConfigXML(BaseConfigParser):
     """
     I represent a planet configuration file for Flumotion.
 
-    @ivar manager:    A L{ConfigEntryManager} containing options for the manager
-                      section, filled in at construction time.
     @ivar atmosphere: A L{ConfigEntryAtmosphere}, filled in when parse() is
                       called.
     @ivar flows:      A list of L{ConfigEntryFlow}, filled in when parse() is
@@ -327,66 +340,40 @@ class FlumotionConfigXML(BaseConfigParser):
         BaseConfigParser.__init__(self, file)
 
         self.flows = []
-        self.manager = None
         self.atmosphere = ConfigEntryAtmosphere()
-
-        # We parse without asking for a registry so the registry doesn't
-        # verify before knowing the debug level
-        self.parse(noRegistry=True)
         
-    def parse(self, noRegistry=False):
+    def parse(self):
         # <planet>
-        #     <manager>
-        #     <atmosphere>
-        #     <flow>
-        #     ...
+        #     <manager>?
+        #     <atmosphere>*
+        #     <flow>*
         # </planet>
-
         root = self.doc.documentElement
-        
-        if not root.nodeName == 'planet':
+        if root.nodeName != 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
         
-        for node in root.childNodes:
-            if node.nodeType != Node.ELEMENT_NODE:
-                continue
-
-            if noRegistry and node.nodeName != 'manager':
-                continue
-                
-            if node.nodeName == 'atmosphere':
-                entry = self._parseAtmosphere(node)
-                self.atmosphere.components.update(entry)
-            elif node.nodeName == 'flow':
-                entry = self._parseFlow(node)
-                self.flows.append(entry)
-            elif node.nodeName == 'manager':
-                entry = self._parseManager(node, noRegistry)
-                self.manager = entry
-            else:
-                raise ConfigError("unexpected node under 'planet': %s" % node.nodeName)
+        parsers = {'atmosphere': (self._parseAtmosphere,
+                                  self.atmosphere.components.update),
+                   'flow': (self._parseFlow,
+                            self.flows.append),
+                   'manager': (_ignore, _ignore)}
+        self.parseFromTable(root, parsers)
 
     def _parseAtmosphere(self, node):
         # <atmosphere>
         #   <component>
         #   ...
         # </atmosphere>
-
         ret = {}
-        for child in node.childNodes:
-            if (child.nodeType == Node.TEXT_NODE or
-                child.nodeType == Node.COMMENT_NODE):
-                continue
-            
-            if child.nodeName == "component":
-                component = self._parseComponent(child, 'atmosphere')
-            else:
-                raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
-
-            ret[component.name] = component
+        def parseComponent(node):
+            return self._parseComponent(node, 'atmosphere')
+        def gotComponent(comp):
+            ret[comp.name] = comp
+        parsers = {'component': (parseComponent, gotComponent)}
+        self.parseFromTable(node, parsers)
         return ret
      
-    def _parseComponent(self, node, parent, forManager=False):
+    def _parseComponent(self, node, parent):
         """
         Parse a <component></component> block.
 
@@ -400,43 +387,9 @@ class FlumotionConfigXML(BaseConfigParser):
         #   <property name="name">value</property>*
         # </component>
         
-        if not node.hasAttribute('name'):
-            raise ConfigError("<component> must have a name attribute")
-        if not node.hasAttribute('type'):
-            raise ConfigError("<component> must have a type attribute")
-        if forManager:
-            if node.hasAttribute('worker'):
-                raise ComponentWorkerConfigError("components in manager"
-                                                 "cannot have workers")
-        else:
-            if (not node.hasAttribute('worker')
-                or not node.getAttribute('worker')):
-                # new since 0.3, give it a different error
-                raise ComponentWorkerConfigError("<component> must have a"
-                                                 " worker attribute")
-        version = None
-        if node.hasAttribute('version'):
-            versionString = node.getAttribute("version")
-            try:
-                versionList = map(int, versionString.split('.'))
-                if len(versionList) == 3:
-                    version = tuple(versionList) + (0,)
-                elif len(versionList) == 4:
-                    version = tuple(versionList)
-            except:
-                raise ComponentWorkerConfigError("<component> version not"
-                                                 " parseable")
-
-        # If we don't have a version at all, use the current version
-        if not version:
-            version = configure.versionTuple
-
-        type = str(node.getAttribute('type'))
-        name = str(node.getAttribute('name'))
-        if forManager:
-            worker = None
-        else:
-            worker = str(node.getAttribute('worker'))
+        attrs = (('name', 'type', 'worker'), ('version',))
+        name, type, worker, version = self.parseAttributes(node, *attrs)
+        version = self.parseVersionString(version)
 
         # FIXME: flumotion-launch does not define parent, type, or
         # avatarId. Thus they don't appear to be necessary, like they're
@@ -803,10 +756,8 @@ class ManagerConfigParser(BaseConfigParser):
         if not root.nodeName == 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
         
-        def ignore(*args):
-            pass
-        parsers = {'atmosphere': (ignore, ignore),
-                   'flow': (ignore, ignore),
+        parsers = {'atmosphere': (_ignore, _ignore),
+                   'flow': (_ignore, _ignore),
                    'manager': (lambda n: self._parseManagerWithoutRegistry(n),
                                lambda v: setattr(self, 'manager', v))}
         self.parseFromTable(root, parsers)
@@ -841,31 +792,17 @@ class ManagerConfigParser(BaseConfigParser):
                                       'one of %r)' % (v, allowed))
                 return v
             return eparse
-        def ignore(*args):
-            pass
 
         parsers = {'host': (simpleparse(str), recordval('host')),
                    'port': (simpleparse(int), recordval('port')),
                    'transport': (simpleparse(enum('tcp', 'ssl')),
                                  recordval('transport')), 
                    'certificate': (simpleparse(str), recordval('certificate')),
-                   'component': (ignore, ignore),
-                   'plugs': (ignore, ignore),
+                   'component': (_ignore, _ignore),
+                   'plugs': (_ignore, _ignore),
                    'debug': (simpleparse(str), recordval('fludebug'))}
         self.parseFromTable(node, parsers)
         return ret
-
-    def _parseVersionString(self, versionString):
-        if versionString:
-            try:
-                def parse(maj, min, mic, nan=0):
-                    return maj, min, mic, nan
-                return parse(*map(int, versionString.split('.')))
-            except:
-                raise ComponentWorkerConfigError("<component> version not"
-                                                 " parseable")
-        else:
-            return configure.versionTuple
 
     def _parseComponent(self, node, parent='manager'):
         """
@@ -879,6 +816,7 @@ class ManagerConfigParser(BaseConfigParser):
         
         attrs = (('name', 'type'), ('worker', 'version'))
         name, type, worker, version = self.parseAttributes(node, *attrs)
+        version = self.parseVersionString(version)
 
         if worker:
             raise ComponentWorkerConfigError("components in manager "
@@ -906,9 +844,7 @@ class ManagerConfigParser(BaseConfigParser):
         def gotPlugs(newplugs):
             for socket in plugs:
                 plugs[socket].extend(newplugs[socket])
-        def ignore(*args):
-            pass
-        parsers = {'property': (ignore, ignore),
+        parsers = {'property': (_ignore, _ignore),
                    'plugs': (parsePlugs, gotPlugs)}
 
         self.parseFromTable(node, parsers)
@@ -950,16 +886,14 @@ class ManagerConfigParser(BaseConfigParser):
         def gotplugs(newplugs):
             for socket in self.plugs:
                 self.plugs[socket].extend(newplugs[socket])
-        def ignore(*args):
-            pass
 
-        parsers = {'host': (ignore, ignore),
-                   'port': (ignore, ignore),
-                   'transport': (ignore, ignore),
-                   'certificate': (ignore, ignore),
+        parsers = {'host': (_ignore, _ignore),
+                   'port': (_ignore, _ignore),
+                   'transport': (_ignore, _ignore),
+                   'certificate': (_ignore, _ignore),
                    'component': (parsecomponent, gotcomponent),
                    'plugs': (parseplugs, gotplugs),
-                   'debug': (ignore, ignore)}
+                   'debug': (_ignore, _ignore)}
         self.parseFromTable(node, parsers)
         return None
 
@@ -973,11 +907,9 @@ class ManagerConfigParser(BaseConfigParser):
         if not root.nodeName == 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
         
-        def ignore(*args):
-            pass
-        parsers = {'atmosphere': (ignore, ignore),
-                   'flow': (ignore, ignore),
-                   'manager': (self._parseManagerWithRegistry, ignore)}
+        parsers = {'atmosphere': (_ignore, _ignore),
+                   'flow': (_ignore, _ignore),
+                   'manager': (self._parseManagerWithRegistry, _ignore)}
         self.parseFromTable(root, parsers)
 
 class AdminConfigParser(BaseConfigParser):

@@ -1,3 +1,28 @@
+2007-05-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/fxml.py (Parser.checkAttributes): Treat an
+	empty attribute as missing; if you are going to specify foo="",
+	you might as well leave it out.
+
+	* flumotion/common/config.py
+	(BaseConfigParser.parseVersionString): New util in the base class.
+	(FlumotionConfigXML.__init__): Remove the call to parse() at
+	__init__ time. No longer have a 'manager' attribute.
+	(_ignore): Factor this util out to the module; update all users.
+	(FlumotionConfigXML.parse): Use a table parser; no more
+	"noRegistry" case.
+	(FlumotionConfigXML._parseAtmosphere): Use a table parser.
+	(FlumotionConfigXML._parseComponent): Use parseAttributes.
+	(ManagerConfigParser._parseComponent): Actually parse the version
+	string, doh...
+
+	* flumotion/test/test_config.py (TestConfig.testParseWrongConfig):
+	Update to reflect semantic XML parsing at parse() time, not
+	__init__() time.
+	(TestConfig.testParseComponentNoWorker)
+	(TestConfig.testParseComponentNoWorker): Update to expect
+	different exception.
+
 2007-05-21  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:
