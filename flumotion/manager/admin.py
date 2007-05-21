@@ -389,7 +389,7 @@ class AdminAvatar(base.ManagerAvatar):
             output = self._saveFlowFile(saveAs)
  
         f = StringIO(xml)
-        res = self.vishnu.loadConfigurationXML(f, self.remoteIdentity)
+        res = self.vishnu.loadComponentConfigurationXML(f, self.remoteIdentity)
         f.close()
 
         if saveAs:

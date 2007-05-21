@@ -919,13 +919,13 @@ class ManagerConfigParser(BaseConfigParser):
                 setattr(ret, k, v)
             return record
         def enum(*allowed):
-            def parse(v):
+            def eparse(v):
                 v = str(v)
                 if v not in allowed:
                     raise ConfigError('unknown value %s (should be '
                                       'one of %r)' % (v, allowed))
                 return v
-            return parse
+            return eparse
         def parsecomponent(node):
             if noRegistry:
                 return None

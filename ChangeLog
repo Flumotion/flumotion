@@ -1,5 +1,16 @@
 2007-05-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py
+	(Vishnu.loadComponentConfigurationXML)
+	(Vishnu._loadComponentConfiguration): Rename methods from
+	loadConfiguration; the goal being to separate manager
+	configuration loading from component conf loading. All callers
+	changed.
+
+	* flumotion/common/config.py
+	(ManagerConfigParser._parseManager.enum.eparse): Distract
+	pychecker.
+
 	* flumotion/manager/main.py (main): Parse the manager config with
 	the new ManagerConfigParser.
 

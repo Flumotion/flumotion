@@ -523,7 +523,7 @@ class Vishnu(log.Loggable):
         for workerId, componentStates in componentsToStart.items():
             self._workerCreateComponents(workerId, componentStates)
 
-    def _loadConfiguration(self, conf, identity):
+    def _loadComponentConfiguration(self, conf, identity):
         # makeBouncer only makes a bouncer if there is one in the config
         d = self._makeBouncer(conf, identity)
         d.addCallback(self._addManagerPlugs, conf, identity)
@@ -531,7 +531,7 @@ class Vishnu(log.Loggable):
         d.addCallback(self._startComponents, conf, identity)
         return d
  
-    def loadConfigurationXML(self, file, identity):
+    def loadComponentConfigurationXML(self, file, identity):
         """
         Load the configuration from the given XML, merging it on top of
         the currently running configuration.
@@ -547,7 +547,7 @@ class Vishnu(log.Loggable):
         self.debug('loading configuration')
         self.configuration = conf = config.FlumotionConfigXML(file)
         conf.parse()
-        return self._loadConfiguration(conf, identity)
+        return self._loadComponentConfiguration(conf, identity)
 
     def _createHeaven(self, interface, klass):
         """
