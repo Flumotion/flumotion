@@ -778,21 +778,27 @@ class ManagerConfigParser(BaseConfigParser):
     """
     logCategory = 'config'
 
+    MANAGER_SOCKETS = \
+        ['flumotion.component.plugs.adminaction.AdminAction',
+         'flumotion.component.plugs.lifecycle.ManagerLifecycle',
+         'flumotion.component.plugs.identity.IdentityProvider']
+
     def __init__(self, file):
         BaseConfigParser.__init__(self, file)
 
+        # the base config: host, port, etc
         self.manager = None
 
-        # We parse without asking for a registry so the registry doesn't
-        # verify before knowing the debug level
-        self.parse(noRegistry=True)
+        # the bouncer ConfigEntryComponent
+        self.bouncer = None
+
+        self.plugs = {}
+        for socket in self.MANAGER_SOCKETS:
+            self.plugs[socket] = []
+
+        self._parseParameters()
         
-    def parse(self, noRegistry=False):
-        # <planet>
-        #     <manager>?
-        #     <atmosphere>*
-        #     <flow>*
-        # </planet>
+    def _parseParameters(self):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
@@ -801,9 +807,53 @@ class ManagerConfigParser(BaseConfigParser):
             pass
         parsers = {'atmosphere': (ignore, ignore),
                    'flow': (ignore, ignore),
-                   'manager': (lambda n: self._parseManager(n, noRegistry),
+                   'manager': (lambda n: self._parseManagerWithoutRegistry(n),
                                lambda v: setattr(self, 'manager', v))}
         self.parseFromTable(root, parsers)
+
+    def _parseManagerWithoutRegistry(self, node):
+        # We parse without asking for a registry so the registry doesn't
+        # verify before knowing the debug level
+        name = self.parseAttributes(node, (), ('name',))
+        ret = ConfigEntryManager(name, None, None, None, None, None,
+                                 None, self.plugs)
+
+        def simpleparse(proc):
+            def parse(node):
+                try:
+                    return proc(self._parseTextNode(node))
+                except Exception, e:
+                    raise ConfigError('failed to parse %s: %s', node,
+                                      log.getExceptionMessage(e))
+            return parse
+        def recordval(k):
+            def record(v):
+                if getattr(ret, k):
+                    raise ConfigError('duplicate %s: %s'
+                                      % (k, getattr(ret, k)))
+                setattr(ret, k, v)
+            return record
+        def enum(*allowed):
+            def eparse(v):
+                v = str(v)
+                if v not in allowed:
+                    raise ConfigError('unknown value %s (should be '
+                                      'one of %r)' % (v, allowed))
+                return v
+            return eparse
+        def ignore(*args):
+            pass
+
+        parsers = {'host': (simpleparse(str), recordval('host')),
+                   'port': (simpleparse(int), recordval('port')),
+                   'transport': (simpleparse(enum('tcp', 'ssl')),
+                                 recordval('transport')), 
+                   'certificate': (simpleparse(str), recordval('certificate')),
+                   'component': (ignore, ignore),
+                   'plugs': (ignore, ignore),
+                   'debug': (simpleparse(str), recordval('fludebug'))}
+        self.parseFromTable(node, parsers)
+        return ret
 
     def _parseVersionString(self, versionString):
         if versionString:
@@ -886,71 +936,49 @@ class ManagerConfigParser(BaseConfigParser):
                                   % (node, child))
         return ''.join(ret)
 
-    def _parseManager(self, node, noRegistry=False):
-        # <manager>
-        #   <component>
-        #   ...
-        # </manager>
-
-        name = self.parseAttributes(node, (), ('name',))
-        plugs = {}
-        manager_sockets = \
-            ['flumotion.component.plugs.adminaction.AdminAction',
-             'flumotion.component.plugs.lifecycle.ManagerLifecycle',
-             'flumotion.component.plugs.identity.IdentityProvider']
-        for k in manager_sockets:
-            plugs[k] = []
-        ret = ConfigEntryManager(name, None, None, None, None, None,
-                                 None, plugs)
-
-        def simpleparse(proc):
-            def parse(node):
-                try:
-                    return proc(self._parseTextNode(node))
-                except Exception, e:
-                    raise ConfigError('failed to parse %s: %s', node,
-                                      log.getExceptionMessage(e))
-            return parse
-        def recordval(k):
-            def record(v):
-                if getattr(ret, k):
-                    raise ConfigError('duplicate %s: %s'
-                                      % (k, getattr(ret, k)))
-                setattr(ret, k, v)
-            return record
-        def enum(*allowed):
-            def eparse(v):
-                v = str(v)
-                if v not in allowed:
-                    raise ConfigError('unknown value %s (should be '
-                                      'one of %r)' % (v, allowed))
-                return v
-            return eparse
+    def _parseManagerWithRegistry(self, node):
         def parsecomponent(node):
-            if noRegistry:
-                return None
             return self._parseComponent(node)
+        def gotcomponent(val):
+            if self.bouncer is not None:
+                raise ConfigError('can only have one bouncer '
+                                  '(%s is superfluous)' % val.name)
+            # FIXME: assert that it is a bouncer !
+            self.bouncer = val
         def parseplugs(node):
-            if noRegistry:
-                return None
-            return self.parsePlugs(node, manager_sockets)
-        def gotPlugs(newplugs):
-            if noRegistry:
-                return
-            for socket in plugs:
-                plugs[socket].extend(newplugs[socket])
+            return self.parsePlugs(node, self.MANAGER_SOCKETS)
+        def gotplugs(newplugs):
+            for socket in self.plugs:
+                self.plugs[socket].extend(newplugs[socket])
+        def ignore(*args):
+            pass
 
-        parsers = {'host': (simpleparse(str), recordval('host')),
-                   'port': (simpleparse(int), recordval('port')),
-                   'transport': (simpleparse(enum('tcp', 'ssl')),
-                                 recordval('transport')), 
-                   'certificate': (simpleparse(str), recordval('certificate')),
-                   'component': (parsecomponent, recordval('bouncer')),
-                   'plugs': (parseplugs, gotPlugs),
-                   'debug': (simpleparse(str), recordval('fludebug'))}
+        parsers = {'host': (ignore, ignore),
+                   'port': (ignore, ignore),
+                   'transport': (ignore, ignore),
+                   'certificate': (ignore, ignore),
+                   'component': (parsecomponent, gotcomponent),
+                   'plugs': (parseplugs, gotplugs),
+                   'debug': (ignore, ignore)}
         self.parseFromTable(node, parsers)
-        # FIXME: assert that it is a bouncer !
-        return ret
+        return None
+
+    def parseBouncerAndPlugs(self):
+        # <planet>
+        #     <manager>?
+        #     <atmosphere>*
+        #     <flow>*
+        # </planet>
+        root = self.doc.documentElement
+        if not root.nodeName == 'planet':
+            raise ConfigError("unexpected root node': %s" % root.nodeName)
+        
+        def ignore(*args):
+            pass
+        parsers = {'atmosphere': (ignore, ignore),
+                   'flow': (ignore, ignore),
+                   'manager': (self._parseManagerWithRegistry, ignore)}
+        self.parseFromTable(root, parsers)
 
 class AdminConfigParser(BaseConfigParser):
     """

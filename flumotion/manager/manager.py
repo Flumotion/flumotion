@@ -337,67 +337,6 @@ class Vishnu(log.Loggable):
         username = getattr(keycard, 'username', None)
         return defer.succeed(RemoteIdentity(username, remoteHost))
 
-    def _makeBouncer(self, conf, identity):
-        # returns a deferred, always
-        if not (conf.manager and conf.manager.bouncer):
-            self.log('no bouncer in config')
-            return defer.succeed(None)
-
-        self.debug('going to start manager bouncer %s of type %s' % (
-            conf.manager.bouncer.name, conf.manager.bouncer.type))
-
-        if identity != LOCAL_IDENTITY:
-            self.adminAction(identity, '_makeBouncer', (conf,), {})
-
-        defs = registry.getRegistry().getComponent(
-            conf.manager.bouncer.type)
-        entry = defs.getEntryByType('component')
-        # FIXME: use entry.getModuleName() (doesn't work atm?)
-        moduleName = defs.getSource()
-        methodName = entry.getFunction()
-        bouncer = reflectcall.createComponent(moduleName, methodName)
-
-        configDict = conf.manager.bouncer.getConfigDict()
-        self.debug('setting up manager bouncer')
-        d = bouncer.setup(configDict)
-        def setupCallback(result):
-            bouncer.debug('started')
-            self.setBouncer(bouncer)
-        def setupErrback(failure):
-            failure.trap(errors.ConfigError)
-            self.warning('Configuration error in manager bouncer: %s' %
-                failure.value.args[0])
-        d.addCallback(setupCallback)
-        d.addErrback(setupErrback)
-        return d
-
-    def _addManagerPlug(self, socket, args, identity):
-        self.debug('loading plug type %s for socket %s'
-                   % (args['type'], socket))
-
-        if identity != LOCAL_IDENTITY:
-            self.adminAction(identity, '_addManagerPlug', (socket, args), {})
-
-        defs = registry.getRegistry().getPlug(args['type'])
-        e = defs.getEntry()
-        call = reflectcall.reflectCallCatching
-    
-        plug = call(errors.ConfigError,
-                    e.getModuleName(), e.getFunction(), args)
-        self.plugs[socket].append(plug)
-        plug.start(self)
-
-    def _addManagerPlugs(self, _, conf, identity):
-        if not conf.manager:
-            return
-
-        for socket, plugs in conf.manager.plugs.items():
-            if not socket in self.plugs:
-                self.plugs[socket] = []
-
-            for args in plugs:
-                self._addManagerPlug(socket, args, identity)
-
     def _addComponent(self, conf, parent, identity):
         """
         Add a component state for the given component config entry.
@@ -525,8 +464,7 @@ class Vishnu(log.Loggable):
 
     def _loadComponentConfiguration(self, conf, identity):
         # makeBouncer only makes a bouncer if there is one in the config
-        d = self._makeBouncer(conf, identity)
-        d.addCallback(self._addManagerPlugs, conf, identity)
+        d = defer.succeed(None)
         d.addCallback(self._updateStateFromConf, conf, identity)
         d.addCallback(self._startComponents, conf, identity)
         return d
@@ -548,6 +486,70 @@ class Vishnu(log.Loggable):
         self.configuration = conf = config.FlumotionConfigXML(file)
         conf.parse()
         return self._loadComponentConfiguration(conf, identity)
+
+    def _loadManagerPlugs(self, conf):
+        # Load plugs
+        for socket, plugs in conf.plugs.items():
+            if not socket in self.plugs:
+                self.plugs[socket] = []
+
+            for args in plugs:
+                self.debug('loading plug type %s for socket %s'
+                           % (args['type'], socket))
+                defs = registry.getRegistry().getPlug(args['type'])
+                e = defs.getEntry()
+                call = reflectcall.reflectCallCatching
+            
+                plug = call(errors.ConfigError,
+                            e.getModuleName(), e.getFunction(), args)
+                self.plugs[socket].append(plug)
+                plug.start(self)
+
+    def _loadManagerBouncer(self, conf):
+        if not (conf.bouncer):
+            self.warning('no bouncer defined, nothing can access the '
+                         'manager')
+            return defer.succeed(None)
+
+        self.debug('going to start manager bouncer %s of type %s',
+                   conf.bouncer.name, conf.bouncer.type)
+
+        defs = registry.getRegistry().getComponent(conf.bouncer.type)
+        entry = defs.getEntryByType('component')
+        # FIXME: use entry.getModuleName() (doesn't work atm?)
+        moduleName = defs.getSource()
+        methodName = entry.getFunction()
+        bouncer = reflectcall.createComponent(moduleName, methodName)
+
+        configDict = conf.bouncer.getConfigDict()
+        self.debug('setting up manager bouncer')
+        d = bouncer.setup(configDict)
+        def setupCallback(result):
+            bouncer.debug('started')
+            self.setBouncer(bouncer)
+        def setupErrback(failure):
+            failure.trap(errors.ConfigError)
+            self.warning('Configuration error in manager bouncer: %s',
+                         failure.value.args[0])
+        d.addCallback(setupCallback)
+        d.addErrback(setupErrback)
+        return d
+
+    def loadManagerConfigurationXML(self, file):
+        """
+        Load manager configuration from the given XML. The manager
+        configuration is currently used to load the manager's bouncer
+        and plugs, and is only run once at startup.
+        
+        @param file:     file to parse, either as an open file object,
+                         or as the name of a file to open
+        @type  file:     str or file
+        """
+        self.debug('loading configuration')
+        conf = config.ManagerConfigXML(file)
+        conf.parseBouncerAndPlugs()
+        self._loadManagerPlugs(conf)
+        self._loadManagerBouncer(conf)
 
     def _createHeaven(self, interface, klass):
         """

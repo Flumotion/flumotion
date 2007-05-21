@@ -1,5 +1,34 @@
 2007-05-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_config.py (TestConfig.testParseManager)
+	(TestConfig.testParseManagerWithPlugs)
+	(TestConfig.testParseManagerWithBogusPlug)
+	(TestConfig.testParseManagerError): Update for
+	parseBouncerAndPlugs rename.
+
+	* flumotion/common/config.py
+	(ManagerConfigParser.parseBouncerAndPlugs)
+	(ManagerConfigParser._parseManagerWithRegistry)
+	(ManagerConfigParser._parseManagerWithoutRegistry)
+	(ManagerConfigParser._parseParameters): Split the code that parses
+	manager parameters and the code that parses the bouncers and
+	plugs; the latter requires the registry, which we can't use at
+	first. Although they traverse the same data structure they do
+	different things.
+	(ManagerConfigParser.__init__): Add attributes: bouncer and plugs.
+	self.manager is not used for bouncer and plug data.
+
+	* flumotion/manager/manager.py
+	(Vishnu.loadManagerConfigurationXML)
+	(Vishnu._loadManagerBouncer, Vishnu._loadManagerPlugs): New
+	methods, load manager config XML; specifically, bouncers and
+	plugs.
+	(Vishnu._loadComponentConfiguration): Don't listen to clients'
+	requests to change the manager's bouncer or plugs.
+
+	* flumotion/manager/main.py: Load the manager config XML right
+	after making the Vishnu.
+
 	* flumotion/manager/manager.py
 	(Vishnu.loadComponentConfigurationXML)
 	(Vishnu._loadComponentConfiguration): Rename methods from

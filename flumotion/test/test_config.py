@@ -199,10 +199,10 @@ class TestConfig(unittest.TestCase):
         self.failUnless(conf.manager)
         self.failIf(conf.manager.bouncer)
 
-        conf.parse()
-        self.failUnless(conf.manager.bouncer)
-        self.failUnless(conf.manager.bouncer.name)
-        self.assertEquals(conf.manager.bouncer.name, "component-name")
+        conf.parseBouncerAndPlugs()
+        self.failUnless(conf.bouncer)
+        self.failUnless(conf.bouncer.name)
+        self.assertEquals(conf.bouncer.name, "component-name")
 
     def testParseManagerWithPlugs(self):
         conf = ManagerConfigXML(
@@ -217,11 +217,11 @@ class TestConfig(unittest.TestCase):
                  </plugs>
                </manager>
              </planet>""")
-        conf.parse()
+        conf.parseBouncerAndPlugs()
         self.failUnless(conf.manager)
-        self.failIf(conf.manager.bouncer)
         self.failIf(conf.manager.host)
-        self.assertEquals(conf.manager.plugs,
+        self.failIf(conf.bouncer)
+        self.assertEquals(conf.plugs,
                           {'flumotion.component.plugs.adminaction.AdminAction':
                            [{'type':'test-adminaction',
                              'socket':
@@ -244,7 +244,7 @@ class TestConfig(unittest.TestCase):
                  </plugs>
                </manager>
              </planet>""")
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(config.ConfigError, conf.parseBouncerAndPlugs)
 
     def testParseError(self):
         xml = '<planet><bad-node/></planet>'
@@ -327,7 +327,7 @@ class TestConfig(unittest.TestCase):
             </manager></planet>"""
         conf = ManagerConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(config.ConfigError, conf.parseBouncerAndPlugs)
 
         xml = """<planet>
                <manager name="aname">

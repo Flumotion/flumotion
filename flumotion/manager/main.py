@@ -265,6 +265,7 @@ def main(args):
             p, project.get(p, 'version')))
 
     vishnu = manager.Vishnu(options.name, configDir=configDir)
+    vishnu.loadManagerConfigurationXML(planetFile)
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
