@@ -1,3 +1,24 @@
+2007-05-22  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog.eaterSetInactive,
+	  SingleBasicWatchdog.eaterSetActive, AVBasicWatchdog.eaterSetInactive,
+	  AVBasicWatchdog.eaterSetActive):
+	* flumotion/component/combiners/switch/switch.py (SwitchMedium,
+	  SwitchMedium.remote_switchToMaster,
+	  SwitchMedium.remote_switchToBackup, Switch.switch_to,
+	  Switch.is_active, SingleSwitch.switch_to, AVSwitch.init,
+	  AVSwitch.get_pipeline_string, AVSwitch._on_message,
+	  AVSwitch.configure_pipeline, AVSwitch.switch_to,
+	  AVSwitch._set_last_timestamp, AVSwitch._block_cb,
+	  AVSwitch._block_switch_sink_pads, AVSwitch.on_pads_blocked,
+	  AVSwitch._add_pad_probes_for_start_time,
+	  AVSwitch._start_time_buffer_probe,
+	  AVSwitch._check_start_times_received):
+	Code dump. Changed some method names etc. Also made it switch almost
+	reliably. Still have some issues that need resolving with respect to
+	switching really fast between eaters with audio and video.
+
 2007-05-22  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_component.py:

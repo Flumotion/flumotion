@@ -33,13 +33,13 @@ class SingleBasicWatchdog(switch.SingleSwitch):
         switch.SingleSwitch.eaterSetInactive(self, feedId)
         eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName and self.isActive("backup"):
-            self.switchToBackup()
+            self.switch_to("backup")
 
     def eaterSetActive(self, feedId):
         switch.SingleSwitch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName:
-            self.switchToMaster()
+            self.switch_to("backup")
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"
@@ -48,18 +48,11 @@ class AVBasicWatchdog(switch.AVSwitch):
         switch.AVSwitch.eaterSetInactive(self, feedId)
         eaterName = self.get_eater_name_for_feedId(feedId)
         if "master" in eaterName and self.isActive("backup"):
-            self.switchToBackup()
+            self.switch_to("backup")
 
     def eaterSetActive(self, feedId):
         switch.AVSwitch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feedId(feedId)
-        if "master" in eaterName:
-            self.switchToMaster()
-
-    def isActive(self, eaterSubstring):
-        # eaterSubstring is "master" or "backup"
-        for eaterFeedId in self._inactiveEaters:
-            eaterName = self.get_eater_name_for_feedId(eaterFeedId)
-            if eaterSubstring in eaterName:
-                return False
-        return True
+        if "master" in eaterName and \
+           self.uiState.get("active-eater") == "backup":
+            self.switch_to("master")
