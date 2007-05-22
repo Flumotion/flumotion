@@ -324,20 +324,28 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._filesAdded = {}
 
         self._directoryWatcher = watcher.DirectoryWatcher(dir)
-        self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged)
+        self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged, 
+            fileDeleted=self._watchFileDeleted)
         self._directoryWatcher.start()
+
+    def _watchFileDeleted(self, file):
+        self.debug("File deleted: %s", file)
+        if file in self._filesAdded:
+            self.playlistparser.playlist.removeItems(file)
+            self._filesAdded.pop(file)
 
     def _watchFileChanged(self, file):
         self.debug("File changed: %s", file)
-        if file not in self._filesAdded:
-            self._filesAdded[file] = None
-            try:
-                self.debug("Parsing file: %s", file)
-                self.playlistparser.parseFile(file)
-            except fxml.ParserError, e:
-                self.warning("Failed to parse playlist file: %r", e)
-        else:
-            self.warning("Can't yet change existing files")
+        if file in self._filesAdded:
+            self.debug("Removing existing items for changed playlist")
+            self.playlistparser.playlist.removeItems(file)
+
+        self._filesAdded[file] = None
+        try:
+            self.debug("Parsing file: %s", file)
+            self.playlistparser.parseFile(file, id=file)
+        except fxml.ParserError, e:
+            self.warning("Failed to parse playlist file: %r", e)
 
     def do_start(self, clocking):
         self.link()
