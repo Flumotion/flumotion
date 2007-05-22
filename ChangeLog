@@ -1,5 +1,8 @@
 2007-05-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/parse.py: Refactor to use the new things in
+	config.py. Code reduction. ALSO! THIS IS COMMIT 5000!!!!
+
 	* flumotion/common/config.py (buildPlugsSet)
 	(ConfigEntryPlug.__init__)
 	(BaseConfigParser.parsePlugs.parsePlug): Change so that a parsed
