@@ -1,5 +1,10 @@
 2007-05-22  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_component.py:
+	  Oops; accidently committed stuff here; set back to skipping.
+
+2007-05-22  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/smartscale.py:
 	  Older versions of gst-python don't have gst.Fraction.__float__, so
 	  don't use it.
