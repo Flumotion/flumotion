@@ -86,6 +86,11 @@ def parsePropertyValue(propName, type, value):
     except KeyError:
         raise ConfigError("unknown type '%s' for property %s"
                           % (type, propName))
+    except Exception, e:
+        raise ConfigError("Error parsing property '%s': '%s' does not "
+                          "appear to be a valid %s.\nDebug: %s"
+                          % (propName, value, type,
+                             log.getExceptionMessage(e)))
 
 def buildPropertyDict(propertyList, propertySpecList):
     ret = {}

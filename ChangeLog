@@ -5,6 +5,8 @@
 	(BaseConfigParser.parsePlugs.parsePlug): Change so that a parsed
 	plug entry doesn't have the socket; it doesn't seem to be
 	necessary.
+	(parsePropertyValue): Raise a ConfigError if a property fails to
+	parse, with a hopefully helpful debug message.
 
 	* flumotion/test/test_config.py
 	(TestConfig.testParseManagerWithBogusPlug): Change the expected
