@@ -1,5 +1,15 @@
 2007-05-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (buildPlugsSet)
+	(ConfigEntryPlug.__init__)
+	(BaseConfigParser.parsePlugs.parsePlug): Change so that a parsed
+	plug entry doesn't have the socket; it doesn't seem to be
+	necessary.
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseManagerWithBogusPlug): Change the expected
+	exception.
+
 	* flumotion/worker/config.py (WorkerConfigXML.parseFeederports):
 	Use common.strToBool.
 

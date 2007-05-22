@@ -116,25 +116,25 @@ def buildPlugsSet(plugsList, sockets):
     ret = {}
     for socket in sockets:
         ret[socket] = []
-    for socket, type, propertyList in plugsList:
-        if socket not in ret:
-            raise ConfigError("Unsupported socket type: %s" % (socket,))
-        plug = ConfigEntryPlug(socket, type, propertyList)
-        ret[socket].append({'type': plug.type, 'socket': plug.socket,
-                            'properties': plug.properties})
+    for type, propertyList in plugsList:
+        plug = ConfigEntryPlug(type, propertyList)
+        if plug.socket not in ret:
+            raise ConfigError("Unsupported socket type: %s"
+                              % (plug.socket,))
+        ret[plug.socket].append({'type': plug.type, 'socket': plug.socket,
+                                 'properties': plug.properties})
     return ret
 
 class ConfigEntryPlug(log.Loggable):
     "I represent a <plug> entry in a planet config file"
-    def __init__(self, socket, type, propertyList):
-        self.socket = socket
-        self.type = type
-
+    def __init__(self, type, propertyList):
         try:
             defs = registry.getRegistry().getPlug(type)
         except KeyError:
             raise ConfigError("unknown plug type: %s" % type)
 
+        self.type = type
+        self.socket = defs.getSocket()
         self.properties = buildPropertyDict(propertyList,
                                             defs.getProperties())
 
@@ -307,12 +307,14 @@ class BaseConfigParser(fxml.Parser):
         def parsePlug(node):
             # <plug socket=... type=...>
             #   <property>
+            # FIXME: is it even necessary to have socket specified?
+            # seems not
             socket, type = self.parseAttributes(node, ('socket', 'type'))
             properties = []
             parsers = {'property': (self._parseProperty,
                                     properties.append)}
             self.parseFromTable(node, parsers)
-            return socket, type, properties
+            return type, properties
 
         parsers = {'plug': (parsePlug, plugs.append)}
         self.parseFromTable(node, parsers)

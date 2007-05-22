@@ -264,7 +264,7 @@ class TestConfig(unittest.TestCase):
                  </plugs>
                </manager>
              </planet>""")
-        self.assertRaises(config.ConfigError, conf.parseBouncerAndPlugs)
+        self.assertRaises(errors.UnknownPlugError, conf.parseBouncerAndPlugs)
 
     def testParseError(self):
         xml = '<planet><bad-node/></planet>'
