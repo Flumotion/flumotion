@@ -247,11 +247,15 @@ class TestParser(unittest.TestCase):
 
     def testErrors(self):
         d, pipeline = pipelineFactory('')
-        def pipelineFactoryErrback(failure):
-            assert(isinstance(failure, failure.Failure))
-        d.addCallback(pipelineFactoryErrback)
+        def notCalled(res):
+            self.fail("Should not be reachable")
+        def pipelineFactoryErrback(f):
+            assert(isinstance(f, failure.Failure))
+
+        d.addCallback(notCalled)
+        d.addErrback(pipelineFactoryErrback)
         return d
-    testErrors.skip = "Help, I cant seem to port properly"
+    #testErrors.skip = "Help, I cant seem to port properly"
     
 if __name__ == '__main__':
     unittest.main()

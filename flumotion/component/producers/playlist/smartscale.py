@@ -158,7 +158,9 @@ class SmartVideoScale(gst.Bin):
         else:
             par = self.parout
             dar = self.darin
-            if float(self.darin) > float(self.darout):
+            fdarin = float(self.darin.num) / float(self.darin.denom)
+            fdarout = float(self.darout.num) / float(self.darout.denom)
+            if fdarin > fdarout:
                 self.log("incoming DAR is greater that ougoing DAR. Adding top/bottom borders")
                 # width, PAR stays the same as output
                 # calculate newheight = (PAR * widthout) / DAR

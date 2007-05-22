@@ -1,5 +1,11 @@
 2007-05-22  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/smartscale.py:
+	  Older versions of gst-python don't have gst.Fraction.__float__, so
+	  don't use it.
+
+2007-05-22  Michael Smith <msmith@fluendo.com>
+
 	* misc/pycheckerhelp.py
 	* flumotion/admin/admin.py:
 	* flumotion/admin/command/commands.py:
