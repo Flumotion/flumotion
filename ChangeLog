@@ -1,5 +1,10 @@
 2007-05-22  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/README:
+	  Add a brief readme for the playlist component.
+
+2007-05-22  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	  Handle removing playlist files, and changing existing files.
 
