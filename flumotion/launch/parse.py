@@ -28,7 +28,7 @@ flumotion.launch.parse: A parsing library for flumotion-launch syntax.
 import copy
 import sys
 
-from flumotion.common import log, common, dag, registry
+from flumotion.common import log, config, common, dag, registry
 
 __all__ = ['parse_args']
 
@@ -39,17 +39,18 @@ def err(x):
 
 
 class Component(object):
-    __slots__ = ['type', 'name', 'properties', 'plugs', 'feed',
-                 'source', 'clock_master', '_reg']
+    __slots__ = ('type', 'name', 'properties', 'plugs', 'source',
+                 'clock_master', 'config_entry', '_reg')
 
     def __init__(self, type, name):
         self.type = type
         self.name = name
-        self.properties = {}
+        self.properties = []
         self.plugs = []
-        self.feed = []
         self.source = []
         self.clock_master = None
+
+        self.config_entry = None
 
         r = registry.getRegistry()
         if not r.hasComponent(self.type):
@@ -57,119 +58,26 @@ class Component(object):
 
         self._reg = r.getComponent(self.type)
 
-    def verify_source(self):
-        eaters = self._reg.getEaters()
-        if eaters:
-            required = [x for x in eaters if x.getRequired()]
-            multiple = [x for x in eaters if x.getMultiple()]
-            if required and not self.source:
-                err('Component %s wants to eat but you didn\'t give it '
-                    'food' % self.name)
-            if not multiple and len(self.source) > 1:
-                err('Component %s can only eat from one feeder' % self.name)
-        else:
-            if self.source:
-                err('Component %s can\'t eat from anything' % self.name)
-
-    def _complete_props(self, dname, props, specs):
-        def parse_fraction(v):
-            split = v.split('/')
-            assert len(split) == 2, \
-                   "Fraction values should be in the form N/D"
-            return (int(split[0]), int(split[1]))
-
-        ret = {}
-        compprops = dict([(x.getName(), x) for x in specs])
-
-        for k, v in props.items():
-            if k not in compprops:
-                err('Component %s has no such property `%s\'' % (dname, k))
-
-            t = compprops[k].getType()
-            parsers = {'int': int,
-                       'long': long,
-                       'float': float,
-                       'bool': common.strToBool,
-                       'string': str,
-                       'fraction': parse_fraction}
-
-            try:
-                parser = parsers[t]
-            except KeyError:
-                err('Unknown type `%s\' of property %s in component %s'
-                    % (t, k, dname))
-
-            val = parser(v)
-
-            if compprops[k].isMultiple():
-                if not k in ret:
-                    ret[k] = []
-                ret[k].append(val)
-            else:
-                ret[k] = val
-
-        for k, v in compprops.items():
-            if v.isRequired() and not k in ret:
-                err('Component %s missing required property `%s\' of type %s'
-                    % (dname, k, v.getType()))
-
-        return ret
-
-    def complete_and_verify_properties(self):
-        return self._complete_props(self.name, self.properties,
-                                    self._reg.getProperties())
-
-    def complete_and_verify_plugs(self):
-        r = registry.getRegistry()
-        ret = {}
-        for socket in self._reg.getSockets():
-            ret[socket] = []
-        for plugtype, plugprops in self.plugs:
-            if not r.hasPlug(plugtype):
-                err('Unknown plug type: %s' % plugtype)
-            spec = r.getPlug(plugtype)
-            socket = spec.getSocket()
-            if not socket in ret:
-                err('Cannot add plug %s to component %s: '
-                    'sockets of type %s not supported'
-                    % (plugtype, self.name, socket))
-            props = self._complete_props(plugtype, plugprops,
-                                         spec.getProperties())
-            plug = {'type': plugtype, 'socket': socket,
-                    'properties': props}
-            ret[socket].append(plug)
-        return ret
-
     def complete_and_verify(self):
         c = self._reg
-
-        self.feed = c.getFeeders()
-
-        self.properties = self.complete_and_verify_properties()
-
-        self.verify_source()
-
-        # fixme: 'feed' is not strictly necessary in config
-        self.feed = c.getFeeders()
-
-        # not used by the component -- see notes in _parseComponent in
+        # not used by the component -- see notes in _buildConfig in
         # config.py
         if c.getNeedsSynchronization():
             self.clock_master = c.getClockPriority()
-
-        self.plugs = self.complete_and_verify_plugs()
+        
+        self.config_entry = config.ConfigEntryComponent(
+            self.name,
+            None,
+            self.type,
+            self.properties,
+            self.plugs,
+            None,
+            [(None, feedId) for feedId in self.source],
+            self.clock_master, 
+            None)
 
     def as_config_dict(self):
-        ret = {'name': self.name,
-               'type': self.type,
-               'properties': copy.deepcopy(self.properties),
-               'plugs': copy.deepcopy(self.properties),
-               'feed': copy.deepcopy(self.feed),
-               'clock-master': copy.deepcopy(self.clock_master),
-               'plugs': copy.deepcopy(self.plugs)}
-        if self.source:
-            ret['eater'] = {'default': copy.deepcopy(self.source)}
-        return ret
+        return copy.deepcopy(self.config_entry.config)
 
 class ComponentStore:
     def __init__(self):
@@ -191,7 +99,7 @@ class ComponentStore:
         self[self.last()].plugs.append((type, props))
 
     def add_prop_to_current(self, key, val):
-        self[self.last()].properties[key] = val
+        self[self.last()].properties.append((key, val))
 
     def last(self):
         assert self._last_component
@@ -320,14 +228,7 @@ class Linker:
 def parse_plug(arg):
     plugargs = arg.split(',')
     plug = plugargs.pop(0)[1:]
-    props = {}
-    for arg in plugargs:
-        prop = arg[:arg.index('=')]
-        val = arg[arg.index('=')+1:]
-        if not prop or not val:
-            err('Invalid plug property setting: %s' % arg)
-        props[prop] = val
-    return plug, props
+    return plug, [parse_prop(arg) for arg in plugargs]
 
 def parse_prop(arg):
     prop = arg[:arg.index('=')]
