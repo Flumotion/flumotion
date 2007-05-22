@@ -30,8 +30,13 @@
         <property name="channels" type="int"
                   description="Audio channels to output" />
 
-        <property name="playlist" type="string" required="yes"
-                  description="Location of the initial playlist file" />
+        <property name="playlist" type="string"
+                  description="Location of the initial playlist file if any" />
+        <property name="playlist-directory" type="string"
+                  description="Location of a directory to monitor for playlist files to add" />
+
+        <property name="base-directory" type="string"
+                  description="Base directory for relative paths in playlist files" />
       </properties>
     </component>
   </components>

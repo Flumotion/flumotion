@@ -27,6 +27,7 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import errors, messages, log, fxml
 from flumotion.component import feedcomponent
+from flumotion.component.base import watcher
 
 from flumotion.common.messages import N_
 
@@ -298,6 +299,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         props = self.config['properties'];
 
         self._playlistfile = props.get('playlist', None)
+        self._playlistdirectory = props.get('playlist-directory', None)
+        self._baseDirectory = props.get('base-directory', None)
 
         self._width = props.get('width', 320)
         self._height = props.get('height', 240)
@@ -316,19 +319,42 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.connect_feeders(pipeline)
         return pipeline
 
+    def _watchDirectory(self, dir):
+        self.debug("Watching directory %s", dir)
+        self._filesAdded = {}
+
+        self._directoryWatcher = watcher.DirectoryWatcher(dir)
+        self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged)
+        self._directoryWatcher.start()
+
+    def _watchFileChanged(self, file):
+        self.debug("File changed: %s", file)
+        if file not in self._filesAdded:
+            self._filesAdded[file] = None
+            try:
+                self.debug("Parsing file: %s", file)
+                self.playlistparser.parseFile(file)
+            except fxml.ParserError, e:
+                self.warning("Failed to parse playlist file: %r", e)
+        else:
+            self.warning("Can't yet change existing files")
+
     def do_start(self, clocking):
         self.link()
 
         playlist = playlistparser.Playlist(self)
         self.playlistparser = playlistparser.PlaylistXMLParser(playlist)
-        try:
-            if self._playlistfile:
-                self.playlistparser.parseFile(self._playlistfile)
-        except fxml.ParserError, e:
-            self.warning("Failed to parse playlist file: %r", e)
+        if self._baseDirectory:
+            self.playlistparser.setBaseDirectory(self._baseDirectory)
 
-        #if self._playlistdirectory:
-        #    watchdirectory(playlistdirectory, newplaylistfile, playlistfiledelted)
+        if self._playlistfile:
+            try:
+                self.playlistparser.parseFile(self._playlistfile)
+            except fxml.ParserError, e:
+                self.warning("Failed to parse playlist file: %r", e)
+
+        if self._playlistdirectory:
+            self._watchDirectory(self._playlistdirectory)
 
         return defer.succeed(None)
         

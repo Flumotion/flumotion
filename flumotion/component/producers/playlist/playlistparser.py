@@ -189,6 +189,13 @@ class PlaylistParser(object, log.Loggable):
         self._pending_items = []
         self._discovering = False
 
+        self._baseDirectory = None
+
+    def setBaseDirectory(self, baseDir):
+        if not baseDir.endswith('/'):
+            baseDir = baseDir + '/'
+        self._baseDirectory = baseDir
+
     def _discoverPending(self):
         def _discovered(disc, is_media):
             self.debug("Discovered!")
@@ -197,7 +204,11 @@ class PlaylistParser(object, log.Loggable):
         def _discoverer_done(disc, is_media):
             if is_media:
                 self.debug("Discovery complete, media found")
-                uri = "file://" + item[0]
+                filename = item[0]
+                if filename[0] != '/' and self._baseDirectory:
+                    filename = self._baseDirectory + filename
+
+                uri = "file://" + filename
                 timestamp = item[1]
                 duration = item[2]
                 offset = item[3]
