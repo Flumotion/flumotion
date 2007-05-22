@@ -1,3 +1,16 @@
+2007-05-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/Makefile.am.
+	* flumotion/component/bouncers/ipbouncer.xml: 
+	* flumotion/component/bouncers/ipbouncer.py: Add a bouncer to
+	authenticate based on remote IP address. Shouldn't currently be
+	used because we currently take address to be whatever the remote
+	side set it to be; need to sanitize in remote_login in pb.py.
+	See #167.
+
+	* flumotion/common/config.py (parsePropertyValue): Reintroduce
+	some old Py2.3 compat code.
+
 2007-05-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py

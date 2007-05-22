@@ -8,10 +8,11 @@ component_PYTHON = \
 	htpasswdcrypt.py \
 	saltsha256.py \
 	tokentest.py \
+	ipbouncer.py \
 	icalbouncer.py
 
 component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade tokentest.xml \
-	icalbouncer.xml
+	ipbouncer.py icalbouncer.xml
 
 
 TAGS_FILES = $(component_PYTHON)

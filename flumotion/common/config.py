@@ -62,6 +62,11 @@ def buildEatersDict(eatersList, eaterDefs):
     return eaters        
 
 def parsePropertyValue(propName, type, value):
+    # XXX: We might end up calling float(), which breaks
+    #      when using LC_NUMERIC when it is not C -- only in python
+    #      2.3 though, no prob in 2.4
+    import locale
+    locale.setlocale(locale.LC_NUMERIC, "C")
     def tryStr(s):
         try:
             return str(s)
