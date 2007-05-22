@@ -1,3 +1,16 @@
+2007-05-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/registry.py (ComponentRegistry.getComponent)
+	(ComponentRegistry.hasComponent)
+	(ComponentRegistry.getComponents, ComponentRegistry.getPlug)
+	(ComponentRegistry.hasPlug, ComponentRegistry.getPlugs): Use
+	parser methods if they are available.
+
+	* flumotion/common/errors.py (UnknownPlugError): New error.
+	
+	* flumotion/common/registry.py (RegistryParser.getPlug): Raise
+	UnknownPlugError if the plug type is unknown.
+
 2007-05-22  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/README:

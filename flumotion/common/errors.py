@@ -211,6 +211,9 @@ class ComponentStartHandledError(ComponentStartError, HandledException):
 class UnknownComponentError(ComponentError):
     "A given component or component type does not exist"
 
+class UnknownPlugError(pb.Error):
+    "A given plug type does not exist"
+
 # effect errors
 class UnknownEffectError(pb.Error):
     "A given effect or effect type does not exist"

@@ -373,7 +373,11 @@ class RegistryParser(fxml.Parser):
         return self._plugs.values()
 
     def getPlug(self, name):
-        return self._plugs[name]
+        try:
+            return self._plugs[name]
+        except KeyError:
+            raise errors.UnknownPlugError("unknown plug type: %s"
+                                          % (name,))
 
     def _parseComponents(self, node):
         # <components>
@@ -1079,6 +1083,8 @@ class ComponentRegistry(log.Loggable):
         self._parser.addDirectory(registryPath)
         return True
         
+    # fixme: these methods inconsistenly molest and duplicate those of
+    # the parser.
     def isEmpty(self):
         return len(self._parser._components) == 0
 
@@ -1086,25 +1092,25 @@ class ComponentRegistry(log.Loggable):
         """
         @rtype: L{RegistryEntryComponent}
         """
-        return self._parser._components[name]
+        return self._parser.getComponent(name)
 
     def hasComponent(self, name):
-        return self._parser._components.has_key(name)
+        return name in self._parser._components
 
     def getComponents(self):
-        return self._parser._components.values()
+        return self._parser.getComponents()
 
     def getPlug(self, type):
         """
         @rtype: L{RegistryEntryPlug}
         """
-        return self._parser._plugs[type]
+        return self._parser.getPlug(type)
 
     def hasPlug(self, name):
-        return self._parser._plugs.has_key(name)
+        return name in self._parser._plugs
 
     def getPlugs(self):
-        return self._parser._plugs.values()
+        return self._parser.getPlugs()
 
     def getBundles(self):
         return self._parser._bundles.values()
