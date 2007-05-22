@@ -1,4 +1,4 @@
-2007-05-22  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py
 	  (SingleBasicWatchdog.eaterSetInactive,
@@ -511,7 +511,7 @@
 	* flumotion/test/test_component_base_scheduler.py (SchedulerTest):
 	Very minimal test.
 
-2007-05-14  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
 	  (SingleSwitch.configure_pipeline, AVSwitch.configure_pipeline):
@@ -519,7 +519,7 @@
 	  (FeedComponent.get_eater_name_for_feedId):
 	s/feedid/feedId
 
-2007-05-14  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/Makefile.am:
 	* flumotion/component/combiners/switch/basicwatchdog.py
@@ -531,7 +531,7 @@
 	Add basic watchdogs that will automatically switch to backup if
 	master eater(s) go(es) hungry.
 
-2007-05-11  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/Makefile.am:
 	Add admin ui to Makefile.
@@ -555,19 +555,19 @@
 	* flumotion/common/enum.py: 
 	Corrected a bug when creating a generic enum instance.
 
-2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py (Switch, SingleSwitch,
 	  AVSwitch):
 	Change log categories.
 
-2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/Makefile.am:
 	* flumotion/component/component.xml:
 	Fix distcheck and fix bundling of switch component.
 
-2007-05-10  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* configure.ac:
 	* flumotion/component/combiners/Makefile.am:
@@ -625,13 +625,13 @@
 	* flumotion/manager/component.py (ComponentAvatar.cleanup): Add a
 	comment.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_manager_depgraph.py
 	  (testDepGraph._createComponent):
 	Fix tests for depgraph to use the eater key.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py
 	  (FeedComponent.get_eater_name_for_feedid):
@@ -677,19 +677,19 @@
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  Use the discoverer on files before adding them.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/config.py (FlumotionConfigXML.parseFeed,
 	  FlumotionConfigXML.addFeed):
 	Used table parser to parse subnodes of eater. This guarantees
 	that only feed nodes are children of the eater node.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/wizard/steps.py (Soundcard.update_inputs):
 	Commit forgotten when moving audio checks to audio.py.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent.py
 	  (MultiInputParseLaunchComponent.get_pipeline_string):
@@ -732,19 +732,19 @@
 	* flumotion/component/misc/httpfile/file.py (loadMimeTypes):
 	  Add .flv mime type in the code.
 
-2007-05-09  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* TODO:
 	* flumotion/common/config.py (FlumotionConfigXML._parseEaters):
 	Thanks Andy, using the helper method parseAttributes.
 
-2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test.xml:
 	Update xml flow used in tests to use new way of configuring
 	eaters.
 
-2007-05-08  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/config.py (FlumotionConfigXML._parseComponent,
 	  FlumotionConfigXML._parseEaters, FlumotionConfigXML._parseSources):
@@ -995,7 +995,7 @@
 	* flumotion/test/test_component_feed.py: Moved from
 	test_worker_feed.py.
 
-2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/client.py
 	  (Window._set_stop_start_component_sensitive):
@@ -1073,7 +1073,7 @@
 	(TestFeedServer.testConnectWithoutDroppingPB): New test, does not
 	yet work
 
-2007-04-25  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* configure.ac:
 	* flumotion/component/producers/Makefile.am:
@@ -1131,31 +1131,31 @@
 	(TestFeedServer.testConnectWithoutDroppingPB): Add test, asserting
 	on the number of open file descriptors at opportune times.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/ivtv/ivtv.py
 	  (Ivtv.get_pipeline_string):
 	* flumotion/component/producers/ivtv/ivtv.xml:
 	Make the deinterlacer configurable.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* po/POTFILES.in:
 	Remove file that no longer exists.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/effects/volume/volume.py (Volume):
 	volume effect does volume setting for all known components
 	that use it.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/soundcard/soundcard.py
 	  (Soundcard.get_pipeline_string):
 	FIXME was fixed last week.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/checks/Makefile.am:
 	* flumotion/worker/checks/package.xml:
@@ -1228,7 +1228,7 @@
 	test, that code is no longer there. Add test for initing worker
 	brain.
 
-2007-04-24  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/soundcard/soundcard.xml:
 	Soundcard should have higher clock priority than firewire.
@@ -1236,7 +1236,7 @@
 	to a different clock.
 	Fixes #547
 
-2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* data/glade/admin.glade:
 	* flumotion/admin/gtk/client.py
@@ -1248,7 +1248,7 @@
 	Add ability to delete one component.
 	Fixes #445
 
-2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* data/glade/wizard_firewire.glade:
 	Change frame name to something representing the frame so it can
@@ -1273,12 +1273,12 @@
 	refactoring comment above.
 	Fixes #111
 
-2007-04-23  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/wizard/steps.py (Soundcard.soundcardCheckComplete):
 	Fix callback to take the correct args.
 
-2007-04-20  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/bouncers/bouncer.py:
 	Remove import that is no longer required.
@@ -1322,7 +1322,7 @@
 	number of chunks, on line boundaries, with the date of the first
 	log statement as part of the chunked output file name.
 
-2007-04-18  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/effects/volume/admin_gtk.py
 	  (VolumeAdminGtkNode.haveWidgetTree,
@@ -1334,7 +1334,7 @@
 	having one averaged over all channels.
 	Remove unnecessary whitespace.
 
-2007-04-17  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/admin.py (AdminClientFactory.clientConnectionFailed):
 	* flumotion/twisted/pb.py
@@ -1343,7 +1343,7 @@
 	Add destination of where the connection was failed to in debug
 	output.
 
-2007-04-17  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/twisted/pb.py
 	  (ReconnectingPBClientFactory.clientConnectionFailed,
@@ -1356,17 +1356,17 @@
 	* env.in:
 	  Actually put the pkgconfig directory in.
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/ivtv/ivtv.xml:
 	Correct directory containing ivtv.
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/ivtv/ivtv.xml:
 	We are no longer in our own project!
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* configure.ac:
 	* flumotion/component/producers/Makefile.am:
@@ -1377,12 +1377,12 @@
 	* flumotion/component/producers/ivtv/ivtv.xml:
 	New ivtv-producer component.
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/main.py (main):
 	Fix grammar.
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* data/glade/admin.glade:
 	Fix open recent connection button tooltip and where it maps to.
@@ -1396,7 +1396,7 @@
 	Add new greeter wizard that just does the steps for opening
 	an existing connection.
 
-2007-04-16  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* data/glade/admin.glade:
 	* flumotion/admin/gtk/client.py (Window._append_recent_connections,
@@ -1570,7 +1570,7 @@
 	  ComponentWrapper.eatFromFD, starter):
 	  Log some more.
 
-2007-04-13  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/firewire/firewire.py
 	  (Firewire.setVolume): Remove unnecessary whitespace.
@@ -1829,7 +1829,7 @@
 
 	* flumotion/twisted/flavors.py: Add a comment.
 
-2007-04-02  Zaheer Abbas Merali  <<zaheerabbas at merali dot org>>
+2007-04-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/effects/volume/volume.py (Volume.setUIState):
 	Admin UI code expects a list, do not set to just a value.
