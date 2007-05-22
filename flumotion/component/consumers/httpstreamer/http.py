@@ -30,13 +30,13 @@ import socket
 from twisted.internet import reactor, error, defer
 from twisted.web import server
 from twisted.cred import credentials
+from zope.interface import implements
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, pygobject
 from flumotion.common import messages, netutils, log, interfaces
 
 from flumotion.twisted import fdserver
-from flumotion.twisted.compat import implements
 from flumotion.component.misc.porter import porterclient
 
 # proxy import

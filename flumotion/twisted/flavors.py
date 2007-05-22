@@ -26,17 +26,11 @@ Inspired by L{twisted.spread.flavors}
 """
 
 from twisted.internet import defer
-from twisted.python import components
 from twisted.spread import pb
-
-# T1.3: suppress components warnings in Twisted 2.0
-from flumotion.twisted import compat
-compat.filterWarnings(components, 'ComponentsDeprecationWarning')
-
-from flumotion.twisted.compat import Interface
+from zope.interface import Interface
 
 ### Generice Cacheable/RemoteCache for state objects
-class IStateListener(compat.Interface):
+class IStateListener(Interface):
     """
     I am an interface for objects that want to listen to changes on
     cached states.

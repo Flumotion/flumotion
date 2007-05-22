@@ -28,6 +28,7 @@ import exceptions
 
 from twisted.spread import pb
 from twisted.internet import reactor, defer
+from zope.interface import implements
 
 from flumotion.common.planet import moods
 
@@ -35,12 +36,6 @@ from flumotion.manager import component, manager
 from flumotion.common import log, planet, interfaces, common
 from flumotion.common import setup
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
-
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
 
 class MyListener(log.Loggable):
     # a helper object that you can get deferreds from that fire when
@@ -485,12 +480,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             # make sure the depgraph is empty
             self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
 
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-            verifyEmptyDAG(None)
-        else:
-            d.addCallback(verifyEmptyDAG)
-            return d
+        d.addCallback(verifyEmptyDAG)
+        return d
 
     def testConfigBeforeWorker(self):
         # test a config with three components being loaded before the worker

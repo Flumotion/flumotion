@@ -27,10 +27,11 @@ import gobject
 import gtk
 import gtk.glade
 
+from zope.interface import implements
+
 from flumotion.configure import configure
 from flumotion.common import log, planet, pygobject
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties

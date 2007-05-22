@@ -23,10 +23,10 @@
 Flumotion interfaces
 """
 
-from flumotion.twisted import compat
+from zope.interface import Interface
 
 # See also flumotion.medium.BaseMedium.
-class IMedium(compat.Interface):
+class IMedium(Interface):
     """
     I am a base interface for PB client-side mediums interfacing with
     manager-side avatars.
@@ -58,7 +58,7 @@ class IComponentMedium(IMedium):
     """
     pass
 
-class IStreamingComponent(compat.Interface):
+class IStreamingComponent(Interface):
     """
     An interface for streaming components, for plugs that require a streaming
     component of some sort to use.
@@ -107,7 +107,7 @@ class IFeedMedium(IMedium):
     """
     pass
 
-class IHeaven(compat.Interface):
+class IHeaven(Interface):
     """
     My implementors manage avatars logging in to the manager.
     """
@@ -125,7 +125,7 @@ class IHeaven(compat.Interface):
         Remove the avatar with the given Id from the heaven.
         """
 
-class IFeedServerParent(compat.Interface):
+class IFeedServerParent(Interface):
     """
     I am an interface for objects that manage a FeedServer, allowing the
     FeedServer to hand off file descriptors to eaters and feeders managed

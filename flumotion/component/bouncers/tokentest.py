@@ -28,7 +28,6 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardToken
-from flumotion.twisted import compat
 
 __all__ = ['TokenTestBouncer']
 

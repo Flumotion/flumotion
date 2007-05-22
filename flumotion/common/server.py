@@ -26,9 +26,10 @@ Server functionality.
 import os
 
 from twisted.internet import reactor
+from zope.interface import Interface
 
 from flumotion.common import log
-from flumotion.twisted import compat
+
 
 class _ServerContextFactory(log.Loggable):
 
@@ -51,7 +52,7 @@ class _ServerContextFactory(log.Loggable):
             self.error('Could not open certificate %s' % self._pemFile)
         return ctx
 
-class IServable(compat.Interface):
+class IServable(Interface):
     """
     I am an interface for objects that want to be servable through a
     L{Server}.

@@ -30,10 +30,10 @@ from twisted.spread import pb as tpb
 from twisted.cred import credentials as tcredentials
 from twisted.cred import checkers as tcheckers
 from twisted.cred import portal, error
+from zope.interface import implements
 
 from flumotion.twisted import checkers, credentials, pb
 from flumotion.twisted import portal as fportal
-from flumotion.twisted.compat import implements
 
 from flumotion.common import keycards, log, interfaces
 from flumotion.component.bouncers import htpasswdcrypt, saltsha256

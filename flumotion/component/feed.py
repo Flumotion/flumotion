@@ -28,9 +28,9 @@ import os
 
 from twisted.internet import reactor, main, defer, tcp
 from twisted.python import failure
+from zope.interface import implements
 
 from flumotion.common import log, common, interfaces
-from flumotion.twisted import compat
 from flumotion.twisted import pb as fpb
 
 
@@ -90,7 +90,7 @@ class FeedMedium(fpb.Referenceable):
     """
     logCategory = 'feedmedium'
     remoteLogName = 'feedserver'
-    compat.implements(interfaces.IFeedMedium)
+    implements(interfaces.IFeedMedium)
 
     remote = None
 

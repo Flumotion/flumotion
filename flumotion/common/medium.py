@@ -27,12 +27,12 @@ import time
 
 from twisted.spread import pb
 from twisted.internet import defer, reactor
+from zope.interface import implements
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
 from flumotion.common import messages
 from flumotion.configure import configure
-from flumotion.twisted.compat import implements
 from flumotion.twisted import pb as fpb
 
 class BaseMedium(fpb.Referenceable):

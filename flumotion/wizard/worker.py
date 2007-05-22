@@ -22,10 +22,11 @@
 
 import gobject
 import gtk
+from zope.interface import implements
+
 from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 
 class WorkerListStore(gtk.ListStore):
     implements(flavors.IStateListener)

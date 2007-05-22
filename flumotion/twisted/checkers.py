@@ -26,10 +26,10 @@ Flumotion Twisted credential checkers
 from twisted.cred import checkers, error
 from twisted.internet import defer
 from twisted.python import failure
+from zope.interface import implements
 
 from flumotion.common import log
 from flumotion.twisted import credentials
-from flumotion.twisted.compat import implements
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it

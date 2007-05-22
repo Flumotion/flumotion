@@ -30,7 +30,7 @@ import random
 
 from flumotion.common import log
 from twisted.cred import credentials
-from flumotion.twisted.compat import implements
+from zope.interface import implements
 
 class Username:
     """

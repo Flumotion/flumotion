@@ -27,10 +27,11 @@ import os
 
 import gtk
 
+from zope.interface import implements
+
 from flumotion.configure import configure
 from flumotion.common import log, planet
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 class FluTrayIcon(log.Loggable):

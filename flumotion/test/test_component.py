@@ -29,11 +29,6 @@ from twisted.internet import defer
 from flumotion.component.feedcomponent import ParseLaunchComponent
 from flumotion.twisted.defer import defer_generator_method
 
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
-
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
         self.__pipeline = pipeline
@@ -89,10 +84,7 @@ class TestExpandElementName(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
         d = self.p.config()
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
     setUp = defer_generator_method(setUp)
 
     def tearDown(self):
@@ -164,10 +156,7 @@ class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
         d = self.p.config()
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
     setUp = defer_generator_method(setUp)
 
     def tearDown(self):
@@ -196,123 +185,72 @@ class TestParser(unittest.TestCase):
 
     def testSimpleOneElement(self):
         d, pipeline = pipelineFactory('foobar')
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-            self.assertEquals(result, 'foobar')
-        else:
-            d.addCallback(self._pipelineFactoryCallback, 'foobar')
-            return d
+        d.addCallback(self._pipelineFactoryCallback, 'foobar')
+        return d
 
     def testSimpleTwoElements(self):
         d, pipeline = pipelineFactory('foo ! bar')
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-            self.assertEquals(result, 'foo ! bar')
-        else:
-            d.addCallback(self._pipelineFactoryCallback, 'foo ! bar')
-            return d
+        d.addCallback(self._pipelineFactoryCallback, 'foo ! bar')
+        return d
 
     def testOneSource(self):
         d, pipeline  = pipelineFactory('@eater:foo@ ! bar', ['foo'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, '%s ! bar' % self._eater('foo:default'))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-                self._eater(pipeline, 'foo:default')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
+            self._eater(pipeline, 'foo:default')))
+        return d
 
     def testOneSourceWithout(self):
         d, pipeline = pipelineFactory('bar', ['foo'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, '%s ! bar' % self._eater('foo:default'))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-                self._eater(pipeline, 'foo:default')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
+            self._eater(pipeline, 'foo:default')))
+        return d
 
     def testOneFeed(self):
         d, pipeline = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, 'foo ! %s' % 
-                self._feeder(pipeline, 'fake:bar'))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-                self._feeder(pipeline, 'fake:bar')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
+            self._feeder(pipeline, 'fake:bar')))
+        return d
         
     def testOneFeedWithout(self):
         d, pipeline = pipelineFactory('foo', [], ['bar'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, 'foo ! %s' % 
-                self._feeder(pipeline, 'fake:bar'))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-                self._feeder(pipeline, 'fake:bar')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
+            self._feeder(pipeline, 'fake:bar')))
+        return d
 
     def testTwoSources(self):
         d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
             ['foo', 'bar'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, '%s ! %s ! baz' % (
-               self._eater(pipeline, 'foo:default'), 
-               self._eater(pipeline, 'bar:default')))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
-               self._eater(pipeline, 'foo:default'), 
-               self._eater(pipeline, 'bar:default')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
+           self._eater(pipeline, 'foo:default'), 
+           self._eater(pipeline, 'bar:default')))
+        return d
 
     def testTwoFeeds(self):
         d, pipeline = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [],
             ['bar', 'baz'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, 'foo ! %s ! %s' % (
-                self._feeder(pipeline, 'fake:bar'), 
-                self._feeder(pipeline, 'fake:baz')))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
-               self._feeder(pipeline, 'fake:bar'), 
-               self._feeder(pipeline, 'fake:baz')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
+           self._feeder(pipeline, 'fake:bar'), 
+           self._feeder(pipeline, 'fake:baz')))
+        return d
 
     def testTwoBoth(self):
         d, pipeline = pipelineFactory(
             '@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
                               ['comp1', 'comp2',],
                               ['feed1', 'feed2'])
-        if weHaveAnOldTwisted():
-            res = unittest.deferredResult(d)
-            self.assertEquals(res, '%s ! %s ! %s ! %s' % (
-                self._eater(pipeline, 'comp1:default'), 
-                self._eater(pipeline, 'comp2:default'),
-                self._feeder(pipeline, 'fake:feed1'), 
-                self._feeder(pipeline, 'fake:feed2')))
-        else:
-            d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
-                self._eater(pipeline, 'comp1:default'), 
-                self._eater(pipeline, 'comp2:default'),
-                self._feeder(pipeline, 'fake:feed1'), 
-                self._feeder(pipeline, 'fake:feed2')))
-            return d
+        d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
+            self._eater(pipeline, 'comp1:default'), 
+            self._eater(pipeline, 'comp2:default'),
+            self._feeder(pipeline, 'fake:feed1'), 
+            self._feeder(pipeline, 'fake:feed2')))
+        return d
 
     def testErrors(self):
         d, pipeline = pipelineFactory('')
-        if weHaveAnOldTwisted():
-            failure = unittest.deferredError(d)
+        def pipelineFactoryErrback(failure):
             assert(isinstance(failure, failure.Failure))
-            #self.assertRaises(failure.Failure, unittest.deferredResult(d), '')
-        else:
-            def pipelineFactoryErrback(failure):
-                assert(isinstance(failure, failure.Failure))
-            d.addCallback(pipelineFactoryErrback)
-            return d
+        d.addCallback(pipelineFactoryErrback)
+        return d
     testErrors.skip = "Help, I cant seem to port properly"
     
 if __name__ == '__main__':

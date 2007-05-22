@@ -32,13 +32,13 @@ from twisted.cred import portal
 from twisted.internet import defer, reactor
 from twisted.spread import pb
 from twisted.internet import error
+from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium, messages, worker
-from flumotion.twisted import checkers, fdserver, compat
+from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
-from flumotion.twisted.compat import implements
 from flumotion.configure import configure
 from flumotion.worker import medium, job, feedserver
 
@@ -88,7 +88,7 @@ class WorkerBrain(log.Loggable):
     @type feedServerPort:      int
     """
 
-    compat.implements(interfaces.IFeedServerParent)
+    implements(interfaces.IFeedServerParent)
 
     logCategory = 'workerbrain'
 

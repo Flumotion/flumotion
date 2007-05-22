@@ -225,12 +225,8 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         """
         if self.mind:
             peer = self.mind.broker.transport.getPeer()
-            # pre-Twisted 1.3.0 compatibility
-            try:
-                return peer.host
-            except AttributeError:
-                return peer[1]
-                
+            return peer.host
+
         return None
 
     def perspective_getBundleSums(self, bundleName=None, fileName=None,

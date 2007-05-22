@@ -34,6 +34,7 @@ from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
 from twisted.python import reflect
+from zope.interface import implements
 
 from flumotion.common import interfaces, errors, log, planet, medium, pygobject
 from flumotion.common import componentui, common, registry, messages, interfaces
@@ -41,7 +42,6 @@ from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
-from flumotion.twisted.compat import implements
 from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_

@@ -30,10 +30,11 @@ import signal
 from twisted.cred import portal
 from twisted.internet import defer, reactor
 from twisted.spread import pb
+from zope.interface import implements
 
 from flumotion.common import errors, log
 from flumotion.common import common, worker
-from flumotion.twisted import checkers, fdserver, compat
+from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import pb as fpb
 
 JOB_SHUTDOWN_TIMEOUT = 5
@@ -262,7 +263,7 @@ class JobHeaven(pb.Root, log.Loggable):
     """
 
     logCategory = "job-heaven"
-    compat.implements(portal.IRealm)
+    implements(portal.IRealm)
 
     def __init__(self, brain):
         """

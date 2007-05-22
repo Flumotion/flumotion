@@ -31,11 +31,11 @@ import gtk.glade
 
 from twisted.python import util
 from twisted.internet import defer
+from zope.interface import implements
 
 from flumotion.common import errors, log, common
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.twisted.compat import implements
 
 from gettext import gettext as _
 

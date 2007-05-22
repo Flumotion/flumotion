@@ -20,13 +20,14 @@
 # Headers in this file shall remain intact.
 import os
 
+from twisted.internet import defer
+from zope.interface import implements
+
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
 from flumotion.common import errors, log, componentui, common
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
-from twisted.internet import defer
 
 __all__ = ['commands']
 

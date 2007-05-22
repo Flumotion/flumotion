@@ -29,6 +29,7 @@ import gobject
 
 from twisted.internet import reactor, defer
 from twisted.spread import pb
+from zope.interface import implements
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
@@ -38,7 +39,6 @@ from flumotion.common import gstreamer
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
-from flumotion.twisted.compat import implements
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')

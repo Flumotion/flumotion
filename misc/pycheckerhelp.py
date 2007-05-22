@@ -10,8 +10,6 @@ import gst
 import gst.interfaces
 e = gst.element_factory_make('fakesrc')
 
-from flumotion.twisted import compat
-
 from twisted.internet import gtk2reactor
 gtk2reactor.install(useGtk=True)
 

@@ -36,6 +36,7 @@ from twisted.cred import credentials
 from twisted.internet import reactor, defer
 from twisted.python import failure
 from twisted.spread import pb
+from zope.interface import implements
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium, package
@@ -47,7 +48,6 @@ from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
 
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.twisted.compat import implements
 
 class JobMedium(medium.BaseMedium):
     """

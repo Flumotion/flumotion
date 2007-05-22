@@ -26,11 +26,6 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import saltsha256
 
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
-
 bouncerconf = {
     'name': 'testbouncer',
     'plugs': {},
@@ -52,12 +47,8 @@ class TestWrongKeycardClass(unittest.TestCase):
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         def wrongKeycardClassCallback(result):
             self.failIf(result)
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-            self.failIf(result)
-        else:
-            d.addCallback(wrongKeycardClassCallback)
-            return d
+        d.addCallback(wrongKeycardClassCallback)
+        return d
 
 class TestSaltSha256USCPCC(unittest.TestCase):
     def setUp(self):
@@ -85,17 +76,8 @@ class TestSaltSha256USCPCC(unittest.TestCase):
             dd.addCallback(authenticatedCallback)
             return dd
             
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-            self.assertEquals(result.state, keycards.REQUESTING)
-            # respond to challenge and resubmit
-            result.setPassword('test')
-            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
-            result = unittest.deferredResult(d)
-            self.assertEquals(result.state, keycards.AUTHENTICATED)
-        else:
-            d.addCallback(okCallback)
-            return d
+        d.addCallback(okCallback)
+        return d
 
     def testTamperWithChallenge(self):
         # create challenger
@@ -115,18 +97,7 @@ class TestSaltSha256USCPCC(unittest.TestCase):
                 self.failIf(result)
             dd.addCallback(tamperAuthenticateCallback)
             return dd
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-            self.assertEquals(result.state, keycards.REQUESTING)
-        
-            # mess with challenge, respond to challenge and resubmit
-            result.challenge = "I am a h4x0r"
-            result.setPassword('test')
-            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
-            result = unittest.deferredResult(d)
-            self.failIf(result)
-        else:
-            d.addCallback(tamperCallback)
-            return d
+        d.addCallback(tamperCallback)
+        return d
 if __name__ == '__main__':
     unittest.main()

@@ -27,8 +27,9 @@ from twisted.trial import unittest
 
 from twisted.internet import reactor, defer
 from twisted.spread import pb
+from zope.interface import implements
+
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 
 class TestStateCacheable(flavors.StateCacheable):
     pass

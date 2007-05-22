@@ -28,15 +28,9 @@ from twisted.internet import reactor, defer
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.common import componentui
 
 from flumotion.twisted.defer import defer_generator_method
-
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
 
 class FakeObject: pass
 
@@ -91,27 +85,16 @@ class TestStateSet(unittest.TestCase):
         port = self._m.run(TestRoot)
         self.admin = FakeAdmin()
         d = self.admin.run(port)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
         self.worker = FakeWorker()
         d = self.worker.run(port)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
     setUp = defer_generator_method(setUp)
 
     def tearDown(self):
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(self._m.stop())
-            unittest.deferredResult(self.admin.stop())
-            unittest.deferredResult(self.worker.stop())
-        else:
-            yield self._m.stop()
-            yield self.admin.stop()
-            yield self.worker.stop()
+        yield self._m.stop()
+        yield self.admin.stop()
+        yield self.worker.stop()
     tearDown = defer_generator_method(tearDown)
 
         
@@ -122,64 +105,37 @@ class TestStateSet(unittest.TestCase):
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
-        if weHaveAnOldTwisted():
-            state = unittest.deferredResult(d)
-
+        def workerGetStateCallback(state):
             self.failUnless(state)
             self.failUnless(state.hasKey('name'))
             self.failUnless(state.hasKey('children'))
-
             self.failUnlessEqual(state.get('name'), 'lois')
 
-            # change state by setting the name
             d = self.admin.remoteRoot.callRemote('workerSetName', 'clark')
-            unittest.deferredResult(d)
 
-            self.failUnlessEqual(state.get('name'), 'clark')
-        else:
-            def workerGetStateCallback(state):
-                self.failUnless(state)
-                self.failUnless(state.hasKey('name'))
-                self.failUnless(state.hasKey('children'))
-                self.failUnlessEqual(state.get('name'), 'lois')
-
-                d = self.admin.remoteRoot.callRemote('workerSetName', 'clark')
-
-                def workerSetNameCallback(result):
-                    self.failUnlessEqual(state.get('name'), 'clark')
-                d.addCallback(workerSetNameCallback)
-                return d
-            d.addCallback(workerGetStateCallback)
+            def workerSetNameCallback(result):
+                self.failUnlessEqual(state.get('name'), 'clark')
+            d.addCallback(workerSetNameCallback)
             return d
+        d.addCallback(workerGetStateCallback)
+        return d
 
     def testStateAppend(self):
         # change state by appending children
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
-        if weHaveAnOldTwisted():
-            state = unittest.deferredResult(d)
+        def workerGetStateCallback(state):
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
 
-            # change state by adding children
             d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-            unittest.deferredResult(d)
-
-            self.failUnlessEqual(state.get('children'), ['batman', ])
-        else:
-            def workerGetStateCallback(state):
-                self.failUnless(state)
-                self.failUnless(state.hasKey('children'))
-
-                d = self.admin.remoteRoot.callRemote('workerBearChild', 
-                    'batman')
-                def workerBearChildCallback(result):
-                    self.failUnlessEqual(state.get('children'), ['batman', ])
-                d.addCallback(workerBearChildCallback)
-                return d
-            d.addCallback(workerGetStateCallback)
+            def workerBearChildCallback(result):
+                self.failUnlessEqual(state.get('children'), ['batman', ])
+            d.addCallback(workerBearChildCallback)
             return d
+        d.addCallback(workerGetStateCallback)
+        return d
 
     def listen(self, state):
         def event(type):
@@ -213,197 +169,110 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(workerBearChildCallback)
         return d
 
-    if weHaveAnOldTwisted():
-        testSimpleStateListener.skip = True
-
-    # change state by appending children
-    if weHaveAnOldTwisted():
-        def testStateListener(self):
-            self.reset()
-            d = self.admin.remoteRoot.callRemote('workerGetState')
-            state = unittest.deferredResult(d)
-
+    def testStateListener(self):
+        def getStateCallback(state):
             self.listen(state)
-
+            self._state = state
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
             self.failIf(self.changes, self.changes)
+            return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
 
-            # change state by adding children
-            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-            unittest.deferredResult(d)
+        def workerBearChildCallback(res):
+            state = self._state
+            self.failUnless(self.changes)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
             # make sure this is the only change
             self.failIf(self.changes, self.changes)
+            return self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
 
-            d = self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
-            unittest.deferredResult(d)
+        def workerBearChildRobinCallback(res):
+            state = self._state
+            self.failUnless(self.changes)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
             self.failIf(self.changes, self.changes)
+            return self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
 
-            d = self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
-            unittest.deferredResult(d)
+        def workerHaveAdoptedCallback(res):
+            state = self._state
+            del self._state
+            self.failUnless(self.changes)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
             self.failIf(self.changes, self.changes)
             state.removeListener(self)
             del state
-    else:
-        def testStateListener(self):
-            def getStateCallback(state):
-                self.listen(state)
-                self._state = state
-                self.failUnless(state)
-                self.failUnless(state.hasKey('children'))
-                self.failIf(self.changes, self.changes)
-                return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
 
-            def workerBearChildCallback(res):
-                state = self._state
-                self.failUnless(self.changes)
-                c = self.changes.pop()
-                self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
-                # make sure this is the only change
-                self.failIf(self.changes, self.changes)
-                return self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
-
-            def workerBearChildRobinCallback(res):
-                state = self._state
-                self.failUnless(self.changes)
-                c = self.changes.pop()
-                self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
-                self.failIf(self.changes, self.changes)
-                return self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
-
-            def workerHaveAdoptedCallback(res):
-                state = self._state
-                del self._state
-                self.failUnless(self.changes)
-                c = self.changes.pop()
-                self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
-                self.failIf(self.changes, self.changes)
-                state.removeListener(self)
-                del state
-
-            self.reset()
-            d = self.admin.remoteRoot.callRemote('workerGetState')
-            d.addCallback(getStateCallback)
-            d.addCallback(workerBearChildCallback)
-            d.addCallback(workerBearChildRobinCallback)
-            d.addCallback(workerHaveAdoptedCallback)
-            return d
+        self.reset()
+        d = self.admin.remoteRoot.callRemote('workerGetState')
+        d.addCallback(getStateCallback)
+        d.addCallback(workerBearChildCallback)
+        d.addCallback(workerBearChildRobinCallback)
+        d.addCallback(workerHaveAdoptedCallback)
+        return d
 
     # change state by appending children
     # verify if we have the right number of items proxied,
     # ie the manager reference doesn't do something weird
-    if weHaveAnOldTwisted():
-        def testStateListenerIntermediate(self):
-            self.reset()
-            # get the state
-            d = self.admin.remoteRoot.callRemote('workerGetState')
-            state = unittest.deferredResult(d)
+    def testStateListenerIntermediate(self):
+        def workerGetStateCallback(state):
             self.listen(state)
-
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
             self.failIf(self.changes, self.changes)
-
-            # change state by adding children
-            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-            unittest.deferredResult(d)
+            self._state = state
+            return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
+                        
+        def workerBearChildCallback(result):
+            state = self._state
+            del self._state
+            self.failIf(self.changes == [])
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
             # make sure this is the only change
             self.failIf(self.changes, self.changes)
             self.assertEquals(len(state.get('children')), 1)
-
             state.removeListener(self)
             del state
-
-            # get the state again
-            d = self.admin.remoteRoot.callRemote('workerGetState')
-            state = unittest.deferredResult(d)
-
+            return self.admin.remoteRoot.callRemote('workerGetState')
+            
+        def workerGetStateAgainCallback(state):
             self.listen(state)
             self.assertEquals(len(state.get('children')), 1)
-
-            d = self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
-            unittest.deferredResult(d)
+            self._state = state
+            return self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
+                
+        def workerBearChildAgainCallback(result):
+            state = self._state
+            self.failUnless(self.changes)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
             self.failIf(self.changes, self.changes)
-
-            d = self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
-            unittest.deferredResult(d)
+            del state
+            return self.admin.remoteRoot.callRemote(
+                'workerHaveAdopted', 'batman')
+                        
+        def workerHaveAdoptedCallback(result):
+            state = self._state
+            del self._state
+            self.failUnless(self.changes)
             c = self.changes.pop()
-            self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
+            self.failUnlessEqual(c, 
+                ('remove', state, 'children', 'batman'))
             self.failIf(self.changes, self.changes)
             state.removeListener(self)
             del state
-    else:
-        def testStateListenerIntermediate(self):
-            def workerGetStateCallback(state):
-                self.listen(state)
-                self.failUnless(state)
-                self.failUnless(state.hasKey('children'))
-                self.failIf(self.changes, self.changes)
-                self._state = state
-                return self.admin.remoteRoot.callRemote('workerBearChild',
-                    'batman')
-                        
-            def workerBearChildCallback(result):
-                state = self._state
-                del self._state
-                self.failIf(self.changes == [])
-                c = self.changes.pop()
-                self.failUnlessEqual(c, ('append', state, 'children', 
-                    'batman'))
-                # make sure this is the only change
-                self.failIf(self.changes, self.changes)
-                self.assertEquals(len(state.get('children')), 1)
-                state.removeListener(self)
-                del state
-                return self.admin.remoteRoot.callRemote('workerGetState')
             
-            def workerGetStateAgainCallback(state):
-                self.listen(state)
-                self.assertEquals(len(state.get('children')), 1)
-                self._state = state
-                return self.admin.remoteRoot.callRemote('workerBearChild',
-                    'robin')
-                
-            def workerBearChildAgainCallback(result):
-                state = self._state
-                self.failUnless(self.changes)
-                c = self.changes.pop()
-                self.failUnlessEqual(c, ('append', state, 
-                    'children', 'robin'))
-                self.failIf(self.changes, self.changes)
-                del state
-                return self.admin.remoteRoot.callRemote(
-                    'workerHaveAdopted', 'batman')
-                        
-            def workerHaveAdoptedCallback(result):
-                state = self._state
-                del self._state
-                self.failUnless(self.changes)
-                c = self.changes.pop()
-                self.failUnlessEqual(c, 
-                    ('remove', state, 'children', 'batman'))
-                self.failIf(self.changes, self.changes)
-                state.removeListener(self)
-                del state
-            
-            # get the state again
-            d = self.admin.remoteRoot.callRemote('workerGetState')
-            d.addCallback(workerGetStateCallback)
-            d.addCallback(workerBearChildCallback)
-            d.addCallback(workerGetStateAgainCallback)
-            d.addCallback(workerBearChildAgainCallback)
-            d.addCallback(workerHaveAdoptedCallback)
-            return d
+        # get the state again
+        d = self.admin.remoteRoot.callRemote('workerGetState')
+        d.addCallback(workerGetStateCallback)
+        d.addCallback(workerBearChildCallback)
+        d.addCallback(workerGetStateAgainCallback)
+        d.addCallback(workerBearChildAgainCallback)
+        d.addCallback(workerHaveAdoptedCallback)
+        return d
                         
     def testStateSaveReference(self):
         # show that we need to keep the state reference around for listener
@@ -411,11 +280,8 @@ class TestStateSet(unittest.TestCase):
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
-        if weHaveAnOldTwisted():
-            state = unittest.deferredResult(d)
-
+        def workerGetStateCallback(state):
             self.listen(state)
-
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
 
@@ -423,22 +289,10 @@ class TestStateSet(unittest.TestCase):
 
             # change state by adding children
             d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-            unittest.deferredResult(d)
-            self.failIf(self.changes)
-        else:
-            def workerGetStateCallback(state):
-                self.listen(state)
-                self.failUnless(state)
-                self.failUnless(state.hasKey('children'))
-
-                del state
-
-                # change state by adding children
-                d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-                def workerBearChildCallback(res):
-                    self.failIf(self.changes)
-                d.addCallback(workerBearChildCallback)
-                return d
-            d.addCallback(workerGetStateCallback)
+            def workerBearChildCallback(res):
+                self.failIf(self.changes)
+            d.addCallback(workerBearChildCallback)
             return d
+        d.addCallback(workerGetStateCallback)
+        return d
 

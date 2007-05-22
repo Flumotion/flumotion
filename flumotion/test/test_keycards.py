@@ -25,27 +25,20 @@ import testclasses
 from twisted.trial import unittest
 
 from flumotion.twisted import credentials
-from flumotion.twisted import compat
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
 
 class TestKeycardUACPP(unittest.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(compat.implementsInterface(
-            keycard, credentials.IUsernameCryptPassword))
+        self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
 
 class TestKeycardUACPCC(unittest.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(compat.implementsInterface(
-            keycard, credentials.IUsernameCryptPassword))
+        self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
         
 # test sending keycards back and forth
 class Admin(testclasses.TestAdmin):
@@ -86,34 +79,19 @@ class TestKeycardSending(unittest.TestCase):
         port = self.m.run(Root)
         self.a = Admin()
         d = self.a.run(port)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
         self.w = Worker()
         d = self.w.run(port)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
     setUp = defer_generator_method(setUp)
 
     def tearDown(self):
         d = self.m.stop()
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
         d = self.a.stop()
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
         d = self.w.stop()
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
+        yield d
     tearDown = defer_generator_method(tearDown)
 
     def testSend(self):
@@ -123,10 +101,7 @@ class TestKeycardSending(unittest.TestCase):
             d2 = self.a.remoteRoot.callRemote('workerGiveKeycard', keycard)
             return d2
         d.addCallback(getKeycardCallback)
-        if weHaveAnOldTwisted():
-            result = unittest.deferredResult(d)
-        else:
-            return d
+        return d
         
         # while writing this test, I came to the conclusion that since
         # this is a copyable, you really can't say much about the id's

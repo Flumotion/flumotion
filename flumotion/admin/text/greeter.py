@@ -24,11 +24,11 @@
 from flumotion.admin import connections
 from flumotion.common import log, connection as fconnection
 from flumotion.twisted import flavors, reflect, pb as fpb
-from flumotion.twisted.compat import implements
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
 
 from twisted.internet import reactor
+from zope.interface import implements
 import gobject
 import curses
 

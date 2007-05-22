@@ -33,6 +33,7 @@ import gtk.glade
 
 from twisted.internet import reactor, defer
 from twisted.python import rebuild
+from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
@@ -43,7 +44,6 @@ from flumotion.common import errors, log, worker, planet, common, pygobject
 from flumotion.common import connection
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, reflect, pb as fpb
-from flumotion.twisted.compat import implements
 from flumotion.ui import icons, trayicon
 
 from flumotion.common.planet import moods

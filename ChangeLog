@@ -1,3 +1,60 @@
+2007-05-22  Michael Smith <msmith@fluendo.com>
+
+	* misc/pycheckerhelp.py
+	* flumotion/admin/admin.py:
+	* flumotion/admin/command/commands.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/text/admin_text.py:
+	* flumotion/admin/text/greeter.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/medium.py:
+	* flumotion/common/planet.py:
+	* flumotion/common/server.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/admin_text.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/bouncers/tokentest.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feed.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_checkers.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_common_messages.py:
+	* flumotion/test/test_common_planet.py:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/test/test_keycards.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/test/test_saltsha256.py:
+	* flumotion/test/test_twisted_compat.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/compat.py:
+	* flumotion/twisted/credentials.py:
+	* flumotion/twisted/flavors.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/ui/trayicon.py:
+	* flumotion/wizard/worker.py:
+	* flumotion/worker/feedserver.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/medium.py:
+	* flumotion/worker/worker.py:
+	  Kill twisted 1.3 compatibility code.
+
 2007-05-22  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/parse.py: Refactor to use the new things in

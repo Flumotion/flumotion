@@ -26,6 +26,7 @@ from twisted.web import resource, static, server, http
 from twisted.web import error as weberror
 from twisted.internet import defer, reactor, error
 from twisted.cred import credentials
+from zope.interface import implements
 
 from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils, interfaces
@@ -34,7 +35,6 @@ from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
 
 from flumotion.twisted import fdserver
-from flumotion.twisted.compat import implements
 
 from flumotion.component.misc.httpfile import file
 

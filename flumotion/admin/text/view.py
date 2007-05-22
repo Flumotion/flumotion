@@ -27,13 +27,12 @@ import curses
 
 from twisted.internet import reactor
 from twisted.python import rebuild
-
+from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.common import log, errors, worker, planet, common
 from flumotion.configure import configure
 from flumotion.twisted import flavors, reflect
-from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 from flumotion.admin.text import misc_curses

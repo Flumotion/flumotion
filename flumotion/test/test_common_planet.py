@@ -22,11 +22,11 @@
 from twisted.trial import unittest
 from twisted.spread import jelly
 from twisted.internet import reactor
+from zope.interface import implements
 
 import common as mcommon
 
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.common import planet
 
 from flumotion.common.planet import moods

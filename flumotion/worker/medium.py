@@ -28,11 +28,11 @@ import signal
 from twisted.internet import reactor
 import twisted.cred.error
 from twisted.internet import error
+from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log
 from flumotion.common import medium
 from flumotion.twisted import pb as fpb
-from flumotion.twisted.compat import implements
 
 JOB_SHUTDOWN_TIMEOUT = 5
 

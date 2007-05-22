@@ -27,9 +27,9 @@ import tempfile
 from twisted.trial import unittest
 from twisted.spread import pb
 from twisted.internet import reactor, address
+from zope.interface import implements,Interface
 
 from flumotion.common import common
-from flumotion.twisted.compat import implements,Interface
 
 class TestFormatStorage(unittest.TestCase):
     def testBytes(self):

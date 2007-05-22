@@ -30,6 +30,7 @@ from StringIO import StringIO
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from twisted.python import failure
+from zope.interface import implements
 
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry
@@ -39,7 +40,6 @@ from flumotion.common import messages
 
 # make ComponentState proxyable
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.common import componentui
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?

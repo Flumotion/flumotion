@@ -27,7 +27,6 @@ from twisted.internet import defer
 
 from flumotion.common import errors, componentui
 from flumotion.twisted import flavors
-from flumotion.twisted.compat import implements
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 (

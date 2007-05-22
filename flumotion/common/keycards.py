@@ -25,9 +25,9 @@ serializable keycards used for authentication inside Flumotion
 
 from twisted.cred import credentials as tcredentials
 from twisted.spread import pb
+from zope.interface import implements
 
 from flumotion.twisted import credentials
-from flumotion.twisted.compat import implements
 from flumotion.common import common
 
 # state enum values

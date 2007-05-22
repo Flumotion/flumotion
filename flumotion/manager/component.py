@@ -30,6 +30,7 @@ import time
 from twisted.spread import pb
 from twisted.internet import reactor, defer, error
 from twisted.python.failure import Failure
+from zope.interface import implements
 
 from flumotion.configure import configure
 # rename to base
@@ -38,7 +39,6 @@ from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.common import messages, common
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 from flumotion.common.messages import N_

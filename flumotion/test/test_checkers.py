@@ -29,14 +29,9 @@ from twisted.cred import error
 from twisted.cred import credentials as tcredentials
 from flumotion.twisted import credentials, checkers
 
-import twisted.copyright #T1.3
 # Use some shorter names
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredCrypt = credentials.UsernameCryptPasswordCrypt
-
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version < '2.0.0'
 
 class TestFlexibleWithPassword(unittest.TestCase):
     def setUp(self):
@@ -48,10 +43,7 @@ class TestFlexibleWithPassword(unittest.TestCase):
         cred = tcredentials.UsernamePassword('user', 'test')
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCorrectCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredPlaintextCorrectWithId(self):
         def credPlaintextCorrectWithIdCallback(result):
@@ -61,10 +53,7 @@ class TestFlexibleWithPassword(unittest.TestCase):
         cred.avatarId = "requested"
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCorrectWithIdCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredPlaintextWrong(self):
         def credPlaintextWrongErrback(failure):
@@ -73,10 +62,7 @@ class TestFlexibleWithPassword(unittest.TestCase):
         cred = tcredentials.UsernamePassword('user', 'wrong')
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credPlaintextWrongErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 class TestFlexibleWithoutPassword(unittest.TestCase):
     def setUp(self):
@@ -90,10 +76,7 @@ class TestFlexibleWithoutPassword(unittest.TestCase):
         cred = tcredentials.UsernamePassword('user', '')
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCorrectCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredPlaintextCorrectWithId(self):
         def credPlaintextCorrectWithIdCallback(result):
@@ -103,10 +86,7 @@ class TestFlexibleWithoutPassword(unittest.TestCase):
         cred.avatarId = "requested"
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCorrectWithIdCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 class TestCryptCheckerInit(unittest.TestCase):
     def setUp(self):
@@ -119,10 +99,7 @@ class TestCryptCheckerInit(unittest.TestCase):
         cred = CredPlaintext('user', 'test')
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 class TestCryptCheckerAddUser(unittest.TestCase):
     def setUp(self):
@@ -138,10 +115,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredPlaintext('user', 'test')
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredPlaintextWrongPassword(self):
         def credPlaintextWrongPasswordErrback(failure):
@@ -150,10 +124,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredPlaintext('user', 'tes')
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credPlaintextWrongPasswordErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredPlaintextWrongUser(self):
         def credPlaintextWrongUserErrback(failure):
@@ -162,10 +133,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredPlaintext('wrong', 'test')
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credPlaintextWrongUserErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredCrypt(self):
         def credCryptCallback(result):
@@ -176,10 +144,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredCrypt('user', crypted)
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credCryptCallback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredCryptWrongSalt(self):
         def credCryptWrongSaltErrback(failure):
@@ -189,10 +154,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredCrypt('user', crypted)
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credCryptWrongSaltErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredCryptWrongPassword(self):
         def credCryptWrongPasswordErrback(failure):
@@ -202,10 +164,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredCrypt('user', crypted)
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credCryptWrongPasswordErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
     def testCredCryptWrongUser(self):
         def credCryptWrongUserErrback(failure):
@@ -215,10 +174,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         cred = CredCrypt('wronguser', crypted)
         d = self.checker.requestAvatarId(cred)
         d.addErrback(credCryptWrongUserErrback)
-        if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(d)
-        else:
-            return d
+        return d
 
 if __name__ == '__main__':
      unittest.main()
