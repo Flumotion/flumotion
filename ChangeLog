@@ -1,5 +1,31 @@
 2007-05-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/config.py (WorkerConfigXML.parseFeederports):
+	Use common.strToBool.
+
+	* flumotion/common/config.py (buildEatersDict)
+	(parsePropertyValue, buildPropertyDict, buildPlugsSet): New
+	exposed functions. Probably will be useful for -launch.
+	(ConfigEntryComponent): Rewritten to do more: takes a parsed but
+	potentially not valid input, validates it against the defs, and
+	produces the canonical config dict.
+	(ConfigEntryFlow.__init__): Add components list to constructor,
+	and verify that it has unique component names.
+	(BaseConfigParser): Rewrite so as to do no validation that would
+	require the defs. Push component parsing down to here. Do all
+	parsing via parseFromTable.
+	(FlumotionConfigXML): Update for above changes; do validating
+	parses via parseFromTable.
+	(AdminConfigParser, ManagerConfigParser): Update for above
+	changes.
+
+	* flumotion/test/test_config.py (TestFunctions): Test one of the
+	new functions we expose.
+	(AdminConfigTest.testUnknownPlug): Change the expected assertion.
+
+	* common/pychecker.mk (%.pychecker): New target, make
+	flumotion/common/config.py.pychecker does a pycheck. Neat!
+
 	* flumotion/common/registry.py (ComponentRegistry.getComponent)
 	(ComponentRegistry.hasComponent)
 	(ComponentRegistry.getComponents, ComponentRegistry.getPlug)

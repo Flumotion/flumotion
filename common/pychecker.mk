@@ -59,6 +59,10 @@ pycheckersplit:
 		fi							\
 	done
 
+# pycheck a given file
+%.pychecker: %
+	$(pychecker) $*
+
 pychecker: pychecker010 pycheckerindep
 
 pycheckerindep: 

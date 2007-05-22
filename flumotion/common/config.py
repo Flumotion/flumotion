@@ -23,10 +23,6 @@
 parsing of configuration files
 """
 
-# Config XML FIXME: Make all <property> nodes be children of
-# <properties>; it's the only thing standing between now and a
-# table-driven, verifying config XML parser
-
 import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
@@ -38,23 +34,171 @@ from flumotion.configure import configure
 
 from errors import ConfigError, ComponentWorkerConfigError
 
-# all these string values should result in True
-BOOL_TRUE_VALUES = ['True', 'true', '1', 'Yes', 'yes']
-
 def _ignore(*args):
     pass
+
+def buildEatersDict(eatersList, eaterDefs):
+    eaters = {}
+    for eater, feedId in eatersList:
+        if eater is None:
+            # cope with old <source> entries
+            eater = eaterDefs[0].getName()
+        feeders = eaters.get(eater, [])
+        if feedId in feeders:
+            raise ConfigError("Already have a feedId %s eating "
+                              "from %s", feedId, eater)
+        feeders.append(feedId)
+        eaters[eater] = feeders
+    for e in eaterDefs:
+        eater = e.getName()
+        if e.getRequired() and not eater in eaters:
+            raise ConfigError("Component wants to eat on %s,"
+                              " but no feeders specified."
+                              % (e.getName(),))
+        if not e.getMultiple() and len(eaters.get(eater, [])) > 1:
+            raise ConfigError("Component does not support multiple "
+                              "sources feeding %s (%r)"
+                              % (eater, eaters[eater]))
+    return eaters        
+
+def parsePropertyValue(propName, type, value):
+    def tryStr(s):
+        try:
+            return str(s)
+        except UnicodeEncodeError:
+            return s
+    def strWithoutNewlines(s):
+        return tryStr(' '.join([x.strip() for x in s.split('\n')]))
+    def fraction(s):
+        def frac(num, denom=1):
+            return int(num), int(denom)
+        return frac(*s.split('/'))
+
+    try:
+        # yay!
+        return {'string': strWithoutNewlines,
+                'rawstring': tryStr,
+                'int': int,
+                'long': long,
+                'bool': common.strToBool,
+                'float': float,
+                'fraction': fraction}[type](value)
+    except KeyError:
+        raise ConfigError("unknown type '%s' for property %s"
+                          % (type, propName))
+
+def buildPropertyDict(propertyList, propertySpecList):
+    ret = {}
+    prop_specs = dict([(x.name, x) for x in propertySpecList])
+    for name, value in propertyList:
+        if not name in prop_specs:
+            raise ConfigError('unknown property %s' % (name,))
+        definition = prop_specs[name]
+
+        parsed = parsePropertyValue(name, definition.type, value)
+        if definition.multiple:
+            vals = ret.get(name, [])
+            vals.append(parsed)
+            ret[name] = vals
+        else:
+            if name in ret:
+                raise ConfigError("multiple value specified but not "
+                                  "allowed for property %s" % (name,))
+            ret[name] = parsed
+
+    for name, definition in prop_specs.items():
+        if definition.isRequired() and not name in ret:
+            raise ConfigError("required but unspecified property %s"
+                              % (name,))
+    return ret
+
+def buildPlugsSet(plugsList, sockets):
+    ret = {}
+    for socket in sockets:
+        ret[socket] = []
+    for socket, type, propertyList in plugsList:
+        if socket not in ret:
+            raise ConfigError("Unsupported socket type: %s" % (socket,))
+        plug = ConfigEntryPlug(socket, type, propertyList)
+        ret[socket].append({'type': plug.type, 'socket': plug.socket,
+                            'properties': plug.properties})
+    return ret
+
+class ConfigEntryPlug(log.Loggable):
+    "I represent a <plug> entry in a planet config file"
+    def __init__(self, socket, type, propertyList):
+        self.socket = socket
+        self.type = type
+
+        try:
+            defs = registry.getRegistry().getPlug(type)
+        except KeyError:
+            raise ConfigError("unknown plug type: %s" % type)
+
+        self.properties = buildPropertyDict(propertyList,
+                                            defs.getProperties())
 
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
     nice = 0
     logCategory = 'config'
-    def __init__(self, name, parent, type, config, defs, worker):
+
+    def __init__(self, name, parent, type, propertyList, plugList,
+                 worker, eatersList, isClockMaster, version):
         self.name = name
         self.parent = parent
         self.type = type
-        self.config = config
-        self.defs = defs
         self.worker = worker
+        self.defs = registry.getRegistry().getComponent(self.type)
+        self.config = self._buildConfig(propertyList, plugList,
+                                        eatersList, isClockMaster,
+                                        version)
+
+    def _buildVersionTuple(self, version):
+        if version is None:
+            return configure.versionTuple
+        elif isinstance(version, tuple):
+            assert len(version) == 4
+            return version
+        elif isinstance(version, str):
+            try:
+                def parse(maj, min, mic, nan=0):
+                    return maj, min, mic, nan
+                return parse(*map(int, version.split('.')))
+            except:
+                raise ComponentWorkerConfigError("<component> version not"
+                                                 " parseable")
+        raise ComponentWorkerConfigError("<component> version not"
+                                         " parseable")
+        
+    def _buildConfig(self, propertyList, plugsList, eatersList,
+                     isClockMaster, version):
+        """
+        Build a component configuration dictionary.
+        """
+        # clock-master should be either an avatar id or None.
+        # It can temporarily be set to True, and the flow parsing
+        # code will change it to the avatar id or None.
+        config = {'name': self.name,
+                  'parent': self.parent,
+                  'type': self.type,
+                  'avatarId': common.componentId(self.parent, self.name),
+                  'version': self._buildVersionTuple(version),
+                  'clock-master': isClockMaster or None,
+                  'feed': self.defs.getFeeders(),
+                  'properties': buildPropertyDict(propertyList,
+                                                  self.defs.getProperties()),
+                  'plugs': buildPlugsSet(plugsList,
+                                         self.defs.getSockets()),
+                  'eater': buildEatersDict(eatersList,
+                                           self.defs.getEaters()),
+                  'source': [feedId for eater, feedId in eatersList]}
+
+        if not config['source']:
+            # preserve old behavior
+            del config['source']
+
+        return config
 
     def getType(self):
         return self.type
@@ -73,9 +217,14 @@ class ConfigEntryComponent(log.Loggable):
 
 class ConfigEntryFlow:
     "I represent a <flow> entry in a planet config file"
-    def __init__(self, name):
+    def __init__(self, name, components):
         self.name = name
         self.components = {}
+        for c in components:
+            if c.name in self.components:
+                raise ConfigError('flow %s already has component named %s'
+                                  % (name, c.name))
+            self.components[c.name] = c
 
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
@@ -132,196 +281,113 @@ class BaseConfigParser(fxml.Parser):
     def export(self):
         return self.doc.toxml()
 
-    def parseVersionString(self, versionString):
-        if versionString:
-            try:
-                def parse(maj, min, mic, nan=0):
-                    return maj, min, mic, nan
-                return parse(*map(int, versionString.split('.')))
-            except:
-                raise ComponentWorkerConfigError("<component> version not"
-                                                 " parseable")
-        else:
-            return configure.versionTuple
-
-    def get_float_values(self, nodes):
-        return [float(subnode.childNodes[0].data) for subnode in nodes]
-
-    def get_int_values(self, nodes):
-        return [int(subnode.childNodes[0].data) for subnode in nodes]
-
-    def get_long_values(self, nodes):
-        return [long(subnode.childNodes[0].data) for subnode in nodes]
-
-    def get_bool_values(self, nodes):
-        return [subnode.childNodes[0].data in BOOL_TRUE_VALUES \
-            for subnode in nodes]
-
-    def get_string_values(self, nodes):
-        values = []
-        for subnode in nodes:
-            try:
-                data = subnode.childNodes[0].data
-            except IndexError:
+    def parseTextNode(self, node, type=str):
+        ret = []
+        for child in node.childNodes:
+            if child.nodeType == Node.TEXT_NODE:
+                ret.append(child.data)
+            elif child.nodeType == Node.COMMENT_NODE:
                 continue
-            # libxml always gives us unicode, even when we encode values
-            # as strings. try to make normal strings again, unless that
-            # isn't possible.
-            try:
-                data = str(data)
-            except UnicodeEncodeError:
-                pass
-            if '\n' in data:
-                parts = [x.strip() for x in data.split('\n')]
-                data = ' '.join(parts)
-            values.append(data)
-
-        return values
-
-    def get_raw_string_values(self, nodes):
-        values = []
-        for subnode in nodes:
-            try:
-                data = str(subnode.childNodes[0].data)
-                values.append(data)
-            except IndexError: # happens on a subnode without childNOdes
-                pass
-
-        string = "".join(values)
-        return [string, ]
-     
-    def get_fraction_values(self, nodes):
-        def fraction_from_string(string):
-            parts = string.split('/')
-            if len(parts) == 2:
-                return (int(parts[0]), int(parts[1]))
-            elif len(parts) == 1:
-                return (int(parts[0]), 1)
             else:
-                raise ConfigError("Invalid fraction: %s", string)
-        return [fraction_from_string(subnode.childNodes[0].data)
-                for subnode in nodes]
-
-    def parseProperties(self, node, properties, error):
-        """
-        Parse a <property>-containing node in a configuration XML file.
-        Ignores any subnode not named <property>.
-
-        @param node: The <properties> XML node to parse.
-        @type  node: L{xml.dom.Node}
-        @param properties: The set of valid properties.
-        @type  properties: list of
-        L{flumotion.common.registry.RegistryEntryProperty}
-        @param error: An exception factory for parsing errors.
-        @type  error: Callable that maps str => Exception.
-
-        @returns: The parsed properties, as a dict of name => value.
-        Absent optional properties will not appear in the dict.
-        """
-        # FIXME: non-validating, see first FIXME
-        # XXX: We might end up calling float(), which breaks
-        #      when using LC_NUMERIC when it is not C -- only in python
-        #      2.3 though, no prob in 2.4
-        import locale
-        locale.setlocale(locale.LC_NUMERIC, "C")
-
-        properties_given = {}
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'property':
-                if not subnode.hasAttribute('name'):
-                    raise error("<property> must have a name attribute")
-                name = subnode.getAttribute('name')
-                if not name in properties_given:
-                    properties_given[name] = []
-                properties_given[name].append(subnode)
-                
-        property_specs = dict([(x.name, x) for x in properties])
-
-        config = {}
-        for name, nodes in properties_given.items():
-            if not name in property_specs:
-                raise error("%s: unknown property" % name)
-                
-            definition = property_specs[name]
-
-            if not definition.multiple and len(nodes) > 1:
-                raise error("%s: multiple value specified but not "
-                            "allowed" % name)
-
-            parsers = {'string': self.get_string_values,
-                       'rawstring': self.get_raw_string_values,
-                       'int': self.get_int_values,
-                       'long': self.get_long_values,
-                       'bool': self.get_bool_values,
-                       'float': self.get_float_values,
-                       'fraction': self.get_fraction_values}
-                       
-            if not definition.type in parsers:
-                raise error("%s: invalid property type %s"
-                            % (name, definition.type))
-                
-            values = parsers[definition.type](nodes)
-
-            if values == []:
-                continue
-            
-            if not definition.multiple:
-                values = values[0]
-            
-            config[name] = values
-            
-        for name, definition in property_specs.items():
-            if definition.isRequired() and not name in config:
-                raise error("%s: required but unspecified property"
-                            % name)
-
-        return config
-
-    def parsePlug(self, node):
-        # <plug socket=... type=...>
-        #   <property>
-        socket, type = self.parseAttributes(node, ('socket', 'type'))
-
+                raise ConfigError('unexpected non-text content of %r: %r'
+                                  % (node, child))
         try:
-            defs = registry.getRegistry().getPlug(type)
-        except KeyError:
-            raise ConfigError("unknown plug type: %s" % type)
-        
-        possible_node_names = ['property']
-        for subnode in node.childNodes:
-            if (subnode.nodeType == Node.COMMENT_NODE
-                or subnode.nodeType == Node.TEXT_NODE):
-                continue
-            elif subnode.nodeName not in possible_node_names:
-                raise ConfigError("Invalid subnode of <plug>: %s"
-                                  % subnode.nodeName)
+            return type(''.join(ret))
+        except Exception, e:
+            raise ConfigError('failed to parse %s as %s: %s', node,
+                              type, log.getExceptionMessage(e))
 
-        property_specs = defs.getProperties()
-        def err(str):
-            return ConfigError('%s: %s' % (type, str))
-        properties = self.parseProperties(node, property_specs, err)
-
-        return {'type':type, 'socket':socket, 'properties':properties}
-
-    def parsePlugs(self, node, sockets):
+    def parsePlugs(self, node):
         # <plugs>
         #  <plug>
-        # returns: dict of socket -> list of plugs
-        # where a plug is 'type'->str, 'socket'->str,
-        #  'properties'->dict of properties
-        plugs = {}
-        for socket in sockets:
-            plugs[socket] = []
-        def addplug(plug):
-            if plug['socket'] not in sockets:
-                raise ConfigError("Component does not support "
-                                  "sockets of type %s" % plug['socket'])
-            plugs[plug['socket']].append(plug)
+        # returns: list of (socket, type, properties)
+        self.checkAttributes(node)
 
-        parsers = {'plug': (self.parsePlug, addplug)}
+        plugs = []
+        def parsePlug(node):
+            # <plug socket=... type=...>
+            #   <property>
+            socket, type = self.parseAttributes(node, ('socket', 'type'))
+            properties = []
+            parsers = {'property': (self._parseProperty,
+                                    properties.append)}
+            self.parseFromTable(node, parsers)
+            return socket, type, properties
+
+        parsers = {'plug': (parsePlug, plugs.append)}
+        self.parseFromTable(node, parsers)
+        return plugs
+
+    def parseComponent(self, node, parent, isFeedComponent,
+                       needsWorker):
+        """
+        Parse a <component></component> block.
+
+        @rtype: L{ConfigEntryComponent}
+        """
+        # <component name="..." type="..." worker="...">
+        #   <source>...</source>* (deprecated)
+        #   <eater name="...">...</eater>*
+        #   <property name="name">value</property>*
+        #   <clock-master>...</clock-master>?
+        #   <plugs>...</plugs>*
+        # </component>
+        
+        attrs = (('name', 'type'), ('worker', 'version',))
+        name, type, worker, version = self.parseAttributes(node, *attrs)
+        if needsWorker and not worker:
+            raise ConfigError('component %s does not specify the worker '
+                              'that it is to run on' % (name,))
+        elif worker and not needsWorker:
+            raise ConfigError('component %s specifies a worker to run '
+                              'on, but does not need a worker' % (name,))
+
+        properties = []
+        plugs = []
+        eaters = []
+        clockmasters = []
+        sources = []
+        
+        def parseBool(node):
+            return self.parseTextNode(node, common.strToBool)
+        parsers = {'property': (self._parseProperty, properties.append),
+                   'plugs': (self.parsePlugs, plugs.extend)}
+
+        if isFeedComponent:
+            parsers.update({'eater': (self._parseEater, eaters.extend),
+                            'clock-master': (parseBool, clockmasters.append),
+                            'source': (self.parseTextNode, sources.append)})
+
         self.parseFromTable(node, parsers)
 
-        return plugs
+        if len(clockmasters) == 0:
+            isClockMaster = None
+        elif len(clockmasters) == 1:
+            isClockMaster = clockmasters[0]
+        else:
+            raise ConfigError("Only one <clock-master> node allowed")
+
+        for feedId in sources:
+            # map old <source> nodes to new <eater> nodes
+            eaters.append((None, feedId))
+
+        return ConfigEntryComponent(name, parent, type, properties,
+                                    plugs, worker, eaters,
+                                    isClockMaster, version)
+
+    def _parseEater(self, node):
+        # <eater name="eater-name">
+        #   <feed>feeding-component:feed-name</feed>*
+        # </eater>
+        name, = self.parseAttributes(node, ('name',))
+        feedIds = []
+        parsers = {'feed': (self.parseTextNode, feedIds.append)}
+        self.parseFromTable(node, parsers)
+        return [(name, feedId) for feedId in feedIds]
+
+    def _parseProperty(self, node):
+        name, = self.parseAttributes(node, ('name',))
+        return name, self.parseTextNode(node, lambda x: x)
 
 # FIXME: rename to PlanetConfigParser or something (should include the
 # word 'planet' in the name)
@@ -366,134 +432,40 @@ class FlumotionConfigXML(BaseConfigParser):
         # </atmosphere>
         ret = {}
         def parseComponent(node):
-            return self._parseComponent(node, 'atmosphere')
+            return self.parseComponent(node, 'atmosphere', False, True)
         def gotComponent(comp):
             ret[comp.name] = comp
         parsers = {'component': (parseComponent, gotComponent)}
         self.parseFromTable(node, parsers)
         return ret
      
-    def _parseComponent(self, node, parent):
-        """
-        Parse a <component></component> block.
-
-        @rtype: L{ConfigEntryComponent}
-        """
-        # <component name="..." type="..." worker="...">
-        #   <source>...</source>* DEPRECATED
-        #   <eater name="...">
-        #     <feed>...</feed>
-        #   </eater>*
-        #   <property name="name">value</property>*
-        # </component>
-        
-        attrs = (('name', 'type', 'worker'), ('version',))
-        name, type, worker, version = self.parseAttributes(node, *attrs)
-        version = self.parseVersionString(version)
-
-        # FIXME: flumotion-launch does not define parent, type, or
-        # avatarId. Thus they don't appear to be necessary, like they're
-        # just extra info for the manager or so. Figure out what's going
-        # on with that. Also, -launch treats clock-master differently.
-        config = { 'name': name,
-                   'parent': parent,
-                   'type': type,
-                   'avatarId': common.componentId(parent, name),
-                   'version': version
-                 }
-
-        try:
-            defs = registry.getRegistry().getComponent(type)
-        except KeyError:
-            raise errors.UnknownComponentError(
-                "unknown component type: %s" % type)
-        
-        possible_node_names = ['source', 'clock-master', 'property',
-                               'plugs', 'eater']
-        for subnode in node.childNodes:
-            if subnode.nodeType == Node.COMMENT_NODE:
-                continue
-            elif subnode.nodeType == Node.TEXT_NODE:
-                # fixme: should check here that the string is empty
-                # should just make a dtd, gah
-                continue
-            elif subnode.nodeName not in possible_node_names:
-                raise ConfigError("Invalid subnode of <component>: %s"
-                                  % subnode.nodeName)
-
-        # let the component know what its feeds should be called
-        config['feed'] = defs.getFeeders()
-
-        eaters = self._parseEaters(node, defs)
-        if not eaters:
-            sources = self._parseSources(node, defs)
-            if sources:
-                config['source'] = sources
-                # assign sources up to first (and only eater)
-                # if more than one eater, parseSources would have raised
-                # a ConfigError
-                config['eater'] = {defs.getEaters()[0].getName():sources}
-        else:
-            # get sources as a list of strings from the dict of eaters
-            sources = []
-            for e in eaters:
-                sources.extend(eaters[e])
-            if sources:
-                config['source'] = sources
-            config['eater'] = eaters
-        config['clock-master'] = self._parseClockMaster(node)
-        config['plugs'] = self._parsePlugs(node, defs.getSockets())
-
-        properties = defs.getProperties()
-
-        self.debug('Parsing component: %s' % name)
-        def err(str):
-            return ConfigError('%s: %s' % (name, str))
-        config['properties'] = self.parseProperties(node, properties, err)
-
-        # fixme: all of the information except the worker is in the
-        # config dict: why?
-        return ConfigEntryComponent(name, parent, type, config, defs, worker)
-
     def _parseFlow(self, node):
         # <flow name="...">
         #   <component>
         #   ...
         # </flow>
         # "name" cannot be atmosphere or manager
-
-        if not node.hasAttribute('name'):
-            raise ConfigError("<flow> must have a name attribute")
-
-        name = str(node.getAttribute('name'))
+        name, = self.parseAttributes(node, ('name',))
         if name == 'atmosphere':
             raise ConfigError("<flow> cannot have 'atmosphere' as name")
         if name == 'manager':
             raise ConfigError("<flow> cannot have 'manager' as name")
 
-        flow = ConfigEntryFlow(name)
+        components = []
+        def parseComponent(node):
+            return self.parseComponent(node, name, True, True)
+        parsers = {'component': (parseComponent, components.append)}
+        self.parseFromTable(node, parsers)
 
-        for child in node.childNodes:
-            if (child.nodeType == Node.TEXT_NODE or
-                child.nodeType == Node.COMMENT_NODE):
-                continue
-            
-            if child.nodeName == "component":
-                component = self._parseComponent(child, name)
-            else:
-                raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
-
-            flow.components[component.name] = component
-
-        # handle master clock selection
-        masters = [x for x in flow.components.values()
-                     if x.config['clock-master']]
+        # handle master clock selection; probably should be done in the
+        # manager in persistent "flow" objects rather than here in the
+        # config
+        masters = [x for x in components if x.config['clock-master']]
         if len(masters) > 1:
             raise ConfigError("Multiple clock masters in flow %s: %r"
                               % (name, masters))
 
-        need_sync = [(x.defs.getClockPriority(), x)
-                     for x in flow.components.values()
+        need_sync = [(x.defs.getClockPriority(), x) for x in components
                      if x.defs.getNeedsSynchronization()]
         need_sync.sort()
         need_sync = [x[1] for x in need_sync]
@@ -514,192 +486,9 @@ class FlumotionConfigXML(BaseConfigParser):
                       'necessary -- ignoring')
             masters[0].config['clock-master'] = None
 
-        return flow
+        return ConfigEntryFlow(name, components)
 
-    def _parseManager(self, node, noRegistry=False):
-        # <manager>
-        #   <component>
-        #   ...
-        # </manager>
-
-        name = None
-        host = None
-        port = None
-        transport = None
-        certificate = None
-        bouncer = None
-        fludebug = None
-        plugs = {}
-
-        manager_sockets = \
-            ['flumotion.component.plugs.adminaction.AdminAction',
-             'flumotion.component.plugs.lifecycle.ManagerLifecycle',
-             'flumotion.component.plugs.identity.IdentityProvider']
-        for k in manager_sockets:
-            plugs[k] = []
-
-        if node.hasAttribute('name'):
-            name = str(node.getAttribute('name'))
-
-        for child in node.childNodes:
-            if (child.nodeType == Node.TEXT_NODE or
-                child.nodeType == Node.COMMENT_NODE):
-                continue
-            
-            if child.nodeName == "host":
-                host = self._nodeGetString("host", child)
-            elif child.nodeName == "port":
-                port = self._nodeGetInt("port", child)
-            elif child.nodeName == "transport":
-                transport = self._nodeGetString("transport", child)
-                if not transport in ('tcp', 'ssl'):
-                    raise ConfigError("<transport> must be ssl or tcp")
-            elif child.nodeName == "certificate":
-                certificate = self._nodeGetString("certificate", child)
-            elif child.nodeName == "component":
-                if noRegistry:
-                    continue
-
-                if bouncer:
-                    raise ConfigError(
-                        "<manager> section can only have one <component>")
-                bouncer = self._parseComponent(child, 'manager',
-                                               forManager=True)
-            elif child.nodeName == "plugs":
-                if noRegistry:
-                    continue
-
-                for k, v in self._parsePlugs(node, manager_sockets).items():
-                    plugs[k].extend(v)
-            elif child.nodeName == "debug":
-                fludebug = self._nodeGetString("debug", child)
-            else:
-                raise ConfigError("unexpected '%s' node: %s" % (
-                    node.nodeName, child.nodeName))
-
-            # FIXME: assert that it is a bouncer !
-
-        return ConfigEntryManager(name, host, port, transport, certificate,
-            bouncer, fludebug, plugs)
-
-    def _nodeGetInt(self, name, node):
-        try:
-            value = int(node.firstChild.nodeValue)
-        except ValueError:
-            raise ConfigError("<%s> value must be an integer" % name)
-        except AttributeError:
-            raise ConfigError("<%s> value not specified" % name)
-        return value
-
-    def _nodeGetString(self, name, node):
-        try:
-            value = str(node.firstChild.nodeValue)
-        except AttributeError:
-            raise ConfigError("<%s> value not specified" % name)
-        return value
-
-    def _parseEaters(self, node, defs):
-        # <eater name="eater-name">
-        #   <feed>feeding-component:feed-name</feed>*
-        # </eater>
-        eaters = dict([(x.getName(), x) for x in defs.getEaters()])
-
-        nodes = {}
-        hasSourceNodes = False
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'eater':
-                name, = self.parseAttributes(subnode, ('name',))
-                if nodes.has_key(name):
-                    raise ConfigError("Component %s should not have "
-                        "multiple eater nodes configured with same name:"
-                        " %s" % (node.nodeName, name))
-                feedNodes = []
-                def parseFeed(feedNode):
-                    # <feed>feeding-component:feed-name</feed>
-                    return self.get_string_values([feedNode])
-                def addFeed(feedNode):
-                    feedNodes.extend(feedNode)
-                self.parseFromTable(subnode, {'feed': (parseFeed, addFeed)})
-                nodes[name] = feedNodes
-            elif subnode.nodeName == 'source':
-                hasSourceNodes = True
-
-        # for backwards compatibility
-        if len(nodes) == 0 and hasSourceNodes:
-            return nodes
-
-        for e in eaters:
-            if eaters[e].getRequired() and not nodes.has_key(e):
-                raise ConfigError("Component %s wants to eat on %s, but no "
-                                  "eater with name: %s specified." % (
-                                  node.nodeName, e, e))
-            if not eaters[e].getMultiple() and nodes.has_key(e):
-                if len(nodes[e]) > 1:
-                    raise ConfigError("Component %s does not support multiple "
-                        "sources feeding %s (%r)"
-                        % (node.nodeName, e, nodes[e]))
-        return nodes
-
-    def _parseSources(self, node, defs):
-        # deprecated in favour of eater tag
-        # <source>feeding-component:feed-name</source>
-        eaters = dict([(x.getName(), x) for x in defs.getEaters()])
-
-        if len(eaters) > 1:
-            raise ConfigError("Component %s has many eater names specified "
-                "in the registry, the <source> tag cannot be used for this "
-                "and is now deprecated. Use the <eater> tag." % (node.nodeName))
-        nodes = []
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'source':
-                nodes.append(subnode)
-        strings = self.get_string_values(nodes)
-
-        # assigning certain sources to certain eaters can be done
-        # with the <eater> tag, the <source> tag is now deprecated
-        required = [x for x in eaters.values() if x.getRequired()]
-        multiple = [x for x in eaters.values() if x.getMultiple()]
-
-        if len(strings) == 0 and required:
-            raise ConfigError("Component %s wants to eat on %s, but no "
-                              "source specified"
-                              % (node.nodeName, eaters.keys()[0]))
-        if len(strings) > 1 and not multiple:
-            raise ConfigError("Component %s does not support multiple "
-                              "sources feeding %s (%r)"
-                              % (node.nodeName, eaters.keys()[0], strings))
-        if len(strings) > 0:
-            self.warning("The <source> tag is deprecated. Please use the "
-                "<eater> tag now")
-        return strings
-            
-    def _parseClockMaster(self, node):
-        nodes = []
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'clock-master':
-                nodes.append(subnode)
-        bools = self.get_bool_values(nodes)
-
-        if len(bools) > 1:
-            raise ConfigError("Only one <clock-master> node allowed")
-
-        if bools and bools[0]:
-            return True # will get changed to avatarId in parseFlow
-        else:
-            return None
-            
-    def _parsePlugs(self, node, sockets):
-        plugs = {}
-        for socket in sockets:
-            plugs[socket] = []
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'plugs':
-                newplugs = self.parsePlugs(subnode, sockets)
-                for socket in sockets:
-                    plugs[socket].extend(newplugs[socket])
-        return plugs
-
-    # FIXME: move to a config base class ?
+    # FIXME: remove, this is only used by the tests
     def getComponentEntries(self):
         """
         Get all component entries from both atmosphere and all flows
@@ -770,13 +559,7 @@ class ManagerConfigParser(BaseConfigParser):
                                  None, self.plugs)
 
         def simpleparse(proc):
-            def parse(node):
-                try:
-                    return proc(self._parseTextNode(node))
-                except Exception, e:
-                    raise ConfigError('failed to parse %s: %s', node,
-                                      log.getExceptionMessage(e))
-            return parse
+            return lambda node: self.parseTextNode(node, proc)
         def recordval(k):
             def record(v):
                 if getattr(ret, k):
@@ -804,77 +587,9 @@ class ManagerConfigParser(BaseConfigParser):
         self.parseFromTable(node, parsers)
         return ret
 
-    def _parseComponent(self, node, parent='manager'):
-        """
-        Parse a <component></component> block.
-
-        @rtype: L{ConfigEntryComponent}
-        """
-        # <component name="..." type="..." version="..."?>
-        #   <property name="name">value</property>*
-        # </component>
-        
-        attrs = (('name', 'type'), ('worker', 'version'))
-        name, type, worker, version = self.parseAttributes(node, *attrs)
-        version = self.parseVersionString(version)
-
-        if worker:
-            raise ComponentWorkerConfigError("components in manager "
-                                             "cannot have workers")
-
-
-        # FIXME: flumotion-launch does not define parent, type, or
-        # avatarId. Thus they don't appear to be necessary, like they're
-        # just extra info for the manager or so. Figure out what's going
-        # on with that. Also, -launch treats clock-master differently.
-        config = { 'name': name,
-                   'parent': parent,
-                   'type': type,
-                   'avatarId': common.componentId(parent, name),
-                   'version': version
-                 }
-
-        defs = registry.getRegistry().getComponent(type)
-        plugs = {}
-        for socket in defs.getSockets():
-            plugs[socket] = []
-        
-        def parsePlugs(node):
-            return self.parsePlugs(node, plugs.keys())
-        def gotPlugs(newplugs):
-            for socket in plugs:
-                plugs[socket].extend(newplugs[socket])
-        parsers = {'property': (_ignore, _ignore),
-                   'plugs': (parsePlugs, gotPlugs)}
-
-        self.parseFromTable(node, parsers)
-
-        config['plugs'] = plugs
-        properties = defs.getProperties()
-        self.debug('Parsing component: %s' % name)
-        def err(str):
-            return ConfigError('%s: %s' % (name, str))
-        config['properties'] = self.parseProperties(node, properties, err)
-
-        # fixme: all of the information except the worker is in the
-        # config dict: why?
-        return ConfigEntryComponent(name, parent, type, config, defs, worker)
-
-    def _parseTextNode(self, node):
-        ret = []
-        for child in node.childNodes:
-            if child.nodeType == Node.TEXT_NODE:
-                ret.append(child.data)
-            elif child.nodeType == Node.COMMENT_NODE:
-                continue
-            else:
-                raise ConfigError('unexpected non-text content of %r: %r'
-                                  % (node, child))
-        return ''.join(ret)
-
     def _parseManagerWithRegistry(self, node):
         def parsecomponent(node):
-            return self._parseComponent(node)
+            return self.parseComponent(node, 'manager', False, False)
         def gotcomponent(val):
             if self.bouncer is not None:
                 raise ConfigError('can only have one bouncer '
@@ -882,7 +597,8 @@ class ManagerConfigParser(BaseConfigParser):
             # FIXME: assert that it is a bouncer !
             self.bouncer = val
         def parseplugs(node):
-            return self.parsePlugs(node, self.MANAGER_SOCKETS)
+            return buildPlugsSet(self.parsePlugs(node),
+                                 self.MANAGER_SOCKETS)
         def gotplugs(newplugs):
             for socket in self.plugs:
                 self.plugs[socket].extend(newplugs[socket])
@@ -939,14 +655,11 @@ class AdminConfigParser(BaseConfigParser):
             raise ConfigError("unexpected root node': %s" % root.nodeName)
         
         def parseplugs(node):
-            return self.parsePlugs(node, self.plugs.keys())
+            return buildPlugsSet(self.parsePlugs(node),
+                                 self.plugs.keys())
         def addplugs(plugs):
             for socket in plugs:
-                try:
-                    self.plugs[socket].extend(plugs[socket])
-                except KeyError:
-                    raise ConfigError("Admin does not support "
-                                      "sockets of type %s" % socket)
+                self.plugs[socket].extend(plugs[socket])
         parsers = {'plugs': (parseplugs, addplugs)}
 
         self.parseFromTable(root, parsers)

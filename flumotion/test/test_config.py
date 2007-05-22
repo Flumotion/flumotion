@@ -94,6 +94,26 @@ def ConfigXML(string, parser=config.FlumotionConfigXML):
 def ManagerConfigXML(string):
     return ConfigXML(string, config.ManagerConfigParser)
 
+class TestFunctions(unittest.TestCase):
+    def testBuildEatersDict(self):
+        def assertEaters(comptype, l, expected):
+            defs = reg.getComponent(comptype)
+            self.assertEquals(config.buildEatersDict(l, defs.getEaters()),
+                              expected)
+        def assertRaises(comptype, l, err):
+            defs = reg.getComponent(comptype)
+            self.assertRaises(err, config.buildEatersDict, l,
+                              defs.getEaters())
+        assertEaters('test-component-with-multiple-eater',
+                     [('default', 'foo:bar'),
+                      ('default', 'baz')],
+                     {'default': ['foo:bar', 'baz']})
+        assertRaises('test-component-with-multiple-eater',
+                     [], config.ConfigError)
+        assertEaters('test-component-with-multiple-eater',
+                     [(None, 'foo:bar')],
+                     {'default': ['foo:bar']})
+                       
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
         conf = ConfigXML('<planet/>')
@@ -736,7 +756,7 @@ class AdminConfigTest(unittest.TestCase):
                '</plug>'
                '</plugs>'
                '</admin>')
-        self.assertRaises(config.ConfigError,
+        self.assertRaises(errors.UnknownPlugError,
                           lambda: AdminConfig(('foo.bar',), doc))
 
     def testUnknownSocket(self):

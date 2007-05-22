@@ -27,7 +27,7 @@ import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common import log, config
+from flumotion.common import log, config, common
 
 class ConfigError(Exception):
     pass
@@ -176,7 +176,7 @@ class WorkerConfigXML(log.Loggable):
         # <feederports>port-list</feederports>
         random = False
         if node.hasAttribute('random'):
-            random = node.getAttribute('random') in config.BOOL_TRUE_VALUES
+            random = common.strToBool(node.getAttribute('random'))
         ports = []
         if not node.firstChild:
             return (ports, random)
