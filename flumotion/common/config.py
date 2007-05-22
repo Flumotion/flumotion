@@ -155,9 +155,15 @@ class ConfigEntryComponent(log.Loggable):
         self.type = type
         self.worker = worker
         self.defs = registry.getRegistry().getComponent(self.type)
-        self.config = self._buildConfig(propertyList, plugList,
-                                        eatersList, isClockMaster,
-                                        version)
+        try:
+            self.config = self._buildConfig(propertyList, plugList,
+                                            eatersList, isClockMaster,
+                                            version)
+        except ConfigError, e:
+            # reuse the original exception?
+            e.args = ("While parsing component %s: %s"
+                      % (name, log.getExceptionMessage(e)),)
+            raise e
 
     def _buildVersionTuple(self, version):
         if version is None:
