@@ -26,6 +26,7 @@ import common
 from twisted.python import failure
 from twisted.internet import defer
 
+from flumotion.common import errors
 from flumotion.component.feedcomponent import ParseLaunchComponent
 from flumotion.twisted.defer import defer_generator_method
 
@@ -69,16 +70,16 @@ def pipelineFactory(pipeline, eaters=None, feeders=None):
     d = defer.Deferred()
     dd = t.config()
     def pipelineConfigCallback(result):
-        res = None
-        try:
-            res = t.parse_pipeline(pipeline)
-            t.stop()
-            d.callback(res)
-        except Exception, e:
-            d.errback(e)
-    dd.addCallback(pipelineConfigCallback)
+        res = t.parse_pipeline(pipeline)
+        t.stop()
+        return res
+    def _eb(failure):
+        t.stop()
+        return failure
+
+    dd.addCallbacks(pipelineConfigCallback, _eb)
     # return a tuple because we need a reference to the PipelineTest object
-    return (d, t)
+    return (dd, t)
 
 class TestExpandElementName(unittest.TestCase):
     def setUp(self):
@@ -247,15 +248,8 @@ class TestParser(unittest.TestCase):
 
     def testErrors(self):
         d, pipeline = pipelineFactory('')
-        def notCalled(res):
-            self.fail("Should not be reachable")
-        def pipelineFactoryErrback(f):
-            assert(isinstance(f, failure.Failure))
-
-        d.addCallback(notCalled)
-        d.addErrback(pipelineFactoryErrback)
+        self.failUnlessFailure(d, errors.ComponentSetupHandledError)
         return d
-    testErrors.skip = "Help, I cant seem to port properly"
     
 if __name__ == '__main__':
     unittest.main()
