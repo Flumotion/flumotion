@@ -1,3 +1,8 @@
+2007-05-23  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_component.py:
+	  Rewrite this test in a twisted-2.0 compatible way.
+
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/steps.py (Vorbis.worker_changed): Remove print.

@@ -248,7 +248,12 @@ class TestParser(unittest.TestCase):
 
     def testErrors(self):
         d, pipeline = pipelineFactory('')
-        self.failUnlessFailure(d, errors.ComponentSetupHandledError)
+        def _cb(r):
+            self.fail("Didn't get expected failure, received %r" % (r,))
+        def _eb(failure):
+            failure.trap(errors.ComponentSetupHandledError)
+            return failure.value
+        d.addCallbacks(_cb, _eb)
         return d
     
 if __name__ == '__main__':
