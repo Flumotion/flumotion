@@ -297,22 +297,6 @@ class BaseConfigParser(fxml.Parser):
     def export(self):
         return self.doc.toxml()
 
-    def parseTextNode(self, node, type=str):
-        ret = []
-        for child in node.childNodes:
-            if child.nodeType == Node.TEXT_NODE:
-                ret.append(child.data)
-            elif child.nodeType == Node.COMMENT_NODE:
-                continue
-            else:
-                raise ConfigError('unexpected non-text content of %r: %r'
-                                  % (node, child))
-        try:
-            return type(''.join(ret))
-        except Exception, e:
-            raise ConfigError('failed to parse %s as %s: %s', node,
-                              type, log.getExceptionMessage(e))
-
     def parsePlugs(self, node):
         # <plugs>
         #  <plug>

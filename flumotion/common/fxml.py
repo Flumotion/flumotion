@@ -177,3 +177,34 @@ class Parser(log.Loggable):
                 raise self.parserError("unexpected node in <%s>: %s"
                                        % (parent.nodeName, child))
             handler(parser(child))
+
+    def parseTextNode(self, node, type=str):
+        """Parse a text-containing XML node.
+
+        The node is expected to contain only text children. Recognized
+        node types are L{xml.dom.Node.TEXT_NODE} and
+        L{xml.dom.Node.CDATA_SECTION_NODE}.
+
+        @param node: the node to parse
+        @type  node: L{xml.dom.Node}
+        @param type: a function to call on the resulting text
+        @type  type: function of type unicode -> object
+
+        @returns: The result of calling type on the unicode text. By
+        default, type is L{str}.
+        """
+        ret = []
+        for child in node.childNodes:
+            if (child.nodeType == Node.TEXT_NODE
+                or child.nodeType == Node.CDATA_SECTION_NODE):
+                ret.append(child.data)
+            elif child.nodeType == Node.COMMENT_NODE:
+                continue
+            else:
+                raise ConfigError('unexpected non-text content of %r: %r'
+                                  % (node, child))
+        try:
+            return type(''.join(ret))
+        except Exception, e:
+            raise ConfigError('failed to parse %s as %s: %s', node,
+                              type, log.getExceptionMessage(e))
