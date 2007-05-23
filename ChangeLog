@@ -1,3 +1,11 @@
+2007-05-23  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Allow the component to respond to getState() remote calls before
+	  login is complete, so that we can (in a later version) avoid some
+	  races (e.g. #624) in connecting components. Unfortunately we can't
+	  do that right now or a new manager will break existing components.
+
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/parse.py (Component.complete_and_verify):

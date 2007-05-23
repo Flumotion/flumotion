@@ -72,6 +72,10 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
 
         self.logName = component.name
 
+    def clientConnectionMade(self, broker):
+        self.medium.broker = broker
+        fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
+
     # vmethod implementation
     def gotDeferredLogin(self, d):
         def remoteDisconnected(remoteReference):
@@ -137,6 +141,11 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         self.comp = component
         self.authenticator = None
+        self.broker = None
+
+    def setRemoteReference(self, reference):
+        self.broker = None # We no longer need that reference
+        medium.PingingMedium.setRemoteReference(self, reference)
 
     ### our methods
     def setup(self, config):
@@ -146,8 +155,9 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         Return the manager IP as seen by us.
         """
-        assert self.remote
-        peer = self.remote.broker.transport.getPeer()
+        assert self.remote or self.broker
+        broker = self.broker or self.remote.broker
+        peer = broker.transport.getPeer()
         try:
             host = peer.host
         except AttributeError:
