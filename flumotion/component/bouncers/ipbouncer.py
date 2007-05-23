@@ -38,7 +38,7 @@ __all__ = ['IPBouncer']
 class IPBouncer(bouncer.Bouncer):
 
     logCategory = 'ip-bouncer'
-    keycardClasses = (KeycardUACPP)
+    keycardClasses = (keycards.KeycardUACPCC, keycards.KeycardUACPP)
 
     def do_setup(self):
         conf = self.config
@@ -67,11 +67,14 @@ class IPBouncer(bouncer.Bouncer):
         ip = keycard.getData()['address']
         self.debug('authenticating keycard from requester %s', ip)
 
-        if self.deny_default:
-            allowed = (self.allowed.route(ip)
+        if ip is None:
+            self.warning('could not get address of remote')
+            allowed = False
+        elif self.deny_default:
+            allowed = (self.allows.route(ip)
                        and not self.denies.route(ip))
         else:
-            allowed = (self.allowed.route(ip)
+            allowed = (self.allows.route(ip)
                        or not self.denies.route(ip))
 
         if not allowed:

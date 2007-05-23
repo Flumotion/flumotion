@@ -1,5 +1,12 @@
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/ipbouncer.py
+	(IPBouncer.do_authenticate): Accept challenge-response keycards,
+	as they also support the address attribute.
+
+	* flumotion/twisted/portal.py (BouncerPortal.login): Reset
+	keycard.address if it is there.
+
 	* flumotion/common/config.py (buildEatersDict): Document.
 	(buildPropertyDict): Document.
 	(buildPlugsSet): Document.

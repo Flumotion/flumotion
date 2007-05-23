@@ -136,6 +136,13 @@ class BouncerPortal(log.Loggable):
 
             return self.realm.requestAvatar(keycard.avatarId, keycard, mind, *ifaces)
 
+        if hasattr(keycard, 'address'):
+            try:
+                keycard.address = mind.broker.transport.getHost().host
+            except:
+                self.debug("can't get address of remote, setting to None")
+                keycard.address = None
+
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         d.addCallback(bouncerResponse)
         d.addErrback(onErrorCloseConnection)
