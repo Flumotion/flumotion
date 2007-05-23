@@ -325,8 +325,6 @@ class Test_FPBClientFactory(unittest.TestCase):
         tlog.flushErrors(error.UnauthorizedLogin)
         log._getTheFluLogObserver().clearIgnores()
         self.port.stopListening()
-        reactor.iterate()
-        reactor.iterate()
 
     def clientDisconnect(self, factory, reference):
         # clean up broker by waiting on Disconnect notify

@@ -25,11 +25,6 @@ from twisted.trial import unittest
 from twisted.internet import defer, reactor
 from flumotion.twisted.defer import defer_generator
 
-
-def run_until_finished():
-    while reactor.getDelayedCalls():
-        reactor.iterate(0.01)
-
 class TestDefer(unittest.TestCase):
     result = None
     error = None
@@ -60,8 +55,10 @@ class TestDefer(unittest.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
-        run_until_finished()
-        assert self.result == 42
+        def checkResult(res):
+            assert self.result == 42
+        d.addCallback(checkResult)
+        return d
 
     def testYieldNothing(self):
         self.result = 42
@@ -77,8 +74,10 @@ class TestDefer(unittest.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
-        run_until_finished()
-        assert self.result == None
+        def checkResult(res):
+            assert self.result == None
+        d.addCallback(checkResult)
+        return d
 
     def testValues(self):
         self.result = None
@@ -101,8 +100,10 @@ class TestDefer(unittest.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
-        run_until_finished()
-        assert self.result == 81
+        def checkResult(res):
+            assert self.result == 81
+        d.addCallback(checkResult)
+        return d
 
     def testBarfOnNongenerator(self):
         def nongen():
@@ -143,8 +144,10 @@ class TestDefer(unittest.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
-        run_until_finished()
-        assert self.result == True
+        def checkResult(res):
+            assert self.result == True
+        d.addCallback(checkResult)
+        return d
 
     def testExceptionChain(self):
         def divide_later(x, y):
@@ -186,6 +189,8 @@ class TestDefer(unittest.TestCase):
         d.addErrback(zerodivisionerrorback)
         d.addErrback(runtimeerrorback)
         d.addCallback(checkexceptionchain)
-        run_until_finished()
-        assert self.result == ['oserror', 'zerodivisionerror'],\
-               "Unexpected exception chain: %r" % (self.result,)
+        def checkResult(res):
+            assert self.result == ['oserror', 'zerodivisionerror'],\
+                   "Unexpected exception chain: %r" % (self.result,)
+        d.addCallback(checkResult)
+        return d

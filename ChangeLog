@@ -1,5 +1,12 @@
 2007-05-23  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_defer.py:
+	* flumotion/test/test_pb.py:
+	  Remove deprecated uses of reactor.iterate() which aren't needed.
+	  There are some remaining.
+
+2007-05-23  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/component.py:
 	  Allow the component to respond to getState() remote calls before
 	  login is complete, so that we can (in a later version) avoid some
