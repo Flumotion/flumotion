@@ -38,7 +38,8 @@ def _ignore(*args):
     pass
 
 def buildEatersDict(eatersList, eaterDefs):
-    """Build a dict suitable for forming part of a component config.
+    """Build a eaters dict suitable for forming part of a component
+    config.
 
     @param eatersList: List of eaters. For example,
                        [('default', 'othercomp:feeder')] says that our
@@ -109,6 +110,19 @@ def parsePropertyValue(propName, type, value):
                              log.getExceptionMessage(e)))
 
 def buildPropertyDict(propertyList, propertySpecList):
+    """Build a property dict suitable for forming part of a component
+    config.
+
+    @param propertyList: List of property name-value pairs. For example,
+                         [('foo', 'bar'), ('baz', 3)] defines two
+                         property-value pairs. The values will be parsed
+                         into the appropriate types, this it is allowed
+                         to pass the string '3' for an int value.
+    @type  propertyList: List of (name, value)
+    @param propertySpecList: The set of allowed and required properties
+    @type  propertySpecList: List of
+                         L{flumotion.common.registry.RegistryEntryProperty}
+    """
     ret = {}
     prop_specs = dict([(x.name, x) for x in propertySpecList])
     for name, value in propertyList:
