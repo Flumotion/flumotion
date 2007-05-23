@@ -1,3 +1,8 @@
+2007-05-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/job.py (JobAvatar.setMind.error): Fix debug
+	statement which triggered tracebacks in error paths.
+
 2007-05-23  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_defer.py:

@@ -512,7 +512,7 @@ class JobAvatar(fpb.Avatar, log.Loggable):
         def error(failure, job):
             msg = log.getFailureMessage(failure)
             if failure.check(errors.ComponentCreateError):
-                self.warning('could not create component %s of type %s:',
+                self.warning('could not create component %s of type %s:'
                              ' %s', job.avatarId, job.type, msg)
             else:
                 self.warning('unhandled error creating component %s: %s',
