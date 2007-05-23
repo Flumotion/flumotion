@@ -154,7 +154,7 @@ class ConfigEntryComponent(log.Loggable):
     logCategory = 'config'
 
     def __init__(self, name, parent, type, propertyList, plugList,
-                 worker, eatersList, isClockMaster, version):
+                 worker, eatersList, isClockMaster, project, version):
         self.name = name
         self.parent = parent
         self.type = type
@@ -163,7 +163,7 @@ class ConfigEntryComponent(log.Loggable):
         try:
             self.config = self._buildConfig(propertyList, plugList,
                                             eatersList, isClockMaster,
-                                            version)
+                                            project, version)
         except ConfigError, e:
             # reuse the original exception?
             e.args = ("While parsing component %s: %s"
@@ -188,7 +188,7 @@ class ConfigEntryComponent(log.Loggable):
                                          " parseable")
         
     def _buildConfig(self, propertyList, plugsList, eatersList,
-                     isClockMaster, version):
+                     isClockMaster, project, version):
         """
         Build a component configuration dictionary.
         """
@@ -199,6 +199,7 @@ class ConfigEntryComponent(log.Loggable):
                   'parent': self.parent,
                   'type': self.type,
                   'avatarId': common.componentId(self.parent, self.name),
+                  'project': project or 'flumotion',
                   'version': self._buildVersionTuple(version),
                   'clock-master': isClockMaster or None,
                   'feed': self.defs.getFeeders(),
@@ -213,6 +214,7 @@ class ConfigEntryComponent(log.Loggable):
         if not config['source']:
             # preserve old behavior
             del config['source']
+        # FIXME: verify that config['project'] matches the defs
 
         return config
 
@@ -327,7 +329,8 @@ class BaseConfigParser(fxml.Parser):
 
         @rtype: L{ConfigEntryComponent}
         """
-        # <component name="..." type="..." worker="...">
+        # <component name="..." type="..." worker="..."?
+        #            project="..."? version="..."?>
         #   <source>...</source>* (deprecated)
         #   <eater name="...">...</eater>*
         #   <property name="name">value</property>*
@@ -335,8 +338,8 @@ class BaseConfigParser(fxml.Parser):
         #   <plugs>...</plugs>*
         # </component>
         
-        attrs = (('name', 'type'), ('worker', 'version',))
-        name, type, worker, version = self.parseAttributes(node, *attrs)
+        name, type, worker, project, version = self.parseAttributes(
+            node, ('name', 'type'), ('worker', 'project', 'version',))
         if needsWorker and not worker:
             raise ConfigError('component %s does not specify the worker '
                               'that it is to run on' % (name,))
@@ -375,7 +378,7 @@ class BaseConfigParser(fxml.Parser):
 
         return ConfigEntryComponent(name, parent, type, properties,
                                     plugs, worker, eaters,
-                                    isClockMaster, version)
+                                    isClockMaster, project, version)
 
     def _parseEater(self, node):
         # <eater name="eater-name">

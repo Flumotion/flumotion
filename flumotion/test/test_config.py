@@ -204,6 +204,46 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(dict.get('name'), 'component-name', dict['name'])
         self.assertEquals(dict.get('type'), 'test-component', dict['type'])
         
+    def testParseComponentWithProject(self):
+        conf = ConfigXML(
+             """
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component"
+                            worker="foo" project="flumotion" version="0.4.2"/>
+               </flow>
+             </planet>
+             """)
+
+        self.failIf(conf.flows)
+        conf.parse()
+
+        flow = conf.flows[0]
+        self.failUnless(flow.components.has_key('component-name'))
+        conf = flow.components['component-name'].getConfigDict()
+        self.assertEquals(conf['project'], 'flumotion', conf['type'])
+        self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
+        
+        # now the same, but without specifying project
+        conf = ConfigXML(
+             """
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component"
+                            worker="foo" version="0.4.2"/>
+               </flow>
+             </planet>
+             """)
+
+        self.failIf(conf.flows)
+        conf.parse()
+
+        flow = conf.flows[0]
+        self.failUnless(flow.components.has_key('component-name'))
+        conf = flow.components['component-name'].getConfigDict()
+        self.assertEquals(conf['project'], 'flumotion', conf['type'])
+        self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
+        
     def testParseManager(self):
         conf = ManagerConfigXML(
              """

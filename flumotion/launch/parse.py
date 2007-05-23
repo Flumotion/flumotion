@@ -74,6 +74,7 @@ class Component(object):
             None,
             [(None, feedId) for feedId in self.source],
             self.clock_master, 
+            None,
             None)
 
     def as_config_dict(self):

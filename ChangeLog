@@ -1,5 +1,17 @@
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/parse.py (Component.complete_and_verify):
+	Update for change to ConfigEntryComponent.
+
+	* flumotion/common/config.py (ConfigEntryComponent._buildConfig)
+	(ConfigEntryComponent.__init__, BaseConfigParser.parseComponent):
+	Parse "project" attributes on components, and add them to the
+	config dict.
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseComponentWithProject): Add a test for parsing
+	<component> entries with project=foo.
+
 	* flumotion/component/bouncers/ipbouncer.xml: Fix the xml.
 
 	* flumotion/common/fxml.py (Parser.parseTextNode): Move here from
