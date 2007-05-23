@@ -1043,7 +1043,6 @@ class Vorbis(AudioEncoder):
         
     def worker_changed(self):
         self.debug('running Vorbis checks')
-        print 'running Vorbis checks'
         d = self.wizard.require_elements(self.worker, 'vorbisenc')
 
         yield d

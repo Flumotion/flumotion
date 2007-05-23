@@ -1,5 +1,7 @@
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/steps.py (Vorbis.worker_changed): Remove print.
+
 	* flumotion/worker/job.py (JobAvatar.setMind.error): Fix debug
 	statement which triggered tracebacks in error paths.
 
