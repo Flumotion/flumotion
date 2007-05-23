@@ -153,6 +153,8 @@ class ConfigEntryComponent(log.Loggable):
     nice = 0
     logCategory = 'config'
 
+    __pychecker__ = 'maxargs=11'
+
     def __init__(self, name, parent, type, propertyList, plugList,
                  worker, eatersList, isClockMaster, project, version):
         self.name = name
