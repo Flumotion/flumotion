@@ -1,3 +1,7 @@
+2007-05-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (buildEatersDict): Document.
+
 2007-05-23  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_component.py:

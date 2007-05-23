@@ -38,6 +38,17 @@ def _ignore(*args):
     pass
 
 def buildEatersDict(eatersList, eaterDefs):
+    """Build a dict suitable for forming part of a component config.
+
+    @param eatersList: List of eaters. For example,
+                       [('default', 'othercomp:feeder')] says that our
+                       eater 'default' will be fed by the feed
+                       identified by the feedId 'othercomp:feeder'.
+    @type  eatersList: List of (eaterName, feedId)
+    @param  eaterDefs: The set of allowed and required eaters
+    @type   eaterDefs: List of
+                       L{flumotion.common.registry.RegistryEntryEater}
+    """
     eaters = {}
     for eater, feedId in eatersList:
         if eater is None:
