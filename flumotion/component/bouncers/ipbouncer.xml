@@ -1,7 +1,8 @@
 <registry>
   <components>
-    <component type="ip-bouncer" base="flumotion/component/bouncers">
-      <source location="flumotion.component.bouncers"/>
+    <component type="ip-bouncer" base="flumotion/component/bouncers"
+               description="A bouncer that authenticates based on remote IP address.">
+      <source location="flumotion.component.bouncers.ipbouncer"/>
 
       <entries>
       	<entry type="component" location="ipbouncer.py"

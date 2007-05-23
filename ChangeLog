@@ -1,5 +1,7 @@
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/ipbouncer.xml: Fix the xml.
+
 	* flumotion/common/fxml.py (Parser.parseTextNode): Move here from
 	config.py, and document. Accept CDATA_SECTION_NODE nodes.
 	(Parser.parseTextNode): Raise self.parserError, not ConfigError.
