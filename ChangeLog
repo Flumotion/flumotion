@@ -2,6 +2,7 @@
 
 	* flumotion/common/config.py (buildEatersDict): Document.
 	(buildPropertyDict): Document.
+	(buildPlugsSet): Document.
 
 2007-05-23  Michael Smith <msmith@fluendo.com>
 

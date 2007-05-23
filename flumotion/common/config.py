@@ -148,6 +148,19 @@ def buildPropertyDict(propertyList, propertySpecList):
     return ret
 
 def buildPlugsSet(plugsList, sockets):
+    """Build a plugs dict suitable for forming part of a component
+    config.
+
+    @param plugsList: List of plugs, as type-propertyList pairs. For
+                      example, [('frag', [('foo', 'bar')])] defines a plug
+                      of type 'frag', and the propertyList representing
+                      that plug's properties. The properties will be
+                      validated against the plug's properties as defined
+                      in the registry.
+    @type  plugsList: List of (type, propertyList)
+    @param sockets: The set of allowed sockets
+    @type  sockets: List of str
+    """
     ret = {}
     for socket in sockets:
         ret[socket] = []
