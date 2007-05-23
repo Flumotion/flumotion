@@ -201,10 +201,10 @@ class Parser(log.Loggable):
             elif child.nodeType == Node.COMMENT_NODE:
                 continue
             else:
-                raise ConfigError('unexpected non-text content of %r: %r'
-                                  % (node, child))
+                raise self.parserError('unexpected non-text content of '
+                                       '%r: %r' % (node, child))
         try:
             return type(''.join(ret))
         except Exception, e:
-            raise ConfigError('failed to parse %s as %s: %s', node,
-                              type, log.getExceptionMessage(e))
+            raise self.parserError('failed to parse %s as %s: %s', node,
+                                   type, log.getExceptionMessage(e))
