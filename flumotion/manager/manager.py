@@ -546,7 +546,7 @@ class Vishnu(log.Loggable):
         @type  file:     str or file
         """
         self.debug('loading configuration')
-        conf = config.ManagerConfigXML(file)
+        conf = config.ManagerConfigParser(file)
         conf.parseBouncerAndPlugs()
         self._loadManagerPlugs(conf)
         self._loadManagerBouncer(conf)
