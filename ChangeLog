@@ -1,5 +1,13 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/twisted/portal.py:
+	  If we have no bouncer, don't use log.error (which raises
+	  SystemError, which isn't jellyable). Instead fail appropriately, so
+	  that the connecting client (admin, etc) gets a clear error message.
+	  Fixes #559.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/manager.py:
 	  When a component not known to the manager logs in, make sure we call
 	  all the appropriate functions to rebuild the entire depgraph

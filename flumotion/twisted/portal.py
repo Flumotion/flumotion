@@ -30,7 +30,7 @@ from twisted.cred.portal import Portal
 from twisted.python import failure, reflect
 from twisted.python.components import registerAdapter
 
-from flumotion.common import keycards, log, interfaces
+from flumotion.common import keycards, log, interfaces, errors
 from flumotion.twisted.pb import _FPortalRoot
 
 class BouncerPortal(log.Loggable):
@@ -60,7 +60,9 @@ class BouncerPortal(log.Loggable):
         @rtype: L{defer.Deferred} firing list of str
         """
         if not self.bouncer:
-            self.error('No bouncer configured, no logins possible')
+            self.warning('No bouncer configured, no logins possible')
+            return defer.fail(errors.NotAuthenticatedError(
+                "No bouncer configured, no logins possible"))
         if hasattr(self.bouncer, 'getKeycardClasses'):
             # must return a deferred
             return self.bouncer.getKeycardClasses()
