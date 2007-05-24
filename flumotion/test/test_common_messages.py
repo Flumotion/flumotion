@@ -319,65 +319,61 @@ class PBSerializationTest(unittest.TestCase):
         return d
 
     def testMessageAppendRemove(self):
-        # this is what we eventually want; get the messages removed properly
-        # from the list key
-
-        # start everything
-        d = self.runClient()
-
-        if False: # Twisted 1.3 version
-            unittest.deferredResult(d)
-        
-            # get the state
+        def clientRunning(result):
             d = self.perspective.callRemote('getState')
-            state = unittest.deferredResult(d)
-
-            self.failUnless(state)
-            self.assertEqual(len(state.get('messages')), 0)
+            d.addCallback(gotState)
+            return d
+        def gotState(result):
+            self._state = result
+            self.failUnless(self._state)
+            self.assertEqual(len(self._state.get('messages')), 0)
 
             # ask server to append a message
             d = self.perspective.callRemote('appendMessage')
-            r = unittest.deferredResult(d)
-
-            l = state.get('messages')
+            d.addCallback(messageAdded)
+            return d
+        def messageAdded(result):
+            l = self._state.get('messages')
             self.assertEquals(len(l), 1)
             self.assertEquals(l[0].level, messages.INFO)
 
             # ask server to append another message
             d = self.perspective.callRemote('appendOtherMessage')
-            r = unittest.deferredResult(d)
-
-            l = state.get('messages')
+            d.addCallback(otherMessageAdded)
+            return d
+        def otherMessageAdded(result):
+            l = self._state.get('messages')
             self.assertEquals(len(l), 2)
             self.assertEquals(l[0].level, messages.INFO)
             self.assertEquals(l[1].level, messages.WARNING)
 
             # ask server to remove other message
             d = self.perspective.callRemote('removeOtherMessage')
-            r = unittest.deferredResult(d)
-
-            l = state.get('messages')
+            d.addCallback(removedOtherMessage)
+            return d
+        def removedOtherMessage(result):
+            l = self._state.get('messages')
             self.assertEquals(len(l), 1)
             self.assertEquals(l[0].level, messages.INFO)
 
             # ask server to remove first message
             d = self.perspective.callRemote('removeMessage')
-            r = unittest.deferredResult(d)
-
-            l = state.get('messages')
+            d.addCallback(removedFirstMessage)
+            return d
+        def removedFirstMessage(result):
+            l = self._state.get('messages')
             self.assertEquals(len(l), 0)
 
             # stop
-            unittest.deferredResult(self.stopClient())
-        else:
-            def runClientCallback(result):
-                d = self.stopClient()
-                def stopClientCallback(res):
-                    pass
-                d.addCallback(stopClientCallback)
-                return d
-            d.addCallback(runClientCallback)
+            d = self.stopClient()
+            def stopClientCallback(res):
+                pass
+            d.addCallback(stopClientCallback)
             return d
+        # start everything
+        d = self.runClient()
+        d.addCallback(clientRunning)
+        return d
 
 if __name__ == '__main__':
     unittest.main()

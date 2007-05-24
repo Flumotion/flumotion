@@ -1,5 +1,12 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_common_messages.py:
+	  Actually port a test to twisted 2 that was never ported.
+	* flumotion/twisted/integration.py:
+	  Another 1.3 compat chunk.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/common.py:
 	* flumotion/test/test_dialogs.py:
 	* flumotion/test/test_http.py:

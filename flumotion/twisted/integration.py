@@ -23,7 +23,6 @@ import os
 import signal
 
 from twisted.python import failure
-import twisted.copyright
 from twisted.internet import reactor, protocol, defer
 from flumotion.common import log as flog
 
@@ -452,13 +451,7 @@ def test(proc):
     def wrappedtest(self):
         plan = Plan(self, testName)
         proc(self, plan)
-        if twisted.copyright.version < '2.0':
-            # FIXME T1.3
-            info('using deferredResult for old trial')
-            from twisted.trial import unittest
-            return unittest.deferredResult(plan.execute())
-        else:
-            return plan.execute()
+        return plan.execute()
     try:
         wrappedtest.__name__ = testName
     except Exception:
