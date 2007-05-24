@@ -1,5 +1,11 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* po/de.po:
+	  Add german translation.
+	  Fixes #544.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/manager.py:
 	  Remove unused local to appease pychecker.
 
