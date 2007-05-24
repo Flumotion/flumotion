@@ -1,3 +1,10 @@
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/compat.py:
+	  Restore minimal compat module; needed so that admins can work with
+	  old managers/components.
+
 2007-05-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/ipbouncer.py

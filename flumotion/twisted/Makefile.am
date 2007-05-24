@@ -5,6 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/twisted
 flumotion_PYTHON = \
 	__init__.py \
 	checkers.py \
+	compat.py \
 	credentials.py \
 	defer.py \
 	fdserver.py \
