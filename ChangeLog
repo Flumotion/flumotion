@@ -1,5 +1,12 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* configure.ac:
+	  Prod so that buildbots reautogen to get new po files.
+	* po/de.po:
+	  Fix so that the translation doesn't cause make errors.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* po/de.po:
 	  Add german translation.
 	  Fixes #544.
