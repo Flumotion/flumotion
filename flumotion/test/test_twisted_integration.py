@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 
-import common
 import os
 import signal
 import tempfile
@@ -44,9 +43,6 @@ def _call_in_reactor(proc):
         # can only set procedure names in python >= 2.4
         pass
     return test
-
-_deferred_result = common.deferred_result
-    
 
 class CompatTestCase(unittest.TestCase):
     if not getattr(unittest.TestCase, 'failUnlessFailure', None):
@@ -81,7 +77,6 @@ class IntegrationProcessTest(CompatTestCase):
         assert p.state != p.NOT_STARTED
         return p.wait(0)
     testTransientProcess = _call_in_reactor(testTransientProcess)
-    testTransientProcess = _deferred_result(testTransientProcess)
 
     def testTimeOut(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
@@ -104,7 +99,6 @@ class IntegrationProcessTest(CompatTestCase):
         self.failUnlessFailure(d, error.ProcessTerminated)
         return d
     testTimeOut = _call_in_reactor(testTimeOut)
-    testTimeOut = _deferred_result(testTimeOut)
         
     def testKill(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
@@ -116,7 +110,6 @@ class IntegrationProcessTest(CompatTestCase):
         d = p.wait(None)
         return d
     testKill = _call_in_reactor(testKill)
-    testKill = _deferred_result(testKill)
 
 
 class IntegrationPlanGenerationTest(CompatTestCase):
@@ -159,14 +152,12 @@ class IntegrationPlanExecuteTest(CompatTestCase):
         process = plan.spawn('echo', 'hello world')
         plan.wait(process, 0)
         return plan.execute()
-    testTransientProcess = _deferred_result(testTransientProcess)
 
     def testKill(self):
         plan = integration.Plan(self, 'testKill')
         process = plan.spawn('cat', '/dev/random')
         plan.kill(process)
         return plan.execute()
-    testKill = _deferred_result(testKill)
 
     def testUnexpectedProcessExit(self):
         plan = integration.Plan(self, 'testUnexpectedProcessExit')
@@ -179,7 +170,6 @@ class IntegrationPlanExecuteTest(CompatTestCase):
         self.failUnlessFailure(d, integration.UnexpectedExitException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
-    testUnexpectedProcessExit = _deferred_result(testUnexpectedProcessExit)
 
     def testUnexpectedExitCode(self):
         plan = integration.Plan(self, 'testUnexpectedExitCode')
@@ -190,7 +180,6 @@ class IntegrationPlanExecuteTest(CompatTestCase):
         self.failUnlessFailure(d, integration.UnexpectedExitCodeException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
-    testUnexpectedExitCode = _deferred_result(testUnexpectedExitCode)
 
     def testProcessesStillRunning(self):
         plan = integration.Plan(self, 'testProcessesStillRunning')
@@ -199,7 +188,6 @@ class IntegrationPlanExecuteTest(CompatTestCase):
         self.failUnlessFailure(d, integration.ProcessesStillRunningException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
-    testProcessesStillRunning = _deferred_result(testProcessesStillRunning)
 
 # the decorator handles compat issues
 class IntegrationTestDecoratorTest(CompatTestCase):

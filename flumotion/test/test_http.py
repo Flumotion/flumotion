@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import common
-deferred_result = common.deferred_result
-
 from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import server
@@ -34,11 +31,7 @@ from flumotion.twisted.defer import defer_generator_method
 import fcntl
 import os
 
-try:
-    from twisted.web import http
-except ImportError:
-    #T1.3
-    from twisted.protocols import http
+from twisted.web import http
 
 class PipeTransport:
     def __init__(self):
@@ -204,7 +197,6 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         request = FakeRequest(ip='127.0.0.1', user='wronguser')
         return self.deferAssertUnauthorized(resource, request)
-    testRenderHTTPAuthUnauthorized = deferred_result(testRenderHTTPAuthUnauthorized)
 
     def testRenderHTTPTokenUnauthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
@@ -231,8 +223,6 @@ class TestHTTPStreamingResource(unittest.TestCase):
         yield self.deferAssertUnauthorized(resource, request)
     testRenderHTTPTokenUnauthorized = \
         defer_generator_method(testRenderHTTPTokenUnauthorized)
-    testRenderHTTPTokenUnauthorized = \
-        deferred_result(testRenderHTTPTokenUnauthorized)
 
     def testRenderHTTPTokenAuthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
@@ -255,8 +245,6 @@ class TestHTTPStreamingResource(unittest.TestCase):
         yield self.deferAssertAuthorized(resource, request)
     testRenderHTTPTokenAuthorized = \
         defer_generator_method(testRenderHTTPTokenAuthorized)
-    testRenderHTTPTokenAuthorized = \
-        deferred_result(testRenderHTTPTokenAuthorized)
         
     def testRenderNew(self):
         streamer = FakeStreamer()

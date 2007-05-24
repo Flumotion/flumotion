@@ -1,5 +1,14 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/common.py:
+	* flumotion/test/test_dialogs.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_twisted_integration.py:
+	  Remove more 1.3 compatibility code.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/twisted/Makefile.am:
 	* flumotion/twisted/compat.py:
 	  Restore minimal compat module; needed so that admins can work with

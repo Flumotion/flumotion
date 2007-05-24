@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-from common import deferred_result
-
 from twisted.trial import unittest
 
 import os
@@ -449,7 +447,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         d = self._loginWorker('worker')
         d.addCallback(got_avatar)
         return d
-    testWorker = deferred_result(testWorker)
 
     def testLoadConfiguration(self):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
@@ -558,7 +555,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         d.addCallback(gotWorker)
         d.addCallback(confChecked)
         return d
-    testConfigBeforeWorker = deferred_result(testConfigBeforeWorker)
 
     def testConfigAfterWorker(self):
         # test a config with three components being loaded after the worker
@@ -634,7 +630,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         d.addCallback(removeWorkersAndCheckDAG)
         d.addCallback(verifyMappersIsZero)
         return d
-    testConfigAfterWorker = deferred_result(testConfigAfterWorker)
 
     def _verifyConfigAndOneWorker(self):
         self.debug('verifying after having loaded config and started worker')

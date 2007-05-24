@@ -143,4 +143,3 @@ class TestErrorDialog(unittest.TestCase):
         # terrible reason
         gtk.main()
         return d
-    testDialogRun = common.deferred_result(testDialogRun)
