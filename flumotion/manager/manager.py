@@ -391,6 +391,7 @@ class Vishnu(log.Loggable):
         componentAvatarId = common.componentId(
             state.get('parent').get('name'), state.get('name'))
 
+        self.debug("Using config: %r for component with avatarId %r", conf, componentAvatarId)
         if componentAvatarId == conf['clock-master']:
             self._depgraph.addClockMaster(state)
 
@@ -920,12 +921,18 @@ class Vishnu(log.Loggable):
             verifyExistingComponentState(jobState, m.state)
         else:
             makeNewComponentState(conf)
+            m = self.getComponentMapper(avatar.avatarId)
+            self._updateFlowDependencies(m.state)
+            try:
+                self._depgraph.mapEatersToFeeders()
+            except errors.ComponentConfigError, e:
+                # This can happen - the feeder that some eater refers to might
+                # not have logged back in yet. Once it does, we'll call this
+                # again, and the depgraph will get rebuilt properly.
+                self.debug("Couldn't map eaters to feeders for reconnecting "
+                    "component")
 
         m = self.getComponentMapper(avatar.avatarId)
-
-        # make sure the component is in the depgraph
-        self._depgraph.addComponent(m.state)
-
         m.avatar = avatar
         self._componentMappers[m.avatar] = m
         avatar.componentState = m.state

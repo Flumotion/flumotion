@@ -1,5 +1,13 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  When a component not known to the manager logs in, make sure we call
+	  all the appropriate functions to rebuild the entire depgraph
+	  correctly, not just fragments of it.
+	  Fixes #574.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/test_common_messages.py:
 	  Actually port a test to twisted 2 that was never ported.
 	* flumotion/twisted/integration.py:
