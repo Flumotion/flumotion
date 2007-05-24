@@ -925,7 +925,7 @@ class Vishnu(log.Loggable):
             self._updateFlowDependencies(m.state)
             try:
                 self._depgraph.mapEatersToFeeders()
-            except errors.ComponentConfigError, e:
+            except errors.ComponentConfigError:
                 # This can happen - the feeder that some eater refers to might
                 # not have logged back in yet. Once it does, we'll call this
                 # again, and the depgraph will get rebuilt properly.

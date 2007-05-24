@@ -1,5 +1,10 @@
 2007-05-24  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  Remove unused local to appease pychecker.
+
+2007-05-24  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/twisted/portal.py:
 	  If we have no bouncer, don't use log.error (which raises
 	  SystemError, which isn't jellyable). Instead fail appropriately, so
