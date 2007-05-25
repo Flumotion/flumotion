@@ -1,3 +1,10 @@
+2007-05-25  Michael Smith <msmtih@fluendo.com>
+
+	* flumotion/component/base/http.py:
+	  Fix re-raising handled error in authentication in http components;
+	  avoids useless/noisy traceback logging.
+	  Fixes #623.
+
 2007-05-25  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

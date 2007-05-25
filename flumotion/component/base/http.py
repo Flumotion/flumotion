@@ -274,7 +274,7 @@ class HTTPAuthentication(log.Loggable):
     def _authenticatedErrback(self, failure, request):
         failure.trap(errors.UnknownComponentError, errors.NotAuthenticatedError)
         self._handleUnauthorized(request)
-        raise errors.HandledException(failure)
+        return None
         
     def _handleUnauthorized(self, request):
         self.debug('client from %s is unauthorized' % (request.getClientIP()))
