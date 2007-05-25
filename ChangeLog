@@ -1,3 +1,10 @@
+2007-05-25  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Reject clients using bandwidth limit if adding this client would
+	  take us over the limit, not only if we're _already_ over the limit.
+	  Fixes #217.
+
 2007-05-25  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/common/config.py:

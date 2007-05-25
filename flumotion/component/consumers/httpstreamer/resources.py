@@ -264,7 +264,8 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         if self.maxclients >= 0 and len(self._requests) >= self.maxclients:
             return True
         elif self.maxbandwidth >= 0:
-            if (len(self._requests) * self.streamer.getCurrentBitrate() >= 
+            # Reject if adding one more client would take us over the limit.
+            if (len(self._requests + 1) * self.streamer.getCurrentBitrate() >= 
                     self.maxbandwidth):
                 return True
         return False
