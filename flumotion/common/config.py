@@ -599,7 +599,7 @@ class ManagerConfigParser(BaseConfigParser):
     def _parseManagerWithoutRegistry(self, node):
         # We parse without asking for a registry so the registry doesn't
         # verify before knowing the debug level
-        name = self.parseAttributes(node, (), ('name',))
+        name, = self.parseAttributes(node, (), ('name',))
         ret = ConfigEntryManager(name, None, None, None, None, None,
                                  None, self.plugs)
 
