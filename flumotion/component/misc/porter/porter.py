@@ -35,8 +35,6 @@ from flumotion.component.component import moods
 
 import socket, string, os, random
 
-#import thisdoesnotexist
-
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
