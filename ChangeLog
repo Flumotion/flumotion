@@ -1,3 +1,9 @@
+2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.change_filename):
+	Log the disker's filename change more nicely for admins.
+
 2007-05-25  Michael Smith <msmtih@fluendo.com>
 
 	* flumotion/component/base/http.py:

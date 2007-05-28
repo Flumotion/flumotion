@@ -162,7 +162,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         """
         @param filenameTemplate: strftime formatted string to decide filename
         """
-        self.debug("change_filename()")
         mime = self.get_mime()
         if mime == 'application/ogg':
             ext = 'ogg'
@@ -203,7 +202,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         filename = "%s.%s" % (time.strftime(filenameTemplate,
             time.localtime()), ext)
         self.location = os.path.join(self.directory, filename)
-
+        self.info("Changing filename to %s", self.location)
         try:
             self.file = open(self.location, 'a')
         except IOError, e:
