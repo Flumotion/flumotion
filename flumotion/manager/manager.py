@@ -515,7 +515,7 @@ class Vishnu(log.Loggable):
 
         return added
 
-    def _startComponents(self, components, conf, identity):
+    def _startComponents(self, components, identity):
         # now start all components that need starting -- collecting into
         # an temporary dict of the form {workerId => [components]}
         componentsToStart = {}
@@ -533,7 +533,7 @@ class Vishnu(log.Loggable):
         # makeBouncer only makes a bouncer if there is one in the config
         d = defer.succeed(None)
         d.addCallback(self._updateStateFromConf, conf, identity)
-        d.addCallback(self._startComponents, conf, identity)
+        d.addCallback(self._startComponents, identity)
         return d
  
     def loadComponentConfigurationXML(self, file, identity):

@@ -11,6 +11,8 @@
 	warn the admin if the configurations are different without
 	modifying the manager's state.
 	(Vishnu.emptyPlanet): Clean all messages from the planet.
+	(Vishnu._startComponents, Vishnu._loadComponentConfiguration): No
+	need to pass conf in here.
 
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
