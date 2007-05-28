@@ -1,5 +1,10 @@
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Improve positioning of parentheses.
+
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/misc/porter/porter.py:
 	  Use DeferredList correctly.
 
