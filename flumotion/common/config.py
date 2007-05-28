@@ -173,6 +173,65 @@ def buildPlugsSet(plugsList, sockets):
                                  'properties': plug.properties})
     return ret
 
+def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
+             keyBase=None):
+    """Compute the difference between two config dicts.
+
+    @returns: 3 tuple: (onlyOld, onlyNew, diff) where:
+              onlyOld is a list of (key, value), representing key-value
+              pairs that are only in old;
+              onlyNew is a list of (key, value), representing key-value
+              pairs that are only in new;
+              diff is a list of (key, oldValue, newValue), representing
+              keys with different values in old and new; and
+              key is a tuple of strings representing the recursive key
+              to get to a value. For example, ('foo', 'bar') represents
+              the value d['foo']['bar'] on a dict d.
+    """
+    # key := tuple of strings
+
+    if onlyOld is None:
+        onlyOld = [] # key, value
+        onlyNew = [] # key, value
+        diff = [] # key, oldvalue, newvalue
+        keyBase = ()
+
+    for k in old:
+        key = (keyBase + (k,))
+        if k not in new:
+            onlyOld.append((key, old[k]))
+        elif old[k] != new[k]:
+            if isinstance(old[k], dict) and isinstance(new[k], dict):
+                dictDiff(old[k], new[k], onlyOld, onlyNew, diff, key)
+            else:
+                diff.append((key, old[k], new[k]))
+
+    for k in new:
+        key = (keyBase + (k,))
+        if k not in old:
+            onlyNew.append((key, new[k]))
+
+    return onlyOld, onlyNew, diff
+
+def dictDiffMessageString((old, new, diff), oldLabel='old',
+                          newLabel='new'):
+    def ref(label, k):
+        return "%s%s: '%s'" % (label,
+                               ''.join(["[%r]" % (subk,)
+                                        for subk in k[:-1]]),
+                               k[-1])
+
+    out = []
+    for k, v in old:
+        out.append('Only in %s = %r' % (ref(oldLabel, k), v))
+    for k, v in new:
+        out.append('Only in %s = %r' % (ref(newLabel, k), v))
+    for k, oldv, newv in diff:
+        out.append('Value mismatch:')
+        out.append('    %s = %r' % (ref(oldLabel, k), oldv))
+        out.append('    %s = %r' % (ref(newLabel, k), newv))
+    return '\n'.join(out)
+
 class ConfigEntryPlug(log.Loggable):
     "I represent a <plug> entry in a planet config file"
     def __init__(self, type, propertyList):

@@ -1,3 +1,12 @@
+2007-05-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_config.py (TestDictDiff.testHumanReadable)
+	(TestDictDiff.testRecursive, TestDictDiff.testSimple): Testes.
+
+	* flumotion/common/config.py (dictDiffMessageString, dictDiff):
+	Add some awesome functions for diffing dicts of dicts and other
+	things.
+
 2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/config.py (BaseConfigParser._parseEater):

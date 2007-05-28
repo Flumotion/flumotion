@@ -808,3 +808,89 @@ class AdminConfigTest(unittest.TestCase):
                '</admin>')
         self.assertRaises(config.ConfigError,
                           lambda: AdminConfig(('foo.bar',), doc))
+
+class TestDictDiff(unittest.TestCase):
+    def assertOND(self, d1, d2, old, new, diff):
+        o, n, d = config.dictDiff(d1, d2)
+        self.assertEquals(old, o)
+        self.assertEquals(new, n)
+        self.assertEquals(diff, d)
+
+    def testSimple(self):
+        ass = self.assertOND
+        ass({}, {}, [], [], [])
+
+        ass({'foo': 'bar'}, {}, [(('foo',), 'bar')], [], [])
+
+        ass({}, {'foo': 'bar'}, [], [(('foo',), 'bar')], [])
+
+        ass({'foo': 'bar'}, {'foo': 'baz'}, [], [], [(('foo',), 'bar', 'baz')])
+
+    def testRecursive(self):
+        ass = self.assertOND
+        ass({}, {}, [], [], [])
+
+        ass({'foo': {'bar': 'baz'}},
+            {},
+            [(('foo',), {'bar':'baz'})],
+            [],
+            [])
+
+        ass({'foo': {'bar': 'baz'}},
+            {'foo': {}},
+            [(('foo','bar'), 'baz')],
+            [],
+            [])
+
+        ass({'foo': {}},
+            {'foo': {'bar': 'baz'}},
+            [],
+            [(('foo','bar'), 'baz')],
+            [])
+
+        ass({},
+            {'foo': {'bar': 'baz'}},
+            [],
+            [(('foo',), {'bar':'baz'})],
+            [])
+
+        ass({'foo': {'bar': 'baz'}},
+            {'foo': {'bar': 'qux'}},
+            [],
+            [],
+            [(('foo','bar'), 'baz', 'qux')])
+
+    def testHumanReadable(self):
+        def test(d1, d2, s):
+            msg = config.dictDiffMessageString(config.dictDiff(d1, d2))
+            self.assertEquals(msg, s)
+
+        test({}, {}, '')
+        test({'foo': 42}, {}, "Only in old: 'foo' = 42")
+        test({}, {'foo': 42}, "Only in new: 'foo' = 42")
+        test({'foo': 17}, {'foo': 42},
+             "Value mismatch:\n"
+             "    old: 'foo' = 17\n"
+             "    new: 'foo' = 42")
+
+        test({'foo': {'bar': 'baz'}},
+             {},
+             "Only in old: 'foo' = {'bar': 'baz'}")
+
+        test({'foo': {'bar': 'baz'}},
+             {'foo': {}},
+             "Only in old['foo']: 'bar' = 'baz'")
+
+        test({'foo': {}},
+             {'foo': {'bar': 'baz'}},
+             "Only in new['foo']: 'bar' = 'baz'")
+
+        test({},
+             {'foo': {'bar': 'baz'}},
+             "Only in new: 'foo' = {'bar': 'baz'}")
+
+        test({'foo': {'bar': 'baz'}},
+             {'foo': {'bar': 'qux'}},
+             "Value mismatch:\n"
+             "    old['foo']: 'bar' = 'baz'\n"
+             "    new['foo']: 'bar' = 'qux'")
