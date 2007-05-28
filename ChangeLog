@@ -1,3 +1,17 @@
+2007-05-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_common_messages.py
+	(SerializeTest.testDefaultMessageId): Add test that all messages
+	have IDs, not just those whose ID was specified explicitly.
+
+	* flumotion/common/messages.py (Message.__init__): Document the id
+	attribute. If not given, construct a default ID from the
+	translatable.
+	(TranslatablePlural.defaultMessageId)
+	(TranslatableSingular.defaultMessageId): Implement a method to
+	determine a default message ID for messages made with this
+	translatable.
+
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porter.py:

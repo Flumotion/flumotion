@@ -53,6 +53,13 @@ class SerializeTest(unittest.TestCase):
         self.assertEquals(t.format, "Something is really wrong.")
         self.assertEquals(self.amsg.level, messages.ERROR)
 
+    def testDefaultMessageId(self):
+        m = messages.Error(T_(N_("Something is really wrong.")))
+        self.assertEquals(m.id, 'Something is really wrong.')
+
+        m = messages.Error(T_(N_("%s is really wrong."), "Thomas"))
+        self.assertEquals(m.id, 'Thomas is really wrong.')
+
     def testCreate(self):
         self.failUnless(messages.Info(T_(N_("Note"))))
         self.failUnless(messages.Warning(T_(N_("warning"))))

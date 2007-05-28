@@ -120,6 +120,9 @@ class TranslatableSingular(Translatable, FancyEqMixin):
         self.domain = domain
         self.format = format
         self.args = args
+
+    def defaultMessageId(self):
+        return self.format % self.args
 pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 
 class TranslatablePlural(Translatable, FancyEqMixin):
@@ -141,6 +144,9 @@ class TranslatablePlural(Translatable, FancyEqMixin):
         self.plural = plural
         self.count = count
         self.args = args
+
+    def defaultMessageId(self):
+        return self.singular % self.args
 pb.setUnjellyableForClass(TranslatablePlural, TranslatablePlural)
     
 class Translator(log.Loggable):
@@ -238,7 +244,23 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
 
     def __init__(self, level, translatable, debug=None, id=None, priority=50,
         timestamp=None):
-        """
+        """Create a new message.
+
+        The id identifies this kind of message, and serves two purposes.
+
+        The first purpose is to serve as a key by which a kind of
+        message might be removed from a set of messages. For example, a
+        firewire component detecting that a cable has been plugged in
+        will remove any message that the cable is unplugged.
+
+        Secondly it serves so that the message viewers that watch the
+        'current state' of some object only see the latest message of a
+        given type. For example when messages are stored in persistent
+        state objects that can be transferred over the network, it
+        becomes inefficient to store the whole history of status
+        messages. Message stores can keep only the latest message of a
+        given ID.
+
         @param level:        ERROR, WARNING or INFO
         @param translatable: a translatable possibly with markup for
                              linking to documentation or running commands.
@@ -248,11 +270,15 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
                              level
         @param timestamp:    time since epoch at which the message was
                              generated, in seconds.
+        @param id:           A unique id for this kind of message, as
+                             discussed above. If not given, will be
+                             generated from the contents of the
+                             translatable.
         """
         self.level = level
         self.translatables = []
         self.debug = debug
-        self.id = id
+        self.id = id or translatable.defaultMessageId()
         self.priority = priority
         self.timestamp = timestamp or time.time() 
 
