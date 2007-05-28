@@ -35,6 +35,8 @@ from flumotion.component.component import moods
 
 import socket, string, os, random
 
+#import thisdoesnotexist
+
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
@@ -289,7 +291,8 @@ class Porter(component.BaseComponent, log.Loggable):
         self._socketlistener = None
 
         if d:
-            return defer.DeferredList(d, component.BaseComponent.do_stop(self))
+            return defer.DeferredList([d, 
+                component.BaseComponent.do_stop(self)])
         else:
             return component.BaseComponent.do_stop(self)
     

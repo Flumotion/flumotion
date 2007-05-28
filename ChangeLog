@@ -1,3 +1,8 @@
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/porter/porter.py:
+	  Use DeferredList correctly.
+
 2007-05-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu.addMessage)
