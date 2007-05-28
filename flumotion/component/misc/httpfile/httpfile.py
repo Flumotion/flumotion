@@ -352,7 +352,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 request.channel.transport.connectionLost(
                     errors.TimeoutException())
 
-        reactor.callLater(self.REQUEST_TIMEOUT, self._timeoutRequests)
+        self._timeoutRequestsCallLater = reactor.callLater(
+            self.REQUEST_TIMEOUT, self._timeoutRequests)
             
     def requestStarted(self, request):
         self._connected_clients.append(request)
