@@ -1,5 +1,12 @@
 2007-05-28  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu._addComponent): Only add a
+	version mismatch warning if versions are really incompatible.
+
+	* flumotion/common/common.py (checkVersionsCompat): New function,
+	checks if versions are compatible in the sense of being able to
+	use the same config files.
+
 	* flumotion/manager/manager.py (Vishnu.addMessage): Change
 	prototype to perhaps be easier.
 	(Vishnu.addMessageObject): Fix typo.

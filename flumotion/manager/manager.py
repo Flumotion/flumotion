@@ -400,7 +400,10 @@ class Vishnu(log.Loggable):
 
         self.clearMessage('loadComponent-%s' % avatarId)
 
-        if conf.getConfigDict()['version'] != configure.versionTuple:
+        # FIXME: don't use configure.versionTuple, get the appropriate
+        # version for conf['package']
+        if not common.checkVersionsCompat(conf.getConfigDict()['version'],
+                                          configure.versionTuple):
             m = messages.Warning(T_(N_("This component is configured for "
                 "Flumotion version %s, but you are running version %s.\n"
                 "Please update the configuration of the component.\n"), 

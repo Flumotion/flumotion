@@ -673,6 +673,36 @@ def compareVersions(first, second):
 
     return 0
 
+def checkVersionsCompat(version, against):
+    """Checks if two versions are compatible.
+
+    Versions are compatible if they are from the same minor release. In
+    addition, unstable (odd) releases are treated as compatible with
+    their subsequent stable (even) releases.
+
+    @param version: version to check
+    @type  version: tuple of int
+    @param against: version against which we are checking. For versions
+                    of core Flumotion, this may be obtained by
+                    L{flumotion.configure.configure.version}.
+    @type  against: tuple of int
+    @returns: True if a configuration from version is compatible with
+              against.
+    """
+    if version == against:
+        return True
+    elif version > against:
+        # e.g. config generated against newer flumotion than what is
+        # running
+        return False
+    elif len(version) < 2 or len(against) < 2:
+        return False
+    elif version[0] != against[0]:
+        return False
+    else:
+        round2 = lambda x: ((x + 1) // 2) * 2
+        return round2(version[1]) == round2(against[1])
+
 def versionTupleToString(versionTuple):
     """
     Converts a version tuple to a string.  If the tuple has a zero nano number,
