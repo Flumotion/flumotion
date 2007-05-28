@@ -1,5 +1,10 @@
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/misc/porter/porter.py:
+	  Fix porter shutdown path for proper socket file removal.
+
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/misc/httpfile/httpfile.py:
 	  Track the right deferred call, so we don't traceback on shutdown.
 

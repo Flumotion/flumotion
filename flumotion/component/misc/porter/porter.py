@@ -283,18 +283,11 @@ class Porter(component.BaseComponent, log.Loggable):
     def do_stop(self):
         if self._socketlistener:
             # stopListening() calls (via a callLater) connectionLost(), which
-            # would normally unlink our socket. However, if we stop the reactor
-            # before this happens, we leave a stale socket. So, we explicitly
-            # unlink it below, as well. 
-            self._socketlistener.stopListening()
+            # will unlink our socket, so we don't need to explicitly delete it.
+            d = self._socketlistener.stopListening()
         self._socketlistener = None
 
-        try:
-            os.unlink(self._socketPath)
-        except:
-            pass
-
-        return component.BaseComponent.do_stop(self)
+        return defer.DeferredList(d, component.BaseComponent.do_stop(self))
     
     def do_start(self, *args, **kwargs):
         # Create our combined PB-server/fd-passing channel
