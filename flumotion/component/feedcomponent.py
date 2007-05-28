@@ -480,9 +480,7 @@ class ParseLaunchComponent(FeedComponent):
         if clocking:
             self.set_master_clock(*clocking)
 
-        self.link()
-
-        return defer.succeed(None)
+        return self.link()
 
 class Effect(log.Loggable):
     """

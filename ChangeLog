@@ -1,5 +1,16 @@
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Make link() return a deferred that fires when the pipeline goes
+	  playing; removes special-casing in statechange message handlers.
+	* flumotion/component/feedcomponent.py:
+	  Now that link() returns a deferred, use that deferred.
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  If using a porter, don't go happy until we've logged in.
+	  Fixes #537.
+
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Improve positioning of parentheses.
 

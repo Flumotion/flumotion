@@ -670,6 +670,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             raise errors.WrongStateError(
                 "Can't specify porter details in master mode")
 
+    def do_pipeline_playing(self):
+        # Override this to not set the component happy; instead do this once
+        # both the pipeline has started AND we've logged in to the porter.
+        pass
+
     def do_start(self, *args, **kwargs):
         root = resources.HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
@@ -707,7 +712,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 fdserver.FDConnector, self._porterPath, 
                 self._pbclient, 10, checkPID=False)
 
-            return defer.DeferredList([d1, d2])
+            d = defer.DeferredList([d1, d2])
         else:
             # Streamer is standalone.
             try:
@@ -715,7 +720,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 iface = self.iface or ""
                 reactor.listenTCP(self.port, server.Site(resource=root), 
                     interface=iface)
-                return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
+                d = feedcomponent.ParseLaunchComponent.do_start(self, *args, 
                     **kwargs)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
@@ -725,5 +730,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
+        def turnHappy(res):
+            self.debug("Turned happy!")
+            self.setMood(moods.happy)
+        d.addCallback(turnHappy)
+        return d
 
 pygobject.type_register(MultifdSinkStreamer)

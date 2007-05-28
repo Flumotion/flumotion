@@ -392,6 +392,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feeder_names = [] # list of feedId
 
         self._inactiveEaters = [] # list of feedId's
+        self._inactivated = False
+
         # feedId -> dict of lastTime, lastConnectTime, lastConnectD,
         # checkEaterDC,
         self._eaterStatus = {}
@@ -502,6 +504,7 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             self._inactiveEaters.append(feedId)
         self.setMood(moods.hungry)
+        self._inactivated = True
 
     def eaterSetActive(self, feedId):
         """
@@ -513,8 +516,11 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('Eater of %s was already active' % feedId)
         else:
             self._inactiveEaters.remove(feedId)
-        if not self._inactiveEaters:
+        if not self._inactiveEaters and self._inactivated:
+            # We never go happy initially because of this; only if we went
+            # hungry because of an eater being inactive.
             self.setMood(moods.happy)
+            self._inactivated = False
     # FIXME: it may make sense to have an updateMood method, that can be used
     # by the two previous methods, but also in other places, and then
     # overridden.  That would make us have to publicize inactiveEaters
@@ -670,9 +676,6 @@ class FeedComponent(basecomponent.BaseComponent):
             if src == self.pipeline:
                 self.log('state change: %r %s->%s'
                     % (src, old.value_nick, new.value_nick)) 
-                if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
-                    self.do_pipeline_playing()
-
                 change = self._getStateChange(old,new)
                 if change in self._stateChangeDeferreds:
                     dlist = self._stateChangeDeferreds[change]
@@ -756,8 +759,6 @@ class FeedComponent(basecomponent.BaseComponent):
                 s = message.structure
                 self.eaterOffsetDiscont(feedId, s["prev-offset-end"],
                     s["cur-offset"])
-
-
         else:
             self.log('message received: %r' % message)
 
@@ -944,6 +945,10 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
+
+        d = self._addStateChangeDeferred(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
+        d.addCallback(lambda x: self.do_pipeline_playing())
+        return d
 
     def _feeder_probe_calllater(self):
         for feedId, feeder in self._feeders.items():
