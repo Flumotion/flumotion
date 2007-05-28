@@ -1,3 +1,10 @@
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	   GNonLin apparently likes leaving elements in PLAYING when you
+	   remove them. Set them to NULL on removal. Hopefully this will fix
+	   memory leaks.
+
 2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py

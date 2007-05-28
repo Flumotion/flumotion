@@ -276,9 +276,11 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         if self._hasVideo and item.hasVideo:
             vsrc = self._vsrcs.pop(item)
             self.videocomp.remove(vsrc)
+            vsrc.set_state(gst.STATE_NULL)
         if self._hasAudio and item.hasAudio: 
             asrc = self._asrcs.pop(item)
             self.audiocomp.remove(asrc)
+            asrc.set_state(gst.STATE_NULL)
 
     def adjustItemScheduling(self, item):
         if self._hasVideo and item.hasVideo:
