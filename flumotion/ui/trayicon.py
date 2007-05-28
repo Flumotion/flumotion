@@ -167,7 +167,7 @@ class FluTrayIcon(log.Loggable):
     def _show_popup_menu(self):
         self.popupMenu = gtk.Menu()
         self.popupMenuQuititem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
-        self.popupMenuQuititem.connect('activate', self.window.file_quit_cb)
+        self.popupMenuQuititem.connect('activate', self.window.connection_quit_cb)
         self.popupMenu.add(self.popupMenuQuititem)
         self.popupMenu.popup(None, None, None, 3, gtk.get_current_event_time())
         self.popupMenu.show_all()
