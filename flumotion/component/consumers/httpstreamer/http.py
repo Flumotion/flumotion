@@ -132,11 +132,8 @@ class Stats:
         if self._lastBytesReceived >= 0:
             self._currentBitrate = ((bytesReceived - self._lastBytesReceived) *
                  8 / STATS_POLL_INTERVAL)
-            self._lastBytesReceived = bytesReceived
+        self._lastBytesReceived = bytesReceived
             
-        self._currentBitrate = -1 # not known yet
-        self._lastBytesSent = -1 # not known yet
-
         self.update_ui_state()
 
         self._updateCallLaterId = reactor.callLater(STATS_POLL_INTERVAL, 
@@ -186,7 +183,10 @@ class Stats:
         set('stream-url', c.getUrl())
         set('stream-uptime', common.formatTime(uptime))
         bitspeed = bytes_received * 8 / uptime
+        currentbitrate = self.getCurrentBitrate()
         set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('stream-current-bitrate', 
+            common.formatStorage(currentbitrate) + 'bit/s')
         set('stream-totalbytes', common.formatStorage(bytes_received) + 'Byte')
         set('stream-bitrate-raw', bitspeed)
         set('stream-totalbytes-raw', bytes_received)
@@ -288,13 +288,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self._pending_removals = {}
 
-        for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
-                  'stream-totalbytes', 'clients-current', 'clients-max',
-                  'clients-peak', 'clients-peak-time', 'clients-average',
-                  'consumption-bitrate', 'consumption-totalbytes',
-                  'stream-bitrate-raw', 'stream-totalbytes-raw',
-                  'consumption-bitrate-raw', 'consumption-totalbytes-raw',
-                  'stream-url'):
+        for i in ('stream-mime', 'stream-uptime', 'stream-current-bitrate',
+                  'stream-bitrate', 'stream-totalbytes', 'clients-current', 
+                  'clients-max', 'clients-peak', 'clients-peak-time', 
+                  'clients-average', 'consumption-bitrate', 
+                  'consumption-totalbytes', 'stream-bitrate-raw', 
+                  'stream-totalbytes-raw', 'consumption-bitrate-raw', 
+                  'consumption-totalbytes-raw', 'stream-url'):
             self.uiState.addKey(i, None)
 
     def getDescription(self):

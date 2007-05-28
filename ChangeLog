@@ -1,3 +1,12 @@
+2007-05-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.glade:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Display current stream bitrate in addition to lifetime average
+	  bitrate.
+	  Fixes #636.
+
 2007-05-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_config.py (TestDictDiff.testHumanReadable)

@@ -110,7 +110,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
         self.widget = self.statistics
-        for type in ('uptime', 'mime', 'bitrate', 'totalbytes', 'url'):
+        for type in ('uptime', 'mime', 'current-bitrate', 'bitrate', 
+                'totalbytes', 'url'):
             self.registerLabel('stream-' + type)
         for type in ('current', 'average', 'max', 'peak', 'peak-time'):
             self.registerLabel('clients-' + type)
