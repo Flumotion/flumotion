@@ -297,14 +297,22 @@ class Vishnu(log.Loggable):
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
         
-    def addMessage(self, level, id, translatable, **kwargs):
+    def addMessage(self, level, id, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
-        planet state. See L{flumotion.common.messages.Message} for the
-        meanings of the arguments, all of which are passed to the
-        Message constructor.
+        planet state. `format' should be marked as translatable in the
+        source with N_, and *args will be stored as format arguments.
+        Keyword arguments are passed on to the message constructor. See
+        L{flumotion.common.messages.Message} for the meanings of the
+        rest of the arguments.
+
+        For example:
+
+          self.addMessage(messages.WARNING, 'foo-warning',
+                          N_('The answer is %d'), 42, debug='not really')
         """
-        self.addMessageObject(messages.Message(level, translatable,
+        self.addMessageObject(messages.Message(level,
+                                               T_(format, *args),
                                                id=id, **kwargs))
         
     def addMessageObject(self, message):
@@ -313,7 +321,7 @@ class Vishnu(log.Loggable):
 
         @type message: L{flumotion.common.messages.Message}
         """
-        self.state.setitem('messages', messages.id, message)
+        self.state.setitem('messages', message.id, message)
         
     def clearMessage(self, mid):
         """
@@ -390,6 +398,8 @@ class Vishnu(log.Loggable):
 
         avatarId = conf.getConfigDict()['avatarId']
 
+        self.clearMessage('loadComponent-%s' % avatarId)
+
         if conf.getConfigDict()['version'] != configure.versionTuple:
             m = messages.Warning(T_(N_("This component is configured for "
                 "Flumotion version %s, but you are running version %s.\n"
@@ -434,30 +444,58 @@ class Vishnu(log.Loggable):
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing
         
+        def checkNotRunning(comp, parentState):
+            name = comp.getName()
+
+            comps = dict([(x.get('name'), x)
+                          for x in parentState.get('components')])
+            if name not in comps:
+                return True
+
+            # if we get here, the component is already running; warn if
+            # the running configuration is different. Return False in
+            # all cases.
+            parent = comps[name].get('parent').get('name')
+            newConf = c.getConfigDict()
+            oldConf = comps[name].get('config')
+
+            if newConf == oldConf:
+                self.debug('%s already has component %s running with '
+                           'same configuration', parent, name)
+                return False
+
+            self.info('%s already has component %s, but configuration '
+                      'not the same -- notifying admin', parent, name)
+
+            diff = config.dictDiff(oldConf, newConf)
+            diffMsg = config.dictDiffMessageString(diff, 'existing', 'new')
+                
+            self.addMessage(messages.WARNING,
+                            'loadComponent-%s' % oldConf['avatarId'],
+                            N_('Could not load component %r into %r: '
+                               'a component is already running with '
+                               'this name, but has a different '
+                               'configuration.'), name, parent,
+                            debug=diffMsg)
+            return False
+
         state = self.state
         atmosphere = state.get('atmosphere')
-        for name, c in conf.atmosphere.components.items():
-            if name in [x.get('name') for x in atmosphere.get('components')]:
-                self.debug('atmosphere already has component %s' % name)
-            else:
+        for c in conf.atmosphere.components.values():
+            if checkNotRunning(c, atmosphere):
                 added.append(self._addComponent(c, atmosphere, identity))
 
         flows = dict([(x.get('name'), x) for x in state.get('flows')])
         for f in conf.flows:
-            try:
+            if f.name in flows:
                 flow = flows[f.name]
-                self.debug('checking existing flow %s' % f.name)
-            except KeyError:
+            else:
                 self.info('creating flow "%s"' % f.name)
                 flow = planet.ManagerFlowState(name=f.name, parent=state)
                 state.append('flows', flow)
                 
-            components = [x.get('name') for x in flow.get('components')]
-            for name, c in f.components.items():
-                if name in components:
-                    self.debug('component %s already in flow %s'
-                               % (c.name, f.name))
-                else:
+            for c in f.components.values():
+                if checkNotRunning(c, flow):
                     added.append(self._addComponent(c, flow, identity))
 
         for componentState in added:
@@ -1099,10 +1137,14 @@ class Vishnu(log.Loggable):
         
     def emptyPlanet(self):
         """
-        Empty the planet of all components, and flows.
+        Empty the planet of all components, and flows. Also clears all
+        messages.
 
         @returns: a deferred that will fire when the planet is empty.
         """
+        for mid in self.state.get('messages').keys():
+            self.clearMessage(mid)
+
         # first get all components to sleep
         components = self.getComponentStates()
 

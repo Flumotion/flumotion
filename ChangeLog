@@ -1,3 +1,17 @@
+2007-05-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.addMessage): Change
+	prototype to perhaps be easier.
+	(Vishnu.addMessageObject): Fix typo.
+	(Vishnu._addComponent): Clear any loadComponent-related messages
+	for a component if we actually get to the point of calling
+	addComponent.
+	(Vishnu._updateStateFromConf): If, when loading a configuration,
+	we find that there is already a component running with this name,
+	warn the admin if the configurations are different without
+	modifying the manager's state.
+	(Vishnu.emptyPlanet): Clean all messages from the planet.
+
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/ui/trayicon.py:
