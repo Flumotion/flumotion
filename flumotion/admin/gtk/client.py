@@ -507,6 +507,14 @@ class Window(log.Loggable, gobject.GObject):
         def planetStateRemove(state, key, value):
             self.debug('something got removed from the planet')
 
+        def planetStateSetitem(state, key, subkey, value):
+            if key == 'messages':
+                self._messages_view.add_message(value)
+
+        def planetStateDelitem(state, key, subkey, value):
+            if key == 'messages':
+                self._messages_view.clear_message(value.id)
+
         self.debug('parsing planetState %r' % planetState)
         self._planetState = planetState
 
@@ -514,7 +522,9 @@ class Window(log.Loggable, gobject.GObject):
         self._components = {}
 
         planetState.addListener(self, append=planetStateAppend,
-                                remove=planetStateRemove)
+                                remove=planetStateRemove,
+                                setitem=planetStateSetitem,
+                                delitem=planetStateDelitem)
 
         a = planetState.get('atmosphere')
         a.addListener(self, append=atmosphereStateAppend,
@@ -525,6 +535,15 @@ class Window(log.Loggable, gobject.GObject):
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
  
+        self._clearMessages()
+
+    def _clearMessages(self):
+        self._messages_view.clear()
+        pstate = self._planetState
+        if pstate.hasKey('messages'):
+            for message in pstate.get('messages').values():
+                self._messages_view.add_message(message)
+        
     def stateSet(self, state, key, value):
         # called by model when state of something changes
         if not isinstance(state, planet.AdminComponentState):
@@ -537,7 +556,7 @@ class Window(log.Loggable, gobject.GObject):
             current = self.components_view.get_selected_name()
             if value == moods.sleeping.value:
                 if state.get('name') == current:
-                    self._messages_view.clear()
+                    self._clearMessages()
                     self._component_view_clear()
 
     def whsAppend(self, state, key, value):
@@ -710,7 +729,7 @@ class Window(log.Loggable, gobject.GObject):
                 current = self.components_view.get_selected_name()
                 if value == moods.sleeping.value:
                     if state.get('name') == current:
-                        self._messages_view.clear()
+                        self._clearMessages()
                         self._component_view_clear()
 
         def compAppend(state, key, value):
@@ -747,7 +766,7 @@ class Window(log.Loggable, gobject.GObject):
         name = state.get('name')
         mood = state.get('mood')
         messages = state.get('messages')
-        self._messages_view.clear()
+        self._clearMessages()
         self._component_view_clear()
 
         if messages:

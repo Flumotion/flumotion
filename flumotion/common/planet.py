@@ -50,6 +50,7 @@ class ManagerPlanetState(flavors.StateCacheable):
         self.addKey('manager')
         self.addKey('atmosphere')
         self.addListKey('flows')
+        self.addDictKey('messages')
 
         # we always have at least one atmosphere
         self.set('atmosphere', ManagerAtmosphereState())

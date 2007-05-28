@@ -297,6 +297,34 @@ class Vishnu(log.Loggable):
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
         
+    def addMessage(self, level, id, translatable, **kwargs):
+        """
+        Convenience message to construct a message and add it to the
+        planet state. See L{flumotion.common.messages.Message} for the
+        meanings of the arguments, all of which are passed to the
+        Message constructor.
+        """
+        self.addMessageObject(messages.Message(level, translatable,
+                                               id=id, **kwargs))
+        
+    def addMessageObject(self, message):
+        """
+        Add a message to the planet state.
+
+        @type message: L{flumotion.common.messages.Message}
+        """
+        self.state.setitem('messages', messages.id, message)
+        
+    def clearMessage(self, mid):
+        """
+        Clear any messages with the given message ID from the planet
+        state.
+
+        @type  mid: message ID, normally a str
+        """
+        if mid in self.state.get('messages'):
+            self.state.delitem('messages', mid)
+        
     def adminAction(self, identity, message, args, kw):
         """
         @param identity: L{flumotion.common.identity.Identity}

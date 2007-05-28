@@ -1,3 +1,20 @@
+2007-05-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.addMessage)
+	(Vishnu.addMessageObject, Vishnu.clearMessage): New methods to add
+	messages to the manager's planet state.
+
+	* flumotion/common/planet.py (ManagerPlanetState.__init__): Add
+	messages.
+
+	* flumotion/admin/gtk/client.py (Window.setPlanetState): Listen to
+	planetState for messages from manager.
+	(Window.stateSet)
+	(Window._components_view_has_selection_cb.compSet)
+	(Window._components_view_has_selection_cb, Window._clearMessages):
+	Add hack so that after calling clear() on the messages view, that
+	we re-add manager messages. Yay flumotion-admin?
+
 2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/wizard/save.py (Component.toXML):
