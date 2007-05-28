@@ -281,13 +281,17 @@ class Porter(component.BaseComponent, log.Loggable):
         self._interface = props.get('interface', '')
 
     def do_stop(self):
+        d = None
         if self._socketlistener:
             # stopListening() calls (via a callLater) connectionLost(), which
             # will unlink our socket, so we don't need to explicitly delete it.
             d = self._socketlistener.stopListening()
         self._socketlistener = None
 
-        return defer.DeferredList(d, component.BaseComponent.do_stop(self))
+        if d:
+            return defer.DeferredList(d, component.BaseComponent.do_stop(self))
+        else:
+            return component.BaseComponent.do_stop(self)
     
     def do_start(self, *args, **kwargs):
         # Create our combined PB-server/fd-passing channel
