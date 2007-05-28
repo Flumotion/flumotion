@@ -1,3 +1,8 @@
+2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/wizard/save.py (Component.toXML):
+	Fix wizard creation of new eater config syntax.
+
 2007-05-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_common_messages.py
