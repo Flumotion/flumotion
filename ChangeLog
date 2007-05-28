@@ -2,6 +2,9 @@
 
 	* flumotion/manager/manager.py (Vishnu._addComponent): Only add a
 	version mismatch warning if versions are really incompatible.
+	(Vishnu._getComponentState.verifyExistingComponentState): If we
+	post a stale-config message, just post the conf differences, not
+	the entire dicts.
 
 	* flumotion/common/common.py (checkVersionsCompat): New function,
 	checks if versions are compatible in the sense of being able to

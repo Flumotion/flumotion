@@ -921,16 +921,19 @@ class Vishnu(log.Loggable):
             state.setJobState(jobState)
 
             if conf and state.get('config') != conf:
+                diff = config.dictDiff(state.get('config'), conf)
+                diffMsg = config.dictDiffMessageString(diff,
+                                                       'internal conf',
+                                                       'running conf')
                 message = messages.Warning(T_(
                     N_("Component logged in with stale configuration. "
                        "Consider stopping this component and restarting "
                        "the manager.")),
-                    debug=("Expected\n%r\n, but got\n%r;\n"
-                           "updating internal state accordingly." %
-                           (state.get('config'), conf)))
-                self.warning('updating internal component state for %r '
-                             '(changing config from %r to %r)', state,
-                             state.get('config'), conf)
+                    debug=("Updating internal conf from running conf:\n"
+                           + diffMsg))
+                self.warning('updating internal component state for %r')
+                self.debug('changes to conf: %s',
+                           config.dictDiffMessageString(diff))
                 state.set('config', conf)
                 state.append('messages', message)
             # if conf is None, then we just created the component and
