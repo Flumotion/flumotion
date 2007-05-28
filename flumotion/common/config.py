@@ -428,6 +428,10 @@ class BaseConfigParser(fxml.Parser):
         feedIds = []
         parsers = {'feed': (self.parseTextNode, feedIds.append)}
         self.parseFromTable(node, parsers)
+        if len(feedIds) == 0:
+            # we have an eater node with no feeds
+            raise ConfigError(
+                "Eater node %s with no <feed> nodes, is not allowed" % name)
         return [(name, feedId) for feedId in feedIds]
 
     def _parseProperty(self, node):

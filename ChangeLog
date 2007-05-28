@@ -1,3 +1,9 @@
+2007-05-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/config.py (BaseConfigParser._parseEater):
+	Raise a ConfigError when an eater node is parsed without
+	child feed nodes.
+
 2007-05-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
