@@ -1,3 +1,15 @@
+2007-05-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py (Switch.init,
+	  Switch.cb, Switch.is_active, Switch.eventStarted,
+	  Switch.eventStopped, AVSwitch.switch_to, AVSwitch._block_cb,
+	  AVSwitch._block_switch_sink_pads):
+	* flumotion/component/combiners/switch/switch.xml:
+	Remove the code that waits for pad blocks to actually get called
+	back, was unnecessary and cannot work for cases where no data
+	gets transferred over some sink pads.
+	Add ical scheduling code, with some FIXMEs for later.
+
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/scheduler.py (ICalScheduler.__init__):

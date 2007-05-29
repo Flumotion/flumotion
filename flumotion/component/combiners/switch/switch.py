@@ -27,6 +27,14 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 import gst
 
+try:
+    # icalendar and dateutil modules needed for scheduling recordings
+    from icalendar import Calendar
+    from dateutil import rrule
+    HAVE_ICAL = True
+except:
+    HAVE_ICAL = False
+
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
         return self.comp.switch_to("master")
@@ -40,7 +48,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     def init(self):
         self.uiState.addKey("active-eater")
-        
+        self.icalScheduler = None
+
     def do_check(self):
         self.debug("checking whether switch element exists")
         from flumotion.worker.checks import check
@@ -48,8 +57,27 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         def cb(result):
             for m in result.messages:
                 self.addMessage(m)
-            d.addCallback(cb)
-            return d
+            # if we have been passed an ical file to use for scheduling
+            # then start the ical monitor
+            # FIXME: need to check for events that are currently running
+            # FIXME: need to handle cases where cannot switch (and hence
+            # post a message to uistate and also store so switch can be
+            # made as soon as it can switch)
+            props = self.config['properties']
+            icalfn = props.get('ical-schedule')
+            if icalfn:
+                if HAVE_ICAL:
+                    from flumotion.component.base import scheduler
+                    self.icalScheduler = scheduler.ICalScheduler(open(
+                        icalfn, 'r'))
+                    self.icalScheduler.subscribe(self.eventStarted,
+                        self.eventStopped)
+                else:
+                    self.warning("An ical file has been specified for "
+                                 "scheduling but the necessary modules "
+                                 "dateutil and/or icalendar are not installed")
+        d.addCallback(cb)
+        return d
         
     def switch_to(self, eaterSubstring):
         raise errors.NotImplementedError('subclasses should implement '
@@ -63,6 +91,22 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.log("eater %s inactive", eaterName)
                 return False
         return True
+
+    # if an event starts, semantics are to switch to backup
+    # if an event stops, semantics are to switch to master
+    def eventStarted(self, event):
+        self.debug("event started %r", event)
+        if self.pipeline:
+            res = self.switch_to("backup")
+            if not res:
+                self.warning("Event started but could not switch to backup")
+
+    def eventStopped(self, event):
+        self.debug("event stopped %r", event)
+        if self.pipeline:
+            res = self.switch_to("master")
+            if not res:
+                self.warning("Event stopped but could not switch to master")
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"
@@ -160,12 +204,6 @@ class AVSwitch(Switch):
 
         return pipeline
 
-    def _on_message(self, bus, message):
-        handlers = {(self.pipeline, gst.MESSAGE_APPLICATION):
-                    self.on_pads_blocked}
-        if (message.src, message.type) in handlers:
-            handlers[(message.src, message.type)]()
-
     def configure_pipeline(self, pipeline, properties):
         self.videoSwitchElement = vsw = pipeline.get_by_name("vswitch")
         self.audioSwitchElement = asw = pipeline.get_by_name("aswitch")
@@ -206,10 +244,6 @@ class AVSwitch(Switch):
             self.switchPads["audio-master"])
         self.uiState.set("active-eater", "master")
 
-        self.bus = pipeline.get_bus()
-        self.bus.add_signal_watch()
-        self.bus.connect('message', self._on_message)
-    
     # So switching audio and video is not that easy
     # We have to make sure the current segment on both
     # the audio and video switch element have the same
@@ -251,7 +285,7 @@ class AVSwitch(Switch):
         else:
             self._switchLock.release()
             if self.uiState.get("active-eater") == eater:
-                self.warning("Could not switch to %s because it is already is active",
+                self.warning("Could not switch to %s because it is already active",
                     eater)
             elif self._startTimes == {}:
                 self.warning("Could not switch to %s because at least "
@@ -293,11 +327,11 @@ class AVSwitch(Switch):
                 return
             self.pads_awaiting_block.remove(pad)
             self.log("Pads awaiting block are: %r", self.pads_awaiting_block)
-            if not self.pads_awaiting_block:
-                s = gst.Structure('pads-blocked')
-                m = gst.message_new_application(self.pipeline, s)
+            #if not self.pads_awaiting_block:
+            #    s = gst.Structure('pads-blocked')
+            #    m = gst.message_new_application(self.pipeline, s)
                 # marshal to the main thread
-                self.pipeline.post_message(m)
+            #    self.pipeline.post_message(m)
 
     def _block_switch_sink_pads(self, block):
         if block:
@@ -324,6 +358,8 @@ class AVSwitch(Switch):
                 ret = pad.set_blocked_async(block, self._block_cb)
                 self.debug("Return of pad block is: %d", ret)
                 self.debug("Pad %r is blocked: %d", pad, pad.is_blocked())
+        if block:
+            self.on_pads_blocked()
 
     def on_pads_blocked(self):
         eater = self.eaterSwitchingTo
