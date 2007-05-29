@@ -1,5 +1,8 @@
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/testLoadComponent.xml: Add forgotten file.
+
 	* flumotion/manager/manager.py (Vishnu.loadComponent): Fix
 	cutnpaste.
 
