@@ -29,6 +29,16 @@ def err(x):
     sys.stderr.write(x + '\n')
     raise SystemExit(1)
 
+def printMultiline(indent, data):
+    maxLen = 76 - indent # Limit to 80 cols; but we add in 4 extra spaces.
+    frags = data.split(' ')
+    while frags:
+        clen = 0
+        segment = frags.pop(0)
+        while frags and len(segment) + len(frags[0]) + 1 <= maxLen:
+            segment += " %s" % frags.pop(0)
+        print '  %s  %s' % (' ' * indent, segment)
+
 def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
@@ -124,7 +134,7 @@ def main(args):
                               v.isRequired() and 'required' or 'optional',
                               v.isMultiple() and ', multiple ok' or ''))
                     if desc:
-                        print '  %s  %s' % (' ' * indent, desc)
+                        printMultiline(indent, desc)
             sockets = c.getSockets()
             print '\nClocking:'
             print '  Needs synchronisation: %r' % c.getNeedsSynchronization()

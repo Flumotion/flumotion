@@ -1,3 +1,9 @@
+2007-05-29  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/launch/inspect.py:
+	  Nicely format long descriptions.
+	  Fixes #640.
+
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
 	Patch by: Sebastien Merle  <sebastien@fluendo.com>
