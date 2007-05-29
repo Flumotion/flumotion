@@ -1,0 +1,11 @@
+<planet>
+
+  <flow name="testflow">
+    <component name="producer-video-test" type="pipeline-producer" worker="worker">
+      <property name="pipeline">
+  videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5/1,format=(fourcc)I420
+      </property>
+    </component>
+  </flow>
+
+</planet>

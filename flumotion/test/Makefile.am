@@ -13,6 +13,7 @@ flumotion_PYTHON =			\
 
 EXTRA_DIST = 				\
 	test.xml			\
+	testLoadComponent.xml		\
 	test_admin_multi.py		\
 	test_bundle.py 			\
 	test_checkers.py 		\
