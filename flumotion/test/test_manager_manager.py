@@ -496,7 +496,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
     def testLoadComponent(self):
         def loadProducerFromFile():
             __thisdir = os.path.dirname(os.path.abspath(__file__))
-            file = os.path.join(__thisdir, 'test_testLoadComponent.xml')
+            file = os.path.join(__thisdir, 'testLoadComponent.xml')
             return self.vishnu.loadComponentConfigurationXML(
                 file, manager.LOCAL_IDENTITY)
 

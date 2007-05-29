@@ -1,5 +1,9 @@
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testLoadComponent.loadProducerFromFile): Can I blame
+	Dirty Mike for this?
+
 	* flumotion/launch/inspect.py (printMultiline): Clean up after
 	Dirty Mike.
 
