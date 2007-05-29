@@ -1,5 +1,11 @@
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/scheduler.py (ICalScheduler.__init__):
+	Actually start the watcher.
+
+	* flumotion/component/base/watcher.py (BaseWatcher.start): Add a
+	comment.
+
 	* flumotion/component/base/scheduler.py (Scheduler._reschedule):
 	Only cancel the call if it hasn't been called yet. Fixes #650.
 

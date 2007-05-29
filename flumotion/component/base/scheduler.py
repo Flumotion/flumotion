@@ -271,6 +271,7 @@ class ICalScheduler(Scheduler):
                 parseCalendarFromFile(open(f,'r'))
             self.watcher = watcher.FilesWatcher([fileObj.name])
             self.watcher.subscribe(fileChanged=fileChanged)
+            self.watcher.start()
 
     def parseCalendar(self, cal):
         events = []

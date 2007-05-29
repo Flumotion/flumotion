@@ -96,6 +96,8 @@ class BaseWatcher(log.Loggable):
             if s[event]:
                 s[event](*args, **kwargs)
 
+    # FIXME: this API has tripped up two people thus far, including its
+    # author. make subscribe() call start() if necessary?
     def start(self):
         """Start checking for file changes.
         
