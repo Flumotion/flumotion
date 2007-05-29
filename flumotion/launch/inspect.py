@@ -33,7 +33,6 @@ def printMultiline(indent, data):
     maxLen = 76 - indent # Limit to 80 cols; but we add in 4 extra spaces.
     frags = data.split(' ')
     while frags:
-        clen = 0
         segment = frags.pop(0)
         while frags and len(segment) + len(frags[0]) + 1 <= maxLen:
             segment += " %s" % frags.pop(0)
