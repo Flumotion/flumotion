@@ -35,8 +35,6 @@ class ConfigError(Exception):
     """
 class NoProjectError(Exception):
     "The given project does not exist"
-class ComponentWorkerConfigError(ConfigError):
-    "Problem with presence of <component> 'worker' attribute"
 
 # connection errors
 class ConnectionError(pb.Error):
@@ -163,6 +161,13 @@ class ComponentConfigError(ComponentError):
 
     args[0]: ComponentState
     args[1]: str
+    """
+
+class ComponentAlreadyExistsError(ComponentError):
+    """
+    A component name is already used.
+
+    args[0]: L{flumotion.common.common.componentId}
     """
 
 class ComponentCreateError(ComponentError):

@@ -32,7 +32,7 @@ from flumotion.common.planet import moods
 
 from flumotion.manager import component, manager
 from flumotion.common import log, planet, interfaces, common
-from flumotion.common import setup
+from flumotion.common import setup, errors
 from flumotion.twisted import flavors
 
 class MyListener(log.Loggable):
@@ -478,6 +478,86 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
 
         d.addCallback(verifyEmptyDAG)
+        return d
+
+
+    def testLoadComponentWithSynchronization(self):
+        def loadProducer():
+            compType = "pipeline-producer"
+            compId = common.componentId("testflow", "producer-video-test")
+            compProps = [("pipeline", "videotestsrc ! video/x-raw-yuv,width=320,"
+                         "height=240,framerate=5/1,format=(fourcc)I420")]
+            return self.vishnu.loadComponent(manager.LOCAL_IDENTITY, 
+                                             compType, compId, compProps,
+                                             "worker", [], [], False)
+        # Add more tests if you implement handling of sync-needing components
+        self.assertRaises(NotImplementedError, loadProducer)
+
+    def testLoadComponent(self):
+        def loadProducerFromFile():
+            __thisdir = os.path.dirname(os.path.abspath(__file__))
+            file = os.path.join(__thisdir, 'test_testLoadComponent.xml')
+            return self.vishnu.loadComponentConfigurationXML(
+                file, manager.LOCAL_IDENTITY)
+
+        def loadConverter(_):
+            flows = self.vishnu.state.get('flows')
+            self.assertEqual(len(flows), 1)
+            flow = flows[0]
+            self.assertEqual(flow.get('name'), 'testflow')
+            components = flow.get('components')
+            self.assertEqual(len(components), 1)
+            self.assertEqual(components[0].get('name'),
+                             "producer-video-test")
+
+            compType = "pipeline-converter"
+            compId = common.componentId("testflow", "converter-ogg-theora")
+            compEaters = [("default", "producer-video-test")]
+            compProps = [("pipeline", "ffmpegcolorspace ! theoraenc "
+                         "keyframe-force=5 ! oggmux")]
+            compState = self.vishnu.loadComponent(
+                manager.LOCAL_IDENTITY, compType, compId, compProps,
+                "worker", [], compEaters, False)
+
+            self.assertEqual(len(components), 2)
+            self.assertEqual(components[1].get('name'),
+                             "converter-ogg-theora")
+
+            # Loading the same component again raises an error
+            self.assertRaises(errors.ComponentAlreadyExistsError,
+                              self.vishnu.loadComponent,
+                              manager.LOCAL_IDENTITY, compType, compId,
+                              compProps, "worker", [], compEaters,
+                              False)
+            
+            compType = "http-streamer"
+            compId = common.componentId("testflow", "streamer-ogg-theora")
+            compEaters = [("default", "converter-ogg-theora")]
+            compProps = [("port", 8800)]
+            compState = self.vishnu.loadComponent(
+                manager.LOCAL_IDENTITY, compType, compId, compProps,
+                "streamer", [], compEaters, False)
+
+            self.assertEqual(len(components), 3)
+            self.assertEqual(components[2].get('name'),
+                             "streamer-ogg-theora")
+
+            # Load a component to atmosphere
+            compType = "ical-bouncer"
+            compId = common.componentId("atmosphere", "test-bouncer")
+            compProps = [("file", "icalfile")]
+            compState = self.vishnu.loadComponent(
+                manager.LOCAL_IDENTITY, compType, compId, compProps,
+                "worker", [], [], False)
+
+            atmosphere = self.vishnu.state.get('atmosphere')
+            components = atmosphere.get('components')
+            self.assertEquals(len(components), 1)
+            self.failUnlessEqual(components[0].get('name'),
+                                 'test-bouncer')
+
+        d = loadProducerFromFile()
+        d.addCallback(loadConverter)
         return d
 
     def testConfigBeforeWorker(self):

@@ -1,3 +1,29 @@
+2007-05-29  Andy Wingo  <wingo@pobox.com>
+
+	Patch by: Sebastien Merle  <sebastien@fluendo.com>
+	
+	* flumotion/manager/manager.py
+	(Vishnu._updateStateFromConf.checkNotRunning): Clear any
+	loadComponent messages here.
+	(Vishnu.loadComponent): New method, loads just one component.
+	Fixes #610.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_loadComponent): New remote method for
+	admins, loads just one component.
+
+	* flumotion/common/errors.py (ComponentWorkerConfigError): Remove
+	this error, it's not used any more.
+
+	* flumotion/common/config.py
+	(ConfigEntryComponent._buildVersionTuple): Raise ConfigError
+	instead of ComponentWorkerConfigError.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testLoadComponentWithSynchronization)
+	(TestVishnu.testLoadComponent.loadProducerFromFile): New tests for
+	loadComponent.
+
 2007-05-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu._addComponent): Only add a

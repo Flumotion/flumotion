@@ -32,7 +32,7 @@ from twisted.python import reflect
 from flumotion.common import log, errors, common, registry, fxml
 from flumotion.configure import configure
 
-from errors import ConfigError, ComponentWorkerConfigError
+from errors import ConfigError
 
 def _ignore(*args):
     pass
@@ -281,10 +281,9 @@ class ConfigEntryComponent(log.Loggable):
                     return maj, min, mic, nan
                 return parse(*map(int, version.split('.')))
             except:
-                raise ComponentWorkerConfigError("<component> version not"
-                                                 " parseable")
-        raise ComponentWorkerConfigError("<component> version not"
-                                         " parseable")
+                raise ConfigError("<component> version not "
+                                  "parseable")
+        raise ConfigError("<component> version not parseable")
         
     def _buildConfig(self, propertyList, plugsList, eatersList,
                      isClockMaster, project, version):

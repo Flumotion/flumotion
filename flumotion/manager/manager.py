@@ -465,6 +465,7 @@ class Vishnu(log.Loggable):
             if newConf == oldConf:
                 self.debug('%s already has component %s running with '
                            'same configuration', parent, name)
+                self.clearMessage('loadComponent-%s' % oldConf['avatarId'])
                 return False
 
             self.info('%s already has component %s, but configuration '
@@ -493,7 +494,7 @@ class Vishnu(log.Loggable):
             if f.name in flows:
                 flow = flows[f.name]
             else:
-                self.info('creating flow "%s"' % f.name)
+                self.info('creating flow %r', f.name)
                 flow = planet.ManagerFlowState(name=f.name, parent=state)
                 state.append('flows', flow)
                 
@@ -620,6 +621,73 @@ class Vishnu(log.Loggable):
         conf.parseBouncerAndPlugs()
         self._loadManagerPlugs(conf)
         self._loadManagerBouncer(conf)
+
+    def loadComponent(self, identity, componentType, componentId,
+                      properties, workerName, plugs, eaters,
+                      isClockMaster):
+        """
+        Load a component into the manager configuration.
+
+        See L{flumotion.manager.admin.loadComponent} for a definition of
+        the argument types.
+        """
+        self.debug('loading %s component %s on %s', 
+                   componentType, componentId, workerName)
+        parentName, compName = common.parseComponentId(componentId)
+
+        if isClockMaster:
+            raise NotImplementedError("Clock master components are not "
+                                      "yet supported")
+        if worker is None:
+            raise ConfigError("Component %r needs to specify the worker"
+                              " on which it should run" % componentId)
+
+        state = self.state
+        compState = None
+
+        compConf = config.ConfigEntryComponent(compName, parentName, 
+                                               componentType, properties,
+                                               plugs, workerName, 
+                                               eaters, isClockMaster,
+                                               None, None)
+
+        if compConf.defs.getNeedsSynchronization():
+            raise NotImplementedError("Components that need "
+                                      "synchronization are not yet "
+                                      "supported")
+
+        if parentName == 'atmosphere':
+            parentState = state.get('atmosphere')
+        else:
+            flows = dict([(x.get('name'), x) for x in state.get('flows')])
+            if parentName in flows:
+                parentState = flows[parentName]
+            else:
+                self.info('creating flow %r', parentName)
+                parentState = planet.ManagerFlowState(name=parentName,
+                                                      parent=state)
+                state.append('flows', parentState)
+
+        components = [x.get('name') for x in parentState.get('components')]
+        if compName in components:
+            self.debug('%r already has component %r', parentName, compName)
+            raise errors.ComponentAlreadyExistsError(compName)
+
+        compState = self._addComponent(compConf, parentState, identity)
+        self._updateFlowDependencies(compState)
+
+        try:
+            self._depgraph.mapEatersToFeeders()
+        except errors.ComponentConfigError:
+            self.warning('could not find feeders to feed component %s',
+                         componentId)
+            self.debug('deleting component')
+            self.deleteComponent(compState)
+            raise
+
+        self._startComponents([compState], identity)
+
+        return compState
 
     def _createHeaven(self, interface, klass):
         """
