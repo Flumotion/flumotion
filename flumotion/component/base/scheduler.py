@@ -228,7 +228,8 @@ class Scheduler(log.Loggable):
             self._reschedule()
             
         if self._delayedCall:
-            self._delayedCall.cancel()
+            if self._delayedCall.active():
+                self._delayedCall.cancel()
             self._delayedCall = None
 
         start = _getNextStart()
