@@ -1,5 +1,13 @@
 2007-05-29  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/worker/feedserver.py:
+	  This code only passes the testsuite because the testsuite runs with
+	  a different reactor (selectreactor, rather than gtk2reactor).
+	  Drop the connection in a more sensible way...
+	  Prevents leaking all connections to the feed server (eek!)
+
+2007-05-29  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/manager.py:
 	  Don't remove messages we might not have added while we're still
 	  proxying state from the remote side.

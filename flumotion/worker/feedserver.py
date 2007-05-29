@@ -31,7 +31,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.configure import configure
-from flumotion.common import log, common, interfaces
+from flumotion.common import log, common, interfaces, debug
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
@@ -130,7 +130,7 @@ class FeedAvatar(fpb.Avatar):
         t.stopWriting()
 
         # hand off the fd to the component
-        self.debug("Attempting to send FD: %d" % t.fileno())
+        self.debug("Attempting to send FD : %d" % t.fileno())
         
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         componentId = common.componentId(flowName, componentName)
@@ -140,22 +140,9 @@ class FeedAvatar(fpb.Avatar):
             t.keepSocketAlive = True
 
         # We removed the transport from the reactor before sending the
-        # FD; now we want a complete and immediate cleanup of the
-        # socket.
-        #
-        # The goal is to trigger connectionLost on the transport.
-        # However we are within a doRead call from the selectreactor,
-        # not a callLater, so we need to work around the selectreactor's
-        # own mechanisms for detecting fd's close from within
-        # doReadOrWrite.
-        #
-        # In this case we can do that by using the selectreactor's
-        # (admittedly undocumented) mechanism, setting the fileno
-        # attribute to a function that returns -1. This will cause the
-        # reactor to call connectionLost() on the transport, which will
-        # close the socket fd, with a failure of "Filedescriptor went
-        # away".
-        t.fileno = lambda: -1 # Utterly ghetto.
+        # FD; now we want the socket cleaned up.
+        #t.loseConnection()
+        t.fileno = lambda: -1
 
     # TODO: receiveFeed is bitrotten. Clean it up.
     def perspective_receiveFeed(self, componentId, feedId):
