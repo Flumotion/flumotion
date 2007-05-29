@@ -639,8 +639,9 @@ class Vishnu(log.Loggable):
             raise NotImplementedError("Clock master components are not "
                                       "yet supported")
         if worker is None:
-            raise ConfigError("Component %r needs to specify the worker"
-                              " on which it should run" % componentId)
+            raise errors.ConfigError("Component %r needs to specify the"
+                                     " worker on which it should run"
+                                     % componentId)
 
         state = self.state
         compState = None
