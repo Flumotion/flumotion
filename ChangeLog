@@ -1,3 +1,10 @@
+2007-05-29  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  Don't remove messages we might not have added while we're still
+	  proxying state from the remote side.
+	  Fixes #582.
+
 2007-05-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_manager_manager.py

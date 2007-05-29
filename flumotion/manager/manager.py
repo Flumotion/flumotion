@@ -758,11 +758,6 @@ class Vishnu(log.Loggable):
         @rtype: L{defer.Deferred}
         """
         self.debug('componentStop(%r)' % componentState)
-        # clear all messages
-        for m in componentState.get('messages'):
-            self.debug('Removing message %r' % m)
-            componentState.remove('messages', m)
-
         # We permit stopping a component even if it has a pending mood of
         # happy, so that if it never gets to happy, we can still stop it.
         if (componentState.get('moodPending') != None and
@@ -1095,6 +1090,12 @@ class Vishnu(log.Loggable):
         self.debug("%s component detached", componentAvatar.avatarId)
         self._depgraph.setJobStopped(componentAvatar.componentState)
         componentAvatar.componentState.set('moodPending', None)
+
+        # Now we're detached (no longer proxying state from the component) 
+        # clear all remaining messages
+        for m in componentAvatar.componentState.get('messages'):
+            self.debug('Removing message %r' % m)
+            componentAvatar.componentState.remove('messages', m)
 
         # detach componentstate fom avatar
         componentAvatar.componentState = None
