@@ -839,14 +839,9 @@ class RegistryDirectory:
                 
         return files
 
-    def hasChangedSince(self, when):
+    def lastModified(self):
         assert self._files, "Path %s does not have registry files" % self._path
-        try:
-            mtime = max(map(_getMTime, self._files))
-        except OSError:
-            # One of the files no longer exists; therefore things have changed.
-            return True
-        return mtime > when
+        return max(map(_getMTime, self._files))
 
     def getFiles(self):
         """
@@ -1192,7 +1187,7 @@ class ComponentRegistry(log.Loggable):
         
         registry_modified = _getMTime(self.filename)
         for d in self._parser.getDirectories():
-            if d.hasChangedSince(registry_modified):
+            if d.lastModified() > registry_modified:
                 return True
 
         return False
@@ -1266,8 +1261,9 @@ class ComponentRegistry(log.Loggable):
             if directory:
                 # if directory is watched in the registry, and it hasn't been
                 # updated, everything's fine
+                dTime = directory.lastModified()
                 fTime = _getMTime(self.filename)
-                if directory.hasChangedSince(fTime):
+                if dTime < fTime:
                     self.debug('%s not changed since last registry parse' %
                         path)
                 else:
