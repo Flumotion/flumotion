@@ -357,7 +357,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             
     def requestStarted(self, request):
         self._connected_clients.append(request)
-        self.uiState.set("connected-clients", self._connected_clients)
+        self.uiState.set("connected-clients", len(self._connected_clients))
 
     def requestFinished(self, request, bytesWritten, timeConnected):
         headers = request.getAllHeaders()
@@ -412,7 +412,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         bytesTransferred = self._total_bytes_written
         for request in self._connected_clients:
             if request._transfer:
-                bytesTransferred += request._transfer.bytesSent
+                bytesTransferred += request._transfer.bytesWritten
 
         return (0, 0, bytesTransferred, len(self._connected_clients), 0)
 

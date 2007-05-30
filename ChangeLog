@@ -1,5 +1,14 @@
 2007-05-30  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Two serious bugs fixed: connected-clients in the uiState should be 
+	  the number of clients currently connected, so don't try to put the
+	  entire connected_clients list in there.
+	  Don't use the wrong (non-existing) variable for the number of bytes
+	  written for a running connection.
+
+2007-05-30  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/worker/feedserver.py:
 	  Thanks to Andy for pointing out that I forgot to actually commit the
 	  change here:
