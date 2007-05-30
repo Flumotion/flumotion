@@ -31,7 +31,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.configure import configure
-from flumotion.common import log, common, interfaces, debug
+from flumotion.common import log, common, interfaces
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
@@ -130,7 +130,7 @@ class FeedAvatar(fpb.Avatar):
         t.stopWriting()
 
         # hand off the fd to the component
-        self.debug("Attempting to send FD : %d" % t.fileno())
+        self.debug("Attempting to send FD: %d" % t.fileno())
         
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         componentId = common.componentId(flowName, componentName)
@@ -141,8 +141,7 @@ class FeedAvatar(fpb.Avatar):
 
         # We removed the transport from the reactor before sending the
         # FD; now we want the socket cleaned up.
-        #t.loseConnection()
-        t.fileno = lambda: -1
+        t.loseConnection()
 
     # TODO: receiveFeed is bitrotten. Clean it up.
     def perspective_receiveFeed(self, componentId, feedId):

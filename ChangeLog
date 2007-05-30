@@ -1,3 +1,11 @@
+2007-05-30  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/feedserver.py:
+	  Thanks to Andy for pointing out that I forgot to actually commit the
+	  change here:
+	  Change to calling loseConnection() to drop the connection, since the
+	  lambda trick only works with the selectreactor (not gtk2reactor).
+
 2007-05-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py (Switch.init,
