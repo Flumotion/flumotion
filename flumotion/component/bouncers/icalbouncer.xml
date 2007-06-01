@@ -20,6 +20,7 @@
     <bundle name="icalbouncer-base">
       <dependencies>
         <dependency name="component" />
+	<dependency name="base-scheduler" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/bouncers">

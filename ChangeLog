@@ -1,5 +1,11 @@
 2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/bouncers/icalbouncer.xml:
+	* flumotion/component/consumers/disker/disker.xml:
+	Add base-scheduler dependency on the component bundles.
+
+2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/consumers/disker/disker.py:
 	Add docs to how the filename strftime should work for
 	ical triggered events.
