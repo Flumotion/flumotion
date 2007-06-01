@@ -1,5 +1,11 @@
 2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Add docs to how the filename strftime should work for
+	ical triggered events.
+
+2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/base/scheduler.py (Event.__init__,
 	  Scheduler.addEvents, ICalScheduler.parseCalendarFromFile,
 	  ICalScheduler.parseCalendar):
