@@ -62,7 +62,9 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
         self.comp.change_filename(filenameTemplate)
 
     def remote_scheduleRecordings(self, ical):
-        self.comp.parse_ical(ical)
+        if HAS_ICAL:
+            cal = Calendar.from_string(ical)
+            self.addEvents(self.comp.icalScheduler.parseCalendar(cal))
 
     # called when admin ui wants updated state (current filename info)
     def remote_notifyState(self):
@@ -308,7 +310,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
-        if HAS_ICAL:
+        if HAS_ICAL and icalfn:
             from flumotion.component.base import scheduler
             self.icalScheduler = scheduler.ICalScheduler(open(
                 icalfn, 'r'))

@@ -1,3 +1,19 @@
+2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/base/scheduler.py (Event.__init__,
+	  Scheduler.addEvents, ICalScheduler.parseCalendarFromFile,
+	  ICalScheduler.parseCalendar):
+	Fix debug statement.
+	Add new method addEvents that adds (and not replaces) events to the
+	scheduler.
+	Make parseCalendar return a list of events and not do the replace
+	just yet.
+	Make parseCalendarFromFile do the replace after running parseCalendar.
+	* flumotion/component/consumers/disker/disker.py
+	  (DiskerMedium.remote_scheduleRecordings, Disker.configure_pipeline):
+	Fix regression of the remote method for scheduling additional
+	recordings.
+
 2007-06-01  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porterclient.py:

@@ -35,8 +35,8 @@ class Event(log.Loggable):
     """
 
     def __init__(self, start, end, content, recur=None, now=None):
-        self.debug('new event, content=%r, start=%r, end=%r', start,
-                   end, content)
+        self.debug('new event, content=%r, start=%r, end=%r', content,
+                   start, end)
 
         if recur:
             from dateutil import rrule
@@ -133,6 +133,22 @@ class Scheduler(log.Loggable):
 
     def getCurrentEvents(self):
         return [e.content for e in self.current]
+
+    def addEvents(self, events):
+        """
+        Add a new list of events to the schedule.
+
+        @param events: the new events
+        @type  events: a new set of events
+        """
+        now = datetime.now()
+        for event in events:
+            if event.end > now:
+                self.events.insert(event)
+                if event.start < now:
+                    self._eventStarted(event)
+        if events:
+            self._reschedule()
 
     def replaceEvents(self, events):
         """Replace the set of events in the scheduler.
@@ -263,7 +279,8 @@ class ICalScheduler(Scheduler):
 
         def parseCalendarFromFile(f):
             cal = Calendar.from_string(f.read())
-            self.parseCalendar(cal)
+            events = self.parseCalendar(cal)
+            self.replaceEvents(events)
         parseCalendarFromFile(fileObj)
 
         if hasattr(fileObj, 'name'):
@@ -274,6 +291,14 @@ class ICalScheduler(Scheduler):
             self.watcher.start()
 
     def parseCalendar(self, cal):
+        """
+        Take a Calendar object and return a list of
+        Event objects.
+
+        @param cal: The calendar to "parse"
+        @type  cal: icalendar.Calendar
+        @rtype List of {flumotion.component.base.scheduler.Event}
+        """
         events = []
         for event in cal.walk('vevent'):
             start = event.decoded('dtstart', None)
@@ -281,6 +306,7 @@ class ICalScheduler(Scheduler):
             summary = event.decoded('summary', None)
             recur = event.get('rrule', None)
             if start and end:
+                self.debug("start %r end %r recur %r", start, end, recur)
                 if recur:
                     e = Event(start, end, summary, recur.ical())
                 else:
@@ -289,4 +315,4 @@ class ICalScheduler(Scheduler):
             else:
                 self.warning('ical has event without start or end: '
                              '%r', event)
-        self.replaceEvents(events)
+        return events
