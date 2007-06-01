@@ -27,6 +27,9 @@
         <property name="hostname" type="string"
                   description="Server's host name to display" />
 
+        <property name="description" type="string"
+                  description="Description of the server" />
+
         <property name="bouncer" type="string"
                   description="Name of a bouncer in the atmosphere to authenticate against" />
         <property name="issuer-class" type="string"

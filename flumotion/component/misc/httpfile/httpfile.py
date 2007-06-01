@@ -166,6 +166,10 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
     def do_setup(self):
         props = self.config['properties']
 
+        desc = props.get('description', None)
+        if desc:
+            self._description = desc
+
         # always make sure the mount point starts with /
         mountPoint = props.get('mount-point', '/')
         if not mountPoint.startswith('/'):
