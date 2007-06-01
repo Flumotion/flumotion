@@ -29,6 +29,7 @@ from flumotion.common import keycards, config
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardGeneric
 from datetime import datetime
+from flumotion.component.base import scheduler
 
 __all__ = ['IcalBouncer']
 
@@ -53,69 +54,26 @@ class IcalBouncer(bouncer.Bouncer):
                     "Please install icalendar and dateutil modules"))
         props = self.config['properties']
         self._icsfile = props['file']
-        return self.parse_ics()
+        self.icalScheduler = scheduler.ICalScheduler(open(
+            self._icsfile, 'r'))
 
-    def parse_ics(self):
-        if self._icsfile:
-            try:
-                icsStr = open(self._icsfile, "rb").read()
-                cal = Calendar.from_string(icsStr)
-                for event in cal.walk('vevent'):
-                    dtstart = event.decoded('dtstart', '')
-                    dtend = event.decoded('dtend', '')
-                    if dtstart and dtend:
-                        self.log("event parsed with start: %r end: %r", 
-                            dtstart, dtend)
-                        recur = event.get('rrule', None)
-                        tempEvent = {}
-                        tempEvent["dtstart"] = dtstart
-                        tempEvent["dtend"] = dtend
-                        if recur:
-                            # startRecur is a recurrence rule for the start of
-                            # the event
-                            startRecur = rrule.rrulestr(recur.ical(), 
-                                dtstart=dtstart)
-                            tempEvent["recur"] = startRecur
-                        self.events.append(tempEvent)
-                    else:
-                        self.log("event had either no dtstart or no dtend"
-                                 ", so ignoring")
-                return defer.succeed(None)
-            except IOError, e:
-                return defer.fail(config.ConfigError(str(e)))
-            except Exception, e:
-                return defer.fail(config.ConfigError(str(e)))
-        else:
-            return defer.fail(config.ConfigError("No ics file configured"))
+        return True
 
     def do_authenticate(self, keycard):
         self.debug('authenticating keycard')
 
         # need to check if inside an event time
-        for event in self.events:
-            if event["dtstart"] < datetime.now() and \
-               event["dtend"] > datetime.now():
-                keycard.state = keycards.AUTHENTICATED
-                duration = event["dtend"] - datetime.now()
-                durationSecs = duration.days * 86400 + duration.seconds
-                keycard.duration = durationSecs
-                self.addKeycard(keycard)
-                self.info("autheticated login")
-                return keycard
-            elif "recur" in event:
-                # check if in a recurrence of this event
-                recurRule = event["recur"]
-                dtstart = recurRule.before(datetime.now())
-                totalDuration = event["dtend"] - event["dtstart"]
-                dtend = dtstart + totalDuration
-                if dtend > datetime.now():
-                    keycard.state = keycards.AUTHENTICATED
-                    duration = dtend - datetime.now()
-                    durationSecs = duration.days * 86400 + duration.seconds
-                    keycard.duration = durationSecs
-                    self.addKeycard(keycard)
-                    self.info("authenticated login")
-                    return keycard
+        # FIXME: think of a strategy for handling overlapping events
+        currentEvents = self.icalScheduler.getCurrentEvents()
+        if currentEvents:
+            event = currentEvents[0]
+            keycard.state = keycards.AUTHENTICATED
+            duration = event.end - datetime.now()
+            durationSecs = duration.days * 86400 + duration.seconds
+            keycard.duration = durationSecs
+            self.addKeycard(keycard)
+            self.info("autheticated login")
+            return keycard
         self.info("failed in authentication, outside hours")
         return None
 

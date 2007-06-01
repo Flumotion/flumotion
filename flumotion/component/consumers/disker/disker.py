@@ -306,7 +306,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self._recordAtStart = properties.get('start-recording', True)
         self._defaultFilenameTemplate = properties.get('filename', 
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
-        self._startFilenameTemplaye = self._defaultFilenameTemplate
+        self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
         if HAS_ICAL:
             from flumotion.component.base import scheduler

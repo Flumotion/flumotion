@@ -1,5 +1,14 @@
 2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/bouncers/icalbouncer.py (IcalBouncer.do_setup,
+	  IcalBouncer.do_authenticate):
+	Port ical bouncer to new scheduling code.
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.configure_pipeline):
+	Fix typo.
+2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/consumers/disker/disker.py
 	  (Disker._notify_caps_cb, Disker.configure_pipeline,
 	  Disker.eventStarted, Disker.eventStopped):
