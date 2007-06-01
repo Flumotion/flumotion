@@ -142,11 +142,11 @@ class FDPassingBroker(pb.Broker, log.Loggable):
             peeraddr = sock.getpeername()
            
             # Based on bits in tcp.Port.doRead()
-            protocol = self.childFactory.buildProtocol(
-                address._ServerFactoryIPv4Address('TCP', 
-                     peeraddr[0], peeraddr[1]))
+            addr = address._ServerFactoryIPv4Address('TCP', 
+                peeraddr[0], peeraddr[1])
+            protocol = self.childFactory.buildProtocol(addr)
 
-            self._connectionClass(sock, protocol, message)
+            self._connectionClass(sock, protocol, peeraddr, message)
         else:
             self.warning("Unexpected: FD-passing message with len(fds) != 1")
 

@@ -1,3 +1,13 @@
+2007-06-01  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/porter/porterclient.py:
+	* flumotion/twisted/fdserver.py:
+	  When creating a new connection in a porter client, get the socket
+	  peer address immediately.
+	  Use this to respond to getPeer() later, more closely mirroring
+	  tcp.Server's behaviour.
+	  Fixes errors in httpfile client shutdown in some cases.
+
 2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/bouncers/icalbouncer.py (IcalBouncer.do_setup,

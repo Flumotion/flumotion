@@ -37,8 +37,9 @@ class FDPorterServer(Connection):
     Similar to tcp.Server, but gets the initial FD from a different source,
     obviously, and also passes along some data with the original connection.
     """
-    def __init__(self, sock, protocol, additionalData):
+    def __init__(self, sock, protocol, addr, additionalData):
         Connection.__init__(self, sock, protocol)
+        self.client = addr
         
         # Inform the protocol we've made a connection.
         protocol.makeConnection(self)
@@ -60,7 +61,7 @@ class FDPorterServer(Connection):
         return address.IPv4Address('TCP', *(self.socket.getsockname() + ('INET',)))
 
     def getPeer(self):
-        return address.IPv4Address('TCP', *(self.socket.getpeername() + ('INET',)))
+        return address.IPv4Address('TCP', *(self.client + ('INET',)))
 
 class PorterMedium(medium.BaseMedium):
     """
