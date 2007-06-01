@@ -1,3 +1,10 @@
+2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker._notify_caps_cb, Disker.configure_pipeline,
+	  Disker.eventStarted, Disker.eventStopped):
+	Port of disker to new scheduling code.
+
 2007-05-30  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py:

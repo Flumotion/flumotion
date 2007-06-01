@@ -275,7 +275,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.caps = caps
 
         if new and self._recordAtStart:
-            reactor.callLater(0, self.change_filename)
+            reactor.callLater(0, self.change_filename, 
+                self._startFilenameTemplate)
 
     # callback for when a client is removed so we can figure out
     # errors
@@ -305,90 +306,36 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self._recordAtStart = properties.get('start-recording', True)
         self._defaultFilenameTemplate = properties.get('filename', 
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
+        self._startFilenameTemplaye = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
-        if icalfn:
-            ical = open(icalfn, "rb").read()
-            self.parse_ical(ical)
-            self._recordAtStart = False
+        if HAS_ICAL:
+            from flumotion.component.base import scheduler
+            self.icalScheduler = scheduler.ICalScheduler(open(
+                icalfn, 'r'))
+            self.icalScheduler.subscribe(self.eventStarted,
+                self.eventStopped)
+            currentEvents = self.icalScheduler.getCurrentEvents()
+            if currentEvents:
+                self._startFilenameTemplate = currentEvents[0].content
+                self._recordAtStart = True
+            else:
+                self._recordAtStart = False
+        else:
+            self.warning("An ical file has been specified for "
+                         "scheduling but the necessary modules "
+                         "dateutil and/or icalendar are not installed")
 
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
 
-    # add code that lets recordings be schedules
-    # TODO: resolve overlapping events
-    def schedule_recording(self, whenStart, whenEnd, recur=None, 
-                           filenameTemplate=None):
-        """
-        Sets a recording to start at a time in the future for a specified
-        duration.
-        @param whenStart time of when to start recording
-        @type whenStart datetime
-        @param whenEnd time of when to end recording
-        @type whenEnd datetime
-        @param recur recurrence rule
-        @type recur icalendar.props.vRecur
-        @param filenameTemplate strftime formatted string to decide filename
-        @type filenameTemplate string
-        """
-        now = datetime.now()
-
-        startRecurRule = None
-        endRecurRule = None
-
-        if recur:
-            self.debug("Have a recurrence rule, parsing")
-            # create dateutil.rrule from the recurrence rules
-            startRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenStart)
-            endRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenEnd) 
-            if now >= whenStart:
-                self.debug("Initial start before now (%r), finding new starts",
-                    whenStart)
-                whenStart = startRecurRule.after(now)
-                whenEnd = endRecurRule.after(now)
-                self.debug("New start is now %r", whenStart)
-
-        if now < whenStart:
-            start = whenStart - now
-            startSecs = start.days * 86400 + start.seconds
-            self.debug("scheduling a recording %d seconds away", startSecs)
-            reactor.callLater(startSecs, 
-                self.start_scheduled_recording, startRecurRule, whenStart,
-                filenameTemplate)
-            end = whenEnd - now
-            endSecs = end.days * 86400 + end.seconds
-            reactor.callLater(endSecs, 
-                self.stop_scheduled_recording, endRecurRule, whenEnd)
-        else:
-            self.warning("attempt to schedule in the past!")
-
-    def start_scheduled_recording(self, recurRule, when, filenameTemplate):
+    def eventStarted(self, event):
+        filenameTemplate = event.content
         self.change_filename(filenameTemplate)
-        if recurRule:
-            now = datetime.now()
-            nextTime = recurRule.after(when)
-            recurInterval = nextTime - now
-            self.debug("recurring start interval: %r", recurInterval)
-            recurIntervalSeconds = recurInterval.days * 86400 + \
-                recurInterval.seconds
-            self.debug("recurring start in %d seconds", recurIntervalSeconds)
-            reactor.callLater(recurIntervalSeconds, 
-                self.start_scheduled_recording,
-                recurRule, nextTime, filenameTemplate)
 
-    def stop_scheduled_recording(self, recurRule, when):
+    def eventStopped(self, event):
         self.stop_recording()
-        if recurRule:
-            now = datetime.now()
-            nextTime = recurRule.after(when)
-            recurInterval = nextTime - now
-            recurIntervalSeconds = recurInterval.days * 86400 + \
-                recurInterval.seconds
-            self.debug("recurring stop in %d seconds", recurIntervalSeconds)
-            reactor.callLater(recurIntervalSeconds, 
-                self.stop_scheduled_recording,
-                recurRule, nextTime)
 
     def parse_ical(self, icsStr):
         if HAS_ICAL:
