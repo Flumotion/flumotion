@@ -1,3 +1,8 @@
+2007-06-01  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Add a description property (which the code already tries to use!)
+
 2007-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/bouncers/icalbouncer.xml:

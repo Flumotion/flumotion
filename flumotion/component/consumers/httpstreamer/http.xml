@@ -59,6 +59,8 @@
 
         <property name="duration" type="float"
                   description="How long to keep clients connected for (in seconds) "/>
+        <property name="description" type="string"
+                  description="A description of the stream"/>
 
         <!-- IP-based filtering for logs; commonly used to filter out 
              automated-tester IPs from the logs. Values should be of the form
