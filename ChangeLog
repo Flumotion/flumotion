@@ -1,6 +1,11 @@
 2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
+	Move fd arg to end of requestFinished.
+
+2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
 	Pass fd because loseConnection() may/will delete it.
 
 2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>

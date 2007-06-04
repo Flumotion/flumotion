@@ -76,8 +76,8 @@ class CancellableRequest(server.Request):
 
     def requestCompleted(self, fd):
         if not self._completed:
-            self._component.requestFinished(self, fd, self._bytes_written, 
-                time.time() - self._start_time)
+            self._component.requestFinished(self, self._bytes_written, 
+                time.time() - self._start_time, fd)
             self._completed = True
     
 class Site(server.Site):
@@ -364,7 +364,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._connected_clients.append(request)
         self.uiState.set("connected-clients", len(self._connected_clients))
 
-    def requestFinished(self, fd, request, bytesWritten, timeConnected):
+    def requestFinished(self, request, bytesWritten, timeConnected, fd):
         self.cleanupAuth(fd)
         headers = request.getAllHeaders()
 
