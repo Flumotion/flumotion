@@ -64,18 +64,19 @@ class CancellableRequest(server.Request):
         
     def finish(self):
         server.Request.finish(self)
-
+        fd = self.transport.fileno()
         # We sent Connection: close, so we must close the connection
         self.transport.loseConnection()
-        self.requestCompleted()
+        self.requestCompleted(fd)
 
     def connectionLost(self, reason):
+        fd = self.transport.fileno()
         server.Request.connectionLost(self, reason)
-        self.requestCompleted()
+        self.requestCompleted(fd)
 
-    def requestCompleted(self):
+    def requestCompleted(self, fd):
         if not self._completed:
-            self._component.requestFinished(self, self._bytes_written, 
+            self._component.requestFinished(self, fd, self._bytes_written, 
                 time.time() - self._start_time)
             self._completed = True
     
@@ -363,8 +364,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._connected_clients.append(request)
         self.uiState.set("connected-clients", len(self._connected_clients))
 
-    def requestFinished(self, request, bytesWritten, timeConnected):
-        self.cleanupAuth(request.transport.fileno())
+    def requestFinished(self, fd, request, bytesWritten, timeConnected):
+        self.cleanupAuth(fd)
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()

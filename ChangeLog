@@ -1,6 +1,11 @@
 2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
+	Pass fd because loseConnection() may/will delete it.
+
+2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
 	Cleanup authentication dicts when a request ends. Fixes a big leak.
 
 2007-06-01  Michael Smith <msmith@fluendo.com>
