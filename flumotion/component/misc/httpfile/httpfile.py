@@ -364,6 +364,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self.uiState.set("connected-clients", len(self._connected_clients))
 
     def requestFinished(self, request, bytesWritten, timeConnected):
+        self.cleanupAuth(request.transport.fileno())
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()
