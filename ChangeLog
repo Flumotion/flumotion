@@ -1,5 +1,15 @@
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/manager/manager.py (Vishnu.verifyExistingComponentState,
+	  Vishnu.makeNewComponentState):
+	Do not assume "default" as the eater name when building the
+	eater dict. Use flumotion.common.config.buildEaterDict to do the
+	actual building.
+	Also handle the other case where component logging in has no
+	eater dict in its config.
+
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/manager/manager.py (Vishnu.verifyExistingComponentState):
 	Handle case where logged in component has no eater dict in its
 	config but does have a list of source(s). Manager config is

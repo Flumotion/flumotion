@@ -50,6 +50,7 @@ from flumotion.manager import admin, component, worker, base, depgraph
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
+
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
@@ -991,15 +992,23 @@ class Vishnu(log.Loggable):
                 eaterConfig = conf.get('eater', {})
                 sourceConfig = conf.get('source', [])
                 if eaterConfig == {}:
-                    if sourceConfig != []:
-                        eatersDefault = []
-                        for s in sourceConfig:
-                            eatersDefault.append(s)
-                        conf.set('eater', {'default':eatersDefault})
-                    else:
-                        conf.set('eater', {})
-
-                if state.get('source') != conf:
+                    eaters = registry.getRegistry().getComponent(
+                        conf.get('type')).getEaters()
+                    eatersDict = {}
+                    try:
+                        eatersTuple = [(None, s) for s in sourceConfig]
+                        eatersDict = config.buildEatersDict(eatersTuple, eaters)
+                    except errors.ConfigError:
+                        message = messages.Warning(T_(
+                            N_("Component logged in with old deprecated "
+                            "configuration and creating an eaters config "
+                            "caused an error. Restarting this component "
+                            "will result in bad things. Best thing to do "
+                            "is stop the component, restart manager and "
+                            "start it again.")))
+                        state.append('messages', message)
+                    conf.set('eater', eatersDict)
+                if state.get('config') != conf:
                     diff = config.dictDiff(state.get('config'), conf)
                     diffMsg = config.dictDiffMessageString(diff,
                                                        'internal conf',
@@ -1036,9 +1045,33 @@ class Vishnu(log.Loggable):
                         'avatarId': avatar.avatarId,
                         'properties': {}}
 
+
             state.set('name', compName)
             state.set('type', conf['type'])
             state.set('workerRequested', jobState.get('workerName'))
+            # check for components that have no eater dict but a
+            # non-empty source list, and file all these under
+            # eater default
+            eaterConfig = conf.get('eater', {})
+            sourceConfig = conf.get('source', [])
+            if eaterConfig == {}:
+                eaters = registry.getRegistry().getComponent(
+                    conf.get('type')).getEaters()
+                eatersDict = {}
+                try:
+                    eatersTuple = [(None, s) for s in sourceConfig]
+                    eatersDict = config.buildEatersDict(eatersTuple, eaters)
+                except errors.ConfigError:
+                    message = messages.Warning(T_(
+                        N_("Component logged in with old deprecated "
+                           "configuration and creating an eaters config "
+                           "caused an error. Restarting this component "
+                           "will result in bad things. Best thing to do "
+                           "is stop the component, restart manager and "
+                           "start it again.")))
+                    state.append('messages', message)
+                conf.set('eater', eatersDict)
+
             state.set('config', conf)
 
             # check if we have this flow yet and add if not
