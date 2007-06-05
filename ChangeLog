@@ -1,5 +1,14 @@
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/converters/overlay/overlay.py
+	  (Overlay.get_pipeline_string):
+	Fix to use eater dict.
+	* flumotion/component/muxers/multipart.py:
+	Port to MultiInputParseLaunchComponent, turns out this fixes
+	it to use eater dict.
+
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/manager/manager.py (Vishnu.verifyExistingComponentState,
 	  Vishnu.makeNewComponentState):
 	Do not assume "default" as the eater name when building the

@@ -23,15 +23,6 @@ import gst
 
 from flumotion.component import feedcomponent
 
-class Multipart(feedcomponent.ParseLaunchComponent):
-    def get_pipeline_string(self, properties):
-        sources = self.config['source']
-
-        pipeline = 'multipartmux name=muxer '
-        for eater in sources:
-            tmpl = '@ eater:%s @ ! queue ! muxer. '
-            pipeline += tmpl % eater
-
-        pipeline += 'muxer.'
-
-        return pipeline
+class Multipart(feedcomponent.MultiInputParseLaunchComponent):
+    def get_muxer_string(self, properties):
+        return 'multipartmux name=muxer'
