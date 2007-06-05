@@ -29,7 +29,7 @@ from flumotion.component.base import scheduler
 
 class EventTest(unittest.TestCase):
     def testSimple(self):
-        now = datetime.now()
+        now = scheduler.now()
         start = now - timedelta(hours=1)
         end = now + timedelta(minutes=1)
         e = scheduler.Event(start, end, 'foo')
@@ -39,7 +39,7 @@ class EventTest(unittest.TestCase):
         self.assertEquals(e.recur, None)
 
     def testUpdateRecurring(self):
-        now = datetime.now()
+        now = scheduler.now()
         now = now.replace(microsecond=0) # recurring adjustments lose precision
         start = now - timedelta(hours=1)
         end = now - timedelta(minutes=1)
@@ -65,7 +65,7 @@ class EventTest(unittest.TestCase):
         self.assertEquals(e.recur, recur)
         
     def testComparison(self):
-        now = datetime.now()
+        now = scheduler.now()
         hour = timedelta(hours=1)
 
         self.failUnless(scheduler.Event(now, now+hour, 'foo') <
@@ -75,6 +75,15 @@ class EventTest(unittest.TestCase):
         self.failUnless(scheduler.Event(now+hour, now+2*hour, 'foo') >
                         scheduler.Event(now, now+hour, 'foo'))
         
+    def testTimeZones(self):
+        now = datetime.now()
+        hour = timedelta(hours=1)
+
+        self.assertEquals(now.tzinfo, None)
+
+        event = scheduler.Event(now, now+hour, 'foo')
+        self.assertEquals(event.start.tzinfo, scheduler.LOCAL)
+        self.assertEquals(event.start, now.replace(tzinfo=scheduler.LOCAL))
 
 
 class SchedulerTest(unittest.TestCase):
@@ -82,7 +91,7 @@ class SchedulerTest(unittest.TestCase):
         scheduler.Scheduler()
 
     def testSimple(self):
-        now = datetime.now()
+        now = scheduler.now()
         start = now - timedelta(hours=1)
         end = now + timedelta(minutes=1)
 

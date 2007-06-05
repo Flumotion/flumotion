@@ -1,3 +1,24 @@
+2007-06-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/scheduler.py (LocalTimezone): New
+	class, based on documentation of datetime.tzinfo.
+	(now): New function, like datetime.now() but returns a datetime
+	qualified against the local timezone.
+	(Event.__init__): Make a datetime against the local timezone. If
+	start or end times lack timezone info, log and interpret them as
+	being against the local timezone.
+	(Scheduler.addEvent, Scheduler.replaceEvents)
+	(Scheduler._reschedule): Make datetimes against the local
+	timezone.
+
+	* flumotion/test/test_component_base_scheduler.py
+	(EventTest.testSimple, EventTest.testUpdateRecurring)
+	(EventTest.testComparison, SchedulerTest.testSimple): Use the new
+	scheduler.now(), which returns a datetime against the local
+	timezone.
+	(EventTest.testTimeZones): New test, tests that dates without
+	timezones are treated as local times.
+
 2007-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.py:

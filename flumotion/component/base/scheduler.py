@@ -20,12 +20,51 @@
 # Headers in this file shall remain intact.
 
 
-from datetime import datetime
+import time
+from datetime import datetime, timedelta, tzinfo
 
 from twisted.internet import reactor
 
 from flumotion.common import log, avltree
 from flumotion.component.base import watcher
+
+
+# A class capturing the platform's idea of local time, from the
+# documentation of datetime.tzinfo.
+class LocalTimezone(tzinfo):
+    STDOFFSET = timedelta(seconds=-time.timezone)
+    if time.daylight:
+        DSTOFFSET = timedelta(seconds=-time.altzone)
+    else:
+        DSTOFFSET = STDOFFSET
+    DSTDIFF = DSTOFFSET - STDOFFSET
+    ZERO = timedelta(0)
+
+    def utcoffset(self, dt):
+        if self._isdst(dt):
+            return self.DSTOFFSET
+        else:
+            return self.STDOFFSET
+
+    def dst(self, dt):
+        if self._isdst(dt):
+            return self.DSTDIFF
+        else:
+            return self.ZERO
+
+    def tzname(self, dt):
+        return time.tzname[self._isdst(dt)]
+
+    def _isdst(self, dt):
+        tt = (dt.year, dt.month, dt.day,
+              dt.hour, dt.minute, dt.second,
+              dt.weekday(), 0, -1)
+        return time.localtime(time.mktime(tt)).tm_isdst > 0
+LOCAL = LocalTimezone()
+
+
+def now(tz=LOCAL):
+    return datetime.now(tz)
 
 
 class Event(log.Loggable):
@@ -43,12 +82,21 @@ class Event(log.Loggable):
             startRecurRule = rrule.rrulestr(recur, dtstart=start)
             endRecurRule = rrule.rrulestr(recur, dtstart=end) 
             if now is None:
-                now = datetime.now()
+                now = datetime.now(LOCAL)
             if end < now:
                 end = endRecurRule.after(now)
                 start = startRecurRule.before(end)
                 self.debug("adjusting start and end times to %r, %r",
                            start, end)
+
+        if not start.tzinfo:
+            self.info('event starting at %r does not have timezone '
+                      'info; using local time zone', start)
+            start = start.replace(tzinfo=LOCAL)
+        if not end.tzinfo:
+            self.info('event ending at %r does not have timezone '
+                      'info; using local time zone', end)
+            end = end.replace(tzinfo=LOCAL)
 
         self.start = start
         self.end = end
@@ -107,7 +155,7 @@ class Scheduler(log.Loggable):
         automatically when it stops.
         """
         if now is None:
-            now = datetime.now()
+            now = datetime.now(LOCAL)
         event = Event(start, end, content, recur, now)
         if event.end < now:
             self.warning('attempted to schedule event in the past: %r',
@@ -160,7 +208,7 @@ class Scheduler(log.Loggable):
         @param events: the new events
         @type  events: a sequence of Event
         """
-        now = datetime.now()
+        now = datetime.now(LOCAL)
         self.events = avltree.AVLTree(events)
         current = []
         for event in self.events:
@@ -250,7 +298,7 @@ class Scheduler(log.Loggable):
 
         start = _getNextStart()
         stop = _getNextStop()
-        now = datetime.now()
+        now = datetime.now(LOCAL)
 
         def toSeconds(td):
             return max(td.days*24*3600 + td.seconds + td.microseconds/1e6, 0)
