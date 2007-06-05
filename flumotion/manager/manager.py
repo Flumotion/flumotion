@@ -980,34 +980,41 @@ class Vishnu(log.Loggable):
         #  (2) we don't know anything about this component, but since it
         #      logged in, we will deal with it, at least allowing the
         #      admin to control it.
+        def parseFeedId(feedId): 
+            if feedId.find(':') == -1:
+                return "%s:default" % feedId
+            else:
+                return feedId
+
+        def fixOldEaterConfig(state):
+            # check for components that have no eater dict but a
+            # non-empty source list, and file all these under
+            # eater default
+            eaterConfig = conf.get('eater', {})
+            sourceConfig = conf.get('source', [])
+            if eaterConfig == {}:
+                eaters = registry.getRegistry().getComponent(
+                    conf.get('type')).getEaters()
+                eatersDict = {}
+                try:
+                    eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
+                    eatersDict = config.buildEatersDict(eatersTuple, eaters)
+                except errors.ConfigError:
+                    message = messages.Warning(T_(
+                        N_("Component logged in with old deprecated "
+                           "configuration and creating an eaters config "
+                           "caused an error. Restarting this component "
+                           "will result in bad things. Best thing to do "
+                           "is stop the component, restart manager and "
+                           "start it again.")))
+                    state.append('messages', message)
+                conf.set('eater', eatersDict)
 
         def verifyExistingComponentState(jobState, state):
             # condition (1)
             state.setJobState(jobState)
-
             if conf:
-                # check for components that have no eater dict but a
-                # non-empty source list, and file all these under
-                # eater default
-                eaterConfig = conf.get('eater', {})
-                sourceConfig = conf.get('source', [])
-                if eaterConfig == {}:
-                    eaters = registry.getRegistry().getComponent(
-                        conf.get('type')).getEaters()
-                    eatersDict = {}
-                    try:
-                        eatersTuple = [(None, s) for s in sourceConfig]
-                        eatersDict = config.buildEatersDict(eatersTuple, eaters)
-                    except errors.ConfigError:
-                        message = messages.Warning(T_(
-                            N_("Component logged in with old deprecated "
-                            "configuration and creating an eaters config "
-                            "caused an error. Restarting this component "
-                            "will result in bad things. Best thing to do "
-                            "is stop the component, restart manager and "
-                            "start it again.")))
-                        state.append('messages', message)
-                    conf.set('eater', eatersDict)
+                fixOldEaterConfig(state)
                 if state.get('config') != conf:
                     diff = config.dictDiff(state.get('config'), conf)
                     diffMsg = config.dictDiffMessageString(diff,
@@ -1034,6 +1041,7 @@ class Vishnu(log.Loggable):
 
             if conf:
                 flowName, compName = conf['parent'], conf['name']
+                fixOldEaterConfig(state)
             else:
                 # unfortunately there is a window in which a component does
                 # not have a config. accept that so that an admin can stop
@@ -1049,29 +1057,6 @@ class Vishnu(log.Loggable):
             state.set('name', compName)
             state.set('type', conf['type'])
             state.set('workerRequested', jobState.get('workerName'))
-            # check for components that have no eater dict but a
-            # non-empty source list, and file all these under
-            # eater default
-            eaterConfig = conf.get('eater', {})
-            sourceConfig = conf.get('source', [])
-            if eaterConfig == {}:
-                eaters = registry.getRegistry().getComponent(
-                    conf.get('type')).getEaters()
-                eatersDict = {}
-                try:
-                    eatersTuple = [(None, s) for s in sourceConfig]
-                    eatersDict = config.buildEatersDict(eatersTuple, eaters)
-                except errors.ConfigError:
-                    message = messages.Warning(T_(
-                        N_("Component logged in with old deprecated "
-                           "configuration and creating an eaters config "
-                           "caused an error. Restarting this component "
-                           "will result in bad things. Best thing to do "
-                           "is stop the component, restart manager and "
-                           "start it again.")))
-                    state.append('messages', message)
-                conf.set('eater', eatersDict)
-
             state.set('config', conf)
 
             # check if we have this flow yet and add if not

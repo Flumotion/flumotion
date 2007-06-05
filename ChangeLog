@@ -1,5 +1,15 @@
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/common/config.py (BaseConfigParser.parseFeedId):
+	Make sure feedIds stored in eater dict are proper feedIds.
+	* flumotion/manager/manager.py (Vishnu.parseFeedId,
+	  Vishnu.fixOldEaterConfig, Vishnu.verifyExistingComponentState,
+	  Vishnu.makeNewComponentState):
+	Move common code out to new function. Translate feedIds to proper
+	feedIds.
+
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/test_component.py (PipelineTest.__init__,
 	  PipelineTest.config):
 	* flumotion/test/test_component_httpstreamer.py
