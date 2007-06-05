@@ -33,6 +33,7 @@ from flumotion.twisted.defer import defer_generator_method
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
         self.__pipeline = pipeline
+        self._source = eaters or []
         if eaters:
             self._eater = {'default':eaters}
         else:
@@ -43,6 +44,7 @@ class PipelineTest(ParseLaunchComponent):
 
     def config(self):
         config = {'name': 'fake',
+                  'source': self._source,
                   'eater': self._eater,
                   'feed': self._feed,
                   'plugs': {},

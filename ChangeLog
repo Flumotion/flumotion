@@ -1,5 +1,16 @@
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_component.py (PipelineTest.__init__,
+	  PipelineTest.config):
+	* flumotion/test/test_component_httpstreamer.py
+	  (TestOldProperties.setUp):
+	* flumotion/test/test_manager_depgraph.py
+	  (testDepGraph._createComponent):
+	Add source key back so that tests more accurately reflect reality
+	because parser adds this key.
+
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/converters/overlay/overlay.py
 	  (Overlay.get_pipeline_string):
 	Fix to use eater dict.

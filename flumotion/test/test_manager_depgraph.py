@@ -40,7 +40,8 @@ class testDepGraph(unittest.TestCase):
         source = []
         for eater in defs[4]:
             source.append(eater)
-        
+       
+        conf["source"] = source
         conf["eater"] = {"default":source}
 
         ret.set("config", conf)

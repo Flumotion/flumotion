@@ -45,6 +45,7 @@ class TestOldProperties(unittest.TestCase):
             'name': 'http-video',
             'parent': 'default',
             'eater': {'default': ['muxer-video']},
+            'source': ['muxer-video'],
             'avatarId': '/default/http-video',
             'clock-master': None,
             'plugs': {
