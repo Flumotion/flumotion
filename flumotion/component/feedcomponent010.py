@@ -572,11 +572,8 @@ class FeedComponent(basecomponent.BaseComponent):
         feed_ids = []
         for eater in eater_config:
             for feed in eater_config[eater]:
-                feed_id = feed
-                if feed.find(':') == -1:
-                    feed_id = feed + ':default'
-                feed_ids.append(feed_id)
-                self._eaterMapping[feed_id] = eater
+                feed_ids.append(feed)
+                self._eaterMapping[feed] = eater
         self.debug('parsed eater config, eater feedIds %r' % feed_ids)
         self.eater_names = feed_ids
         self.state.set('eaterNames', self.eater_names)

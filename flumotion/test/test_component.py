@@ -197,13 +197,13 @@ class TestParser(unittest.TestCase):
         return d
 
     def testOneSource(self):
-        d, pipeline  = pipelineFactory('@eater:foo@ ! bar', ['foo'])
+        d, pipeline  = pipelineFactory('@eater:foo@ ! bar', ['foo:default'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
             self._eater(pipeline, 'foo:default')))
         return d
 
     def testOneSourceWithout(self):
-        d, pipeline = pipelineFactory('bar', ['foo'])
+        d, pipeline = pipelineFactory('bar', ['foo:default'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
             self._eater(pipeline, 'foo:default')))
         return d
@@ -222,7 +222,7 @@ class TestParser(unittest.TestCase):
 
     def testTwoSources(self):
         d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
-            ['foo', 'bar'])
+            ['foo:default', 'bar:default'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
            self._eater(pipeline, 'foo:default'), 
            self._eater(pipeline, 'bar:default')))
@@ -239,7 +239,7 @@ class TestParser(unittest.TestCase):
     def testTwoBoth(self):
         d, pipeline = pipelineFactory(
             '@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
-                              ['comp1', 'comp2',],
+                              ['comp1:default', 'comp2:default',],
                               ['feed1', 'feed2'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
             self._eater(pipeline, 'comp1:default'), 

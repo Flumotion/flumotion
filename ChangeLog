@@ -1,5 +1,16 @@
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.parseEaterConfig):
+	Moved checking of full feed id to parser, so redundant.
+	* flumotion/test/test_component.py (TestParser.testOneSource,
+	  TestParser.testOneSourceWithout, TestParser.testTwoSources,
+	  TestParser.testTwoBoth):
+	Fix tests now that the component will not append :default
+	for you.
+
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/common/config.py (BaseConfigParser.parseFeedId):
 	Make sure feedIds stored in eater dict are proper feedIds.
 	* flumotion/manager/manager.py (Vishnu.parseFeedId,
