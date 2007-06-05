@@ -1,3 +1,11 @@
+2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/manager/manager.py (Vishnu.verifyExistingComponentState):
+	Handle case where logged in component has no eater dict in its
+	config but does have a list of source(s). Manager config is
+	changed to reflect component config + a generated eater dict
+	based from source list.
+
 2007-06-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/scheduler.py (LocalTimezone): New

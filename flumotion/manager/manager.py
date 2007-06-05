@@ -984,22 +984,37 @@ class Vishnu(log.Loggable):
             # condition (1)
             state.setJobState(jobState)
 
-            if conf and state.get('config') != conf:
-                diff = config.dictDiff(state.get('config'), conf)
-                diffMsg = config.dictDiffMessageString(diff,
+            if conf:
+                # check for components that have no eater dict but a
+                # non-empty source list, and file all these under
+                # eater default
+                eaterConfig = conf.get('eater', {})
+                sourceConfig = conf.get('source', [])
+                if eaterConfig == {}:
+                    if sourceConfig != []:
+                        eatersDefault = []
+                        for s in sourceConfig:
+                            eatersDefault.append(s)
+                        conf.set('eater', {'default':eatersDefault})
+                    else:
+                        conf.set('eater', {})
+
+                if state.get('source') != conf:
+                    diff = config.dictDiff(state.get('config'), conf)
+                    diffMsg = config.dictDiffMessageString(diff,
                                                        'internal conf',
                                                        'running conf')
-                message = messages.Warning(T_(
-                    N_("Component logged in with stale configuration. "
-                       "Consider stopping this component and restarting "
-                       "the manager.")),
-                    debug=("Updating internal conf from running conf:\n"
+                    message = messages.Warning(T_(
+                        N_("Component logged in with stale configuration. "
+                        "Consider stopping this component and restarting "
+                        "the manager.")),
+                        debug=("Updating internal conf from running conf:\n"
                            + diffMsg))
-                self.warning('updating internal component state for %r')
-                self.debug('changes to conf: %s',
-                           config.dictDiffMessageString(diff))
-                state.set('config', conf)
-                state.append('messages', message)
+                    self.warning('updating internal component state for %r')
+                    self.debug('changes to conf: %s',
+                               config.dictDiffMessageString(diff))
+                    state.set('config', conf)
+                    state.append('messages', message)
             # if conf is None, then we just created the component and
             # it's not set up yet
 
