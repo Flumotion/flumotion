@@ -1,5 +1,12 @@
 2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/common/config.py (BaseConfigParser._parseFeedId,
+	  BaseConfigParser.parseBool, BaseConfigParser._parseSource,
+	  BaseConfigParser._parseEater):
+	Finish move of checking full feed id to the parser.
+
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/feedcomponent010.py
 	  (FeedComponent.get_eater_name_for_feedId):
 	Document new api for feedcomponent.

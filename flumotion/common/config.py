@@ -428,6 +428,12 @@ class BaseConfigParser(fxml.Parser):
         self.parseFromTable(node, parsers)
         return plugs
 
+    def _parseFeedId(self, feedId):
+        if feedId.find(':') == -1:
+            return "%s:default" % feedId
+        else:
+            return feedId
+
     def parseComponent(self, node, parent, isFeedComponent,
                        needsWorker):
         """
@@ -468,7 +474,7 @@ class BaseConfigParser(fxml.Parser):
         if isFeedComponent:
             parsers.update({'eater': (self._parseEater, eaters.extend),
                             'clock-master': (parseBool, clockmasters.append),
-                            'source': (self.parseTextNode, sources.append)})
+                            'source': (self._parseSource, sources.append)})
 
         self.parseFromTable(node, parsers)
 
@@ -487,6 +493,9 @@ class BaseConfigParser(fxml.Parser):
                                     plugs, worker, eaters,
                                     isClockMaster, project, version)
 
+    def _parseSource(self, node):
+        return self._parseFeedId(self.parseTextNode(node)) 
+    
     def _parseEater(self, node):
         # <eater name="eater-name">
         #   <feed>feeding-component:feed-name</feed>*
@@ -499,12 +508,7 @@ class BaseConfigParser(fxml.Parser):
             # we have an eater node with no feeds
             raise ConfigError(
                 "Eater node %s with no <feed> nodes, is not allowed" % name)
-        def parseFeedId(feedId):
-            if feedId.find(':') == -1:
-                return "%s:default" % feedId
-            else:
-                return feedId
-        return [(name, parseFeedId(feedId)) for feedId in feedIds]
+        return [(name, self._parseFeedId(feedId)) for feedId in feedIds]
 
     def _parseProperty(self, node):
         name, = self.parseAttributes(node, ('name',))
