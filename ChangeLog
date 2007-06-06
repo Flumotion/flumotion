@@ -1,5 +1,11 @@
 2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_component_httpstreamer.py
+	  (TestOldProperties.setUp):
+	Fix test to have a full feed id.
+
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/common/config.py (BaseConfigParser._parseFeedId,
 	  BaseConfigParser.parseBool, BaseConfigParser._parseSource,
 	  BaseConfigParser._parseEater):
