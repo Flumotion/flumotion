@@ -1,5 +1,15 @@
 2007-06-06  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	  Add a message to component state when we fail to parse a file.
+	  Remove this message if we later re-parse the file, or it is deleted.
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Fix base directory handling for relative paths in playlist files.
+	  Don't raise KeyError when a file is removed after parsing it failed.
+
+2007-06-06  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/base/watcher.py:
 	  Don't mutate a dict we're iterating over; instead iterate over the
 	  keys of the dict.

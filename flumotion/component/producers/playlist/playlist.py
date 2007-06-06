@@ -336,6 +336,15 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self.playlistparser.playlist.removeItems(file)
             self._filesAdded.pop(file)
 
+            self._cleanMessage(file)
+
+    def _cleanMessage(self, file):
+        # There's no message removal API! We have to do this instead. Ick?
+        msgid = ("playlist-parse-error", file)
+        for m in self.state.get('messages'):
+            if m.id == msgid:
+                self.state.remove('messages', m)
+
     def _watchFileChanged(self, file):
         self.debug("File changed: %s", file)
         if file in self._filesAdded:
@@ -343,11 +352,21 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self.playlistparser.playlist.removeItems(file)
 
         self._filesAdded[file] = None
+        self._cleanMessage(file)
         try:
             self.debug("Parsing file: %s", file)
             self.playlistparser.parseFile(file, id=file)
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
+            # Since this isn't done directly via the remote method, add a 
+            # message so people can find out that it failed...
+            # Use a tuple including the filename to identify the warning, so we
+            # can add/remove one per file
+            msgid = ("playlist-parse-error", file)
+            self.addMessage(
+                messages.Warning(T_(N_(
+                    "Failed to parse a playlist from file %s: %s" % 
+                        (file, e))), id=msgid))
 
     def do_start(self, clocking):
         self.link()

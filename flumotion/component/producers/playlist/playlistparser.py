@@ -78,6 +78,9 @@ class Playlist(object, log.Loggable):
     def removeItems(self, id):
         current = self._getCurrentItem()
             
+        if id not in self._itemsById:
+            return
+
         items = self._itemsById[id]
         for item in items:
             if (current and item.timestamp < current.timestamp + 
@@ -204,11 +207,7 @@ class PlaylistParser(object, log.Loggable):
         def _discoverer_done(disc, is_media):
             if is_media:
                 self.debug("Discovery complete, media found")
-                filename = item[0]
-                if filename[0] != '/' and self._baseDirectory:
-                    filename = self._baseDirectory + filename
-
-                uri = "file://" + filename
+                uri = "file://" + item[0]
                 timestamp = item[1]
                 duration = item[2]
                 offset = item[3]
@@ -260,6 +259,9 @@ class PlaylistParser(object, log.Loggable):
         if end < time.time() * gst.SECOND:
             self.debug("Early-out: ignoring add for item in past")
             return
+
+        if filename[0] != '/' and self._baseDirectory:
+            filename = self._baseDirectory + filename
 
         self._pending_items.append((filename, timestamp, duration, offset, id))
 
