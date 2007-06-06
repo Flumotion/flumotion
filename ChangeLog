@@ -1,5 +1,16 @@
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/checks/video.py (checkWebcam): 
+	* flumotion/wizard/steps.py (Webcam):
+	* data/glade/wizard_webcam.glade: Update to present discrete
+	choices rather than spinbuttons.
+
+	* flumotion/worker/checks/video.py
+	(checkWebcam.probeDevice.forAllStructValues): Instead of just
+	calling proc on the high value, call for the low value, doubling
+	until we get to the high value. Still not really good, but it at
+	least is more useful in the v4l1 case.
+
 	Patch by: Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/admin/gtk/parts.py: 

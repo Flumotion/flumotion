@@ -516,9 +516,8 @@ class Webcam(VideoSource):
     
     in_setup = False
 
-    # these are probed, not set from the UI
-    _mime = None
-    _format = None
+    # _sizes is probed, not set from the UI
+    _sizes = None
     
     def setup(self):
         self.in_setup = True
@@ -526,19 +525,38 @@ class Webcam(VideoSource):
                                        '/dev/video1',
                                        '/dev/video2',
                                        '/dev/video3'))
+        cell = gtk.CellRendererText()
+        self.combobox_size.pack_start(cell, True)
+        self.combobox_size.add_attribute(cell, 'text', 0)
+        cell = gtk.CellRendererText()
+        self.combobox_framerate.pack_start(cell, True)
+        self.combobox_framerate.add_attribute(cell, 'text', 0)
         self.in_setup = False
 
     def on_combobox_device_changed(self, combo):
         self.run_checks()
+
+    def on_combobox_size_changed(self, combo):
+        # check for custom
+        i = self.combobox_size.get_active_iter()
+        if i:
+            w, h = self.combobox_size.get_model().get(i, 1, 2)
+            store = gtk.ListStore(str, object)
+            for d in self._sizes[(w,h)]:
+                num, denom = d['framerate']
+                store.set(store.append(), 0, '%.2f fps' % (1.0*num/denom),
+                          1, d)
+            # add custom
+            self.combobox_framerate.set_model(store)
+            self.combobox_framerate.set_active(0)
 
     def worker_changed(self):
         self.clear()
         self.run_checks()
         
     def clear(self):
-        self.spinbutton_width.set_sensitive(False)
-        self.spinbutton_height.set_sensitive(False)
-        self.spinbutton_framerate.set_sensitive(False)
+        self.combobox_size.set_sensitive(False)
+        self.combobox_framerate.set_sensitive(False)
         self.label_name.set_label("")
         self.wizard.block_next(True)
         
@@ -563,19 +581,19 @@ class Webcam(VideoSource):
                 self.debug('no device %s' % device)
                 yield None
 
-            deviceName, caps = result
+            deviceName, sizes = result
+            self._sizes = sizes
             self.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
-            self.spinbutton_width.set_value(caps['width'])
-            self.spinbutton_width.set_sensitive(True)
-            self.spinbutton_height.set_value(caps['height'])
-            self.spinbutton_height.set_sensitive(True)
-            fps = caps['framerate']
-            self.spinbutton_framerate.set_value(float(fps[0]) / fps[1])
-            self.spinbutton_framerate.set_sensitive(True)
-            self._mime = caps['mime']
-            self._format = caps.get('format', None)
+            self.combobox_size.set_sensitive(True)
+            self.combobox_framerate.set_sensitive(True)
+            store = gtk.ListStore(str, int, int)
+            for w, h in sizes:
+                store.set(store.append(), 0, '%d x %d' % (w,h),
+                          1, w, 2, h)
+            self.combobox_size.set_model(store)
+            self.combobox_size.set_active(0)
         except errors.RemoteRunFailure, e:
             self.debug('a RemoteRunFailure happened')
             self.clear()
@@ -583,14 +601,31 @@ class Webcam(VideoSource):
 
     def get_state(self):
         options = {}
+        i = self.combobox_size.get_active_iter()
+        if i:
+            w, h = self.combobox_size.get_model().get(i, 1, 2)
+        else:
+            self.warning('something bad happened: no height/width selected?')
+            w, h = 320, 240
+        i = self.combobox_framerate.get_active_iter()
+        if i:
+            d = self.combobox_framerate.get_model().get_value(i, 1)
+            num, denom = d['framerate']
+            mime = d['mime']
+            format = d.get('format', None)
+        else:
+            self.warning('something bad happened: no framerate selected?')
+            num, denom = 15, 2
+            mime = 'video/x-raw-yuv'
+            format = None
+
         options['device'] = self.combobox_device.get_string()
-        options['width'] = int(self.spinbutton_width.get_value())
-        options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = \
-            _fraction_from_float(self.spinbutton_framerate.get_value(), 16)
-        options['mime'] = self._mime
-        if self._format:
-            options['format'] = self._format
+        options['width'] = w
+        options['height'] = h
+        options['framerate'] = '%d/%d' % (num, denom)
+        options['mime'] = mime
+        if format:
+            options['format'] = format
         return options
 
 class TestVideoSource(VideoSource):

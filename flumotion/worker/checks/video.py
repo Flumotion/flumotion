@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+from twisted.internet import defer
 from flumotion.worker.checks import check
 
 import gst
@@ -63,44 +64,67 @@ def checkWebcam(device, id):
     
     @rtype: L{flumotion.common.messages.Result}
     """
-    result = messages.Result()
-
     # FIXME: add code that checks permissions and ownership on errors,
     # so that we can offer helpful hints on what to do.
-    def get_device_name(element):
+    def probeDevice(element):
         name = element.get_property('device-name')
-        caps = element.get_pad("src").get_negotiated_caps()
-        log.debug('check', 'negotiated caps: %s' % caps.to_string())
-        s = caps[0]
-        num = s['framerate'].num
-        denom = s['framerate'].denom
+        caps = element.get_pad("src").get_caps()
+        log.debug('check', 'caps: %s' % caps.to_string())
 
-        d = {
-            'mime': s.get_name(),
-            'width': s['width'],
-            'height': s['height'],
-            'framerate': (num, denom),
-        }
-        # FIXME: do something about rgb
-        if s.get_name() == 'video/x-raw-yuv':
-            d['format'] = s['format'].fourcc
-        return (name, d)
+        sizes = {} # (width, height) => [{'framerate': (framerate_num,
+                   #                                    framerate_denom),
+                   #                      'mime': str,
+                   #                      'fourcc': fourcc}]
+        
+        def forAllStructValues(struct, key, proc):
+            vals = struct[key]
+            if isinstance(vals, list):
+                for val in vals:
+                    proc(struct, val)
+            elif isinstance(vals, gst.IntRange):
+                val = vals.low
+                while val < vals.high:
+                    proc(struct, val)
+                    val *= 2
+                proc(struct, vals.high)
+            elif isinstance(vals, gst.DoubleRange):
+                # hack :)
+                proc(struct, vals.high)
+            elif isinstance(vals, gst.FractionRange):
+                # hack :)
+                proc(struct, vals.high)
+            else:
+                # scalar
+                proc(struct, vals)
+        def addRatesForWidth(struct, width):
+            def addRatesForHeight(struct, height):
+                def addRate(struct, rate):
+                    if (width, height) not in sizes:
+                        sizes[(width, height)] = []
+                    d = {'framerate': (rate.num, rate.denom),
+                         'mime': struct.get_name()}
+                    if 'yuv' in d['mime']:
+                        d['format'] = struct['format'].fourcc
+                    sizes[(width, height)].append(d)
+                forAllStructValues(struct, 'framerate', addRate)
+            forAllStructValues(struct, 'height', addRatesForHeight)
+        for struct in caps:
+            if 'yuv' not in struct.get_name():
+                continue
+            forAllStructValues(struct, 'width', addRatesForWidth)
+
+        return (name, sizes)
                 
-    # FIXME: taken from the 0.8 check
-    # autoprobe = "autoprobe=false"
-    # added in gst-plugins 0.8.6
-    # if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
-    #    autoprobe += " autoprobe-fps=false"
+    def tryV4L1(_):
+        log.debug('webcam', 'trying v4l1')
+        pipeline = 'v4lsrc name=source device=%s ! fakesink' % (device,)
+        d = do_element_check(pipeline, 'source', probeDevice, 
+                             state=gst.STATE_PAUSED, set_state_deferred=True)
+        return d
 
-    autoprobe = "autoprobe-fps=false"
-    # FIXME: with autoprobe-fps turned off, pwc's don't work anymore
-    autoprobe = ""
+    result = messages.Result()
 
-    pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
-        autoprobe)
-    d = do_element_check(pipeline, 'source', get_device_name, 
-        state=gst.STATE_PAUSED, set_state_deferred=True)
-
+    d = tryV4L1()
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)
     d.addErrback(check.errbackResult, result, id, device)
