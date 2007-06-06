@@ -44,17 +44,19 @@ __all__ = ['Disker']
 
 
 """
-Disker has a property "ical-schedule". This allows an ical file to be specified
-in the config and have recordings scheduled based on events. This file will be 
-monitored for changes and events reloaded if this happens. The filename 
-template that will be used for these files is taken from the summary of the
-event. This template is strftime formatted. The ical file can have events
-specified in a different timezone. The files saved from these events should
-have their strftime format strings therefore formatted with the timezone
-of the event and not of the local system. Files resulting from non-ical
-triggered scheduling should use the timezone of the local system.
+Disker has a property 'ical-schedule'. This allows an ical file to be
+specified in the config and have recordings scheduled based on events.
+This file will be monitored for changes and events reloaded if this
+happens.
 
-Note that this ideal scenario is not the current scenario.
+The filename of a recording started from an ical file will be produced
+via passing the ical event summary through strftime, so that an archive
+can encode the date and time that it was begun.
+
+The time that will be given to strftime will be given in the timezone of
+the ical event. In practice this will either be UTC or the local time of
+the machine running the disker, as the ical scheduler does not
+understand arbitrary timezones.
 """
 
 try:
@@ -175,9 +177,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             mime += ";boundary=ThisRandomString"
         return mime
     
-    def change_filename(self, filenameTemplate=None):
+    def change_filename(self, filenameTemplate=None, timeOrTuple=None):
         """
         @param filenameTemplate: strftime formatted string to decide filename
+        @param timeOrTuple: a valid time to pass to strftime, defaulting
+        to time.localtime(). A 9-tuple may be passed instead.
         """
         mime = self.get_mime()
         if mime == 'application/ogg':
@@ -217,7 +221,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if not filenameTemplate:
             filenameTemplate = self._defaultFilenameTemplate
         filename = "%s.%s" % (time.strftime(filenameTemplate,
-            time.localtime()), ext)
+            timeOrTuple or time.localtime()), ext)
         self.location = os.path.join(self.directory, filename)
         self.info("Changing filename to %s", self.location)
         try:
@@ -348,8 +352,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.connect('client-removed', self._client_removed_cb)
 
     def eventStarted(self, event):
-        filenameTemplate = event.content
-        self.change_filename(filenameTemplate)
+        self.change_filename(event.content, event.start.timetuple())
 
     def eventStopped(self, event):
         self.stop_recording()

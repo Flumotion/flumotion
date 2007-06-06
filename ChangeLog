@@ -1,3 +1,11 @@
+2007-06-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.eventStarted, Disker.change_filename): When rotating from
+	ical, take the rotate time from the ical event. Incidentally this
+	time will be against the timezone specified in the ical file,
+	either local or UTC. Update comment to document this. Untested!
+
 2007-06-06  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/watcher.py:
