@@ -1010,7 +1010,12 @@ class Vishnu(log.Loggable):
                            "is stop the component, restart manager and "
                            "start it again.")))
                     state.append('messages', message)
-                conf.set('eater', eatersDict)
+                conf['eater'] =  eatersDict
+            if sourceConfig:
+                sources = []
+                for s in sourceConfig:
+                    sources.append(parseFeedId(s))
+                conf['source'] = sources
 
         def verifyExistingComponentState(jobState, state):
             # condition (1)

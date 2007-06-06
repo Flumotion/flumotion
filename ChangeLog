@@ -1,5 +1,12 @@
 2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/manager/manager.py (Vishnu.fixOldEaterConfig):
+	conf is a dict, don't use set!
+	Fix up the source node in the config correctly on newly
+	logging in components.
+
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/basicwatchdog.py
 	  (AVBasicWatchdog.eaterSetInactive):
 	Use correct method name.
