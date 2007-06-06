@@ -44,6 +44,10 @@ COL_STATE      = 4
 COL_MOOD_VALUE = 5 # to sort COL_MOOD
 COL_CPU        = 6
 
+def getComponentLabel(state):
+    config = state.get('config')
+    return config and config.get('label', config['name'])
+
 class AdminStatusbar:
     """
     I implement the status bar used in the admin UI.
@@ -352,7 +356,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
             self._model.set(iter, COL_STATE, component)
 
-            self._model.set(iter, COL_NAME, component.get('name'))
+            self._model.set(iter, COL_NAME, getComponentLabel(component))
 
             self._updateWorker(iter, component)
         self.debug('updated components view')

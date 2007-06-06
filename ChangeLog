@@ -1,3 +1,19 @@
+2007-06-06  Andy Wingo  <wingo@pobox.com>
+
+	Patch by: Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/admin/gtk/parts.py: 
+	* flumotion/admin/gtk/client.py: 
+	* flumotion/launch/parse.py: 
+	* flumotion/manager/manager.py: 
+	* flumotion/manager/admin.py: 
+	* flumotion/common/config.py: 
+	* flumotion/test/test_config.py: 
+	* flumotion/test/test_manager_manager.py:
+	The components can now have a human-readable guaranteed label,
+	which is set in the config dict. If not specified, no label will
+	be set in the dict. Fixes #658.
+
 2007-06-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py

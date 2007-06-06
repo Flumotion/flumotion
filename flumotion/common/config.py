@@ -250,13 +250,14 @@ class ConfigEntryComponent(log.Loggable):
     nice = 0
     logCategory = 'config'
 
-    __pychecker__ = 'maxargs=11'
+    __pychecker__ = 'maxargs=12'
 
-    def __init__(self, name, parent, type, propertyList, plugList,
+    def __init__(self, name, parent, type, label, propertyList, plugList,
                  worker, eatersList, isClockMaster, project, version):
         self.name = name
         self.parent = parent
         self.type = type
+        self.label = label
         self.worker = worker
         self.defs = registry.getRegistry().getComponent(self.type)
         try:
@@ -309,6 +310,10 @@ class ConfigEntryComponent(log.Loggable):
                                            self.defs.getEaters()),
                   'source': [feedId for eater, feedId in eatersList]}
 
+        if self.label:
+            # only add a label attribute if it was specified
+            config['label'] = self.label
+
         if not config['source']:
             # preserve old behavior
             del config['source']
@@ -319,6 +324,9 @@ class ConfigEntryComponent(log.Loggable):
     def getType(self):
         return self.type
     
+    def getLabel(self):
+        return self.label
+
     def getName(self):
         return self.name
 
@@ -427,7 +435,7 @@ class BaseConfigParser(fxml.Parser):
 
         @rtype: L{ConfigEntryComponent}
         """
-        # <component name="..." type="..." worker="..."?
+        # <component name="..." type="..." label="..."? worker="..."?
         #            project="..."? version="..."?>
         #   <source>...</source>* (deprecated)
         #   <eater name="...">...</eater>*
@@ -436,8 +444,9 @@ class BaseConfigParser(fxml.Parser):
         #   <plugs>...</plugs>*
         # </component>
         
-        name, type, worker, project, version = self.parseAttributes(
-            node, ('name', 'type'), ('worker', 'project', 'version',))
+        attrs = self.parseAttributes(node, ('name', 'type'),
+                ('label', 'worker', 'project', 'version',))
+        name, type, label, worker, project, version = attrs
         if needsWorker and not worker:
             raise ConfigError('component %s does not specify the worker '
                               'that it is to run on' % (name,))
@@ -474,7 +483,7 @@ class BaseConfigParser(fxml.Parser):
             # map old <source> nodes to new <eater> nodes
             eaters.append((None, feedId))
 
-        return ConfigEntryComponent(name, parent, type, properties,
+        return ConfigEntryComponent(name, parent, type, label, properties,
                                     plugs, worker, eaters,
                                     isClockMaster, project, version)
 

@@ -624,8 +624,8 @@ class Vishnu(log.Loggable):
         self._loadManagerBouncer(conf)
 
     def loadComponent(self, identity, componentType, componentId,
-                      properties, workerName, plugs, eaters,
-                      isClockMaster):
+                      componentLabel, properties, workerName, 
+                      plugs, eaters, isClockMaster):
         """
         Load a component into the manager configuration.
 
@@ -648,7 +648,9 @@ class Vishnu(log.Loggable):
         compState = None
 
         compConf = config.ConfigEntryComponent(compName, parentName, 
-                                               componentType, properties,
+                                               componentType, 
+                                               componentLabel,
+                                               properties,
                                                plugs, workerName, 
                                                eaters, isClockMaster,
                                                None, None)

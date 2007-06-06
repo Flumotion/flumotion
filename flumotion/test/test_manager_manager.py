@@ -488,7 +488,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compProps = [("pipeline", "videotestsrc ! video/x-raw-yuv,width=320,"
                          "height=240,framerate=5/1,format=(fourcc)I420")]
             return self.vishnu.loadComponent(manager.LOCAL_IDENTITY, 
-                                             compType, compId, compProps,
+                                             compType, compId, None, compProps,
                                              "worker", [], [], False)
         # Add more tests if you implement handling of sync-needing components
         self.assertRaises(NotImplementedError, loadProducer)
@@ -516,9 +516,12 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compProps = [("pipeline", "ffmpegcolorspace ! theoraenc "
                          "keyframe-force=5 ! oggmux")]
             compState = self.vishnu.loadComponent(
-                manager.LOCAL_IDENTITY, compType, compId, compProps,
+                manager.LOCAL_IDENTITY, compType, compId, None, compProps,
                 "worker", [], compEaters, False)
 
+            self.assertEqual(compState.get('config').get('name'), 
+                             "converter-ogg-theora")
+            self.failIf('label' in compState.get('config'))
             self.assertEqual(len(components), 2)
             self.assertEqual(components[1].get('name'),
                              "converter-ogg-theora")
@@ -527,17 +530,22 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.assertRaises(errors.ComponentAlreadyExistsError,
                               self.vishnu.loadComponent,
                               manager.LOCAL_IDENTITY, compType, compId,
-                              compProps, "worker", [], compEaters,
+                              None, compProps, "worker", [], compEaters,
                               False)
             
             compType = "http-streamer"
             compId = common.componentId("testflow", "streamer-ogg-theora")
+            compLabel = "Streamer OGG-Theora/Vorbis"
             compEaters = [("default", "converter-ogg-theora")]
             compProps = [("port", 8800)]
             compState = self.vishnu.loadComponent(
-                manager.LOCAL_IDENTITY, compType, compId, compProps,
-                "streamer", [], compEaters, False)
+                manager.LOCAL_IDENTITY, compType, compId, compLabel,
+                compProps, "streamer", [], compEaters, False)
 
+            self.assertEqual(compState.get('config').get('name'), 
+                             "streamer-ogg-theora")
+            self.assertEqual(compState.get('config').get('label'), 
+                             "Streamer OGG-Theora/Vorbis")
             self.assertEqual(len(components), 3)
             self.assertEqual(components[2].get('name'),
                              "streamer-ogg-theora")
@@ -547,8 +555,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compId = common.componentId("atmosphere", "test-bouncer")
             compProps = [("file", "icalfile")]
             compState = self.vishnu.loadComponent(
-                manager.LOCAL_IDENTITY, compType, compId, compProps,
-                "worker", [], [], False)
+                manager.LOCAL_IDENTITY, compType, compId, None,
+                compProps, "worker", [], [], False)
 
             atmosphere = self.vishnu.state.get('atmosphere')
             components = atmosphere.get('components')

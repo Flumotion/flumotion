@@ -38,6 +38,7 @@ from zope.interface import implements
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
 from flumotion.admin.gtk import dialogs, parts, message
+from flumotion.admin.gtk.parts import getComponentLabel
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common, pygobject
@@ -271,7 +272,7 @@ class Window(log.Loggable, gobject.GObject):
 
         instance = None
 
-        name = state.get('name')
+        name = getComponentLabel(state)
         self.statusbar.set('main', _("Loading UI for %s ...") % name)
 
         moduleName = common.pathToModuleName(fileName)
@@ -441,27 +442,28 @@ class Window(log.Loggable, gobject.GObject):
             state = self.components_view.get_selected_state()
             if not state:
                 return
-        name = state.get('name')
-        if not name:
+
+        label = getComponentLabel(state)
+        if not label:
             return
 
         mid = None
         if pre:
-            mid = self.statusbar.push('main', pre % name)
+            mid = self.statusbar.push('main', pre % label)
         d = self.admin.componentCallRemote(state, methodName, *args, **kwargs)
 
         def cb(result, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
             if post:
-                self.statusbar.push('main', post % name)
+                self.statusbar.push('main', post % label)
         def eb(failure, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
             self.warning("Failed to execute %s on component %s: %s"
-                         % (methodName, name, failure))
+                         % (methodName, label, failure))
             if fail:
-                self.statusbar.push('main', fail % name)
+                self.statusbar.push('main', fail % label)
             
         d.addCallback(cb, self, mid)
         d.addErrback(eb, self, mid)
@@ -763,7 +765,7 @@ class Window(log.Loggable, gobject.GObject):
             self.debug('no state, returning')
             return
 
-        name = state.get('name')
+        name = getComponentLabel(state)
         mood = state.get('mood')
         messages = state.get('messages')
         self._clearMessages()
@@ -904,9 +906,7 @@ class Window(log.Loggable, gobject.GObject):
         d.run()
 
     def _component_reload(self, state):
-        name = state.get('name')
-        if not name:
-            return
+        name = getComponentLabel(state)
 
         dialog = dialogs.ProgressDialog("Reloading",
             _("Reloading component code for %s") % name, self.window)
@@ -954,7 +954,7 @@ class Window(log.Loggable, gobject.GObject):
                 self.statusbar.push('main', _("No component selected."))
                 return None
 
-        name = state.get('name')
+        name = getComponentLabel(state)
         if not name:
             return None
 

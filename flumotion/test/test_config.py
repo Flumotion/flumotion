@@ -196,6 +196,37 @@ class TestConfig(unittest.TestCase):
         component = flow.components['component-name']
         self.assertEquals(component.name, 'component-name')
         self.assertEquals(component.getName(), 'component-name')
+        self.assertEquals(component.label, None)
+        self.assertEquals(component.getLabel(), None)
+        self.assertEquals(component.type, 'test-component')
+        self.assertEquals(component.getType(), 'test-component')
+        self.assertEquals(component.getParent(), 'default')
+        self.assertEquals(component.getWorker(), 'foo')
+        dict = component.getConfigDict()
+        self.assertEquals(dict.get('name'), 'component-name', dict['name'])
+        self.assertEquals(dict.get('type'), 'test-component', dict['type'])
+
+    def testParseComponentWithLabel(self):
+        conf = ConfigXML(
+             """
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component"
+                            label="component-label" worker="foo"/>
+               </flow>
+             </planet>
+             """)
+
+        self.failIf(conf.flows)
+        conf.parse()
+
+        flow = conf.flows[0]
+        self.failUnless(flow.components.has_key('component-name'))
+        component = flow.components['component-name']
+        self.assertEquals(component.name, 'component-name')
+        self.assertEquals(component.getName(), 'component-name')
+        self.assertEquals(component.label, 'component-label')
+        self.assertEquals(component.getLabel(), 'component-label')
         self.assertEquals(component.type, 'test-component')
         self.assertEquals(component.getType(), 'test-component')
         self.assertEquals(component.getParent(), 'default')

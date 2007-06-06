@@ -69,6 +69,7 @@ class Component(object):
             self.name,
             None,
             self.type,
+            None,
             self.properties,
             self.plugs,
             None,

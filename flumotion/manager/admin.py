@@ -409,40 +409,45 @@ class AdminAvatar(base.ManagerAvatar):
 
         return res
 
-    def perspective_loadComponent(self, componentType, componentId,
-                                  properties, workerName, plugs=None, 
-                                  eaters=None, isClockMaster=None):
+    def perspective_loadComponent(self, componentType, componentId, 
+                                  componentLabel, properties, workerName, 
+                                  plugs=None, eaters=None,
+                                  isClockMaster=None):
         """
         Load a component into the manager configuration.
         Returns a deferred that will be called with the component state.
 
-        @param componentType: the registered type of the component to be added
-        @type  componentType: str
-        @param componentId:   the identifier of the component to add,
-                              should be created by the function
-                              L{flumotion.common.common.componentId}
-        @type  componentId:   str
-        @param properties:    List of property name-value pairs.
-                              See L{flumotion.common.config.buildPropertyDict}
-        @type  properties:    [(str, object)]
-        @param workerName:    the name of the worker where the added
-                              component should run.
-        @type  workerName:    str
-        @param plugs:         List of plugs, as type-propertyList pairs.
-                              See {flumotion.common.config.buildPlugsSet}.
-        @type  plugs:         [(str, [(str, object)])]
-        @param eaters:        List of (eater name, feed ID) pairs.
-                              See L{flumotion.common.config.buildEatersDict}
-        @type  eaters:        [(str, str)]
-        @param isClockMaster: True if the component to be added must be
-                              a clock master. Passing False here means
-                              that the manager will choose what
-                              component, if any, will be clock master
-                              for this flow.
-        @type  isClockMaster: bool
+        @param componentType:  The registered type of the component to be added
+        @type  componentType:  str
+        @param componentId:    The identifier of the component to add,
+                               should be created by the function
+                               L{flumotion.common.common.componentId}
+        @type  componentId:    str
+        @param componentLabel: The human-readable label of the component.
+                               if None, no label will be set.
+        @type  componentLabel: str or None
+        @param properties:     List of property name-value pairs.
+                               See L{flumotion.common.config.buildPropertyDict}
+        @type  properties:     [(str, object)]
+        @param workerName:     the name of the worker where the added
+                               component should run.
+        @type  workerName:     str
+        @param plugs:          List of plugs, as type-propertyList pairs.
+                               See {flumotion.common.config.buildPlugsSet}.
+        @type  plugs:          [(str, [(str, object)])]
+        @param eaters:         List of (eater name, feed ID) pairs.
+                               See L{flumotion.common.config.buildEatersDict}
+        @type  eaters:         [(str, str)]
+        @param isClockMaster:  True if the component to be added must be
+                               a clock master. Passing False here means
+                               that the manager will choose what
+                               component, if any, will be clock master
+                               for this flow.
+        @type  isClockMaster:  bool
         """
         return self.vishnu.loadComponent(self.remoteIdentity, componentType, 
-                                         componentId, properties, workerName,
+                                         componentId, componentLabel, 
+                                         properties, workerName,
                                          plugs or [], eaters or [],
                                          isClockMaster) 
 
