@@ -1,3 +1,9 @@
+2007-06-06  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/watcher.py:
+	  Don't mutate a dict we're iterating over; instead iterate over the
+	  keys of the dict.
+
 2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/manager/manager.py (Vishnu.fixOldEaterConfig):

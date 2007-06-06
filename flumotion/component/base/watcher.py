@@ -126,7 +126,7 @@ class BaseWatcher(log.Loggable):
                     else:
                         self.log('change continues for %s', f)
                         changing[f] = new[f]
-            for f in stable:
+            for f in stable.keys():
                 if f not in new:
                     # deletion
                     del stable[f]
