@@ -1310,7 +1310,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 self._gotFirstNewSegment[feedId] = True
         return True
 
-    def get_eater_name_for_feedId(self, feedId):
+    def get_eater_name_for_feed_id(self, feedId):
         """
         Given a feedId, it will return the eater name that it is in.
         Unfortunately feedcomponent keys eaters on the feedId so

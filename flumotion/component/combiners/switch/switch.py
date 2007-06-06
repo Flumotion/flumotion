@@ -86,7 +86,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def is_active(self, eaterSubstring):
         # eaterSubstring is "master" or "backup"
         for eaterFeedId in self._inactiveEaters:
-            eaterName = self.get_eater_name_for_feedId(eaterFeedId)
+            eaterName = self.get_eater_name_for_feed_id(eaterFeedId)
             if eaterSubstring in eaterName:
                 self.log("eater %s inactive", eaterName)
                 return False
@@ -135,6 +135,9 @@ class SingleSwitch(Switch):
         # figure out the pads connected for the eaters
         padPeers = {} # padName -> peer element name
         for sinkPadNumber in range(0, len(self.eater_names)):
+            self.debug("sink pad %d %r", sinkPadNumber, sw.get_pad("sink%d" % sinkPadNumber))
+            self.debug("peer pad %r", sw.get_pad("sink%d" % (
+                sinkPadNumber)).get_peer())
             padPeers["sink%d" % sinkPadNumber] = sw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer().get_parent().get_name()
 

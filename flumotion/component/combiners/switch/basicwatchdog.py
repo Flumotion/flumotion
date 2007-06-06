@@ -47,7 +47,7 @@ class AVBasicWatchdog(switch.AVSwitch):
     def eaterSetInactive(self, feedId):
         switch.AVSwitch.eaterSetInactive(self, feedId)
         eaterName = self.get_eater_name_for_feedId(feedId)
-        if "master" in eaterName and self.isActive("backup"):
+        if "master" in eaterName and self.is_active("backup"):
             self.switch_to("backup")
 
     def eaterSetActive(self, feedId):

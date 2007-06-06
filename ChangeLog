@@ -1,3 +1,16 @@
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (AVBasicWatchdog.eaterSetInactive):
+	Use correct method name.
+	* flumotion/component/combiners/switch/switch.py (Switch.is_active,
+	  SingleSwitch.configure_pipeline):
+	Change to use get_eater_name_for_feed_id.
+	Add some verbose debugging for seeing pads.
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.get_eater_name_for_feed_id):
+	Rename to get_eater_name_for_feed_id
+
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video.py (checkWebcam): Erm, actually
