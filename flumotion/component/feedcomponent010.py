@@ -1311,6 +1311,17 @@ class FeedComponent(basecomponent.BaseComponent):
         return True
 
     def get_eater_name_for_feedId(self, feedId):
+        """
+        Given a feedId, it will return the eater name that it is in.
+        Unfortunately feedcomponent keys eaters on the feedId so
+        it is impossible to have the same feedId feeding multiple
+        eaters in the same component.
+
+        @param feedId the feedId to get the eater name for
+        @returns the eater name
+        @rtype: string
+        """
+
         if self._eaterMapping.has_key(feedId):
             return self._eaterMapping[feedId]
         return None

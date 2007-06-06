@@ -1,3 +1,9 @@
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.get_eater_name_for_feedId):
+	Document new api for feedcomponent.
+
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video.py (checkWebcam): 
