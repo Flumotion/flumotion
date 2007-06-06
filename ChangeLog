@@ -9,7 +9,7 @@
 	Add some verbose debugging for seeing pads.
 	* flumotion/component/feedcomponent010.py
 	  (FeedComponent.get_eater_name_for_feed_id):
-	Rename to get_eater_name_for_feed_id
+	Rename to get_eater_name_for_feed_id.
 
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
