@@ -49,6 +49,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def init(self):
         self.uiState.addKey("active-eater")
         self.icalScheduler = None
+        self._startingEater = "master"
 
     def do_check(self):
         self.debug("checking whether switch element exists")
@@ -59,7 +60,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.addMessage(m)
             # if we have been passed an ical file to use for scheduling
             # then start the ical monitor
-            # FIXME: need to check for events that are currently running
             # FIXME: need to handle cases where cannot switch (and hence
             # post a message to uistate and also store so switch can be
             # made as soon as it can switch)
@@ -72,6 +72,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                         icalfn, 'r'))
                     self.icalScheduler.subscribe(self.eventStarted,
                         self.eventStopped)
+                    if self.icalScheduler.getCurrentEvents():
+                        self._startingEater = "backup"
                 else:
                     self.warning("An ical file has been specified for "
                                  "scheduling but the necessary modules "
@@ -154,10 +156,10 @@ class SingleSwitch(Switch):
                         eaterName )
         # make sure switch has the correct sink pad as active
         self.debug("Setting switch's active-pad to %s", 
-            self.switchPads["master"])
+            self.switchPads[self._startingEater])
         self.switchElement.set_property("active-pad", 
-            self.switchPads["master"])
-        self.uiState.set("active-eater", "master")
+            self.switchPads[self._startingEater])
+        self.uiState.set("active-eater", self._startingEater)
 
     def switch_to(self, eater):
         if not eater in [ "backup", "master" ]:
@@ -238,14 +240,14 @@ class AVSwitch(Switch):
                         eaterName )
         # make sure switch has the correct sink pad as active
         self.debug("Setting video switch's active-pad to %s", 
-            self.switchPads["video-master"])
+            self.switchPads["video-%s" % self._startingEater])
         vsw.set_property("active-pad", 
-            self.switchPads["video-master"])
+            self.switchPads["video-%s" % self._startingEater])
         self.debug("Setting audio switch's active-pad to %s",
-            self.switchPads["audio-master"])
+            self.switchPads["audio-%s" % self._startingEater])
         asw.set_property("active-pad",
-            self.switchPads["audio-master"])
-        self.uiState.set("active-eater", "master")
+            self.switchPads["audio-%s" % self._startingEater])
+        self.uiState.set("active-eater", self._startingEater)
 
     # So switching audio and video is not that easy
     # We have to make sure the current segment on both

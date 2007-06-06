@@ -1,3 +1,11 @@
+2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py (Switch.init,
+	  Switch.cb, SingleSwitch.configure_pipeline,
+	  AVSwitch.configure_pipeline):
+	If there are current events when we start, switch to correct
+	eater when starting component. Untested!
+
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/disker/disker.py
