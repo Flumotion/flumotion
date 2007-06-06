@@ -994,7 +994,7 @@ class Vishnu(log.Loggable):
             # eater default
             eaterConfig = conf.get('eater', {})
             sourceConfig = conf.get('source', [])
-            if eaterConfig == {}:
+            if eaterConfig == {} and sourceConfig != []:
                 eaters = registry.getRegistry().getComponent(
                     conf.get('type')).getEaters()
                 eatersDict = {}
