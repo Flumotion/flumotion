@@ -1,3 +1,21 @@
+2007-06-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/webcam/webcam.py
+	(Webcam.get_pipeline_string): Support v4l or v4l2, depending on
+	element-factory. v4l2 currently does not work because the driver
+	needs to copy its buffers instead of having a limited set of mmap
+	buffers.
+
+	* flumotion/worker/checks/video.py (checkWebcam.tryV4L2): Add
+	check for V4L2, only passes currently if you have CVS -good.
+
+	* flumotion/component/producers/webcam/webcam.xml: Add optional
+	property, element-factory, defaulting to v4lsrc.
+
+	* flumotion/worker/checks/video.py (checkWebcam.probeDevice): 
+	* flumotion/wizard/steps.py (Webcam.run_checks)
+	(Webcam.get_state): Add probed element factory name to check.
+
 2007-06-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py (Switch.init,

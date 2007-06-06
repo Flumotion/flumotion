@@ -32,6 +32,9 @@ class Webcam(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         device = properties['device']
 
+        # v4l or v4l2?
+        factory_name = properties.get('element-factory', 'v4lsrc')
+
         # Filtered caps
         mime = properties.get('mime', 'video/x-raw-yuv')
         format = properties.get('format', 'I420')
@@ -49,8 +52,9 @@ class Webcam(feedcomponent.ParseLaunchComponent):
             f = properties['framerate']
             string += ",framerate=(fraction)%d/%d" % (f[0], f[1])
 
-        # create component
-        autoprobe = "autoprobe=false autoprobe-fps=false"
+        if factory_name == 'v4lsrc':
+            factory_name += ' autoprobe=false autoprobe-fps=false copy-mode=1'
+        # FIXME: copy-mode for v4l2src needs implementation in the plugin
         
         # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
         # hack in 0.9 to work around, not in 0.8
@@ -58,8 +62,8 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         # pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
         #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
         #           % (autoprobe, device, caps, caps)
-        return ('v4lsrc name=source %s copy-mode=1 device=%s ! '
-                '%s ! videorate' % (autoprobe, device, string))
+        return ('%s name=source device=%s ! %s ! videorate'
+                % (factory_name, device, string))
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect

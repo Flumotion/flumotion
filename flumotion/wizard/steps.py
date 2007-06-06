@@ -518,6 +518,7 @@ class Webcam(VideoSource):
 
     # _sizes is probed, not set from the UI
     _sizes = None
+    _factoryName = None
     
     def setup(self):
         self.in_setup = True
@@ -581,7 +582,8 @@ class Webcam(VideoSource):
                 self.debug('no device %s' % device)
                 yield None
 
-            deviceName, sizes = result
+            deviceName, factoryName, sizes = result
+            self._factoryName = factoryName
             self._sizes = sizes
             self.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
@@ -621,6 +623,7 @@ class Webcam(VideoSource):
 
         options['device'] = self.combobox_device.get_string()
         options['width'] = w
+        options['element-factory'] = self._factoryName
         options['height'] = h
         options['framerate'] = '%d/%d' % (num, denom)
         options['mime'] = mime
