@@ -1,5 +1,12 @@
 2007-06-06  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/base/watcher.py:
+	  Don't leak files that were seen changing but not stable, then
+	  deleted. Remove code that deleted from the changing dict where it
+	  wasn't possibly there.
+
+2007-06-06  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	  Add a message to component state when we fail to parse a file.
 	  Remove this message if we later re-parse the file, or it is deleted.

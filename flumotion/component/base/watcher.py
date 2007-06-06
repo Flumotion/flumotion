@@ -130,10 +130,12 @@ class BaseWatcher(log.Loggable):
                 if f not in new:
                     # deletion
                     del stable[f]
-                    if f in changing:
-                        del changing[f]
                     self.debug('file %s has been deleted', f)
                     self.event('fileDeleted', f)
+            for f in changing.keys():
+                if f not in new:
+                    self.debug('file %s has been deleted', f)
+                    del changing[f]
             self._delayedCall = reactor.callLater(self.timeout,
                                                   checkFiles)
 
