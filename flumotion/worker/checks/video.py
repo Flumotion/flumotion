@@ -124,7 +124,7 @@ def checkWebcam(device, id):
 
     result = messages.Result()
 
-    d = tryV4L1()
+    d = tryV4L1(None)
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)
     d.addErrback(check.errbackResult, result, id, device)
