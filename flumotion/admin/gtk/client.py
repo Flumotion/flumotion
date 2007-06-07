@@ -334,7 +334,7 @@ class Window(log.Loggable, gobject.GObject):
         except Exception, e:
             msg = log.getExceptionMessage(e)
         self.debug('Setup instance %r' % instance)
-        if not d:
+        if not d and not msg:
             msg = "%r.setup() should return a deferred" % klass
 
         if msg:

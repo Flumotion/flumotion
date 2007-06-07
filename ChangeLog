@@ -1,5 +1,12 @@
 2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/gtk/client.py (Window._instanceSetup):
+	Fix bug where there is an exception in setup() of an
+	admin gtk, we instead always were outputting setup()
+	does not return a deferred.
+
+2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/basicwatchdog.py
 	  (SingleBasicWatchdog.eaterSetActive):
 	Bad logic in SingleBasicWatchdog. Fixed.
