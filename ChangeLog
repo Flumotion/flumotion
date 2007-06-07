@@ -1,3 +1,8 @@
+2007-06-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Handle non-ascii filenames properly. Assumes a UTF-8 filesystem.
+
 2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py (Switch.init,

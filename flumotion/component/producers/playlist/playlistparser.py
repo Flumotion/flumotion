@@ -302,11 +302,28 @@ class PlaylistXMLParser(PlaylistParser):
                 self.debug("Parsing entry")
                 self._parsePlaylistEntry(parser, child, id)
 
+    # A simplified private version of this code from fxml without the 
+    # undesirable unicode->str conversions.
+    def _parseAttributes(self, node, required, optional):
+        out = []
+        for k in required:
+            if node.hasAttribute(k):
+                out.append(node.getAttribute(k))
+            else:
+                raise fxml.ParserError("Missing required attribute %s" % k)
+
+        for k in optional:
+            if node.hasAttribute(k):
+                out.append(node.getAttribute(k))
+            else:
+                out.append(None)
+        return out
+
     def _parsePlaylistEntry(self, parser, entry, id):
         mandatory = ['filename', 'time']
         optional = ['duration', 'offset']
 
-        (filename, timestamp, duration, offset) = parser.parseAttributes(
+        (filename, timestamp, duration, offset) = self._parseAttributes(
             entry, mandatory, optional)
 
         if duration is not None:
@@ -316,6 +333,9 @@ class PlaylistXMLParser(PlaylistParser):
         offset = int(offset) * gst.SECOND
 
         timestamp = self._parseTimestamp(timestamp)
+
+        # Assume UTF-8 filesystem.
+        filename = filename.encode("UTF-8")
 
         self.addItemToPlaylist(filename, timestamp, duration, offset, id)
 
