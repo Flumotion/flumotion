@@ -39,7 +39,7 @@ class SingleBasicWatchdog(switch.SingleSwitch):
         switch.SingleSwitch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
         if "master" in eaterName:
-            self.switch_to("backup")
+            self.switch_to("master")
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"

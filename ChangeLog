@@ -1,3 +1,15 @@
+2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog.eaterSetActive):
+	Bad logic in SingleBasicWatchdog. Fixed.
+	* flumotion/component/combiners/switch/switch.py (Switch.eventStarted,
+	  Switch.eventStopped, SingleSwitch.eaterSetActive,
+	  AVSwitch._check_start_times_received, AVSwitch.eaterSetActive):
+	Finish off the deferred firing and callback on response to ical
+	events.
+	Untested!
+
 2007-06-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlistparser.py:

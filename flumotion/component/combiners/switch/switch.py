@@ -106,14 +106,24 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if self.pipeline:
             res = self.switch_to("backup")
             if not res:
-                self.warning("Event started but could not switch to backup")
+                self.warning("Event started but could not switch to backup"
+                    ", will switch when backup is back")
+                self._eaterReadyDefers["backup"] = defer.Deferred()
+                self._eaterReadyDefers["backup"].addCallback(
+                    lambda x: self.switchTo("backup"))
+                self._eaterReadyDefers["master"] = None
 
     def eventStopped(self, event):
         self.debug("event stopped %r", event)
         if self.pipeline:
             res = self.switch_to("master")
             if not res:
-                self.warning("Event stopped but could not switch to master")
+                self.warning("Event stopped but could not switch to master"
+                    ", will switch when master is back")
+                self._eaterReadyDefers["master"] = defer.Deferred()
+                self._eaterReadyDefers["master"].addCallback(
+                    lambda x: self.switchTo("master"))
+                self._eaterReadyDefers["backup"] = None
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"
@@ -186,7 +196,7 @@ class SingleSwitch(Switch):
         d = self._eaterReadyDefers[eaterName]
         if d:
             d.callback(True)
-        self._eaterReadyDefers[eaterName] = []
+        self._eaterReadyDefers[eaterName] = None
 
 class AVSwitch(Switch):
     logCategory = "comb-av-switch"
@@ -455,3 +465,17 @@ class AVSwitch(Switch):
             self.debug("eaterSwitchingTo becoming None from %s", self.eaterSwitchingTo)
             self.eaterSwitchingTo = None
             self._switchLock.release()
+
+    def eaterSetActive(self, feedId):
+        Switch.eaterSetActive(self, feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
+        d = None
+        if "master" in eaterName and self.is_active("master"):
+            d = self._eaterReadyDefers["master"]
+            self._eaterReadyDefers["master"] = None
+        elif "backup" in eaterName and self.is_active("backup"):
+            d = self._eaterReadyDefers["backup"]
+            self._eaterReadyDefers["backup"] = None
+        if d:
+            d.callback(True)
+
