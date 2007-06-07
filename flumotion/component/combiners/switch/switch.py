@@ -55,6 +55,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # was requested and the eater wasn't ready, it'll fire when ready
         # so the switch can be made
         self._eaterReadyDefers = { "master": None, "backup": None }
+        self._started = False
 
     def do_check(self):
         self.debug("checking whether switch element exists")
@@ -88,7 +89,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         
     def switch_to(self, eaterSubstring):
         raise errors.NotImplementedError('subclasses should implement '
-                                         'switchTo')
+                                         'switch_to')
 
     def is_active(self, eaterSubstring):
         # eaterSubstring is "master" or "backup"
@@ -110,7 +111,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                     ", will switch when backup is back")
                 self._eaterReadyDefers["backup"] = defer.Deferred()
                 self._eaterReadyDefers["backup"].addCallback(
-                    lambda x: self.switchTo("backup"))
+                    lambda x: self.switch_to("backup"))
                 self._eaterReadyDefers["master"] = None
 
     def eventStopped(self, event):
@@ -122,8 +123,14 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                     ", will switch when master is back")
                 self._eaterReadyDefers["master"] = defer.Deferred()
                 self._eaterReadyDefers["master"].addCallback(
-                    lambda x: self.switchTo("master"))
+                    lambda x: self.switch_to("master"))
                 self._eaterReadyDefers["backup"] = None
+
+    def do_pipeline_playing(self):
+        feedcomponent.MultiInputParseLaunchComponent.do_pipeline_playing(self)
+        # needed to stop the flapping between master and backup on startup
+        # in the watchdogs if the starting state is backup
+        self._started = True
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"
@@ -218,9 +225,9 @@ class AVSwitch(Switch):
         eaters = self.eater_names
 
         pipeline = "switch name=vswitch ! " \
-            "identity single-segment=true name=viden " \
+            "identity silent=true single-segment=true name=viden " \
             "switch name=aswitch ! " \
-            "identity single-segment=true name=aiden "
+            "identity silent=true single-segment=true name=aiden "
         for eater in eaters:
             if "video" in eater:
                 tmpl = '@ eater:%s @ ! vswitch. '
@@ -271,6 +278,7 @@ class AVSwitch(Switch):
         asw.set_property("active-pad",
             self.switchPads["audio-%s" % self._startingEater])
         self.uiState.set("active-eater", self._startingEater)
+        self.debug("active-eater set to %s", self._startingEater)
 
     # So switching audio and video is not that easy
     # We have to make sure the current segment on both

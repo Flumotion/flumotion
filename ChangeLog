@@ -1,5 +1,20 @@
 2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog.eaterSetActive,
+	  AVBasicWatchdog.eaterSetInactive, AVBasicWatchdog.eaterSetActive):
+	Add debug, check to see if component has started before switching
+	when eaters go inactive or active.
+	* flumotion/component/combiners/switch/switch.py (Switch.init,
+	  Switch.switch_to, Switch.eventStarted, Switch.eventStopped,
+	  Switch.do_pipeline_playing, AVSwitch.get_pipeline_string,
+	  AVSwitch.configure_pipeline):
+	Add a flag that denotes whether component has started or not, used
+	in watchdogs. Fix calls to non-existant methods. Make identity
+	elements silent.
+
+2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/gtk/client.py (Window._instanceSetup):
 	Fix bug where there is an exception in setup() of an
 	admin gtk, we instead always were outputting setup()
