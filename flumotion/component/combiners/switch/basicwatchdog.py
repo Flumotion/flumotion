@@ -31,13 +31,13 @@ class SingleBasicWatchdog(switch.SingleSwitch):
 
     def eaterSetInactive(self, feedId):
         switch.SingleSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feedId(feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
         if "master" in eaterName and self.isActive("backup"):
             self.switch_to("backup")
 
     def eaterSetActive(self, feedId):
         switch.SingleSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feedId(feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
         if "master" in eaterName:
             self.switch_to("backup")
 
@@ -46,13 +46,13 @@ class AVBasicWatchdog(switch.AVSwitch):
 
     def eaterSetInactive(self, feedId):
         switch.AVSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feedId(feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
         if "master" in eaterName and self.is_active("backup"):
             self.switch_to("backup")
 
     def eaterSetActive(self, feedId):
         switch.AVSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feedId(feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
         if "master" in eaterName and \
            self.uiState.get("active-eater") == "backup":
             self.switch_to("master")

@@ -1,3 +1,11 @@
+2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog.eaterSetInactive,
+	  SingleBasicWatchdog.eaterSetActive, AVBasicWatchdog.eaterSetInactive,
+	  AVBasicWatchdog.eaterSetActive):
+	Use renamed method name.
+
 2007-06-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/webcam/webcam.py
