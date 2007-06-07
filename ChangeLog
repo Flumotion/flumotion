@@ -1,5 +1,14 @@
 2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/switch.py (Switch.init,
+	  SingleSwitch.configure_pipeline, SingleSwitch.eaterSetActive,
+	  AVSwitch.configure_pipeline):
+	Add a set of deferreds and fire relevant ones when eater becomes
+	active for the SingleSwitch case.
+	Fix use of method name that has been renamed.
+
+2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/basicwatchdog.py
 	  (SingleBasicWatchdog.eaterSetInactive,
 	  SingleBasicWatchdog.eaterSetActive, AVBasicWatchdog.eaterSetInactive,

@@ -50,6 +50,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.uiState.addKey("active-eater")
         self.icalScheduler = None
         self._startingEater = "master"
+        # these deferreds will fire when relevant eaters are ready
+        # usually these will be None, but when a scheduled switch
+        # was requested and the eater wasn't ready, it'll fire when ready
+        # so the switch can be made
+        self._eaterReadyDefers = { "master": None, "backup": None }
 
     def do_check(self):
         self.debug("checking whether switch element exists")
@@ -144,7 +149,7 @@ class SingleSwitch(Switch):
                 sinkPadNumber)).get_peer().get_parent().get_name()
 
         for feedId in self.eater_names:
-            eaterName = self.get_eater_name_for_feedId(feedId)
+            eaterName = self.get_eater_name_for_feed_id(feedId)
             self.debug("feedId %s is mapped to eater name %s", feedId, 
                 eaterName)
             if eaterName:
@@ -174,6 +179,14 @@ class SingleSwitch(Switch):
             self.warning("Could not switch to %s because the %s eater "
                 "is not active." % (eater, eater))
         return False
+
+    def eaterSetActive(self, feedId):
+        Switch.eaterSetActive(self, feedId)
+        eaterName = self.get_eater_name_for_feed_id(feedId)
+        d = self._eaterReadyDefers[eaterName]
+        if d:
+            d.callback(True)
+        self._eaterReadyDefers[eaterName] = []
 
 class AVSwitch(Switch):
     logCategory = "comb-av-switch"
@@ -228,7 +241,7 @@ class AVSwitch(Switch):
                 sinkPadNumber)).get_peer().get_parent().get_name()
 
         for feedId in self.eater_names:
-            eaterName = self.get_eater_name_for_feedId(feedId)
+            eaterName = self.get_eater_name_for_feed_id(feedId)
             self.debug("feedId %s is mapped to eater name %s", feedId, 
                 eaterName)
             if eaterName:
