@@ -1,3 +1,14 @@
+2007-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (AVBasicWatchdog.eaterSetInactive, AVBasicWatchdog.eaterSetActive):
+	* flumotion/component/combiners/switch/switch.py (Switch.init,
+	  Switch.cb, Switch.eventStarted, Switch.eventStopped,
+	  SingleSwitch.configure_pipeline, AVSwitch.configure_pipeline):
+	Renamed startingEater to idealEater so the watchdog can know
+	which eater is the current one it should switch to when it comes
+	back online.
+
 2007-06-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py

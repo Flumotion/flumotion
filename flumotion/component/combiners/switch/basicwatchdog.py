@@ -50,17 +50,25 @@ class AVBasicWatchdog(switch.AVSwitch):
     def eaterSetInactive(self, feedId):
         switch.AVSwitch.eaterSetInactive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
-        if "master" in eaterName and self.is_active("backup") and \
-           self.uiState.get("active-eater") == "master" and self._started:
-            self.debug("Switching to backup active eater is %s",
+        oppositeEater = "backup"
+        if self._idealEater == "backup":
+            oppositeEater = "master"
+        if self._idealEater in eaterName and self.is_active(oppositeEater) and \
+           self.uiState.get("active-eater") == self._idealEater and \
+           self._started:
+            self.debug("Switching to %s, active eater is %s", oppositeEater,
                 self.uiState.get("active-eater"))
-            self.switch_to("backup")
+            self.switch_to(oppositeEater)
 
     def eaterSetActive(self, feedId):
         switch.AVSwitch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
-        if "master" in eaterName and self.is_active("master") and \
-           self.uiState.get("active-eater") == "backup" and self._started:
-            self.debug("Switching to master active eater is %s",
+        oppositeEater = "backup"
+        if self._idealEater == "backup":
+            oppositeEater = "master"
+        if self._idealEater in eaterName and self.is_active(self._idealEater) \
+           and self.uiState.get("active-eater") == oppositeEater and \
+           self._started:
+            self.debug("Switching to %s, active eater is %s", self._idealEater,
                 self.uiState.get("active-eater"))
-            self.switch_to("master")
+            self.switch_to(self._idealEater)
