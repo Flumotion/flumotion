@@ -28,6 +28,7 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
                                                 'outputColorbalance',
                                                 'Output Colorbalance')
         self.nodes['Colorbalance'] = colorbalance
+        return admin_gtk.BaseAdminGtk.setup(self)
 
     def component_effectPropertyChanged(self, effectName, propertyName, value):
         if not effectName == "outputColorbalance":

@@ -1,3 +1,8 @@
+2007-06-08  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/producers/bttv/admin_gtk.py (BTTVAdminGtk.setup):
+	Make sure setup() method returns a deffered.
+
 2007-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py
