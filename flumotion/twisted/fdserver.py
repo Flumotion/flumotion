@@ -141,7 +141,7 @@ class FDPassingBroker(pb.Broker, log.Loggable):
 
             try:
                 peeraddr = sock.getpeername()
-            except socket.error
+            except socket.error:
                 self.info("Socket disconnected before being passed to client")
                 sock.close()
                 return

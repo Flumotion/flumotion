@@ -1,6 +1,11 @@
 2007-06-11  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/twisted/fdserver.py:
+	  Add more colon for Dirty Andy.
+
+2007-06-11  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/twisted/fdserver.py:
 	  If we receive an unconnected socket, log this, close it, and return,
 	  rather than passing something that won't work properly to the new
 	  client.
