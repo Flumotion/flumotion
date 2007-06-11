@@ -254,13 +254,14 @@ def do_invoke(model, quit, avatarId, methodName, *args):
     quit()
 do_invoke = defer_generator(do_invoke)
 
-def do_workerinvoke(model, quit, workerName, methodName, *args):
+def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     if args:
         args = _parse_typed_args(args[0], args[1:])
         if args is None:
             yield None
 
-    d = model.callRemote('workerCallRemote', workerName, methodName, *args)
+    d = model.callRemote('workerCallRemote', workerName, 'runFunction',
+                         moduleName, methodName, *args)
     yield d
 
     try:
@@ -428,6 +429,7 @@ commands = (('getprop',
             ('workerinvoke',
              'invoke a function on a worker',
              (('worker-name', str),
+              ('module-name', str),
               ('method-name', str),
               ('args', str, None, True)),
              do_workerinvoke),

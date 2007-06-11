@@ -2,6 +2,7 @@
 
 	* flumotion/admin/command/commands.py (do_workerinvoke): Add new
 	command, invokes a function on a worker.
+	(do_workerinvoke): Fixor.
 
 2007-06-11  Michael Smith <msmith@fluendo.com>
 
