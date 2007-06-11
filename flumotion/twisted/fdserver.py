@@ -139,7 +139,12 @@ class FDPassingBroker(pb.Broker, log.Loggable):
             # So, we need to close the FD that we originally had...
             os.close(fd)
 
-            peeraddr = sock.getpeername()
+            try:
+                peeraddr = sock.getpeername()
+            except socket.error
+                self.info("Socket disconnected before being passed to client")
+                sock.close()
+                return
            
             # Based on bits in tcp.Port.doRead()
             addr = address._ServerFactoryIPv4Address('TCP', 
