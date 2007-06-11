@@ -209,6 +209,10 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
                 (first, last, fileSize))
             # Start sending from the requested position in the file
             if first:
+                # TODO: logs suggest this is called with negative values, figure
+                # out how
+                self.debug("Request for range \"%s\" of file, seeking to "
+                    "%d of total file size %d", ranges, first, fileSize)
                 f.seek(first)
           
         self.do_prepareBody(request, f, first, last)

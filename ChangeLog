@@ -1,5 +1,11 @@
 2007-06-11  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/file.py:
+	  Add a debug statement to help track down unexpected/unexplained
+	  exceptions in logs.
+
+2007-06-11  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/twisted/fdserver.py:
 	  Add more colon for Dirty Andy.
 
