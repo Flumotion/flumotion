@@ -254,6 +254,27 @@ def do_invoke(model, quit, avatarId, methodName, *args):
     quit()
 do_invoke = defer_generator(do_invoke)
 
+def do_workerinvoke(model, quit, workerName, methodName, *args):
+    if args:
+        args = _parse_typed_args(args[0], args[1:])
+        if args is None:
+            yield None
+
+    d = model.callRemote('workerCallRemote', workerName, methodName, *args)
+    yield d
+
+    try:
+        v = d.value()
+        print "Invoke of %s on %s was successful." % (methodName, workerName)
+        print v
+    except errors.NoMethodError:
+        print "No method '%s' on component '%s'" % (methodName, workerName)
+    except Exception, e:
+        raise
+
+    quit()
+do_workerinvoke = defer_generator(do_workerinvoke)
+
 def do_loadconfiguration(model, quit, confFile, saveAs):
     print 'Loading configuration from file: %s' % confFile
 
@@ -404,6 +425,12 @@ commands = (('getprop',
               ('method-name', str),
               ('args', str, None, True)),
              do_invoke),
+            ('workerinvoke',
+             'invoke a function on a worker',
+             (('worker-name', str),
+              ('method-name', str),
+              ('args', str, None, True)),
+             do_workerinvoke),
             ('loadconfiguration',
              'load configuration into the manager',
              (('conf-file', str),
