@@ -42,6 +42,7 @@ _initialized = False
 
 _stdout = None
 _stderr = None
+_old_hup_handler = None
    
 
 # public log levels
@@ -534,17 +535,24 @@ def outputToFiles(stdout, stderr):
     stdout then interleaved output may not appear in the order that you
     expect.
     """
-    global _stdout, _stderr
+    global _stdout, _stderr, _old_hup_handler
     _stdout, _stderr = stdout, stderr
     reopenOutputFiles()
 
     def sighup(signum, frame):
         info('log', "Received SIGHUP, reopening logs")
         reopenOutputFiles()
+        if _old_hup_handler:
+            info('log', "Calling old SIGHUP hander")
+            _old_hup_handler(signum, frame)
 
     debug('log', 'installing SIGHUP handler')
     import signal
-    signal.signal(signal.SIGHUP, sighup)
+    handler = signal.signal(signal.SIGHUP, sighup)
+    if handler == signal.SIG_DFL or handler == signal.SIG_IGN:
+        _old_hup_handler = None
+    else:
+        _old_hup_handler = handler
 
 
 # base class for loggable objects

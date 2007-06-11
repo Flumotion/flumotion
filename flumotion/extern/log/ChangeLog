@@ -1,3 +1,8 @@
+2007-06-11  Andy Wingo  <wingo@pobox.com>
+
+	* log.py (outputToFiles): Store the previous SIGHUP handler, if
+	any, and call it after rotating logs.
+
 2007-05-09  Andy Wingo  <wingo@pobox.com>
 
 	Patch by: Philippe Normand <philippe fluendo.com>
