@@ -215,7 +215,6 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         @rtype: L{twisted.internet.defer.Deferred} firing a keycard or None.
         """
         d = self.callRemote('authenticate', bouncerName, keycard)
-        d.addErrback(log.warningFailure)
         return d
 
     def removeKeycardId(self, bouncerName, keycardId):

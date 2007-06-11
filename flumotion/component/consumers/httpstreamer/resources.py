@@ -362,6 +362,9 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         self.debug('_render(): asked for (possible) authentication')
         d = self.startAuthentication(request)
         d.addCallback(self.handleAuthenticatedRequest, request)
+        # Authentication has failed and we've written a response; nothing 
+        # more to do
+        d.addErrback(lambda x: None)
 
         # we MUST return this from our _render.
         return server.NOT_DONE_YET

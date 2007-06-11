@@ -102,6 +102,8 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         d = self._component.startAuthentication(request)
         d.addCallback(self.renderAuthenticated, request)
         d.addCallback(terminateSimpleRequest, request)
+        # Authentication failed; nothing more to do.
+        d.addErrback(lambda x: None)
 
         return server.NOT_DONE_YET
 
