@@ -14,7 +14,6 @@
 	  <filename location="converters/__init__.py" />
           <filename location="encoders/__init__.py" />
           <filename location="muxers/__init__.py" />
-	  <filename location="combiners/__init__.py" />
           <filename location="consumers/__init__.py" />
           <filename location="bouncers/__init__.py" />
           <filename location="effects/__init__.py" />
