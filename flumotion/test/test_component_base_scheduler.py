@@ -96,8 +96,8 @@ class SchedulerTest(unittest.TestCase):
         end = now + timedelta(minutes=1)
 
         calls = []
-        started = lambda c: calls.append(('started', c))
-        stopped = lambda c: calls.append(('stopped', c))
+        started = lambda c: calls.append(('started', c.content))
+        stopped = lambda c: calls.append(('stopped', c.content))
             
         s = scheduler.Scheduler()
         sid = s.subscribe(started, stopped)

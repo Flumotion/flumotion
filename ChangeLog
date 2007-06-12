@@ -1,5 +1,14 @@
 2007-06-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/scheduler.py (Scheduler._eventStarted)
+	(Scheduler._eventStopped): Call eventStarted and eventStopped with
+	the whole event, not just the content. Fixes to match
+	documentation and the code in the disker.
+
+	* flumotion/test/test_component_base_scheduler.py
+	(SchedulerTest.testSimple): Expect the events, not the content in
+	the event callbacks.
+
 	* configure.ac: Only check for codegen things if we have the other
 	dependencies to build the trayicon (GTK and python.h). Now there
 	are no mandatory GTK+ checks, note that the pygtk one checks for

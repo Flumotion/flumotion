@@ -256,12 +256,12 @@ class Scheduler(log.Loggable):
     def _eventStarted(self, event):
         self.current.append(event)
         for started, _ in self.subscribers.values():
-            started(event.content)
+            started(event)
 
     def _eventStopped(self, event):
         self.current.remove(event)
         for _, stopped in self.subscribers.values():
-            stopped(event.content)
+            stopped(event)
 
     def _reschedule(self):
         def _getNextStart():
