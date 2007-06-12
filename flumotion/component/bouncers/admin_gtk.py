@@ -147,6 +147,6 @@ class HTPasswdCryptAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
     def cleanup(self):
-        self._nodes['Keycards'].cleanup()
+        self.nodes['Keycards'].cleanup()
 
 GUIClass = HTPasswdCryptAdminGtk

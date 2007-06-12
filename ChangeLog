@@ -1,3 +1,8 @@
+2007-06-12  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/bouncers/admin_gtk.py:
+	  Don't use variables that don't exist in HTPasswd bouncer admin.
+
 2007-06-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/webcam/webcam.py
