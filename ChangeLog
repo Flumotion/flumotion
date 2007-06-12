@@ -1,3 +1,8 @@
+2007-06-12  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/component.xml:
+	Bundle combiners.
+
 2007-06-11  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/commands.py (do_workerinvoke): Add new

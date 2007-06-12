@@ -10,7 +10,8 @@
         <directory name="flumotion/component">
           <filename location="__init__.py" />
           <filename location="producers/__init__.py" />
-          <filename location="converters/__init__.py" />
+          <filename location="combiners/__init__.py" />
+	  <filename location="converters/__init__.py" />
           <filename location="encoders/__init__.py" />
           <filename location="muxers/__init__.py" />
 	  <filename location="combiners/__init__.py" />
