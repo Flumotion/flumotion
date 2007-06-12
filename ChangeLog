@@ -1,3 +1,10 @@
+2007-06-12  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Only check for codegen things if we have the other
+	dependencies to build the trayicon (GTK and python.h). Now there
+	are no mandatory GTK+ checks, note that the pygtk one checks for
+	pygtk.py, a part of pygobject. Fixes #224.
+
 2007-06-12  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/bouncers/admin_gtk.py:

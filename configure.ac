@@ -66,19 +66,6 @@ AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
 PYTHONPATH=$as_save_PYTHONPATH
 export PYTHONPATH
 
-PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
-dnl check stuff we can generate the tray icon with
-AC_MSG_CHECKING(for pygtk codegen)
-PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"
-dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
-AC_SUBST(PYGTK_CODEGEN)
-AC_MSG_RESULT($PYGTK_CODEGEN)
-
-AC_MSG_CHECKING(for pygtk defsdir)
-PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
-AC_SUBST(PYGTK_DEFSDIR)
-AC_MSG_RESULT($PYGTK_DEFSDIR)
-
 PKG_CHECK_MODULES(GTK, gtk+-2.0, HAVE_GTK=yes, HAVE_GTK=no)
 
 # decide on tray icon
@@ -97,6 +84,19 @@ fi
 if test "x$BUILD_TRAYICON" = "xyes"
 then
   AC_MSG_NOTICE([Building tray icon])
+
+  PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
+  dnl check stuff we can generate the tray icon with
+  AC_MSG_CHECKING(for pygtk codegen)
+  PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"
+  dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
+  AC_SUBST(PYGTK_CODEGEN)
+  AC_MSG_RESULT($PYGTK_CODEGEN)
+
+  AC_MSG_CHECKING(for pygtk defsdir)
+  PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
+  AC_SUBST(PYGTK_DEFSDIR)
+  AC_MSG_RESULT($PYGTK_DEFSDIR)
 fi
 
 AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
