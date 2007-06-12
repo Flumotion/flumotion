@@ -463,7 +463,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.connect('client-removed', self._client_removed_cb)
 
         if properties.has_key('client-limit'):
-            self.resource.setUserLimit(int(properties['client-limit']))
+            limit = int(properties['client-limit'])
+            self.resource.setUserLimit(limit)
+            if limit != self.resource.maxclients:
+                self.addMessage(
+                    messages.Info(T_(N_("Unable to set the maximum "
+                                        "client limit to %d clients."),
+                                     limit),
+                                  debug=("Your system has limited "
+                                         "the ability to open file "
+                                         "descriptors. Check your "
+                                         "limits.conf to see how to "
+                                         "raise this limit.")))
 
         if properties.has_key('bandwidth-limit'):
             limit = int(properties['bandwidth-limit'])

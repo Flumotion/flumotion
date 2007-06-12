@@ -1,3 +1,20 @@
+2007-06-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/webcam/webcam.py
+	(Webcam.get_pipeline_string): (comment)
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.configure_pipeline): Add a message if we have
+	to reduce the client limit, fixes #214.
+
+	* flumotion/wizard/steps.py (HTTP): Hook up the checkbuttons to
+	spinbutton sensitivity, and only save limits if the checkbuttons
+	were on.
+
+	* data/glade/wizard_http.glade: Add checkbuttons beside user-limit
+	and bandwidth-limit. Bandwidth limiting defaults to off. Default
+	to a user limit of 500 to avoid rlimit issues.
+
 2007-06-12  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/component.xml:

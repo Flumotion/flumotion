@@ -54,7 +54,7 @@ class Webcam(feedcomponent.ParseLaunchComponent):
 
         if factory_name == 'v4lsrc':
             factory_name += ' autoprobe=false autoprobe-fps=false copy-mode=1'
-        # FIXME: copy-mode for v4l2src needs implementation in the plugin
+        # v4l2src automatically copies
         
         # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
         # hack in 0.9 to work around, not in 0.8

@@ -1262,6 +1262,10 @@ class HTTP(WizardStep):
         d.addCallback(got_missing)
         
     def verify(self):
+        self.spinbutton_client_limit.set_sensitive(
+            self.checkbutton_client_limit.get_active())
+        self.spinbutton_bandwidth_limit.set_sensitive(
+            self.checkbutton_bandwidth_limit.get_active())
         self.wizard.block_next(self._missing_elements or
                                self.entry_mount_point.get_text() == '')
         
@@ -1279,11 +1283,23 @@ class HTTP(WizardStep):
 
         options['bandwidth-limit'] = int(options['bandwidth-limit'] * 1e6)
         options['client-limit'] = int(options['client-limit'])
+
+        if not self.checkbutton_bandwidth_limit.get_active():
+            del options['bandwidth-limit']
+        if not self.checkbutton_client_limit.get_active():
+            del options['client-limit']
+
         options['port'] = int(options['port'])
  
         return options
 
     def on_entry_mount_point_changed(self, entry):
+        self.verify()
+
+    def on_checkbutton_client_limit_toggled(self, *args):
+        self.verify()
+
+    def on_checkbutton_bandwidth_limit_toggled(self, *args):
         self.verify()
 
 class HTTPBoth(HTTP):
