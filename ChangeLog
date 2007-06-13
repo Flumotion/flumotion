@@ -1,5 +1,10 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/client.py (Window.admin_disconnected_cb):
+	Disconnect from the planet state, clear messages, and clear the
+	component list when we disconnect, not when we reconnect. Fixes
+	#520 and similar.
+
 	* flumotion/twisted/flavors.py
 	(StateRemoteCache._notifyListeners): Warn if an exception is
 	raised in a StateCache handler. Fixes #512.

@@ -341,8 +341,6 @@ class Window(log.Loggable, gobject.GObject):
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
  
-        self._clearMessages()
-
     def _clearMessages(self):
         self._messages_view.clear()
         pstate = self._planetState
@@ -390,10 +388,6 @@ class Window(log.Loggable, gobject.GObject):
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
-        if self._planetState:
-            self._planetState.removeListener(self)
-            self._planetState = None
-        
         self.info('Connected to manager')
         if self._disconnected_dialog:
             self._disconnected_dialog.destroy()
@@ -417,6 +411,13 @@ class Window(log.Loggable, gobject.GObject):
             self.runWizard()
     
     def admin_disconnected_cb(self, admin):
+        self._components = {}
+        self.update_components()
+        self._clearMessages()
+        if self._planetState:
+            self._planetState.removeListener(self)
+            self._planetState = None
+        
         message = _("Lost connection to manager, reconnecting ...")
         d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
