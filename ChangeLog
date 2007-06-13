@@ -1,5 +1,8 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* data/glade/admin.glade: Prevent irritating effect whereby
+	component UI can leave artifacts on the vpane's handle.
+
 	* flumotion/admin/gtk/client.py (Window.admin_disconnected_cb):
 	Disconnect from the planet state, clear messages, and clear the
 	component list when we disconnect, not when we reconnect. Fixes
