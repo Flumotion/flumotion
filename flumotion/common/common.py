@@ -123,6 +123,18 @@ def formatTime(seconds, fractional=0):
 
     return " ".join(chunks)
 
+def formatTimeStamp(timeOrTuple):
+    """
+    Format a timestamp in a human-readable format.
+
+    @param timeOrTuple: the timestamp to format
+    @type  timeOrTuple: something that time.strftime will accept
+
+    @rtype: string
+    @returns: a nicely formatted timestamp string.
+    """
+    return time.strftime("%Y-%m-%d %H:%M %Z", timeOrTuple)
+
 def version(binary):
     """
     Print a version block for the flumotion binaries.

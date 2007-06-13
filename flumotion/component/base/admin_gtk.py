@@ -520,21 +520,21 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def setFeederClientLastConnect(self, state, value):
         if value:
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._lastConnect = value
             self.updateConnectionTime()
 
     def setFeederClientLastDisconnect(self, state, value):
         if value:
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['disconnected-since'].set_text(text)
             self._lastDisconnect = value
             self.updateDisconnectionTime()
 
     def setFeederClientLastActivity(self, state, value):
         if value:
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['last-activity'].set_text(text)
 
     def setFeederClientFD(self, state, value):
@@ -718,7 +718,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'timeTimestampDiscont':
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['timestamp-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_timestamp_discont_current.show()
@@ -743,7 +743,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'timeOffsetDiscont':
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['offset-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_offset_discont_current.show()
@@ -797,7 +797,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
 
     def _setEaterLastConnect(self, state, value):
         if value:
-            text = time.strftime("%c", time.localtime(value))
+            text = common.formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._table_connected.show()
             self._table_disconnected.hide()

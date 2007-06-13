@@ -1,5 +1,24 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/eaters.glade: 
+	* flumotion/component/base/feeders.glade: Fix some spacing issues;
+	unfortunately one of the things that we have lost is consistent
+	horizontal alignment between column 2 of different tables.
+	Something to fix in the future. But do not do so via reintroducing
+	homogeneous tables, that makes the page way too wide. See #540.
+
+	* flumotion/component/base/admin_gtk.py
+	(FeedersAdminGtkNode.setFeederClientLastConnect)
+	(FeedersAdminGtkNode.setFeederClientLastDisconnect)
+	(FeedersAdminGtkNode.setFeederClientLastActivity)
+	(EatersAdminGtkNode._setEaterConnectionItem)
+	(EatersAdminGtkNode._setEaterConnectionItem)
+	(EatersAdminGtkNode._setEaterLastConnect): Use formatTimestamp so
+	that the timestamp isn't quite so wide.
+
+	* flumotion/common/common.py (formatTimeStamp): New function,
+	formats a timestamp.
+
 	* data/glade/admin.glade: Prevent irritating effect whereby
 	component UI can leave artifacts on the vpane's handle.
 
