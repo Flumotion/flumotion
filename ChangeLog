@@ -1,5 +1,8 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/bundle.py (Unbundler.unbundle): Write files
+	atomically. Fixes #373.
+
 	* flumotion/admin/admin.py (AdminModel.connectToManager): 
 	* flumotion/job/job.py (JobMedium._createComponent): 
 	* flumotion/worker/medium.py (WorkerMedium.startConnecting): 

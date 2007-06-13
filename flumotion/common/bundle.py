@@ -28,6 +28,7 @@ import md5
 import os
 import sys
 import zipfile
+import tempfile
 import StringIO
 
 from flumotion.common import errors, dag
@@ -156,9 +157,13 @@ class Unbundler:
                 if err.errno != errno.EEXIST or not os.path.isdir(parent):
                     raise
             data = zip.read(filepath)
-            handle = open(path, 'wb')
+
+            # atomically write to path, see #373
+            fd, tempname = tempfile.mkstemp(dir=parent)
+            handle = os.fdopen(fd)
             handle.write(data)
             handle.close()
+            os.rename(tempname, path)
         return dir
         
 class Bundler:
