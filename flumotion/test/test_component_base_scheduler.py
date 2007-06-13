@@ -104,7 +104,12 @@ class SchedulerTest(unittest.TestCase):
 
         self.assertEquals(calls, [])
 
+        s.addEvent(start, end, 'foo', now=now)
+        # add again to show that the same event, added twice, is treated
+        # as one, and that the new returned event can always be passed
+        # to removeEvent
         e = s.addEvent(start, end, 'foo', now=now)
+        s.addEvent(start, end, 'foo', now=now)
 
         self.assertEquals(calls, [('started', 'foo')])
         self.assertEquals(s.getCurrentEvents(), ['foo'])

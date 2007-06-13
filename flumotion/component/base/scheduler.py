@@ -113,6 +113,9 @@ class Event(log.Loggable):
     def toTuple(self):
         return self.start, self.end, self.content, self.recur
 
+    def __repr__(self):
+        return '<Event %r>' % (self.toTuple(),)
+
     def __lt__(self, other):
         return self.toTuple() < other.toTuple()
 
@@ -121,6 +124,22 @@ class Event(log.Loggable):
 
     def __eq__(self, other):
         return self.toTuple() == other.toTuple()
+
+
+class EventStore(avltree.AVLTree, log.Loggable):
+    def __init__(self, events):
+        avltree.AVLTree.__init__(self)
+        for event in events:
+            self.insert(event)
+
+    def insert(self, event):
+        try:
+            avltree.AVLTree.insert(self, event)
+            return True
+        except ValueError:
+            self.warning('an identical event to %r already exists in '
+                         'store', event)
+            return False
 
 
 class Scheduler(log.Loggable):
@@ -161,10 +180,10 @@ class Scheduler(log.Loggable):
             self.warning('attempted to schedule event in the past: %r',
                          event)
         else:
-            self.events.insert(event)
-            if event.start < now:
-                self._eventStarted(event)
-        self._reschedule()
+            if self.events.insert(event):
+                if event.start < now:
+                    self._eventStarted(event)
+                self._reschedule()
         return event
 
     def removeEvent(self, event):
@@ -192,9 +211,9 @@ class Scheduler(log.Loggable):
         now = datetime.now()
         for event in events:
             if event.end > now:
-                self.events.insert(event)
-                if event.start < now:
-                    self._eventStarted(event)
+                if self.events.insert(event):
+                    if event.start < now:
+                        self._eventStarted(event)
         if events:
             self._reschedule()
 
@@ -209,7 +228,7 @@ class Scheduler(log.Loggable):
         @type  events: a sequence of Event
         """
         now = datetime.now(LOCAL)
-        self.events = avltree.AVLTree(events)
+        self.events = EventStore(events)
         current = []
         for event in self.events:
             if now < event.start:

@@ -1,5 +1,15 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component_base_scheduler.py
+	(SchedulerTest.testSimple): Add test.
+
+	* flumotion/component/base/scheduler.py (Event.__repr__): Add a
+	nice repr.
+	(EventStore): New class inheriting from AVLTree, warns when an
+	identical event is added instead of throwing an exception.
+	(Scheduler.replaceEvents): Use EventStore rather than the base
+	AVLTree.
+
 	* flumotion/admin/gtk/client.py (Window.__init__)
 	(Window._setAdminModel, Window._create_ui, show_component)
 	(_instanceSetup, _setupCallback, _setupErrback)
