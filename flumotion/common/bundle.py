@@ -160,7 +160,7 @@ class Unbundler:
 
             # atomically write to path, see #373
             fd, tempname = tempfile.mkstemp(dir=parent)
-            handle = os.fdopen(fd)
+            handle = os.fdopen(fd, 'wb')
             handle.write(data)
             handle.close()
             os.rename(tempname, path)

@@ -2,6 +2,7 @@
 
 	* flumotion/common/bundle.py (Unbundler.unbundle): Write files
 	atomically. Fixes #373.
+	(Unbundler.unbundle): Er, fdopen with 'wb'.
 
 	* flumotion/admin/admin.py (AdminModel.connectToManager): 
 	* flumotion/job/job.py (JobMedium._createComponent): 
