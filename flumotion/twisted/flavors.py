@@ -28,6 +28,8 @@ Inspired by L{twisted.spread.flavors}
 from twisted.internet import defer
 from twisted.spread import pb
 from zope.interface import Interface
+from flumotion.common import log
+
 
 ### Generice Cacheable/RemoteCache for state objects
 class IStateListener(Interface):
@@ -327,7 +329,12 @@ class StateRemoteCache(pb.RemoteCache):
         self._ensureListeners()
         for proc in [tup[index] for tup in self._listeners.values()]:
             if proc:
-                proc(self, *args)
+                try:
+                    proc(self, *args)
+                except Exception, e:
+                    # These are all programming errors
+                    log.warning(None, 'Exception in StateCache handler: %s',
+                                log.getExceptionMessage(e))
         
     def observe_set(self, key, value):
         self._dict[key] = value

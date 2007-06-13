@@ -1,3 +1,9 @@
+2007-06-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/flavors.py
+	(StateRemoteCache._notifyListeners): Warn if an exception is
+	raised in a StateCache handler. Fixes #512.
+
 2007-06-13  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
