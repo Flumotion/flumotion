@@ -1,3 +1,12 @@
+2007-06-13  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  Raise appropriate exceptions rather than KeyError or AttributeError
+	  when invoking remote methods on already-deleted components.
+	  Raise a more specific exception type when trying to stop a component
+	  that is already stopped.
+	  Fixes #652, #653, #654.
+
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_component_base_scheduler.py

@@ -768,7 +768,14 @@ class Vishnu(log.Loggable):
             self.debug("Pending mood is %r", componentState.get('moodPending'))
             raise errors.BusyComponentError(componentState)
 
-        avatar = self.getComponentMapper(componentState).avatar
+        m = self.getComponentMapper(componentState)
+        if not m:
+            # We have a stale componentState for an already-deleted component
+            self.warning("Component mapper for component state %r doesn't exist", 
+                componentState)
+            raise errors.UnknownComponentError(componentState)
+
+        avatar = m.avatar
         if not avatar:
             # reset moodPending if asked to stop without an avatar
             # because we changed above to allow stopping even if
@@ -787,7 +794,7 @@ class Vishnu(log.Loggable):
             msg = 'asked to stop a component without avatar in mood %s' % \
                     moods.get(componentState.get('mood'))
             self.warning(msg)
-            return defer.fail(errors.ComponentError(msg))
+            return defer.fail(errors.ComponentMoodError(msg))
 
         d = avatar.mindCallRemote('stop')
         def cleanupAndDisconnectComponent(result):
@@ -1214,6 +1221,9 @@ class Vishnu(log.Loggable):
         """
         self.debug('deleting component %r from state', componentState)
         c = componentState
+        if c not in self._componentMappers:
+            raise errors.UnknownComponentError(c)
+
         flow = componentState.get('parent')
         if (c.get('moodPending') != None
             or c.get('mood') is not moods.sleeping.value):
