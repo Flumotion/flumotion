@@ -36,6 +36,9 @@ class ConfigError(Exception):
 class NoProjectError(Exception):
     "The given project does not exist"
 
+class NoSSLError(Exception):
+    "SSL is not available"
+
 # connection errors
 class ConnectionError(pb.Error):
     "General connection error"

@@ -261,6 +261,8 @@ class JobMedium(medium.BaseMedium):
         transport = self._managerTransport
         self.debug('logging in with authenticator %r' % self._authenticator)
         if transport == "ssl":
+            from flumotion.common import common
+            common.assertSSLAvailable()
             from twisted.internet import ssl
             self.info('Connecting to manager %s:%d with SSL' % (host, port))
             reactor.connectSSL(host, port, managerClientFactory,

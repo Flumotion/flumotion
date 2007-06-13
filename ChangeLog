@@ -1,3 +1,17 @@
+2007-06-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/admin.py (AdminModel.connectToManager): 
+	* flumotion/job/job.py (JobMedium._createComponent): 
+	* flumotion/worker/medium.py (WorkerMedium.startConnecting): 
+	* flumotion/common/server.py (Server.startSSL): When asked to
+	listen or connect with SSL, first assert that it is available, so
+	that we get a common exception. Fixes #371.
+	
+	* flumotion/common/errors.py (NoSSLError): 
+	* flumotion/common/common.py (assertSSLAvailable): New utility,
+	asserts that SSL is available, raising NoSSLError if that is not
+	the case.
+
 2007-06-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/scheduler.py (Scheduler._eventStarted)

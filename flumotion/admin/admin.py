@@ -207,6 +207,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         self.clientFactory.startLogin(connectionInfo.authenticator)
 
         if connectionInfo.use_ssl:
+            common.assertSSLAvailable()
             from twisted.internet import ssl
             reactor.connectSSL(connectionInfo.host, connectionInfo.port,
                                self.clientFactory, ssl.ClientContextFactory())

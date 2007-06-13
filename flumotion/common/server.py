@@ -91,6 +91,9 @@ class Server(log.Loggable):
         @returns: {twisted.internet.interfaces.IListeningPort} on which
         we are listening; call .stopListening() to stop.
         """
+        from flumotion.common import common
+        common.assertSSLAvailable()
+
         # if no path in pemFile, then look for it in the config directory
         if not os.path.split(pemFile)[0]:
             pemFile = os.path.join(configDir, pemFile)

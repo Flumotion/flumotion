@@ -800,3 +800,12 @@ def strToBool(string):
         return True
 
     return False
+
+def assertSSLAvailable():
+    """Assert that twisted has support for SSL connections.
+    """
+    from twisted.internet import posixbase
+    from flumotion.common import errors
+
+    if not posixbase.sslEnabled:
+        raise errors.NoSSLError()

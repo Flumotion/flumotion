@@ -147,6 +147,8 @@ class WorkerMedium(medium.PingingMedium):
         self.factory.startLogin(info.authenticator)
 
         if info.use_ssl:
+            from flumotion.common import common
+            common.assertSSLAvailable()
             from twisted.internet import ssl
             reactor.connectSSL(info.host, info.port, self.factory,
                                ssl.ClientContextFactory())
