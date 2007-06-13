@@ -159,7 +159,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     gsignal('connection-refused')
     gsignal('connection-failed', str)
     gsignal('connection-error', object)
-    gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
     gsignal('message', str)
     gsignal('update')

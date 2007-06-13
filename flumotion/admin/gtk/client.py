@@ -72,9 +72,6 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('creating UI')
         self._trayicon = None
 
-        # current component's UI;
-        # L{flumotion.component.base.admin_gtk.BaseAdminGtk}
-        self.current_component = None
         self.current_component_state = None # its state
 
         self._create_ui()
@@ -113,8 +110,6 @@ class Window(log.Loggable, gobject.GObject):
                            self.admin_connection_refused_cb)
         self.admin.connect('connection-failed',
                            self.admin_connection_failed_cb)
-        self.admin.connect('component-property-changed',
-            self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
 
     # default Errback
@@ -162,7 +157,6 @@ class Window(log.Loggable, gobject.GObject):
 
         # the widget containing the component view
         self._component_view = widgets['component_view']
-        self._component_view_clear()
  
         window.connect('delete-event', self.close)
 
@@ -245,196 +239,6 @@ class Window(log.Loggable, gobject.GObject):
         d = dialogs.ErrorDialog(message, parent, close_on_response)
         d.show_all()
         return d
-
-    # FIXME(wingo): use common.bundleclient
-    # FIXME: this method uses a file and a methodname as entries
-    # FIXME: do we want to switch to imports instead so the whole file
-    # is available in its namespace ?
-    # FIXME: factor this out into a ComponentView or SidePaneView class
-    # so we can reuse it
-    def show_component(self, state, entryPath, fileName, methodName, data):
-        """
-        Show the user interface for this component.
-        Searches data for the given methodName global,
-        then instantiates an object from that class,
-        and calls the render() method.
-
-        @type  state:      L{flumotion.common.planet.AdminComponentState}
-        @param entryPath:  absolute path to the cached base directory
-        @param fileName:   path to the file with the entry point, under
-                           entryPath
-        @param methodName: name of the method to instantiate the
-                           L{flumotion.component.base.admin_gtk.BaseAdminGtk}
-                           UI view
-        @param data:       the python code to load
-        """
-        # methodName has historically been GUIClass
-
-        instance = None
-
-        name = getComponentLabel(state)
-        self.statusbar.set('main', _("Loading UI for %s ...") % name)
-
-        moduleName = common.pathToModuleName(fileName)
-        statement = 'import %s' % moduleName
-        self.debug('running %s' % statement)
-        try:
-            exec(statement)
-        except SyntaxError, e:
-            # the syntax error can happen in the entry file, or any import
-            where = getattr(e, 'filename', "<entry file>")
-            lineno = getattr(e, 'lineno', 0)
-            msg = "Syntax Error at %s:%d while executing %s" % (
-                where, lineno, fileName)
-            self.warning(msg)
-            raise errors.EntrySyntaxError(msg)
-        except NameError, e:
-            msg = "NameError at while executing %s: %s" % (
-                fileName, " ".join(e.args))
-            raise
-            self.warning(msg)
-            raise errors.EntrySyntaxError(msg)
-        except ImportError, e:
-            msg = "ImportError while executing %s: %s" % (fileName,
-                " ".join(e.args))
-            self.warning(msg)
-            raise errors.EntrySyntaxError(msg)
-
-        # make sure we're running the latest version
-        module = reflect.namedAny(moduleName)
-        rebuild.rebuild(module)
-
-        # check if we have the method
-        if not hasattr(module, methodName):
-            msg = 'method %s not found in file %s' % (
-                methodName, fileName)
-            self.warning(msg)
-
-            m = messages.Error(T_(
-                N_("This component has a UI bug.")),
-                    debug=msg,
-                    id=methodName)
-            self._messages_view.add_message(m)
-
-            # FIXME: something more detailed as an error ?
-            raise errors.FlumotionError(msg)
-        klass = getattr(module, methodName)
-
-        # instantiate the GUIClass
-        instance = klass(state, self.admin)
-        self.debug("Created entry instance %r" % instance)
-        self._instanceSetup(instance, klass, name)
-
-    def _instanceSetup(self, instance, klass, name):
-        self.debug('Setting up instance %r' % instance)
-        msg = None
-        d = None
-        try:
-            d = instance.setup()
-        except Exception, e:
-            msg = log.getExceptionMessage(e)
-        self.debug('Setup instance %r' % instance)
-        if not d and not msg:
-            msg = "%r.setup() should return a deferred" % klass
-
-        if msg:
-            self.warning('Component UI bug: %s' % msg)
-            m = messages.Error(T_(
-                N_("This component has a UI bug.")),
-                    debug=msg,
-                    id=name)
-            self._messages_view.add_message(m)
-            return
-
-        d.addCallback(self._setupCallback, name, instance)
-        d.addErrback(self._setupErrback, name)
-
-    def _setupCallback(self, result, name, instance):
-        notebook = gtk.Notebook()
-        nodeWidgets = {}
-        nodes = instance.getNodes()
-        self.statusbar.clear('main')
-        # create pages for all nodes, and just show a loading label for
-        # now
-        for node in nodes.values():
-            self.debug("Creating node for %s" % node.title)
-            label = gtk.Label(_('Loading UI for %s ...') % node.title)
-            table = gtk.Table(1, 1)
-            table.add(label)
-            nodeWidgets[node.title] = table
-
-            notebook.append_page(table, gtk.Label(node.title))
-            
-        # put "loading" widget in
-        self._component_view_set_widget(notebook)
-
-        # trigger node rendering
-        d = defer.Deferred()
-
-        for node in nodes.values():
-            mid = self.statusbar.push('notebook',
-                _("Loading tab %s for %s ...") % (node.title, name))
-            node.statusbar = self.statusbar # hack
-            self.debug('adding callback for %s node.render()' % node.title)
-            d.addCallback(lambda _, n: n.render(), node)
-            d.addCallback(self._nodeRenderCallback, node.title,
-                nodeWidgets, mid)
-            d.addErrback(self._nodeRenderErrback, node.title)
-
-        d.addCallback(self._setCurrentComponentCallback, instance)
-
-        d.callback(None)
-        return d
-
-    def _setupErrback(self, failure, name):
-        self.warning('Could not setup component %s' % name)
-        msg = 'Could not setup component %s: %s' % (name,
-            log.getFailureMessage(failure))
-        self.debug(msg)
-        m = messages.Error(T_(
-                N_("This component has a UI bug.")),
-                    debug=msg,
-                    id=name)
-        self._messages_view.add_message(m)
-
-    # called when one node gets rendered
-    def _nodeRenderCallback(self, widget, nodeName, nodeWidgets, mid):
-        # used by show_component
-        self.debug("Got sub widget %r" % widget)
-        self.statusbar.remove('notebook', mid)
-
-        # clear out any old node widgets with the same name
-        table = nodeWidgets[nodeName]
-        for w in table.get_children():
-            table.remove(w)
-        
-        if not widget:
-            self.warning(".render() did not return an object")
-            widget = gtk.Label(_('%s does not have a UI yet') % nodeName)
-        else:
-            parent = widget.get_parent()
-            if parent:
-                parent.remove(widget)
-            
-        table.add(widget)
-        widget.show()
-
-    def _nodeRenderErrback(self, failure, nodeName):
-        self.warning('Could not render node %s' % nodeName)
-        debug = log.getFailureMessage(failure)
-        if failure.check(errors.NoBundleError):
-            debug = "Could not get bundle %s" % failure.value.args[0]
-        msg = 'Could not render node %s: %s' % (nodeName, debug)
-        self.debug(msg)
-        m = messages.Error(T_(
-                N_("This component has a UI bug in the %s tab."), nodeName),
-                    debug=msg,
-                    id=nodeName)
-        self._messages_view.add_message(m)
-
-    def _setCurrentComponentCallback(self, _, instance):
-        self.debug('setting current_component to %r' % instance)
-        self.current_component = instance
 
     def componentCallRemoteStatus(self, state, pre, post, fail,
                                   methodName, *args, **kwargs):
@@ -559,7 +363,6 @@ class Window(log.Loggable, gobject.GObject):
             if value == moods.sleeping.value:
                 if state.get('name') == current:
                     self._clearMessages()
-                    self._component_view_clear()
 
     def whsAppend(self, state, key, value):
         if key == 'names':
@@ -577,7 +380,6 @@ class Window(log.Loggable, gobject.GObject):
         # if this component was selected, clear selection
         if self.current_component_state == state:
             self.debug('removing currently selected component state')
-            self.current_component = None
             self.current_component_state = None
         # FIXME: would be nicer to do this incrementally instead
         self.update_components()
@@ -604,7 +406,8 @@ class Window(log.Loggable, gobject.GObject):
 
         self.emit('connected')
 
-        # get initial info we need
+        self._component_view.set_single_admin(admin)
+
         self.setPlanetState(self.admin.planet)
 
         if not self._components:
@@ -663,17 +466,6 @@ class Window(log.Loggable, gobject.GObject):
         reactor.callLater(0, self.admin_connection_failed_later, admin, reason)
         log.debug('adminclient', "handled connection-failed")
 
-    # FIXME: deprecated
-    def property_changed_cb(self, admin, componentName, propertyName, value):
-        # called when a property for that component has changed
-        current = self.components_view.get_selected_name()
-        if current != componentName:
-            return
-
-        comp = self.current_component
-        if comp:
-            comp.propertyChanged(propertyName, value)
-         
     def start_stop_notify_cb(self, *args):
         can_start = self.components_view.get_property('can-start-any')
         can_stop = self.components_view.get_property('can-stop-any')
@@ -708,31 +500,11 @@ class Window(log.Loggable, gobject.GObject):
         d['toolbutton_delete_component'].set_sensitive(can_delete)
         self.debug('can start %r, can stop %r' % (can_start, can_stop))
 
-    # clear the component view in the sidepane.  Called when the current
-    # component goes sleeping
-    def _component_view_clear(self):
-        empty = gtk.Label("")
-        self._component_view_set_widget(empty)
-
-    # set the given widget in the component view
-    def _component_view_set_widget(self, widget):
-        for c in self._component_view.get_children():
-            self._component_view.remove(c)
-        self._component_view.add(widget)
-        widget.show_all()
-
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
         def compSet(state, key, value):
-            if key == 'message':
-                self.statusbar.set('main', value)
-            elif key == 'mood':
+            if key == 'mood':
                 self._set_stop_start_component_sensitive()
-                current = self.components_view.get_selected_name()
-                if value == moods.sleeping.value:
-                    if state.get('name') == current:
-                        self._clearMessages()
-                        self._component_view_clear()
 
         def compAppend(state, key, value):
             name = state.get('name')
@@ -749,87 +521,43 @@ class Window(log.Loggable, gobject.GObject):
                 current = self.components_view.get_selected_name()
                 if name == current:
                     self._messages_view.clear_message(value.id)
-            self._set_stop_start_component_sensitive()
 
         if self.current_component_state:
             self.current_component_state.removeListener(self)
         self.current_component_state = state
         if self.current_component_state:
-            self.current_component_state.addListener(self, compSet,
-                                                     compAppend,
-                                                     compRemove)
+            self.current_component_state.addListener(
+                self, compSet, compAppend, compRemove)
 
         self._set_stop_start_component_sensitive()
-
-        if not state:
-            self.debug('no state, returning')
-            return
-
-        name = getComponentLabel(state)
-        mood = state.get('mood')
-        messages = state.get('messages')
+        self._component_view.show_object(state)
         self._clearMessages()
-        self._component_view_clear()
 
-        if messages:
-            for m in messages:
-                self.debug('have message %r' % m)
-                self._messages_view.add_message(m)
+        if state:
+            name = getComponentLabel(state)
 
-        if mood == moods.sad.value:
-            self.debug('component %s is sad' % name)
-            self.statusbar.set('main',
-                _("Component %s is sad") % name)
-           
-            return
+            messages = state.get('messages')
+            if messages:
+                for m in messages:
+                    self.debug('have message %r' % m)
+                    self._messages_view.add_message(m)
 
-        def gotEntryCallback(result):
-            entryPath, filename, methodName = result
+            if state.get('mood') == moods.sad.value:
+                self.debug('component %s is sad' % name)
+                self.statusbar.set('main',
+                    _("Component %s is sad") % name)
 
-            self.statusbar.set('main', _('Showing UI for %s') % name)
+        # FIXME: show statusbar things
+        # self.statusbar.set('main', _('Showing UI for %s') % name)
+        # self.statusbar.set('main',
+        #       _("Component %s is still sleeping") % name)
+        # self.statusbar.set('main', _("Requesting UI for %s ...") % name)
+        # self.statusbar.set('main', _("Loading UI for %s ...") % name)
+        # self.statusbar.clear('main')
+        # mid = self.statusbar.push('notebook',
+        #         _("Loading tab %s for %s ...") % (node.title, name))
+        # node.statusbar = self.statusbar # hack
 
-            filepath = os.path.join(entryPath, filename)
-            self.debug("Got the UI, lives in %s" % filepath)
-            # FIXME: this is a silent assumption that the glade file
-            # lives in the same directory as the entry point
-            self.uidir = os.path.split(filepath)[0]
-            handle = open(filepath, "r")
-            data = handle.read()
-            handle.close()
-            # FIXME: is name (of component) needed ?
-            self.debug("showing admin UI for component %s" % name)
-            # callLater to avoid any errors going to our errback
-            reactor.callLater(0, self.show_component,
-                state, entryPath, filename, methodName, data)
-
-        def gotEntryNoBundleErrback(failure):
-            failure.trap(errors.NoBundleError)
-            self.debug("Making generic UI for component %s" % name)
-
-            # make a generic ui
-            from flumotion.component.base import admin_gtk
-            instance = admin_gtk.BaseAdminGtk(state, self.admin)
-            self._instanceSetup(instance, admin_gtk.BaseAdminGtk, name)
-
-        def gotEntrySleepingComponentErrback(failure):
-            failure.trap(errors.SleepingComponentError)
-
-            self.statusbar.set('main',
-                _("Component %s is still sleeping") % name)
-
-        self.statusbar.set('main', _("Requesting UI for %s ...") % name)
-        # if there's a current component being shown, give it a chance
-        # to clean up
-        if self.current_component:
-            if hasattr(self.current_component, 'cleanup'):
-                self.debug('Cleaning up current component view')
-                self.current_component.cleanup()
-        self.current_component = None
-
-        d = self.admin.getEntry(state, 'admin/gtk')
-        d.addCallback(gotEntryCallback)
-        d.addErrback(gotEntryNoBundleErrback)
-        d.addErrback(gotEntrySleepingComponentErrback)
 
     def _components_view_activated_cb(self, view, state, action):
         self.debug('action %s on component %s' % (action, state.get('name')))

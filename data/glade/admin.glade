@@ -61,13 +61,13 @@
 		      </child>
 		    </widget>
 		  </child>
+
 		  <child>
 		    <widget class="GtkImageMenuItem" id="connection_open_existing">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Open _Existing Connection...</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="connection_open_existing_cb" last_modification_time="Mon, 16 Apr 2007 16:01:15 GMT"/>
-
 		    </widget>
 		  </child>
 
@@ -176,12 +176,13 @@
 		      </child>
 		    </widget>
 		  </child>
+
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_manage_delete_component">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Delete Component</property>
 		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="manage_delete_component_cb" last_modification_time="Mon, 23 Apr 2006 18:40:11 GMT"/>
+		      <signal name="activate" handler="manage_delete_component_cb" last_modification_time="Sun, 23 Apr 2006 18:40:11 GMT"/>
 
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image112">
@@ -573,35 +574,12 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkHBox" id="component_view">
+		<widget class="Custom" id="component_view">
 		  <property name="visible">True</property>
-		  <property name="homogeneous">False</property>
-		  <property name="spacing">0</property>
-
-		  <child>
-		    <widget class="GtkLabel" id="preview">
-		      <property name="visible">True</property>
-		      <property name="label">Here is where the component ui will end up in the end</property>
-		      <property name="use_underline">False</property>
-		      <property name="use_markup">False</property>
-		      <property name="justify">GTK_JUSTIFY_LEFT</property>
-		      <property name="wrap">True</property>
-		      <property name="selectable">False</property>
-		      <property name="xalign">0.5</property>
-		      <property name="yalign">0.5</property>
-		      <property name="xpad">0</property>
-		      <property name="ypad">0</property>
-		      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-		      <property name="width_chars">-1</property>
-		      <property name="single_line_mode">False</property>
-		      <property name="angle">0</property>
-		    </widget>
-		    <packing>
-		      <property name="padding">0</property>
-		      <property name="expand">True</property>
-		      <property name="fill">True</property>
-		    </packing>
-		  </child>
+		  <property name="creation_function">flumotion.admin.gtk.componentview.ComponentView()</property>
+		  <property name="int1">0</property>
+		  <property name="int2">0</property>
+		  <property name="last_modification_time">Wed, 13 Jun 2007 11:04:16 GMT</property>
 		</widget>
 		<packing>
 		  <property name="shrink">False</property>

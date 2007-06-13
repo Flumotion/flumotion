@@ -5,6 +5,7 @@ component_PYTHON = \
 	__init__.py \
 	client.py \
 	connections.py \
+	componentview.py \
 	dialogs.py \
 	greeter.py \
 	message.py \

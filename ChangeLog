@@ -1,5 +1,26 @@
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/client.py (Window.__init__)
+	(Window._setAdminModel, Window._create_ui, show_component)
+	(_instanceSetup, _setupCallback, _setupErrback)
+	(_nodeRenderCallback, _nodeRenderErrback)
+	(_setCurrentComponentCallback, Window.stateSet)
+	(_component_view_set_widget, _component_view_clear): 
+	(Window.property_changed_cb, Window._remove_component): Remove
+	cruftiness!
+	(Window.admin_connected_cb)
+	(Window._components_view_has_selection_cb): Tell the component
+	view about the selected object.
+
+	* flumotion/admin/gtk/Makefile.am (component_PYTHON): 
+	* flumotion/admin/gtk/componentview.py: New file, pulled in from
+	f-g-c. Fixes #459, I think.
+
+	* flumotion/admin/admin.py (AdminModel): Remove unused
+	component-property-changed signal.
+
+	* data/glade/admin.glade: Use the componentview.
+
 	* flumotion/common/bundle.py (Unbundler.unbundle): Write files
 	atomically. Fixes #373.
 	(Unbundler.unbundle): Er, fdopen with 'wb'.
