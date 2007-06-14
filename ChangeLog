@@ -1,5 +1,17 @@
 2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/switch.py (Switch.cb):
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.update_symlink, Disker._client_error_cb,
+	  Disker.configure_pipeline):
+	Actually show warnings in admin ui when ical file is not
+	parsable and when ical file has been specified but the python
+	modules required are not installed on worker.
+	Fixes #671
+	Fixes #670
+
+2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/base/scheduler.py (Event.__init__,
 	  ICalScheduler.parseCalendar):
 	Fix where we have a recurrence rule with dtstart/dtend with non

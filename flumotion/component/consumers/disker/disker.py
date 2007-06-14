@@ -262,7 +262,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                                        "%s. Check your permissions."
                                        % (dest,))),
                                  debug=log.getExceptionMessage(e))
-            self.state.append('messages', m)
+            self.addMessage(m)
 
     def stop_recording(self):
         sink = self.get_element('fdsink')
@@ -316,7 +316,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             "Error writing to file %s.  Maybe disk is full." % (
             self.location))),
             id=id, priority=40)
-        self.state.append('messages', m)
+        self.addMessage(m)
 
     def configure_pipeline(self, pipeline, properties):
         self.debug('configure_pipeline for disker')
@@ -331,20 +331,30 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         icalfn = properties.get('ical-schedule')
         if HAS_ICAL and icalfn:
             from flumotion.component.base import scheduler
-            self.icalScheduler = scheduler.ICalScheduler(open(
-                icalfn, 'r'))
-            self.icalScheduler.subscribe(self.eventStarted,
-                self.eventStopped)
-            currentEvents = self.icalScheduler.getCurrentEvents()
-            if currentEvents:
-                self._startFilenameTemplate = currentEvents[0].content
-                self._recordAtStart = True
-            else:
-                self._recordAtStart = False
-        else:
-            self.warning("An ical file has been specified for "
-                         "scheduling but the necessary modules "
-                         "dateutil and/or icalendar are not installed")
+            try:
+                self.icalScheduler = scheduler.ICalScheduler(open(
+                    icalfn, 'r'))
+                self.icalScheduler.subscribe(self.eventStarted,
+                    self.eventStopped)
+                currentEvents = self.icalScheduler.getCurrentEvents()
+                if currentEvents:
+                    self._startFilenameTemplate = currentEvents[0]
+                    self._recordAtStart = True
+                else:
+                    self._recordAtStart = False
+            except ValueError:
+                m = messages.Warning(T_(N_(
+                    "Error parsing ical file %s, so not scheduling any"
+                    " events." % icalfn)), id="error-parsing-ical")
+                self.addMessage(m)
+
+        elif icalfn:
+            warnStr = "An ical file has been specified for " \
+                      "scheduling but the necessary modules " \
+                      "dateutil and/or icalendar are not installed"
+            self.warning(warnStr)
+            m = messages.Warning(T_(N_(warnStr)), id="error-parsing-ical")
+            self.addMessage(m)
 
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)

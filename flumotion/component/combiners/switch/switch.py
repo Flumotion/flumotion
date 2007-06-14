@@ -75,17 +75,27 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             icalfn = props.get('ical-schedule')
             if icalfn:
                 if HAVE_ICAL:
-                    from flumotion.component.base import scheduler
-                    self.icalScheduler = scheduler.ICalScheduler(open(
-                        icalfn, 'r'))
-                    self.icalScheduler.subscribe(self.eventStarted,
-                        self.eventStopped)
-                    if self.icalScheduler.getCurrentEvents():
-                        self._idealEater = "backup"
+                    try:
+                        from flumotion.component.base import scheduler
+                        self.icalScheduler = scheduler.ICalScheduler(open(
+                            icalfn, 'r'))
+                        self.icalScheduler.subscribe(self.eventStarted,
+                            self.eventStopped)
+                        if self.icalScheduler.getCurrentEvents():
+                            self._idealEater = "backup"
+                    except ValueError:
+                        m = messages.Warning(T_(N_(
+                            "Error parsing ical file %s, so not scheduling any"
+                            " events." % icalfn)), id="error-parsing-ical")
+                        self.addMessage(m)
                 else:
-                    self.warning("An ical file has been specified for "
-                                 "scheduling but the necessary modules "
-                                 "dateutil and/or icalendar are not installed")
+                    warnStr = "An ical file has been specified for " \
+                              "scheduling but the necessary modules " \
+                              "dateutil and/or icalendar are not installed"
+                    self.warning(warnStr)
+                    m = messages.Warning(T_(N_(warnStr)), 
+                        id="error-parsing-ical")
+                    self.addMessage(m)
         d.addCallback(cb)
         return d
         
