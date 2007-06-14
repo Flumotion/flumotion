@@ -547,7 +547,16 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             self.QUEUE_SIZE_BUFFERS)
 
     def get_pipeline_string(self, properties):
-        eaters = self.config['eater']
+        eaters = self.config.get('eater', {})
+        sources = self.config.get('source', [])
+        if eaters == {} and sources != []:
+            # for upgrade without manager restart
+            feeds = []
+            for feed in sources:
+                if not ':' in feed:
+                    feed = '%s:default' % feed
+                feeds.append(feed)
+            eaters = { 'default':feeds }
 
         pipeline = self.get_muxer_string(properties) + ' '
         for e in eaters:

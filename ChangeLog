@@ -1,5 +1,14 @@
 2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/feedcomponent.py
+	  (MultiInputParseLaunchComponent.get_pipeline_string):
+	* flumotion/component/feedcomponent010.py (FeedComponent.do_setup,
+	  FeedComponent.parseEaterConfig):
+	Forward port from platform-3 of fix when upgrading managers
+	without restarting.
+
+2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/switch.py (Switch.cb):
 	* flumotion/component/consumers/disker/disker.py
 	  (Disker.update_symlink, Disker._client_error_cb,

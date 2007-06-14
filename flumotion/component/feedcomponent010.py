@@ -433,10 +433,16 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         eater_config = self.config.get('eater', {})
         feeder_config = self.config.get('feed', [])
+        source_config = self.config.get('source', [])
 
         self.debug("FeedComponent.do_setup(): eater_config %r" % eater_config)
         self.debug("FeedComponent.do_setup(): feeder_config %r" % feeder_config)
-        
+        self.debug("FeedComponent.do_setup(): source_config %r" % source_config)
+        # for upgrade of code without restarting managers
+        # this will only be for components whose eater name in registry is
+        # default, so no need to import registry and find eater name
+        if eater_config == {} and source_config != []:
+            eater_config = { 'default': source_config }
         # this sets self.eater_names
         self.parseEaterConfig(eater_config)
 
@@ -572,6 +578,9 @@ class FeedComponent(basecomponent.BaseComponent):
         feed_ids = []
         for eater in eater_config:
             for feed in eater_config[eater]:
+                if not ':' in feed:
+                    # only needed for upgrade without manager restart
+                    feed = '%s:default' % feed
                 feed_ids.append(feed)
                 self._eaterMapping[feed] = eater
         self.debug('parsed eater config, eater feedIds %r' % feed_ids)
