@@ -1,3 +1,10 @@
+2007-06-13  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/client.py:
+	  Sort author names by surname, rather than mostly by first name but
+	  with new people randomly added to the bottom.
+	  Add Arek.
+
 2007-06-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/eaters.glade: 

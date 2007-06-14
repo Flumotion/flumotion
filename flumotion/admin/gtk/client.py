@@ -887,13 +887,15 @@ class Window(log.Loggable, gobject.GObject):
 
         text = _('Flumotion is a streaming media server.\n\n'
             '© 2004, 2005, 2006, 2007 Fluendo S.L.')
-        authors = ('Andy Wingo',
+        authors = (
                    'Johan Dahlin',
-                   'Mike Smith',
-                   'Thomas Vander Stichele',
-                   'Wim Taymans',
+                   'Arek Korbik',
                    'Zaheer Abbas Merali',
-                   'Sébastien Merle'
+                   'Sébastien Merle',
+                   'Mike Smith',
+                   'Wim Taymans',
+                   'Thomas Vander Stichele',
+                   'Andy Wingo',
         )
         text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:
