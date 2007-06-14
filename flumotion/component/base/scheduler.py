@@ -79,10 +79,18 @@ class Event(log.Loggable):
 
         if recur:
             from dateutil import rrule
-            startRecurRule = rrule.rrulestr(recur, dtstart=start)
-            endRecurRule = rrule.rrulestr(recur, dtstart=end) 
             if now is None:
                 now = datetime.now(LOCAL)
+            if end.tzinfo is None:
+                end = datetime(end.year, end.month, end.day, end.hour, 
+                    end.minute, end.second, end.microsecond, LOCAL)
+            endRecurRule = rrule.rrulestr(recur, dtstart=end) 
+            if start.tzinfo is None:
+                start = datetime(start.year, start.month, start.day, 
+                    start.hour, start.minute, start.second, 
+                    start.microsecond, LOCAL)
+            startRecurRule = rrule.rrulestr(recur, dtstart=start)
+
             if end < now:
                 end = endRecurRule.after(now)
                 start = startRecurRule.before(end)
@@ -373,7 +381,8 @@ class ICalScheduler(Scheduler):
             summary = event.decoded('summary', None)
             recur = event.get('rrule', None)
             if start and end:
-                self.debug("start %r end %r recur %r", start, end, recur)
+                self.debug("start %r tzname %s end %r recur %r", start, 
+                    start.tzname(), end, recur)
                 if recur:
                     e = Event(start, end, summary, recur.ical())
                 else:
