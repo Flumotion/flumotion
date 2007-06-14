@@ -21,6 +21,7 @@
 
 from flumotion.component import feedcomponent
 from flumotion.common import errors, messages
+from flumotion.common.planet import moods
 from twisted.internet import defer
 import threading
 from flumotion.common.messages import N_
@@ -145,6 +146,12 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # needed to stop the flapping between master and backup on startup
         # in the watchdogs if the starting state is backup
         self._started = True
+
+    def eaterSetActive(self, feedId):
+        # need to just set _started to True if False and mood is happy
+        feedcomponent.MultiInputParseLaunchComponent.eaterSetActive(self, feedId)
+        if not self._started and moods.get(self.getMood()) == moods.happy:
+            self._started = True
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"

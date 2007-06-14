@@ -26,23 +26,34 @@ from flumotion.component.combiners.switch import switch
 
 # These basic watchdog components switch to backup
 # when the master eater(s) have gone hungry
-# FIXME: if a scheduled event happens so we are meant to be on backup, and then
-# both backup and master go away and come back, it will switch to master
 class SingleBasicWatchdog(switch.SingleSwitch):
     logCategory = "comb-single-basic-watchdog"
 
     def eaterSetInactive(self, feedId):
         switch.SingleSwitch.eaterSetInactive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
-        if "master" in eaterName and self.isActive("backup"):
-            self.switch_to("backup")
+        oppositeEater = "backup"
+        if self._idealEater == "backup":
+            oppositeEater = "master"
+        if self._idealEater in eaterName and self.is_active(oppositeEater) and \
+           self.uiState.get("active-eater") == self._idealEater and \
+           self._started:
+            self.debug("Switching to %s, active eater is %s", oppositeEater,
+                self.uiState.get("active-eater"))
+            self.switch_to(oppositeEater)
 
     def eaterSetActive(self, feedId):
         switch.SingleSwitch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
-        if "master" in eaterName:
-            self.debug("Switching to master")
-            self.switch_to("master")
+        oppositeEater = "backup"
+        if self._idealEater == "backup":
+            oppositeEater = "master"
+        if self._idealEater in eaterName and self.is_active(self._idealEater) \
+           and self.uiState.get("active-eater") == oppositeEater and \
+           self._started:
+            self.debug("Switching to %s, active eater is %s", self._idealEater,
+                self.uiState.get("active-eater"))
+            self.switch_to(self._idealEater)
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"

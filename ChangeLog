@@ -1,5 +1,16 @@
 2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	  (SingleBasicWatchdog, SingleBasicWatchdog.eaterSetInactive,
+	  SingleBasicWatchdog.eaterSetActive):
+	Fix SingleBasicWatchdog to actually work.
+	* flumotion/component/combiners/switch/switch.py
+	  (Switch.eaterSetActive):
+	Use a platform-3 backportable way of figuring out if component
+	has started.
+
+2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/feedcomponent.py
 	  (MultiInputParseLaunchComponent.get_pipeline_string):
 	* flumotion/component/feedcomponent010.py (FeedComponent.do_setup,
