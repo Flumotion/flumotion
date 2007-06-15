@@ -19,6 +19,11 @@
         <property name="video" type="boolean"
                   description="Output video"/>
 
+        <property name="video-pattern" type="string"
+                  description="Output video pattern for default video"/>
+        <property name="audio-wave" type="string"
+                  description="Output audio wave for default audio"/>
+
         <property name="height" type="int"
                   description="Scaled output height of video" />
         <property name="width" type="int"

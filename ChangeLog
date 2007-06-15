@@ -1,5 +1,11 @@
 2007-06-15  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/playlist/playlist.xml:
+	  Configurable default pattern/wave for playlist.
+
+2007-06-15  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/component.py:
 	  Don't detach unattached avatars.
 

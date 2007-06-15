@@ -37,10 +37,13 @@ import playlistparser
 
 T_ = messages.gettexter('flumotion')
 
-def videotest_gnl_src(name, start, duration, priority):
+def videotest_gnl_src(name, start, duration, priority, pattern=None):
     src = gst.element_factory_make('videotestsrc')
-    # Set videotestsrc to all black.
-    src.props.pattern = 2
+    if pattern:
+        src.props.pattern = pattern
+    else:
+        # Set videotestsrc to all black.
+        src.props.pattern = 2
     gnlsrc = gst.element_factory_make('gnlsource', name)
     gnlsrc.props.start = start
     gnlsrc.props.duration = duration
@@ -51,10 +54,13 @@ def videotest_gnl_src(name, start, duration, priority):
 
     return gnlsrc
 
-def audiotest_gnl_src(name, start, duration, priority):
+def audiotest_gnl_src(name, start, duration, priority, wave=None):
     src = gst.element_factory_make('audiotestsrc')
-    # Set audiotestsrc to use silence.
-    src.props.wave = 4 
+    if wave:
+        src.props.wave = wave
+    else:
+        # Set audiotestsrc to use silence.
+        src.props.wave = 4 
     gnlsrc = gst.element_factory_make('gnlsource', name)
     gnlsrc.props.start = start
     gnlsrc.props.duration = duration
@@ -192,15 +198,15 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
         return pipeline
 
-    def _createDefaultSources(self):
+    def _createDefaultSources(self, properties):
         if self._hasVideo:
             vsrc = videotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
-                2**31 - 1)
+                2**31 - 1, properties.get('video-pattern', None))
             self.videocomp.add(vsrc)
 
         if self._hasAudio:
             asrc = audiotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
-                2**31 - 1)
+                2**31 - 1, properties.get('audio-wave', None))
             self.audiocomp.add(asrc)
 
     def _setupClock(self, pipeline):
@@ -316,7 +322,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         pipeline = self._buildPipeline() 
         self._setupClock(pipeline)
 
-        self._createDefaultSources()
+        self._createDefaultSources(props)
 
         self.connect_feeders(pipeline)
         return pipeline
