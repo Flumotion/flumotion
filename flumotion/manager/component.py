@@ -176,6 +176,11 @@ class ComponentAvatar(base.ManagerAvatar):
         return d
 
     def detached(self, mind):
+        if not self.componentState:
+            # Not attached, so don't detach
+            self.warning("Asked to detach unattached avatar, ignoring")
+            return
+
         # doc in base class
         self.vishnu.unregisterComponent(self)
         self.heaven.unregisterComponent(self)

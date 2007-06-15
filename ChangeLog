@@ -1,3 +1,8 @@
+2007-06-15  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/component.py:
+	  Don't detach unattached avatars.
+
 2007-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py
