@@ -1,5 +1,10 @@
 2007-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/base/scheduler.py:
+	Remove unused variables.
+
+2007-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/base/scheduler.py (ICalScheduler.parseCalendar):
 	Gracefully handled errors in parsing an event.
 
