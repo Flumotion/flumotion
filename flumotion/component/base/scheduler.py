@@ -375,20 +375,24 @@ class ICalScheduler(Scheduler):
         @rtype List of {flumotion.component.base.scheduler.Event}
         """
         events = []
+        parseException = None
         for event in cal.walk('vevent'):
-            start = event.decoded('dtstart', None)
-            end = event.decoded('dtend', None)
-            summary = event.decoded('summary', None)
-            recur = event.get('rrule', None)
-            if start and end:
-                self.debug("start %r tzname %s end %r recur %r", start, 
-                    start.tzname(), end, recur)
-                if recur:
-                    e = Event(start, end, summary, recur.ical())
+            try:
+                start = event.decoded('dtstart', None)
+                end = event.decoded('dtend', None)
+                summary = event.decoded('summary', None)
+                recur = event.get('rrule', None)
+                if start and end:
+                    self.debug("start %r tzname %s end %r recur %r", start, 
+                        start.tzname(), end, recur)
+                    if recur:
+                        e = Event(start, end, summary, recur.ical())
+                    else:
+                        e = Event(start, end, summary)
+                    events.append(e)
                 else:
-                    e = Event(start, end, summary)
-                events.append(e)
-            else:
-                self.warning('ical has event without start or end: '
-                             '%r', event)
+                    self.warning('ical has event without start or end: '
+                                 '%r', event)
+            except Exception, e:
+                self.warning("could not parse ical event %r", event)
         return events
