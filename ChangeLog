@@ -1,5 +1,16 @@
 2007-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/gtk/componentview.py
+	  (ComponentView.object_active_to_inactive):
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.__init__,
+	  BaseAdminGtk.cleanup, BaseAdminGtkNode.__init__,
+	  BaseAdminGtkNode.cleanup):
+	Actually remove the ui state listeners when removing admin
+	widgets.
+	Fixes #674
+
+2007-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/base/scheduler.py:
 	Remove unused variables.
 

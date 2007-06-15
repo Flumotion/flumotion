@@ -66,7 +66,13 @@ class BaseAdminGtk(log.Loggable):
 
         d = admin.componentCallRemote(state, 'getUIState')
         d.addCallback(self.setUIState)
-        
+    
+    def cleanup(self):
+        if self.uiState:
+            self.uiState.removeListener(self)
+        for node in self.getNodes().values():
+            node.cleanup()
+
     def setUIState(self, state):
         self.debug('starting listening to state %r', state)
         state.addListener(self, self.stateSet, self.stateAppend,
@@ -225,7 +231,11 @@ class BaseAdminGtkNode(log.Loggable):
         ## Absolute path to the glade file.
         ##   e.g. "/home/flu/.flumotion/cache/test/80...df7/flumotion/ui.glade
         self._gladefilepath = None 
-        
+
+    def cleanup(self):
+        if self.uiState:
+            self.uiState.removeListener(self)
+
         
     def status_push(self, str):
         if self.statusbar:

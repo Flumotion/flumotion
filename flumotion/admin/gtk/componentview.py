@@ -139,8 +139,11 @@ class ComponentView(gtk.VBox, log.Loggable):
         d.addCallback(got_widget_constructor, callStamp)
         
     def object_active_to_inactive(self):
-        self.remove(self.widget)
-        self.widget = None
+        if self.widget:
+            if self.widget.admingtk:
+                self.widget.admingtk.cleanup()
+            self.remove(self.widget)
+            self.widget = None
         
     def object_inactive_to_unset(self):
         self.object.removeListener(self)
