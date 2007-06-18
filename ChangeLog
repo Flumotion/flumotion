@@ -3,6 +3,7 @@
 	* flumotion/common/common.py (_acquirePidFile, writePidFile)
 	(daemonizeHelper): Open the PID file for writing before forking.
 	Fixes #558.
+	(_acquirePidFile): Hush pychecker.
 
 2007-06-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 

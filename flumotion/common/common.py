@@ -389,7 +389,6 @@ def _acquirePidFile(type, name=None):
     @returns: file object, open for writing
     """
     ensureDir(configure.rundir, "rundir")
-    pid = os.getpid()
     path = getPidPath(type, name)
     return open(path, 'w')
  
