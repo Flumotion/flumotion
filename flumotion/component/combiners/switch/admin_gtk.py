@@ -36,13 +36,14 @@ class SwitchingNode(BaseAdminGtkNode):
         self.radioButton["backup"] = gtk.RadioButton(label="Backup")
         self.radioButton["master"] = gtk.RadioButton(self.radioButton["backup"],
             label="Master")
+        self.radioButtonHandlers = {}
         currentRow = 0
         for eaterName in self.radioButton:
             self.widget.attach(self.radioButton[eaterName], 0, 1, currentRow, 
                 currentRow+1, yoptions=gtk.FILL, xpadding=6, ypadding=6)
             currentRow = currentRow + 1
             self.radioButton[eaterName].show()
-            self.radioButton[eaterName].connect("toggled", 
+            self.radioButtonHandlers[eaterName] = self.radioButton[eaterName].connect("toggled", 
                 self.cb_toggled, eaterName)
         self.widget.show()
 
@@ -60,7 +61,10 @@ class SwitchingNode(BaseAdminGtkNode):
     def stateSet(self, state, key, value):
         if key == 'active-eater':
             if not self.radioButton[value].get_active():
+                self.radioButton[value].handler_block(self.radioButtonHandlers)
                 self.radioButton[value].set_active(True)
+                self.radioButton[value].handler_unblock(
+                    self.radioButtonHandlers)
     
 class SwitcherAdminGtk(BaseAdminGtk):
     def setup(self):

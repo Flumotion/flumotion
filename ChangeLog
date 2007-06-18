@@ -1,3 +1,9 @@
+2007-06-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/admin_gtk.py
+	  (SwitchingNode.__init__, SwitchingNode.stateSet):
+	Use signal blocks to stop extra remote calls unnecessarily.
+
 2007-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/componentview.py
