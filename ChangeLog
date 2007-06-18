@@ -1,3 +1,9 @@
+2007-06-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/common.py (_acquirePidFile, writePidFile)
+	(daemonizeHelper): Open the PID file for writing before forking.
+	Fixes #558.
+
 2007-06-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/admin_gtk.py

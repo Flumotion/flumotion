@@ -285,13 +285,15 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
                                '%s.log' % (processType,))
     log.debug(processType, 'Further logging will be done to %s', logPath)
 
+    file = _acquirePidFile(processType, processName)
+
     # here we daemonize; so we also change our pid
     daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
 
     log.debug(processType, 'Started daemon')
 
     # from now on I should keep running until killed, whatever happens
-    path = writePidFile(processType, processName)
+    path = writePidFile(processType, processName, file=file)
     log.debug(processType, 'written pid file %s', path)
 
     # import inside function so we avoid affecting startup
@@ -356,7 +358,7 @@ def getPidPath(type, name=None):
         type, name, path))
     return path
  
-def writePidFile(type, name=None):
+def writePidFile(type, name=None, file=None):
     """
     Write a pid file in the run directory, using the given process type
     and process name for the filename.
@@ -364,13 +366,32 @@ def writePidFile(type, name=None):
     @rtype:   str
     @returns: full path to the pid file that was written
     """
+    pid = os.getpid()
+    if not file:
+        ensureDir(configure.rundir, "rundir")
+        path = getPidPath(type, name)
+        file = open(path, 'w')
+        file.write("%d\n" % pid)
+        file.close()
+        return path
+    else:
+        file.write("%d\n" % pid)
+        file.close()
+        return file.name
+ 
+def _acquirePidFile(type, name=None):
+    """
+    Open a PID file for writing, using the given process type and
+    process name for the filename. The returned file can be then passed
+    to writePidFile after forking.
+
+    @rtype:   str
+    @returns: file object, open for writing
+    """
     ensureDir(configure.rundir, "rundir")
     pid = os.getpid()
     path = getPidPath(type, name)
-    file = open(path, 'w')
-    file.write("%d\n" % pid)
-    file.close()
-    return path
+    return open(path, 'w')
  
 def deletePidFile(type, name=None):
     """
