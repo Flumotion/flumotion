@@ -1,3 +1,10 @@
+2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/screencast/screencast.py
+	  (Screencast.get_pipeline_string):
+	Force damage use to be false because it is broken and
+	was probably always.
+
 2007-06-19  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/job/job.py:

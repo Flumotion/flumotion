@@ -44,7 +44,7 @@ class Screencast(feedcomponent.ParseLaunchComponent):
         if not gstreamer.element_factory_exists(src):
             raise errors.MissingElementError(src)
 
-        return ('%s startx=%d starty=%d endx=%d endy=%d'
+        return ('%s startx=%d starty=%d endx=%d endy=%d use-damage=false'
                 ' ! ffmpegcolorspace'
                 ' ! video/x-raw-yuv,framerate=(fraction)%s,format=(fourcc)I420'
                 % (src, x_offset, y_offset, width + x_offset, height + y_offset,
