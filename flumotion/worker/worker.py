@@ -280,7 +280,8 @@ class WorkerBrain(log.Loggable):
         __import__(moduleName) 
 
     def getComponents(self):
-        return self.jobHeaven.getJobAvatarIds()
+        return [job.avatarId for job in self.jobHeaven.getJobInfos()]
 
     def killJob(self, avatarId, signum):
         self.jobHeaven.killJob(avatarId, signum)
+

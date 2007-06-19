@@ -120,6 +120,9 @@ class JobMedium(medium.BaseMedium):
             self.log('... from path %s' % path)
             packager.registerPackagePath(path, name)
 
+    def remote_getPid(self):
+        return os.getpid()
+
     def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
         """
         I am called on by the worker's JobAvatar to create a component.

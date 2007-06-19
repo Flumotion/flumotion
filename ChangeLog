@@ -1,3 +1,12 @@
+2007-06-19  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/job/job.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  Make the worker tracks jobs by PID, not avatarId, because avatarId
+	  isn't unique when restarting components.
+	  Fixes #683.
+
 2007-06-19  Andy Wingo  <wingo@pobox.com>
 
 	* configure.ac: 
