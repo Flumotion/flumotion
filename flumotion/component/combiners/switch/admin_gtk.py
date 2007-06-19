@@ -61,10 +61,11 @@ class SwitchingNode(BaseAdminGtkNode):
     def stateSet(self, state, key, value):
         if key == 'active-eater':
             if not self.radioButton[value].get_active():
-                self.radioButton[value].handler_block(self.radioButtonHandlers)
+                self.radioButton[value].handler_block(
+                    self.radioButtonHandlers[value])
                 self.radioButton[value].set_active(True)
                 self.radioButton[value].handler_unblock(
-                    self.radioButtonHandlers)
+                    self.radioButtonHandlers[value])
     
 class SwitcherAdminGtk(BaseAdminGtk):
     def setup(self):

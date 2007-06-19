@@ -1,3 +1,9 @@
+2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/admin_gtk.py
+	  (SwitchingNode.stateSet):
+	Pass the actual signal id not the dict :)
+
 2007-06-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/componentview.py (NodeBook.__init__): Avoid
