@@ -1,5 +1,15 @@
 2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/switch.py (Switch.cb,
+	  AVSwitch.do_check, AVSwitch.checkConfig,
+	  AVSwitch.get_pipeline_string):
+	* flumotion/component/combiners/switch/switch.xml:
+	Add caps properties to the audio video switchers so that
+	they force both master and backup streams going into the
+	switch elements to be of same caps.
+
+2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/producers/videotest/videotest.py
 	  (VideoTest.get_pipeline_string):
 	* flumotion/component/producers/videotest/videotest.xml:

@@ -97,6 +97,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                     m = messages.Warning(T_(N_(warnStr)), 
                         id="error-parsing-ical")
                     self.addMessage(m)
+            return result
         d.addCallback(cb)
         return d
         
@@ -242,22 +243,95 @@ class AVSwitch(Switch):
         self.pads_awaiting_block = []
         self.padsBlockedDefer = None
 
+    def do_check(self):
+        d = Switch.do_check(self)
+        def checkConfig(result):
+            self.debug("checking config")
+            props = self.config['properties']
+            videoParams = {}
+            audioParams = {}
+            videoParams["video-width"] = props.get("video-width", None)
+            videoParams["video-height"] = props.get("video-height", None)
+            videoParams["video-framerate"] = props.get("video-framerate", None)
+            videoParams["video-pixel-aspect-ratio"] = props.get("video-pixel-aspect-ratio", None)
+            audioParams["audio-channels"] = props.get("audio-channels", None)
+            audioParams["audio-samplerate"] = props.get("audio-samplerate", None)
+
+            nonExistantVideoParams = []
+            existsVideoParam = False
+            allVideoParams = True
+            for p in videoParams:
+                if videoParams[p] == None:
+                    allVideoParams = False
+                    nonExistantVideoParams.append(p)
+                else:
+                    existsVideoParam = True
+            self.debug("exists video param: %d all: %d nonexistant: %r", 
+                existsVideoParam, allVideoParams, nonExistantVideoParams)
+            if not allVideoParams and existsVideoParam:
+                # message
+                m = messages.Error(T_(N_(
+                    "Video parameter(s) were specified but not all. "
+                    "Missing parameters are: %r" % nonExistantVideoParams)),
+                    id="video-params-not-specified")
+                self.addMessage(m)
+            nonExistantAudioParams = []
+            existsAudioParam = False
+            allAudioParams = True
+            for p in audioParams:
+                if audioParams[p] == None:
+                    allAudioParams = False
+                    nonExistantAudioParams.append(p)
+                else:
+                    existsAudioParam = True
+            if not allAudioParams and existsAudioParam:
+                # message
+                m = messages.Error(T_(N_(
+                    "Audio parameter(s) were specified but not all. "
+                    "Missing parameters are: %r" % nonExistantAudioParams)),
+                    id="audio-params-not-specified")
+                self.addMessage(m)
+            return result
+        d.addCallback(checkConfig)
+        return d
+
     def get_pipeline_string(self, properties):
         eaters = self.eater_names
-
+        videoForceCapsTemplate = ""
+        audioForceCapsTemplate = ""
+        if properties.get("video-width", None):
+            width = properties["video-width"]
+            height = properties["video-height"]
+            par = properties["video-pixel-aspect-ratio"]
+            framerate = properties["video-framerate"]
+            videoForceCapsTemplate = \
+                "ffmpegcolorspace ! videorate ! videoscale !" \
+                " capsfilter caps=video/x-raw-yuv,width=%d,height=%d," \
+                "framerate=%d/%d,pixel-aspect-ratio=%d/%d," \
+                "format=(fourcc)I420 " \
+                "name=capsfilter-%%(eaterName)s ! " % (width, 
+                height, framerate[0], framerate[1], par[0], par[1])
+        if self.config.get("audio-channels", None):
+            channels = self.config["audio-channels"]
+            samplerate = self.config["audio-samplerate"]
+            audioForceCapsTemplate = \
+                "audioconvert ! audioconvert ! capsfilter caps=" \
+                "audio/x-raw-int,channels=%d,samplerate=%d," \
+                "width=16,depth=16,signed=true " \
+                "name=capsfilter-%%(eaterName)s ! " % (
+                channels, samplerate)
         pipeline = "switch name=vswitch ! " \
             "identity silent=true single-segment=true name=viden " \
             "switch name=aswitch ! " \
             "identity silent=true single-segment=true name=aiden "
         for eater in eaters:
             if "video" in eater:
-                tmpl = '@ eater:%s @ ! vswitch. '
+                tmpl = '@ eater:%%(eaterName)s @ ! %s vswitch. ' % videoForceCapsTemplate
             if "audio" in eater:
-                tmpl = '@ eater:%s @ ! aswitch. '
-            pipeline += tmpl % eater
+                tmpl = '@ eater:%%(eaterName)s @ ! %s aswitch. ' % audioForceCapsTemplate
+            pipeline += tmpl % dict(eaterName=eater)
 
         pipeline += 'viden. ! @feeder::video@ aiden. ! @feeder::audio@'
-
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):

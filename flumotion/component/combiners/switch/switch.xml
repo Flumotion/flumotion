@@ -36,6 +36,13 @@
       </entries>
       <properties>
         <property name="ical-schedule" type="string" required="no" />
+	<property name="video-width" type="int" required="no" />
+	<property name="video-height" type="int" required="no" />
+	<property name="video-framerate" type="fraction" required="no" />
+	<property name="video-pixel-aspect-ratio" type="fraction" 
+	          required="no" />
+	<property name="audio-samplerate" type="int" required="no" />
+	<property name="audio-channels" type="int" required="no" />
       </properties>
     </component>
     <component type="single-basic-watchdog-combiner"
@@ -73,6 +80,13 @@
       </entries>
       <properties>
         <property name="ical-schedule" type="string" required="no" />
+	<property name="video-width" type="int" required="no" />
+	<property name="video-height" type="int" required="no" />
+	<property name="video-framerate" type="fraction" required="no" />
+	<property name="video-pixel-aspect-ratio" type="fraction" 
+	          required="no" />
+	<property name="audio-samplerate" type="int" required="no" />
+	<property name="audio-channels" type="int" required="no" />
       </properties>
     </component>
 
