@@ -1,3 +1,12 @@
+2007-06-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py
+	(Vishnu.loadComponentConfigurationXML): Add a message to the
+	planet state if the config XML fails to parse. Fixes #578.
+
+	* conf/managers/default/flows/porter.xml: Fix up for The Great
+	Renaming.
+
 2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/admin_gtk.py

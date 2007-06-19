@@ -555,10 +555,18 @@ class Vishnu(log.Loggable):
         @type  identity: L{flumotion.common.identity.Identity}
         """
         self.debug('loading configuration')
-        self.configuration = conf = config.FlumotionConfigXML(file)
-        conf.parse()
-        return self._loadComponentConfiguration(conf, identity)
-
+        try:
+            self.clearMessage('loadComponent-parse-error')
+            self.configuration = conf = config.FlumotionConfigXML(file)
+            conf.parse()
+            return self._loadComponentConfiguration(conf, identity)
+        except errors.ConfigError, e:
+            self.addMessage(messages.WARNING,
+                            'loadComponent-parse-error',
+                            N_('Invalid component configuration.'),
+                            debug=e.args[0])
+            return defer.fail(e)
+            
     def _loadManagerPlugs(self, conf):
         # Load plugs
         for socket, plugs in conf.plugs.items():

@@ -5,17 +5,17 @@
       <property name="port">8800</property>
       <property name="username">me</property>
       <property name="password">unguessable</property>
-      <property name="socket_path">/tmp/portertest1</property>
+      <property name="socket-path">/tmp/portertest1</property>
     </component>
     <component name="porter2" type="porter" worker="localhost">
       <property name="port">8801</property>
       <property name="username">otherme</property>
       <property name="password">hidden</property>
-      <property name="socket_path">/tmp/portertest2</property>
+      <property name="socket-path">/tmp/portertest2</property>
     </component>
   </atmosphere>
   <flow name="default">
-    <component name="video-source" type="videotest" worker="localhost">
+    <component name="video-source" type="videotest-producer" worker="localhost">
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -34,16 +34,16 @@
     <component name="http-video" type="http-streamer" worker="localhost">
       <source>muxer-video</source>
       <!-- properties -->
-      <property name="bandwidth_limit">10</property>
-      <property name="burst_on_connect">True</property>
-      <property name="mount_point">/test1.ogg</property>
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/test1.ogg</property>
 
       <!-- Configure this streamer as slaved to the porter defined above -->
       <property name="type">slave</property>
 
-      <property name="porter_socket_path">/tmp/portertest1</property>
-      <property name="porter_username">me</property>
-      <property name="porter_password">unguessable</property> 
+      <property name="porter-socket-path">/tmp/portertest1</property>
+      <property name="porter-username">me</property>
+      <property name="porter-password">unguessable</property> 
     </component>
   </flow>
 </planet>
