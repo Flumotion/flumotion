@@ -49,6 +49,12 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
             framerate = properties['framerate']
             struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
 
+        # always set par
+        struct['pixel-aspect-ratio']= gst.Fraction(1,1)
+        if 'pixel-aspect-ratio' in properties:
+            par = properties['pixel-aspect-ratio']
+            struct['pixel-aspect-ratio'] = gst.Fraction(par[0], par[1])
+
         # If RGB, set something ffmpegcolorspace can convert.
         if format == 'video/x-raw-rgb':
             struct['red_mask'] = 0xff00

@@ -25,6 +25,8 @@
                   description="Width in pixels" />
         <property name="framerate" type="fraction"
                   description="Video framerate as numerator/denominator" />
+	<property name="pixel-aspect-ratio" type="fraction"
+		  description="Video pixel aspect ratio as numerator/denominator" />
         <property name="format" type="string"
                   description="Video format" />
         <property name="pattern" type="int"

@@ -1,3 +1,14 @@
+2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/videotest/videotest.py
+	  (VideoTest.get_pipeline_string):
+	* flumotion/component/producers/videotest/videotest.xml:
+	Force the src caps to have a pixel-aspect-ratio.
+	This is needed for any downstream component that wants
+	to videoscale to pixel aspect ratio 1/1. It is a workaround
+	for a GStreamer bug in videoscale that currently has no
+	resolution date.
+
 2007-06-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py
