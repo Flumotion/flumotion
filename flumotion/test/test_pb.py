@@ -320,9 +320,15 @@ class Test_FPBClientFactory(unittest.TestCase):
         # don't output Twisted tracebacks for PB errors we will trigger
         log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
 
+    def flushUnauthorizedLogin(self):
+        try:
+            self.flushLoggedErrors(error.UnauthorizedLogin)
+        except AttributeError:
+            tlog.flushErrors(error.UnauthorizedLogin)
+
     def tearDown(self):
         self.bouncer.stop()
-        tlog.flushErrors(error.UnauthorizedLogin)
+        self.flushUnauthorizedLogin()
         log._getTheFluLogObserver().clearIgnores()
         self.port.stopListening()
 
@@ -421,8 +427,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             # find copied failure
             self.failUnless(failure.check(
                 "twisted.cred.error.UnauthorizedLogin"))
-            from twisted.cred.error import UnauthorizedLogin
-            tlog.flushErrors(UnauthorizedLogin)
+            self.flushUnauthorizedLogin()
             return self.clientDisconnect(factory, None)
     
         d.addCallback(WrongUserCb)
@@ -451,8 +456,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
                 # find copied failure
                 self.failUnless(failure.check(
                     "twisted.cred.error.UnauthorizedLogin"))
-                from twisted.cred.error import UnauthorizedLogin
-                tlog.flushErrors(UnauthorizedLogin)
+                self.flushUnauthorizedLogin()
                 return self.clientDisconnect(factory, None)
             
             d.addErrback(uacpccWrongPasswordErrback)
@@ -486,7 +490,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
                 self.failUnless(failure.check(
                     "twisted.cred.error.UnauthorizedLogin"))
                 from twisted.cred.error import UnauthorizedLogin
-                tlog.flushErrors(UnauthorizedLogin)
+                self.flushUnauthorizedLogin()
                 return self.clientDisconnect(factory, None)
 
             d.addErrback(uacpccTamperErrback)
@@ -555,8 +559,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             # find copied failure
             self.failUnless(failure.check(
                 "twisted.cred.error.UnauthorizedLogin"))
-            from twisted.cred.error import UnauthorizedLogin
-            tlog.flushErrors(UnauthorizedLogin)
+            self.flushUnauthorizedLogin()
             return self.clientDisconnect(factory, None)
     
         d.addCallback(WrongUserCb)
@@ -589,8 +592,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
                 # find copied failure
                 self.failUnless(failure.check(
                     "twisted.cred.error.UnauthorizedLogin"))
-                from twisted.cred.error import UnauthorizedLogin
-                tlog.flushErrors(UnauthorizedLogin)
+                self.flushUnauthorizedLogin()
                 return self.clientDisconnect(factory, None)
 
             d.addErrback(uacpccTamperErrback)

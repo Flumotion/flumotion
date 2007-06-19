@@ -127,7 +127,10 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
                                   % (self._fdCount, additionalFDs, actual)))
 
     def tearDown(self):
-        tlog.flushErrors(error.UnauthorizedLogin)
+        try:
+            self.flushLoggedErrors(error.UnauthorizedLogin)
+        except AttributeError:
+            tlog.flushErrors(error.UnauthorizedLogin)
         log._getTheFluLogObserver().clearIgnores()
         d = self.feedServer.shutdown()
         d.addCallback(lambda _: self._bouncer.stop())

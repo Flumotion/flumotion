@@ -1,3 +1,10 @@
+2007-06-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_component_feed.py (TestFeedClient.tearDown): 
+	* flumotion/test/test_pb.py
+	(Test_FPBClientFactory.flushUnauthorizedLogin): Avoid deprecated
+	log flush method for twisted 2.5.
+
 2007-06-18  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/common.py (_acquirePidFile, writePidFile)
