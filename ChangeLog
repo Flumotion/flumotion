@@ -10,6 +10,8 @@
 	(TestVishnu.testConfigBeforeWorker.gotWorker)
 	(TestVishnu.testConfigAfterWorker.loadConfigAndOneWorker): Wait
 	for components to log in before verifying things.
+	(TestVishnu._logoutAvatar): Remove one more call to
+	reactor.iterate; fortunately this one seems superfluous.
 
 	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): Add
 	a note to remove this in 0.6.

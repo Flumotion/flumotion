@@ -437,13 +437,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         avatarId = avatar._avatarId
 
         logout(avatarId, avatar, mind)
-        
-        # trigger detached
-        # twisted 2.2.0 TestCase does not have a runReactor method
-        # and according to twisted changeset 15556 it was always
-        # deprecated
-        from twisted.internet import reactor
-        reactor.iterate()
 
     def testWorker(self):
         names = self.vishnu.workerHeaven.state.get('names')
