@@ -471,7 +471,7 @@ class JobHeaven(pb.Root, log.Loggable):
     def killJob(self, avatarId, signum):
         for job in self.jobInfos.values():
             if job.avatarId == avatarId:
-                self.killJobByPid(self, job.pid, signum)
+                self.killJobByPid(job.pid, signum)
 
 class JobAvatar(fpb.Avatar, log.Loggable):
     """
