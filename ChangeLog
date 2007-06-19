@@ -1,5 +1,10 @@
 2007-06-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/componentview.py (NodeBook.__init__): Avoid
+	calling show_all in a way that would unconditionally show
+	admin/gtk contents. Fixes #575, I think, although that bug was
+	filed when the code was significantly different.
+
 	* flumotion/test/test_manager_manager.py: Import common, so that
 	we set up logging &c.
 	(FakeWorkerMind.waitForComponentsCreate): New method, keeps track

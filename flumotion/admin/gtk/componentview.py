@@ -34,13 +34,16 @@ class NodeBook(gtk.Notebook):
         admingtk.setup()
         self.nodes = admingtk.getNodes()
         self._setup_pages()
-        self.show_all()
+        self.show()
         
     def _setup_pages(self):
         for name, node in self.nodes.items():
             table = gtk.Table(1,1)
+            table.show()
             table.add(gtk.Label('Loading UI for %s...' % name))
-            self.append_page(table, gtk.Label(name))
+            label = gtk.Label(name)
+            label.show()
+            self.append_page(table, label)
 
             def got_widget(w, name, table, node):
                 # dumb dumb dumb dumb
