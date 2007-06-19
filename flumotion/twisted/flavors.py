@@ -300,6 +300,7 @@ class StateRemoteCache(pb.RemoteCache):
         @type  invalidate: procedure(object) -> None
         """
         if not (set or append or remove or setitem or delitem or invalidate):
+            # FIXME: remove this behavior in 0.6
             print ("Warning: Use of deprecated %r.addListener(%r) without "
                    "explicit event handlers" % (self, listener))
             set = listener.stateSet

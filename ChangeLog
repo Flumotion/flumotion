@@ -1,5 +1,19 @@
 2007-06-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_manager_manager.py: Import common, so that
+	we set up logging &c.
+	(FakeWorkerMind.waitForComponentsCreate): New method, keeps track
+	of the deferreds returned from _loginComponent, so that later one
+	can wait for them all to be given avatars.
+	(TestVishnu._requestAvatar.got_result): Don't call
+	reactor.iterate. Fixes #569.
+	(TestVishnu.testConfigBeforeWorker.gotWorker)
+	(TestVishnu.testConfigAfterWorker.loadConfigAndOneWorker): Wait
+	for components to log in before verifying things.
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): Add
+	a note to remove this in 0.6.
+
 	* flumotion/test/test_component_feed.py (TestFeedClient.tearDown): 
 	* flumotion/test/test_pb.py
 	(Test_FPBClientFactory.flushUnauthorizedLogin): Avoid deprecated

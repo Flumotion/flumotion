@@ -21,6 +21,8 @@
 
 from twisted.trial import unittest
 
+import common
+
 import os
 import exceptions
 
@@ -284,6 +286,7 @@ class FakeWorkerMind(FakeMind):
     def __init__(self, testcase, avatarId):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
+        self._createDeferreds = []
 
     def remote_getPorts(self):
         return range(7600,7608)
@@ -293,11 +296,22 @@ class FakeWorkerMind(FakeMind):
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
         self.debug('remote_create(%s): logging in component' % avatarId)
-        avatar = self.testcase._loginComponent(self.avatarId,
+        d = self.testcase._loginComponent(self.avatarId,
             avatarId, moduleName, methodName, type, config)
+
+        d2 = defer.Deferred()
+        self._createDeferreds.append(d2)
+        d.addCallback(lambda _: d2.callback(avatarId))
+
         # need to return the avatarId for comparison
-        return avatarId
+        d.addCallback(lambda _: avatarId)
+        return d
     
+    def waitForComponentsCreate(self):
+        d = defer.DeferredList(self._createDeferreds)
+        self._createDeferreds = []
+        return d
+
     def remote_getComponents(self):
         return []
 
@@ -385,9 +399,12 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             # and according to twisted changeset 15556 it was always
             # deprecated
             from twisted.internet import reactor
-            reactor.iterate()
             avatarDict[avatarId] = avatar
-            return avatar
+            d = defer.Deferred()
+            # FIXME: since the manager does a callLater(0,
+            # avatar.attached), we have to do likewise. Suck! See #624.
+            reactor.callLater(0, d.callback, avatar)
+            return d
         d.addCallback(got_result)
         return d
         
@@ -602,7 +619,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             return self._loginWorker('worker')
 
         def gotWorker(workerAvatar):
-            d = self._verifyConfigAndOneWorker()
+            d = workerAvatar.mind.waitForComponentsCreate()
+            d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
         
@@ -654,6 +672,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             
             # load configuration
             d = self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
+            d.addCallback(lambda _: self._workers['worker'].mind.waitForComponentsCreate())
             d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
