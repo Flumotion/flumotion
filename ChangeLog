@@ -1,3 +1,13 @@
+2007-06-19  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: 
+	* flumotion/component/producers/Makefile.am (SUBDIRS): 
+	* flumotion/component/producers/screencast/Makefile.am: 
+	* flumotion/component/producers/screencast/__init__.py: 
+	* flumotion/component/producers/screencast/screencast.xml: 
+	* flumotion/component/producers/screencast/screencast.py: Add new
+	producer, screencast-producer. See #579.
+
 2007-06-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py (Switch.cb,

@@ -1,0 +1,63 @@
+<registry>
+
+  <components>
+
+    <component type="screencast-producer"
+               base="flumotion/component/producers/screencast"
+               description="Capture video from a screen.">
+      <source location="flumotion.component.producers.screencast.screencast" />
+      <feeder name="default"/>
+
+      <entries>
+        <entry type="component" location="screencast.py"
+               function="Screencast" />
+      </entries>
+
+      <synchronization required="yes" clock-priority="0"/>
+
+      <properties>
+        <property name="height" type="int"
+                  description="Height in pixels" />
+        <property name="width" type="int"
+                  description="Width in pixels" />
+        <property name="x-offset" type="int"
+                  description="Capture a subwindow offset by this many pixels from the left" />
+        <property name="y-offset" type="int"
+                  description="Capture a subwindow offset by this many pixels from the top" />
+        <property name="framerate" type="fraction"
+                  description="Video framerate as numerator/denominator" />
+      </properties>
+    </component>
+
+  </components>
+
+  <bundles>
+
+    <bundle name="screencast-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/screencast">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="screencast-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="screencast-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/screencast">
+                <filename location="screencast.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

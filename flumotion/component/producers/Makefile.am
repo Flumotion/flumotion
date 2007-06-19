@@ -19,6 +19,7 @@ SUBDIRS = \
 	pipeline \
 	playlist \
 	rtsp \
+	screencast \
 	soundcard \
 	videotest \
 	webcam \
