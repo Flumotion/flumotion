@@ -269,6 +269,7 @@ def main(args):
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
+    reactor.callLater(0, vishnu.startManagerPlugs)
     
     # set up server based on transport
     myServer = server.Server(vishnu)

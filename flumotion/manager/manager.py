@@ -583,6 +583,11 @@ class Vishnu(log.Loggable):
                 plug = call(errors.ConfigError,
                             e.getModuleName(), e.getFunction(), args)
                 self.plugs[socket].append(plug)
+
+    def startManagerPlugs(self):
+        for socket in self.plugs:
+            for plug in self.plugs[socket]:
+                self.debug('starting plug %r for socket %s', plug, socket)
                 plug.start(self)
 
     def _loadManagerBouncer(self, conf):
