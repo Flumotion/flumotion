@@ -558,16 +558,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.effects[effect.name] = effect
         effect.setComponent(self)
 
-    def effectPropertyChanged(self, effectName, propertyName, value):
-        """
-        Notify the manager that an effect property has changed to a new value.
-        
-        Admin clients will receive it as a propertyChanged message for
-        effectName:propertyName.
-        """
-        self.medium.callRemote("propertyChanged", self.name,
-            "%s:%s" % (effectName, propertyName), value)
-
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
         # they are specified under <eater> as <feed> elements in XML

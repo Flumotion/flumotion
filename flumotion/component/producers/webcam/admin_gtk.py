@@ -31,15 +31,4 @@ class WebcamAdminGtk(BaseAdminGtk):
         self.nodes['Colorbalance'] = colorbalance
         return BaseAdminGtk.setup(self)
 
-    def component_effectPropertyChanged(self, effectName, propertyName, value):
-        self.debug("effect %s has property %s changed to %r" % (
-            effectName, propertyName, value))
-
-        if not effectName == "outputColorbalance":
-            self.warning("Unknown effect '%s'" % effectName)
-            return
-            
-        cb = self.nodes['Colorbalance']
-        cb.propertyChanged(propertyName, value)
-
 GUIClass = WebcamAdminGtk

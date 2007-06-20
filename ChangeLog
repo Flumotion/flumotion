@@ -1,3 +1,13 @@
+2007-06-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/webcam/admin_gtk.py
+	(component_effectPropertyChanged): 
+	* flumotion/component/producers/bttv/admin_gtk.py
+	(component_effectPropertyChanged): 
+	* flumotion/component/feedcomponent010.py (effectPropertyChanged):
+	Remove, the property change notifications now go through UI
+	states.
+
 2007-06-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py
