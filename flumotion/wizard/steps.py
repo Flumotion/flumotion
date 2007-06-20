@@ -690,14 +690,27 @@ class Overlay(WizardStep):
             self.add_msg(message)
         else:
             self.clear_msg('overlay')
-            self.can_overlay = True
-            self.set_sensitive(True)
 
         # now check import
-        d = self.wizard.require_import(self.worker, 'PIL',
-            'Python Imaging Library',
-            'http://www.pythonware.com/products/pil/')
+        d = self.wizard.check_import(self.worker, 'PIL')
         yield d
+        try:
+            d.value()
+            self.can_overlay = True
+            self.set_sensitive(True)
+        except ImportError:
+            self.info('could not import PIL')
+            message = messages.Warning(T_(N_(
+                "Worker '%s' cannot import module '%s'."),
+                self.worker, 'PIL'))
+            message.add(T_(N_("\nThis module is part of '%s'."),
+                           'Python Imaging Library'))
+            message.add(T_(N_("\nThe project's homepage is %s"),
+                           'http://www.pythonware.com/products/pil/'))
+            message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
+            message.id = 'module-PIL'
+            self.add_msg(message)
+            self.can_overlay = False
 
     worker_changed_010 = defer_generator_method(worker_changed_010)
 

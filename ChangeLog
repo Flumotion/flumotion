@@ -1,3 +1,9 @@
+2007-06-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/steps.py (Overlay.worker_changed_010): Fix so
+	as to allow the user to proceed without PIL. We should use cairo
+	instead, but whatevs...
+
 2007-06-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
