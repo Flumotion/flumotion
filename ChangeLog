@@ -1,3 +1,13 @@
+2007-06-20  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  If a component without config logs into the manager, add
+	  'clock-master' and 'plugs' into the synthesised config we give it.
+	  Should prevent KeyError: 'plugs' if someone/something tries to start
+	  it (though starting it will still fail), and the clock-master will
+	  prevent an exception being thrown that stops logout from completing
+	  cleanly (which means that stopping the component doesn't work).
+
 2007-06-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/webcam/admin_gtk.py

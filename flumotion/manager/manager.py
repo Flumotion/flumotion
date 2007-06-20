@@ -1072,14 +1072,16 @@ class Vishnu(log.Loggable):
             else:
                 # unfortunately there is a window in which a component does
                 # not have a config. accept that so that an admin can stop
-                # this component.
+                # this component. This can happen if the component logs out 
+                # before setup() was called, then it logs back in.
                 flowName, compName = common.parseComponentId(avatar.avatarId)
                 conf = {'name': compName,
                         'parent': flowName,
                         'type': 'unknown-component',
                         'avatarId': avatar.avatarId,
+                        'clock-master': None,
+                        'plugs': {},
                         'properties': {}}
-
 
             state.set('name', compName)
             state.set('type', conf['type'])
