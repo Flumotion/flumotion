@@ -421,8 +421,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.addMessage(
                 messages.Info(T_(N_(
                     "You will get more debugging information "
-                    "if you upgrade to GStreamer 0.10.13 or later "
-                    "as and when available."))))
+                    "if you upgrade to GStreamer 0.10.13 or later."))))
 
     def do_setup(self):
         """

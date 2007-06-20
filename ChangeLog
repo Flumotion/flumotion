@@ -1,5 +1,8 @@
 2007-06-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	s/ as and when available//, thank Jeebus.
+
 	* flumotion/manager/main.py (main): Parse all files for manager
 	config, not just the first one.
 
