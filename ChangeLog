@@ -1,3 +1,8 @@
+2007-06-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/main.py (main): Parse all files for manager
+	config, not just the first one.
+
 2007-06-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/main.py:
