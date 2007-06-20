@@ -60,7 +60,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         self._feederFeedServer = {} # FeedId -> (fullFeedId, host, port) tuple
                                     # for remote feeders
-        self._feederClientFactory = {} # fullFeedId -> client factory
+        self._feederPendingConnections = {} # fullFeedId -> cancel thunk
         self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
                                     # for remote eaters
         self._eaterClientFactory = {} # (componentId, feedId) -> client factory
@@ -133,35 +133,29 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
     def connectEater(self, feedId):
         """
-        Actually eat the given feed.
-        Used on initial connection, and for reconnecting.
+        Connect one of the medium's component's eaters to a remote feed.
+        Called by the component, both on initial connection and for
+        reconnecting.
+
+        @returns: (deferred, cancel) pair, where cancel is a thunk that
+        you can call to cancel any pending connection attempt.
         """
+        def gotFeed((feedId, fd)):
+            self._feederPendingConnections.pop(fullFeedId, None)
+            self.comp.eatFromFD(feedId, fd)
+
         (fullFeedId, host, port) = self._feederFeedServer[feedId]
-        client = feed.FeedMedium(self.comp)
-        factory = feed.FeedClientFactory(client)
-        # FIXME: maybe copy keycard instead, so we can change requester ?
-        self.debug('connecting to FeedServer on %s:%d' % (host, port))
-        reactor.connectTCP(host, port, factory)
-        d = factory.login(self.authenticator)
-        self._feederClientFactory[fullFeedId] = factory
-        def loginCb(remoteRef):
-            self.debug('logged in to feedserver, remoteRef %r' % remoteRef)
-            client.setRemoteReference(remoteRef)
-            # now call on the remoteRef to eat
-            self.debug(
-                'COMPONENT --> feedserver: sendFeed(%s)' % fullFeedId)
-            d = remoteRef.callRemote('sendFeed', fullFeedId)
 
-            def sendFeedCb(result):
-                self.debug('COMPONENT <-- feedserver: sendFeed(%s): %r' % (
-                    fullFeedId, result))
-                # FIXME: why does this not return result ?
-                return None
+        cancel = self._feederPendingConnections.pop(fullFeedId, None)
+        if cancel:
+            self.debug('cancelling previous connection attempt to %s',
+                       fullFeedId)
+            cancel()
 
-            d.addCallback(sendFeedCb)
-            return d
-
-        d.addCallback(loginCb)
+        client = feed.FeedMedium(logName=self.comp.name)
+        d = client.requestFeed(host, port, self.authenticator, fullFeedId)
+        self._feederPendingConnections[fullFeedId] = client.stopConnecting
+        d.addCallback(gotFeed)
         return d
 
     def remote_feedTo(self, componentId, feedId, host, port):

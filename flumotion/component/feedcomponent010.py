@@ -394,8 +394,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self._inactiveEaters = [] # list of feedId's
         self._inactivated = False
 
-        # feedId -> dict of lastTime, lastConnectTime, lastConnectD,
-        # checkEaterDC,
+        # feedId -> dict of lastTime, lastConnectTime,
+        # checkEaterDC
         self._eaterStatus = {}
 
         # statechange -> [ deferred ]
@@ -452,7 +452,6 @@ class FeedComponent(basecomponent.BaseComponent):
             d = {
                 'lastTime': 0,
                 'lastConnectTime': 0,
-                'lastConnectD': None,
                 'checkEaterDC': None
             }
             self._eaterStatus[name] = d
@@ -1086,17 +1085,9 @@ class FeedComponent(basecomponent.BaseComponent):
         # call could accidentally think the eater was reconnected properly.
         # Setting lastTime to 0 here avoids that happening in eaterCheck.
         self._eaterStatus[feedId]['lastTime'] = 0
-
         status['lastConnectTime'] = time.time()
-        if status['lastConnectD']:
-            self.debug('Cancel previous connection attempt ?')
-            # FIXME: it seems fine to not errback explicitly, but we may
-            # want to investigate further later
-        d = self.medium.connectEater(feedId)
-        def connectEaterCb(result, status, eater):
-            status['lastConnectD'] = None
-        d.addCallback(connectEaterCb, status, eater)
-        status['lastConnectD'] = d
+
+        self.medium.connectEater(feedId)
 
     def get_element(self, element_name):
         """Get an element out of the pipeline.

@@ -1,5 +1,15 @@
 2007-06-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent._reconnectEater, FeedComponent.do_setup)
+	(FeedComponent.init): No longer any need for lastConnectD, which
+	was badly named anyway.
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.connectEater): Simplify via use of the
+	FeedMedium's requestFeed, which is actually tested. As a new
+	feature, cancel any pending connection before starting a new one.
+
 	* flumotion/wizard/steps.py (Overlay.worker_changed_010): Fix so
 	as to allow the user to proceed without PIL. We should use cairo
 	instead, but whatevs...
