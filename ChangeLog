@@ -1,3 +1,9 @@
+2007-06-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.change_filename):
+	Add extensions for flv and ts.
+
 2007-06-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py (FeedComponent.init):

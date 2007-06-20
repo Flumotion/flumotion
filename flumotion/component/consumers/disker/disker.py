@@ -202,6 +202,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             ext = 'mkv'
         elif mime == 'video/x-dv':
             ext = 'dv'
+        elif mime == 'video/x-flv':
+            ext = 'flv'
+        elif mime == 'video/mpegts':
+            ext = 'ts'
         else:
             ext = 'data'
         
