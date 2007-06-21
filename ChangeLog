@@ -1,3 +1,11 @@
+2007-06-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/command/commands.py (do_invoke, do_workerinvoke):
+	Run quit function (callLater of reactor.stop) in error cases where
+	we yield None.
+	Catch invokes on components that are not started and so manager sends
+	us SleepingComponentError.
+
 2007-06-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py

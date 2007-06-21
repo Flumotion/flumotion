@@ -231,11 +231,13 @@ def do_invoke(model, quit, avatarId, methodName, *args):
     c = utils.find_component(planet, avatarId)
     if not c:
         print "Could not find component %r" % avatarId
+        quit()
         yield None
 
     if args:
         args = _parse_typed_args(args[0], args[1:])
         if args is None:
+            quit()
             yield None
 
     d = model.componentCallRemote(c, methodName, *args)
@@ -248,6 +250,8 @@ def do_invoke(model, quit, avatarId, methodName, *args):
         print v
     except errors.NoMethodError:
         print "No method '%s' on component '%s'" % (methodName, avatarId)
+    except errors.SleepingComponentError:
+        print "Component %s not running." % avatarId[1]
     except Exception, e:
         raise
 
@@ -258,6 +262,7 @@ def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     if args:
         args = _parse_typed_args(args[0], args[1:])
         if args is None:
+            quit()
             yield None
 
     d = model.callRemote('workerCallRemote', workerName, 'runFunction',
