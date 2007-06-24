@@ -399,14 +399,13 @@ def addLogHandler(func):
     """
     Add a custom log handler.
 
-    @param func:    a function object
-                    with prototype (level, object, category, message)
-                    where level is either ERROR, WARN, INFO, DEBUG, or
-                    LOG, and the rest of the arguments are strings or
-                    None. Use getLevelName(level) to get a printable
-                    name for the log level.
-    @type func:     a callable function
-    @raises:        TypeError if func is not a callable
+    @param func: a function object with prototype (level, object, category,
+                 message) where level is either ERROR, WARN, INFO, DEBUG, or
+                 LOG, and the rest of the arguments are strings or None. Use
+                 getLevelName(level) to get a printable name for the log level.
+    @type func:  a callable function
+
+    @raises TypeError: if func is not a callable
     """
 
     if not callable(func):
@@ -419,14 +418,13 @@ def addLimitedLogHandler(func):
     """
     Add a custom log handler.
 
-    @param func:    a function object
-                    with prototype (level, object, category, message)
-                    where level is either ERROR, WARN, INFO, DEBUG, or
-                    LOG, and the rest of the arguments are strings or
-                    None. Use getLevelName(level) to get a printable
-                    name for the log level.
-    @type func:     a callable function
-    @raises:        TypeError if func is not a callable    
+    @param func: a function object with prototype (level, object, category,
+                 message) where level is either ERROR, WARN, INFO, DEBUG, or
+                 LOG, and the rest of the arguments are strings or None. Use
+                 getLevelName(level) to get a printable name for the log level.
+    @type func:  a callable function
+
+    @raises TypeError: TypeError if func is not a callable    
     """
     if not callable(func):
         raise TypeError, "func must be callable"
@@ -438,14 +436,13 @@ def removeLogHandler(func):
     """
     Remove a registered log handler.
 
-    @param func:    a function object
-                    with prototype (level, object, category, message)
-                    where level is either ERROR, WARN, INFO, DEBUG, or
-                    LOG, and the rest of the arguments are strings or
-                    None. Use getLevelName(level) to get a printable
-                    name for the log level.
-    @type func:     a callable function
-    @raises:        ValueError if func is not registered
+    @param func: a function object with prototype (level, object, category,
+                 message) where level is either ERROR, WARN, INFO, DEBUG, or
+                 LOG, and the rest of the arguments are strings or None. Use
+                 getLevelName(level) to get a printable name for the log level.
+    @type func:  a callable function
+
+    @raises ValueError: if func is not registered
     """
     _log_handlers.remove(func)
 
@@ -454,14 +451,13 @@ def removeLimitedLogHandler(func):
     """
     Remove a registered limited log handler.
 
-    @param func:    a function object
-                    with prototype (level, object, category, message)
-                    where level is either ERROR, WARN, INFO, DEBUG, or
-                    LOG, and the rest of the arguments are strings or
-                    None. Use getLevelName(level) to get a printable
-                    name for the log level.
-    @type func:     a callable function
-    @raises:        ValueError if func is not registered
+    @param func: a function object with prototype (level, object, category,
+                 message) where level is either ERROR, WARN, INFO, DEBUG, or
+                 LOG, and the rest of the arguments are strings or None. Use
+                 getLevelName(level) to get a printable name for the log level.
+    @type func:  a callable function
+
+    @raises ValueError: if func is not registered
     """
     _log_handlers_limited.remove(func)
 
