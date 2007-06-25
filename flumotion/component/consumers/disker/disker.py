@@ -365,6 +365,13 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
 
+        # set event probe if we should react to video mark events
+        react_to_marks = properties.get('react-to-stream-markers', False)
+        if react_to_marks:
+            pfx = properties.get('stream-marker-filename-prefix', '%03d.')
+            self._marker_prefix = pfx
+            sink.get_pad('sink').add_event_probe(self._markers_event_probe)
+
     def eventStarted(self, event):
         self.change_filename(event.content, event.start.timetuple())
 
@@ -385,5 +392,35 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                     self.schedule_recording(dtstart, dtend, recur, summary)
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
+
+    def _markers_event_probe(self, element, event):
+        if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:
+            evt_struct = event.get_structure()
+            if evt_struct.get_name() == 'FluStreamMark':
+                if evt_struct['action'] == 'start':
+                    self._on_marker_start(evt_struct['prog_id'])
+                elif evt_struct['action'] == 'stop':
+                    self._on_marker_stop()
+        return True
+
+    def _on_marker_stop(self):
+        self.stop_recording()
+
+    def _on_marker_start(self, data):
+        tmpl = self._defaultFilenameTemplate
+        if self._marker_prefix:
+            try:
+                tmpl = '%s%s' % (self._marker_prefix % data,
+                                 self._defaultFilenameTemplate)
+            except TypeError, err:
+                m = messages.Warning(T_(N_('Failed expanding filename prefix: '
+                                           '%r <-- %r.'),
+                                        self._marker_prefix, data),
+                                     id='expand-marker-prefix')
+                self.addMessage(m)
+                self.warning('Failed expanding filename prefix: '
+                             '%r <-- %r; %r' %
+                             (self._marker_prefix, data, err))
+        self.change_filename(tmpl)
 
 pygobject.type_register(Disker)

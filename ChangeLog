@@ -1,3 +1,11 @@
+2007-06-25  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.configure_pipeline, Disker._markers_event_probe,
+	  Disker._on_marker_stop, Disker._on_marker_start):
+	* flumotion/component/consumers/disker/disker.xml:
+	Make disker able to react to stream markers, take 2.
+
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.cleanup):
