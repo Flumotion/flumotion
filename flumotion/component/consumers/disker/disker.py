@@ -103,7 +103,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def get_pipeline_string(self, properties):
         directory = properties['directory']
-
+    
         self.directory = directory
 
         self.fixRenamedProperties(properties, [('rotateType', 'rotate-type')])
@@ -150,10 +150,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         @param size: size of file (in bytes)
         """
         reactor.callLater(5, self._rotateSizeCallback, size)
-
+        
     def _rotateTimeCallback(self, time):
         self.change_filename()
-
+        
         # Add a new one
         reactor.callLater(time, self._rotateTimeCallback, time)
 
@@ -163,10 +163,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         else:
             if os.stat(self.location).st_size > size:
                 self.change_filename()
-
+        
         # Add a new one
         reactor.callLater(5, self._rotateTimeCallback, size)
-
+        
     def get_mime(self):
         if self.caps:
             return self.caps.get_structure(0).get_name()
@@ -176,7 +176,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if mime == 'multipart/x-mixed-replace':
             mime += ";boundary=ThisRandomString"
         return mime
-
+    
     def change_filename(self, filenameTemplate=None, timeOrTuple=None):
         """
         @param filenameTemplate: strftime formatted string to decide filename
@@ -208,7 +208,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             ext = 'ts'
         else:
             ext = 'data'
-
+        
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
@@ -241,7 +241,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.emit('add', self.file.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
-
+    
         if self.symlink_to_current_recording:
             self.update_symlink(self.location,
                                 self.symlink_to_current_recording)
@@ -287,7 +287,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
-
+        
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
 
@@ -295,12 +295,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if not self.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
             new = False
-
+            
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
         if new and self._recordAtStart:
-            reactor.callLater(0, self.change_filename,
+            reactor.callLater(0, self.change_filename, 
                 self._startFilenameTemplate)
 
     # callback for when a client is removed so we can figure out
@@ -329,7 +329,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.symlink_to_current_recording = \
             properties.get('symlink-to-current-recording', None)
         self._recordAtStart = properties.get('start-recording', True)
-        self._defaultFilenameTemplate = properties.get('filename',
+        self._defaultFilenameTemplate = properties.get('filename', 
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
@@ -365,13 +365,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
 
-        # set event probe if we should react to video mark events
-        react_to_marks = properties.get('react-to-stream-markers', False)
-        if react_to_marks:
-            pfx = properties.get('stream-marker-filename-prefix', '%03d.')
-            self._marker_prefix = pfx
-            sink.get_pad('sink').add_event_probe(self._markers_event_probe)
-
     def eventStarted(self, event):
         self.change_filename(event.content, event.start.timetuple())
 
@@ -392,30 +385,5 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                     self.schedule_recording(dtstart, dtend, recur, summary)
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
-
-    def _markers_event_probe(self, element, event):
-        if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:
-            evt_struct = event.get_structure()
-            if evt_struct.get_name() == 'FluStreamMark':
-                if evt_struct['action'] == 'start':
-                    self._on_marker_start(evt_struct['prog_id'])
-                elif evt_struct['action'] == 'stop':
-                    self._on_marker_stop()
-        return True
-
-    def _on_marker_stop(self):
-        self.stop_recording()
-
-    def _on_marker_start(self, data):
-        tmpl = self._defaultFilenameTemplate
-        if self._marker_prefix:
-            try:
-                tmpl = '%s%s' % (self._marker_prefix % data,
-                                 self._defaultFilenameTemplate)
-            except TypeError, err:
-                self.warning('Failed expanding filename prefix: '
-                             '%s <-- %r; %r' %
-                             (self._marker_prefix, data, err))
-        self.change_filename(tmpl)
 
 pygobject.type_register(Disker)

@@ -15,7 +15,7 @@
         <entry type="admin/text" location="admin_text.py"
               function="UIClass" />
       </entries>
-
+      
       <properties>
         <property name="directory" type="string" required="yes" />
         <property name="rotate-type" type="string" required="no"
@@ -29,9 +29,6 @@
         <property name="symlink-to-current-recording" type="string" required="no" />
         <property name="ical-schedule" type="string" required="no" />
         <property name="filename" type="string" required="no" />
-        <property name="react-to-stream-markers" type="bool" required="no" />
-        <property name="stream-marker-filename-prefix" type="string"
-                  required="no" description="Formatting template for program id (default '%03d')" />
       </properties>
     </component>
   </components>
@@ -54,7 +51,7 @@
             <dependency name="base-admin-gtk"/>
 	        <dependency name="disker-base"/>
         </dependencies>
-
+        
         <directories>
             <directory name="flumotion/component/consumers/disker">
                 <filename location="admin_gtk.py"/>
@@ -91,4 +88,5 @@
      </bundle>
   </bundles>
 
-</registry>
+</registry> 
+  

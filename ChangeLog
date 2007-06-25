@@ -84,15 +84,6 @@
 	* flumotion/component/consumers/httpstreamer/http.glade:
 	  Fix HIG breakage done by Mike.
 
-2007-06-22  Arek Korbik  <arkadini@gmail.com>
-
-	* flumotion/component/consumers/disker/disker.py
-	  (Disker.configure_pipeline, Disker._markers_event_probe,
-	  Disker._on_marker_stop, Disker._on_marker_start):
-	* flumotion/component/consumers/disker/disker.xml:
-	Make disker able to react to stream markers; clean some
-	whitespace, too.
-
 2007-06-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/commands.py (do_invoke, do_workerinvoke):
