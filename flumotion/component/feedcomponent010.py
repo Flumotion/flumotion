@@ -674,6 +674,32 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         self.setMood(moods.happy)
 
+    def make_message_for_gstreamer_error(self, gerror, debug):
+        """Make a flumotion error message to show to the user.
+
+        This method may be overridden by components that have special
+        knowledge about potential errors. If the component does not know
+        about the error, it can chain up to this implementation, which
+        will make a generic message.
+
+        @param gerror: The GError from the error message posted on the
+        GStreamer message bus.
+        @type  gerror: L{gst.GError}
+        @param  debug: A string with debugging information.
+        @type   debug: str
+
+        @returns A L{flumotion.common.messages.Message} to show to the
+        user.
+        """
+        # generate a unique id
+        mid = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
+        m = messages.Error(T_(N_(
+            "Internal GStreamer error.")),
+            debug="%s\n%s: %d\n%s" % (
+                gerror.message, gerror.domain, gerror.code, debug),
+            id=mid, priority=40)
+        return m
+
     def bus_message_received_cb(self, bus, message):
         t = message.type
         src = message.src
@@ -705,13 +731,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('element %s error %s %s' %
                          (src.get_path_string(), gerror, debug))
             self.setMood(moods.sad)
-            # generate a unique id
-            mid = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
-            m = messages.Error(T_(N_(
-                "Internal GStreamer error.")),
-                debug="%s\n%s: %d\n%s" % (
-                    gerror.message, gerror.domain, gerror.code, debug),
-                id=mid, priority=40)
+            m = self.make_message_for_gstreamer_error(gerror, debug)
             self.state.append('messages', m)
             # if we have a state change defer that has not yet
             # fired, we should errback it

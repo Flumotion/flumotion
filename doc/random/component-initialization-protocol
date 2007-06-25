@@ -18,7 +18,7 @@ This factory function is called the "entry point" of a component type.
 This entry point is declared in the registry section for that component type.
 
 The manager invokes the worker's remote_create() method.
-The worker then spawns a job to run this component in.
+The worker then spawns a job in which to run this component.
 It calls the factory function with the config dictionary as the sole argument.
 
 In practice all components in flumotion's repository are set to have the
@@ -160,6 +160,13 @@ FeedComponent.set_pipeline(self, pipeline)
 The base implementation of this method will set self.pipeline to
 pipeline and will connect to signals, the bus, etc. Subclass
 implementations should chain up to this method first.
+
+FeedComponent.make_message_for_gstreamer_error(self, gerror, debug)
+-------------------------------------------------------------------
+Make a flumotion error message to show when a GStreamer error occurs.
+The base implementation makes a generic message; a component might want
+to specialize this method to handle certain known errors.
+Implementations should return the new message.
 
 
 Parse-launch components

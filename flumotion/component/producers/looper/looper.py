@@ -116,6 +116,15 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
         return template
 
+    def make_message_for_gstreamer_error(self, gerror, debug):
+        if gerror.domain == 'gst-resource-error-quark':
+            return messages.Error(T_(N_("Could not open file %r."),
+                                     self.filelocation),
+                                  debug='%s\n%s' % (gerror.message, debug),
+                                  id=gerror.domain, priority=40)
+        base = feedcomponent.ParseLaunchComponent
+        return base.make_message_for_gstreamer_error(gerror, debug)
+
     def run_discoverer(self):
         def discovered(d, ismedia):
             self.uiState.set('info-location', self.filelocation)

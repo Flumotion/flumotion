@@ -1,5 +1,22 @@
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/looper/looper.py
+	(Looper.make_message_for_gstreamer_error): Make a nicer error if
+	we can.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.make_message_for_gstreamer_error): New public,
+	overridable method.
+	(FeedComponent.bus_message_received_cb): Call
+	make_message_for_gstreamer_error so that components can give more
+	informative messages. Fixes #598.
+
+	* doc/random/component-initialization-protocol: Add documentation
+	for make_message_for_gstreamer_error.
+
+	* conf/managers/default/flows/looper.xml: Update for the great
+	renaming.
+
 	* flumotion/manager/main.py (_initialLoadConfig): No more need to
 	catch errors and print here, as flumotion.manager.manager does the
 	right thing now.
