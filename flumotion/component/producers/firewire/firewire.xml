@@ -2,10 +2,11 @@
   <components>
     <component type="firewire-producer"
                base="flumotion/component/producers/firewire"
-               description="Produce raw feeds from a Firewire/DV device.">
+               description="Produce feeds from a Firewire/DV device.">
       <source location="flumotion.component.producers.firewire.firewire" />
-      <feeder name="audio"/>
-      <feeder name="video"/>
+      <feeder name="audio" />
+      <feeder name="video" />
+      <feeder name="dv" />
       <entries>
         <entry type="component" location="firewire.py"
                function="Firewire" />
@@ -13,7 +14,7 @@
                function="GUIClass" />
       </entries>
 
-      <synchronization required="yes" clock-priority="160"/>
+      <synchronization required="yes" clock-priority="160" />
 
       <properties>
         <property name="height" type="int"

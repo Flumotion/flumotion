@@ -95,6 +95,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
         template = ('dv1394src'
+                    '    ! tee name=t'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
                     '  demux. ! queue ! dvdec drop-factor=%(df)d'
@@ -108,6 +109,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '  demux. ! queue ! audio/x-raw-int ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder::audio@'
+                    '    t. ! queue ! @feeder::dv@'
                     % dict(df=drop_factor, ih=interlaced_height,
                            sq=square_pipe, pp=pad_pipe,
                            sw=scaled_width, h=height,
