@@ -58,6 +58,8 @@ NUM_STATES = 3
 OBJECT_UNSET, OBJECT_INACTIVE, OBJECT_ACTIVE = range(NUM_STATES)
 
 class ComponentView(gtk.VBox, log.Loggable):
+    logCategory='componentview'
+
     def __init__(self):
         gtk.VBox.__init__(self)
         self.widget_constructor = None
@@ -74,34 +76,37 @@ class ComponentView(gtk.VBox, log.Loggable):
         # override me to do e.g. multi.get_admin_for_object
         return self.admin
 
-    @defer_generator_method
     def get_widget_constructor(self, state):
-        def sleeping_component():
-            return gtk.Label('Component %s is still sleeping' %
-                             state.get('name'))
         def not_component_state():
             return gtk.Label('')
+
+        def no_bundle(failure):
+            failure.trap(errors.NoBundleError)
+            return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
             
+        def got_file_name((filename, procname)):
+            modname = common.pathToModuleName(filename)
+            return admin.getBundledFunction(modname, procname)
+            
+        def got_constructor(proc):
+            return lambda: NodeBook(proc(state, admin))
+
+        def sleeping_component(failure):
+            failure.trap(errors.SleepingComponentError)
+            return lambda: gtk.Label('Component %s is still sleeping' %
+                                     state.get('name'))
+
+
         admin = self.get_admin_for_object(state)
         if not isinstance(state, planet.AdminComponentState):
-            yield not_component_state
+            return not_component_state
 
-        try:
-            d = admin.callRemote('getEntryByType', state, 'admin/gtk')
-            yield d
-            filename, procname = d.value()
-        except errors.NoBundleError, e:
-            # Use a default of BaseAdminGtk so our plumbing nodes work
-            filename = "flumotion/component/base/admin_gtk.py"
-            procname  = "BaseAdminGtk"
-        except errors.SleepingComponentError, e:
-            yield sleeping_component
-        
-        modname = common.pathToModuleName(filename)
-        d = admin.getBundledFunction(modname, procname)
-        yield d
-        proc = d.value()
-        yield lambda: NodeBook(proc(state, admin))
+        d = admin.callRemote('getEntryByType', state, 'admin/gtk')
+        d.addErrback(no_bundle)
+        d.addCallback(got_file_name)
+        d.addCallback(got_constructor)
+        d.addErrback(sleeping_component)
+        return d
 
     def object_unset_to_inactive(self):
         def invalidate(_):
@@ -122,8 +127,7 @@ class ComponentView(gtk.VBox, log.Loggable):
 
     def object_inactive_to_active(self):
         def got_widget_constructor(proc, callStamp):
-            if (callStamp != self._callStamp
-                or self._state != OBJECT_ACTIVE):
+            if callStamp != self._callStamp:
                 # in the time that get_widget_constructor was running,
                 # perhaps the user selected another object; only update
                 # the ui if that did not happen
@@ -131,6 +135,7 @@ class ComponentView(gtk.VBox, log.Loggable):
                            'callstamps %d/%d', proc, self._state,
                            callStamp, self._callStamp)
                 return
+            assert self.widget == None
             self.widget = proc()
             self.widget.show()
             self.pack_start(self.widget, True, True)
@@ -142,6 +147,8 @@ class ComponentView(gtk.VBox, log.Loggable):
         d.addCallback(got_widget_constructor, callStamp)
         
     def object_active_to_inactive(self):
+        # prevent got_widget_constructor from adding the widget above
+        self._callStamp += 1
         if self.widget:
             self.remove(self.widget)
             # widget maybe a gtk.Label or a NodeBook

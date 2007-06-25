@@ -1,3 +1,20 @@
+2007-06-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.cleanup):
+	Set uiState to None when we stop listening.
+	(BaseAdminGtkNode.__init__, BaseAdminGtkNode.gotUIState)
+	(BaseAdminGtkNode.render): Fix bug that could cause cleanup() to
+	raise an exception, corrupting the state of the GTK+ UI.
+
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView.get_widget_constructor): Rewrite to not be a
+	defgen.
+	(ComponentView.object_inactive_to_active.got_widget_constructor)
+	(ComponentView.object_active_to_inactive): Increment callstamp
+	when going to inactive, so we can simplify the check in
+	got_widget_constructor. Add an assertion in got_widget_constructor
+	that we don't already have a widget.
+
 2007-06-25  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

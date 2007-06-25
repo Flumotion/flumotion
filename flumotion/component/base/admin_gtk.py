@@ -70,6 +70,7 @@ class BaseAdminGtk(log.Loggable):
     def cleanup(self):
         if self.uiState:
             self.uiState.removeListener(self)
+            self.uiState = None
         for node in self.getNodes().values():
             node.cleanup()
 
@@ -227,7 +228,9 @@ class BaseAdminGtkNode(log.Loggable):
         self.nodes = util.OrderedDict()
         self.wtree = None
         self.widget = None
-        self.uiState = None
+        self.uiState = None # set if we are listening
+        self._pendingUIState = None # set if we are waiting for the ui
+                                    # to load
         ## Absolute path to the glade file.
         ##   e.g. "/home/flu/.flumotion/cache/test/80...df7/flumotion/ui.glade
         self._gladefilepath = None 
@@ -236,7 +239,6 @@ class BaseAdminGtkNode(log.Loggable):
         if self.uiState:
             self.uiState.removeListener(self)
 
-        
     def status_push(self, str):
         if self.statusbar:
             return self.statusbar.push('notebook', str)
@@ -339,9 +341,10 @@ class BaseAdminGtkNode(log.Loggable):
         self.debug("property %s changed to %r" % (name, value))
 
     def gotUIState(self, state):
-        self.uiState = state
         if self.widget:
-            self.setUIState(self.uiState)
+            self.setUIState(state)
+        else:
+            self._pendingUIState = state
 
     def setUIState(self, state):
         """
@@ -399,9 +402,9 @@ class BaseAdminGtkNode(log.Loggable):
             self.debug('render: no self.widget, failing')
             yield defer.fail(IndexError)
             
-        if self.uiState:
+        if self._pendingUIState:
             self.debug('calling setUIState on the node')
-            self.setUIState(self.uiState)
+            self.setUIState(self._pendingUIState)
 
         self.debug('render: yielding widget %s' % self.widget)
         yield self.widget
