@@ -12,7 +12,7 @@
 	* flumotion/configure/uninstalled.py.in:
 	* flumotion/configure/installed.py.in: Use safeprintf instead of
 	print everywhere it can be called from a daemonized process.
-	Fixes #605.
+	Fixes #613.
 
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer.check_properties): Change to implement
