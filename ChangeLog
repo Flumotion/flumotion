@@ -1,3 +1,17 @@
+2007-06-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.check_properties): Change to implement
+	check_properties instead of do_check.
+
+	* flumotion/component/component.py (BaseComponent.do_check): By
+	default, call the check_properties vmethod.
+	(BaseComponent.check_properties): New vmethod.
+	(BaseComponent.setup): Rearrange some code; no semantic change.
+
+	* doc/random/component-initialization-protocol (check_properties):
+	New vmethod. Fixes #605.
+
 2007-06-25  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/consumers/disker/disker.py

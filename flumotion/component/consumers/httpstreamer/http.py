@@ -302,8 +302,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def get_pipeline_string(self, properties):
         return self.pipe_template
 
-    def do_check(self):
-        props = self.config['properties']
+    def check_properties(self, props, addMessage):
 
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
@@ -321,12 +320,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
                 if not 'porter-' + k in props:
-                    msg = "slave mode, missing required property 'porter-%s'" % k
-                    return defer.fail(errors.ConfigError(msg))
+                    raise errors.ConfigError("slave mode, missing required"
+                                             " property 'porter-%s'" % k)
 
         if 'burst-size' in props and 'burst-time' in props:
-            msg = 'both burst-size and burst-time set, cannot satisfy'
-            return defer.fail(errors.ConfigError(msg))
+            raise errors.ConfigError('both burst-size and burst-time '
+                                     'set, cannot satisfy')
 
         # tcp is where multifdsink is
         version = gstreamer.get_plugin_version('tcp') 
@@ -336,12 +335,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                     ".".join(map(str, version)), 'multifdsink'))
             m.add(T_(N_("Please upgrade '%s' to version %s."),
                 'gst-plugins-base', '0.10.10'))
-            self.addMessage(m)
-            self.setMood(moods.sad)
-
-            return defer.fail(
-                errors.ComponentSetupHandledError(
-                    "multifdsink version not newer than 0.10.9.1"))
+            addMessage(m)
 
     def time_bursting_supported(self, sink):
         try:

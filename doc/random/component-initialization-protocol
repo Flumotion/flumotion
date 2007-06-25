@@ -84,6 +84,17 @@ Subclasses should declare instance variables, ...
 All .init methods of every class in the hierarchy get called.
 This method is optional for subclasses.
 
+BaseComponent.check_properties(self, properties, addMessage)
+------------------------------------------------------------
+A helper vmethod called by the default implementation of do_check() that
+includes the properties in the arguments. The addMessage argument is a
+function that will call self.addMessage, additionally raising an
+exception if the message is of level ERROR.
+
+This procedure is called with twisted.internet.defer.maybeDeferred, so
+all exceptions thrown by this procedure will be caught, and it is
+acceptable (although not required) to return a deferred.
+
 BaseComponent.do_check(self)
 ----------------------------
 This method has no requirements. It is implementation-specific.

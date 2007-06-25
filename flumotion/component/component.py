@@ -358,7 +358,33 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
-        return defer.succeed(None)
+        def addMessage(message):
+            self.addMessage(message)
+            if message.level == messages.ERROR:
+                raise errors.ComponentSetupHandledError(message.debug)
+
+        return defer.maybeDeferred(self.check_properties,
+                                   self.config['properties'],
+                                   addMessage)
+
+    def check_properties(self, properties, addMessage):
+        """
+        BaseComponent convenience vmethod for running checks.
+
+        A component implementation can override this method to run any
+        checks that it needs to. Typically, a check_properties
+        implementation will call the provided addMessage() callback to
+        note warnings or errors. For errors, addMessage() will abort the
+        check process, setting the mood to sad.
+
+        @param properties: The component's properties
+        @type properties: dict of string => object
+        @param addMessage: Thunk to add a message to the component
+                           state. Will raise an exception if the
+                           message is of level ERROR.
+        @type addMessage: L{flumotion.common.messages.Message} -> None
+        """
+        pass
 
     def do_setup(self):
         """
@@ -460,16 +486,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                 self.warning('Running checks made the component sad.')
                 raise errors.ComponentSetupHandledError()
 
-        self.debug("setup() called with config %r", config)
-        self.setMood(moods.waking)
-        self._setConfig(config)
-        # now we have a name, set it on the medium too
-        if self.medium:
-            self.medium.logName = self.getName()
-        d = setup_plugs()
-        d.addCallback(lambda r: self.do_check())
-        d.addCallback(checkErrorCallback)
-        d.addCallback(lambda r: self.do_setup())
         def setupErrback(failure):
             # pass through handled errors
             if failure.check(errors.ComponentSetupHandledError):
@@ -485,6 +501,16 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             raise errors.ComponentSetupHandledError(
                 'Could not set up component')
 
+        self.debug("setup() called with config %r", config)
+        self.setMood(moods.waking)
+        self._setConfig(config)
+        # now we have a name, set it on the medium too
+        if self.medium:
+            self.medium.logName = self.getName()
+        d = setup_plugs()
+        d.addCallback(lambda r: self.do_check())
+        d.addCallback(checkErrorCallback)
+        d.addCallback(lambda r: self.do_setup())
         d.addErrback(setupErrback)
         return d
 
