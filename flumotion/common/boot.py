@@ -192,5 +192,5 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     try:
         sys.exit(catching(main, sys.argv))
     except (errors.SystemError, SystemError), e:
-        safeprintf('ERROR: %s\n', e)
+        safeprintf(sys.stderr, 'ERROR: %s\n', e)
         sys.exit(1)

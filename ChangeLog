@@ -2,6 +2,13 @@
 
 	* flumotion/manager/component.py
 	(ComponentAvatar._mindPropertyErrback)
+	(ComponentAvatar.reloadComponent._reloadComponentErrback):
+	* flumotion/common/boot.py (boot): 
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): Fix
+	the fixes.
+	
+	* flumotion/manager/component.py
+	(ComponentAvatar._mindPropertyErrback)
 	(ComponentAvatar.reloadComponent._reloadComponentErrback): 
 	* flumotion/component/producers/screencast/screencast.py
 	(Screencast.get_pipeline_string): 

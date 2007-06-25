@@ -25,6 +25,7 @@ manager-side objects for components
 API Stability: semi-stable
 """
 
+import sys
 import time
 
 from twisted.spread import pb
@@ -148,7 +149,8 @@ class ComponentAvatar(base.ManagerAvatar):
     # the error will still get sent back correctly to admin.
     def _mindPropertyErrback(self, failure):
         failure.trap(errors.PropertyError)
-        log.safeprintf("Ignore the following Traceback line, issue in Twisted\n")
+        log.safeprintf(sys.stderr,
+                       "Ignore the following Traceback line, issue in Twisted\n")
         return failure
 
     def attached(self, mind):
@@ -504,7 +506,8 @@ class ComponentAvatar(base.ManagerAvatar):
         def _reloadComponentErrback(failure, self):
             failure.trap(errors.ReloadSyntaxError)
             self.warning(failure.getErrorMessage())
-            log.safeprintf("Ignore the following Traceback line, issue in "
+            log.safeprintf(sys.stderr,
+                           "Ignore the following Traceback line, issue in "
                            "Twisted\n")
             return failure
 

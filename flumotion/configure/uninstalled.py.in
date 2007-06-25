@@ -20,6 +20,8 @@
 # Headers in this file shall remain intact.
 
 import os
+import sys
+from flumotion.common.log import safeprintf
 
 def get():
     # where am I on the disk ?
@@ -67,8 +69,8 @@ def get():
         try:
             ensure(ret[i+'dir'])
         except OSError, e:
-            safeprintf('Error making %s dir %s: %s\n', i, e.filename,
-                       e.strerror)
-            safeprintf('Things are probably going to break!\n')
+            safeprintf(sys.stderr, 'Error making %s dir %s: %s\n', i,
+                       e.filename, e.strerror)
+            safeprintf(sys.stderr, 'Things are probably going to break!\n')
 
     return ret
