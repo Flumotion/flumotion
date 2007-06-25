@@ -1,3 +1,12 @@
+2007-06-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/componentview.py
+	  (ComponentView.object_active_to_inactive):
+	widget in componentview can either be a gtk.Label or a
+	NodeBook object. Handle case where it is not a NodeBook
+	on removal of widget.
+	Fixes #687.
+
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/main.py: Pacify pyfascist.

@@ -143,9 +143,12 @@ class ComponentView(gtk.VBox, log.Loggable):
         
     def object_active_to_inactive(self):
         if self.widget:
-            if self.widget.admingtk:
-                self.widget.admingtk.cleanup()
             self.remove(self.widget)
+            # widget maybe a gtk.Label or a NodeBook
+            if hasattr(self.widget, 'admingtk'):
+                if self.widget.admingtk:
+                    self.widget.admingtk.cleanup()
+                    del self.widget.admingtk
             self.widget = None
         
     def object_inactive_to_unset(self):
