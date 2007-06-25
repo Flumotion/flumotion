@@ -4,6 +4,8 @@
 	(ComponentAvatar._mindPropertyErrback)
 	(ComponentAvatar.reloadComponent._reloadComponentErrback):
 	* flumotion/common/boot.py (boot): 
+	* flumotion/configure/installed.py.in (get):
+	* flumotion/configure/uninstalled.py.in (get): 
 	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): Fix
 	the fixes.
 	
