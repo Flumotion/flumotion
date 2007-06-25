@@ -89,7 +89,7 @@ class Feeder:
         @type fd: file descriptor
         """
         (client, cleanup) = self._fdToClient.pop(fd)
-        client.disconnected()
+        client.disconnected(fd=fd)
 
         # To avoid races between this thread (a GStreamer thread) closing the
         # FD, and the reactor thread reusing this FD, we only actually perform
@@ -176,34 +176,49 @@ class FeederClient:
         """
         if not when:
             when = time.time()
+
+        if self.fd:
+            # It's normal to receive a reconnection before we notice
+            # that an old connection has been closed. Perform the
+            # disconnection logic for the old FD if necessary. See #591.
+            self._updateUIStateForDisconnect(self.fd, when)
+
         self.fd = fd
         self.uiState.set('fd', fd)
         self.uiState.set('lastConnect', when)
         self.uiState.set('reconnects', self.uiState.get('reconnects', 0) + 1)
 
-    def disconnected(self, when=None):
+    def _updateUIStateForDisconnect(self, fd, when):
+        if self.fd == fd:
+            self.fd = None
+            self.uiState.set('fd', None)
+        self.uiState.set('lastDisconnect', when)
+
+        # update our internal counters and reset current counters to 0
+        self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
+        self.uiState.set('bytesReadCurrent', 0)
+        if self.uiState.get('buffersDroppedCurrent') is not None:
+            self._buffersDroppedBefore += self.uiState.get(
+                'buffersDroppedCurrent')
+            self.uiState.set('buffersDroppedCurrent', 0)
+
+    def disconnected(self, when=None, fd=None):
         """
         The client has disconnected.
         Update related stats.
 
         Called from GStreamer threads.
         """
+        if self.fd != fd:
+            # assume that connected() already called
+            # _updateUIStateForDisconnect for us
+            return
+
         if not when:
             when = time.time()
-        self.fd = None
 
-        def updateUIState():
-            self.uiState.set('fd', None)
-            self.uiState.set('lastDisconnect', when)
-
-            # update our internal counters and reset current counters to 0
-            self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
-            self.uiState.set('bytesReadCurrent', 0)
-            if self.uiState.get('buffersDroppedCurrent') is not None:
-                self._buffersDroppedBefore += self.uiState.get(
-                    'buffersDroppedCurrent')
-                self.uiState.set('buffersDroppedCurrent', 0)
-        reactor.callFromThread(updateUIState)
+        reactor.callFromThread(self._updateUIStateForDisconnect, fd,
+                               when)
 
 class Eater:
     """

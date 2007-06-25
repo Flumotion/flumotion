@@ -1,3 +1,16 @@
+2007-06-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent010.py
+	(Feeder.clientDisconnected): Pass the fd being disconnected to the
+	client.
+	(FeederClient.connected): If we already have an FD, process the
+	UIState as if the old one had disconnected. 
+	(FeederClient._updateUIStateForDisconnect): Factored out of
+	disconnect().
+	(FeederClient.disconnected): Add FD argument. Only update the UI
+	state if the fd being disconnected is the "current" one.
+	Fixes #591.
+
 2007-06-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/extern/log/log.py:
