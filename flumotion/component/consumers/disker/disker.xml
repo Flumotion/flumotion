@@ -30,7 +30,7 @@
         <property name="ical-schedule" type="string" required="no" />
         <property name="filename" type="string" required="no" />
         <property name="react-to-stream-markers" type="bool" required="no"
-                  description="Start/stop the disker when stream marker events are received"/>
+                  description="Start/stop the disker when stream marker events are received" />
         <property name="stream-marker-filename-prefix" type="string"
                   required="no" description="Formatting template for program id (default '%03d.')" />
       </properties>
