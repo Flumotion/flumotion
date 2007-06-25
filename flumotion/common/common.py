@@ -190,7 +190,6 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
         log.outputToFiles(stdout, stderr)
     except IOError, e:
         if e.errno == errno.EACCES:
-            print dir(e)
             log.error('common', 'Permission denied writing to log file %s.',
                 e.filename)
 

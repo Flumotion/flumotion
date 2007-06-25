@@ -148,7 +148,7 @@ class ComponentAvatar(base.ManagerAvatar):
     # the error will still get sent back correctly to admin.
     def _mindPropertyErrback(self, failure):
         failure.trap(errors.PropertyError)
-        print "Ignore the following Traceback line, issue in Twisted"
+        log.safeprintf("Ignore the following Traceback line, issue in Twisted\n")
         return failure
 
     def attached(self, mind):
@@ -504,7 +504,8 @@ class ComponentAvatar(base.ManagerAvatar):
         def _reloadComponentErrback(failure, self):
             failure.trap(errors.ReloadSyntaxError)
             self.warning(failure.getErrorMessage())
-            print "Ignore the following Traceback line, issue in Twisted"
+            log.safeprintf("Ignore the following Traceback line, issue in "
+                           "Twisted\n")
             return failure
 
         d = self.mindCallRemote('reloadComponent')

@@ -448,7 +448,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         return d
 
     def _callRemoteErrback(self, failure, type, name, methodName):
-        print "THOMAS: errback: failure %r" % failure
         if failure.check(errors.NoMethodError):
             self.warning("method '%s' on component '%s' does not exist, "
                 "component bug" % (methodName, name))

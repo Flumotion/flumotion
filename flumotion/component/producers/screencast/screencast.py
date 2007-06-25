@@ -38,7 +38,6 @@ class Screencast(feedcomponent.ParseLaunchComponent):
                 ret.append(properties.get(k, default))
             return ret
         width, height, x_offset, y_offset, framerate = getProps()
-        print framerate
 
         src = 'ximagesrc'
         if not gstreamer.element_factory_exists(src):

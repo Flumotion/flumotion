@@ -21,6 +21,7 @@
 
 import os
 import sys
+from flumotion.common.log import safeprintf
 
 PYGTK_REQ = (2, 6, 3)
 
@@ -190,6 +191,6 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     
     try:
         sys.exit(catching(main, sys.argv))
-    except errors.SystemError, e:
-        print 'ERROR:', e
+    except (errors.SystemError, SystemError), e:
+        safeprintf('ERROR: %s\n', e)
         sys.exit(1)

@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import os
+from flumotion.common.log import safeprintf
 
 def get():
     def ensure(path):
@@ -29,8 +30,8 @@ def get():
             except:
                 os.makedirs(path)
         except OSError, e:
-            print 'Error making dir %s: %s' % (e.filename, e.strerror)
-            print 'Things are probably going to break!'
+            safeprintf('Error making dir %s: %s\n', e.filename, e.strerror)
+            safeprintf('Things are probably going to break!\n')
 
     if 'FLU_CACHE_DIR' in os.environ:
         cachedir = os.path.realpath(os.environ['FLU_CACHE_DIR'])

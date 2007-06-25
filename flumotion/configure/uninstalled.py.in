@@ -67,7 +67,8 @@ def get():
         try:
             ensure(ret[i+'dir'])
         except OSError, e:
-            print 'Error making %s dir %s: %s' % (i, e.filename, e.strerror)
-            print 'Things are probably going to break!'
+            safeprintf('Error making %s dir %s: %s\n', i, e.filename,
+                       e.strerror)
+            safeprintf('Things are probably going to break!\n')
 
     return ret

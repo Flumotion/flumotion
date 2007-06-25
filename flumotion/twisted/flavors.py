@@ -301,8 +301,9 @@ class StateRemoteCache(pb.RemoteCache):
         """
         if not (set or append or remove or setitem or delitem or invalidate):
             # FIXME: remove this behavior in 0.6
-            print ("Warning: Use of deprecated %r.addListener(%r) without "
-                   "explicit event handlers" % (self, listener))
+            log.safeprintf("Warning: Use of deprecated %r.addListener(%r)"
+                           " without explicit event handlers\n", self,
+                           listener)
             set = listener.stateSet
             append = listener.stateAppend
             remove = listener.stateRemove

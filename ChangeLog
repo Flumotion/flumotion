@@ -1,5 +1,19 @@
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar._mindPropertyErrback)
+	(ComponentAvatar.reloadComponent._reloadComponentErrback): 
+	* flumotion/component/producers/screencast/screencast.py
+	(Screencast.get_pipeline_string): 
+	* flumotion/admin/admin.py (AdminModel._callRemoteErrback): 
+	* flumotion/common/boot.py (boot): 
+	* flumotion/common/common.py (daemonize): 
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener):
+	* flumotion/configure/uninstalled.py.in:
+	* flumotion/configure/installed.py.in: Use safeprintf instead of
+	print everywhere it can be called from a daemonized process.
+	Fixes #605.
+
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer.check_properties): Change to implement
 	check_properties instead of do_check.
