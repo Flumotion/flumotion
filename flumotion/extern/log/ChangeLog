@@ -1,3 +1,8 @@
+2007-06-25  Andy Wingo  <wingo@pobox.com>
+
+	* log.py (safeprintf): New procedure. See #613.
+	(stderrHandler, TwistedLogObserver.emit): Use safeprintf.
+
 2007-06-11  Andy Wingo  <wingo@pobox.com>
 
 	* log.py (outputToFiles): Store the previous SIGHUP handler, if

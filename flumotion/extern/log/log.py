@@ -293,6 +293,21 @@ def logObject(object, cat, format, *args):
     """
     doLog(LOG, object, cat, format, args)
 
+def safeprintf(file, format, *args):
+    """Write to a file object, ignoring errors.
+    """
+    try:
+        if args:
+            file.write(format % args)
+        else:
+            file.write(format)
+    except IOError, e:
+        if e.errno == errno.EPIPE:
+            # if our output is closed, exit; e.g. when logging over an
+            # ssh connection and the ssh connection is closed
+            os._exit(os.EX_OSERR)
+        # otherwise ignore it, there's nothing you can do
+
 def stderrHandler(level, object, category, file, line, message):
     """
     A log handler that writes to stderr.
@@ -309,25 +324,14 @@ def stderrHandler(level, object, category, file, line, message):
 
     where = "(%s:%d)" % (file, line)
 
-    try:
-        # level   pid     object   cat      time
-        # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
-        sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
-            getLevelName(level), os.getpid(), o, category,
-            time.strftime("%b %d %H:%M:%S")))
-        sys.stderr.write('%-4s %s %s\n' % ("", message, where))
+    # level   pid     object   cat      time
+    # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
+    safeprintf(sys.stderr, '%-5s [%5d] %-32s %-17s %-15s ',
+              getLevelName(level), os.getpid(), o, category,
+              time.strftime("%b %d %H:%M:%S"))
+    safeprintf(sys.stderr, '%-4s %s %s\n', "", message, where)
 
-        # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
-        #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
-        #    level, o, category, where, os.getpid(),
-        #    "", time.strftime("%b %d %H:%M:%S"), message))
-        sys.stderr.flush()
-    except IOError, e:
-        if e.errno == errno.EPIPE:
-            # if our output is closed, exit; e.g. when logging over an
-            # ssh connection and the ssh connection is closed
-            os._exit(os.EX_OSERR)
-        # otherwise ignore it, there's nothing you can do
+    sys.stderr.flush()
 
 ### "public" useful API
 
@@ -762,19 +766,8 @@ class TwistedLogObserver(Loggable):
                 # and an additional warning
                 warning('twisted', msg)
                 text = f.getTraceback()
-                # as above in stderrHandler: don't screw the pooch if
-                # the log is full
-                try:
-                    sys.stderr.write("\nTwisted traceback:\n")
-                    sys.stderr.write(text + '\n')
-                    sys.stderr.flush()
-                except IOError, e:
-                    if e.errno == errno.EPIPE:
-                        # if our output is closed, exit; e.g. when
-                        # logging over an ssh connection and the ssh
-                        # connection is closed
-                        os._exit(os.EX_OSERR)
-                    # otherwise ignore it, there's nothing you can do
+                safeprintf(sys.stderr, "\nTwisted traceback:\n")
+                safeprintf(sys.stderr, text + '\n')
             elif eventDict.has_key('format'):
                 text = eventDict['format'] % eventDict
             else:
