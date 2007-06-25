@@ -1,5 +1,18 @@
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/main.py (_initialLoadConfig): No more need to
+	catch errors and print here, as flumotion.manager.manager does the
+	right thing now.
+
+	* flumotion/manager/manager.py
+	(Vishnu.loadComponentConfigurationXML): Set a file-specific
+	message ID if the configuration is being loaded from a file. Catch
+	UnknownComponentError, adding a message for that case, and generic
+	exceptions as well.
+
+	* flumotion/admin/gtk/client.py (Window.setPlanetState): Show any
+	planet messages as soon as we have the planet state.
+
 	* flumotion/component/feedcomponent010.py
 	(Feeder.clientDisconnected): Pass the fd being disconnected to the
 	client.

@@ -332,6 +332,8 @@ class Window(log.Loggable, gobject.GObject):
                                 setitem=planetStateSetitem,
                                 delitem=planetStateDelitem)
 
+        self._clearMessages()
+
         a = planetState.get('atmosphere')
         a.addListener(self, append=atmosphereStateAppend,
                       remove=atmosphereStateRemove)

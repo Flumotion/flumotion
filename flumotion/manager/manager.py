@@ -555,17 +555,33 @@ class Vishnu(log.Loggable):
         @type  identity: L{flumotion.common.identity.Identity}
         """
         self.debug('loading configuration')
+        mid = 'loadComponent-parse-error'
+        if isinstance(file, str):
+            mid += '-%s' % file
         try:
-            self.clearMessage('loadComponent-parse-error')
+            self.clearMessage(mid)
             self.configuration = conf = config.FlumotionConfigXML(file)
             conf.parse()
             return self._loadComponentConfiguration(conf, identity)
         except errors.ConfigError, e:
-            self.addMessage(messages.WARNING,
-                            'loadComponent-parse-error',
+            self.addMessage(messages.WARNING, mid,
                             N_('Invalid component configuration.'),
                             debug=e.args[0])
             return defer.fail(e)
+        except errors.UnknownComponentError, e:
+            if isinstance(file, str):
+                debug = 'Configuration loaded from file %r' % file
+            else:
+                debug = 'Configuration loaded remotely'
+            self.addMessage(messages.WARNING, mid,
+                            N_('Unknown component in configuration: %s.'),
+                            e.args[0], debug=debug)
+            return defer.fail(e)
+        except Exception, e:
+            self.addMessage(messages.WARNING, mid,
+                            N_('Unknown error while loading configuration.'),
+                            debug=log.getExceptionMessage(e))
+            return defer.faile(e)
             
     def _loadManagerPlugs(self, conf):
         # Load plugs

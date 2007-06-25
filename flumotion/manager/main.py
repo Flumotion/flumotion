@@ -103,40 +103,12 @@ def _createParser():
 
     return parser
  
-def _error(message, reason):
-    msg = message
-    if reason:
-        msg += "\n%s" % reason
-    # since our SystemError is going to be lost in the reactor, we may as well
-    # trap it here
-    # FIXME: maybe we should stop making this raise SystemErrror ?
-    try:
-        log.error('manager', msg)
-    except errors.SystemError:
-        pass
-
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     # since this is run after daemonizing, it should show errors, but not stop
     for path in paths:
         log.debug('manager', 'Loading configuration file from (%s)' % path)
-        try:
-            vishnu.loadComponentConfigurationXML(path, manager.LOCAL_IDENTITY)
-        except config.ConfigError, reason:
-            _error(
-                "configuration error in configuration file\n'%s':" % path,
-                reason.args[0])
-        except errors.UnknownComponentError, reason:
-            _error(
-                "unknown component in configuration file\n'%s':" % path,
-                reason.args[0])
-        except Exception, e:
-            # a re-raise here would be caught by twisted and only shows at
-            # debug level 4 because that's where we hooked up twisted logging
-            # so print a traceback before stopping the program
-            traceback.print_tb(sys.exc_info()[2])
-            _error("failed to load planet configuration '%s':" % path,
-                "%s: %s" % (e.__class__, str(e)))
+        vishnu.loadComponentConfigurationXML(path, manager.LOCAL_IDENTITY)
 
 def main(args):
     # XXX: gst_init should remove all options, like gtk_init
