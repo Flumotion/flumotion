@@ -26,7 +26,6 @@ manager main function
 import optparse
 import os
 import sys
-import traceback
 
 from twisted.internet import reactor, error
 

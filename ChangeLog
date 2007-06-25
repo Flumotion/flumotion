@@ -1,5 +1,7 @@
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/main.py: Pacify pyfascist.
+
 	* flumotion/component/producers/looper/looper.py
 	(Looper.make_message_for_gstreamer_error): Make a nicer error if
 	we can.
