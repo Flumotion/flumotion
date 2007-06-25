@@ -1,3 +1,8 @@
+2007-06-25  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Revert an accidental commit from some days ago.
+
 2007-06-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/componentview.py

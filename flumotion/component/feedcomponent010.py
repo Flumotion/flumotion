@@ -361,7 +361,7 @@ class FeedComponent(basecomponent.BaseComponent):
     FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
     # EATER_TMPL is no longer used due to it being dynamic
     # how often to add the buffer probe
-    BUFFER_PROBE_ADD_FREQUENCY = 1.5
+    BUFFER_PROBE_ADD_FREQUENCY = 5
 
     # how often to check that a buffer has arrived recently
     BUFFER_CHECK_FREQUENCY = BUFFER_PROBE_ADD_FREQUENCY * 2.5
