@@ -799,13 +799,15 @@ class Vishnu(log.Loggable):
 
         m = self.getComponentMapper(componentState)
         if not m:
-            # We have a stale componentState for an already-deleted component
-            self.warning("Component mapper for component state %r doesn't exist", 
-                componentState)
+            # We have a stale componentState for an already-deleted 
+            # component
+            self.warning("Component mapper for component state %r doesn't "
+                "exist", componentState)
             raise errors.UnknownComponentError(componentState)
 
-        avatar = m.avatar
-        if not avatar:
+        componentAvatar = m.avatar
+
+        if not componentAvatar:
             # reset moodPending if asked to stop without an avatar
             # because we changed above to allow stopping even if
             # moodPending is happy
@@ -825,11 +827,11 @@ class Vishnu(log.Loggable):
             self.warning(msg)
             return defer.fail(errors.ComponentMoodError(msg))
 
-        d = avatar.mindCallRemote('stop')
+        d = componentAvatar.mindCallRemote('stop')
         def cleanupAndDisconnectComponent(result):
-            avatar._starting = False
-            avatar._beingSetup = False
-            return avatar.disconnect()
+            componentAvatar._starting = False
+            componentAvatar._beingSetup = False
+            return componentAvatar.disconnect()
 
         def setSleeping(result):
             if componentState.get('mood') == moods.sad.value:
@@ -1015,9 +1017,11 @@ class Vishnu(log.Loggable):
         #  (1) we were waiting for such a component to start. There is a
         #      ManagerComponentState and an avatarId in the
         #      componentMappers waiting for us.
-        #  (2) we don't know anything about this component, but since it
-        #      logged in, we will deal with it, at least allowing the
-        #      admin to control it.
+        #  (2) we don't know anything about this component, but it has a state 
+        #      and config. We deal with it, creating all the neccesary internal
+        #      state.
+        #  (3) we don't know anything about this component, and it has no
+        #      config. We stop it.
         def parseFeedId(feedId): 
             if feedId.find(':') == -1:
                 return "%s:default" % feedId
@@ -1082,22 +1086,8 @@ class Vishnu(log.Loggable):
             state = planet.ManagerComponentState()
             state.setJobState(jobState)
 
-            if conf:
-                flowName, compName = conf['parent'], conf['name']
-                fixOldEaterConfig(state)
-            else:
-                # unfortunately there is a window in which a component does
-                # not have a config. accept that so that an admin can stop
-                # this component. This can happen if the component logs out 
-                # before setup() was called, then it logs back in.
-                flowName, compName = common.parseComponentId(avatar.avatarId)
-                conf = {'name': compName,
-                        'parent': flowName,
-                        'type': 'unknown-component',
-                        'avatarId': avatar.avatarId,
-                        'clock-master': None,
-                        'plugs': {},
-                        'properties': {}}
+            flowName, compName = conf['parent'], conf['name']
+            fixOldEaterConfig(state)
 
             state.set('name', compName)
             state.set('type', conf['type'])
@@ -1133,7 +1123,7 @@ class Vishnu(log.Loggable):
 
         if m:
             verifyExistingComponentState(jobState, m.state)
-        else:
+        elif conf:
             makeNewComponentState(conf)
             m = self.getComponentMapper(avatar.avatarId)
             self._updateFlowDependencies(m.state)
@@ -1145,6 +1135,19 @@ class Vishnu(log.Loggable):
                 # again, and the depgraph will get rebuilt properly.
                 self.debug("Couldn't map eaters to feeders for reconnecting "
                     "component")
+        else:
+            # A component which we don't know about has logged in without a
+            # config. This is something that was created, but did not have 
+            # setup() called on it, then the manager was restarted... we can't
+            # do anything useful with it, so shut it down.
+            self.warning("Component logged in with no config: shutting it down")
+            def cleanupAndDisconnectComponent(result):
+                avatar._starting = False
+                avatar._beingSetup = False
+                return avatar.disconnect()
+            d = avatar.mindCallRemote('stop')
+            d.addCallback(cleanupAndDisconnectComponent)
+            return d
 
         m = self.getComponentMapper(avatar.avatarId)
         m.avatar = avatar

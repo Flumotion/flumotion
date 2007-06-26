@@ -1,5 +1,15 @@
 2007-06-26  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  If a component with no manager-side state and no config logs in,
+	  just immediately tell it to shut down and then disconnect it.
+	  We can't possibly do anything useful with it other than this, and
+	  the previous approach (creating a fake config) didn't handle it
+	  right.
+	  Fixes a private bug.
+
+2007-06-26  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/worker/job.py:
 	  Back out most of r5207, which didn't work right (it left stale
 	  processes around).
