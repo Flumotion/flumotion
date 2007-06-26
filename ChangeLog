@@ -1,3 +1,11 @@
+2007-06-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/job.py:
+	  Back out most of r5207, which didn't work right (it left stale
+	  processes around).
+	  Replace with a simpler patch that correctly handles restarting
+	  components without temporarily making them sad.
+
 2007-06-26  Christian Schaller <christian@fluendo.com>
 
 	* data/91-flumotion-device-policy.fdi: Add

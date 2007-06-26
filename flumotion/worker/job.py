@@ -86,6 +86,7 @@ class JobInfo(object):
 class JobProcessProtocol(worker.ProcessProtocol):
     def __init__(self, heaven, avatarId, deferredStarts):
         self._deferredStarts = deferredStarts
+        self._deferredStart = deferredStarts.createRegistered(avatarId)
         worker.ProcessProtocol.__init__(self, heaven, avatarId,
                                         'component',
                                         heaven.brain.workerName)
@@ -105,7 +106,8 @@ class JobProcessProtocol(worker.ProcessProtocol):
         # otherwise the manager still thinks it's starting up when it's
         # dead.  If the job already attached to the worker however,
         # the create deferred will already have callbacked.
-        if dstarts.createRegistered(self.pid):
+        deferred = dstarts.createRegistered(self.avatarId)
+        if deferred is self._deferredStart:
             if signum:
                 reason = "received signal %d" % signum
             else:
@@ -113,11 +115,11 @@ class JobProcessProtocol(worker.ProcessProtocol):
             text = "Component '%s' has exited early (%s).  " \
                    "This is sometimes triggered by a corrupt " \
                    "GStreamer registry." % (self.avatarId, reason)
-            dstarts.createFailed(self.pid, 
+            dstarts.createFailed(self.avatarId, 
                                  errors.ComponentCreateError(text))
 
-        if dstarts.shutdownRegistered(self.pid):
-            dstarts.shutdownTrigger(self.pid)
+        if dstarts.shutdownRegistered(self.avatarId):
+            dstarts.shutdownTrigger(self.avatarId)
 
         heaven.jobStopped(self.pid)
 
@@ -129,12 +131,12 @@ class DeferredStartSet(log.Loggable):
         self._getAvatars = getAvatars # function of no arguments,
                                       # returns {avatarId=>avatar}
 
-        self._createDeferreds = {} # processId => deferred that will fire
+        self._createDeferreds = {} # avatarId => deferred that will fire
                                    # when the job attaches
-        self._shutdownDeferreds = {} # processId => deferred for shutting
+        self._shutdownDeferreds = {} # avatarId => deferred for shutting
                                    # down jobs; fires when job is reaped
 
-    def create(self, avatarId, processId):
+    def create(self, avatarId):
         """
         Create and register a deferred for creating the given component.
         This deferred will be fired when the JobAvatar has instructed the
@@ -150,18 +152,18 @@ class DeferredStartSet(log.Loggable):
         # three places: the create deferreds hash, the avatar list in
         # the jobheaven, and the shutdown deferreds hash. there are four
         # possible answers:
-        if processId in self._createDeferreds:
+        if avatarId in self._createDeferreds:
             # (1) a job is already starting: it is in the
             # createdeferreds hash
-            self.info('already have a create deferred for %d', processId)
+            self.info('already have a create deferred for %s', avatarId)
             raise errors.ComponentAlreadyStartingError(avatarId)
-        elif processId in self._shutdownDeferreds:
+        elif avatarId in self._shutdownDeferreds:
             # (2) a job is shutting down; note it is also in
             # heaven.avatars
             self.debug('waiting for previous %s to shut down like it '
                        'said it would', avatarId)
             def ensureShutdown(res,
-                               shutdown=self._shutdownDeferreds[processId]):
+                               shutdown=self._shutdownDeferreds[avatarId]):
                 shutdown.addCallback(lambda _: res)
                 return shutdown
             d.addCallback(ensureShutdown)
@@ -174,43 +176,46 @@ class DeferredStartSet(log.Loggable):
             pass
 
         self.debug('registering deferredCreate for %s', avatarId)
-        self._createDeferreds[processId] = d
+        self._createDeferreds[avatarId] = d
         return d
 
-    def createTrigger(self, avatarId, processId):
+    def createTrigger(self, avatarId):
         """
         Trigger a previously registered deferred for creating up the given
         component.
         """
         self.debug('triggering create deferred for %s', avatarId)
-        if not processId in self._createDeferreds:
-            self.warning('No create deferred registered for %d', processId)
+        if not avatarId in self._createDeferreds:
+            self.warning('No create deferred registered for %s', avatarId)
             return
 
-        d = self._createDeferreds.pop(processId)
+        d = self._createDeferreds[avatarId]
+        del self._createDeferreds[avatarId]
         # return the avatarId the component will use to the original caller
         d.callback(avatarId)
  
-    def createFailed(self, processId, exception):
+    def createFailed(self, avatarId, exception):
         """
         Notify the caller that a create has failed, and remove the create
         from the list of pending creates.
         """
-        self.debug('create deferred failed for %d', processId)
-        if not processId in self._createDeferreds:
-            self.warning('No create deferred registered for %d', processId)
+        self.debug('create deferred failed for %s', avatarId)
+        if not avatarId in self._createDeferreds:
+            self.warning('No create deferred registered for %s', avatarId)
             return
 
-        d = self._createDeferreds.pop(processId)
+        d = self._createDeferreds[avatarId]
+        del self._createDeferreds[avatarId]
         d.errback(exception)
 
-    def createRegistered(self, processId):
+    def createRegistered(self, avatarId):
         """
-        Check if a deferred create has been registered for the given processId
+        Check if a deferred create has been registered for the given avatarId,
+        and return it or none
         """
-        return processId in self._createDeferreds
+        return self._createDeferreds.get(avatarId, None)
 
-    def shutdown(self, processId):
+    def shutdown(self, avatarId):
         """
         Create and register a deferred for notifying the worker of a
         clean job shutdown. This deferred will be fired when the job is
@@ -218,35 +223,36 @@ class DeferredStartSet(log.Loggable):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.debug('making shutdown deferred for %d', processId)
+        self.debug('making shutdown deferred for %s', avatarId)
 
-        if processId in self._shutdownDeferreds:
-            self.warning('already have a shutdown deferred for %d',
-                         processId)
-            return self._shutdownDeferreds[processId]
+        if avatarId in self._shutdownDeferreds:
+            self.warning('already have a shutdown deferred for %s',
+                         avatarId)
+            return self._shutdownDeferreds[avatarId]
         else:
-            self.debug('registering shutdown for %d', processId)
+            self.debug('registering shutdown for %s', avatarId)
             d = defer.Deferred()
-            self._shutdownDeferreds[processId] = d
+            self._shutdownDeferreds[avatarId] = d
             return d
 
-    def shutdownTrigger(self, processId):
+    def shutdownTrigger(self, avatarId):
         """
-        Trigger a previously registered deferred for shutting down a process.
+        Trigger a previously registered deferred for creating up the given
+        component.
         """
-        self.debug('triggering shutdown deferred for %d', processId)
-        if not processId in self._shutdownDeferreds:
-            self.warning('No shutdown deferred registered for %d', processId)
+        self.debug('triggering shutdown deferred for %s', avatarId)
+        if not avatarId in self._shutdownDeferreds:
+            self.warning('No shutdown deferred registered for %s', avatarId)
             return
 
-        d = self._shutdownDeferreds.pop(processId)
-        d.callback(processId)
+        d = self._shutdownDeferreds.pop(avatarId)
+        d.callback(avatarId)
 
-    def shutdownRegistered(self, processId):
+    def shutdownRegistered(self, avatarId):
         """
-        Check if a deferred shutdown has been registered for the given processId
+        Check if a deferred shutdown has been registered for the given avatarId.
         """
-        return processId in self._shutdownDeferreds
+        return avatarId in self._shutdownDeferreds
 
 class JobHeaven(pb.Root, log.Loggable):
     """
@@ -355,6 +361,8 @@ class JobHeaven(pb.Root, log.Loggable):
                            component
         @type  bundles:    list of (str, str)
         """
+        d = self._deferredStarts.create(avatarId)
+
         p = JobProcessProtocol(self, avatarId, self._deferredStarts)
         executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
         if not os.path.exists(executable):
@@ -391,8 +399,6 @@ class JobHeaven(pb.Root, log.Loggable):
         jobInfo = JobInfo(process.pid, avatarId, type, moduleName,
                           methodName, nice, bundles)
         self._jobInfos[process.pid] = jobInfo
-
-        d = self._deferredStarts.create(avatarId, process.pid)
         return d
 
     def getJobInfo(self, processId):
@@ -506,13 +512,13 @@ class JobAvatar(fpb.Avatar, log.Loggable):
                                        job.moduleName, job.methodName,
                                        job.nice)
 
-        def success(_, avatarId, pid):
+        def success(_, avatarId):
             self.debug('job started component with avatarId %s',
                        avatarId)
             # FIXME: drills down too much?
-            self._heaven._deferredStarts.createTrigger(avatarId, pid)
+            self._heaven._deferredStarts.createTrigger(avatarId)
 
-        def error(failure, job, pid):
+        def error(failure, job):
             msg = log.getFailureMessage(failure)
             if failure.check(errors.ComponentCreateError):
                 self.warning('could not create component %s of type %s:'
@@ -521,8 +527,7 @@ class JobAvatar(fpb.Avatar, log.Loggable):
                 self.warning('unhandled error creating component %s: %s',
                              job.avatarId, msg)
             # FIXME: drills down too much?
-            self._heaven._deferredStarts.createFailed(pid,
-                                                      failure)
+            self._heaven._deferredStarts.createFailed(job.avatarId, failure)
 
         def gotPid(pid):
             self.pid = pid
@@ -537,8 +542,8 @@ class JobAvatar(fpb.Avatar, log.Loggable):
             d = bootstrap(workerName, info.host, info.port, transport,
                           info.authenticator, job.bundles)
             d.addCallback(create, job)
-            d.addCallback(success, job.avatarId, pid)
-            d.addErrback(error, job, pid)
+            d.addCallback(success, job.avatarId)
+            d.addErrback(error, job)
             return d
         d = self.mindCallRemote("getPid")
         d.addCallback(gotPid)
