@@ -1,5 +1,8 @@
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/job.py: Rename the _deferredStarts member to
+	_startSet.
+
 	* flumotion/common/startset.py (StartSet.createRegistered): Commit
 	a similar fix to the startset as the one Mike just committed to
 	the copy in worker/job.py.

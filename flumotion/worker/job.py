@@ -85,7 +85,7 @@ class JobInfo(object):
 
 class JobProcessProtocol(worker.ProcessProtocol):
     def __init__(self, heaven, avatarId, deferredStarts):
-        self._deferredStarts = deferredStarts
+        self._startSet = deferredStarts
         self._deferredStart = deferredStarts.createRegistered(avatarId)
         worker.ProcessProtocol.__init__(self, heaven, avatarId,
                                         'component',
@@ -98,7 +98,7 @@ class JobProcessProtocol(worker.ProcessProtocol):
 
     def processEnded(self, status):
         heaven = self.loggable
-        dstarts = self._deferredStarts
+        dstarts = self._startSet
         signum = status.value.signal
 
         # we need to trigger a failure on the create deferred 
@@ -284,7 +284,7 @@ class JobHeaven(pb.Root, log.Loggable):
 
         self._jobInfos = {} # processid -> JobInfo
 
-        self._deferredStarts = DeferredStartSet(lambda: self.avatars)
+        self._startSet = DeferredStartSet(lambda: self.avatars)
 
     def listen(self):
         assert self._port is None
@@ -361,9 +361,9 @@ class JobHeaven(pb.Root, log.Loggable):
                            component
         @type  bundles:    list of (str, str)
         """
-        d = self._deferredStarts.create(avatarId)
+        d = self._startSet.create(avatarId)
 
-        p = JobProcessProtocol(self, avatarId, self._deferredStarts)
+        p = JobProcessProtocol(self, avatarId, self._startSet)
         executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
         if not os.path.exists(executable):
             self.error("Trying to spawn job process, but '%s' does not "
@@ -516,7 +516,7 @@ class JobAvatar(fpb.Avatar, log.Loggable):
             self.debug('job started component with avatarId %s',
                        avatarId)
             # FIXME: drills down too much?
-            self._heaven._deferredStarts.createTrigger(avatarId)
+            self._heaven._startSet.createTrigger(avatarId)
 
         def error(failure, job):
             msg = log.getFailureMessage(failure)
@@ -527,7 +527,7 @@ class JobAvatar(fpb.Avatar, log.Loggable):
                 self.warning('unhandled error creating component %s: %s',
                              job.avatarId, msg)
             # FIXME: drills down too much?
-            self._heaven._deferredStarts.createFailed(job.avatarId, failure)
+            self._heaven._startSet.createFailed(job.avatarId, failure)
 
         def gotPid(pid):
             self.pid = pid
@@ -634,4 +634,4 @@ class JobAvatar(fpb.Avatar, log.Loggable):
         """
         self.info("component %s shutting down cleanly", self.avatarId)
         # FIXME: drills down too much?
-        self._heaven._deferredStarts.shutdown(self.pid)
+        self._heaven._startSet.shutdown(self.pid)
