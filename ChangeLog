@@ -1,5 +1,10 @@
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component_feed.py (FeedTestCase): Split
+	fixture out into base class.
+	(TestUpstreamFeedClient): Rename from TestFeedClient so we can
+	test downstream connections in a separate class.
+
 	* flumotion/component/feedcomponent.py
 	(FeedComponentMedium._getAuthenticatorForFeed): New helper.
 	(FeedComponentMedium.connectEater): Attempt to identify ourself to

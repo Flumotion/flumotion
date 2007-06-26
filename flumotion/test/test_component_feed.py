@@ -100,9 +100,9 @@ class FeedServer(feedserver.FeedServer):
         # closed
         reactor.callLater(0, self.waitForAvatarExit().callback, None)
 
-# this tests both flumotion.worker.feedserver and
+# these tests test both flumotion.worker.feedserver and
 # flumotion.component.feed.
-class TestFeedClient(unittest.TestCase, log.Loggable):
+class FeedTestCase(unittest.TestCase, log.Loggable):
     bouncerconf = {'name': 'testbouncer',
                    'plugs': {},
                    # user:test
@@ -137,6 +137,7 @@ class TestFeedClient(unittest.TestCase, log.Loggable):
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
         return d
         
+class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
     def testConnectWithoutDroppingPB(self):
         component = FakeComponent()
         client = feed.FeedMedium(component)
