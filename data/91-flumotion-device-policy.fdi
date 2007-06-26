@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<deviceinfo version="0.2">
+  <device>
+    <match key="info.capabilities" contains="access_control">
+      <match key="info.capabilities" contains="alsa">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+      <match key="info.capabilities" contains="oss">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+      <match key="info.capabilities" contains="video4linux">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+      <match key="info.capabilities" contains="dvb">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+      <match key="info.capabilities" contains="ieee1394_unit.iidc">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+      <match key="info.capabilities" contains="ieee1394_unit.avc">
+      <append key="access_control.grant_user" type="strlist">flumotion</append>
+      </match>
+    </match>
+</device>
+</deviceinfo>

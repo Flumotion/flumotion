@@ -13,5 +13,8 @@ xsl_DATA = upgrade-to-0.2.0.xsl upgrade-to-0.3.2.xsl upgrade-to-0.4.1.xsl
 scriptdir = $(pkgdatadir)
 script_DATA = make-dummy-cert
 
+halpolicydir = $(datadir)/hal/fdi/policy/20thirdparty
+halpolicy_DATA = 91-flumotion-device-policy.fdi
+
 EXTRA_DIST = \
-        $(desktop_in_files) $(pixmap_DATA) $(xsl_DATA) $(script_DATA)
+        $(desktop_in_files) $(pixmap_DATA) $(xsl_DATA) $(script_DATA) $(halpolicy_DATA)

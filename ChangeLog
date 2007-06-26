@@ -1,3 +1,8 @@
+2007-06-26  Christian Schaller <christian@fluendo.com>
+
+	* data/91-flumotion-device-policy.fdi: Add
+	policy file for HAL correct set device access
+
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.getEaters):
@@ -29,6 +34,7 @@
 	* data/flumotion-admin.desktop.in: Update Categories according to
 	these instructions:
 	http://live.gnome.org/GnomeGoals/ApplicationCategory
+	correct set device access
 
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 

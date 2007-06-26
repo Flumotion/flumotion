@@ -247,14 +247,18 @@ fi
 %{_datadir}/flumotion/image
 %{_datadir}/flumotion/make-dummy-cert
 %{_datadir}/flumotion/*.xsl
+%{_datadir}/hal/fdi/policy/20thirdparty/91-flumotion-device-policy.fdi
 
 %attr(750,root,flumotion) %{_sysconfdir}/flumotion
 %attr(770,root,flumotion) %{_localstatedir}/run/flumotion
 %attr(770,root,flumotion) %{_localstatedir}/log/flumotion
-%attr(770,root,flumotion) %{_localstatedir}/cache/flumotion
+%attr(770,flumotion,flumotion) %{_localstatedir}/cache/flumotion
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Tue Jun 26 2007 Christian Schaller <christian at fluendo dot com>
+- Adding SELinux policy file for setting device access
+
 * Wed May 16 2007 Thomas Vander Stichele <thomas at apestaart dot org>
 - Add a python-crypto dependency for the sha256 bouncer
 
