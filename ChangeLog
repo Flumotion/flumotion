@@ -1,3 +1,8 @@
+2007-06-26  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/twisted/flavors.py (StateRemoteCache._notifyListeners):
+	None was used as logging category, and it's not supported.
+
 2007-06-26  Christian Schaller <christian@fluendo.com>
 
 	* data/flumotion-admin.desktop.in: Update Categories according to

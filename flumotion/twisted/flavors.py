@@ -337,7 +337,8 @@ class StateRemoteCache(pb.RemoteCache):
                     proc(self, *args)
                 except Exception, e:
                     # These are all programming errors
-                    log.warning(None, 'Exception in StateCache handler: %s',
+                    log.warning("stateremotecache",
+                                'Exception in StateCache handler: %s',
                                 log.getExceptionMessage(e))
         
     def observe_set(self, key, value):
