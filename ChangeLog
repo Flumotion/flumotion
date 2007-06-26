@@ -1,5 +1,14 @@
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium._getAuthenticatorForFeed): New helper.
+	(FeedComponentMedium.connectEater): Attempt to identify ourself to
+	the remote side with our fullFeedId, if possible.
+
+	* flumotion/twisted/pb.py (RemoteAuthenticator.copy): New method,
+	mostly useful if you want to log in with different avatarIds, as
+	is the case for component eaters into a remote feedserver.
+
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent._reconnectEater): Don't reconnect if we don't have
 	a medium, as in flumotion-launch. Fixes #616.

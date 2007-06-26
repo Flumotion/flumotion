@@ -131,6 +131,20 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         # FIXME: drop connection if we already had one
         return self.connectEater(feedId)
 
+    def _getAuthenticatorForFeed(self, feedId):
+        # The avatarId on the keycards issued by the authenticator will
+        # identify us to the remote component. Attempt to use our
+        # fullFeedId, for debugging porpoises.
+        if hasattr(self.authenticator, 'copy'):
+            tup = common.parseComponentId(self.authenticator.avatarId)
+            flowName, componentName = tup
+            feedName = common.parseFeedId(feedId)[1]
+            fullFeedId = common.fullFeedId(flowName, componentName,
+                                           feedName)
+            return self.authenticator.copy(fullFeedId)
+        else:
+            return self.authenticator
+
     def connectEater(self, feedId):
         """
         Connect one of the medium's component's eaters to a remote feed.
@@ -153,7 +167,10 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             cancel()
 
         client = feed.FeedMedium(logName=self.comp.name)
-        d = client.requestFeed(host, port, self.authenticator, fullFeedId)
+
+        d = client.requestFeed(host, port,
+                               self._getAuthenticatorForFeed(feedId),
+                               fullFeedId)
         self._feederPendingConnections[fullFeedId] = client.stopConnecting
         d.addCallback(gotFeed)
         return d

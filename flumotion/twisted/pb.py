@@ -498,6 +498,11 @@ class RemoteAuthenticator:
     def __init__(self, remoteReference):
         self._remote = remoteReference
 
+    def copy(self, avatarId=None):
+        ret = RemoteAuthenticator(self._remote)
+        ret.avatarId = avatarId or self.avatarId
+        return ret
+
     def issue(self, interfaces):
         def issueCb(keycard):
             keycard.avatarId = self.avatarId
