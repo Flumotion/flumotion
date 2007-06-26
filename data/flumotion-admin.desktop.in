@@ -7,4 +7,4 @@ Exec=flumotion-admin
 Terminal=false
 Type=Application
 Icon=flumotion.png
-Categories=GNOME;Application;AudioVideo;Player;X-Ximian-Main;X-Red-Hat-Base;
+Categories=GNOME;GTK;AudioVideo;Player;X-Ximian-Main;X-Red-Hat-Base;
