@@ -2,6 +2,13 @@
 
 	* flumotion/worker/job.py: Rename the _deferredStarts member to
 	_startSet.
+	(JobProcessProtocol.__init__): Finish some renaming.
+	(JobProcessProtocol.processEnded): Port to startSet. This code is
+	pretty hacky.
+	(DeferredStartSet): Remove, replaced with the code in startset.
+	(JobHeaven.__init__, JobHeaven.spawn, JobAvatar.setMind.success)
+	(JobAvatar.perspective_cleanShutdown): Port to startset. Fix one
+	part of [5207] that didn't get rolled back. Fixes #620.
 
 	* flumotion/common/startset.py (StartSet.createRegistered): Commit
 	a similar fix to the startset as the one Mike just committed to
