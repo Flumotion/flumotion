@@ -230,11 +230,6 @@ class TestComponentHeaven(unittest.TestCase):
         self.failIf(self.heaven.hasAvatar(a.avatarId))
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
 
-    def testComponentEatersEmpty(self):
-        a = FakeComponentAvatar('fake')
-        self.heaven.avatars[a.avatarId] = a
-        self.assertEquals(self.heaven._getComponentEatersData(a), [])
-        
     def testComponentsEaters(self):
         a = FakeComponentAvatar(name='foo',
             eaters=['bar:default', 'baz:default'])

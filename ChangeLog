@@ -1,3 +1,24 @@
+2007-06-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.getEaters):
+	Return just the list of eater names.
+	(ComponentAvatar.getFeedersForEater): New function, returns a list
+	of remote feedIds to which an eater should connect.
+	(ComponentAvatar.getFeeders, ComponentAvatar.getEatersForFeeder):
+	Likewise for feeders, although getting eaters for feeders is more
+	expensive. See #694.
+	(ComponentHeaven._connectEaterUpstream)
+	(ComponentHeaven._connectEaters)
+	(ComponentHeaven._connectFeeders)
+	(ComponentHeaven._connectFeederDownstream)
+	(ComponentHeaven._startComponent): Break startComponent into its
+	pieces. 
+	(ComponentHeaven._setupComponent): Remove some now-unnecessary
+	code.
+
+	* flumotion/test/test_manager_manager.py
+	(testComponentEatersEmpty): Remove test of removed internal method.
+
 2007-06-26  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/twisted/flavors.py (StateRemoteCache._notifyListeners):

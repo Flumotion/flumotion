@@ -81,8 +81,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self._shutdown_requested = False
 
         self._happydefers = [] # deferreds to call when mood changes to happy
-        self.feeder_names = []
-        self.eater_names = []
         
     ### python methods
     def __repr__(self):
@@ -226,66 +224,77 @@ class ComponentAvatar(base.ManagerAvatar):
                 self._happydefers = []
 
     # my methods
-    def parseEaterConfig(self, eater_config):
-        # the source feeder names come from the config
-        # they are specified under <component> as <source> elements in XML
-        # so if they don't specify a feed name, use "default" as the feed name
-        eater_names = []
-        for block in eater_config:
-            eater_name = block
-            if block.find(':') == -1:
-                eater_name = block + ':default'
-            eater_names.append(eater_name)
-        self.debug('parsed eater config, eaters %r' % eater_names)
-        self.eater_names = eater_names
-
-    def parseFeederConfig(self, feeder_config):
-        # for pipeline components, in the case there is only one
-        # feeder, <feed></feed> still needs to be listed explicitly
-
-        # the feed names come from the config
-        # they are specified under <component> as <feed> elements in XML
-        feed_names = feeder_config
-        #self.debug("parseFeederConfig: feed_names: %r" % self.feed_names)
-        name = self.componentState.get('name')
-        # we create feeder names this component contains based on feed names
-        self.feeder_names = map(lambda n: name + ':' + n, feed_names)
-        self.debug('parsed feeder config, feeders %r' % self.feeder_names)
-
-    # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
-        Get a list of L{feedId<flumotion.common.common.feedId>}s
-        for feeds this component wants to eat from.
+        Get a list of this component's eaters.
 
+        @return: a list of eater names, or the empty list.
+        @rtype:  list of str
+        """
+        if not self.componentState:
+            self.warning("detached component")
+            return []
+        eaterDict = self.componentState.get('config').get('eater', {})
+        return eaterDict.keys()
+    
+    def getFeedersForEater(self, eaterName):
+        """Get a list of L{feedId<flumotion.common.common.feedId>}s that
+        this eater should eat from.
+
+        Will raise a KeyError if the eaterName is not known.
+
+        @param eaterName: The name of the specific eater, e.g. 'default'
+        @type  eaterName: str
         @return: a list of feedId's, or the empty list
         @rtype:  list of str
         """
-        if not self.eater_names:
+        if not self.componentState:
+            self.warning("detached component")
             return []
+        # FIXME: perhaps return fullFeedIds instead of feedIds; if so
+        # change getEatersForFeeder and _connectEaterUpstream
+        eaterDict = self.componentState.get('config').get('eater', {})
+        return list(eaterDict[eaterName])
 
-        # this gets created and added by feedcomponent.py
-        return self.eater_names
-    
     def getFeeders(self):
         """
-        Get a list of L{feedId<flumotion.common.common.feedId>}s that this
-        component has feeders for.
+        Get a list of this component's feeders.
 
-        Obviously, the componentName part will be the same for all of them,
-        since it's the name of this component, but we return the feedId to be
-        similar to getEaters.
+        @return: a list of feeder names, or the empty list.
+        @rtype:  list of str
+        """
+        if not self.componentState:
+            self.warning("detached component")
+            return []
+        return list(self.componentState.get('config').get('feed', []))
+    
+    def getEatersForFeeder(self, feederName, otherComponents):
+        """Get a list of L{feedId<flumotion.common.common.feedId>}s to
+        which this feeder should feed.
 
+        Note that you need to pass a list of other components to this
+        function; it has to search them all.
+
+        @param feederName: The name of the specific feeder, e.g. 'video'
+        @type  feederName: str
+        @param otherComponents: Other components that might eat from
+        this component.
+        @type  feederName: list of ComponentAvatar
         @return: a list of feedId's, or the empty list
         @rtype:  list of str
         """
-        # non-feed components don't have these keys
-        # FIXME: feederNames need to be renamed, either feedIds or feedNames
-        if not self.feeder_names:
-            self.warning('no feederNames key, so no feeders')
+        if not self.componentState:
+            self.warning("detached component")
             return []
-
-        return self.feeder_names
+        
+        s = self.componentState
+        thisFeedId = common.feedId(self.getName(), feederName)
+        ret = []
+        for comp in otherComponents:
+            for eaterName in comp.getEaters():
+                if thisFeedId in comp.getFeedersForEater(eaterName):
+                    ret.append(common.feedId(comp.getName(), eaterName))
+        return ret
 
     def getFeedServerPort(self):
         """
@@ -679,138 +688,153 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         self.removeAvatar(componentAvatar.avatarId)
         
-    def _getComponentEatersData(self, componentAvatar):
-        """
-        Retrieve the information about the feeders this component's eaters
-        are eating from.
+    def _connectEaterUpstream(self, componentAvatar, eaterName,
+                              remoteFeedId):
+        def error(format, *args, **kwargs):
+            m = messages.Error(T_(format, *args),
+                               id=("component-start-%s-%s"
+                                   % (eaterName, remoteFeedId)),
+                               **kwargs)
+            # FIXME: make addMessage and setMood public
+            componentAvatar._addMessage(m)
+            componentAvatar._setMood(moods.sad)
+            return defer.fail(errors.ComponentStartHandledError())
 
-        @param componentAvatar: the component
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        self.debug('connecting from eater to feeder')
+        # the flow is the same for both components
+        flowName = componentAvatar.getParentName()
 
-        @returns: list of fullFeedIds
-        """
-        componentId = componentAvatar.avatarId
-        eaterFeedIds = componentAvatar.getEaters()
-        self.debug('feeds we eat: %r' % eaterFeedIds)
+        # these are remote names
+        componentName, feedName = common.parseFeedId(remoteFeedId)
+        fullFeedId = common.fullFeedId(flowName, componentName,
+                                       feedName)
+        componentId = common.componentId(flowName, componentName)
 
-        retval = []
-        for feedId in eaterFeedIds:
-            (componentName, feedName) = common.parseFeedId(feedId)
-            flowName = common.parseComponentId(componentId)[0]
-            fullFeedId = common.fullFeedId(flowName, componentName, feedName)
+        feederAvatar = self.getAvatar(componentId)
+        if not feederAvatar:
+            return error(N_("Configuration problem."),
+                         debug="No component '%s'." % componentId)
 
-            retval.append(fullFeedId)
+        # FIXME: get from network map instead
+        host = feederAvatar.getClientAddress()
+        port = feederAvatar.getFeedServerPort()
 
-        return retval
+        # FIXME: until network map is implemented, hack to
+        # assume that connections from what appears to us to be
+        # the same IP go through localhost instead. Allows
+        # connections between components on a worker behind a
+        # firewall, but not between components running on
+        # different workers, both behind a firewall
+        eaterHost = componentAvatar.mind.broker.transport.getPeer().host
+        if eaterHost == host:
+            host = '127.0.0.1'
 
-    def _getComponentFeedersData(self, component):
-        """
-        Retrieves the data of feeders (feed producer elements) for a component.
+        def errback(failure):
+            failure.trap(error.ConnectError,
+                         error.ConnectionRefusedError)
+            return error(N_("Could not connect component to %s:%d for "
+                            "feed %s."), host, port, fullFeedId,
+                         debug="No component '%s'." % componentId)
 
-        @param component: the component
-        @type  component: L{flumotion.manager.component.ComponentAvatar}
+        # FIXME: pass the eaterName also. See #694.
+        d = componentAvatar.eatFrom(fullFeedId, host, port)
+        d.addErrback(errback)
+        return d
 
-        @returns: tuple of (feedId, host, port) for each feeder
-        @rtype:   tuple of (str, str, int) tuple
-        """
-        # FIXME: host and port are constant for all the feedIds, so
-        # maybe we should return host, port, list-of-feeders
+    def _connectEaters(self, componentAvatar):
+        # connect the component's eaters
+        for eaterName in componentAvatar.getEaters():
+            for remoteFeedId in componentAvatar.getFeedersForEater(eaterName):
+                self.debug('connecting eater %s of feed %s', eaterName,
+                           remoteFeedId)
+                # FIXME: all connections are upstream for now
+                connection = "upstream"
+                if connection == "upstream":
+                    self._connectEaterUpstream(componentAvatar,
+                                               eaterName, remoteFeedId)
+                else:
+                    self.debug('component providing feed %s will '
+                               'connect later', remoteFeedId)
 
-        # get what we think is the IP address where the component is running
-        host = component.getClientAddress()
-        port = component.getFeedServerPort()
-        feedIds = component.getFeeders()
-        self.debug('returning data for feeders: %r', feedIds)
-        return map(lambda f: (f, host, port), feedIds)
+    def _connectFeeders(self, componentAvatar):
+        flowName = componentAvatar.getParentName()
+        otherComponents = [c for c in self.avatars.values()
+                           if c.getParentName() == flowName]
+        for feederName in componentAvatar.getFeeders():
+            for remoteFeedId in componentAvatar.getEatersForFeeder(
+                feederName, otherComponents):
+                self.debug('connecting feeder %s to feed %s', feederName,
+                           remoteFeedId)
+                # FIXME: all connections are upstream for now
+                connection = "upstream"
+                if connection == "upstream":
+                    self.debug('component eating feed %s will '
+                               'connect later', remoteFeedId)
+                else:
+                    self._connectFeederDownstream(componentAvatar,
+                                                  feederName,
+                                                  remoteFeedId)
+
+    def _connectFeederDownstream(self, componentAvatar, feederName,
+                                 remoteFeedId):
+        def error(format, *args, **kwargs):
+            m = messages.Error(T_(format, *args),
+                               id=("component-start-%s-%s"
+                                   % (feederName, remoteFeedId)),
+                               **kwargs)
+            # FIXME: make addMessage and setMood public
+            componentAvatar._addMessage(m)
+            componentAvatar._setMood(moods.sad)
+            return defer.fail(errors.ComponentStartHandledError())
+
+        self.debug('connecting from feeder to eater')
+        # the flow is the same for both components
+        flowName = componentAvatar.getParentName()
+
+        # these are remote names
+        componentName, feedName = common.parseFeedId(remoteFeedId)
+        fullFeedId = common.fullFeedId(flowName, componentName,
+                                       feedName)
+        componentId = common.componentId(flowName, componentName)
+
+        eaterAvatar = self.getAvatar(componentId)
+        if not eaterAvatar:
+            return error(N_("Configuration problem."),
+                         debug="No component '%s'." % componentId)
+
+        # FIXME: get from network map instead
+        host = eaterAvatar.getClientAddress()
+        port = eaterAvatar.getFeedServerPort()
+
+        def errback(failure):
+            failure.trap(error.ConnectError,
+                         error.ConnectionRefusedError)
+            return error(N_("Could not connect component to %s:%d for "
+                            "feed %s."), host, port, fullFeedId,
+                         debug="No component '%s'." % componentId)
+
+        # FIXME: put in the feeder name, see #694; and whose avatarId is
+        # this meant to be anyway?
+        d = componentAvatar.feedTo(componentAvatar.avatarId,
+                                   remoteFeedId, host, port)
+        d.addErrback(errback)
+        return d
 
     def _startComponent(self, componentAvatar):
-        state = componentAvatar.componentState
-        conf = state.get('config')
-    
-        # connect the component's eaters
-        eatersData = self._getComponentEatersData(componentAvatar)
-        for fullFeedId in eatersData:
-            self.debug('connecting eater of feed %s' % fullFeedId)
-            # FIXME: ideally we would get this from the config
-            # downstream makes more sense since it's more likely
-            # for a producer to be behind NAT
-            connection = "upstream"
+        def connectEaters():
+            return self._connectEaters(componentAvatar)
 
-            if connection == "upstream":
-                self.debug('connecting from eater to feeder')
-                # find avatar that feeds this feed
-                (flowName, componentName, feedName) = common.parseFullFeedId(
-                    fullFeedId)
-                avatarId = common.componentId(flowName, componentName)
-                feederAvatar = self.getAvatar(avatarId)
-                if not feederAvatar:
-                    m = messages.Error(T_(
-                        N_("Configuration problem.")),
-                        debug="No component '%s'." % avatarId,
-                        id="component-start-%s" % fullFeedId)
-                    # FIXME: make addMessage and setMood public
-                    componentAvatar._addMessage(m)
-                    componentAvatar._setMood(moods.sad)
- 
-                # FIXME: get from network map instead
-                host = feederAvatar.getClientAddress()
-                port = feederAvatar.getFeedServerPort()
+        def connectFeeders(_):
+            return self._connectFeeders(componentAvatar)
 
-                # FIXME: until network map is implemented, hack to
-                # assume that connections from what appears to us to be
-                # the same IP go through localhost instead. Allows
-                # connections between components on a worker behind a
-                # firewall, but not between components running on
-                # different workers, both behind a firewall
-                eaterHost = componentAvatar.mind.broker.transport.getPeer().host
-                if eaterHost == host:
-                    host = '127.0.0.1'
+        def start(_):
+            componentAvatar.debug('starting component')
+            return componentAvatar.start()
 
-                d = componentAvatar.eatFrom(fullFeedId, host, port)
-                yield d
-                try:
-                    d.value()
-                except (error.ConnectError, error.ConnectionRefusedError), e:
-                    m = messages.Error(T_(
-                        N_("Could not connect component to %s:%d for feed %s."),
-                            host, port, fullFeedId),
-                        debug=log.getExceptionMessage(e, filename='component'),
-                        id="component-start-%s" % fullFeedId)
-                    # FIXME: make addMessage and setMood public
-                    componentAvatar._addMessage(m)
-                    componentAvatar._setMood(moods.sad)
-                    raise errors.ComponentStartHandledError(e)
-            elif connection == "downstream":
-                self.debug('connecting from feeder to eater')
-                # find avatar that feeds this feed
-                (flowName, componentName, feedName) = common.parseFullFeedId(
-                    fullFeedId)
-                feederAvatarId = common.componentId(flowName, componentName)
-                feederAvatar = self.getAvatar(feederAvatarId)
-                # FIXME: get from network map instead
-                host = componentAvatar.getClientAddress()
-                port = componentAvatar.getFeedServerPort()
-                d = feederAvatar.feedTo(componentAvatar.avatarId,
-                    common.feedId(componentName, feedName), host, port)
-                yield d
-                try:
-                    d.value()
-                except error.ConnectionRefusedError, e:
-                    m = messages.Error(T_(
-                        N_("Could not connect to %s:%d for feed %s."),
-                            host, port, fullFeedId),
-                        debug=log.getExceptionMessage(e),
-                        id="component-start-%s" % fullFeedId)
-                    self._addMessage(m)
-                    self._setMood(moods.sad)
-                    raise errors.ComponentStartHandledError
-
-        componentAvatar.debug('starting component')
-        try:
-            componentAvatar.start()
-        except errors.ComponentStartHandledError, e:
-            pass
-    _startComponent = defer_generator_method(_startComponent)
+        d = defer.maybeDeferred(connectEaters)
+        d.addCallback(connectFeeders)
+        d.addCallback(start)
+        return d
 
     def _tryWhatCanBeStarted(self, result=True):
         """
@@ -965,10 +989,6 @@ class ComponentHeaven(base.ManagerHeaven):
         # set up the component
         state = componentAvatar.componentState
         conf = state.get('config')
-        eater_config = conf.get('source', [])
-        feeder_config = conf.get('feed', [])
-        componentAvatar.parseEaterConfig(eater_config)
-        componentAvatar.parseFeederConfig(feeder_config)
 
         self.debug('setting up componentAvatar %r' % componentAvatar)
         d = componentAvatar.setup(conf)
