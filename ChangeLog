@@ -1,3 +1,9 @@
+2007-06-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/startset.py (StartSet.createRegistered): Commit
+	a similar fix to the startset as the one Mike just committed to
+	the copy in worker/job.py.
+
 2007-06-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

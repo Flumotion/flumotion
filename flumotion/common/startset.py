@@ -152,10 +152,10 @@ class StartSet(log.Loggable):
         @param avatarId: the id of the remote process, for example the
         avatarId of the job
 
-        @returns: True if a deferred create has been registered for this
-        object, False otherwise
+        @returns: The deferred create, if one has been registered.
+        Otherwise None.
         """
-        return avatarId in self._createDeferreds
+        return self._createDeferreds.get(avatarId, None)
 
     def shutdownStart(self, avatarId):
         """
