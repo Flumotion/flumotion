@@ -1,3 +1,9 @@
+2007-06-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent._reconnectEater): Don't reconnect if we don't have
+	a medium, as in flumotion-launch. Fixes #616.
+
 2007-06-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/firewire/firewire.py

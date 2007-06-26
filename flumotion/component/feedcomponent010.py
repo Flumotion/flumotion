@@ -1109,6 +1109,11 @@ class FeedComponent(basecomponent.BaseComponent):
             self._checkEater, feedId)
         
     def _reconnectEater(self, feedId):
+        if not self.medium:
+            self.debug("Can't reconnect eater for feed %s, running "
+                       "without a medium", feedId)
+            return
+
         eater = self._eaters[feedId]
         eater.disconnected()
         # reconnect the eater for the given feedId, updating the internal
