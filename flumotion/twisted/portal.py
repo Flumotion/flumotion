@@ -149,5 +149,25 @@ class BouncerPortal(log.Loggable):
         d.addCallback(bouncerResponse)
         d.addErrback(onErrorCloseConnection)
         return d
+    
+    def logout(self, keycard):
+        """
+        Logout of client from portal. This removes the keycard
+        from the bouncer.
+
+        @param keycard:    the keycard used to login
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
+        """
+        d = defer.maybeDeferred(self.bouncer.removeKeycard, keycard)
+        def bouncerResponse(result):
+            self.debug("keycard %r removed from bouncer", keycard)
+            return result
+        def bouncerError(failure):
+            self.debug("got error removing keycard %r from bouncer: %r",
+                keycard,
+                log.getFailureMessage(failure))
+        d.addCallback(bouncerResponse)
+        d.addErrback(bouncerError)
+        return d
 
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

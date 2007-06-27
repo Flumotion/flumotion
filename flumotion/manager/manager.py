@@ -88,7 +88,7 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, computeIdentity):
+    def __init__(self, computeIdentity, vishnu):
         """
         @param computeIdentity: see L{Vishnu.computeIdentity}
         @type  computeIdentity: callable
@@ -98,6 +98,8 @@ class Dispatcher(log.Loggable):
         self._interfaceHeavens = {} # interface -> heaven
         self._avatarHeavens = {} # avatarId -> heaven
         self._computeIdentity = computeIdentity
+        self._vishnu = vishnu
+        self._avatarKeycards = {} # avatarId -> keycard
         
     ### IRealm methods
 
@@ -123,6 +125,7 @@ class Dispatcher(log.Loggable):
             # FIXME: there needs to be a way to not have to do a callLater
             # blindly so cleanup can be guaranteed
             reactor.callLater(0, avatar.attached, mind)
+            self._avatarKeycards[avatarId] = keycard
             return (pb.IPerspective, avatar, cleanup)
         def got_error(failure):
             # If we failed for some reason, we want to drop the connection.
@@ -148,7 +151,9 @@ class Dispatcher(log.Loggable):
         """
         heaven = self._avatarHeavens[avatarId]
         del self._avatarHeavens[avatarId]
-        
+        keycard = self._avatarKeycards[avatarId]
+        self._vishnu.portal.logout(keycard)
+        del self._avatarKeycards[avatarId]
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
 
@@ -230,7 +235,7 @@ class Vishnu(log.Loggable):
     def __init__(self, name, unsafeTracebacks=0, configDir=None):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher(self.computeIdentity)
+        self.dispatcher = Dispatcher(self.computeIdentity, self)
 
         self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
                                                worker.WorkerHeaven)
