@@ -88,19 +88,26 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, computeIdentity, vishnu):
+    def __init__(self, computeIdentity):
         """
         @param computeIdentity: see L{Vishnu.computeIdentity}
         @type  computeIdentity: callable
-        """
+                """
         # FIXME: Is passing a callable to a constructor offending anyone
         # else's sense of aesthetics ?
         self._interfaceHeavens = {} # interface -> heaven
         self._avatarHeavens = {} # avatarId -> heaven
         self._computeIdentity = computeIdentity
-        self._vishnu = vishnu
+        self._bouncerPortal = None 
         self._avatarKeycards = {} # avatarId -> keycard
-        
+    
+    def setBouncerPortal(self, bouncerPortal):
+        """
+        @param bouncerPortal: the portal that uses a bouncer to authenticate
+        @type bouncerPortal: L{flumotion.twisted.portal.BouncerPortal}
+        """
+        self._bouncerPortal = bouncerPortal
+
     ### IRealm methods
 
     # requestAvatar gets called through ClientFactory.login()
@@ -152,7 +159,10 @@ class Dispatcher(log.Loggable):
         heaven = self._avatarHeavens[avatarId]
         del self._avatarHeavens[avatarId]
         keycard = self._avatarKeycards[avatarId]
-        self._vishnu.portal.logout(keycard)
+        # if there is no bouncerPortal or bouncer
+        # do not try to logout
+        if self._bouncerPortal and self._bouncerPortal.bouncer:
+            self._bouncerPortal.logout(keycard)
         del self._avatarKeycards[avatarId]
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
@@ -235,7 +245,7 @@ class Vishnu(log.Loggable):
     def __init__(self, name, unsafeTracebacks=0, configDir=None):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher(self.computeIdentity, self)
+        self.dispatcher = Dispatcher(self.computeIdentity)
 
         self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
                                                worker.WorkerHeaven)
@@ -266,6 +276,7 @@ class Vishnu(log.Loggable):
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
+        self.dispatcher.setBouncerPortal(self.portal)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(self.portal,
             unsafeTracebacks=unsafeTracebacks)
