@@ -1,0 +1,14 @@
+<rrdmon>
+ <source name="http-streamer">
+  <manager>user:test@localhost:7531</manager>
+  <ui-state-key>stream-totalbytes</ui-state-key>
+  <is-gauge>False</is-gauge>
+  <sample-frequency>300</sample-frequency>
+  <archive>
+   <!-- This should be nicer in the future, but the meaning of this is that we
+        sample every 1*stepsize=1*300s=5 minutes, for 1200 samples = 5
+        min*1200=100h.-->
+   <rra-spec>AVERAGE:0.5:1:1200</rra-spec>
+  </archive>
+ </source>
+</rrdmon>

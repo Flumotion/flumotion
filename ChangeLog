@@ -1,5 +1,18 @@
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
+	* configure.ac: 
+	* conf/rrdmon/default.xml: 
+	* bin/Makefile.am (bin_SCRIPTS): 
+	* bin/flumotion-rrdmon.in: 
+	* flumotion/admin/Makefile.am: 
+	* flumotion/admin/rrdmon/config.py: 
+	* flumotion/admin/rrdmon/main.py: 
+	* flumotion/admin/rrdmon/Makefile.am: 
+	* flumotion/admin/rrdmon/rrdmon.py: 
+	* flumotion/admin/rrdmon/__init__.py: Add scaffolding for a daemon
+	that can monitor components' UIState keys, logging them to an RRD
+	file.
+
 	* flumotion/admin/multi.py (MultiAdminModel.removeListener): New
 	method.
 	(MultiAdminModel._managerConnected)
