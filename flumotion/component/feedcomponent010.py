@@ -1191,7 +1191,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('FeedToFD(%s, %d)' % (feedName, fd))
         feedId = common.feedId(self.name, feedName)
 
-        if not self.pipeline:
+        # We must have a pipeline in READY or above to do this.
+        if not self.pipeline or self.pipeline.get_state(0)[1] != gst.STATE_NULL:
             self.warning('told to feed %s to fd %d, but pipeline not '
                          'running yet', feedId, fd)
             cleanup(fd)
