@@ -1193,7 +1193,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # We must have a pipeline in READY or above to do this. Do a 
         # non-blocking (zero timeout) get_state.
-        if not self.pipeline or self.pipeline.get_state(0)[1] != gst.STATE_NULL:
+        if not self.pipeline or self.pipeline.get_state(0)[1] == gst.STATE_NULL:
             self.warning('told to feed %s to fd %d, but pipeline not '
                          'running yet', feedId, fd)
             cleanup(fd)
