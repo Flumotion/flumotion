@@ -1,3 +1,9 @@
+2007-06-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/common.py: 
+	* flumotion/test/test_admin_admin.py: Move the TestCaseWithManager
+	to common.py.
+
 2007-06-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
