@@ -275,6 +275,22 @@ class Vishnu(log.Loggable):
 
         self.configuration = None
 
+    def shutdown(self):
+        """Cancel any pending operations in preparation for shutdown.
+
+        This method is mostly useful for unit tests; currently, it is
+        not called during normal operation. Note that the caller is
+        responsible for stopping listening on the port, as the the
+        manager does not have a handle on the twisted port object.
+
+        @returns: A deferred that will fire when the manager has shut
+        down.
+        """
+        if self.bouncer:
+            return self.bouncer.stop()
+        else:
+            return defer.succeed(None)
+
     def setConnectionInfo(self, host, port, use_ssl):
         info = dict(host=host, port=port, use_ssl=use_ssl)
         self.connectionInfo.update(info)

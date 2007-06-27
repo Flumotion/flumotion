@@ -1,3 +1,12 @@
+2007-06-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_admin_admin.py: New test, not quite fleshed
+	out yet.
+
+	* flumotion/manager/manager.py (Vishnu.shutdown): New method,
+	mostly for test cases.
+
 2007-06-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/manager/manager.py (Dispatcher.__init__,
