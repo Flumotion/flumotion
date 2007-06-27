@@ -19,12 +19,17 @@
 
 # Headers in this file shall remain intact.
 
+import common
+
 from StringIO import StringIO
 
+from twisted.cred import error
 from twisted.trial import unittest
 from twisted.internet import reactor
+from twisted.python import log as tlog
 
-from flumotion.common import config, server
+from flumotion.common import config, server, connection, log
+from flumotion.twisted import pb
 from flumotion.manager import manager
 from flumotion.admin import admin
 
@@ -47,6 +52,14 @@ user:PSfNpHTkpTx1M
 
 class TestCaseWithManager(unittest.TestCase):
     def setUp(self):
+        # This bit about log flushing is repeated in various tests;
+        # would be good to see about making it unnecessary. Perhaps
+        # returning a pb.Error subclass instead of UnauthorizedLogin
+        # would do the trick.
+
+        # don't output Twisted tracebacks for PB errors we will trigger
+        log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
+
         conf = config.ManagerConfigParser(StringIO(managerConf)).manager
         self.vishnu = manager.Vishnu(conf.name,
                                      unsafeTracebacks=True)
@@ -59,8 +72,19 @@ class TestCaseWithManager(unittest.TestCase):
             p = s.startTCP(conf.host, conf.port)
         self.tport = p
         self.port = p.getHost().port
+        i = connection.PBConnectionInfo('localhost', self.port,
+                                        conf.transport == 'ssl',
+                                        pb.Authenticator(username='user',
+                                                         password='test'))
+        self.connectionInfo = i
         
     def tearDown(self):
+        try:
+            self.flushLoggedErrors(error.UnauthorizedLogin)
+        except AttributeError:
+            tlog.flushErrors(error.UnauthorizedLogin)
+        log._getTheFluLogObserver().clearIgnores()
+
         d = self.vishnu.shutdown()
         d.addCallback(lambda _: self.tport.stopListening())
         return d
@@ -69,3 +93,34 @@ class TestCaseWithManager(unittest.TestCase):
 class AdminTest(TestCaseWithManager):
     def testConstructor(self):
         model = admin.AdminModel()
+
+    def testConnectSuccess(self):
+        def connected(_):
+            self.failUnless(a.planet is not None)
+            self.assertEqual(len(self.vishnu.adminHeaven.avatars),
+                             1)
+            a.shutdown()
+
+        a = admin.AdminModel()
+        d = a.connectToManager(self.connectionInfo)
+        d.addCallback(connected)
+        return d
+
+    def testConnectFailure(self):
+        def connected(_):
+            self.fail('should not have connected')
+
+        def failure(f):
+            # ok!
+            a.shutdown()
+
+        a = admin.AdminModel()
+        # create a connectionInfo that will not succeed
+        i = connection.PBConnectionInfo(self.connectionInfo.host,
+                                        self.connectionInfo.port,
+                                        self.connectionInfo.use_ssl,
+                                        pb.Authenticator(username='user',
+                                                         password='pest'))
+        d = a.connectToManager(i)
+        d.addCallbacks(connected, failure)
+        return d

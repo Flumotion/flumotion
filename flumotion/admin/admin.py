@@ -182,6 +182,8 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         self.state = 'disconnected'
         self.clientFactory = None
 
+        self._deferredConnect = None
+
         self._components = {} # dict of components
         self.planet = None
         self._workerHeavenState = None
@@ -214,38 +216,48 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             reactor.connectTCP(connectionInfo.host, connectionInfo.port,
                                self.clientFactory)
 
-        def connected(model, d, ids):
-            map(model.disconnect, ids)
+        def connected(model, d):
+            # model is really "self". yay gobject?
             d.callback(model)
 
-        def disconnected(model, d, ids):
+        def disconnected(model, d):
             # can happen after setRemoteReference but before
             # getPlanetState or getWorkerHeavenState returns
-            map(model.disconnect, ids)
-            d.errback(errors.ConnectionFailedError('Lost connection'))
+            if not keepTrying:
+                d.errback(errors.ConnectionFailedError('Lost connection'))
 
-        def connection_refused(model, d, ids):
-            map(model.disconnect, ids)
-            d.errback(errors.ConnectionRefusedError())
+        def connection_refused(model, d):
+            if not keepTrying:
+                d.errback(errors.ConnectionRefusedError())
 
-        def connection_failed(model, reason, d, ids):
-            map(model.disconnect, ids)
-            d.errback(errors.ConnectionFailedError(reason))
+        def connection_failed(model, reason):
+            if not keepTrying:
+                d.errback(errors.ConnectionFailedError(reason))
 
-        def connection_error(model, exception, d, ids):
-            map(model.disconnect, ids)
-            d.errback(exception)
+        def connection_error(model, exception):
+            if not keepTrying:
+                d.errback(exception)
 
         d = defer.Deferred()
         ids = []
-        ids.append(self.connect('connected', connected, d, ids))
-        ids.append(self.connect('disconnected', disconnected, d, ids))
-        ids.append(self.connect('connection-refused',
-                                connection_refused, d, ids))
-        ids.append(self.connect('connection-failed',
-                                connection_failed, d, ids))
-        ids.append(self.connect('connection-error',
-                                connection_error, d, ids))
+        ids.append(self.connect('connected', connected, d))
+        ids.append(self.connect('disconnected', disconnected, d))
+        ids.append(self.connect('connection-refused', connection_refused, d))
+        ids.append(self.connect('connection-failed', connection_failed, d))
+        ids.append(self.connect('connection-error', connection_error, d))
+
+        def success(model):
+            map(self.disconnect, ids)
+            self._deferredConnect = None
+            return model
+
+        def failure(f):
+            map(self.disconnect, ids)
+            self._deferredConnect = None
+            return f
+
+        d.addCallbacks(success, failure)
+        self._deferredConnect = d
         return d
 
     def shutdown(self):
@@ -256,6 +268,11 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             self.clientFactory.stopTrying()
             self.clientFactory.disconnect()
             self.clientFactory = None
+
+        if self._deferredConnect is not None:
+            # this can happen with keepTrying=True
+            self.debug('cancelling connection attempt')
+            self._deferredConnect.errback(errors.ConnectionCancelledError())
 
     def reconnect(self, keepTrying=False):
         """Close any existing connection to the manager and

@@ -1,5 +1,21 @@
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py (AdminModel.connectToManager): Some
+	fixes to the deferred connection interface such that it respects
+	keepTrying. The bit about keepTrying=True doesn't have tests yet
+	though. See #621.
+	(AdminModel.shutdown): Cancel the pending deferred connect, if
+	there is one.
+
+	* flumotion/common/errors.py (ConnectionCancelledError): New
+	error.
+
+	* flumotion/test/test_admin_admin.py (TestCaseWithManager.setUp)
+	(TestCaseWithManager.tearDown): Add foo such that twisted
+	exceptions don't cause errors. A better solution would be nice.
+	(AdminTest.testConnectSuccess, AdminTest.testConnectFailure): New
+	tests for the deferred connection interface.
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): 
 	* flumotion/test/test_admin_admin.py: New test, not quite fleshed
 	out yet.
