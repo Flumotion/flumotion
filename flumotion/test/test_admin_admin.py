@@ -25,7 +25,7 @@ from StringIO import StringIO
 
 from twisted.cred import error
 from twisted.trial import unittest
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.python import log as tlog
 
 from flumotion.common import config, server, connection, log
@@ -104,6 +104,41 @@ class AdminTest(TestCaseWithManager):
         a = admin.AdminModel()
         d = a.connectToManager(self.connectionInfo)
         d.addCallback(connected)
+        return d
+
+    def testReconnect(self):
+        disconnectDeferred = defer.Deferred()
+        reconnectDeferred = defer.Deferred()
+
+        def connected(_):
+            self.failUnless(a.planet is not None)
+            self.assertEqual(len(self.vishnu.adminHeaven.avatars),
+                             1)
+
+            def _disconnected(_):
+                disconnectDeferred.callback(None)
+            def _connected(_):
+                map(a.disconnect, ids)
+                reconnectDeferred.callback(None)
+
+            ids = []
+            ids.append(a.connect('disconnected', _disconnected))
+            ids.append(a.connect('connected', _connected))
+            a.clientFactory.disconnect()
+            return disconnectDeferred
+
+        def disconnected(_):
+            return reconnectDeferred
+
+        def reconnected(_):
+            # yay
+            a.shutdown()
+
+        a = admin.AdminModel()
+        d = a.connectToManager(self.connectionInfo)
+        d.addCallback(connected)
+        d.addCallback(disconnected)
+        d.addCallback(reconnected)
         return d
 
     def testConnectFailure(self):

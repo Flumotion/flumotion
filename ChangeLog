@@ -1,5 +1,8 @@
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_admin_admin.py (AdminTest.testReconnect):
+	New test. Nifty!
+
 	* flumotion/admin/admin.py (AdminModel.connectToManager): Some
 	fixes to the deferred connection interface such that it respects
 	keepTrying. The bit about keepTrying=True doesn't have tests yet
