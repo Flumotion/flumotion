@@ -1,5 +1,23 @@
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/multi.py (MultiAdminModel.removeListener): New
+	method.
+	(MultiAdminModel._managerConnected)
+	(MultiAdminModel._managerDisconnected): New internal methods.
+	Listen for reconnections. Fixes #664.
+	(MultiAdminModel.addManager): Refactor to use the admin's deferred
+	connection interface. This shows that the interface is sufficient.
+	Fixes #621.
+	(MultiAdminModel.removeManager): Remove reconnection signals, and
+	treat the manager as disconnected immediately. No need to use
+	deferred stops.
+
+	* flumotion/test/test_admin_multi.py (MultiAdminTest): Use
+	TestCaseWithManager.
+	(MultiAdminTest.testConnectSuccess)
+	(MultiAdminTest.testConnectFailure)
+	(MultiAdminTest.testReconnect): Add tests.
+
 	* flumotion/test/common.py: 
 	* flumotion/test/test_admin_admin.py: Move the TestCaseWithManager
 	to common.py.

@@ -19,11 +19,88 @@
 
 # Headers in this file shall remain intact.
 
+import common
+
 from twisted.trial import unittest
-from twisted.internet import reactor
+from twisted.internet import defer
 
-class MultiAdminTest(unittest.TestCase):
+from flumotion.admin import multi
+from flumotion.common import connection
+from flumotion.twisted import pb
+
+
+class MultiAdminTest(common.TestCaseWithManager):
     def testConstructor(self):
-        from flumotion.admin import multi
-
         model = multi.MultiAdminModel()
+
+    def testConnectSuccess(self):
+        def connected(_):
+            self.assertEqual(len(self.vishnu.adminHeaven.avatars),
+                             1)
+            return m.removeManager(str(self.connectionInfo))
+
+        m = multi.MultiAdminModel()
+        d = m.addManager(self.connectionInfo)
+        d.addCallback(connected)
+        return d
+
+    def testConnectFailure(self):
+        def connected(_):
+            self.fail('should not have connected')
+
+        def failure(f):
+            # ok!
+            self.assertEqual(len(self.vishnu.adminHeaven.avatars), 0)
+            self.assertEqual(m.admins, {})
+            self.assertEqual(m._reconnectHandlerIds, {})
+
+        m = multi.MultiAdminModel()
+        i = connection.PBConnectionInfo(self.connectionInfo.host,
+                                        self.connectionInfo.port,
+                                        self.connectionInfo.use_ssl,
+                                        pb.Authenticator(username='user',
+                                                         password='pest'))
+        d = m.addManager(i)
+        d.addCallbacks(connected, failure)
+        return d
+
+    def testReconnect(self):
+        class Listener:
+            def __init__(self):
+                self.disconnectDeferred = defer.Deferred()
+                self.reconnectDeferred = defer.Deferred()
+                
+            def model_addPlanet(self, admin, planet):
+                self.reconnectDeferred.callback(admin)
+                self.reconnectDeferred = None
+
+            def model_removePlanet(self, admin, planet):
+                self.disconnectDeferred.callback(admin)
+                self.disconnectDeferred = None
+        Listener = Listener()
+
+        def connected(_):
+            self.assertEqual(len(self.vishnu.adminHeaven.avatars),
+                             1)
+            a = m.admins[str(self.connectionInfo)]
+
+            m.addListener(Listener)
+
+            a.clientFactory.disconnect()
+
+            return Listener.disconnectDeferred
+
+        def disconnected(_):
+            return Listener.reconnectDeferred
+
+        def reconnected(_):
+            m.removeListener(Listener)
+            return m.removeManager(str(self.connectionInfo))
+
+        m = multi.MultiAdminModel()
+        d = m.addManager(self.connectionInfo)
+        d.addCallback(connected)
+        d.addCallback(disconnected)
+        d.addCallback(reconnected)
+        return d
+

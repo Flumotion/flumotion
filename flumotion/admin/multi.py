@@ -77,6 +77,7 @@ class MultiAdminModel(log.Loggable):
         self.admins = WatchedDict() # {managerId: AdminModel}
         # private
         self.listeners = []
+        self._reconnectHandlerIds = {} # managerId => [disconnect, id..]
         self._startSet = startset.StartSet(self.admins.has_key,
                                            errors.AlreadyConnectingError,
                                            errors.AlreadyConnectedError)
@@ -98,101 +99,92 @@ class MultiAdminModel(log.Loggable):
         assert not obj in self.listeners
         self.listeners.append(obj)
 
+    def removeListener(self, obj):
+        self.listeners.remove(obj)
+
+    def _managerConnected(self, admin):
+        if admin.managerId not in self._reconnectHandlerIds:
+            # the first time a manager is connected to, start listening
+            # for reconnections; intertwingled with removeManager()
+            ids = [admin.disconnect]
+            ids.append(admin.connect('connected',
+                                     self._managerConnected))
+            ids.append(admin.connect('disconnected',
+                                     self._managerDisconnected))
+            self._reconnectHandlerIds[admin.managerId] = ids
+
+        planet = admin.planet
+        self.info('Connected to manager %s (planet %s)',
+                  admin.managerId, planet.get('name'))
+        assert admin.managerId not in self.admins
+        self.admins[admin.managerId] = admin
+        self.emit('addPlanet', admin, planet)
+
+    def _managerDisconnected(self, admin):
+        if admin.managerId in self.admins:
+            self.emit('removePlanet', admin, admin.planet)
+            del self.admins[admin.managerId]
+        else:
+            self.warning('Could not find admin model %r', admin)
+        
     def addManager(self, connectionInfo, tenacious=False):
-        def connected_cb(admin):
-            self._startSet.avatarStarted(managerId)
-
-        def disconnected_cb(admin):
-            self.info('Disconnected from manager')
-            if admin.managerId in self.admins:
-                self.emit('removePlanet', admin, admin.planet)
-                del self.admins[admin.managerId]
-            else:
-                self.warning('Could not find admin model %r', admin)
-            if self._startSet.shutdownRegistered(managerId):
-                self._startSet.shutdownSuccess(managerId)
-
-        def connection_refused_cb(admin):
-            msg = 'Connection to %s:%d refused.' % (i.host, i.port)
-            self.info('%s', msg)
-            if not tenacious:
-                self._startSet.avatarStopped(managerId,
-                    errors.ConnectionRefusedError(msg))
-
-        def connection_failed_cb(admin, string):
-            msg = 'Connection to %s:%d failed: %s' % (i.host, i.port,
-                                                      string)
-            self.info('%s', msg)
-            if not tenacious:
-                self._startSet.avatarStopped(managerId,
-                    lambda _: errors.ConnectionFailedError(msg))
-
-        def connection_error_cb(admin, obj):
-            msg = 'Error connecting to %s:%d: %r' % (i.host, i.port,
-                                                     obj)
-            self.warning('%s', msg)
-            if not tenacious:
-                self._startSet.avatarStopped(managerId,
-                    lambda _: errors.ConnectionFailedError(msg))
-
         i = connectionInfo
         managerId = str(i)
+
+        # This dance of deferreds is here so as to make sure that
+        # removeManager can cancel a pending connection.
 
         # can raise errors.AlreadyConnectingError or
         # errors.AlreadyConnectedError
         try:
-            d = self._startSet.createStart(managerId)
+            startD = self._startSet.createStart(managerId)
         except Exception, e:
             return defer.fail(e)
 
         a = admin.AdminModel()
-        a.connectToManager(i, tenacious)
+        connectD = a.connectToManager(i, tenacious)
         assert a.managerId == managerId
 
-        a.connect('connected', connected_cb)
-        a.connect('disconnected', disconnected_cb)
-        a.connect('connection-refused', connection_refused_cb)
-        a.connect('connection-failed', connection_failed_cb)
-        a.connect('connection-error', connection_error_cb)
+        def connect_callback(_):
+            self._startSet.avatarStarted(managerId)
+            
+        def connect_errback(failure):
+            self._startSet.avatarStopped(managerId, lambda _: failure)
 
-        # the admin should offer a decent deferred-connect interface;
-        # instead here we conflate the startset and the
-        # signal->deferred adaptations in one function
+        connectD.addCallbacks(connect_callback, connect_errback)
 
-        def emit_add_planet(_):
-            planet = a.planet
-            self.info('Connected to manager %s (planet %s)',
-                      a.managerId, planet.get('name'))
-            self.admins[a.managerId] = a
-            self.emit('addPlanet', a, planet)
-            return a
-
-        def disconnect_on_error(failure):
+        def start_callback(_):
+            self._managerConnected(a)
+            
+        def start_errback(failure):
             a.shutdown()
             return failure
 
-        d.addCallbacks(emit_add_planet, disconnect_on_error)
+        startD.addCallbacks(start_callback, start_errback)
 
-        return d
+        return startD
 
     def removeManager(self, managerId):
         self.info('disconnecting from %s', managerId)
+
+        # stop listening to admin's signals, if the manager had actually
+        # connected at some point
+        if managerId in self._reconnectHandlerIds:
+            disconnect = self._reconnectHandlerIds[managerId][0]
+            ids = self._reconnectHandlerIds[managerId][1:]
+            map(disconnect, ids)
+
         if managerId in self.admins:
-            self.admins[managerId].shutdown()
-            return self._startSet.shutdownStart(managerId)
-        elif self._startSet.createRegistered(managerId):
-            # this admin has not yet connected; let us assume that in
-            # this window, it will not connect. Firing this makes the
-            # admin shutdown, see disconnect_on_error above.
-            self._startSet.shutdownSuccess(admin.managerId)
-            return defer.succeed(managerId)
-        elif self._startSet.shutdownRegistered(managerId):
-            # some caller is overzealous?
-            return self._startSet.shutdownStart(managerId)
-        else:
-            self.warning('told to remove an unknown manager: %s',
-                         managerId)
-            return defer.succeed(managerId)
+            admin = self.admins[managerId]
+            admin.shutdown()
+            self._managerDisconnected(admin)
+
+        # Firing this has the side effect of errbacking on any pending
+        # start, calling start_errback above if appropriate.
+        self._startSet.avatarStopped(
+            managerId, lambda _: errors.ConnectionCancelledError())
+
+        return defer.succeed(managerId)
 
     def for_each_component(self, object, proc):
         '''Call a procedure on each component that is a child of OBJECT'''
