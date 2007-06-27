@@ -218,6 +218,12 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             map(model.disconnect, ids)
             d.callback(model)
 
+        def disconnected(model, d, ids):
+            # can happen after setRemoteReference but before
+            # getPlanetState or getWorkerHeavenState returns
+            map(model.disconnect, ids)
+            d.errback(errors.ConnectionFailedError('Lost connection'))
+
         def connection_refused(model, d, ids):
             map(model.disconnect, ids)
             d.errback(errors.ConnectionRefusedError())
@@ -233,6 +239,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         d = defer.Deferred()
         ids = []
         ids.append(self.connect('connected', connected, d, ids))
+        ids.append(self.connect('disconnected', disconnected, d, ids))
         ids.append(self.connect('connection-refused',
                                 connection_refused, d, ids))
         ids.append(self.connect('connection-failed',

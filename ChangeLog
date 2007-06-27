@@ -1,3 +1,9 @@
+2007-06-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/admin.py
+	(AdminModel.connectToManager.disconnected): Handle one case in
+	which the returned deferred would not get fired. See #621.
+
 2007-06-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/job.py: Rename the _deferredStarts member to
