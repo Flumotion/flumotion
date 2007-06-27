@@ -287,7 +287,6 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning("detached component")
             return []
         
-        s = self.componentState
         thisFeedId = common.feedId(self.getName(), feederName)
         ret = []
         for comp in otherComponents:

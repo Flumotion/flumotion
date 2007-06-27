@@ -1,5 +1,8 @@
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar.getEatersForFeeder): Pacify pyfascist.
+
 	* flumotion/test/test_admin_admin.py (AdminTest.testReconnect):
 	New test. Nifty!
 
