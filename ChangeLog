@@ -1,6 +1,11 @@
 2007-06-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
+	  Pacify commentfascist.
+
+2007-06-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
 	  Don't accept file descriptors for feeders unless we've actually
 	  started the pipeline (READY or above).
 
