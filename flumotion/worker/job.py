@@ -349,7 +349,7 @@ class JobHeaven(pb.Root, log.Loggable):
         common.signalPid(jobInfo.pid, signum)
 
     def killJob(self, avatarId, signum):
-        for job in self.jobInfos.values():
+        for job in self._jobInfos.values():
             if job.avatarId == avatarId:
                 self.killJobByPid(job.pid, signum)
 

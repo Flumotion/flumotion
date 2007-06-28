@@ -1,3 +1,9 @@
+2007-06-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/job.py:
+	  Make killJob work again by using the right variable. Jobs can now
+	  again be killed from the admin.
+
 2007-06-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/manager/manager.py (Dispatcher.setBouncer):
