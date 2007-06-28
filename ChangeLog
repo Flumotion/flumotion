@@ -1,3 +1,9 @@
+2007-06-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/worker.py:
+	  Don't run the shutdown handler twice, as it tracebacks if we do so.
+	  Fixes #697.
+
 2007-06-27  Andy Wingo  <wingo@pobox.com>
 
 	* configure.ac: 

@@ -116,6 +116,7 @@ class WorkerBrain(log.Loggable):
         # configured to have 0 tcp ports; setup this in listen()
         self.feedServer = None
 
+        self.stopping = False
         reactor.addSystemEventTrigger('before', 'shutdown',
                                       self.shutdownHandler)
         self._installHUPHandler()
@@ -181,7 +182,12 @@ class WorkerBrain(log.Loggable):
         return self.medium.callRemote(methodName, *args, **kwargs)
 
     def shutdownHandler(self):
+        if self.stopping:
+            self.warning("Already shutting down, ignoring shutdown request")
+            return
+
         self.info("Reactor shutting down, stopping jobHeaven")
+        self.stopping = True
 
         l = [self.jobHeaven.shutdown()]
         if self.feedServer:
