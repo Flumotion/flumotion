@@ -1,3 +1,14 @@
+2007-06-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/manager/manager.py (Dispatcher.__init__,
+	  Dispatcher.setBouncer, Dispatcher._bouncerLogout,
+	  Dispatcher.bouncerResponse, Dispatcher.bouncerError,
+	  Dispatcher.removeAvatar, Vishnu.__init__, Vishnu.setBouncer):
+	* flumotion/twisted/portal.py:
+	Just set bouncer in dispatcher not the portal and move logout to
+	the dispatcher.
+	Addresses #696.
+
 2007-06-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/worker/worker.py:

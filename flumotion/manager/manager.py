@@ -98,15 +98,15 @@ class Dispatcher(log.Loggable):
         self._interfaceHeavens = {} # interface -> heaven
         self._avatarHeavens = {} # avatarId -> heaven
         self._computeIdentity = computeIdentity
-        self._bouncerPortal = None 
+        self._bouncer = None 
         self._avatarKeycards = {} # avatarId -> keycard
     
-    def setBouncerPortal(self, bouncerPortal):
+    def setBouncer(self, bouncer):
         """
-        @param bouncerPortal: the portal that uses a bouncer to authenticate
-        @type bouncerPortal: L{flumotion.twisted.portal.BouncerPortal}
+        @param bouncer: the bouncer to authenticate with
+        @type bouncerPortal: L{flumotion.component.bouncers.bouncer}
         """
-        self._bouncerPortal = bouncerPortal
+        self._bouncer = bouncer
 
     ### IRealm methods
 
@@ -150,6 +150,26 @@ class Dispatcher(log.Loggable):
 
     ### our methods
 
+    def _bouncerLogout(self, keycard):
+        """
+        Logout of client from manager. This removes the keycard
+        from the bouncer.
+
+        @param keycard:    the keycard used to login
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
+        """
+        d = defer.maybeDeferred(self._bouncer.removeKeycard, keycard)
+        def bouncerResponse(result):
+            self.debug("keycard %r removed from bouncer", keycard)
+            return result
+        def bouncerError(failure):
+            self.warning("got error removing keycard %r from bouncer: %r",
+                keycard,
+                log.getFailureMessage(failure))
+        d.addCallback(bouncerResponse)
+        d.addErrback(bouncerError)
+        return d
+
     def removeAvatar(self, avatarId, avatar, mind):
         """
         Remove an avatar because it logged out of the manager.
@@ -158,12 +178,11 @@ class Dispatcher(log.Loggable):
         """
         heaven = self._avatarHeavens[avatarId]
         del self._avatarHeavens[avatarId]
-        keycard = self._avatarKeycards[avatarId]
-        # if there is no bouncerPortal or bouncer
+        keycard = self._avatarKeycards.pop(avatarId)
+        # if there is no bouncer
         # do not try to logout
-        if self._bouncerPortal and self._bouncerPortal.bouncer:
-            self._bouncerPortal.logout(keycard)
-        del self._avatarKeycards[avatarId]
+        if self._bouncer:
+            self._bouncerLogout(keycard)
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
 
@@ -276,11 +295,9 @@ class Vishnu(log.Loggable):
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
-        self.dispatcher.setBouncerPortal(self.portal)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(self.portal,
             unsafeTracebacks=unsafeTracebacks)
-
         self.connectionInfo = {}
         self.setConnectionInfo(None, None, None)
 
@@ -778,6 +795,7 @@ class Vishnu(log.Loggable):
 
         self.bouncer = bouncer
         self.portal.bouncer = bouncer
+        self.dispatcher.setBouncer(bouncer)
 
     def getFactory(self):
         return self.factory
