@@ -104,7 +104,7 @@ class Dispatcher(log.Loggable):
     def setBouncer(self, bouncer):
         """
         @param bouncer: the bouncer to authenticate with
-        @type bouncerPortal: L{flumotion.component.bouncers.bouncer}
+        @type bouncer: L{flumotion.component.bouncers.bouncer}
         """
         self._bouncer = bouncer
 

@@ -1,5 +1,10 @@
 2007-06-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/manager/manager.py (Dispatcher.setBouncer):
+	Fix docstring.
+
+2007-06-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/manager/manager.py (Dispatcher.__init__,
 	  Dispatcher.setBouncer, Dispatcher._bouncerLogout,
 	  Dispatcher.bouncerResponse, Dispatcher.bouncerError,
