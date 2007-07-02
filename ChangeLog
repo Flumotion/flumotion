@@ -1,3 +1,24 @@
+2007-07-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window._clearMessages): Fix bug
+	when the manager goes away.
+
+	* flumotion/component/base/scheduler.py (Event.__init__): Add some
+	assertions, and the ability to specify recur as a timedelta.
+	(Scheduler.addEvent): Document recur as timedelta.
+
+	* flumotion/admin/rrdmon/config.py (ConfigParser._parseSource):
+	Require absolute filenames for <rrd-file>. Add <component-id>,
+	also required. Add docs.
+
+	* flumotion/admin/rrdmon/rrdmon.py: Actually implement. Add docs.
+	Fixes #626.
+
+	* conf/managers/default/flows/ogg-test-theora.xml: Fix up for The
+	Great Renaming.
+
+	* conf/rrdmon/default.xml: Fix up; require <rrd-file>.
+
 2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/componentview.py

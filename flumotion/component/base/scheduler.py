@@ -77,6 +77,8 @@ class Event(log.Loggable):
         self.debug('new event, content=%r, start=%r, end=%r', content,
                    start, end)
 
+        assert start < end
+
         if recur:
             from dateutil import rrule
             if now is None:
@@ -84,12 +86,22 @@ class Event(log.Loggable):
             if end.tzinfo is None:
                 end = datetime(end.year, end.month, end.day, end.hour, 
                     end.minute, end.second, end.microsecond, LOCAL)
-            endRecurRule = rrule.rrulestr(recur, dtstart=end) 
             if start.tzinfo is None:
                 start = datetime(start.year, start.month, start.day, 
                     start.hour, start.minute, start.second, 
                     start.microsecond, LOCAL)
-            startRecurRule = rrule.rrulestr(recur, dtstart=start)
+
+            if isinstance(recur, timedelta):
+                interval = recur.days*24*60*60 + recur.seconds
+                endRecurRule = rrule.rrule(rrule.SECONDLY,
+                                           interval=interval,
+                                           dtstart=end)
+                startRecurRule = rrule.rrule(rrule.SECONDLY,
+                                             interval=interval,
+                                             dtstart=start)
+            else:
+                endRecurRule = rrule.rrulestr(recur, dtstart=end) 
+                startRecurRule = rrule.rrulestr(recur, dtstart=start)
 
             if end < now:
                 end = endRecurRule.after(now)
@@ -174,8 +186,9 @@ class Scheduler(log.Loggable):
         @type    end: datetime
         @param content: content of this event
         @type  content: str
-        @param recur: recurrence rule
-        @type  recur: str
+        @param recur: recurrence rule, either as a string parseable by
+        datetime.rrule.rrulestr or as a datetime.timedelta
+        @type  recur: None, str, or datetime.timedelta
 
         @returns: an Event that can later be passed to removeEvent, if
         so desired. The event will be removed or rescheduled

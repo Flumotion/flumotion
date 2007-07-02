@@ -1,9 +1,11 @@
 <rrdmon>
  <source name="http-streamer">
   <manager>user:test@localhost:7531</manager>
-  <ui-state-key>stream-totalbytes</ui-state-key>
+  <component-id>/default/http-audio-video</component-id>
+  <ui-state-key>stream-totalbytes-raw</ui-state-key>
   <is-gauge>False</is-gauge>
-  <sample-frequency>300</sample-frequency>
+  <sample-frequency>30</sample-frequency>
+  <rrd-file>/tmp/stream-bitrate.rrd</rrd-file>
   <archive>
    <!-- This should be nicer in the future, but the meaning of this is that we
         sample every 1*stepsize=1*300s=5 minutes, for 1200 samples = 5

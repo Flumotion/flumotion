@@ -28,6 +28,65 @@ from flumotion.common import common, config, connection
 from flumotion.common.errors import ConfigError
 
 
+"""
+RRD monitor configuration
+
+The format of the configuration file is as follows. *, +, and ? have
+their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.
+
+<rrdmon>
+
+  <!-- normal -->
+  <debug>*:4</debug> ?
+
+  <!-- implementation note: the name of the source is used as the DS
+       name in the RRD file -->
+  <source name="http-streamer"> +
+
+    <!-- how we connect to the manager; parsed with
+         L{flumotion.common.connection.parsePBConnectionInfo} -->
+    <manager>user:test@localhost:7531</manager>
+
+    <!-- the L{flumotion.common.common.componentId} of the component we
+         will poll --> 
+    <component-id>/default/http-audio-video</component-id>
+
+    <!-- the key of the L{flumotion.common.componentui} UIState that we
+         will poll; should be numeric in value -->
+    <ui-state-key>stream-totalbytes-raw</ui-state-key>
+
+    <!-- boolean; examples of gauge values would be number of users,
+         temperature, signal strength, precomputed bitrate. The most
+         common non-gauge values are bitrate values, where you poll e.g.
+         the number of bytes sent, not the rate itself -->
+    <is-gauge>False</is-gauge> ?
+
+    <!-- sample frequency in seconds, defaults to 5 minutes -->
+    <sample-frequency>300</sample-frequency> ?
+
+    <!-- Normally we generate the RRD DS spec from the answers above,
+         but if you want to you can specify one directly here. The DS
+         name should be the source name -->
+    <rrd-ds-spec>DS-SPEC</rrd-ds-spec> ?
+
+    <!-- file will be created if necessary -->
+    <rrd-file>/tmp/stream-bitrate.rrd</rrd-file>
+
+    <!-- set of archives to store in the rrd file
+    <archive> +
+      <!-- Would be nice to break this down as we did above for the DS
+           spec, but for now you have to specify the RRA specs manually.
+           Bummer dude! In this example, the meaning is that we should
+           archive a sample every 1*stepsize=1*300s=5 minutes, for 1200
+           samples = 5 min*1200=100h.-->
+      <rra-spec>AVERAGE:0.5:1:1200</rra-spec>
+    </archive>
+  </source>
+
+</rrdmon>
+"""
+
+
 class ConfigParser(config.BaseConfigParser):
     """
     RRD monitor configuration file parser.
@@ -38,18 +97,11 @@ class ConfigParser(config.BaseConfigParser):
     """
     logCategory = 'rrdmon-config'
 
-    def __init__(self, file, rrdBaseDir=None):
+    def __init__(self, file):
         """
         @param file: The path to the config file to parse, or a file object
         @type  file: str or file
-        @param rrdBaseDir: The base directory for resolving filenames, or None to
-                        infer from the path passed
-        @type rrdBaseDir: str or None
         """
-        if rrdBaseDir is not None:
-            self.rrdBaseDir = rrdBaseDir
-        else:
-            self.rrdBaseDir = os.path.dirname(file)
         config.BaseConfigParser.__init__(self, file)
 
     def _parseArchive(self, node):
@@ -86,7 +138,11 @@ class ConfigParser(config.BaseConfigParser):
             def setter(v):
                 res[k] = v
             return setter
-
+        def filename(v):
+            if v[0] != os.sep:
+                raise config.ConfigError('rrdfile paths should be absolute')
+            return str(v)
+                
         name, = self.parseAttributes(node, ('name',))
 
         res = {'name': name}
@@ -94,11 +150,12 @@ class ConfigParser(config.BaseConfigParser):
 
         basicOptions = (('manager', True,
                          connection.parsePBConnectionInfo, None),
+                        ('component-id', True, str, None),
                         ('ui-state-key', True, str, None),
-                        ('sample-frequency', False, float, 300),
+                        ('sample-frequency', False, int, 300),
                         ('is-gauge', False, common.strToBool, True),
                         ('rrd-ds-spec', False, str, None),
-                        ('rrd-file', False, str, None))
+                        ('rrd-file', True, filename, None))
         for k, required, parser, default in basicOptions:
             table[k] = strparser(parser), ressetter(k)
             if not required:

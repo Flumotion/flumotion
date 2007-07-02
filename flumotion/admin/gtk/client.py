@@ -346,7 +346,7 @@ class Window(log.Loggable, gobject.GObject):
     def _clearMessages(self):
         self._messages_view.clear()
         pstate = self._planetState
-        if pstate.hasKey('messages'):
+        if pstate and pstate.hasKey('messages'):
             for message in pstate.get('messages').values():
                 self._messages_view.add_message(message)
         
