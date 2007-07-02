@@ -1,3 +1,17 @@
+2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/Makefile.am:
+	* flumotion/component/combiners/switch/patternswitch.py
+	  (PatternEventSwitcher, PatternEventSwitcher.configure_pipeline,
+	  PatternEventSwitcher._markers_event_probe):
+	* flumotion/component/combiners/switch/switch.xml:
+	New switch based component that switches based on patterns, similar
+	to how the disker starts and stops based on patterns.
+	* flumotion/component/combiners/switch/switch.py (Switch.eventStarted,
+	  Switch.eventStopped, Switch.switch_to_for_event):
+	Share code switch_to_for_event between ical event switching and
+	"other" event based switching like pattern based.
+
 2007-06-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/worker/job.py:

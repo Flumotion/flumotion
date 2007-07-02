@@ -69,9 +69,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.addMessage(m)
             # if we have been passed an ical file to use for scheduling
             # then start the ical monitor
-            # FIXME: need to handle cases where cannot switch (and hence
-            # post a message to uistate and also store so switch can be
-            # made as soon as it can switch)
             props = self.config['properties']
             icalfn = props.get('ical-schedule')
             if icalfn:
@@ -119,28 +116,12 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def eventStarted(self, event):
         self.debug("event started %r", event)
         if self.pipeline:
-            self._idealEater = "backup"
-            res = self.switch_to("backup")
-            if not res:
-                self.warning("Event started but could not switch to backup"
-                    ", will switch when backup is back")
-                self._eaterReadyDefers["backup"] = defer.Deferred()
-                self._eaterReadyDefers["backup"].addCallback(
-                    lambda x: self.switch_to("backup"))
-                self._eaterReadyDefers["master"] = None
+            self.switch_to_for_event("backup", True)
 
     def eventStopped(self, event):
         self.debug("event stopped %r", event)
         if self.pipeline:
-            self._idealEater = "master"
-            res = self.switch_to("master")
-            if not res:
-                self.warning("Event stopped but could not switch to master"
-                    ", will switch when master is back")
-                self._eaterReadyDefers["master"] = defer.Deferred()
-                self._eaterReadyDefers["master"].addCallback(
-                    lambda x: self.switch_to("master"))
-                self._eaterReadyDefers["backup"] = None
+            self.switch_to_for_event("master", False)
 
     def do_pipeline_playing(self):
         feedcomponent.MultiInputParseLaunchComponent.do_pipeline_playing(self)
@@ -153,6 +134,36 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         feedcomponent.MultiInputParseLaunchComponent.eaterSetActive(self, feedId)
         if not self._started and moods.get(self.getMood()) == moods.happy:
             self._started = True
+
+    def switch_to_for_event(self, eaterSubstring, startOrStop):
+        """
+        @param eaterSubstring: either "master" or "backup"
+        @param startOrStop: True if start of event, False if stop
+        """
+        if eaterSubstring != "master" or eaterSubstring != "backup":
+            self.warning("switch_to_for_event should be called with 'master'"
+                " or 'backup'")
+            return
+        self._idealEater = eaterSubstring
+        res = self.switch_to(eaterSubstring)
+        if not res:
+            startOrStopStr = "stopped"
+            if startOrStop:
+                startOrStopStr = "started"
+            warnStr = "Event %s but could not switch to %s" \
+                ", will switch when %s is back" % (startOrStopStr,
+                eaterSubstring, eaterSubstring)
+            self.warning(warnStr)
+            m = messages.Warning(T_(N_(warnStr)), 
+                        id="error-scheduling-event")
+            self.addMessage(m)
+            self._eaterReadyDefers[eaterSubstring] = defer.Deferred()
+            self._eaterReadyDefers[eaterSubstring].addCallback(
+                lambda x: self.switch_to(eaterSubstring))
+            otherEater = "backup"
+            if eaterSubstring == "backup":
+                otherEater = "master"
+            self._eaterReadyDefers[otherEater] = None
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"

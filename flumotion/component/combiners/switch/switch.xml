@@ -89,6 +89,34 @@
 	<property name="audio-channels" type="int" required="no" />
       </properties>
     </component>
+    <component type="av-pattern-switch-combiner"
+               base="flumotion/component/combiners/switch"
+               description="An audio/video switching based on pattern component">
+      <source location="flumotion.component.combiners.switch.patternswitch" />
+      <eater name="video-master" />
+      <eater name="video-backup" />
+      <eater name="audio-master" />
+      <eater name="audio-backup" />
+      <feeder name="video" />
+      <feeder name="audio" />
+      <entries>
+        <entry type="component" location="patternswitch.py"
+               function="PatternEventSwitcher" />
+	<entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+      <properties>
+        <property name="ical-schedule" type="string" required="no" />
+	<property name="video-width" type="int" required="no" />
+	<property name="video-height" type="int" required="no" />
+	<property name="video-framerate" type="fraction" required="no" />
+	<property name="video-pixel-aspect-ratio" type="fraction" 
+	          required="no" />
+	<property name="audio-samplerate" type="int" required="no" />
+	<property name="audio-channels" type="int" required="no" />
+	<property name="eater-with-stream-markers" type="string" required="yes" />
+      </properties>
+    </component>
 
   </components>
 
@@ -128,6 +156,17 @@
 	<directories>
 	    <directory name="flumotion/component/combiners/switch">
 	        <filename location="basicwatchdog.py" />
+	    </directory>
+	</directories>
+    </bundle>
+
+    <bundle name="switch-combiner-pattern">
+        <dependencies>
+	    <dependency name="switch-combiner-basic-watchdog" />
+	</dependencies>
+	<directories>
+	    <directory name="flumotion/component/combiners/switch">
+	        <filename location="patternswitch.py" />
 	    </directory>
 	</directories>
     </bundle>
