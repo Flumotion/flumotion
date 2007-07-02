@@ -20,13 +20,32 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
-from flumotion.common import errors
+from flumotion.common import errors, messages
 
 from flumotion.component.combiners.switch import basicwatchdog
 import gst
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
 class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
     logCategory = "comb-av-pattern-switcher"
+
+    def do_check(self):
+        d = basicwatchdog.AVBasicWatchdog.do_check(self)
+        def checkConfig(result):
+            props = self.config['properties']
+            eaterName = props.get('eater-with-stream-markers', None)
+            if eaterName != 'video-master' and eaterName != 'video-backup':
+                warnStr = "The value provided for the " \
+                    "eater-with-stream-markers property " \
+                    "must be one of video-backup, video-master."
+                self.warning(warnStr)
+                self.addMessage(messages.Error(T_(N_(warnstr)), 
+                    id="eater-with-stream-markers-wrong"))
+            return result
+        d.addCallback(checkConfig)
+        return d
 
     def configure_pipeline(self, pipeline, properties):
         basicwatchdog.AVBasicWatchdog.configure_pipeline(self, pipeline, 
@@ -34,7 +53,7 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
         # set event probe to react to video mark events
         eaterName = properties.get('eater-with-stream-markers', 
             'video-backup')
-        sinkpad = self.switchPads[eaterName]
+        sinkpad = self.videoSwitchElement.get_pad(self.switchPads[eaterName])
         sinkpad.add_event_probe(self._markers_event_probe)
 
     def _markers_event_probe(self, element, event):

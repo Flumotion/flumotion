@@ -1,5 +1,18 @@
 2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/patternswitch.py
+	  (PatternEventSwitcher, PatternEventSwitcher.do_check,
+	  PatternEventSwitcher.checkConfig,
+	  PatternEventSwitcher.configure_pipeline):
+	Get the pad as the value stored is a string not a pad!
+	Validate the eater-with-stream-markers property value passed
+	in.
+	* flumotion/component/combiners/switch/switch.py
+	  (Switch.switch_to_for_event):
+	Fix some stupid logic.
+
+2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/Makefile.am:
 	* flumotion/component/combiners/switch/patternswitch.py
 	  (PatternEventSwitcher, PatternEventSwitcher.configure_pipeline,

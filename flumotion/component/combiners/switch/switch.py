@@ -140,13 +140,13 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         @param eaterSubstring: either "master" or "backup"
         @param startOrStop: True if start of event, False if stop
         """
-        if eaterSubstring != "master" or eaterSubstring != "backup":
+        if eaterSubstring != "master" and eaterSubstring != "backup":
             self.warning("switch_to_for_event should be called with 'master'"
                 " or 'backup'")
             return
         self._idealEater = eaterSubstring
         res = self.switch_to(eaterSubstring)
-        if not res:
+        if res == False:
             startOrStopStr = "stopped"
             if startOrStop:
                 startOrStopStr = "started"
