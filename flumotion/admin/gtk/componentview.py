@@ -154,7 +154,9 @@ class ComponentView(gtk.VBox, log.Loggable):
             # widget maybe a gtk.Label or a NodeBook
             if hasattr(self.widget, 'admingtk'):
                 if self.widget.admingtk:
-                    self.widget.admingtk.cleanup()
+                    # needed for compatibility with managers with old code
+                    if hasattr(self.widget.admingtk, 'cleanup'):
+                        self.widget.admingtk.cleanup()
                     del self.widget.admingtk
             self.widget = None
         

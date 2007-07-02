@@ -1,5 +1,11 @@
 2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/gtk/componentview.py
+	  (ComponentView.object_active_to_inactive):
+	Keep compatibility with managers running older code.
+
+2007-07-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/patternswitch.py
 	  (PatternEventSwitcher, PatternEventSwitcher.do_check,
 	  PatternEventSwitcher.checkConfig,
