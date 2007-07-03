@@ -343,7 +343,7 @@ class Vishnu(log.Loggable):
         """
         if registry.getRegistry().rebuildNeeded():
             self.info("Registry changed, rebuilding")
-            registry.getRegistry().verify()
+            registry.getRegistry().verify(force=True)
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
         

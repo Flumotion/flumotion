@@ -24,6 +24,7 @@ parsing of registry, which holds component and bundle information
 """
 
 import os
+import sets
 import stat
 import errno
 from StringIO import StringIO
@@ -793,7 +794,7 @@ class RegistryParser(fxml.Parser):
 
     
 # FIXME: filename -> path
-class RegistryDirectory:
+class RegistryDirectory(log.Loggable):
     """
     I represent a directory under a path managed by the registry.
     I can be queried for a list of partial registry .xml files underneath
@@ -839,9 +840,25 @@ class RegistryDirectory:
                 
         return files
 
-    def lastModified(self):
+    def rebuildNeeded(self, mtime):
+        def _rebuildNeeded(file):
+            try:
+                if _getMTime(file) > mtime:
+                    self.debug("Path %s changed since registry last "
+                               "scanned", f)
+                    return True
+                return False
+            except OSError, e:
+                self.debug("Failed to stat file %s, need to rescan", f)
+                return True
+
         assert self._files, "Path %s does not have registry files" % self._path
-        return max(map(_getMTime, self._files))
+        for f in self._files:
+            if _rebuildNeeded(f):
+                return True
+        # finally, stat the dir itself, to see if its contents changed;
+        # maybe there is a new file here
+        return _rebuildNeeded(self._path)
 
     def getFiles(self):
         """
@@ -1185,9 +1202,20 @@ class ComponentRegistry(log.Loggable):
         if not os.path.exists(self.filename):
             return True
         
+        # A bit complicated because we want to allow FLU_PROJECT_PATH to
+        # point to nonexistent directories
+        registryPaths = sets.Set(self._getRegistryPathsFromEnviron())
+        oldRegistryPaths = sets.Set([dir.getPath()
+                                     for dir in self.getDirectories()])
+        if registryPaths != oldRegistryPaths:
+            if oldRegistryPaths - registryPaths:
+                return True
+            if filter(os.path.exists, registryPaths - oldRegistryPaths):
+                return True
+
         registry_modified = _getMTime(self.filename)
         for d in self._parser.getDirectories():
-            if d.lastModified() > registry_modified:
+            if d.rebuildNeeded(registry_modified):
                 return True
 
         return False
@@ -1222,6 +1250,13 @@ class ComponentRegistry(log.Loggable):
             else:
                 raise
 
+    def _getRegistryPathsFromEnviron(self):
+        registryPaths = [configure.pythondir, ]
+        if os.environ.has_key('FLU_PROJECT_PATH'):
+            paths = os.environ['FLU_PROJECT_PATH']
+            registryPaths += paths.split(':')
+        return registryPaths
+
     def verify(self, force=False):
         """
         Verify if the registry is uptodate and rebuild if it is not.
@@ -1229,55 +1264,13 @@ class ComponentRegistry(log.Loggable):
         @param force: True if the registry needs rebuilding for sure.
         """
         # construct a list of all paths to scan for registry .xml files
-        registryPaths = [configure.pythondir, ]
-        if os.environ.has_key('FLU_PROJECT_PATH'):
-            paths = os.environ['FLU_PROJECT_PATH']
-            registryPaths += paths.split(':')
-        
-        # get the list of all paths used to construct the old registry
-        oldRegistryPaths = [dir.getPath() for dir in self.getDirectories()]
-        # only accept paths that actually exist
-        oldRegistryPaths = [p for p in oldRegistryPaths if os.path.exists(p)]
-
-        self.debug('previously scanned registry paths: %s' % 
-            ", ".join(oldRegistryPaths))
-
-        # if the lists are not equal, then a path was added or removed and
-        # we need to rebuild
-        registryPaths.sort()
-        oldRegistryPaths.sort()
-        if registryPaths != oldRegistryPaths:
-            self.debug('old and new registry paths are different')
-            self.info('Rescanning registry paths')
-            force = True
-        else:
-            self.debug('registry paths are still the same')
-
-        # check if any of the directories has been modified after the cache
-        # we check times here instead of in addRegistryPath so we can
-        # self.clean() if we now we need to rebuild before adding any
-        for path in registryPaths:
-            directory = self._parser._directories.get(path, None)
-            if directory:
-                # if directory is watched in the registry, and it hasn't been
-                # updated, everything's fine
-                dTime = directory.lastModified()
-                fTime = _getMTime(self.filename)
-                if dTime < fTime:
-                    self.debug('%s not changed since last registry parse' %
-                        path)
-                else:
-                    self.debug('%s has changed since last registry parse' %
-                        path)
-                    force = True
-     
-        if force:
+        if force or self.rebuildNeeded():
+            self.info("Rebuilding registry")
             self.clean()
-            for path in registryPaths:
+            for path in self._getRegistryPathsFromEnviron():
                 if not self.addRegistryPath(path):
                     self._parser.removeDirectoryByPath(path)
-
-        self.save(force)
+            self.save(True)
 
 class RegistrySubsetWriter(RegistryWriter):
     def __init__(self, fromRegistry=None, onlyBundles=None):

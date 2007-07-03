@@ -1,3 +1,18 @@
+2007-07-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.getBundlerBasket): If the
+	registry needs a rebuild, avoid scanning the directories twice.
+
+	* flumotion/common/registry.py (RegistryDirectory.rebuildNeeded):
+	Change from lastModified, returns whether a directory needs a
+	rebuild. Catch OSError for missing files. Also see if the
+	directory mtime changed to catch new files.
+	(ComponentRegistry.rebuildNeeded): Check to see if the set of
+	paths changed, as well.
+	(ComponentRegistry._getRegistryPathsFromEnviron): New helper.
+	(ComponentRegistry.verify): Use rebuildNeeded(), as it does
+	everything we need. See #665. Fixes #641.
+
 2007-07-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window._clearMessages): Fix bug
