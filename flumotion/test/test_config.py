@@ -641,7 +641,7 @@ class TestConfig(unittest.TestCase):
             """)
         self.assertRaises(config.ConfigError, conf.parse)
 
-    def testParseComponentsWithEatersDeprecatedWay(self):
+    def testParseComponentsWithSource(self):
         conf = ConfigXML(
             """
             <planet>
@@ -696,7 +696,7 @@ class TestConfig(unittest.TestCase):
         self.failUnless(cons['eater'].has_key('audio'))
         self.failUnless(cons['eater']['audio'] == ['prod2:default'])
 
-    def testParseComponentsWithTwoEatersDeprecatedWay(self):
+    def testParseComponentsWithTwoSources(self):
         conf = ConfigXML(
             """
             <planet>
@@ -747,7 +747,7 @@ class TestConfig(unittest.TestCase):
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
 
-    def testParseComponentsWithMultipleEaterDeprecatedWay(self):
+    def testParseComponentsWithMultipleSources(self):
         conf = ConfigXML(
             """
             <planet>

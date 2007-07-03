@@ -576,8 +576,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # the source feeder names come from the config
         # they are specified under <eater> as <feed> elements in XML
         # so if they don't specify a feed name, use "default" as the feed name
-        # there is also a deprecated way by specifying them under <component>
-        # as <source> elements in XML
+        # They may also be specified under <component> as <source> elements.
         feed_ids = []
         for eater in eater_config:
             for feed in eater_config[eater]:

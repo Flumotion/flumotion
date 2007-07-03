@@ -443,7 +443,7 @@ class BaseConfigParser(fxml.Parser):
         """
         # <component name="..." type="..." label="..."? worker="..."?
         #            project="..."? version="..."?>
-        #   <source>...</source>* (deprecated)
+        #   <source>...</source>*
         #   <eater name="...">...</eater>*
         #   <property name="name">value</property>*
         #   <clock-master>...</clock-master>?

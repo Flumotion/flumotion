@@ -1,3 +1,11 @@
+2007-07-03  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/config.py:
+	* flumotion/component/feedcomponent010.py:
+	  Change comment to not say that <source> is deprecated. It's not.
+	* flumotion/test/test_config.py:
+	  <source> has not been deprecated, rename test methods for clarity.
+
 2007-07-03  Pedro Gracia <pedro@flumotion.com>
 
 	* po/es.po: updated spanish translation.
