@@ -10,15 +10,21 @@
       <property name="width">320</property>
     </component>
     <component name="video-encoder" type="theora-encoder" worker="localhost">
-      <source>video-source</source>
+      <eater name="default">
+        <feed>video-source</feed>
+      </eater>
       <!-- properties -->
       <property name="bitrate">400</property>
     </component>
     <component name="muxer-video" type="ogg-muxer" worker="localhost">
-      <source>video-encoder</source>
+      <eater name="default">
+        <feed>video-encoder</feed>
+      </eater>
     </component>
     <component name="http-video" type="http-streamer" worker="localhost">
-      <source>muxer-video</source>
+      <eater name="default">
+        <feed>muxer-video</feed>
+      </eater>
       <!-- properties -->
       <property name="burst-on-connect">True</property>
       <property name="mount-point">/</property>

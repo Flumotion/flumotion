@@ -1,3 +1,10 @@
+2007-07-03  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* conf/managers/default/flows/looper.xml:
+	* conf/managers/default/flows/ogg-test-theora.xml:
+	* conf/managers/default/flows/porter.xml:
+	Change examples to use new eater syntax.
+
 2007-07-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu.getBundlerBasket): If the
