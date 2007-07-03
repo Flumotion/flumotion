@@ -230,7 +230,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             if not keepTrying:
                 d.errback(errors.ConnectionRefusedError())
 
-        def connection_failed(model, reason):
+        def connection_failed(model, reason, d):
             if not keepTrying:
                 d.errback(errors.ConnectionFailedError(reason))
 

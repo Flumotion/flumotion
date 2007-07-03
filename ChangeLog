@@ -1,3 +1,9 @@
+2007-07-03  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/admin.py (AdminModel.connection_failed):
+	connection_failed was being passed 3 arguments all the time,
+	so make it take 3!
+
 2007-07-03  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/config.py:
