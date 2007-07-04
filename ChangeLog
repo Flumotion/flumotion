@@ -1,3 +1,9 @@
+2007-07-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/patternswitch.py
+	  (PatternEventSwitcher.checkConfig):
+	Fix typo.
+
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/fxml.py (Parser.checkAttributes): Remove

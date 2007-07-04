@@ -41,7 +41,7 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
                     "eater-with-stream-markers property " \
                     "must be one of video-backup, video-master."
                 self.warning(warnStr)
-                self.addMessage(messages.Error(T_(N_(warnstr)), 
+                self.addMessage(messages.Error(T_(N_(warnStr)), 
                     id="eater-with-stream-markers-wrong"))
             return result
         d.addCallback(checkConfig)
