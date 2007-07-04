@@ -246,7 +246,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         if start < neareststarttime:
             if start + item.duration < neareststarttime:
                 self.debug("Item too late; skipping entirely")
-                return
+                return False
             else:
                 change = neareststarttime - start
                 self.debug("Starting item with offset %d", change)
@@ -276,6 +276,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self.audiocomp.add(asrc)
             self._asrcs[item] = asrc
         self.debug("Done scheduling")
+        return True
 
     def unscheduleItem(self, item):
         self.debug("Unscheduling item at uri %s", item.uri)

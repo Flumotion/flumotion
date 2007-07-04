@@ -1,3 +1,12 @@
+2007-07-04  Michael Smith <msmith@fluendo.com>
+	* flumotion/component/producers/playlist/playlist.py:
+	  Return item if we successfully scheduled it.
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Unlink item from list if we failed to schedule it, so we don't have
+	  stale entries that we can't clean up properly.
+	* flumotion/test/test_component_playlist.py:
+	  Return item in FakeProducer as API now requires it.
+
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/registry.py (RegistryDirectory.__init__)

@@ -32,7 +32,7 @@ class FakeProducer(object):
     position = -1
 
     def scheduleItem(self, item):
-        pass
+        return item
 
     def unscheduleItem(self, item):
         pass

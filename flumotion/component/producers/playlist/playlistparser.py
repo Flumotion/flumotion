@@ -87,13 +87,7 @@ class Playlist(object, log.Loggable):
                     current.duration):
                 self.debug("Not removing current item!")
                 continue
-            if item.prev:
-                item.prev.next = item.next
-            else:
-                self.items = item.next
-
-            if item.next:
-                item.next.prev = item.prev
+            self.unlinkItem(item)
             self.producer.unscheduleItem(item)
 
         del self._itemsById[id]
@@ -181,9 +175,22 @@ class Playlist(object, log.Loggable):
             self.producer.adjustItemScheduling(next)
 
         # Then we need to actually add newitem into the gnonlin timeline
-        self.producer.scheduleItem(newitem)
+        if not self.producer.scheduleItem(newitem):
+            self.debug("Failed to schedule item, unlinking")
+            # Failed to schedule it. 
+            self.unlinkItem(newitem)
+            return None
 
         return newitem
+
+    def unlinkItem(self, item):
+        if item.prev:
+            item.prev.next = item.next
+        else:
+            self.items = item.next
+
+        if item.next:
+            item.next.prev = item.prev
 
 class PlaylistParser(object, log.Loggable):
     def __init__(self, playlist):
