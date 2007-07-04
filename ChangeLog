@@ -1,3 +1,11 @@
+2007-07-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/fxml.py (Parser.checkAttributes): Remove
+	unnecessary call to str().
+	(Parser.parseAttributes): Don't call str() always; instead allow
+	the caller to decide, while defaulting to the existing behavior.
+	Fixes #661.
+
 2007-07-04  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/combiners/switch/switch.xml:

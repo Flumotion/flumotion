@@ -105,7 +105,7 @@ class Parser(log.Loggable):
         @type optional: Sequence (list, tuple, ...) of strings.
         """
         attrs = sets.Set([k for k in node.attributes.keys()
-                          if str(node.getAttribute(k))])
+                          if node.getAttribute(k)])
         required = sets.Set(required or ())
         optional = sets.Set(optional or ())
         for x in attrs - required.union(optional):
@@ -115,7 +115,8 @@ class Parser(log.Loggable):
             raise self.parserError("Missing attribute in <%s>: %s"
                                    % (node.nodeName, x))
 
-    def parseAttributes(self, node, required=None, optional=None):
+    def parseAttributes(self, node, required=None, optional=None,
+                        type=str):
         """
         Checks the validity of the attributes on an XML node, via
         Parser.checkAttributes, then parses them out and returns them
@@ -127,6 +128,10 @@ class Parser(log.Loggable):
         @type required: Sequence (list, tuple, ...) of strings.
         @param optional: Set of optional attributes, or None.
         @type optional: Sequence (list, tuple, ...) of strings.
+        @param type: Type to which to cast attribute values. The
+        original values will always be unicode objects; in most cases
+        you want `str' objects, so this defaults to `str'.
+        @type type: Function of type object -> object.
 
         @returns: List of all attributes as a tuple. The first element
         of the returned tuple will be the value of the first required
@@ -140,10 +145,10 @@ class Parser(log.Loggable):
         out = []
         for k in (required or ()) + (optional or ()):
             if node.hasAttribute(k):
-                # expat always gives us unicode; we always want str
+                # note that 'a' is of type 'unicode'
                 a = node.getAttribute(k)
                 if a:
-                    out.append(str(a))
+                    out.append(type(a))
                 else:
                     out.append(None)
             else:
