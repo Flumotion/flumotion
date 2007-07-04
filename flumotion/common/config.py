@@ -86,10 +86,17 @@ def parsePropertyValue(propName, type, value):
             return s
     def strWithoutNewlines(s):
         return tryStr(' '.join([x.strip() for x in s.split('\n')]))
-    def fraction(s):
+    def fraction(v):
         def frac(num, denom=1):
             return int(num), int(denom)
-        return frac(*s.split('/'))
+        if isinstance(v, basestring):
+            return frac(*v.split('/'))
+        else:
+            return frac(*v)
+    def boolean(v):
+        if isinstance(v, bool):
+            return v
+        return common.strToBool(v)
 
     try:
         # yay!
@@ -97,7 +104,7 @@ def parsePropertyValue(propName, type, value):
                 'rawstring': tryStr,
                 'int': int,
                 'long': long,
-                'bool': common.strToBool,
+                'bool': boolean,
                 'float': float,
                 'fraction': fraction}[type](value)
     except KeyError:

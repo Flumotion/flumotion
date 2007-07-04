@@ -1,3 +1,8 @@
+2007-07-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (parsePropertyValue): Allow native
+	bools and fractions, as we do with other types. Fixes #682.
+
 2007-07-04  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/watcher.py:
