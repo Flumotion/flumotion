@@ -1,5 +1,17 @@
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/worker.py (WorkerBrain.__init__): Adapt to
+	jobheaven name change.
+
+	* flumotion/worker/job.py (ComponentJobAvatar)
+	(ComponentJobHeaven): Implement a special avatar and heaven for
+	components. The intention is later to add analogs for checks run
+	by workers; see #667.
+
+	* flumotion/worker/base.py (_getSocketPath, JobInfo)
+	(JobProcessProtocol, BaseJobHeaven, BaseJobAvatar): Factor some
+	bits out into a base class.
+
 	* flumotion/common/config.py (parsePropertyValue): Allow native
 	bools and fractions, as we do with other types. Fixes #682.
 

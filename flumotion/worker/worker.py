@@ -108,7 +108,8 @@ class WorkerBrain(log.Loggable):
 
         self.medium = medium.WorkerMedium(self)
 
-        self.jobHeaven = job.JobHeaven(self)
+        # really should be componentJobHeaven, but this is shorter :)    
+        self.jobHeaven = job.ComponentJobHeaven(self)
 
         self.managerConnectionInfo = None
 
