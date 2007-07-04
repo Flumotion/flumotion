@@ -1,5 +1,8 @@
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/registry.py (RegistryDirectory._getFileLists):
+	Fix error caught by pychecker.
+
 	* flumotion/worker/worker.py (WorkerBrain.__init__): Adapt to
 	jobheaven name change.
 

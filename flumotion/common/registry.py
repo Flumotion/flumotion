@@ -826,7 +826,7 @@ class RegistryDirectory(log.Loggable):
                 directory_files = os.listdir(root)
             except OSError, e:
                 if e.errno == errno.EACCES:
-                    return files
+                    return files, dirs
                 else:
                     raise
                 
