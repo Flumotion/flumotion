@@ -1,4 +1,10 @@
+2007-07-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/bundle.py (BundlerBasket.getDependencies):
+	Handle case where bundle has no dependencies. Fixes #665, finally.
+
 2007-07-04  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlist.py:
 	  Return item if we successfully scheduled it.
 	* flumotion/component/producers/playlist/playlistparser.py:

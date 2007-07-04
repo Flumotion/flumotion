@@ -307,7 +307,10 @@ class BundlerBasket:
         """
         if not bundlerName in self._bundlers:
             raise errors.NoBundleError('Unknown bundle %s' % bundlerName)
-        return [bundlerName,] + self._graph.getOffspring(bundlerName)
+        elif not self._graph.hasNode(bundlerName):
+            return [bundlerName]
+        else:
+            return [bundlerName] + self._graph.getOffspring(bundlerName)
 
     def getBundlerByName(self, bundlerName):
         """
