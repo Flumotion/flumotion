@@ -160,7 +160,7 @@ class BaseWatcher(log.Loggable):
                 stat = os.stat(f)
                 ret[f] = (stat.st_mtime, stat.st_size)
             except OSError, e:
-                self.debug('could not read file %f: %s', f,
+                self.debug('could not read file %s: %s', f,
                            log.getExceptionMessage(e))
         return ret
 

@@ -1,3 +1,11 @@
+2007-07-04  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/watcher.py:
+	  %f is not a filename specifier. Fix warning logging.
+	* flumotion/component/producers/playlist/playlist.py:
+	  Don't throw KeyError when trying to unschedule something not
+	  scheduled. Fixes #703.
+
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/bundle.py (BundlerBasket.getDependencies):

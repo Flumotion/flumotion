@@ -280,11 +280,11 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
     def unscheduleItem(self, item):
         self.debug("Unscheduling item at uri %s", item.uri)
-        if self._hasVideo and item.hasVideo:
+        if self._hasVideo and item.hasVideo and item in self._vsrcs:
             vsrc = self._vsrcs.pop(item)
             self.videocomp.remove(vsrc)
             vsrc.set_state(gst.STATE_NULL)
-        if self._hasAudio and item.hasAudio: 
+        if self._hasAudio and item.hasAudio and item in self._asrcs: 
             asrc = self._asrcs.pop(item)
             self.audiocomp.remove(asrc)
             asrc.set_state(gst.STATE_NULL)
