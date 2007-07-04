@@ -1,3 +1,11 @@
+2007-07-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/registry.py (RegistryDirectory.__init__)
+	(RegistryDirectory._getFileLists): Keep a list of dirs to watch as
+	well as files. Don't descend into .svn dirs.
+	(RegistryDirectory.rebuildNeeded): Check the dirs as well.
+	See #665.
+
 2007-07-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py

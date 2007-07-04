@@ -803,12 +803,13 @@ class RegistryDirectory(log.Loggable):
     def __init__(self, path, prefix='flumotion'):
         self._path = path
         self._prefix = prefix
-        self._files = self._getFileList(os.path.join(path, prefix))
+        scanPath = os.path.join(path, prefix)
+        self._files, self._dirs = self._getFileLists(scanPath)
         
     def __repr__(self):
         return "<RegistryDirectory %s>" % self._path
 
-    def _getFileList(self, root):
+    def _getFileLists(self, root):
         """
         Get all files ending in .xml from all directories under the given root.
 
@@ -818,6 +819,7 @@ class RegistryDirectory(log.Loggable):
         @returns: a list of .xml files, relative to the given root directory
         """
         files = []
+        dirs = []
         
         if os.path.exists(root):
             try:
@@ -828,17 +830,22 @@ class RegistryDirectory(log.Loggable):
                 else:
                     raise
                 
+            dirs.append(root)
+
             for dir in directory_files:
                 filename = os.path.join(root, dir)
                 # if it's a .xml file, then add it to the list
                 if not os.path.isdir(filename):
                     if filename.endswith('.xml'):
                         files.append(filename)
-                # if it's a directory, then get its files and add them
-                else:
-                    files += self._getFileList(filename)
+                # if it's a directory and not an svn directory, then get
+                # its files and add them
+                elif dir != '.svn':
+                    newFiles, newDirs = self._getFileLists(filename)
+                    files.extend(newFiles)
+                    dirs.extend(newDirs)
                 
-        return files
+        return files, dirs
 
     def rebuildNeeded(self, mtime):
         def _rebuildNeeded(file):
@@ -848,7 +855,7 @@ class RegistryDirectory(log.Loggable):
                                "scanned", f)
                     return True
                 return False
-            except OSError, e:
+            except OSError:
                 self.debug("Failed to stat file %s, need to rescan", f)
                 return True
 
@@ -856,9 +863,10 @@ class RegistryDirectory(log.Loggable):
         for f in self._files:
             if _rebuildNeeded(f):
                 return True
-        # finally, stat the dir itself, to see if its contents changed;
-        # maybe there is a new file here
-        return _rebuildNeeded(self._path)
+        for f in self._dirs:
+            if _rebuildNeeded(f):
+                return True
+        return False
 
     def getFiles(self):
         """
