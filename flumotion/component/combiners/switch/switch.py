@@ -143,27 +143,30 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if eaterSubstring != "master" and eaterSubstring != "backup":
             self.warning("switch_to_for_event should be called with 'master'"
                 " or 'backup'")
-            return
+            return None
         self._idealEater = eaterSubstring
-        res = self.switch_to(eaterSubstring)
-        if res == False:
-            startOrStopStr = "stopped"
-            if startOrStop:
-                startOrStopStr = "started"
-            warnStr = "Event %s but could not switch to %s" \
-                ", will switch when %s is back" % (startOrStopStr,
-                eaterSubstring, eaterSubstring)
-            self.warning(warnStr)
-            m = messages.Warning(T_(N_(warnStr)), 
+        d = defer.maybeDeferred(self.switch_to, eaterSubstring)
+        def switch_to_cb(res):
+            if not res :
+                startOrStopStr = "stopped"
+                if startOrStop:
+                    startOrStopStr = "started"
+                warnStr = "Event %s but could not switch to %s" \
+                    ", will switch when %s is back" % (startOrStopStr,
+                    eaterSubstring, eaterSubstring)
+                self.warning(warnStr)
+                m = messages.Warning(T_(N_(warnStr)), 
                         id="error-scheduling-event")
-            self.addMessage(m)
-            self._eaterReadyDefers[eaterSubstring] = defer.Deferred()
-            self._eaterReadyDefers[eaterSubstring].addCallback(
-                lambda x: self.switch_to(eaterSubstring))
-            otherEater = "backup"
-            if eaterSubstring == "backup":
-                otherEater = "master"
-            self._eaterReadyDefers[otherEater] = None
+                self.addMessage(m)
+                self._eaterReadyDefers[eaterSubstring] = defer.Deferred()
+                self._eaterReadyDefers[eaterSubstring].addCallback(
+                    lambda x: self.switch_to(eaterSubstring))
+                otherEater = "backup"
+                if eaterSubstring == "backup":
+                    otherEater = "master"
+                self._eaterReadyDefers[otherEater] = None
+        d.addCallback(switch_to_cb)
+        return d
 
 class SingleSwitch(Switch):
     logCategory = "comb-single-switch"

@@ -1,5 +1,13 @@
 2007-07-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/switch.py
+	  (Switch.switch_to_for_event, Switch.switch_to_cb):
+	switch_to can return a deferred or a boolean, so callback
+	on a maybeDeferred. Fixes pychecker warning of comparing to
+	False.
+
+2007-07-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/patternswitch.py
 	  (PatternEventSwitcher.checkConfig):
 	Fix typo.
