@@ -1,3 +1,17 @@
+2007-07-06  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker.change_filename, Disker.stop_recording,
+	  Disker._plug_recording_started, Disker._plug_recording_stopped):
+	Add disker plug hooks. Remove duplication of code of the
+	stop_recording() method.
+
+	* flumotion/component/consumers/disker/disker_plug.py:
+	Add base class for disker plugs.
+
+	* flumotion/component/consumers/disker/disker.xml:
+	Add disker plug registry entries.
+
 2007-07-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/registry.py (RegistryDirectory._getFileLists):

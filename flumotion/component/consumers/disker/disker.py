@@ -209,17 +209,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         else:
             ext = 'data'
         
+        self.stop_recording()
+
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
-
-        if self.file:
-            self.file.flush()
-            sink.emit('remove', self.file.fileno())
-            self.file = None
-            if self.symlink_to_last_recording:
-                self.update_symlink(self.location,
-                                    self.symlink_to_last_recording)
 
         filename = ""
         if not filenameTemplate:
@@ -238,6 +232,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                                        % (self.location,))))
             self.addMessage(m)
             return
+        self._plug_recording_started(self.file, self.location)
         sink.emit('add', self.file.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
@@ -276,6 +271,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if self.file:
             self.file.flush()
             sink.emit('remove', self.file.fileno())
+            self._plug_recording_stopped(self.file, self.location)
             self.file = None
             self.uiState.set('filename', None)
             self.uiState.set('recording', False)
@@ -392,6 +388,20 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                     self.schedule_recording(dtstart, dtend, recur, summary)
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
+
+    def _plug_recording_started(self, file, location):
+        socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
+        for plug in self.plugs[socket]:
+            self.debug('invoking recording_started on '
+                       'plug %r on socket %s', plug, socket)
+            plug.recording_started(file, location)
+
+    def _plug_recording_stopped(self, file, location):
+        socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
+        for plug in self.plugs[socket]:
+            self.debug('invoking recording_stopped on '
+                       'plug %r on socket %s', plug, socket)
+            plug.recording_stopped(file, location)
 
     def _markers_event_probe(self, element, event):
         if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:

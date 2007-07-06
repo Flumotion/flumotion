@@ -15,7 +15,11 @@
         <entry type="admin/text" location="admin_text.py"
               function="UIClass" />
       </entries>
-      
+
+      <sockets>
+        <socket type="flumotion.component.consumers.disker.disker_plug.DiskerPlug" />
+      </sockets>
+
       <properties>
         <property name="directory" type="string" required="yes" />
         <property name="rotate-type" type="string" required="no"
@@ -90,6 +94,19 @@
             </directory>
         </directories>
      </bundle>
+
+    <bundle name="disker-plug">
+      <dependencies>
+        <dependency name="base-plugs" />
+        <dependency name="disker-base"/>
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/consumers/disker">
+          <filename location="disker_plug.py"/>
+        </directory>
+      </directories>
+    </bundle>
+
   </bundles>
 
 </registry> 
