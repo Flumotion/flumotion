@@ -232,9 +232,9 @@ class DepGraph(log.Loggable):
 
                         if not feederFound:
                             raise errors.ComponentConfigError(eatingComponent,
-                                "No feeder exists for eater %s on component %s"
-                                " feeding from %s" % (eater, eatingComponent,
-                                feed))
+                                "No feeder exists feeding %s to eater"
+                                " %s on component %s" % (
+                                feed, eater, eatingComponent))
 
     def whatShouldBeStarted(self):
         """

@@ -1,3 +1,9 @@
+2007-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/depgraph.py:
+	  Make the exception have correct text so I can follow what's going
+	  on.
+
 2007-07-06  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/consumers/disker/disker.py
