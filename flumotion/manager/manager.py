@@ -630,7 +630,7 @@ class Vishnu(log.Loggable):
             self.addMessage(messages.WARNING, mid,
                             N_('Unknown error while loading configuration.'),
                             debug=log.getExceptionMessage(e))
-            return defer.faile(e)
+            return defer.fail(e)
             
     def _loadManagerPlugs(self, conf):
         # Load plugs

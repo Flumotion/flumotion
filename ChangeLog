@@ -1,3 +1,14 @@
+2007-07-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/config.py:
+	  If a <source> is specified for a component that has no eaters, raise
+	  a ConfigError with an appropriate message.
+
+	* flumotion/manager/manager.py:
+	  If we fail to parse a config, call fail() instead of faile(), it
+	  exists more.
+	  Fixes #713.
+
 2007-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/depgraph.py:

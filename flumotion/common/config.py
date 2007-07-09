@@ -53,6 +53,9 @@ def buildEatersDict(eatersList, eaterDefs):
     eaters = {}
     for eater, feedId in eatersList:
         if eater is None:
+            if not eaterDefs:
+                raise ConfigError("Feed %r cannot be connected, component has "
+                    "no eaters" % (feedId,))
             # cope with old <source> entries
             eater = eaterDefs[0].getName()
         feeders = eaters.get(eater, [])
