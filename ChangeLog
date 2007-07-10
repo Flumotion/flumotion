@@ -1,5 +1,11 @@
 2007-07-10  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/worker/Makefile.am:
+	* flumotion/component/consumers/disker/Makefile.am:
+	  Dist files added recently so that installed flumotion works again.
+
+2007-07-10  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/test_config.py:
 	  Add a test that specifying a source for a component with no eaters
 	  raises ConfigError.
