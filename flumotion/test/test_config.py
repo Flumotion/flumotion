@@ -372,6 +372,18 @@ class TestConfig(unittest.TestCase):
         conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
+
+        # Specify a source for a component with no eaters
+        xml = """<planet>
+              <flow name="default">
+                <component name="test-component" worker="foo">
+                  <source>foo:bar</source>
+                </component>
+              </flow>
+            </planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        self.assertRaises(config.ConfigError, conf.parse)
         
     def testParseFlowError(self):
         xml = """<planet>

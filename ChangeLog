@@ -1,3 +1,9 @@
+2007-07-10  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_config.py:
+	  Add a test that specifying a source for a component with no eaters
+	  raises ConfigError.
+
 2007-07-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/config.py:
