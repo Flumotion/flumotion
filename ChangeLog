@@ -1,3 +1,9 @@
+2007-07-10  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/launch/inspect.py:
+	Add printing of plugs' property description strings and
+	right-align the property names. Fixes #717.
+
 2007-07-10  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/worker/Makefile.am:

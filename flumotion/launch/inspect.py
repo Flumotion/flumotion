@@ -157,11 +157,15 @@ def main(args):
             properties = [(x.getName(), x) for x in p.getProperties()]
             properties.sort()
             if properties:
+                indent = max([len(p[0]) for p in properties])
                 for k, v in properties:
-                    print ('  %s: type %s, %s%s'
-                           % (k, v.getType(),
+                    desc = v.getDescription()
+                    print ('  %s%s: type %s, %s%s'
+                           % (' '*(indent-len(k)), k, v.getType(),
                               v.isRequired() and 'required' or 'optional',
                               v.isMultiple() and ', multiple ok' or ''))
+                    if desc:
+                        printMultiline(indent, desc)
             print
         if not handled:
             err('Unknown component or plug `%s\'' % cname)
