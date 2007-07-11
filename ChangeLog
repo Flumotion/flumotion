@@ -1,3 +1,8 @@
+2007-07-11  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/http.py:
+	  Don't accept a keycard with an id that's already in use.
+
 2007-07-10  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/launch/inspect.py:

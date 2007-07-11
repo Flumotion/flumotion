@@ -258,6 +258,10 @@ class HTTPAuthentication(log.Loggable):
             fd = request.transport.fileno()
 
             if self.bouncerName:
+                if keycard.id in self._idToKeycard:
+                    self.warning("Duplicate keycard id: refusing")
+                    raise errors.NotAuthenticatedError()
+
                 self._fdToKeycard[fd] = keycard
                 self._idToKeycard[keycard.id] = keycard
 
