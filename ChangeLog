@@ -1,5 +1,10 @@
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* po/POTFILES.in:
+	  Add feedcomponent010.py which contains translatable strings.
+
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  Translatable strings with more than one variable need to be done
 	  with a dict so translators can change ordering of strings.

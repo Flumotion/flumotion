@@ -14,6 +14,7 @@ flumotion/common/worker.py
 
 flumotion/component/component.py
 flumotion/component/feedcomponent.py
+flumotion/component/feedcomponent010.py
 
 flumotion/component/base/admin_gtk.py
 flumotion/component/base/feeders.glade
