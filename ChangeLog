@@ -1,5 +1,11 @@
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/common.mk:
+	  Put coverage in _trial_coverage so other trial runs don't
+	  remove the expensive coverage data.
+
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/main.py:
 	  Add a FIXME.
 	* flumotion/admin/gtk/wizard.py (Wizard, Wizard.finished):

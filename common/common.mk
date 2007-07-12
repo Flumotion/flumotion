@@ -7,7 +7,7 @@ check-docs:
 	@make check -C doc/reference
 
 coverage:
-	@trial --coverage flumotion.test
+	@trial --temp-directory=_trial_coverage --coverage flumotion.test
 	make show-coverage
 
 show-coverage:
@@ -16,7 +16,7 @@ show-coverage:
 	@keep="";							\
 	for m in $(COVERAGE_MODULES); do				\
 		echo adding $$m;					\
-		keep="$$keep `ls _trial_temp/coverage/$$m*`";		\
+		keep="$$keep `ls _trial_coverage/coverage/$$m*`";	\
 	done;								\
 	$(PYTHON) common/show-coverage.py $$keep
 
