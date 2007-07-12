@@ -1,5 +1,14 @@
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/greeter-start_new_error.glade:
+	* data/glade/greeter-start_new_success.glade:
+	  Set visible to False.  This fixes the "two small windows are
+	  popping up when flumotion-admin starts" problem.  I have no idea
+	  why it's fine for all the other steps' glade files to have this
+	  set to True, but it seems it is.
+
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/common.mk:
 	  Put coverage in _trial_coverage so other trial runs don't
 	  remove the expensive coverage data.
