@@ -182,8 +182,11 @@ class Window(log.Loggable, gobject.GObject):
         i = connectionInfo
         model = AdminModel()
         d = model.connectToManager(i)
-        self._trayicon.set_tooltip(_("Connecting to %s:%s") %
-            (i.host, i.port))
+
+        self._trayicon.set_tooltip(_("Connecting to %(host)s:%(port)s") % {
+            'host': i.host,
+            'port': i.port,
+        })
 
         def connected(model):
             self.window.set_sensitive(True)
@@ -455,8 +458,11 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handled connection-refused")
 
     def admin_connection_failed_later(self, admin, reason):
-        message = (_("Connection to manager on %s failed (%s).")
-                   % (admin.connectionInfoStr(), reason))
+        message = (
+            _("Connection to manager on %(conn)s failed (%(reason)s).") % {
+                'conn': admin.connectionInfoStr(),
+                'reason': reason,
+            })
         self._trayicon.set_tooltip("Connection to %s failed" %
             self.admin.adminInfoStr())
         self.info(message)
@@ -698,9 +704,12 @@ class Window(log.Loggable, gobject.GObject):
         def _actionErrback(failure, self, mid):
             self.statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
-                action, name, failure))
-            self.statusbar.push('main', _("Failed to %s component %s") % (
-                action, name))
+                action.lower(), name, failure))
+            self.statusbar.push('main',
+                _("Failed to %(action)s component %(name)s") % {
+                    'action': action.lower(),
+                    'name': name,
+                })
             
         d.addCallback(_actionCallback, self, mid)
         d.addErrback(_actionErrback, self, mid)
@@ -855,16 +864,17 @@ class Window(log.Loggable, gobject.GObject):
                 "admin": self.admin,
                 "components": self._components
             }
-        message = ("  Flumotion Admin Debug Shell\n"
-                   "\n"
-                   "Local variables are:\n"
-                   "  admin      (flumotion.admin.admin.AdminModel)\n"
-                   "  components (dict: name -> flumotion.common.planet.AdminComponentState)\n"
-                   "\n"
-                   "You can do remote component calls using:\n"
-                   "  admin.componentCallRemote(components['component-name'],\n"
-                   "         'methodName', arg1, arg2)\n\n")
+        message = """Flumotion Admin Debug Shell
 
+Local variables are:
+  admin      (flumotion.admin.admin.AdminModel)
+  components (dict: name -> flumotion.common.planet.AdminComponentState)
+
+You can do remote component calls using:
+  admin.componentCallRemote(components['component-name'],
+         'methodName', arg1, arg2)
+  
+"""
         code.interact(local=vars, banner=message)
 
     def help_about_cb(self, button):
@@ -881,7 +891,9 @@ class Window(log.Loggable, gobject.GObject):
         image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
         image.show()
         
-        version = gtk.Label('<span size="xx-large"><b>Flumotion %s</b></span>' % configure.version)
+        version = gtk.Label(
+            '<span size="xx-large"><b>Flumotion %s</b></span>' %
+                configure.version)
         version.set_selectable(True)
         dialog.vbox.pack_start(version)
         version.set_use_markup(True)
@@ -920,4 +932,3 @@ class Window(log.Loggable, gobject.GObject):
         self.window.show()
 
 pygobject.type_register(Window)
-

@@ -1,5 +1,13 @@
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  Translatable strings with more than one variable need to be done
+	  with a dict so translators can change ordering of strings.
+	  Clean up some > 80 character lines.
+	  Fix instances of "Failed to Stop component"
+
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/greeter-start_new_error.glade:
 	* data/glade/greeter-start_new_success.glade:
 	  Set visible to False.  This fixes the "two small windows are
