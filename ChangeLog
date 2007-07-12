@@ -1,5 +1,10 @@
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  Break up a translatable string so we reuse an existing one.
+
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/POTFILES.in:
 	  Add feedcomponent010.py which contains translatable strings.
 

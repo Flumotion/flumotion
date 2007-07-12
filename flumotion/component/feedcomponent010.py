@@ -824,11 +824,14 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning("Feeder statistics unavailable, your "
                 "gst-plugins-base is too old")
             self.addMessage(
-                messages.Warning(T_(N_(
-                    "Your gst-plugins-base is too old (older than 0.10.11), so "
-                    "feeder statistics will be unavailable. Please upgrade to "
-                    "the most recent gst-plugins-base release.")), 
+            m = messages.Warning(T_(N_(
+                    "Your gst-plugins-base is too old, so "
+                    "feeder statistics will be unavailable.")), 
                     id='multifdsink'))
+            m.add(T_(N_(
+                "Please upgrade '%s' to version %s."), 'gst-plugins-base',
+                '0.10.11'))
+            self.addMessage(m)
 
     def pipeline_stop(self):
         if not self.pipeline:
