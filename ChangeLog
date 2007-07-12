@@ -1,3 +1,10 @@
+2007-07-12  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  When switching fd for fdsrc in feed component pipelines, remove the
+	  element from its parent rather than the toplevel pipeline.
+	  Fixes components that put the source elements in a bin.
+
 2007-07-11  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/http.py:

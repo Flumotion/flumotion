@@ -1279,14 +1279,15 @@ class FeedComponent(basecomponent.BaseComponent):
             # Now, we can switch FD with this mess
             sinkpad = srcpad.get_peer()
             srcpad.unlink(sinkpad)
-            self.pipeline.remove(element)
+            parent = element.get_parent()
+            parent.remove(element)
             self.log("setting to ready")
             element.set_state(gst.STATE_READY)
             self.log("setting to ready complete!!!")
             old = element.get_property('fd')
             os.close(old)
             element.set_property('fd', fd)
-            self.pipeline.add(element)
+            parent.add(element)
             srcpad.link(sinkpad)
             element.set_state(gst.STATE_PLAYING)
             # We're done; unblock the pad
