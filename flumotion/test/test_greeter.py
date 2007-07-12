@@ -41,7 +41,7 @@ def check_prev_next(can_prev, can_next):
     assert_sensitive('button_next', can_next)
 
 class WizardTest(unittest.TestCase):
-    def testMakeGreeter(self):
+    def testGreeter(self):
         wiz = greeter.Greeter()
         ass = self.assert_
         ass(isinstance(wiz, wizard.Wizard))
@@ -77,8 +77,13 @@ class WizardTest(unittest.TestCase):
         state = wiz.run()
 
         assert_not_failed()
+        wiz.hide()
+        gtk.main_iteration()
         wiz.destroy()
+        # I don't know why it needs so many, but it seems it does to actually
+        # unmap the window
+        for i in range(1, 32): gtk.main_iteration()
         
         refstate = {'passwd': 'baz', 'host': 'foolio', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
-        assert state == refstate
+        self.assertEquals(state, refstate)

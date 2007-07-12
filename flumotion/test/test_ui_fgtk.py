@@ -70,4 +70,9 @@ class VUTest(unittest.TestCase):
         gobject.timeout_add(1 * INTERVAL, w.set_property, 'peak', -5.0)
         gobject.timeout_add(2 * INTERVAL, gtk.main_quit)
         gtk.main()
+        # these four calls make sure the window doesn't hang around during
+        # other tests
+        window.hide()
+        gtk.main_iteration()
         window.destroy()
+        gtk.main_iteration()

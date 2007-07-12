@@ -35,6 +35,7 @@ from flumotion.common import log, errors, connection
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
+# FIXME: a function with a capital is extremely poor style.
 def Greeter():
     # We do the import here so gettext has been set up and class strings
     # from greeter are translated

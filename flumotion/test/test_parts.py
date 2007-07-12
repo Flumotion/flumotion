@@ -44,7 +44,11 @@ class TestAdminStatusbar(unittest.TestCase):
         self.bar = parts.AdminStatusbar(self.widget)
 
     def tearDown(self):
+        # the iterations make sure the window goes away
+        self.window.hide()
+        gtk.main_iteration()
         self.window.destroy()
+        gtk.main_iteration()
 
     def testPushRemove(self):
         mid = self.bar.push('main', 'I am a message')
@@ -95,15 +99,19 @@ class TestComponentsView(unittest.TestCase):
         self.view = parts.ComponentsView(self.widget)
         gtk.main_iteration()
 
+    def tearDown(self):
+        # the iterations make sure the window goes away
+        self.window.hide()
+        gtk.main_iteration()
+        self.window.destroy()
+        gtk.main_iteration()
+
     def _createComponent(self, dict):
         mstate = planet.ManagerComponentState()
         for key in dict.keys():
             mstate.set(key, dict[key]) 
         astate = jelly.unjelly(jelly.jelly(mstate))
         return astate
-
-    def tearDown(self):
-        self.window.destroy()
 
     def testNoneSelected(self):
         self.failIf(self.view.get_selected_name())

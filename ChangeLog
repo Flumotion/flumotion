@@ -1,3 +1,17 @@
+2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/main.py:
+	  Add a FIXME.
+	* flumotion/admin/gtk/wizard.py (Wizard, Wizard.finished):
+	  Hide when we're finished.
+	* flumotion/test/test_greeter.py (WizardTest.testGreeter):
+	* flumotion/test/test_ui_fgtk.py (VUTest.testWidget):
+	* flumotion/test/test_parts.py (TestAdminStatusbar.tearDown,
+	  TestComponentsView.tearDown):
+	  iterate the main context to make sure windows unmap during tests
+	* flumotion/test/gtkunit.py:
+	  remove an unused method
+
 2007-07-12  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
@@ -3443,7 +3457,7 @@
 	* flumotion/twisted/flavors.py (StateRemoteCache.invalidate):
 	  Don't use setattr if we don't need to.
 	* flumotion/twisted/rtsp.py (RTSPRequest.process):
-	  Don't trigger and IndexError when there are no headers in the
+	  Don't trigger an IndexError when there are no headers in the
 	  request.
 
 2007-04-07  Thomas Vander Stichele  <thomas at apestaart dot org>

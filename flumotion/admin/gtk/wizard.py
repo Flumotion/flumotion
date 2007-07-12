@@ -132,6 +132,7 @@ class Wizard(GladeWindow):
     steps = []
 
     # private
+    # well really, if they're private, why not prefix them with _
     glade_file = 'admin-wizard.glade'
     page = None
     page_stack = []
@@ -273,6 +274,7 @@ class Wizard(GladeWindow):
         d = defer.Deferred()
         def finished(x):
             self.disconnect(i)
+            self.hide()
             if self.state:
                 d.callback(self.state)
             else:
