@@ -759,7 +759,8 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectFeeders(self, componentAvatar):
         flowName = componentAvatar.getParentName()
         otherComponents = [c for c in self.avatars.values()
-                           if c.getParentName() == flowName]
+                           if c.componentState != None and 
+                               c.getParentName() == flowName]
         for feederName in componentAvatar.getFeeders():
             for remoteFeedId in componentAvatar.getEatersForFeeder(
                 feederName, otherComponents):
@@ -880,6 +881,8 @@ class ComponentHeaven(base.ManagerHeaven):
             else:
                 self.debug("Component %s already on way to clock master", 
                     componentState.get("name"))
+        else:
+            self.warning("Component %s to be clock master, but has no avatar")
 
     def startComponent(self, componentState):
         self.debug("Component %s to be started" % componentState.get("name"))
@@ -945,7 +948,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 self.debug("Component %s already on way to being setup", 
                     componentState.get("name"))
         else:
-            self.debug("Component %s to be setup but has no avatar yet", 
+            self.warning("Component %s to be setup but has no avatar yet", 
                 componentState.get("name"))
 
     def _doSetupComponent(self, componentAvatar):

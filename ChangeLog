@@ -1,5 +1,18 @@
 2007-07-18  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/feed.py:
+	  Call up to the right superclass.
+
+	* flumotion/manager/component.py:
+	  When looking for other components to connect feeders to, only
+	  consider components that are fully logged in (i.e. where 
+	  componentAvatar.componentState != None).
+
+	  Fixes #699 - components going sad when starting multiple components
+	  at the same time.
+
+2007-07-18  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/component.py:
 	  Import twisted.internet.error as terror, use terror where there's a
 	  local function called error.

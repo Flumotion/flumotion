@@ -49,7 +49,7 @@ class _SocketMaybeCloser(tcp._SocketCloser):
             except socket.error:
                 pass
         else:
-            tcp.Server._closeSocket(self)
+            tcp._SocketCloser._closeSocket(self)
 
 class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
     pass
