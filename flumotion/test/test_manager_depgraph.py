@@ -47,6 +47,19 @@ class testDepGraph(unittest.TestCase):
         ret.set("config", conf)
         return ret
 
+    def setUp(self):
+        self._setup = []
+        self._started = []
+
+    def _addComponent(self, dg, component):
+        def setup(component):
+            name = component.get('name')
+            self._setup.append(name)
+        def started(component):
+            name = component.get('name')
+            self._started.append(name)
+
+        dg.addComponent(component, setup, started)
         
     def testVideoOnlyOnOneWorker(self):
         """
@@ -55,6 +68,7 @@ class testDepGraph(unittest.TestCase):
         """
         
         dg = DepGraph()
+
         videotest_defs = ["video-test", "videotest", "default", 
             ["video-test:default"], [] ]
         videoenc_defs = ["video-encoder", "theora-encoder", "default",
@@ -69,11 +83,11 @@ class testDepGraph(unittest.TestCase):
         muxer = self._createComponent(muxer_defs)
         streamer = self._createComponent(streamer_defs)
         
-        dg.addComponent(videotest)
-        dg.addComponent(videoenc)
-        dg.addComponent(muxer)
-        dg.addComponent(streamer)
-        dg.addClockMaster(videotest)
+        self._addComponent(dg, videotest)
+        self._addComponent(dg, videoenc)
+        self._addComponent(dg, muxer)
+        self._addComponent(dg, streamer)
+        dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
         
         # now check depgraph is correct
@@ -120,27 +134,39 @@ class testDepGraph(unittest.TestCase):
                     #    self.failUnless(postindex > jobindex)
                         
         # Nothing should be started yet, because no workers logged in
-        tobestarted = dg.whatShouldBeStarted()
-        self.assertEquals(len(tobestarted), 0)
-        dg.setWorkerStarted("default")
-        
-        # What is told to be started should be everything except the worker
-        # which is already started
-        #tobestarted = dg.whatShouldBeStarted()
-        #self.assertEquals(len(tobestarted), len(startorder)-1)
-        #dg.setJobStarted(videotest)
-        #tobestarted = dg.whatShouldBeStarted()
-        #self.assertEquals(len(tobestarted), len(startorder)-2)
-        #self.failUnless((videotest, "JOB") not in tobestarted)
+        self.assertEquals(len(self._setup), 0)
+        self.assertEquals(len(self._started), 0)
 
+        dg.setWorkerStarted("default")
+        # Just starting the worker isn't enough...
+        self.assertEquals(len(self._setup), 0)
+        self.assertEquals(len(self._started), 0)
+
+        dg.setJobStarted(videotest)
         dg.setJobStarted(videoenc)
         dg.setJobStarted(muxer)
         dg.setJobStarted(streamer)
-        tobestarted = dg.whatShouldBeStarted()
-        # go through tobestarted and check if state of all is 0
-        for obj in tobestarted:
-            self.failUnless(dg._state[obj] == False)
-        
+
+        # videotest should have been told to setup now, but nothing else yet.
+        self.assertEquals(self._setup, ['video-test'])
+
+        dg.setComponentSetup(videotest)
+        dg.setClockMasterStarted(videotest)
+        # Now we should have video-encoder asked to setup, and videotest 
+        # asked to start.
+        self.assertEquals(self._setup, ['video-test', 'video-encoder'])
+        self.assertEquals(self._started, ['video-test'])
+
+        dg.setComponentSetup(videoenc)
+        dg.setComponentSetup(muxer)
+        dg.setComponentStarted(videotest)
+        # And now everything should be in _setup, and videotest and videoenc in
+        # _started
+        self.assertEquals(self._setup, 
+            ['video-test', 'video-encoder', 'muxer-video', 'http-video'])
+        self.assertEquals(self._started, 
+            ['video-test', 'video-encoder'])
+
     def testBrokenDepGraph(self):
         dg = DepGraph()
         videotest_defs = ["video-test", "videotest", "default", ["video-test:default"], []]
@@ -150,9 +176,10 @@ class testDepGraph(unittest.TestCase):
         videotest = self._createComponent(videotest_defs)
         muxer = self._createComponent(muxer_defs)
 
-        self.assertRaises(KeyError, dg.addClockMaster, videotest)
-        dg.addComponent(videotest)
-        dg.addComponent(muxer)
+        self.assertRaises(KeyError, dg.addClockMaster, videotest, 
+            lambda x: None)
+        dg.addComponent(videotest, lambda x: None, lambda x: None)
+        dg.addComponent(muxer, lambda x: None, lambda x: None)
         # lets be naughty and try to mapEatersToFeeders before whole flow is in
         self.assertRaises(errors.ComponentConfigError, dg.mapEatersToFeeders)
 
@@ -172,11 +199,11 @@ class testDepGraph(unittest.TestCase):
         muxer = self._createComponent(muxer_defs)
         streamer = self._createComponent(streamer_defs)
         
-        dg.addComponent(videotest)
-        dg.addComponent(videoenc)
-        dg.addComponent(muxer)
-        dg.addComponent(streamer)
-        dg.addClockMaster(videotest)
+        self._addComponent(dg, videotest)
+        self._addComponent(dg, videoenc)
+        self._addComponent(dg, muxer)
+        self._addComponent(dg, streamer)
+        dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
         
         # now cleanup depgraph
@@ -185,8 +212,10 @@ class testDepGraph(unittest.TestCase):
         dg.removeComponent(muxer)
         dg.removeComponent(videoenc)
 
-        started = dg.whatShouldBeStarted()
-        assert(len(started) == 0)
+        # Nothing should be started.
+        self.assertEquals(len(self._setup), 0)
+        self.assertEquals(len(self._started), 0)
+
         # let's make sure worker has no children
         assert(dg._dag.hasNode("default", "WORKER"))
         workerchildren = dg._dag.getChildrenTyped("default", "WORKER")
@@ -202,19 +231,21 @@ class testDepGraph(unittest.TestCase):
         for node in dg._dag.sort():
             assert(dg._dag.hasNode(node[0], node[1]))
         
-        dg.addComponent(videotest)
-        dg.addComponent(videoenc)
-        dg.addComponent(muxer)
-        dg.addComponent(streamer)
-        dg.addClockMaster(videotest)
+        self._addComponent(dg, videotest)
+        self._addComponent(dg, videoenc)
+        self._addComponent(dg, muxer)
+        self._addComponent(dg, streamer)
+        dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
         
-        # Nothing should be started yet, because no workers logged in
-        tobestarted = dg.whatShouldBeStarted()
-        self.assertEquals(len(tobestarted), 0)
+        # Nothing should be started, no worker logged in
+        self.assertEquals(len(self._setup), 0)
+        self.assertEquals(len(self._started), 0)
+
         dg.setWorkerStarted("default")
 
-        startorder = dg.whatShouldBeStarted()
+        #startorder = dg.whatShouldBeStarted()
+        startorder = dg._dag.sort()
         # now check that the jobs are before the componentsetup
         # and componentsetup before componentready
         # and componentready before any clock master in that component

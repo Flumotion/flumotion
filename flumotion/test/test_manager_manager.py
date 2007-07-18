@@ -598,11 +598,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.failUnless('converter-ogg-theora' in names)
             self.failUnless('streamer-ogg-theora' in names)
 
-            # verify that nothing should be started
-            start = self.vishnu._depgraph.whatShouldBeStarted()
-            # should be nothing because we have no worker
-            assert start == []
-            
             # log in a worker and verify components get started
             return self._loginWorker('worker')
 

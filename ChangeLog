@@ -1,5 +1,11 @@
 2007-07-18  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_manager_depgraph.py:
+	* flumotion/test/test_manager_manager.py:
+	  Fix up testsuite for depgraph changes.
+
+2007-07-18  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/depgraph.py:
 	  Remove Feeder, Eater classes, which are unused.
 	  Make state dict contain a callable as well as a boolean for each DAG
