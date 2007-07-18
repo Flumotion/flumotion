@@ -835,156 +835,119 @@ class ComponentHeaven(base.ManagerHeaven):
         d.addCallback(start)
         return d
 
-    def _tryWhatCanBeStarted(self, result=True):
-        """
-        I try to start nodes in the depgraph if they should be started.  I am
-        a recursive method, because the depgraph's list of what should be
-        started may change when nodes start/stop.
-        
-        @param result: only needed because this method is added as a callback
-        """
-        
-        # Generic failure handler for 
-        # synchronous and asynchronous errors
-        def handleFailure(failure, avatar, message, id_template):
-            log.warningFailure(failure, swallow=False)
-            if failure.check(errors.HandledException):
-                self.debug('failure %r already handled' % failure)
-                return                                        
-            self.debug('showing error message for failure %r' % failure)            
-            m = messages.Error(message, 
-               id=id_template % componentAvatar.avatarId,
-               debug=log.getFailureMessage(failure))
-            avatar._addMessage(m)
-            avatar._setMood(moods.sad)
+    # Generic failure handler for 
+    # synchronous and asynchronous errors
+    def handleFailure(self, failure, avatar, message, id_template):
+        log.warningFailure(failure, swallow=False)
+        if failure.check(errors.HandledException):
+            self.debug('failure %r already handled' % failure)
+            return                                        
+        self.debug('showing error message for failure %r' % failure)            
 
-        self.debug("tryWhatCanBeStarted")
-        deplist = self.vishnu._depgraph.whatShouldBeStarted()
-        self.debug("Listing deplist")
+        m = messages.Error(message, 
+           id=id_template % avatar.avatarId,
+           debug=log.getFailureMessage(failure))
+        avatar._addMessage(m)
+        avatar._setMood(moods.sad)
 
-        if not deplist:
-            self.debug("Nothing needs to be setup or started!")
-            return
-        for dep in deplist:
-            self.debug("Deplist: %r,%r" % (dep[0], dep[1]))
+    def setupClockMaster(self, componentState):
+        self.debug("Component %s to be clock master!", 
+            componentState.get('name'))
+        componentAvatar = self.getComponentAvatarForState(componentState)
+        if componentAvatar:
+            if not componentAvatar._providingClock:
+                componentAvatar._providingClock = True
+                # specific master clock failure handler
+                def componentMasterClockFailed(failure):
+                    componentAvatar._providingClock = False
+                    self.handleFailure(failure, componentAvatar, 
+                        T_(N_("Could not setup component's master clock.")),
+                        "component-clock-%s")
+                try:
+                    d = self.provideMasterClock(componentAvatar)
+                except:
+                    # give feedback of synchronous failures 
+                    # to the componentAvatar
+                    componentMasterClockFailed(Failure())
+                    return
+                # Add errback to be able to give feedback
+                # of asynchronous failures to the componentAvatar.
+                def clockMasterErrback(failure):
+                    componentMasterClockFailed(failure)
+                    raise errors.ComponentStartHandledError(failure)                            
+                d.addErrback(clockMasterErrback)
+            else:
+                self.debug("Component %s already on way to clock master", 
+                    componentState.get("name"))
 
-        # we handle all direct dependencies;
-        # an error for one of them shouldn't stop handling the others
-        for dep, deptype in deplist:
-            if dep:
-                if deptype == "COMPONENTSETUP":
-                    self.debug("Component %s to be setup" % dep.get("name"))
-                    componentAvatar = self.getComponentAvatarForState(dep)
-                    if componentAvatar:
-                        if not componentAvatar._beingSetup:
-                            componentAvatar._beingSetup = True
-                            # specific setup failure handler
-                            def componentSetupFailed(failure):
-                                componentAvatar._beingSetup = False                            
-                                handleFailure(failure, componentAvatar,
-                                         T_(N_("Could not setup component.")),
-                                         "component-setup-%s")
-                            try:
-                                d = self.setupComponent(componentAvatar)
-                            except:
-                                # give feedback of synchronous failures 
-                                # to the componentAvatar, and resume the loop
-                                componentSetupFailed(Failure())
-                                continue
-                            # add callback because nodes that can be
-                            # started as a result of this component being
-                            # setup may not be in the current list, and
-                            # add errback to be able to give feedback
-                            # of asynchronous failures to the componentAvatar.
-                            def setupErrback(failure):
-                                componentSetupFailed(failure)
-                                raise errors.ComponentSetupHandledError(failure)                            
-                            d.addCallbacks(self._tryWhatCanBeStarted, 
-                                setupErrback)
-                        else:
-                            self.debug(
-                                "Component %s already on way to being setup",
-                                dep.get("name"))
-                    else:
-                        self.debug(
-                            "Component %s to be setup but has no avatar yet",
-                                dep.get("name"))
-                elif deptype == "COMPONENTSTART":
-                    self.debug("Component %s to be started" % dep.get("name"))
-                    componentAvatar = self.getComponentAvatarForState(dep)
-                    if not componentAvatar._starting:
-                        componentAvatar._starting = True
-                        happyd = defer.Deferred()
-                        # since we've reached happy, we should clear the pending
-                        # mood - it is done transitioning
-                        happyd.addCallback(lambda r, s: s.set(
-                            'moodPending', None), 
-                            componentAvatar.componentState)
-                        # add callback because nodes that can be
-                        # started as a result of this component being
-                        # happy may not be in the current list.
-                        happyd.addCallback(self._tryWhatCanBeStarted)
-                        componentAvatar._happydefers.append(happyd)
+    def startComponent(self, componentState):
+        self.debug("Component %s to be started" % componentState.get("name"))
+        componentAvatar = self.getComponentAvatarForState(componentState)
+        if not componentAvatar._starting:
+            componentAvatar._starting = True
+            happyd = defer.Deferred()
+            # When we reach happy, we should clear the pending
+            # mood - it is done transitioning
+            happyd.addCallback(lambda r, s: s.set('moodPending', None), 
+                componentState)
+            # TODO: Ugly poking in privates
+            componentAvatar._happydefers.append(happyd)
 
-                        # specific startup failure handler
-                        def componentStartupFailed(failure):
-                            componentAvatar._starting = False
-                            handleFailure(failure, componentAvatar,
-                                         T_(N_("Could not start component.")),
-                                         "component-start-%s")
-                        try:
-                            d = self._startComponent(componentAvatar)
-                        except:
-                            # give feedback of synchronous failures 
-                            # to the componentAvatar, and resume the loop
-                            componentStartupFailed(Failure())
-                            continue                        
-                        # add errback to be able to give feedback
-                        # of asynchronous failures to the componentAvatar.
-                        def startErrback(failure):
-                            componentStartupFailed(failure)
-                            raise errors.ComponentStartHandledError(failure)
-                        d.addErrback(startErrback)
-                    else:
-                        self.log("Component is already starting")
-                elif deptype == "CLOCKMASTER":
-                    self.debug("Component %s to be clock master!",
-                        dep.get("name"))
-                    componentAvatar = self.getComponentAvatarForState(dep)
-                    if componentAvatar:
-                        if not componentAvatar._providingClock:
-                            componentAvatar._providingClock = True
-                            # specific master clock failure handler
-                            def componentMasterClockFailed(failure):
-                                componentAvatar._providingClock = False
-                                handleFailure(failure, componentAvatar,
-                                      T_(N_("Could not setup component's master clock.")),
-                                      "component-clock-%s")
-                            try:
-                                d = self.provideMasterClock(componentAvatar)
-                            except:
-                                # give feedback of synchronous failures 
-                                # to the componentAvatar and resume the loop
-                                componentMasterClockFailed(Failure())
-                                continue                                
-                            # add callback because nodes that can be
-                            # started as a result of this component providing
-                            # master clock may not be in the current list, and
-                            # add errback to be able to give feedback
-                            # of asynchronous failures to the componentAvatar.
-                            def clockMasterErrback(failure):
-                                componentMasterClockFailed(failure)
-                                raise errors.ComponentStartHandledError(failure)                            
-                            d.addCallbacks(self._tryWhatCanBeStarted, 
-                                clockMasterErrback)
-                        else:
-                            self.debug(
-                                "Component %s already on way to clock master", 
-                                dep.get("name"))
-                else:
-                    self.debug("Unknown dependency type")
+            # specific startup failure handler
+            def componentStartupFailed(failure):
+                componentAvatar._starting = False
+                self.handleFailure(failure, componentAvatar,
+                    T_(N_("Could not start component.")),
+                    "component-start-%s")
+            try:
+                d = self._startComponent(componentAvatar)
+            except:
+                # give feedback of synchronous failures 
+                # to the componentAvatar
+                componentStartupFailed(Failure())
+                return
+            # add errback to be able to give feedback
+            # of asynchronous failures to the componentAvatar.
+            def startErrback(failure):
+                componentStartupFailed(failure)
+                raise errors.ComponentStartHandledError(failure)
+            d.addErrback(startErrback)
+        else:
+            self.log("Component is already starting")
 
-    def _setupComponent(self, componentAvatar):
+    def setupComponent(self, componentState):
+        self.debug("Component %s to be setup" % componentState.get("name"))
+        componentAvatar = self.getComponentAvatarForState(componentState)
+        if componentAvatar:
+            if not componentAvatar._beingSetup:
+                componentAvatar._beingSetup = True
+                # specific setup failure handler
+                def componentSetupFailed(failure):
+                    componentAvatar._beingSetup = False
+                    self.handleFailure(failure, componentAvatar,
+                        T_(N_("Could not setup component.")),
+                        "component-setup-%s")
+                try:
+                    d = self.doSetupComponent(componentAvatar)
+                except:
+                    # give feedback of synchronous failures 
+                    # to the componentAvatar
+                    componentSetupFailed(Failure())
+                    return
+                # add errback to be able to give feedback
+                # of asynchronous failures to the componentAvatar.
+                def setupErrback(failure):
+                    componentSetupFailed(failure)
+                    raise errors.ComponentSetupHandledError(failure)                            
+                d.addErrback(setupErrback)
+            else:
+                self.debug("Component %s already on way to being setup", 
+                    componentState.get("name"))
+        else:
+            self.debug("Component %s to be setup but has no avatar yet", 
+                componentState.get("name"))
+
+    def _doSetupComponent(self, componentAvatar):
         # set up the component
         state = componentAvatar.componentState
         conf = state.get('config')
@@ -1013,7 +976,7 @@ class ComponentHeaven(base.ManagerHeaven):
             componentAvatar._setMood(moods.sad)
             raise errors.FlumotionError('Could not set up component')
  
-    setupComponent = defer_generator_method(_setupComponent)
+    doSetupComponent = defer_generator_method(_doSetupComponent)
         
     def registerComponent(self, componentAvatar):
         """

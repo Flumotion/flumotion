@@ -473,7 +473,9 @@ class Vishnu(log.Loggable):
     def _updateFlowDependencies(self, state):
         self.debug('registering dependencies of %r' % state)
 
-        self._depgraph.addComponent(state)
+        self._depgraph.addComponent(state, 
+            self.componentHeaven.setupComponent, 
+            self.componentHeaven.startComponent)
 
         conf = state.get('config')
 
@@ -484,7 +486,8 @@ class Vishnu(log.Loggable):
 
         self.debug("Using config: %r for component with avatarId %r", conf, componentAvatarId)
         if componentAvatarId == conf['clock-master']:
-            self._depgraph.addClockMaster(state)
+            self._depgraph.addClockMaster(state, 
+                self.componentHeaven.setupClockMaster)
 
     def _updateStateFromConf(self, _, conf, identity):
         """
@@ -1237,7 +1240,6 @@ class Vishnu(log.Loggable):
         self.debug('vishnu registering component %r' % componentAvatar)
 
         state = componentAvatar.componentState
-        self._depgraph.setJobStarted(state)
         # If this is a reconnecting component, we might also need to set the
         # component as started.
         # If mood is happy or hungry, then the component is running.
@@ -1245,6 +1247,8 @@ class Vishnu(log.Loggable):
         if mood == moods.happy.value or mood == moods.hungry.value:
             self.debug("Component %s is already in mood %s.  Set depgraph "
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
+            # TODO: Somehow freeze the depgraph so we don't follow all the links
+            # until these 2 or 3 things are all completed?
             self._depgraph.setComponentSetup(state)
             self._depgraph.setComponentStarted(state)
             if self._depgraph.isAClockMaster(state):
@@ -1254,7 +1258,7 @@ class Vishnu(log.Loggable):
                 self._depgraph.setClockMasterStarted(state)
 
         self.debug('vishnu registered component %r' % componentAvatar)
-        self.componentHeaven._tryWhatCanBeStarted()
+        self._depgraph.setJobStarted(state)
 
     def unregisterComponent(self, componentAvatar):
         # called when the component is logging out

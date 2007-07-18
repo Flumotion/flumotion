@@ -1,3 +1,23 @@
+2007-07-18  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/depgraph.py:
+	  Remove Feeder, Eater classes, which are unused.
+	  Make state dict contain a callable as well as a boolean for each DAG
+	  node. 
+	  All methods that add a node now get passed a callable as well.
+	  Remove whatShouldBeStarted entirely.
+	  On _setState(True), call appropriate down-graph callables, if we
+	  can.
+	  All actions needed by the depgraph are now directly driven from the
+	  depgraph code.
+	* flumotion/manager/component.py:
+	  Remove tryWhatCanBeStarted. Split the individual things out into
+	  separate methods. These are used as callables in the depgraph now.
+	* flumotion/manager/manager.py:
+	  Changes for depgraph API additions.
+
+	  Fixes #691.
+
 2007-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:

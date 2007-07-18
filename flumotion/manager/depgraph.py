@@ -22,26 +22,6 @@
 from flumotion.common import dag, log, registry, errors, common
 from flumotion.common.planet import moods
 
-class Feeder:
-    """
-    I am an object representing a feeder in the DepGraph
-    """
-    def __init__(self, feederName, component):
-        self.feederName = feederName
-        self.component = component
-        self.feederData = None
-        
-class Eater:
-    """
-    I am an object representing an eater in the DepGraph
-    """
-    def __init__(self, eaterName, component):
-        # feeder attribute is a reference to the Feeder object
-        # that this eater eats from
-        self.eaterName = eaterName
-        self.component = component
-        self.feeder = None
-
 class DepGraph(log.Loggable):
     """
     I am a dependency graph for components.  I also maintain boolean state
@@ -50,19 +30,24 @@ class DepGraph(log.Loggable):
     I contain a DAG to help with resolving dependencies.
     """
     logCategory = "depgraph"
-
+    
     typeNames = ("WORKER", "JOB", "COMPONENTSETUP", "CLOCKMASTER",
         "COMPONENTSTART")
-    
+
     def __init__(self):
+        # Each node in the DAG is an object (and has a given type, corresponding
+        # to some action that must be taken to progress through the DAG
         self._dag = dag.DAG()
+
+        # (object,type) -> (callable, boolean) mapping. True if the object/type tuple 
+        # corresponding to this action has been done (TODO: make this make sense!)
         self._state = {}
 
-    def _addNode(self, component, type):
+    def _addNode(self, component, type, callable):
         # type: str
         self.debug("Adding node %r of type %s" % (component, type))
         self._dag.addNode(component, type)
-        self._state[(component, type)] = False
+        self._state[(component, type)] = (callable, False)
 
     def _removeNode(self, component, type):
         self.debug("Removing node %r of type %s" % (component, type))
@@ -78,7 +63,7 @@ class DepGraph(log.Loggable):
             parent, parentType, child, childType))
         self._dag.removeEdge(parent, child, parentType, childType)
 
-    def addClockMaster(self, component):
+    def addClockMaster(self, component, setupClockMasterCallable):
         """
         I set a component to be the clock master in the dependency
         graph.  This component must have already been added to the
@@ -88,7 +73,7 @@ class DepGraph(log.Loggable):
         @type  component: L{flumotion.manager.component.ComponentAvatar}
         """
         if self._dag.hasNode(component, "JOB"):
-            self._addNode(component, "CLOCKMASTER")
+            self._addNode(component, "CLOCKMASTER", setupClockMasterCallable)
             self._addEdge(component, component, "COMPONENTSETUP",
                 "CLOCKMASTER")
         
@@ -103,7 +88,7 @@ class DepGraph(log.Loggable):
         else:
             raise KeyError("Component %r has not been added" % component)
 
-    def addComponent(self, component):
+    def addComponent(self, component, setupCallable, startCallable):
         """
         I add a component to the dependency graph.
         This includes adding the worker (if not already added), the job,
@@ -120,9 +105,9 @@ class DepGraph(log.Loggable):
             return
         
         self.debug('adding component %r to depgraph' % component)
-        self._addNode(component, "JOB")
-        self._addNode(component, "COMPONENTSTART")
-        self._addNode(component, "COMPONENTSETUP")
+        self._addNode(component, "JOB", lambda x: None)
+        self._addNode(component, "COMPONENTSTART", startCallable)
+        self._addNode(component, "COMPONENTSETUP", setupCallable)
         self._addEdge(component, component, "JOB", "COMPONENTSETUP")
         workername = component.get('workerRequested')
         if workername:
@@ -140,7 +125,7 @@ class DepGraph(log.Loggable):
         """
         self.debug('adding worker %s' % worker)
         if not self._dag.hasNode(worker, "WORKER"):
-            self._addNode(worker, "WORKER")
+            self._addNode(worker, "WORKER", lambda x: None)
 
     def removeComponent(self, component):
         """
@@ -236,55 +221,12 @@ class DepGraph(log.Loggable):
                                 " %s on component %s" % (
                                 feed, eater, eatingComponent))
 
-    def whatShouldBeStarted(self):
-        """
-        I return a list of things that can and should be started now.
-
-        @return: a list of nodes that should be started, in order
-        @rtype:  list of (object, str)
-        """
-        # A bit tricky because workers can't be started by manager,
-        # and jobs are started automatically when worker is attached
-        # So we get all the stuff sorted by depgraph,
-        # then remove ones that are already have state of True,
-        # then remove ones that are workers who are False, and their offspring,
-        # then remove ones that are jobs who are False, and their offspring,
-        # and also remove nodes that are offspring of nodes with state of False
-        toBeStarted = self._dag.sort()
-        # we want to loop over all objects, so we loop over a copy
-        for obj in toBeStarted[:]:
-            if obj in toBeStarted:
-                self.log("toBeStarted: checking if (%r, %r) needs starting",
-                    obj[0], obj[1])
-                if self._state[obj]:
-                    toBeStarted.remove(obj)
-                elif obj[1] == "WORKER":
-                    # This is a worker not started.
-                    # Let's remove it and its offspring
-                    worker_offspring = self._dag.getOffspringTyped(
-                        obj[0], obj[1])
-                    for offspring in worker_offspring:
-                        if offspring in toBeStarted:
-                            toBeStarted.remove(offspring)
-                    toBeStarted.remove(obj)
-                elif obj[1] == "JOB":
-                    job_offspring = self._dag.getOffspringTyped(obj[0], obj[1])
-                    for offspring in job_offspring:
-                        if offspring in toBeStarted:
-                            toBeStarted.remove(offspring)
-                    toBeStarted.remove(obj)
-                else:
-                    offspring = self._dag.getOffspringTyped(obj[0], obj[1])
-                    for child in offspring:
-                        if child in toBeStarted:
-                            toBeStarted.remove(child)
-        
-        return toBeStarted
-
     def _setState(self, object, type, value):
         self.doLog(log.DEBUG, -2, "Setting state of (%r, %s) to %d" % (
             object, type, value))
-        self._state[(object,type)] = value
+        (callable, oldstate) = self._state[(object,type)]
+        self._state[(object,type)] = (callable, value)
+
         # if making state False, should make its offspring False
         # if the object is the same
         if not value:
@@ -294,7 +236,25 @@ class DepGraph(log.Loggable):
             for kid in offspring:
                 self.debug("Setting state of offspring (%r) to %d", kid, value)
                 if kid[0] == object:
-                    self._state[kid] = False
+                    (callable, oldstate) = self._state[kid]
+                    self._state[kid] = (callable, False)
+        else:
+            # We set this to true. So perhaps we can progress!
+            kids = self._dag.getChildrenTyped(object, type)
+            for (kid, kidtype) in kids:
+                # For each of these we need to check that ALL the parents are
+                # now true before we can go further
+                # if reduce(lambda x,y: x and self._state[y][1], self._dag.getParentsTyped(kid, kidtype), True):
+                parents = self._dag.getParentsTyped(kid, kidtype)
+                ready = True
+                for parent in parents:
+                    if not self._state[parent][1]:
+                        ready = False
+                if ready:
+                    self.debug("Calling callable %r", 
+                        self._state[(kid, kidtype)][0])
+                    self._state[(kid,kidtype)][0](kid)
+
 
     def setComponentStarted(self, component):
         """
