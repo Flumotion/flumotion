@@ -176,6 +176,9 @@ class DepGraph(log.Loggable):
             raise KeyError("Worker %s or Component %r not in dependency graph" %
                 (worker, component))
 
+    # TODO: This is nasty: it goes and touches anything in the graph, not just
+    # the newly added things. Unfortunately, we don't enforce adding things in
+    # the right order, so doing it correctly otherwise looks hard.
     def mapEatersToFeeders(self):
         """
         I am called once a piece of configuration has been added,

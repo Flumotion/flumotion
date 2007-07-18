@@ -29,7 +29,8 @@ import sys
 import time
 
 from twisted.spread import pb
-from twisted.internet import reactor, defer, error
+from twisted.internet import reactor, defer
+from twisted.internet import error as terror
 from twisted.python.failure import Failure
 from zope.interface import implements
 
@@ -729,8 +730,8 @@ class ComponentHeaven(base.ManagerHeaven):
             host = '127.0.0.1'
 
         def errback(failure):
-            failure.trap(error.ConnectError,
-                         error.ConnectionRefusedError)
+            failure.trap(terror.ConnectError,
+                         terror.ConnectionRefusedError)
             return error(N_("Could not connect component to %s:%d for "
                             "feed %s."), host, port, fullFeedId,
                          debug="No component '%s'." % componentId)
@@ -806,8 +807,8 @@ class ComponentHeaven(base.ManagerHeaven):
         port = eaterAvatar.getFeedServerPort()
 
         def errback(failure):
-            failure.trap(error.ConnectError,
-                         error.ConnectionRefusedError)
+            failure.trap(terror.ConnectError,
+                         terror.ConnectionRefusedError)
             return error(N_("Could not connect component to %s:%d for "
                             "feed %s."), host, port, fullFeedId,
                          debug="No component '%s'." % componentId)

@@ -1,5 +1,14 @@
 2007-07-18  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/component.py:
+	  Import twisted.internet.error as terror, use terror where there's a
+	  local function called error.
+
+	* flumotion/manager/depgraph.py:
+	  Add a comment.
+
+2007-07-18  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/depgraph.py:
 	  Add some comments, simplify a bit of code.
 
