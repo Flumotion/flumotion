@@ -36,11 +36,14 @@ class DepGraph(log.Loggable):
 
     def __init__(self):
         # Each node in the DAG is an object (and has a given type, corresponding
-        # to some action that must be taken to progress through the DAG
+        # to some action that must be taken to progress through the DAG). The
+        # objects are states - componentState, jobState, workerState.
         self._dag = dag.DAG()
 
-        # (object,type) -> (callable, boolean) mapping. True if the object/type tuple 
-        # corresponding to this action has been done (TODO: make this make sense!)
+        # (object,type) -> (callable, boolean) mapping. 
+        # The boolean is true if the action needed at this node has completed.
+        # The callable should take some action to (eventually) set the state to
+        # True so we can progress further through the depgraph.
         self._state = {}
 
     def _addNode(self, component, type, callable):
@@ -105,6 +108,8 @@ class DepGraph(log.Loggable):
             return
         
         self.debug('adding component %r to depgraph' % component)
+        # Starting jobs is handled elsewhere, not by the depgraph, so we don't
+        # need a function to do anything in particular.
         self._addNode(component, "JOB", lambda x: None)
         self._addNode(component, "COMPONENTSTART", startCallable)
         self._addNode(component, "COMPONENTSETUP", setupCallable)
@@ -125,6 +130,8 @@ class DepGraph(log.Loggable):
         """
         self.debug('adding worker %s' % worker)
         if not self._dag.hasNode(worker, "WORKER"):
+            # Workers only get started explicitly externally to the manager.
+            # So we don't need a function here.
             self._addNode(worker, "WORKER", lambda x: None)
 
     def removeComponent(self, component):
@@ -244,17 +251,11 @@ class DepGraph(log.Loggable):
             for (kid, kidtype) in kids:
                 # For each of these we need to check that ALL the parents are
                 # now true before we can go further
-                # if reduce(lambda x,y: x and self._state[y][1], self._dag.getParentsTyped(kid, kidtype), True):
-                parents = self._dag.getParentsTyped(kid, kidtype)
-                ready = True
-                for parent in parents:
-                    if not self._state[parent][1]:
-                        ready = False
-                if ready:
+                if reduce(lambda x,y: x and self._state[y][1], 
+                        self._dag.getParentsTyped(kid, kidtype), True):
                     self.debug("Calling callable %r", 
                         self._state[(kid, kidtype)][0])
                     self._state[(kid,kidtype)][0](kid)
-
 
     def setComponentStarted(self, component):
         """
