@@ -1245,6 +1245,8 @@ class Vishnu(log.Loggable):
         # If mood is happy or hungry, then the component is running.
         mood = state.get('mood')
         if mood == moods.happy.value or mood == moods.hungry.value:
+            # When it reconnects, it shouldn't have a pending mood.
+            state.set('moodPending', None)
             self.debug("Component %s is already in mood %s.  Set depgraph "
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
             # TODO: Somehow freeze the depgraph so we don't follow all the links

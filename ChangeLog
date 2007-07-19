@@ -1,3 +1,9 @@
+2007-07-19  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  When a component reconnects that is already happy, clear
+	  moodPending. It probably turned happy while it was disconnected.
+
 2007-07-18  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feed.py:
