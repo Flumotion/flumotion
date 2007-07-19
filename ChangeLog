@@ -1,5 +1,10 @@
 2007-07-19  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Fix Thomas's untested and broken message changes.
+
+2007-07-19  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/depgraph.py:
 	  Don't execute things that are already set to true when progressing
 	  through the depgraph.

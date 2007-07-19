@@ -823,11 +823,10 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             self.warning("Feeder statistics unavailable, your "
                 "gst-plugins-base is too old")
-            self.addMessage(
             m = messages.Warning(T_(N_(
                     "Your gst-plugins-base is too old, so "
                     "feeder statistics will be unavailable.")), 
-                    id='multifdsink'))
+                    id='multifdsink')
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s."), 'gst-plugins-base',
                 '0.10.11'))
