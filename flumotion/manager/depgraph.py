@@ -252,6 +252,9 @@ class DepGraph(log.Loggable):
             # We set this to true. So perhaps we can progress!
             kids = self._dag.getChildrenTyped(object, type)
             for (kid, kidtype) in kids:
+                # Skip this for things already True.
+                if self._state[(kid,kidtype)][1]:
+                    continue
                 # For each of these we need to check that ALL the parents are
                 # now true before we can go further
                 if reduce(lambda x,y: x and self._state[y][1], 

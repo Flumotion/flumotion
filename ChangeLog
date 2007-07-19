@@ -1,5 +1,14 @@
 2007-07-19  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/depgraph.py:
+	  Don't execute things that are already set to true when progressing
+	  through the depgraph.
+	* flumotion/manager/manager.py:
+	  When a happy running component logs back in, set things in the
+	  depgraph in reverse order to avoid trying to restart it.
+
+2007-07-19  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/manager.py:
 	  When a component reconnects that is already happy, clear
 	  moodPending. It probably turned happy while it was disconnected.

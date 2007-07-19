@@ -1249,15 +1249,17 @@ class Vishnu(log.Loggable):
             state.set('moodPending', None)
             self.debug("Component %s is already in mood %s.  Set depgraph "
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
-            # TODO: Somehow freeze the depgraph so we don't follow all the links
-            # until these 2 or 3 things are all completed?
-            self._depgraph.setComponentSetup(state)
+            # We set these in backwards order (start, clockmaster, setup), to
+            # avoid trying to execute the later ones unneccesarily (since we're
+            # already running, we don't want setComponentSetup() to try to start
+            # the component!)
             self._depgraph.setComponentStarted(state)
             if self._depgraph.isAClockMaster(state):
                 self.log("Component %s is a clock master and is happy/hungry "
                     "so must already be providing clock master",
                     componentAvatar.avatarId)
                 self._depgraph.setClockMasterStarted(state)
+            self._depgraph.setComponentSetup(state)
 
         self.debug('vishnu registered component %r' % componentAvatar)
         self._depgraph.setJobStarted(state)
