@@ -1,5 +1,12 @@
 2007-07-19  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/common/planet.py:
+	  We permit stopping a lost component in the manager (and in the
+	  admin). Change the moods.can_stop() predicate to match; it's used in
+	  flumotion-command (and private modules).
+
+2007-07-19  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent010.py:
 	  Fix Thomas's untested and broken message changes.
 

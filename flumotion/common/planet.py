@@ -189,7 +189,7 @@ moods = enum.EnumClass(
     'Moods',
     ('happy', 'hungry', 'waking', 'sleeping', 'lost', 'sad')
 )
-moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
+moods.can_stop = staticmethod(lambda m: m != moods.sleeping)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
 _jobStateKeys = ['mood', 'manager-ip', 'pid', 'workerName', 'cpu']
