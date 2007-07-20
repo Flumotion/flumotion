@@ -132,11 +132,11 @@ class ComponentWrapper(object, log.Loggable):
         return '%s(%r, %r)' % (self.__class__.__name__,
                                self.comp_class.__name__, self.cfg)
 
-    @classmethod
     def get_unique_name(cls, prefix='cmp-'):
         name, cls._u_name_cnt = ('%s%d' % (prefix, cls._u_name_cnt),
                                  cls._u_name_cnt + 1)
         return name
+    get_unique_name = classmethod(get_unique_name)
 
     def instantiate(self):
         self.comp = self.comp_class()
@@ -307,7 +307,9 @@ class Pond(object, log.Loggable):
             return d
         def do_stop(failure):
             self.debug('** X: do_stop: %r' % failure)
-            for c in reversed(self._comps):
+            rcomps = self._comps[:]
+            rcomps.reverse()
+            for c in rcomps:
                 c.stop()
             return failure
 
@@ -327,7 +329,9 @@ class Pond(object, log.Loggable):
         return d
 
     def stop_flow(self):
-        d = defer.DeferredList([c.stop() for c in reversed(self._comps)],
+        rcomps = self._comps[:]
+        rcomps.reverse()
+        d = defer.DeferredList([c.stop() for c in rcomps],
                                fireOnOneErrback=1, consumeErrors=1)
         def stop_flow_report(results):
             self.debug('stop_flow_report: %r' % (results,))

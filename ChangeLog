@@ -1,5 +1,11 @@
 2007-07-20  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/pond.py (ComponentWrapper.get_unique_name,
+	  Pond.do_stop, Pond.stop_flow):
+	Don't use language elements not available in python2.3.
+
+2007-07-20  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/pond.py:
 	* flumotion/test/test_pond.py:
 	* flumotion/test/Makefile.am:
