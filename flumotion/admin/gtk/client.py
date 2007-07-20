@@ -500,7 +500,7 @@ class Window(log.Loggable, gobject.GObject):
         d['toolbutton_start_component'].set_sensitive(can_start)
 
         moodname = state and moods.get(state.get('mood')).name
-        can_stop = bool(moodname and moodname!='sleeping')
+        can_stop = bool(moodname and moodname == 'happy')
         can_delete = bool(state and not can_stop)
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)

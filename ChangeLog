@@ -1,3 +1,8 @@
+2007-07-20 Pedro Gracia <pedro@flumotion.com>
+
+	* flumotion/admin/gtk/client.py:
+	Closed ticket #293
+
 2007-07-20  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/pond.py (Pond.set_flow):
