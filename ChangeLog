@@ -1,5 +1,10 @@
 2007-07-20  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/pond.py (Pond.set_flow):
+	Don't use 9 lines of code where 1 is enough.
+
+2007-07-20  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/pond.py (ComponentWrapper.get_unique_name,
 	  Pond.do_stop, Pond.stop_flow):
 	Don't use language elements not available in python2.3.

@@ -211,16 +211,8 @@ class Pond(object, log.Loggable):
         if len(comp_chain) == 0:
             return
 
-        # given a sequence (a0, a1, a2, ..., aN-1, aN)
-        # this generator produces: (a0, a1), (a1, a2), ..., (aN-1, aN)
-        def pair_chain(seq):
-            car = seq[0]
-            for cdr in seq[1:]:
-                yield car, cdr
-                car = cdr
-
         if auto_link:
-            for c_src, c_sink in pair_chain(comp_chain):
+            for c_src, c_sink in zip(comp_chain[:-1], comp_chain[1:]):
                 if c_sink.auto_link:
                     c_src.feed(c_sink)
 
