@@ -1,3 +1,8 @@
+2007-07-20 Pedro Gracia <pedro@flumotion.com>
+
+	* flumotion/wizard/steps.py:
+	Webcam sizes are displayed ordered in its wizard step.
+
 2007-07-19  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/planet.py:
