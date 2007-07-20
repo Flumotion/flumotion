@@ -8,7 +8,7 @@ flumotion_PYTHON =			\
         __init__.py			\
 	common.py			\
 	testclasses.py			\
-	pond.y				\
+	pond.py				\
 	gtkunit.py			\
 	realm.py
 
