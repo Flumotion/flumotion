@@ -1,3 +1,10 @@
+2007-07-20  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/pond.py:
+	* flumotion/test/test_pond.py:
+	* flumotion/test/Makefile.am:
+	Add a component test helper class.
+
 2007-07-20 Pedro Gracia <pedro@flumotion.com>
 
 	* flumotion/wizard/steps.py:
