@@ -1,3 +1,9 @@
+2007-07-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/playlist/playlist.py
+	  (PlaylistProducer._buildAudioPipeline):
+	Force output audio to be 16bit width and depth.
+
 2007-07-23  Pedro Gracia <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:

@@ -114,7 +114,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
         audioresample = gst.element_factory_make('audioresample')
-        outcaps = gst.Caps("audio/x-raw-int,channels=%d,rate=%d" % 
+        outcaps = gst.Caps(
+            "audio/x-raw-int,channels=%d,rate=%d,width=16,depth=16" % 
             (self._channels, self._samplerate))
 
         capsfilter = gst.element_factory_make("capsfilter")
