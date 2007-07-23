@@ -1,3 +1,10 @@
+2007-07-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_common_netutils.py
+	(TestRoutingTable.testRouteNamesOrder): New test, that
+	getRouteNames() returns the names in the order in which they are
+	first seen by the routing table.
+
 2007-07-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/playlist/playlist.py

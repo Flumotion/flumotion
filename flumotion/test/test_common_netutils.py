@@ -180,3 +180,19 @@ class TestRoutingTable(unittest.TestCase):
                                '0.0.0.0/0 general',
                                [('foo', '192.168.1.1', 32),
                                 ('general', '0.0.0.0', 0)])
+
+    def assertRouteNamesOrder(self, string, routeNames):
+        f = StringIO.StringIO(string)
+        net = RoutingTable.fromFile(f)
+        f.close()
+
+        self.assertEquals(net.getRouteNames(), routeNames)
+        
+    def testRouteNamesOrder(self):
+        self.assertRouteNamesOrder('#comment\n'
+                                   '  \n'
+                                   '192.168.1.1/32 foo\n'
+                                   '192.168.2.1/32 bar\n'
+                                   '192.168.3.1/32 foo\n'
+                                   ,
+                                   ['foo', 'bar'])
