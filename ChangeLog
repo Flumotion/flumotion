@@ -1,5 +1,9 @@
 2007-07-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/debug.py (AllocMonitor): New object, uses
+	PySizer (http://pysizer.8325.org/) to periodically monitor the
+	python heap and print out information about allocations.
+
 	* flumotion/test/test_common_netutils.py
 	(TestRoutingTable.testRouteNamesOrder): New test, that
 	getRouteNames() returns the names in the order in which they are

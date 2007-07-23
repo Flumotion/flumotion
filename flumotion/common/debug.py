@@ -25,6 +25,7 @@ Debugging helper code
 import sys
 import re
 import linecache
+import types
 
 from twisted.python.reflect import filenameToModuleName
 
@@ -122,3 +123,93 @@ def print_stack(file=None):
     for line in output:
         file.write(line)
 
+class AllocMonitor(object):
+    def __init__(self, period=10, analyze=None, allocPrint=None):
+        self.period = period
+        self.objset = None
+
+        from sizer import scanner, annotate
+
+        from twisted.internet import reactor
+
+        if analyze is not None:
+            self.analyze = analyze
+        if allocPrint is not None:
+            self.allocPrint = allocPrint
+
+        def sample():
+            objset = scanner.Objects()
+            annotate.markparents(objset)
+
+            if self.objset:
+                self.analyze(self.objset, objset)
+
+            self.objset = objset
+            reactor.callLater(self.period, sample)
+            
+        reactor.callLater(self.period, sample)
+
+    def analyze(self, old, new):
+        from sizer import operations
+
+        size = 0
+
+        for k in operations.diff(new, old):
+            size -= old[k].size
+
+        allocators = {}
+        diff = operations.diff(old, new)
+        for k in diff:
+            w = new[k]
+            size += w.size
+            if not w.parents:
+                print "Unreferenced object %r, what?" % (w,)
+            for p in w.parents:
+                if id(p.obj) == id(self.__dict__):
+                    continue
+                if id(p.obj) not in diff:
+                    # print "Object %r alloced by %r" % (w, p)
+                    if p not in allocators:
+                        allocators[p] = []
+                    allocators[p].append(w)
+        print "Total alloc size:", size
+        for p in allocators:
+            if p.obj == old or p.obj == new:
+                print 'foo'
+            else:
+                self.allocPrint(p, allocators[p])
+        import gc
+        print '\ngc.garbage:', gc.garbage
+
+    def _allocStack(self, wrap, stack):
+        stack.append(wrap)
+        for p in wrap.parents:
+            if (isinstance(p.obj, types.ModuleType)
+                or isinstance(p.obj, type)
+                or isinstance(p.obj, types.InstanceType)):
+                stack.append(p)
+                return stack
+        if len(wrap.parents) == 1:
+            return self._allocStack(wrap.parents[0], stack)
+        return stack
+
+    def _wrapperRepr(self, wrap):
+        o = wrap.obj
+        if wrap.type != dict:
+            return '%s %r @ 0x%x' % (wrap.type.__name__, o, id(o))
+        else:
+            keys = o.keys()
+            keys.sort()
+            return 'dict with keys %r @ 0x%x' % (keys, id(o))
+
+    def allocPrint(self, allocator, directAllocs):
+        allocStack = self._allocStack(allocator, [])
+        
+        print '\nAlloc by ' + self._wrapperRepr(allocStack.pop(0))
+        while allocStack:
+            print '  referenced by ' + self._wrapperRepr(allocStack.pop(0))
+        
+        print "%d new %s:" % (len(directAllocs),
+                              len(directAllocs) == 1 and "object" or "objects")
+        for wrap in directAllocs:
+            print '  ' + self._wrapperRepr(wrap)
