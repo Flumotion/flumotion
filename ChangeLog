@@ -1,3 +1,9 @@
+2007-07-23  Pedro Gracia <pedro@flumotion.com>
+
+	* flumotion/admin/gtk/client.py:
+	Reverted changes from ticket #293. It's useful to stop
+	components with mood different to 'happy'.
+
 2007-07-23  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/Makefile.am:
