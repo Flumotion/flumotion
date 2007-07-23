@@ -1,3 +1,14 @@
+2007-07-23  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/pond.py:
+	Fix component clock synchronization and startup dealy code; turn
+	some callback functions into less implicit helper functions.
+
+	* flumotion/test/test_pond.py:
+	Add tests for providing clocking info and for startup delays,
+	remove redundant/useless tests, fix spelling, replace unclear
+	callbacks.
+
 2007-07-20 Pedro Gracia <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:

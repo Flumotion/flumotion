@@ -64,6 +64,26 @@ class StopTimeout(PondException):
     pass
 
 
+def delayed_d(time, val):
+    """Insert some delay into callback chain."""
+
+    d = defer.Deferred()
+    reactor.callLater(time, d.callback, val)
+    return d
+
+def override_value_callback(_result, value):
+    """
+    Ignore the result returned from the deferred callback chain and
+    return the given value.
+    """
+    return value
+
+def call_and_passthru_callback(result, callable_, *args, **kwargs):
+    """Invoke the callable_ and passthrough the original result."""
+    callable_(*args, **kwargs)
+    return result
+
+
 class ComponentWrapper(object, log.Loggable):
     logCategory = 'pond-compwrap'
     _u_name_cnt = 0
@@ -203,20 +223,17 @@ class Pond(object, log.Loggable):
         self._comps = []
         self._byname = {}
         self._master = None
-        self._syncing = None
 
     def set_flow(self, comp_chain, auto_link=True):
-        self._comps = []
-
         if len(comp_chain) == 0:
             return
+
+        self._comps = comp_chain
 
         if auto_link:
             for c_src, c_sink in zip(comp_chain[:-1], comp_chain[1:]):
                 if c_sink.auto_link:
                     c_src.feed(c_sink)
-
-        self._comps.extend(comp_chain)
 
         masters = [c for c in self._comps if c.sync_master is not None]
         need_sync = sorted([c for c in self._comps if c.sync is not None],
@@ -224,7 +241,7 @@ class Pond(object, log.Loggable):
 
         if need_sync:
             if masters:
-                master = master[0]
+                master = masters[0]
             else:
                 master = need_sync[0]
 
@@ -267,36 +284,47 @@ class Pond(object, log.Loggable):
         def all_ready_p(results):
             self.debug('** 1: all_ready_p: %r' % results)
             pass
+
         def setup_failed(failure):
             self.info('*! 1: setup_failed: %r' % (failure,))
             failure.trap(defer.FirstError)
             return failure.value.subFailure
+
         def start_master_clock(_):
             self.debug('** 2: start_master_clock: %r (%r)' % (_, self._master))
             if self._master is not None:
                 self.debug('About to ask to provide_master_clock()...')
                 d = self._master.comp.provide_master_clock(7600 - 1) # ...hack?
-                def _jd(_):
-                    self.debug('After provide_master_clock() : %r' % (_,))
-                d.addCallback(_jd)
+                def _passthrough_debug(_res):
+                    self.debug('After provide_master_clock() : %r' % (_res,))
+                    return _res
+                d.addCallback(_passthrough_debug)
                 return d
             return None
+
         def add_delay(value):
-            self.debug('** 3: add_delay: %r' % value)
+            self.debug('** 3: add_delay: %r' % (value,))
             if delay:
-                return DeferredDelay(delay, value)
-            return defer.succeed(delay)
+                return delayed_d(delay, value)
+            return defer.succeed(value)
+
         def do_start(clocking, c):
             self.debug('** 4: do_start_cb: %r, %r' % (clocking, c))
             for src in c.cfg['source']:
                 r_fd, feed_starter = self._fds[src]
                 c.eatFromFD(src, r_fd)
                 feed_starter()
+            comp_clocking = clocking
             if not c.sync:
-                clocking = None
-            d = c.start(clocking)
-            d.addCallback(lambda _: clocking)
+                comp_clocking = None
+            self.debug('*_ 4: do_start_cb: %r, %r' % (comp_clocking, c))
+            d = c.start(comp_clocking)
+
+            # if component starts ok, repeat/pass clocking info to a
+            # subsequent component
+            d.addCallback(override_value_callback, clocking)
             return d
+
         def do_stop(failure):
             self.debug('** X: do_stop: %r' % failure)
             rcomps = self._comps[:]

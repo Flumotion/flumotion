@@ -111,7 +111,6 @@ class TestComponentWrapper(unittest.TestCase):
     def test_instantiate_and_setup_errors(self):
         pp = pond.ComponentWrapper('pipeline-producer', None, name='pp')
         self.failUnlessRaises(TypeError, pp.instantiate) # None()!?
-        from flumotion.component.producers.pipeline import pipeline
         pp = pond.ComponentWrapper('pipeline-producer', Producer, name='pp')
 
         pp.instantiate()
@@ -119,12 +118,11 @@ class TestComponentWrapper(unittest.TestCase):
 
         # the deferred should fail (no mandatory pipeline property) -
         # stop the component in any case (to clean the reactor) and
-        # passtrough the result/failure
-        d.addBoth(lambda rf: (pp.stop(), rf)[1])
+        # passthrough the result/failure
+        d.addBoth(pond.call_and_passthru_callback, pp.stop)
         return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
 
     def test_setup_pipeline_error(self):
-        from flumotion.component.producers.pipeline import pipeline
         pp = pond.ComponentWrapper('pipeline-producer', Producer,
                                    name='pp', props={'pipeline': 'fakesink'})
 
@@ -138,9 +136,9 @@ class TestComponentWrapper(unittest.TestCase):
 
         # the deferred should fail (the only pipeline element doesn't
         # have source pads) - stop the component in any case (to clean
-        # the reactor) and passtrough the result/failure
+        # the reactor) and passthrough the result/failure
+        d.addBoth(pond.call_and_passthru_callback, pp.stop)
 
-        d.addBoth(lambda rf: (pp.stop(), rf)[1])
         if old_debug_level != gst.LEVEL_NONE:
             def _restore_gst_debug_level(rf):
                 gst.debug_set_default_threshold(old_debug_level)
@@ -149,7 +147,6 @@ class TestComponentWrapper(unittest.TestCase):
         return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
 
     def test_setup_and_stop(self):
-        from flumotion.component.producers.pipeline import pipeline
         pp = pond.ComponentWrapper('pipeline-producer', Producer,
                                    name='pp', props={'pipeline': 'fakesrc'})
 
@@ -323,6 +320,48 @@ class TestPondFlow(PondTestCase):
         d = self.p.run_flow(self.duration)
         return self.failUnlessFailure(d, pond.StartTimeout)
 
+    def test_run_with_delays(self):
+        self.p.start_delay = 0.5
+
+        self.p.set_flow([self.prod, self.cnv1, self.cnv2])
+        d = self.p.run_flow(self.duration)
+        return d
+
+    def test_run_provides_clocking(self):
+        p2_pp = ('videotestsrc is-live=true ! '
+                 'video/x-raw-rgb,framerate=(fraction)8/1,'
+                 'width=32,height=24')
+        p2 = pond.pipeline_src(p2_pp)
+
+        from flumotion.component.muxers.multipart import Multipart
+        mux = pond.ComponentWrapper('multipart-muxer', Multipart, name='mux')
+
+        self.prod.feed(mux)
+        p2.feed(mux)
+        mux.feed(self.cnv1)
+
+        self.clock_slave = p2
+        def check_clocking(_):
+            self.warning('check_clocking: %s %r' %
+                         (self.clock_slave.name,
+                          self.clock_slave.comp.pipeline.get_clock()))
+            import gst
+            pp = self.clock_slave.comp.pipeline
+            # is there a better way to check if that component is
+            # using an external clock source?
+            self.failUnless(isinstance(pp.get_clock(), gst.NetClientClock),
+                            "Didn't receive external clocking info.")
+            return _
+        task_d = defer.Deferred()
+        task_d.addCallback(check_clocking)
+
+        self.p.set_flow([self.prod, p2, mux, self.cnv1], auto_link=False)
+        if self.prod is not self.p._master:
+            # p2 (of [self.prod, p2]) seems to be the master this time
+            self.clock_slave = self.prod
+        d = self.p.run_flow(self.duration, tasks=[task_d])
+        return d
+
     def test_run_tasks_chained_and_fired(self):
         self.tasks_fired = []
         self.tasks = []
@@ -343,34 +382,6 @@ class TestPondFlow(PondTestCase):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
         d = self.p.run_flow(self.duration, tasks=self.tasks)
         d.addCallback(tasks_check)
-
-        return d
-
-    def test_run_started_happy_and_running_and_stopping(self):
-        self.time_tolerance = 0.5 # should suffice, no?
-        self.timer = 0.0
-
-        self.p.set_flow([self.prod, self.cnv1, self.cnv2])
-
-        def check_happy(_):
-            for c in (self.prod, self.cnv1, self.cnv2):
-                self.assertEquals(moods.get(c.comp.getMood()), moods.happy)
-            return _
-        def timer_start(result):
-            self.timer = time.time()
-            return result
-        def timer_check(result):
-            time_difference = abs(time.time() - self.timer - self.duration)
-            self.failUnless(time_difference < self.time_tolerance,
-                            "Time difference too big: %r" % time_difference)
-            return result
-
-        task_d = defer.Deferred()
-        task_d.addCallback(check_happy)
-        task_d.addCallback(timer_start)
-
-        d = self.p.run_flow(self.duration, tasks=[task_d])
-        d.addCallback(timer_check)
 
         return d
 
