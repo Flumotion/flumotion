@@ -8,7 +8,7 @@ flumotion_PYTHON =			\
         __init__.py			\
 	common.py			\
 	testclasses.py			\
-	pond.py				\
+	comptest.py			\
 	gtkunit.py			\
 	realm.py
 
@@ -37,6 +37,7 @@ EXTRA_DIST = 				\
 	test_component_httpserver.py 	\
 	test_component_httpstreamer.py 	\
 	test_component_playlist.py 	\
+	test_comptest.py 		\
 	test_config.py 			\
 	test_credentials.py 		\
 	test_dag.py	 		\
@@ -57,7 +58,6 @@ EXTRA_DIST = 				\
 	test_parts.py	 		\
 	test_pb.py	 		\
 	test_pbstream.py		\
-	test_pond.py			\
 	test_porter.py	 		\
 	test_reflect.py 		\
 	test_registry.py 		\

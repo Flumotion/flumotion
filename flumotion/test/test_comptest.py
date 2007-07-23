@@ -32,50 +32,55 @@ from twisted.web import client, error
 from flumotion.common import log, errors
 from flumotion.common.planet import moods
 
-from flumotion.test import pond
+from flumotion.test import comptest
+from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
+     ComponentUnitTestMixin, pipeline_src, pipeline_cnv
 
 from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
 
-class PondTestCase(log.Loggable, unittest.TestCase, pond.PondUnitTestMixin):
-    logCategory = 'pond-test'
+class CompTestTestCase(log.Loggable, unittest.TestCase,
+                       ComponentUnitTestMixin):
+    logCategory = 'comptest-test'
 
-class TestPondGtk2Reactorness(unittest.TestCase):
+class TestCompTestGtk2Reactorness(unittest.TestCase):
     def test_mixin_class(self):
-        class TestPondUnitTestMixin(unittest.TestCase, pond.PondUnitTestMixin):
+        class TestCompTestUnitTestMixin(unittest.TestCase,
+                                        ComponentUnitTestMixin):
             pass
         if not isinstance(sys.modules['twisted.internet.reactor'],
                           gtk2reactor.Gtk2Reactor):
-            # not running with a gtk2reactor, TestPondUnitTestMixin
+            # not running with a gtk2reactor, TestCompTestUnitTestMixin
             # class should have .skip attribute
-            self.failUnless(hasattr(TestPondUnitTestMixin, 'skip'),
-                            "PondUnitTestMixin doesn't set .skip correctly.")
+            self.failUnless(hasattr(TestCompTestUnitTestMixin, 'skip'),
+                            "ComponentUnitTestMixin doesn't set .skip"
+                            " correctly.")
         else:
-            self.failIf(hasattr(TestPondUnitTestMixin, 'skip'),
-                        "PondUnitTestMixin sets .skip incorrectly.")
+            self.failIf(hasattr(TestCompTestUnitTestMixin, 'skip'),
+                        "ComponentUnitTestMixin sets .skip incorrectly.")
 
     def test_have_gtk2reactor(self):
         if not isinstance(sys.modules['twisted.internet.reactor'],
                           gtk2reactor.Gtk2Reactor):
-            # not running with a gtk2reactor, pond.HAVE_GTK2REACTOR
+            # not running with a gtk2reactor, comptest.HAVE_GTK2REACTOR
             # should be False
-            self.failUnlessEquals(pond.HAVE_GTK2REACTOR, False)
+            self.failUnlessEquals(comptest.HAVE_GTK2REACTOR, False)
         else:
-            self.failIfEquals(pond.HAVE_GTK2REACTOR, False)
+            self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
 
 class TestComponentWrapper(unittest.TestCase):
     def test_get_unique_name(self):
-        self.failIfEquals(pond.ComponentWrapper.get_unique_name(),
-                          pond.ComponentWrapper.get_unique_name())
+        self.failIfEquals(ComponentWrapper.get_unique_name(),
+                          ComponentWrapper.get_unique_name())
 
 
     def test_invalid_type(self):
         self.failUnlessRaises(errors.UnknownComponentError,
-                              pond.ComponentWrapper, 'invalid-comp-type',
+                              ComponentWrapper, 'invalid-comp-type',
                               None)
 
     def test_valid_type(self):
-        cw = pond.ComponentWrapper('pipeline-producer', None, name='pp')
+        cw = ComponentWrapper('pipeline-producer', None, name='pp')
         self.failUnlessEquals(cw.cfg,
                               {'feed': ['default'], 'name': 'pp',
                                'parent': 'default', 'clock-master': None,
@@ -85,20 +90,20 @@ class TestComponentWrapper(unittest.TestCase):
 
 
     def test_simple_link(self):
-        pp = pond.ComponentWrapper('pipeline-producer', None, name='pp')
-        pc = pond.ComponentWrapper('pipeline-converter', None)
+        pp = ComponentWrapper('pipeline-producer', None, name='pp')
+        pc = ComponentWrapper('pipeline-converter', None)
 
         pp.feed(pc)
         self.failUnlessEquals(pc.cfg['source'], ['pp:default'])
         self.failUnlessEquals(pc.cfg['eater'], {'default': ['pp:default']})
 
     def test_non_default_link(self):
-        fwp = pond.ComponentWrapper('firewire-producer', None, name='fwp')
-        pc = pond.ComponentWrapper('pipeline-converter', None, name='pc')
+        fwp = ComponentWrapper('firewire-producer', None, name='fwp')
+        pc = ComponentWrapper('pipeline-converter', None, name='pc')
 
         # this should raise an exception - firewire-producer doesn't
         # have a default feeder
-        self.failUnlessRaises(pond.PondException, fwp.feed, pc)
+        self.failUnlessRaises(comptest.ComponentTestException, fwp.feed, pc)
 
         fwp.feed(pc, [('video', 'default')])
         fwp.feed(pc, [('audio', 'default')])
@@ -109,9 +114,9 @@ class TestComponentWrapper(unittest.TestCase):
 
 
     def test_instantiate_and_setup_errors(self):
-        pp = pond.ComponentWrapper('pipeline-producer', None, name='pp')
+        pp = ComponentWrapper('pipeline-producer', None, name='pp')
         self.failUnlessRaises(TypeError, pp.instantiate) # None()!?
-        pp = pond.ComponentWrapper('pipeline-producer', Producer, name='pp')
+        pp = ComponentWrapper('pipeline-producer', Producer, name='pp')
 
         pp.instantiate()
         d = pp.setup()
@@ -119,12 +124,12 @@ class TestComponentWrapper(unittest.TestCase):
         # the deferred should fail (no mandatory pipeline property) -
         # stop the component in any case (to clean the reactor) and
         # passthrough the result/failure
-        d.addBoth(pond.call_and_passthru_callback, pp.stop)
+        d.addBoth(comptest.call_and_passthru_callback, pp.stop)
         return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
 
     def test_setup_pipeline_error(self):
-        pp = pond.ComponentWrapper('pipeline-producer', Producer,
-                                   name='pp', props={'pipeline': 'fakesink'})
+        pp = ComponentWrapper('pipeline-producer', Producer,
+                              name='pp', props={'pipeline': 'fakesink'})
 
         pp.instantiate()
         # we're going to fail in gst - make sure the gst logger is silent
@@ -137,7 +142,7 @@ class TestComponentWrapper(unittest.TestCase):
         # the deferred should fail (the only pipeline element doesn't
         # have source pads) - stop the component in any case (to clean
         # the reactor) and passthrough the result/failure
-        d.addBoth(pond.call_and_passthru_callback, pp.stop)
+        d.addBoth(comptest.call_and_passthru_callback, pp.stop)
 
         if old_debug_level != gst.LEVEL_NONE:
             def _restore_gst_debug_level(rf):
@@ -147,8 +152,8 @@ class TestComponentWrapper(unittest.TestCase):
         return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
 
     def test_setup_and_stop(self):
-        pp = pond.ComponentWrapper('pipeline-producer', Producer,
-                                   name='pp', props={'pipeline': 'fakesrc'})
+        pp = ComponentWrapper('pipeline-producer', Producer,
+                              name='pp', props={'pipeline': 'fakesrc'})
 
         pp.instantiate()
         d = pp.setup()
@@ -156,14 +161,14 @@ class TestComponentWrapper(unittest.TestCase):
         d.addCallback(lambda _: pp.stop())
         return d
 
-class TestPondSetup(PondTestCase):
+class TestCompTestSetup(CompTestTestCase):
     def setUp(self):
-        self.prod = pond.pipeline_src()
-        self.cnv1 = pond.pipeline_cnv()
-        self.cnv2 = pond.pipeline_cnv()
+        self.prod = pipeline_src()
+        self.cnv1 = pipeline_cnv()
+        self.cnv2 = pipeline_cnv()
         self.components = [self.prod, self.cnv1, self.cnv2]
 
-        self.p = pond.Pond()
+        self.p = ComponentTestHelper()
 
     def tearDown(self):
         return defer.DeferredList([c.stop() for c in self.components])
@@ -183,7 +188,7 @@ class TestPondSetup(PondTestCase):
         self.failUnlessEquals({'default': [cnv1_feed]}, self.cnv2.cfg['eater'])
 
     def test_dont_auto_link_linked(self):
-        p2 = pond.pipeline_src()
+        p2 = pipeline_src()
         self.components.append(p2)
 
         p2.feed(self.cnv1)
@@ -206,7 +211,7 @@ class TestPondSetup(PondTestCase):
         self.failUnlessEquals({'default': [prod_feed]}, self.cnv2.cfg['eater'])
 
     def test_master_clock(self):
-        p2 = pond.pipeline_src()
+        p2 = pipeline_src()
         self.components.append(p2)
 
         p2.feed(self.cnv1)
@@ -231,32 +236,32 @@ class TestPondSetup(PondTestCase):
         self.failUnlessEquals(master.sync, None)
         self.failIfEquals(slave.sync, None)
 
-class TestPondFlow(PondTestCase):
+class TestCompTestFlow(CompTestTestCase):
     def setUp(self):
         self.duration = 2.0
 
         prod_pp = ('videotestsrc is-live=true ! '
                    'video/x-raw-rgb,framerate=(fraction)8/1,'
                    'width=32,height=24')
-        self.prod = pond.pipeline_src(prod_pp)
+        self.prod = pipeline_src(prod_pp)
 
-        self.cnv1 = pond.pipeline_cnv()
-        self.cnv2 = pond.pipeline_cnv()
+        self.cnv1 = pipeline_cnv()
+        self.cnv2 = pipeline_cnv()
 
-        self.p = pond.Pond()
+        self.p = ComponentTestHelper()
 
     def tearDown(self):
         d = self.p.stop_flow()
 
         # add cleanup, otherwise components a.t.m. don't cleanup after
         # themselves too well, remove when fixed
-        d.addBoth(lambda _: pond.cleanup_reactor())
+        d.addBoth(lambda _: comptest.cleanup_reactor())
         return d
 
 
     def test_setup_fail_gst_linking(self):
-        p2 = pond.pipeline_src('fakesink') # this just can't work!
-        c2 = pond.pipeline_cnv('fakesink') # and neither can this!
+        p2 = pipeline_src('fakesink') # this just can't work!
+        c2 = pipeline_cnv('fakesink') # and neither can this!
 
         # we're going to fail in gst - make sure the gst logger is silent
         import gst
@@ -284,8 +289,8 @@ class TestPondFlow(PondTestCase):
         return d
 
     def test_run_fail_gst_linking(self):
-        p2 = pond.pipeline_src('fakesink') # this just can't work!
-        c2 = pond.pipeline_cnv('fakesink') # and neither can this!
+        p2 = pipeline_src('fakesink') # this just can't work!
+        c2 = pipeline_cnv('fakesink') # and neither can this!
 
         # we're going to fail in gst - make sure the gst logger is silent
         import gst
@@ -305,9 +310,9 @@ class TestPondFlow(PondTestCase):
     def test_run_start_timeout(self):
         start_delay_time = 5.0
         self.p.guard_timeout = 2.0
-        class LingeringCompWrapper(pond.ComponentWrapper):
+        class LingeringCompWrapper(ComponentWrapper):
             def start(self, *a, **kw):
-                d = pond.ComponentWrapper.start(self, *a, **kw)
+                d = ComponentWrapper.start(self, *a, **kw)
                 def delay_start(result):
                     dd = defer.Deferred()
                     reactor.callLater(start_delay_time, dd.callback, result)
@@ -318,7 +323,7 @@ class TestPondFlow(PondTestCase):
                                   props={'pipeline': 'identity'})
         self.p.set_flow([self.prod, c2])
         d = self.p.run_flow(self.duration)
-        return self.failUnlessFailure(d, pond.StartTimeout)
+        return self.failUnlessFailure(d, comptest.StartTimeout)
 
     def test_run_with_delays(self):
         self.p.start_delay = 0.5
@@ -331,10 +336,10 @@ class TestPondFlow(PondTestCase):
         p2_pp = ('videotestsrc is-live=true ! '
                  'video/x-raw-rgb,framerate=(fraction)8/1,'
                  'width=32,height=24')
-        p2 = pond.pipeline_src(p2_pp)
+        p2 = pipeline_src(p2_pp)
 
         from flumotion.component.muxers.multipart import Multipart
-        mux = pond.ComponentWrapper('multipart-muxer', Multipart, name='mux')
+        mux = ComponentWrapper('multipart-muxer', Multipart, name='mux')
 
         self.prod.feed(mux)
         p2.feed(mux)
@@ -398,15 +403,15 @@ class TestPondFlow(PondTestCase):
 
         d = self.p.run_flow(self.duration, tasks=[task_d])
 
-        return self.failUnlessFailure(d, pond.FlowTimeout)
+        return self.failUnlessFailure(d, comptest.FlowTimeout)
 
     def test_run_stop_timeout(self):
         stop_delay_time = 6.0
         self.p.guard_timeout = 4.0
-        class DelayingCompWrapper(pond.ComponentWrapper):
+        class DelayingCompWrapper(ComponentWrapper):
             do_delay = True
             def stop(self, *a, **kw):
-                d = pond.ComponentWrapper.stop(self, *a, **kw)
+                d = ComponentWrapper.stop(self, *a, **kw)
                 def delay_stop(result):
                     if self.do_delay:
                         self.do_delay = False
@@ -420,7 +425,7 @@ class TestPondFlow(PondTestCase):
                                  props={'pipeline': 'identity'})
         self.p.set_flow([self.prod, c2])
         d = self.p.run_flow(self.duration)
-        return self.failUnlessFailure(d, pond.StopTimeout)
+        return self.failUnlessFailure(d, comptest.StopTimeout)
 
     def test_run_started_then_fails(self):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
@@ -449,10 +454,10 @@ class TestPondFlow(PondTestCase):
         class CustomStopException(Exception):
             pass
 
-        class BrokenCompWrapper(pond.ComponentWrapper):
+        class BrokenCompWrapper(ComponentWrapper):
             do_break = True
             def stop(self, *a, **kw):
-                d = pond.ComponentWrapper.stop(self, *a, **kw)
+                d = ComponentWrapper.stop(self, *a, **kw)
                 def delay_stop(result):
                     # breaking once should be enough
                     if self.do_break:
@@ -468,7 +473,7 @@ class TestPondFlow(PondTestCase):
             pass
         def insert_flow_errors(_):
             def insert_error(_ignore):
-                raise CustomFlowException("This pond is too small!")
+                raise CustomFlowException("Exception!")
             d = defer.Deferred()
             d.addCallback(insert_error)
             reactor.callLater(flow_error_timeout, d.callback, None)

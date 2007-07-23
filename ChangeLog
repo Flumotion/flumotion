@@ -1,5 +1,14 @@
 2007-07-23  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/Makefile.am:
+	* flumotion/test/pond.py:
+	* flumotion/test/comptest.py:
+	* flumotion/test/test_pond.py:
+	* flumotion/test/test_comptest.py:
+	Rename 'Pond' -> 'ComponentTestHelper'.
+
+2007-07-23  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/pond.py:
 	Fix component clock synchronization and startup dealy code; turn
 	some callback functions into less implicit helper functions.

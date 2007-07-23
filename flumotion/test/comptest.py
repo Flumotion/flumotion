@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-__all__ = ['Pond', 'PondUnitTestMixin', 'cleanup_reactor',
-           'pipeline_src', 'pipeline_cnv']
+__all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
+           'pipeline_cnv']
 
 import common
 
@@ -48,19 +48,19 @@ from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.twisted import flavors
 
 
-class PondException(Exception):
+class ComponentTestException(Exception):
     pass
 
-class WrongReactor(PondException):
+class WrongReactor(ComponentTestException):
     pass
 
-class StartTimeout(PondException):
+class StartTimeout(ComponentTestException):
     pass
 
-class FlowTimeout(PondException):
+class FlowTimeout(ComponentTestException):
     pass
 
-class StopTimeout(PondException):
+class StopTimeout(ComponentTestException):
     pass
 
 
@@ -85,7 +85,7 @@ def call_and_passthru_callback(result, callable_, *args, **kwargs):
 
 
 class ComponentWrapper(object, log.Loggable):
-    logCategory = 'pond-compwrap'
+    logCategory = 'comptest-compwrap'
     _u_name_cnt = 0
     _registry = None
 
@@ -181,7 +181,8 @@ class ComponentWrapper(object, log.Loggable):
         sink_name = sink_comp.name
         for feeder, eater in links:
             if feeder not in self.cfg['feed']:
-                raise PondException('Invalid feeder specified: %r' % feeder)
+                raise ComponentTestException('Invalid feeder specified: %r' %
+                                             feeder)
             #self.cfg['feed'].append('%s:%s' % (sink_name, eater))
             sink_comp.add_feeder(self, '%s:%s' % (self.name, feeder), eater)
             #self.auto_link = False
@@ -212,8 +213,8 @@ class ComponentWrapper(object, log.Loggable):
         return defer.succeed(None)
 
 
-class Pond(object, log.Loggable):
-    logCategory = 'pond'
+class ComponentTestHelper(object, log.Loggable):
+    logCategory = 'comptest-helper'
 
     guard_timeout = 60.0
     guard_delay = 0.5
@@ -486,21 +487,21 @@ class Pond(object, log.Loggable):
         callids[1] = reactor.callLater(self.guard_timeout, flow_timed_out)
         return guard_d
 
-class PondUnitTestMixin:
+class ComponentUnitTestMixin:
     if not HAVE_GTK2REACTOR:
         skip = 'gtk2reactor is required for this test case'
 
 def cleanup_reactor(force=False):
     if not HAVE_GTK2REACTOR and not force:
         return
-    log.debug('pond', 'running cleanup_reactor...')
+    log.debug('comptest', 'running cleanup_reactor...')
     delayed = reactor.getDelayedCalls()
     for dc in delayed:
         dc.cancel()
     # the rest is taken from twisted trial...
     sels = reactor.removeAll()
     if sels:
-        log.info('pond', 'leftover selectables...: %r %r' %
+        log.info('comptest', 'leftover selectables...: %r %r' %
                  (sels, reactor.waker))
         for sel in sels:
             if interfaces.IProcessTransport.providedBy(sel):
