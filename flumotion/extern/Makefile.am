@@ -10,7 +10,8 @@ logdir = $(libdir)/flumotion/python/flumotion/extern/log
 
 log_PYTHON = \
 	log/__init__.py \
-	log/log.py
+	log/log.py \
+	log/termcolor.py
 
 EXTRA_DIST = log/test_log.py
 

@@ -1,3 +1,8 @@
+2007-07-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/extern/Makefile.am (log_PYTHON): Dist/install log.py's
+	new termcolor file.
+
 2007-07-24  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
