@@ -403,10 +403,14 @@ class PadMonitor(log.Loggable):
 
         # Data received! Return to happy ASAP:
         self._check_flow_dc.cancel()
-        self._check_flow_timeout()
+        reactor.callFromThread(self._check_flow_timeout_now)
 
         return True
 
+    def _check_flow_timeout_now(self):
+        self._check_flow_dc.cancel()
+        self._check_flow_timeout()
+        
     def _check_flow_timeout(self):
         now = time.time()
 
