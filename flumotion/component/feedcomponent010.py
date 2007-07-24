@@ -357,26 +357,26 @@ class PadMonitor(log.Loggable):
         self._component = component
         self._pad = pad
         self._name = name
-        self._active = True
+        self._active = False
 
-        # Note: be very careful touching anything here: most of these functions
-        # are called from multiple threads
+        # This dict sillyness is because python's dict operations are atomic
+        # w.r.t. the GIL.
+        self._probe_id = {}
         self._add_probe_dc = None
-        self._probe_id = None
 
         self._add_flow_probe()
 
-        self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_PROBE_TIMEOUT,
+        self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
             self._check_flow_timeout)
 
     def isActive(self):
         return self._active
 
     def detach(self):
-        # TODO: This doesn't look very threadsafe
-        if self._probe_id:
-            self._pad.remove_buffer_probe(self._probe_id)
-            self._probe_id = None
+        probe_id = self._probe_id.pop("id", None)
+        if probe_id:
+            self._pad.remove_buffer_probe(probe_id)
+
         if self._add_probe_dc:
             self._add_probe_dc.cancel()
             self._add_probe_dc = None
@@ -386,7 +386,8 @@ class PadMonitor(log.Loggable):
             self._check_flow_dc = None
         
     def _add_flow_probe(self):
-        self._probe_id = self._pad.add_buffer_probe(self._probe_cb)
+        self._probe_id['id'] = self._pad.add_buffer_probe(
+            self._flow_watch_probe_cb)
         self._add_probe_dc = None
 
     def _add_flow_probe_later(self):
@@ -396,14 +397,15 @@ class PadMonitor(log.Loggable):
     def _flow_watch_probe_cb(self, pad, buffer):
         self._last_data_time = time.time()
 
-        pad.remove_buffer_probe(self._probe_id)
-        self._probe_id = None
+        id = self._probe_id.pop("id", None)
+        if id:
+            # This will be None only if detach() has been called.
+            self._pad.remove_buffer_probe(id)
 
-        reactor.callFromThread(self._add_flow_probe_later, pad)
+            reactor.callFromThread(self._add_flow_probe_later)
 
-        # Data received! Return to happy ASAP:
-        self._check_flow_dc.cancel()
-        reactor.callFromThread(self._check_flow_timeout_now)
+            # Data received! Return to happy ASAP:
+            reactor.callFromThread(self._check_flow_timeout_now)
 
         return True
 
@@ -412,6 +414,8 @@ class PadMonitor(log.Loggable):
         self._check_flow_timeout()
         
     def _check_flow_timeout(self):
+        self._check_flow_dc = None
+
         now = time.time()
 
         if self._last_data_time > 0:
@@ -421,11 +425,11 @@ class PadMonitor(log.Loggable):
                 self.info("No data received on pad for > %r seconds, setting "
                     "to hungry", self.PAD_MONITOR_TIMEOUT)
 
-                self._component.setFlowInactive(self._name)
+                self._component.setPadMonitorInactive(self._name)
                 self._active = False
             elif not self._active and delta < self.PAD_MONITOR_TIMEOUT:
                 self.info("Receiving data again, flow active")
-                self._component.setFlowActive(self._name)
+                self._component.setPadMonitorActive(self._name)
                 self._active = True
 
         self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,

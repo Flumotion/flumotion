@@ -1,3 +1,11 @@
+2007-07-24  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Some fixes to PadMonitor code. Including making it threadsafe with
+	  nasty trickery.
+	* flumotion/test/test_feedcomponent010.py:
+	  Unit tests for PadMonitors.
+
 2007-07-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feed.py (FeedMedium.stopConnecting): Drop
