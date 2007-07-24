@@ -179,7 +179,27 @@ class AllocMonitor(object):
             else:
                 self.allocPrint(p, allocators[p])
         import gc
-        print '\ngc.garbage:', gc.garbage
+        for o in gc.garbage:
+            print '\nUncollectable object cycle in gc.garbage:'
+            self._printCycle(new[id(o)])
+
+    def _printCycle(self, root):
+        print "Parents:"
+        self._printParents(root, 2)
+        print "Kids:"
+        self._printKids(root, 2)
+
+    def _printParents(self, wrap, level, indent='  '):
+        print indent, self._wrapperRepr(wrap)
+        if level > 0:
+            for p in wrap.parents:
+                self._printParents(p, level - 1, indent + '  ')
+
+    def _printKids(self, wrap, level, indent='  '):
+        print indent, self._wrapperRepr(wrap)
+        if level > 0:
+            for kid in wrap.children:
+                self._printKids(kid, level - 1, indent + '  ')
 
     def _allocStack(self, wrap, stack):
         stack.append(wrap)

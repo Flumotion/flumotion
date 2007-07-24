@@ -1,3 +1,20 @@
+2007-07-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feed.py (FeedMedium.stopConnecting): Drop
+	any remote reference, just in case.
+	(FeedMedium._doFeedTo): Drop the remote reference after the pb
+	handshaking is finished and the transport is closed. Fixes
+	uncollectable object leaks when reconnecting feeds.
+
+	* flumotion/common/debug.py (AllocMonitor.analyze)
+	(AllocMonitor._printCycle, AllocMonitor._printParents)
+	(AllocMonitor._printKids): More informative printing of object
+	cycles.
+
+	* flumotion/test/test_component_feed.py (TestUpstreamFeedClient):
+	Add assertions regarding the state of the feedmedium's reference
+	to the RemoteReference.
+
 2007-07-24  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

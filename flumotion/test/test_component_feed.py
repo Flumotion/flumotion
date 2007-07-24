@@ -143,6 +143,8 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         client = feed.FeedMedium(component)
         factory = feed.FeedClientFactory(client)
 
+        self.failIf(client.hasRemoteReference())
+
         def login():
             port = self.feedServer.getPortNum()
             self.assertAdditionalFDsOpen(1, 'connect (socket)')
@@ -152,6 +154,9 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
                                                    password='test'))
 
         def cleanup(res):
+            # We're not using requestFeed, so no reference should be set
+            self.failIf(client.hasRemoteReference())
+
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
             factory.disconnect()
 
@@ -179,6 +184,8 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         client = feed.FeedMedium(component)
         factory = feed.FeedClientFactory(client)
 
+        self.failIf(client.hasRemoteReference())
+
         def login():
             port = self.feedServer.getPortNum()
             self.assertAdditionalFDsOpen(1, 'connect (socket)')
@@ -189,7 +196,9 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
 
         def sendFeed(remote):
             # apparently one has to do magic to get the feed to work
+            self.failIf(client.hasRemoteReference())
             client.setRemoteReference(remote)
+            self.failUnless(client.hasRemoteReference())
             self.assertAdditionalFDsOpen(3, 'feed (socket, client, server)')
             return remote.callRemote('sendFeed', '/foo/bar:baz')
 
@@ -211,6 +220,9 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         def feedReadyOnServer((componentId, feedName, fd, eaterId)):
             # this likely fires directly, not having dropped into the
             # reactor.
+
+            # The feed medium should have dropped its reference already
+            self.failIf(client.hasRemoteReference())
 
             # this fd is not ours, we should dup it if we want to hold
             # onto it
@@ -264,6 +276,9 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         def feedReadyOnServer((componentId, feedName, fd, eaterId)):
             # this likely fires directly, not having dropped into the
             # reactor.
+
+            # The feed medium should have dropped its reference already
+            self.failIf(client.hasRemoteReference())
 
             # this fd is not ours, we should dup it if we want to hold
             # onto it
@@ -324,6 +339,8 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
     def testRequestFeed(self):
         client = feed.FeedMedium(logName='frobby')
 
+        self.failIf(client.hasRemoteReference())
+
         def requestFeed():
             port = self.feedServer.getPortNum()
             self.assertAdditionalFDsOpen(1, 'connect (socket)')
@@ -331,10 +348,17 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
                                    fpb.Authenticator(username='user',
                                                      password='test'),
                                    '/foo/bar:baz')
+            self.failIf(client.hasRemoteReference())
             self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
             return d
 
         def gotFeed((feedId, fd)):
+            # the feed medium should have dropped its reference to the
+            # remotereference by now, otherwise we get cycles, and
+            # remote references can't exist in cycles because they have
+            # a __del__ method
+            self.failIf(client.hasRemoteReference())
+
             self.assertEquals(feedId, 'bar:baz')
             self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
             # our responsibility to close fd

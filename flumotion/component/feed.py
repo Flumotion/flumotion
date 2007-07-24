@@ -191,6 +191,9 @@ class FeedMedium(fpb.Referenceable):
         if self._factory:
             self._factory.disconnect()
             self._factory = None
+        # not sure if this is necessary; call it just in case, so we
+        # don't leave a lingering reference cycle
+        self.setRemoteReference(None)
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
@@ -238,6 +241,10 @@ class FeedMedium(fpb.Referenceable):
         # callLater, not doReadOrWrite, we call connectionLost directly
         # on the transport.
         t.connectionLost(failure.Failure(main.CONNECTION_DONE))
+
+        # This medium object is of no use any more; drop our reference
+        # to the remote so we can avoid cycles.
+        self.setRemoteReference(None)
 
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         feedId = common.feedId(componentName, feedName)
