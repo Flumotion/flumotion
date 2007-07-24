@@ -23,7 +23,7 @@ import fnmatch
 import time
 import types
 import traceback
-
+    
 # environment variables controlling levels for each category
 _DEBUG = "*:1"
 # name of the environment variable controlling our logging
@@ -52,6 +52,15 @@ INFO = 3
 DEBUG = 4
 LOG = 5
 
+COLORS = {ERROR: 'RED',
+          WARN: 'YELLOW',
+          INFO: 'GREEN',
+          DEBUG: 'BLUE',
+          LOG: 'CYAN'
+          }
+
+_FORMATTED_LEVELS = []
+
 def getLevelName(level):
     """
     Return the name of a log level.
@@ -59,6 +68,11 @@ def getLevelName(level):
     assert isinstance(level, int) and level > 0 and level < 6, \
            "Bad debug level"
     return ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')[level - 1]
+
+def getFormattedLevelName(level):
+    assert isinstance(level, int) and level > 0 and level < 6, \
+           "Bad debug level"
+    return _FORMATTED_LEVELS[level - 1]
 
 def registerCategory(category):
     """
@@ -326,17 +340,44 @@ def stderrHandler(level, object, category, file, line, message):
 
     # level   pid     object   cat      time
     # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
-    safeprintf(sys.stderr, '%-5s [%5d] %-32s %-17s %-15s ',
-              getLevelName(level), os.getpid(), o, category,
-              time.strftime("%b %d %H:%M:%S"))
+    safeprintf(sys.stderr, '%s [%5d] %-32s %-17s %-15s ',
+               getFormattedLevelName(level), os.getpid(), o, category,
+               time.strftime("%b %d %H:%M:%S"))
     safeprintf(sys.stderr, '%-4s %s %s\n', "", message, where)
 
     sys.stderr.flush()
 
+def _preformatLevels(noColorEnvVarName):
+    levels = ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')
+    format = '%-5s'
+
+    try:
+        import termcolor
+    except ImportError:
+        # we don't need to catch this if termcolor is in same package as
+        # log.py
+        termcolor = None
+
+    if (noColorEnvVarName is not None
+        and termcolor is not None
+        and (noColorEnvVarName not in os.environ
+             or not os.environ[noColorEnvVarName])):
+
+        t = termcolor.TerminalController()
+        def formatter(level):
+            return ''.join((t.BOLD, getattr(t, COLORS[level]),
+                            format % (levels[level-1],), t.NORMAL))
+    else:
+        def formatter(level):
+            return format % (levels[level-1],)
+
+    for level in ERROR, WARN, INFO, DEBUG, LOG:
+        _FORMATTED_LEVELS.append(formatter(level))
+
 ### "public" useful API
 
 # setup functions
-def init(envVarName):
+def init(envVarName, enableColorOutput=False):
     """
     Initialize the logging system and parse the environment variable
     of the given name.
@@ -349,6 +390,11 @@ def init(envVarName):
 
     global _ENV_VAR_NAME
     _ENV_VAR_NAME = envVarName
+
+    if enableColorOutput:
+        _preformatLevels(envVarName + "_NO_COLOR")
+    else:
+        _preformatLevels(None)
 
     if os.environ.has_key(envVarName):
         # install a log handler that uses the value of the environment var

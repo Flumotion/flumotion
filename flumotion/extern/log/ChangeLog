@@ -1,3 +1,13 @@
+2007-07-24  Andy Wingo  <wingo@pobox.com>
+
+	Patch by: Philippe Normand <philippe fluendo.com>
+
+	* log.py: Optionally support colorizing the log level. Fixes #642.
+	Patch modified slightly.
+
+	* termcolor.py: New file, imported only if we are enabling color
+	debug output.
+
 2007-06-25  Andy Wingo  <wingo@pobox.com>
 
 	* log.py (safeprintf): New procedure. See #613.
