@@ -1,3 +1,10 @@
+2007-07-24  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Generalise the eater probes/data flow checks as a PadMonitor class,
+	  so that other components can use it on other parts of a pipeline.
+	  Partially (not yet fully) move the eater checks over to using it.
+
 2007-07-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/debug.py (AllocMonitor): New object, uses
