@@ -132,6 +132,13 @@ class Bouncer(component.BaseComponent):
 
     def hasKeycard(self, keycard):
         return keycard in self._keycards.values()
+    
+    def generateKeycardId(self):
+        # FIXME: what if it already had one ?
+        # FIXME: deal with wraparound ?
+        id = "%016x" % self._idCounter
+        self._idCounter += 1
+        return id
 
     def addKeycard(self, keycard):
         # give keycard an id and store it in our hash
@@ -139,11 +146,7 @@ class Bouncer(component.BaseComponent):
             # already in there
             return
             
-        # FIXME: what if it already had one ?
-        # FIXME: deal with wraparound ?
-        id = "%016x" % self._idCounter
-        self._idCounter += 1
-
+        id = self.generateKeycardId()
         keycard.id = id
         self._keycards[id] = keycard
         data = keycard.getData()

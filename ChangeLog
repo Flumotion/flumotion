@@ -1,3 +1,10 @@
+2007-07-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/bouncers/bouncer.py (Bouncer.hasKeycard,
+	  Bouncer.generateKeycardId, Bouncer.addKeycard):
+	Split out keycard id generation from keycard addition. Useful
+	for when a bouncer does not want to store keycards.
+
 2007-07-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
