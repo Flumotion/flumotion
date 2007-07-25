@@ -391,6 +391,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def _plug_recording_started(self, file, location):
         socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
+        # make sure plugs are configured with our socket, see #732
+        if socket not in self.plugs:
+            return
         for plug in self.plugs[socket]:
             self.debug('invoking recording_started on '
                        'plug %r on socket %s', plug, socket)
@@ -398,6 +401,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def _plug_recording_stopped(self, file, location):
         socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
+        # make sure plugs are configured with our socket, see #732
+        if socket not in self.plugs:
+            return
         for plug in self.plugs[socket]:
             self.debug('invoking recording_stopped on '
                        'plug %r on socket %s', plug, socket)

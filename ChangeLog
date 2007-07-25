@@ -1,3 +1,9 @@
+2007-07-25  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	  (Disker._plug_recording_started, Disker._plug_recording_stopped):
+	Add plug socket checks, fixes #730.
+
 2007-07-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/job/job.py (JobMedium.remote_bootstrap): Allow
