@@ -220,6 +220,10 @@ class SingleSwitch(Switch):
         self.uiState.set("active-eater", self._idealEater)
 
     def switch_to(self, eater):
+        if not self.switchElement:
+            self.warning("switch_to called with eater %s but before pipeline "
+                "configured")
+            return False
         if not eater in [ "backup", "master" ]:
             self.warning ("%s is not master or backup", eater)
             return False
@@ -411,6 +415,10 @@ class AVSwitch(Switch):
     #    elements
     # 8) set the queue-buffers property on the switch elements to FALSE 
     def switch_to(self, eater):
+        if not (self.videoSwitchElement and self.audioSwitchElement):
+            self.warning("switch_to called with eater %s but before pipeline "
+                "configured")
+            return False
         if eater not in [ "master", "backup" ]:
             self.warning("%s is not master or backup", eater)
             return False
@@ -579,7 +587,8 @@ class AVSwitch(Switch):
             # we can also turn off the queue-buffers property
             self.audioSwitchElement.set_property("queue-buffers", False)
             self.videoSwitchElement.set_property("queue-buffers", False)
-            self.debug("eaterSwitchingTo becoming None from %s", self.eaterSwitchingTo)
+            self.debug("eaterSwitchingTo becoming None from %s", 
+                self.eaterSwitchingTo)
             self.eaterSwitchingTo = None
             self._switchLock.release()
 

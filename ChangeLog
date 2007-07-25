@@ -1,3 +1,10 @@
+2007-07-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py
+	  (SingleSwitch.switch_to, AVSwitch.switch_to,
+	  AVSwitch._check_start_times_received):
+	Trivial reject for switching before pipeline configured.
+
 2007-07-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/debug.py (UncollectableMonitor): New helper
