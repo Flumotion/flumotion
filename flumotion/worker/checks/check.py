@@ -126,6 +126,23 @@ class CheckProcError(Exception):
     def __init__(self, data):
         self.data = data
 
+def checkImport(moduleName):
+    log.debug('check', 'checkImport: %s', moduleName)
+    __import__(moduleName) 
+
+def checkElements(elementNames):
+    log.debug('check', 'checkElements: element names to check %r',
+               elementNames)
+    ret = []
+    for name in elementNames:
+        try:
+            gst.element_factory_make(name)
+            ret.append(name)
+        except gst.PluginNotFoundError:
+            pass
+    log.debug('check', 'checkElements: returning elements names %r', ret)
+    return ret
+
 def checkPlugin(pluginName, packageName, minimumVersion=None):
     """
     Check if the given plug-in is available.

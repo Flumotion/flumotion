@@ -25,9 +25,6 @@ worker-side objects to handle worker clients
 
 import signal
 
-import gst
-import gst.interfaces
-
 from twisted.cred import portal
 from twisted.internet import defer, reactor
 from twisted.spread import pb
@@ -287,25 +284,6 @@ class WorkerBrain(log.Loggable):
         d = getBundles()
         d.addCallback(runCheck)
         return d
-
-    def checkElements(self, elementNames):
-        self.debug('checkElements: element names to check %r',
-                   elementNames)
-        ret = []
-        for name in elementNames:
-            try:
-                gst.element_factory_make(name)
-                ret.append(name)
-            except gst.PluginNotFoundError:
-                pass
-        self.debug('checkElements: returning elements names %r', ret)
-        return ret
-
-    def checkImport(self, moduleName):
-        self.debug('checkImport: %s', moduleName)
-        # FIXME: maybe find a nice way to check if we can import
-        # without importing ?
-        __import__(moduleName) 
 
     def getComponents(self):
         return [job.avatarId for job in self.jobHeaven.getJobInfos()]

@@ -211,7 +211,8 @@ class WorkerMedium(medium.PingingMedium):
         @rtype:   list of str
         @returns: a list of instantiatable element names
         """
-        return self.brain.checkElements(elementNames)
+        return self.brain.runCheck('flumotion.worker.checks.check',
+                                   'checkElements', elementNames)
 
     def remote_checkImport(self, moduleName):
         """
@@ -222,7 +223,8 @@ class WorkerMedium(medium.PingingMedium):
 
         @returns: None or Failure
         """
-        return self.brain.checkImport(moduleName)
+        return self.brain.runCheck('flumotion.worker.checks.check', 'checkImport',
+                                   moduleName)
 
     def remote_runCheck(self, module, function, *args, **kwargs):
         """

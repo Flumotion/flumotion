@@ -259,8 +259,6 @@ def main(args):
     import twisted.copyright
     log.debug('worker', 'Running against Twisted version %s' %
         twisted.copyright.version)
-    log.debug('worker', 'Running against GStreamer version %s' %
-        configure.gst_version)
 
     # register all package paths (FIXME: this should go away when
     # components come from manager)
