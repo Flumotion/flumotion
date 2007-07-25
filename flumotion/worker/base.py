@@ -187,6 +187,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
     def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
             avatar = self.avatarClass(self, avatarId, mind)
+            assert avatarId not in self.avatars
             self.avatars[avatarId] = avatar
             return pb.IPerspective, avatar, avatar.logout
         else:

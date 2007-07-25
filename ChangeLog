@@ -1,3 +1,9 @@
+2007-07-25  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/base.py:
+	  Add an assertion to ensure that we aren't allowing duplicate logins
+	  in the worker heaven.
+
 2007-07-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/bouncers/bouncer.py (Bouncer.hasKeycard,
