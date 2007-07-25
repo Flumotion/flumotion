@@ -22,6 +22,7 @@ Debugging helper code
 """
 
 
+import gc
 import sys
 import re
 import linecache
@@ -123,6 +124,57 @@ def print_stack(file=None):
     for line in output:
         file.write(line)
 
+class UncollectableMonitor(object):
+    def __init__(self, period=120):
+        known = {}
+
+        # set this if you want python to print out when uncollectable
+        # objects are detected; will print out all objects in the cycle,
+        # not just the one(s) that caused the cycle to be uncollectable
+        # 
+        # gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_INSTANCES |
+        # gc.DEBUG_OBJECTS)
+        
+        from twisted.internet import reactor
+
+        def sample():
+            gc.collect()
+            for o in gc.garbage:
+                if o not in known:
+                    known[o] = True
+                    self.uncollectable(o)
+            reactor.callLater(period, sample)
+            
+        reactor.callLater(period, sample)
+
+    def uncollectable(self, obj):
+        print '\nUncollectable object cycle in gc.garbage:'
+
+        print "Parents:"
+        self._printParents(obj, 2)
+        print "Kids:"
+        self._printKids(obj, 2)
+
+    def _printParents(self, obj, level, indent='  '):
+        print indent, self._shortRepr(obj)
+        if level > 0:
+            for p in gc.get_referrers(obj):
+                self._printParents(p, level - 1, indent + '  ')
+
+    def _printKids(self, obj, level, indent='  '):
+        print indent, self._shortRepr(obj)
+        if level > 0:
+            for kid in gc.get_referents(obj):
+                self._printKids(kid, level - 1, indent + '  ')
+
+    def _shortRepr(self, obj):
+        if not isinstance(obj, dict):
+            return '%s %r @ 0x%x' % (type(obj).__name__, obj, id(obj))
+        else:
+            keys = obj.keys()
+            keys.sort()
+            return 'dict with keys %r @ 0x%x' % (keys, id(obj))
+
 class AllocMonitor(object):
     def __init__(self, period=10, analyze=None, allocPrint=None):
         self.period = period
@@ -178,7 +230,6 @@ class AllocMonitor(object):
                 print 'foo'
             else:
                 self.allocPrint(p, allocators[p])
-        import gc
         for o in gc.garbage:
             print '\nUncollectable object cycle in gc.garbage:'
             self._printCycle(new[id(o)])
