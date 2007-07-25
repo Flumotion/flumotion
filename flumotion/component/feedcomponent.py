@@ -91,6 +91,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_setGstDebug(self, debug):
         """
         Sets the GStreamer debugging levels based on the passed debug string.
+
+        @since: 0.4.2
         """
         self.debug('Setting GStreamer debug level to %s' % debug)
         if not debug:
