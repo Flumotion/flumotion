@@ -110,6 +110,8 @@ class WorkerBrain(log.Loggable):
 
         # really should be componentJobHeaven, but this is shorter :)    
         self.jobHeaven = job.ComponentJobHeaven(self)
+        # for ephemeral checks
+        self.checkHeaven = job.CheckJobHeaven(self)
 
         self.managerConnectionInfo = None
 
@@ -157,6 +159,12 @@ class WorkerBrain(log.Loggable):
             self.warning("Failed to listen on job server port: %r", e)
             return False
 
+        try:
+            self.checkHeaven.listen()
+        except error.CannotListenError, e:
+            self.warning("Failed to listen on check server port: %r", e)
+            return False
+
         return True
 
     def _makeFeedServer(self):
@@ -190,7 +198,7 @@ class WorkerBrain(log.Loggable):
         self.info("Reactor shutting down, stopping jobHeaven")
         self.stopping = True
 
-        l = [self.jobHeaven.shutdown()]
+        l = [self.jobHeaven.shutdown(), self.checkHeaven.shutdown()]
         if self.feedServer:
             l.append(self.feedServer.shutdown())
         # Don't fire this other than from a callLater
@@ -267,6 +275,19 @@ class WorkerBrain(log.Loggable):
         d.addErrback(createError)
         return d
 
+    def runCheck(self, module, function, *args, **kwargs):
+        def getBundles():
+            self.debug('setting up bundles for %s', module)
+            return self.medium.bundleLoader.getBundles(moduleName=module)
+
+        def runCheck(bundles):
+            return self.checkHeaven.runCheck(bundles, module, function,
+                                             *args, **kwargs)
+
+        d = getBundles()
+        d.addCallback(runCheck)
+        return d
+
     def checkElements(self, elementNames):
         self.debug('checkElements: element names to check %r',
                    elementNames)
@@ -291,4 +312,3 @@ class WorkerBrain(log.Loggable):
 
     def killJob(self, avatarId, signum):
         self.jobHeaven.killJob(avatarId, signum)
-

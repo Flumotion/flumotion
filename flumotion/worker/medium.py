@@ -224,7 +224,7 @@ class WorkerMedium(medium.PingingMedium):
         """
         return self.brain.checkImport(moduleName)
 
-    def remote_runFunction(self, module, function, *args, **kwargs):
+    def remote_runCheck(self, module, function, *args, **kwargs):
         """
         Runs the given function in the given module with the given arguments.
         
@@ -235,7 +235,8 @@ class WorkerMedium(medium.PingingMedium):
 
         @returns: the return value of the given function in the module.
         """
-        return self.runBundledFunction(module, function, *args, **kwargs)
+        return self.brain.runCheck(module, function, *args, **kwargs)
+    remote_runFunction = remote_runCheck
 
     def remote_getComponents(self):
         """

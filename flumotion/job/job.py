@@ -40,7 +40,7 @@ from zope.interface import implements
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium, package
-from flumotion.common.reflectcall import createComponent
+from flumotion.common.reflectcall import createComponent, reflectCallCatching
 from flumotion.component import component
 
 from flumotion.twisted import fdserver
@@ -101,18 +101,16 @@ class JobMedium(medium.BaseMedium):
                               (package name, package path) tuples
         @type  packagePaths:  list of (str, str)
         """
-        assert isinstance(workerName, str)
-        assert isinstance(host, str)
-        assert isinstance(port, int)
-        assert transport in ('ssl', 'tcp')
-        assert isinstance(authenticator, pb.RemoteReference)
-        assert isinstance(packagePaths, list)
-
         self._workerName = workerName
         self._managerHost = host
         self._managerPort = port
         self._managerTransport = transport
-        self._authenticator = fpb.RemoteAuthenticator(authenticator)
+        if authenticator:
+            self._authenticator = fpb.RemoteAuthenticator(authenticator)
+        else:
+            self.debug('no authenticator, will not be able to log '
+                       'into manager')
+            self._authenticator = None
         
         packager = package.getPackager()
         for name, path in packagePaths:
@@ -122,6 +120,30 @@ class JobMedium(medium.BaseMedium):
 
     def remote_getPid(self):
         return os.getpid()
+
+    def remote_runFunction(self, moduleName, methodName, *args, **kwargs):
+        """
+        I am called on by the worker's JobAvatar to run a function,
+        normally on behalf of the flumotion wizard.
+        
+        @param moduleName: name of the module containing the function
+        @type  moduleName: str
+        @param methodName: the method to run
+        @type  methodName: str
+        @param args: args to pass to the method
+        @type  args: tuple
+        @param kwargs: kwargs to pass to the method
+        @type  kwargs: dict
+
+        @returns: the result of invoking the method
+        """
+        self.info('Running %s.%s(*%r, **%r)' % (moduleName, methodName,
+                                                args, kwargs))
+        # FIXME: do we want to do this?
+        self._enableCoreDumps()
+        
+        return reflectCallCatching(errors.RemoteRunError, moduleName,
+                                   methodName, *args, **kwargs)
 
     def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
         """

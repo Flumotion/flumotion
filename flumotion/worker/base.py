@@ -91,7 +91,7 @@ class JobProcessProtocol(worker.ProcessProtocol):
         self._deferredStart = startSet.createRegistered(avatarId)
         worker.ProcessProtocol.__init__(self, heaven, avatarId,
                                         'component',
-                                        heaven.brain.workerName)
+                                        heaven.getWorkerName())
 
     def sendMessage(self, message):
         heaven = self.loggable

@@ -24,12 +24,16 @@ worker-side objects to handle worker clients
 """
 
 import os
+import signal
 import sys
 
 from twisted.internet import defer, reactor
 
 from flumotion.common import errors, log
-from flumotion.common import common
+from flumotion.common import common, messages
+
+N_ = messages.N_
+T_ = messages.gettexter('flumotion')
 
 from flumotion.worker import base
 
@@ -216,4 +220,101 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         self.addJobInfo(process.pid,
                         base.JobInfo(process.pid, avatarId, type,
                                      moduleName, methodName, nice, bundles))
+        return d
+        
+
+class CheckJobAvatar(base.BaseJobAvatar):
+    def haveMind(self):
+        # FIXME: drills down too much?
+        def gotPid(pid):
+            self.pid = pid
+            job = self._heaven.getJobInfo(pid)
+            self._heaven._startSet.createSuccess(job.avatarId)
+
+        d = self.mindCallRemote("getPid")
+        d.addCallback(gotPid)
+        return d
+
+    def stop(self):
+        """
+        returns: a deferred marking completed stop.
+        """
+        self._heaven._startSet.shutdownStart(self.avatarId)
+        self._heaven.killJob(self.avatarId, signal.SIGTERM)
+
+    def perspective_cleanShutdown(self):
+        self.debug("job is stopping")
+        pass
+
+
+class CheckJobHeaven(base.BaseJobHeaven):
+    avatarClass = CheckJobAvatar
+
+    _checkCount = 0
+    _timeout = 45
+
+    def runCheck(self, bundles, moduleName, methodName, *args, **kwargs):
+        avatarId = '%s-%d' % (methodName, self._checkCount)
+        self._checkCount += 1
+
+        d = self._startSet.createStart(avatarId)
+
+        p = base.JobProcessProtocol(self, avatarId, self._startSet)
+        executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
+        argv = [executable, avatarId, self._socketPath]
+
+        childFDs = {0: 0, 1: 1, 2: 2}
+        env = {}
+        env.update(os.environ)
+        env['FLU_DEBUG'] = log.getDebug()
+        process = reactor.spawnProcess(p, executable, env=env, args=argv,
+                                       childFDs=childFDs)
+
+        p.setPid(process.pid)
+
+        def haveMind(_):
+            # we have a mind, in theory
+            job = self.avatars[avatarId]
+            return job.mindCallRemote('bootstrap', self.getWorkerName(),
+                                      None, None, None, None, bundles)
+
+        def callProc(_):
+            job = self.avatars[avatarId]
+            return job.mindCallRemote('runFunction', moduleName,
+                                      methodName, *args, **kwargs)
+
+        def timeout(sig):
+            self.killJobByPid(process.pid, sig)
+
+        def haveResult(res):
+            if not termtimeout.active():
+                self.info("Discarding error %s", res)
+                res = messages.Result()
+                res.add(messages.Error(T_(N_("Check timed out.")),
+                                       debug=("Timed out running %s."%methodName)))
+            else:
+                self.killJobByPid(process.pid, signal.SIGTERM)
+                # so, we're just assuming that this process goes away...
+                # fixme?
+
+            if termtimeout.active():
+                termtimeout.cancel()
+            if killtimeout.active():
+                killtimeout.cancel()
+            return res
+
+        # add callbacks and errbacks that kill the job
+
+        termtimeout = reactor.callLater(self._timeout, timeout,
+                                        signal.SIGTERM)
+        killtimeout = reactor.callLater(self._timeout, timeout,
+                                        signal.SIGKILL)
+
+        d.addCallback(haveMind)
+        d.addCallback(callProc)
+        d.addCallbacks(haveResult, haveResult)
+
+        jobInfo = base.JobInfo(process.pid, avatarId, type, moduleName,
+                               methodName, None, bundles)
+        self._jobInfos[process.pid] = jobInfo
         return d

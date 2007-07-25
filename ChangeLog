@@ -1,3 +1,28 @@
+2007-07-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/job/job.py (JobMedium.remote_bootstrap): Allow
+	operation without an authenticator.
+	(JobMedium.remote_runFunction): New remote method, used to run
+	checks on behalf of the worker.
+
+	* flumotion/worker/medium.py (WorkerMedium.remote_runCheck):
+	Rename from runFunction, but keep the old alias. Dispatch to the
+	brain instead of running the function directly.
+
+	* flumotion/worker/base.py (JobProcessProtocol.__init__): Use
+	getWorkerName accessor.
+
+	* flumotion/worker/job.py (ComponentJobAvatar)
+	(ComponentJobHeaven): New avatar and heaven for checks. Runs
+	checks in job processes. See #667.
+
+	* flumotion/worker/worker.py (WorkerBrain.__init__)
+	(WorkerBrain.listen, WorkerBrain.shutdownHandler): Make a
+	checkHeaven, running alongside the heaven for jobs that start
+	components.
+	(WorkerBrain.runCheck): New function, fetches bundles, then asks
+	the checkHeaven to run a check.
+
 2007-07-25  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/worker/base.py:
