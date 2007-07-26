@@ -1,0 +1,102 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# (C) Copyright 2007 Zaheer Abbas Merali <zaheerabbas at merali dot org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+from flumotion.component import feed
+from twisted.internet import reactor
+from flumotion.twisted import pb
+from flumotion.common import log
+import os
+import sys
+import string
+import gobject
+gobject.threads_init()
+import gst
+import optparse
+
+def usage(args, exitval=0):
+    print "usage: %s [OPTIONS] -w WORKER -p FEEDERPORT -f FULLFEEDID " \
+        "<partial_pipeline>" % args[0]
+    print ''
+    print 'partial_pipeline is the part of the pipeline that will receive ' \
+        'the gdp encoded stream'
+    print 'e.g. fdsink fd=1'
+    print 'streams the gdp encoded stream to stdout'
+    print 'See %s -h for help on the available options.' % args[0]
+    sys.exit(exitval)
+
+def gotFeed(res, partial_pipeline):
+    if not res:
+        log.debug("output-feed", "got None in gotFeed")
+        reactor.stop()
+        return
+    (feedId, fd) = res
+    log.debug("output-feed","Got feed on fd %r for feedId %s" % (fd, feedId))
+    pipe = gst.parse_launch("fdsrc fd=%d ! %s" % (fd, partial_pipeline))
+    pipe.set_state(gst.STATE_PLAYING)
+
+def main(args):
+    log.init()
+
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
+    parser.add_option('-u', '--usage',
+                      action="store_true", dest="usage",
+                      help="show a usage message")
+    parser.add_option('-w', '--worker',
+                      action="store", type="string", dest="host",
+                      help="the host of the worker to connect to"
+                        ", e.g. localhost")
+    parser.add_option('-p', '--port',
+                      action="store", type="int", dest="port",
+                      help="the feeder port of the job's feeder")
+    parser.add_option('-U', '--username',
+                      action="store", type="string", dest="username",
+                      help="the username to log into the feed server")
+    parser.add_option('-P', '--password',
+                      action="store", type="string", dest="password",
+                      help="the password to log into the feed server")
+    parser.add_option('-f', '--feed-id',
+                      action="store", type="string", dest="feedId",
+                      help="the full feed id of the feed to connect to"
+                        ", e.g. /default/video-source:default")
+    
+    options, args = parser.parse_args(args)
+
+    if options.debug:
+        log.setFluDebug(options.debug)
+
+    if options.usage or not args[1:]:
+        usage(args)
+
+    if not options.host or not options.port or not options.username or not \
+        options.password or not options.feedId:
+        usage(args)
+
+    client = feed.FeedMedium(logName="output-feed-script")
+    authenticator = pb.Authenticator(username=options.username, 
+        password=options.password)
+    d = client.requestFeed(options.host, options.port, authenticator, 
+        options.feedId)
+    d.addCallback(gotFeed, string.join(args[1:], ' '))
+    reactor.run()
+
+main(sys.argv)

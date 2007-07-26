@@ -1,3 +1,9 @@
+2007-07-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* scripts/output-feed (usage, gotFeed, main):
+	Add raw ghetto script (now using optparse) to connect to a 
+	feeder on a component running in a job.
+
 2007-07-25  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/consumers/disker/disker.py
