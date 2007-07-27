@@ -1,5 +1,10 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_common_signals.py
+	(TestSignalMixin.testDisconnect):
+	* flumotion/common/signals.py (SignalMixin.connect): Return the
+	signal ID.
+
 	* flumotion/common/signals.py (SignalMixin.emit): 
 	* flumotion/test/test_common_signals.py
 	(TestSignalMixin.testEmitSelf): Er, check to make sure that

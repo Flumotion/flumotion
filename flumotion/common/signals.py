@@ -41,6 +41,7 @@ class SignalMixin(object):
         sid = self.__signalId
         self.__signalConnections[sid] = (signalName, proc, args, kwargs)
         self.__signalId += 1
+        return sid
 
     def disconnect(self, signalId):
         self.__ensureSignals()
