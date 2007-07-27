@@ -33,7 +33,6 @@ from flumotion.common import gstreamer, componentui
 from flumotion.component import feed
 
 from flumotion.common.planet import moods
-from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -457,8 +456,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     logCategory = 'feedcomponent'
 
-    gsignal('feed-ready', str, bool)
-    gsignal('error', str, str)
+    __signals__ = ('feed-ready', 'error')
 
     _reconnectInterval = 3
     
@@ -1484,5 +1482,3 @@ class FeedComponent(basecomponent.BaseComponent):
         if self._eaterMapping.has_key(feedId):
             return self._eaterMapping[feedId]
         return None
-
-pygobject.type_register(FeedComponent)

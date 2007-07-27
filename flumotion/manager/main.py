@@ -110,9 +110,6 @@ def _initialLoadConfig(vishnu, paths):
         vishnu.loadComponentConfigurationXML(path, manager.LOCAL_IDENTITY)
 
 def main(args):
-    # XXX: gst_init should remove all options, like gtk_init
-    args = [arg for arg in args if not arg.startswith('--gst')]
-
     parser = _createParser()
    
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))

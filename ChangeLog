@@ -1,5 +1,34 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer): Don't register type; register signals via
+	SignalMixin interface.
+
+	* flumotion/component/consumers/preview/preview.py
+	(Preview.get_pipeline_string): 
+	* flumotion/component/consumers/disker/disker.py
+	(Disker._on_marker_start): No need to register gtypes.
+
+	* flumotion/manager/main.py (main): Remove gstreamer arg munger.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.__signals__): Define the signals via the mixin.
+
+	* flumotion/component/component.py (BaseComponent): Don't import
+	gobject. Make components have the SignalMixin; they are not
+	GObjects any more.
+
+	* flumotion/common/Makefile.am (flumotion_PYTHON): 
+	* flumotion/common/signals.py: New mixin, emulates the GObject
+	connection mechanism in Python so that we can remove dependencies
+	on GLib in more places.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_common_signals.py: Tests for SignalMixin.
+
+	* bin/flumotion-manager.in: Don't install the gtk2reactor, we can
+	use the selectreactor.
+
 	* flumotion/worker/job.py (CheckJobHeaven.__init__): Keep a pool
 	of idle jobs for running checks.
 	(CheckJobHeaven.getCheckJobFromPool): New function, tries to reuse

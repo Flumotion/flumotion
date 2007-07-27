@@ -28,21 +28,20 @@ import sys
 import time
 import socket
 
-import gobject
-
 from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
 from twisted.python import reflect
 from zope.interface import implements
 
-from flumotion.common import interfaces, errors, log, planet, medium, pygobject
+from flumotion.common import interfaces, errors, log, planet, medium
 from flumotion.common import componentui, common, registry, messages, interfaces
+from flumotion.common import signals
+
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
-from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -273,7 +272,8 @@ class BaseComponentMedium(medium.PingingMedium):
         self.warning(msg)
         raise errors.MoMethodError(msg)
 
-class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
+class BaseComponent(common.InitMixin, log.Loggable,
+                    signals.SignalMixin):
     """
     I am the base class for all Flumotion components.
 
@@ -300,8 +300,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         See L{flumotion.common.common.InitMixin} for more details.
         """
-        gobject.GObject.__init__(self)
-
         # this will call self.init() for all implementors of init()
         common.InitMixin.__init__(self)
 
@@ -585,14 +583,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addBoth(fireShutdownHook)
         return d
 
-    ### GObject methods
-    def emit(self, name, *args):
-        if 'uninitialized' in str(self):
-            self.warning('Uninitialized object!')
-            #self.__gobject_init__()
-        else:
-            gobject.GObject.emit(self, name, *args)
-        
     ### BaseComponent public methods
     def getName(self):
         return self.name
@@ -720,5 +710,3 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.lastClock = nowClock
 
         self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
-
-pygobject.type_register(BaseComponent)

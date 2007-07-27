@@ -61,6 +61,7 @@ EXTRA_DIST = 				\
 	test_porter.py	 		\
 	test_reflect.py 		\
 	test_registry.py 		\
+	test_signal_mixin.py		\
 	test_testclasses.py 		\
 	test_twisted_integration.py 	\
 	test_ui_fgtk.py 		\

@@ -254,7 +254,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     pipe_template = 'multifdsink name=sink ' + \
                                 'sync=false ' + \
                                 'recover-policy=3'
-    gsignal('client-removed', object, int, int, object)
+
+    __signals__ = feedcomponent.ParseLaunchComponent.__signals__
+    __signals__ += ('client-removed',)
     
     componentMediumClass = HTTPMedium
 
@@ -739,5 +741,3 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.setMood(moods.happy)
         d.addCallback(turnHappy)
         return d
-
-pygobject.type_register(MultifdSinkStreamer)

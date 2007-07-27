@@ -27,5 +27,3 @@ __all__ = ['Preview']
 class Preview(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         return 'decodebin ! ffmpegcolorspace ! xvimagesink qos=false'
-
-pygobject.type_register(Preview)
