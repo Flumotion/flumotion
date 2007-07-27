@@ -59,7 +59,7 @@ class SignalMixin(object):
         for name, proc, pargs, pkwargs in connections.itervalues():
             if name == signalName:
                 try:
-                    proc(*(args + pargs), **pkwargs)
+                    proc(self, *(args + pargs), **pkwargs)
                 except Exception, e:
                     log.warning("signalmixin", "Exception calling "
                                 "signal handler %r: %s", proc,
