@@ -17,6 +17,24 @@
 
 2007-07-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/main.py (main): Don't log our GStreamer
+	version; we don't use GStreamer.
+
+	* flumotion/worker/medium.py (WorkerMedium.remote_checkElements)
+	(WorkerMedium.remote_checkImport): Run the new bundled functions
+	instead of the in-process workerbrain functions. Fixes #667.
+
+	* flumotion/worker/worker.py (WorkerBrain): Don't import
+	gstreamer. Remove in-process check methods.
+
+	* flumotion/worker/checks/check.py (checkImport, checkElements):
+	Moved here, out of the worker brain.
+
+	* flumotion/common/boot.py (boot): Always monkeypatch the reactor,
+	even when not installing it.
+
+	* bin/flumotion-worker.in: Don't import gtk or gstreamer.
+
 	* flumotion/job/job.py (JobMedium.remote_bootstrap): Allow
 	operation without an authenticator.
 	(JobMedium.remote_runFunction): New remote method, used to run
