@@ -364,12 +364,10 @@ def _preformatLevels(noColorEnvVarName):
              or not os.environ[noColorEnvVarName])):
 
         t = termcolor.TerminalController()
-        def formatter(level):
-            return ''.join((t.BOLD, getattr(t, COLORS[level]),
+        formatter = lambda level: ''.join((t.BOLD, getattr(t, COLORS[level]),
                             format % (levels[level-1],), t.NORMAL))
     else:
-        def formatter(level):
-            return format % (levels[level-1],)
+        formatter = lambda level: format % (levels[level-1],)
 
     for level in ERROR, WARN, INFO, DEBUG, LOG:
         _FORMATTED_LEVELS.append(formatter(level))

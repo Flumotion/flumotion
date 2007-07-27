@@ -1,3 +1,8 @@
+2007-07-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/extern/log/log.py:
+	  Fix0r pychecker stuff broken by coloured-logs code.
+
 2007-07-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* scripts/output-feed (usage, gotFeed, main):
