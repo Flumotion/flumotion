@@ -1,5 +1,30 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* bin/flumotion-admin.in: Don't import gstreamer, we don't use it.
+
+	* data/glade/admin-wizard.glade:
+	* data/glade/spyglass.glade:
+	* data/glade/videotest.glade:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_overview.glade:
+	* data/glade/wizard_shout2.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_summary.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_theora.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_vorbis.glade: Don't require gnome libs, we
+	don't use them.
+
+2007-07-27  Andy Wingo  <wingo@pobox.com>
+
+	* bin/flumotion-admin.in: Don't import gstreamer.
+
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer): Don't register type; register signals via
 	SignalMixin interface.
