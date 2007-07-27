@@ -24,7 +24,6 @@ worker-side objects for components
 """
 
 import os
-import sys
 import time
 import socket
 

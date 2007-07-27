@@ -1,5 +1,7 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/component.py: Don't import sys.
+
 	* flumotion/admin/admin.py (AdminModel): This is a changelog for
 	the last change to admin.py. It makes the AdminModel not be a
 	gobject. It does not change the admin's interface. Apologies for
