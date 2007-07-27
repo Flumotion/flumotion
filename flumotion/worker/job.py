@@ -253,10 +253,25 @@ class CheckJobHeaven(base.BaseJobHeaven):
     _checkCount = 0
     _timeout = 45
 
-    def runCheck(self, bundles, moduleName, methodName, *args, **kwargs):
-        avatarId = '%s-%d' % (methodName, self._checkCount)
+    def __init__(self, brain):
+        base.BaseJobHeaven.__init__(self, brain)
+
+        # job processes that are available to do work (i.e. not actively
+        # running checks)
+        self.jobPool = []
+
+    def getCheckJobFromPool(self):
+        if self.jobPool:
+            job, expireDC = self.jobPool.pop(0)
+            expireDC.cancel()
+            self.debug('running check in already-running job %s',
+                       job.avatarId)
+            return defer.succeed(job)
+
+        avatarId = 'check-%d' % (self._checkCount,)
         self._checkCount += 1
 
+        self.debug('spawning new job %s to run a check', avatarId)
         d = self._startSet.createStart(avatarId)
 
         p = base.JobProcessProtocol(self, avatarId, self._startSet)
@@ -271,50 +286,62 @@ class CheckJobHeaven(base.BaseJobHeaven):
                                        childFDs=childFDs)
 
         p.setPid(process.pid)
+        jobInfo = base.JobInfo(process.pid, avatarId, type, None, None,
+                               None, [])
+        self._jobInfos[process.pid] = jobInfo
 
         def haveMind(_):
-            # we have a mind, in theory
-            job = self.avatars[avatarId]
-            return job.mindCallRemote('bootstrap', self.getWorkerName(),
-                                      None, None, None, None, bundles)
-
-        def callProc(_):
-            job = self.avatars[avatarId]
-            return job.mindCallRemote('runFunction', moduleName,
-                                      methodName, *args, **kwargs)
-
-        def timeout(sig):
-            self.killJobByPid(process.pid, sig)
-
-        def haveResult(res):
-            if not termtimeout.active():
-                self.info("Discarding error %s", res)
-                res = messages.Result()
-                res.add(messages.Error(T_(N_("Check timed out.")),
-                                       debug=("Timed out running %s."%methodName)))
-            else:
-                self.killJobByPid(process.pid, signal.SIGTERM)
-                # so, we're just assuming that this process goes away...
-                # fixme?
-
-            if termtimeout.active():
-                termtimeout.cancel()
-            if killtimeout.active():
-                killtimeout.cancel()
-            return res
-
-        # add callbacks and errbacks that kill the job
-
-        termtimeout = reactor.callLater(self._timeout, timeout,
-                                        signal.SIGTERM)
-        killtimeout = reactor.callLater(self._timeout, timeout,
-                                        signal.SIGKILL)
+            # we have a mind, in theory; return the job avatar
+            return self.avatars[avatarId]
 
         d.addCallback(haveMind)
-        d.addCallback(callProc)
-        d.addCallbacks(haveResult, haveResult)
+        return d
 
-        jobInfo = base.JobInfo(process.pid, avatarId, type, moduleName,
-                               methodName, None, bundles)
-        self._jobInfos[process.pid] = jobInfo
+    def runCheck(self, bundles, moduleName, methodName, *args, **kwargs):
+        def haveJob(job):
+            def callProc(_):
+                return job.mindCallRemote('runFunction', moduleName,
+                                          methodName, *args, **kwargs)
+
+            def timeout(sig):
+                self.killJobByPid(process.pid, sig)
+
+            def haveResult(res):
+                if not termtimeout.active():
+                    self.info("Discarding error %s", res)
+                    res = messages.Result()
+                    res.add(messages.Error(T_(N_("Check timed out.")),
+                                           debug=("Timed out running %s."%methodName)))
+                else:
+                    def expire():
+                        if (job, expireDC) in self.jobPool:
+                            self.debug('stopping idle check job process %s', 
+                                       job.avatarId)
+                            self.jobPool.remove((job, expireDC))
+                            job.mindCallRemote('stop')
+                    expireDC = reactor.callLater(self._timeout, expire)
+                    self.jobPool.append((job, expireDC))
+
+                if termtimeout.active():
+                    termtimeout.cancel()
+                if killtimeout.active():
+                    killtimeout.cancel()
+                return res
+
+            # add callbacks and errbacks that kill the job
+
+            termtimeout = reactor.callLater(self._timeout, timeout,
+                                            signal.SIGTERM)
+            killtimeout = reactor.callLater(self._timeout, timeout,
+                                            signal.SIGKILL)
+
+            d = job.mindCallRemote('bootstrap', self.getWorkerName(),
+                                   None, None, None, None, bundles)
+            d.addCallback(callProc)
+            d.addCallbacks(haveResult, haveResult)
+            return d
+
+        d = self.getCheckJobFromPool()
+        d.addCallback(haveJob)
+
         return d

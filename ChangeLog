@@ -1,3 +1,13 @@
+2007-07-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/job.py (CheckJobHeaven.__init__): Keep a pool
+	of idle jobs for running checks.
+	(CheckJobHeaven.getCheckJobFromPool): New function, tries to reuse
+	an idle job instead of starting a new one every time.
+	(CheckJobHeaven.runCheck.haveJob.haveResult): Don't kill the job
+	right when it finishes; keep it around for a while in case we want
+	to run another check on it. Makes the wizard fast again.
+
 2007-07-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/extern/log/log.py:
