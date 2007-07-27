@@ -67,3 +67,10 @@ class TestSignalMixin(unittest.TestCase):
         self.assertEquals(emissions, [('foo', (o,), {}),
                                       ('foo', (o,1,), {}),
                                       ('bar', (o,'xyzzy',), {'baz':'qux'})])
+
+    def testDisconnect(self):
+        o = TestObject()
+
+        sid = o.connect('foo', self.fail)
+        o.disconnect(sid)
+        o.emit('foo')

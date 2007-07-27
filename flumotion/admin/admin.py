@@ -24,7 +24,6 @@ model abstraction for administration clients supporting different views
 """
 
 import sys
-import gobject
 
 from twisted.spread import pb
 from twisted.internet import error, defer, reactor
@@ -32,8 +31,9 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect, failure
 from zope.interface import implements
 
-from flumotion.common import common, errors, interfaces, log, pygobject
-from flumotion.common import keycards, worker, planet, medium, package, messages
+from flumotion.common import common, errors, interfaces, log
+from flumotion.common import keycards, worker, planet, medium, package
+from flumotion.common import messages, signals
 # serializable worker and component state
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
@@ -42,8 +42,6 @@ from flumotion.configure import configure
 from flumotion.common import reload, connection
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
-
-from flumotion.common.pygobject import gsignal, gproperty
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -145,7 +143,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
-class AdminModel(medium.PingingMedium, gobject.GObject):
+class AdminModel(medium.PingingMedium, signals.SignalMixin):
     """
     I live in the admin client.
     I am a data model for any admin view implementing a UI to
@@ -154,14 +152,9 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
 
     Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
-    gsignal('connected')
-    gsignal('disconnected')
-    gsignal('connection-refused')
-    gsignal('connection-failed', str)
-    gsignal('connection-error', object)
-    gsignal('reloading', str)
-    gsignal('message', str)
-    gsignal('update')
+    __signals__ = ('connected', 'disconnected', 'connection-refused',
+                   'connection-failed', 'connection-error', 'reloading',
+                   'message', 'update')
 
     logCategory = 'adminmodel'
 
@@ -171,8 +164,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     planet = None
 
     def __init__(self):
-        self.__gobject_init__()
-        
         # All of these instance variables are private. Cuidado cabrones!
         self.connectionInfo = None
         self.keepTrying = None
@@ -658,5 +649,3 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
 
     def getWorkerHeavenState(self):
         return self._workerHeavenState
-
-pygobject.type_register(AdminModel)
