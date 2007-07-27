@@ -1,5 +1,8 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/signals.py (SignalMixin.emit): Iterate over a
+	list copy.
+
 	* flumotion/test/test_common_signals.py
 	(TestSignalMixin.testDisconnect):
 	* flumotion/common/signals.py (SignalMixin.connect): Return the

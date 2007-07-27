@@ -57,7 +57,7 @@ class SignalMixin(object):
             raise ValueError('Emitting unknown signal %s' % signalName)
 
         connections = self.__signalConnections
-        for name, proc, pargs, pkwargs in connections.itervalues():
+        for name, proc, pargs, pkwargs in connections.values():
             if name == signalName:
                 try:
                     proc(self, *(args + pargs), **pkwargs)
