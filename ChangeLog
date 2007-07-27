@@ -1,5 +1,10 @@
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py (AdminModel): This is a changelog for
+	the last change to admin.py. It makes the AdminModel not be a
+	gobject. It does not change the admin's interface. Apologies for
+	the fuckups!
+
 	* flumotion/common/signals.py (SignalMixin.emit): Iterate over a
 	list copy.
 
