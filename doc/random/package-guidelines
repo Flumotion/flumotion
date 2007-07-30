@@ -1,0 +1,13 @@
+This file contains guidelines for packagers of flumotion
+--------------------------------------------------------
+
+* configuration directory:
+  /etc/flumotion
+  should be owned by flumotion:flumotion, 750
+  This allows people in the flumotion group to examine the configuration,
+  but no ordinary users.
+
+* log directory:
+  /var/log/flumotion
+  should be owned by flumotion:flumotion, 750
+
