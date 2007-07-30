@@ -1,0 +1,65 @@
+Notes on feed reconnection
+--------------------------
+
+- components get told to feed to a downstream component or eat from an
+  upstream component by the manager
+- the actual connection is to a feedserver of a worker that houses the other
+  component
+- the manager's call to eatFrom or feedTo informs the component that initiates
+  the connection about the connection information.  After that, it is the
+  component's job to make sure these feeds stay active.  This includes
+  reconnecting when there are connection problems
+- in the case of eatFrom, this is done through buffer probes and callLaters
+  that monitor if the fdsrc is pushing out data within a defined interval
+- in the case of feedTo, this can be done with the timeout property,
+  which gives us a client-removed signal
+- the base implementation of FeedComponent is responsible for doing the
+  automatic reconnection on EOS, no data received or sent, connection hangups,
+  ...
+- whenever a feed gets connected or disconnected, a vmethod should be called.
+  The default implementation should set the component hungry as soon as any
+  feed is disconnected, and set back to HAPPY as soon as all feeds are
+  connected.
+- A component like a watchdog can then override these vmethods to implement
+  a different behaviour
+- buffer checking functions for feeding multifdsinks and eating fdsrcs should
+  be per-element and not global
+
+Use Cases
+---------
+
+STOPPING A WORKER, downstream/eater initiates connection
+-----------------
+- flow:
+  - source, encoder, streamer on worker 1
+  - muxer on worker 2
+- worker 2 gets stopped (e.g. ctrl-c)
+  - muxer detaches and stops
+  - worker detaches from manager
+  - streamer goes hungry because GStreamer pipeline goes EOS
+  - streamer starts feed reconnection indefinately as long as it is not
+    told to stop
+  - manager can tell it to stop, since it knows the component was stopped;
+    FIXME: figure out if we can shoehorn "stop" into eatFrom at all ?
+- worker 2 gets started
+  - worker logs in to manager
+  - manager asks to start muxer component
+  - muxer goes happy again
+  - streamer should be reconnected to muxer and turn happy as well
+- note:
+  - the muxer got stopped and started again; the stream will effectively
+    be different, not just with a discontinuity (e.g. the ogg serial will
+    be different)
+
+LOSING NETWORK CONNECTION
+-------------------------
+- flow: same as above
+- worker 2 connects to manager over different interface (e.g. an eth0 alias)
+- interface is brought down
+  - worker avatar times out -> disconnected in manager 
+  - worker medium times out -> disconnected in worker
+  - component avatar times out -> disconnected in manager 
+  - component medium times out -> disconnected in worker
+  - streamer stops receiving data -> turns hungry
+  - same for component -> manager marks muxer as lost
+
