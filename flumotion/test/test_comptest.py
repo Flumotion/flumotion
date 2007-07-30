@@ -46,10 +46,14 @@ class CompatTestCase(unittest.TestCase):
     """
     if not getattr(unittest.TestCase, 'failUnlessFailure', None):
         try:
-            from twisted.trial import assertions
             def failUnlessFailure(self, deferred, *expectedFailures):
-                from twisted.trial import assertions
-                return assertions.failUnlessFailure(deferred, expectedFailures)
+                def _cb(result):
+                    self.fail("did not catch an error, instead got %r" %
+                              (result,))
+                def _eb(failure):
+                    failure.trap(*expectedFailures)
+                    return failure.value
+                return deferred.addCallbacks(_cb, _eb)
         except ImportError:
             # must not be Twisted 2.0, let the test fail
             pass

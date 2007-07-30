@@ -1,6 +1,11 @@
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/test_comptest.py (CompatTestCase.failUnlessFailure):
+	FINE, just provide the whole method.
+
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/test_comptest.py (CompatTestCase.failUnlessFailure):
 	Fine, provide the method more explicitly.
 
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
