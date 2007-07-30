@@ -107,13 +107,19 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
                 value = int(pair[0])
             elif len(pair) == 2:
                 glob, value = pair
+                value = int(value)
             else:
                 self.warning("Cannot parse GStreamer debug setting '%s'." %
                     part) 
                 continue
 
             if glob:
-                gst.debug_set_threshold_for_name(glob, value)
+                try:
+                    # value has to be an integer
+                    gst.debug_set_threshold_for_name(glob, value)
+                except TypeError:
+                    self.warning("Cannot set glob %s to value %s" % (
+                        glob, value))
             else:
                 gst.debug_set_default_threshold(value)
 

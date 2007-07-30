@@ -1,3 +1,11 @@
+2007-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py
+	  (FeedComponentMedium.remote_setGstDebug):
+	  Fix setting the debug stream to a glob.
+	  Tested with bin/flumotion-command -m localhost:7531 invoke
+	  /default/http-audio setGstDebug s multi*:5
+
 2007-07-30  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent.py:
