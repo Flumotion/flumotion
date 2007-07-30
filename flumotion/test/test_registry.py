@@ -114,6 +114,77 @@ class TestRegistry(unittest.TestCase):
         self.failUnless(prop.isRequired())
         self.failUnless(prop.isMultiple())
 
+    def testParseComponentCompoundProperties(self):
+        self.failUnless(self.reg.isEmpty())
+        self.reg.addFromString("""
+<registry>
+  <components>
+    <component type="component">
+      <properties>
+        <property name="source" type="string" required="yes" multiple="no" description="a source property" />
+        <compound-property name="group" required="yes" multiple="yes"
+                           description="a group of properties">
+          <property name="first" type="int" required="yes" multiple="no"
+                    description="a required int property" />
+          <property name="last" type="bool" required="no" multiple="yes"
+                    description="an optional bool property" />
+        </compound-property>
+      </properties>
+    </component>
+  </components>
+</registry>""")
+
+        comp = self.reg.getComponent('component')
+        props = dict([(p.getName(), p) for p in comp.getProperties()])
+        self.failUnless(props)
+        self.assertEquals(len(props), 2)
+        self.failUnless(comp.hasProperty('source'))
+        self.failUnless(comp.hasProperty('group'))
+
+        prop = props['source']
+        self.failUnless(isinstance(prop, registry.RegistryEntryProperty))
+        self.failIf(isinstance(prop, registry.RegistryEntryCompoundProperty))
+        self.assertEquals(prop.getName(), 'source')
+        self.assertEquals(prop.getType(), 'string')
+        self.assertEquals(prop.getDescription(), 'a source property')
+        self.failUnless(prop.isRequired())
+        self.failIf(prop.isMultiple())
+
+        prop = props['group']
+        self.failUnless(isinstance(prop, registry.RegistryEntryProperty))
+        self.failUnless(isinstance(prop,
+                                   registry.RegistryEntryCompoundProperty))
+        self.assertEquals(prop.getName(), 'group')
+        self.assertEquals(prop.getType(), 'compound')
+        self.assertEquals(prop.getDescription(), 'a group of properties')
+        self.failUnless(prop.isRequired())
+        self.failUnless(prop.isMultiple())
+
+        # get and test (sub)properties of the compound property 'group'
+        props = dict([(p.getName(), p) for p in prop.getProperties()])
+        self.failUnless(props)
+        self.assertEquals(len(props), 2)
+        self.failUnless(prop.hasProperty('first'))
+        self.failUnless(prop.hasProperty('last'))
+
+        prop = props['first']
+        self.failUnless(isinstance(prop, registry.RegistryEntryProperty))
+        self.failIf(isinstance(prop, registry.RegistryEntryCompoundProperty))
+        self.assertEquals(prop.getName(), 'first')
+        self.assertEquals(prop.getType(), 'int')
+        self.assertEquals(prop.getDescription(), 'a required int property')
+        self.failUnless(prop.isRequired())
+        self.failIf(prop.isMultiple())
+
+        prop = props['last']
+        self.failUnless(isinstance(prop, registry.RegistryEntryProperty))
+        self.failIf(isinstance(prop, registry.RegistryEntryCompoundProperty))
+        self.assertEquals(prop.getName(), 'last')
+        self.assertEquals(prop.getType(), 'bool')
+        self.assertEquals(prop.getDescription(), 'an optional bool property')
+        self.failIf(prop.isRequired())
+        self.failUnless(prop.isMultiple())
+
     def testParseComponentPropertiesErrors(self):
         template = """
 <registry>
@@ -277,7 +348,131 @@ class TestRegistry(unittest.TestCase):
             t = targetlines.pop()
             self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
                 i, d, t))
-            
+
+    def testDumpWithCompoundProperties(self):
+        xml = """
+<registry>
+  <components>
+    <component type="bar" base="base/dir"
+               description="A bar component.">
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
+      <properties>
+        <compound-property name="cgrr" description="an cgrry property">
+          <property name="c" type="int" description="c property"/>
+        </compound-property>
+        <property name="cux" type="string" description="a cuxy property"/>
+      </properties>
+    </component>
+  </components>
+  <plugs>
+    <plug type="baz" socket="frogger">
+      <entry location="loc" function="main"/>
+      <properties>
+        <property name="qux" type="string" description="a quxy property"/>
+        <compound-property name="grr" description="an agrry property">
+          <property name="a" type="int" description="a property"/>
+        </compound-property>
+      </properties>
+    </plug>
+  </plugs>
+  <bundles>
+    <bundle name="test-bundle">
+      <dependencies>
+        <dependency name="test-dependency"/>
+      </dependencies>
+      <directories>
+        <directory name="/tmp">
+          <filename location="loc" relative="lob"/>
+        </directory>
+        <directory name="foobie">
+          <filename location="barie"/>
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>"""
+        reg = registry.ComponentRegistry()
+        reg.clean()
+        reg.addFromString(xml)
+        import sys, StringIO
+        s = StringIO.StringIO()
+        reg.dump(s)
+        s.seek(0, 0)
+        data = s.read()
+        target = """<registry>
+
+  <components>
+
+    <component type="bar" base="base/dir"
+               description="A bar component.">
+      <source location="None"/>
+      <synchronization required="no" clock-priority="100"/>
+      <properties>
+        <compound-property name="cgrr"
+                           description="an cgrry property"
+                           required="False" multiple="False">
+          <property name="c" type="int"
+                    description="c property"
+                    required="False" multiple="False"/>
+        </compound-property>
+        <property name="cux" type="string"
+                  description="a cuxy property"
+                  required="False" multiple="False"/>
+      </properties>
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
+    </component>
+
+  </components>
+
+  <plugs>
+
+    <plug type="baz" socket="frogger">
+      <entry location="loc" function="main"/>
+      <properties>
+        <property name="qux" type="string"
+                  description="a quxy property"
+                  required="False" multiple="False"/>
+        <compound-property name="grr"
+                           description="an agrry property"
+                           required="False" multiple="False">
+          <property name="a" type="int"
+                    description="a property"
+                    required="False" multiple="False"/>
+        </compound-property>
+      </properties>
+    </plug>
+
+  </plugs>
+
+  <bundles>
+    <bundle name="test-bundle" under="pythondir" project="flumotion">
+      <dependencies>
+        <dependency name="test-dependency"/>
+      </dependencies>
+      <directories>
+        <directory name="/tmp">
+          <filename location="loc" relative="lob"/>
+        </directory>
+        <directory name="foobie">
+          <filename location="barie" relative="foobie/barie"/>
+        </directory>
+      </directories>
+    </bundle>
+
+  </bundles>
+</registry>
+"""
+        datalines = data.splitlines()
+        targetlines = target.splitlines()
+        self.assertEquals(len(targetlines), len(datalines))
+        for i, (d, t) in enumerate(zip(datalines, targetlines)):
+            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
+                i + 1, d, t))
+
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')

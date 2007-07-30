@@ -1,3 +1,14 @@
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/common/registry.py:
+	Add compound-property support: add RegistryEntryCompoundProperty
+	class and parsing methods, update property parsing methods to look
+	for 'compound-property'; modify RegistryWriter to print nested
+	compound and simple properties properly.
+
+	* flumotion/test/test_registry.py:
+	Add test cases for compound properties.
+
 2007-07-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py: Don't import sys.

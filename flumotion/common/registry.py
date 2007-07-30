@@ -280,6 +280,32 @@ class RegistryEntryProperty:
     def isMultiple(self):
         return self.multiple
 
+class RegistryEntryCompoundProperty(RegistryEntryProperty):
+    "This class represents a <compound-property> entry in the registry"
+    def __init__(self, name, description, properties, required=False,
+                 multiple=False):
+        RegistryEntryProperty.__init__(self, name, 'compound', description,
+                                       required, multiple)
+        self.properties = properties
+
+    def __repr__(self):
+        return '<Compound-property name=%s>' % self.name
+
+    def getProperties(self):
+        """
+        Get a list of all sub-properties.
+
+        @rtype: list of L{RegistryEntryProperty}
+        """
+        return self.properties.values()
+
+    def hasProperty(self, name):
+        """
+        Check if the compound-property has a sub-property with the
+        given name.
+        """
+        return name in self.properties
+
 class RegistryEntryFile:
     "This class represents a <file> entry in the registry"
     def __init__(self, filename, type):
@@ -466,16 +492,44 @@ class RegistryParser(fxml.Parser):
         return RegistryEntryProperty(name, type, description, required=required,
                                      multiple=multiple)
 
+    def _parseCompoundProperty(self, node):
+        # <compound-property name="..." required="yes/no" multiple="yes/no">
+        #   <property ... />*
+        #   <compound-property ... >...</compound-property>*
+        # </compound-property>
+        # returns: RegistryEntryCompoundProperty
+
+        attrs = self.parseAttributes(node, required=('name',),
+            optional=('required', 'multiple', 'description'))
+        name, required, multiple, description = attrs
+        required = common.strToBool(required)
+        multiple = common.strToBool(multiple)
+
+        properties = {}
+        def addProperty(prop):
+            properties[prop.getName()] = prop
+
+        parsers = {'property': (self._parseProperty, addProperty),
+                   'compound-property': (self._parseCompoundProperty,
+                                         addProperty)}
+        self.parseFromTable(node, parsers)
+
+        return RegistryEntryCompoundProperty(name, description, properties,
+                   required=required, multiple=multiple)
+
     def _parseProperties(self, node):
         # <properties>
-        #   <property>
+        #   <property>*
+        #   <compound-proerty>*
         # </properties>
         
         properties = {}
         def addProperty(prop):
             properties[prop.getName()] = prop
 
-        parsers = {'property': (self._parseProperty, addProperty)}
+        parsers = {'property': (self._parseProperty, addProperty),
+                   'compound-property': (self._parseCompoundProperty,
+                                         addProperty)}
 
         self.parseFromTable(node, parsers)
 
@@ -905,7 +959,28 @@ class RegistryWriter(log.Loggable):
         
         def w(i, msg):
             print >> fd, ' '*i + msg
-            
+
+        def _dump_proplist(i, proplist, ioff=2):
+            for prop in proplist:
+                if isinstance(prop, RegistryEntryCompoundProperty):
+                    _dump_compound(i, prop)
+                else:
+                    w(i, ('<property name="%s" type="%s"'
+                          % (prop.getName(), prop.getType())))
+                    w(i, ('          description="%s"'
+                          % (prop.getDescription(),)))
+                    w(i, ('          required="%s" multiple="%s"/>'
+                          % (prop.isRequired(), prop.isMultiple())))
+
+        def _dump_compound(i, cprop, ioff=2):
+            w(i, ('<compound-property name="%s"' % (cprop.getName(),)))
+            w(i, ('                   description="%s"'
+                  % (cprop.getDescription(),)))
+            w(i, ('                   required="%s" multiple="%s">'
+                  % (cprop.isRequired(), cprop.isMultiple())))
+            _dump_proplist(i + ioff, cprop.getProperties())
+            w(i, ('</compound-property>'))
+
         w(0, '<registry>')
         w(0, '')
 
@@ -936,13 +1011,7 @@ class RegistryWriter(log.Loggable):
                 w(6, '</sockets>')
 
             w(6, '<properties>')
-            for prop in component.getProperties():
-                w(8, ('<property name="%s" type="%s"'
-                      % (prop.getName(), prop.getType())))
-                w(8, ('          description="%s"'
-                      % (prop.getDescription(),)))
-                w(8, ('          required="%s" multiple="%s"/>'
-                      % (prop.isRequired(), prop.isMultiple())))
+            _dump_proplist(8, component.getProperties())
             w(6, '</properties>')
 
             files = component.getFiles()
@@ -981,12 +1050,7 @@ class RegistryWriter(log.Loggable):
                   % (entry.getLocation(), entry.getFunction())))
 
             w(6, '<properties>')
-            for prop in plug.getProperties():
-                w(8, ('<property name="%s" type="%s"' % (
-                      prop.getName(), prop.getType())))
-                w(8, ('          description="%s"' % prop.getDescription()))
-                w(8, ('          required="%s" multiple="%s"/>' % (
-                         prop.isRequired(), prop.isMultiple())))
+            _dump_proplist(8, plug.getProperties())
             w(6, '</properties>')
 
             w(4, '</plug>')
