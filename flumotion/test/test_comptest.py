@@ -47,9 +47,11 @@ class CompatTestCase(unittest.TestCase):
     if not getattr(unittest.TestCase, 'failUnlessFailure', None):
         try:
             from twisted.trial import assertions
-            failUnlessFailure = lambda self, deferred, expectedFailures: \
-                assertions.failUnlessFailure(deferred, expectedFailures)
+            def failUnlessFailure(self, deferred, *expectedFailures):
+                from twisted.trial import assertions
+                return assertions.failUnlessFailure(deferred, expectedFailures)
         except ImportError:
+            # must not be Twisted 2.0, let the test fail
             pass
 
 class CompTestTestCase(log.Loggable, CompatTestCase,
