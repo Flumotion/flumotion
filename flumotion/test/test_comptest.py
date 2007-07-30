@@ -39,7 +39,20 @@ from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
 from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
 
-class CompTestTestCase(log.Loggable, unittest.TestCase,
+class CompatTestCase(unittest.TestCase):
+    """TestCase in Twisted 2.0 doesn't define 'failUnlessFailure' method.
+
+    This class adds it, if necessary.
+    """
+    if not getattr(unittest.TestCase, 'failUnlessFailure', None):
+        try:
+            from twisted.trial import assertions
+            failUnlessFailure = lambda self, deferred, expectedFailures: \
+                assertions.failUnlessFailure(deferred, expectedFailures)
+        except ImportError:
+            pass
+
+class CompTestTestCase(log.Loggable, CompatTestCase,
                        ComponentUnitTestMixin):
     logCategory = 'comptest-test'
 
@@ -68,7 +81,7 @@ class TestCompTestGtk2Reactorness(unittest.TestCase):
         else:
             self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
 
-class TestComponentWrapper(unittest.TestCase):
+class TestComponentWrapper(CompatTestCase):
     def test_get_unique_name(self):
         self.failIfEquals(ComponentWrapper.get_unique_name(),
                           ComponentWrapper.get_unique_name())

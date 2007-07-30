@@ -1,5 +1,11 @@
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/test_comptest.py (CompatTestCase, CompTestTestCase,
+	  TestComponentWrapper):
+	Add failUnlessFailure method (for Twisted 2.0 compatibility).
+
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/test_comptest.py:
 	Use assertEquals instead of failUnlessEquals (for Twisted 2.0
 	compatibility).
