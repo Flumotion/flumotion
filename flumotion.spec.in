@@ -234,6 +234,7 @@ fi
 %{_bindir}/flumotion-job
 %{_bindir}/flumotion-inspect
 %{_bindir}/flumotion-launch
+%{_bindir}/flumotion-rrdmon
 %{_sbindir}/flumotion
 
 %{_libdir}/flumotion
@@ -256,6 +257,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Mon Jul 30 2007 Arek Korbik <arkadini at gmail dot com>
+- Add flumotion-rrdmon
+
 * Tue Jun 26 2007 Christian Schaller <christian at fluendo dot com>
 - Adding SELinux policy file for setting device access
 

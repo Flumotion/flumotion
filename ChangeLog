@@ -1,5 +1,10 @@
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion.spec.in:
+	Add flumotion-rrdmon.
+
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/test_comptest.py (CompatTestCase, CompTestTestCase,
 	  TestComponentWrapper):
 	Add failUnlessFailure method (for Twisted 2.0 compatibility).
