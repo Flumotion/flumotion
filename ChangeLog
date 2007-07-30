@@ -1,5 +1,14 @@
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/common/config.py:
+	Add compound-property support: add xml-parsing and update config
+	dict building methods.
+
+	* flumotion/test/test_config.py:
+	Add test cases for compound properties.
+
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/common/registry.py:
 	Add compound-property support: add RegistryEntryCompoundProperty
 	class and parsing methods, update property parsing methods to look

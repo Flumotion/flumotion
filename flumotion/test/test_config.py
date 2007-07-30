@@ -64,6 +64,29 @@ regchunk = """
     <component type="test-component-with-multiple-eater">
       <eater name="default" multiple="true" />
     </component>
+    <component type="test-component-with-compound-properties">
+      <properties>
+        <compound-property name="one">
+          <property name="one" type="string" />
+          <property name="two" type="int" />
+        </compound-property>
+        <compound-property name="two" multiple="true" required="true">
+          <property name="one" type="string" required="true" />
+          <property name="two" type="int" />
+          <property name="three" type="float" />
+        </compound-property>
+        <compound-property name="three" multiple="true">
+          <property name="one" type="string" />
+          <property name="two" type="int" />
+          <property name="three" type="float" />
+          <compound-property name="four" multiple="no">
+            <property name="one" type="string" />
+            <property name="two" type="int" />
+          </compound-property>
+        </compound-property>
+        <property name="five" type="bool"/>
+      </properties>
+    </component>
   </components>
   <plugs>
     <plug socket="foo.bar" type="frobulator">
@@ -77,6 +100,18 @@ regchunk = """
       <entry location="qux/baz.py" function="Quxulator"/>
       <properties>
         <property name="foo" type="string" required="true"/>
+      </properties>
+    </plug>
+    <plug socket="foo.bar" type="compoundulator">
+      <entry location="xom/baz.py" function="Xombulator"/>
+      <properties>
+        <property name="act" type="bool" required="true" />
+        <compound-property name="cp1" multiple="true" required="true">
+          <property name="one" type="string" required="true" />
+        </compound-property>
+        <compound-property name="cp2" multiple="false" required="false">
+          <property name="two" type="int" required="false" />
+        </compound-property>
       </properties>
     </plug>
   </plugs>
@@ -491,6 +526,139 @@ class TestConfig(unittest.TestCase):
         # synchronization
         self.assertEquals(conf['clock-master'], None)
 
+    def testParseCompoundProperties(self):
+        planet = ConfigXML(
+             """<planet><flow name="default">
+             <component name="component-name"
+                        type="test-component-with-compound-properties"
+                        worker="foo">
+               <compound-property name="one">
+                 <property name="one">string</property>
+                 <property name="two">1</property>
+               </compound-property>
+               <compound-property name="two">
+                 <property name="one">string</property>
+                 <property name="three">2.5</property>
+               </compound-property>
+               <compound-property name="two">
+                 <property name="one">unicode</property>
+                 <property name="two">2</property>
+               </compound-property>
+               <compound-property name="three">
+                 <property name="one">string</property>
+                 <property name="two">1</property>
+                 <property name="three">2.5</property>
+                 <compound-property name="four">
+                   <property name="one">s</property>
+                   <property name="two">1</property>
+                 </compound-property>
+               </compound-property>
+               <property name="five">True</property>
+             </component></flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        component = flow.components['component-name']
+        conf = component.getConfigDict()
+        props = conf.get('properties')
+        self.failUnless(isinstance(props, dict))
+        self.assertEquals(props.get('one'), {'one': 'string', 'two': 1})
+        self.assertEquals(props.get('two'), [{'one': 'string', 'three': 2.5},
+                                             {'one': 'unicode', 'two': 2}])
+        self.assertEquals(props.get('three'), [{'one': 'string', 'two': 1,
+                                                'three': 2.5,
+                                                'four': {'one':'s','two':1}}])
+        self.failUnless(props.get('five'))
+
+    def testParseCompoundPropertiesError(self):
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # no required compound property 'two'
+        self.assertRaises(errors.ConfigError, conf.parse)
+
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+                <compound-property name="two">
+                </compound-property>
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # no required subproperty 'one' of the compound property 'two'
+        self.assertRaises(errors.ConfigError, conf.parse)
+
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+                <property name="two" />
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # wrong tags: 'property' instead of 'compound-property'
+        self.assertRaises(errors.ConfigError, conf.parse)
+
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+                <compound-property name="five">
+                  <property name="foo">bar</property>
+                </compound-property>
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # wrong tags: 'compound-property' instead of 'property'
+        self.assertRaises(errors.ConfigError, conf.parse)
+
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+                <compound-property name="one">
+                  <property name="one">foo</property>
+                </compound-property>
+                <compound-property name="one">
+                  <property name="one">bar</property>
+                </compound-property>
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # multiple compound properties for 'one' not allowed
+        self.assertRaises(errors.ConfigError, conf.parse)
+
+        xml = """<planet><flow name="default">
+              <component name="component-name"
+                         type="test-component-with-compound-properties"
+                         worker="foo">
+                <compound-property name="three">
+                  <compound-property name="four">
+                    <property name="one">string</property>
+                  </compound-property>
+                  <compound-property name="four">
+                    <property name="one">string</property>
+                  </compound-property>
+                </compound-property>
+              </component>
+            </flow></planet>"""
+        conf = ConfigXML(xml)
+        self.failUnless(conf)
+        # multiple compound properties for 'four', inside 'three' not allowed
+        self.assertRaises(errors.ConfigError, conf.parse)
+
     def testParsePlugs(self):
         planet = ConfigXML(
              """<planet><flow name="default">
@@ -517,6 +685,45 @@ class TestConfig(unittest.TestCase):
                           {'socket': 'foo.bar',
                            'type': 'frobulator',
                            'properties': {'rate': (3, 4)}})
+
+    def testParsePlugsWithCompoundProperties(self):
+        planet = ConfigXML(
+             """<planet><flow name="default">
+             <component name="component-name" type="test-component"
+                        worker="foo">
+               <plugs>
+                 <plug socket="foo.bar" type="compoundulator">
+                   <property name="act">true</property>
+                   <compound-property name="cp1">
+                     <property name="one">a string</property>
+                   </compound-property>
+                   <compound-property name="cp1">
+                     <property name="one">a second string</property>
+                   </compound-property>
+                   <compound-property name="cp2">
+                     <property name="two">2</property>
+                   </compound-property>
+                 </plug>
+               </plugs>
+             </component></flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        component = flow.components['component-name']
+        conf = component.getConfigDict()
+        plugs = conf['plugs']
+        self.assertEquals(plugs.keys(), ['foo.bar'])
+        foobars = plugs['foo.bar']
+        self.assertEquals(len(foobars), 1)
+        self.assertEquals(foobars[0],
+                          {'socket': 'foo.bar',
+                           'type': 'compoundulator',
+                           'properties': {'cp1': [{'one': 'a string'},
+                                                  {'one': 'a second string'}],
+                                          'cp2': {'two': 2},
+                                          'act': True}})
 
     def testParseNoPlugs(self):
         planet = ConfigXML(

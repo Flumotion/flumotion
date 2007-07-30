@@ -119,6 +119,22 @@ def parsePropertyValue(propName, type, value):
                           % (propName, value, type,
                              log.getExceptionMessage(e)))
 
+def parseCompoundPropertyValue(name, definition, value):
+    if isinstance(value, (list, tuple)):
+        try:
+            parsed = buildPropertyDict(value, definition.getProperties())
+        except ConfigError, ce:
+            m = ('(inside compound-property %r) %s' %
+                 (name, ce.args[0]))
+            raise ConfigError(m)
+    # elif isinstance(value, basestring):
+    #    FIXME: parse the string representation of the compound property?
+    #    pass
+    else:
+        raise ConfigError('simple value specified where compound property'
+                          ' (name=%r) expected' % (name,))
+    return parsed
+
 def buildPropertyDict(propertyList, propertySpecList):
     """Build a property dict suitable for forming part of a component
     config.
@@ -140,7 +156,13 @@ def buildPropertyDict(propertyList, propertySpecList):
             raise ConfigError('unknown property %s' % (name,))
         definition = prop_specs[name]
 
-        parsed = parsePropertyValue(name, definition.type, value)
+        if isinstance(definition, registry.RegistryEntryCompoundProperty):
+            parsed = parseCompoundPropertyValue(name, definition, value)
+        else:
+            if isinstance(value, (list, tuple)):
+                raise ConfigError('compound value specified where simple'
+                                  ' property (name=%r) expected' % (name,))
+            parsed = parsePropertyValue(name, definition.type, value)
         if definition.multiple:
             vals = ret.get(name, [])
             vals.append(parsed)
@@ -429,8 +451,9 @@ class BaseConfigParser(fxml.Parser):
             # seems not
             socket, type = self.parseAttributes(node, ('socket', 'type'))
             properties = []
-            parsers = {'property': (self._parseProperty,
-                                    properties.append)}
+            parsers = {'property': (self._parseProperty, properties.append),
+                       'compound-property': (self._parseCompoundProperty,
+                                             properties.append)}
             self.parseFromTable(node, parsers)
             return type, properties
 
@@ -479,6 +502,8 @@ class BaseConfigParser(fxml.Parser):
         def parseBool(node):
             return self.parseTextNode(node, common.strToBool)
         parsers = {'property': (self._parseProperty, properties.append),
+                   'compound-property': (self._parseCompoundProperty,
+                                         properties.append),
                    'plugs': (self.parsePlugs, plugs.extend)}
 
         if isFeedComponent:
@@ -523,6 +548,20 @@ class BaseConfigParser(fxml.Parser):
     def _parseProperty(self, node):
         name, = self.parseAttributes(node, ('name',))
         return name, self.parseTextNode(node, lambda x: x)
+
+    def _parseCompoundProperty(self, node):
+        # <compound-property name="name">
+        #   <property name="name">value</property>*
+        #   <compound-property name="name">...</compound-property>*
+        # </compound-property>
+        name, = self.parseAttributes(node, ('name',))
+        properties = []
+        parsers = {'property': (self._parseProperty, properties.append),
+                   'compound-property': (self._parseCompoundProperty,
+                                         properties.append)}
+        self.parseFromTable(node, parsers)
+        return name, properties
+
 
 # FIXME: rename to PlanetConfigParser or something (should include the
 # word 'planet' in the name)
