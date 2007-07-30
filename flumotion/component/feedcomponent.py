@@ -240,6 +240,15 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug('remote_provideMasterClock(port=%r)' % port)
         return self.comp.provide_master_clock(port)
 
+    def remote_getMasterClockInfo(self, port):
+        """
+        Return the clock master info created by a previous call to provideMasterClock.
+
+        @returns: (ip, port, base_time)
+        @rtype:   tuple of (str, int, long)
+        """
+        return self.comp.get_master_clock()
+
     def remote_effect(self, effectName, methodName, *args, **kwargs):
         """
         Invoke the given methodName on the given effectName in this component.

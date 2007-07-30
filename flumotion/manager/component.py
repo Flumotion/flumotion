@@ -1008,6 +1008,27 @@ class ComponentHeaven(base.ManagerHeaven):
             # houston, we have a master clock
             self.removeMasterClock(componentAvatar)
 
+    def setMasterClockInfo(self, result, componentAvatar):
+        # we get host, port, base_time
+        # FIXME: host is the default from NetClock, so the local IP,
+        # always.  A little inconvenient.
+        avatarId = componentAvatar.avatarId
+        self.info('Received master clock info from clock master %s' % avatarId)
+        self.debug('got master clock info: %r' % (result, ))
+        self._masterClockInfo[avatarId] = result
+        self.vishnu._depgraph.setClockMasterStarted(
+            componentAvatar.componentState)
+        # not in process of providing anymore
+        componentAvatar._providingClock = False
+
+        # wake all components waiting on the clock master info
+        if avatarId in self._clockMasterWaiters:
+            waiters = self._clockMasterWaiters.pop(avatarId)
+            for d, waiterId in waiters:
+                self.debug('giving master clock info to waiting component %s', waiterId)
+                d.callback(result)
+        return result
+
     def provideMasterClock(self, componentAvatar):
         """
         Tell the given component to provide a master clock.
@@ -1020,32 +1041,6 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         avatarId = componentAvatar.avatarId
         self.debug('provideMasterClock on component %s' % avatarId)
-
-        def setMasterClockInfo(result):
-            # we get host, port, base_time
-            # FIXME: host is the default from NetClock, so the local IP,
-            # always.  A little inconvenient.
-            self._masterClockInfo[avatarId] = result
-            self.vishnu._depgraph.setClockMasterStarted(
-                componentAvatar.componentState)
-            # not in process of providing anymore
-            componentAvatar._providingClock = False
-            return result
-
-        def wakeClockMasterWaiters(result):
-            self.info('Received master clock info from clock master %s' %
-                avatarId)
-            self.debug('got master clock info: %r' % (result, ))
-
-            # wake all components waiting on the clock master info
-            if avatarId in self._clockMasterWaiters:
-                waiters = self._clockMasterWaiters[avatarId]
-                del self._clockMasterWaiters[avatarId]
-                for d, waiterId in waiters:
-                    self.debug(
-                        'giving master clock info to waiting component %s' %
-                        waiterId)
-                    d.callback(result)
 
         workerName = componentAvatar.getWorkerName()
         port = self.vishnu.reservePortsOnWorker(workerName, 1)[0]
@@ -1068,8 +1063,7 @@ class ComponentHeaven(base.ManagerHeaven):
                          % (avatarId, self._masterClockInfo[avatarId]))
             del self._masterClockInfo[avatarId]
         d = componentAvatar.mindCallRemote('provideMasterClock', port)
-        d.addCallback(setMasterClockInfo)
-        d.addCallback(wakeClockMasterWaiters)
+        d.addCallback(self.setMasterClockInfo, componentAvatar)
         d.addErrback(failedToProvideMasterClock)
         return d
 

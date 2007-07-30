@@ -1259,6 +1259,12 @@ class Vishnu(log.Loggable):
                     "so must already be providing clock master",
                     componentAvatar.avatarId)
                 self._depgraph.setClockMasterStarted(state)
+
+                # And we need to trigger any deferreds waiting for the clocking
+                # info - so get the clock info
+                d = componentAvatar.mindCallRemote('getMasterClockInfo')
+                d.addCallback(self.componentHeaven.setMasterClockInfo)
+
             self._depgraph.setComponentSetup(state)
 
         self.debug('vishnu registered component %r' % componentAvatar)

@@ -486,6 +486,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self._pad_monitors_inactive = 0
 
         self.clock_provider = None
+        self._master_clock_info = None # (ip, port, basetime) if we're the 
+                                       # clock master
 
         self.eater_names = [] # componentName:feedName list
         self._eaterReconnectDC = {} 
@@ -1007,6 +1009,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline.set_base_time(base_time)
         self.pipeline.use_clock(clock)
 
+    def get_master_clock(self):
+        """
+        Return the connection details for the master clock, if any.
+        """
+
+        return self._master_clock_info
+
     def provide_master_clock(self, port):
         """
         Tell the component to provide a master clock on the given port.
@@ -1036,7 +1045,8 @@ class FeedComponent(basecomponent.BaseComponent):
             else:
                 ip = "127.0.0.1"
 
-            return (ip, port, base_time)
+            self._master_clock_info = (ip, port, base_time)
+            return self._master_clock_info
 
         if not self.pipeline:
             self.warning('No self.pipeline, cannot provide master clock')
@@ -1060,9 +1070,7 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             self.info ("Pipeline already started, retrieving clocking")
             # Just return the already set up info, as a fired deferred
-            ip = self.state.get('manager-ip')
-            base_time = self.pipeline.get_base_time()
-            return defer.succeed((ip, port, base_time))
+            return defer.succeed(self._master_clock_info)
 
     # FIXME: rename, since this just starts the pipeline,
     # and linking is done by the manager

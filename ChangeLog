@@ -1,3 +1,14 @@
+2007-07-30  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	  Keep master clock info. Provide it by a remote method.
+
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	  Store clock master info when a clockmaster logs in. Trigger
+	  deferreds waiting for it.
+
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/common/config.py:
