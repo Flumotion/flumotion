@@ -64,7 +64,7 @@ class TestCompTestGtk2Reactorness(unittest.TestCase):
                           gtk2reactor.Gtk2Reactor):
             # not running with a gtk2reactor, comptest.HAVE_GTK2REACTOR
             # should be False
-            self.failUnlessEquals(comptest.HAVE_GTK2REACTOR, False)
+            self.assertEquals(comptest.HAVE_GTK2REACTOR, False)
         else:
             self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
 
@@ -81,12 +81,12 @@ class TestComponentWrapper(unittest.TestCase):
 
     def test_valid_type(self):
         cw = ComponentWrapper('pipeline-producer', None, name='pp')
-        self.failUnlessEquals(cw.cfg,
-                              {'feed': ['default'], 'name': 'pp',
-                               'parent': 'default', 'clock-master': None,
-                               'avatarId': '/default/pp', 'eater': {},
-                               'source': [], 'plugs': {}, 'properties': {},
-                               'type': 'pipeline-producer'})
+        self.assertEquals(cw.cfg,
+                          {'feed': ['default'], 'name': 'pp',
+                           'parent': 'default', 'clock-master': None,
+                           'avatarId': '/default/pp', 'eater': {},
+                           'source': [], 'plugs': {}, 'properties': {},
+                           'type': 'pipeline-producer'})
 
 
     def test_simple_link(self):
@@ -94,8 +94,8 @@ class TestComponentWrapper(unittest.TestCase):
         pc = ComponentWrapper('pipeline-converter', None)
 
         pp.feed(pc)
-        self.failUnlessEquals(pc.cfg['source'], ['pp:default'])
-        self.failUnlessEquals(pc.cfg['eater'], {'default': ['pp:default']})
+        self.assertEquals(pc.cfg['source'], ['pp:default'])
+        self.assertEquals(pc.cfg['eater'], {'default': ['pp:default']})
 
     def test_non_default_link(self):
         fwp = ComponentWrapper('firewire-producer', None, name='fwp')
@@ -108,9 +108,9 @@ class TestComponentWrapper(unittest.TestCase):
         fwp.feed(pc, [('video', 'default')])
         fwp.feed(pc, [('audio', 'default')])
 
-        self.failUnlessEquals(pc.cfg['source'], ['fwp:video', 'fwp:audio'])
-        self.failUnlessEquals(pc.cfg['eater'],
-                              {'default': ['fwp:video', 'fwp:audio']})
+        self.assertEquals(pc.cfg['source'], ['fwp:video', 'fwp:audio'])
+        self.assertEquals(pc.cfg['eater'],
+                          {'default': ['fwp:video', 'fwp:audio']})
 
 
     def test_instantiate_and_setup_errors(self):
@@ -180,12 +180,12 @@ class TestCompTestSetup(CompTestTestCase):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
 
         prod_feed = '%s:%s' % (self.prod.name, self.prod.cfg['feed'][0])
-        self.failUnlessEquals([prod_feed], self.cnv1.cfg['source'])
-        self.failUnlessEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
+        self.assertEquals([prod_feed], self.cnv1.cfg['source'])
+        self.assertEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
 
         cnv1_feed = '%s:%s' % (self.cnv1.name, self.cnv1.cfg['feed'][0])
-        self.failUnlessEquals([cnv1_feed], self.cnv2.cfg['source'])
-        self.failUnlessEquals({'default': [cnv1_feed]}, self.cnv2.cfg['eater'])
+        self.assertEquals([cnv1_feed], self.cnv2.cfg['source'])
+        self.assertEquals({'default': [cnv1_feed]}, self.cnv2.cfg['eater'])
 
     def test_dont_auto_link_linked(self):
         p2 = pipeline_src()
@@ -200,15 +200,15 @@ class TestCompTestSetup(CompTestTestCase):
         self.p.set_flow([p2, self.prod, self.cnv2, self.cnv1])
 
         prod_feed = '%s:%s' % (p2.name, p2.cfg['feed'][0])
-        self.failUnlessEquals([prod_feed], self.cnv1.cfg['source'])
-        self.failUnlessEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
+        self.assertEquals([prod_feed], self.cnv1.cfg['source'])
+        self.assertEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
 
-        self.failUnlessEquals([], self.prod.cfg['source'])
-        self.failUnlessEquals({}, self.prod.cfg['eater'])
+        self.assertEquals([], self.prod.cfg['source'])
+        self.assertEquals({}, self.prod.cfg['eater'])
 
         prod_feed = '%s:%s' % (self.prod.name, self.prod.cfg['feed'][0])
-        self.failUnlessEquals([prod_feed], self.cnv2.cfg['source'])
-        self.failUnlessEquals({'default': [prod_feed]}, self.cnv2.cfg['eater'])
+        self.assertEquals([prod_feed], self.cnv2.cfg['source'])
+        self.assertEquals({'default': [prod_feed]}, self.cnv2.cfg['eater'])
 
     def test_master_clock(self):
         p2 = pipeline_src()
@@ -221,10 +221,10 @@ class TestCompTestSetup(CompTestTestCase):
         self.p.set_flow([self.prod, p2, self.cnv1, self.cnv2], auto_link=False)
 
         # both prod and p2 require a clock, only one should provide it
-        self.failUnlessEquals(self.prod.cfg['clock-master'],
-                              p2.cfg['clock-master'])
-        self.failUnlessEquals(self.cnv1.cfg['clock-master'], None)
-        self.failUnlessEquals(self.cnv2.cfg['clock-master'], None)
+        self.assertEquals(self.prod.cfg['clock-master'],
+                          p2.cfg['clock-master'])
+        self.assertEquals(self.cnv1.cfg['clock-master'], None)
+        self.assertEquals(self.cnv2.cfg['clock-master'], None)
 
         master = self.prod
         slave = p2
@@ -233,7 +233,7 @@ class TestCompTestSetup(CompTestTestCase):
 
         # the master-clock component should provide a clock, and not
         # require an external clock source, as opposed the the slave
-        self.failUnlessEquals(master.sync, None)
+        self.assertEquals(master.sync, None)
         self.failIfEquals(slave.sync, None)
 
 class TestCompTestFlow(CompTestTestCase):
