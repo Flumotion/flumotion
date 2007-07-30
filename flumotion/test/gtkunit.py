@@ -140,6 +140,14 @@ class GtkTestCase(unittest.TestCase):
         timeout_add(gtk.main_quit, increase=False)
         gtk.main()
 
+    def set_widget(self, widget):
+        self.window = gtk.Window()
+        self.widget = widget
+        set_window(self.window)
+        widget.reparent(self.window)
+        self.window.show_all()
+        pause()
+
     def toggle(self, name, process=True):
         """
         toggle a gtk.ToggleButton.

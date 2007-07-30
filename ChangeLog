@@ -1,5 +1,11 @@
 2007-07-30  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/gtkunit.py (GtkTestCase.set_widget):
+	flumotion-template does use the set_widget() method - revert part
+	of the r5316.
+
+2007-07-30  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/test_comptest.py (CompatTestCase.failUnlessFailure):
 	FINE, just provide the whole method.
 
