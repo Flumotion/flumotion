@@ -29,7 +29,7 @@ EXTRA_DIST = 				\
 	test_common_package.py	 	\
 	test_common_planet.py	 	\
 	test_common_pygobject.py 	\
-	test_common_signal.py	 	\
+	test_common_signals.py	 	\
 	test_component.py 		\
 	test_component_base_scheduler.py\
 	test_component_base_watcher.py  \

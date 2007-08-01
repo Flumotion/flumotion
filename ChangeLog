@@ -1,5 +1,15 @@
 2007-08-01  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/Makefile.am (EXTRA_DIST): Fix import, for the
+	last time.
+
+	* flumotion/test/common.py: Provide a way to use either the gtk2
+	or the select reactor in tests. Fixes #675. By default choose
+	randomly. Perhaps a bad idea?
+
+	* flumotion/test/test_common_package.py: Reorder imports so
+	reactor install workses.
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): Add signal mixin test,
 	this time correctly.
 

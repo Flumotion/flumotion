@@ -19,19 +19,47 @@
 
 # Headers in this file shall remain intact.
 
+import os
+
 import flumotion.common.setup
 # logging
 flumotion.common.setup.setup()
 
 from flumotion.common import log
+
+def useGtk2Reactor():
+    var = 'FLU_TEST_GTK2_REACTOR'
+
+    if var not in os.environ:
+        import random
+        # Perhaps this is a bad idea!
+        return random.choice((True, False))
+    else:
+        return True
+        
+if useGtk2Reactor():
+    log.info('check', 'using gtk2 reactor')
+    from twisted.internet import gtk2reactor
+    gtk2reactor.install()
+else:
+    log.info('check', 'using default reactor')
+
+# have to choose the reactor before calling this method
 log.logTwisted()
+
+# FIXME: boot.py does this, but enabling this borks
+# test_common_package.py. I have no idea what that code does, either.
+# 
+# # installing the reactor could override our packager's import hooks ...
+# from twisted.internet import reactor
+# # ... so we install them again here to be safe
+# from flumotion.common import package
+# package.getPackager().install()
 
 # make sure we have the right gst-python version
 from flumotion.common import boot
 boot.init_gobject()
 boot.init_gst()
-
-import os
 
 # fdpass is a built module,  so it lives in builddir, while the package
 # __init__ is in srcdir.  Append to its __path__ to make the tests work 

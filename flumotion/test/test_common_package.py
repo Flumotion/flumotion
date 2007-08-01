@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import common as testcommon
+
 import os
 import sys
 import time
@@ -29,8 +31,6 @@ from twisted.spread import pb
 from twisted.internet import reactor, address
 
 from flumotion.common import common, package
-
-import common as testcommon
 
 # for our simulation of failIfRaises
 import twisted.python.util
