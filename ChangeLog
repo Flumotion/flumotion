@@ -1,5 +1,8 @@
 2007-08-01  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py (AdminModel.remote_log): Removed, not
+	used since time memorial.
+
 	* flumotion/test/common.py (useGtk2Reactor): Following popular but
 	impolite demands, don't default to randomness.
 

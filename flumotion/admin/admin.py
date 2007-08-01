@@ -371,10 +371,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.emit('connected')
     setRemoteReference = defer_generator_method(setRemoteReference)
 
-    ### pb.Referenceable methods
-    def remote_log(self, category, type, message):
-        self.log('remote: %s: %s: %s' % (type, category, message))
-        
     # IStateListener interface
     def stateSet(self, state, key, value):
         self.debug("state set on %r: key %s" % (state, key))
