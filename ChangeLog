@@ -1,5 +1,8 @@
 2007-08-01  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/common.py (useGtk2Reactor): Following popular but
+	impolite demands, don't default to randomness.
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): Fix import, for the
 	last time.
 

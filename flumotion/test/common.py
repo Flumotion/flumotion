@@ -31,9 +31,7 @@ def useGtk2Reactor():
     var = 'FLU_TEST_GTK2_REACTOR'
 
     if var not in os.environ:
-        import random
-        # Perhaps this is a bad idea!
-        return random.choice((True, False))
+        return False
     else:
         return True
         
