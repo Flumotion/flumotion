@@ -25,10 +25,6 @@ import sys
 from flumotion.common import log, common, registry
 
 
-def err(x):
-    sys.stderr.write(x + '\n')
-    raise SystemExit(1)
-
 def printMultiline(indent, data):
     maxLen = 76 - indent # Limit to 80 cols; but we add in 4 extra spaces.
     frags = data.split(' ')
