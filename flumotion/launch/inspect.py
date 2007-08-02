@@ -38,11 +38,66 @@ def printMultiline(indent, data):
             segment += " %s" % frags.pop(0)
         print '  %s  %s' % (' ' * indent, segment)
 
+def printProperty(prop, indent):
+    pname = prop.getName()
+    desc = prop.getDescription()
+    print ('  %s%s: type %s, %s%s'
+           % (' '*(indent-len(pname)), pname, prop.getType(),
+              prop.isRequired() and 'required' or 'optional',
+              prop.isMultiple() and ', multiple ok' or ''))
+    if desc:
+        printMultiline(indent, desc)
+    if isinstance(prop, registry.RegistryEntryCompoundProperty):
+        subprop_names = [sp.getName() for sp in prop.getProperties()]
+        subprop_names.sort()
+        printMultiline(indent, 'subproperties: %s' %
+                       ', '.join(subprop_names))
+
+def printProperties(props, indent):
+    properties = [(p.getName(), p) for p in props]
+    properties.sort()
+    if properties:
+        indent = max([len(p[0]) for p in properties])
+        for _, p in properties:
+            printProperty(p, indent)
+
+class _NestedPropertyError(Exception):
+    pass
+
+def getNestedProperty(c, ppath):
+    obj_class = 'Component'
+    obj_type = c.getType()
+    if not isinstance(c, registry.RegistryEntryComponent):
+        obj_class = 'Plug'
+    if not c.hasProperty(ppath[0]):
+        raise _NestedPropertyError("%s `%s' has no property `%s'." %
+                                   (obj_class, obj_type, ppath[0]))
+    cobj = c
+    found = []
+    while ppath:
+        cname = ppath.pop(0)
+        try:
+            cobj = cobj.properties[cname]
+        except:
+            raise _NestedPropertyError("%s `%s': property `%s' has no"
+                                       " subproperty `%s'." %
+                                       (obj_class, obj_type,
+                                        ':'.join(found), cname))
+        found.append(cname)
+    return cobj
+
+
 def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
 
-    parser = optparse.OptionParser()
+    usage_str = ('Usage: %prog [options] [COMPONENT-OR-PLUG'
+                 ' [FULL-PROPERTY-NAME]]')
+    epilog_str = ("FULL-PROPERTY-NAME: represents a fully qualified"
+                  " property name, including the names of the containing"
+                  " properties: "
+                  "...[property-name:]property-name")
+    parser = optparse.OptionParser(usage=usage_str, epilog=epilog_str)
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
                       help="set debug levels")
@@ -121,19 +176,8 @@ def main(args):
                     print '  %s: %s:%s' % (k, v.getLocation(), v.getFunction())
             else:
                 print '  (None)'
-            properties = [(p.getName(), p) for p in c.getProperties()]
-            properties.sort()
             print '\nProperties:'
-            if properties:
-                indent = max([len(p[0]) for p in properties])
-                for k, v in properties:
-                    desc = v.getDescription()
-                    print ('  %s%s: type %s, %s%s'
-                           % (' '*(indent-len(k)), k, v.getType(),
-                              v.isRequired() and 'required' or 'optional',
-                              v.isMultiple() and ', multiple ok' or ''))
-                    if desc:
-                        printMultiline(indent, desc)
+            printProperties(c.getProperties(), 0)
             sockets = c.getSockets()
             print '\nClocking:'
             print '  Needs synchronisation: %r' % c.getNeedsSynchronization()
@@ -154,22 +198,49 @@ def main(args):
             e = p.getEntry()
             print '  %s() in %s' % (e.getFunction(), e.getModuleName())
             print '\nProperties:'
-            properties = [(x.getName(), x) for x in p.getProperties()]
-            properties.sort()
-            if properties:
-                indent = max([len(p[0]) for p in properties])
-                for k, v in properties:
-                    desc = v.getDescription()
-                    print ('  %s%s: type %s, %s%s'
-                           % (' '*(indent-len(k)), k, v.getType(),
-                              v.isRequired() and 'required' or 'optional',
-                              v.isMultiple() and ', multiple ok' or ''))
-                    if desc:
-                        printMultiline(indent, desc)
+            printProperties(p.getProperties(), 0)
             print
         if not handled:
-            err('Unknown component or plug `%s\'' % cname)
+            parser.exit(status=1, msg=('Unknown component or plug `%s\'\n' %
+                                       cname))
+    elif len(args) == 3:
+        cname = args[1]
+        pname = args[2]
+        ppath = pname.split(':')
+        handled = False
+        if r.hasComponent(cname):
+            handled = True
+            c = r.getComponent(cname)
+            try:
+                prop = getNestedProperty(c, ppath)
+            except _NestedPropertyError, npe:
+                parser.exit(status=1, msg='%s\n' % npe.message)
+            print '\nComponent:'
+            print '  %s' % cname
+            desc = c.getDescription()
+            if desc:
+                print '  %s' % desc
+            print '\nProperty:'
+            printProperty(prop, len(prop.getName()))
+            print
+        if r.hasPlug(cname):
+            handled = True
+            p = r.getPlug(cname)
+            try:
+                prop = getNestedProperty(p, ppath)
+            except _NestedPropertyError, npe:
+                parser.exit(status=1, msg='%s\n' % npe.message)
+            print '\nPlug:'
+            print '  %s' % cname
+            print '\nType:'
+            print '  %s' % p.getType()
+            print '\nProperty:'
+            printProperty(prop, len(prop.getName()))
+            print
+        if not handled:
+            parser.exit(status=1, msg=('Unknown component or plug `%s\'\n' %
+                                       cname))
     else:
-        err('Usage: flumotion-inspect [COMPONENT-OR-PLUG]')
+        parser.error('Could not process arguments, try "-h" option.')
 
     return 0
