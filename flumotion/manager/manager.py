@@ -1263,7 +1263,8 @@ class Vishnu(log.Loggable):
                 # And we need to trigger any deferreds waiting for the clocking
                 # info - so get the clock info
                 d = componentAvatar.mindCallRemote('getMasterClockInfo')
-                d.addCallback(self.componentHeaven.setMasterClockInfo)
+                d.addCallback(self.componentHeaven.setMasterClockInfo, 
+                    componentAvatar)
 
             self._depgraph.setComponentSetup(state)
 
