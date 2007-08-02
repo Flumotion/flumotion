@@ -1,3 +1,8 @@
+2007-08-02  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent.py:
+	  oops. No port argument to getMasterClockInfo()
+
 2007-08-02  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/launch/inspect.py (main):

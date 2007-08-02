@@ -246,7 +246,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug('remote_provideMasterClock(port=%r)' % port)
         return self.comp.provide_master_clock(port)
 
-    def remote_getMasterClockInfo(self, port):
+    def remote_getMasterClockInfo(self):
         """
         Return the clock master info created by a previous call to provideMasterClock.
 
