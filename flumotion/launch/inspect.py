@@ -89,11 +89,11 @@ def main(args):
 
     usage_str = ('Usage: %prog [options] [COMPONENT-OR-PLUG'
                  ' [FULL-PROPERTY-NAME]]')
-    epilog_str = ("FULL-PROPERTY-NAME: represents a fully qualified"
+    fpname_str = ("FULL-PROPERTY-NAME: represents a fully qualified"
                   " property name, including the names of the containing"
                   " properties: "
                   "...[property-name:]property-name")
-    parser = optparse.OptionParser(usage=usage_str, epilog=epilog_str)
+    parser = optparse.OptionParser(usage=usage_str, description=fpname_str)
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
                       help="set debug levels")

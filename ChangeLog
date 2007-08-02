@@ -1,5 +1,10 @@
 2007-08-02  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/launch/inspect.py (main):
+	Don't use python2.5 features.
+
+2007-08-02  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/launch/inspect.py:
 	Add support for compound properties in flumotion inspect.
 
