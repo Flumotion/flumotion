@@ -86,7 +86,7 @@ def _createParser():
                      default=False,
                      help="run in background as a daemon")
     group.add_option('', '--daemonize-to',
-                     action="store", dest="daemonizeTo",
+                     action="store", dest="daemonizeTo", default="/",
                      help="what directory to run from when daemonizing")
 
     parser.add_option('-L', '--logdir',
