@@ -53,7 +53,7 @@ def _createParser():
                      action="store_true", dest="daemonize",
                      help="run in background as a daemon")
     group.add_option('', '--daemonize-to',
-                     action="store", dest="daemonizeTo", default="/", 
+                     action="store", dest="daemonizeTo",
                      help="what directory to run from when daemonizing")
 
     parser.add_option('-L', '--logdir',
@@ -129,6 +129,8 @@ def main(args):
     if options.daemonize:
         if options.serviceName:
             name = options.serviceName
+        if not options.daemonizeTo:
+            options.daemonizeTo = "/"
 
     common.startup("rrdmon", name, options.daemonize, options.daemonizeTo)
 

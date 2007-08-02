@@ -3,6 +3,13 @@
 	* flumotion/admin/rrdmon/main.py:
 	* flumotion/manager/main.py:
 	* flumotion/worker/main.py:
+	  When not daemonizing, don't fail to start.
+
+2007-08-02  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/rrdmon/main.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
 	  When daemonizing, default for daemonizeTo should be '/', not None.
 	  Fixes #734.
 
