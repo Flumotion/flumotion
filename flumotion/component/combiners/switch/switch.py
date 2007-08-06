@@ -401,8 +401,9 @@ class AVSwitch(Switch):
     # In order to do this:
     # 1) we need to block all src pads of elements connected 
     #    to the switches' sink pads
-    # 2) we need to set the property "stop-value" on both the
-    #    switches to the highest value of "last-timestamp" on the two
+    # 2) we need to set the property "stop-value" on the
+    #    switches to the value of "last-timestamp" on the respective
+    #    switch.
     # 3) the pads should be switched (ie active-pad set) on the two switched
     # 4) the switch elements should be told to queue buffers coming on their
     #    active sinkpads by setting the queue-buffers property to TRUE
@@ -410,8 +411,8 @@ class AVSwitch(Switch):
     #    switch elements, so that the start value of the enxt new segment can
     #    be determined
     # 6) the src pads we blocked in 1) should be unblocked
-    # 7) when both pad probes have fired once, use the lowest timestamp received
-    #    as the start value and set the "start-value" property on the switch
+    # 7) when both pad probes have fired once, use the timestamps received
+    #    as the start value for the respective switch elements
     #    elements
     # 8) set the queue-buffers property on the switch elements to FALSE 
     def switch_to(self, eater):
@@ -463,15 +464,14 @@ class AVSwitch(Switch):
     def _set_last_timestamp(self):
         vswTs = self.videoSwitchElement.get_property("last-timestamp")
         aswTs = self.audioSwitchElement.get_property("last-timestamp")
-        tsToSet = vswTs
-        if aswTs > vswTs:
-            tsToSet = aswTs
-        self.log("Setting stop-value on switches to %u",
-            tsToSet)
+        self.log("Setting stop-value on video switch to %u",
+            vswTs)
+        self.log("Setting stop-value on audio switch to %u",
+            aswTs)
         self.videoSwitchElement.set_property("stop-value",
-            tsToSet)
+            vswTs)
         self.audioSwitchElement.set_property("stop-value",
-            tsToSet)
+            aswTs)
 
     def _block_cb(self, pad, blocked):
         self.log("here with pad %r and blocked %d", pad, blocked)
@@ -568,26 +568,24 @@ class AVSwitch(Switch):
         self.debug("here")
         activeEater = self.uiState.get("active-eater")
         haveAllStartTimes = True
-        lowestTs = 0
         for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
-            self.debug("in for loop")
             haveAllStartTimes = haveAllStartTimes and \
                 (eaterName in self._startTimes)
-            if eaterName in self._startTimes and \
-                (lowestTs == 0 or self._startTimes[eaterName] < lowestTs):
-                lowestTs = self._startTimes[eaterName]
-                self.debug("lowestTs is %d", lowestTs)
                 
         if haveAllStartTimes:
             self.debug("have all start times")
+            for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
+                if "video" in eaterName:
+                    self.videoSwitchElement.set-property("start-value",
+                        self._startTimes[eaterName])
+                elif "audio" in eaterName:
+                    self.audioSwitchElement.set_property("start-value",
+                        self._startTimes[eaterName])
             self._startTimes = {}
-            # we can set the start-value now on the switch components
-            self.audioSwitchElement.set_property("start-value", lowestTs)
-            self.videoSwitchElement.set_property("start-value", lowestTs)
             # we can also turn off the queue-buffers property
             self.audioSwitchElement.set_property("queue-buffers", False)
             self.videoSwitchElement.set_property("queue-buffers", False)
-            self.debug("eaterSwitchingTo becoming None from %s", 
+            self.log("eaterSwitchingTo becoming None from %s", 
                 self.eaterSwitchingTo)
             self.eaterSwitchingTo = None
             self._switchLock.release()
