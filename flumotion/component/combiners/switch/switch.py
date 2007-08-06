@@ -576,7 +576,7 @@ class AVSwitch(Switch):
             self.debug("have all start times")
             for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
                 if "video" in eaterName:
-                    self.videoSwitchElement.set-property("start-value",
+                    self.videoSwitchElement.set_property("start-value",
                         self._startTimes[eaterName])
                 elif "audio" in eaterName:
                     self.audioSwitchElement.set_property("start-value",

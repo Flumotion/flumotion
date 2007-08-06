@@ -1,6 +1,12 @@
 2007-08-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
+	  (AVSwitch._check_start_times_received):
+	Fix syntax error.
+
+2007-08-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py
 	  (AVSwitch._set_last_timestamp,
 	  AVSwitch._check_start_times_received):
 	Change switch's behaviour to not assume the video and audio
