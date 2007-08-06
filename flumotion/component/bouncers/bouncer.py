@@ -26,6 +26,7 @@ authentication services for other components.
 
 import md5
 import random
+import time
 
 from twisted.internet import defer
 from twisted.cred import error
@@ -80,6 +81,7 @@ class Bouncer(component.BaseComponent):
 
     def init(self):
         self._idCounter = 0
+        self._idFormat = time.strftime('%Y%m%d%H%M%S-%%016x')
         self._keycards = {} # keycard id -> Keycard
         self._keycardDatas = {} # keycard id -> data in uiState
         self.uiState.addListKey('keycards')
@@ -136,7 +138,7 @@ class Bouncer(component.BaseComponent):
     def generateKeycardId(self):
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
-        id = "%016x" % self._idCounter
+        id = self._idFormat % self._idCounter
         self._idCounter += 1
         return id
 

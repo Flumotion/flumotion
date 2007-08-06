@@ -1,3 +1,9 @@
+2007-08-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/bouncer.py (Bouncer.init)
+	(Bouncer.generateKeycardId): Make keycard ids more globally
+	uniquer.
+
 2007-08-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
