@@ -1,3 +1,31 @@
+2007-08-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.do_stop)
+	(MultifdSinkStreamer.do_start.turnHappy): 
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer.do_stop)
+	(HTTPFileStreamer.do_start.setComponentHappy): Start and stop the
+	keepAlive callbacks.
+
+	* flumotion/component/base/http.py (HTTPAuthentication.keepAlive):
+	New vmethod.
+	(HTTPAuthentication.authenticate): Set the issuerName and ttl.
+	(HTTPAuthentication._stopKeepAlive)
+	(HTTPAuthentication._scheduleKeepAlive):
+	(HTTPAuthentication.KEYCARD_TRYAGAIN_INTERVAL)
+	(HTTPAuthentication.KEYCARD_KEEPALIVE_INTERVAL)
+	(HTTPAuthentication.KEYCARD_TTL): Infrastructure to send keepAlive
+	requests to the bouncer.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(HTTPMedium.keepAlive): 
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.keepAlive): 
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileMedium.keepAlive, HTTPFileStreamer.keepAlive): Implement
+	the keepAlive hooks.
+
 2007-08-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

@@ -372,6 +372,9 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
     def authenticateKeycard(self, bouncerName, keycard):
         return self.streamer.medium.authenticate(bouncerName, keycard)
 
+    def keepAlive(self, bouncerName, issuerName, ttl):
+        return self.streamer.medium.keepAlive(bouncerName, issuerName, ttl)
+
     def cleanupKeycard(self, bouncerName, keycard):
         return self.streamer.medium.removeKeycardId(bouncerName, keycard.id)
 

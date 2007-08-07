@@ -217,6 +217,12 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         d = self.callRemote('authenticate', bouncerName, keycard)
         return d
 
+    def keepAlive(self, bouncerName, issuerName, ttl):
+        """
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.callRemote('keepAlive', bouncerName, issuerName, ttl)
+
     def removeKeycardId(self, bouncerName, keycardId):
         """
         @rtype: L{twisted.internet.defer.Deferred}
@@ -639,6 +645,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._updateCallLaterId.cancel()
             self._updateCallLaterId = None
 
+        if self.resource:
+            self.resource.stopKeepAlive()
+
         if self.type == 'slave' and self._pbclient:
             d1 = self._pbclient.deregisterPath(self.mountPoint)
             d2 = feedcomponent.ParseLaunchComponent.do_stop(self)
@@ -737,6 +746,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
         def turnHappy(res):
+            self.resource.scheduleKeepAlive()
             self.debug("Turned happy!")
             self.setMood(moods.happy)
         d.addCallback(turnHappy)

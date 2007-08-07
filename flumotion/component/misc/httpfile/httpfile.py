@@ -101,6 +101,12 @@ class HTTPFileMedium(component.BaseComponentMedium):
         """
         return self.callRemote('authenticate', bouncerName, keycard)
 
+    def keepAlive(self, bouncerName, issuerName, ttl):
+        """
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.callRemote('keepAlive', bouncerName, issuerName, ttl)
+
     def removeKeycardId(self, bouncerName, keycardId):
         """
         @rtype: L{twisted.internet.defer.Deferred}
@@ -202,6 +208,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             self._logfilter = filter
 
     def do_stop(self):
+        self.stopKeepAlive()
         if self._timeoutRequestsCallLater:
             self._timeoutRequestsCallLater.cancel()
             self._timeoutRequestsCallLater = None
@@ -311,6 +318,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             d.callback(None)
         # we are responsible for setting component happy
         def setComponentHappy(result):
+            self.scheduleKeepAlive()
             self.setMood(moods.happy)
             return result
         d.addCallback(setComponentHappy)
@@ -425,6 +433,9 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
     # Override HTTPAuthentication methods
     def authenticateKeycard(self, bouncerName, keycard):
         return self.medium.authenticate(bouncerName, keycard)
+
+    def keepAlive(self, bouncerName, issuerName, ttl):
+        return self.medium.authenticate(bouncerName, issuerName, ttl)
 
     def cleanupKeycard(self, bouncerName, keycard):
         return self.medium.removeKeycardId(bouncerName, keycard.id)

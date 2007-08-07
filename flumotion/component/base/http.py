@@ -25,10 +25,11 @@ import socket
 from twisted.web import http, server
 from twisted.web import resource as web_resource
 from twisted.internet import reactor, defer
-from twisted.python import reflect
+from twisted.python import reflect, failure
 
 from flumotion.configure import configure
 from flumotion.common import errors
+from flumotion.twisted.credentials import cryptChallenge
 
 from flumotion.common import common, log, keycards
 
@@ -121,6 +122,10 @@ class HTTPAuthentication(log.Loggable):
 
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
+    KEYCARD_TTL = 60 * 60
+    KEYCARD_KEEPALIVE_INTERVAL = 20 * 60
+    KEYCARD_TRYAGAIN_INTERVAL = 1 * 60
+
     def __init__(self, component):
 
         self._fdToKeycard = {}         # request fd -> Keycard
@@ -129,10 +134,45 @@ class HTTPAuthentication(log.Loggable):
         self._domain = None            # used for auth challenge and on keycard
         self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
         self.bouncerName = None
-        self.requesterId = component.getName() # avatarId of streamer component
+        self.setRequesterId(component.getName())
         self._defaultDuration = None   # default duration to use if the keycard
                                        # doesn't specify one.
+        self._keepAlive = None
         
+    def scheduleKeepAlive(self, tryingAgain=False):
+        def timeout():
+            def reschedule(res):
+                if isinstance(res, failure.Failure):
+                    self.info('keepAlive failed, rescheduling in %d '
+                              'seconds', self.KEYCARD_TRYAGAIN_INTERVAL)
+                    self._keepAlive = None
+                    self.scheduleKeepAlive(tryingAgain=True)
+                else:
+                    self.info('keepAlive successful')
+                    self._keepAlive = None
+                    self.scheduleKeepAlive(tryingAgain=False)
+
+            if self.bouncerName is not None:
+                self.debug('calling keepAlive on bouncer %s',
+                           self.bouncerName)
+                d = self.keepAlive(self.bouncerName, self.issuerName,
+                                   self.KEYCARD_TTL)
+                d.addCallbacks(reschedule, reschedule)
+            else:
+                self.scheduleKeepAlive()
+
+        if tryingAgain:
+            self._keepAlive = reactor.callLater(self.KEYCARD_TRYAGAIN_INTERVAL,
+                                                timeout)
+        else:
+            self._keepAlive = reactor.callLater(self.KEYCARD_KEEPALIVE_INTERVAL,
+                                                timeout)
+
+    def stopKeepAlive(self):
+        if self._keepAlive is not None:
+            self._keepAlive.cancel()
+            self._keepAlive = None
+
     def setDomain(self, domain):
         """
         Set a domain name on the resource, used in HTTP auth challenges and
@@ -147,6 +187,8 @@ class HTTPAuthentication(log.Loggable):
 
     def setRequesterId(self, requesterId):
         self.requesterId = requesterId
+        # make something uniquey
+        self.issuerName = str(self.requesterId) + '-' + cryptChallenge()
 
     def setDefaultDuration(self, defaultDuration):
         self._defaultDuration = defaultDuration
@@ -173,6 +215,8 @@ class HTTPAuthentication(log.Loggable):
             return defer.succeed(None)
 
         keycard.requesterId = self.requesterId
+        keycard.issuerName = self.issuerName
+        keycard.ttl = self.KEYCARD_TTL
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName == None:
@@ -188,6 +232,9 @@ class HTTPAuthentication(log.Loggable):
     def authenticateKeycard(self, bouncerName, keycard):
         pass
 
+    def keepAlive(self, issuerName, ttl):
+        raise NotImplementedError()
+
     def cleanupKeycard(self, bouncerName, keycard):
         pass
 
@@ -199,8 +246,8 @@ class HTTPAuthentication(log.Loggable):
             keycard = self._fdToKeycard[fd]
             del self._fdToKeycard[fd]
             del self._idToKeycard[keycard.id]
-            self.debug('[fd %5d] asking bouncer %s to remove keycard id %s' % (
-                fd, self.bouncerName, keycard.id))
+            self.debug('[fd %5d] asking bouncer %s to remove keycard id %s',
+                       fd, self.bouncerName, keycard.id)
             self.cleanupKeycard(self.bouncerName, keycard)
         if self._fdToDurationCall.has_key(fd):
             self.debug('[fd %5d] canceling later expiration call' % fd)
