@@ -1,3 +1,11 @@
+2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py
+	  (AVSwitch._set_last_timestamp):
+	Add warning message when timestamps of current source differ
+	between video and audio by at least 10 seconds, when swicthing
+	to new source.
+
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/bouncer.py

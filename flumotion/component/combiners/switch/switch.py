@@ -475,6 +475,21 @@ class AVSwitch(Switch):
             tsToSet)
         self.audioSwitchElement.set_property("stop-value",
             tsToSet)
+        message = None
+        if (aswTs > vswTs) and (aswTs - vswTs > gst.SECOND * 10):
+            message = "When switching to %s the other source's video" \
+                " and audio timestamps differ by %u" % (self.eaterSwitchingTo,
+                aswTs - vswTs)
+        elif (vswTs > aswTs) and (vswTs - aswTs > gst.SECOND * 10):
+            message = "When switching to %s the other source's video" \
+                " and audio timestamps differ by %u" % (self.eaterSwitchingTo,
+                vswTs - aswTs)
+        if message:
+            m = messages.Warning(T_(N_(
+                message)),
+                id="large-timestamp-difference",
+                priority=40)
+            self.state.append('messages', m)
 
     def _block_cb(self, pad, blocked):
         self.log("here with pad %r and blocked %d", pad, blocked)
