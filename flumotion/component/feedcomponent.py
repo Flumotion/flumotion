@@ -88,6 +88,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
 
+    def remote_attachPadMonitorToFeeder(self, feederName):
+        self.comp.attachPadMonitorToFeeder(feederName)
+
     def remote_setGstDebug(self, debug):
         """
         Sets the GStreamer debugging levels based on the passed debug string.

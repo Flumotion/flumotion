@@ -1,3 +1,10 @@
+2007-08-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	  Add more crack!
+	  Remote method to attach a pad monitor to a named feeder.
+
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/base.py (ManagerAvatar.perspective_keepAlive):

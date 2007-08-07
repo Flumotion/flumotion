@@ -602,6 +602,15 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline = pipeline
         self.setup_pipeline()
 
+    def attachPadMonitorToFeeder(self, feederName):
+        elementName = feederName+"-pay"
+        element = self.pipeline.get_by_name(elementName)
+        if not element:
+            raise ComponentError("No such feeder %s", feederName)
+
+        pad = element.get_pad('src')
+        self.attachPadMonitor(self, pad, elementName)
+
     def attachPadMonitor(self, pad, name):
         """
         Watch for data flow through this pad periodically.
