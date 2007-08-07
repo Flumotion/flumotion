@@ -1,5 +1,12 @@
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/pb.py (Authenticator.ttl): OK! Since, in
+	challenge-response authentication we have to allocate a keycard id
+	<-> challenge pair, and we use challenge-response authentication
+	by default, default to 30 seconds of ttl, so that we keep the
+	keycard long enough to recognize a valid response, but not too
+	long so that we leak memory by default.
+
 	* flumotion/worker/main.py (main): Remove unneccessary ttl=0 line.
 
 	* flumotion/twisted/pb.py (Authenticator.ttl): Default to 0. There

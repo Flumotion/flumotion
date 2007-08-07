@@ -394,7 +394,7 @@ class Authenticator(flog.Loggable, pb.Referenceable):
     username = None
     password = None
     address = None
-    ttl = 0
+    ttl = 30
     # FIXME: we can add ssh keys and similar here later on
 
     def __init__(self, **kwargs):
