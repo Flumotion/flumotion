@@ -1,3 +1,10 @@
+2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py
+	  (AVSwitch._set_last_timestamp):
+	Logic mistake from yesterday, the stop-value needs to be
+	set to the highest last timestamp of the 2 switch elements.
+
 2007-08-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/bouncer.py (Bouncer.init)

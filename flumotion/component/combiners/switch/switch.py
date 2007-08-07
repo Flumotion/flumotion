@@ -401,9 +401,9 @@ class AVSwitch(Switch):
     # In order to do this:
     # 1) we need to block all src pads of elements connected 
     #    to the switches' sink pads
-    # 2) we need to set the property "stop-value" on the
-    #    switches to the value of "last-timestamp" on the respective
-    #    switch.
+    # 2) we need to set the property "stop-value" on both the
+    #    switches to the highest value of "last-timestamp" on the two
+    #    switches.
     # 3) the pads should be switched (ie active-pad set) on the two switched
     # 4) the switch elements should be told to queue buffers coming on their
     #    active sinkpads by setting the queue-buffers property to TRUE
@@ -464,14 +464,17 @@ class AVSwitch(Switch):
     def _set_last_timestamp(self):
         vswTs = self.videoSwitchElement.get_property("last-timestamp")
         aswTs = self.audioSwitchElement.get_property("last-timestamp")
+        tsToSet = vswTs
+        if aswTs > vswTs:
+            tsToSet = aswTs
         self.log("Setting stop-value on video switch to %u",
-            vswTs)
+            tsToSet)
         self.log("Setting stop-value on audio switch to %u",
-            aswTs)
+            tsToSet)
         self.videoSwitchElement.set_property("stop-value",
-            vswTs)
+            tsToSet)
         self.audioSwitchElement.set_property("stop-value",
-            aswTs)
+            tsToSet)
 
     def _block_cb(self, pad, blocked):
         self.log("here with pad %r and blocked %d", pad, blocked)
