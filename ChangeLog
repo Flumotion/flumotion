@@ -1,5 +1,15 @@
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/main.py (main): Give the authenticator a TTL of
+	0, so that the manager never stores the keycards. Should fix
+	keycard leaks in reconnecting worker<->manager,
+	component<->manager, and component<->feedserver connections.
+
+	* flumotion/twisted/pb.py (Authenticator.ttl): New attribute, None
+	by default.
+	(Authenticator.issue): If self.ttl is not None, attach it to the
+	keycard.
+
 	* flumotion/manager/base.py (ManagerAvatar.perspective_keepAlive):
 	New remote call, allows something logged into the manager to keep
 	any keycards that it has authenticated from being expired.

@@ -394,6 +394,7 @@ class Authenticator(flog.Loggable, pb.Referenceable):
     username = None
     password = None
     address = None
+    ttl = None
     # FIXME: we can add ssh keys and similar here later on
 
     def __init__(self, **kwargs):
@@ -435,6 +436,8 @@ class Authenticator(flog.Loggable, pb.Referenceable):
                 self.debug('Issuing keycard %r of class %s', keycard,
                            name)
                 keycard.avatarId = self.avatarId
+                if self.ttl is not None:
+                    keycard.ttl = self.ttl
                 return defer.succeed(keycard)
 
         self.debug('Could not issue a keycard')

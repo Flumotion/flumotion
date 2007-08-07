@@ -271,6 +271,7 @@ def main(args):
     authenticator = pb.Authenticator(username=options.username,
                                      password=options.password,
                                      address='localhost',
+                                     ttl=0,
                                      avatarId=options.name)
     info = connection.PBConnectionInfo(options.host, options.port,
                                        options.transport == "ssl",
