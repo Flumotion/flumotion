@@ -1,3 +1,24 @@
+2007-08-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/bouncer.py
+	(Bouncer._scheduleTimeout.timeout, Bouncer._unscheduleTimeout):
+	Infrastructure to time out keycards automatically if the keycard
+	has a "ttl" attribute. Need to add support for resetting keycards'
+	TTL values.
+	(Bouncer.expireKeycardId): Actually pop out the keycard here,
+	instead of waiting for confirmation.
+	(Bouncer.expireAllKeycards): With expireKeycardId popping the
+	cards, we need to iterate over a copy.
+	(TrivialBouncer.do_authenticate): Add the keycard to the bouncer
+	set.
+	(Bouncer.do_stop): Implement so that we can cancel any pending
+	calls.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_component_bouncers_bouncer.py: New file,
+	tests the trivial bouncer, and tests that timing out keycards
+	actually works.
+
 2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
