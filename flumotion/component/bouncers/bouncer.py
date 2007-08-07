@@ -22,6 +22,47 @@
 """
 Base class and implementation for bouncer components, who perform
 authentication services for other components.
+
+Bouncers receive keycards, defined in L{flumotion.common.keycards}, and
+then authenticate them.
+
+Passing a keycard over a PB connection will copy all of the keycard's
+attributes to a remote side, so that bouncer authentication can be
+coupled with PB. Bouncer implementations have to make sure that they
+never store sensitive data as an attribute on a keycard.
+
+Keycards have three states: REQUESTING, AUTHENTICATED, and REFUSED. When
+a keycard is first passed to a bouncer, it has the state REQUESTING.
+Bouncers should never read the 'state' attribute on a keycard for any
+authentication-related purpose, since it comes from the remote side.
+Typically, a bouncer will only set the 'state' attribute to
+AUTHENTICATED or REFUSED once it has the information to make such a
+decision.
+
+Authentication of keycards is performed in the authenticate() method,
+which takes a keycard as an argument. The Bouncer base class'
+implementation of this method will perform some common checks (e.g., is
+the bouncer enabled, is the keycard of the correct type), and then
+dispatch to the do_authenticate method, which is expected to be
+overridden by subclasses.
+
+Implementations of do_authenticate should eventually return a keycard
+with the state AUTHENTICATED or REFUSED. It is acceptable for this
+method to return either a keycard or a deferred that will eventually
+return a keycard.
+
+FIXME: Currently, a return value of 'None' is treated as rejecting the
+keycard. This is unintuitive.
+
+Challenge-response authentication may be implemented in
+do_authenticate(), by returning a keycard still in the state REQUESTING
+but with extra attributes annotating the keycard. The remote side would
+then be expected to set a response on the card, resubmit, at which point
+authentication could be performed. The exact protocol for this depends
+on the particular keycard class and set of bouncers that can
+authenticate that keycard class.
+
+
 """
 
 import md5
@@ -144,7 +185,7 @@ class Bouncer(component.BaseComponent):
             if self.__timeout is None and hasattr(keycard, 'expiration'):
                 self.debug('installing keycard timeout poller')
                 self._scheduleTimeout()
-            return self.do_authenticate(keycard)
+            return defer.maybeDeferred(self.do_authenticate, keycard)
         else:
             self.debug("Bouncer disabled, refusing authentication")
             return None
@@ -217,10 +258,11 @@ class Bouncer(component.BaseComponent):
 
         keycard = self._keycards.pop(id)
 
-        d = self.medium.callRemote(
-            'expireKeycard', keycard.requesterId, keycard.id)
-
-        return d
+        if self.medium:
+            return self.medium.callRemote('expireKeycard',
+                                          keycard.requesterId, keycard.id)
+        else:
+            return defer.succeed(None)
 
 class TrivialBouncer(Bouncer):
     """

@@ -48,11 +48,17 @@ class TrivialBouncerTest(unittest.TestCase):
     def testHarness(self):
         pass
 
+    def assertAttr(self, keycard, attr, val):
+        self.assertEquals(getattr(keycard, attr), val)
+        return keycard
+
     def testAuthentication(self):
         k = keycards.KeycardGeneric()
         self.assertEquals(k.state, keycards.REQUESTING)
-        k = self.comp.authenticate(k)
-        self.assertEquals(k.state, keycards.AUTHENTICATED)
+
+        d = self.comp.authenticate(k)
+        d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
+        return d
 
     def testTimeoutAlgorithm(self):
         # the plan: make a keycard that expires in 0.75 seconds, and
@@ -64,39 +70,43 @@ class TrivialBouncerTest(unittest.TestCase):
 
         # check for expired keycards every half a second
         self.comp.KEYCARD_EXPIRE_INTERVAL = 0.5
-        k = keycards.KeycardGeneric()
-        k.expiration = 0.75
 
-        self.assertEquals(k.state, keycards.REQUESTING)
-        k = self.comp.authenticate(k)
-        self.assertEquals(k.state, keycards.AUTHENTICATED)
-        self.assertEquals(k.expiration, 0.75)
-
-        d = defer.Deferred()
-        def check(expected, inBouncer, furtherChecks):
-            if k.expiration != expected:
-                d.errback(AssertionError('expiration %r != expected %r'
-                                         % (k.expiration, expected)))
-            if inBouncer:
-                if not self.comp.hasKeycard(k):
-                    d.errback(AssertionError('comp missing keycard'))
-            else:
-                if self.comp.hasKeycard(k):
-                    d.errback(AssertionError('comp unexpectedly has keycard'))
-                    
-            if furtherChecks:
-                args = furtherChecks.pop(0)
-                args += (furtherChecks,)
-                reactor.callLater(*args)
-            else:
-                d.callback('success')
-        reactor.callLater(0.25, check, 0.75, True,
-                          [(0.5, check, 0.25, True),
-                           (0.5, check, -0.25, False)])
+        def checkTimeout(k):
+            def check(expected, inBouncer, furtherChecks):
+                if k.expiration != expected:
+                    d.errback(AssertionError('expiration %r != expected %r'
+                                             % (k.expiration, expected)))
+                if inBouncer:
+                    if not self.comp.hasKeycard(k):
+                        d.errback(AssertionError('comp missing keycard'))
+                else:
+                    if self.comp.hasKeycard(k):
+                        d.errback(AssertionError(
+                            'comp unexpectedly has keycard'))
+                        
+                if furtherChecks:
+                    args = furtherChecks.pop(0)
+                    args += (furtherChecks,)
+                    reactor.callLater(*args)
+                else:
+                    d.callback('success')
+            reactor.callLater(0.25, check, 0.75, True,
+                              [(0.5, check, 0.25, True),
+                               (0.5, check, -0.25, False)])
+            d = defer.Deferred()
+            return d
 
         def checkCalls(res):
             self.assertEquals(self.comp.medium.calls,
                               [('expireKeycard', (k.requesterId, k.id), {})])
             return res
+
+        k = keycards.KeycardGeneric()
+        k.expiration = 0.75
+        self.assertEquals(k.state, keycards.REQUESTING)
+        d = self.comp.authenticate(k)
+        d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
+        d.addCallback(self.assertAttr, 'expiration', 0.75)
+        d.addCallback(checkTimeout)
         d.addCallback(checkCalls)
         return d

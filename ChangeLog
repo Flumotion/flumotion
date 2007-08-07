@@ -1,5 +1,14 @@
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/bouncer.py: Add some module docs.
+	(Bouncer.authenticate): Always return a deferred.
+	(Bouncer.expireKeycardId): Be nice if we have no medium.
+
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.testAuthentication)
+	(TrivialBouncerTest.testTimeoutAlgorithm): Refactor to assume that
+	comp.authenticate() returns a deferred.
+
 	* flumotion/component/bouncers/bouncer.py
 	(Bouncer._scheduleTimeout.timeout, Bouncer._unscheduleTimeout):
 	Infrastructure to time out keycards automatically if the keycard
