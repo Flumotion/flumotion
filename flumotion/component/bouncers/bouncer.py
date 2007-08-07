@@ -62,7 +62,25 @@ authentication could be performed. The exact protocol for this depends
 on the particular keycard class and set of bouncers that can
 authenticate that keycard class.
 
+It is expected that a bouncer implementation keeps references on the
+currently active set of authenticated keycards. These keycards can then
+be revoked at any time by the bouncer, which will be effected through an
+'expireKeycard' call. When the code that requested the keycard detects
+that the keycard is no longer necessary, it should notify the bouncer
+via calling 'removeKeycardId'.
 
+The above process is leak-prone, however; if for whatever reason, the
+remote side is unable to remove the keycard, the keycard will never be
+removed from the bouncer's state. For that reason there is a more robust
+method: if the keycard has a 'ttl' attribute, then it will be expired
+automatically after 'keycard.ttl' seconds have passed. The remote side
+is then responsible for periodically telling the bouncer which keycards
+are still valid via the 'keepAlive' call, which resets the TTL on the
+given set of keycards.
+
+Note that with automatic expiry via the TTL attribute, it is still
+preferred, albeit not strictly necessary, that callers of authenticate()
+call removeKeycardId.
 """
 
 import md5
@@ -90,6 +108,17 @@ class BouncerMedium(component.BaseComponentMedium):
         @type  keycard: L{flumotion.common.keycards.Keycard}
         """
         return self.comp.authenticate(keycard)
+
+    def remote_keepAlive(self, keycardIds, ttl):
+        """
+        Resets the expiry timeout for a set of keycards.
+
+        @param keycardIds: the ids of set of keycards to keep alive
+        @type  keycardIds: iterable
+        @param ttl: the new expiry timeout
+        @type  ttl: number
+        """
+        return self.comp.keepAlive(keycardIds, ttl)
 
     def remote_removeKeycardId(self, keycardId):
         try:
@@ -246,6 +275,14 @@ class Bouncer(component.BaseComponent):
 
         keycard = self._keycards[id]
         self.removeKeycard(keycard)
+
+    def keepAlive(self, keycardIds, ttl):
+        for id in keycardIds:
+            if id in self._keycards:
+                self._keycards[id].ttl = ttl
+            else:
+                self.debug('asked to keepAlive unkown keycard with id %s',
+                           id)
 
     def expireAllKeycards(self):
         return defer.DeferredList(

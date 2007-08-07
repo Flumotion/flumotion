@@ -1,3 +1,12 @@
+2007-08-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/bouncer.py: Doc more.
+	(BouncerMedium.remote_keepAlive, Bouncer.keepAlive): Implement
+	keepAlive.
+
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.testKeepAlive): Test for keepAlive.
+
 2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
