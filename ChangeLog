@@ -1,5 +1,12 @@
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/bouncer.py
+	(Bouncer._scheduleTimeout.timeout, Bouncer.authenticate): 
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.testTimeoutAlgorithm)
+	(TrivialBouncerTest.testTimeoutAlgorithm.checkTimeout)
+	(TrivialBouncerTest.testTimeoutAlgorithm): s/expiration/ttl/.
+
 	* flumotion/component/bouncers/bouncer.py: Add some module docs.
 	(Bouncer.authenticate): Always return a deferred.
 	(Bouncer.expireKeycardId): Be nice if we have no medium.

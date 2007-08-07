@@ -161,9 +161,9 @@ class Bouncer(component.BaseComponent):
     def _scheduleTimeout(self):
         def timeout():
             for k in self._keycards.values():
-                if hasattr(k, 'expiration'):
-                    k.expiration -= self.KEYCARD_EXPIRE_INTERVAL
-                    if k.expiration <= 0:
+                if hasattr(k, 'ttl'):
+                    k.ttl -= self.KEYCARD_EXPIRE_INTERVAL
+                    if k.ttl <= 0:
                         self.expireKeycardId(k.id)
             self.__timeout = None
             self._scheduleTimeout()
@@ -182,7 +182,7 @@ class Bouncer(component.BaseComponent):
             return None
 
         if self.enabled:
-            if self.__timeout is None and hasattr(keycard, 'expiration'):
+            if self.__timeout is None and hasattr(keycard, 'ttl'):
                 self.debug('installing keycard timeout poller')
                 self._scheduleTimeout()
             return defer.maybeDeferred(self.do_authenticate, keycard)

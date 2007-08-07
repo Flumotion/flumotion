@@ -64,7 +64,7 @@ class TrivialBouncerTest(unittest.TestCase):
         # the plan: make a keycard that expires in 0.75 seconds, and
         # set up the component such that it checks for expired keycards
         # every half second. this test will check the keycard's
-        # expiration value at 0.25 seconds and 0.75 seconds, and will
+        # ttl value at 0.25 seconds and 0.75 seconds, and will
         # make sure that at 1.25 seconds that the keycard is out of the
         # bouncer.
 
@@ -73,9 +73,9 @@ class TrivialBouncerTest(unittest.TestCase):
 
         def checkTimeout(k):
             def check(expected, inBouncer, furtherChecks):
-                if k.expiration != expected:
-                    d.errback(AssertionError('expiration %r != expected %r'
-                                             % (k.expiration, expected)))
+                if k.ttl != expected:
+                    d.errback(AssertionError('ttl %r != expected %r'
+                                             % (k.ttl, expected)))
                 if inBouncer:
                     if not self.comp.hasKeycard(k):
                         d.errback(AssertionError('comp missing keycard'))
@@ -102,11 +102,11 @@ class TrivialBouncerTest(unittest.TestCase):
             return res
 
         k = keycards.KeycardGeneric()
-        k.expiration = 0.75
+        k.ttl = 0.75
         self.assertEquals(k.state, keycards.REQUESTING)
         d = self.comp.authenticate(k)
         d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
-        d.addCallback(self.assertAttr, 'expiration', 0.75)
+        d.addCallback(self.assertAttr, 'ttl', 0.75)
         d.addCallback(checkTimeout)
         d.addCallback(checkCalls)
         return d
