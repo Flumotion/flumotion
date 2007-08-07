@@ -1,3 +1,8 @@
+2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
+	Remove commented crufty code.
+
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/bouncer.py: Doc more.

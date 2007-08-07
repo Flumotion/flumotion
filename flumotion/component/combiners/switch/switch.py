@@ -498,11 +498,6 @@ class AVSwitch(Switch):
                 return
             self.pads_awaiting_block.remove(pad)
             self.log("Pads awaiting block are: %r", self.pads_awaiting_block)
-            #if not self.pads_awaiting_block:
-            #    s = gst.Structure('pads-blocked')
-            #    m = gst.message_new_application(self.pipeline, s)
-                # marshal to the main thread
-            #    self.pipeline.post_message(m)
 
     def _block_switch_sink_pads(self, block):
         if block:
