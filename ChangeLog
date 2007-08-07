@@ -1,5 +1,17 @@
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/base.py (ManagerAvatar.perspective_keepAlive):
+	* flumotion/component/bouncers/bouncer.py
+	(BouncerMedium.remote_keepAlive, Bouncer.keepAlive): Instead of
+	passing all keycard IDs to be kept alive, instead pass an
+	identifier of the object that initially issued the keycards. This
+	to renew a keycard, you will have to mark the it with an
+	issuerName.
+
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.testKeepAlive): Adapt test to new keepAlive
+	semantics.
+
 	* flumotion/twisted/pb.py (Authenticator.ttl): OK! Since, in
 	challenge-response authentication we have to allocate a keycard id
 	<-> challenge pair, and we use challenge-response authentication

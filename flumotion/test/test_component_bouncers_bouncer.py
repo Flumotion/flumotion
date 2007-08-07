@@ -114,13 +114,14 @@ class TrivialBouncerTest(unittest.TestCase):
     def testKeepAlive(self):
         def adjustTTL(_):
             self.assertEquals(k.ttl, 0.75)
-            self.comp.keepAlive([], 10)
+            self.comp.keepAlive('bar', 10)
             self.assertEquals(k.ttl, 0.75)
-            self.comp.keepAlive([k.id], 10)
+            self.comp.keepAlive('foo', 10)
             self.assertEquals(k.ttl, 10)
 
         k = keycards.KeycardGeneric()
         k.ttl = 0.75
+        k.issuerName = 'foo'
         self.assertEquals(k.state, keycards.REQUESTING)
         d = self.comp.authenticate(k)
         d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)

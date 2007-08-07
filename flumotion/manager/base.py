@@ -377,27 +377,30 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         bouncerAvatar = self.heaven.getAvatar(avatarId)
         return bouncerAvatar.authenticate(keycard)
 
-    def perspective_keepAlive(self, bouncerName, keycardIds, ttl):
+    def perspective_keepAlive(self, bouncerName, issuerName, ttl):
         """
-        Resets the expiry timeout for a set of expirable keycards. See
-        L{flumotion.component.bouncers.bouncer} for more information
+        Resets the expiry timeout for keycards issued by issuerName. See
+        L{flumotion.component.bouncers.bouncer} for more information.
 
         @since: 0.4.3
 
         @param bouncerName: the name of the atmosphere bouncer, or None
         @type  bouncerName: str or None
-        @param keycardIds: the ids of set of keycards to keep alive
-        @type  keycardIds: iterable
+        @param issuerName: the issuer for which keycards should be kept
+                           alive; that is to say, keycards with the
+                           attribute 'issuerName' set to this value will
+                           have their ttl values reset.
+        @type  issuerName: str
         @param ttl: the new expiry timeout
         @type  ttl: number
 
         @returns: a deferred which will fire success or failure.
         """
-        self.debug('keeping %d keycards alive on behalf of %s, ttl=%d',
-                   len(keycardIds), self.avatarId, ttl)
+        self.debug('keycards keepAlive on behalf of %s, ttl=%d',
+                   issuerName, ttl)
 
         if not bouncerName:
-            return self.vishnu.bouncer.keepAlive(keycardIds, ttl)
+            return self.vishnu.bouncer.keepAlive(issuerName, ttl)
 
         self.debug('looking for bouncer %s in atmosphere', bouncerName)
         avatarId = common.componentId('atmosphere', bouncerName)
@@ -406,7 +409,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
             raise errors.UnknownComponentError(avatarId)
 
         bouncerAvatar = self.heaven.getAvatar(avatarId)
-        return bouncerAvatar.keepAlive(keycardIds, ttl)
+        return bouncerAvatar.keepAlive(issuerName, ttl)
 
     def perspective_getKeycardClasses(self):
         """

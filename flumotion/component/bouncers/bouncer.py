@@ -109,16 +109,19 @@ class BouncerMedium(component.BaseComponentMedium):
         """
         return self.comp.authenticate(keycard)
 
-    def remote_keepAlive(self, keycardIds, ttl):
+    def remote_keepAlive(self, issuerName, ttl):
         """
-        Resets the expiry timeout for a set of keycards.
+        Resets the expiry timeout for keycards issued by issuerName.
 
-        @param keycardIds: the ids of set of keycards to keep alive
-        @type  keycardIds: iterable
+        @param issuerName: the issuer for which keycards should be kept
+                           alive; that is to say, keycards with the
+                           attribute 'issuerName' set to this value will
+                           have their ttl values reset.
+        @type  issuerName: str
         @param ttl: the new expiry timeout
         @type  ttl: number
         """
-        return self.comp.keepAlive(keycardIds, ttl)
+        return self.comp.keepAlive(issuerName, ttl)
 
     def remote_removeKeycardId(self, keycardId):
         try:
@@ -281,13 +284,10 @@ class Bouncer(component.BaseComponent):
         keycard = self._keycards[id]
         self.removeKeycard(keycard)
 
-    def keepAlive(self, keycardIds, ttl):
-        for id in keycardIds:
-            if id in self._keycards:
-                self._keycards[id].ttl = ttl
-            else:
-                self.debug('asked to keepAlive unkown keycard with id %s',
-                           id)
+    def keepAlive(self, issuerName, ttl):
+        for k in self._keycards.itervalues():
+            if hasattr(k, 'issuerName') and k.issuerName == issuerName:
+                k.ttl = ttl
 
     def expireAllKeycards(self):
         return defer.DeferredList(
