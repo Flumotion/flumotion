@@ -127,3 +127,17 @@ class TrivialBouncerTest(unittest.TestCase):
         d.addCallback(self.assertAttr, 'ttl', 0.75)
         d.addCallback(adjustTTL)
         return d
+
+    def testAutoExpire(self):
+        def authenticated(_):
+            self.assertAttr(k, 'state', keycards.AUTHENTICATED)
+            self.assertAttr(k, 'ttl', 0)
+            self.failIf(self.comp.hasKeycard(k))
+            self.assertEquals(self.comp.medium.calls, [])
+
+        k = keycards.KeycardGeneric()
+        k.ttl = 0
+        self.assertEquals(k.state, keycards.REQUESTING)
+        d = self.comp.authenticate(k)
+        d.addCallback(authenticated)
+        return d

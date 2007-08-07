@@ -1,3 +1,16 @@
+2007-08-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/base.py (ManagerAvatar.perspective_keepAlive):
+	New remote call, allows something logged into the manager to keep
+	any keycards that it has authenticated from being expired.
+
+	* flumotion/component/bouncers/bouncer.py: More doc.
+	(Bouncer.addKeycard): If the keycard has a ttl <= 0, don't bother
+	adding it to our data structures.
+
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.testAutoExpire): New test.
+
 2007-08-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py:

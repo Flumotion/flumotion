@@ -80,7 +80,7 @@ given set of keycards.
 
 Note that with automatic expiry via the TTL attribute, it is still
 preferred, albeit not strictly necessary, that callers of authenticate()
-call removeKeycardId.
+call removeKeycardId when the keycard is no longer used.
 """
 
 import md5
@@ -246,9 +246,14 @@ class Bouncer(component.BaseComponent):
         if self._keycards.has_key(keycard.id):
             # already in there
             return
-            
+
         id = self.generateKeycardId()
         keycard.id = id
+
+        if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
+            self.debug('immediately expiring keycard %r', keycard)
+            return
+
         self._keycards[id] = keycard
         data = keycard.getData()
         self._keycardDatas[id] = data
