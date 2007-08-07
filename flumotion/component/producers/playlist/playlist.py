@@ -37,6 +37,12 @@ import playlistparser
 
 T_ = messages.gettexter('flumotion')
 
+def _tsToString(ts):
+    """
+    Return a string in local time from a gstreamer timestamp value
+    """
+    return time.ctime(ts/gst.SECOND)
+
 def videotest_gnl_src(name, start, duration, priority, pattern=None):
     src = gst.element_factory_make('videotestsrc')
     if pattern:
@@ -233,7 +239,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         Schedule a given playlist item in our playback compositions.
         """
         start = item.timestamp - self.basetime
-        self.debug("Starting item %s in %d seconds", item.uri, start/gst.SECOND)
+        self.debug("Starting item %s at %d seconds from start: %s", item.uri, 
+            start/gst.SECOND, _tsToString(item.timestamp))
 
         # If we schedule things to start before the current pipeline position,
         # gnonlin will adjust this to start now. However, it does this 
@@ -276,7 +283,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 start, item.duration, item.offset, 0)
             self.audiocomp.add(asrc)
             self._asrcs[item] = asrc
-        self.debug("Done scheduling")
+        self.debug("Done scheduling: start at %s, end at %s", 
+            _tsToString(start + self.basetime), 
+            _tsToString(start + self.basetime + item.duration))
         return True
 
     def unscheduleItem(self, item):

@@ -1,5 +1,11 @@
 2007-08-07  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	  Log when we expect an item to start/end, since this information is
+	  difficult to recover from the existing log messages.
+
+2007-08-07  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/feedcomponent010.py:
 	  Add more crack!
