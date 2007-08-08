@@ -606,10 +606,10 @@ class FeedComponent(basecomponent.BaseComponent):
         elementName = feederName+"-pay"
         element = self.pipeline.get_by_name(elementName)
         if not element:
-            raise ComponentError("No such feeder %s", feederName)
+            raise errors.ComponentError("No such feeder %s" % feederName)
 
         pad = element.get_pad('src')
-        self.attachPadMonitor(self, pad, elementName)
+        self.attachPadMonitor(pad, elementName)
 
     def attachPadMonitor(self, pad, name):
         """

@@ -1,3 +1,8 @@
+2007-08-08  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Fix build errors that I failed to commit properly last night?
+
 2007-08-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py
