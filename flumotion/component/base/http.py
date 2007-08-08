@@ -137,6 +137,7 @@ class HTTPAuthentication(log.Loggable):
         self.setRequesterId(component.getName())
         self._defaultDuration = None   # default duration to use if the keycard
                                        # doesn't specify one.
+        self._pendingCleanups = []
         self._keepAlive = None
         
     def scheduleKeepAlive(self, tryingAgain=False):
@@ -241,6 +242,22 @@ class HTTPAuthentication(log.Loggable):
     def clientDone(self, fd):
         pass
 
+    def doCleanupKeycard(self, bouncerName, keycard):
+        # cleanup this one keycard, and take the opportunity to retry
+        # previous failed cleanups
+        def cleanup(bouncerName, keycard):
+            def cleanupLater(res, pair):
+                self.log('failed to clean up keycard %r, will do '
+                         'so later', keycard)
+                self._pendingCleanups.append(pair)
+            d = self.cleanupKeycard(bouncerName, keycard)
+            d.addErrback(cleanupLater, (bouncerName, keycard))
+        pending = self._pendingCleanups
+        self._pendingCleanups = []
+        cleanup(bouncerName, keycard)
+        for bouncerName, keycard in pending:
+            cleanup(bouncerName, keycard)
+
     def cleanupAuth(self, fd):
         if self.bouncerName and self._fdToKeycard.has_key(fd):
             keycard = self._fdToKeycard[fd]
@@ -248,7 +265,7 @@ class HTTPAuthentication(log.Loggable):
             del self._idToKeycard[keycard.id]
             self.debug('[fd %5d] asking bouncer %s to remove keycard id %s',
                        fd, self.bouncerName, keycard.id)
-            self.cleanupKeycard(self.bouncerName, keycard)
+            self.doCleanupKeycard(self.bouncerName, keycard)
         if self._fdToDurationCall.has_key(fd):
             self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()

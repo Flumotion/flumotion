@@ -156,7 +156,7 @@ class Bouncer(component.BaseComponent):
 
     def init(self):
         self._idCounter = 0
-        self._idFormat = time.strftime('%Y%m%d%H%M%S-%%016x')
+        self._idFormat = time.strftime('%Y%m%d%H%M%S-%%d')
         self._keycards = {} # keycard id -> Keycard
         self._keycardDatas = {} # keycard id -> data in uiState
         self.uiState.addListKey('keycards')
@@ -254,7 +254,7 @@ class Bouncer(component.BaseComponent):
         keycard.id = id
 
         if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
-            self.debug('immediately expiring keycard %r', keycard)
+            self.log('immediately expiring keycard %r', keycard)
             return
 
         self._keycards[id] = keycard
@@ -294,7 +294,7 @@ class Bouncer(component.BaseComponent):
             [self.expireKeycardId(id) for id in self._keycards.keys()])
 
     def expireKeycardId(self, id):
-        self.debug("expiring keycard with id %r" % id)
+        self.log("expiring keycard with id %r", id)
         if not self._keycards.has_key(id):
             raise KeyError
 

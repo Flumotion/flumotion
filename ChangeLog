@@ -1,5 +1,15 @@
 2007-08-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/http.py (HTTPAuthentication.__init__)
+	(HTTPAuthentication.doCleanupKeycard)
+	(HTTPAuthentication.cleanupAuth): If a call to cleanupKeycard
+	fails, try again later.
+
+	* flumotion/component/bouncers/bouncer.py (Bouncer.init): Make
+	keycard ids shorter, no need to be so long.
+	(Bouncer.expireKeycardId, Bouncer.addKeycard): Be less verbose,
+	expiring happens all the time now.
+
 	* flumotion/component/base/http.py (HTTPAuthentication.keepAlive):
 	Fix argument count of unused method.
 
