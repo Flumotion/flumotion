@@ -1,3 +1,8 @@
+2007-08-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/http.py (HTTPAuthentication.keepAlive):
+	Fix argument count of unused method.
+
 2007-08-08  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

@@ -232,7 +232,7 @@ class HTTPAuthentication(log.Loggable):
     def authenticateKeycard(self, bouncerName, keycard):
         pass
 
-    def keepAlive(self, issuerName, ttl):
+    def keepAlive(self, bouncerName, issuerName, ttl):
         raise NotImplementedError()
 
     def cleanupKeycard(self, bouncerName, keycard):
