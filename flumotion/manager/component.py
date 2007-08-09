@@ -167,6 +167,42 @@ class ComponentAvatar(base.ManagerAvatar):
                     d.callback(True)
                 self._happydefers = []
 
+        def refresh(_):
+            def success(result, comp, fullFeedId, host, port):
+                self.debug("success running test and got result %r" % (result,))
+                if result:
+                    oldhost, oldport = result
+                    if oldhost != host or oldport != port:
+                        self.debug("calling eatFrom with fullFeedId:%s host:%s"
+                                   " and port:%d", fullFeedId, host, port)
+                        comp.eatFrom(fullFeedId, host, port)
+                        
+            def NoMethodError(failure):
+                failure.trap(errors.NoMethodError)
+                self.warning("update feedcomponent! can't retrieve eater info from it")         
+                
+            host = self.getClientAddress()
+            port = self.getFeedServerPort()
+            componentName = self.getName()
+            flowName = self.getParentName()
+            feeders = self.getFeeders()
+            componentId = common.componentId(flowName, componentName)
+            otherComponents = [c for c in self.heaven.avatars.values()
+                           if c.componentState != None and 
+                               c.getParentName() == flowName]
+            # We find the eaters from this component
+            for feedName in feeders:
+                feedId = common.feedId(componentName, feedName)
+                fullFeedId = common.fullFeedId(flowName, componentName, feedName)
+                for comp in otherComponents:
+                    self.debug("looking at component %r for feedId %s", comp, feedId)
+                    for eaterName in comp.getEaters():
+                        self.debug("looking at eater %s for component: %r", eaterName, comp)
+                        if feedId in comp.getFeedersForEater(eaterName):
+                            dd = comp.mindCallRemote("getEaterDetail", fullFeedId)
+                            dd.addCallback(success, comp, fullFeedId, host, port)
+                            dd.addErrback(NoMethodError)
+        
         d.addCallback(checkInitialMood)
         # listen to the mood so we can tell the depgraph
         d.addCallback(lambda _: self.jobState.addListener(self,
@@ -174,6 +210,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # make heaven register component
         d.addCallback(lambda _: self.heaven.registerComponent(self))
         d.addCallback(lambda _: self.vishnu.registerComponent(self))
+        d.addCallback(refresh)
         return d
 
     def detached(self, mind):
@@ -280,7 +317,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @type  feederName: str
         @param otherComponents: Other components that might eat from
         this component.
-        @type  feederName: list of ComponentAvatar
+        @type  otherComponents: list of ComponentAvatar
         @return: a list of feedId's, or the empty list
         @rtype:  list of str
         """
