@@ -1,6 +1,15 @@
 2007-08-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:
+	  Put the synchronising identity after the videorate/audiorate, 
+	  so that if there's a substantial gap in the video frames coming out 
+	  of the gnlcomposition, videorate can fill in frames so that we never
+	  have to wait for synchronisation for too long.
+	  Doesn't fix audio, as audiorate will output a single large buffer.
+
+2007-08-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
 	  Override some additional clocking related methods to ensure we have
 	  sane behaviour when asked to provide a master clock.
 	  Periodically report what our pipeline clock says the time is.

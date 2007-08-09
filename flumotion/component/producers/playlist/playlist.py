@@ -180,8 +180,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 self.debug("Pad added, linking")
                 pad.link(target)
             composition.connect('pad-added', _padAddedCb, 
-                identity.get_pad("sink"))
-            identity.link(queue)
+                queue.get_pad("sink"))
 
             if mediatype == 'audio':
                 self.audiocomp = composition
@@ -189,6 +188,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             else:
                 self.videocomp = composition
                 srcpad = self._buildVideoPipeline(pipeline, queue)
+
+            srcpad.link(identity.get_pad('sink'))
 
             feedername = 'feeder:%s:%s' % (self.name, mediatype)
             chunk = self.FEEDER_TMPL % {'name': feedername}
@@ -201,7 +202,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             bin.add_pad(ghostpad)
 
             pipeline.add(bin)
-            srcpad.link(ghostpad)
+            identity.get_pad('src').link(ghostpad)
 
         return pipeline
 
