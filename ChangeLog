@@ -1,5 +1,9 @@
 2007-08-09  Pedro Gracia <pedro@flumotion.com>
 
+	* flumotion/manager/component.py: now pass unittest.
+
+2007-08-09  Pedro Gracia <pedro@flumotion.com>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/manager/component.py:
 	  Reconect eaters from components when the worker is launched

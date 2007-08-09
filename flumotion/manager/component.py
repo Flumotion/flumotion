@@ -200,8 +200,9 @@ class ComponentAvatar(base.ManagerAvatar):
                         self.debug("looking at eater %s for component: %r", eaterName, comp)
                         if feedId in comp.getFeedersForEater(eaterName):
                             dd = comp.mindCallRemote("getEaterDetail", fullFeedId)
-                            dd.addCallback(success, comp, fullFeedId, host, port)
-                            dd.addErrback(NoMethodError)
+                            if dd:
+                                dd.addCallback(success, comp, fullFeedId, host, port)
+                                dd.addErrback(NoMethodError)
         
         d.addCallback(checkInitialMood)
         # listen to the mood so we can tell the depgraph
