@@ -1,3 +1,7 @@
+2007-08-09  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/manager/component.py: removed componentId.
+
 2007-08-09  Pedro Gracia <pedro@flumotion.com>
 
 	* flumotion/manager/component.py: now pass unittest.

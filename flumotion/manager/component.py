@@ -186,7 +186,6 @@ class ComponentAvatar(base.ManagerAvatar):
             componentName = self.getName()
             flowName = self.getParentName()
             feeders = self.getFeeders()
-            componentId = common.componentId(flowName, componentName)
             otherComponents = [c for c in self.heaven.avatars.values()
                            if c.componentState != None and 
                                c.getParentName() == flowName]
