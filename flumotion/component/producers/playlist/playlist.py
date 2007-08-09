@@ -216,6 +216,29 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 2**31 - 1, properties.get('audio-wave', None))
             self.audiocomp.add(asrc)
 
+    def set_master_clock(self, ip, port, base_time):
+        raise NotImplementedError("Playlist producer doesn't support slaving")
+
+    def provide_master_clock(self, port):
+        # Most of this copied from feedcomponent010, but changed in various
+        # ways. Refactor the base class?
+        if self.medium:
+            ip = self.medium.getIP()
+        else:
+            ip = "127.0.0.1"
+
+        clock = self.pipeline.get_clock()
+        self.clock_provider = gst.NetTimeProvider(clock, None, port)
+        # small window here but that's ok
+        self.clock_provider.set_property('active', False)
+
+        self._master_clock_info = (ip, port, self.basetime)
+
+        return defer.succeed(self._master_clock_info)
+
+    def get_master_clock(self):
+        return self._master_clock_info
+
     def _setupClock(self, pipeline):
         # Configure our pipeline to use a known basetime and clock.
         clock = gst.SystemClock()
@@ -230,6 +253,11 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         # And we choose our own basetime...
         self.debug("Setting basetime of %d", self.basetime)
         pipeline.set_base_time(self.basetime)
+
+    def timeReport(self):
+        ts = self.pipeline.get_clock().get_time()
+        self.debug("Pipeline clock is now at %d -> %s", ts, _tsToString(ts))
+        reactor.callLater(10, self.timeReport)
 
     def getCurrentPosition(self):
         return self.pipeline.query_position(gst.FORMAT_TIME)[0]
@@ -401,6 +429,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
         if self._playlistdirectory:
             self._watchDirectory(self._playlistdirectory)
+
+        reactor.callLater(10, self.timeReport)
 
         return defer.succeed(None)
         

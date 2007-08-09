@@ -1,3 +1,10 @@
+2007-08-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  Override some additional clocking related methods to ensure we have
+	  sane behaviour when asked to provide a master clock.
+	  Periodically report what our pipeline clock says the time is.
+
 2007-08-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py
@@ -52,6 +59,11 @@
 	* flumotion/component/misc/httpfile/httpfile.py
 	(HTTPFileMedium.keepAlive, HTTPFileStreamer.keepAlive): Implement
 	the keepAlive hooks.
+
+2007-08-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Fix some typos.
 
 2007-08-07  Michael Smith <msmith@fluendo.com>
 
