@@ -411,9 +411,8 @@ class AVSwitch(Switch):
     #    switch elements, so that the start value of the enxt new segment can
     #    be determined
     # 6) the src pads we blocked in 1) should be unblocked
-    # 7) when both pad probes have fired once, use the timestamps received
-    #    as the start value for the respective switch elements
-    #    elements
+    # 7) when both pad probes have fired once, use the lowest timestamp
+    #    received as the start value for the switch elements
     # 8) set the queue-buffers property on the switch elements to FALSE 
     def switch_to(self, eater):
         if not (self.videoSwitchElement and self.audioSwitchElement):
@@ -581,19 +580,20 @@ class AVSwitch(Switch):
         self.debug("here")
         activeEater = self.uiState.get("active-eater")
         haveAllStartTimes = True
+        lowestTs = 0
         for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
             haveAllStartTimes = haveAllStartTimes and \
                 (eaterName in self._startTimes)
+            if eaterName in self._startTimes and \
+                (lowestTs == 0 or self._startTimes[eaterName] < lowestTs):
+                lowestTs = self._startTimes[eaterName]
+                self.debug("lowest ts received from buffer probes: %u",
+                    lowestTs)
                 
         if haveAllStartTimes:
             self.debug("have all start times")
-            for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
-                if "video" in eaterName:
-                    self.videoSwitchElement.set_property("start-value",
-                        self._startTimes[eaterName])
-                elif "audio" in eaterName:
-                    self.audioSwitchElement.set_property("start-value",
-                        self._startTimes[eaterName])
+            self.videoSwitchElement.set_property("start-value", lowestTs)
+            self.audioSwitchElement.set_property("start-value", lowestTs)
             self._startTimes = {}
             # we can also turn off the queue-buffers property
             self.audioSwitchElement.set_property("queue-buffers", False)

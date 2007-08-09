@@ -1,3 +1,10 @@
+2007-08-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py
+	  (AVSwitch._check_start_times_received):
+	Revert bad commit that set start-time differently for each switch
+	element.
+
 2007-08-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/http.py (HTTPAuthentication.__init__)
