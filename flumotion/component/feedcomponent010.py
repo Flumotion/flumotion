@@ -357,6 +357,7 @@ class PadMonitor(log.Loggable):
         self._pad = pad
         self._name = name
         self._active = False
+        self._first = True
 
         # This dict sillyness is because python's dict operations are atomic
         # w.r.t. the GIL.
@@ -383,6 +384,12 @@ class PadMonitor(log.Loggable):
         if self._check_flow_dc:
             self._check_flow_dc.cancel()
             self._check_flow_dc = None
+
+    def logMessage(self, message, *args):
+        if self._first:
+            self.debug(message, *args)
+        else:
+            self.log(message, *args)
         
     def _add_flow_probe(self):
         self._probe_id['id'] = self._pad.add_buffer_probe(
@@ -394,7 +401,20 @@ class PadMonitor(log.Loggable):
             self._add_flow_probe)
 
     def _flow_watch_probe_cb(self, pad, buffer):
+        """
+        Periodically scheduled buffer probe, that ensures that we're currently
+        actually having dataflow through our eater elements.
+
+        Called from GStreamer threads.
+
+        @param pad:       The gst.Pad srcpad for one eater in this component.
+        @param buffer:    A gst.Buffer that has arrived on this pad
+        """
+
         self._last_data_time = time.time()
+
+        self.logMessage('buffer probe on %s has timestamp %s', self._name,
+             gst.TIME_ARGS(buffer.timestamp))
 
         id = self._probe_id.pop("id", None)
         if id:
@@ -406,6 +426,8 @@ class PadMonitor(log.Loggable):
             # Data received! Return to happy ASAP:
             reactor.callFromThread(self._check_flow_timeout_now)
 
+        self._first = False
+
         return True
 
     def _check_flow_timeout_now(self):
@@ -415,24 +437,65 @@ class PadMonitor(log.Loggable):
     def _check_flow_timeout(self):
         self._check_flow_dc = None
 
+        self.log('last buffer for %s at %r', self._name, self._last_data_time)
+
         now = time.time()
 
         if self._last_data_time > 0:
             delta = now - self._last_data_time
 
             if self._active and delta > self.PAD_MONITOR_TIMEOUT:
-                self.info("No data received on pad for > %r seconds, setting "
-                    "to hungry", self.PAD_MONITOR_TIMEOUT)
-
-                self._component.setPadMonitorInactive(self._name)
-                self._active = False
+                self.info("No data received on pad %s for > %r seconds, setting "
+                    "to hungry", self._name, self.PAD_MONITOR_TIMEOUT)
+                self.setInactive()
             elif not self._active and delta < self.PAD_MONITOR_TIMEOUT:
-                self.info("Receiving data again, flow active")
-                self._component.setPadMonitorActive(self._name)
-                self._active = True
+                self.info("Receiving data again on pad %s, flow active", 
+                    self._name)
+                self.setActive()
 
         self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
             self._check_flow_timeout)
+
+    def setInactive(self):
+        self._component.setPadMonitorInactive(self._name)
+        self._active = False
+
+    def setActive(self):
+        self._component.setPadMonitorActive(self._name)
+        self._active = True
+
+class EaterPadMonitor(PadMonitor):
+    def __init__(self, *args):
+        PadMonitor.__init__(self, *args)
+
+        self._reconnectDC = None
+
+    def setInactive(self):
+        PadMonitor.setInactive(self)
+
+        # If an eater received a buffer before being marked as disconnected,
+        # and still within the buffer check interval, the next eaterCheck
+        # call could accidentally think the eater was reconnected properly.
+        # Setting lastTime to 0 here avoids that happening in eaterCheck.
+        self._last_buffer_time = 0
+
+        self._component.reconnectEater(self._name)
+        self._reconnectDC = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
+            self._component.reconnectEater, self._name)
+
+    def setActive(self):
+        PadMonitor.setActive(self)
+
+        if self._reconnectDC:
+            self._reconnectDC.cancel()
+            self._reconnectDC = None
+
+    def detach(self):
+        PadMonitor.detach(self)
+
+        if self._reconnectDC:
+            self._reconnectDC.cancel()
+            self._reconnectDC = None
 
 class FeedComponent(basecomponent.BaseComponent):
     """
@@ -444,22 +507,17 @@ class FeedComponent(basecomponent.BaseComponent):
     # keep these as class variables for the tests
     FDSRC_TMPL = 'fdsrc name=%(name)s'
     DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
-    FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
-    # EATER_TMPL is no longer used due to it being dynamic
-    # how often to add the buffer probe
-    BUFFER_PROBE_ADD_FREQUENCY = 5
+    FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false '\
+                      'name=%(name)s buffers-max=500 buffers-soft-max=450 '\
+                      'recover-policy=1'
 
-    # how often to check that a buffer has arrived recently
-    BUFFER_CHECK_FREQUENCY = BUFFER_PROBE_ADD_FREQUENCY * 2.5
-
-    BUFFER_TIME_THRESHOLD = BUFFER_CHECK_FREQUENCY
+    # how often to update the UIState feeder statistics
+    FEEDER_STATS_UPDATE_FREQUENCY = 12.5
 
     logCategory = 'feedcomponent'
 
     __signals__ = ('feed-ready', 'error')
 
-    _reconnectInterval = 3
-    
     checkTimestamp = False
     checkOffset = False
 
@@ -477,9 +535,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline = None
         self.pipeline_signals = []
         self.bus_signal_id = None
-        self.files = []
         self.effects = {}
-        self._probe_ids = {} # eater name -> probe handler id
         self._feeder_probe_cl = None
 
         self._pad_monitors = {}
@@ -490,18 +546,12 @@ class FeedComponent(basecomponent.BaseComponent):
                                        # clock master
 
         self.eater_names = [] # componentName:feedName list
-        self._eaterReconnectDC = {} 
 
-        self.feedersFeeding = 0
         self.feed_names = []   # list of feedName
         self.feeder_names = [] # list of feedId
 
-        self._inactiveEaters = [] # list of feedId's
-        self._inactivated = False
-
-        # feedId -> dict of lastTime, lastConnectTime,
-        # checkEaterDC
-        self._eaterStatus = {}
+        self._inactivated = False # Has the component ever gone hungry due to
+                                  # pad flow not happening?
 
         # statechange -> [ deferred ]
         self._stateChangeDeferreds = {}
@@ -550,19 +600,9 @@ class FeedComponent(basecomponent.BaseComponent):
         # this sets self.eater_names
         self.parseEaterConfig(eater_config)
 
-        # all eaters start out inactive
-        self._inactiveEaters = self.eater_names[:]
-
         for name in self.eater_names:
-            d = {
-                'lastTime': 0,
-                'lastConnectTime': 0,
-                'checkEaterDC': None
-            }
-            self._eaterStatus[name] = d
             self._eaters[name] = Eater(name)
             self.uiState.append('eaters', self._eaters[name].uiState)
-            self._eaterReconnectDC['eater:' + name] = None
 
         # this sets self.feeder_names
         self.parseFeederConfig(feeder_config)
@@ -571,10 +611,6 @@ class FeedComponent(basecomponent.BaseComponent):
             self._feeders[feederName] = Feeder(feederName)
             self.uiState.append('feeders',
                                  self._feeders[feederName].uiState)
-
-        self.debug('FeedComponent.do_setup(): '
-            '%d eaters and %d feeders waiting' % (
-            len(self._inactiveEaters), self.feedersWaiting))
 
         pipeline = self.create_pipeline()
         self.set_pipeline(pipeline)
@@ -600,7 +636,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if self.pipeline:
             self.cleanup()
         self.pipeline = pipeline
-        self.setup_pipeline()
+        self._setup_pipeline()
 
     def attachPadMonitorToFeeder(self, feederName):
         elementName = feederName+"-pay"
@@ -656,27 +692,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.setMood(moods.hungry)
         self._inactivated = True
-
-    def eaterSetInactive(self, feedId):
-        """
-        The eater for the given feedId is no longer active
-        By default, the component will go hungry.
-        """
-        self.setPadMonitorInactive(feedId)
-        self._inactiveEaters.append(feedId)
-
-    def eaterSetActive(self, feedId):
-        """
-        The eater for the given feedId is now active and producing data.
-        By default, the component will go happy if all eaters are active.
-        """
-        self.setPadMonitorActive(feedId)
-        if feedId in self._inactiveEaters:
-            self._inactiveEaters.remove(feedId)
-
-    # FIXME: it may make sense to have an updateMood method, that can be used
-    # by the two previous methods, but also in other places, and then
-    # overridden.  That would make us have to publicize inactiveEaters
 
     def eaterTimestampDiscont(self, feedId, prevTs, prevDuration, curTs):
         """
@@ -897,7 +912,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 feedId = name[len('eater:'):]
                 self.eaterSetInactive(feedId)
                 # start reconnection
-                self._reconnectEater(feedId)
+                self.reconnectEater(feedId)
             else:
                 self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
@@ -929,8 +944,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return True
 
-    # FIXME: privatize
-    def setup_pipeline(self):
+    def _setup_pipeline(self):
         self.debug('setup_pipeline()')
         assert self.bus_signal_id == None
 
@@ -947,17 +961,10 @@ class FeedComponent(basecomponent.BaseComponent):
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
 
-        # start checking eaters
-        for feedId in self.eater_names:
-            status = self._eaterStatus[feedId]
-            self._pad_monitors_inactive += 1
-            status['checkEaterDC'] = reactor.callLater(
-                self.BUFFER_CHECK_FREQUENCY, self._checkEater, feedId)
-
         # start checking feeders, if we have a sufficiently recent multifdsink
         if self._get_stats_supported:
             self._feeder_probe_cl = reactor.callLater(
-                self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
+                self.FEEDER_STATS_UPDATE_FREQUENCY, self._feeder_probe_calllater)
         else:
             self.warning("Feeder statistics unavailable, your "
                 "gst-plugins-base is too old")
@@ -989,11 +996,12 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_stop()
         # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
-        self.pipeline.get_bus().disconnect(self.bus_signal_id)
-        self.pipeline.get_bus().remove_signal_watch()
-        self.pipeline = None
         self.pipeline_signals = []
-        self.bus_signal_id = None
+        if self.bus_signal_id:
+            self.pipeline.get_bus().disconnect(self.bus_signal_id)
+            self.pipeline.get_bus().remove_signal_watch()
+            self.bus_signal_id = None
+        self.pipeline = None
 
         if self._feeder_probe_cl:
             self._feeder_probe_cl.cancel()
@@ -1001,10 +1009,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # clean up checkEater callLaters
         for feedId in self.eater_names:
-            status = self._eaterStatus[feedId]
-            if status['checkEaterDC']:
-                status['checkEaterDC'].cancel()
-                status['checkEaterDC'] = None
+            self.removePadMonitor(feedId)
 
     def do_stop(self):
         self.debug('Stopping')
@@ -1115,7 +1120,9 @@ class FeedComponent(basecomponent.BaseComponent):
                 depaysrc = depay.get_pad("src")
                 depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
                     feedId)
-            self._add_buffer_probe(pad, feedId, firstTime=True)
+
+            self._pad_monitors[name] = EaterPadMonitor(self, pad, feedId)
+            self._pad_monitors_inactive += 1
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -1143,135 +1150,16 @@ class FeedComponent(basecomponent.BaseComponent):
                             'client fd %d' % (feedId, client.fd))
                     else:
                         client.setStats(array)
-        self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
+        self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY, 
             self._feeder_probe_calllater)
 
-    def _add_buffer_probe(self, pad, feedId, firstTime=False):
-        # attached from above, and called again every
-        # BUFFER_PROBE_ADD_FREQUENCY seconds
-        method = self.log
-        if firstTime: method = self.debug
-        method("Adding new scheduled buffer probe for %s" % feedId)
-        self._probe_ids[feedId] = pad.add_buffer_probe(self._buffer_probe_cb,
-            feedId, firstTime)
-
-    def _buffer_probe_cb(self, pad, buffer, feedId, firstTime=False):
-        """
-        Periodically scheduled buffer probe, that ensures that we're currently
-        actually having dataflow through our eater elements.
-
-        Called from GStreamer threads.
-
-        @param pad:       The gst.Pad srcpad for one eater in this component.
-        @param buffer:    A gst.Buffer that has arrived on this pad
-        @param feedId:    The feedId for the feed we're eating on this pad
-        @param firstTime: Boolean, true if this is the first time this buffer 
-                          probe has been added for this eater.
-        """
-
-        # log info about first incoming buffer for this check interval,
-        # then remove ourselves
-        method = self.log
-        if firstTime: method = self.debug
-        method('buffer probe on eater %s has timestamp %s' % (
-            feedId, gst.TIME_ARGS(buffer.timestamp)))
-        # We carefully only use atomic (w.r.t. the GIL) operations on the dicts
-        # here: we pop things from _probe_ids, and only set things in 
-        # self._eaterStatus[feedId].
-
-        # now store the last buffer received time
-        self._eaterStatus[feedId]['lastTime'] = time.time()
-        probeid = self._probe_ids.pop(feedId, None)
-        if probeid:
-            pad.remove_buffer_probe(probeid)
-
-            # add buffer probe every BUFFER_PROBE_ADD_FREQUENCY seconds
-            reactor.callFromThread(reactor.callLater, 
-                self.BUFFER_PROBE_ADD_FREQUENCY,
-                self._add_buffer_probe, pad, feedId)
-
-        # since we've received a buffer, it makes sense to call _checkEater,
-        # allowing us to revert to go back to happy as soon as possible
-        reactor.callFromThread(self._checkEater, feedId)
-
-        return True
-
-    def _checkEater(self, feedId):
-        """
-        Check that buffers are being received by the eater.
-        If no buffer was received for more than BUFFER_TIME_THRESHOLD on
-        a connected feed, I call eaterSetInactive.
-        Likewise, if a buffer was received on an inactive feed, I call
-        eaterSetActive.
-
-        I am used both as a callLater and as a direct method.
-        """
-        status = self._eaterStatus[feedId]
-        # a callLater is not active anymore while it's being executed,
-        # cancel deferred call if there's one pending (i.e. if we were called
-        # by something other than the deferred call)
-        if status['checkEaterDC'] and status['checkEaterDC'].active():
-            status['checkEaterDC'].cancel()
-
-        self.log('_checkEater: last buffer at %r' % status['lastTime'])
-        currentTime = time.time()
-
-        # we do not run any checks if the last buffer time is 0 or lower
-        # this allows us to make sure no check is run when this is needed
-        # (for example, on eos)
-        if status['lastTime'] > 0:
-            delta = currentTime - status['lastTime']
-
-            if feedId not in self._inactiveEaters \
-            and delta > self.BUFFER_TIME_THRESHOLD:
-                self.info(
-                    'No data received for %r seconds, feed %s inactive' % (
-                        self.BUFFER_TIME_THRESHOLD, feedId))
-                self.eaterSetInactive(feedId)
-                # TODO: we never actually disconnect the eater explicitly, but 
-                # a successful reconnect will cause the old fd to be closed. 
-                # Maybe we should change this?
-                # start reconnection
-                self._reconnectEater(feedId)
-
-            # mark as connected if recent data received
-            elif feedId in self._inactiveEaters \
-            and delta < self.BUFFER_TIME_THRESHOLD:
-                self.debug('Received data, feed %s active' % feedId)
-                self.eaterSetActive(feedId)
-
-        # retry a connect call if it has been too long since the
-        # last and we still don't have data
-        if feedId in self._inactiveEaters \
-        and status['lastConnectTime'] > 0:
-            connectDelta = currentTime - status['lastConnectTime']
-            if connectDelta > self.BUFFER_TIME_THRESHOLD:
-                self.debug('Too long since last reconnect, retrying')
-                self._reconnectEater(feedId)
-
-        # we run forever
-        status['checkEaterDC'] = reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
-            self._checkEater, feedId)
-        
-    def _reconnectEater(self, feedId):
+    def reconnectEater(self, feedId):
         if not self.medium:
             self.debug("Can't reconnect eater for feed %s, running "
                        "without a medium", feedId)
             return
 
-        eater = self._eaters[feedId]
-        eater.disconnected()
-        # reconnect the eater for the given feedId, updating the internal
-        # status for that eater
-        status = self._eaterStatus[feedId]
-
-        # If an eater received a buffer before being marked as disconnected,
-        # and still within the buffer check interval, the next eaterCheck
-        # call could accidentally think the eater was reconnected properly.
-        # Setting lastTime to 0 here avoids that happening in eaterCheck.
-        self._eaterStatus[feedId]['lastTime'] = 0
-        status['lastConnectTime'] = time.time()
-
+        self._eaters[feedId].disconnected()
         self.medium.connectEater(feedId)
 
     def get_element(self, element_name):

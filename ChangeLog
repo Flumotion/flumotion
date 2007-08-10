@@ -1,3 +1,11 @@
+2007-08-10  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Refactor eater probes to use PadMonitor code.
+	  Refactor PadMonitor to allow an EaterPadMonitor subclass to handle
+	  the eater-specific things properly.
+	  Some cleanups of unused code and variables.
+
 2007-08-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py
