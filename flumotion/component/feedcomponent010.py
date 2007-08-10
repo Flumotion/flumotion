@@ -901,26 +901,29 @@ class FeedComponent(basecomponent.BaseComponent):
             else:
                 self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
-            if message.structure.get_name() == 'imperfect-timestamp':
-                identityName = src.get_name()
-                eaterName = identityName.split("-identity")[0]
-                feedId = eaterName[len('eater:'):]
+            elementName = src.get_name()
+            if elementName.startsWith('eater'):
+                if message.structure.get_name() == 'imperfect-timestamp':
+                    identityName = elementName
+                    eaterName = identityName.split("-identity")[0]
+                    feedId = eaterName[len('eater:'):]
+                    self.log("we have an imperfect stream from %s",
+                        elementName)
+                    # figure out the discontinuity
+                    s = message.structure
+                    self.eaterTimestampDiscont(feedId, s["prev-timestamp"],
+                        s["prev-duration"], s["cur-timestamp"])
+                elif message.structure.get_name() == 'imperfect-offset':
+                    identityName = elementName
+                    eaterName = identityName.split("-identity")[0]
+                    feedId = eaterName[len('eater:'):]
                 
-                self.log("we have an imperfect stream from %s" % src.get_name())
-                # figure out the discontinuity
-                s = message.structure
-                self.eaterTimestampDiscont(feedId, s["prev-timestamp"],
-                    s["prev-duration"], s["cur-timestamp"])
-            elif message.structure.get_name() == 'imperfect-offset':
-                identityName = src.get_name()
-                eaterName = identityName.split("-identity")[0]
-                feedId = eaterName[len('eater:'):]
-                
-                self.log("we have an imperfect stream from %s" % src.get_name())
-                # figure out the discontinuity
-                s = message.structure
-                self.eaterOffsetDiscont(feedId, s["prev-offset-end"],
-                    s["cur-offset"])
+                    self.log("we have an imperfect stream from %s",
+                        elementName)
+                    # figure out the discontinuity
+                    s = message.structure
+                    self.eaterOffsetDiscont(feedId, s["prev-offset-end"],
+                        s["cur-offset"])
         else:
             self.log('message received: %r' % message)
 
