@@ -225,7 +225,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
             if not keepTrying:
                 d.errback(errors.ConnectionFailedError(reason))
 
-        def connection_error(model, exception):
+        def connection_error(model, exception, d):
             if not keepTrying:
                 d.errback(exception)
 

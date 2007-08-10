@@ -1,3 +1,8 @@
+2007-08-10  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/admin.py (AdminModel.connection_error):
+	Make the errback accept the deffered arg that it uses!
+
 2007-08-09  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/manager/component.py: removed componentId.
