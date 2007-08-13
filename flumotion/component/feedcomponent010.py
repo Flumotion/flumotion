@@ -917,7 +917,8 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
             elementName = src.get_name()
-            if elementName.startsWith('eater'):
+            # check if the element name is an eater's identity
+            if elementName in ['eater:%s-identity' % n for n in self.eater_names]:
                 if message.structure.get_name() == 'imperfect-timestamp':
                     identityName = elementName
                     eaterName = identityName.split("-identity")[0]

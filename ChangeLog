@@ -1,3 +1,10 @@
+2007-08-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py
+	  (FeedComponent.bus_message_received_cb):
+	Check if the identity is actually the identity from an eater
+	not just if it starts with 'eater'.
+
 2007-08-10  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
