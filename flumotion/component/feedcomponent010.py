@@ -431,7 +431,8 @@ class PadMonitor(log.Loggable):
         return True
 
     def _check_flow_timeout_now(self):
-        self._check_flow_dc.cancel()
+        if self._check_flow_dc:
+            self._check_flow_dc.cancel()
         self._check_flow_timeout()
         
     def _check_flow_timeout(self):
@@ -480,8 +481,12 @@ class EaterPadMonitor(PadMonitor):
         self._last_buffer_time = 0
 
         self._component.reconnectEater(self._name)
+        def reconnect():
+            self._reconnectDC = None
+            self._component.reconnectEater(self._name)
+
         self._reconnectDC = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
-            self._component.reconnectEater, self._name)
+            reconnect)
 
     def setActive(self):
         PadMonitor.setActive(self)
