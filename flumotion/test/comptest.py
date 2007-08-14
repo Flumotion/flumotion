@@ -476,7 +476,7 @@ class ComponentTestHelper(object, log.Loggable):
                     self.info('force_stop_failed: %r' % (failure,))
                     failure.trap(defer.FirstError)
                     return failure.value.subFailure
-                d.addCallbacks(lambda r: r[0][1], force_stop_failed)
+                d.addCallbacks(lambda r: r[0], force_stop_failed)
                 d.addBoth(_return_orig_result)
                 return d
             guard_d.addBoth(_force_stop_flow)

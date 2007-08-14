@@ -1,3 +1,8 @@
+2007-08-14  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/comptest.py (ComponentTestHelper.run_flow):
+	Unbox DeferredList result properly.
+
 2007-08-14  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
