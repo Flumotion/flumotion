@@ -1,3 +1,9 @@
+2007-08-16  Michael Smith,,,  <set EMAIL_ADDRESS environment variable>
+
+	* flumotion/component/feedcomponent010.py:
+	  Don't call methods that no longer exist.
+	  Fixes #741.
+
 2007-08-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

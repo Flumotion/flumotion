@@ -915,9 +915,9 @@ class FeedComponent(basecomponent.BaseComponent):
             if name in ['eater:' + n for n in self.eater_names]:
                 self.info('End of stream in eater %s' % src.get_name())
                 feedId = name[len('eater:'):]
-                self.eaterSetInactive(feedId)
-                # start reconnection
-                self.reconnectEater(feedId)
+                # Setting the pad monitor inactive turns us hungry and 
+                # triggers a reconnect attempt
+                self._pad_monitors[name].setInactive()
             else:
                 self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
