@@ -165,22 +165,32 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 mediatype == 'video' and not self._hasVideo):
                 continue
 
+            # For each of audio, video, we build a pipeline that looks roughly 
+            # like:
+            # 
+            # gnlcomposition ! identity single-segment=true ! queue ! 
+            #    audio/video-elements ! identity sync=true ! sink
+
             composition = gst.element_factory_make("gnlcomposition", 
                 mediatype + "-composition")
 
+            segmentidentity = gst.element_factory_make("identity")
+            segmentidentity.set_property("single-segment", True)
+            segmentidentity.set_property("silent", True)
+            syncidentity = gst.element_factory_make("identity")
+            syncidentity.set_property("silent", True)
+            syncidentity.set_property("sync", True)
             queue = gst.element_factory_make("queue")
-            identity = gst.element_factory_make("identity")
-            identity.set_property("sync", True)
-            identity.set_property("single-segment", True)
-            identity.set_property("silent", True)
 
-            pipeline.add(composition, identity, queue)
+            pipeline.add(composition, segmentidentity, queue, syncidentity)
 
             def _padAddedCb(element, pad, target):
                 self.debug("Pad added, linking")
                 pad.link(target)
             composition.connect('pad-added', _padAddedCb, 
-                queue.get_pad("sink"))
+                segmentidentity.get_pad("sink"))
+
+            segmentidentity.link(queue)
 
             if mediatype == 'audio':
                 self.audiocomp = composition
@@ -189,7 +199,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 self.videocomp = composition
                 srcpad = self._buildVideoPipeline(pipeline, queue)
 
-            srcpad.link(identity.get_pad('sink'))
+            srcpad.link(syncidentity.get_pad('sink'))
 
             feedername = 'feeder:%s:%s' % (self.name, mediatype)
             chunk = self.FEEDER_TMPL % {'name': feedername}
@@ -202,7 +212,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             bin.add_pad(ghostpad)
 
             pipeline.add(bin)
-            identity.get_pad('src').link(ghostpad)
+            syncidentity.get_pad('src').link(ghostpad)
 
         return pipeline
 

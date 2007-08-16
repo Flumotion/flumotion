@@ -1,3 +1,11 @@
+2007-08-16  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  identity doesn't seem to handle new segments very well when syncing.
+	  So, use two identities: one early in the pipeline with
+	  single-segment=true, and one late in the pipeline doing
+	  synchronisation.
+
 2007-08-14  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/comptest.py (ComponentTestHelper.run_flow):
