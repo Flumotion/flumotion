@@ -544,7 +544,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self._feeder_probe_cl = None
 
         self._pad_monitors = {}
-        self._pad_monitors_inactive = 0
 
         self.clock_provider = None
         self._master_clock_info = None # (ip, port, basetime) if we're the 
@@ -659,7 +658,6 @@ class FeedComponent(basecomponent.BaseComponent):
         we return to happy.
         """
         self._pad_monitors[name] = PadMonitor(self, pad, name)
-        self._pad_monitors_inactive += 1
         self.info("Added pad monitor %s", name)
 
     def removePadMonitor(self, name):
@@ -669,8 +667,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self._pad_monitors[name].detach()
 
-        if not self._pad_monitors[name].isActive():
-            self._pad_monitors_inactive -= 1
         del self._pad_monitors[name]
 
     def setPadMonitorActive(self, name):
@@ -679,9 +675,13 @@ class FeedComponent(basecomponent.BaseComponent):
         currently working. 
         """
         self.info('Pad data flow at %s is active', name)
-        self._pad_monitors_inactive -= 1
 
-        if self._pad_monitors_inactive == 0 and self._inactivated:
+        allActive = True
+        for monitor in self._pad_monitors.values():
+            if not monitor.isActive():
+                allActive = False
+                
+        if allActive and self._inactivated:
             # We never go happy initially because of this; only if we went
             # hungry because of an eater being inactive.
             self.setMood(moods.happy)
@@ -693,7 +693,6 @@ class FeedComponent(basecomponent.BaseComponent):
         ceased.
         """
         self.info('Pad data flow at %s is inactive', name)
-        self._pad_monitors_inactive += 1
 
         self.setMood(moods.hungry)
         self._inactivated = True
@@ -1128,7 +1127,6 @@ class FeedComponent(basecomponent.BaseComponent):
                     feedId)
 
             self._pad_monitors[name] = EaterPadMonitor(self, pad, feedId)
-            self._pad_monitors_inactive += 1
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
