@@ -207,9 +207,9 @@ class Porter(component.BaseComponent, log.Loggable):
 
     def findPrefixMatch(self, path):
         found = None
-        # TODO: Horribly inefficient. Figure out a smart algorithm
+        # TODO: Horribly inefficient. Replace with pathtree code.
         for prefix in self._prefixes.keys():
-            self.debug("Checking: %r, %r" % (prefix, path))
+            self.log("Checking: %r, %r" % (prefix, path))
             if (path.startswith(prefix) and (not found or len(found) < len(prefix))):
                 found = prefix
         if found:
@@ -378,6 +378,10 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
     # Don't permit a first line longer than this.
     MAX_SIZE = 4096
 
+    # Timeout any client connected to the porter for longer than this. A normal
+    # client should only ever be connected for a fraction of a second.
+    PORTER_CLIENT_TIMEOUT = 30
+
     # In fact, because we check \r, we'll never need to check for \r\n - we
     # leave this in as \r\n is the more correct form. At the other end, this
     # gets processed by a full protocol implementation, so being flexible hurts
@@ -387,6 +391,22 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
     def __init__(self, porter):
         self._buffer = ''
         self._porter = porter
+
+        self.debug("Accepted connection")
+
+        self._timeoutDC = reactor.callLater(self.PORTER_CLIENT_TIMEOUT,
+            self._timeout)
+
+    def _timeout(self):
+        self._timeoutDC = None
+        self.debug("Timing out porter client after %d seconds", 
+            self.PORTER_CLIENT_TIMEOUT)
+        self.transport.loseConnection()
+
+    def connectionLost(self, reason):
+        if self._timeoutDC:
+            self._timeoutDC.cancel()
+            self._timeoutDC = None
 
     def dataReceived(self, data):
         self._buffer = self._buffer + data
@@ -398,7 +418,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
                 line, remaining = self._buffer.split(delim, 1)
                 break
             except ValueError:
-                self.log("No line break found yet")
+                # We didn't find this delimiter; continue with the others.
                 pass
         else:
             # Failed to find a valid delimiter. 
@@ -407,7 +427,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
                 self.log("Dropping connection!")
                 return self.transport.loseConnection()
             else:
-                # TODO: Should we return anything?
+                # No delimiter found; haven't reached the length limit yet.
+                # Wait for more data.
                 return
 
         # Got a line. self._buffer is still our entire buffer, should be
@@ -424,8 +445,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
         if not destinationAvatar or not destinationAvatar.isAttached():
             if destinationAvatar:
-                self.log("There was an avatar, but it logged out?")
-            self.log("No destination avatar found for \"%s\"" % identifier)
+                self.debug("There was an avatar, but it logged out?")
+            self.debug("No destination avatar found for \"%s\"" % identifier)
             self.writeNotFoundResponse()
             return self.transport.loseConnection()
 

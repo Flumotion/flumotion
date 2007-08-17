@@ -1,3 +1,11 @@
+2007-08-17  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/porter/porter.py:
+	  Implement porter client timeouts, so that we (reasonably quickly)
+	  time out clients that connect to the porter but never send a
+	  complete first line.
+	  Change some debug/log statements to more appropriate levels.
+
 2007-08-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
