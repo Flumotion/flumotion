@@ -1,3 +1,10 @@
+2007-08-17  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/base/watcher.py (BaseWatcher.checkFiles,
+	  BaseWatcher.isNewFileStable):
+	Make file watchers recognize old files (with mtime in the past) in
+	the first scan.
+
 2007-08-17  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porter.py:

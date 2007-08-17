@@ -21,6 +21,7 @@
 
 
 import os
+import time
 
 from twisted.internet import reactor
 
@@ -111,7 +112,11 @@ class BaseWatcher(log.Loggable):
             stable = self._stableData
             for f in new:
                 if f not in changing:
-                    if f in stable and new[f] == stable[f]:
+                    if not f in stable and self.isNewFileStable(f, new[f]):
+                        self.debug('file %s stable when noted', f)
+                        stable[f] = new[f]
+                        self.event('fileChanged', f)
+                    elif f in stable and new[f] == stable[f]:
                         # no change
                         pass
                     else:
@@ -162,6 +167,24 @@ class BaseWatcher(log.Loggable):
             except OSError, e:
                 self.debug('could not read file %s: %s', f,
                            log.getExceptionMessage(e))
+        return ret
+
+    def isNewFileStable(self, fName, fData):
+        """
+        Check if the file is already stable when being added to the
+        set of watched files.
+
+        @param fName: filename
+        @type  fName: str
+        @param fData: DATA, as returned by L{getFileData} method. In
+                      the default implementation it is a pair of
+                      (mtime, size).
+
+        @rtype: bool
+        """
+        __pychecker__ = 'unusednames=fName'
+
+        ret = fData[0] + self.timeout < time.time()
         return ret
 
     def getFilesToStat(self):
