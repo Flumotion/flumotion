@@ -161,7 +161,7 @@ class TestPadMonitor(unittest.TestCase):
             # we should go inactive. Pass our test if that happens. Otherwise
             # trial will time out.
             component.setPadMonitorInactive = hasInactivated
-        reactor.callLater(0.1, hasActivated)
+        reactor.callLater(0.2, hasActivated)
 
         return d
 

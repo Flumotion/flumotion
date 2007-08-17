@@ -1,0 +1,56 @@
+Theory
+------
+
+The manager maintains a dependency graph for components and workers.
+
+It contains nodes corresponding to particular actions, and edges denoting
+dependencies.
+
+Node types:
+ - WORKER:          worker logs in
+ - JOB:             job is started
+ - COMPONENTSETUP:  we set up a component on a running job
+ - CLOCKMASTER:     we configure a component as the clock master for the flow
+ - COMPONENTSTART:  we tell a running job to start its component
+
+When an action at a given node is completed, we follow the dependency edges
+to see what further actions can be taken.
+
+The initial trigger for doing something in the depgraph is a worker logging in.
+This triggers job creation. When job creation is complete, we can start setting
+up and starting componenents.
+
+Specifics: whenever an action corresponding to a depgraph node is complete, we
+set the node to True through a call to Vishnu._depgraph.setXXXStarted(), for 
+appropriate XXX (e.g. setWorkerStarted). We then follow all edges from this 
+node to its immediate children. For each child node that hasn't already been 
+set to true, we check whether all its parent nodes are set to true. If so, we
+then start the appropriate action at that node. This will (if things work)
+result in the action completing, the node being set True, and we'll proceed
+further through the depgraph.
+
+Example:
+ - Suppose a simple flow: soundcard-source -> audio-encoder -> http-streamer
+ - A worker logs in. We set the appropriate worker node to true, and look for
+   its children. In this case, this is the three jobs. We start the jobs.
+ - Each job in turn logs in. We set the JOB nodes to true.
+ - The only thing we can do as a result of this is set up the soundcard-source
+   (it is the clock master, and thus must go first). 
+ - When that completes, we set the soundcard-source as a clock master.
+ - Then we can start the soundcard source, and setup the other two components
+ - When those are both done, we can start the encoder. When that starts, we
+   start the streamer.
+
+Practice
+--------
+
+There are two main things that aren't done according to this right now.
+
+1. When a worker logs in, there's code that explicitly handles that, and
+   starts jobs in reaction to it. We don't actually follow the depgraph edges
+   until the _job_ logs in - at which point we use the depgraph to set up, set
+   clock masters, and start components
+2. We don't set components up in parallel. There are depgraph edges between 
+   feeder and eater for setup (which probably doesn't make sense), not just for
+   start (which does)
+

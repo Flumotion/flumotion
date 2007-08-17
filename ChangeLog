@@ -1,5 +1,12 @@
 2007-08-17  Michael Smith <msmith@fluendo.com>
 
+	* doc/random/manager-dependency-graph:
+	  Some docs on how we use the depgraph.
+	* flumotion/test/test_feedcomponent010.py:
+	  Increase a timeout; this test sometimes spuriously fails.
+
+2007-08-17  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/test_porter.py:
 	  Fix tests to shut down connections properly so we don't have pending
 	  calls remaining.
