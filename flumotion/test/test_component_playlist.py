@@ -198,6 +198,7 @@ class TestPlaylistXMLParser(unittest.TestCase):
 
         self.pl1.close()
         self.pl2.close()
+        self.pl3.close()
 
     def testItemsSortedSingle(self):
         self.xmlparser.parseFile(self.pl1.name)
