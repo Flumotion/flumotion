@@ -97,7 +97,7 @@ class PlaylistProducerMedium(feedcomponent.FeedComponentMedium):
         self.comp.addPlaylist(data)
 
 class PlaylistProducer(feedcomponent.FeedComponent):
-
+    logCategory = 'playlist-prod'
     componentMediumClass = PlaylistProducerMedium
 
     def init(self):
@@ -384,7 +384,14 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._directoryWatcher = watcher.DirectoryWatcher(dir)
         self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged, 
             fileDeleted=self._watchFileDeleted)
-        self._directoryWatcher.start()
+
+        # in the start call watcher should find all the existing
+        # files, so we block discovery while the watcher starts
+        self.playlistparser.blockDiscovery()
+        try:
+            self._directoryWatcher.start()
+        finally:
+            self.playlistparser.unblockDiscovery()
 
     def _watchFileDeleted(self, file):
         self.debug("File deleted: %s", file)
@@ -425,6 +432,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                         (file, e))), id=msgid))
 
     def do_start(self, clocking):
+        self.debug('do_start')
         self.link()
 
         playlist = playlistparser.Playlist(self)

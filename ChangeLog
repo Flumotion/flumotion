@@ -1,5 +1,22 @@
 2007-08-17  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/component/producers/playlist/playlist.py
+	  (PlaylistProducer._watchDirectory):
+	Block discovery while the watcher is first being started.
+
+	* flumotion/component/producers/playlist/playlistparser.py
+	  (PlaylistParser):
+	Make discoverer blockable/suspendable, sort pending playlist entries
+	before starting discoverer.
+	  (PlaylistXMLParser.parseFile):
+	Block discoverer until the whole file has been processed.
+
+	* flumotion/test/test_component_playlist.py
+	  (TestPlaylistXMLParser):
+	Add tests for entry sorting and discovery blocking.
+
+2007-08-17  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/component/base/watcher.py (BaseWatcher.checkFiles,
 	  BaseWatcher.isNewFileStable):
 	Make file watchers recognize old files (with mtime in the past) in

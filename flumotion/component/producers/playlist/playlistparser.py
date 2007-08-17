@@ -47,6 +47,8 @@ class PlaylistItem(object, log.Loggable):
         self.prev = None
 
 class Playlist(object, log.Loggable):
+    logCategory = 'playlist-list'
+
     def __init__(self, producer):
         """
         Create an initially empty playlist
@@ -193,11 +195,14 @@ class Playlist(object, log.Loggable):
             item.next.prev = item.prev
 
 class PlaylistParser(object, log.Loggable):
+    logCategory = 'playlist-parse'
+
     def __init__(self, playlist):
         self.playlist = playlist
 
         self._pending_items = []
         self._discovering = False
+        self._discovering_blocked = 0
 
         self._baseDirectory = None
 
@@ -205,6 +210,54 @@ class PlaylistParser(object, log.Loggable):
         if not baseDir.endswith('/'):
             baseDir = baseDir + '/'
         self._baseDirectory = baseDir
+
+    def blockDiscovery(self):
+        """
+        Prevent playlist parser from running discoverer on any pending
+        playlist entries. Multiple subsequent invocations will require
+        the same corresponding number of calls to L{unblockDiscovery}
+        to resume discovery.
+        """
+        self._discovering_blocked += 1
+        self.debug('  blocking discovery: %d' % self._discovering_blocked)
+
+    def unblockDiscovery(self):
+        """
+        Resume discovering of any pending playlist entries. If
+        L{blockDiscovery} was called multiple times multiple
+        invocations of unblockDiscovery will be required to unblock
+        the discoverer.
+        """
+        if self._discovering_blocked > 0:
+            self._discovering_blocked -= 1
+        self.debug('unblocking discovery: %d' % self._discovering_blocked)
+        if self._discovering_blocked < 1:
+            self.startDiscovery()
+
+    def startDiscovery(self, doSort=True):
+        """
+        Initiate discovery of any pending playlist entries.
+
+        @param doSort: should the pending entries be ordered
+                       chronologically before initiating discovery
+        @type  doSort: bool
+        """
+        self.log('startDiscovery: discovering: %s, block: %d, pending: %d' %
+                 (self._discovering, self._discovering_blocked,
+                  len(self._pending_items)))
+        if not self._discovering and self._discovering_blocked < 1 \
+               and self._pending_items:
+            if doSort:
+                self._sortPending()
+            self._discoverPending()
+
+    def _sortPending(self):
+        self.debug('sort pending: %d' % len(self._pending_items))
+        if not self._pending_items:
+            return
+        sortlist = [(elt[1], elt) for elt in self._pending_items]
+        sortlist.sort()
+        self._pending_items = [elt for (ts, elt) in sortlist]
 
     def _discoverPending(self):
         def _discovered(disc, is_media):
@@ -248,6 +301,11 @@ class PlaylistParser(object, log.Loggable):
             self._discovering = False
             return
 
+        if self._discovering_blocked > 0:
+            self.debug("Discovering blocked: %d" % self._discovering_blocked)
+            self._discovering = False
+            return
+
         self._discovering = True
         
         item = self._pending_items.pop(0)
@@ -273,10 +331,10 @@ class PlaylistParser(object, log.Loggable):
         self._pending_items.append((filename, timestamp, duration, offset, id))
 
         # Now launch the discoverer for any pending items
-        if not self._discovering:
-            self._discoverPending()
+        self.startDiscovery()
 
 class PlaylistXMLParser(PlaylistParser):
+    logCategory = 'playlist-xml'
 
     def parseData(self, data):
         """
@@ -303,11 +361,15 @@ class PlaylistXMLParser(PlaylistParser):
         if node.nodeName != 'playlist':
             raise fxml.ParserError("Root node is not 'playlist'")
 
-        for child in node.childNodes:
-            if child.nodeType == Node.ELEMENT_NODE and \
-                    child.nodeName == 'entry':
-                self.debug("Parsing entry")
-                self._parsePlaylistEntry(parser, child, id)
+        self.blockDiscovery()
+        try:
+            for child in node.childNodes:
+                if child.nodeType == Node.ELEMENT_NODE and \
+                        child.nodeName == 'entry':
+                    self.debug("Parsing entry")
+                    self._parsePlaylistEntry(parser, child, id)
+        finally:
+            self.unblockDiscovery()
 
     # A simplified private version of this code from fxml without the 
     # undesirable unicode->str conversions.
