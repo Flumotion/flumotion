@@ -1,3 +1,9 @@
+2007-08-17  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_porter.py:
+	  Fix tests to shut down connections properly so we don't have pending
+	  calls remaining.
+
 2007-08-17  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/producers/playlist/playlist.py

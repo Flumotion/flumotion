@@ -31,11 +31,13 @@ class FakeTransport:
     connected = True
     _fileno = 5
 
-    def __init__(self):
+    def __init__(self, protocol):
         self.written = ''
+        self.protocol = protocol
 
     def loseConnection(self):
         self.connected = False
+        self.protocol.connectionLost(None)
         
     def sendFileDescriptor(self, fd, data):
         pass
@@ -58,7 +60,7 @@ class FakePorter:
     
 class FakeBroker:
     def __init__(self):
-        self.transport = FakeTransport()
+        self.transport = FakeTransport(self)
 
 class FakeMind:
     def __init__(self):
@@ -75,7 +77,7 @@ class TestPorterProtocol(unittest.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
-        self.t = FakeTransport()
+        self.t = FakeTransport(self.pp)
         self.pp.transport = self.t
         self.failUnless(self.t.connected)
         self.failIf(self.p.foundDestination)
@@ -98,7 +100,7 @@ class TestHTTPPorterProtocol(unittest.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
-        self.t = FakeTransport()
+        self.t = FakeTransport(self.pp)
         self.pp.transport = self.t
         self.failUnless(self.t.connected)
         self.failIf(self.p.foundDestination)
@@ -134,6 +136,11 @@ class TestHTTPPorterProtocolParser(unittest.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
+        self.t = FakeTransport(self.pp)
+        self.pp.transport = self.t
+
+    def tearDown(self):
+        self.t.loseConnection()
 
     def testSimpleParse(self):
         result = self.pp.parseLine('GET /test HTTP/1.0\r\n')
