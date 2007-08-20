@@ -116,7 +116,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._vsrcs = {} # { PlaylistItem -> gnlsource }
         self._asrcs = {} # { PlaylistItem -> gnlsource }
 
-    def _buildAudioPipeline(self, pipeline, queue):
+    def _buildAudioPipeline(self, pipeline, src):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
         audioresample = gst.element_factory_make('audioresample')
@@ -128,14 +128,14 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         capsfilter.props.caps = outcaps
 
         pipeline.add(audiorate, audioconvert, audioresample, capsfilter)
-        queue.link(audioconvert)
+        src.link(audioconvert)
         audioconvert.link(audioresample)
         audioresample.link(audiorate)
         audiorate.link(capsfilter)
 
         return capsfilter.get_pad('src')
 
-    def _buildVideoPipeline(self, pipeline, queue):
+    def _buildVideoPipeline(self, pipeline, src):
         outcaps = gst.Caps(
             "video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d,"
             "pixel-aspect-ratio=1/1" % 
@@ -151,7 +151,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
         pipeline.add(cspace, scaler, videorate, capsfilter)
 
-        queue.link(cspace)
+        src.link(cspace)
         cspace.link(scaler)
         scaler.link(videorate)
         videorate.link(capsfilter)
@@ -168,7 +168,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             # For each of audio, video, we build a pipeline that looks roughly 
             # like:
             # 
-            # gnlcomposition ! identity single-segment=true ! queue ! 
+            # gnlcomposition ! identity single-segment=true !
             #    audio/video-elements ! identity sync=true ! sink
 
             composition = gst.element_factory_make("gnlcomposition", 
@@ -180,9 +180,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             syncidentity = gst.element_factory_make("identity")
             syncidentity.set_property("silent", True)
             syncidentity.set_property("sync", True)
-            queue = gst.element_factory_make("queue")
 
-            pipeline.add(composition, segmentidentity, queue, syncidentity)
+            pipeline.add(composition, segmentidentity, syncidentity)
 
             def _padAddedCb(element, pad, target):
                 self.debug("Pad added, linking")
@@ -190,14 +189,12 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             composition.connect('pad-added', _padAddedCb, 
                 segmentidentity.get_pad("sink"))
 
-            segmentidentity.link(queue)
-
             if mediatype == 'audio':
                 self.audiocomp = composition
-                srcpad = self._buildAudioPipeline(pipeline, queue)
+                srcpad = self._buildAudioPipeline(pipeline, segmentidentity)
             else:
                 self.videocomp = composition
-                srcpad = self._buildVideoPipeline(pipeline, queue)
+                srcpad = self._buildVideoPipeline(pipeline, segmentidentity)
 
             srcpad.link(syncidentity.get_pad('sink'))
 
