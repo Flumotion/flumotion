@@ -1,3 +1,23 @@
+2007-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/Makefile.am:
+	* bin/flumotion-nagios.in:
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/monitor/Makefile.am:
+	* flumotion/monitor/__init__.py:
+	* flumotion/monitor/nagios/Makefile.am:
+	* flumotion/monitor/nagios/__init__.py:
+	* flumotion/monitor/nagios/main.py (Mood, Mood.addOptions,
+	  Mood.handleOptions, Mood.do, Mood._callback, Mood.gotMoodCb, Nagios,
+	  Nagios.addOptions, Nagios.handleOptions, Nagios.parse, Nagios.cb,
+	  Nagios.eb, Nagios.run, Nagios.connect, Nagios._connectedCb,
+	  Nagios._connectedEb, main):
+	* flumotion/monitor/nagios/util.py (LogCommand, LogCommand.__init__,
+	  findComponent, ok, warning, critical):
+	  Add a first stab at a flumotion-nagios binary, and an implementation
+	  of the mood check.
+
 2007-08-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/Makefile.am: Autotoolage.

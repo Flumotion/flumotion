@@ -6,6 +6,7 @@ bin_SCRIPTS = \
 	flumotion-job \
 	flumotion-launch \
 	flumotion-manager \
+	flumotion-nagios \
 	flumotion-rrdmon \
 	flumotion-tester \
 	flumotion-worker
