@@ -21,6 +21,7 @@
     <bundle name="tokentest-base">
       <dependencies>
         <dependency name="component" />
+        <dependency name="deprecated-bouncer-base" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/bouncers">

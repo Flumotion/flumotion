@@ -1,3 +1,17 @@
+2007-08-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/saltsha256.xml: 
+	* flumotion/component/bouncers/icalbouncer.xml: 
+	* flumotion/component/bouncers/ipbouncer.xml: 
+	* flumotion/component/bouncers/tokentest.xml: 
+	* flumotion/component/bouncers/htpasswdcrypt.xml: Depend on the
+	base bouncer component bundle.
+
+	* flumotion/component/bouncers/Makefile.am (component_DATA): 
+	* flumotion/component/bouncers/deprecated.xml: New file,
+	registering a bundle for the current bouncer code, which will be
+	deprecated.
+
 2007-08-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

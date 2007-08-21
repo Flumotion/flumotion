@@ -1,0 +1,15 @@
+<registry>
+  <bundles>
+    <bundle name="deprecated-bouncer-base">
+      <dependencies>
+        <dependency name="component" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="bouncer.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry> 
+

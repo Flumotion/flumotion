@@ -21,6 +21,7 @@
       <dependencies>
         <dependency name="component" />
 	<dependency name="base-scheduler" />
+        <dependency name="deprecated-bouncer-base" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/bouncers">
