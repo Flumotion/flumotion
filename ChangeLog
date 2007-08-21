@@ -1,5 +1,18 @@
 2007-08-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/Makefile.am: Autotoolage.
+
+	* flumotion/component/bouncers/plug.py: New file, copied from
+	bouncer.py, refactors bouncer functionality into a plug. The code
+	for dealing with the uistate was removed, for better or for worse.
+
+	* flumotion/component/bouncers/bouncer.xml: New file, declares the
+	bouncer component, the bouncer plug bundles, and an implementation
+	for the trivial bouncer. As yet untested.
+
+	* flumotion/component/bouncers/component.py: New file, breaks out
+	a generic bouncer component that can support bouncer plugs.
+
 	* flumotion/component/bouncers/saltsha256.xml: 
 	* flumotion/component/bouncers/icalbouncer.xml: 
 	* flumotion/component/bouncers/ipbouncer.xml: 
