@@ -1,3 +1,12 @@
+2007-08-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* scripts/check-sync-on-feeds:
+	Script that probably could do with a bit of refactoring, to
+	play back video and audio given video feeder and audio feeder
+	details.
+	Useful for checking sync at different points in a Flumotion
+	flow.
+
 2007-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/Makefile.am:

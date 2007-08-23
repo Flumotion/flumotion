@@ -1,0 +1,226 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# (C) Copyright 2007 Zaheer Abbas Merali <zaheerabbas at merali dot org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+from flumotion.component import feed
+from twisted.internet import reactor
+from flumotion.twisted import pb
+from flumotion.common import log
+import os
+import sys
+import string
+import gobject
+gobject.threads_init()
+import gst
+import optparse
+
+haveVideoFeed = False
+haveAudioFeed = False
+videoFd = 0
+audioFd = 0
+videoBufferProbeId = 0
+audioBufferProbeId = 0
+haveVideoBuffer = False
+haveAudioBuffer = False
+lowestTimestamp = 0L
+pipe = None
+sentNewsegment = False
+seenNewsegmentAudio = False
+seenNewsegmentVideo = False
+
+def usage(args, exitval=0):
+    print "usage: %s [OPTIONS] -w WORKER -p FEEDERPORT " \
+        "-V FULLFEEDIDOFVIDEOFEEDER -A FULLFEEDIDOFAUDIOFEEDER" % args[0]
+    print ' -U username -P password'
+    print ''
+    print 'See %s -h for help on the available options.' % args[0]
+    sys.exit(exitval)
+
+def gotVideoFeed(res):
+    global haveAudioFeed
+    global haveVideoFeed
+    global videoFd
+
+    if not res:
+        log.debug("output-feed", "got None in gotFeed")
+        reactor.stop()
+        return
+    (feedId, fd) = res
+    videoFd = fd
+    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" % 
+        (fd, feedId))
+    haveVideoFeed = True
+    if haveAudioFeed:
+        startPipeline()
+
+def videoEventProbe(pad, event):
+    global seenNewsegmentVideo
+    if event.type == gst.EVENT_NEWSEGMENT:
+        log.debug("check-sync-on-feeds", "New segment event")
+        if not seenNewsegmentVideo:
+            seenNewsegmentVideo = True
+            return False 
+    return True
+
+def audioEventProbe(pad, event):
+    global seenNewsegmentAudio
+    if event.type == gst.EVENT_NEWSEGMENT:
+        log.debug("check-sync-on-feeds", "New segment event")
+        if not seenNewsegmentAudio:
+            seenNewsegmentAudio = True
+            return False
+    return True
+
+def sendNewsegments():
+    global pipe
+    global lowestTimestamp
+    global sentNewsegment
+    global videoBufferProbeId
+    global audioBufferProbeId
+
+    if not sentNewsegment:
+        sentNewsegment = True
+        log.debug("check-sync-on-feeds", "new segment with timestamp %d", lowestTimestamp)
+        newseg = gst.event_new_new_segment(False, 1.0, gst.FORMAT_TIME, lowestTimestamp, -1, 0)
+        vsinkpad = pipe.get_by_name("vsinkpad").get_pad("sink")
+        asinkpad = pipe.get_by_name("asinkpad").get_pad("sink")
+        vsinkpad.send_event(newseg)
+        asinkpad.send_event(newseg)
+        vsinkpad.remove_buffer_probe(videoBufferProbeId)
+        asinkpad.remove_buffer_probe(audioBufferProbeId)
+
+def videoBufferProbe(pad, buffer):
+    global haveVideoBuffer
+    global haveAudioBuffer
+    global lowestTimestamp
+    haveVideoBuffer = True
+    if haveAudioBuffer:
+        if lowestTimestamp > buffer.timestamp:
+            lowestTimestamp = buffer.timestamp
+        sendNewsegments()
+    else:
+        lowestTimestamp = buffer.timestamp
+    return False 
+
+def audioBufferProbe(pad, buffer):
+    global haveVideoBuffer
+    global haveAudioBuffer
+    global lowestTimestamp
+    haveAudioBuffer = True
+    if haveVideoBuffer:
+        if lowestTimestamp > buffer.timestamp:
+            lowestTimestamp = buffer.timestamp
+        sendNewsegments()
+    else:
+        lowestTimestamp = buffer.timestamp
+    return False
+
+def startPipeline():
+    global videoFd
+    global audioFd
+    global videoBufferProbeId
+    global audioBufferProbeId
+    global pipe
+    log.debug("check-sync-on-feeds", "Starting pipeline")
+    pipe = gst.parse_launch("fdsrc fd=%d ! queue ! gdpdepay ! ffmpegcolorspace name=vsinkpad ! videoscale ! ximagesink fdsrc fd=%d ! queue ! gdpdepay ! audioconvert name=asinkpad ! audioresample ! alsasink" % (videoFd,audioFd))
+    vsinkpadElement = pipe.get_by_name("vsinkpad")
+    asinkpadElement = pipe.get_by_name("asinkpad")
+    # add event probes, when new segments received, block pad
+    vsinkpad = vsinkpadElement.get_pad("sink")
+    asinkpad = asinkpadElement.get_pad("sink")
+    vsinkpad.add_event_probe(videoEventProbe)
+    asinkpad.add_event_probe(audioEventProbe)
+    videoBufferProbeId = vsinkpad.add_buffer_probe(videoBufferProbe)
+    audioBufferProbeId = asinkpad.add_buffer_probe(audioBufferProbe)
+    pipe.set_state(gst.STATE_PLAYING)
+
+def gotAudioFeed(res):
+    global haveAudioFeed
+    global haveVideoFeed
+    global audioFd
+    if not res:
+        log.debug("check-sync-on-feeds", "got None in gotFeed")
+        reactor.stop()
+        return
+    (feedId, fd) = res
+    audioFd = fd
+    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" % 
+        (fd, feedId))
+    haveAudioFeed = True
+    if haveVideoFeed:
+        startPipeline()
+
+def main(args):
+    log.init()
+
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
+    parser.add_option('-u', '--usage',
+                      action="store_true", dest="usage",
+                      help="show a usage message")
+    parser.add_option('-w', '--worker',
+                      action="store", type="string", dest="host",
+                      help="the host of the worker to connect to"
+                        ", e.g. localhost")
+    parser.add_option('-p', '--port',
+                      action="store", type="int", dest="port",
+                      help="the feeder port of the job's feeder")
+    parser.add_option('-U', '--username',
+                      action="store", type="string", dest="username",
+                      help="the username to log into the feed server")
+    parser.add_option('-P', '--password',
+                      action="store", type="string", dest="password",
+                      help="the password to log into the feed server")
+    parser.add_option('-V', '--video-feed-id',
+                      action="store", type="string", dest="videoFeedId",
+                      help="the full feed id of the video feed to connect to"
+                        ", e.g. /default/video-source:default")
+    parser.add_option('-A', '--audio-feed-id',
+                      action="store", type="string", dest="audioFeedId",
+                      help="the full feed id of the audio feed to connect to"
+                        ", e.g. /default/audio-source:default")
+    
+    options, args = parser.parse_args(args)
+
+    if options.debug:
+        log.setFluDebug(options.debug)
+
+    if options.usage:
+        usage(args)
+
+    if not options.host or not options.port or not options.username or not \
+        options.password or not options.videoFeedId or not \
+        options.audioFeedId:
+        usage(args)
+
+    vclient = feed.FeedMedium(logName="check-sync-on-feeds")
+    aclient = feed.FeedMedium(logName="check-sync-on-feeds")
+    authenticator = pb.Authenticator(username=options.username, 
+        password=options.password)
+    vd = vclient.requestFeed(options.host, options.port, authenticator, 
+        options.videoFeedId)
+    ad = aclient.requestFeed(options.host, options.port, authenticator,
+        options.audioFeedId)
+    vd.addCallback(gotVideoFeed)
+    ad.addCallback(gotAudioFeed)
+    reactor.run()
+
+main(sys.argv)
