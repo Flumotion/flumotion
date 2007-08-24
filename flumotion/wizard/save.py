@@ -80,10 +80,10 @@ class Component(log.Loggable):
             self.name, self.type, configure.version, extra)
         whoIsFeedingUs = self.getFeeders()
         if len(whoIsFeedingUs) > 0:
-            s += '     <eater name="default">\n'
+            s += '      <eater name="default">\n'
             for sourceName in whoIsFeedingUs:
-                s += "      <feed>%s</feed>\n" % sourceName
-            s += '     </eater>\n'
+                s += "        <feed>%s</feed>\n" % sourceName
+            s += '      </eater>\n'
                     
         if self.props:
             s += "\n"
