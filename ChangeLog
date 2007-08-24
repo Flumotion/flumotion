@@ -1,3 +1,9 @@
+2007-08-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* scripts/check-sync-on-feeds (videoEventProbe, audioEventProbe,
+	  sendNewsegments, videoBufferProbe, audioBufferProbe):
+	Improve the debug logging.
+
 2007-08-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* scripts/check-sync-on-feeds:

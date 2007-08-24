@@ -72,7 +72,8 @@ def gotVideoFeed(res):
 def videoEventProbe(pad, event):
     global seenNewsegmentVideo
     if event.type == gst.EVENT_NEWSEGMENT:
-        log.debug("check-sync-on-feeds", "New segment event")
+        log.debug("check-sync-on-feeds", "New segment event on video pad %r",
+            event)
         if not seenNewsegmentVideo:
             seenNewsegmentVideo = True
             return False 
@@ -81,7 +82,8 @@ def videoEventProbe(pad, event):
 def audioEventProbe(pad, event):
     global seenNewsegmentAudio
     if event.type == gst.EVENT_NEWSEGMENT:
-        log.debug("check-sync-on-feeds", "New segment event")
+        log.debug("check-sync-on-feeds", "New segment event on audio pad %r",
+            event)
         if not seenNewsegmentAudio:
             seenNewsegmentAudio = True
             return False
@@ -96,7 +98,7 @@ def sendNewsegments():
 
     if not sentNewsegment:
         sentNewsegment = True
-        log.debug("check-sync-on-feeds", "new segment with timestamp %d", lowestTimestamp)
+        log.debug("check-sync-on-feeds", "new segment created with timestamp %d", lowestTimestamp)
         newseg = gst.event_new_new_segment(False, 1.0, gst.FORMAT_TIME, lowestTimestamp, -1, 0)
         vsinkpad = pipe.get_by_name("vsinkpad").get_pad("sink")
         asinkpad = pipe.get_by_name("asinkpad").get_pad("sink")
@@ -110,6 +112,8 @@ def videoBufferProbe(pad, buffer):
     global haveAudioBuffer
     global lowestTimestamp
     haveVideoBuffer = True
+    log.debug("check-sync-on-feeds", "video buffer arrived with timestamp %d",
+        buffer.timestamp)
     if haveAudioBuffer:
         if lowestTimestamp > buffer.timestamp:
             lowestTimestamp = buffer.timestamp
@@ -123,6 +127,9 @@ def audioBufferProbe(pad, buffer):
     global haveAudioBuffer
     global lowestTimestamp
     haveAudioBuffer = True
+    log.debug("check-sync-on-feeds", "audio buffer arrived with timestamp %d",
+        buffer.timestamp)
+
     if haveVideoBuffer:
         if lowestTimestamp > buffer.timestamp:
             lowestTimestamp = buffer.timestamp
