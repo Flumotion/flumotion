@@ -235,6 +235,7 @@ fi
 %{_bindir}/flumotion-inspect
 %{_bindir}/flumotion-launch
 %{_bindir}/flumotion-rrdmon
+%{_bindir}/flumotion-nagios
 %{_sbindir}/flumotion
 
 %{_libdir}/flumotion
@@ -257,6 +258,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Fri Aug 24 2007 Zaheer Abbas Merali <zaheerabbas at merali dot org>
+- Add flumotion-nagios
+
 * Mon Jul 30 2007 Arek Korbik <arkadini at gmail dot com>
 - Add flumotion-rrdmon
 
