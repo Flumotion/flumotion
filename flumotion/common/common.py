@@ -146,31 +146,25 @@ def version(binary):
     block = []
     block.append("%s %s" % (binary, configure.version))
     block.append("part of Flumotion - a streaming media server")
-    block.append("(C) Copyright 2004,2005,2006 Fluendo")
+    block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
     return "\n".join(block)
              
 def mergeImplements(*classes):
     """
     Merge the __implements__ tuples of the given classes into one tuple.
     """
-    if twisted.copyright.version[0] < '2':
-        allYourBase = []
-        for clazz in classes:
-            allYourBase += getattr(clazz, '__implements__', ())
-        return tuple(allYourBase)
-    else:
-        allYourBase = ()
-        for clazz in classes:
-            try:
-                interfaces = [i for i in clazz.__implemented__]
-            except AttributeError:
-                # with twisted 2.0.1, we get AttributeError with a simple
-                # class C: pass
-                # which does not have C.__implemented__
-                interfaces = []
-            for interface in interfaces:
-                allYourBase += (interface,)
-        return allYourBase
+    allYourBase = ()
+    for clazz in classes:
+        try:
+            interfaces = [i for i in clazz.__implemented__]
+        except AttributeError:
+            # with twisted 2.0.1, we get AttributeError with a simple
+            # class C: pass
+            # which does not have C.__implemented__
+            interfaces = []
+        for interface in interfaces:
+            allYourBase += (interface,)
+    return allYourBase
 
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
               directory='/'):
@@ -554,6 +548,8 @@ def componentId(parentName, componentName):
 
 def parseComponentId(componentId):
     """
+    Parses a component id ("/flowName/componentName") into its parts.
+
     @since: 0.3.1
 
     @rtype:  tuple of (str, str)

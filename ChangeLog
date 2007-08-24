@@ -1,5 +1,11 @@
 2007-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py (version, mergeImplements,
+	  parseComponentId):
+	  Fix copyright header.  Remove pre-Twisted 2 stuff.  Add doc.
+
+2007-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/save.py (Component.toXML):
 	  Consistently use 2-space indent in config xml.
 
