@@ -30,7 +30,6 @@ import time
 import signal
 
 from twisted.internet import address
-import twisted.copyright
 
 from flumotion.common import log
 
