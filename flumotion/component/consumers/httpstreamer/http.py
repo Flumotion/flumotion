@@ -231,7 +231,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
     ### remote methods for manager to call on
     def remote_expireKeycard(self, keycardId):
-        self.comp.resource.expireKeycard(keycardId)
+        self.comp.httpauth.expireKeycard(keycardId)
 
     def remote_notifyState(self):
         self.comp.update_ui_state()
@@ -272,6 +272,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.caps = None
         self.resource = None
+        self.httpauth = None
         self.mountPoint = None
         self.burst_on_connect = False
 
@@ -444,7 +445,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.description = "Flumotion Stream"
  
         # FIXME: tie these together more nicely
-        self.resource = resources.HTTPStreamingResource(self)
+        self.httpauth = http.HTTPAuthentication(self)
+        self.resource = resources.HTTPStreamingResource(self,
+                                                        self.httpauth)
 
         # check how to set client sync mode
         sink = self.get_element('sink')
@@ -492,19 +495,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 properties['redirect-on-overflow'])
 
         if properties.has_key('bouncer'):
-            self.resource.setBouncerName(properties['bouncer'])
+            self.httpauth.setBouncerName(properties['bouncer'])
 
         if properties.has_key('issuer-class'):
-            self.resource.setIssuerClass(properties['issuer-class'])
+            self.httpauth.setIssuerClass(properties['issuer-class'])
 
         if properties.has_key('duration'):
-            self.resource.setDefaultDuration(float(properties['duration']))
+            self.httpauth.setDefaultDuration(float(properties['duration']))
 
         if properties.has_key('domain'):
-            self.resource.setDomain(properties['domain'])
+            self.httpauth.setDomain(properties['domain'])
 
         if self.config.has_key('avatarId'):
-            self.resource.setRequesterId(self.config['avatarId'])
+            self.httpauth.setRequesterId(self.config['avatarId'])
 
         if properties.has_key('ip-filter'):
             filter = http.LogFilter()
@@ -645,8 +648,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._updateCallLaterId.cancel()
             self._updateCallLaterId = None
 
-        if self.resource:
-            self.resource.stopKeepAlive()
+        if self.httpauth:
+            self.httpauth.stopKeepAlive()
 
         if self.type == 'slave' and self._pbclient:
             d1 = self._pbclient.deregisterPath(self.mountPoint)
@@ -746,7 +749,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
         def turnHappy(res):
-            self.resource.scheduleKeepAlive()
+            self.httpauth.scheduleKeepAlive()
             self.debug("Turned happy!")
             self.setMood(moods.happy)
         d.addCallback(turnHappy)

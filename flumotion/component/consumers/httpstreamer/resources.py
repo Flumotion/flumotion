@@ -63,8 +63,7 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
 ### the Twisted resource that handles the base URL
-class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
-    log.Loggable):
+class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
@@ -75,12 +74,13 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
     # getChildWithDefault
     isLeaf = True
     
-    def __init__(self, streamer):
+    def __init__(self, streamer, httpauth):
         """
         @param streamer: L{MultifdSinkStreamer}
         """
         streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
+        self.httpauth = httpauth
         
         self._requests = {}            # request fd -> Request
         
@@ -96,7 +96,6 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         self.logfilter = None
             
         web_resource.Resource.__init__(self)
-        httpbase.HTTPAuthentication.__init__(self, streamer)
 
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
         # this is the callback attached to our flumotion component,
@@ -314,7 +313,7 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         # We can't call request.finish(), since we already "stole" the fd, we 
         # just loseConnection on the transport directly, and delete the 
         # Request object, after cleaning up the bouncer bits.
-        self.cleanupAuth(fd)
+        self.httpauth.cleanupAuth(fd)
 
         self.debug('[fd %5d] closing transport %r' % (fd, request.transport))
         # This will close the underlying socket. We first remove the request
@@ -324,9 +323,6 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         request.transport.loseConnection()
 
         self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
-
-    def clientDone(self, fd):
-        self.streamer.remove_client(fd)
 
     def handleAuthenticatedRequest(self, res, request):
         if request.method == 'GET':
@@ -360,7 +356,7 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
             return self._handleServerFull(request)
 
         self.debug('_render(): asked for (possible) authentication')
-        d = self.startAuthentication(request)
+        d = self.httpauth.startAuthentication(request)
         d.addCallback(self.handleAuthenticatedRequest, request)
         # Authentication has failed and we've written a response; nothing 
         # more to do
@@ -368,15 +364,6 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
 
         # we MUST return this from our _render.
         return server.NOT_DONE_YET
-
-    def authenticateKeycard(self, bouncerName, keycard):
-        return self.streamer.medium.authenticate(bouncerName, keycard)
-
-    def keepAlive(self, bouncerName, issuerName, ttl):
-        return self.streamer.medium.keepAlive(bouncerName, issuerName, ttl)
-
-    def cleanupKeycard(self, bouncerName, keycard):
-        return self.streamer.medium.removeKeycardId(bouncerName, keycard.id)
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')

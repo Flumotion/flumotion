@@ -125,8 +125,7 @@ class HTTPFileMedium(component.BaseComponentMedium):
     def remote_rotateLog(self):
         return self.comp.rotateLog()
 
-class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication, 
-    log.Loggable):
+class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     implements(interfaces.IStreamingComponent)
 
     componentMediumClass = HTTPFileMedium
@@ -136,7 +135,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def __init__(self):
        component.BaseComponent.__init__(self)
-       httpbase.HTTPAuthentication.__init__(self, self)
 
     def init(self):
         self.mountPoint = None
@@ -197,10 +195,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._loggers = \
             self.plugs.get('flumotion.component.plugs.loggers.Logger', [])
 
+        self.httpauth = http.HTTPAuthentication(self)
+
         if 'bouncer' in props:
-            self.setBouncerName(props['bouncer'])
+            self.httpauth.setBouncerName(props['bouncer'])
         if 'issuer-class' in props:
-            self.setIssuerClass(props['issuer-class'])
+            self.httpauth.setIssuerClass(props['issuer-class'])
         if 'ip-filter' in props:
             filter = http.LogFilter()
             for f in props['ip-filter']:
@@ -251,7 +251,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def do_start(self, *args, **kwargs):
         self.debug('Starting with mount point "%s"' % self.mountPoint)
-        factory = file.MimedFileFactory(self,
+        factory = file.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource)
         if self.mountPoint == '/':
             self.debug('mount point / - create File resource as root')
@@ -429,21 +429,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 bytesTransferred += request._transfer.bytesWritten
 
         return (0, 0, bytesTransferred, len(self._connected_clients), 0)
-
-    # Override HTTPAuthentication methods
-    def authenticateKeycard(self, bouncerName, keycard):
-        return self.medium.authenticate(bouncerName, keycard)
-
-    def keepAlive(self, bouncerName, issuerName, ttl):
-        return self.medium.authenticate(bouncerName, issuerName, ttl)
-
-    def cleanupKeycard(self, bouncerName, keycard):
-        return self.medium.removeKeycardId(bouncerName, keycard.id)
-
-    def clientDone(self, fd):
-        # TODO: implement this properly.
-        self.warning ("Expiring clients is not implemented for static "
-            "fileserving")
 
     def rotateLog(self):
         """

@@ -23,6 +23,7 @@ from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import server
 
+from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.consumers.httpstreamer import resources
 from flumotion.common import interfaces, keycards, log
 from flumotion.twisted.defer import defer_generator_method
@@ -125,7 +126,7 @@ class FakeStreamer:
 
 class TestHTTPStreamingResource(unittest.TestCase):
     # helpers
-    def deferAssertUnauthorized(self, resource, request):
+    def deferAssertUnauthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
         # the request is not authorized
         def checkResult(res):
@@ -140,30 +141,32 @@ class TestHTTPStreamingResource(unittest.TestCase):
                 'error': http.RESPONSES[error_code]}
             self.assertEquals(request.data, expected)
 
-        d = resource.startAuthentication(request)
+        d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
         return d
  
-    def deferAssertAuthorized(self, resource, request):
+    def deferAssertAuthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
         # the request is authorized
         def checkResult(res):
             self.failIfEquals(request.response, http.UNAUTHORIZED)
 
-        d = resource.startAuthentication(request)
+        d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
         return d
 
     def testRenderNotReady(self):
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         self.failIf(resource.isReady())
         status = resource.render(FakeRequest(ip=''))
         self.assertEquals(status,  server.NOT_DONE_YET)
 
     def testRenderReachedMaxClients(self):
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         self.failIf(resource.isReady())
         streamer.caps = True
         self.failUnless(resource.isReady())
@@ -188,67 +191,71 @@ class TestHTTPStreamingResource(unittest.TestCase):
 
     def testRenderHTTPAuthUnauthorized(self):
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
-        resource.setBouncerName('fakebouncer')
-        resource.setDomain('FakeDomain')
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        httpauth.setBouncerName('fakebouncer')
+        httpauth.setDomain('FakeDomain')
         
         streamer.caps = True
         self.failUnless(resource.isReady())
         
         request = FakeRequest(ip='127.0.0.1', user='wronguser')
-        return self.deferAssertUnauthorized(resource, request)
+        return self.deferAssertUnauthorized(httpauth, request)
 
     def testRenderHTTPTokenUnauthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         # override issuer
-        resource.setIssuerClass('HTTPTokenIssuer')
-        resource.setBouncerName('fakebouncer')
-        resource.setDomain('FakeDomain')
+        httpauth.setIssuerClass('HTTPTokenIssuer')
+        httpauth.setBouncerName('fakebouncer')
+        httpauth.setDomain('FakeDomain')
         
         streamer.caps = True
         self.failUnless(resource.isReady())
         
         # wrong token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
-        yield self.deferAssertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(httpauth, request)
 
         # no token
         request = FakeRequest(ip='127.0.0.1', args={'notoken': 'LETMEIN'})
-        yield self.deferAssertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(httpauth, request)
 
         # doublewrong token
         request = FakeRequest(ip='127.0.0.1',
             args={'token': ['WRONG', 'AGAIN']})
-        yield self.deferAssertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(httpauth, request)
     testRenderHTTPTokenUnauthorized = \
         defer_generator_method(testRenderHTTPTokenUnauthorized)
 
     def testRenderHTTPTokenAuthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         # override issuer
-        resource.setIssuerClass('HTTPTokenIssuer')
-        resource.setBouncerName('fakebouncer')
-        resource.setDomain('FakeDomain')
+        httpauth.setIssuerClass('HTTPTokenIssuer')
+        httpauth.setBouncerName('fakebouncer')
+        httpauth.setDomain('FakeDomain')
         
         streamer.caps = True
         self.failUnless(resource.isReady())
         
         # right token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
-        yield self.deferAssertAuthorized(resource, request)
+        yield self.deferAssertAuthorized(httpauth, request)
 
         # right token, twice
         request = FakeRequest(ip='127.0.0.1',
             args={'token': ['LETMEIN', 'LETMEIN']})
-        yield self.deferAssertAuthorized(resource, request)
+        yield self.deferAssertAuthorized(httpauth, request)
     testRenderHTTPTokenAuthorized = \
         defer_generator_method(testRenderHTTPTokenAuthorized)
         
     def testRenderNew(self):
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         streamer.caps = True
         streamer.mime = 'application/x-ogg'
         
@@ -267,7 +274,8 @@ class TestHTTPRoot(unittest.TestCase):
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         root.putChild('', resource)
 
         log.debug('unittest', 'requesting /, should work')
@@ -290,7 +298,8 @@ class TestHTTPRoot(unittest.TestCase):
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         root.putChild('a', resource)
 
         # a request for / should give 404
@@ -321,7 +330,8 @@ class TestHTTPRoot(unittest.TestCase):
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
-        resource = resources.HTTPStreamingResource(streamer)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
         root.putChild('a/b', resource)
 
         # a request for / should give 404

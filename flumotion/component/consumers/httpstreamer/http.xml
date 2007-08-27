@@ -19,9 +19,12 @@
       <sockets>
         <socket type="flumotion.component.plugs.loggers.Logger" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider" />
+        <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
       </sockets>
 
       <properties>
+        <!-- FIXME, authenticating against remote bouncers should happen through
+             a plug, not this property -->
         <property name="bouncer" type="string"
                   description="Name of a bouncer in the atmosphere to authenticate against" />
         <property name="issuer-class" type="string"

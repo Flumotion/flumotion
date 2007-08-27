@@ -50,17 +50,17 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
     childNotFound = weberror.NoResource("File not found.")
 
-    def __init__(self, path, component, mimeToResource=None):
+    def __init__(self, path, httpauth, mimeToResource=None):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
         resource.Resource.__init__(self)
         filepath.FilePath.__init__(self, path)
 
-        self._component = component
+        self._httpauth = httpauth
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
-        self._factory = MimedFileFactory(component, self._mimeToResource)
+        self._factory = MimedFileFactory(httpauth, self._mimeToResource)
 
     def getChild(self, path, request):
         self.log('getChild: self %r, path %r', self, path)
@@ -99,7 +99,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             if res != server.NOT_DONE_YET:
                 request.finish()
 
-        d = self._component.startAuthentication(request)
+        d = self._httpauth.startAuthentication(request)
         d.addCallback(self.renderAuthenticated, request)
         d.addCallback(terminateSimpleRequest, request)
         # Authentication failed; nothing more to do.
@@ -243,8 +243,8 @@ class MimedFileFactory(log.Loggable):
     contentTypes = loadMimeTypes()
     defaultType = "application/octet-stream"
 
-    def __init__(self, component, mimeToResource=None):
-        self._component = component
+    def __init__(self, httpauth, mimeToResource=None):
+        self._httpauth = httpauth
         self._mimeToResource = mimeToResource or {}
 
     def create(self, path):
@@ -258,7 +258,7 @@ class MimedFileFactory(log.Loggable):
         mimeType = self.contentTypes.get(ext, self.defaultType)
         klazz = self._mimeToResource.get(mimeType, File)
         self.debug("mimetype %s, class %r" % (mimeType, klazz))
-        return klazz(path, self._component, mimeToResource=self._mimeToResource)
+        return klazz(path, self._httpauth, mimeToResource=self._mimeToResource)
 
 class FLVFile(File):
     """

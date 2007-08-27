@@ -1,5 +1,24 @@
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.xml: Add
+	BouncerPlug socket to httpstreamer.
+
+	* flumotion/component/base/http.py (HTTPAuthentication): Change to
+	not be a mixin. Add the beginnings of plug-based authentication.
+	(HTTPAuthentication.authenticateKeycard)
+	(HTTPAuthentication.keepAlive)
+	(HTTPAuthentication.cleanupKeycard)
+	(HTTPAuthentication.clientDone): Instead of being vmethods,
+	standardize on what the component should provide for us. This
+	doesn't work for keycards expired on httpfile, though.
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/file.py:
+	* flumotion/test/test_http.py: Update for making
+	HTTPAuthentication not a mixin.
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): Add to dist.
 
 	* flumotion/test/bouncertest.py

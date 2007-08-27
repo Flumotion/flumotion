@@ -112,22 +112,22 @@ class HTTPTokenIssuer(Issuer):
             request.getClientIP())
         return keycard
  
+BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
+
 class HTTPAuthentication(log.Loggable):
     """
-    Mixin for handling HTTP authentication for twisted.web Resources, using
-    issuers and bouncers.
+    Helper object for handling HTTP authentication for twisted.web
+    Resources, using issuers and bouncers.
     """
 
     logCategory = 'httpauth'
-
-    __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
     KEYCARD_TTL = 60 * 60
     KEYCARD_KEEPALIVE_INTERVAL = 20 * 60
     KEYCARD_TRYAGAIN_INTERVAL = 1 * 60
 
     def __init__(self, component):
-
+        self.component = component
         self._fdToKeycard = {}         # request fd -> Keycard
         self._idToKeycard = {}         # keycard id -> Keycard
         self._fdToDurationCall = {}    # request fd -> IDelayedCall for duration
@@ -140,6 +140,13 @@ class HTTPAuthentication(log.Loggable):
         self._pendingCleanups = []
         self._keepAlive = None
         
+        if (BOUNCER_SOCKET in self.component.plugs
+            and self.component.plugs[BOUNCER_SOCKET]):
+            assert len(self.component.plugs[BOUNCER_SOCKET]) == 1
+            self.plug = self.component.plugs[BOUNCER_SOCKET]
+        else:
+            self.plug = None
+
     def scheduleKeepAlive(self, tryingAgain=False):
         def timeout():
             def reschedule(res):
@@ -217,30 +224,33 @@ class HTTPAuthentication(log.Loggable):
 
         keycard.requesterId = self.requesterId
         keycard.issuerName = self.issuerName
-        keycard.ttl = self.KEYCARD_TTL
         keycard._fd = request.transport.fileno()
+        keycard.setDomain(self._domain)
         
-        if self.bouncerName == None:
+        if self.plug:
+            self.debug('authenticating against plug')
+            return self.plug.authenticate(keycard)
+        elif self.bouncerName == None:
             self.debug('no bouncer, accepting')
             return defer.succeed(keycard)
+        else:
+            keycard.ttl = self.KEYCARD_TTL
+            self.debug('sending keycard to remote bouncer %r',
+                       self.bouncerName)
+            return self.authenticateKeycard(self.bouncerName, keycard)
 
-        keycard.setDomain(self._domain)
-        self.debug('sending keycard to bouncer %r' % self.bouncerName)
-
-        return self.authenticateKeycard(self.bouncerName, keycard)
-
-    # Must be implemented in subclasses
     def authenticateKeycard(self, bouncerName, keycard):
-        pass
+        return self.component.medium.authenticate(bouncerName, keycard)
 
     def keepAlive(self, bouncerName, issuerName, ttl):
-        raise NotImplementedError()
+        return self.component.medium.keepAlive(bouncerName, issuerName, ttl)
 
     def cleanupKeycard(self, bouncerName, keycard):
-        pass
+        return self.component.medium.removeKeycardId(bouncerName, keycard.id)
 
+    # FIXME: check this
     def clientDone(self, fd):
-        pass
+        return self.component.remove_client(fd)
 
     def doCleanupKeycard(self, bouncerName, keycard):
         # cleanup this one keycard, and take the opportunity to retry
@@ -258,6 +268,7 @@ class HTTPAuthentication(log.Loggable):
         for bouncerName, keycard in pending:
             cleanup(bouncerName, keycard)
 
+    # public
     def cleanupAuth(self, fd):
         if self.bouncerName and self._fdToKeycard.has_key(fd):
             keycard = self._fdToKeycard[fd]
