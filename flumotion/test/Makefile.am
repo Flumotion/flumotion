@@ -13,6 +13,7 @@ flumotion_PYTHON =			\
 	realm.py
 
 EXTRA_DIST = 				\
+	bouncertest.py			\
 	test.xml			\
 	testLoadComponent.xml		\
 	test_admin_admin.py		\

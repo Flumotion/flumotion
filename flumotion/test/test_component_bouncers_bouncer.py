@@ -21,124 +21,24 @@
 
 import common
 
-from twisted.trial import unittest
-from twisted.internet import defer, reactor
-
 from flumotion.component.bouncers import bouncer
-from flumotion.common import keycards
 
+import bouncertest
 
-class FakeBouncerMedium(bouncer.BouncerMedium):
+class FakeBouncerMedium(bouncertest.FakeMedium, bouncer.BouncerMedium):
     def __init__(self):
-        self.calls = []
-
-    def callRemote(self, method, *args, **kwargs):
-        self.calls.append((method, args, kwargs))
-        return defer.succeed(None)
-
-class TrivialBouncerTest(unittest.TestCase):
-    def setUp(self):
-        self.comp = bouncer.TrivialBouncer()
-        self.comp.setMedium(FakeBouncerMedium())
-        return self.comp.start()
-
-    def tearDown(self):
-        return self.comp.stop()
-
-    def testHarness(self):
         pass
 
-    def assertAttr(self, keycard, attr, val):
-        self.assertEquals(getattr(keycard, attr), val)
-        return keycard
-
-    def testAuthentication(self):
-        k = keycards.KeycardGeneric()
-        self.assertEquals(k.state, keycards.REQUESTING)
-
-        d = self.comp.authenticate(k)
-        d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
+class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
+    def setUp(self):
+        self.obj = bouncer.TrivialBouncer()
+        self.medium = FakeBouncerMedium()
+        self.obj.setMedium(self.medium)
+        d = self.obj.start()
+        d.addCallback(lambda _: bouncertest.TrivialBouncerTest.setUp(self))
         return d
 
-    def testTimeoutAlgorithm(self):
-        # the plan: make a keycard that expires in 0.75 seconds, and
-        # set up the component such that it checks for expired keycards
-        # every half second. this test will check the keycard's
-        # ttl value at 0.25 seconds and 0.75 seconds, and will
-        # make sure that at 1.25 seconds that the keycard is out of the
-        # bouncer.
-
-        # check for expired keycards every half a second
-        self.comp.KEYCARD_EXPIRE_INTERVAL = 0.5
-
-        def checkTimeout(k):
-            def check(expected, inBouncer, furtherChecks):
-                if k.ttl != expected:
-                    d.errback(AssertionError('ttl %r != expected %r'
-                                             % (k.ttl, expected)))
-                if inBouncer:
-                    if not self.comp.hasKeycard(k):
-                        d.errback(AssertionError('comp missing keycard'))
-                else:
-                    if self.comp.hasKeycard(k):
-                        d.errback(AssertionError(
-                            'comp unexpectedly has keycard'))
-                        
-                if furtherChecks:
-                    args = furtherChecks.pop(0)
-                    args += (furtherChecks,)
-                    reactor.callLater(*args)
-                else:
-                    d.callback('success')
-            reactor.callLater(0.25, check, 0.75, True,
-                              [(0.5, check, 0.25, True),
-                               (0.5, check, -0.25, False)])
-            d = defer.Deferred()
-            return d
-
-        def checkCalls(res):
-            self.assertEquals(self.comp.medium.calls,
-                              [('expireKeycard', (k.requesterId, k.id), {})])
-            return res
-
-        k = keycards.KeycardGeneric()
-        k.ttl = 0.75
-        self.assertEquals(k.state, keycards.REQUESTING)
-        d = self.comp.authenticate(k)
-        d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
-        d.addCallback(self.assertAttr, 'ttl', 0.75)
-        d.addCallback(checkTimeout)
-        d.addCallback(checkCalls)
-        return d
-
-    def testKeepAlive(self):
-        def adjustTTL(_):
-            self.assertEquals(k.ttl, 0.75)
-            self.comp.keepAlive('bar', 10)
-            self.assertEquals(k.ttl, 0.75)
-            self.comp.keepAlive('foo', 10)
-            self.assertEquals(k.ttl, 10)
-
-        k = keycards.KeycardGeneric()
-        k.ttl = 0.75
-        k.issuerName = 'foo'
-        self.assertEquals(k.state, keycards.REQUESTING)
-        d = self.comp.authenticate(k)
-        d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
-        d.addCallback(self.assertAttr, 'ttl', 0.75)
-        d.addCallback(adjustTTL)
-        return d
-
-    def testAutoExpire(self):
-        def authenticated(_):
-            self.assertAttr(k, 'state', keycards.AUTHENTICATED)
-            self.assertAttr(k, 'ttl', 0)
-            self.failIf(self.comp.hasKeycard(k))
-            self.assertEquals(self.comp.medium.calls, [])
-
-        k = keycards.KeycardGeneric()
-        k.ttl = 0
-        self.assertEquals(k.state, keycards.REQUESTING)
-        d = self.comp.authenticate(k)
-        d.addCallback(authenticated)
+    def tearDown(self):
+        d = self.obj.stop()
+        d.addCallback(lambda _: bouncertest.TrivialBouncerTest.tearDown(self))
         return d

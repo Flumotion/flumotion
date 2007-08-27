@@ -84,10 +84,11 @@ class Bouncer(component.BaseComponent):
     def do_start(self):
         assert len(self.plugs[BOUNCER_SOCKET]) == 1
         self.plug = self.plugs[BOUNCER_SOCKET][0]
+        self.plug.setMedium(self.medium)
         return component.BaseComponent.do_start(self)
 
     def authenticate(self, keycard):
-        return self.plug.authenticate()
+        return self.plug.authenticate(keycard)
          
     def setEnabled(self, enabled):
         self.plug.setEnabled(enabled)
