@@ -116,6 +116,8 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         common.InitMixin.__init__(self)
 
     def init(self):
+        self.medium = None
+        self.enabled = True
         self._idCounter = 0
         self._idFormat = time.strftime('%Y%m%d%H%M%S-%%d')
         self._keycards = {} # keycard id -> Keycard
@@ -137,6 +139,9 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
             self._unscheduleTimeout()
 
         self.enabled = enabled
+
+    def setMedium(self, medium):
+        self.medium = medium
 
     def stop(self, component):
         self.expireAllKeycards()
@@ -244,12 +249,8 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
         keycard = self._keycards.pop(id)
 
-        return self.doExpireKeycard(keycard.requesterId, keycard.id)
-
-    def doExpireKeycard(self, requesterId, keycardId):
-        # return self.medium.callRemote('expireKeycard',
-        #                               keycard.requesterId, keycard.id)
-        return defer.succeed(None)
+        return self.medium.callRemote('expireKeycard',
+                                      keycard.requesterId, keycard.id)
 
 class TrivialBouncerPlug(BouncerPlug):
     """

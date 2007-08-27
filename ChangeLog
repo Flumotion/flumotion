@@ -1,3 +1,14 @@
+2007-08-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/plug.py (BouncerPlug.setMedium):
+	New method to set the medium on a bouncer plug. Optional.
+	(BouncerPlug.expireKeycardId): Actually do the callRemote.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST):
+	* flumotion/test/test_component_bouncers_plug.py
+	(TrivialBouncerTest): New test, taken from the one for the
+	deprecated bouncer interface.
+
 2007-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py (version, mergeImplements,

@@ -34,6 +34,7 @@ EXTRA_DIST = 				\
 	test_component_base_scheduler.py\
 	test_component_base_watcher.py  \
 	test_component_bouncers_bouncer.py\
+	test_component_bouncers_plug.py\
 	test_component_init.py 		\
 	test_component_feed.py		\
 	test_component_httpserver.py 	\
