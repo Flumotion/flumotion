@@ -27,7 +27,7 @@ from twisted.internet import defer, reactor
 from flumotion.common import keycards
 
 
-class FakeMedium():
+class FakeMedium:
     calls = []
 
     def callRemote(self, method, *args, **kwargs):
