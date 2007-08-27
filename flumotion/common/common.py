@@ -29,7 +29,6 @@ import sys
 import time
 import signal
 
-from twisted.python import reflect, rebuild, components
 from twisted.internet import address
 import twisted.copyright
 
