@@ -1,3 +1,12 @@
+2007-08-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/bouncertest.py
+	(TrivialBouncerTest.setKeycardExpireInterval): New vmethod, so
+	that test cases can virtualize this hack.
+
+	* flumotion/test/test_component_bouncers_component.py: New test
+	for the generic bouncer.
+
 2007-08-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* scripts/check-sync-on-feeds (usage, main, failed, getFeed,

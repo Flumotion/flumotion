@@ -60,6 +60,10 @@ class TrivialBouncerTest(unittest.TestCase):
         d.addCallback(self.assertAttr, 'state', keycards.AUTHENTICATED)
         return d
 
+    def setKeycardExpireInterval(self, interval):
+        # can be overridden
+        self.obj.KEYCARD_EXPIRE_INTERVAL = interval
+
     def testTimeoutAlgorithm(self):
         # the plan: make a keycard that expires in 0.75 seconds, and
         # set up the component such that it checks for expired keycards
@@ -69,7 +73,7 @@ class TrivialBouncerTest(unittest.TestCase):
         # bouncer.
 
         # check for expired keycards every half a second
-        self.obj.KEYCARD_EXPIRE_INTERVAL = 0.5
+        self.setKeycardExpireInterval(0.5)
 
         def checkTimeout(k):
             def check(expected, inBouncer, furtherChecks):
