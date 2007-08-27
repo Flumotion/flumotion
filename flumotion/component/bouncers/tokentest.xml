@@ -4,7 +4,7 @@
                base="flumotion/component/bouncers"
                description="A test bouncer that only allows one token.">
 
-      <source location="flumotion.component.bouncers.tokentest" />
+      <source location="flumotion.component.bouncers.tokentestbouncer" />
 
       <entries>
         <entry type="component" location="tokentestbouncer.py"

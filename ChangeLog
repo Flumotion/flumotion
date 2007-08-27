@@ -1,5 +1,8 @@
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/tokentest.xml: Final fix to get
+	things working again.
+
 	* flumotion/component/bouncers/tokentestbouncer.py: Fix a bug!
 
 	* flumotion/component/base/http.py (HTTPAuthentication.__init__):
