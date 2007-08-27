@@ -1,5 +1,11 @@
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer.init HTTPFileStreamer.do_setup)
+	(HTTPFileStreamer.do_stop, HTTPFileStreamer.do_start)
+	(HTTPFileStreamer.requestFinished): Fix bugs related to httpauth
+	factoring.
+
 	* flumotion/component/consumers/httpstreamer/http.xml: Add
 	BouncerPlug socket to httpstreamer.
 

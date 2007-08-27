@@ -143,6 +143,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.hostname = None
         self._loggers = []
         self._logfilter = None
+        self.httpauth = None
 
         self._description = 'On-Demand Flumotion Stream',
 
@@ -195,7 +196,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._loggers = \
             self.plugs.get('flumotion.component.plugs.loggers.Logger', [])
 
-        self.httpauth = http.HTTPAuthentication(self)
+        self.httpauth = httpbase.HTTPAuthentication(self)
 
         if 'bouncer' in props:
             self.httpauth.setBouncerName(props['bouncer'])
@@ -208,7 +209,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._logfilter = filter
 
     def do_stop(self):
-        self.stopKeepAlive()
+        if self.httpauth:
+            self.httpauth.stopKeepAlive()
         if self._timeoutRequestsCallLater:
             self._timeoutRequestsCallLater.cancel()
             self._timeoutRequestsCallLater = None
@@ -318,7 +320,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             d.callback(None)
         # we are responsible for setting component happy
         def setComponentHappy(result):
-            self.scheduleKeepAlive()
+            self.httpauth.scheduleKeepAlive()
             self.setMood(moods.happy)
             return result
         d.addCallback(setComponentHappy)
@@ -373,7 +375,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.uiState.set("connected-clients", len(self._connected_clients))
 
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
-        self.cleanupAuth(fd)
+        self.httpauth.cleanupAuth(fd)
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()
