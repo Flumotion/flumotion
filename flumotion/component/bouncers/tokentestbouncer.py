@@ -25,7 +25,7 @@ A test token bouncer.
 
 from twisted.internet import defer
 
-from flumotion.component.bouncers import bouncer
+from flumotion.component.bouncers import bouncer, tokentest
 
 __all__ = ['TokenTestBouncer']
 
