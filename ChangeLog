@@ -1,3 +1,11 @@
+2007-08-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* scripts/check-sync-on-feeds (usage, main, failed, getFeed,
+	  gotFeedServerPort, managerConnected, gotPlanetState,
+	  gotWorkerHeavenState):
+	Made script connect to manager to get host name and port of
+	feed servers.
+
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/component.py (Bouncer.do_start):

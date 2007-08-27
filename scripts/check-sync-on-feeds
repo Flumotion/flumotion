@@ -21,7 +21,11 @@
 from flumotion.component import feed
 from twisted.internet import reactor
 from flumotion.twisted import pb
-from flumotion.common import log
+from flumotion.common import log, errors
+from flumotion.admin import connections
+from flumotion.admin.command import utils
+from flumotion.admin.admin import AdminModel
+
 import os
 import sys
 import string
@@ -45,9 +49,8 @@ seenNewsegmentAudio = False
 seenNewsegmentVideo = False
 
 def usage(args, exitval=0):
-    print "usage: %s [OPTIONS] -w WORKER -p FEEDERPORT " \
+    print "usage: %s [OPTIONS] -m MANAGER " \
         "-V FULLFEEDIDOFVIDEOFEEDER -A FULLFEEDIDOFAUDIOFEEDER" % args[0]
-    print ' -U username -P password'
     print ''
     print 'See %s -h for help on the available options.' % args[0]
     sys.exit(exitval)
@@ -183,19 +186,12 @@ def main(args):
     parser.add_option('-u', '--usage',
                       action="store_true", dest="usage",
                       help="show a usage message")
-    parser.add_option('-w', '--worker',
-                      action="store", type="string", dest="host",
-                      help="the host of the worker to connect to"
-                        ", e.g. localhost")
-    parser.add_option('-p', '--port',
-                      action="store", type="int", dest="port",
-                      help="the feeder port of the job's feeder")
-    parser.add_option('-U', '--username',
-                      action="store", type="string", dest="username",
-                      help="the username to log into the feed server")
-    parser.add_option('-P', '--password',
-                      action="store", type="string", dest="password",
-                      help="the password to log into the feed server")
+    parser.add_option('-m', '--manager',
+                      action="store", type="string", dest="manager",
+                      help="the manager to connect to, e.g. localhost:7531")
+    parser.add_option('', '--no-ssl',
+                      action="store_true", dest="no_ssl",
+                      help="disable encryption when connecting to the manager")
     parser.add_option('-V', '--video-feed-id',
                       action="store", type="string", dest="videoFeedId",
                       help="the full feed id of the video feed to connect to"
@@ -213,21 +209,69 @@ def main(args):
     if options.usage:
         usage(args)
 
-    if not options.host or not options.port or not options.username or not \
-        options.password or not options.videoFeedId or not \
+    if not options.manager or not options.videoFeedId or not \
         options.audioFeedId:
         usage(args)
 
-    vclient = feed.FeedMedium(logName="check-sync-on-feeds")
-    aclient = feed.FeedMedium(logName="check-sync-on-feeds")
-    authenticator = pb.Authenticator(username=options.username, 
-        password=options.password)
-    vd = vclient.requestFeed(options.host, options.port, authenticator, 
-        options.videoFeedId)
-    ad = aclient.requestFeed(options.host, options.port, authenticator,
-        options.audioFeedId)
-    vd.addCallback(gotVideoFeed)
-    ad.addCallback(gotAudioFeed)
+    connection = connections.parsePBConnectionInfo(options.manager,
+                                                   not options.no_ssl)
+    model = AdminModel()
+    d = model.connectToManager(connection)
+    def failed(failure):
+        if failure.check(errors.ConnectionRefusedError):
+            print "Manager refused connection. Check your user and password."
+        elif failure.check(errors.ConnectionFailedError):
+            message = "".join(failure.value.args)
+            print "Connection to manager failed: %s" % message
+        else:
+            print ("Exception while connecting to manager: %s"
+                   % log.getFailureMessage(failure))
+        return failure
+
+    d.addErrback(failed)
+    d.addCallback(managerConnected, options)
     reactor.run()
 
+def getFeed(feedClient, worker, authenticator, feedId, model):
+    fsd = model.workerCallRemote(worker.get("name"), "getFeedServerPort")
+    def gotFeedServerPort(port):
+        return feedClient.requestFeed(worker.get('host'), port, 
+            authenticator, feedId)
+    fsd.addCallback(gotFeedServerPort)
+    return fsd
+
+def managerConnected(model, options):
+    psd = model.callRemote('getPlanetState')
+    
+    def gotPlanetState(planet):
+        videoAvatarId = utils.avatarId(options.videoFeedId.split(":")[0])
+        audioAvatarId = utils.avatarId(options.audioFeedId.split(":")[0])
+        videoComponent = utils.find_component(planet, videoAvatarId)
+        audioComponent = utils.find_component(planet, audioAvatarId)
+        if videoComponent and audioComponent:
+            whsd = model.callRemote('getWorkerHeavenState')
+            def gotWorkerHeavenState(whs):
+                # find worker for each component
+                vworkername = videoComponent.get("workerRequested")
+                aworkername = audioComponent.get("workerRequested")
+                vworker = None
+                aworker = None
+                for worker in whs.get('workers'):
+                    if worker.get('name') == vworkername:
+                        vworker = worker
+                    if worker.get('name') == aworkername:
+                        aworker = worker
+                if vworker and aworker:
+                    vclient = feed.FeedMedium(logName="check-sync-on-feeds")
+                    aclient = feed.FeedMedium(logName="check-sync-on-feeds")
+                    authenticator = model.connectionInfo.authenticator
+                    vd = getFeed(vclient, vworker, authenticator, 
+                        options.videoFeedId, model)
+                    ad = getFeed(aclient, aworker, authenticator,
+                        options.audioFeedId, model)
+                    vd.addCallback(gotVideoFeed)
+                    ad.addCallback(gotAudioFeed)
+        whsd.addCallback(gotWorkerHeavenState)
+    psd.addCallback(gotPlanetState)
+   
 main(sys.argv)
