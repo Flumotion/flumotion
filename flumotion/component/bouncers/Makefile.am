@@ -6,12 +6,13 @@ component_PYTHON = \
 	admin_gtk.py \
 	bouncer.py \
 	component.py \
-	plug.py \
 	htpasswdcrypt.py \
-	saltsha256.py \
-	tokentest.py \
+	icalbouncer.py \
 	ipbouncer.py \
-	icalbouncer.py
+	saltsha256.py \
+	plug.py \
+	tokentest.py \
+	tokentestbouncer.py
 
 component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade tokentest.xml \
 	ipbouncer.py icalbouncer.xml deprecated.xml bouncer.xml

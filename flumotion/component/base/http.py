@@ -143,7 +143,7 @@ class HTTPAuthentication(log.Loggable):
         if (BOUNCER_SOCKET in self.component.plugs
             and self.component.plugs[BOUNCER_SOCKET]):
             assert len(self.component.plugs[BOUNCER_SOCKET]) == 1
-            self.plug = self.component.plugs[BOUNCER_SOCKET]
+            self.plug = self.component.plugs[BOUNCER_SOCKET][0]
         else:
             self.plug = None
 

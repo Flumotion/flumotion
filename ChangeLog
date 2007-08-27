@@ -1,5 +1,21 @@
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/http.py (HTTPAuthentication.__init__):
+	Fix a bug.
+
+	* flumotion/component/bouncers/tokentest.py: Changed to implement
+	a token test base class and plug.
+
+	* flumotion/component/bouncers/tokentestbouncer.py: New file,
+	broken out of tokentest.py.
+
+	* flumotion/component/bouncers/tokentest.xml: Note that the token
+	test component moved to tokentestbouncer.py. Add registry things
+	about the token test plug.
+
+	* flumotion/component/bouncers/Makefile.am (component_PYTHON): Add
+	tokentestbouncer.
+
 	* flumotion/component/misc/httpfile/httpfile.py
 	(HTTPFileStreamer.init HTTPFileStreamer.do_setup)
 	(HTTPFileStreamer.do_stop, HTTPFileStreamer.do_start)

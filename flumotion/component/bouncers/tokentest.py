@@ -23,40 +23,38 @@
 A test token bouncer.
 """
 
-from twisted.internet import defer
-
-from flumotion.common import keycards
-from flumotion.component.bouncers import bouncer
+from flumotion.common import keycards, log
+from flumotion.component.bouncers import plug
 from flumotion.common.keycards import KeycardToken
 
-__all__ = ['TokenTestBouncer']
-
-class TokenTestBouncer(bouncer.Bouncer):
+class TokenTestBase(log.Loggable):
 
     logCategory = 'tokentestbouncer'
     keycardClasses = (KeycardToken)
 
-    def do_setup(self):
-        props = self.config['properties']
-        self._authtoken = props['authorized-token']
-        return defer.succeed(None)
+    def haveProperties(self, properties):
+        self._authtoken = properties['authorized-token']
    
     def do_authenticate(self, keycard):
         keycard_data = keycard.getData()
-        self.debug('authenticating keycard from requester %s with token %s' % (
-            keycard_data['address'], keycard_data['token']))
+        self.debug('authenticating keycard from requester %s with token %s',
+                   keycard_data['address'], keycard_data['token'])
 
         if keycard_data['token'] == self._authtoken:
             # authenticated, so return the keycard with state authenticated
             keycard.state = keycards.AUTHENTICATED
             self.addKeycard(keycard)
-            self.info('authenticated login of "%s" from ip address %s' % 
-                (keycard.token, keycard.address) )
-            self.debug('keycard %r authenticated, token %s ip address %s' % 
-                (keycard, keycard.token, keycard.address))
+            self.info('authenticated login of "%s" from ip address %s',
+                      keycard.token, keycard.address)
+            self.debug('keycard %r authenticated, token %s ip address %s',
+                       keycard, keycard.token, keycard.address)
             return keycard
 
         else:
-            self.info('keycard %r unauthorized, returning None')
+            self.info('keycard %r unauthorized, returning None', keycard)
             return None
 
+class TokenTestPlug(TokenTestBase, plug.BouncerPlug):
+    def __init__(self, args):
+        plug.BouncerPlug.__init__(self, args)
+        self.haveProperties(args['properties'])
