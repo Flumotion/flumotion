@@ -25,8 +25,8 @@ worker-side objects to handle worker clients
 
 import signal
 
-from twisted.internet import reactor
-from twisted.internet import error
+from twisted.internet import reactor, error
+from twisted.spread import flavors
 from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log
@@ -95,12 +95,12 @@ class WorkerClientFactory(factoryClass):
             self.warning('Access denied.')
             
         def connectionRefusedErrback(failure):
-            failure.trap(twisted.internet.error.ConnectionRefusedError)
+            failure.trap(error.ConnectionRefusedError)
             self.warning('Connection to %s:%d refused.' % (self._managerHost,
                                                          self._managerPort))
                                                           
         def NoSuchMethodErrback(failure):
-            failure.trap(twisted.spread.flavors.NoSuchMethod)
+            failure.trap(flavors.NoSuchMethod)
             # failure.value is a str
             if failure.value.find('remote_getKeycardClasses') > -1:
                 self.warning(

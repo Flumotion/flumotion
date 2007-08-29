@@ -1,5 +1,8 @@
 2007-08-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/medium.py: 
+	(WorkerClientFactory.gotDeferredLogin): Fix some nasties.
+
 	* flumotion/admin/admin.py:
 	* flumotion/component/bouncers/bouncer.py:
 	* flumotion/component/bouncers/htpasswdcrypt.py:
