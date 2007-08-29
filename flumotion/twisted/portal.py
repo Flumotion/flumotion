@@ -60,9 +60,9 @@ class BouncerPortal(log.Loggable):
         @rtype: L{defer.Deferred} firing list of str
         """
         if not self.bouncer:
-            self.warning('No bouncer configured, no logins possible')
-            return defer.fail(errors.NotAuthenticatedError(
-                "No bouncer configured, no logins possible"))
+            # no logins will be possible, but we can wait until they try
+            # to login() to reject them
+            return []
         if hasattr(self.bouncer, 'getKeycardClasses'):
             # must return a deferred
             return self.bouncer.getKeycardClasses()
@@ -89,6 +89,7 @@ class BouncerPortal(log.Loggable):
 
         if not self.bouncer:
             self.warning("no bouncer, refusing login")
+            mind.broker.transport.loseConnection()
             return defer.fail(error.UnauthorizedLogin())
 
         def onErrorCloseConnection(failure):

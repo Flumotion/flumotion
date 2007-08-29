@@ -1,3 +1,13 @@
+2007-08-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/pb/portal.py
+	(BouncerPortal.getKeycardClasses): Don't return a failure here, as
+	we don't have a pointer to the transport (so that we can drop the
+	connection).
+	(BouncerPortal.login): If we error because we have no bouncer,
+	drop the connection as well. Otherwise both sides will chill in
+	this state with an open TCP connection, and no reconnect attempts.
+
 2007-08-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/bouncers/tokentest.xml: Final fix to get
