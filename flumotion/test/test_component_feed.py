@@ -123,6 +123,11 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
                                   % (self._fdCount, additionalFDs, actual)))
 
     def tearDown(self):
+        try:
+            self.flushLoggedErrors(errors.NotAuthenticatedError)
+        except AttributeError:
+            tlog.flushErrors(errors.NotAuthenticatedError)
+        log._getTheFluLogObserver().clearIgnores()
         d = self.feedServer.shutdown()
         d.addCallback(lambda _: self._bouncer.stop())
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))

@@ -1,5 +1,8 @@
 2007-08-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component_feed.py (FeedTestCase.tearDown):
+	Appeasement.
+
 	* flumotion/test/common.py (TestCaseWithManager.tearDown): Flush
 	errors, in an attempt to appease twisted < 2.5.
 
