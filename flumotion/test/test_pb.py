@@ -318,8 +318,15 @@ class Test_FPBClientFactory(unittest.TestCase):
             interface="127.0.0.1")
         self.portno = self.port.getHost().port
 
+    def flushNotAuthenticatedError(self):
+        try:
+            self.flushLoggedErrors(errors.NotAuthenticatedError)
+        except AttributeError:
+            tlog.flushErrors(errors.NotAuthenticatedError)
+        
     def tearDown(self):
         self.bouncer.stop()
+        self.flushNotAuthenticatedError()
         self.port.stopListening()
 
     def clientDisconnect(self, factory, reference):
