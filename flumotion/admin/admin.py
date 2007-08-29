@@ -27,7 +27,6 @@ import sys
 
 from twisted.spread import pb
 from twisted.internet import error, defer, reactor
-from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect, failure
 from zope.interface import implements
 
@@ -129,7 +128,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.medium.emit('connection-refused')
             self.debug("emitted connection-refused")
 
-        except crederror.UnauthorizedLogin:
+        except errors.NotAuthenticatedError:
             # FIXME: unauthorized login emit !
             self.debug("emitting connection-refused")
             self.medium.emit('connection-refused')

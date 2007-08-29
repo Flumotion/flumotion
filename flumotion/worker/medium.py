@@ -26,7 +26,6 @@ worker-side objects to handle worker clients
 import signal
 
 from twisted.internet import reactor
-import twisted.cred.error
 from twisted.internet import error
 from zope.interface import implements
 
@@ -92,7 +91,7 @@ class WorkerClientFactory(factoryClass):
                 failure.value)
 
         def accessDeniedErrback(failure):
-            failure.trap(twisted.cred.error.UnauthorizedLogin)
+            failure.trap(errors.NotAuthenticatedError)
             self.warning('Access denied.')
             
         def connectionRefusedErrback(failure):

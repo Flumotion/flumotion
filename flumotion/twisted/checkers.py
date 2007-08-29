@@ -23,53 +23,60 @@
 Flumotion Twisted credential checkers
 """
 
-from twisted.cred import checkers, error
+from twisted.cred import checkers
 from twisted.internet import defer
 from twisted.python import failure
 from zope.interface import implements
 
-from flumotion.common import log
+from flumotion.common import log, errors
 from flumotion.twisted import credentials
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it
-parent = checkers.InMemoryUsernamePasswordDatabaseDontUse
-class FlexibleCredentialsChecker(parent, log.Loggable):
+class FlexibleCredentialsChecker(log.Loggable):
     """
     I am an in-memory username/password credentials checker that also
     allows anonymous logins if instructed to do so.
     """
     logCategory = 'credchecker'
+    implements(checkers.ICredentialsChecker)
+
+    credentialInterfaces = (credentials.IUsernamePassword,
+        credentials.IUsernameHashedPassword)
+
     def __init__(self, **users):
-        parent.__init__(self, **users)
+        self.users = users
         self._passwordless = False # do we allow passwordless logins ?
         
     def allowPasswordless(self, wellDoWeQuestionMark):
         self._passwordless = wellDoWeQuestionMark
                          
+    def addUser(self, username, password):
+        self.users[username] = password
+
+    def _cbPasswordMatch(self, matched, username, avatarId):
+        if matched:
+            return avatarId or username
+        else:
+            return failure.Failure(errors.NotAuthenticatedError())
+
     ### ICredentialsChecker interface methods
     def requestAvatarId(self, credentials):
         avatarId = getattr(credentials, 'avatarId', None)
 
-        d = None
-        if not self._passwordless:
+        if self._passwordless:
+            self.debug('allowing passwordless login for user %s',
+                       credentials.username)
+            return defer.succeed(avatarId or credentials.username)
+        elif credentials.username in self.users:
             self.debug('authenticating user %s' % credentials.username)
-            d = parent.requestAvatarId(self, credentials)
+            return defer.maybeDeferred(
+                credentials.checkPassword,
+                self.users[credentials.username]).addCallback(
+                self._cbPasswordMatch, str(credentials.username),
+                avatarId)
         else:
-            self.debug('allowing passwordless login for user %s' %
-                credentials.username)
-            d = defer.succeed(credentials.username)
-
-        d.addCallback(self._requestCallback, avatarId)
-        return d
-
-    def _requestCallback(self, result, avatarId):
-        if avatarId:
-            self.debug("assigned requested avatarId %s" % avatarId)
-            return avatarId
-        else:
-            self.debug("assigned avatarId %s" % result)
-            return result
+            return defer.fail(errors.NotAuthenticatedError())
 
 class CryptChecker(log.Loggable):
     """
@@ -101,7 +108,7 @@ class CryptChecker(log.Loggable):
             return username
         else:
             self.debug('user %s refused, password not matched' % username)
-            return failure.Failure(error.UnauthorizedLogin())
+            return failure.Failure(errors.NotAuthenticatedError())
 
     ### ICredentialsChecker methods
     def requestAvatarId(self, credentials):
@@ -113,7 +120,7 @@ class CryptChecker(log.Loggable):
         else:
             self.debug("user '%s' refused, not in storage backend" %
                 credentials.username)
-            return defer.fail(error.UnauthorizedLogin())
+            return defer.fail(errors.NotAuthenticatedError())
 
 class Sha256Checker(log.Loggable):
     """
@@ -147,7 +154,7 @@ class Sha256Checker(log.Loggable):
             return username
         else:
             self.debug('user %s refused, password not matched' % username)
-            return failure.Failure(error.UnauthorizedLogin())
+            return failure.Failure(errors.NotAuthenticatedError())
 
     ### ICredentialsChecker methods
     def requestAvatarId(self, credentials):
@@ -161,4 +168,4 @@ class Sha256Checker(log.Loggable):
         else:
             self.debug('user %s refused, not in database' %
                 credentials.username)
-            return defer.fail(error.UnauthorizedLogin())
+            return defer.fail(errors.NotAuthenticatedError())

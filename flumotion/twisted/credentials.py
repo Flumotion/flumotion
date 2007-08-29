@@ -44,6 +44,10 @@ class Username:
     def checkPassword(self, password):
         return password == self.password
 
+IUsernamePassword = credentials.IUsernamePassword
+
+IUsernameHashedPassword = credentials.IUsernameHashedPassword
+
 class IUsernameCryptPassword(credentials.ICredentials):
     """
     I encapsulate a username and check crypted passwords.

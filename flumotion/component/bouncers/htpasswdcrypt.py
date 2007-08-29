@@ -27,7 +27,6 @@ import md5
 import random
 
 from twisted.python import components
-from twisted.cred import error
 from twisted.internet import defer
 
 from flumotion.common import interfaces, keycards, log, config

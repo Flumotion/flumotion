@@ -88,9 +88,8 @@ import random
 import time
 
 from twisted.internet import defer, reactor
-from twisted.cred import error
 
-from flumotion.common import interfaces, keycards
+from flumotion.common import interfaces, keycards, errors
 from flumotion.common.componentui import WorkerComponentUIState
 
 from flumotion.component import component
@@ -353,7 +352,7 @@ class ChallengeResponseBouncer(Bouncer):
         return keycard
 
     def _requestAvatarIdErrback(self, failure, keycard):
-        failure.trap(error.UnauthorizedLogin)
+        failure.trap(errors.NotAuthenticatedError)
         # FIXME: we want to make sure the "None" we return is returned
         # as coming from a callback, ie the deferred
         self.removeKeycard(keycard)

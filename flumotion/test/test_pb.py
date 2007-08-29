@@ -29,13 +29,13 @@ from twisted.python import log as tlog
 from twisted.spread import pb as tpb
 from twisted.cred import credentials as tcredentials
 from twisted.cred import checkers as tcheckers
-from twisted.cred import portal, error
+from twisted.cred import portal
 from zope.interface import implements
 
 from flumotion.twisted import checkers, credentials, pb
 from flumotion.twisted import portal as fportal
 
-from flumotion.common import keycards, log, interfaces
+from flumotion.common import keycards, log, interfaces, errors
 from flumotion.component.bouncers import htpasswdcrypt, saltsha256
 
 htpasswdcryptConf = {
@@ -56,7 +56,7 @@ class FakePortalWrapperPlaintext:
     # a fake wrapper with a checker that lets username, password in
     def __init__(self):
         self.broker = FakeBroker()
-        self.checker = tcheckers.InMemoryUsernamePasswordDatabaseDontUse()
+        self.checker = checkers.FlexibleCredentialsChecker()
         self.checker.addUser("username", "password")
         self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
@@ -129,7 +129,7 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         d = self.challenger.remote_respond(response, None)
         
         def wrongPasswordErrback(wrongpasserror):
-            self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
 
         d.addErrback(wrongPasswordErrback)
         return d
@@ -166,7 +166,7 @@ class Test_BouncerWrapper(unittest.TestCase):
             'twisted.spread.pb.IPerspective')
         
         def uacppWrongPasswordErrback(wrongpasserror):
-            self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
         
         d.addErrback(uacppWrongPasswordErrback)
         return d
@@ -210,7 +210,7 @@ class Test_BouncerWrapper(unittest.TestCase):
                 'twisted.spread.pb.IPerspective')
             def uacpccWrongUserErrback(failure):
                 self.assert_(isinstance(failure.type(),
-                    error.UnauthorizedLogin))
+                    errors.NotAuthenticatedError))
                 return True
             d.addErrback(uacpccWrongUserErrback)
             return d
@@ -234,7 +234,7 @@ class Test_BouncerWrapper(unittest.TestCase):
                 'twisted.spread.pb.IPerspective')
             def uacpccWrongPasswordErrback(failure):
                 self.assert_(isinstance(failure.type(),
-                    error.UnauthorizedLogin))
+                    errors.NotAuthenticatedError))
                 return True
             d.addErrback(uacpccWrongPasswordErrback)
             return d
@@ -262,7 +262,7 @@ class Test_BouncerWrapper(unittest.TestCase):
                 'twisted.spread.pb.IPerspective')
             def uacpccTamperErrback(failure):
                 self.assert_(isinstance(failure.type(),
-                    error.UnauthorizedLogin))
+                    errors.NotAuthenticatedError))
             d.addErrback(uacpccTamperErrback)
             return d
 
@@ -317,19 +317,9 @@ class Test_FPBClientFactory(unittest.TestCase):
         self.port = reactor.listenTCP(0, self.serverFactory,
             interface="127.0.0.1")
         self.portno = self.port.getHost().port
-        # don't output Twisted tracebacks for PB errors we will trigger
-        log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
-
-    def flushUnauthorizedLogin(self):
-        try:
-            self.flushLoggedErrors(error.UnauthorizedLogin)
-        except AttributeError:
-            tlog.flushErrors(error.UnauthorizedLogin)
 
     def tearDown(self):
         self.bouncer.stop()
-        self.flushUnauthorizedLogin()
-        log._getTheFluLogObserver().clearIgnores()
         self.port.stopListening()
 
     def clientDisconnect(self, factory, reference):
@@ -377,7 +367,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             self.failUnless(isinstance(factory.keycard, keycards.KeycardUACPCC))
             # This is a CopiedFailure
             self.assert_(failure.check(
-                "twisted.cred.error.UnauthorizedLogin"))
+                "flumotion.common.errors.NotAuthenticatedError"))
             log.debug("trial", "got failure %r" % failure)
             c.disconnect()
             return True
@@ -421,13 +411,12 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
         
         def WrongUserCb(keycard):
-            self.fail("Should have returned UnauthorizedLogin")
+            self.fail("Should have returned NotAuthenticatedError")
             
         def WrongUserEb(failure):
             # find copied failure
             self.failUnless(failure.check(
-                "twisted.cred.error.UnauthorizedLogin"))
-            self.flushUnauthorizedLogin()
+                "flumotion.common.errors.NotAuthenticatedError"))
             return self.clientDisconnect(factory, None)
     
         d.addCallback(WrongUserCb)
@@ -455,8 +444,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             def uacpccWrongPasswordErrback(failure):
                 # find copied failure
                 self.failUnless(failure.check(
-                    "twisted.cred.error.UnauthorizedLogin"))
-                self.flushUnauthorizedLogin()
+                    "flumotion.common.errors.NotAuthenticatedError"))
                 return self.clientDisconnect(factory, None)
             
             d.addErrback(uacpccWrongPasswordErrback)
@@ -488,9 +476,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             def uacpccTamperErrback(failure):
                 # find copied failure
                 self.failUnless(failure.check(
-                    "twisted.cred.error.UnauthorizedLogin"))
-                from twisted.cred.error import UnauthorizedLogin
-                self.flushUnauthorizedLogin()
+                    "flumotion.common.errors.NotAuthenticatedError"))
                 return self.clientDisconnect(factory, None)
 
             d.addErrback(uacpccTamperErrback)
@@ -534,7 +520,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             self.failUnless(isinstance(factory.keycard, keycards.KeycardUASPCC))
             # This is a CopiedFailure
             self.assert_(failure.check(
-                "twisted.cred.error.UnauthorizedLogin"))
+                "flumotion.common.errors.NotAuthenticatedError"))
             log.debug("trial", "got failure %r" % failure)
             c.disconnect()
             return True
@@ -553,13 +539,12 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
         
         def WrongUserCb(keycard):
-            self.fail("Should have returned UnauthorizedLogin")
+            self.fail("Should have returned NotAuthenticatedError")
             
         def WrongUserEb(failure):
             # find copied failure
             self.failUnless(failure.check(
-                "twisted.cred.error.UnauthorizedLogin"))
-            self.flushUnauthorizedLogin()
+                "flumotion.common.errors.NotAuthenticatedError"))
             return self.clientDisconnect(factory, None)
     
         d.addCallback(WrongUserCb)
@@ -591,8 +576,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             def uacpccTamperErrback(failure):
                 # find copied failure
                 self.failUnless(failure.check(
-                    "twisted.cred.error.UnauthorizedLogin"))
-                self.flushUnauthorizedLogin()
+                    "flumotion.common.errors.NotAuthenticatedError"))
                 return self.clientDisconnect(factory, None)
 
             d.addErrback(uacpccTamperErrback)

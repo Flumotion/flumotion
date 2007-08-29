@@ -25,7 +25,6 @@ to eat from or feed to this worker's components.
 """
 
 from twisted.internet import reactor, defer, main
-from twisted.cred import error
 from twisted.python import components, failure, reflect
 from twisted.spread import pb
 from twisted.cred import portal

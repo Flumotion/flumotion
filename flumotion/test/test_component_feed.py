@@ -25,13 +25,12 @@ import common
 import errno
 import os
 
-from twisted.cred import error
 from twisted.trial import unittest
 from twisted.internet import reactor, defer
 from twisted.python import log as tlog
 
 from flumotion.twisted import pb as fpb
-from flumotion.common import log
+from flumotion.common import log, errors
 from flumotion.component.bouncers import htpasswdcrypt
 
 from flumotion.worker import feedserver
@@ -109,9 +108,6 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
                    'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
     def setUp(self):
-        # don't output Twisted tracebacks for PB errors we will trigger
-        log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
-
         self._fdCount = countOpenFileDescriptors()
 
         self.brain = FakeWorkerBrain()
@@ -127,11 +123,6 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
                                   % (self._fdCount, additionalFDs, actual)))
 
     def tearDown(self):
-        try:
-            self.flushLoggedErrors(error.UnauthorizedLogin)
-        except AttributeError:
-            tlog.flushErrors(error.UnauthorizedLogin)
-        log._getTheFluLogObserver().clearIgnores()
         d = self.feedServer.shutdown()
         d.addCallback(lambda _: self._bouncer.stop())
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
@@ -325,7 +316,7 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
                 raise AssertionError, 'should not get here'
 
             self.info('loginFailed: %s', log.getFailureMessage(failure))
-            failure.trap(error.UnauthorizedLogin)
+            failure.trap(errors.NotAuthenticatedError)
             d = factory.getRootObject() # should fire immediately
             d.addCallback(gotRoot)
             d.addCallbacks(gotKeycardClasses, gotError)

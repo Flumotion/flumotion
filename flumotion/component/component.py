@@ -28,7 +28,6 @@ import time
 import socket
 
 from twisted.internet import reactor, error, defer
-from twisted.cred import error as crederror
 from twisted.spread import pb
 from twisted.python import reflect
 from zope.interface import implements
@@ -92,7 +91,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def accessDeniedErrback(failure):
-            failure.trap(crederror.UnauthorizedLogin)
+            failure.trap(errors.NotAuthenticatedError)
             self.warning('Access denied.')
             
         def connectionRefusedErrback(failure):

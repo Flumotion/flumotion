@@ -88,32 +88,12 @@ user:PSfNpHTkpTx1M
 """
 
 
-# This bit about log flushing is repeated in various tests; would be
-# good to see about making it unnecessary. Perhaps returning a pb.Error
-# subclass instead of UnauthorizedLogin would do the trick.
-
-def ignoreErrors(*types):
-    log._getTheFluLogObserver().ignoreErrors(*types)
-
-def flushErrors(testcase, *types):
-    try:
-        testcase.flushLoggedErrors(*types)
-    except AttributeError:
-        from twisted.python import log as tlog
-        tlog.flushErrors(*types)
-    log._getTheFluLogObserver().clearIgnores()
-
-
 class TestCaseWithManager(unittest.TestCase):
     def setUp(self):
-        from twisted.cred import error
         from flumotion.twisted import pb
         from flumotion.common import config, server, connection
         from flumotion.manager import manager
         from StringIO import StringIO
-
-        # don't output Twisted tracebacks for PB errors we will trigger
-        ignoreErrors(error.UnauthorizedLogin)
 
         conf = config.ManagerConfigParser(StringIO(managerConf)).manager
         self.vishnu = manager.Vishnu(conf.name,
@@ -134,10 +114,6 @@ class TestCaseWithManager(unittest.TestCase):
         self.connectionInfo = i
         
     def tearDown(self):
-        from twisted.cred import error
-
-        flushErrors(self, error.UnauthorizedLogin)
-
         d = self.vishnu.shutdown()
         d.addCallback(lambda _: self.tport.stopListening())
         return d

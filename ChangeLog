@@ -1,5 +1,37 @@
 2007-08-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/common.py:
+	* flumotion/test/test_checkers.py:
+	* flumotion/test/test_component_feed.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/credentials.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/worker/feedserver.py:
+	* flumotion/worker/medium.py: Change to return
+	errors.NotAuthenticatedError from authentication
+	procedures/bouncers instead of cred.error.UnauthorizedLogin. This
+	lets the error be serialized across a PB connection instead of
+	causing a printout and a need for hacks in the test suite.
+	Fixes #44.
+
+	* flumotion/twisted/checkers.py (FlexibleCredentialsChecker):
+	Don't subclass from InMemoryUsernamePasswordDatabaseDontUse, just
+	pull its code in. Allows us to control the type of the returned
+	failure (so it can be a pb.Error subclass).
+
+	* flumotion/twisted/credentials.py (IUsernamePassword)
+	(IUsernameHashedPassword): Re-export these from
+	twisted.cred.credentials.
+
 	* flumotion/twisted/pb/portal.py
 	(BouncerPortal.getKeycardClasses): Don't return a failure here, as
 	we don't have a pointer to the transport (so that we can drop the

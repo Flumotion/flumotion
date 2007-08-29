@@ -35,7 +35,6 @@ __all__ = ['ManagerServerFactory', 'Vishnu']
 import os
 
 from twisted.internet import reactor, defer
-from twisted.cred import error
 from twisted.python import components, failure
 from twisted.spread import pb
 from twisted.cred import portal

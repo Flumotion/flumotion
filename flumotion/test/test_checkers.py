@@ -24,10 +24,9 @@ from twisted.trial import unittest
 
 import crypt
 
-from twisted.cred import error
-
 from twisted.cred import credentials as tcredentials
 from flumotion.twisted import credentials, checkers
+from flumotion.common import errors
 
 # Use some shorter names
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
@@ -57,7 +56,7 @@ class TestFlexibleWithPassword(unittest.TestCase):
 
     def testCredPlaintextWrong(self):
         def credPlaintextWrongErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         cred = tcredentials.UsernamePassword('user', 'wrong')
         d = self.checker.requestAvatarId(cred)
@@ -119,7 +118,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredPlaintextWrongPassword(self):
         def credPlaintextWrongPasswordErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         cred = CredPlaintext('user', 'tes')
         d = self.checker.requestAvatarId(cred)
@@ -128,7 +127,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredPlaintextWrongUser(self):
         def credPlaintextWrongUserErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         cred = CredPlaintext('wrong', 'test')
         d = self.checker.requestAvatarId(cred)
@@ -148,7 +147,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredCryptWrongSalt(self):
         def credCryptWrongSaltErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('test', 'aa')
         cred = CredCrypt('user', crypted)
@@ -158,7 +157,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredCryptWrongPassword(self):
         def credCryptWrongPasswordErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('wrong', 'qi')
         cred = CredCrypt('user', crypted)
@@ -168,7 +167,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredCryptWrongUser(self):
         def credCryptWrongUserErrback(failure):
-            self.assert_(isinstance(failure.type(), error.UnauthorizedLogin))
+            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('test', 'qi')
         cred = CredCrypt('wronguser', crypted)

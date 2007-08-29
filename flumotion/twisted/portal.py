@@ -25,7 +25,6 @@ portal-related functionality inspired by twisted.cred.portal
 
 from twisted.spread import flavors
 from twisted.internet import defer
-from twisted.cred import error
 from twisted.cred.portal import Portal
 from twisted.python import failure, reflect
 from twisted.python.components import registerAdapter
@@ -90,7 +89,8 @@ class BouncerPortal(log.Loggable):
         if not self.bouncer:
             self.warning("no bouncer, refusing login")
             mind.broker.transport.loseConnection()
-            return defer.fail(error.UnauthorizedLogin())
+            return defer.fail(errors.NotAuthenticatedError(
+                "No bouncer configured, no logins possible"))
 
         def onErrorCloseConnection(failure):
             try:
@@ -116,7 +116,8 @@ class BouncerPortal(log.Loggable):
             # directly, but that's not how the current interface works.
             if not result:
                 self.info("unauthorized login for interfaces %r", ifaces)
-                return defer.fail(error.UnauthorizedLogin())
+                return defer.fail(errors.NotAuthenticatedError(
+                    "Unauthorized login"))
 
             keycard = result
             if not keycard.state == keycards.AUTHENTICATED:

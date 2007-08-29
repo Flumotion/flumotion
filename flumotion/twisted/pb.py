@@ -27,7 +27,7 @@ Inspired by L{twisted.spread.pb}
 
 import time
 
-from twisted.cred import checkers, credentials, error
+from twisted.cred import checkers, credentials
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol, defer, reactor
 from twisted.internet import error as terror
@@ -346,8 +346,8 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
             - a L{twisted.spread.pb.AsReferenceable} when authentication 
               has succeeded, which will turn into a
               L{twisted.spread.pb.RemoteReference} on the client side
-            - a L{twisted.cred.error.UnauthorizedLogin} when authentication
-              is denied
+            - a L{flumotion.common.errors.NotAuthenticatedError} when
+              authentication is denied
         """
         def loginResponse(result):
             self.log("loginResponse: result=%r", result)
