@@ -1,5 +1,8 @@
 2007-08-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/common.py (TestCaseWithManager.tearDown): Flush
+	errors, in an attempt to appease twisted < 2.5.
+
 	* flumotion/test/test_pb.py
 	(Test_FPBClientFactory.flushNotAuthenticatedError)
 	(Test_FPBClientFactory.tearDown): Reinstate some of the error

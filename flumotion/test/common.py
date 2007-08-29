@@ -88,6 +88,16 @@ user:PSfNpHTkpTx1M
 """
 
 
+# This bit about log flushing seems to be necessary with twisted < 2.5.
+
+def flushErrors(testcase, *types):
+    try:
+        testcase.flushLoggedErrors(*types)
+    except AttributeError:
+        from twisted.python import log as tlog
+        tlog.flushErrors(*types)
+
+
 class TestCaseWithManager(unittest.TestCase):
     def setUp(self):
         from flumotion.twisted import pb
@@ -114,6 +124,10 @@ class TestCaseWithManager(unittest.TestCase):
         self.connectionInfo = i
         
     def tearDown(self):
+        from flumotion.common import errors
+
+        flushErrors(self, errors.NotAuthenticatedError)
+
         d = self.vishnu.shutdown()
         d.addCallback(lambda _: self.tport.stopListening())
         return d
