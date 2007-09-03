@@ -1,5 +1,8 @@
 2007-09-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/commands.py (do_managerinvoke): New
+	command, invokes an arbitrary remote method on the manager.
+
 	* flumotion/common/manhole.py (openSSHManhole)
 	(openAnonymousTelnetManhole): New optional argument, the port
 	number to request.

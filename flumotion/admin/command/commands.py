@@ -281,6 +281,28 @@ def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     quit()
 do_workerinvoke = defer_generator(do_workerinvoke)
 
+def do_managerinvoke(model, quit, methodName, *args):
+    if args:
+        args = _parse_typed_args(args[0], args[1:])
+        if args is None:
+            quit()
+            yield None
+
+    d = model.callRemote(methodName, *args)
+    yield d
+
+    try:
+        v = d.value()
+        print "Invoke of %s was successful." % (methodName,)
+        print v
+    except errors.NoMethodError:
+        print "No method '%s' on manager" % (methodName,)
+    except Exception, e:
+        raise
+
+    quit()
+do_managerinvoke = defer_generator(do_managerinvoke)
+
 def do_loadconfiguration(model, quit, confFile, saveAs):
     print 'Loading configuration from file: %s' % confFile
 
@@ -438,6 +460,11 @@ commands = (('getprop',
               ('method-name', str),
               ('args', str, None, True)),
              do_workerinvoke),
+            ('managerinvoke',
+             'invoke a function on a manager',
+             (('method-name', str),
+              ('args', str, None, True)),
+             do_managerinvoke),
             ('loadconfiguration',
              'load configuration into the manager',
              (('conf-file', str),
