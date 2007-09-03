@@ -113,7 +113,7 @@ class SSHPublicKeyChecker(log.Loggable):
             return failure.Failure(UnauthorizedLogin())
         return f
 
-def openSSHManhole(authorizedKeysFile, namespace):
+def openSSHManhole(authorizedKeysFile, namespace, portNum=-1):
     from twisted.conch import manhole_ssh
 
     def makeProtocol():
@@ -123,10 +123,10 @@ def openSSHManhole(authorizedKeysFile, namespace):
     sshRealm.chainedProtocolFactory = makeProtocol
     sshPortal = portal.Portal(sshRealm, [checker])
     sshFactory = manhole_ssh.ConchFactory(sshPortal)
-    port = reactor.listenTCP(-1, sshFactory, interface='localhost')
+    port = reactor.listenTCP(portNum, sshFactory, interface='localhost')
     return port
 
-def openAnonymousTelnetManhole(namespace):
+def openAnonymousTelnetManhole(namespace, portNum=-1):
     from twisted.conch import telnet
     from twisted.internet import protocol
 
@@ -137,5 +137,6 @@ def openAnonymousTelnetManhole(namespace):
 
     telnetFactory = protocol.ServerFactory()
     telnetFactory.protocol = makeProtocol
-    port = reactor.listenTCP(-1, telnetFactory, interface='localhost')
+    port = reactor.listenTCP(portNum, telnetFactory,
+                             interface='localhost')
     return port

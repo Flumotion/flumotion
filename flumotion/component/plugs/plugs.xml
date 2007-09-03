@@ -26,6 +26,18 @@
              function="ManagerLifecyclePrinter"/>
     </plug>
 
+    <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
+          type="manager-manhole-plug">
+      <entry location="flumotion/component/plugs/manhole.py"
+             function="ManagerManholePlug"/>
+
+      <properties>
+        <property name="ssh-authorized-keys-file" type="string" required="false"/>
+        <property name="initially-open" type="bool" required="false"/>
+        <property name="port" type="int" required="false"/>
+      </properties>
+    </plug>
+
     <plug socket="flumotion.component.plugs.identity.IdentityProvider"
           type="exampleidentityprovider">
       <entry location="flumotion/component/plugs/identity.py"
@@ -83,6 +95,16 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="lifecycle.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="plugs-manager-manhole">
+      <dependencies>
+        <dependency name="base-plugs-lifecycle" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="manhole.py" />
         </directory>
       </directories>
     </bundle>

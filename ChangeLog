@@ -1,5 +1,19 @@
 2007-09-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/manhole.py (openSSHManhole)
+	(openAnonymousTelnetManhole): New optional argument, the port
+	number to request.
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): 
+	* flumotion/component/plugs/plugs.xml: Add to bundles and dist.
+
+	* flumotion/component/plugs/manhole.py: New file, implements a
+	manager plug that starts a manhole, either on ssh or telnet, and
+	which can be opened or closed over the admin interface.
+
+	* conf/Makefile.am (EXTRA_DIST): 
+	* conf/managers/default/manhole.xml: Add example for manhole plug.
+
 	* flumotion/common/Makefile.am (flumotion_PYTHON): 
 	* flumotion/common/manhole.py: Add manhole module. MUAHAHA
 
