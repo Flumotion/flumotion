@@ -1,3 +1,9 @@
+2007-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/boot.py:
+	  Fail to start if python is 2.5 or newer, and Twisted is older than
+	  2.5.0
+
 2007-09-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/commands.py (do_managerinvoke): New

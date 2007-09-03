@@ -118,6 +118,16 @@ def init_gst():
     return gst_majorminor
 
 def boot(path, gtk=False, gst=True, installReactor=True):
+    # python 2.5 and twisted < 2.5 don't work together
+    pythonMM = sys.version_info[0:2]
+    from twisted.copyright import version
+    twistedMM = tuple([int(n) for n in version.split('.')[0:2]])
+    if pythonMM >= (2, 5) and twistedMM < (2, 5):
+        raise SystemError(
+            "Twisted versions older than 2.5.0 do not work with "
+            "Python 2.5 and newer.  "
+            "Please upgrade Twisted or downgrade Python.")
+
     if gtk or gst:
         init_gobject()
 
