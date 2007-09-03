@@ -22,6 +22,7 @@ flumotion_PYTHON = \
 	interfaces.py \
 	log.py \
 	keycards.py \
+	manhole.py \
 	medium.py \
 	messages.py \
 	netutils.py \
