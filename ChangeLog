@@ -2,6 +2,7 @@
 
 	* flumotion/common/manhole.py (SSHPublicKeyChecker): Stub out if
 	we have a twisted without ISSHPrivateKey.
+	(SSHPublicKeyChecker): Try a different hack.
 
 	* flumotion/manager/depgraph.py: Editorialize more.
 
