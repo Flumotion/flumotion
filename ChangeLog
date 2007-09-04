@@ -1,5 +1,7 @@
 2007-09-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/depgraph.py: Editorialize more.
+
 	* flumotion/manager/depgraph.py: Add documentation for the
 	depgraph, along with some editorials.
 

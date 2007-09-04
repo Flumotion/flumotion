@@ -52,18 +52,23 @@ Components also are marked as depending on the components that feed
 them.[2]
 
 In reality, the only interesting feature of the depgraph is the
-clockmaster dependency, which only really works in the case in which all
-components have been added to the depgraph, then the clock master is
-marked, and no more components are added to the depgraph. Also, all
-components must have been added to the depgraph. There are numerous
-places in flumotion/manager files that do not complete these
-requirements. Hopefully this caveat is temporary.
+clockmaster dependency, because otherwise a deferred from calling
+setup() could be directly chained to start() in all cases[3].
 
 [1] It is unclear if this recursive behavior is actually what you want.
 Specifically, if a worker pings out, it doesn't mean that the component
 will go away, or that you should do anything different.
 
 [2] This is BS, and will be changed soon (accompanied with comments).
+
+[3] This only really works in the case in which all components have been
+added to the depgraph, then the clock master is marked, and no more
+components are added to the depgraph. Also, all components must have
+been added to the depgraph. There are numerous places in
+flumotion/manager files that do not complete these requirements. Perhaps
+if the clock master strategy were changed, then this entire file would
+be unnecessary; it seems to introduce concepts needlessly, causing
+needless complexity and brittleness.
 """
 
 from flumotion.common import dag, log, registry, errors, common
