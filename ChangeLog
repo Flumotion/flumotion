@@ -1,5 +1,8 @@
 2007-09-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/manhole.py (SSHPublicKeyChecker): Stub out if
+	we have a twisted without ISSHPrivateKey.
+
 	* flumotion/manager/depgraph.py: Editorialize more.
 
 	* flumotion/manager/depgraph.py: Add documentation for the

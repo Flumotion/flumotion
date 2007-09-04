@@ -63,8 +63,7 @@ will go away, or that you should do anything different.
 
 [3] This only really works in the case in which all components have been
 added to the depgraph, then the clock master is marked, and no more
-components are added to the depgraph. Also, all components must have
-been added to the depgraph. There are numerous places in
+components are added to the depgraph. There are numerous places in
 flumotion/manager files that do not complete these requirements. Perhaps
 if the clock master strategy were changed, then this entire file would
 be unnecessary; it seems to introduce concepts needlessly, causing
@@ -227,61 +226,6 @@ class DepGraph(log.Loggable):
         else:
             raise KeyError("Worker %s or Component %r not in dependency graph" %
                 (worker, component))
-
-    # TODO: This is nasty: it goes and touches anything in the graph, not just
-    # the newly added things. Unfortunately, we don't enforce adding things in
-    # the right order, so doing it correctly otherwise looks hard.
-    def mapEatersToFeeders(self):
-        """
-        I am called once a piece of configuration has been added,
-        so I can add edges to the DAG for each feed from the
-        feeding component to the eating component.
-
-        @raise errors.ComponentConfigError: if a component is
-                                            misconfigured and eats from
-                                            a non-existant component
-        """
-        toSetup = self._dag.getAllNodesByType("COMPONENTSETUP")
-        
-        for eatingComponent in toSetup:
-            # for this component setup, go through all the feeders in it
-            config = eatingComponent.get('config')
-
-            if not config.has_key('eater'):
-                # no eaters
-                self.debug("Component %r has no eaters" % eatingComponent)
-            else:
-                # eater is a dict of eaterName -> list of componentName[:feedName]
-                # with feedName defaulting to default
-                eaters = config['eater']
-
-                for eater in eaters:
-                    for feed in eaters[eater]:
-                        feederFound = False
-                        feederComponentName = feed.split(':')[0]
-                        # find the feeder
-                        for feedingComponent in toSetup:
-                            if feedingComponent.get("name") == feederComponentName:
-                                feederFound = True
-                                try:
-                                    self._addEdge(feedingComponent, eatingComponent,
-                                        "COMPONENTSETUP", "COMPONENTSETUP")
-                                except KeyError:
-                                    # it is possible for a component to have
-                                    # two eaters, each eating from feeders on
-                                    # one other component
-                                    pass
-                                try:
-                                    self._addEdge(feedingComponent, eatingComponent,
-                                        "COMPONENTSTART", "COMPONENTSTART")
-                                except KeyError:
-                                    pass
-
-                        if not feederFound:
-                            raise errors.ComponentConfigError(eatingComponent,
-                                "No feeder exists feeding %s to eater"
-                                " %s on component %s" % (
-                                feed, eater, eatingComponent))
 
     def _setState(self, object, type, value):
         self.doLog(log.DEBUG, -2, "Setting state of (%r, %s) to %d" % (

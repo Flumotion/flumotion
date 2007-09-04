@@ -27,7 +27,6 @@ from twisted.conch import error, manhole
 from twisted.conch.insults import insults
 from twisted.conch.ssh import keys
 from twisted.cred.checkers import ICredentialsChecker
-from twisted.cred.credentials import ISSHPrivateKey
 from twisted.cred.error import UnauthorizedLogin
 from twisted.internet import defer, reactor
 from twisted.cred import portal
@@ -61,57 +60,63 @@ from flumotion.common import log
 
 # It has been modified to check a particular authorized_keys file
 # instead of poking in users' ~/.ssh directories.
-class SSHPublicKeyChecker(log.Loggable):
-    credentialInterfaces = ISSHPrivateKey,
-    interface.implements(ICredentialsChecker)
+try:
+    from twisted.cred.credentials import ISSHPrivateKey
+    class SSHPublicKeyChecker(log.Loggable):
+        credentialInterfaces = ISSHPrivateKey,
+        interface.implements(ICredentialsChecker)
 
-    def __init__(self, authorizedKeysFile):
-        self.authorizedKeysFile = authorizedKeysFile
+        def __init__(self, authorizedKeysFile):
+            self.authorizedKeysFile = authorizedKeysFile
 
-    def requestAvatarId(self, credentials):
-        d = defer.maybeDeferred(self.checkKey, credentials)
-        d.addCallback(self._cbRequestAvatarId, credentials)
-        d.addErrback(self._ebRequestAvatarId)
-        return d
+        def requestAvatarId(self, credentials):
+            d = defer.maybeDeferred(self.checkKey, credentials)
+            d.addCallback(self._cbRequestAvatarId, credentials)
+            d.addErrback(self._ebRequestAvatarId)
+            return d
 
-    def _cbRequestAvatarId(self, validKey, credentials):
-        if not validKey:
+        def _cbRequestAvatarId(self, validKey, credentials):
+            if not validKey:
+                return failure.Failure(UnauthorizedLogin())
+            if not credentials.signature:
+                return failure.Failure(error.ValidPublicKey())
+            else:
+                try:
+                    pubKey = keys.getPublicKeyObject(data = credentials.blob)
+                    if keys.verifySignature(pubKey, credentials.signature,
+                                            credentials.sigData):
+                        return credentials.username
+                except: # any error should be treated as a failed login
+                    f = failure.Failure()
+                    log.warning('error checking signature: %r', credentials)
+                    return f
             return failure.Failure(UnauthorizedLogin())
-        if not credentials.signature:
-            return failure.Failure(error.ValidPublicKey())
-        else:
-            try:
-                pubKey = keys.getPublicKeyObject(data = credentials.blob)
-                if keys.verifySignature(pubKey, credentials.signature,
-                                        credentials.sigData):
-                    return credentials.username
-            except: # any error should be treated as a failed login
-                f = failure.Failure()
-                log.warning('error checking signature: %r', credentials)
-                return f
-        return failure.Failure(UnauthorizedLogin())
 
-    def checkKey(self, credentials):
-        filename = self.authorizedKeysFile
-        if not os.path.exists(filename):
+        def checkKey(self, credentials):
+            filename = self.authorizedKeysFile
+            if not os.path.exists(filename):
+                return 0
+            lines = open(filename).xreadlines()
+            for l in lines:
+                l2 = l.split()
+                if len(l2) < 2:
+                    continue
+                try:
+                    if base64.decodestring(l2[1]) == credentials.blob:
+                        return 1
+                except binascii.Error:
+                    continue
             return 0
-        lines = open(filename).xreadlines()
-        for l in lines:
-            l2 = l.split()
-            if len(l2) < 2:
-                continue
-            try:
-                if base64.decodestring(l2[1]) == credentials.blob:
-                    return 1
-            except binascii.Error:
-                continue
-        return 0
 
-    def _ebRequestAvatarId(self, f):
-        if not f.check(UnauthorizedLogin, error.ValidPublicKey):
-            log.warning('failed login %r', f)
-            return failure.Failure(UnauthorizedLogin())
-        return f
+        def _ebRequestAvatarId(self, f):
+            if not f.check(UnauthorizedLogin, error.ValidPublicKey):
+                log.warning('failed login %r', f)
+                return failure.Failure(UnauthorizedLogin())
+            return f
+except ImportError:
+    class SSHPublicKeyChecker:
+        def __init__(self, *args):
+            raise NotImplementedError('Your twisted lacks ISSHPrivateKey')
 
 def openSSHManhole(authorizedKeysFile, namespace, portNum=-1):
     from twisted.conch import manhole_ssh
