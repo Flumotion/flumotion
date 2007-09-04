@@ -557,6 +557,18 @@ class Vishnu(log.Loggable):
         for componentState in added:
             self._updateFlowDependencies(componentState)
 
+        try:
+            self._depgraph.mapEatersToFeeders()
+        except errors.ComponentConfigError, e:
+            state = e.args[0]
+            debug = e.args[1]
+            message = messages.Error(T_(
+                N_("The component is misconfigured.")),
+                    debug=debug)
+            state.append('messages', message)
+            state.setMood(moods.sad.value)
+            raise e
+
         return added
 
     def _startComponents(self, components, identity):
