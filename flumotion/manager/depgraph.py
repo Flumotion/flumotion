@@ -19,6 +19,53 @@
 
 # Headers in this file shall remain intact.
 
+"""
+A dependency graph for the manager.
+
+The purpose of this code is to make sure that the multi-stage component
+start process proceeds in order, and that components do not start before
+their clock master (if any).
+
+The strategy used by the code is to model each dependency as a node in
+the graph, with a boolean state, and a callable to attempt to make that
+state true.
+
+When a node changes its state to False, all offspring (children,
+childrens' children, etc) of that node are marked as False.[1]
+
+When a node changes its state to True, all children (the direct
+dependencies only) are examined to see if they can "start". A node can
+start when all nodes that it depends on are True, and if the node itself
+is False. In that case, the node's callable is called, which is code
+external to this file that should attempt to make that node True.
+
+For example, DepGraph.addClockMaster() marks a component as being a
+clock master, with a callable to start that component's clock. All
+components with that clock master will be marked as children of the
+master component's "CLOCKMASTER" node, which in turn is a child of the
+master component's "COMPONENTSETUP" node. So when the master component
+has been set up ("COMPONENTSETUP" == True), the setupClockMasterCallable
+will be called, which at some point will mark "CLOCKMASTER" == True,
+which will allow other components to be started.
+
+Components also are marked as depending on the components that feed
+them.[2]
+
+In reality, the only interesting feature of the depgraph is the
+clockmaster dependency, which only really works in the case in which all
+components have been added to the depgraph, then the clock master is
+marked, and no more components are added to the depgraph. Also, all
+components must have been added to the depgraph. There are numerous
+places in flumotion/manager files that do not complete these
+requirements. Hopefully this caveat is temporary.
+
+[1] It is unclear if this recursive behavior is actually what you want.
+Specifically, if a worker pings out, it doesn't mean that the component
+will go away, or that you should do anything different.
+
+[2] This is BS, and will be changed soon (accompanied with comments).
+"""
+
 from flumotion.common import dag, log, registry, errors, common
 from flumotion.common.planet import moods
 
