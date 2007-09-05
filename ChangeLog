@@ -1,5 +1,10 @@
 2007-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.remote_eatFrom): Remove a FIXME, we will drop
+	the old connection when the new connection suceeds, not when we
+	start connecting.
+
 	* flumotion/common/config.py (upgradeAliases, UPGRADERS): Add an
 	upgrader for eater alias changes.
 	(buildEatersDict): Instead of returning the eater config property

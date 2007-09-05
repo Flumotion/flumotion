@@ -139,7 +139,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         flowName, componentName, feedName = common.parseFullFeedId(fullFeedId)
         feedId = common.feedId(componentName, feedName)
         self._feederFeedServer[feedId] = (fullFeedId, host, port)
-        # FIXME: drop connection if we already had one
         return self.connectEater(feedId)
 
     def _getAuthenticatorForFeed(self, feedId):
