@@ -54,7 +54,7 @@ def upgradeEaters(conf):
             conf.get('type')).getEaters()
         eatersDict = {}
         eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
-        eatersDict = config.buildEatersDict(eatersTuple, eaters)
+        eatersDict = buildEatersDict(eatersTuple, eaters)
         conf['eater'] =  eatersDict
 
     if sourceConfig:
