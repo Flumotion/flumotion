@@ -1,5 +1,9 @@
 2007-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu._upgradeComponentConfig)
+	(Vishnu._getComponentState): Factor out the config upgrading into
+	a separate method.
+
 	* flumotion/common/config.py (CURRENT_VERSION)
 	(ConfigEntryComponent._buildConfig): Add a 'config-version'
 	element to the config, to be incremented when the config needs
