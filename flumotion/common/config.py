@@ -34,6 +34,9 @@ from flumotion.configure import configure
 
 from errors import ConfigError
 
+# Update manager.py's _upgradeComponentConfig if you increment this
+CURRENT_VERSION = 1
+
 def _ignore(*args):
     pass
 
@@ -329,6 +332,7 @@ class ConfigEntryComponent(log.Loggable):
         config = {'name': self.name,
                   'parent': self.parent,
                   'type': self.type,
+                  'config-version': CURRENT_VERSION,
                   'avatarId': common.componentId(self.parent, self.name),
                   'project': project or 'flumotion',
                   'version': self._buildVersionTuple(version),

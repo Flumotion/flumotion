@@ -1063,6 +1063,49 @@ class Vishnu(log.Loggable):
         self.debug('vishnu.workerDetached(): id %s' % workerId)
         self._depgraph.setWorkerStopped(workerId)
 
+    def _upgradeComponentConfig(self, state, conf):
+        def upgradeFailedWarning(self, format, *args, **kwargs):
+            message = messages.Warning(T_(format, *args), **kwargs)
+            state.append('messages', message)
+
+        def parseFeedId(feedId): 
+            if feedId.find(':') == -1:
+                return "%s:default" % feedId
+            else:
+                return feedId
+
+        def upgradeEaters():
+            eaterConfig = conf.get('eater', {})
+            sourceConfig = conf.get('source', [])
+            if eaterConfig == {} and sourceConfig != []:
+                eaters = registry.getRegistry().getComponent(
+                    conf.get('type')).getEaters()
+                eatersDict = {}
+                eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
+                eatersDict = config.buildEatersDict(eatersTuple, eaters)
+                conf['eater'] =  eatersDict
+
+            if sourceConfig:
+                sources = []
+                for s in sourceConfig:
+                    sources.append(parseFeedId(s))
+                conf['source'] = sources
+
+        # different from conf['version'], eh...
+        version = conf.get('config-version', 0)
+        upgraders = [upgradeEaters]
+        while version < config.CURRENT_VERSION:
+            try:
+                upgraders[version]()
+                version += 1
+                conf['config-version'] = version
+            except Exception, e:
+                upgradeFailedWarning(N_("Failed to upgrade config %r "
+                                        "from version %d. Please file "
+                                        "a bug."), conf, version,
+                                     debug=log.getExceptionMessage(e))
+                return
+
     def _getComponentState(self, deferredListResult, avatar):
         # a component just logged in with good credentials. we fetched
         # its config and job state. now there are two possibilities:
@@ -1074,46 +1117,12 @@ class Vishnu(log.Loggable):
         #      state.
         #  (3) we don't know anything about this component, and it has no
         #      config. We stop it.
-        def parseFeedId(feedId): 
-            if feedId.find(':') == -1:
-                return "%s:default" % feedId
-            else:
-                return feedId
-
-        def fixOldEaterConfig(state):
-            # check for components that have no eater dict but a
-            # non-empty source list, and file all these under
-            # eater default
-            eaterConfig = conf.get('eater', {})
-            sourceConfig = conf.get('source', [])
-            if eaterConfig == {} and sourceConfig != []:
-                eaters = registry.getRegistry().getComponent(
-                    conf.get('type')).getEaters()
-                eatersDict = {}
-                try:
-                    eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
-                    eatersDict = config.buildEatersDict(eatersTuple, eaters)
-                except errors.ConfigError:
-                    message = messages.Warning(T_(
-                        N_("Component logged in with old deprecated "
-                           "configuration and creating an eaters config "
-                           "caused an error. Restarting this component "
-                           "will result in bad things. Best thing to do "
-                           "is stop the component, restart manager and "
-                           "start it again.")))
-                    state.append('messages', message)
-                conf['eater'] =  eatersDict
-            if sourceConfig:
-                sources = []
-                for s in sourceConfig:
-                    sources.append(parseFeedId(s))
-                conf['source'] = sources
-
         def verifyExistingComponentState(jobState, state):
             # condition (1)
             state.setJobState(jobState)
+
             if conf:
-                fixOldEaterConfig(state)
+                self._upgradeComponentConfig(state, conf)
                 if state.get('config') != conf:
                     diff = config.dictDiff(state.get('config'), conf)
                     diffMsg = config.dictDiffMessageString(diff,
@@ -1138,8 +1147,9 @@ class Vishnu(log.Loggable):
             state = planet.ManagerComponentState()
             state.setJobState(jobState)
 
+            self._upgradeComponentConfig(state, conf)
+
             flowName, compName = conf['parent'], conf['name']
-            fixOldEaterConfig(state)
 
             state.set('name', compName)
             state.set('type', conf['type'])

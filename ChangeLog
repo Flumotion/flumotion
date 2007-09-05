@@ -1,3 +1,10 @@
+2007-09-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (CURRENT_VERSION)
+	(ConfigEntryComponent._buildConfig): Add a 'config-version'
+	element to the config, to be incremented when the config needs
+	upgrading.
+
 2007-09-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/manhole.py (SSHPublicKeyChecker): Stub out if
