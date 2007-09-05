@@ -40,6 +40,32 @@ CURRENT_VERSION = 1
 def _ignore(*args):
     pass
 
+def upgradeEaters(conf):
+    def parseFeedId(feedId): 
+        if feedId.find(':') == -1:
+            return "%s:default" % feedId
+        else:
+            return feedId
+
+    eaterConfig = conf.get('eater', {})
+    sourceConfig = conf.get('source', [])
+    if eaterConfig == {} and sourceConfig != []:
+        eaters = registry.getRegistry().getComponent(
+            conf.get('type')).getEaters()
+        eatersDict = {}
+        eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
+        eatersDict = config.buildEatersDict(eatersTuple, eaters)
+        conf['eater'] =  eatersDict
+
+    if sourceConfig:
+        sources = []
+        for s in sourceConfig:
+            sources.append(parseFeedId(s))
+        conf['source'] = sources
+
+UPGRADERS = [upgradeEaters]
+CURRENT_VERSION = len(UPGRADERS)
+
 def buildEatersDict(eatersList, eaterDefs):
     """Build a eaters dict suitable for forming part of a component
     config.

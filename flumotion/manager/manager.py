@@ -1064,39 +1064,15 @@ class Vishnu(log.Loggable):
         self._depgraph.setWorkerStopped(workerId)
 
     def _upgradeComponentConfig(self, state, conf):
-        def upgradeFailedWarning(self, format, *args, **kwargs):
+        def upgradeFailedWarning(format, *args, **kwargs):
             message = messages.Warning(T_(format, *args), **kwargs)
             state.append('messages', message)
 
-        def parseFeedId(feedId): 
-            if feedId.find(':') == -1:
-                return "%s:default" % feedId
-            else:
-                return feedId
-
-        def upgradeEaters():
-            eaterConfig = conf.get('eater', {})
-            sourceConfig = conf.get('source', [])
-            if eaterConfig == {} and sourceConfig != []:
-                eaters = registry.getRegistry().getComponent(
-                    conf.get('type')).getEaters()
-                eatersDict = {}
-                eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
-                eatersDict = config.buildEatersDict(eatersTuple, eaters)
-                conf['eater'] =  eatersDict
-
-            if sourceConfig:
-                sources = []
-                for s in sourceConfig:
-                    sources.append(parseFeedId(s))
-                conf['source'] = sources
-
         # different from conf['version'], eh...
         version = conf.get('config-version', 0)
-        upgraders = [upgradeEaters]
         while version < config.CURRENT_VERSION:
             try:
-                upgraders[version]()
+                config.UPGRADERS[version](conf)
                 version += 1
                 conf['config-version'] = version
             except Exception, e:

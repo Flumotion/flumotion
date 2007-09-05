@@ -1,5 +1,11 @@
 2007-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py
+	(Vishnu._upgradeComponentConfig.upgradeFailedWarning): 
+	* flumotion/common/config.py (upgradeEaters, UPGRADERS): Move
+	upgraders to config.py, where they're more appropriate. Manager
+	CURRENT_VERSION automagically.
+
 	* flumotion/manager/manager.py (Vishnu._upgradeComponentConfig)
 	(Vishnu._getComponentState): Factor out the config upgrading into
 	a separate method.
