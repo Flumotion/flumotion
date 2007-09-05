@@ -37,12 +37,11 @@ class testDepGraph(unittest.TestCase):
         # now handle eaters and feeders
         conf = {}
         
-        source = []
+        conf["source"] = []
+        conf["eater"] = {"default": []}
         for eater in defs[4]:
-            source.append(eater)
-       
-        conf["source"] = source
-        conf["eater"] = {"default":source}
+            conf["source"].append(eater)
+            conf["eater"]["default"].append((eater, "default"))
 
         ret.set("config", conf)
         return ret

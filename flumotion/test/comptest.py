@@ -189,7 +189,12 @@ class ComponentWrapper(object, log.Loggable):
 
     def add_feeder(self, src_comp, feeder_name, eater):
         self.cfg['source'].append(feeder_name)
-        self.cfg['eater'].setdefault(eater, []).append(feeder_name)
+        # To fully mimic the behavior of the core, we reproduce its
+        # unspecified behavior.
+        alias = eater
+        while alias in [x[1] for x in self.cfg['eater'].setdefault(eater, [])]:
+            alias += '-bis'
+        self.cfg['eater'][eater].append((feeder_name, alias))
         self.auto_link = False
 
     def feedToFD(self, feedName, fd, eaterId=None):
@@ -270,7 +275,7 @@ class ComponentTestHelper(object, log.Loggable):
         for c in self._comps:
             eaters = c.cfg['eater']
             for eater_id in eaters:
-                for src in eaters[eater_id]:
+                for src, alias in eaters[eater_id]:
                     e_name, e_feed = src.split(':')
                     self.debug('creating pipe: %r, %r, %r' %
                                (src, e_feed, eater_id))

@@ -48,7 +48,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         # this got added to ffmpegcolorspace in 0.8.5
         addalpha = 'ffmpegcolorspace'
 
-        source = self.config['eater']['default'][0]
+        source = self.config['eater']['default'][0][0]
         eater = '@ eater:%s @' % source
 
         # the order here is important; to have our eater be the reference

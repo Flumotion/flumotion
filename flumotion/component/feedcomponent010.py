@@ -600,7 +600,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # this will only be for components whose eater name in registry is
         # default, so no need to import registry and find eater name
         if eater_config == {} and source_config != []:
-            eater_config = { 'default': source_config }
+            eater_config = {'default': [(x, 'default') for x in source_config]}
         # this sets self.eater_names
         self.parseEaterConfig(eater_config)
 
@@ -732,7 +732,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # They may also be specified under <component> as <source> elements.
         feed_ids = []
         for eater in eater_config:
-            for feed in eater_config[eater]:
+            for feed, alias in eater_config[eater]:
                 if not ':' in feed:
                     # only needed for upgrade without manager restart
                     feed = '%s:default' % feed

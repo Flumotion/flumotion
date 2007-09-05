@@ -292,7 +292,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # FIXME: perhaps return fullFeedIds instead of feedIds; if so
         # change getEatersForFeeder and _connectEaterUpstream
         eaterDict = self.componentState.get('config').get('eater', {})
-        return list(eaterDict[eaterName])
+        return list([feedId for feedId, alias in eaterDict[eaterName]])
 
     def getFeeders(self):
         """

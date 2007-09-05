@@ -114,7 +114,7 @@ class TestComponentWrapper(CompatTestCase):
 
         pp.feed(pc)
         self.assertEquals(pc.cfg['source'], ['pp:default'])
-        self.assertEquals(pc.cfg['eater'], {'default': ['pp:default']})
+        self.assertEquals(pc.cfg['eater'], {'default': [('pp:default', 'default')]})
 
     def test_non_default_link(self):
         fwp = ComponentWrapper('firewire-producer', None, name='fwp')
@@ -129,7 +129,8 @@ class TestComponentWrapper(CompatTestCase):
 
         self.assertEquals(pc.cfg['source'], ['fwp:video', 'fwp:audio'])
         self.assertEquals(pc.cfg['eater'],
-                          {'default': ['fwp:video', 'fwp:audio']})
+                          {'default': [('fwp:video', 'default'),
+                                       ('fwp:audio', 'default-bis')]})
 
 
     def test_instantiate_and_setup_errors(self):
@@ -200,11 +201,13 @@ class TestCompTestSetup(CompTestTestCase):
 
         prod_feed = '%s:%s' % (self.prod.name, self.prod.cfg['feed'][0])
         self.assertEquals([prod_feed], self.cnv1.cfg['source'])
-        self.assertEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
+        self.assertEquals({'default': [(prod_feed, 'default')]},
+                          self.cnv1.cfg['eater'])
 
         cnv1_feed = '%s:%s' % (self.cnv1.name, self.cnv1.cfg['feed'][0])
         self.assertEquals([cnv1_feed], self.cnv2.cfg['source'])
-        self.assertEquals({'default': [cnv1_feed]}, self.cnv2.cfg['eater'])
+        self.assertEquals({'default': [(cnv1_feed, 'default')]},
+                          self.cnv2.cfg['eater'])
 
     def test_dont_auto_link_linked(self):
         p2 = pipeline_src()
@@ -220,14 +223,16 @@ class TestCompTestSetup(CompTestTestCase):
 
         prod_feed = '%s:%s' % (p2.name, p2.cfg['feed'][0])
         self.assertEquals([prod_feed], self.cnv1.cfg['source'])
-        self.assertEquals({'default': [prod_feed]}, self.cnv1.cfg['eater'])
+        self.assertEquals({'default': [(prod_feed, 'default')]},
+                          self.cnv1.cfg['eater'])
 
         self.assertEquals([], self.prod.cfg['source'])
         self.assertEquals({}, self.prod.cfg['eater'])
 
         prod_feed = '%s:%s' % (self.prod.name, self.prod.cfg['feed'][0])
         self.assertEquals([prod_feed], self.cnv2.cfg['source'])
-        self.assertEquals({'default': [prod_feed]}, self.cnv2.cfg['eater'])
+        self.assertEquals({'default': [(prod_feed, 'default')]},
+                          self.cnv2.cfg['eater'])
 
     def test_master_clock(self):
         p2 = pipeline_src()

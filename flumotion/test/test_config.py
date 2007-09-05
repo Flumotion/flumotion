@@ -142,12 +142,18 @@ class TestFunctions(unittest.TestCase):
         assertEaters('test-component-with-multiple-eater',
                      [('default', 'foo:bar'),
                       ('default', 'baz')],
-                     {'default': ['foo:bar', 'baz']})
+                     {'default': [('foo:bar', 'default'),
+                                  ('baz', 'default-bis')]})
+        assertEaters('test-component-with-multiple-eater',
+                     [('default', 'foo:bar'),
+                      ('default', 'baz', 'alias')],
+                     {'default': [('foo:bar', 'default'),
+                                  ('baz', 'alias')]})
         assertRaises('test-component-with-multiple-eater',
                      [], config.ConfigError)
         assertEaters('test-component-with-multiple-eater',
                      [(None, 'foo:bar')],
-                     {'default': ['foo:bar']})
+                     {'default': [('foo:bar', 'default')]})
                        
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
@@ -844,7 +850,7 @@ class TestConfig(unittest.TestCase):
         cons = entries['/default/cons'].getConfigDict()
         self.failUnless(cons.has_key('eater'))
         self.failUnless(cons['eater'].has_key('default'))
-        self.failUnless(cons['eater']['default'] == ["prod:default"])
+        self.failUnless(cons['eater']['default'] == [("prod:default", 'default')])
         self.failUnless(cons['source'] == ["prod:default"])
 
     def testParseComponentsWithEatersNotSpecified(self):
@@ -881,7 +887,7 @@ class TestConfig(unittest.TestCase):
         cons = entries['/default/cons'].getConfigDict()
         self.failUnless(cons.has_key('source'))
         self.failUnless(cons['source'] == ["prod:default"])
-        self.failUnless(cons['eater']['default'] == ["prod:default"])
+        self.failUnless(cons['eater']['default'] == [("prod:default", 'default')])
 
     def testParseComponentsWithTwoEaters(self):
         conf = ConfigXML(
@@ -911,9 +917,9 @@ class TestConfig(unittest.TestCase):
         cons = entries['/default/cons'].getConfigDict()
         self.failUnless(cons.has_key('eater'))
         self.failUnless(cons['eater'].has_key('video'))
-        self.failUnless(cons['eater']['video'] == ["prod:default"])
+        self.failUnless(cons['eater']['video'] == [("prod:default", 'video')])
         self.failUnless(cons['eater'].has_key('audio'))
-        self.failUnless(cons['eater']['audio'] == ['prod2:default'])
+        self.failUnless(cons['eater']['audio'] == [('prod2:default', 'audio')])
 
     def testParseComponentsWithTwoSources(self):
         conf = ConfigXML(
@@ -961,7 +967,7 @@ class TestConfig(unittest.TestCase):
         self.failUnless(cons.has_key('eater'))
         self.failUnless(cons['eater'].has_key('default'))
         self.failUnless(cons['eater']['default'] == [
-            "prod:default", "prod2:default"])
+            ("prod:default", 'default'), ("prod2:default", 'default-bis')])
         self.failUnless(cons.has_key('source'))
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
@@ -991,7 +997,7 @@ class TestConfig(unittest.TestCase):
         self.failUnless(cons.has_key('eater'))
         self.failUnless(cons['eater'].has_key('default'))
         self.failUnless(cons['eater']['default'] == [
-            "prod:default", "prod2:default"])
+            ("prod:default", 'default'), ("prod2:default", 'default-bis')])
         self.failUnless(cons.has_key('source'))
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])

@@ -63,7 +63,32 @@ def upgradeEaters(conf):
             sources.append(parseFeedId(s))
         conf['source'] = sources
 
-UPGRADERS = [upgradeEaters]
+def upgradeAliases(conf):
+    eaters = dict(conf.get('eater', {})) # a copy
+    concat = lambda lists: reduce(list.__add__, lists, [])
+    if not reduce(lambda x,y: y and isinstance(x, tuple),
+                  concat(eaters.values()),
+                  True):
+        for eater in eaters:
+            aliases = []
+            feeders = eaters[eater]
+            for i in range(len(feeders)):
+                val = feeders[i]
+                if isinstance(val, tuple):
+                    feedId, alias = val
+                    aliases.append(val[1])
+                else:
+                    feedId = val
+                    alias = eater
+                    while alias in aliases:
+                        log.warning('config', "Duplicate alias %s for "
+                                    "eater %s, uniquifying", alias, eater)
+                        alias += '-bis'
+                    aliases.append(alias)
+                    feeders[i] = (feedId, val)
+        conf['eater'] = eaters
+
+UPGRADERS = [upgradeEaters, upgradeAliases]
 CURRENT_VERSION = len(UPGRADERS)
 
 def buildEatersDict(eatersList, eaterDefs):
@@ -71,27 +96,43 @@ def buildEatersDict(eatersList, eaterDefs):
     config.
 
     @param eatersList: List of eaters. For example,
-                       [('default', 'othercomp:feeder')] says that our
-                       eater 'default' will be fed by the feed
-                       identified by the feedId 'othercomp:feeder'.
-    @type  eatersList: List of (eaterName, feedId)
+                       [('default', 'othercomp:feeder', 'foo')] says
+                       that our eater 'default' will be fed by the feed
+                       identified by the feedId 'othercomp:feeder', and
+                       that it has the alias 'foo'. Alias is optional.
+    @type  eatersList: List of (eaterName, feedId, eaterAlias?)
     @param  eaterDefs: The set of allowed and required eaters
     @type   eaterDefs: List of
                        L{flumotion.common.registry.RegistryEntryEater}
+    @returns: Dict of eaterName => [(feedId, eaterAlias)]
     """
+    def parseEaterTuple(tup):
+        def parse(eaterName, feedId, eaterAlias=None):
+            if eaterAlias is None:
+                eaterAlias = eaterName
+            return (eaterName, feedId, eaterAlias)
+        return parse(*tup)
+        
     eaters = {}
-    for eater, feedId in eatersList:
+    for eater, feedId, alias in [parseEaterTuple(t) for t in eatersList]:
         if eater is None:
             if not eaterDefs:
                 raise ConfigError("Feed %r cannot be connected, component has "
                     "no eaters" % (feedId,))
             # cope with old <source> entries
             eater = eaterDefs[0].getName()
+        if alias is None:
+            alias = eater
         feeders = eaters.get(eater, [])
         if feedId in feeders:
             raise ConfigError("Already have a feedId %s eating "
                               "from %s", feedId, eater)
-        feeders.append(feedId)
+        while alias in [a for f, a in feeders]:
+            log.warning('config', "Duplicate alias %s for eater %s, "
+                        "uniquifying", alias, eater)
+            alias += '-bis'
+
+        feeders.append((feedId, alias))
         eaters[eater] = feeders
     for e in eaterDefs:
         eater = e.getName()
@@ -103,6 +144,16 @@ def buildEatersDict(eatersList, eaterDefs):
             raise ConfigError("Component does not support multiple "
                               "sources feeding %s (%r)"
                               % (eater, eaters[eater]))
+    aliases = reduce(list.__add__,
+                     [[x[1] for x in tups] for tups in eaters.values()],
+                     [])
+    # FIXME: Python 2.3 has no sets
+    # if len(aliases) != len(set(aliases):
+    while aliases:
+        alias = aliases.pop()
+        if alias in aliases:
+            raise ConfigError("Duplicate alias: %s" % alias)
+
     return eaters        
 
 def parsePropertyValue(propName, type, value):

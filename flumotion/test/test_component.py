@@ -34,11 +34,14 @@ class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
         self.__pipeline = pipeline
         self._source = eaters or []
-        if eaters:
-            self._eater = {'default':eaters}
-        else:
-            self._eater = {}
+        self._eater = {}
         self._feed = feeders or []
+        for feeder in self._source:
+            feeders = self._eater.setdefault('default', [])
+            alias = 'default'
+            while alias in [x[1] for x in feeders]:
+                alias += '-bis'
+            feeders.append((feeder, alias))
 
         ParseLaunchComponent.__init__(self)
 

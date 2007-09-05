@@ -1,5 +1,32 @@
 2007-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (upgradeAliases, UPGRADERS): Add an
+	upgrader for eater alias changes.
+	(buildEatersDict): Instead of returning the eater config property
+	as a list of feedIds, have it be a list of feedId, eaterAlias
+	tuples. The eaterAlias will be constant across the lifetime of the
+	component, but in the future the manager will be able to switch
+	the feedId that the component is eating from. See #694.
+
+	* flumotion/test/test_config.py
+	(TestFunctions.testBuildEatersDict): Add some checks for the
+	aliasing behavior.
+
+	* flumotion/common/config.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/depgraph.py:
+	* flumotion/test/comptest.py:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_component_httpstreamer.py:
+	* flumotion/test/test_comptest.py:
+	* flumotion/test/test_manager_depgraph.py: Update code and tests
+	for changes to config['eater']. 
+
+2007-09-05  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/manager/manager.py
 	(Vishnu._upgradeComponentConfig.upgradeFailedWarning): 
 	* flumotion/common/config.py (upgradeEaters, UPGRADERS): Move

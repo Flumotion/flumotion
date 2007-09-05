@@ -609,11 +609,11 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
                 if not ':' in feed:
                     feed = '%s:default' % feed
                 feeds.append(feed)
-            eaters = { 'default':feeds }
+            eaters = { 'default': [(x, 'default') for x in feeds] }
 
         pipeline = self.get_muxer_string(properties) + ' '
         for e in eaters:
-            for feed in eaters[e]:
+            for feed, alias in eaters[e]:
                 tmpl = '@ eater:%s @ ! muxer. '
                 pipeline += tmpl % feed
 

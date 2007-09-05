@@ -256,7 +256,7 @@ class DepGraph(log.Loggable):
                 eaters = config['eater']
 
                 for eater in eaters:
-                    for feed in eaters[eater]:
+                    for feed, alias in eaters[eater]:
                         feederFound = False
                         feederComponentName = feed.split(':')[0]
                         # find the feeder
