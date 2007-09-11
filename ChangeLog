@@ -1,5 +1,11 @@
 2007-09-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (ComponentWrapper.eatFromFD)
+	(make_pipes, start_components.do_start): Changes to make
+	flumotion-launch work, after the eaterAlias changes.
+
+2007-09-11  Andy Wingo  <wingo@pobox.com>
+
 	Restructure the FeedComponent and ParseLaunchComponent base
 	classes to name their eaters by eaterAlias and feeders by feedName
 	instead of by remoteFeedId and feedId, respectively. See #694.

@@ -146,9 +146,10 @@ class ComponentWrapper(object, log.Loggable):
         self.debug('feedToFD(feedName=%s, %d)' % (feedName, fd))
         return self.component.feedToFD(feedName, fd, os.close)
 
-    def eatFromFD(self, feedId, fd):
-        self.debug('eatFromFD(feedId=%s, %d)' % (feedId, fd))
-        return self.component.eatFromFD(feedId, fd)
+    def eatFromFD(self, eaterAlias, feedId, fd):
+        self.debug('eatFromFD(eaterAlias=%s, feedId=%s, %d)',
+                   eaterAlias, feedId, fd)
+        return self.component.eatFromFD(eaterAlias, feedId, fd)
 
 def make_pipes(wrappers):
     fds = {} # feedcompname:feeder => (fd, start())
@@ -157,13 +158,15 @@ def make_pipes(wrappers):
     def starter(wrapper, feedName, write):
         return lambda: wrapper.feedToFD(feedName, write)
     for wrapper in wrappers:
-        for source in wrapper.config.get('source', []):
-            compName, feedName = source.split(':')
-            read, write = os.pipe()
-            log.debug('launch', '%s: read from fd %d, write to fd %d' % (
-                source, read, write))
-            start = starter(wrappersByName[compName], feedName, write)
-            fds[source] = (read, start)
+        eaters = wrapper.config.get('eater', {})
+        for eaterName in eaters:
+            for feedId, eaterAlias in eaters[eaterName]:
+                compName, feederName = common.parseFeedId(feedId)
+                read, write = os.pipe()
+                log.debug('launch', '%s: read from fd %d, write to fd %d',
+                          feedId, read, write)
+                start = starter(wrappersByName[compName], feederName, write)
+                fds[feedId] = (read, start)
     return fds
 
 def DeferredDelay(time, val):
@@ -214,10 +217,12 @@ def start_components(wrappers, fds, delay):
         need_sync, clocking = synchronization
 
         # start it up, with clocking data only if it needs it
-        for source in wrapper.config.get('source', []):
-            read, start = fds[source]
-            wrapper.eatFromFD(source, read)
-            start()
+        eaters = wrapper.config.get('eater', {})
+        for eaterName in eaters:
+            for feedId, eaterAlias in eaters[eaterName]:
+                read, start = fds[feedId]
+                wrapper.eatFromFD(eaterAlias, feedId, read)
+                start()
         if (not need_sync) or (wrapper not in need_sync) or (not clocking):
             clocking = None
         d = wrapper.start(clocking)
