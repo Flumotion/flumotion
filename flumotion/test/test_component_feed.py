@@ -55,20 +55,6 @@ class FakeWorkerBrain(log.Loggable):
         self.info('eat from fd: %s %d %s', feedId, fd)
         return True
    
-class FakeComponent(log.Loggable):
-    def __init__(self, name='test'):
-        self.name = name
-        self._deferredFD = None
-    
-    def waitForFD(self):
-        if self._deferredFD is None:
-            self._deferredFD = defer.Deferred()
-        return self._deferredFD
-
-    def eatFromFD(self, feedId, fd):
-        self.info('eat from fd: %s %d', feedId, fd)
-        self.waitForFD().callback((feedId, fd))
-
 def countOpenFileDescriptors():
     import resource
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -135,8 +121,7 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
         
 class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
     def testConnectWithoutDroppingPB(self):
-        component = FakeComponent()
-        client = feed.FeedMedium(component)
+        client = feed.FeedMedium(logName='test')
         factory = feed.FeedClientFactory(client)
 
         self.failIf(client.hasRemoteReference())
@@ -173,71 +158,8 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(checkfds)
         return d
 
-    def testConnectAndFeedLegacy(self):
-        # this is a legacy test, to see if existing (25 april)
-        # components connecting with normal tcp transports still works.
-        component = FakeComponent()
-        client = feed.FeedMedium(component)
-        factory = feed.FeedClientFactory(client)
-
-        self.failIf(client.hasRemoteReference())
-
-        def login():
-            port = self.feedServer.getPortNum()
-            self.assertAdditionalFDsOpen(1, 'connect (socket)')
-            reactor.connectTCP('localhost', port, factory)
-            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
-            return factory.login(fpb.Authenticator(username='user',
-                                                   password='test'))
-
-        def sendFeed(remote):
-            # apparently one has to do magic to get the feed to work
-            self.failIf(client.hasRemoteReference())
-            client.setRemoteReference(remote)
-            self.failUnless(client.hasRemoteReference())
-            self.assertAdditionalFDsOpen(3, 'feed (socket, client, server)')
-            return remote.callRemote('sendFeed', '/foo/bar:baz')
-
-        def feedSent(thisValueIsNone):
-            # either just before or just after this, we received a
-            # sendFeedReply call from the feedserver. so now we're
-            # waiting on the component to get its fd
-            self.assertAdditionalFDsOpen(3, 'feedSent (socket, client, server)')
-            return component.waitForFD()
-
-        def feedReady((feedId, fd)):
-            # this fd is ours, it's our responsibility to close it.
-            self.assertEquals(feedId, 'bar:baz')
-            self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
-            os.close(fd)
-            self.assertAdditionalFDsOpen(2, 'cleanup (socket, client, server)')
-            return self.brain.waitForFD()
-
-        def feedReadyOnServer((componentId, feedName, fd, eaterId)):
-            # this likely fires directly, not having dropped into the
-            # reactor.
-
-            # The feed medium should have dropped its reference already
-            self.failIf(client.hasRemoteReference())
-
-            # this fd is not ours, we should dup it if we want to hold
-            # onto it
-            return self.feedServer.waitForAvatarExit()
-
-        def checkfds(_):
-            self.assertAdditionalFDsOpen(1, 'feedReadyOnServer (socket)')
-
-        d = login()
-        d.addCallback(sendFeed)
-        d.addCallback(feedSent)
-        d.addCallback(feedReady)
-        d.addCallback(feedReadyOnServer)
-        d.addCallback(checkfds)
-        return d
-
     def testConnectAndFeed(self):
-        component = FakeComponent()
-        client = feed.FeedMedium(component)
+        client = feed.FeedMedium(logName='test')
 
         def login():
             port = self.feedServer.getPortNum()
@@ -259,25 +181,22 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
             # sendFeedReply call from the feedserver. so now we're
             # waiting on the component to get its fd
             self.assertAdditionalFDsOpen(3, 'feedSent (socket, client, server)')
-            return component.waitForFD()
+
+            # This is poking the feedmedium's internals, but in the end,
+            # this test is of the feed medium's internals, so that's ok.
+            return client._feedToDeferred
 
         def feedReady((feedId, fd)):
             # this fd is ours, it's our responsibility to close it.
             self.assertEquals(feedId, 'bar:baz')
-            self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
-            os.close(fd)
-            self.assertAdditionalFDsOpen(2, 'cleanup (socket, client, server)')
-            return self.brain.waitForFD()
-
-        def feedReadyOnServer((componentId, feedName, fd, eaterId)):
-            # this likely fires directly, not having dropped into the
-            # reactor.
 
             # The feed medium should have dropped its reference already
             self.failIf(client.hasRemoteReference())
 
-            # this fd is not ours, we should dup it if we want to hold
-            # onto it
+            self.assertAdditionalFDsOpen(3, 'cleanup (socket, client, server)')
+            os.close(fd)
+            self.assertAdditionalFDsOpen(2, 'cleanup (socket, server)')
+
             return self.feedServer.waitForAvatarExit()
 
         def checkfds(_):
@@ -287,13 +206,11 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(sendFeed)
         d.addCallback(feedSent)
         d.addCallback(feedReady)
-        d.addCallback(feedReadyOnServer)
         d.addCallback(checkfds)
         return d
 
     def testBadPass(self):
-        component = FakeComponent()
-        client = feed.FeedMedium(component)
+        client = feed.FeedMedium(logName='test')
         factory = feed.FeedClientFactory(client)
 
         def login():

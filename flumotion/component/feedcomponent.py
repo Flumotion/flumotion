@@ -58,22 +58,18 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self._feederFeedServer = {} # FeedId -> (fullFeedId, host, port) tuple
+        self._feederFeedServer = {} # eaterAlias -> (fullFeedId, host, port) tuple
                                     # for remote feeders
-        self._feederPendingConnections = {} # fullFeedId -> cancel thunk
+        self._feederPendingConnections = {} # eaterAlias -> cancel thunk
         self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
-                                    # for remote eaters
+                                    # for remote eaters (FIXME bitrotten)
         self._eaterClientFactory = {} # (componentId, feedId) -> client factory
         self._eaterTransport = {}     # (componentId, feedId) -> transport
         self.logName = component.name
 
-        def on_feed_ready(component, feedName, isReady):
-            self.callRemote('feedReady', feedName, isReady)
-
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)
 
-        self.comp.connect('feed-ready', on_feed_ready)
         self.comp.connect('error', on_component_error)
         
         # override base Errback for callRemote to stop the pipeline
@@ -126,7 +122,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             else:
                 gst.debug_set_default_threshold(value)
 
-    def remote_eatFrom(self, fullFeedId, host, port):
+    def remote_eatFrom(self, eaterAlias, fullFeedId, host, port):
         """
         Tell the component the host and port for the FeedServer through which
         it can connect a local eater to a remote feeder to eat the given
@@ -134,28 +130,23 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         Called on by the manager-side ComponentAvatar.
         """
-        # we key on the feedId because a component is part of only one flow,
-        # and doesn't even know the flow name it is part of.
-        flowName, componentName, feedName = common.parseFullFeedId(fullFeedId)
-        feedId = common.feedId(componentName, feedName)
-        self._feederFeedServer[feedId] = (fullFeedId, host, port)
-        return self.connectEater(feedId)
+        self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
+        return self.connectEater(eaterAlias)
 
-    def _getAuthenticatorForFeed(self, feedId):
+    def _getAuthenticatorForEater(self, eaterAlias):
         # The avatarId on the keycards issued by the authenticator will
         # identify us to the remote component. Attempt to use our
         # fullFeedId, for debugging porpoises.
         if hasattr(self.authenticator, 'copy'):
             tup = common.parseComponentId(self.authenticator.avatarId)
             flowName, componentName = tup
-            feedName = common.parseFeedId(feedId)[1]
             fullFeedId = common.fullFeedId(flowName, componentName,
-                                           feedName)
+                                           eaterAlias)
             return self.authenticator.copy(fullFeedId)
         else:
             return self.authenticator
 
-    def connectEater(self, feedId):
+    def connectEater(self, eaterAlias):
         """
         Connect one of the medium's component's eaters to a remote feed.
         Called by the component, both on initial connection and for
@@ -165,23 +156,23 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         you can call to cancel any pending connection attempt.
         """
         def gotFeed((feedId, fd)):
-            self._feederPendingConnections.pop(fullFeedId, None)
-            self.comp.eatFromFD(feedId, fd)
+            self._feederPendingConnections.pop(eaterAlias, None)
+            self.comp.eatFromFD(eaterAlias, feedId, fd)
 
-        (fullFeedId, host, port) = self._feederFeedServer[feedId]
+        (fullFeedId, host, port) = self._feederFeedServer[eaterAlias]
 
-        cancel = self._feederPendingConnections.pop(fullFeedId, None)
+        cancel = self._feederPendingConnections.pop(eaterAlias, None)
         if cancel:
-            self.debug('cancelling previous connection attempt to %s',
-                       fullFeedId)
+            self.debug('cancelling previous connection attempt on %s',
+                       eaterAlias)
             cancel()
 
         client = feed.FeedMedium(logName=self.comp.name)
 
         d = client.requestFeed(host, port,
-                               self._getAuthenticatorForFeed(feedId),
+                               self._getAuthenticatorForEater(eaterAlias),
                                fullFeedId)
-        self._feederPendingConnections[fullFeedId] = client.stopConnecting
+        self._feederPendingConnections[eaterAlias] = client.stopConnecting
         d.addCallback(gotFeed)
         return d
 
@@ -192,10 +183,11 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         Called on by the manager-side ComponentAvatar.
         """
+        # FIXME: bitrotten, should use the FeedMedium
         # FIXME: check if this overwrites current config, and adapt if it
         # does
         self._eaterFeedServer[(componentId, feedId)] = (host, port)
-        client = feed.FeedMedium(self.comp)
+        client = feed.FeedMedium(logName=self.comp.name)
         factory = feed.FeedClientFactory(client)
         # FIXME: maybe copy keycard instead, so we can change requester ?
         self.debug('connecting to FeedServer on %s:%d' % (host, port))
@@ -257,6 +249,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         return self.comp.get_master_clock()
 
+    # FIXME: completely unnecessary, remove me
     def remote_getEaterDetail(self, fullFeedId):
         """
         Returns the host and port that the eater, that is eating from the feed id
@@ -366,129 +359,87 @@ class ParseLaunchComponent(FeedComponent):
         pass
 
     ### private methods
-    def _expandElementName(self, block):
-        """
-        Expand the given string to a full element name for an eater or feeder.
-        The full name is of the form eater:(sourceComponentName):(feedName)
-        or feeder:(componentName):feedName
-        """
-        if ' ' in block:
-            raise TypeError, "spaces not allowed in '%s'" % block
-        if not ':' in block:
-            raise TypeError, "no colons in'%s'" % block
-        if block.count(':') > 2:
-            raise TypeError, "too many colons in '%s'" % block
-            
-        parts = block.split(':')
+    def add_default_eater_feeder(self, pipeline):
+        if len(self.eaters) == 1:
+            eater = 'eater:' + self.eaters.keys()[0]
+            if eater not in pipeline:
+                pipeline = '@' + eater + '@ ! ' + pipeline
+        if len(self.feeders) == 1:
+            feeder = 'feeder:' + self.feeders.keys()[0]
+            if feeder not in pipeline:
+                pipeline = pipeline + ' ! @' + feeder + '@'
+        return pipeline
 
-        if parts[0] != 'eater' and parts[0] != 'feeder':
-            raise TypeError, "'%s' does not start with eater or feeder" % block
-            
-        # we can only fill in component names for feeders
-        if not parts[1]:
-            if parts[0] == 'eater':
-                raise TypeError, "'%s' should specify feeder component" % block
-            parts[1] = self.name
-        if len(parts) == 2:
-            parts.append('')
-        if  not parts[2]:
-            parts[2] = 'default'
-
-        return ":".join(parts)
-        
-    def _expandElementNames(self, block):
-        """
-        Expand each @..@ block to use the full element name for eater or feeder.
-        The full name is of the form eater:(sourceComponentName):(feedName)
-        or feeder:(componentName):feedName
-        This also does some basic checking of the block.
-        """
-        assert block != ''
-
-        # verify the template has an even number of delimiters
-        if block.count(self.DELIMITER) % 2 != 0:
-            raise TypeError, "'%s' contains an odd number of '%s'" % (block, self.DELIMITER)
-        
-        # when splitting, the even-indexed members will remain,
-        # and the odd-indexed members are the blocks to be substituted
-        blocks = block.split(self.DELIMITER)
-
-        for i in range(1, len(blocks) - 1, 2):
-            blocks[i] = self._expandElementName(blocks[i].strip())
-        return "@".join(blocks)
-  
-    def parse_tmpl(self, pipeline, names, template_func, format):
+    def parse_tmpl(self, pipeline, templatizers):
         """
         Expand the given pipeline string representation by substituting
         blocks between '@' with a filled-in template.
 
         @param pipeline: a pipeline string representation with variables
-        @param names: the element names to substitute for @...@ segments
-        @param template_func: function to call to get the template to use for 
-                              element factory info
-        @param format: the format to use when substituting
-
+        @param templatizers: A dict of prefix => procedure. Template
+                             blocks in the pipeline will be replaced
+                             with the result of calling the procedure
+                             with what is left of the template after
+                             taking off the prefix.
         Returns: a new pipeline string representation.
         """
         assert pipeline != ''
 
-        deli = self.DELIMITER
-
-        if len(names) == 1:
-            part_name = names[0]
-            template = template_func(part_name)
-            named = template % {'name': part_name}
-            if pipeline.find(part_name) != -1:
-                pipeline = pipeline.replace(deli + part_name + deli, named)
+        # verify the template has an even number of delimiters
+        if pipeline.count(self.DELIMITER) % 2 != 0:
+            raise TypeError("'%s' contains an odd number of '%s'"
+                            % (pipeline, self.DELIMITER))
+        
+        out = []
+        for i, block in enumerate(pipeline.split(self.DELIMITER)):
+            # when splitting, the even-indexed members will remain, and
+            # the odd-indexed members are the blocks to be substituted
+            if i % 2 == 0:
+                out.append(block)
             else:
-                pipeline = format % {'tmpl': named, 'pipeline': pipeline}
-        else:
-            for part in names:
-                part_name = deli + part + deli # mmm, deli sandwich
-                if pipeline.find(part_name) == -1:
-                    raise TypeError, "%s needs to be specified in the pipeline '%s'" % (part_name, pipeline)
-            
-                template = template_func(part)
-                pipeline = pipeline.replace(part_name,
-                    template % {'name': part})
-        return pipeline
+                block = block.strip()
+                try:
+                    pos = block.index(':')
+                except ValueError:
+                    raise TypeError("Template %r has no colon" % (block,))
+                prefix = block[:pos+1]
+                if prefix not in templatizers:
+                    raise TypeError("Template %r has invalid prefix %r"
+                                    % (block, prefix))
+                out.append(templatizers[prefix](block[pos+1:]))
+        return ''.join(out)
         
     def parse_pipeline(self, pipeline):
         pipeline = " ".join(pipeline.split())
-        self.debug('Creating pipeline, template is %s' % pipeline)
+        self.debug('Creating pipeline, template is %s', pipeline)
         
-        eater_names = self.get_eater_names()
-        if pipeline == '' and not eater_names:
-            raise TypeError, "Need a pipeline or a eater"
-
-        if pipeline == '':
-            assert eater_names
-            pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
-            
         # we expand the pipeline based on the templates and eater/feeder names
         # elements are named eater:(source_component_name):(feed_name)
         # or feeder:(component_name):(feed_name)
-        eater_element_names = map(lambda n: "eater:" + n, eater_names)
-        feeder_element_names = map(lambda n: "feeder:" + n, self.feeder_names)
-        self.debug('we eat with eater elements %s' % eater_element_names)
-        self.debug('we feed with feeder elements %s' % feeder_element_names)
-        pipeline = self._expandElementNames(pipeline)
+        eater_element_names = [e.elementName for e in self.eaters.values()]
+        feeder_element_names = [f.elementName for f in self.feeders.values()]
+        self.debug('we eat with eater elements %s', eater_element_names)
+        self.debug('we feed with feeder elements %s', feeder_element_names)
+
+        if pipeline == '' and not eater_element_names:
+            raise TypeError, "Need a pipeline or a eater"
+
+        if pipeline == '':
+            assert eater_element_names
+            pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
+            
+        pipeline = self.add_default_eater_feeder(pipeline)
+        pipeline = self.parse_tmpl(pipeline,
+                                   {'eater:': self.get_eater_template,
+                                    'feeder:': self.get_feeder_template})
         
-        pipeline = self.parse_tmpl(pipeline, eater_element_names,
-                                   self.get_eater_template,
-                                   '%(tmpl)s ! %(pipeline)s') 
-        pipeline = self.parse_tmpl(pipeline, feeder_element_names,
-                                   self.get_feeder_template,
-                                   '%(pipeline)s ! %(tmpl)s') 
-        pipeline = " ".join(pipeline.split())
-        
-        self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
+        self.debug('pipeline is %s', pipeline)
         assert self.DELIMITER not in pipeline
         
         return pipeline
 
-    def get_eater_template(self, eaterName):
-        queue = self.get_queue_string(eaterName)
+    def get_eater_template(self, eaterAlias):
+        queue = self.get_queue_string(eaterAlias)
         check = ""
         if self.checkTimestamp:
             check += " check-imperfect-timestamp=1"
@@ -496,17 +447,19 @@ class ParseLaunchComponent(FeedComponent):
             check += " check-imperfect-offset=1"
         if check != "":
             check = " ! identity name=%s-identity silent=TRUE %s" % (
-                eaterName, check)
+                eaterAlias, check)
         depay = self.DEPAY_TMPL + check
         if not queue:
-            return self.FDSRC_TMPL + ' ! ' + depay
+            ret = self.FDSRC_TMPL + ' ! ' + depay
         else:
-            return self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + depay
+            ret = self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + depay
 
-    def get_feeder_template(self, eaterName):
-        return self.FEEDER_TMPL
+        return ret % {'name': 'eater:' + eaterAlias}
 
-    def get_queue_string(self, eaterName):
+    def get_feeder_template(self, feederName):
+        return self.FEEDER_TMPL % {'name': 'feeder:' + feederName}
+
+    def get_queue_string(self, eaterAlias):
         """
         Return a parse-launch description of a queue, if this component
         wants an input queue on this eater, or None if not
@@ -594,9 +547,9 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         """
         raise errors.NotImplementedError("Implement in a subclass")
 
-    def get_queue_string(self, eaterName):
-        return "queue name=%s-queue max-size-buffers=%d" % (eaterName, 
-            self.QUEUE_SIZE_BUFFERS)
+    def get_queue_string(self, eaterAlias):
+        return ("queue name=eater:%s-queue max-size-buffers=%d"
+                % (eaterAlias, self.QUEUE_SIZE_BUFFERS))
 
     def get_pipeline_string(self, properties):
         eaters = self.config.get('eater', {})
@@ -613,17 +566,16 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         pipeline = self.get_muxer_string(properties) + ' '
         for e in eaters:
             for feed, alias in eaters[e]:
-                tmpl = '@ eater:%s @ ! muxer. '
-                pipeline += tmpl % feed
+                pipeline += '@ eater:%s @ ! muxer. ' % alias
 
         pipeline += 'muxer.'
 
         return pipeline
 
-    def unblock_eater(self, feedId):
+    def unblock_eater(self, eaterAlias):
         # Firstly, ensure that any push in progress is guaranteed to return,
         # by temporarily enlarging the queue
-        queuename = "eater:%s-queue" % feedId
+        queuename = "eater:%s-queue" % eaterAlias
         queue = self.pipeline.get_by_name(queuename)
 
         size = queue.get_property("max-size-buffers")

@@ -500,9 +500,17 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
     def setFeederName(self, state, value):
         self.labels['feeder-name'].set_markup(_('Feeder <b>%s</b>') % value)
 
+    def _mungeClientId(self, clientId):
+        try:
+            flowName, compName, feedName = common.parseFullFeedId(clientId)
+            return common.feedId(compName, feedName)
+        except:
+            return clientId
+
     def setFeederClientName(self, state, value):
+        value = self._mungeClientId(value)
         self.labels['feeder-name'].set_markup(_('Feeding to <b>%s</b>')
-                                              % value)
+                                              % (value,))
 
     def setFeederClientBytesReadCurrent(self, state, value):
         txt = value and (common.formatStorage(value) + _('Byte')) or ''
@@ -576,13 +584,13 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         @param uiState: the component's uiState
         @param state:   the feeder's uiState
         """
-        feederId = state.get('feedId')
+        feederName = state.get('feederName')
         i = self.treemodel.append(None)
-        self.treemodel.set(i, 0, feederId, 1, state)
+        self.treemodel.set(i, 0, feederName, 1, state)
         w = _StateWatcher(state,
-                         {'feedId': self.setFeederName},
-                         {'clients': self.addFeederClient},
-                         {'clients': self.removeFeederClient})
+                          {'feederName': self.setFeederName},
+                          {'clients': self.addFeederClient},
+                          {'clients': self.removeFeederClient})
         self.treemodel.set(i, 2, w, 3, 'feeder')
         self.treeview.expand_all()
 
@@ -592,12 +600,12 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         @param state: the feeder client's uiState
         """
 
-        clientId = state.get('clientId')
+        printableClientId = self._mungeClientId(state.get('clientId'))
         for row in self.treemodel:
             if self.treemodel.get_value(row.iter, 1) == feederState:
                 break
         i = self.treemodel.append(row.iter)
-        self.treemodel.set(i, 0, clientId, 1, state)
+        self.treemodel.set(i, 0, printableClientId, 1, state)
         w = _StateWatcher(state, {
             'clientId':              self.setFeederClientName,
             'bytesReadCurrent':      self.setFeederClientBytesReadCurrent,
@@ -725,8 +733,10 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self._updateDisconnectionTime()
 
     def _setEaterConnectionItem(self, state, key, value):
+        if key == 'feedId':
+            self.labels['eating-from'].set_text(str(value))
         # timestamps
-        if key == 'countTimestampDiscont':
+        elif key == 'countTimestampDiscont':
             self.labels['timestamp-discont-count-current'].set_text(str(value))
             if value > 0:
                 self._expander_discont_current.show()
@@ -846,13 +856,13 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         @param uiState: the component's uiState
         @param state:   the eater's uiState
         """
-        eaterId = state.get('eaterId')
+        eaterId = state.get('eaterAlias')
         i = self.treemodel.append(None)
         self.treemodel.set(i, 0, eaterId, 1, state)
         w = _StateWatcher(state,
             {
                 'fd':                    self._setEaterFD,
-                'eaterId':               self._setEaterName,
+                'eaterAlias':            self._setEaterName,
                 'lastConnect':           self._setEaterLastConnect,
                 'countTimestampDiscont': self._setEaterCountTimestampDiscont,
                 'totalTimestampDiscont': self._setEaterTotalTimestampDiscont,
@@ -901,10 +911,9 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             # zeroes out all value labels
             self.labels[name].set_text('')
 
-        set_label('eater-name')
         for type in (
-            'connected-since', 'connection-time',
-            'timestamp-discont-timestamp-current',
+            'eater-name', 'connected-since', 'connection-time',
+            'eating-from', 'timestamp-discont-timestamp-current',
             'offset-discont-offset-current',
             'timestamp-discont-count-current', 'offset-discont-count-current',
             'timestamp-discont-total-current', 'offset-discont-total-current',

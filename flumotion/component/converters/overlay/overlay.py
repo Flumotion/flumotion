@@ -40,23 +40,12 @@ class Overlay(feedcomponent.ParseLaunchComponent):
     _filename = None
 
     def get_pipeline_string(self, properties):
-        # due to createComponent entry pointism, we have to import inside our
-        # function.  PLEASE MAKE THE PAIN GO AWAY ? <- might not be
-        # necessary still
-
-        # we need an element that does RGBA -> AYUV so we can overlay png
-        # this got added to ffmpegcolorspace in 0.8.5
-        addalpha = 'ffmpegcolorspace'
-
-        source = self.config['eater']['default'][0][0]
-        eater = '@ eater:%s @' % source
-
         # the order here is important; to have our eater be the reference
         # stream for videomixer it needs to be specified last
         pipeline = (
             'filesrc name=source blocksize=100000 ! pngdec ! alphacolor ! '
-            'videomixer name=mix ! @ feeder:: @ '
-            '%(eater)s ! %(addalpha)s ! mix.' % locals())
+            'videomixer name=mix ! @feeder:default@ '
+            '@eater:default@ ! ffmpegcolorspace ! mix.')
         
         return pipeline
 

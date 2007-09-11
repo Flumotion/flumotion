@@ -94,18 +94,12 @@ class FeedMedium(fpb.Referenceable):
 
     remote = None
 
-    def __init__(self, component=None, logName=None):
-        """
-        @param component: the component this is a feed client for
-        @type  component: L{flumotion.component.feedcomponent.FeedComponent}
-        """
-        self.logName = logName or component.name
+    def __init__(self, logName=None):
+        if logName:
+            assert isinstance(logName, str)
+        self.logName = logName
         self._factory = None
         self._feedToDeferred = defer.Deferred()
-        if component:
-            def gotFeed((feedId, fd), component):
-                component.eatFromFD(feedId, fd)
-            self._feedToDeferred.addCallback(gotFeed, component)
 
     def startConnecting(self, host, port, authenticator, timeout=30,
                         bindAddress=None):

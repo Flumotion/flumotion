@@ -86,78 +86,6 @@ def pipelineFactory(pipeline, eaters=None, feeders=None):
     # return a tuple because we need a reference to the PipelineTest object
     return (dd, t)
 
-class TestExpandElementName(unittest.TestCase):
-    def setUp(self):
-        self.p = PipelineTest([], [])
-        d = self.p.config()
-        yield d
-    setUp = defer_generator_method(setUp)
-
-    def tearDown(self):
-        self.p.stop()
-
-    def testSpaces(self):
-        try:
-            r = self.p._expandElementName('test with spaces')
-            raise
-        except TypeError:
-            pass
-
-    def testNoColons(self):
-        try:
-            r = self.p._expandElementName('testwithoutcolons')
-            raise
-        except TypeError:
-            pass
-
-    def testTooManyColons(self):
-        try:
-            r = self.p._expandElementName('too:many:colons:here')
-            raise
-        except TypeError:
-            pass
-
-    def testNoEaterFeeder(self):
-        try:
-            r = self.p._expandElementName(':test')
-            raise
-        except TypeError:
-            pass
-
-    def testEaterComponent(self):
-        try:
-            r = self.p._expandElementName('eater::feed')
-            raise
-        except TypeError:
-            pass
-
-    def testFeederComponent(self):
-        r = self.p._expandElementName('feeder::feed')
-        assert r == 'feeder:fake:feed'
-
-    def testFeederDefault(self):
-        r = self.p._expandElementName('feeder:test')
-        assert r == 'feeder:test:default'
-        r = self.p._expandElementName('feeder:test:')
-        assert r == 'feeder:test:default'
-
-    def testEaterDefault(self):
-        r = self.p._expandElementName('eater:test')
-        assert r == 'eater:test:default'
-        r = self.p._expandElementName('eater:test:')
-        assert r == 'eater:test:default'
-
-    def testFeederEmpty(self):
-        r = self.p._expandElementName('feeder::')
-        assert r == 'feeder:fake:default'
-        r = self.p._expandElementName('feeder:')
-        assert r == 'feeder:fake:default'
-        try:
-            r = self.p._expandElementName('feeder')
-            raise
-        except TypeError:
-            pass
-
 class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
@@ -169,23 +97,10 @@ class TestExpandElementNames(unittest.TestCase):
         self.p.stop()
 
     def testOddDelimeters(self):
-        try:
-            r = self.p._expandElementNames('@ this:is:wrong @ ! because ! @')
-            raise
-        except TypeError:
-            pass
+        self.assertRaises(TypeError, self.p.parse_pipeline,
+                          '@ this:is:wrong @ ! because ! @')
 
-    def testPipeline(self):
-        r = self.p._expandElementNames('@eater:card @ !  @ feeder::sound @')
-        assert r == '@eater:card:default@ !  @feeder:fake:sound@' 
-        
 class TestParser(unittest.TestCase):
-    def _eater(self, pipeline, name):
-        return pipeline.get_eater_template(name) % { 'name': 'eater:%s' % name }
-    def _feeder(self, pipeline, name):
-        return pipeline.get_feeder_template(name) % \
-            { 'name': 'feeder:%s' % name }
-
     def _pipelineFactoryCallback(self, result, correctresult):
         self.assertEquals(result, correctresult)
 
@@ -200,55 +115,55 @@ class TestParser(unittest.TestCase):
         return d
 
     def testOneSource(self):
-        d, pipeline  = pipelineFactory('@eater:foo@ ! bar', ['foo:default'])
+        d, pipeline  = pipelineFactory('@eater:default@ ! bar', ['foo:bar'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-            self._eater(pipeline, 'foo:default')))
+            pipeline.get_eater_template('default')))
         return d
 
     def testOneSourceWithout(self):
-        d, pipeline = pipelineFactory('bar', ['foo:default'])
+        d, pipeline = pipelineFactory('bar', ['foo:quoi'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-            self._eater(pipeline, 'foo:default')))
+            pipeline.get_eater_template('default')))
         return d
 
     def testOneFeed(self):
-        d, pipeline = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
+        d, pipeline = pipelineFactory('foo ! @feeder:bar@', [], ['bar'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-            self._feeder(pipeline, 'fake:bar')))
+            pipeline.get_feeder_template('bar')))
         return d
         
     def testOneFeedWithout(self):
         d, pipeline = pipelineFactory('foo', [], ['bar'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-            self._feeder(pipeline, 'fake:bar')))
+            pipeline.get_feeder_template('bar')))
         return d
 
     def testTwoSources(self):
         d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
-            ['foo:default', 'bar:default'])
+            ['baz:default', 'qux:default'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
-           self._eater(pipeline, 'foo:default'), 
-           self._eater(pipeline, 'bar:default')))
+           pipeline.get_eater_template('foo'), 
+           pipeline.get_eater_template('bar')))
         return d
 
     def testTwoFeeds(self):
-        d, pipeline = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [],
+        d, pipeline = pipelineFactory('foo ! @feeder:bar@ ! @feeder:baz@', [],
             ['bar', 'baz'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
-           self._feeder(pipeline, 'fake:bar'), 
-           self._feeder(pipeline, 'fake:baz')))
+           pipeline.get_feeder_template('bar'), 
+           pipeline.get_feeder_template('baz')))
         return d
 
     def testTwoBoth(self):
         d, pipeline = pipelineFactory(
-            '@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
+            '@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
                               ['comp1:default', 'comp2:default',],
                               ['feed1', 'feed2'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
-            self._eater(pipeline, 'comp1:default'), 
-            self._eater(pipeline, 'comp2:default'),
-            self._feeder(pipeline, 'fake:feed1'), 
-            self._feeder(pipeline, 'fake:feed2')))
+            pipeline.get_eater_template('src1'), 
+            pipeline.get_eater_template('src2'),
+            pipeline.get_feeder_template('feed1'), 
+            pipeline.get_feeder_template('feed2')))
         return d
 
     def testErrors(self):

@@ -41,17 +41,22 @@ class Feeder:
     """
     This class groups feeder-related information as used by a Feed Component.
 
-    @ivar feedId:  id of the feed this is a feeder for
+    @ivar feederName: name of the feeder
     @ivar uiState: the serializable UI State for this feeder
     """
-    def __init__(self, feedId):
-        self.feedId = feedId
+    def __init__(self, feederName):
+        self.feederName = feederName
+        self.elementName = 'feeder:' + feederName
         self.uiState = componentui.WorkerComponentUIState()
-        self.uiState.addKey('feedId')
-        self.uiState.set('feedId', feedId)
+        self.uiState.addKey('feederName')
+        self.uiState.set('feederName', feederName)
         self.uiState.addListKey('clients')
         self._fdToClient = {} # fd -> (FeederClient, cleanupfunc)
         self._clients = {} # id -> FeederClient
+
+    def __repr__(self):
+        return ('<Feeder %s (%d client(s))>'
+                % (self.feederName, len(self._clients)))
 
     def clientConnected(self, clientId, fd, cleanup):
         """
@@ -223,16 +228,24 @@ class Eater:
     """
     This class groups eater-related information as used by a Feed Component.
 
-    @ivar eaterId:  id of the feed this is eating from
+    @ivar eaterAlias:  the alias of this eater (e.g. "default", "video",
+                       ...)
+    @ivar feedId:  id of the feed this is eating from
     @ivar uiState: the serializable UI State for this eater
     """
-    def __init__(self, eaterId):
-        self.eaterId = eaterId
+    def __init__(self, eaterAlias, eaterName):
+        self.eaterAlias = eaterAlias
+        self.eaterName = eaterName
+        self.feedId = None
+        self.elementName = 'eater:' + eaterAlias
         self.uiState = componentui.WorkerComponentUIState()
-        self.uiState.addKey('eaterId')
-        self.uiState.set('eaterId', eaterId)
+        self.uiState.addKey('eaterAlias')
+        self.uiState.set('eaterAlias', eaterAlias)
+        self.uiState.addKey('eaterName')
+        self.uiState.set('eaterName', eaterName)
         # dict for the current connection
         connectionDict = { 
+            "feedId":                None,
             "timeTimestampDiscont":  None,
             "timestampTimestampDiscont":  0.0,  # ts of buffer after discont,
                                                 # in float seconds
@@ -263,7 +276,12 @@ class Eater:
             self.uiState.addKey(key, 0.0)
         self.uiState.addKey('fd', None)
 
-    def connected(self, fd, when=None):
+    def __repr__(self):
+        return '<Eater %s %s>' % (self.eaterAlias,
+                                  (self.feedId and '(disconnected)'
+                                   or ('eating from %s' % self.feedId)))
+
+    def connected(self, fd, feedId, when=None):
         """
         The eater has been connected.
         Update related stats.
@@ -272,11 +290,13 @@ class Eater:
             when = time.time()
 
         def updateUIState():
+            self.feedId = feedId
             self.uiState.set('lastConnect', when)
             self.uiState.set('fd', fd)
             self.uiState.set('totalConnections',
                 self.uiState.get('totalConnections', 0) + 1)
 
+            self.uiState.setitem("connection", 'feedId', feedId)
             self.uiState.setitem("connection", "countTimestampDiscont", 0)
             self.uiState.setitem("connection", "timeTimestampDiscont",  None)
             self.uiState.setitem("connection", "lastTimestampDiscont",  0.0)
@@ -528,12 +548,9 @@ class FeedComponent(basecomponent.BaseComponent):
 
     ### BaseComponent interface implementations
     def init(self):
-        # add extra keys to state
-        self.state.addKey('eaterNames') # feedId of eaters
-        self.state.addKey('feederNames') # feedId of feeders
         # add keys for eaters and feeders uiState
-        self._feeders = {} # feeder feedId -> Feeder
-        self._eaters = {} # eater feedId -> Eater
+        self.feeders = {} # feeder feedName -> Feeder
+        self.eaters = {} # eater eaterAlias -> Eater
         self.uiState.addListKey('feeders')
         self.uiState.addListKey('eaters')
 
@@ -549,11 +566,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self._master_clock_info = None # (ip, port, basetime) if we're the 
                                        # clock master
 
-        self.eater_names = [] # componentName:feedName list
-
-        self.feed_names = []   # list of feedName
-        self.feeder_names = [] # list of feedId
-
         self._inactivated = False # Has the component ever gone hungry due to
                                   # pad flow not happening?
 
@@ -561,8 +573,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self._stateChangeDeferreds = {}
 
         self._gotFirstNewSegment = {}
-        # feedId of eater -> eater name as specified in config
-        self._eaterMapping = {}
 
         # multifdsink's get-stats signal had critical bugs before this version
         tcppluginversion = gstreamer.get_plugin_version('tcp')
@@ -593,28 +603,25 @@ class FeedComponent(basecomponent.BaseComponent):
         feeder_config = self.config.get('feed', [])
         source_config = self.config.get('source', [])
 
-        self.debug("FeedComponent.do_setup(): eater_config %r" % eater_config)
-        self.debug("FeedComponent.do_setup(): feeder_config %r" % feeder_config)
-        self.debug("FeedComponent.do_setup(): source_config %r" % source_config)
+        self.debug("FeedComponent.do_setup(): eater_config %r", eater_config)
+        self.debug("FeedComponent.do_setup(): feeder_config %r", feeder_config)
+        self.debug("FeedComponent.do_setup(): source_config %r", source_config)
         # for upgrade of code without restarting managers
         # this will only be for components whose eater name in registry is
         # default, so no need to import registry and find eater name
         if eater_config == {} and source_config != []:
             eater_config = {'default': [(x, 'default') for x in source_config]}
-        # this sets self.eater_names
-        self.parseEaterConfig(eater_config)
 
-        for name in self.eater_names:
-            self._eaters[name] = Eater(name)
-            self.uiState.append('eaters', self._eaters[name].uiState)
-
-        # this sets self.feeder_names
-        self.parseFeederConfig(feeder_config)
-        self.feedersWaiting = len(self.feeder_names)
-        for feederName in self.feeder_names:
-            self._feeders[feederName] = Feeder(feederName)
+        for eaterName in eater_config:
+            for feedId, eaterAlias in eater_config[eaterName]:
+                self.eaters[eaterAlias] = Eater(eaterAlias, eaterName)
+                self.uiState.append('eaters', self.eaters[eaterAlias].uiState)
+                
+        for feederName in feeder_config:
+            self.feeders[feederName] = Feeder(feederName)
             self.uiState.append('feeders',
-                                 self._feeders[feederName].uiState)
+                                 self.feeders[feederName].uiState)
+        self.feedersWaiting = len(self.feeders)
 
         pipeline = self.create_pipeline()
         self.set_pipeline(pipeline)
@@ -643,6 +650,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self._setup_pipeline()
 
     def attachPadMonitorToFeeder(self, feederName):
+        # FIXME: intertwingliness
         elementName = feederName+"-pay"
         element = self.pipeline.get_by_name(elementName)
         if not element:
@@ -697,98 +705,40 @@ class FeedComponent(basecomponent.BaseComponent):
         self.setMood(moods.hungry)
         self._inactivated = True
 
-    def eaterTimestampDiscont(self, feedId, prevTs, prevDuration, curTs):
+    def eaterTimestampDiscont(self, eaterAlias, prevTs, prevDuration, curTs):
         """
         Inform of a timestamp discontinuity for the given eater.
         """
         discont = curTs - (prevTs + prevDuration)
         dSeconds = discont / float(gst.SECOND)
-        self.debug("we have a discont on feedId %s of %f s between %s and %s ", 
-            feedId, dSeconds,
-            gst.TIME_ARGS(prevTs),
-            gst.TIME_ARGS(curTs))
-        self._eaters[feedId].timestampDiscont(dSeconds, 
-            float(curTs) / float(gst.SECOND))
+        self.debug("we have a discont on eater %s of %f s between %s and %s ", 
+                   eaterAlias, dSeconds, gst.TIME_ARGS(prevTs),
+                   gst.TIME_ARGS(curTs))
+        self.eaters[eaterAlias].timestampDiscont(
+            dSeconds, float(curTs) / float(gst.SECOND))
 
-    def eaterOffsetDiscont(self, feedId, prevOffsetEnd, curOffset):
+    def eaterOffsetDiscont(self, eaterAlias, prevOffsetEnd, curOffset):
         """
         Inform of a timestamp discontinuity for the given eater.
         """
         discont = curOffset - prevOffsetEnd
-        self.debug(
-            "we have a discont on feedId %s of %d units between %d and %d ", 
-            feedId, discont, prevOffsetEnd, curOffset)
-        self._eaters[feedId].offsetDiscont(discont, curOffset)
+        self.debug("we have a discont on eater %s of %d units between "
+                   "%d and %d ", eaterAlias, discont, prevOffsetEnd,
+                   curOffset)
+        self.eaters[eaterAlias].offsetDiscont(discont, curOffset)
          
     ### FeedComponent methods
     def addEffect(self, effect):
         self.effects[effect.name] = effect
         effect.setComponent(self)
 
-    def parseEaterConfig(self, eater_config):
-        # the source feeder names come from the config
-        # they are specified under <eater> as <feed> elements in XML
-        # so if they don't specify a feed name, use "default" as the feed name
-        # They may also be specified under <component> as <source> elements.
-        feed_ids = []
-        for eater in eater_config:
-            for feed, alias in eater_config[eater]:
-                if not ':' in feed:
-                    # only needed for upgrade without manager restart
-                    feed = '%s:default' % feed
-                feed_ids.append(feed)
-                self._eaterMapping[feed] = eater
-        self.debug('parsed eater config, eater feedIds %r' % feed_ids)
-        self.eater_names = feed_ids
-        self.state.set('eaterNames', self.eater_names)
-            
-    def parseFeederConfig(self, feeder_config):
-        # for pipeline components, in the case there is only one
-        # feeder, <feed></feed> still needs to be listed explicitly
-
-        # the feed names come from the config
-        # they are specified under <component> as <feed> elements in XML
-        self.feed_names = feeder_config
-        #self.debug("parseFeederConfig: feed_names: %r" % self.feed_names)
-
-        # we create feeder names this component contains based on feed names
-        self.feeder_names = map(lambda n: self.name + ':' + n, self.feed_names)
-        self.debug('parsed feeder config, feeders %r' % self.feeder_names)
-        self.state.set('feederNames', self.feeder_names)
-
     def connect_feeders(self, pipeline):
         # Connect to the client-fd-removed signals on each feeder, so we 
         # can clean up properly on removal.
-        feeder_element_names = map(lambda n: "feeder:" + n, 
-            self.feeder_names)
-        for feeder in feeder_element_names:
-            element = pipeline.get_by_name(feeder)
+        for feeder in self.feeders.values():
+            element = pipeline.get_by_name(feeder.elementName)
             element.connect('client-fd-removed', self.removeClientCallback)
-            self.debug("Connected %s to removeClientCallback", feeder)
-
-    def get_eater_names(self):
-        """
-        Return the list of feeder names this component eats from.
-
-        @returns: a list of "componentName:feedName" strings
-        """
-        return self.eater_names
-    
-    def get_feeder_names(self):
-        """
-        Return the list of feedId's of feeders this component has.
-
-        @returns: a list of "componentName:feedName" strings
-        """
-        return self.feeder_names
-
-    def get_feed_names(self):
-        """
-        Return the list of feedeNames for feeds this component has.
-
-        @returns: a list of "feedName" strings
-        """
-        return self.feed_names
+            self.debug("Connected %r to removeClientCallback", feeder)
 
     def get_pipeline(self):
         return self.pipeline
@@ -859,6 +809,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # print 'message:', t, src and src.get_name() or '(no source)'
         if t == gst.MESSAGE_STATE_CHANGED:
             old, new, pending = message.parse_state_changed()
+            name = src.get_name()
             # print src.get_name(), old.value_nick, new.value_nick, pending.value_nick
             if src == self.pipeline:
                 self.log('state change: %r %s->%s'
@@ -870,14 +821,13 @@ class FeedComponent(basecomponent.BaseComponent):
                         d.callback(None)
                     del self._stateChangeDeferreds[change]
 
-            elif src.get_name() in ['feeder:'+n for n in self.feeder_names]:
+            # FIXME: intertwingly!
+            elif (name.startswith('feeder:') and
+                  name in [f.elementName for f in self.feeders.values()]):
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
-                    self.debug('feeder %s is now feeding' % src.get_name())
+                    self.debug('feeder %s is now feeding', name)
                     self.feedersWaiting -= 1
-                    self.debug('%d feeders waiting' % self.feedersWaiting)
-                    # somewhat hacky... feeder:foo:default => default
-                    feed_name = src.get_name().split(':')[2]
-                    self.emit('feed-ready', feed_name, True)
+                    self.debug('%d feeders waiting', self.feedersWaiting)
         elif t == gst.MESSAGE_ERROR:
             gerror, debug = message.parse_error()
             self.warning('element %s error %s %s' %
@@ -911,39 +861,45 @@ class FeedComponent(basecomponent.BaseComponent):
 
         elif t == gst.MESSAGE_EOS:
             name = src.get_name()
-            if name in ['eater:' + n for n in self.eater_names]:
-                self.info('End of stream in eater %s' % src.get_name())
-                feedId = name[len('eater:'):]
-                # Setting the pad monitor inactive turns us hungry and 
-                # triggers a reconnect attempt
-                self._pad_monitors[name].setInactive()
+            # FIXME twingly
+            if name.startswith('eater:'):
+                eaterAlias = name[len('eater:'):]
+                if eaterAlias in self.eaters:
+                    self.info('End of stream in eater %r', eaterAlias)
+                    # Setting the pad monitor inactive turns us hungry and 
+                    # triggers a reconnect attempt
+                    self._pad_monitors[name].setInactive()
+                else:
+                    self.warning("We got an eos from %s", name)
             else:
                 self.warning("We got an eos from %s", name)
         elif t == gst.MESSAGE_ELEMENT:
-            elementName = src.get_name()
+            name = src.get_name()
             # check if the element name is an eater's identity
-            if elementName in ['eater:%s-identity' % n for n in self.eater_names]:
-                if message.structure.get_name() == 'imperfect-timestamp':
-                    identityName = elementName
-                    eaterName = identityName.split("-identity")[0]
-                    feedId = eaterName[len('eater:'):]
-                    self.log("we have an imperfect stream from %s",
-                        elementName)
-                    # figure out the discontinuity
+            # FIXME: intertwingliness
+            if name.startswith('eater:') and name.endswith('-identity'):
+                eaterAlias = name[len('eater:'):-len('-identity')]
+                if eaterAlias in self.eaters:
                     s = message.structure
-                    self.eaterTimestampDiscont(feedId, s["prev-timestamp"],
-                        s["prev-duration"], s["cur-timestamp"])
-                elif message.structure.get_name() == 'imperfect-offset':
-                    identityName = elementName
-                    eaterName = identityName.split("-identity")[0]
-                    feedId = eaterName[len('eater:'):]
-                
-                    self.log("we have an imperfect stream from %s",
-                        elementName)
-                    # figure out the discontinuity
-                    s = message.structure
-                    self.eaterOffsetDiscont(feedId, s["prev-offset-end"],
-                        s["cur-offset"])
+                    def imperfectTimestamp():
+                        self.log("we have an imperfect stream from %s",
+                                 name)
+                        self.eaterTimestampDiscont(eaterAlias,
+                                                   s["prev-timestamp"],
+                                                   s["prev-duration"],
+                                                   s["cur-timestamp"])
+                        
+                    def imperfectOffset():
+                        self.log("we have an imperfect stream from %s",
+                                 name)
+                        self.eaterOffsetDiscont(eaterAlias,
+                                                s["prev-offset-end"],
+                                                s["cur-offset"])
+
+                    handlers = {'imperfect-timestamp': imperfectTimestamp,
+                                'imperfect-offset': imperfectOffset}
+                    if s.get_name() in handlers:
+                        handlers[s.get_name()]()
         else:
             self.log('message received: %r' % message)
 
@@ -1013,8 +969,8 @@ class FeedComponent(basecomponent.BaseComponent):
             self._feeder_probe_cl = None
 
         # clean up checkEater callLaters
-        for feedId in self.eater_names:
-            self.removePadMonitor(feedId)
+        for eaterAlias in self.eaters:
+            self.removePadMonitor(eaterAlias)
 
     def do_stop(self):
         self.debug('Stopping')
@@ -1037,6 +993,9 @@ class FeedComponent(basecomponent.BaseComponent):
         """
 
         return self._master_clock_info
+
+    def isEaterActive(self, eaterAlias):
+        return self._pad_monitors[eaterAlias].isActive()
 
     def provide_master_clock(self, port):
         """
@@ -1108,25 +1067,28 @@ class FeedComponent(basecomponent.BaseComponent):
             self.clock_provider.set_property('active', True)
 
         # attach event-probe callbacks for each eater
-        for feedId in self.get_eater_names():
-            self.debug('adding event probe for eater of %s' % feedId)
-            name = "eater:%s" % feedId
-            eater = self.get_element(name)
+        for eater in self.eaters.values():
+            self.debug('adding event probe for eater %s',
+                       eater.eaterAlias)
+            name = eater.elementName
+            fdsrc = self.get_element(name)
             # FIXME: should probably raise
-            if not eater:
+            if not fdsrc:
                 self.warning('No element named %s in pipeline' % name)
                 continue
-            pad = eater.get_pad("src")
-            pad.add_event_probe(self._eater_event_probe_cb, feedId)
+            pad = fdsrc.get_pad("src")
+            pad.add_event_probe(self._eater_event_probe_cb,
+                                eater.eaterAlias)
             gdp_version = gstreamer.get_plugin_version('gdp')
             if gdp_version[2] < 11 and not (gdp_version[2] == 10 and \
                                             gdp_version[3] > 0):
                 depay = self.get_element("%s-depay" % name)
                 depaysrc = depay.get_pad("src")
                 depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
-                    feedId)
+                    eater.eaterAlias)
 
-            self._pad_monitors[name] = EaterPadMonitor(self, pad, feedId)
+            self._pad_monitors[name] = EaterPadMonitor(self, pad,
+                                                       eater.eaterAlias)
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -1136,8 +1098,8 @@ class FeedComponent(basecomponent.BaseComponent):
         return d
 
     def _feeder_probe_calllater(self):
-        for feedId, feeder in self._feeders.items():
-            feederElement = self.get_element("feeder:%s" % feedId)
+        for feedId, feeder in self.feeders.items():
+            feederElement = self.get_element(feeder.elementName)
             for client in feeder.getClients():
                 # a currently disconnected client will have fd None
                 if client.fd is not None:
@@ -1157,14 +1119,14 @@ class FeedComponent(basecomponent.BaseComponent):
         self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY, 
             self._feeder_probe_calllater)
 
-    def reconnectEater(self, feedId):
+    def reconnectEater(self, eaterAlias):
         if not self.medium:
-            self.debug("Can't reconnect eater for feed %s, running "
-                       "without a medium", feedId)
+            self.debug("Can't reconnect eater %s, running "
+                       "without a medium", eaterAlias)
             return
 
-        self._eaters[feedId].disconnected()
-        self.medium.connectEater(feedId)
+        self.eaters[eaterAlias].disconnected()
+        self.medium.connectEater(eaterAlias)
 
     def get_element(self, element_name):
         """Get an element out of the pipeline.
@@ -1173,9 +1135,11 @@ class FeedComponent(basecomponent.BaseComponent):
         the caller needs to check if self.pipeline is actually set.
         """
         assert self.pipeline
-        self.log('Looking up element %r in pipeline %r' % (
-            element_name, self.pipeline))
+        self.log('Looking up element %r in pipeline %r',
+                 element_name, self.pipeline)
         element = self.pipeline.get_by_name(element_name)
+        if not element:
+            self.warning("No element named %r in pipeline", element_name)
         return element
     
     def get_element_property(self, element_name, property):
@@ -1225,23 +1189,20 @@ class FeedComponent(basecomponent.BaseComponent):
         @param cleanup:  the function to call when the FD is no longer feeding
         @type  cleanup:  callable
         """
-        self.debug('FeedToFD(%s, %d)' % (feedName, fd))
-        feedId = common.feedId(self.name, feedName)
+        self.debug('FeedToFD(%s, %d)', feedName, fd)
 
         # We must have a pipeline in READY or above to do this. Do a 
         # non-blocking (zero timeout) get_state.
         if not self.pipeline or self.pipeline.get_state(0)[1] == gst.STATE_NULL:
             self.warning('told to feed %s to fd %d, but pipeline not '
-                         'running yet', feedId, fd)
+                         'running yet', feedName, fd)
             cleanup(fd)
             # can happen if we are restarting but the other component is
             # happy; assume other side will reconnect later
             return
 
-        elementName = "feeder:%s" % feedId
-        element = self.get_element(elementName)
-        if not element:
-            msg = "Cannot find feeder element named '%s'" % elementName
+        if feedName not in self.feeders:
+            msg = "Cannot find feeder named '%s'" % feedName
             mid = "feedToFD-%s" % feedName
             m = messages.Warning(T_(N_("Internal Flumotion error.")),
                 debug=msg, id=mid, priority=40)
@@ -1249,10 +1210,12 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning(msg)
             return False
 
+        feeder = self.feeders[feedName]
+        element = self.get_element(feeder.elementName)
+        assert element
         clientId = eaterId or ('client-%d' % fd)
-
         element.emit('add', fd)
-        self._feeders[feedId].clientConnected(clientId, fd, cleanup)
+        feeder.clientConnected(clientId, fd, cleanup)
 
     def removeClientCallback(self, sink, fd):
         """
@@ -1263,22 +1226,28 @@ class FeedComponent(basecomponent.BaseComponent):
         Called from GStreamer threads.
         """
         self.debug("cleaning up fd %d", fd)
-        feedId = ':'.join(sink.get_name().split(':')[1:])
-        self._feeders[feedId].clientDisconnected(fd)
+        name = sink.get_name()
+        for feeder in self.feeders.values():
+            if feeder.elementName == name:
+                feeder.clientDisconnected(fd)
+                return
+        self.warning('Unknown feeder element %s', name)
 
-    def eatFromFD(self, feedId, fd):
+    def eatFromFD(self, eaterAlias, feedId, fd):
         """
         Tell the component to eat the given feedId from the given fd.
         The component takes over the ownership of the fd, closing it when
         no longer eating.
 
+        @param eaterAlias: the alias of the eater
+        @type  eaterAlias: str
         @param feedId: feed id (componentName:feedName) to eat from through
                        the given fd
         @type  feedId: str
         @param fd:     the file descriptor to eat from
         @type  fd:     int
         """
-        self.debug('EatFromFD(%s, %d)' % (feedId, fd))
+        self.debug('EatFromFD(%s, %s, %d)', eaterAlias, feedId, fd)
 
         if not self.pipeline:
             self.warning('told to eat %s from fd %d, but pipeline not '
@@ -1288,18 +1257,23 @@ class FeedComponent(basecomponent.BaseComponent):
             os.close(fd)
             return
 
-        eaterName = "eater:%s" % feedId
-        self.debug('looking up element %s' % eaterName)
-        element = self.get_element(eaterName)
+        if eaterAlias not in self.eaters:
+            self.warning('Unknown eater alias: %s', eaterAlias)
+            os.close(fd)
+            return
+        
+        eater = self.eaters[eaterAlias]
+        element = self.get_element(eater.elementName)
         if not element:
-            self.warning('No element named %s in pipeline' % eaterName)
+            self.warning('Eater element %s not found', eater.elementName)
+            os.close(fd)
             return
  
         # fdsrc only switches to the new fd in ready or below
         (result, current, pending) = element.get_state(0L)
         if current not in [gst.STATE_NULL, gst.STATE_READY]:
-            self.debug('eater %s in state %r, kidnapping it' % (
-                eaterName, current))
+            self.debug('eater %s in state %r, kidnapping it',
+                       eaterAlias, current)
 
             # we unlink fdsrc from its peer, take it out of the pipeline
             # so we can set it to READY without having it send EOS,
@@ -1312,7 +1286,7 @@ class FeedComponent(basecomponent.BaseComponent):
             def _block_cb(pad, blocked):
                 pass
             srcpad.set_blocked_async(True, _block_cb)
-            self.unblock_eater(feedId)
+            self.unblock_eater(eaterAlias)
 
             # Now, we can switch FD with this mess
             sinkpad = srcpad.get_peer()
@@ -1333,10 +1307,11 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             element.set_property('fd', fd)
 
-        # update our eater uiState
-        self._eaters[feedId].connected(fd)
+        # update our eater uiState, saying that we are eating from a
+        # possibly new feedId
+        eater.connected(fd, feedId)
 
-    def unblock_eater(self, feedId):
+    def unblock_eater(self, eaterAlias):
         """
         After this function returns, the stream lock for this eater must have
         been released. If your component needs to do something here, override
@@ -1344,23 +1319,22 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         pass
 
-    def _eater_event_probe_cb(self, pad, event, feedId):
+    def _eater_event_probe_cb(self, pad, event, eaterAlias):
         """
         An event probe used to consume unwanted EOS events on eaters.
 
         Called from GStreamer threads.
         """
         if event.type == gst.EVENT_EOS:    
-            self.info(
-                'End of stream on feed %s, disconnect will be triggered' %
-                    feedId)
+            self.info('End of stream for eater %s, disconnect will be '
+                      'triggered', eaterAlias)
             # We swallow it because otherwise our component acts on the EOS
             # and we can't recover from that later.  Instead, fdsrc will be
             # taken out and given a new fd on the next eatFromFD call.
             return False
         return True
 
-    def _depay_eater_event_probe_cb(self, pad, event, feedId):
+    def _depay_eater_event_probe_cb(self, pad, event, eaterAlias):
         """
         An event probe used to consume unwanted duplicate newsegment events.
 
@@ -1369,14 +1343,13 @@ class FeedComponent(basecomponent.BaseComponent):
         if event.type == gst.EVENT_NEWSEGMENT:
             # We do this because we know gdppay/gdpdepay screw up on 2nd
             # newsegments
-            if feedId in self._gotFirstNewSegment:
-                self.info(
-                    "Subsequent new segment event received on depay on "
-                    " feed %s" % feedId)
-                # swallow
+            if eaterAlias in self._gotFirstNewSegment:
+                self.info("Subsequent new segment event received on "
+                          "depay on eater %s", eaterAlias)
+                # swallow (gulp)
                 return False
             else:
-                self._gotFirstNewSegment[feedId] = True
+                self._gotFirstNewSegment[eaterAlias] = True
         return True
 
     def get_eater_name_for_feed_id(self, feedId):
@@ -1390,7 +1363,8 @@ class FeedComponent(basecomponent.BaseComponent):
         @returns the eater name
         @rtype: string
         """
-
-        if self._eaterMapping.has_key(feedId):
-            return self._eaterMapping[feedId]
+        # FIXME: seems like an unnecessary function
+        for eater in self.eaters.values():
+            if eater.feedId == feedId:
+                return eater.eaterName
         return None

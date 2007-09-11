@@ -356,7 +356,7 @@ class FakeComponentMind(FakeMind):
         
         self.state.observe_set('mood', moods.happy.value)
 
-    def remote_eatFrom(self, fullFeedId, host, port):
+    def remote_eatFrom(self, eaterAlias, fullFeedId, host, port):
         # pretend this works
         return
 

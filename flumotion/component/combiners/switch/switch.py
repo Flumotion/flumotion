@@ -104,11 +104,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     def is_active(self, eaterSubstring):
         # eaterSubstring is "master" or "backup"
-        for eaterFeedId in self._inactiveEaters:
-            eaterName = self.get_eater_name_for_feed_id(eaterFeedId)
-            if eaterSubstring in eaterName:
-                self.log("eater %s inactive", eaterName)
-                return False
+        for eaterAlias in self.eaters:
+            if eaterSubstring in eaterAlias:
+                return self.isEaterActive(eaterAlias)
         return True
 
     # if an event starts, semantics are to switch to backup
@@ -178,13 +176,11 @@ class SingleSwitch(Switch):
         self.switchPads = {}
 
     def get_pipeline_string(self, properties):
-        eaters = self.eater_names
-
         pipeline = "switch name=switch ! " \
             "identity silent=true single-segment=true name=iden "
-        for eater in eaters:
-            tmpl = '@ eater:%s @ ! switch. '
-            pipeline += tmpl % eater
+
+        for eaterAlias in self.eaters:
+            pipeline += '@ eater:%s @ ! switch. ' % (eaterAlias,)
 
         pipeline += 'iden.'
 
@@ -194,24 +190,21 @@ class SingleSwitch(Switch):
         self.switchElement = sw = pipeline.get_by_name("switch")
         # figure out the pads connected for the eaters
         padPeers = {} # padName -> peer element name
-        for sinkPadNumber in range(0, len(self.eater_names)):
+        for sinkPadNumber in range(0, len(self.eaters)):
             self.debug("sink pad %d %r", sinkPadNumber, sw.get_pad("sink%d" % sinkPadNumber))
             self.debug("peer pad %r", sw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer())
             padPeers["sink%d" % sinkPadNumber] = sw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer().get_parent().get_name()
 
-        for feedId in self.eater_names:
-            eaterName = self.get_eater_name_for_feed_id(feedId)
-            self.debug("feedId %s is mapped to eater name %s", feedId, 
-                eaterName)
-            if eaterName:
-                for sinkPad in padPeers:
-                    if feedId in padPeers[sinkPad]:
-                        self.switchPads[eaterName] = sinkPad
-                if not self.switchPads.has_key(eaterName):    
-                    self.warning("could not find sink pad for eater %s", 
-                        eaterName )
+        for eaterAlias in self.eaters:
+            feedId = self.eaters[eaterAlias].feedId
+            for sinkPad in padPeers:
+                if feedId and feedId in padPeers[sinkPad]:
+                    self.switchPads[eaterAlias] = sinkPad
+            if not eaterAlias in self.switchPads:    
+                self.warning("could not find sink pad for eater %s", 
+                             eaterAlias)
         # make sure switch has the correct sink pad as active
         self.debug("Setting switch's active-pad to %s", 
             self.switchPads[self._idealEater])

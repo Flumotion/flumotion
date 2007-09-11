@@ -1,3 +1,101 @@
+2007-09-11  Andy Wingo  <wingo@pobox.com>
+
+	Restructure the FeedComponent and ParseLaunchComponent base
+	classes to name their eaters by eaterAlias and feeders by feedName
+	instead of by remoteFeedId and feedId, respectively. See #694.
+	Incompatibly breaks the manager<->component interface, because the
+	manager needs to refer to eaters internally and over the wire by
+	eaterAlias and not by the id of the feeder that they initially
+	eat from.
+
+	* flumotion/manager/component.py (ComponentAvatar.attached):
+	Revert #721; this function spewed warnings on manager restart, and
+	will be obviated by virtual feed-related changes.
+	(ComponentAvatar.getFeedersForEaters)
+	(ComponentAvatar.getEatersForFeeders)
+	(ComponentHeaven._connectEaters)
+	(ComponentHeaven._connectFeeders): Refactor a bit, reflecting the
+	fact that we can refer to individual eaters by eaterAlias.
+	(ComponentHeaven._connectEaterUpstream): Pass the eaterAlias to
+	the remote eatFrom call.
+
+	* flumotion/component/feedcomponent.py (FeedComponentMedium): Some
+	data structure keying updates. Don't connect to feed-ready, the
+	manager doesn't do anything with it. (Dunno why.)
+	(FeedComponentMedium.remote_eatFrom): Add the eaterAlias argument,
+	an incompatible remote method signature change.
+	(FeedComponentMedium._getAuthenticatorForEater): Change from
+	_getAuthenticatorForFeeder, take an eaterAlias instead.
+	(FeedComponentMedium.connectEater): Take an eaterAlias instead.
+	(FeedComponentMedium.remote_feedTo): A minimal update attempt, but
+	the code is bitrotten.
+	(ParseLaunchComponent.add_default_eater_feeder)
+	(ParseLaunchComponent.parse_tmpl)
+	(ParseLaunchComponent.parse_pipeline):
+	(MultiInputParseLaunchComponent.get_queue_string): Rewrite the
+	template parsing code to be more simple, and to not encode remote
+	feeder names into eater element names. See #694.
+
+	* flumotion/component/base/eaters.glade: 
+	* flumotion/component/base/admin_gtk.py (FeedersAdminGtkNode)
+	(EatersAdminGtkNode): Update for uistate changes; show feedId
+	separately from the eaterName in the eaters page.
+
+	* flumotion/component/feedcomponent010.py (Feeder): Key by
+	feederName instead of feedId; including the component name is
+	redundant.
+	
+	* flumotion/component/feedcomponent010.py (Eater): Key by
+	eaterAlias instead of by the id of the feed that we initially eat
+	from. Adds new uiState keys 'eaterName' and 'eaterAlias', and
+	moves 'eaterId' to be named 'feedId' in the connections dict.
+	(Eater.connected): Add argument feedId, to indicate which feed we
+	are eating from.
+	
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	Remove 'eaterNames' and 'feederNames' from the jobstate, they were
+	not used. Publicize self.eaters and self.feeders, which are keyed
+	by eater alias and feeder name, respectively.
+	(FeedComponent.do_setup): Simplify the parsing of the 'eater' and
+	'feed' config keys.
+	(FeedComponent.get_eater_names, FeedComponent.get_feeder_names)
+	(FeedComponent.get_feed_names): Removed, along with the
+	attributes. Use component.eaters and component.feeders directly.
+	(FeedComponent.bus_message_received_cb): Deal with changes; nasty
+	in all cases.
+	(FeedComponent.isEaterActive): New function, for switch. Needs
+	review; probably better to have an isActive() method on eaters
+	directly.
+	(FeedComponent.get_element): Warn if the element is not found.
+	(FeedComponent.eatFromFD): Add argument, eaterAlias. An
+	incompatible change. Pass it on to Eater.connected().
+
+	* flumotion/component/converters/overlay/overlay.py
+	(Overlay.get_pipeline_string): Simplify.
+
+	* flumotion/component/combiners/switch/switch.py: Some changes to
+	attempt to make things work, but switch in trunk wasn't working
+	anyways. Fix later...
+
+	* flumotion/component/feed.py (FeedMedium.__init__): Remove the
+	legacy mode of operation where the FeedMedium would automatically
+	call eatFromFD on the component. requestFeed is the replacement.
+
+	* flumotion/test/test_component_feed.py
+	(TestUpstreamFeedClient.testConnectAndFeedLegacy): Since we
+	removed the legacy interface on FeedMedium we can remove this test
+	as well.
+	* flumotion/test/test_component_feed.py (TestUpstreamFeedClient):
+	Update tests to cope with FeedMedium changes.
+
+	* flumotion/test/test_manager_manager.py
+	(FakeComponentMind.remote_eatFrom): New arg in the prototype.
+
+	* flumotion/test/test_component.py (TestExpandElementName):
+	Removed, as the complicated code that it tested is gone. Yay!
+	(TestParser): Update the tests to reflect what the new code should
+	do.
+
 2007-09-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent.py
