@@ -1,5 +1,13 @@
 2007-09-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py (StateChangeMonitor):
+	New class, abstracts out the state change deferred struct,
+	unfucking some of the api badness.
+	(FeedComponent): Refactor to use the StateChangeMonitor.
+
+	* flumotion/common/gstreamer.py (get_state_change): New public
+	function, moved here from feedcomponent010.py.
+
 	* flumotion/test/test_component.py: Fix test cases to use 'eater'
 	rather than 'source'.
 

@@ -124,3 +124,19 @@ def get_plugin_version(plugin_name):
     if len(versionTuple) < 4:
         versionTuple = versionTuple + (0,)
     return versionTuple
+
+# GstPython should have something for this, but doesn't.
+def get_state_change(old, new):
+    table = {(gst.STATE_NULL, gst.STATE_READY):
+             gst.STATE_CHANGE_NULL_TO_READY,
+             (gst.STATE_READY, gst.STATE_PAUSED):
+             gst.STATE_CHANGE_READY_TO_PAUSED,
+             (gst.STATE_PAUSED, gst.STATE_PLAYING):
+             gst.STATE_CHANGE_PAUSED_TO_PLAYING,
+             (gst.STATE_PLAYING, gst.STATE_PAUSED):
+             gst.STATE_CHANGE_PLAYING_TO_PAUSED,
+             (gst.STATE_PAUSED, gst.STATE_READY):
+             gst.STATE_CHANGE_PAUSED_TO_READY,
+             (gst.STATE_READY, gst.STATE_NULL):
+             gst.STATE_CHANGE_READY_TO_NULL}
+    return table.get((old, new), 0)

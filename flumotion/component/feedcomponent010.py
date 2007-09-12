@@ -522,6 +522,52 @@ class EaterPadMonitor(PadMonitor):
             self._reconnectDC.cancel()
             self._reconnectDC = None
 
+class StateChangeMonitor(dict, log.Loggable):
+    def __init__(self):
+        # statechange -> [ deferred ]
+        dict.__init__(self)
+
+    def add(self, statechange):
+        if statechange not in self:
+            self[statechange] = []
+
+        d = defer.Deferred()
+        self[statechange].append(d)
+
+        return d
+
+    def state_changed(self, old, new):
+        self.log('state change: pipeline %s->%s',
+                 old.value_nick, new.value_nick)
+        change = gstreamer.get_state_change(old, new)
+        if change in self:
+            dlist = self[change]
+            for d in dlist:
+                d.callback(None)
+            del self[change]
+
+    def have_error(self, curstate, message):
+        # if we have a state change defer that has not yet
+        # fired, we should errback it
+        changes = [gst.STATE_CHANGE_NULL_TO_READY, 
+                   gst.STATE_CHANGE_READY_TO_PAUSED,
+                   gst.STATE_CHANGE_PAUSED_TO_PLAYING]
+
+        extras = ((gst.STATE_PAUSED, gst.STATE_CHANGE_PLAYING_TO_PAUSED),
+                  (gst.STATE_READY, gst.STATE_CHANGE_PAUSED_TO_READY)
+                  (gst.STATE_NULL, gst.STATE_CHANGE_READY_TO_NULL))
+        for state, change in extras:
+            if curstate <= state:
+                changes.append(change)
+        
+        for change in changes:
+            if change in self:
+                self.log("We have an error, going to errback pending "
+                         "state change defers")
+                for d in self[change]:
+                    d.errback(errors.ComponentStartHandledError(message))
+                del self[change]
+
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
@@ -557,8 +603,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self._inactivated = False # Has the component ever gone hungry due to
                                   # pad flow not happening?
 
-        # statechange -> [ deferred ]
-        self._stateChangeDeferreds = {}
+        self._change_monitor = StateChangeMonitor()
 
         self._gotFirstNewSegment = {}
 
@@ -595,7 +640,6 @@ class FeedComponent(basecomponent.BaseComponent):
             self.feeders[feederName] = Feeder(feederName)
             self.uiState.append('feeders',
                                  self.feeders[feederName].uiState)
-        self.feedersWaiting = len(self.feeders)
 
         pipeline = self.create_pipeline()
         self.set_pipeline(pipeline)
@@ -695,32 +739,6 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_pipeline(self):
         return self.pipeline
 
-    def _addStateChangeDeferred(self, statechange):
-        if statechange not in self._stateChangeDeferreds:
-            self._stateChangeDeferreds[statechange] = []
-
-        d = defer.Deferred()
-        self._stateChangeDeferreds[statechange].append(d)
-
-        return d
-
-    # GstPython should have something for this, but doesn't.
-    def _getStateChange(self, old, new):
-        if old == gst.STATE_NULL and new == gst.STATE_READY:
-            return gst.STATE_CHANGE_NULL_TO_READY
-        elif old == gst.STATE_READY and new == gst.STATE_PAUSED:
-            return gst.STATE_CHANGE_READY_TO_PAUSED
-        elif old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
-            return gst.STATE_CHANGE_PAUSED_TO_PLAYING
-        elif old == gst.STATE_PLAYING and new == gst.STATE_PAUSED:
-            return gst.STATE_CHANGE_PLAYING_TO_PAUSED
-        elif old == gst.STATE_PAUSED and new == gst.STATE_READY:
-            return gst.STATE_CHANGE_PAUSED_TO_READY
-        elif old == gst.STATE_READY and new == gst.STATE_NULL:
-            return gst.STATE_CHANGE_READY_TO_NULL
-        else:
-            return 0
-       
     def do_pipeline_playing(self):
         """
         Invoked when the pipeline has changed the state to playing.
@@ -758,28 +776,11 @@ class FeedComponent(basecomponent.BaseComponent):
         t = message.type
         src = message.src
 
-        # print 'message:', t, src and src.get_name() or '(no source)'
         if t == gst.MESSAGE_STATE_CHANGED:
             old, new, pending = message.parse_state_changed()
             name = src.get_name()
-            # print src.get_name(), old.value_nick, new.value_nick, pending.value_nick
             if src == self.pipeline:
-                self.log('state change: %r %s->%s'
-                    % (src, old.value_nick, new.value_nick)) 
-                change = self._getStateChange(old,new)
-                if change in self._stateChangeDeferreds:
-                    dlist = self._stateChangeDeferreds[change]
-                    for d in dlist:
-                        d.callback(None)
-                    del self._stateChangeDeferreds[change]
-
-            # FIXME: intertwingly!
-            elif (name.startswith('feeder:') and
-                  name in [f.elementName for f in self.feeders.values()]):
-                if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
-                    self.debug('feeder %s is now feeding', name)
-                    self.feedersWaiting -= 1
-                    self.debug('%d feeders waiting', self.feedersWaiting)
+                self._change_monitor.state_changed(old, new)
         elif t == gst.MESSAGE_ERROR:
             gerror, debug = message.parse_error()
             self.warning('element %s error %s %s' %
@@ -787,30 +788,9 @@ class FeedComponent(basecomponent.BaseComponent):
             self.setMood(moods.sad)
             m = self.make_message_for_gstreamer_error(gerror, debug)
             self.state.append('messages', m)
-            # if we have a state change defer that has not yet
-            # fired, we should errback it
-            changes = [gst.STATE_CHANGE_NULL_TO_READY, 
-                gst.STATE_CHANGE_READY_TO_PAUSED,
-                gst.STATE_CHANGE_PAUSED_TO_PLAYING]
-            # get current state and add downward state changes from states
-            # higher than current element state
-            curstate = self.pipeline.get_state()
-            if curstate == gst.STATE_NULL:
-                changes.append(gst.STATE_CHANGE_READY_TO_NULL)
-            if curstate <= gst.STATE_PAUSED:
-                changes.append(gst.STATE_CHANGE_PLAYING_TO_PAUSED)
-            if curstate <= gst.STATE_READY:
-                changes.append(gst.STATE_CHANGE_PAUSED_TO_READY)
-            for change in changes:
-                if change in self._stateChangeDeferreds:
-                    self.log("We have an error, going to errback pending "
-                        "state change defers")
-                    dlist = self._stateChangeDeferreds[change]
-                    for d in dlist:
-                        d.errback(errors.ComponentStartHandledError(
-                            gerror.message))
-                    del self._stateChangeDeferreds[change]
 
+            self._change_monitor.have_error(self.pipeline.get_state(),
+                                            gerror.message)
         elif t == gst.MESSAGE_EOS:
             name = src.get_name()
             # FIXME twingly
@@ -873,6 +853,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # we know that there is a signal watch already installed
         bus = self.pipeline.get_bus()
+        # never gets cleaned up; does that matter?
         bus.connect("message::element", on_element_message)
             
     def _setup_pipeline(self):
@@ -1013,7 +994,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if state != gst.STATE_PAUSED and state != gst.STATE_PLAYING:
             self.info ("Setting pipeline to PAUSED")
 
-            d = self._addStateChangeDeferred(gst.STATE_CHANGE_READY_TO_PAUSED)
+            d = self._change_monitor.add(gst.STATE_CHANGE_READY_TO_PAUSED)
             d.addCallback(pipelinePaused)
 
             self.pipeline.set_state(gst.STATE_PAUSED)
@@ -1072,7 +1053,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
-        d = self._addStateChangeDeferred(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
+        d = self._change_monitor.add(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
         d.addCallback(lambda x: self.do_pipeline_playing())
         return d
 
