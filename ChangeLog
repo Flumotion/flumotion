@@ -1,3 +1,9 @@
+2007-09-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent.py
+	(ParseLaunchComponent.get_eater_template): Fix naming of eater
+	identities.
+
 2007-09-11  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (ComponentWrapper.eatFromFD)
