@@ -1,5 +1,8 @@
 2007-09-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component.py: Fix test cases to use 'eater'
+	rather than 'source'.
+
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent.install_eater_continuity_watch): New public method,
 	watches some elements for discontinuity message; palliates some

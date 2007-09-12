@@ -33,21 +33,12 @@ from flumotion.twisted.defer import defer_generator_method
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
         self.__pipeline = pipeline
-        self._source = eaters or []
-        self._eater = {}
+        self._eater = eaters or {}
         self._feed = feeders or []
-        for feeder in self._source:
-            feeders = self._eater.setdefault('default', [])
-            alias = 'default'
-            while alias in [x[1] for x in feeders]:
-                alias += '-bis'
-            feeders.append((feeder, alias))
-
         ParseLaunchComponent.__init__(self)
 
     def config(self):
         config = {'name': 'fake',
-                  'source': self._source,
                   'eater': self._eater,
                   'feed': self._feed,
                   'plugs': {},
@@ -115,39 +106,42 @@ class TestParser(unittest.TestCase):
         return d
 
     def testOneSource(self):
-        d, pipeline  = pipelineFactory('@eater:default@ ! bar', ['foo:bar'])
+        d, pipeline = pipelineFactory('@eater:default@ ! bar',
+                                      {'qux': [('foo:bar', 'default')]})
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
             pipeline.get_eater_template('default')))
         return d
 
     def testOneSourceWithout(self):
-        d, pipeline = pipelineFactory('bar', ['foo:quoi'])
+        d, pipeline = pipelineFactory('bar',
+                                      {'qux': [('foo:quoi', 'default')]})
         d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
             pipeline.get_eater_template('default')))
         return d
 
     def testOneFeed(self):
-        d, pipeline = pipelineFactory('foo ! @feeder:bar@', [], ['bar'])
+        d, pipeline = pipelineFactory('foo ! @feeder:bar@', {}, ['bar'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
             pipeline.get_feeder_template('bar')))
         return d
         
     def testOneFeedWithout(self):
-        d, pipeline = pipelineFactory('foo', [], ['bar'])
+        d, pipeline = pipelineFactory('foo', {}, ['bar'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
             pipeline.get_feeder_template('bar')))
         return d
 
     def testTwoSources(self):
         d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
-            ['baz:default', 'qux:default'])
+                                      {'qux': [('baz:default', 'foo')],
+                                       'zag': [('qux:default', 'bar')]})
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
            pipeline.get_eater_template('foo'), 
            pipeline.get_eater_template('bar')))
         return d
 
     def testTwoFeeds(self):
-        d, pipeline = pipelineFactory('foo ! @feeder:bar@ ! @feeder:baz@', [],
+        d, pipeline = pipelineFactory('foo ! @feeder:bar@ ! @feeder:baz@', {},
             ['bar', 'baz'])
         d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
            pipeline.get_feeder_template('bar'), 
@@ -157,8 +151,9 @@ class TestParser(unittest.TestCase):
     def testTwoBoth(self):
         d, pipeline = pipelineFactory(
             '@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
-                              ['comp1:default', 'comp2:default',],
-                              ['feed1', 'feed2'])
+            {'qux': [('comp1:default', 'src1')],
+             'zag': [('comp2:default', 'src2')]},
+            ['feed1', 'feed2'])
         d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
             pipeline.get_eater_template('src1'), 
             pipeline.get_eater_template('src2'),
