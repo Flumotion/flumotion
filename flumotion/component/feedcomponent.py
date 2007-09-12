@@ -300,10 +300,47 @@ from feedcomponent010 import FeedComponent
 FeedComponent.componentMediumClass = FeedComponentMedium
 
 class ParseLaunchComponent(FeedComponent):
-    'A component using gst-launch syntax'
+    """A component using gst-launch syntax
+
+    @cvar checkTimestamp: whether to check continuity of timestamps for eaters
+    @cvar checkOffset:    whether to check continuity of offsets for
+    eaters
+    """
 
     DELIMITER = '@'
 
+    # can be set by subclasses
+    checkTimestamp = False
+    checkOffset = False
+
+    # keep these as class variables for the tests
+    FDSRC_TMPL = 'fdsrc name=%(name)s'
+    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
+    FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false '\
+                      'name=%(name)s buffers-max=500 buffers-soft-max=450 '\
+                      'recover-policy=1'
+    EATER_TMPL = None
+
+    def init(self):
+        if not gstreamer.get_plugin_version('coreelements'):
+            raise errors.MissingElementError('identity')
+        if not gstreamer.element_factory_has_property('identity', 
+            'check-imperfect-timestamp'):
+            self.checkTimestamp = False
+            self.checkOffset = False
+            self.addMessage(
+                messages.Info(T_(N_(
+                    "You will get more debugging information "
+                    "if you upgrade to GStreamer 0.10.13 or later."))))
+
+        self.EATER_TMPL = self.FDSRC_TMPL + ' %(queue)s ' + self.DEPAY_TMPL
+        if self.checkTimestamp or self.checkOffset:
+            self.EATER_TMPL += " ! identity name=%(name)s-identity silent=TRUE"
+        if self.checkTimestamp:
+            self.EATER_TMPL += " check-imperfect-timestamp=1"
+        if self.checkOffset:
+            self.EATER_TMPL += " check-imperfect-offset=1"
+            
     ### FeedComponent interface implementations
     def create_pipeline(self):
         try:
@@ -334,6 +371,10 @@ class ParseLaunchComponent(FeedComponent):
 
     def set_pipeline(self, pipeline):
         FeedComponent.set_pipeline(self, pipeline)
+        if self.checkTimestamp or self.checkOffset:
+            watchElements = dict([(e.elementName + '-identity' , e)
+                                  for e in self.eaters.values()])
+            self.install_eater_continuity_watch(watchElements)
         self.configure_pipeline(self.pipeline, self.config['properties'])
 
     ### ParseLaunchComponent interface for subclasses
@@ -413,19 +454,12 @@ class ParseLaunchComponent(FeedComponent):
         pipeline = " ".join(pipeline.split())
         self.debug('Creating pipeline, template is %s', pipeline)
         
-        # we expand the pipeline based on the templates and eater/feeder names
-        # elements are named eater:(source_component_name):(feed_name)
-        # or feeder:(component_name):(feed_name)
-        eater_element_names = [e.elementName for e in self.eaters.values()]
-        feeder_element_names = [f.elementName for f in self.feeders.values()]
-        self.debug('we eat with eater elements %s', eater_element_names)
-        self.debug('we feed with feeder elements %s', feeder_element_names)
-
-        if pipeline == '' and not eater_element_names:
+        if pipeline == '' and not self.eaters:
             raise TypeError, "Need a pipeline or a eater"
 
         if pipeline == '':
-            assert eater_element_names
+            # code of dubious value
+            assert self.eaters
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
             
         pipeline = self.add_default_eater_feeder(pipeline)
@@ -440,52 +474,21 @@ class ParseLaunchComponent(FeedComponent):
 
     def get_eater_template(self, eaterAlias):
         queue = self.get_queue_string(eaterAlias)
-        check = ""
-        if self.checkTimestamp:
-            check += " check-imperfect-timestamp=1"
-        if self.checkOffset:
-            check += " check-imperfect-offset=1"
-        if check != "":
-            check = " ! identity name=eater:%s-identity silent=TRUE %s" % (
-                eaterAlias, check)
-        depay = self.DEPAY_TMPL + check
-        if not queue:
-            ret = self.FDSRC_TMPL + ' ! ' + depay
-        else:
-            ret = self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + depay
+        elementName = self.eaters[eaterAlias].elementName
 
-        return ret % {'name': 'eater:' + eaterAlias}
+        return self.EATER_TMPL % {'name': elementName, 'queue': queue}
 
     def get_feeder_template(self, feederName):
-        return self.FEEDER_TMPL % {'name': 'feeder:' + feederName}
+        elementName = self.feeders[feederName].elementName
+        return self.FEEDER_TMPL % {'name': elementName}
 
     def get_queue_string(self, eaterAlias):
         """
-        Return a parse-launch description of a queue, if this component
-        wants an input queue on this eater, or None if not
+        Return a parse-launch string to join the fdsrc eater element and
+        the depayer, for example '!' or '! queue !'. The string may have
+        no format strings.
         """
-        return None
-
-    ### BaseComponent interface implementation
-    def do_start(self, clocking):
-        """
-        Tell the component to start.
-        Whatever is using the component is responsible for making sure all
-        eaters have received their file descriptor to eat from.
-
-        @param clocking: tuple of (ip, port, base_time) of a master clock,
-                         or None not to slave the clock
-        @type  clocking: tuple(str, int, long) or None.
-        """
-        self.debug('ParseLaunchComponent.start')
-        if clocking:
-            self.info('slaving to master clock on %s:%d with base time %d' %
-                clocking)
-
-        if clocking:
-            self.set_master_clock(*clocking)
-
-        return self.link()
+        return '!'
 
 class Effect(log.Loggable):
     """
@@ -548,8 +551,9 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         raise errors.NotImplementedError("Implement in a subclass")
 
     def get_queue_string(self, eaterAlias):
-        return ("queue name=eater:%s-queue max-size-buffers=%d"
-                % (eaterAlias, self.QUEUE_SIZE_BUFFERS))
+        name = self.eaters[eaterAlias].elementName
+        return ("! queue name=%s-queue max-size-buffers=%d !"
+                % (name, self.QUEUE_SIZE_BUFFERS))
 
     def get_pipeline_string(self, properties):
         eaters = self.config.get('eater', {})
@@ -575,7 +579,7 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
     def unblock_eater(self, eaterAlias):
         # Firstly, ensure that any push in progress is guaranteed to return,
         # by temporarily enlarging the queue
-        queuename = "eater:%s-queue" % eaterAlias
+        queuename = self.eaters[eaterAlias].elementName + '-queue'
         queue = self.pipeline.get_by_name(queuename)
 
         size = queue.get_property("max-size-buffers")

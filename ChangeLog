@@ -1,5 +1,32 @@
 2007-09-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.install_eater_continuity_watch): New public method,
+	watches some elements for discontinuity message; palliates some
+	magical element naming intertwingliness.
+	(FeedComponent.get_eater_name_for_feed_id): Remove; although
+	switch needs it, switch should be refactored to make more use of
+	Eater objects.
+	(FeedComponent.do_start): Rename from link() and incorporate
+	do_start() from ParseLaunchComponent, allows implementation of
+	pure FeedComponent classes. Fixes #646.
+
+	* flumotion/component/feedcomponent.py
+	(ParseLaunchComponent.FDSRC_TMPL)
+	(ParseLaunchComponent.DEPAY_TMPL)
+	(ParseLaunchComponent.FEEDER_TMPL): Moved here from FeedComponent.
+	(ParseLaunchComponent.EATER_TMPL): New template variable, computed
+	at init-time as a combination of FDSRC_TMPL, DEPAY_TMPL,
+	get_queue_string(), and identity, if we are checking stream
+	continuity.
+	(ParseLaunchComponent.set_pipeline): Install an eater continuity
+	watch if needed.
+	(ParseLaunchComponent.get_eater_template)
+	(ParseLaunchComponent.parse_pipeline)
+	(ParseLaunchComponent.get_feeder_template)
+	(ParseLaunchComponent.get_queue_string)
+	(MultiInputParseLaunchComponent.get_queue_string): Detwingle.
+
 	* flumotion/component/feedcomponent.py
 	(ParseLaunchComponent.get_eater_template): Fix naming of eater
 	identities.

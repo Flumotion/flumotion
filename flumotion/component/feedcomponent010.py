@@ -525,16 +525,7 @@ class EaterPadMonitor(PadMonitor):
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
-
-    @cvar checkTimestamp: whether to check continuity of timestamps for eaters
-    @cvar checkOffset:    whether to check continuity of offsets for eaters
     """
-    # keep these as class variables for the tests
-    FDSRC_TMPL = 'fdsrc name=%(name)s'
-    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
-    FEEDER_TMPL = 'gdppay name=%(name)s-pay ! multifdsink sync=false '\
-                      'name=%(name)s buffers-max=500 buffers-soft-max=450 '\
-                      'recover-policy=1'
 
     # how often to update the UIState feeder statistics
     FEEDER_STATS_UPDATE_FREQUENCY = 12.5
@@ -542,9 +533,6 @@ class FeedComponent(basecomponent.BaseComponent):
     logCategory = 'feedcomponent'
 
     __signals__ = ('feed-ready', 'error')
-
-    checkTimestamp = False
-    checkOffset = False
 
     ### BaseComponent interface implementations
     def init(self):
@@ -575,22 +563,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self._gotFirstNewSegment = {}
 
         # multifdsink's get-stats signal had critical bugs before this version
-        tcppluginversion = gstreamer.get_plugin_version('tcp')
-        self._get_stats_supported = tcppluginversion >= (0, 10, 11, 0)
-
-        # check for identity version and set checkTimestamp and checkOffset
-        # to false if too old
-        vt = gstreamer.get_plugin_version('coreelements')
-        if not vt:
-            raise errors.MissingElementError('identity')
-        if not gstreamer.element_factory_has_property('identity', 
-            'check-imperfect-timestamp'):
-            self.checkTimestamp = False
-            self.checkOffset = False
-            self.addMessage(
-                messages.Info(T_(N_(
-                    "You will get more debugging information "
-                    "if you upgrade to GStreamer 0.10.13 or later."))))
+        self._get_stats_supported = (gstreamer.get_plugin_version('tcp')
+                                     >= (0, 10, 11, 0))
 
     def do_setup(self):
         """
@@ -705,28 +679,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.setMood(moods.hungry)
         self._inactivated = True
 
-    def eaterTimestampDiscont(self, eaterAlias, prevTs, prevDuration, curTs):
-        """
-        Inform of a timestamp discontinuity for the given eater.
-        """
-        discont = curTs - (prevTs + prevDuration)
-        dSeconds = discont / float(gst.SECOND)
-        self.debug("we have a discont on eater %s of %f s between %s and %s ", 
-                   eaterAlias, dSeconds, gst.TIME_ARGS(prevTs),
-                   gst.TIME_ARGS(curTs))
-        self.eaters[eaterAlias].timestampDiscont(
-            dSeconds, float(curTs) / float(gst.SECOND))
-
-    def eaterOffsetDiscont(self, eaterAlias, prevOffsetEnd, curOffset):
-        """
-        Inform of a timestamp discontinuity for the given eater.
-        """
-        discont = curOffset - prevOffsetEnd
-        self.debug("we have a discont on eater %s of %d units between "
-                   "%d and %d ", eaterAlias, discont, prevOffsetEnd,
-                   curOffset)
-        self.eaters[eaterAlias].offsetDiscont(discont, curOffset)
-         
     ### FeedComponent methods
     def addEffect(self, effect):
         self.effects[effect.name] = effect
@@ -873,38 +825,56 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.warning("We got an eos from %s", name)
             else:
                 self.warning("We got an eos from %s", name)
-        elif t == gst.MESSAGE_ELEMENT:
-            name = src.get_name()
-            # check if the element name is an eater's identity
-            # FIXME: intertwingliness
-            if name.startswith('eater:') and name.endswith('-identity'):
-                eaterAlias = name[len('eater:'):-len('-identity')]
-                if eaterAlias in self.eaters:
-                    s = message.structure
-                    def imperfectTimestamp():
-                        self.log("we have an imperfect stream from %s",
-                                 name)
-                        self.eaterTimestampDiscont(eaterAlias,
-                                                   s["prev-timestamp"],
-                                                   s["prev-duration"],
-                                                   s["cur-timestamp"])
-                        
-                    def imperfectOffset():
-                        self.log("we have an imperfect stream from %s",
-                                 name)
-                        self.eaterOffsetDiscont(eaterAlias,
-                                                s["prev-offset-end"],
-                                                s["cur-offset"])
-
-                    handlers = {'imperfect-timestamp': imperfectTimestamp,
-                                'imperfect-offset': imperfectOffset}
-                    if s.get_name() in handlers:
-                        handlers[s.get_name()]()
         else:
             self.log('message received: %r' % message)
 
         return True
 
+    def install_eater_continuity_watch(self, eaterWatchElements):
+        """Watch a set of elements for discontinuity messages.
+
+        @param eaterWatchElements: the set of elements to watch for
+        discontinuities.
+        @type eaterWatchElements: Dict of elementName => Eater.
+        """
+        def on_element_message(bus, message):
+            src = message.src
+            name = src.get_name()
+            if name in eaterWatchElements:
+                eater = eaterWatchElements[name]
+                s = message.structure
+                def timestampDiscont():
+                    prevTs = s["prev-timestamp"]
+                    prevDuration = s["prev-duration"]
+                    curTs = s["cur-timestamp"]
+                    discont = curTs - (prevTs + prevDuration)
+                    dSeconds = discont / float(gst.SECOND)
+                    self.debug("we have a discont on eater %s of %f s "
+                               "between %s and %s ", eater.eaterAlias,
+                               dSeconds, gst.TIME_ARGS(prevTs),
+                               gst.TIME_ARGS(curTs))
+                    eater.timestampDiscont(dSeconds,
+                                           float(curTs) / float(gst.SECOND))
+
+                def offsetDiscont():
+                    prevOffsetEnd = s["prev-offset-end"]
+                    curOffset = s["cur-offset"]
+                    discont = curOffset - prevOffsetEnd
+                    self.debug("we have a discont on eater %s of %d "
+                               "units between %d and %d ",
+                               eater.eaterAlias, discont, prevOffsetEnd,
+                               curOffset)
+                    eater.offsetDiscont(discont, curOffset)
+
+                handlers = {'imperfect-timestamp': timestampDiscont,
+                            'imperfect-offset': offsetDiscont}
+                if s.get_name() in handlers:
+                    handlers[s.get_name()]()
+
+        # we know that there is a signal watch already installed
+        bus = self.pipeline.get_bus()
+        bus.connect("message::element", on_element_message)
+            
     def _setup_pipeline(self):
         self.debug('setup_pipeline()')
         assert self.bus_signal_id == None
@@ -1053,15 +1023,24 @@ class FeedComponent(basecomponent.BaseComponent):
             # Just return the already set up info, as a fired deferred
             return defer.succeed(self._master_clock_info)
 
-    # FIXME: rename, since this just starts the pipeline,
-    # and linking is done by the manager
-    def link(self):
+    ### BaseComponent interface implementation
+    def do_start(self, clocking):
         """
-        Make the component eat from the feeds it depends on and start
-        producing feeds itself.
+        Tell the component to start.
+        Whatever is using the component is responsible for making sure all
+        eaters have received their file descriptor to eat from.
 
-        @rtype: L{twisted.internet.defer.Deferred}
+        @param clocking: tuple of (ip, port, base_time) of a master clock,
+                         or None not to slave the clock
+        @type  clocking: tuple(str, int, long) or None.
         """
+        self.debug('FeedComponent.start')
+        if clocking:
+            host, port, base_time = clocking
+            self.info('slaving to master clock on %s:%d with base time %d',
+                      host, port, base_time)
+            self.set_master_clock(host, port, base_time)
+        
         # set pipeline to playing, and provide clock if asked for
         if self.clock_provider:
             self.clock_provider.set_property('active', True)
@@ -1351,20 +1330,3 @@ class FeedComponent(basecomponent.BaseComponent):
             else:
                 self._gotFirstNewSegment[eaterAlias] = True
         return True
-
-    def get_eater_name_for_feed_id(self, feedId):
-        """
-        Given a feedId, it will return the eater name that it is in.
-        Unfortunately feedcomponent keys eaters on the feedId so
-        it is impossible to have the same feedId feeding multiple
-        eaters in the same component.
-
-        @param feedId the feedId to get the eater name for
-        @returns the eater name
-        @rtype: string
-        """
-        # FIXME: seems like an unnecessary function
-        for eater in self.eaters.values():
-            if eater.feedId == feedId:
-                return eater.eaterName
-        return None
