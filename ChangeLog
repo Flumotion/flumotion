@@ -1,3 +1,8 @@
+2007-09-12  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	Fix disker's use of old method on remote call to add events.
+
 2007-09-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_component_feeder.py (TestFeeder): 

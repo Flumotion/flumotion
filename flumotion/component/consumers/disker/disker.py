@@ -377,15 +377,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def parse_ical(self, icsStr):
         if HAS_ICAL:
             cal = Calendar.from_string(icsStr)
-            for event in cal.walk('vevent'):
-                dtstart = event.decoded('dtstart', '')
-                dtend = event.decoded('dtend', '')
-                summary = event.decoded('summary', None)
-                self.debug("event parsed with start: %r end: %r and summary: %s"
-                           , dtstart, dtend, summary)
-                recur = event.get('rrule', None)
-                if dtstart and dtend:
-                    self.schedule_recording(dtstart, dtend, recur, summary)
+            if self.icalScheduler:
+                events = self.icalScheduler.parseCalendar(cal)
+                if events:
+                    self.icalScheduler.addEvents(events)
+                else:
+                    self.warning("No events found in the ical string")
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
 
