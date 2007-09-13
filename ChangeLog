@@ -1,5 +1,9 @@
 2007-09-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.attachPadMonitorToFeeder): Improved variable
+	existence.
+
 	* flumotion/component/padmonitor.py (PadMonitor.__init__):
 	Publicize monitor.name.
 	(PadMonitorSet): New object, factored out of FeedComponent.

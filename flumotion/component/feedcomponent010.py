@@ -140,7 +140,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def attachPadMonitorToFeeder(self, feederName):
         elementName = self.feeders[feederName].payName
-        element = self.pipeline.get_by_name(payName)
+        element = self.pipeline.get_by_name(elementName)
         if not element:
             raise errors.ComponentError("No such feeder %s" % feederName)
 
