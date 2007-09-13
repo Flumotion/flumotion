@@ -39,6 +39,7 @@ class Feeder:
     def __init__(self, feederName):
         self.feederName = feederName
         self.elementName = 'feeder:' + feederName
+        self.payName = self.elementName + '-pay'
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('feederName')
         self.uiState.set('feederName', feederName)

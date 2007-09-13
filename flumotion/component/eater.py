@@ -40,6 +40,8 @@ class Eater:
         self.eaterName = eaterName
         self.feedId = None
         self.elementName = 'eater:' + eaterAlias
+        self.depayName = self.elementName + '-depay'
+        self.setPadMonitor(None)
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('eaterAlias')
         self.uiState.set('eaterAlias', eaterAlias)
@@ -123,6 +125,12 @@ class Eater:
             self.uiState.set('fd', None)
 
         reactor.callFromThread(updateUIState)
+
+    def setPadMonitor(self, monitor):
+        self._padMonitor = monitor
+
+    def isActive(self):
+        return self._padMonitor and self._padMonitor.isActive()
 
     def timestampDiscont(self, seconds, timestamp):
         """

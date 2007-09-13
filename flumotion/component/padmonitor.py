@@ -35,7 +35,7 @@ class PadMonitor(log.Loggable):
     def __init__(self, pad, name, setActive, setInactive):
         self._last_data_time = 0
         self._pad = pad
-        self._name = name
+        self.name = name
         self._active = False
         self._first = True
 
@@ -96,7 +96,7 @@ class PadMonitor(log.Loggable):
 
         self._last_data_time = time.time()
 
-        self.logMessage('buffer probe on %s has timestamp %s', self._name,
+        self.logMessage('buffer probe on %s has timestamp %s', self.name,
              gst.TIME_ARGS(buffer.timestamp))
 
         id = self._probe_id.pop("id", None)
@@ -121,7 +121,7 @@ class PadMonitor(log.Loggable):
     def _check_flow_timeout(self):
         self._check_flow_dc = None
 
-        self.log('last buffer for %s at %r', self._name, self._last_data_time)
+        self.log('last buffer for %s at %r', self.name, self._last_data_time)
 
         now = time.time()
 
@@ -130,22 +130,22 @@ class PadMonitor(log.Loggable):
 
             if self._active and delta > self.PAD_MONITOR_TIMEOUT:
                 self.info("No data received on pad %s for > %r seconds, setting "
-                    "to hungry", self._name, self.PAD_MONITOR_TIMEOUT)
+                    "to hungry", self.name, self.PAD_MONITOR_TIMEOUT)
                 self.setInactive()
             elif not self._active and delta < self.PAD_MONITOR_TIMEOUT:
                 self.info("Receiving data again on pad %s, flow active", 
-                    self._name)
+                    self.name)
                 self.setActive()
 
         self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
             self._check_flow_timeout)
 
     def setInactive(self):
-        self._doSetInactive(self._name)
+        self._doSetInactive(self.name)
         self._active = False
 
     def setActive(self):
-        self._doSetActive(self._name)
+        self._doSetActive(self.name)
         self._active = True
 
 class EaterPadMonitor(PadMonitor):
@@ -165,10 +165,10 @@ class EaterPadMonitor(PadMonitor):
         # Setting lastTime to 0 here avoids that happening in eaterCheck.
         self._last_buffer_time = 0
 
-        self._doReconnectEater(self._name)
+        self._doReconnectEater(self.name)
         def reconnect():
             self._reconnectDC = None
-            self._doReconnectEater(self._name)
+            self._doReconnectEater(self.name)
 
         self._reconnectDC = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
             reconnect)
@@ -186,3 +186,53 @@ class EaterPadMonitor(PadMonitor):
         if self._reconnectDC:
             self._reconnectDC.cancel()
             self._reconnectDC = None
+
+class PadMonitorSet(dict, log.Loggable):
+    def __init__(self, setActive, setInactive):
+        # These callbacks will be called when the set as a whole is
+        # active or inactive.
+        self._doSetActive = setActive
+        self._doSetInactive = setInactive
+        self._wasActive = True
+
+    def attach(self, pad, name, klass=PadMonitor, *args):
+        """
+        Watch for data flow through this pad periodically.
+        If data flow ceases for too long, we turn hungry. If data flow resumes,
+        we return to happy.
+        """
+        def monitorActive(name):
+            self.info('Pad data flow at %s is active', name)
+            if self.isActive() and not self._wasActive:
+                # The wasActive check is to prevent _doSetActive from being
+                # called happy initially because of this; only if we
+                # previously went inactive because of an inactive monitor. A
+                # curious interface.
+                self._wasActive = True
+                self._doSetActive()
+
+        def monitorInactive(name):
+            self.info('Pad data flow at %s is inactive', name)
+            if self._wasActive:
+                self._doSetInactive()
+            self._wasActive = False
+
+        assert name not in self
+        monitor = klass(pad, name, monitorActive, monitorInactive, *args)
+        self[monitor.name] = monitor
+        self.info("Added pad monitor %s", monitor.name)
+
+    def remove(self, name):
+        if name not in self:
+            self.warning("No pad monitor with name %s", name)
+            return
+
+        monitor = self.pop(name)
+        monitor.detach()
+
+    def isActive(self):
+        for monitor in self.values():
+            if not monitor.isActive():
+                return False
+        return True
+

@@ -1,3 +1,30 @@
+2007-09-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/padmonitor.py (PadMonitor.__init__):
+	Publicize monitor.name.
+	(PadMonitorSet): New object, factored out of FeedComponent.
+
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	Make _pad_monitors a PadMonitorSet, which still derives from dict.
+	(attachPadMonitor, removePadMonitor, setPadMonitorActive)
+	(setPadMonitorInactive): Removed, now part of the PadMonitorSet.
+
+	* flumotion/component/eater.py (Eater.setPadMonitor)
+	(Eater.isActive): New methods, for indexing pad monitors by eater.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.attachPadMonitorToFeeder)
+	(FeedComponent.bus_message_received_cb): 
+	* flumotion/component/eater.py (Eater.__init__)
+	* flumotion/component/feeder.py (Feeder.__init__): Detwingle names
+	more.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.isEaterActive): Removed, use the eater directly.
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.is_active): Update to new API.
+
 2007-09-12  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:

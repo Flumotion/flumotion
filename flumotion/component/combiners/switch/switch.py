@@ -106,7 +106,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # eaterSubstring is "master" or "backup"
         for eaterAlias in self.eaters:
             if eaterSubstring in eaterAlias:
-                return self.isEaterActive(eaterAlias)
+                return self.eaters[eaterAlias].isActive()
         return True
 
     # if an event starts, semantics are to switch to backup

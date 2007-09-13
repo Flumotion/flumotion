@@ -66,14 +66,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self.effects = {}
         self._feeder_probe_cl = None
 
-        self._pad_monitors = {}
+        self._pad_monitors = padmonitor.PadMonitorSet(
+            lambda: self.setMood(moods.happy),
+            lambda: self.setMood(moods.hungry))
 
         self.clock_provider = None
         self._master_clock_info = None # (ip, port, basetime) if we're the 
                                        # clock master
-
-        self._inactivated = False # Has the component ever gone hungry due to
-                                  # pad flow not happening?
 
         self._change_monitor = gstreamer.StateChangeMonitor()
 
@@ -140,63 +139,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self._setup_pipeline()
 
     def attachPadMonitorToFeeder(self, feederName):
-        # FIXME: intertwingliness
-        elementName = feederName+"-pay"
-        element = self.pipeline.get_by_name(elementName)
+        elementName = self.feeders[feederName].payName
+        element = self.pipeline.get_by_name(payName)
         if not element:
             raise errors.ComponentError("No such feeder %s" % feederName)
 
         pad = element.get_pad('src')
-        self.attachPadMonitor(pad, elementName)
-
-    def attachPadMonitor(self, pad, name):
-        """
-        Watch for data flow through this pad periodically.
-        If data flow ceases for too long, we turn hungry. If data flow resumes,
-        we return to happy.
-        """
-        monitor = padmonitor.PadMonitor(pad, name,
-                                        self.setPadMonitorActive,
-                                        self.setPadMonitorInactive)
-        self._pad_monitors[name] = monitor
-        self.info("Added pad monitor %s", name)
-
-    def removePadMonitor(self, name):
-        if name not in self._pad_monitors:
-            self.warning("No pad monitor with name %s", name)
-            return
-
-        self._pad_monitors[name].detach()
-
-        del self._pad_monitors[name]
-
-    def setPadMonitorActive(self, name):
-        """
-        Inform the component that data flow through the given pad monitor is
-        currently working. 
-        """
-        self.info('Pad data flow at %s is active', name)
-
-        allActive = True
-        for monitor in self._pad_monitors.values():
-            if not monitor.isActive():
-                allActive = False
-                
-        if allActive and self._inactivated:
-            # We never go happy initially because of this; only if we went
-            # hungry because of an eater being inactive.
-            self.setMood(moods.happy)
-            self._inactivated = False
-
-    def setPadMonitorInactive(self, name):
-        """
-        Inform the component that data flow through the given pad monitor has
-        ceased.
-        """
-        self.info('Pad data flow at %s is inactive', name)
-
-        self.setMood(moods.hungry)
-        self._inactivated = True
+        self._pad_monitors.attach(pad, elementName)
 
     ### FeedComponent methods
     def addEffect(self, effect):
@@ -268,18 +217,11 @@ class FeedComponent(basecomponent.BaseComponent):
                                             gerror.message)
         elif t == gst.MESSAGE_EOS:
             name = src.get_name()
-            # FIXME twingly
-            if name.startswith('eater:'):
-                eaterAlias = name[len('eater:'):]
-                if eaterAlias in self.eaters:
-                    self.info('End of stream in eater %r', eaterAlias)
-                    # Setting the pad monitor inactive turns us hungry and 
-                    # triggers a reconnect attempt
-                    self._pad_monitors[name].setInactive()
-                else:
-                    self.warning("We got an eos from %s", name)
+            if name in self._pad_monitors:
+                self.info('End of stream in element %s', name)
+                self._pad_monitors[name].setInactive()
             else:
-                self.warning("We got an eos from %s", name)
+                self.info("We got an eos from %s", name)
         else:
             self.log('message received: %r' % message)
 
@@ -395,8 +337,9 @@ class FeedComponent(basecomponent.BaseComponent):
             self._feeder_probe_cl = None
 
         # clean up checkEater callLaters
-        for eaterAlias in self.eaters:
-            self.removePadMonitor(eaterAlias)
+        for eater in self.eaters:
+            self._pad_monitors.remove(eater.elementName)
+            eater.setPadMonitor(None)
 
     def do_stop(self):
         self.debug('Stopping')
@@ -419,9 +362,6 @@ class FeedComponent(basecomponent.BaseComponent):
         """
 
         return self._master_clock_info
-
-    def isEaterActive(self, eaterAlias):
-        return self._pad_monitors[eaterAlias].isActive()
 
     def provide_master_clock(self, port):
         """
@@ -522,11 +462,10 @@ class FeedComponent(basecomponent.BaseComponent):
                 depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
                     eater.eaterAlias)
 
-            monitor = padmonitor.EaterPadMonitor(pad, eater.eaterAlias,
-                                                 self.setPadMonitorActive,
-                                                 self.setPadMonitorInactive,
-                                                 self.reconnectEater)
-            self._pad_monitors[name] = monitor
+            self._pad_monitors.attach(pad, name,
+                                      padmonitor.EaterPadMonitor,
+                                      self.reconnectEater)
+            eater.setPadMonitor(self._pad_monitors[name])
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
