@@ -3,6 +3,7 @@
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent.attachPadMonitorToFeeder): Improved variable
 	existence.
+	(FeedComponent.cleanup): Further fixage.
 
 	* flumotion/component/padmonitor.py (PadMonitor.__init__):
 	Publicize monitor.name.

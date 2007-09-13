@@ -337,7 +337,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self._feeder_probe_cl = None
 
         # clean up checkEater callLaters
-        for eater in self.eaters:
+        for eater in self.eaters.values():
             self._pad_monitors.remove(eater.elementName)
             eater.setPadMonitor(None)
 
