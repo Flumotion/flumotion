@@ -31,9 +31,12 @@
       <directories>
         <directory name="flumotion/component">
           <filename location="component.py" />
+          <filename location="eater.py" />
           <filename location="feed.py" />
+          <filename location="feeder.py" />
           <filename location="feedcomponent.py" />
           <filename location="feedcomponent010.py" />
+          <filename location="padmonitor.py" />
         </directory>
       </directories>
     </bundle>

@@ -20,24 +20,18 @@
 # Headers in this file shall remain intact.
 
 import time
-import gobject
-gobject.threads_init()
-import pygst
-pygst.require('0.10')
-import gst
 
 from twisted.trial import unittest
 
 import common
 
-from twisted.python import failure
 from twisted.internet import defer, reactor
 
-from flumotion.component import feedcomponent010 as fc
+from flumotion.component import feeder
 
 class TestFeeder(unittest.TestCase):
     def setUp(self):
-        self.feeder = fc.Feeder('video:default')
+        self.feeder = feeder.Feeder('video:default')
 
     def test_clientConnected(self):
         clientId = '/default/muxer-video'
@@ -92,78 +86,3 @@ class TestFeeder(unittest.TestCase):
         self.clientAssertEquals(client, 'bytesReadTotal', brt)
         self.clientAssertEquals(client, 'buffersDroppedTotal', bdt)
         self.clientAssertEquals(client, 'reconnects', reconnects)
-
-class FakeComponent(object):
-    def setPadMonitorActive(self, name):
-        pass
-
-    def setPadMonitorInactive(self, name):
-        pass
-
-class TestPadMonitor(unittest.TestCase):
-
-    def _run_pipeline(self, pipeline):
-        pipeline.set_state(gst.STATE_PLAYING)
-        pipeline.get_bus().poll(gst.MESSAGE_EOS, -1)
-        pipeline.set_state(gst.STATE_NULL)
-        
-    def testPadMonitorActivation(self):
-        component = FakeComponent()
-        pipeline = gst.parse_launch(
-            'fakesrc num-buffers=1 ! identity name=id ! fakesink')
-        identity = pipeline.get_by_name('id')
-
-        srcpad = identity.get_pad('src')
-        monitor = fc.PadMonitor(component, srcpad, 
-            "identity-source")
-        self.assertEquals(monitor.isActive(), False)
-
-        self._run_pipeline(pipeline)
-        # Now give the reactor a chance to process the callFromThread()
-        d = defer.Deferred()
-        def finishTest():
-            self.assertEquals(monitor.isActive(), True)
-            monitor.detach()
-            d.callback(True)
-        reactor.callLater(0.1, finishTest)
-
-        return d
-
-    def testPadMonitorTimeout(self):
-        fc.PadMonitor.PAD_MONITOR_PROBE_FREQUENCY = 0.2
-        fc.PadMonitor.PAD_MONITOR_TIMEOUT = 0.5
-
-        component = FakeComponent()
-        pipeline = gst.parse_launch(
-            'fakesrc num-buffers=1 ! identity name=id ! fakesink')
-        identity = pipeline.get_by_name('id')
-
-        srcpad = identity.get_pad('src')
-        monitor = fc.PadMonitor(component, srcpad, 
-            "identity-source")
-        self.assertEquals(monitor.isActive(), False)
-
-        self._run_pipeline(pipeline)
-        # Now give the reactor a chance to process the callFromThread()
-        d = defer.Deferred()
-        def finished():
-            monitor.detach()
-            d.callback(True)
-
-        def hasInactivated(name):
-            # We can't detach the monitor from this callback safely, so do
-            # it from a reactor.callLater()
-            reactor.callLater(0, finished)
-            
-        def hasActivated():
-            self.assertEquals(monitor.isActive(), True)
-            # Now, we don't send any more data, and after our 0.5 second timeout
-            # we should go inactive. Pass our test if that happens. Otherwise
-            # trial will time out.
-            component.setPadMonitorInactive = hasInactivated
-        reactor.callLater(0.2, hasActivated)
-
-        return d
-
-if __name__ == '__main__':
-    unittest.main()

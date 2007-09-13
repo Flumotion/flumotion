@@ -1,3 +1,31 @@
+2007-09-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_component_feeder.py (TestFeeder): 
+	* flumotion/test/test_component_padmonitor.py (TestPadMonitor):
+	Split out tests from test_feedcomponent010.py, which wasn't even
+	being disted, and which now is empty and deleted. Update to use
+	new API.
+
+	* flumotion/component/feeder.py (Feeder): 
+	* flumotion/component/eater.py (Eater): Move out to separate
+	files.
+
+	* flumotion/component/padmonitor.py (PadMonitor)
+	(EaterPadMonitor): Move to a separate file; take the callbacks in
+	__init__() so that we don't have to introduce a dependency on the
+	naming of the component's interface.
+
+	* flumotion/common/gstreamer.py (StateChangeMonitor): Move here
+	from feedcomponent010.py; requires extra imports in this file, but
+	that shouldn't be a problem.
+
+	* flumotion/component/feedcomponent010.py: Import helper classes
+	from external modules.
+
+	* flumotion/component/Makefile.am (component_PYTHON): 
+	* flumotion/component/component.xml: Add new files to bundles and
+	dist.
+
 2007-09-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py (StateChangeMonitor):

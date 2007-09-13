@@ -39,8 +39,10 @@ EXTRA_DIST = 				\
 	test_component_bouncers_plug.py\
 	test_component_init.py 		\
 	test_component_feed.py		\
+	test_component_feeder.py	\
 	test_component_httpserver.py 	\
 	test_component_httpstreamer.py 	\
+	test_component_padmonitor.py 	\
 	test_component_playlist.py 	\
 	test_comptest.py 		\
 	test_config.py 			\

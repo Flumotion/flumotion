@@ -23,8 +23,9 @@
 GStreamer helper functionality
 """
 
+from twisted.internet import defer
 # moving this down causes havoc when running this file directly for some reason
-from flumotion.common import errors
+from flumotion.common import errors, log
 
 import gobject
 import gst
@@ -140,3 +141,49 @@ def get_state_change(old, new):
              (gst.STATE_READY, gst.STATE_NULL):
              gst.STATE_CHANGE_READY_TO_NULL}
     return table.get((old, new), 0)
+
+class StateChangeMonitor(dict, log.Loggable):
+    def __init__(self):
+        # statechange -> [ deferred ]
+        dict.__init__(self)
+
+    def add(self, statechange):
+        if statechange not in self:
+            self[statechange] = []
+
+        d = defer.Deferred()
+        self[statechange].append(d)
+
+        return d
+
+    def state_changed(self, old, new):
+        self.log('state change: pipeline %s->%s',
+                 old.value_nick, new.value_nick)
+        change = get_state_change(old, new)
+        if change in self:
+            dlist = self[change]
+            for d in dlist:
+                d.callback(None)
+            del self[change]
+
+    def have_error(self, curstate, message):
+        # if we have a state change defer that has not yet
+        # fired, we should errback it
+        changes = [gst.STATE_CHANGE_NULL_TO_READY, 
+                   gst.STATE_CHANGE_READY_TO_PAUSED,
+                   gst.STATE_CHANGE_PAUSED_TO_PLAYING]
+
+        extras = ((gst.STATE_PAUSED, gst.STATE_CHANGE_PLAYING_TO_PAUSED),
+                  (gst.STATE_READY, gst.STATE_CHANGE_PAUSED_TO_READY)
+                  (gst.STATE_NULL, gst.STATE_CHANGE_READY_TO_NULL))
+        for state, change in extras:
+            if curstate <= state:
+                changes.append(change)
+        
+        for change in changes:
+            if change in self:
+                self.log("We have an error, going to errback pending "
+                         "state change defers")
+                for d in self[change]:
+                    d.errback(errors.ComponentStartHandledError(message))
+                del self[change]

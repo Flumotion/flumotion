@@ -5,9 +5,12 @@ component_DATA = component.xml
 component_PYTHON = \
 	__init__.py \
 	component.py \
+	eater.py \
 	feed.py \
+	feeder.py \
 	feedcomponent.py \
-	feedcomponent010.py
+	feedcomponent010.py \
+	padmonitor.py
 
 TAGS_FILES = $(component_PYTHON)
 
