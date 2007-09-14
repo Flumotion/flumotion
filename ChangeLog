@@ -1,5 +1,29 @@
 2007-09-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/padmonitor.py (EaterPadMonitor.__init__)
+	(EaterPadMonitor.setInactive): Changes to fix the FeedComponent
+	reconnectEater problem.
+
+	* flumotion/component/component.py (BaseComponent): Remove signal
+	stuff, as I had meant to do before.
+
+	* flumotion/component/producers/playlist/playlist.py
+	(PlaylistProducer.create_pipeline): 
+	* flumotion/component/feedcomponent.py
+	(ParseLaunchComponent.create_pipeline): Don't connect_feeders, the
+	base class will do this.
+
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	New instance var, _clock_slaved. Will be used later.
+	(FeedComponent.do_setup): Set _clock_slaved to True if we should
+	expect to slave our clock to another one. Call connect_feeders()
+	on the pipeline instead of expecting create_pipeline() to do so.
+	(FeedComponent.stop_pipeline): Rename from pipeline_stop.
+	(FeedComponent.cleanup): It's stop_pipeline now.
+	(FeedComponent.do_start): Fix bug in eater pad monitors whereby it
+	would call back with the fdsrc name, not the eater alias.
+	(FeedComponent.feedToFD): Clean up the fd in an error case.
+
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer)
 	(MultifdSinkStreamer._client_removed_handler): 

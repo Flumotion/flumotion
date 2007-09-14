@@ -68,6 +68,7 @@ class FeedComponent(basecomponent.BaseComponent):
             lambda: self.setMood(moods.happy),
             lambda: self.setMood(moods.hungry))
 
+        self._clock_slaved = False
         self.clock_provider = None
         self._master_clock_info = None # (ip, port, basetime) if we're the 
                                        # clock master
@@ -85,9 +86,10 @@ class FeedComponent(basecomponent.BaseComponent):
         Invokes the L{create_pipeline} and L{set_pipeline} vmethods,
         which subclasses can provide.
         """
-        eater_config = self.config.get('eater', {})
-        feeder_config = self.config.get('feed', [])
-        source_config = self.config.get('source', [])
+        config = self.config
+        eater_config = config.get('eater', {})
+        feeder_config = config.get('feed', [])
+        source_config = config.get('source', [])
 
         self.debug("FeedComponent.do_setup(): eater_config %r", eater_config)
         self.debug("FeedComponent.do_setup(): feeder_config %r", feeder_config)
@@ -108,11 +110,19 @@ class FeedComponent(basecomponent.BaseComponent):
             self.uiState.append('feeders',
                                  self.feeders[feederName].uiState)
 
+        clockMaster = config.get('clock-master', None)
+        if clockMaster:
+            self._clock_slaved = clockMaster != config['avatarId']
+        else:
+            self._clock_slaved = False
+
         pipeline = self.create_pipeline()
+        self.connect_feeders(pipeline)
         self.set_pipeline(pipeline)
 
-        self.debug("FeedComponent.do_setup(): finished")
+        self.debug("FeedComponent.do_setup(): setup finished")
 
+        # wait to start until clocking details received
         return defer.succeed(None)
 
     ### FeedComponent interface for subclasses
@@ -315,7 +325,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 '0.10.11'))
             self.addMessage(m)
 
-    def pipeline_stop(self):
+    def stop_pipeline(self):
         if not self.pipeline:
             return
         
@@ -331,7 +341,7 @@ class FeedComponent(basecomponent.BaseComponent):
         
         assert self.pipeline != None
 
-        self.pipeline_stop()
+        self.stop_pipeline()
         # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
         self.pipeline_signals = []
@@ -492,7 +502,8 @@ class FeedComponent(basecomponent.BaseComponent):
             pad = self.get_element(eater.elementName).get_pad('src')
             self._pad_monitors.attach(pad, eater.elementName,
                                       padmonitor.EaterPadMonitor,
-                                      self.reconnectEater)
+                                      self.reconnectEater,
+                                      eater.eaterAlias)
             eater.setPadMonitor(self._pad_monitors[eater.elementName])
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
@@ -621,6 +632,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 debug=msg, id=mid, priority=40)
             self.state.append('messages', m)
             self.warning(msg)
+            cleanup(fd)
             return False
 
         feeder = self.feeders[feedName]

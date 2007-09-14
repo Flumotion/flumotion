@@ -355,8 +355,6 @@ class ParseLaunchComponent(FeedComponent):
             self.state.append('messages', m)
             raise errors.PipelineParseError(e.message)
 
-        self.connect_feeders(pipeline)
-
         return pipeline
 
     def set_pipeline(self, pipeline):

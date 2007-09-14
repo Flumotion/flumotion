@@ -371,7 +371,6 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
         self._createDefaultSources(props)
 
-        self.connect_feeders(pipeline)
         return pipeline
 
     def _watchDirectory(self, dir):

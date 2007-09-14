@@ -34,7 +34,6 @@ from zope.interface import implements
 
 from flumotion.common import interfaces, errors, log, planet, medium
 from flumotion.common import componentui, common, registry, messages, interfaces
-from flumotion.common import signals
 
 from flumotion.common.planet import moods
 from flumotion.configure import configure
@@ -270,8 +269,7 @@ class BaseComponentMedium(medium.PingingMedium):
         self.warning(msg)
         raise errors.MoMethodError(msg)
 
-class BaseComponent(common.InitMixin, log.Loggable,
-                    signals.SignalMixin):
+class BaseComponent(common.InitMixin, log.Loggable):
     """
     I am the base class for all Flumotion components.
 

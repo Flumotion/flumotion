@@ -150,10 +150,10 @@ class PadMonitor(log.Loggable):
 
 class EaterPadMonitor(PadMonitor):
     def __init__(self, pad, name, setActive, setInactive,
-                 reconnectEater):
+                 reconnectEater, *args):
         PadMonitor.__init__(self, pad, name, setActive, setInactive)
 
-        self._doReconnectEater = reconnectEater
+        self._doReconnectEater = lambda: reconnectEater(*args)
         self._reconnectDC = None
 
     def setInactive(self):
@@ -165,10 +165,10 @@ class EaterPadMonitor(PadMonitor):
         # Setting lastTime to 0 here avoids that happening in eaterCheck.
         self._last_buffer_time = 0
 
-        self._doReconnectEater(self.name)
+        self._doReconnectEater()
         def reconnect():
             self._reconnectDC = None
-            self._doReconnectEater(self.name)
+            self._doReconnectEater()
 
         self._reconnectDC = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
             reconnect)
