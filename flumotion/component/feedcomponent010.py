@@ -204,34 +204,38 @@ class FeedComponent(basecomponent.BaseComponent):
         return m
 
     def bus_message_received_cb(self, bus, message):
-        t = message.type
-        src = message.src
-
-        if t == gst.MESSAGE_STATE_CHANGED:
-            old, new, pending = message.parse_state_changed()
-            name = src.get_name()
+        def state_changed():
             if src == self.pipeline:
+                old, new, pending = message.parse_state_changed()
                 self._change_monitor.state_changed(old, new)
-        elif t == gst.MESSAGE_ERROR:
+
+        def error():
             gerror, debug = message.parse_error()
-            self.warning('element %s error %s %s' %
-                         (src.get_path_string(), gerror, debug))
+            self.warning('element %s error %s %s',
+                         src.get_path_string(), gerror, debug)
             self.setMood(moods.sad)
             m = self.make_message_for_gstreamer_error(gerror, debug)
             self.state.append('messages', m)
-
             self._change_monitor.have_error(self.pipeline.get_state(),
                                             gerror.message)
-        elif t == gst.MESSAGE_EOS:
+
+        def eos():
             name = src.get_name()
             if name in self._pad_monitors:
                 self.info('End of stream in element %s', name)
                 self._pad_monitors[name].setInactive()
             else:
                 self.info("We got an eos from %s", name)
-        else:
-            self.log('message received: %r' % message)
 
+        def default():
+            self.log('message received: %r', message)
+            
+        handlers = {gst.MESSAGE_STATE_CHANGED: state_changed,
+                    gst.MESSAGE_ERROR: error,
+                    gst.MESSAGE_EOS: eos}
+        t = message.type
+        src = message.src
+        handlers.get(t, default)()
         return True
 
     def install_eater_continuity_watch(self, eaterWatchElements):
@@ -522,14 +526,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY, 
             self._feeder_probe_calllater)
 
-    def reconnectEater(self, eaterAlias):
-        if not self.medium:
-            self.debug("Can't reconnect eater %s, running "
-                       "without a medium", eaterAlias)
-            return
-
-        self.eaters[eaterAlias].disconnected()
-        self.medium.connectEater(eaterAlias)
+    def unblock_eater(self, eaterAlias):
+        """
+        After this function returns, the stream lock for this eater must have
+        been released. If your component needs to do something here, override
+        this method.
+        """
+        pass
 
     def get_element(self, element_name):
         """Get an element out of the pipeline.
@@ -583,6 +586,15 @@ class FeedComponent(basecomponent.BaseComponent):
         pygobject.gobject_set_property(element, property, value)
     
     ### methods to connect component eaters and feeders
+    def reconnectEater(self, eaterAlias):
+        if not self.medium:
+            self.debug("Can't reconnect eater %s, running "
+                       "without a medium", eaterAlias)
+            return
+
+        self.eaters[eaterAlias].disconnected()
+        self.medium.connectEater(eaterAlias)
+
     def feedToFD(self, feedName, fd, cleanup, eaterId=None):
         """
         @param feedName: name of the feed to feed to the given fd.
@@ -697,11 +709,3 @@ class FeedComponent(basecomponent.BaseComponent):
         # update our eater uiState, saying that we are eating from a
         # possibly new feedId
         eater.connected(fd, feedId)
-
-    def unblock_eater(self, eaterAlias):
-        """
-        After this function returns, the stream lock for this eater must have
-        been released. If your component needs to do something here, override
-        this method.
-        """
-        pass

@@ -6,6 +6,10 @@
 	(FeedComponent.install_eater_event_probes): New helper, installs
 	the necessary event probes, which are now folded into the method.
 	(FeedComponent.do_start): Call install_eater_event_probes.
+	(FeedComponent.bus_message_received_cb): Clean up (to my eyes).
+	(FeedComponent.unblock_eater): Move around.
+	(FeedComponent.reconnectEater): Move around. Perhaps now I should
+	start making bugs again.
 
 2007-09-13  Andy Wingo  <wingo@pobox.com>
 
