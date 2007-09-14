@@ -58,6 +58,9 @@ class PipelineTest(ParseLaunchComponent):
             self.warning('Could not parse pipeline: %s' % e.message)
             raise errors.PipelineParseError(e.message)
 
+    def connect_feeders(self, pipeline):
+        pass
+        
     def set_pipeline(self, pipeline):
         self.pipeline = pipeline
         

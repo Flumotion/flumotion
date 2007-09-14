@@ -1,5 +1,8 @@
 2007-09-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component.py (PipelineTest.connect_feeders):
+	Stub out.
+
 	* flumotion/manager/component.py
 	(ComponentAvatar.perspective_feedReady)
 	(ComponentAvatar.perspective_error): Remove unused remote methods.
