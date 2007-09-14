@@ -78,7 +78,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         @param streamer: L{MultifdSinkStreamer}
         """
-        streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
         self.httpauth = httpauth
         
@@ -97,7 +96,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             
         web_resource.Resource.__init__(self)
 
-    def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
+    def clientRemoved(self, sink, fd, reason, stats):
         # this is the callback attached to our flumotion component,
         # not the GStreamer element
         if fd in self._requests:

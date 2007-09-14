@@ -67,16 +67,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self._eaterTransport = {}     # (componentId, feedId) -> transport
         self.logName = component.name
 
-        def on_component_error(component, element_path, message):
-            self.callRemote('error', element_path, message)
-
-        self.comp.connect('error', on_component_error)
-        
-        # override base Errback for callRemote to stop the pipeline
-        #def callRemoteErrback(reason):
-        #    self.warning('stopping pipeline because of %s' % reason)
-        #    self.comp.pipeline_stop()
-
     ### Referenceable remote methods which can be called from manager
     def remote_getElementProperty(self, elementName, property):
         return self.comp.get_element_property(elementName, property)

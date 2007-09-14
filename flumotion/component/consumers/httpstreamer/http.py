@@ -261,9 +261,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                 'sync=false ' + \
                                 'recover-policy=3'
 
-    __signals__ = feedcomponent.ParseLaunchComponent.__signals__
-    __signals__ += ('client-removed',)
-    
     componentMediumClass = HTTPMedium
 
     def init(self):
@@ -603,7 +600,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if reason.value_name == 'GST_CLIENT_STATUS_ERROR':
             self.warning('[fd %5d] Client removed because of write error' % fd)
 
-        self.emit('client-removed', sink, fd, reason, stats)
+        self.resource.clientRemoved(sink, fd, reason, stats)
         Stats.clientRemoved(self)
         self.update_ui_state()
 

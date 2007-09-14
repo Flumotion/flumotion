@@ -1,5 +1,17 @@
 2007-09-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer)
+	(MultifdSinkStreamer._client_removed_handler): 
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.__init__)
+	(HTTPStreamingResource.clientRemoved): 
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.__init__):
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.__signals): Remove signals from components, which
+	were a bit cracky.
+
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent.connect_feeders): Fold the client-fd-removed signal
 	handler into the method.

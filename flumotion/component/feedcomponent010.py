@@ -50,8 +50,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
     logCategory = 'feedcomponent'
 
-    __signals__ = ('feed-ready', 'error')
-
     ### BaseComponent interface implementations
     def init(self):
         # add keys for eaters and feeders uiState
