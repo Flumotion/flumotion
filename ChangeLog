@@ -1,5 +1,9 @@
 2007-09-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar.perspective_feedReady)
+	(ComponentAvatar.perspective_error): Remove unused remote methods.
+	
 	* flumotion/component/padmonitor.py (EaterPadMonitor.__init__)
 	(EaterPadMonitor.setInactive): Changes to fix the FeedComponent
 	reconnectEater problem.

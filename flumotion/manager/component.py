@@ -541,20 +541,6 @@ class ComponentAvatar(base.ManagerAvatar):
         return d
 
     ### IPerspective methods, called by the worker's component
-    def perspective_feedReady(self, feedName, isReady):
-        """
-        Called by the component to tell the manager that a given feed is
-        ready or not. Will notify other components depending on this
-        feeder, starting them if all of their dependencies are ready.
-
-        @param feedName: name of the feeder, e.g. "default".
-        @type  feedName: str
-        @param isReady:  True if the feed is now ready, False otherwise.
-        @type  isReady:  bool
-        @deprecated      Don't call this!
-        """
-        assert isinstance(feedName, str)
-
     def perspective_cleanShutdown(self):
         """
         Called by a component to tell the manager that it's shutting down
@@ -562,10 +548,6 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         self.debug("shutdown is clean, shouldn't go to lost")
         self._shutdown_requested = True
-
-    def perspective_error(self, element, error):
-        self.error('error element=%s string=%s' % (element, error))
-        self.heaven.removeComponent(self)
 
     def perspective_removeKeycardId(self, bouncerName, keycardId):
         """
