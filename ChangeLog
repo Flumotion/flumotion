@@ -1,3 +1,12 @@
+2007-09-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.connect_feeders): Fold the client-fd-removed signal
+	handler into the method.
+	(FeedComponent.install_eater_event_probes): New helper, installs
+	the necessary event probes, which are now folded into the method.
+	(FeedComponent.do_start): Call install_eater_event_probes.
+
 2007-09-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py

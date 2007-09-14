@@ -76,8 +76,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self._change_monitor = gstreamer.StateChangeMonitor()
 
-        self._gotFirstNewSegment = {}
-
         # multifdsink's get-stats signal had critical bugs before this version
         self._get_stats_supported = (gstreamer.get_plugin_version('tcp')
                                      >= (0, 10, 11, 0))
@@ -155,10 +153,19 @@ class FeedComponent(basecomponent.BaseComponent):
     def connect_feeders(self, pipeline):
         # Connect to the client-fd-removed signals on each feeder, so we 
         # can clean up properly on removal.
+        def client_fd_removed(sink, fd, feeder):
+            # Called (as a signal callback) when the FD is no longer in
+            # use by multifdsink.
+            # This will call the registered callable on the fd.
+            # Called from GStreamer threads.
+            self.debug("cleaning up fd %d", fd)
+            feeder.clientDisconnected(fd)
+
         for feeder in self.feeders.values():
             element = pipeline.get_by_name(feeder.elementName)
-            element.connect('client-fd-removed', self.removeClientCallback)
-            self.debug("Connected %r to removeClientCallback", feeder)
+            element.connect('client-fd-removed', client_fd_removed,
+                            feeder)
+            self.debug("Connected to client-fd-removed on %r", feeder)
 
     def get_pipeline(self):
         return self.pipeline
@@ -419,6 +426,43 @@ class FeedComponent(basecomponent.BaseComponent):
             # Just return the already set up info, as a fired deferred
             return defer.succeed(self._master_clock_info)
 
+    def install_eater_event_probes(self, eater):
+        def fdsrc_event(pad, event):
+            # An event probe used to consume unwanted EOS events on eaters.
+            # Called from GStreamer threads.
+            if event.type == gst.EVENT_EOS:    
+                self.info('End of stream for eater %s, disconnect will be '
+                          'triggered', eater.eaterAlias)
+                # We swallow it because otherwise our component acts on the EOS
+                # and we can't recover from that later.  Instead, fdsrc will be
+                # taken out and given a new fd on the next eatFromFD call.
+                return False
+            return True
+
+        def depay_event(pad, event):
+            # An event probe used to consume unwanted duplicate
+            # newsegment events.
+            # Called from GStreamer threads.
+            if event.type == gst.EVENT_NEWSEGMENT:
+                # We do this because we know gdppay/gdpdepay screw up on 2nd
+                # newsegments (unclear what the original reason for this
+                # was, perhaps #349204)
+                if getattr(eater, '_gotFirstNewSegment', False):
+                    self.info("Subsequent new segment event received on "
+                              "depay on eater %s", eater.eaterAlias)
+                    # swallow (gulp)
+                    return False
+                else:
+                    eater._gotFirstNewSegment = True
+            return True
+
+        self.debug('adding event probe for eater %s', eater.eaterAlias)
+        fdsrc = self.get_element(eater.elementName)
+        fdsrc.get_pad("src").add_event_probe(fdsrc_event)
+        if gstreamer.get_plugin_version('gdp') < (0, 10, 10, 1):
+            depay = self.get_element(eater.depayName)
+            depay.get_pad("src").add_event_probe(depay_event)
+
     ### BaseComponent interface implementation
     def do_start(self, clocking):
         """
@@ -437,35 +481,17 @@ class FeedComponent(basecomponent.BaseComponent):
                       host, port, base_time)
             self.set_master_clock(host, port, base_time)
         
-        # set pipeline to playing, and provide clock if asked for
         if self.clock_provider:
+            # start responding to network time query packets
             self.clock_provider.set_property('active', True)
 
-        # attach event-probe callbacks for each eater
         for eater in self.eaters.values():
-            self.debug('adding event probe for eater %s',
-                       eater.eaterAlias)
-            name = eater.elementName
-            fdsrc = self.get_element(name)
-            # FIXME: should probably raise
-            if not fdsrc:
-                self.warning('No element named %s in pipeline' % name)
-                continue
-            pad = fdsrc.get_pad("src")
-            pad.add_event_probe(self._eater_event_probe_cb,
-                                eater.eaterAlias)
-            gdp_version = gstreamer.get_plugin_version('gdp')
-            if gdp_version[2] < 11 and not (gdp_version[2] == 10 and \
-                                            gdp_version[3] > 0):
-                depay = self.get_element("%s-depay" % name)
-                depaysrc = depay.get_pad("src")
-                depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
-                    eater.eaterAlias)
-
-            self._pad_monitors.attach(pad, name,
+            self.install_eater_event_probes(eater)
+            pad = self.get_element(eater.elementName).get_pad('src')
+            self._pad_monitors.attach(pad, eater.elementName,
                                       padmonitor.EaterPadMonitor,
                                       self.reconnectEater)
-            eater.setPadMonitor(self._pad_monitors[name])
+            eater.setPadMonitor(self._pad_monitors[eater.elementName])
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -594,22 +620,6 @@ class FeedComponent(basecomponent.BaseComponent):
         element.emit('add', fd)
         feeder.clientConnected(clientId, fd, cleanup)
 
-    def removeClientCallback(self, sink, fd):
-        """
-        Called (as a signal callback) when the FD is no longer in use by
-        multifdsink.
-        This will call the registered callable on the fd.
-
-        Called from GStreamer threads.
-        """
-        self.debug("cleaning up fd %d", fd)
-        name = sink.get_name()
-        for feeder in self.feeders.values():
-            if feeder.elementName == name:
-                feeder.clientDisconnected(fd)
-                return
-        self.warning('Unknown feeder element %s', name)
-
     def eatFromFD(self, eaterAlias, feedId, fd):
         """
         Tell the component to eat the given feedId from the given fd.
@@ -695,36 +705,3 @@ class FeedComponent(basecomponent.BaseComponent):
         this method.
         """
         pass
-
-    def _eater_event_probe_cb(self, pad, event, eaterAlias):
-        """
-        An event probe used to consume unwanted EOS events on eaters.
-
-        Called from GStreamer threads.
-        """
-        if event.type == gst.EVENT_EOS:    
-            self.info('End of stream for eater %s, disconnect will be '
-                      'triggered', eaterAlias)
-            # We swallow it because otherwise our component acts on the EOS
-            # and we can't recover from that later.  Instead, fdsrc will be
-            # taken out and given a new fd on the next eatFromFD call.
-            return False
-        return True
-
-    def _depay_eater_event_probe_cb(self, pad, event, eaterAlias):
-        """
-        An event probe used to consume unwanted duplicate newsegment events.
-
-        Called from GStreamer threads.
-        """
-        if event.type == gst.EVENT_NEWSEGMENT:
-            # We do this because we know gdppay/gdpdepay screw up on 2nd
-            # newsegments
-            if eaterAlias in self._gotFirstNewSegment:
-                self.info("Subsequent new segment event received on "
-                          "depay on eater %s", eaterAlias)
-                # swallow (gulp)
-                return False
-            else:
-                self._gotFirstNewSegment[eaterAlias] = True
-        return True
