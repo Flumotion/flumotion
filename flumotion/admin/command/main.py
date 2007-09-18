@@ -114,7 +114,14 @@ def parse_commands(args):
     proc = commandspec[3]
 
     def command(model, quit):
-        proc(model, quit, *vals)
+        def print_traceback(failure):
+            import traceback
+            warn('Operation %s failed:' % op)
+            traceback.print_exc()
+            return failure
+        d = proc(model, quit, *vals)
+        d.addErrback(print_traceback)
+        return d
 
     return command
 

@@ -371,7 +371,9 @@ def do_avatar_action(model, quit, avatarPath, action):
         components = components + planet.get('atmosphere').get('components')
     else:
         c = utils.find_component(planet, avatarPath[1:])
-        components.append(c)
+        if c:
+            components.append(c)
+        # else: message already printed in find_component()
 
     if len(components) > 0:
         def actionComponent(c):

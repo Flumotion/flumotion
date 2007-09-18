@@ -1,3 +1,12 @@
+2007-09-18  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/command/commands.py (do_avatar_action):
+	Do not operate on non-existing components. Fixes #757.
+
+	* flumotion/admin/command/main.py (parse_commands):
+	Make command's flow part of the main deferred (and print traceback
+	on errors, too). Fixes #727.
+
 2007-09-18  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:
