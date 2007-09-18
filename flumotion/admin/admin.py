@@ -345,10 +345,13 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         # fixme: push the disconnect notification upstream
         def remoteDisconnected(remoteReference):
-            self.debug("emitting disconnected")
-            self.state = 'disconnected'
-            self.emit('disconnected')
-            self.debug("emitted disconnected")
+            if self.state != 'disconnected':
+                self.debug("emitting disconnected")
+                self.state = 'disconnected'
+                self.emit('disconnected')
+                self.debug("emitted disconnected")
+            else:
+                self.debug("Already disconnected, not emitting disconnected")
         self.remote.notifyOnDisconnect(remoteDisconnected)
 
         d = self.callRemote('getPlanetState')
