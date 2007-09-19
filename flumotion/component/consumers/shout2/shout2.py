@@ -30,6 +30,7 @@ class Shout2Consumer(feedcomponent.ParseLaunchComponent):
 
         elprops = (('mount-point', 'mount'),
                    ('port', 'port'),
+                   ('ip', 'ip'),
                    ('password', 'password'),
                    ('description', 'description'),
                    ('url', 'url'),

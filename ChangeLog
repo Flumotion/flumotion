@@ -1,3 +1,10 @@
+2007-09-19  Michael Smith <msmith@fluendo.com>
+
+	Patch by: daniel.hnn@gmail.com
+	* flumotion/component/consumers/shout2/shout2.py:
+	  Trivial fix to shout2 consumer to allow streaming to a non-localhost
+	  server. Fixes #754.
+
 2007-09-18  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/admin/command/commands.py (do_avatar_action):
