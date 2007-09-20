@@ -1,3 +1,21 @@
+2007-09-20  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/base.py:
+	  Update a comment.
+	* flumotion/manager/component.py:
+	  Rearrange component attach and detach code to be clearer and saner.
+	  Remove register/unregister from component heaven.
+	* flumotion/manager/manager.py:
+	  Call avatar.attached() directly from login code, so that we do all
+	  this during login, rather than at various later points.
+	* flumotion/manager/worker.py:
+	  Remove a fixme, raise an exception if a duplicate worker somehow
+	  gets into the heaven twice.
+	* flumotion/test/test_manager_manager.py:
+	  Update tests for avatars attaching during login.
+
+	  Fixes #624.
+
 2007-09-19  Michael Smith <msmith@fluendo.com>
 
 	Patch by: daniel.hnn@gmail.com

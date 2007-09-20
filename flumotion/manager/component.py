@@ -154,41 +154,25 @@ class ComponentAvatar(base.ManagerAvatar):
 
     def attached(self, mind):
         # doc in base class
-        self.info('component "%s" logged in' % self.avatarId)
+        self.info('component "%s" logging in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind) # sets self.mind
         
         d = self.vishnu.componentAttached(self)
-
-        def checkInitialMood(_):
-            # If we're already set to happy, ensure that we trigger our 
-            # deferreds
-            if self.jobState.get('mood') == moods.happy.value:
-                for d in self._happydefers:
-                    d.callback(True)
-                self._happydefers = []
-
-        d.addCallback(checkInitialMood)
-        # listen to the mood so we can tell the depgraph
-        d.addCallback(lambda _: self.jobState.addListener(self,
-                                                          set=self.stateSet))
-        # make heaven register component
-        d.addCallback(lambda _: self.heaven.registerComponent(self))
-        d.addCallback(lambda _: self.vishnu.registerComponent(self))
+        # Once jobState is attached here, we can add our listener.
+        d.addCallback(lambda _: self.addMoodListener())
         return d
 
     def detached(self, mind):
-        if not self.componentState:
-            # Not attached, so don't detach
-            self.warning("Asked to detach unattached avatar, ignoring")
-            return
-
         # doc in base class
         self.vishnu.unregisterComponent(self)
-        self.heaven.unregisterComponent(self)
 
         self.info('component "%s" logged out' % self.avatarId)
 
         self.componentState.clearJobState()
+
+        conf = self.componentState.get('config')
+        if conf['clock-master'] == self.avatarId:
+            self.heaven.removeMasterClock(self)
 
         # Now, we're detached: set our state to sleeping (or lost). 
         # Do this before vishnu.componentDetached() severs our association 
@@ -208,7 +192,15 @@ class ComponentAvatar(base.ManagerAvatar):
         base.ManagerAvatar.detached(self, mind)
 
         self.cleanup() # callback done at end
- 
+
+    def addMoodListener(self):
+        # Handle initial state appropriately.
+        if self.jobState.get('mood') == moods.happy.value:
+            for d in self._happydefers:
+                d.callback(True)
+            self._happydefers = []
+        self.jobState.addListener(self, set=self.stateSet)
+
     # IStateListener methods
     def stateSet(self, state, key, value):
         self.log("state set on %r: %s now %r" % (state, key, value))
@@ -937,32 +929,6 @@ class ComponentHeaven(base.ManagerHeaven):
  
     doSetupComponent = defer_generator_method(_doSetupComponent)
         
-    def registerComponent(self, componentAvatar):
-        """
-        This function registers a component in the heaven.
-        It is triggered when the mind is attached.
-
-        @param componentAvatar: the component to register
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        """
-        self.debug('heaven registering component %r' % componentAvatar)
-        # nothing to do
-
-    def unregisterComponent(self, componentAvatar):
-        """
-        This function unregisters a component in the heaven.
-        It is triggered when the mind is detached.
-
-        @param componentAvatar: the component to unregister
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        """
-        componentAvatar.debug('unregistering component')
-
-        conf = componentAvatar.componentState.get('config')
-        if conf['clock-master'] == componentAvatar.avatarId:
-            # houston, we have a master clock
-            self.removeMasterClock(componentAvatar)
-
     def setMasterClockInfo(self, result, componentAvatar):
         # we get host, port, base_time
         # FIXME: host is the default from NetClock, so the local IP,

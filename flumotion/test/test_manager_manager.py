@@ -263,10 +263,12 @@ class FakeMind(log.Loggable):
         if hasattr(self, method):
             m = getattr(self, method)
             try:
-                result = m(*args, **kwargs)
-                self.debug('callRemote(%s) succeeded with %r' % (
-                    name, result))
-                return defer.succeed(result)
+                def gotResult(res):
+                    self.debug('callRemote(%s) succeeded with %r', name, res)
+                    return res
+                d = defer.maybeDeferred(m, *args, **kwargs)
+                d.addCallback(gotResult)
+                return d
             except Exception, e:
                 self.warning('callRemote(%s) failed with %s' % (
                     name, log.getExceptionMessage(e)))
@@ -389,17 +391,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             avatar._mind = mind
             avatar._avatarId = avatarId
 
-            # trigger attached
-            # twisted 2.2.0 TestCase does not have a runReactor method
-            # and according to twisted changeset 15556 it was always
-            # deprecated
-            from twisted.internet import reactor
             avatarDict[avatarId] = avatar
-            d = defer.Deferred()
-            # FIXME: since the manager does a callLater(0,
-            # avatar.attached), we have to do likewise. Suck! See #624.
-            reactor.callLater(0, d.callback, avatar)
-            return d
+            return avatar
         d.addCallback(got_result)
         return d
         

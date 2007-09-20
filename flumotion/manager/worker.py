@@ -50,7 +50,7 @@ class WorkerAvatar(base.ManagerAvatar):
 
     def attached(self, mind):
         # doc in base class
-        self.info('worker "%s" logged in' % self.getName())
+        self.info('worker "%s" logged in', self.getName())
         base.ManagerAvatar.attached(self, mind)
 
         self.debug('MANAGER -> WORKER: getFeedServerPort()')
@@ -185,9 +185,9 @@ class WorkerHeaven(base.ManagerHeaven):
             self.state.append('names', workerName)
             self.state.append('workers', state)
         else:
-            # FIXME: what if it was already there ?
             self.warning('worker %s was already registered in the heaven' %
                 workerName)
+            raise errors.AlreadyConnectedError()
 
     def workerDetached(self, workerAvatar):
         """

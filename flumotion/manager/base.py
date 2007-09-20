@@ -179,7 +179,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         Tell the avatar that the given mind has been attached.
         This gives the avatar a way to call remotely to the client that
         requested this avatar.
-        This is scheduled by the portal after the client has logged in.
+        This is called by the portal during client login.
 
         @type mind: L{twisted.spread.pb.RemoteReference}
         """

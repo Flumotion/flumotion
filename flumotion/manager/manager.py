@@ -127,12 +127,14 @@ class Dispatcher(log.Loggable):
             # suite.
             def cleanup(avatarId=avatarId, avatar=avatar, mind=mind):
                 self.removeAvatar(avatarId, avatar, mind)
-            # schedule a perspective attached for after this function
-            # FIXME: there needs to be a way to not have to do a callLater
-            # blindly so cleanup can be guaranteed
-            reactor.callLater(0, avatar.attached, mind)
-            self._avatarKeycards[avatarId] = keycard
-            return (pb.IPerspective, avatar, cleanup)
+            def attached(_):
+                self._avatarKeycards[avatarId] = keycard
+                return (pb.IPerspective, avatar, cleanup)
+                
+            # Attach the mind to the avatar; does whatever login is required.
+            d = defer.maybeDeferred(avatar.attached, mind)
+            d.addCallback(attached)
+            return d
         def got_error(failure):
             # If we failed for some reason, we want to drop the connection.
             # However, we want the failure to get to the client, so we don't
@@ -1202,6 +1204,7 @@ class Vishnu(log.Loggable):
                                 componentAvatar.mindCallRemote('getState')],
                                fireOnOneErrback=True)
         d.addCallback(self._getComponentState, componentAvatar)
+        d.addCallback(lambda _: self._registerComponent(componentAvatar))
         return d
 
     def componentDetached(self, componentAvatar):
@@ -1220,7 +1223,7 @@ class Vishnu(log.Loggable):
         componentAvatar.componentState = None
         componentAvatar.jobState = None
 
-    def registerComponent(self, componentAvatar):
+    def _registerComponent(self, componentAvatar):
         # called when the jobstate is retrieved
         self.debug('vishnu registering component %r' % componentAvatar)
 
