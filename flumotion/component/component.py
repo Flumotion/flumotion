@@ -429,20 +429,26 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         def setup_plugs():
             # by this time we have a medium, so we can load bundles
-            reg = registry.getRegistry()
-
             def load_bundles():
                 modules = {}
                 for plugs in config['plugs'].values():
                     for plug in plugs:
                         modules[plug['type']] = True
+
+                if not modules:
+                    return defer.succeed(True) # shortcut
+
+                # Only parse the registry if we need to; this is the
+                # only component code that parses a registry, and it
+                # should probably be made unnecessary.
+                reg = registry.getRegistry()
+                
                 for plugtype in modules.keys():
                     # we got this far, it should work
                     entry = reg.getPlug(plugtype).getEntry()
                     modules[plugtype] = entry.getModuleName()
-                if not modules:
-                    return defer.succeed(True) # shortcut
-                elif not self.medium:
+
+                if not self.medium:
                     self.warning('Not connected to a medium, cannot '
                                  'load bundles -- assuming all modules '
                                  'are available')
@@ -453,6 +459,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 
             def make_plugs():
                 for socket, plugs in config['plugs'].items():
+                    # Again, only get the registry if we need to.
+                    reg = registry.getRegistry()
                     self.plugs[socket] = []
                     for plug in plugs:
                         entry = reg.getPlug(plug['type']).getEntry()

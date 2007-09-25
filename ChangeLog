@@ -1,3 +1,14 @@
+2007-09-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py
+	(BaseComponent.setup.setup_plugs): Only load up the registry if we
+	actually have plugs to instantiate. Speeds up component start
+	dramatically in the normal case of no plugs.
+
+	Loading the registry should not be necessary at all; the manager
+	should give the component all of the information that it needs so
+	that it can find the plugs on the local filesystem.
+
 2007-09-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/base.py:
