@@ -1,6 +1,12 @@
 2007-09-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:
+	  Set AdminModel logName to the managerId to make log files more
+	  comprehensible when there are multiple AdminModels in a process.
+
+2007-09-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
 	  Revert r5537, it causes problems.
 
 2007-09-25  Andy Wingo  <wingo@pobox.com>

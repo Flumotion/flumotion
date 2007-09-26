@@ -184,6 +184,9 @@ class StateChangeMonitor(dict, log.Loggable):
             if change in self:
                 self.log("We have an error, going to errback pending "
                          "state change defers")
+                gerror, debug = message.parse_error()
                 for d in self[change]:
-                    d.errback(errors.ComponentStartHandledError(message))
+                    d.errback(errors.GStreamerGstError(
+                        message.src, gerror, debug))
                 del self[change]
+

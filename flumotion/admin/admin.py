@@ -188,6 +188,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         # adminning multiple managers, this id should tell them apart
         # (and identify duplicates)
         self.managerId = str(connectionInfo)
+        self.logName = self.managerId
 
         self.info('Connecting to manager %s with %s',
                   self.managerId, connectionInfo.use_ssl and 'SSL' or 'TCP')
