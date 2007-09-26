@@ -1,3 +1,8 @@
+2007-09-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	  Revert r5537, it causes problems.
+
 2007-09-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py
