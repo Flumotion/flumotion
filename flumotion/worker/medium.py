@@ -178,7 +178,8 @@ class WorkerMedium(medium.PingingMedium):
         """
         return self.brain.getFeedServerPort()
 
-    def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
+    def remote_create(self, avatarId, type, moduleName, methodName,
+                      nice, conf):
         """
         Start a component of the given type with the given nice level.
         Will spawn a new job process to run the component in.
@@ -193,11 +194,14 @@ class WorkerMedium(medium.PingingMedium):
         @type  methodName: str
         @param nice:       nice level
         @type  nice:       int
+        @param nice:       component config
+        @type  nice:       dict
 
         @returns: a deferred fired when the process has started and created
                   the component
         """
-        return self.brain.create(avatarId, type, moduleName, methodName, nice)
+        return self.brain.create(avatarId, type, moduleName, methodName,
+                                 nice, conf)
 
     def remote_checkElements(self, elementNames):
         """

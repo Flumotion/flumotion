@@ -145,7 +145,8 @@ class JobMedium(medium.BaseMedium):
         return reflectCallCatching(errors.RemoteRunError, moduleName,
                                    methodName, *args, **kwargs)
 
-    def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
+    def remote_create(self, avatarId, type, moduleName, methodName,
+                      nice, conf):
         """
         I am called on by the worker's JobAvatar to create a component.
         
@@ -159,12 +160,14 @@ class JobMedium(medium.BaseMedium):
         @type  methodName: str
         @param nice:       the nice level
         @type  nice:       int
+        @param conf:       the component configuration
+        @type  conf:       dict
         """
         self.avatarId = avatarId
         self.logName = avatarId
 
         self.component = self._createComponent(avatarId, type, moduleName,
-            methodName, nice)
+                                               methodName, nice, conf)
         self.component.setShutdownHook(self._componentStopped)
 
     def _componentStopped(self):
@@ -227,7 +230,8 @@ class JobMedium(medium.BaseMedium):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def _createComponent(self, avatarId, type, moduleName, methodName, nice=0):
+    def _createComponent(self, avatarId, type, moduleName, methodName,
+                         nice, conf):
         """
         Create a component of the given type.
         Log in to the manager with the given avatarId.
@@ -242,10 +246,10 @@ class JobMedium(medium.BaseMedium):
         @type  methodName: str
         @param nice:       the nice level to run with
         @type  nice:       int
+        @param conf:       the component configuration
+        @type  conf:       dict
         """
-        self.info('Creating component "%s" of type "%s"' % (avatarId, type))
-        #self.info('setting up signals')
-        #signal.signal(signal.SIGINT, signal.SIG_IGN)
+        self.info('Creating component "%s" of type "%s"', avatarId, type)
 
         self._setNice(nice)
         self._enableCoreDumps()
@@ -280,6 +284,12 @@ class JobMedium(medium.BaseMedium):
         self.debug('created ComponentClientFactory %r' % managerClientFactory)
         self._authenticator.avatarId = avatarId
         managerClientFactory.startLogin(self._authenticator)
+
+        try:
+            comp.setup(conf)
+        except Exception, e:
+            self.warning("setup failed: %s", log.getExceptionMessage(e))
+            self.debug("ignoring setup failure, manager will see it later")
 
         host = self._managerHost
         port = self._managerPort

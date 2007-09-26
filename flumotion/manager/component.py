@@ -64,18 +64,15 @@ class ComponentAvatar(base.ManagerAvatar):
 
     logCategory = 'comp-avatar'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, heaven, avatarId, remoteIdentity, mind, conf,
+                 jobState, clocking):
         # doc in base class
-        base.ManagerAvatar.__init__(self, *args, **kwargs)
+        base.ManagerAvatar.__init__(self, heaven, avatarId,
+                                    remoteIdentity, mind)
         
-        self.componentState = None # set by the vishnu by componentAttached
-        self.jobState = None # set by the vishnu by componentAttached
-
-        # these flags say when this component is in the middle of doing stuff
-        # starting, setup and providing master clock respectively
-        self._starting = False
-        self._beingSetup = False
-        self._providingClock = False
+        self.jobState = jobState
+        self.componentState = self.makeComponentState(conf)
+        self.clocking = clocking
 
         self._ports = {}
 
@@ -83,6 +80,83 @@ class ComponentAvatar(base.ManagerAvatar):
 
         self._happydefers = [] # deferreds to call when mood changes to happy
         
+        self.vishnu.registerComponent(self)
+        self.addMoodListener()
+        # calllater to allow the component a chance to receive its
+        # avatar, so that it has set medium.remote
+        reactor.callLater(0, self.heaven.componentAttached, avatarId)
+
+    def makeComponentState(self, conf):
+        # the component just logged in with good credentials. we fetched
+        # its config and job state. now there are two possibilities:
+        #  (1) we were waiting for such a component to start. There was
+        #      a ManagerComponentState and an avatarId in the
+        #      componentMappers waiting for us.
+        #  (2) we don't know anything about this component, but it has a
+        #      state and config. We deal with it, creating all the
+        #      neccesary internal state.
+        def verifyExistingComponentState(conf, state):
+            # condition (1)
+            state.setJobState(self.jobState)
+
+            self._upgradeConfig(state, conf)
+            if state.get('config') != conf:
+                diff = config.dictDiff(state.get('config'), conf)
+                diffMsg = config.dictDiffMessageString(diff,
+                                                   'internal conf',
+                                                   'running conf')
+                self.addMessage(messages.WARNING, 'stale-config',
+                                N_("Component logged in with stale "
+                                   "configuration. Consider stopping "
+                                   "this component and restarting "
+                                   "the manager."),
+                                debug=("Updating internal conf from "
+                                       "running conf:\n" + diffMsg))
+                self.warning('updating internal component state for %r')
+                self.debug('changes to conf: %s',
+                           config.dictDiffMessageString(diff))
+                state.set('config', conf)
+
+        def makeNewComponentState(conf):
+            # condition (2)
+            state = planet.ManagerComponentState()
+            state.setJobState(self.jobState)
+
+            self._upgradeConfig(state, conf)
+
+            flowName, compName = conf['parent'], conf['name']
+
+            state.set('name', compName)
+            state.set('type', conf['type'])
+            state.set('workerRequested', self.jobState.get('workerName'))
+            state.set('config', conf)
+            self.vishnu.addComponentToFlow(state, flowName)
+            return state
+
+        mState = self.vishnu.getManagerComponentState(self.avatarId)
+        if mState:
+            verifyExistingComponentState(conf, mState)
+            return mState
+        else:
+            return makeNewComponentState(conf)
+            
+    def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
+                           mind):
+        def gotStates(result):
+            (_s1, conf), (_s2, jobState), (_s3, clocking) = result
+            assert _s1 and _s2 and _s3 # fireOnErrback=1
+            log.debug('component-avatar', 'got state information')
+            return (heaven, avatarId, remoteIdentity, mind,
+                    conf, jobState, clocking)
+        log.debug('component-avatar', 'calling mind for state information')
+        d = defer.DeferredList([mind.callRemote('getConfig'),
+                                mind.callRemote('getState'),
+                                mind.callRemote('getMasterClockInfo')],
+                               fireOnOneErrback=True)
+        d.addCallback(gotStates)
+        return d
+    makeAvatarInitArgs = classmethod(makeAvatarInitArgs)
+
     ### python methods
     def __repr__(self):
         mood = '(unknown)'
@@ -94,19 +168,6 @@ class ComponentAvatar(base.ManagerAvatar):
                                       self.avatarId, mood)
 
     ### ComponentAvatar methods
-    def cleanup(self):
-        """
-        Clean up when detaching.
-        """
-        if self._ports:
-            # FIXME: doesn't seem to ever be possible
-            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
-                                             self._ports.values())
-            
-        self._ports = {}
-
-        self.jobState = None
-
     def _setMood(self, mood):
         if not self.componentState:
             return
@@ -124,63 +185,70 @@ class ComponentAvatar(base.ManagerAvatar):
             return
         return self.componentState.get('mood')
 
-    def _addMessage(self, message):
-        if not self.componentState:
-            return
+    def addMessage(self, level, id, format, *args, **kwargs):
+        """
+        Convenience message to construct a message and add it to the
+        component state. `format' should be marked as translatable in
+        the source with N_, and *args will be stored as format
+        arguments. Keyword arguments are passed on to the message
+        constructor. See L{flumotion.common.messages.Message} for the
+        meanings of the rest of the arguments.
 
-        self.componentState.append('messages', message)
+        For example:
 
-    # general fallback for unhandled errors so we detect them
-    # FIXME: we can't use this since we want a PropertyError to fall through
-    # after going through the PropertyErrback.
-    def _mindErrback(self, failure, *ignores):
-        if ignores:
-            if failure.check(*ignores):
-               return failure
-        self.warning("Unhandled remote call error: %s" %
-            failure.getErrorMessage())
-        self.warning("raising '%s'" % str(failure.type))
-        return failure
-
-    # we create this errback just so we can interject a message inbetween
-    # to make it clear the Traceback line is fine.
-    # When this is fixed in Twisted we can just remove the errback and
-    # the error will still get sent back correctly to admin.
-    def _mindPropertyErrback(self, failure):
-        failure.trap(errors.PropertyError)
-        log.safeprintf(sys.stderr,
-                       "Ignore the following Traceback line, issue in Twisted\n")
-        return failure
-
-    def attached(self, mind):
-        # doc in base class
-        self.info('component "%s" logging in' % self.avatarId)
-        base.ManagerAvatar.attached(self, mind) # sets self.mind
+          self.addMessage(messages.WARNING, 'foo-warning',
+                          N_('The answer is %d'), 42, debug='not really')
+        """
+        self.addMessageObject(messages.Message(level,
+                                               T_(format, *args),
+                                               id=id, **kwargs))
         
-        d = self.vishnu.componentAttached(self)
-        # Once jobState is attached here, we can add our listener.
-        d.addCallback(lambda _: self.addMoodListener())
-        return d
+    def addMessageObject(self, message):
+        """
+        Add a message to the planet state.
 
-    def detached(self, mind):
+        @type message: L{flumotion.common.messages.Message}
+        """
+        self.componentState.append('messages', message)
+        
+    def _upgradeConfig(self, state, conf):
+        # different from conf['version'], eh...
+        version = conf.get('config-version', 0)
+        while version < config.CURRENT_VERSION:
+            try:
+                config.UPGRADERS[version](conf)
+                version += 1
+                conf['config-version'] = version
+            except Exception, e:
+                self.addMessage(messages.WARNING,
+                                'upgrade-%d' % version,
+                                N_("Failed to upgrade config %r "
+                                   "from version %d. Please file "
+                                   "a bug."), conf, version,
+                                debug=log.getExceptionMessage(e))
+                return
+
+    def onShutdown(self):
         # doc in base class
         self.vishnu.unregisterComponent(self)
 
-        self.info('component "%s" logged out' % self.avatarId)
+        self.info('component "%s" logged out', self.avatarId)
+
+        if self.clocking:
+            ip, port, base_time = self.clocking
+            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
+                                             [port])
+        if self._ports:
+            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
+                                             self._ports.values())
 
         self.componentState.clearJobState()
 
-        conf = self.componentState.get('config')
-        if conf['clock-master'] == self.avatarId:
-            self.heaven.removeMasterClock(self)
-
-        # Now, we're detached: set our state to sleeping (or lost). 
-        # Do this before vishnu.componentDetached() severs our association 
-        # with our componentState. Also, don't ever remove 'sad' here.
-        # If we shut down due to an explicit manager request, go to sleeping. 
-        # Otherwise, go to lost, because it got disconnected for an unknown 
-        # reason (probably network related)
-        if not self._getMoodValue() == moods.sad.value:
+        # If we were sad, leave the mood as it is. Otherwise if shut
+        # down due to an explicit manager request, go to sleeping.
+        # Otherwise, go to lost, because it got disconnected for an
+        # unknown reason (probably network related)
+        if self._getMoodValue() != moods.sad.value:
             if self._shutdown_requested:
                 self.debug("Shutdown was requested, component now sleeping")
                 self._setMood(moods.sleeping)
@@ -188,10 +256,24 @@ class ComponentAvatar(base.ManagerAvatar):
                 self.debug("Shutdown was NOT requested, component now lost")
                 self._setMood(moods.lost)
 
-        self.vishnu.componentDetached(self)
-        base.ManagerAvatar.detached(self, mind)
+        # FIXME: why?
+        self.componentState.set('moodPending', None)
 
-        self.cleanup() # callback done at end
+        # Now we're detached (no longer proxying state from the component) 
+        # clear all remaining messages
+        for m in self.componentState.get('messages'):
+            self.debug('Removing message %r', m)
+            self.componentState.remove('messages', m)
+
+        # detach componentstate from avatar
+        self.componentState = None
+        self.jobState = None
+            
+        self._ports = {}
+
+        self.jobState = None
+
+        base.ManagerAvatar.onShutdown(self)
 
     def addMoodListener(self):
         # Handle initial state appropriately.
@@ -208,15 +290,38 @@ class ComponentAvatar(base.ManagerAvatar):
             self.info('Mood changed to %s' % moods.get(value).name)
 
             if value == moods.happy.value:
-                self.vishnu._depgraph.setComponentStarted(self.componentState)
-                # component not starting anymore
-                self._starting = False
-                # callback any deferreds waiting on this
-                for d in self._happydefers:
-                    d.callback(True)
-                self._happydefers = []
+                # callback any deferreds waiting on this -- what is this
+                # for?
+                while self._happydefers:
+                    self._happydefers.pop(0).callback(True)
 
     # my methods
+    def provideMasterClock(self):
+        """
+        Tell the component to provide a master clock.
+        
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        def success(clocking):
+            self.clocking = clocking
+            self.heaven.masterClockAvailable(self.avatarId, clocking)
+
+        def error(failure):
+            self.addMessage(messages.WARNING, 'provide-master-clock',
+                            N_('Failed to provide the master clock'),
+                            debug=log.getFailureMessage(failure))
+            self.vishnu.releasePortsOnWorker(self.getWorkerName(), [port])
+
+        if self.clocking:
+            return defer.succeed(self.clocking)
+
+        (port,) = self.vishnu.reservePortsOnWorker(self.getWorkerName(), 1)
+        self.debug('provideMasterClock on port %d', port)
+
+        d = self.mindCallRemote('provideMasterClock', port)
+        d.addCallbacks(success, error)
+        return d
+
     def getFeedersForEaters(self):
         """Get the set of feeds that this component is eating from,
         keyed by eater alias.
@@ -328,80 +433,9 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addErrback(lambda x: None)
         return d
             
-    def setup(self, conf):
-        """
-        Set up the component with the given config.
-        Proxies to
-        L{flumotion.component.component.BaseComponentMedium.remote_setup}
-
-        @type  conf: dict
-        """
-        def _setupErrback(failure):
-            self._setMood(moods.sad)
-            return failure
-
-        d = self.mindCallRemote('setup', conf)
-        d.addErrback(_setupErrback)
-        return d
-
-    # This function tells the component to start
-    # feedcomponents will:
-    # - get their eaters connected to the feeders
-    # - start up their feeders
-    def start(self):
-        """
-        Tell the component to start, possibly linking to other components.
-        """
-        self.debug('start')
-        conf = self.componentState.get('config')
-        master = conf['clock-master'] # avatarId of the clock master comp
-        clocking = None
-        if master != self.avatarId and master != None:
-            self.debug('Need to synchronize with clock master %r' % master)
-            d = self.heaven.getMasterClockInfo(master, self.avatarId)
-            yield d
-            try:
-                clocking = d.value()
-                self.debug('Got master clock info %r' % (clocking, ))
-                host, port, base_time = clocking
-                # FIXME: the host we get is as seen from the component, so lo
-                # mangle it here
-                # if the clock master is local (which is what we assume for now)
-                # and the slave is not, then we need to tell the slave our
-                # IP
-                if (not self.heaven._componentIsLocal(self)
-                    and host == '127.0.0.1'):
-                    host = self.getRemoteManagerIP()
-                    self.debug('Overriding clock master host to %s' % host)
-                    clocking = (host, port, base_time)
-
-                if master == self.avatarId:
-                    self.debug('we are the master, so reset to None')
-                    # we needed to wait for the set_master to complete,
-                    # but we don't slave the clock to itself...
-                    clocking = None
-            except Exception, e:
-                self.error("Could not make component start, reason %s"
-                           % log.getExceptionMessage(e))
-
-        self.debug('calling remote_start on component %r' % self)
-        d = self.mindCallRemote('start', clocking)
-        yield d
-        try:
-            d.value()
-        except errors.ComponentStartHandledError, e:
-            self.debug('already handled error while starting: %s' %
-                log.getExceptionMessage(e))
-        except Exception, e:
-            m = messages.Error(T_(N_("Could not start component.")),
-                debug = log.getExceptionMessage(e),
-                id="component-start")
-            self._addMessage(m)
-            self.warning("Could not make component start, reason %s"
-                       % log.getExceptionMessage(e))
-            self._setMood(moods.sad)
-            raise
-    start = defer_generator_method(start)
+    def setClocking(self, host, port, base_time):
+        # setMood on error?
+        return self.mindCallRemote('setMasterClock', host, port, base_time)
 
     def eatFrom(self, eaterAlias, fullFeedId, host, port):
         d = self.mindCallRemote('eatFrom', eaterAlias, fullFeedId, host,
@@ -613,11 +647,6 @@ class ComponentHeaven(base.ManagerHeaven):
     def __init__(self, vishnu):
         # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
-
-        # hash of clock master avatarId ->
-        # list of (deferreds, avatarId) created by getMasterClockInfo
-        self._clockMasterWaiters = {}
-        self._masterClockInfo = {}
         
     ### our methods
     def _componentIsLocal(self, componentAvatar):
@@ -629,27 +658,65 @@ class ComponentHeaven(base.ManagerHeaven):
         else:
             return False
 
-    def removeComponent(self, componentAvatar):
-        """
-        Remove a component avatar from the heaven.
-
-        @param componentAvatar: the component to remove
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        """
-        self.removeAvatar(componentAvatar.avatarId)
+    def feedServerAvailable(self, workerName):
+        self.debug('feed server %s logged in, we can connect to its port', 
+                   workerName)
+        # can be made more efficient
+        for avatar in self.avatars.values():
+            if avatar.componentState:
+                if avatar.componentState.get('workerRequested') == workerName:
+                    self.componentAttached(avatar.avatarId)
         
+    def masterClockAvailable(self, avatarId, clocking):
+        self.debug('master clock for %r provided on %r', avatarId,
+                   clocking)
+        # can be made more efficient
+        for avatar in self.avatars.values():
+            if avatar.componentState:
+                self._setupClocking(avatar)
+
+    def _setupClocking(self, componentAvatar):
+        conf = componentAvatar.componentState.get('config')
+        master = conf['clock-master'] # avatarId of the clock master
+        if master:
+            if master == componentAvatar.avatarId:
+                self.debug('Need for %r to provide a clock master',
+                           master)
+                componentAvatar.provideMasterClock()
+            else:
+                self.debug('Need to synchronize with clock master %r',
+                           master)
+                # if master in self.avatars would be natural, but it seems
+                # that for now due to the getClocking() calls etc we need to
+                # check against the componentMapper set. could (and probably
+                # should) be fixed in the future.
+                m = self.vishnu.getComponentMapper(master)
+                if m and m.avatar:
+                    clocking = m.avatar.clocking
+                    if clocking:
+                        host, port, base_time = clocking
+                        componentAvatar.setClocking(host, port, base_time)
+                    else:
+                        self.warning('%r should provide a clock master '
+                                     'but is not doing so', master)
+                        # should we componentAvatar.provideMasterClock() ?
+                else:
+                    self.debug('clock master not logged in yet, will '
+                               'set clocking later')
+            
+    def componentAttached(self, avatarId):
+        # No need to wait for any of this, they are not interdependent
+        if avatarId in self.avatars:
+            avatar = self.avatars[avatarId]
+            self._setupClocking(avatar)
+            self._connectEaters(avatar)
+            self._connectFeeders(avatar)
+        else:
+            self.debug('avatar %s seems to have logged out rather quickly',
+                       avatarId)
+
     def _connectEaterUpstream(self, componentAvatar, eaterAlias,
                               remoteFeedId):
-        def error(format, *args, **kwargs):
-            m = messages.Error(T_(format, *args),
-                               id=("component-start-%s-%s"
-                                   % (eaterAlias, remoteFeedId)),
-                               **kwargs)
-            # FIXME: make addMessage and setMood public
-            componentAvatar._addMessage(m)
-            componentAvatar._setMood(moods.sad)
-            return defer.fail(errors.ComponentStartHandledError())
-
         self.debug('connecting from eater to feeder')
         # the flow is the same for both components
         flowName = componentAvatar.getParentName()
@@ -661,13 +728,18 @@ class ComponentHeaven(base.ManagerHeaven):
         componentId = common.componentId(flowName, componentName)
 
         if not self.hasAvatar(componentId):
-            return error(N_("Configuration problem."),
-                         debug="No component '%s'." % componentId)
+            self.debug('feed %s unavailable, assuming it will log '
+                       'in later', remoteFeedId)
+            return
         feederAvatar = self.getAvatar(componentId)
 
         # FIXME: get from network map instead
         host = feederAvatar.getClientAddress()
         port = feederAvatar.getFeedServerPort()
+        if not port:
+            self.debug('feed server not available, will connect feed'
+                       ' later')
+            return
 
         # FIXME: until network map is implemented, hack to
         # assume that connections from what appears to us to be
@@ -679,16 +751,7 @@ class ComponentHeaven(base.ManagerHeaven):
         if eaterHost == host:
             host = '127.0.0.1'
 
-        def errback(failure):
-            failure.trap(terror.ConnectError,
-                         terror.ConnectionRefusedError)
-            return error(N_("Could not connect component to %s:%d for "
-                            "feed %s."), host, port, fullFeedId,
-                         debug="No component '%s'." % componentId)
-
-        d = componentAvatar.eatFrom(eaterAlias, fullFeedId, host, port)
-        d.addErrback(errback)
-        return d
+        return componentAvatar.eatFrom(eaterAlias, fullFeedId, host, port)
 
     def _connectEaters(self, componentAvatar):
         # connect the component's eaters
@@ -701,8 +764,18 @@ class ComponentHeaven(base.ManagerHeaven):
                 self._connectEaterUpstream(componentAvatar,
                                            eaterAlias, remoteFeedId)
             else:
-                self.debug('component providing feed %s will '
-                           'connect later', remoteFeedId)
+                feedCompName, feederName = common.parseFeedId(remoteFeedId)
+                flowName = componentAvatar.getParentName()
+                feedCompId = common.componentId(flowName, feedCompName)
+                feedCompAvatar = self.avatars.get(feedCompId, None)
+                feedId = common.feedId(componentAvatar.getName(),
+                                       eaterAlias)
+                if feedCompAvatar and feedCompAvatar.componentState:
+                    self._connectFeederDownstream(feedCompAvatar,
+                                                  feederName, feedId)
+                else:
+                    self.debug('component providing feed %s will '
+                               'connect later', remoteFeedId)
 
     def _connectFeeders(self, componentAvatar):
         flowName = componentAvatar.getParentName()
@@ -716,8 +789,17 @@ class ComponentHeaven(base.ManagerHeaven):
             # FIXME: all connections are upstream for now
             connection = "upstream"
             if connection == "upstream":
-                self.debug('component eating feed %s will '
-                           'connect later', remoteFeedId)
+                eaterCompName, eaterAlias = common.parseFeedId(remoteFeedId)
+                eaterCompId = common.componentId(flowName, eaterCompName)
+                eaterCompAvatar = self.avatars.get(eaterCompId, None)
+                feedId = common.feedId(componentAvatar.getName(),
+                                       feederName)
+                if eaterCompAvatar and eaterCompAvatar.componentState:
+                    self._connectEaterUpstream(eaterCompAvatar,
+                                               eaterAlias, feedId)
+                else:
+                    self.debug('component with eater %s will '
+                               'connect later', remoteFeedId)
             else:
                 self._connectFeederDownstream(componentAvatar,
                                               feederName,
@@ -726,12 +808,11 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectFeederDownstream(self, componentAvatar, feederName,
                                  remoteFeedId):
         def error(format, *args, **kwargs):
-            m = messages.Error(T_(format, *args),
-                               id=("component-start-%s-%s"
-                                   % (feederName, remoteFeedId)),
-                               **kwargs)
-            # FIXME: make addMessage and setMood public
-            componentAvatar._addMessage(m)
+            componentAvatar.addMessage(messages.ERROR, 
+                                       ("component-start-%s-%s"
+                                        % (feederName, remoteFeedId)),
+                                       format, *args, **kwargs)
+            # FIXME: make setMood public
             componentAvatar._setMood(moods.sad)
             return defer.fail(errors.ComponentStartHandledError())
 
@@ -753,6 +834,10 @@ class ComponentHeaven(base.ManagerHeaven):
         # FIXME: get from network map instead
         host = eaterAvatar.getClientAddress()
         port = eaterAvatar.getFeedServerPort()
+        if not port:
+            self.debug('feed server not available, will connect feed'
+                       ' later')
+            return
 
         def errback(failure):
             failure.trap(terror.ConnectError,
@@ -767,286 +852,6 @@ class ComponentHeaven(base.ManagerHeaven):
                                    remoteFeedId, host, port)
         d.addErrback(errback)
         return d
-
-    def _startComponent(self, componentAvatar):
-        def connectEaters():
-            return self._connectEaters(componentAvatar)
-
-        def connectFeeders(_):
-            return self._connectFeeders(componentAvatar)
-
-        def start(_):
-            componentAvatar.debug('starting component')
-            return componentAvatar.start()
-
-        d = defer.maybeDeferred(connectEaters)
-        d.addCallback(connectFeeders)
-        d.addCallback(start)
-        return d
-
-    # Generic failure handler for 
-    # synchronous and asynchronous errors
-    def handleFailure(self, failure, avatar, message, id_template):
-        log.warningFailure(failure, swallow=False)
-        if failure.check(errors.HandledException):
-            self.debug('failure %r already handled' % failure)
-            return                                        
-        self.debug('showing error message for failure %r' % failure)            
-
-        m = messages.Error(message, 
-           id=id_template % avatar.avatarId,
-           debug=log.getFailureMessage(failure))
-        avatar._addMessage(m)
-        avatar._setMood(moods.sad)
-
-    def setupClockMaster(self, componentState):
-        self.debug("Component %s to be clock master!", 
-            componentState.get('name'))
-        componentAvatar = self.getComponentAvatarForState(componentState)
-        if componentAvatar:
-            if not componentAvatar._providingClock:
-                componentAvatar._providingClock = True
-                # specific master clock failure handler
-                def componentMasterClockFailed(failure):
-                    componentAvatar._providingClock = False
-                    self.handleFailure(failure, componentAvatar, 
-                        T_(N_("Could not setup component's master clock.")),
-                        "component-clock-%s")
-                try:
-                    d = self.provideMasterClock(componentAvatar)
-                except:
-                    # give feedback of synchronous failures 
-                    # to the componentAvatar
-                    componentMasterClockFailed(Failure())
-                    return
-                # Add errback to be able to give feedback
-                # of asynchronous failures to the componentAvatar.
-                def clockMasterErrback(failure):
-                    componentMasterClockFailed(failure)
-                    raise errors.ComponentStartHandledError(failure)                            
-                d.addErrback(clockMasterErrback)
-            else:
-                self.debug("Component %s already on way to clock master", 
-                    componentState.get("name"))
-        else:
-            self.warning("Component %s to be clock master, but has no avatar")
-
-    def startComponent(self, componentState):
-        self.debug("Component %s to be started" % componentState.get("name"))
-        componentAvatar = self.getComponentAvatarForState(componentState)
-        if not componentAvatar._starting:
-            componentAvatar._starting = True
-            happyd = defer.Deferred()
-            # When we reach happy, we should clear the pending
-            # mood - it is done transitioning
-            happyd.addCallback(lambda r, s: s.set('moodPending', None), 
-                componentState)
-            # TODO: Ugly poking in privates
-            componentAvatar._happydefers.append(happyd)
-
-            # specific startup failure handler
-            def componentStartupFailed(failure):
-                componentAvatar._starting = False
-                self.handleFailure(failure, componentAvatar,
-                    T_(N_("Could not start component.")),
-                    "component-start-%s")
-            try:
-                d = self._startComponent(componentAvatar)
-            except:
-                # give feedback of synchronous failures 
-                # to the componentAvatar
-                componentStartupFailed(Failure())
-                return
-            # add errback to be able to give feedback
-            # of asynchronous failures to the componentAvatar.
-            def startErrback(failure):
-                componentStartupFailed(failure)
-                raise errors.ComponentStartHandledError(failure)
-            d.addErrback(startErrback)
-        else:
-            self.log("Component is already starting")
-
-    def setupComponent(self, componentState):
-        self.debug("Component %s to be setup" % componentState.get("name"))
-        componentAvatar = self.getComponentAvatarForState(componentState)
-        if componentAvatar:
-            if not componentAvatar._beingSetup:
-                componentAvatar._beingSetup = True
-                # specific setup failure handler
-                def componentSetupFailed(failure):
-                    componentAvatar._beingSetup = False
-                    self.handleFailure(failure, componentAvatar,
-                        T_(N_("Could not setup component.")),
-                        "component-setup-%s")
-                try:
-                    d = self.doSetupComponent(componentAvatar)
-                except:
-                    # give feedback of synchronous failures 
-                    # to the componentAvatar
-                    componentSetupFailed(Failure())
-                    return
-                # add errback to be able to give feedback
-                # of asynchronous failures to the componentAvatar.
-                def setupErrback(failure):
-                    componentSetupFailed(failure)
-                    raise errors.ComponentSetupHandledError(failure)                            
-                d.addErrback(setupErrback)
-            else:
-                self.debug("Component %s already on way to being setup", 
-                    componentState.get("name"))
-        else:
-            self.warning("Component %s to be setup but has no avatar yet", 
-                componentState.get("name"))
-
-    def _doSetupComponent(self, componentAvatar):
-        # set up the component
-        state = componentAvatar.componentState
-        conf = state.get('config')
-
-        self.debug('setting up componentAvatar %r' % componentAvatar)
-        d = componentAvatar.setup(conf)
-        yield d
-
-        try:
-            d.value()
-            self.debug("componentAvatar %r now setup" % componentAvatar)
-            self.vishnu._depgraph.setComponentSetup(state)
-            # now not being setup
-            componentAvatar._beingSetup = False
-        except errors.HandledException, e:
-            self.warning('setup failed, already handled: %s' % 
-                log.getExceptionMessage(e))
-            raise e
-        except Exception, e:
-            self.warning('setup failed: %s' % log.getExceptionMessage(e))
-            m = messages.Error(T_(
-                N_("Could not setup component.")),
-                debug=log.getExceptionMessage(e),
-                id="component-setup-%s" % componentAvatar.avatarId)
-            componentAvatar._addMessage(m)
-            componentAvatar._setMood(moods.sad)
-            raise errors.FlumotionError('Could not set up component')
- 
-    doSetupComponent = defer_generator_method(_doSetupComponent)
-        
-    def setMasterClockInfo(self, result, componentAvatar):
-        # we get host, port, base_time
-        # FIXME: host is the default from NetClock, so the local IP,
-        # always.  A little inconvenient.
-        avatarId = componentAvatar.avatarId
-        self.info('Received master clock info from clock master %s' % avatarId)
-        self.debug('got master clock info: %r' % (result, ))
-        self._masterClockInfo[avatarId] = result
-        self.vishnu._depgraph.setClockMasterStarted(
-            componentAvatar.componentState)
-        # not in process of providing anymore
-        componentAvatar._providingClock = False
-
-        # wake all components waiting on the clock master info
-        if avatarId in self._clockMasterWaiters:
-            waiters = self._clockMasterWaiters.pop(avatarId)
-            for d, waiterId in waiters:
-                self.debug('giving master clock info to waiting component %s', waiterId)
-                d.callback(result)
-        return result
-
-    def provideMasterClock(self, componentAvatar):
-        """
-        Tell the given component to provide a master clock.
-        Trigger all deferreds waiting on this componentAvatar to provide
-        a master clock.
-        
-        @type componentAvatar: L{ComponentAvatar}
-        
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        avatarId = componentAvatar.avatarId
-        self.debug('provideMasterClock on component %s' % avatarId)
-
-        workerName = componentAvatar.getWorkerName()
-        port = self.vishnu.reservePortsOnWorker(workerName, 1)[0]
-
-        def failedToProvideMasterClock(failure):
-            # check if we actually did provide master clock and failed
-            # to give to a waiting component or we actually failed to
-            # provide a master clock
-            if avatarId in self._masterClockInfo:
-                self.warning('Failed to provide master clock info to a '
-                    'component waiting for it')
-            else:
-                self.warning('Failed to provide master clock itself')
-                self.debug('Going to release port')
-                self.vishnu.releasePortsOnWorker(workerName, [port])
-            self.warning(failure.getErrorMessage())
-
-        if avatarId in self._masterClockInfo:
-            self.warning('component %s already has master clock info: %r'
-                         % (avatarId, self._masterClockInfo[avatarId]))
-            del self._masterClockInfo[avatarId]
-        d = componentAvatar.mindCallRemote('provideMasterClock', port)
-        d.addCallback(self.setMasterClockInfo, componentAvatar)
-        d.addErrback(failedToProvideMasterClock)
-        return d
-
-    def removeMasterClock(self, componentAvatar):
-        """
-        Tell the given component to stop providing a master clock.
-        
-        @type componentAvatar: L{ComponentAvatar}
-        """
- 
-        avatarId = componentAvatar.avatarId
-        workerName = componentAvatar.getWorkerName()
-
-        # if any components were waiting on master clock info from this
-        # clock master, errback them
-        if avatarId in self._clockMasterWaiters:
-            waiters = self._clockMasterWaiters[avatarId]
-            del self._clockMasterWaiters[avatarId]
-            for d, waiterId in waiters:
-                self.debug('telling waiting component %s that '
-                    'the clock master %s is gone' % (waiterId, avatarId))
-                d.errback(errors.ComponentStartError(
-                    'clock master component start cancelled'))
-
-        # release our clock port
-        if avatarId in self._masterClockInfo:
-            info = self._masterClockInfo[avatarId]
-            if info:
-                port = info[1]
-                self.vishnu.releasePortsOnWorker(workerName, [port])
-            else:
-                self.debug('avatarId %r has None masterClockInfo' % avatarId)
-            del self._masterClockInfo[avatarId]
-        else:
-            self.warning('component %s has no master clock info'
-                         % (avatarId,))
-
-    def getMasterClockInfo(self, avatarId, waiterId=None):
-        """
-        Get the master clock information from the given clock master component.
-
-        @param avatarId: the id of the clock master
-        @type  avatarId: str
-        @param waiterId: the id of the requesting component
-        @type  waiterId: str
-
-        @returns: a deferred firing an (ip, port, base_time) triple.
-        @rtype:   L{twisted.internet.defer.Deferred}
-        """
-        self.debug('getting master clock info for component %s' % avatarId)
-
-        # if we already have it, return it immediately
-        if avatarId in self._masterClockInfo:
-            return defer.succeed(self._masterClockInfo[avatarId])
-
-        if not avatarId in self._clockMasterWaiters:
-            self._clockMasterWaiters[avatarId] = []
-
-        # otherwise, add a deferred and our own avatarId
-        ret = defer.Deferred()
-        self._clockMasterWaiters[avatarId].append((ret, waiterId))
-        return ret
 
     def getComponentAvatarForState(self, state):
         """

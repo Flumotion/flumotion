@@ -44,8 +44,9 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     @type vishnu:   L{flumotion.manager.manager.Vishnu}
     """
     remoteLogName = 'medium'
+    logCategory = 'manager-avatar'
 
-    def __init__(self, heaven, avatarId, remoteIdentity):
+    def __init__(self, heaven, avatarId, remoteIdentity, mind):
         """
         @param heaven:         the heaven this avatar is part of
         @type  heaven:         L{flumotion.manager.base.ManagerHeaven}
@@ -54,35 +55,36 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         @param remoteIdentity: manager-assigned identity object for this
                                avatar
         @type  remoteIdentity: L{flumotion.common.identity.RemoteIdentity}
+        @param mind:           a remote reference to the client-side Medium
+        @type  mind:           L{twisted.spread.pb.RemoteReference}
         """
+        fpb.PingableAvatar.__init__(self, avatarId)
         self.heaven = heaven
-        self.avatarId = avatarId
         self.logName = avatarId
-        self.mind = None
+        self.setMind(mind)
         self.vishnu = heaven.vishnu
         self.remoteIdentity = remoteIdentity
-        self._detachedD = None # deferred to fire when the avatar's mind is 
-                               # detached
 
-        self.debug("created new Avatar with id %s" % avatarId)
+        self.debug("created new Avatar with id %s", avatarId)
 
-    def disconnect(self):
-        if self.mind:
-            self.debug("Avatar %r disconnecting", self.avatarId)
-            self._detachedD = defer.Deferred()
-            self.mind.broker.transport.loseConnection()
-            return self._detachedD
-        else:
-            self.debug("Avatar %r is already disconnected", self.avatarId)
-            return defer.succeed(True)
+    def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity, mind):
+        return defer.succeed((heaven, avatarId, remoteIdentity, mind))
+    makeAvatarInitArgs = classmethod(makeAvatarInitArgs)
 
-    def timeoutDisconnect(self):
-        if self.hasRemoteReference():
-            self.debug("Disconnecting due to ping timeout")
-            self.mind.broker.transport.loseConnection()
-        else:
-            self.debug("Ping timeout, but already disconnected")
-        
+    def makeAvatar(klass, heaven, avatarId, remoteIdentity, mind):
+        log.debug('manager-avatar', 'making avatar with avatarId %s',
+                  avatarId)
+        def have_args(args):
+            log.debug('manager-avatar', 'instantiating with args=%r', args)
+            return klass(*args)
+        d = klass.makeAvatarInitArgs(heaven, avatarId, remoteIdentity, mind)
+        d.addCallback(have_args)
+        return d
+    makeAvatar = classmethod(makeAvatar)
+
+    def onShutdown(self):
+        self.stopPingChecking()
+
     def hasRemoteReference(self):
         """
         Check if the avatar has a remote reference to the peer.
@@ -91,7 +93,6 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         """
         return self.mind != None
     
-    # FIXME: we probably need to return Failure objects when something is wrong
     def mindCallRemote(self, name, *args, **kwargs):
         """
         Call the given remote method, and log calling and returning nicely.
@@ -100,120 +101,10 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         @type  name: str
         """
         level = log.DEBUG
-        if name == 'ping': level = log.LOG
-        debugClass = str(self.__class__).split(".")[-1].upper()
-        startArgs = [self.remoteLogName, debugClass, name]
-        format, debugArgs = log.getFormatArgs(
-            '%s --> %s: callRemote(%s, ', startArgs,
-            ')', (), args, kwargs)
-        logKwArgs = self.doLog(level, -2, format, *debugArgs)
-        if not self.hasRemoteReference():
-            self.warning(
-                "Can't call remote method %s, no mind, except a local Traceback"
-                % name)
-            return
+        if name == 'ping':
+            level = log.LOG
         
-        # we can't do a .debug here, since it will trigger a resend of the
-        # debug message as well, causing infinite recursion !
-        # self.debug('Calling remote method %s%r' % (name, args))
-        if not hasattr(self.mind, 'callRemote'):
-            self.error("mind %r does not implement callRemote" % self.mind)
-            return
-        try:
-            d = self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError:
-            self.warning("mind %s is a dead reference, removing" % self.mind)
-            self.mind = None
-            return
-        except Exception, e:
-            self.warning("Exception trying to remote call '%s': %s: %s" % (
-                name, str(e.__class__), ", ".join(e.args)))
-            return
-
-        def callback(result):
-            format, debugArgs = log.getFormatArgs(
-                '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (log.ellipsize(result), ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-            return result
-
-        def errback(failure):
-            format, debugArgs = log.getFormatArgs(
-                '%s <-- %s: callRemote(%s', startArgs,
-                '): %r', (failure, ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-            return failure
-
-        d.addCallback(callback)
-        d.addErrback(errback)
-        d.addErrback(self._mindCallRemoteErrback, name)
-        # FIXME: is there some way we can register an errback as the
-        # LAST to call as a general fallback ?
-        return d
-
-    def _mindCallRemoteErrback(self, f, name):
-        if f.check(AttributeError):
-            from twisted.spread import flavors
-            if hasattr(flavors, 'NoSuchMethod'):
-                if f.check(flavors.NoSuchMethod):
-                    self.warning("No such remote method '%s'" % name)
-                    raise errors.NoMethodError(name)
-                else:
-                    raise errors.RemoteRunFailure(name,
-                        debug=log.getFailureMessage(f))
-
-            # revision #13473 of Twisted added NoSuchMethod
-            # this is an older version, so we don't know the difference.
-            self.warning("No such remote method '%s', or AttributeError "
-                "while executing remote method (%s)" % (
-                    name, log.getFailureMessage(f)))
-            raise errors.NoMethodError(name,
-                debug=log.getFailureMessage(f))
-
-        self.debug("Failure on remote call %s: %r, %s" % (name,
-             f, log.getFailureMessage(f)))
-        return f
-
-    def attached(self, mind):
-        """
-        Tell the avatar that the given mind has been attached.
-        This gives the avatar a way to call remotely to the client that
-        requested this avatar.
-        This is called by the portal during client login.
-
-        @type mind: L{twisted.spread.pb.RemoteReference}
-        """
-        self.mind = mind
-        transport = self.mind.broker.transport
-        tarzan = transport.getHost()
-        jane = transport.getPeer()
-        if tarzan and jane:
-            self.debug("PB client connection seen by me is from me %s to %s" % (
-                common.addressGetHost(tarzan),
-                common.addressGetHost(jane)))
-        self.log('Client attached is mind %s' % mind)
-
-        # Now we have a remote reference, so start checking pings.
-        self.startPingChecking(self.timeoutDisconnect)
-
-    def detached(self, mind):
-        """
-        Tell the avatar that the peer's client referenced by the mind
-        has detached.
-
-        Called through the manager's PB logout trigger calling
-        L{flumotion.manager.manager.Dispatcher.removeAvatar}
-
-        @type mind: L{twisted.spread.pb.RemoteReference}
-        """
-        assert(self.mind == mind)
-        self.debug('PB client from %s detached' % self.getClientAddress())
-        self.stopPingChecking()
-        self.mind = None
-        self.log('Client detached is mind %s' % mind)
-        if self._detachedD:
-            self._detachedD.callback(None)
-            self._detachedD = None
+        return self.mindCallRemoteLogging(level, -1, name, *args, **kwargs)
 
     def getClientAddress(self):
         """
@@ -442,43 +333,10 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @type  vishnu: L{flumotion.manager.manager.Vishnu}
         """
         self.vishnu = vishnu
-        self.avatars = {} # avatarId -> avatar
+        self.avatars = {} # avatarId -> avatar; populated by
+                          # manager.Dispatcher
        
     ### ManagerHeaven methods
-    def createAvatar(self, avatarId, remoteIdentity):
-        """
-        Create a new avatar and manage it.
-
-        @param avatarId:       id of the avatar to create
-        @type  avatarId:       str
-        @param remoteIdentity: the manager-side representation of the
-                               remote identity
-        @type  remoteIdentity: L{flumotion.common.identity.RemoteIdentity}
-
-        @returns: a new avatar for the client
-        @rtype:   L{flumotion.manager.base.ManagerAvatar}
-        """
-        self.debug('creating new Avatar with name %s' % avatarId)
-        if self.avatars.has_key(avatarId):
-            self.warning('an avatar named %s is already logged in' %
-                         avatarId)
-            raise errors.AlreadyConnectedError(avatarId)
-
-        avatar = self.avatarClass(self, avatarId, remoteIdentity)
-        
-        self.avatars[avatarId] = avatar
-        return avatar
-
-    def removeAvatar(self, avatarId):
-        """
-        Stop managing the given avatar.
-
-        @param avatarId: id of the avatar to remove
-        @type  avatarId: str
-        """
-        self.debug('removing Avatar with id %s' % avatarId)
-        del self.avatars[avatarId]
-        
     def getAvatar(self, avatarId):
         """
         Get the avatar with the given id.

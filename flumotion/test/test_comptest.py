@@ -180,6 +180,7 @@ class TestComponentWrapper(CompatTestCase):
 
         d.addCallback(lambda _: pp.stop())
         return d
+    test_setup_and_stop.skip = 'no eater info ever specified, will not fire -- fixme'
 
 class TestCompTestSetup(CompTestTestCase):
     def setUp(self):

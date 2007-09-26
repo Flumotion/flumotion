@@ -149,6 +149,13 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             self._feederPendingConnections.pop(eaterAlias, None)
             self.comp.eatFromFD(eaterAlias, feedId, fd)
 
+        if eaterAlias not in self._feederFeedServer:
+            self.debug("eatFrom() hasn't been called yet for eater %s",
+                       eaterAlias)
+            # unclear if this function should have a return value at
+            # all...
+            return defer.succeed(None)
+
         (fullFeedId, host, port) = self._feederFeedServer[eaterAlias]
 
         cancel = self._feederPendingConnections.pop(eaterAlias, None)
@@ -239,29 +246,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         return self.comp.get_master_clock()
 
-    # FIXME: completely unnecessary, remove me
-    def remote_getEaterDetail(self, fullFeedId):
-        """
-        Returns the host and port that the eater, that is eating from the feed id
-        specified, is using to connect to its upstream feeder.
-        
-        @param fullFeedId: full feed id
-        @type fullFeedId: str
-        
-        @returns (host, port) or None if unknown
-        @rtype: tuple of (str, int)
-        """
-        self.debug("fullFeedId is %s and our current "
-                   "feederFeedServer is %r" % (
-                   fullFeedId, self._feederFeedServer))
-        flowName, componentName, feedName = common.parseFullFeedId(fullFeedId)
-        feedId = common.feedId(componentName, feedName)
-        fullFeedId, host, port = self._feederFeedServer.get(feedId, (None, None, None))
-        if fullFeedId:
-            return host, port
-        else:
-            return None
-        
+    def remote_setMasterClock(self, ip, port, base_time):
+        return self.comp.set_master_clock(ip, port, base_time)
+
     def remote_effect(self, effectName, methodName, *args, **kwargs):
         """
         Invoke the given methodName on the given effectName in this component.

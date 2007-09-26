@@ -45,7 +45,7 @@ from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
-from flumotion.manager import admin, component, worker, base, depgraph
+from flumotion.manager import admin, component, worker, base
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
@@ -91,11 +91,8 @@ class Dispatcher(log.Loggable):
         """
         @param computeIdentity: see L{Vishnu.computeIdentity}
         @type  computeIdentity: callable
-                """
-        # FIXME: Is passing a callable to a constructor offending anyone
-        # else's sense of aesthetics ?
+        """
         self._interfaceHeavens = {} # interface -> heaven
-        self._avatarHeavens = {} # avatarId -> heaven
         self._computeIdentity = computeIdentity
         self._bouncer = None 
         self._avatarKeycards = {} # avatarId -> keycard
@@ -107,121 +104,6 @@ class Dispatcher(log.Loggable):
         """
         self._bouncer = bouncer
 
-    ### IRealm methods
-
-    # requestAvatar gets called through ClientFactory.login()
-    # An optional second argument can be passed to login, which should be
-    # a L{twisted.spread.flavours.Referenceable}
-    # A L{twisted.spread.pb.RemoteReference} to it is passed to
-    # requestAvatar as mind.
-
-    # So in short, the mind is a reference to the client passed in login()
-    # on the peer, allowing any object that has the mind to call back
-    # to the piece that called login(),
-    # which in our case is a component or an admin client.
-    def requestAvatar(self, avatarId, keycard, mind, *ifaces):
-        def got_avatar(avatar):
-            # OK so this is byzantine, but test_manager_manager actually
-            # uses these kwargs to set its own info. so don't change
-            # these args or their order or you will break your test
-            # suite.
-            def cleanup(avatarId=avatarId, avatar=avatar, mind=mind):
-                self.removeAvatar(avatarId, avatar, mind)
-            def attached(_):
-                self._avatarKeycards[avatarId] = keycard
-                return (pb.IPerspective, avatar, cleanup)
-                
-            # Attach the mind to the avatar; does whatever login is required.
-            d = defer.maybeDeferred(avatar.attached, mind)
-            d.addCallback(attached)
-            return d
-        def got_error(failure):
-            # If we failed for some reason, we want to drop the connection.
-            # However, we want the failure to get to the client, so we don't
-            # call loseConnection() immediately - we return the failure first.
-            # loseConnection() will then not drop the connection until it has
-            # finished sending the current data to the client.
-            reactor.callLater(0, mind.broker.transport.loseConnection)
-            return failure
-
-        host = common.addressGetHost(mind.broker.transport.getPeer())
-        d = self.createAvatarFor(avatarId, keycard, host, ifaces)
-        d.addCallbacks(got_avatar, got_error)
-        return d
-
-    ### our methods
-
-    def _bouncerLogout(self, keycard):
-        """
-        Logout of client from manager. This removes the keycard
-        from the bouncer.
-
-        @param keycard:    the keycard used to login
-        @type  keycard:    L{flumotion.common.keycards.Keycard}
-        """
-        d = defer.maybeDeferred(self._bouncer.removeKeycard, keycard)
-        def bouncerResponse(result):
-            self.debug("keycard %r removed from bouncer", keycard)
-            return result
-        def bouncerError(failure):
-            self.warning("got error removing keycard %r from bouncer: %r",
-                keycard,
-                log.getFailureMessage(failure))
-        d.addCallback(bouncerResponse)
-        d.addErrback(bouncerError)
-        return d
-
-    def removeAvatar(self, avatarId, avatar, mind):
-        """
-        Remove an avatar because it logged out of the manager.
-        
-        This function is registered by requestAvatar.
-        """
-        heaven = self._avatarHeavens[avatarId]
-        del self._avatarHeavens[avatarId]
-        keycard = self._avatarKeycards.pop(avatarId)
-        # if there is no bouncer
-        # do not try to logout
-        if self._bouncer:
-            self._bouncerLogout(keycard)
-        avatar.detached(mind)
-        heaven.removeAvatar(avatarId)
-
-    def createAvatarFor(self, avatarId, keycard, remoteHost, ifaces):
-        """
-        Create an avatar from the heaven implementing the given interface.
-
-        @type  avatarId:   str
-        @param avatarId:   the name of the new avatar
-        @type  keycard:    L{flumotion.common.keycards.Keycard}
-        @param keycard:    the credentials being used to log in
-        @type  remoteHost: str
-        @param remoteHost: the remote host
-        @type  ifaces:     tuple of interfaces linked to heaven
-        @param ifaces:     a list of heaven interfaces to get avatar from,
-                           including pb.IPerspective
-
-        @returns:          a deferred that will fire an avatar from
-                           the heaven managing the given interface.
-        """
-        def gotIdentity(identity):
-            for iface in ifaces:
-                heaven = self._interfaceHeavens.get(iface, None)
-                if heaven:
-                    avatar = heaven.createAvatar(avatarId, identity)
-                    self.debug('Created avatar %r for identity %r' % (
-                        avatar, identity))
-                    self._avatarHeavens[avatarId] = heaven
-                    return avatar
-            raise errors.NoPerspectiveError("%s requesting iface %r",
-                                            avatarId, ifaces)
-            
-        if not pb.IPerspective in ifaces:
-            raise errors.NoPerspectiveError(avatarId)
-        d = self._computeIdentity(keycard, remoteHost)
-        d.addCallback(gotIdentity)
-        return d
-
     def registerHeaven(self, heaven, interface):
         """
         Register a Heaven as managing components with the given interface.
@@ -232,6 +114,61 @@ class Dispatcher(log.Loggable):
         assert isinstance(heaven, base.ManagerHeaven)
        
         self._interfaceHeavens[interface] = heaven
+
+    ### IRealm methods
+    def requestAvatar(self, avatarId, keycard, mind, *ifaces):
+        def got_avatar(avatar):
+            if avatar.avatarId in heaven.avatars:
+                raise errors.AlreadyConnectedError(avatar.avatarId)
+            heaven.avatars[avatar.avatarId] = avatar
+            self._avatarKeycards[avatar.avatarId] = keycard
+
+            # OK so this is byzantine, but test_manager_manager actually
+            # uses these kwargs to set its own info. so don't change
+            # these args or their order or you will break your test
+            # suite.
+            def cleanup(avatarId=avatar.avatarId, avatar=avatar, mind=mind):
+                self.info('lost connection to client %r', avatar)
+                del heaven.avatars[avatar.avatarId]
+                avatar.onShutdown()
+                # avoid leaking the keycard
+                keycard = self._avatarKeycards.pop(avatarId)
+                if self._bouncer:
+                    try:
+                        self._bouncer.removeKeycard(keycard)
+                    except KeyError:
+                        self.warning("bouncer forgot about keycard %r",
+                                     keycard)
+
+            return (pb.IPerspective, avatar, cleanup)
+
+        def got_error(failure):
+            # If we failed for some reason, we want to drop the connection.
+            # However, we want the failure to get to the client, so we don't
+            # call loseConnection() immediately - we return the failure first.
+            # loseConnection() will then not drop the connection until it has
+            # finished sending the current data to the client.
+            reactor.callLater(0, mind.broker.transport.loseConnection)
+            return failure
+
+        if pb.IPerspective not in ifaces:
+            raise errors.NoPerspectiveError(avatarId)
+        if len(ifaces) != 2:
+            # IPerspective and the specific avatar interface.
+            raise errors.NoPerspectiveError(avatarId)
+        iface = [x for x in ifaces if x != pb.IPerspective][0]
+        if iface not in self._interfaceHeavens:
+            self.warning('unknown interface %r', iface)
+            raise errors.NoPerspectiveError(avatarId)
+
+        heaven = self._interfaceHeavens[iface]
+        klass = heaven.avatarClass
+        host = common.addressGetHost(mind.broker.transport.getPeer())
+        d = self._computeIdentity(keycard, host)
+        d.addCallback(lambda identity: \
+                      klass.makeAvatar(heaven, avatarId, identity, mind))
+        d.addCallbacks(got_avatar, got_error)
+        return d
 
 class ComponentMapper:
     """
@@ -291,8 +228,6 @@ class Vishnu(log.Loggable):
 
         self.plugs = {} # socket -> list of plugs
 
-        self._depgraph = depgraph.DepGraph()
-        
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
@@ -471,25 +406,6 @@ class Vishnu(log.Loggable):
 
         return state
 
-    def _updateFlowDependencies(self, state):
-        self.debug('registering dependencies of %r' % state)
-
-        self._depgraph.addComponent(state, 
-            self.componentHeaven.setupComponent, 
-            self.componentHeaven.startComponent)
-
-        conf = state.get('config')
-
-        # If this component has the same id as the clock-master, then it is the
-        # clock master; add to the dependency graph.
-        componentAvatarId = common.componentId(
-            state.get('parent').get('name'), state.get('name'))
-
-        self.debug("Using config: %r for component with avatarId %r", conf, componentAvatarId)
-        if componentAvatarId == conf['clock-master']:
-            self._depgraph.addClockMaster(state, 
-                self.componentHeaven.setupClockMaster)
-
     def _updateStateFromConf(self, _, conf, identity):
         """
         Add a new config object into the planet state.
@@ -555,21 +471,6 @@ class Vishnu(log.Loggable):
             for c in f.components.values():
                 if checkNotRunning(c, flow):
                     added.append(self._addComponent(c, flow, identity))
-
-        for componentState in added:
-            self._updateFlowDependencies(componentState)
-
-        try:
-            self._depgraph.mapEatersToFeeders()
-        except errors.ComponentConfigError, e:
-            state = e.args[0]
-            debug = e.args[1]
-            message = messages.Error(T_(
-                N_("The component is misconfigured.")),
-                    debug=debug)
-            state.append('messages', message)
-            state.setMood(moods.sad.value)
-            raise e
 
         return added
 
@@ -760,16 +661,6 @@ class Vishnu(log.Loggable):
             raise errors.ComponentAlreadyExistsError(compName)
 
         compState = self._addComponent(compConf, parentState, identity)
-        self._updateFlowDependencies(compState)
-
-        try:
-            self._depgraph.mapEatersToFeeders()
-        except errors.ComponentConfigError:
-            self.warning('could not find feeders to feed component %s',
-                         componentId)
-            self.debug('deleting component')
-            self.deleteComponent(compState)
-            raise
 
         self._startComponents([compState], identity)
 
@@ -883,8 +774,6 @@ class Vishnu(log.Loggable):
 
         d = componentAvatar.mindCallRemote('stop')
         def cleanupAndDisconnectComponent(result):
-            componentAvatar._starting = False
-            componentAvatar._beingSetup = False
             return componentAvatar.disconnect()
 
         def setSleeping(result):
@@ -921,9 +810,6 @@ class Vishnu(log.Loggable):
         # called when a worker logs in
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerAttached(): id %s' % workerId)
-
-        self._depgraph.addWorker(workerId)
-        self._depgraph.setWorkerStarted(workerId)
 
         # Create all components assigned to this worker. Note that the
         # order of creation is unimportant, it's only the order of
@@ -969,6 +855,7 @@ class Vishnu(log.Loggable):
         
             self._workerCreateComponents(workerId, allComponents)
         d.addCallback(workerAvatarComponentListReceived)
+        self.componentHeaven.feedServerAvailable(workerId)
             
     def _workerCreateComponents(self, workerId, components):
         """
@@ -1020,7 +907,8 @@ class Vishnu(log.Loggable):
         # asked to start once
         componentState.set('moodPending', moods.happy.value)
 
-        d = workerAvatar.createComponent(avatarId, componentType, nice)
+        d = workerAvatar.createComponent(avatarId, componentType, nice,
+                                         conf)
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
         d.addCallback(self._createCallback, componentState)
@@ -1038,8 +926,8 @@ class Vishnu(log.Loggable):
     def _createErrback(self, failure, state):
         # FIXME: make ConfigError copyable so we can .check() it here
         # and print a nicer warning
-        self.warning('failed to create component %s: %s'
-                  % (state.get('name'), log.getFailureMessage(failure)))
+        self.warning('failed to create component %s: %s',
+                     state.get('name'), log.getFailureMessage(failure))
 
         if failure.check(errors.ComponentAlreadyRunningError):
             if self._componentMappers[state].jobState:
@@ -1063,201 +951,49 @@ class Vishnu(log.Loggable):
         # called when a worker logs out
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerDetached(): id %s' % workerId)
-        self._depgraph.setWorkerStopped(workerId)
 
-    def _upgradeComponentConfig(self, state, conf):
-        def upgradeFailedWarning(format, *args, **kwargs):
-            message = messages.Warning(T_(format, *args), **kwargs)
-            state.append('messages', message)
-
-        # different from conf['version'], eh...
-        version = conf.get('config-version', 0)
-        while version < config.CURRENT_VERSION:
-            try:
-                config.UPGRADERS[version](conf)
-                version += 1
-                conf['config-version'] = version
-            except Exception, e:
-                upgradeFailedWarning(N_("Failed to upgrade config %r "
-                                        "from version %d. Please file "
-                                        "a bug."), conf, version,
-                                     debug=log.getExceptionMessage(e))
-                return
-
-    def _getComponentState(self, deferredListResult, avatar):
-        # a component just logged in with good credentials. we fetched
-        # its config and job state. now there are two possibilities:
-        #  (1) we were waiting for such a component to start. There is a
-        #      ManagerComponentState and an avatarId in the
-        #      componentMappers waiting for us.
-        #  (2) we don't know anything about this component, but it has a state 
-        #      and config. We deal with it, creating all the neccesary internal
-        #      state.
-        #  (3) we don't know anything about this component, and it has no
-        #      config. We stop it.
-        def verifyExistingComponentState(jobState, state):
-            # condition (1)
-            state.setJobState(jobState)
-
-            if conf:
-                self._upgradeComponentConfig(state, conf)
-                if state.get('config') != conf:
-                    diff = config.dictDiff(state.get('config'), conf)
-                    diffMsg = config.dictDiffMessageString(diff,
-                                                       'internal conf',
-                                                       'running conf')
-                    message = messages.Warning(T_(
-                        N_("Component logged in with stale configuration. "
-                        "Consider stopping this component and restarting "
-                        "the manager.")),
-                        debug=("Updating internal conf from running conf:\n"
-                           + diffMsg))
-                    self.warning('updating internal component state for %r')
-                    self.debug('changes to conf: %s',
-                               config.dictDiffMessageString(diff))
-                    state.set('config', conf)
-                    state.append('messages', message)
-            # if conf is None, then we just created the component and
-            # it's not set up yet
-
-        def makeNewComponentState(conf):
-            # condition (2)
-            state = planet.ManagerComponentState()
-            state.setJobState(jobState)
-
-            self._upgradeComponentConfig(state, conf)
-
-            flowName, compName = conf['parent'], conf['name']
-
-            state.set('name', compName)
-            state.set('type', conf['type'])
-            state.set('workerRequested', jobState.get('workerName'))
-            state.set('config', conf)
-
-            # check if we have this flow yet and add if not
-            if flowName == 'atmosphere':
-                # treat the atmosphere like a flow, although it's not
-                flow = self.state.get('atmosphere')
-            else:
-                flow = _first(self.state.get('flows'),
-                              lambda x: x.get('name') == flowName)
-            if not flow:
-                self.info('Creating flow "%s"' % flowName)
-                flow = planet.ManagerFlowState()
-                flow.set('name', flowName)
-                flow.set('parent', self.state)
-                self.state.append('flows', flow)
-
-            state.set('parent', flow)
-            flow.append('components', state)
-
-            # add to mapper
-            m = ComponentMapper()
-            m.state = state
-            m.id = avatar.avatarId
-            self._componentMappers[m.state] = m
-            self._componentMappers[m.id] = m
-
-        (_success1, conf), (_success2, jobState) = deferredListResult
-        m = self.getComponentMapper(avatar.avatarId)
-
-        if m:
-            verifyExistingComponentState(jobState, m.state)
-        elif conf:
-            makeNewComponentState(conf)
-            m = self.getComponentMapper(avatar.avatarId)
-            self._updateFlowDependencies(m.state)
-            try:
-                self._depgraph.mapEatersToFeeders()
-            except errors.ComponentConfigError:
-                # This can happen - the feeder that some eater refers to might
-                # not have logged back in yet. Once it does, we'll call this
-                # again, and the depgraph will get rebuilt properly.
-                self.debug("Couldn't map eaters to feeders for reconnecting "
-                    "component")
+    def addComponentToFlow(self, componentState, flowName):
+        # check if we have this flow yet and add if not
+        if flowName == 'atmosphere':
+            # treat the atmosphere like a flow, although it's not
+            flow = self.state.get('atmosphere')
         else:
-            # A component which we don't know about has logged in without a
-            # config. This is something that was created, but did not have 
-            # setup() called on it, then the manager was restarted... we can't
-            # do anything useful with it, so shut it down.
-            self.warning("Component logged in with no config: shutting it down")
-            def cleanupAndDisconnectComponent(result):
-                avatar._starting = False
-                avatar._beingSetup = False
-                return avatar.disconnect()
-            d = avatar.mindCallRemote('stop')
-            d.addCallback(cleanupAndDisconnectComponent)
-            return d
+            flow = _first(self.state.get('flows'),
+                          lambda x: x.get('name') == flowName)
+        if not flow:
+            self.info('Creating flow "%s"' % flowName)
+            flow = planet.ManagerFlowState()
+            flow.set('name', flowName)
+            flow.set('parent', self.state)
+            self.state.append('flows', flow)
 
-        m = self.getComponentMapper(avatar.avatarId)
-        m.avatar = avatar
+        componentState.set('parent', flow)
+        flow.append('components', componentState)
+        
+    def registerComponent(self, componentAvatar):
+        # fetch or create a new mapper
+        m = (self.getComponentMapper(componentAvatar.avatarId)
+             or ComponentMapper())
+
+        m.state = componentAvatar.componentState
+        m.jobState = componentAvatar.jobState
+        m.id = componentAvatar.avatarId
+        m.avatar = componentAvatar
+
+        self._componentMappers[m.state] = m
+        self._componentMappers[m.jobState] = m
+        self._componentMappers[m.id] = m
         self._componentMappers[m.avatar] = m
-        avatar.componentState = m.state
-        avatar.jobState = jobState
-        m.jobState = jobState
-        self._componentMappers[jobState] = m
 
-    def componentAttached(self, componentAvatar):
-        # called when a component logs in and gets a component avatar created
-        self.debug("%s component attached", componentAvatar.avatarId)
-        d = defer.DeferredList([componentAvatar.mindCallRemote('getConfig'),
-                                componentAvatar.mindCallRemote('getState')],
-                               fireOnOneErrback=True)
-        d.addCallback(self._getComponentState, componentAvatar)
-        d.addCallback(lambda _: self._registerComponent(componentAvatar))
-        return d
+        # FIXME: should we really be poking around the componentState
+        # here?
 
-    def componentDetached(self, componentAvatar):
-        # called when the component has detached
-        self.debug("%s component detached", componentAvatar.avatarId)
-        self._depgraph.setJobStopped(componentAvatar.componentState)
-        componentAvatar.componentState.set('moodPending', None)
-
-        # Now we're detached (no longer proxying state from the component) 
-        # clear all remaining messages
-        for m in componentAvatar.componentState.get('messages'):
-            self.debug('Removing message %r' % m)
-            componentAvatar.componentState.remove('messages', m)
-
-        # detach componentstate fom avatar
-        componentAvatar.componentState = None
-        componentAvatar.jobState = None
-
-    def _registerComponent(self, componentAvatar):
-        # called when the jobstate is retrieved
-        self.debug('vishnu registering component %r' % componentAvatar)
-
-        state = componentAvatar.componentState
-        # If this is a reconnecting component, we might also need to set the
-        # component as started.
-        # If mood is happy or hungry, then the component is running.
-        mood = state.get('mood')
+        # If mood is happy or hungry, then the component is running, and
+        # a reconnecting worker should not trigger a start of this
+        # component, should it ever be stopped by the admin.
+        mood = m.state.get('mood')
         if mood == moods.happy.value or mood == moods.hungry.value:
-            # When it reconnects, it shouldn't have a pending mood.
-            state.set('moodPending', None)
-            self.debug("Component %s is already in mood %s.  Set depgraph "
-                "appropriately", componentAvatar.avatarId, moods.get(mood).name)
-            # We set these in backwards order (start, clockmaster, setup), to
-            # avoid trying to execute the later ones unneccesarily (since we're
-            # already running, we don't want setComponentSetup() to try to start
-            # the component!)
-            self._depgraph.setComponentStarted(state)
-            if self._depgraph.isAClockMaster(state):
-                self.log("Component %s is a clock master and is happy/hungry "
-                    "so must already be providing clock master",
-                    componentAvatar.avatarId)
-                self._depgraph.setClockMasterStarted(state)
-
-                # And we need to trigger any deferreds waiting for the clocking
-                # info - so get the clock info
-                d = componentAvatar.mindCallRemote('getMasterClockInfo')
-                d.addCallback(self.componentHeaven.setMasterClockInfo, 
-                    componentAvatar)
-
-            self._depgraph.setComponentSetup(state)
-
-        self.debug('vishnu registered component %r' % componentAvatar)
-        self._depgraph.setJobStarted(state)
+            m.state.set('moodPending', None)
 
     def unregisterComponent(self, componentAvatar):
         # called when the component is logging out
@@ -1316,8 +1052,6 @@ class Vishnu(log.Loggable):
             or c.get('mood') is not moods.sleeping.value):
             raise errors.BusyComponentError(c)
 
-        self._depgraph.removeComponent(c)
-
         del self._componentMappers[self._componentMappers[c].id]
         del self._componentMappers[c]
         return flow.remove('components', c)
@@ -1341,7 +1075,6 @@ class Vishnu(log.Loggable):
             raise errors.BusyComponentError(_first(components, pred))
 
         for c in components:
-            self._depgraph.removeComponent(c)
             del self._componentMappers[self._componentMappers[c].id]
             del self._componentMappers[c]
         yield flow.empty()
@@ -1407,11 +1140,8 @@ class Vishnu(log.Loggable):
             len(components))
 
         for c in components:
-            # remove from depgraph
-            self._depgraph.removeComponent(c)
-
             if c.get('mood') is not moods.sleeping.value:
-                self.warning('Component %s is not sleeping' % c.get('name'))
+                self.warning('Component %s is not sleeping', c.get('name'))
             # clear mapper; remove componentstate and id
             m = self._componentMappers[c]
             del self._componentMappers[m.id]
@@ -1460,7 +1190,9 @@ class Vishnu(log.Loggable):
         return self.workerHeaven.avatars[workerName]
 
     def getWorkerFeedServerPort(self, workerName):
-        return self._getWorker(workerName).feedServerPort
+        if workerName in self.workerHeaven.avatars:
+            return self._getWorker(workerName).feedServerPort
+        return None
     
     def reservePortsOnWorker(self, workerName, numPorts):
         """
@@ -1490,5 +1222,16 @@ class Vishnu(log.Loggable):
         """
         if object in self._componentMappers.keys():
             return self._componentMappers[object]
+
+        return None
+
+    def getManagerComponentState(self, object):
+        """
+        Look up an object mapper given the object.
+
+        @rtype: L{ComponentMapper} or None
+        """
+        if object in self._componentMappers.keys():
+            return self._componentMappers[object].state
 
         return None

@@ -289,6 +289,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # We listen on this interface, if set.
         self.iface = None
 
+        self._tport = None
+
         self._updateCallLaterId = None
 
         self._pending_removals = {}
@@ -648,6 +650,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self.httpauth:
             self.httpauth.stopKeepAlive()
 
+        if self._tport:
+            self._tport.stopListening()
+
         if self.type == 'slave' and self._pbclient:
             d1 = self._pbclient.deregisterPath(self.mountPoint)
             d2 = feedcomponent.ParseLaunchComponent.do_stop(self)
@@ -688,9 +693,16 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def do_pipeline_playing(self):
         # Override this to not set the component happy; instead do this once
         # both the pipeline has started AND we've logged in to the porter.
-        pass
+        if hasattr(self, '_porterDeferred'):
+            d = self._porterDeferred
+        else:
+            d = defer.succeed(None)
+        self.httpauth.scheduleKeepAlive()
+        d.addCallback(lambda res: feedcomponent.ParseLaunchComponent.do_pipeline_playing(self))
+        return d
 
-    def do_start(self, *args, **kwargs):
+    def start_pipeline(self):
+        feedcomponent.ParseLaunchComponent.start_pipeline(self)
         root = resources.HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]
@@ -709,34 +721,27 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             # automatically-reconnecting client factory, and we only fire 
             # this deferred the first time)
 
-            d1 = feedcomponent.ParseLaunchComponent.do_start(self, 
-                *args, **kwargs)
-
-            d2 = defer.Deferred()
+            self._porterDeferred = d = defer.Deferred()
             mountpoints = [self.mountPoint]
             self._pbclient = porterclient.HTTPPorterClientFactory(
-                server.Site(resource=root), mountpoints, d2)
+                server.Site(resource=root), mountpoints, d)
 
             creds = credentials.UsernamePassword(self._porterUsername, 
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
 
             self.debug("Starting porter login at \"%s\"", self._porterPath)
-            # This will eventually cause d2 to fire
+            # This will eventually cause d to fire
             reactor.connectWith(
                 fdserver.FDConnector, self._porterPath, 
                 self._pbclient, 10, checkPID=False)
-
-            d = defer.DeferredList([d1, d2])
         else:
             # Streamer is standalone.
             try:
                 self.debug('Listening on %d' % self.port)
                 iface = self.iface or ""
-                reactor.listenTCP(self.port, server.Site(resource=root), 
+                self._tport = reactor.listenTCP(self.port, server.Site(resource=root), 
                     interface=iface)
-                d = feedcomponent.ParseLaunchComponent.do_start(self, *args, 
-                    **kwargs)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
@@ -745,9 +750,3 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
-        def turnHappy(res):
-            self.httpauth.scheduleKeepAlive()
-            self.debug("Turned happy!")
-            self.setMood(moods.happy)
-        d.addCallback(turnHappy)
-        return d

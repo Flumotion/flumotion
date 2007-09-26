@@ -48,7 +48,7 @@ class ComponentJobAvatar(base.BaseJobAvatar):
                        " type %s", job.avatarId, job.type)
             return self.mindCallRemote('create', job.avatarId, job.type,
                                        job.moduleName, job.methodName,
-                                       job.nice)
+                                       job.nice, job.conf)
 
         def success(_, avatarId):
             self.debug('job started component with avatarId %s',
@@ -147,6 +147,16 @@ class ComponentJobAvatar(base.BaseJobAvatar):
         self._heaven._startSet.shutdownStart(self.avatarId)
 
 
+class ComponentJobInfo(base.JobInfo):
+    __slots__ = ('conf',)
+
+    def __init__(self, pid, avatarId, type, moduleName, methodName,
+                 nice, bundles, conf):
+        base.JobInfo.__init__(self, pid, avatarId, type, moduleName,
+                              methodName, nice, bundles)
+        self.conf = conf
+
+
 class ComponentJobHeaven(base.BaseJobHeaven):
     avatarClass = ComponentJobAvatar
 
@@ -159,7 +169,8 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         """
         return self.brain.managerConnectionInfo
 
-    def spawn(self, avatarId, type, moduleName, methodName, nice, bundles):
+    def spawn(self, avatarId, type, moduleName, methodName, nice,
+              bundles, conf):
         """
         Spawn a new job.
 
@@ -181,6 +192,8 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         @param bundles:    ordered list of (bundleName, bundlePath) for this
                            component
         @type  bundles:    list of (str, str)
+        @param conf:       component configuration
+        @type  conf:       dict
         """
         d = self._startSet.createStart(avatarId)
 
@@ -218,8 +231,9 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         p.setPid(process.pid)
 
         self.addJobInfo(process.pid,
-                        base.JobInfo(process.pid, avatarId, type,
-                                     moduleName, methodName, nice, bundles))
+                        ComponentJobInfo(process.pid, avatarId, type,
+                                         moduleName, methodName, nice,
+                                         bundles, conf))
         return d
         
 

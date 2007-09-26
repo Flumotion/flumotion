@@ -122,8 +122,11 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug("FeedComponent.do_setup(): setup finished")
 
-        # wait to start until clocking details received
-        return defer.succeed(None)
+        if self._clock_slaved:
+            # wait to start until clocking details received
+            return defer.succeed(None)
+        else:
+            return self.start_pipeline()
 
     ### FeedComponent interface for subclasses
     def create_pipeline(self):
@@ -296,10 +299,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('setup_pipeline()')
         assert self.bus_signal_id == None
 
-        # disable the pipeline's management of base_time -- we're going
-        # to set it ourselves.
-        self.pipeline.set_new_stream_time(gst.CLOCK_TIME_NONE)
-
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
@@ -371,16 +370,34 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("Master clock set to %s:%d with base_time %s", ip, port, 
             gst.TIME_ARGS(base_time))
 
+        assert self._clock_slaved
+        if self._master_clock_info == (ip, port, base_time):
+            self.debug("Same master clock info, returning directly")
+            return defer.succeed(None)
+        elif self._master_clock_info:
+            self.stop_pipeline()
+
+        self._master_clock_info = ip, port, base_time
+
         clock = gst.NetClientClock(None, ip, port, base_time)
+        # disable the pipeline's management of base_time -- we're going
+        # to set it ourselves.
+        self.pipeline.set_new_stream_time(gst.CLOCK_TIME_NONE)
         self.pipeline.set_base_time(base_time)
         self.pipeline.use_clock(clock)
 
+        return self.start_pipeline()
+
     def get_master_clock(self):
         """
-        Return the connection details for the master clock, if any.
+        Return the connection details for the network clock provided by
+        this component, if any.
         """
-
-        return self._master_clock_info
+        if self.clock_provider:
+            ip, port, base_time = self._master_clock_info
+            return ip, port, base_time
+        else:
+            return None
 
     def provide_master_clock(self, port):
         """
@@ -394,14 +411,11 @@ class FeedComponent(basecomponent.BaseComponent):
             self.pipeline.use_clock(clock)
 
             self.clock_provider = gst.NetTimeProvider(clock, None, port)
-            # small window here but that's ok
-            self.clock_provider.set_property('active', False)
         
-            base_time = clock.get_time()
-            self.pipeline.set_base_time(base_time)
+            base_time = self.pipeline.get_base_time()
 
-            self.debug('provided master clock from %r, base time %s'
-                       % (clock, gst.TIME_ARGS(base_time)))
+            self.debug('provided master clock from %r, base time %s',
+                       clock, gst.TIME_ARGS(base_time))
 
             if self.medium:
                 # FIXME: This isn't always correct. We need a more flexible API,
@@ -412,31 +426,21 @@ class FeedComponent(basecomponent.BaseComponent):
                 ip = "127.0.0.1"
 
             self._master_clock_info = (ip, port, base_time)
-            return self._master_clock_info
+            return self.get_master_clock()
 
-        if not self.pipeline:
-            self.warning('No self.pipeline, cannot provide master clock')
-            # FIXME: should we have a NoSetupError() for cases where setup
-            # was not called ? For now we fall through and get an exception
-
-        if self.clock_provider:
-            self.warning('already had a clock provider, removing it')
-            self.clock_provider = None
-
-        # We need to be >= PAUSED to get the correct clock, in general
+        assert self.pipeline
+        assert not self._clock_slaved
         (ret, state, pending) = self.pipeline.get_state(0)
         if state != gst.STATE_PAUSED and state != gst.STATE_PLAYING:
-            self.info ("Setting pipeline to PAUSED")
-
+            self.debug("pipeline still spinning up: %r", state)
             d = self._change_monitor.add(gst.STATE_CHANGE_READY_TO_PAUSED)
             d.addCallback(pipelinePaused)
-
-            self.pipeline.set_state(gst.STATE_PAUSED)
             return d
+        elif self.clock_provider:
+            self.debug("returning existing master clock info")
+            return defer.succeed(self.get_master_clock())
         else:
-            self.info ("Pipeline already started, retrieving clocking")
-            # Just return the already set up info, as a fired deferred
-            return defer.succeed(self._master_clock_info)
+            return defer.maybeDeferred(pipelinePaused, None)
 
     def install_eater_event_probes(self, eater):
         def fdsrc_event(pad, event):
@@ -476,7 +480,7 @@ class FeedComponent(basecomponent.BaseComponent):
             depay.get_pad("src").add_event_probe(depay_event)
 
     ### BaseComponent interface implementation
-    def do_start(self, clocking):
+    def start_pipeline(self):
         """
         Tell the component to start.
         Whatever is using the component is responsible for making sure all
@@ -487,15 +491,6 @@ class FeedComponent(basecomponent.BaseComponent):
         @type  clocking: tuple(str, int, long) or None.
         """
         self.debug('FeedComponent.start')
-        if clocking:
-            host, port, base_time = clocking
-            self.info('slaving to master clock on %s:%d with base time %d',
-                      host, port, base_time)
-            self.set_master_clock(host, port, base_time)
-        
-        if self.clock_provider:
-            # start responding to network time query packets
-            self.clock_provider.set_property('active', True)
 
         for eater in self.eaters.values():
             self.install_eater_event_probes(eater)

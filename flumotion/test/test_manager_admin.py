@@ -35,14 +35,37 @@ class FakeHeaven:
     def __init__(self, vishnu):
         self.vishnu = vishnu
 
+class FakeTransport:
+    def getPeer(self):
+        from twisted.internet.address import IPv4Address
+        return IPv4Address('TCP', 'nullhost', 1)
+    def getHost(self):
+        from twisted.internet.address import IPv4Address
+        return IPv4Address('TCP', 'nullhost', 1)
+
+class FakeBroker:
+    def __init__(self):
+        self.transport = FakeTransport()
+
+class FakeMind:
+    def __init__(self):
+        self.broker = FakeBroker()
+
+    def notifyOnDisconnect(self, proc):
+        pass
+
 class TestAdminAvatar(unittest.TestCase):
     def setUp(self):
         vishnu = FakeVishnu()
         self.heaven = FakeHeaven(vishnu)
+        self.avatar = admin.AdminAvatar(self.heaven, 'admin', None,
+                                        FakeMind())
+
+    def tearDown(self):
+        self.avatar.onShutdown()
 
     def testHasRemoteReference(self):
-        avatar = admin.AdminAvatar(self.heaven, 'admin', None)
-        avatar.hasRemoteReference()
+        self.avatar.hasRemoteReference()
 
 if __name__ == '__main__':
      unittest.main()

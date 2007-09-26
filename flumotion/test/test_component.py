@@ -26,7 +26,7 @@ import common
 from twisted.python import failure
 from twisted.internet import defer
 
-from flumotion.common import errors
+from flumotion.common import errors, planet
 from flumotion.component.feedcomponent import ParseLaunchComponent
 from flumotion.twisted.defer import defer_generator_method
 
@@ -39,10 +39,14 @@ class PipelineTest(ParseLaunchComponent):
 
     def config(self):
         config = {'name': 'fake',
+                  'avatarId': '/default/fake',
                   'eater': self._eater,
                   'feed': self._feed,
                   'plugs': {},
-                  'properties': {}}
+                  'properties': {},
+                  # clock master prevents the comp from being
+                  # instantiated
+                  'clock-master': '/some/component'}
 
         return self.setup(config)
 
@@ -64,22 +68,6 @@ class PipelineTest(ParseLaunchComponent):
     def set_pipeline(self, pipeline):
         self.pipeline = pipeline
         
-def pipelineFactory(pipeline, eaters=None, feeders=None):
-    t = PipelineTest(pipeline=pipeline, eaters=eaters, feeders=feeders)
-    d = defer.Deferred()
-    dd = t.config()
-    def pipelineConfigCallback(result):
-        res = t.parse_pipeline(pipeline)
-        t.stop()
-        return res
-    def _eb(failure):
-        t.stop()
-        return failure
-
-    dd.addCallbacks(pipelineConfigCallback, _eb)
-    # return a tuple because we need a reference to the PipelineTest object
-    return (dd, t)
-
 class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
@@ -95,84 +83,66 @@ class TestExpandElementNames(unittest.TestCase):
                           '@ this:is:wrong @ ! because ! @')
 
 class TestParser(unittest.TestCase):
-    def _pipelineFactoryCallback(self, result, correctresult):
-        self.assertEquals(result, correctresult)
+    def parse(self, unparsed, correctresultproc, eaters=None, feeders=None):
+        comp = PipelineTest(eaters, feeders, unparsed)
+        comp.config()
+        result = comp.parse_pipeline(unparsed)
+        self.assertEquals(result, correctresultproc(comp))
+        comp.stop()
 
     def testSimpleOneElement(self):
-        d, pipeline = pipelineFactory('foobar')
-        d.addCallback(self._pipelineFactoryCallback, 'foobar')
-        return d
+        self.parse('foobar', lambda p: 'foobar')
 
     def testSimpleTwoElements(self):
-        d, pipeline = pipelineFactory('foo ! bar')
-        d.addCallback(self._pipelineFactoryCallback, 'foo ! bar')
-        return d
+        self.parse('foo ! bar', lambda p: 'foo ! bar')
 
     def testOneSource(self):
-        d, pipeline = pipelineFactory('@eater:default@ ! bar',
-                                      {'qux': [('foo:bar', 'default')]})
-        d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-            pipeline.get_eater_template('default')))
-        return d
+        self.parse('@eater:default@ ! bar',
+                   lambda p: '%s ! bar' % (p.get_eater_template('default')),
+                   {'qux': [('foo:bar', 'default')]})
 
     def testOneSourceWithout(self):
-        d, pipeline = pipelineFactory('bar',
-                                      {'qux': [('foo:quoi', 'default')]})
-        d.addCallback(self._pipelineFactoryCallback, '%s ! bar' % (
-            pipeline.get_eater_template('default')))
-        return d
+        self.parse('bar',
+                   lambda p: '%s ! bar' % (p.get_eater_template('default')),
+                   {'qux': [('foo:quoi', 'default')]})
 
     def testOneFeed(self):
-        d, pipeline = pipelineFactory('foo ! @feeder:bar@', {}, ['bar'])
-        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-            pipeline.get_feeder_template('bar')))
-        return d
-        
+        self.parse('foo ! @feeder:bar@',
+                   lambda p: 'foo ! %s' % (p.get_feeder_template('bar')),
+                   {}, ['bar'])
+
     def testOneFeedWithout(self):
-        d, pipeline = pipelineFactory('foo', {}, ['bar'])
-        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s' % (
-            pipeline.get_feeder_template('bar')))
-        return d
+        self.parse('foo',
+                   lambda p: 'foo ! %s' % (p.get_feeder_template('bar')),
+                   {}, ['bar'])
 
     def testTwoSources(self):
-        d, pipeline = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', 
-                                      {'qux': [('baz:default', 'foo')],
-                                       'zag': [('qux:default', 'bar')]})
-        d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! baz' % (
-           pipeline.get_eater_template('foo'), 
-           pipeline.get_eater_template('bar')))
-        return d
+        self.parse('@eater:foo@ ! @eater:bar@ ! baz', 
+                   lambda p: '%s ! %s ! baz' % (p.get_eater_template('foo'), 
+                                      p.get_eater_template('bar')),
+                   {'qux': [('baz:default', 'foo')],
+                    'zag': [('qux:default', 'bar')]})
 
     def testTwoFeeds(self):
-        d, pipeline = pipelineFactory('foo ! @feeder:bar@ ! @feeder:baz@', {},
-            ['bar', 'baz'])
-        d.addCallback(self._pipelineFactoryCallback, 'foo ! %s ! %s' % (
-           pipeline.get_feeder_template('bar'), 
-           pipeline.get_feeder_template('baz')))
-        return d
+        self.parse('foo ! @feeder:bar@ ! @feeder:baz@',
+                   lambda p: 'foo ! %s ! %s' % (p.get_feeder_template('bar'), 
+                                      p.get_feeder_template('baz')),
+                   {}, ['bar', 'baz'])
 
     def testTwoBoth(self):
-        d, pipeline = pipelineFactory(
-            '@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
-            {'qux': [('comp1:default', 'src1')],
-             'zag': [('comp2:default', 'src2')]},
-            ['feed1', 'feed2'])
-        d.addCallback(self._pipelineFactoryCallback, '%s ! %s ! %s ! %s' % (
-            pipeline.get_eater_template('src1'), 
-            pipeline.get_eater_template('src2'),
-            pipeline.get_feeder_template('feed1'), 
-            pipeline.get_feeder_template('feed2')))
-        return d
+        self.parse('@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
+                   lambda p: '%s ! %s ! %s ! %s' % (p.get_eater_template('src1'), 
+                                          p.get_eater_template('src2'),
+                                          p.get_feeder_template('feed1'), 
+                                          p.get_feeder_template('feed2')),
+                   {'qux': [('comp1:default', 'src1')],
+                    'zag': [('comp2:default', 'src2')]},
+                   ['feed1', 'feed2'])
 
     def testErrors(self):
-        d, pipeline = pipelineFactory('')
-        def _cb(r):
-            self.fail("Didn't get expected failure, received %r" % (r,))
-        def _eb(failure):
-            failure.trap(errors.ComponentSetupHandledError)
-            return failure.value
-        d.addCallbacks(_cb, _eb)
-        return d
+        comp = PipelineTest(None, None, '')
+        self.assertFailure(comp.config(), errors.ComponentSetupHandledError)
+        comp.stop()
     
 if __name__ == '__main__':
     unittest.main()

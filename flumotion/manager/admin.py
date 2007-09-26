@@ -52,15 +52,6 @@ class AdminAvatar(base.ManagerAvatar):
     """
     logCategory = 'admin-avatar'
        
-    # override base methods
-    def attached(self, mind):
-        self.info('admin client "%s" logged in' % self.avatarId)
-        base.ManagerAvatar.attached(self, mind)
-
-    def detached(self, mind):
-        self.info('admin client "%s" logged out' % self.avatarId)
-        base.ManagerAvatar.detached(self, mind)
-
     # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
     def getComponentStates(self):
         """

@@ -214,18 +214,6 @@ class BaseComponentMedium(medium.PingingMedium):
             self.debug('getConfig(), but component is not set up yet')
             return None
         
-    def remote_setup(self, config):
-        """
-        Set up the component and the component's medium with the given config,
-        in that order.
-        """
-        d = self.comp.setup(config)
-        d.addCallback(lambda r, c: self.setup(c), config)
-        return d
-        
-    def remote_start(self, *args, **kwargs):
-        return self.comp.start(*args, **kwargs)
-       
     def remote_stop(self):
         self.info('Stopping component')
         return self.comp.stop()
@@ -418,7 +406,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
  
     ### BaseComponent implementation related to compoment protocol
     ### called by manager through medium
-    def setup(self, config, *args, **kwargs):
+    def setup(self, config):
         """
         Sets up the component with the given config.  Called by the manager
         through the medium.

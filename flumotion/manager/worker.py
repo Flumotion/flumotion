@@ -45,39 +45,38 @@ class WorkerAvatar(base.ManagerAvatar):
     _portSet = None
     feedServerPort = None
 
-    def getName(self):
-        return self.avatarId
-
-    def attached(self, mind):
-        # doc in base class
-        self.info('worker "%s" logged in', self.getName())
-        base.ManagerAvatar.attached(self, mind)
-
-        self.debug('MANAGER -> WORKER: getFeedServerPort()')
-        d = self.mindCallRemote('getFeedServerPort')
-        yield d
-        # this can be None if no feed server is configured
-        self.feedServerPort = d.value()
-        self.debug('WORKER -> MANAGER: getFeedServerPort(): %r' %
-            self.feedServerPort)
-
-        self.debug('MANAGER -> WORKER: getPorts()')
-        d = self.mindCallRemote('getPorts')
-        yield d
-        ports = d.value()
-        self.debug('WORKER -> MANAGER: getPorts(): %r' % ports)
+    def __init__(self, heaven, avatarId, remoteIdentity, mind,
+                 feedServerPort, ports):
+        base.ManagerAvatar.__init__(self, heaven, avatarId,
+                                    remoteIdentity, mind)
+        self.feedServerPort = feedServerPort
         self._portSet = worker.PortSet(self.avatarId, ports)
 
         self.heaven.workerAttached(self)
         self.vishnu.workerAttached(self)
-    attached = defer_generator_method(attached)
 
-    def detached(self, mind):
-        # doc in base class
-        self.info('worker "%s" logged out' % self.getName())
-        base.ManagerAvatar.detached(self, mind)
+    def getName(self):
+        return self.avatarId
+
+    def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
+                           mind):
+        def havePorts(res):
+            log.debug('worker-avatar', 'got port information')
+            (_s1, feedServerPort), (_s2, ports) = res
+            return (heaven, avatarId, remoteIdentity, mind,
+                    feedServerPort, ports)
+        log.debug('worker-avatar', 'calling mind for port information')
+        d = defer.DeferredList([mind.callRemote('getFeedServerPort'),
+                                mind.callRemote('getPorts')],
+                               fireOnOneErrback=True)
+        d.addCallback(havePorts)
+        return d
+    makeAvatarInitArgs = classmethod(makeAvatarInitArgs)
+
+    def onShutdown(self):
         self.heaven.workerDetached(self)
         self.vishnu.workerDetached(self)
+        base.ManagerAvatar.onShutdown(self)
     
     def reservePorts(self, numPorts):
         """
@@ -97,7 +96,7 @@ class WorkerAvatar(base.ManagerAvatar):
         """
         self._portSet.releasePorts(ports)
 
-    def createComponent(self, avatarId, type, nice):
+    def createComponent(self, avatarId, type, nice, conf):
         """
         Create a component of the given type with the given nice level.
 
@@ -107,12 +106,14 @@ class WorkerAvatar(base.ManagerAvatar):
         @type  type:     str
         @param nice:     the nice level to create the component at
         @type  nice:     int
+        @param conf:     the component's config dict
+        @type  conf:     dict
 
         @returns: a deferred that will give the avatarId the component
                   will use to log in to the manager
         """
-        self.debug('creating %s (%s) on worker %s with nice level %d' % (
-            avatarId, type, self.avatarId, nice))
+        self.debug('creating %s (%s) on worker %s with nice level %d',
+                   avatarId, type, self.avatarId, nice)
         defs = registry.getRegistry().getComponent(type)
         try:
             entry = defs.getEntryByType('component')
@@ -127,7 +128,7 @@ class WorkerAvatar(base.ManagerAvatar):
 
         self.debug('call remote create')
         return self.mindCallRemote('create', avatarId, type, moduleName,
-            methodName, nice)
+            methodName, nice, conf)
 
     def getComponents(self):
         """

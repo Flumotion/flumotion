@@ -59,7 +59,7 @@ class TestOldProperties(unittest.TestCase):
         return self.component.setup(config)
 
     def tearDown(self):
-        self.component.stop()
+        return self.component.stop()
 
     def testConfigure(self):
         # test that the old-style properties were renamed to new-style

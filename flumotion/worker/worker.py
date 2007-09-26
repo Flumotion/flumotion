@@ -240,7 +240,8 @@ class WorkerBrain(log.Loggable):
         else:
             return None
 
-    def create(self, avatarId, type, moduleName, methodName, nice=0):
+    def create(self, avatarId, type, moduleName, methodName, nice,
+               conf):
         def getBundles():
             # set up bundles as we need to have a pb connection to
             # download the modules -- can't do that in the kid yet.
@@ -251,7 +252,7 @@ class WorkerBrain(log.Loggable):
 
         def spawnJob(bundles):
             return self.jobHeaven.spawn(avatarId, type, moduleName,
-                                        methodName, nice, bundles)
+                                        methodName, nice, bundles, conf)
 
         def createError(failure):
             failure.trap(errors.ComponentCreateError)

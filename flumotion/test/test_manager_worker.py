@@ -19,10 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
+import common
 
-from flumotion.manager import worker
-from flumotion.common import log
+from twisted.trial import unittest
+from twisted.internet import defer
+from twisted.spread import pb
+
+from flumotion.manager import worker, manager
+from flumotion.common import log, interfaces
 
 class FakeTransport:
     def getPeer(self):
@@ -31,6 +35,8 @@ class FakeTransport:
     def getHost(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+    def loseConnection(self):
+        pass
 
 class FakeBroker:
     def __init__(self):
@@ -40,6 +46,9 @@ class FakeMind(log.Loggable):
     def __init__(self, testcase):
         self.broker = FakeBroker()
         self.testcase = testcase
+
+    def notifyOnDisconnect(self, proc):
+        pass
 
     def callRemote(self, name, *args, **kwargs):
         self.debug('callRemote(%s, %r, %r)' % (name, args, kwargs))
@@ -71,6 +80,9 @@ class FakeWorkerMind(FakeMind):
     def remote_getPorts(self):
         return range(7600,7610)
 
+    def remote_getFeedServerPort(self):
+        return 7610
+
     def remote_create(self, avatarId, type, moduleName, methodName, config):
         self.debug('remote_create(%s): logging in component' % avatarId)
         avatar = self.testcase._loginComponent(self.avatarId,
@@ -91,27 +103,20 @@ class TestHeaven(unittest.TestCase):
         assert isinstance(h, worker.WorkerHeaven)
 
     def testAdd(self):
-        h = worker.WorkerHeaven(None)
-        avatar = h.createAvatar('foo', None)
-
-        assert 'foo' in [a.getName() for a in h.getAvatars()]
-        assert isinstance(avatar, worker.WorkerAvatar)
-        h.removeAvatar('foo')
-        
-        assert not 'foo' in [a.getName() for a in h.getAvatars()]
-
-    def testError(self):
-        h = worker.WorkerHeaven(None)
-
-    def testAttached(self):
+        def gotAvatar(res):
+            interface, avatar, cleanup = res
+            assert 'foo' in [a.getName() for a in h.getAvatars()]
+            assert isinstance(avatar, worker.WorkerAvatar)
+            cleanup()
+            assert not 'foo' in [a.getName() for a in h.getAvatars()]
+            
         h = worker.WorkerHeaven(FakeVishnu())
-        # need to create fake mind so workerAttached works
         mind = FakeWorkerMind(self, 'testworker')
-        avatar = h.createAvatar('foo', None)
-        avatar.attached(mind)
-
-        h.workerAttached(avatar)
-
-        # Have to detach it to ensure cleanup happens.
-        avatar.detached(mind)
+        from flumotion.manager.manager import Dispatcher
+        dispatcher = manager.Dispatcher(lambda x, y: defer.succeed(None))
+        dispatcher.registerHeaven(h, interfaces.IWorkerMedium)
+        d = dispatcher.requestAvatar('foo', None, mind, pb.IPerspective,
+                                     interfaces.IWorkerMedium)
+        d.addCallback(gotAvatar)
+        return d
 
