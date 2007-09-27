@@ -144,6 +144,8 @@ def _readConfig(workerFile, options):
     # XML could specify it as empty, meaning "don't use any"
     if not options.feederports and cfg.feederports is not None:
         options.feederports = cfg.feederports
+    if options.randomFeederports is None:
+        options.randomFeederports = cfg.randomFeederports
     if options.randomFeederports:
         options.feederports = None
         log.debug('worker', 'Using random feederports')

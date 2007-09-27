@@ -73,6 +73,7 @@ EXTRA_DIST = 				\
 	test_ui_fgtk.py 		\
 	test_wizard.py 			\
 	test_workerconfig.py		\
+	test_worker_config.py		\
 	test_worker_medium.py		\
 	test_worker_worker.py
 

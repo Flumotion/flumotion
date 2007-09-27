@@ -125,14 +125,18 @@ class PortSet(log.Loggable):
     given machine.
     """
     # not very efficient mkay
-    def __init__(self, logName, ports):
+    def __init__(self, logName, ports, randomPorts=False):
         self.logName = logName
         self.ports = ports
         self.used = [0] * len(ports)
+        self.random = False
 
     def reservePorts(self, numPorts):
         ret = []
         while numPorts > 0:
+            if self.random:
+                ret.append(0)
+                continue
             if not 0 in self.used:
                 raise errors.ComponentStartError(
                     'could not allocate port on worker %s' % self.logName)

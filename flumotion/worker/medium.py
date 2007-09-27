@@ -164,8 +164,9 @@ class WorkerMedium(medium.PingingMedium):
         """
         Gets the set of TCP ports that this worker is configured to use.
 
-        @rtype:  list of int
-        @return: list of ports
+        @rtype:  2-tuple: (list of int, bool)
+        @return: list of ports, and a boolean if we allocate ports
+                 randomly
         """
         return self.brain.getPorts()
 

@@ -46,11 +46,12 @@ class WorkerAvatar(base.ManagerAvatar):
     feedServerPort = None
 
     def __init__(self, heaven, avatarId, remoteIdentity, mind,
-                 feedServerPort, ports):
+                 feedServerPort, ports, randomPorts):
         base.ManagerAvatar.__init__(self, heaven, avatarId,
                                     remoteIdentity, mind)
         self.feedServerPort = feedServerPort
-        self._portSet = worker.PortSet(self.avatarId, ports)
+        
+        self._portSet = worker.PortSet(self.avatarId, ports, randomPorts)
 
         self.heaven.workerAttached(self)
         self.vishnu.workerAttached(self)
@@ -62,9 +63,9 @@ class WorkerAvatar(base.ManagerAvatar):
                            mind):
         def havePorts(res):
             log.debug('worker-avatar', 'got port information')
-            (_s1, feedServerPort), (_s2, ports) = res
+            (_s1, feedServerPort), (_s2, (ports, random)) = res
             return (heaven, avatarId, remoteIdentity, mind,
-                    feedServerPort, ports)
+                    feedServerPort, ports, random)
         log.debug('worker-avatar', 'calling mind for port information')
         d = defer.DeferredList([mind.callRemote('getFeedServerPort'),
                                 mind.callRemote('getPorts')],

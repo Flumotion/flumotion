@@ -232,7 +232,7 @@ class WorkerBrain(log.Loggable):
    
     ### these methods called by WorkerMedium
     def getPorts(self):
-        return self.ports
+        return self.ports, self.options.randomFeederports
 
     def getFeedServerPort(self):
         if self.feedServer:

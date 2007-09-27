@@ -1,5 +1,27 @@
 2007-09-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/worker.py
+	(WorkerAvatar.makeAvatarInitArgs.havePorts)
+	(WorkerAvatar.__init__):  New initarg, randomPorts, true if the
+	worker will be allocating ports randomly.
+
+	* flumotion/worker/medium.py (WorkerMedium.remote_getPorts):
+	Update docs.
+
+	* flumotion/worker/worker.py (WorkerBrain.getPorts): Return a
+	pair, the ports and the randomPorts bool.
+
+	* flumotion/common/worker.py (PortSet.__init__): New optional arg,
+	randomPorts.
+	(PortSet.reservePorts): If we have randomPorts, return 0.
+
+	* flumotion/worker/main.py (_readConfig): Actually respect a
+	random=true argument in the worker config.
+
+	* flumotion/test/Makefile.am
+	* flumotion/test/test_worker_config.py
+	(WorkerConfigTest.testRandomFeederPorts): New test.
+
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent._setup_pipeline): Set the pipeline to READY even if
 	we have a delayed start due to a slaved clock.
