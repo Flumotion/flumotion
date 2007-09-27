@@ -415,6 +415,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.pipeline.use_clock(clock)
 
             self.clock_provider = gst.NetTimeProvider(clock, None, port)
+            port = self.clock_provider.get_property('port')
         
             base_time = self.pipeline.get_base_time()
 

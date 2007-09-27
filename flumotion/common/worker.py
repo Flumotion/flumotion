@@ -129,13 +129,14 @@ class PortSet(log.Loggable):
         self.logName = logName
         self.ports = ports
         self.used = [0] * len(ports)
-        self.random = False
+        self.random = randomPorts
 
     def reservePorts(self, numPorts):
         ret = []
         while numPorts > 0:
             if self.random:
                 ret.append(0)
+                numPorts -= 1
                 continue
             if not 0 in self.used:
                 raise errors.ComponentStartError(

@@ -1,5 +1,13 @@
 2007-09-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.provide_master_clock.pipelinePaused): Get the
+	listening port from the time provider.
+
+	* flumotion/common/worker.py (PortSet.reservePorts): Avoid
+	infinite loops.
+	(PortSet.__init__): Actually pay attention to the initarg.
+
 	* flumotion/manager/worker.py
 	(WorkerAvatar.makeAvatarInitArgs.havePorts)
 	(WorkerAvatar.__init__):  New initarg, randomPorts, true if the
