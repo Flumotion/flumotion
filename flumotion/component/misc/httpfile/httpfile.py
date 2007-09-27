@@ -145,7 +145,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._logfilter = None
         self.httpauth = None
 
-        self._description = 'On-Demand Flumotion Stream',
+        self._description = 'On-Demand Flumotion Stream'
 
         self._singleFile = False
         self._connected_clients = []

@@ -1,3 +1,8 @@
+2007-09-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  description should be a string, not a tuple. Remove stray comma.
+
 2007-09-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py
