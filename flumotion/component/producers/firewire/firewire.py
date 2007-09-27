@@ -105,11 +105,11 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! videoscale'
                     '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
                     '    %(pp)s'
-                    '    ! @feeder::video@'
+                    '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
-                    '    ! @feeder::audio@'
-                    '    t. ! queue ! @feeder::dv@'
+                    '    ! @feeder:audio@'
+                    '    t. ! queue ! @feeder:dv@'
                     % dict(df=drop_factor, ih=interlaced_height,
                            sq=square_pipe, pp=pad_pipe,
                            sw=scaled_width, h=height,

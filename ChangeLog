@@ -1,3 +1,9 @@
+2007-09-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/firewire/firewire.py
+	(Firewire.get_pipeline_string): Fix some of the @feeder@ strings
+	for changes on 2007-09-12.
+
 2007-09-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_comptest.py
