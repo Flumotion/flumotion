@@ -308,6 +308,10 @@ class FeedComponent(basecomponent.BaseComponent):
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
 
+        # set to ready so that multifdsinks can always receive fds, even
+        # if the pipeline has a delayed start due to clock slaving
+        self.pipeline.set_state(gst.STATE_READY)
+
         # start checking feeders, if we have a sufficiently recent multifdsink
         if self._get_stats_supported:
             self._feeder_probe_cl = reactor.callLater(

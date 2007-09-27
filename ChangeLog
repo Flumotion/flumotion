@@ -1,5 +1,9 @@
 2007-09-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent._setup_pipeline): Set the pipeline to READY even if
+	we have a delayed start due to a slaved clock.
+
 	* flumotion/worker/worker.py (WorkerBrain.create.getBundles): Get
 	any necessary plug bundles.
 
