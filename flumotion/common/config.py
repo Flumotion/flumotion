@@ -281,8 +281,7 @@ def buildPlugsSet(plugsList, sockets):
         if plug.socket not in ret:
             raise ConfigError("Unsupported socket type: %s"
                               % (plug.socket,))
-        ret[plug.socket].append({'type': plug.type, 'socket': plug.socket,
-                                 'properties': plug.properties})
+        ret[plug.socket].append(plug.config)
     return ret
 
 def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
@@ -356,6 +355,11 @@ class ConfigEntryPlug(log.Loggable):
         self.socket = defs.getSocket()
         self.properties = buildPropertyDict(propertyList,
                                             defs.getProperties())
+        self.config = {'type': self.type,
+                       'socket': self.socket,
+                       'module-name': defs.entry.getModuleName(),
+                       'function-name': defs.entry.getFunction(),
+                       'properties': self.properties}
 
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"

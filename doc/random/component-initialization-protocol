@@ -15,7 +15,7 @@ Entry points
 
 A component object gets created using a factory function.
 This factory function is called the "entry point" of a component type.
-This entry point is declared in the registry section for that component type.
+This entry point is declared in the registry section for that component type. 
 
 The manager invokes the worker's remote_create() method.
 The worker then spawns a job in which to run this component.
@@ -40,9 +40,9 @@ to report state through.
 The implementation calls every init() method of any of the subclasses
 in the hierarchy.
 
-BaseComponent.setup(self, config, *args, **kwargs)
+BaseComponent.setup(self, config)
 ---------------------------------
-Invoked by manager through medium.
+Invoked by job directly on the component.
 sets self.config
 Must configure any plugs specified in config. This involves loading
 their bundles, instantiating the plugs, and adding them to lists on the

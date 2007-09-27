@@ -404,6 +404,15 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         return defer.succeed(None)
  
+    def _instantiate_plugs(self):
+        for socket, plugs in self.config['plugs'].items():
+            self.plugs[socket] = []
+            for plug in plugs:
+                instance = common.reflectCall(plug['module-name'],
+                                              plug['function-name'],
+                                              plug)
+                self.plugs[socket].append(instance)
+
     ### BaseComponent implementation related to compoment protocol
     ### called by manager through medium
     def setup(self, config):
@@ -415,57 +424,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
         @raise    flumotion.common.errors.ComponentSetupError:
                   when an error happened during setup of the component
         """
-        def setup_plugs():
-            # by this time we have a medium, so we can load bundles
-            def load_bundles():
-                modules = {}
-                for plugs in config['plugs'].values():
-                    for plug in plugs:
-                        modules[plug['type']] = True
-
-                if not modules:
-                    return defer.succeed(True) # shortcut
-
-                # Only parse the registry if we need to; this is the
-                # only component code that parses a registry, and it
-                # should probably be made unnecessary.
-                reg = registry.getRegistry()
-                
-                for plugtype in modules.keys():
-                    # we got this far, it should work
-                    entry = reg.getPlug(plugtype).getEntry()
-                    modules[plugtype] = entry.getModuleName()
-
-                if not self.medium:
-                    self.warning('Not connected to a medium, cannot '
-                                 'load bundles -- assuming all modules '
-                                 'are available')
-                    return defer.succeed(True)
-                else:
-                    loader = self.medium.bundleLoader
-                    return loader.getBundles(moduleName=modules.values())
-                
-            def make_plugs():
-                for socket, plugs in config['plugs'].items():
-                    # Again, only get the registry if we need to.
-                    reg = registry.getRegistry()
-                    self.plugs[socket] = []
-                    for plug in plugs:
-                        entry = reg.getPlug(plug['type']).getEntry()
-                        module = reflect.namedAny(entry.getModuleName())
-                        proc = getattr(module, entry.getFunction())
-                        instance = proc(plug)
-                        self.plugs[socket].append(instance)
-
-            try:
-                d = load_bundles()
-                d.addCallback(lambda x: make_plugs())
-                return d
-            except Exception, e:
-                self.debug("Exception while loading bundles: %s" % 
-                    log.getExceptionMessage(e))
-                return defer.fail(e)
-
         def checkErrorCallback(result):
             # if the mood is now sad, it means an error was encountered
             # during check, and we should return a failure here.
@@ -497,8 +455,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # now we have a name, set it on the medium too
         if self.medium:
             self.medium.logName = self.getName()
-        d = setup_plugs()
-        d.addCallback(lambda r: self.do_check())
+        self._instantiate_plugs()
+        d = defer.maybeDeferred(self.do_check)
         d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
         d.addErrback(setupErrback)

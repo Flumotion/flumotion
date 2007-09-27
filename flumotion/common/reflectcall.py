@@ -28,6 +28,26 @@ from twisted.python import reflect
 from flumotion.common import errors, log
 
 
+def reflectCall(moduleName, methodName, *args, **kwargs):
+    """
+    @param moduleName: name of the module to load
+    @type  moduleName: string
+    @param methodName: name of the function to call
+    @type  methodName: string
+
+    Invokes a function in a given module.
+    """
+
+    log.debug('reflectcall', 'Loading moduleName %s', moduleName)
+
+    module = reflect.namedModule(moduleName)
+        
+    log.debug('reflectcall', 'calling method %s.%s', moduleName,
+              methodName)
+
+    proc = getattr(module, methodName)
+    return proc(*args, **kwargs)
+
 def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
     """
     @param err: The type of error to throw

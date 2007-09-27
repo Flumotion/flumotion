@@ -245,10 +245,12 @@ class WorkerBrain(log.Loggable):
         def getBundles():
             # set up bundles as we need to have a pb connection to
             # download the modules -- can't do that in the kid yet.
-            # FIXME: find a way to rebuild less so this doesn't
-            # take excessive amounts of CPU time
-            self.debug('setting up bundles for %s', moduleName)
-            return self.medium.bundleLoader.getBundles(moduleName=moduleName)
+            moduleNames = [moduleName]
+            for plugs in conf.get('plugs', {}).values():
+                for plug in plugs:
+                    moduleNames.append(plug['module-name'])
+            self.debug('setting up bundles for %r', moduleNames)
+            return self.medium.bundleLoader.getBundles(moduleName=moduleNames)
 
         def spawnJob(bundles):
             return self.jobHeaven.spawn(avatarId, type, moduleName,

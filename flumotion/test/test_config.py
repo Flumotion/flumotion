@@ -358,6 +358,8 @@ class TestConfig(unittest.TestCase):
                            [{'type':'test-adminaction',
                              'socket':
                              'flumotion.component.plugs.adminaction.AdminAction',
+                             'module-name': 'qux.baz',
+                             'function-name': 'Quxulator',
                              'properties': {'foo': 'bar'}}],
                            'flumotion.component.plugs.lifecycle.ManagerLifecycle':
                            [],
@@ -690,6 +692,8 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'frobulator',
+                           'function-name': 'Frobulator',
+                           'module-name': 'bar.baz',
                            'properties': {'rate': (3, 4)}})
 
     def testParsePlugsWithCompoundProperties(self):
@@ -726,6 +730,8 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'compoundulator',
+                           'module-name': 'xom.baz',
+                           'function-name': 'Xombulator',
                            'properties': {'cp1': [{'one': 'a string'},
                                                   {'one': 'a second string'}],
                                           'cp2': {'two': 2},
