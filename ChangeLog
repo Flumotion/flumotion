@@ -3,6 +3,8 @@
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent.provide_master_clock.pipelinePaused): Get the
 	listening port from the time provider.
+	(FeedComponent.provide_master_clock.pipelinePaused): Fuck python's
+	lexicals!!!!!
 
 	* flumotion/common/worker.py (PortSet.reservePorts): Avoid
 	infinite loops.

@@ -415,7 +415,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.pipeline.use_clock(clock)
 
             self.clock_provider = gst.NetTimeProvider(clock, None, port)
-            port = self.clock_provider.get_property('port')
+            realport = self.clock_provider.get_property('port')
         
             base_time = self.pipeline.get_base_time()
 
@@ -430,7 +430,7 @@ class FeedComponent(basecomponent.BaseComponent):
             else:
                 ip = "127.0.0.1"
 
-            self._master_clock_info = (ip, port, base_time)
+            self._master_clock_info = (ip, realport, base_time)
             return self.get_master_clock()
 
         assert self.pipeline
