@@ -33,7 +33,7 @@ class PadMonitor(log.Loggable):
     PAD_MONITOR_TIMEOUT = PAD_MONITOR_PROBE_FREQUENCY * 2.5
 
     def __init__(self, pad, name, setActive, setInactive):
-        self._last_data_time = 0
+        self._last_data_time = -1
         self._pad = pad
         self.name = name
         self._active = False
@@ -125,6 +125,11 @@ class PadMonitor(log.Loggable):
 
         now = time.time()
 
+        if self._last_data_time < 0:
+            # We never received any data in the first timeout period... 
+            self._last_data_time = 0
+            self.setInactive()
+
         if self._last_data_time > 0:
             delta = now - self._last_data_time
 
@@ -162,8 +167,8 @@ class EaterPadMonitor(PadMonitor):
         # If an eater received a buffer before being marked as disconnected,
         # and still within the buffer check interval, the next eaterCheck
         # call could accidentally think the eater was reconnected properly.
-        # Setting lastTime to 0 here avoids that happening in eaterCheck.
-        self._last_buffer_time = 0
+        # Setting this to 0 here avoids that happening in eaterCheck.
+        self._last_data_time = 0
 
         self._doReconnectEater()
         def reconnect():

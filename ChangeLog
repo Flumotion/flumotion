@@ -1,3 +1,9 @@
+2007-09-27  Michael Smith <msmith@fluedo.com>
+
+	* flumotion/component/padmonitor.py:
+	  If we never receive data in the first timeout period, then go
+	  to inactive.
+
 2007-09-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
