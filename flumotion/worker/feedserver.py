@@ -89,8 +89,8 @@ class FeedServer(log.Loggable):
     def feedToFD(self, componentId, feedId, fd, eaterId):
         return self._brain.feedToFD(componentId, feedId, fd, eaterId)
 
-    def eatFromFD(self, componentId, feedId, fd):
-        return self._brain.eatFromFD(componentId, feedId, fd)
+    def eatFromFD(self, componentId, eaterAlias, fd, feedId):
+        return self._brain.eatFromFD(componentId, eaterAlias, fd, feedId)
 
 class FeedAvatar(fpb.Avatar):
     """
@@ -129,7 +129,7 @@ class FeedAvatar(fpb.Avatar):
         t.stopWriting()
 
         # hand off the fd to the component
-        self.debug("Attempting to send FD: %d" % t.fileno())
+        self.debug("Attempting to send FD: %d", t.fileno())
         
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         componentId = common.componentId(flowName, componentName)
@@ -142,8 +142,7 @@ class FeedAvatar(fpb.Avatar):
         # FD; now we want the socket cleaned up.
         t.loseConnection()
 
-    # TODO: receiveFeed is bitrotten. Clean it up.
-    def perspective_receiveFeed(self, componentId, feedId):
+    def perspective_receiveFeed(self, fullFeedId):
         """
         Called when the PB client wants to send the given feedId to the
         given component
@@ -151,23 +150,24 @@ class FeedAvatar(fpb.Avatar):
         # we need to make sure our result goes back, so only stop reading
         t = self.mind.broker.transport
         t.stopReading()
-        reactor.callLater(0, self._doReceiveFeed, componentId, feedId)
+        reactor.callLater(0, self._doReceiveFeed, fullFeedId)
 
-    # FIXME: receiveFeed is broken and this method below will
-    # probably leak fds.  Fix before using.
-    def _doReceiveFeed(self, componentId, feedId):
+    def _doReceiveFeed(self, fullFeedId):
         t = self.mind.broker.transport
+
         self.debug('flushing PB write queue')
         t.doWrite()
         self.debug('stop writing to transport')
         t.stopWriting()
-        # this keeps a ref around, so the socket will not get closed
-        self._transport = t
-        self.mind.broker.transport = None
 
-        # pass the fd to the component to eat from
-        fd = t.fileno()
-        self.debug('telling component %s to eat feedId %s from fd %d' % (
-            componentId, feedId, fd))
-        if not self.feedServer.eatFromFD(componentId, feedId, fd):
-            self.debug("unsuccessful request to eatFromFD.")
+        # hand off the fd to the component
+        self.debug("Attempting to send FD: %d", t.fileno())
+        
+        (flowName, componentName, eaterAlias) = common.parseFullFeedId(fullFeedId)
+        componentId = common.componentId(flowName, componentName)
+
+        if self.feedServer.eatFromFD(componentId, eaterAlias, t.fileno(),
+                                     self.avatarId):
+            t.keepSocketAlive = True
+
+        t.loseConnection()

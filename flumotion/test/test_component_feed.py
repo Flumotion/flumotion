@@ -26,8 +26,9 @@ import errno
 import os
 
 from twisted.trial import unittest
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, main
 from twisted.python import log as tlog
+from twisted.python import failure
 
 from flumotion.twisted import pb as fpb
 from flumotion.common import log, errors
@@ -51,8 +52,9 @@ class FakeWorkerBrain(log.Loggable):
         # need to return True for server to keep fd open
         return True
 
-    def eatFromFD(self, componentId, feedId, fd):
-        self.info('eat from fd: %s %d %s', feedId, fd)
+    def eatFromFD(self, componentId, eaterAlias, fd, feedId):
+        self.info('eat from fd: %s %s %d %s', componentId, eaterAlias, fd, feedId)
+        self.waitForFD().callback((componentId, eaterAlias, fd, feedId))
         return True
    
 def countOpenFileDescriptors():
@@ -119,7 +121,7 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
         return d
         
-class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
+class TestFeedClient(FeedTestCase, log.Loggable):
     def testConnectWithoutDroppingPB(self):
         client = feed.FeedMedium(logName='test')
         factory = feed.FeedClientFactory(client)
@@ -158,6 +160,47 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(checkfds)
         return d
 
+    def testBadPass(self):
+        client = feed.FeedMedium(logName='test')
+        factory = feed.FeedClientFactory(client)
+
+        def login():
+            port = self.feedServer.getPortNum()
+            self.assertAdditionalFDsOpen(1, 'connect (socket)')
+            reactor.connectTCP('localhost', port, factory)
+            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
+            return factory.login(fpb.Authenticator(username='user',
+                                                   password='badpass'))
+
+        def loginOk(root):
+            raise AssertionError, 'should not get here'
+
+        def loginFailed(failure):
+            def gotRoot(root):
+                # an idempotent method, should return a network failure if
+                # the remote side disconnects as it should
+                return root.callRemote('getKeycardClasses')
+            
+            def gotError(failure):
+                self.assertAdditionalFDsOpen(1, 'feedSent (socket)')
+                self.info('success')
+
+            def gotKeycardClasses(classes):
+                raise AssertionError, 'should not get here'
+
+            self.info('loginFailed: %s', log.getFailureMessage(failure))
+            failure.trap(errors.NotAuthenticatedError)
+            d = factory.getRootObject() # should fire immediately
+            d.addCallback(gotRoot)
+            d.addCallbacks(gotKeycardClasses, gotError)
+
+            return d
+
+        d = login()
+        d.addCallbacks(loginOk, loginFailed)
+        return d
+
+class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
     def testConnectAndFeed(self):
         client = feed.FeedMedium(logName='test')
 
@@ -209,46 +252,6 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(checkfds)
         return d
 
-    def testBadPass(self):
-        client = feed.FeedMedium(logName='test')
-        factory = feed.FeedClientFactory(client)
-
-        def login():
-            port = self.feedServer.getPortNum()
-            self.assertAdditionalFDsOpen(1, 'connect (socket)')
-            reactor.connectTCP('localhost', port, factory)
-            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
-            return factory.login(fpb.Authenticator(username='user',
-                                                   password='badpass'))
-
-        def loginOk(root):
-            raise AssertionError, 'should not get here'
-
-        def loginFailed(failure):
-            def gotRoot(root):
-                # an idempotent method, should return a network failure if
-                # the remote side disconnects as it should
-                return root.callRemote('getKeycardClasses')
-            
-            def gotError(failure):
-                self.assertAdditionalFDsOpen(1, 'feedSent (socket)')
-                self.info('success')
-
-            def gotKeycardClasses(classes):
-                raise AssertionError, 'should not get here'
-
-            self.info('loginFailed: %s', log.getFailureMessage(failure))
-            failure.trap(errors.NotAuthenticatedError)
-            d = factory.getRootObject() # should fire immediately
-            d.addCallback(gotRoot)
-            d.addCallbacks(gotKeycardClasses, gotError)
-
-            return d
-
-        d = login()
-        d.addCallbacks(loginOk, loginFailed)
-        return d
-
     def testRequestFeed(self):
         client = feed.FeedMedium(logName='frobby')
 
@@ -293,5 +296,66 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d = requestFeed()
         d.addCallback(gotFeed)
         d.addCallback(feedReadyOnServer)
+        d.addCallback(checkfds)
+        return d
+
+class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
+    def testConnectAndFeed(self):
+        client = feed.FeedMedium(logName='test')
+
+        def login():
+            port = self.feedServer.getPortNum()
+            self.assertAdditionalFDsOpen(1, 'connect (socket)')
+            d = client.startConnecting('localhost', port,
+                                       fpb.Authenticator(username='user',
+                                                         password='test',
+                                                         avatarId='test:src'))
+            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
+            return d
+
+        def receiveFeed(remote):
+            client.setRemoteReference(remote)
+            self.assertAdditionalFDsOpen(3, 'feed (socket, client, server)')
+            return remote.callRemote('receiveFeed', '/foo/bar:baz')
+
+        def feedReceived(thisValueIsNone):
+            return self.feedServer.waitForAvatarExit()
+
+        def serverFdPassed(res):
+            self.assertAdditionalFDsOpen(2, 'feedSent (socket, client)')
+
+            t = client.remote.broker.transport
+            self.info('stop reading from transport')
+            t.stopReading()
+                        
+            self.info('flushing PB write queue')
+            t.doWrite()
+            self.info('stop writing to transport')
+            t.stopWriting()
+
+            t.keepSocketAlive = True
+        
+            # avoid refcount cycles
+            client.setRemoteReference(None)
+
+            # Since we need to be able to know when the file descriptor
+            # closes, and we currently could be within a doReadOrWrite
+            # callstack, close the fd from within a callLater instead to
+            # avoid corrupting the reactor's internal state.
+            d = defer.Deferred()
+            def loseConnection():
+                t.connectionLost(failure.Failure(main.CONNECTION_DONE))
+                d.callback(None)
+
+            reactor.callLater(0, loseConnection)
+            return d
+
+        def checkfds(_):
+            self.assertAdditionalFDsOpen(1, 'feedReadyOnServer (socket)')
+
+        d = login()
+        d.addCallback(receiveFeed)
+        d.addCallback(feedReceived)
+        d.addCallback(serverFdPassed)
         d.addCallback(checkfds)
         return d

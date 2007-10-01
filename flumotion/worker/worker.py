@@ -216,7 +216,7 @@ class WorkerBrain(log.Loggable):
         avatar = self.jobHeaven.avatars[componentId]
         return avatar.sendFeed(feedName, fd, eaterId)
 
-    def eatFromFD(self, componentId, feedId, fd):
+    def eatFromFD(self, componentId, eaterAlias, fd, feedId):
         """
         Called from the FeedAvatar to pass a file descriptor on to
         the job running the given component.
@@ -228,7 +228,7 @@ class WorkerBrain(log.Loggable):
             return False
 
         avatar = self.jobHeaven.avatars[componentId]
-        return avatar.receiveFeed(feedId, fd)
+        return avatar.receiveFeed(eaterAlias, fd, feedId)
    
     ### these methods called by WorkerMedium
     def getPorts(self):

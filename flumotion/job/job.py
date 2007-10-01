@@ -335,8 +335,11 @@ class JobClientBroker(pb.Broker, log.Loggable):
             self.factory.medium.component.feedToFD(feedName, fds[0],
                                                    os.close, eaterId)
         elif message.startswith('receiveFeed '):
-            feedId = message[len('receiveFeed '):]
-            self.factory.medium.component.eatFromFD(feedId, fds[0])
+            def parseargs2(_, eaterAlias, feedId=None):
+                return eaterAlias, feedId
+            eaterAlias, feedId = parseargs2(*message.split(' '))
+            self.factory.medium.component.eatFromFD(eaterAlias, feedId,
+                                                    fds[0])
         elif message == 'redirectStdout':
             self.debug('told to rotate stdout to fd %d', fds[0])
             os.dup2(fds[0], sys.stdout.fileno())

@@ -1,3 +1,21 @@
+2007-10-01  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/job/job.py (JobClientBroker.fileDescriptorsReceived):
+	* flumotion/worker/feedserver.py (FeedServer.eatFromFD)
+	(FeedAvatar._sendFeedReplyCb)
+	(FeedAvatar.perspective_receiveFeed, FeedAvatar._doReceiveFeed): 
+	* flumotion/worker/job.py (ComponentJobAvatar.receiveFeed): 
+	* flumotion/worker/worker.py (WorkerBrain.eatFromFD): De-bitrot
+	the downstream connection code.
+
+	* flumotion/component/feed.py (FeedMedium.sendFeed): Add stub
+	implementation, not tested yet.
+
+	* flumotion/worker/feedserver.py (FeedAvatar.eatFromFd)
+	* flumotion/test/test_component_feed.py
+	(TestDownstreamFeedClient): Add downstream connection tests.
+	(TestFeedClient): Refactored common tests to a separate suite.
+
 2007-09-27  Michael Smith <msmith@fluedo.com>
 
 	* flumotion/component/padmonitor.py:

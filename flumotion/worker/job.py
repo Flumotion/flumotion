@@ -118,18 +118,18 @@ class ComponentJobAvatar(base.BaseJobAvatar):
             self.debug('my mind is gone, trigger disconnect')
             return False
 
-    def receiveFeed(self, feedId, fd):
+    def receiveFeed(self, eaterAlias, fd, feedId):
         """
         Tell the feeder to receive the given feed from the given fd.
 
         @returns: whether the fd was successfully handed off to the component.
         """
         self.debug('Sending FD %d to component job to eat %s from fd',
-                   fd, feedId)
+                   fd, eaterAlias)
 
         # same note as in sendFeed
         if self.mind:
-            message = "receiveFeed %s" % (feedId,)
+            message = "receiveFeed %s %s" % (eaterAlias, feedId)
             return self._sendFileDescriptor(fd, message)
         else:
             self.debug('my mind is gone, trigger disconnect')

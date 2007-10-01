@@ -174,6 +174,71 @@ class FeedMedium(fpb.Referenceable):
         d.addErrback(error)
         return d
 
+    def sendFeed(self, host, port, authenticator, fullFeedId):
+        """Send a feed to a remote feed server.
+
+        This helper method calls startConnecting() to make the
+        connection and authenticate, and will return the feed file
+        descriptor or an error. A pending connection attempt can be
+        cancelled via stopConnecting().
+
+        @param host: the remote host name
+        @type host: str
+        @param port: the tcp port on which to connect
+        @type port int
+        @param authenticator: the authenticator, normally provided by
+        the worker
+        @type authenticator: L{flumotion.twisted.pb.Authenticator}
+        @param fullFeedId: the full feed id (/flow/component:eaterAlias)
+        to feed to on the remote size
+        @type fullFeedId: str
+
+        @returns: a deferred that, if successful, will fire with a pair
+        (feedId, fd). In an error case it will errback and close the
+        remote connection.
+        """
+        def connected(remote):
+            assert isinstance(remote.broker.transport, _SocketMaybeCloser)
+            self.setRemoteReference(remote)
+            return remote.callRemote('receiveFeed', fullFeedId)
+
+        def feedSent(res):
+            t = self.remote.broker.transport
+            self.debug('stop reading from transport')
+            t.stopReading()
+                        
+            self.debug('flushing PB write queue')
+            t.doWrite()
+            self.debug('stop writing to transport')
+            t.stopWriting()
+
+            t.keepSocketAlive = True
+            fd = os.dup(t.fileno())
+        
+            # avoid refcount cycles
+            self.setRemoteReference(None)
+
+            d = defer.Deferred()
+            def loseConnection():
+                t.connectionLost(failure.Failure(main.CONNECTION_DONE))
+                d.callback((fullFeedId, fd))
+
+            reactor.callLater(0, loseConnection)
+            return d
+
+        def error(failure):
+            self.warning('failed to retrieve %s from %s:%d', fullFeedId,
+                         host, port)
+            self.debug('failure: %s', log.getFailureMessage(failure))
+            self.debug('closing connection')
+            self.stopConnecting()
+
+        d = self.startConnecting(host, port, authenticator)
+        d.addCallback(connected)
+        d.addCallback(feedSent)
+        d.addErrback(error)
+        return d
+
     def stopConnecting(self):
         """Stop a pending or established connection made via
         startConnecting().
