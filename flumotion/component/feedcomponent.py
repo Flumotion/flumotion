@@ -23,6 +23,8 @@
 Feed components, participating in the stream
 """
 
+import os
+
 import gst
 import gst.interfaces
 import gobject
@@ -62,9 +64,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
                                     # for remote feeders
         self._feederPendingConnections = {} # eaterAlias -> cancel thunk
         self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
-                                    # for remote eaters (FIXME bitrotten)
-        self._eaterClientFactory = {} # (componentId, feedId) -> client factory
-        self._eaterTransport = {}     # (componentId, feedId) -> transport
+                                    # for remote eaters
+        self._eaterPendingConnections = {} # feederName -> cancel thunk
         self.logName = component.name
 
     ### Referenceable remote methods which can be called from manager
@@ -123,7 +124,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
         return self.connectEater(eaterAlias)
 
-    def _getAuthenticatorForEater(self, eaterAlias):
+    def _getAuthenticatorForFeed(self, eaterAliasOrFeedName):
         # The avatarId on the keycards issued by the authenticator will
         # identify us to the remote component. Attempt to use our
         # fullFeedId, for debugging porpoises.
@@ -131,7 +132,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             tup = common.parseComponentId(self.authenticator.avatarId)
             flowName, componentName = tup
             fullFeedId = common.fullFeedId(flowName, componentName,
-                                           eaterAlias)
+                                           eaterAliasOrFeedName)
             return self.authenticator.copy(fullFeedId)
         else:
             return self.authenticator
@@ -167,60 +168,56 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         client = feed.FeedMedium(logName=self.comp.name)
 
         d = client.requestFeed(host, port,
-                               self._getAuthenticatorForEater(eaterAlias),
+                               self._getAuthenticatorForFeed(eaterAlias),
                                fullFeedId)
         self._feederPendingConnections[eaterAlias] = client.stopConnecting
         d.addCallback(gotFeed)
         return d
 
-    def remote_feedTo(self, componentId, feedId, host, port):
+    def remote_feedTo(self, feederName, fullFeedId, host, port):
         """
         Tell the component to feed the given feed to the receiving component
         accessible through the FeedServer on the given host and port.
 
         Called on by the manager-side ComponentAvatar.
         """
-        # FIXME: bitrotten, should use the FeedMedium
-        # FIXME: check if this overwrites current config, and adapt if it
-        # does
-        self._eaterFeedServer[(componentId, feedId)] = (host, port)
+        self._eaterFeedServer[fullFeedId] = (host, port)
+        self.connectFeeder(feederName, fullFeedId)
+
+    def connectFeeder(self, feederName, fullFeedId):
+        """
+        Tell the component to feed the given feed to the receiving component
+        accessible through the FeedServer on the given host and port.
+
+        Called on by the manager-side ComponentAvatar.
+        """
+        def gotFeed((fullFeedId, fd)):
+            self._eaterPendingConnections.pop(feederName, None)
+            self.comp.feedToFD(feederName, fd, os.close, fullFeedId)
+
+        if fullFeedId not in self._eaterFeedServer:
+            self.debug("feedTo() hasn't been called yet for feeder %s",
+                       feederName)
+            # unclear if this function should have a return value at
+            # all...
+            return defer.succeed(None)
+
+        host, port = self._eaterFeedServer[fullFeedId]
+
+        # probably should key on feederName as well
+        cancel = self._eaterPendingConnections.pop(fullFeedId, None)
+        if cancel:
+            self.debug('cancelling previous connection attempt on %s',
+                       feederName)
+            cancel()
+
         client = feed.FeedMedium(logName=self.comp.name)
-        factory = feed.FeedClientFactory(client)
-        # FIXME: maybe copy keycard instead, so we can change requester ?
-        self.debug('connecting to FeedServer on %s:%d' % (host, port))
-        reactor.connectTCP(host, port, factory)
-        d = factory.login(self.authenticator)
-        self._eaterClientFactory[(componentId, feedId)] = factory
-        def loginCb(remoteRef):
-            self.debug('logged in to feedserver, remoteRef %r' % remoteRef)
-            client.setRemoteReference(remoteRef)
-            # now call on the remoteRef to eat
-            self.debug(
-                'COMPONENT --> feedserver: receiveFeed(%s, %s)' % (
-                    componentId, feedId))
-            d = remoteRef.callRemote('receiveFeed', componentId, feedId)
 
-            def receiveFeedCb(result):
-                self.debug(
-                    'COMPONENT <-- feedserver: receiveFeed(%s, %s): %r' % (
-                    componentId, feedId, result))
-                componentName, feedName = common.parseFeedId(feedId)
-                t = remoteRef.broker.transport
-                t.stopReading()
-                t.stopWriting()
-
-                key = (componentId, feedId)
-                self._eaterTransport[key] = t
-                remoteRef.broker.transport = None
-                fd = t.fileno()
-                self.debug('Telling component to feed feedName %s to fd %d'% (
-                    feedName, fd))
-                self.comp.feedToFD(feedName, fd)
-                
-            d.addCallback(receiveFeedCb)
-            return d
-
-        d.addCallback(loginCb)
+        d = client.sendFeed(host, port,
+                            self._getAuthenticatorForFeed(feederName),
+                            fullFeedId)
+        self._eaterPendingConnections[feederName] = client.stopConnecting
+        d.addCallback(gotFeed)
         return d
 
     def remote_provideMasterClock(self, port):

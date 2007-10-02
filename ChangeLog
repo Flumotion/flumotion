@@ -1,5 +1,14 @@
 2007-10-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.feedTo)
+	(ComponentHeaven._connectFeederDownstream): Updates to pass the
+	right thing to callRemote('feedTo', ...).
+
+	* flumotion/component/feedcomponent.py (FeedComponentMedium):
+	De-bitrot downsteam connections. Changed the remote call to feedTo
+	to be more like eatFrom. Uses the feed medium. Works,
+	astonishingly.
+
 	* flumotion/test/test_component_feed.py
 	(TestDownstreamFeedClient.testRequestFeed): New test, tests the
 	high level 'requestFeed' interface.

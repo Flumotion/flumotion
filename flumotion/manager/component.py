@@ -442,9 +442,9 @@ class ComponentAvatar(base.ManagerAvatar):
                                 port)
         return d
 
-    # FIXME bitrotten, needs an eaterAlias
-    def feedTo(self, componentId, feedId, host, port):
-        d = self.mindCallRemote('feedTo', componentId, feedId, host, port)
+    def feedTo(self, feederName, fullFeedId, host, port):
+        d = self.mindCallRemote('feedTo', feederName, fullFeedId, host,
+                                port)
         return d
   
     def setElementProperty(self, element, property, value):
@@ -846,10 +846,8 @@ class ComponentHeaven(base.ManagerHeaven):
                             "feed %s."), host, port, fullFeedId,
                          debug="No component '%s'." % componentId)
 
-        # FIXME: put in the feeder name, see #694; and whose avatarId is
-        # this meant to be anyway?
-        d = componentAvatar.feedTo(componentAvatar.avatarId,
-                                   remoteFeedId, host, port)
+        d = componentAvatar.feedTo(feederName, fullFeedId,
+                                   host, port)
         d.addErrback(errback)
         return d
 
