@@ -1,4 +1,6 @@
--*- text -*-
+=================================
+Component Initialization Protocol
+=================================
 
 This file documents the protocol used by the component base classes to
 produce initialized components. These descriptions are not the only
@@ -10,8 +12,8 @@ For more information on object protocols, see
 http://www2.parc.com/csl/groups/sda/publications/papers/Kiczales-OOPSLA92/.
 
 
-Entry points
-============
+Component creation
+==================
 
 A component object gets created using a factory function.
 This factory function is called the "entry point" of a component type.
@@ -27,101 +29,94 @@ BaseComponent class to handle entry point requests. To allow for
 extensibility, there is a protocol that __init__ is expected to follow
 to initialize the component.
 
+BaseComponent
+=============
+
 Implementations
 ---------------
 
-BaseComponent.__init__(self)
-----------------------------
-This method is expected to produce an initialized component.
-It should do as little as possible, and not access any resources,
-config, ... because it does not yet have a connection to the manager
-to report state through.
+__init__(self)
+    This method is expected to produce an initialized component.
+    It should do as little as possible, and not access any resources,
+    config, ... because it does not yet have a connection to the manager
+    to report state through.
 
-The implementation calls every init() method of any of the subclasses
-in the hierarchy.
+    The implementation calls every init() method of any of the subclasses
+    in the hierarchy.
 
-BaseComponent.setup(self, config)
----------------------------------
-Invoked by job directly on the component.
-sets self.config
-Must configure any plugs specified in config. This involves loading
-their bundles, instantiating the plugs, and adding them to lists on the
-dict stored in the self.plugs attribute.
-Invokes do_check() vmethod, which returns a deferred.
-When this deferred succeeds, invokes do_setup() vmethod, which
-also returns a deferred.
-If any of these fail, this method also raises
-flumotion.common.errors.ComponentSetupError() and does not proceed to
-do_setup()
+setup(self, config)
+    Invoked by job directly on the component.
+    sets self.config
+    Must configure any plugs specified in config. This involves loading
+    their bundles, instantiating the plugs, and adding them to lists on the
+    dict stored in the self.plugs attribute.
+    Invokes do_check() vmethod, which returns a deferred.
+    When this deferred succeeds, invokes do_setup() vmethod, which
+    also returns a deferred.
+    If any of these fail, this method also raises
+    flumotion.common.errors.ComponentSetupError() and does not proceed to
+    do_setup()
 
-returns the original deferred.
+    returns the original deferred.
 
-BaseComponent.start(self, *args, **kwargs)
-------------------------------------------
-Sets mood to waking.
-Must start any plugs specified in the config, which means calling their
-start() method.
-Invokes do_start(), which returns a deferred.
-Any errors encountered during start() should return a Failure so the remote
-call fails.
-Any errors encountered after this step should be proxied through state
-messages.
-Returns the deferred.
+start(self, *args, **kwargs)
+    Sets mood to waking.
+    Must start any plugs specified in the config, which means calling their
+    start() method.
+    Invokes do_start(), which returns a deferred.
+    Any errors encountered during start() should return a Failure so the remote
+    call fails.
+    Any errors encountered after this step should be proxied through state
+    messages.
+    Returns the deferred.
 
-BaseComponent.stop(self)
--------------------------
-Sets mood to waking.
-Invokes do_stop(), which returns a deferred.
-After the deferred fires, must stop all plugs.
-Returns the deferred.
+stop(self)
+    Sets mood to waking.
+    Invokes do_stop(), which returns a deferred.
+    After the deferred fires, must stop all plugs.
+    Returns the deferred.
 
 Interface
 ---------
 
-BaseComponent.init(self)
-------------------------
-Subclasses should declare instance variables, ...
-All .init methods of every class in the hierarchy get called.
-This method is optional for subclasses.
+init(self)
+    Subclasses should declare instance variables, ...
+    All .init methods of every class in the hierarchy get called.
+    This method is optional for subclasses.
 
-BaseComponent.check_properties(self, properties, addMessage)
-------------------------------------------------------------
-A helper vmethod called by the default implementation of do_check() that
-includes the properties in the arguments. The addMessage argument is a
-function that will call self.addMessage, additionally raising an
-exception if the message is of level ERROR.
+check_properties(self, properties, addMessage)
+    A helper vmethod called by the default implementation of do_check() that
+    includes the properties in the arguments. The addMessage argument is a
+    function that will call self.addMessage, additionally raising an
+    exception if the message is of level ERROR.
 
-This procedure is called with twisted.internet.defer.maybeDeferred, so
-all exceptions thrown by this procedure will be caught, and it is
-acceptable (although not required) to return a deferred.
+    This procedure is called with twisted.internet.defer.maybeDeferred, so
+    all exceptions thrown by this procedure will be caught, and it is
+    acceptable (although not required) to return a deferred.
 
-BaseComponent.do_check(self)
-----------------------------
-This method has no requirements. It is implementation-specific.
-It can be used to check various requirements, or known bugs in certain
-versions of software.
-If this method adds any error messages to the component state, this will
-automatically trigger a mood change to sad and raise a ComponentSetupError.
-If there is a fatal problem that can't be expressed with a message, this
-method should go to sad and raise ComponentSetupError itself.
-If there is nothing, or only warnings, the method should return a result.
-After this call, the component should be ready to set up.
+do_check(self)
+    This method has no requirements. It is implementation-specific.
+    It can be used to check various requirements, or known bugs in certain
+    versions of software.
+    If this method adds any error messages to the component state, this will
+    automatically trigger a mood change to sad and raise a ComponentSetupError.
+    If there is a fatal problem that can't be expressed with a message, this
+    method should go to sad and raise ComponentSetupError itself.
+    If there is nothing, or only warnings, the method should return a result.
+    After this call, the component should be ready to set up.
 
-BaseComponent.do_setup(self, *args, **kwargs)
-----------------------------
-This method has no requirements. It is implementation-specific.
-After this call, the component should have created all resources and
-be ready to start.
+do_setup(self, *args, **kwargs)
+    This method has no requirements. It is implementation-specific.
+    After this call, the component should have created all resources and
+    be ready to start.
 
-BaseComponent.do_start(self, *args, **kwargs)
----------------------------------------------
-Implementations should make sure that a succesful start sets the mood to
-happy.
+do_start(self, *args, **kwargs)
+    Implementations should make sure that a succesful start sets the mood to
+    happy.
 
-BaseComponent.do_stop(self)
----------------------------
-Implementations should make sure that a succesful stop sets the mood to
-sleeping.
+do_stop(self)
+    Implementations should make sure that a succesful stop sets the mood to
+    sleeping.
 
 
 Feed components
@@ -134,50 +129,44 @@ pipeline.
 Implementations
 ---------------
 
-FeedComponent.do_setup(self)
--------------------------
-This method will instantiate a pipeline first, and set up the eaters' and
-feeders' hostnames and ports then allow the object a chance to do any further
-initialization after the pipeline is created.
-It does this by calling the following two methods:
+do_setup(self)
+    This method will instantiate a pipeline first, and set up the eaters' and
+    feeders' hostnames and ports then allow the object a chance to do any further
+    initialization after the pipeline is created.
+    It does this by calling the following two methods:
 
-  FeedComponent.create_pipeline(self)
-  FeedComponent.set_pipeline(self, pipeline)
+      FeedComponent.create_pipeline(self)
+      FeedComponent.set_pipeline(self, pipeline)
 
-FeedComponent.provide_master_clock(self, port)
-----------------------------------------------
-If a component is selected as a master clock, this method will be called
-after setup (and before start), and will create a gst.NetTimeProvider() on 
-the given port to provide the flumotion flow master clock.
+provide_master_clock(self, port)
+    If a component is selected as a master clock, this method will be called
+    after setup (and before start), and will create a gst.NetTimeProvider() on 
+    the given port to provide the flumotion flow master clock.
 
-FeedComponent.set_master_clock(self, ip, port, base_time)
----------------------------------------------------------
-For components that require a clock, but either do cannot provide a clock, or
-are not selected as the master clock, this method will be called to tell the
-component about the clock to slave to; a gst.NetClientClock will be created
-to slave to this master.
-This will be called between setup and start for the component.
+set_master_clock(self, ip, port, base_time)
+    For components that require a clock, but either do cannot provide a clock, or
+    are not selected as the master clock, this method will be called to tell the
+    component about the clock to slave to; a gst.NetClientClock will be created
+    to slave to this master.
+    This will be called between setup and start for the component.
 
 Interface
 ---------
 
-FeedComponent.create_pipeline(self)
------------------------------------
-This method should return a GstPipeline object. It is a pure virtual
-method.
+create_pipeline(self)
+    This method should return a GstPipeline object. It is a pure virtual
+    method.
 
-FeedComponent.set_pipeline(self, pipeline)
-------------------------------------------
-The base implementation of this method will set self.pipeline to
-pipeline and will connect to signals, the bus, etc. Subclass
-implementations should chain up to this method first.
+set_pipeline(self, pipeline)
+    The base implementation of this method will set self.pipeline to
+    pipeline and will connect to signals, the bus, etc. Subclass
+    implementations should chain up to this method first.
 
-FeedComponent.make_message_for_gstreamer_error(self, gerror, debug)
--------------------------------------------------------------------
-Make a flumotion error message to show when a GStreamer error occurs.
-The base implementation makes a generic message; a component might want
-to specialize this method to handle certain known errors.
-Implementations should return the new message.
+make_message_for_gstreamer_error(self, gerror, debug)
+    Make a flumotion error message to show when a GStreamer error occurs.
+    The base implementation makes a generic message; a component might want
+    to specialize this method to handle certain known errors.
+    Implementations should return the new message.
 
 
 Parse-launch components
@@ -191,28 +180,24 @@ once the pipeline is created.
 Implementation
 --------------
 
-ParseLaunchComponent.create_pipeline(self)
-------------------------------------------
-Calls the following method:
+create_pipeline(self)
+    Calls the following method:
 
-  ParseLaunchComponent.get_pipeline_string(self, properties)
+      ParseLaunchComponent.get_pipeline_string(self, properties)
 
-ParseLaunchComponent.set_pipeline(self, pipeline)
--------------------------------------------------
-Chains up to the parent, then calls the following method:
+set_pipeline(self, pipeline)
+    Chains up to the parent, then calls the following method:
 
-  ParseLaunchComponent.configure_pipeline(self, pipeline, properties)
+      ParseLaunchComponent.configure_pipeline(self, pipeline, properties)
 
 Interface
 ---------
 
-ParseLaunchComponent.get_pipeline_string(self, properties)
-----------------------------------------------------------
-Must return a string, the pipeline template. Properties is a dict from
-self.config['properties'] (i.e., the component properties, without the
-name, type, parent, etc.). Pure virtual.
+get_pipeline_string(self, properties)
+    Must return a string, the pipeline template. Properties is a dict from
+    self.config['properties'] (i.e., the component properties, without the
+    name, type, parent, etc.). Pure virtual.
 
-ParseLaunchComponent.configure_pipeline(self, pipeline, properties)
--------------------------------------------------------------------
-Called so that subclasses can manipulate the pipeline directly if
-needed. Defaults to doing nothing.
+configure_pipeline(self, pipeline, properties)
+    Called so that subclasses can manipulate the pipeline directly if
+    needed. Defaults to doing nothing.

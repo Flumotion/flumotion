@@ -1,5 +1,8 @@
 2007-10-02  Andy Wingo  <wingo@pobox.com>
 
+	* doc/random/component-initialization-protocol: Convert to be
+	restructured text. No changes.
+
 	* flumotion/manager/component.py (ComponentAvatar.feedTo)
 	(ComponentHeaven._connectFeederDownstream): Updates to pass the
 	right thing to callRemote('feedTo', ...).
