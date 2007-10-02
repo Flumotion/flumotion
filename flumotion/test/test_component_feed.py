@@ -359,3 +359,44 @@ class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(serverFdPassed)
         d.addCallback(checkfds)
         return d
+
+    def testRequestFeed(self):
+        client = feed.FeedMedium(logName='frobby')
+
+        self.failIf(client.hasRemoteReference())
+
+        def requestFeed():
+            port = self.feedServer.getPortNum()
+            self.assertAdditionalFDsOpen(1, 'connect (socket)')
+            d = client.sendFeed('localhost', port,
+                                fpb.Authenticator(username='user',
+                                                  password='test',
+                                                  avatarId='test:src'),
+                                '/foo/bar:baz')
+            self.failIf(client.hasRemoteReference())
+            self.assertAdditionalFDsOpen(2, 'connect (socket, client)')
+            return d
+
+        def gotFeed((fullFeedId, fd)):
+            # the feed medium should have dropped its reference to the
+            # remotereference by now, otherwise we get cycles, and
+            # remote references can't exist in cycles because they have
+            # a __del__ method
+            self.assertEquals(fullFeedId, '/foo/bar:baz')
+            self.failIf(client.hasRemoteReference())
+            # since both the server and the client close their
+            # transports via calllaters, we don't know how many extra
+            # sockets should be open now
+
+            # this fd is ours to close
+            os.close(fd)
+
+            return self.feedServer.waitForAvatarExit()
+
+        def checkfds(_):
+            self.assertAdditionalFDsOpen(1, 'feedReadyOnServer (socket)')
+
+        d = requestFeed()
+        d.addCallback(gotFeed)
+        d.addCallback(checkfds)
+        return d

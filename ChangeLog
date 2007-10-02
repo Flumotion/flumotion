@@ -1,3 +1,14 @@
+2007-10-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_component_feed.py
+	(TestDownstreamFeedClient.testRequestFeed): New test, tests the
+	high level 'requestFeed' interface.
+
+	* flumotion/component/feed.py (FeedMedium.requestFeed.error)
+	(FeedMedium.sendFeed.error): Propagate the errors to the client;
+	avoids successful None returns when the remote feed is not
+	available.
+
 2007-10-01  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/job/job.py (JobClientBroker.fileDescriptorsReceived):

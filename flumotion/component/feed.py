@@ -167,6 +167,7 @@ class FeedMedium(fpb.Referenceable):
             self.debug('failure: %s', log.getFailureMessage(failure))
             self.debug('closing connection')
             self.stopConnecting()
+            return failure
 
         d = self.startConnecting(host, port, authenticator)
         d.addCallback(connected)
@@ -232,6 +233,7 @@ class FeedMedium(fpb.Referenceable):
             self.debug('failure: %s', log.getFailureMessage(failure))
             self.debug('closing connection')
             self.stopConnecting()
+            return failure
 
         d = self.startConnecting(host, port, authenticator)
         d.addCallback(connected)
