@@ -1,5 +1,12 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar.makeAvatarInitArgs): Only callRemote to
+	getMasterClockInfo if the component has 'clock-master' in its
+	config. Slightly hacky, but at least it doesn't assume that all
+	components are feed components. Should we just make the base
+	Component have a getClockMaster implementation?
+
 	* flumotion/component/feed.py (FeedMedium._doFeedTo): Remove
 	monkeypatch, now that we are forcing restarts. See #619.
 

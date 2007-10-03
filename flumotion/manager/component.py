@@ -143,15 +143,21 @@ class ComponentAvatar(base.ManagerAvatar):
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
                            mind):
         def gotStates(result):
-            (_s1, conf), (_s2, jobState), (_s3, clocking) = result
-            assert _s1 and _s2 and _s3 # fireOnErrback=1
-            log.debug('component-avatar', 'got state information')
-            return (heaven, avatarId, remoteIdentity, mind,
-                    conf, jobState, clocking)
+            (_s1, conf), (_s2, jobState) = result
+            assert _s1 and _s2 # fireOnErrback=1
+            def gotClocking(clocking):
+                log.debug('component-avatar', 'got state information')
+                return (heaven, avatarId, remoteIdentity, mind,
+                        conf, jobState, clocking)
+            if 'clock-master' in conf:
+                d = mind.callRemote('getMasterClockInfo')
+                d.addCallback(gotClocking)
+                return d
+            else:
+                return gotClocking(None)
         log.debug('component-avatar', 'calling mind for state information')
         d = defer.DeferredList([mind.callRemote('getConfig'),
-                                mind.callRemote('getState'),
-                                mind.callRemote('getMasterClockInfo')],
+                                mind.callRemote('getState')],
                                fireOnOneErrback=True)
         d.addCallback(gotStates)
         return d
