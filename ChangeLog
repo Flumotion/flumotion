@@ -1,5 +1,8 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feed.py (FeedMedium._doFeedTo): Remove
+	monkeypatch, now that we are forcing restarts. See #619.
+
 	* flumotion/launch/main.py:
 	* flumotion/launch/parse.py: Fix flumotion-launch, albeit a bit
 	hackily. At least clock master selection is more like core now.

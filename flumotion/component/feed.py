@@ -274,27 +274,12 @@ class FeedMedium(fpb.Referenceable):
         reactor.callLater(0, self._doFeedTo, fullFeedId, t)
 
     def _doFeedTo(self, fullFeedId, t):
-        def mungeTransport(transport):
-            # see _SocketMaybeCloser above, i am a bad bad man
-            def _closeSocket():
-                if transport.keepSocketAlive:
-                    try:
-                        transport.socket.close()
-                    except socket.error:
-                        pass
-                else:
-                    tcp.Server._closeSocket(transport)
-            transport._closeSocket = _closeSocket
-            return transport
-                        
         self.debug('flushing PB write queue')
         t.doWrite()
         self.debug('stop writing to transport')
         t.stopWriting()
 
         # make sure shutdown() is not called on the socket
-        if not isinstance(t, _SocketMaybeCloser):
-            t = mungeTransport(t)
         t.keepSocketAlive = True
         
         fd = os.dup(t.fileno())
