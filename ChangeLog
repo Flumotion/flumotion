@@ -1,5 +1,14 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py: Fix flumotion-launch, albeit a bit
+	hackily. At least clock master selection is more like core now.
+
+	* flumotion/component/component.py (BaseComponent.__init__)
+	(BaseComponent.__init__, BaseComponent.addMessage): Hackily add
+	another error reporting mechanism for programmatically running
+	components; probably needs more thought.
+
 	* flumotion/manager/manager.py (Vishnu._loadManagerBouncer): Fix
 	to conform to init protocol; still seems hacky.
 

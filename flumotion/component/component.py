@@ -284,7 +284,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
     logCategory = 'basecomp'
     componentMediumClass = BaseComponentMedium
     
-    def __init__(self, config):
+    def __init__(self, config, haveError=None):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
@@ -297,6 +297,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         self.debug("initializing %r with config %r", type(self), config)
         self.config = config
+        self._haveError = haveError
 
         # this will call self.init() for all implementors of init()
         common.InitMixin.__init__(self)
@@ -551,6 +552,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         if message.level == messages.ERROR:
             self.debug('error message, turning sad')
             self.setMood(moods.sad)
+            if self._haveError:
+                self._haveError(message)
         
     def fixRenamedProperties(self, properties, list):
         """

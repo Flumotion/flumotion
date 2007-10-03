@@ -40,7 +40,7 @@ def err(x):
 
 class Component(object):
     __slots__ = ('type', 'name', 'properties', 'plugs', 'source',
-                 'clock_master', 'config_entry', '_reg')
+                 'clock_priority', 'config_entry', '_reg')
 
     def __init__(self, type, name):
         self.type = type
@@ -48,7 +48,6 @@ class Component(object):
         self.properties = []
         self.plugs = []
         self.source = []
-        self.clock_master = None
 
         self.config_entry = None
 
@@ -57,14 +56,12 @@ class Component(object):
             err('Unknown component type: %s' % self.type)
 
         self._reg = r.getComponent(self.type)
+        if self._reg.getNeedsSynchronization():
+            self.clock_priority = self._reg.getClockPriority()
+        else:
+            self.clock_priority = None
 
     def complete_and_verify(self):
-        c = self._reg
-        # not used by the component -- see notes in _buildConfig in
-        # config.py
-        if c.getNeedsSynchronization():
-            self.clock_master = c.getClockPriority()
-        
         self.config_entry = config.ConfigEntryComponent(
             self.name,
             None,
@@ -74,7 +71,7 @@ class Component(object):
             self.plugs,
             None,
             [(None, feedId) for feedId in self.source],
-            self.clock_master, 
+            None,
             None,
             None)
 
@@ -113,6 +110,19 @@ class ComponentStore:
     def complete_and_verify_configs(self):
         for name in self.components:
             self.components[name].complete_and_verify()
+
+        # hackily stolen from config.ConfigXML.parseFlow, definitely
+        # hackariffic
+
+        need_sync = [(x.clock_priority, x) for x in self.components.values()
+                     if x.clock_priority]
+        need_sync.sort()
+        need_sync = [x[1] for x in need_sync]
+
+        if need_sync:
+            master = need_sync[-1]
+            for x in need_sync:
+                x.config_entry.config['clock-master'] = master.config_entry.config['avatarId']
 
     def sorted_configs(self, partial_orders):
         sort = dag.topological_sort

@@ -109,35 +109,26 @@ class ComponentWrapper(object, log.Loggable):
         return getattr(module, entry.getFunction())
 
     def instantiate(self):
-        self.component = self.procedure()
-        # since we cannot listen to a StateCacheable, we monkeypatch the
-        # append method so we can intercept messages
-        def append(instance, key, value):
-            if key == 'messages':
-                translator = messages.Translator()
-                print "%s: %s" % (_headings[value.level],
-                    translator.translate(value))
-                if value.debug:
-                    print "Debug information:", value.debug
-            flavors.StateCacheable.append(instance, key, value)
+        errors = []
+        def haveError(value):
+            translator = messages.Translator()
+            print "%s: %s" % (_headings[value.level],
+                              translator.translate(value))
+            if value.debug:
+                print "Debug information:", value.debug
+            errors.append(value)
 
-        import new
-        self.component.state.append = new.instancemethod(append,
-            self.component.state)
-        d = self.component.setup(self.config)
-        def handledEb(failure):
-            failure.trap(errors.ComponentSetupHandledError)
-            os._exit(1)
-        d.addErrback(handledEb)
-        return d
+        self.component = self.procedure(self.config,
+                                        haveError=haveError)
+        return not bool(errors)
 
     def provideMasterClock(self, port):
         # rtype: defer.Deferred
         d = self.component.provide_master_clock(port)
         return d
 
-    def start(self, clocking):
-        return self.component.start(clocking)
+    def set_master_clock(self, ip, port, base_time):
+        return self.component.set_master_clock(ip, port, base_time)
 
     def stop(self):
         return self.component.stop()
@@ -169,49 +160,28 @@ def make_pipes(wrappers):
                 fds[feedId] = (read, start)
     return fds
 
-def DeferredDelay(time, val):
-    d = defer.Deferred()
-    reactor.callLater(time, d.callback, val)
-    return d
-
-def start_components(wrappers, fds, delay):
+def start_components(wrappers, fds):
     # figure out the links and start the components
 
-    # first phase: instantiation and setup
-    def got_results(results):
-        success = True
-        for result, wrapper in zip(results, wrappers):
-            if not result[0]:
-                print ("Component %s failed to start, reason: %r"
-                       % (wrapper, result[1]))
-                success = False
-        if not success:
-            raise errors.ComponentStartError()
-
-    def choose_clocking(unused):
+    def provide_clock():
         # second phase: clocking
-        need_sync = [(x.config['clock-master'], x) for x in wrappers
-                     if x.config['clock-master'] is not None]
-        need_sync.sort()
-        need_sync = [x[1] for x in need_sync]
+        need_sync = [x for x in wrappers if x.config['clock-master']]
 
         if need_sync:
+            master = None
+            for x in need_sync:
+                if x.config['clock-master'] == x.config['avatarId']:
+                    master = x
+                    break
+            assert master
+            need_sync.remove(master)
+            d = master.provideMasterClock(7600 - 1) # hack!
             def addNeedSync(clocking):
                 return need_sync, clocking
-            master = need_sync.pop(0)
-            print "Telling", master.name, "to provide the master clock."
-            d = master.provideMasterClock(7600 - 1) # hack!
             d.addCallback(addNeedSync)
             return d 
         else:
-            return None, None
-
-    def add_delay(val):
-        if delay:
-            print 'Delaying component startup by %f seconds...' % delay
-            return DeferredDelay(delay, val)
-        else:
-            return defer.succeed(val)
+            return defer.succeed((None, None))
 
     def do_start(synchronization, wrapper):
         need_sync, clocking = synchronization
@@ -225,20 +195,20 @@ def start_components(wrappers, fds, delay):
                 start()
         if (not need_sync) or (wrapper not in need_sync) or (not clocking):
             clocking = None
-        d = wrapper.start(clocking)
-        d.addCallback(lambda val: synchronization)
-        return d
+        if clocking:
+            wrapper.set_master_clock(*clocking)
+        return synchronization
 
     def do_stop(failure):
         for wrapper in wrappers:
             wrapper.stop()
         return failure
 
-    d = defer.DeferredList([wrapper.instantiate() for wrapper in wrappers])
-    d.addCallback(got_results)
-    d.addCallback(choose_clocking)
     for wrapper in wrappers:
-        d.addCallback(add_delay)
+        if not wrapper.instantiate():
+            return defer.fail(errors.ComponentStartError)
+    d = provide_clock()
+    for wrapper in wrappers:
         d.addCallback(do_start, wrapper)
     d.addErrback(do_stop)
     return d
@@ -260,9 +230,6 @@ def main(args):
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('', '--delay',
-                      action="store", type="float", dest="delay",
                       help="set debug levels")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
@@ -287,11 +254,6 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
-    if options.delay:
-        delay = options.delay
-    else:
-        delay = 0.
-
     # note parser versus parse
     configs = parse.parse_args(args[1:])
 
@@ -305,7 +267,7 @@ def main(args):
     reactor.failure = False
     reactor.callLater(0, lambda: setattr(reactor, 'running', True))
 
-    d = start_components(wrappers, fds, delay)
+    d = start_components(wrappers, fds)
 
     def errback(failure):
         log.debug('launch', log.getFailureMessage(failure))
