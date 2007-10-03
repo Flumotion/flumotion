@@ -133,54 +133,25 @@ class TestComponentWrapper(CompatTestCase):
                                        ('fwp:audio', 'default-bis')]})
 
 
-    def test_instantiate_and_setup_errors(self):
+    def test_instantiate_errors(self):
         pp = ComponentWrapper('pipeline-producer', None, name='pp')
         self.failUnlessRaises(TypeError, pp.instantiate) # None()!?
         pp = ComponentWrapper('pipeline-producer', Producer, name='pp')
 
         pp.instantiate()
-        d = pp.setup()
+        # sad because missing mandatory pipeline property
+        d = pp.wait_for_mood(moods.sad)
+        d.addCallback(lambda _: pp.stop())
+        return d
 
-        # the deferred should fail (no mandatory pipeline property) -
-        # stop the component in any case (to clean the reactor) and
-        # passthrough the result/failure
-        d.addBoth(comptest.call_and_passthru_callback, pp.stop)
-        return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
-
-    def test_setup_pipeline_error(self):
+    def test_gstreamer_error(self):
         pp = ComponentWrapper('pipeline-producer', Producer,
                               name='pp', props={'pipeline': 'fakesink'})
 
         pp.instantiate()
-        # we're going to fail in gst - make sure the gst logger is silent
-        import gst
-        old_debug_level = gst.debug_get_default_threshold()
-        gst.debug_set_default_threshold(gst.LEVEL_NONE)
-
-        d = pp.setup()
-
-        # the deferred should fail (the only pipeline element doesn't
-        # have source pads) - stop the component in any case (to clean
-        # the reactor) and passthrough the result/failure
-        d.addBoth(comptest.call_and_passthru_callback, pp.stop)
-
-        if old_debug_level != gst.LEVEL_NONE:
-            def _restore_gst_debug_level(rf):
-                gst.debug_set_default_threshold(old_debug_level)
-                return rf
-            d.addBoth(_restore_gst_debug_level)
-        return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
-
-    def test_setup_and_stop(self):
-        pp = ComponentWrapper('pipeline-producer', Producer,
-                              name='pp', props={'pipeline': 'fakesrc'})
-
-        pp.instantiate()
-        d = pp.setup()
-
+        d = pp.wait_for_mood(moods.sad)
         d.addCallback(lambda _: pp.stop())
         return d
-    test_setup_and_stop.skip = 'no eater info ever specified, will not fire -- fixme'
 
 class TestCompTestSetup(CompTestTestCase):
     def setUp(self):
@@ -194,6 +165,16 @@ class TestCompTestSetup(CompTestTestCase):
     def tearDown(self):
         return defer.DeferredList([c.stop() for c in self.components])
 
+    def test_success(self):
+        pp = ComponentWrapper('pipeline-producer', Producer,
+                              name='pp', props={'pipeline':
+                                                'audiotestsrc is-live=1'},
+                              cfg={'clock-master': '/default/pp'})
+
+        pp.instantiate()
+        d = pp.wait_for_mood(moods.happy)
+        d.addCallback(lambda _: pp.stop())
+        return d
 
     def test_auto_linking(self):
         # the components should be linked automatically

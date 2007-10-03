@@ -33,7 +33,8 @@ from twisted.python import reflect
 from zope.interface import implements
 
 from flumotion.common import interfaces, errors, log, planet, medium
-from flumotion.common import componentui, common, registry, messages, interfaces
+from flumotion.common import componentui, common, registry, messages
+from flumotion.common import interfaces, reflectcall
 
 from flumotion.common.planet import moods
 from flumotion.configure import configure
@@ -115,6 +116,16 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     def startLogin(self, authenticator):
         self.medium.setAuthenticator(authenticator)
         return fpb.ReconnectingFPBClientFactory.startLogin(self, authenticator)
+
+def maybe_deferred_chain(procs, *args, **kwargs):
+    def call_proc(_, p):
+        log.debug('', 'calling %r', p)
+        return p(*args, **kwargs)
+    p, procs = procs[0], procs[1:]
+    d = defer.maybeDeferred(call_proc, None, p)
+    for p in procs:
+        d.addCallback(call_proc, p)
+    return d
 
 # needs to be before BaseComponent because BaseComponent references it
 class BaseComponentMedium(medium.PingingMedium):
@@ -273,7 +284,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
     logCategory = 'basecomp'
     componentMediumClass = BaseComponentMedium
     
-    def __init__(self):
+    def __init__(self, config):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
@@ -284,8 +295,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         See L{flumotion.common.common.InitMixin} for more details.
         """
+        self.debug("initializing %r with config %r", type(self), config)
+        self.config = config
+
         # this will call self.init() for all implementors of init()
         common.InitMixin.__init__(self)
+
+        self.setup()
 
     # BaseComponent interface for subclasses related to component protocol
     def init(self):
@@ -299,11 +315,11 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         self.state = planet.WorkerJobState()
 
-        self.name = None
+        self.name = self.config['name']
         
         #self.state.set('name', name)
         self.state.set('pid', os.getpid())
-        self.state.set('mood', moods.waking.value)
+        self.setMood(moods.waking)
 
         self.medium = None # the medium connecting us to the manager's avatar
  
@@ -318,6 +334,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.plugs = {}
 
         # Start the cpu-usage updating.
+        self._happyWaits = []
         self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
 
         self._shutdownHook = None
@@ -333,21 +350,15 @@ class BaseComponent(common.InitMixin, log.Loggable):
         do_setup() will not be called.
 
         In the event of a fatal problem that can't be expressed through an
-        error message, this method should set the mood to sad and raise the
-        error on its own.
+        error message, this method should raise an exception or return a
+        failure.
 
-        self.config will be set before this is called.
-
-        @Returns: L{twisted.internet.defer.Deferred}
+        It is not necessary to chain up in this function. The return
+        value may be a deferred.
         """
-        def addMessage(message):
-            self.addMessage(message)
-            if message.level == messages.ERROR:
-                raise errors.ComponentSetupHandledError(message.debug)
-
         return defer.maybeDeferred(self.check_properties,
                                    self.config['properties'],
-                                   addMessage)
+                                   self.addMessage)
 
     def check_properties(self, properties, addMessage):
         """
@@ -376,24 +387,22 @@ class BaseComponent(common.InitMixin, log.Loggable):
         Non-programming errors should not be raised, but returned as a
         failing deferred.
 
-        self.config will be set before this is called.
-
-        @Returns: L{twisted.internet.defer.Deferred}
+        The return value may be a deferred.
         """
-        return defer.succeed(None)
+        for socket, plugs in self.config['plugs'].items():
+            self.plugs[socket] = []
+            for plug in plugs:
+                instance = reflectcall.reflectCall(plug['module-name'],
+                                                   plug['function-name'],
+                                                   plug)
+                self.plugs[socket].append(instance)
+                self.debug('Starting plug %r on socket %s',
+                           instance, socket)
+                instance.start(self)
 
-    def do_start(self, *args, **kwargs):
-        """
-        BaseComponent vmethod for starting up. If you override this
-        method, you are responsible for arranging that the component
-        becomes happy.
+        checks = common.get_all_methods(self, 'do_check', False)
+        return maybe_deferred_chain(checks, self)
 
-        @Returns: L{twisted.internet.defer.Deferred}
-        """
-        # default behavior
-        self.setMood(moods.happy)
-        return defer.succeed(None)
-       
     def do_stop(self):
         """
         BaseComponent vmethod for stopping.
@@ -402,96 +411,47 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
-        return defer.succeed(None)
- 
-    def _instantiate_plugs(self):
-        for socket, plugs in self.config['plugs'].items():
-            self.plugs[socket] = []
+        for socket, plugs in self.plugs.items():
             for plug in plugs:
-                instance = common.reflectCall(plug['module-name'],
-                                              plug['function-name'],
-                                              plug)
-                self.plugs[socket].append(instance)
+                self.debug('Stopping plug %r on socket %s', plug, socket)
+                plug.stop(self)
 
+        if self._shutdownHook:
+            self.debug('_stoppedCallback: firing shutdown hook')
+            self._shutdownHook()
+ 
     ### BaseComponent implementation related to compoment protocol
-    ### called by manager through medium
-    def setup(self, config):
+    def setup(self):
         """
-        Sets up the component with the given config.  Called by the manager
-        through the medium.
-
-        @Returns: L{twisted.internet.defer.Deferred}
-        @raise    flumotion.common.errors.ComponentSetupError:
-                  when an error happened during setup of the component
+        Sets up the component.  Called during __init__, so be sure not
+        to raise exceptions, instead adding messages to the component
+        state.
         """
-        def checkErrorCallback(result):
-            # if the mood is now sad, it means an error was encountered
-            # during check, and we should return a failure here.
-            # since the checks are responsible for adding a message,
-            # this is a handled error.
-            current = self.state.get('mood')            
-            if current == moods.sad.value:
-                self.warning('Running checks made the component sad.')
-                raise errors.ComponentSetupHandledError()
+        def run_setups():
+            setups = common.get_all_methods(self, 'do_setup', False)
+            return maybe_deferred_chain(setups, self)
+            
+        def go_happy(_):
+            self.debug('setup complete, going happy')
+            self.setMood(moods.happy)
 
-        def setupErrback(failure):
-            # pass through handled errors
-            if failure.check(errors.ComponentSetupHandledError):
-                return failure
+        def got_error(failure):
+            if not failure.check(errors.ComponentSetupHandledError):
+                txt = log.getFailureMessage(failure)
+                self.warning('Setup failed: %s', txt)
+                m = messages.Error(T_(N_("Could not setup component.")),
+                                   debug=txt,
+                                   id="component-setup-%s" % self.name)
+                # will call setMood(moods.sad)
+                self.addMessage(m)
+            # swallow
+            return None
 
-            self.warning('Could not set up component: %s',
-                log.getFailureMessage(failure))
-            m = messages.Error(T_(N_("Could not setup component.")),
-                debug=log.getFailureMessage(failure),
-                id="component-setup-%s" % self.name)
-            self.state.append('messages', m)
-            self.setMood(moods.sad)
-            raise errors.ComponentSetupHandledError(
-                'Could not set up component')
-
-        self.debug("setup() called with config %r", config)
         self.setMood(moods.waking)
-        self._setConfig(config)
-        # now we have a name, set it on the medium too
-        if self.medium:
-            self.medium.logName = self.getName()
-        self._instantiate_plugs()
-        d = defer.maybeDeferred(self.do_check)
-        d.addCallback(checkErrorCallback)
-        d.addCallback(lambda r: self.do_setup())
-        d.addErrback(setupErrback)
-        return d
 
-    def start(self, *args, **kwargs):
-        """
-        Tell the component to start.  This is called when all its dependencies
-        are already started.
-
-        To hook onto this method, implement your own do_start method.
-        See BaseComponent.do_start() for what your do_start method is
-        responsible for doing.
-
-        Again, don't override this method. Thanks.
-        """
-        self.debug('BaseComponent.start()')
-
-        def start_plugs():
-            for socket, plugs in self.plugs.items():
-                for plug in plugs:
-                    self.debug('Starting plug %r on socket %s', plug, socket)
-                    plug.start(self)
-
-        try:
-            start_plugs()
-            ret = self.do_start(*args, **kwargs)
-            assert isinstance(ret, defer.Deferred), \
-                   "do_start %r must return a deferred" % self.do_start
-            self.debug('BaseComponent.start(): returning value %s' % ret)
-            return ret
-        except Exception, e:
-            self.debug("Exception during component do_start: %s" % 
-                log.getExceptionMessage(e))
-            return defer.fail(e)
+        d = run_setups()
+        d.addCallbacks(go_happy, got_error)
+        # all status info via messages and the mood
 
     def setShutdownHook(self, shutdownHook):
         """
@@ -506,19 +466,11 @@ class BaseComponent(common.InitMixin, log.Loggable):
         The connection to the manager will be closed.
         The job process will also finish.
         """
+        def run_stops():
+            stops = common.get_all_methods(self, 'do_stop', True)
+            return maybe_deferred_chain(stops, self)
+
         self.debug('BaseComponent.stop')
-
-        def stop_plugs(ret):
-            for socket, plugs in self.plugs.items():
-                for plug in plugs:
-                    self.debug('Stopping plug %r on socket %s', plug, socket)
-                    plug.stop(self)
-            return ret
-
-        def fireShutdownHook(ret):
-            if self._shutdownHook:
-                self.debug('_stoppedCallback: firing shutdown hook')
-                self._shutdownHook()
 
         self.setMood(moods.waking)
         for message in self.state.get('messages'):
@@ -528,10 +480,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self._cpuCallLater.cancel()
             self._cpuCallLater = None
 
-        d = self.do_stop()
-        d.addCallback(stop_plugs)
-        d.addBoth(fireShutdownHook)
-        return d
+        return run_stops()
 
     ### BaseComponent public methods
     def getName(self):
@@ -546,6 +495,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
+        self.medium.logName = self.getName()
 
     def setMood(self, mood):
         """
@@ -561,9 +511,15 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self.info('tried to set mood to %r, but already sad :-(' % mood)
             return
 
-        self.debug('MOOD changed to %r' % mood)
         self.doLog(log.DEBUG, -2, 'MOOD changed to %r by caller', mood)
         self.state.set('mood', mood.value)
+
+        if mood == moods.happy:
+            while self._happyWaits:
+                self._happyWaits.pop(0).callback(None)
+        elif mood == moods.sad:
+            while self._happyWaits:
+                self._happyWaits.pop(0).errback(errors.ComponentStartError())
 
     def getMood(self):
         """
@@ -573,6 +529,16 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         return self.state.get('mood')
 
+    def waitForHappy(self):
+        mood = self.getMood()
+        if mood == moods.happy.value:
+            return defer.succeed(None)
+        elif mood == moods.sad.value:
+            return defer.fail(errors.ComponentStartError())
+        else:
+            d = defer.Deferred()
+            self._happyWaits.append(d)
+            return d
         
     def addMessage(self, message):
         """
@@ -635,14 +601,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self.debug('asked to adminCallRemote(%s, *%r, **%r), but '
                        'no manager.'
                        % (methodName, args, kwargs))
-
-    # private methods
-    def _setConfig(self, config):
-        if self.name:
-            assert config['name'] == self.name, \
-                   "Can't change name while running"
-        self.config = config
-        self.name = config['name']
 
     def _updateCPUUsage(self):
         # update CPU time stats

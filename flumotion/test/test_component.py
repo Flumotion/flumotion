@@ -35,9 +35,6 @@ class PipelineTest(ParseLaunchComponent):
         self.__pipeline = pipeline
         self._eater = eaters or {}
         self._feed = feeders or []
-        ParseLaunchComponent.__init__(self)
-
-    def config(self):
         config = {'name': 'fake',
                   'avatarId': '/default/fake',
                   'eater': self._eater,
@@ -47,8 +44,7 @@ class PipelineTest(ParseLaunchComponent):
                   # clock master prevents the comp from being
                   # instantiated
                   'clock-master': '/some/component'}
-
-        return self.setup(config)
+        ParseLaunchComponent.__init__(self, config)
 
     def create_pipeline(self):
         unparsed = self.__pipeline
@@ -71,12 +67,9 @@ class PipelineTest(ParseLaunchComponent):
 class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
-        d = self.p.config()
-        yield d
-    setUp = defer_generator_method(setUp)
 
     def tearDown(self):
-        self.p.stop()
+        return self.p.stop()
 
     def testOddDelimeters(self):
         self.assertRaises(TypeError, self.p.parse_pipeline,
@@ -85,7 +78,6 @@ class TestExpandElementNames(unittest.TestCase):
 class TestParser(unittest.TestCase):
     def parse(self, unparsed, correctresultproc, eaters=None, feeders=None):
         comp = PipelineTest(eaters, feeders, unparsed)
-        comp.config()
         result = comp.parse_pipeline(unparsed)
         self.assertEquals(result, correctresultproc(comp))
         comp.stop()
@@ -141,8 +133,8 @@ class TestParser(unittest.TestCase):
 
     def testErrors(self):
         comp = PipelineTest(None, None, '')
-        self.assertFailure(comp.config(), errors.ComponentSetupHandledError)
-        comp.stop()
+        d = self.assertFailure(comp.waitForHappy(), errors.ComponentStartError)
+        d.addCallback(lambda _: comp.stop())
     
 if __name__ == '__main__':
     unittest.main()

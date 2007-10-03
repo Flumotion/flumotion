@@ -90,5 +90,4 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         else:
             self.debug("Temporary overlay already gone, " \
                 "did we not start up correctly ?")
-        return feedcomponent.ParseLaunchComponent.do_stop(self)
         

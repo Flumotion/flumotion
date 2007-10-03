@@ -21,7 +21,7 @@
 
 import common
 
-from flumotion.component.bouncers import component, plug
+from flumotion.component.bouncers import component
 
 import bouncertest
 
@@ -31,14 +31,20 @@ class FakeBouncerMedium(bouncertest.FakeMedium, component.BouncerMedium):
 
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
     def setUp(self):
-        p = plug.TrivialBouncerPlug({'socket': component.BOUNCER_SOCKET,
-                                     'type': 'trivial-bouncer-plug',
-                                     'properties': {}})
-        self.obj = component.Bouncer()
-        self.obj.plugs = {component.BOUNCER_SOCKET: [p]}
+        plugs = {component.BOUNCER_SOCKET:
+                 [{'socket': component.BOUNCER_SOCKET,
+                   'type': 'trivial-bouncer-plug',
+                   'properties': {},
+                   'module-name': 'flumotion.component.bouncers.plug',
+                   'function-name': 'TrivialBouncerPlug'}]}
+        self.obj = component.Bouncer({'name': 'fake',
+                                      'avatarId': '/default/fake',
+                                      'plugs': plugs,
+                                      'properties': {}})
+
         self.medium = FakeBouncerMedium()
         self.obj.setMedium(self.medium)
-        d = self.obj.start()
+        d = self.obj.waitForHappy()
         d.addCallback(lambda _: bouncertest.TrivialBouncerTest.setUp(self))
         return d
 

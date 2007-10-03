@@ -209,7 +209,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         return self.oggdemux.seek(1.0, gst.FORMAT_TIME, flags,
                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
 
-    def do_start(self, *args, **kwargs):
+    def do_setup(self):
         def check_time():
             self.log("checking position")
             try:
@@ -220,15 +220,8 @@ class Looper(feedcomponent.ParseLaunchComponent):
                 self.uiState.set('position', pos)
             return True
 
-        def on_start(result):
-            if not self.timeoutid:
-                self.timeoutid = gobject.timeout_add(500, check_time)
-            return result
-
-        d = feedcomponent.ParseLaunchComponent.do_start(self, *args, **kwargs)
-        d.addCallback(on_start)
-
-        return d
+        if not self.timeoutid:
+            self.timeoutid = gobject.timeout_add(500, check_time)
 
     def do_stop(self):
         if self.bus:
@@ -240,5 +233,3 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.timeoutid = 0
 
         self.nbiterations = 0
-
-        return feedcomponent.ParseLaunchComponent.do_stop(self)

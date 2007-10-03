@@ -574,20 +574,15 @@ class Vishnu(log.Loggable):
         # FIXME: use entry.getModuleName() (doesn't work atm?)
         moduleName = defs.getSource()
         methodName = entry.getFunction()
-        bouncer = reflectcall.createComponent(moduleName, methodName)
-
-        configDict = conf.bouncer.getConfigDict()
-        self.debug('setting up manager bouncer')
-        d = bouncer.setup(configDict)
+        bouncer = reflectcall.createComponent(moduleName, methodName,
+                                              conf.bouncer.getConfigDict())
+        d = bouncer.waitForHappy()
         def setupCallback(result):
             bouncer.debug('started')
             self.setBouncer(bouncer)
         def setupErrback(failure):
-            failure.trap(errors.ConfigError)
-            self.warning('Configuration error in manager bouncer: %s',
-                         failure.value.args[0])
-        d.addCallback(setupCallback)
-        d.addErrback(setupErrback)
+            self.warning('Error starting manager bouncer')
+        d.addCallbacks(setupCallback, setupErrback)
         return d
 
     def loadManagerConfigurationXML(self, file):

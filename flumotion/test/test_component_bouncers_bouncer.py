@@ -31,10 +31,13 @@ class FakeBouncerMedium(bouncertest.FakeMedium, bouncer.BouncerMedium):
 
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
     def setUp(self):
-        self.obj = bouncer.TrivialBouncer()
+        self.obj = bouncer.TrivialBouncer({'name': 'fake',
+                                           'avatarId': '/default/fake',
+                                           'plugs': {},
+                                           'properties': {}})
         self.medium = FakeBouncerMedium()
         self.obj.setMedium(self.medium)
-        d = self.obj.start()
+        d = self.obj.waitForHappy()
         d.addCallback(lambda _: bouncertest.TrivialBouncerTest.setUp(self))
         return d
 

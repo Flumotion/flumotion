@@ -133,9 +133,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     REQUEST_TIMEOUT = 30 # Time out requests after this many seconds of 
                          # inactivity
 
-    def __init__(self):
-       component.BaseComponent.__init__(self)
-
     def init(self):
         self.mountPoint = None
         self.type = None
@@ -166,12 +163,36 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
 
-    def getDescription(self):
-        return self._description
-
-    def do_setup(self):
+    def do_check(self):
         props = self.config['properties']
+        self.fixRenamedProperties(props, [
+            ('issuer',             'issuer-class'),
+            ('porter_socket_path', 'porter-socket-path'),
+            ('porter_username',    'porter-username'),
+            ('porter_password',    'porter-password'),
+            ('mount_point',        'mount-point')
+            ])
 
+        if props.get('type', 'master') == 'slave':
+            for k in 'socket-path', 'username', 'password':
+                if not 'porter-' + k in props:
+                    msg = 'slave mode, missing required property porter-%s' % k
+                    return defer.fail(errors.ConfigError(msg))
+
+            path = props.get('path', None) 
+            if path is None: 
+                msg = "missing required property 'path'"
+                return defer.fail(errors.ConfigError(msg)) 
+            if os.path.isfile(path):
+                self._singleFile = True
+            elif os.path.isdir(path):
+                self._singleFile = False
+            else:
+                msg = "the file or directory specified in 'path': %s does " \
+                    "not exist or is neither a file nor directory" % path
+                return defer.fail(errors.ConfigError(msg)) 
+
+    def have_properties(self, props):
         desc = props.get('description', None)
         if desc:
             self._description = desc
@@ -208,50 +229,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 filter.addIPFilter(f)
             self._logfilter = filter
 
-    def do_stop(self):
-        if self.httpauth:
-            self.httpauth.stopKeepAlive()
-        if self._timeoutRequestsCallLater:
-            self._timeoutRequestsCallLater.cancel()
-            self._timeoutRequestsCallLater = None
-        if self._twistedPort:
-            self._twistedPort.stopListening()
-
-        if self.type == 'slave' and self._pbclient:
-            return self._pbclient.deregisterPath(self.mountPoint)
-
-        return component.BaseComponent.do_stop(self)
-
-    def updatePorterDetails(self, path, username, password):
-        """
-        Provide a new set of porter login information, for when we're in slave
-        mode and the porter changes.
-        If we're currently connected, this won't disconnect - it'll just change
-        the information so that next time we try and connect we'll use the
-        new ones
-        """
-        if self.type == 'slave':
-            self._porterUsername = username
-            self._porterPassword = password
-
-            creds = credentials.UsernamePassword(self._porterUsername, 
-                self._porterPassword)
-            self._pbclient.startLogin(creds, self.medium)
-
-            # If we've changed paths, we must do some extra work.
-            if path != self._porterPath:
-                self._porterPath = path
-                self._pbclient.stopTrying() # Stop trying to connect with the
-                                            # old connector.
-                self._pbclient.resetDelay()
-                reactor.connectWith(
-                    fdserver.FDConnector, self._porterPath, 
-                    self._pbclient, 10, checkPID=False)
-        else:
-            raise errors.WrongStateError(
-                "Can't specify porter details in master mode")
-
-    def do_start(self, *args, **kwargs):
+    def do_setup(self):
+        self.have_properties(self.config['properties'])
         self.debug('Starting with mount point "%s"' % self.mountPoint)
         factory = file.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource)
@@ -326,34 +305,46 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         d.addCallback(setComponentHappy)
         return d
 
-    def do_check(self):
-        props = self.config['properties']
-        self.fixRenamedProperties(props, [
-            ('issuer',             'issuer-class'),
-            ('porter_socket_path', 'porter-socket-path'),
-            ('porter_username',    'porter-username'),
-            ('porter_password',    'porter-password'),
-            ('mount_point',        'mount-point')
-            ])
+    def do_stop(self):
+        if self.httpauth:
+            self.httpauth.stopKeepAlive()
+        if self._timeoutRequestsCallLater:
+            self._timeoutRequestsCallLater.cancel()
+            self._timeoutRequestsCallLater = None
+        if self._twistedPort:
+            self._twistedPort.stopListening()
 
-        if props.get('type', 'master') == 'slave':
-            for k in 'socket-path', 'username', 'password':
-                if not 'porter-' + k in props:
-                    msg = 'slave mode, missing required property porter-%s' % k
-                    return defer.fail(errors.ConfigError(msg))
+        if self.type == 'slave' and self._pbclient:
+            return self._pbclient.deregisterPath(self.mountPoint)
 
-            path = props.get('path', None) 
-            if path is None: 
-                msg = "missing required property 'path'"
-                return defer.fail(errors.ConfigError(msg)) 
-            if os.path.isfile(path):
-                self._singleFile = True
-            elif os.path.isdir(path):
-                self._singleFile = False
-            else:
-                msg = "the file or directory specified in 'path': %s does " \
-                    "not exist or is neither a file nor directory" % path
-                return defer.fail(errors.ConfigError(msg)) 
+    def updatePorterDetails(self, path, username, password):
+        """
+        Provide a new set of porter login information, for when we're in slave
+        mode and the porter changes.
+        If we're currently connected, this won't disconnect - it'll just change
+        the information so that next time we try and connect we'll use the
+        new ones
+        """
+        if self.type == 'slave':
+            self._porterUsername = username
+            self._porterPassword = password
+
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self._pbclient.startLogin(creds, self.medium)
+
+            # If we've changed paths, we must do some extra work.
+            if path != self._porterPath:
+                self._porterPath = path
+                self._pbclient.stopTrying() # Stop trying to connect with the
+                                            # old connector.
+                self._pbclient.resetDelay()
+                reactor.connectWith(
+                    fdserver.FDConnector, self._porterPath, 
+                    self._pbclient, 10, checkPID=False)
+        else:
+            raise errors.WrongStateError(
+                "Can't specify porter details in master mode")
 
     def _timeoutRequests(self):
         now = time.time()
@@ -402,6 +393,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         self._total_bytes_written += bytesWritten
         self.uiState.set("bytes-transferred", self._total_bytes_written)
+
+    def getDescription(self):
+        return self._description
 
     def getUrl(self):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)

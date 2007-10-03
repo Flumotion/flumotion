@@ -255,7 +255,7 @@ class JobMedium(medium.BaseMedium):
         self._enableCoreDumps()
         
         try:
-            comp = createComponent(moduleName, methodName)
+            comp = createComponent(moduleName, methodName, conf)
         except Exception, e:
             msg = "Exception %s during createComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
@@ -284,12 +284,6 @@ class JobMedium(medium.BaseMedium):
         self.debug('created ComponentClientFactory %r' % managerClientFactory)
         self._authenticator.avatarId = avatarId
         managerClientFactory.startLogin(self._authenticator)
-
-        try:
-            comp.setup(conf)
-        except Exception, e:
-            self.warning("setup failed: %s", log.getExceptionMessage(e))
-            self.debug("ignoring setup failure, manager will see it later")
 
         host = self._managerHost
         port = self._managerPort

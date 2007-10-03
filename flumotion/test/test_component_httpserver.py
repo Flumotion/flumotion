@@ -42,14 +42,14 @@ class MountTest(log.Loggable, unittest.TestCase):
         os.mkdir(B)
         C = os.path.join(self.path, 'B', 'C')
         open(C, "w").write('test file C')
+        self.component = None
         
-        self.component = httpfile.HTTPFileStreamer()
-
     def tearDown(self):
-        self.component.stop()
+        if self.component:
+            self.component.stop()
         os.system('rm -r %s' % self.path)
 
-    def start(self, properties):
+    def makeComponent(self, properties):
         # start the component with the given properties
         config = {
             'feed': [],
@@ -61,10 +61,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             'plugs': {},
             'properties': properties,
         }
-
-        d = self.component.setup(config)
-        d.addCallback(lambda _: self.component.start())
-        return d
+        self.component = httpfile.HTTPFileStreamer(config)
 
     def getURL(self, path):
         # path should start with /
@@ -76,7 +73,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             u'path': self.path,
             u'port': 0,
         }
-        self.start(properties)
+        self.makeComponent(properties)
 
         d = client.getPage(self.getURL('/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
@@ -93,7 +90,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             u'path': self.path,
             u'port': 0,
         }
-        self.start(properties)
+        self.makeComponent(properties)
 
         d = client.getPage(self.getURL('/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
@@ -110,7 +107,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             u'path': self.path,
             u'port': 0,
         }
-        self.start(properties)
+        self.makeComponent(properties)
 
         d = client.getPage(self.getURL('/ondemand/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
@@ -129,7 +126,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             u'path': os.path.join(self.path, 'A'),
             u'port': 0,
         }
-        self.start(properties)
+        self.makeComponent(properties)
 
         d = defer.Deferred()
         # FIXME: what if just the server URL is requested ?
@@ -149,7 +146,7 @@ class MountTest(log.Loggable, unittest.TestCase):
             u'path': os.path.join(self.path, 'A'),
             u'port': 0,
         }
-        self.start(properties)
+        self.makeComponent(properties)
 
         d = client.getPage(self.getURL('/ondemand'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))

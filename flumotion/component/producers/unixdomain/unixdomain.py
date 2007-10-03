@@ -51,17 +51,12 @@ class UnixDomainDumbFactory(ServerFactory):
         self.component = component
 
 # Component
-class UnixDomainProvider(feedcomponent.ParseLaunchComponent, log.Loggable):
+class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
 
     def init(self):
         self.factory = None
         self.socketPath = None
         self.currentTransport = None
-
-    def do_setup(self):
-        props = self.config['properties']
-        self.socketPath = props.get('path')
-        feedcomponent.ParseLaunchComponent.do_setup(self)
 
     def setUnixTransport(self, transport):
         self.debug("got transport %r [fd:%d]" % (transport, transport.fileno()))
@@ -79,14 +74,10 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent, log.Loggable):
         """ return the pipeline """
         return 'fdsrc name=fdsrc ! gdpdepay'
 
-    def do_stop(self):
-        # FIXME : do I need to implement something here ?
-        return feedcomponent.ParseLaunchComponent.do_stop(self)
-
-    def do_start(self, clocking):
+    def do_setup(self):
+        props = self.config['properties']
+        self.socketPath = props.get('path')
         self.factory = UnixDomainDumbFactory(self)
-        if clocking:
-            self.set_master_clock(*clocking)
 
         # We need to set the pipeline to READY so the multifdsink gets start'ed
         self.pipeline.set_state(gst.STATE_READY)
@@ -98,5 +89,3 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.log("Starting to listen on UNIX : %s" % self.socketPath)
         reactor.listenUNIX(self.socketPath, self.factory)
         # we will link once we have a valid FD
-
-        return defer.succeed(None)

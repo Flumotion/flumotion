@@ -235,7 +235,7 @@ class FakeWorkerMind(FakeMind):
         self._createDeferreds = []
 
     def remote_getPorts(self):
-        return range(7600,7608)
+        return (range(7600,7608), False)
 
     def remote_getFeedServerPort(self):
         return 7609

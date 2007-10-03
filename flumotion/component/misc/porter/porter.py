@@ -252,7 +252,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
         return str
 
-    def do_setup(self):
+    def have_properties(self):
         props = self.config['properties']
 
         self.fixRenamedProperties(props, 
@@ -287,22 +287,19 @@ class Porter(component.BaseComponent, log.Loggable):
             # will unlink our socket, so we don't need to explicitly delete it.
             d = self._socketlistener.stopListening()
         self._socketlistener = None
-
-        if d:
-            return defer.DeferredList([d, 
-                component.BaseComponent.do_stop(self)])
-        else:
-            return component.BaseComponent.do_stop(self)
+        return d
     
-    def do_start(self, *args, **kwargs):
+    def do_setup(self):
         # Create our combined PB-server/fd-passing channel
-
+        self.have_properties()
         realm = PorterRealm(self)
         checker = checkers.FlexibleCredentialsChecker()
         checker.addUser(self._username, self._password)
         
         p = portal.Portal(realm, [checker])
         serverfactory = pb.PBServerFactory(p)
+
+        # FIXME: shouldn't we be raising handled errors here?
 
         try:
             # Rather than a normal listenTCP() or listenUNIX(), we use 
@@ -350,8 +347,6 @@ class Porter(component.BaseComponent, log.Loggable):
             self.addMessage(m)
             self.setMood(moods.sad)
             return defer.fail(e)
-
-        return component.BaseComponent.do_start(self, *args, **kwargs)
 
 class PorterProtocolFactory(protocol.Factory):
     def __init__(self, porter, protocol):

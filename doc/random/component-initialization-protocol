@@ -35,58 +35,45 @@ BaseComponent
 Implementations
 ---------------
 
-__init__(self)
-    This method is expected to produce an initialized component.
-    It should do as little as possible, and not access any resources,
-    config, ... because it does not yet have a connection to the manager
-    to report state through.
+__init__(self, config)
+    This method is expected to produce an initialized component, ready
+    to go happy.
 
-    The implementation calls every init() method of any of the subclasses
-    in the hierarchy.
+    First, the config is set as self.config.
 
-setup(self, config)
-    Invoked by job directly on the component.
-    sets self.config
-    Must configure any plugs specified in config. This involves loading
-    their bundles, instantiating the plugs, and adding them to lists on the
-    dict stored in the self.plugs attribute.
-    Invokes do_check() vmethod, which returns a deferred.
-    When this deferred succeeds, invokes do_setup() vmethod, which
-    also returns a deferred.
-    If any of these fail, this method also raises
-    flumotion.common.errors.ComponentSetupError() and does not proceed to
-    do_setup()
+    Then the implementation calls every init() method of any of the
+    subclasses in the hierarchy.
 
-    returns the original deferred.
+    The component's mood should be set to waking, initially.
 
-start(self, *args, **kwargs)
-    Sets mood to waking.
-    Must start any plugs specified in the config, which means calling their
-    start() method.
-    Invokes do_start(), which returns a deferred.
-    Any errors encountered during start() should return a Failure so the remote
-    call fails.
-    Any errors encountered after this step should be proxied through state
-    messages.
-    Returns the deferred.
+    After that, plugs are instantiated and started, and self.plugs is
+    initalized.
+
+    Invokes all defined do_check methods on the self's class and
+    superclasses, in order from least to most specific. The do_check()
+    methods may return deferreds; they will be chained.
+
+    After the do_check() methods are invoked, the do_setup() methods
+    will be invoked in the same way.
+
+    Any errors encountered during setup should be proxied through state
+    messages, and the mood set accordingly.
 
 stop(self)
-    Sets mood to waking.
-    Invokes do_stop(), which returns a deferred.
-    After the deferred fires, must stop all plugs.
-    Returns the deferred.
+    Stops a component. Will call do_stop functions in order from most to
+    least specific, chaining their maybeDeferred returns. Returns a
+    deferred that will fire when the component has stopped.
 
 Interface
 ---------
 
 init(self)
-    Subclasses should declare instance variables, ...
-    All .init methods of every class in the hierarchy get called.
-    This method is optional for subclasses.
+    Any instance variables needed by a subclass should be declared in
+    this method. There is no need to chain up.
 
 check_properties(self, properties, addMessage)
-    A helper vmethod called by the default implementation of do_check() that
-    includes the properties in the arguments. The addMessage argument is a
+    A helper vmethod called by BaseComponent's do_check() that includes
+    the properties in the arguments. The addMessage argument is a
     function that will call self.addMessage, additionally raising an
     exception if the message is of level ERROR.
 
@@ -98,25 +85,31 @@ do_check(self)
     This method has no requirements. It is implementation-specific.
     It can be used to check various requirements, or known bugs in certain
     versions of software.
-    If this method adds any error messages to the component state, this will
-    automatically trigger a mood change to sad and raise a ComponentSetupError.
-    If there is a fatal problem that can't be expressed with a message, this
-    method should go to sad and raise ComponentSetupError itself.
-    If there is nothing, or only warnings, the method should return a result.
-    After this call, the component should be ready to set up.
 
-do_setup(self, *args, **kwargs)
+    If this method adds any error messages to the component state, this
+    will automatically trigger a mood change to sad and raise a
+    ComponentSetupError. If there is a fatal problem that can't be
+    expressed with a message, this method should go to sad and raise
+    ComponentSetupError itself.
+
+    If there is nothing, or only warnings, the method should return a
+    result. After this call, a call to setup() will succeed, in theory.
+
+    There is no need to chain up in a do_check() implementation.
+
+do_setup(self)
     This method has no requirements. It is implementation-specific.
     After this call, the component should have created all resources and
-    be ready to start.
+    started all processes. Implementations should make sure that a
+    succesful do_setup() eventually sets the mood to happy.
 
-do_start(self, *args, **kwargs)
-    Implementations should make sure that a succesful start sets the mood to
-    happy.
+    There is no need to chain up in a do_setup() implementation.
 
 do_stop(self)
     Implementations should make sure that a succesful stop sets the mood to
     sleeping.
+
+    There is no need to chain up in a do_stop() implementation.
 
 
 Feed components
@@ -130,25 +123,26 @@ Implementations
 ---------------
 
 do_setup(self)
-    This method will instantiate a pipeline first, and set up the eaters' and
-    feeders' hostnames and ports then allow the object a chance to do any further
-    initialization after the pipeline is created.
-    It does this by calling the following two methods:
+    This method will instantiate a pipeline and then allow the object a
+    chance to do any further initialization after the pipeline is
+    created. It does this by calling the following two methods:
 
       FeedComponent.create_pipeline(self)
       FeedComponent.set_pipeline(self, pipeline)
 
 provide_master_clock(self, port)
-    If a component is selected as a master clock, this method will be called
-    after setup (and before start), and will create a gst.NetTimeProvider() on 
-    the given port to provide the flumotion flow master clock.
+    Export the component's clock on the given UDP port, which may be
+    zero to allow random port selection. Returns the ip, port, base_time
+    clocking information. May be called at any time.
 
 set_master_clock(self, ip, port, base_time)
-    For components that require a clock, but either do cannot provide a clock, or
-    are not selected as the master clock, this method will be called to tell the
-    component about the clock to slave to; a gst.NetClientClock will be created
-    to slave to this master.
-    This will be called between setup and start for the component.
+    For components that require a clock, but are not selected as the
+    master clock, this method will be called to tell the component about
+    the clock to slave to; a gst.NetClientClock will be created to
+    slave to this master. This call may be made at any time. If the
+    component needs a clock, it will not produce data until
+    set_master_clock is called once. Calling it again with different
+    master clock info will restart the pipeline.
 
 Interface
 ---------

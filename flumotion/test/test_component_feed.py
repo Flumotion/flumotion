@@ -99,8 +99,7 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
         self._fdCount = countOpenFileDescriptors()
 
         self.brain = FakeWorkerBrain()
-        self._bouncer = bouncer = htpasswdcrypt.HTPasswdCrypt()
-        bouncer.setup(self.bouncerconf)
+        self._bouncer = bouncer = htpasswdcrypt.HTPasswdCrypt(self.bouncerconf)
         self.feedServer = FeedServer(self.brain, bouncer, 0)
         self.assertAdditionalFDsOpen(1, 'setUp (socket)')
 

@@ -159,7 +159,7 @@ class ComponentWrapper(object, log.Loggable):
     get_unique_name = classmethod(get_unique_name)
 
     def instantiate(self):
-        self.comp = self.comp_class()
+        self.comp = self.comp_class(self.cfg)
         self.debug('instantiate:: %r' % self.comp.state)
         def append(instance, key, value):
             self.debug('append %r: %r' % (value.level, value))
@@ -170,10 +170,19 @@ class ComponentWrapper(object, log.Loggable):
             flavors.StateCacheable.append(instance, key, value)
         self.comp.state.append = new.instancemethod(append, self.comp.state)
 
-    def setup(self):
-        if self.comp is None:
-            self.instantiate()
-        return self.comp.setup(self.cfg)
+    def wait_for_mood(self, mood):
+        if self.comp.state.get('mood') == mood.value:
+            return defer.succeed(mood)
+
+        prev = self.comp.state.set
+        d = defer.Deferred()
+        def set(key, value):
+            self.debug('set %r: %r', key, value)
+            prev(key, value)
+            if key == 'mood' and value == mood.value:
+                d.callback(mood)
+        self.comp.state.set = set
+        return d
 
     def feed(self, sink_comp, links=None):
         if links is None:
@@ -205,16 +214,14 @@ class ComponentWrapper(object, log.Loggable):
         self.debug('eatFromFD(feedId=%s, %d)' % (feedId, fd))
         return self.comp.eatFromFD(feedId, fd)
 
-    def start(self, *args, **kwargs):
-        self.debug('start(*%r, **%r)' % (args, kwargs))
-        d = self.comp.start(*args, **kwargs)
-        d.addCallback(lambda _: (self.debug('after start: %r' % _), _)[1])
-        return d
+    def set_master_clock(self, ip, port, base_time):
+        self.debug('eatFromFD(%s, %d, %d)', ip, port, base_time)
+        return self.comp.set_master_clock(ip, port, base_time)
 
-    def stop(self, *args, **kwargs):
-        self.debug('stop(*%r, **%r)' % (args, kwargs))
+    def stop(self):
+        self.debug('stop()')
         if self.comp:
-            return self.comp.stop(*args, **kwargs)
+            return self.comp.stop()
         return defer.succeed(None)
 
 
@@ -320,11 +327,9 @@ class ComponentTestHelper(object, log.Loggable):
                 r_fd, feed_starter = self._fds[src]
                 c.eatFromFD(src, r_fd)
                 feed_starter()
-            comp_clocking = clocking
-            if not c.sync:
-                comp_clocking = None
-            self.debug('*_ 4: do_start_cb: %r, %r' % (comp_clocking, c))
-            d = c.start(comp_clocking)
+            if clocking and c.sync:
+                ip, port, base_time = clocking
+                c.set_master_clock(ip, port, base_time)
 
             # if component starts ok, repeat/pass clocking info to a
             # subsequent component
@@ -344,7 +349,7 @@ class ComponentTestHelper(object, log.Loggable):
         self.debug('About to start the flow...')
         # P(ossible)TODO: make it report setup failures in all the
         # components, not only in the first to fail...?
-        d = defer.DeferredList([c.setup() for c in self._comps],
+        d = defer.DeferredList([c.instantiate() for c in self._comps],
                                fireOnOneErrback=1, consumeErrors=1)
         d.addCallbacks(all_ready_p, setup_failed)
         d.addCallback(start_master_clock)

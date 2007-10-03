@@ -30,7 +30,6 @@ from flumotion.component.consumers.httpstreamer import http
 
 class TestOldProperties(unittest.TestCase):
     def setUp(self):
-        self.component = http.MultifdSinkStreamer()
         # config and properties copied from an actual log file, which
         # explains the unicode keys
         properties = {
@@ -55,8 +54,7 @@ class TestOldProperties(unittest.TestCase):
             'type': 'http-streamer',
             'properties': properties
         }
-
-        return self.component.setup(config)
+        self.component = http.MultifdSinkStreamer(config)
 
     def tearDown(self):
         return self.component.stop()

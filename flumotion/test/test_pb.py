@@ -139,8 +139,7 @@ class Test_BouncerWrapper(unittest.TestCase):
     def setUp(self):
         broker = FakeBroker()
 
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt()
-        self.bouncer.setup(htpasswdcryptConf)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(htpasswdcryptConf)
         self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), self.bouncer)
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, broker)
 
@@ -309,8 +308,7 @@ class Test_FPBClientFactory(unittest.TestCase):
 
     def setUp(self):
         self.realm = FakeFRealm()
-        self.bouncer = self.bouncerClass()
-        self.bouncer.setup(self.bouncerConf)
+        self.bouncer = self.bouncerClass(self.bouncerConf)
         self.portal = fportal.BouncerPortal(self.realm, self.bouncer)
         self.serverFactory = tpb.PBServerFactory(self.portal,
             unsafeTracebacks=0)

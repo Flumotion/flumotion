@@ -103,12 +103,14 @@ def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
 
     return ret
 
-def createComponent(moduleName, methodName):
+def createComponent(moduleName, methodName, config):
     """
     @param moduleName: name of the module to create the component from
     @type  moduleName: string
     @param methodName: the factory method to use to create the component
     @type  methodName: string
+    @param config: the component's config dict
+    @type  config: dict
 
     Invokes the entry point for a component in the given module using the
     given factory method, thus creating the component.
@@ -116,4 +118,4 @@ def createComponent(moduleName, methodName):
     @rtype: L{flumotion.component.component.BaseComponent}
     """
     return reflectCallCatching(errors.ComponentCreateError,
-                               moduleName, methodName)
+                               moduleName, methodName, config)

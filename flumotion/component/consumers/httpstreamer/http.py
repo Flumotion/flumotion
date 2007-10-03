@@ -654,11 +654,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._tport.stopListening()
 
         if self.type == 'slave' and self._pbclient:
-            d1 = self._pbclient.deregisterPath(self.mountPoint)
-            d2 = feedcomponent.ParseLaunchComponent.do_stop(self)
-            return defer.DeferredList([d1,d2])
-        else:
-            return feedcomponent.ParseLaunchComponent.do_stop(self)
+            return self._pbclient.deregisterPath(self.mountPoint)
 
     def updatePorterDetails(self, path, username, password):
         """
@@ -701,8 +697,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         d.addCallback(lambda res: feedcomponent.ParseLaunchComponent.do_pipeline_playing(self))
         return d
 
-    def start_pipeline(self):
-        feedcomponent.ParseLaunchComponent.start_pipeline(self)
+    def do_setup(self):
         root = resources.HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]

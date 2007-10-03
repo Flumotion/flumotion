@@ -495,7 +495,7 @@ class FeedComponent(basecomponent.BaseComponent):
                          or None not to slave the clock
         @type  clocking: tuple(str, int, long) or None.
         """
-        self.debug('FeedComponent.start')
+        self.debug('FeedComponent.start_pipeline')
 
         for eater in self.eaters.values():
             self.install_eater_event_probes(eater)
@@ -509,6 +509,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
+        # no race here, change notifications are marshalled through the
+        # bus
         d = self._change_monitor.add(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
         d.addCallback(lambda x: self.do_pipeline_playing())
         return d

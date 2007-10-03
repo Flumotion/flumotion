@@ -754,7 +754,13 @@ def _uniq(l, key=lambda x: x):
             out.append(x)
     return out
 
-def _call_each_method(obj, method, mro, args, kwargs):
+def get_all_methods(obj, method, subclass_first):
+    mro = type(obj).__mro__
+    if not subclass_first:
+        # do a list() so as to copy the mro, we reverse the list in
+        # place so as to start with the base class
+        mro = list(mro)
+        mro.reverse()
     procs = []
     for c in mro:
         if hasattr(c, method):
@@ -766,10 +772,7 @@ def _call_each_method(obj, method, mro, args, kwargs):
     # In a hierarchy A -> B, if A implements the method, B will inherit
     # it as well. Compare the functions implementing the methods so as
     # to avoid calling them twice.
-    procs = _uniq(procs, lambda proc: proc.im_func)
-
-    for proc in procs:
-        proc(obj, *args, **kwargs)
+    return _uniq(procs, lambda proc: proc.im_func)
 
 def call_each_method(obj, method, *args, **kwargs):
     """
@@ -779,8 +782,8 @@ def call_each_method(obj, method, *args, **kwargs):
     the class' superclasses. Calls the methods in method resolution
     order, which goes from subclasses to superclasses.
     """
-    mro = type(obj).__mro__
-    _call_each_method(obj, method, mro, args, kwargs)
+    for proc in get_all_methods(obj, method, True):
+        proc(obj, *args, **kwargs)
 
 def call_each_method_reversed(obj, method, *args, **kwargs):
     """
@@ -789,11 +792,8 @@ def call_each_method_reversed(obj, method, *args, **kwargs):
     Like call_each_method, but calls the methods in reverse method
     resolution order, from superclasses to subclasses.
     """
-    # do a list() so as to copy the mro, we reverse the list in
-    # place so as to start with the base class
-    mro = list(type(obj).__mro__)
-    mro.reverse()
-    _call_each_method(obj, method, mro, args, kwargs)
+    for proc in get_all_methods(obj, method, False):
+        proc(obj, *args, **kwargs)
     
 class InitMixin(object):
     """

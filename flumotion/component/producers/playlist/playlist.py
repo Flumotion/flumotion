@@ -427,10 +427,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                     "Failed to parse a playlist from file %s: %s" % 
                         (file, e))), id=msgid))
 
-    def do_start(self, clocking):
-        self.debug('do_start')
-        self.link()
-
+    def do_setup(self):
         playlist = playlistparser.Playlist(self)
         self.playlistparser = playlistparser.PlaylistXMLParser(playlist)
         if self._baseDirectory:
@@ -446,8 +443,3 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self._watchDirectory(self._playlistdirectory)
 
         reactor.callLater(10, self.timeReport)
-
-        return defer.succeed(None)
-        
-    def do_stop(self):
-        return feedcomponent.FeedComponent.do_stop(self)

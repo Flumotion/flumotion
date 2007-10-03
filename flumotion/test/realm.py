@@ -59,10 +59,9 @@ class TestRealm(log.Loggable):
         pass
 
     def getFactory(self):
-        self._bouncer = bouncer = htpasswdcrypt.HTPasswdCrypt()
-        bouncer.setup(self.bouncerconf)
+        self._bouncer = htpasswdcrypt.HTPasswdCrypt(self.bouncerconf)
 
-        portal = fportal.BouncerPortal(self, bouncer)
+        portal = fportal.BouncerPortal(self, self._bouncer)
         return pb.PBServerFactory(portal, unsafeTracebacks=1)
 
     def listen(self):

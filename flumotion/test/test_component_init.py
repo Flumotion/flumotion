@@ -24,9 +24,9 @@ from twisted.trial import unittest
 import common
 
 
-# test __init__ of every component in the registry
+# test importing modules for every component in the registry
 
-from flumotion.common import registry, log
+from flumotion.common import registry, log, reflectcall
 from flumotion.job import job
 
 class TestInit(unittest.TestCase):
@@ -48,10 +48,13 @@ class TestInit(unittest.TestCase):
                         type)
             moduleName = defs.getSource()
             methodName = entry.getFunction()
-            component = job.createComponent(moduleName, methodName)
-            self.failUnless(component)
-
-            component.stop()
+            # call __init__ without the config arg; this will load
+            # modules, get the entry point, then fail with too-few
+            # arguments. would be nice to __init__ with the right
+            # config, but that is component-specific...
+            self.assertRaises(TypeError,
+                              reflectcall.reflectCall,
+                              moduleName, methodName)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,102 @@
+2007-10-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._loadManagerBouncer): Fix
+	to conform to init protocol; still seems hacky.
+
+	* flumotion/job/job.py (JobMedium._createComponent): Pass the
+	config to createComponent(). No need to setup() any more.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer):
+	* flumotion/component/producers/unixdomain/unixdomain.py
+	(UnixDomainProvider): 
+	* flumotion/component/producers/playlist/playlist.py
+	(PlaylistProducer):
+	* flumotion/component/producers/looper/looper.py (Looper): Conform
+	to initialization protocol.
+
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer): Conform to initialization protocol. Reorder
+	some functions.
+
+	* flumotion/component/converters/overlay/overlay.py (Overlay.do_stop): 
+
+	* flumotion/component/component.py (maybe_deferred_chain): New
+	helper, chains a set of methods.
+	(BaseComponent.__init__): Take the component config as an arg. Set
+	self.config directly, and run setup() after running init().
+	(BaseComponent.init): We can set self.name directly.
+	(BaseComponent.do_check): Refactor this base implementation a bit.
+	(BaseComponent.do_setup): Do work here that had been done in
+	setup(). Fix bugs in the presence of plugs. Chain calls to
+	do_check().
+	(BaseComponent.setup): No longer take the config, __init__ set it
+	already. Push lots of details into the base do_setup(). Go happy
+	after the do_setup() chain succeeds, and ensure that messages are
+	posted (and the mood changed) on failure.
+	(BaseComponent.start): Removed, no longer used.
+	(BaseComponent.stop): Chain calls to do_stop(). Push some details
+	into the base do_stop().
+	(BaseComponent.setMood, BaseComponent.waitForHappy): Add
+	infrastructure for getting a deferred that will be fired on ->
+	happy; seems a bit hackish. Mostly used by tests and in-process
+	manager bouncers. (In-process manager bouncers should probably be
+	plugs instead.)
+
+	* flumotion/component/bouncers/component.py (Bouncer.do_setup):
+	Rename from do_start.
+	(Bouncer.setMedium): Proxy the setMedium to the plug.
+
+	* flumotion/common/common.py (get_all_methods): New public method,
+	the guts of call_each_method.
+
+	* flumotion/common/reflectcall.py (createComponent): Take new
+	argument, the component config.
+
+	* flumotion/test/test_component_bouncers_bouncer.py
+	(TrivialBouncerTest.setUp): 
+	* flumotion/test/test_htpasswdcrypt.py
+	(TestHTPasswdCryptUACPP.setUp, TestHTPasswdCryptUACPCC.setUp): 
+	* flumotion/test/test_component.py (PipelineTest.__init__)
+	(TestExpandElementNames.setUp, TestParser.parse)
+	(TestParser.testErrors): 
+	* flumotion/test/test_saltsha256.py (TestWrongKeycardClass.setUp)
+	(TestSaltSha256USCPCC.setUp): 
+	* flumotion/test/test_component_feed.py (FeedTestCase.setUp): 
+	* flumotion/test/test_pb.py (Test_BouncerWrapper.setUp)
+	(Test_FPBClientFactory.setUp): 
+	* flumotion/test/realm.py (TestRealm.getFactory): 
+	* flumotion/test/test_component_httpserver.py
+	(MountTest.makeComponent): 
+	* flumotion/test/test_component_bouncers_component.py
+	(TrivialBouncerTest.setUp): 
+	* flumotion/test/test_component_httpstreamer.py
+	(TestOldProperties.setUp): Update component __init__.
+
+	* flumotion/test/test_component_init.py (TestInit.testInit): We
+	can't successfully __init__ generically any more, now that
+	__init__ takes the config. Load the modules anyway though.
+
+	* flumotion/test/comptest.py (ComponentWrapper): 
+	* flumotion/test/test_comptest.py
+	(TestComponentWrapper.test_instantiate_errors)
+	(TestComponentWrapper.test_gstreamer_error)
+	(TestCompTestSetup.test_success): Update for component init
+	protocol changes.
+
+	* flumotion/test/test_manager_manager.py
+	(FakeWorkerMind.remote_getPorts): 
+	* flumotion/test/test_manager_worker.py
+	(FakeWorkerMind.remote_getPorts): Fix to work with the random port
+	change of last week.
+
 2007-10-02  Andy Wingo  <wingo@pobox.com>
+
+	* doc/random/component-initialization-protocol: Updates. setup()
+	is now called directly from __init__, which takes the config dict
+	directly. do_check, do_setup, and do_stop methods are
+	automatically chained, and do not need to chain up. Start has been
+	removed, reflecting the code.
 
 	* doc/random/component-initialization-protocol: Convert to be
 	restructured text. No changes.
