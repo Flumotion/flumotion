@@ -1,5 +1,9 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/soundcard/soundcard.py
+	(Soundcard.getVolume): Avoid dividing by 0 if GStreamer reports 0
+	channels. Strange, but fixes #715.
+
 	* configure.ac:
 	  bump the minor version, this is the crazy development
 	  branch

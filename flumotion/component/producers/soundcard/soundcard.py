@@ -128,9 +128,9 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
                 if track.get_property("label") == self.inputTrackLabel:
                     volumeVals = element.get_volume(track)
                     vol = 0
+                    nchannels = track.get_property("num-channels")
                     for k in range(0, track.get_property("num-channels")):
-                        vol = vol + volumeVals[k]
-                    vol = vol / track.get_property("num-channels")
+                        vol = vol + (volumeVals[k] / nchannels)
                     self.debug("vol: %f max vol: %d", vol, track.get_property("max-volume"))
                     v = vol / float(track.get_property("max-volume"))
                     self.debug("v: %f", v)
