@@ -1,5 +1,11 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* configure.ac:
+	  bump the minor version, this is the crazy development
+	  branch
+
+2007-10-03  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/manager/component.py (ComponentAvatar.__init__)
 	(ComponentAvatar.makeComponentState): Set self.componentState
 	before calling self.addMessage.
