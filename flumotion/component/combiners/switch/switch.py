@@ -342,7 +342,7 @@ class AVSwitch(Switch):
                 tmpl = '@ eater:%%(eaterName)s @ ! %s aswitch. ' % audioForceCapsTemplate
             pipeline += tmpl % dict(eaterName=eater)
 
-        pipeline += 'viden. ! @feeder::video@ aiden. ! @feeder::audio@'
+        pipeline += 'viden. ! @feeder:video@ aiden. ! @feeder:audio@'
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):

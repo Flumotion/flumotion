@@ -71,7 +71,7 @@ class ComponentAvatar(base.ManagerAvatar):
                                     remoteIdentity, mind)
         
         self.jobState = jobState
-        self.componentState = self.makeComponentState(conf)
+        self.makeComponentState(conf)
         self.clocking = clocking
 
         self._ports = {}
@@ -98,6 +98,7 @@ class ComponentAvatar(base.ManagerAvatar):
         def verifyExistingComponentState(conf, state):
             # condition (1)
             state.setJobState(self.jobState)
+            self.componentState = state
 
             self._upgradeConfig(state, conf)
             if state.get('config') != conf:
@@ -121,6 +122,7 @@ class ComponentAvatar(base.ManagerAvatar):
             # condition (2)
             state = planet.ManagerComponentState()
             state.setJobState(self.jobState)
+            self.componentState = state
 
             self._upgradeConfig(state, conf)
 

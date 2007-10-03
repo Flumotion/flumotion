@@ -106,12 +106,12 @@ class Looper(feedcomponent.ParseLaunchComponent):
             '       ! videorate name=videorate'
             '       ! videoscale'
             '       ! %(vcaps)s'
-            '       ! identity name=vident sync=true silent=true ! @feeder::video@'
+            '       ! identity name=vident sync=true silent=true ! @feeder:video@'
             '    demux. ! queue ! vorbisdec name=vorbisdec'
             '       ! identity name=audiolive single-segment=true silent=true'
             '       ! audioconvert'
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-            '       ! identity name=aident sync=true silent=true ! @feeder::audio@'
+            '       ! identity name=aident sync=true silent=true ! @feeder:audio@'
             % dict(location=self.filelocation, vcaps=vcaps))
 
         return template

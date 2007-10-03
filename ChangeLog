@@ -1,5 +1,16 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.__init__)
+	(ComponentAvatar.makeComponentState): Set self.componentState
+	before calling self.addMessage.
+
+	* flumotion/component/producers/rtsp/rtsp.py
+	(Rtsp.get_pipeline_string): 
+	* flumotion/component/producers/ivtv/ivtv.py
+	(Ivtv.get_pipeline_string): 
+	* flumotion/component/producers/looper/looper.py
+	(Looper.get_pipeline_string): Fix naming of feeders.
+
 	* flumotion/manager/component.py
 	(ComponentAvatar.makeAvatarInitArgs): Revert to previous
 	implementation.

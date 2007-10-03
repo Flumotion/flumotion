@@ -34,6 +34,6 @@ class Ivtv(feedcomponent.ParseLaunchComponent):
             scaling_template = ""
         return ("filesrc name=src location=%s ! decodebin name=d ! queue !  "
                 " %s ! %s ! ffmpegcolorspace ! video/x-raw-yuv "
-                " ! @feeder::video@ d. ! queue ! audioconvert ! audio/x-raw-int "
-                " ! @feeder::audio@"
+                " ! @feeder:video@ d. ! queue ! audioconvert ! audio/x-raw-int "
+                " ! @feeder:audio@"
                 % (device, deinterlacer, scaling_template))
