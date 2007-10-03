@@ -1,6 +1,17 @@
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py
+	(ComponentAvatar.makeAvatarInitArgs): Revert to previous
+	implementation.
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_getMasterClockInfo): Implement for all
+	components, as it seems that all components have clock-master in
+	the config.
+
+	* flumotion/common/config.py: Update comment.
+
+	* flumotion/manager/component.py
 	(ComponentAvatar.makeAvatarInitArgs): Only callRemote to
 	getMasterClockInfo if the component has 'clock-master' in its
 	config. Slightly hacky, but at least it doesn't assume that all

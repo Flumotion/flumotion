@@ -34,7 +34,7 @@ from flumotion.configure import configure
 
 from errors import ConfigError
 
-# Update manager.py's _upgradeComponentConfig if you increment this
+# Update component.py's _upgradeComponentConfig if you increment this
 CURRENT_VERSION = 1
 
 def _ignore(*args):

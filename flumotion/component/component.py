@@ -268,6 +268,13 @@ class BaseComponentMedium(medium.PingingMedium):
         self.warning(msg)
         raise errors.MoMethodError(msg)
 
+    def remote_getMasterClockInfo(self):
+        """
+        Base implementation of getMasterClockInfo, can be overridden by
+        subclasses. By default, just returns None.
+        """
+        return None
+
 class BaseComponent(common.InitMixin, log.Loggable):
     """
     I am the base class for all Flumotion components.
