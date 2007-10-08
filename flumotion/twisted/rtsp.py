@@ -304,13 +304,25 @@ class RTSPRequest(http.Request, flog.Loggable):
         self.log('%r.render(%r)' % (resrc, self))
         result = resrc.render(self)
         self.log('%r.render(%r) returned result %r' % (resrc, self, result))
-        # web uses NOT_DONE_YET as a return value of render, maybe we should
-        # do that instead of doing deferreds
         if isinstance(result, defer.Deferred):
             result.addCallback(self._renderCallback, resrc)
+            result.addErrback(self._renderErrback, resrc)
         else:
             self._renderCallback(result, resrc)
         
+    # TODO: Refactor this and renderCallback to be cleaner and share code.
+    def _renderErrback(self, failure, resrc):
+        body = self._error(INTERNAL_SERVER_ERROR,
+            "Request failed: %r" % failure)
+        self.setHeader('Content-Length', str(len(body)))
+        lines = []
+        for key, value in self.headers.items():
+            lines.append("%s: %s" % (key, value))
+
+        self.channel.site.logReply(self.code, self.code_message, lines, body)
+ 
+        self.write(body)
+        self.finish()
         
     def _renderCallback(self, result, resrc):
         body = result

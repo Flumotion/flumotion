@@ -1,3 +1,9 @@
+2007-10-08  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/twisted/rtsp.py:
+	  If our render() deferred errbacks, then respond with an internal
+	  server error rather than silently not responding.
+
 2007-10-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/soundcard/soundcard.py
