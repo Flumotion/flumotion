@@ -1,3 +1,19 @@
+2007-10-16  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  Make implementation match comments (the comments were correct) when
+	  finding the next scheduled item.
+	  Fixes problems when adding an item before, but partially overlapping
+	  with, the first item in the schedule.
+	  
+	* flumotion/test/test_component_playlist.py:
+	  Add a new test that is fixed by this commit.
+
+2007-10-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Fix plug instantiation.
+
 2007-10-08  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/twisted/rtsp.py:

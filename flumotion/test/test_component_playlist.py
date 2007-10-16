@@ -67,10 +67,14 @@ class TestPlaylist(unittest.TestCase):
     def checkItems(self, expectedlen):
         l = 0
         cur = self.playlist.items
+        all = []
+
         if cur:
             self.assertEquals(cur.prev, None)
 
         while cur:
+            all.append(cur)
+            self.assertTrue(cur in self.playlist._itemsById[cur.id])
             l += 1
             # Check consistency of links
             if cur.next:
@@ -78,6 +82,14 @@ class TestPlaylist(unittest.TestCase):
             cur = cur.next
 
         self.assertEquals(l, expectedlen)
+
+        itemsbyidtotal = 0
+
+        for id in self.playlist._itemsById:
+            for item in self.playlist._itemsById[id]:
+                self.assertTrue(item in all)
+                itemsbyidtotal += 1
+        self.assertEquals(itemsbyidtotal, expectedlen)
 
     def testAddSingleItem(self):
         self.playlist.addItem(None, 0, "file:///testuri", 0, 100, True, True)
@@ -124,6 +136,17 @@ class TestPlaylist(unittest.TestCase):
         self.assert_(second not in self.playlist._itemsById['id1'])
         self.checkItems(2)
         self.assertEquals(first.duration, 25)
+
+    def testAddRemoveRepeatedly(self):
+        self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
+        self.checkItems(1)
+        self.playlist.addItem('id2', 100, "file:///testuri", 0, 100, True, True)
+        self.checkItems(2)
+
+        self.playlist.removeItems('id1')
+        self.checkItems(1)
+        self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
+        self.checkItems(2)
 
 class TestPlaylistXMLParser(unittest.TestCase):
     def setUp(self):

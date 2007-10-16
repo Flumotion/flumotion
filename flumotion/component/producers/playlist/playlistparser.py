@@ -130,10 +130,12 @@ class Playlist(object, log.Loggable):
                 break
             item = item.next
 
-        if item:
-            item = item.next
+        if prev:
+            item = prev.next
         while item:
-            if (item.timestamp + item.duration > newitem.timestamp):
+            if (item.timestamp > newitem.timestamp and
+                    item.timestamp + item.duration > 
+                    newitem.timestamp + newitem.duration):
                 next = item
                 break
             item = item.next
