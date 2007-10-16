@@ -31,6 +31,7 @@ from StringIO import StringIO
 
 from xml.dom import minidom, Node
 from xml.parsers import expat
+from xml.sax import saxutils
 
 from flumotion.common import common, log, package, bundle, errors, fxml
 from flumotion.configure import configure
@@ -959,6 +960,8 @@ class RegistryWriter(log.Loggable):
         
         def w(i, msg):
             print >> fd, ' '*i + msg
+        def e(attr):
+            return saxutils.quoteattr(attr)
 
         def _dump_proplist(i, proplist, ioff=2):
             for prop in proplist:
@@ -967,15 +970,15 @@ class RegistryWriter(log.Loggable):
                 else:
                     w(i, ('<property name="%s" type="%s"'
                           % (prop.getName(), prop.getType())))
-                    w(i, ('          description="%s"'
-                          % (prop.getDescription(),)))
+                    w(i, ('          description=%s'
+                          % (e(prop.getDescription()),)))
                     w(i, ('          required="%s" multiple="%s"/>'
                           % (prop.isRequired(), prop.isMultiple())))
 
         def _dump_compound(i, cprop, ioff=2):
             w(i, ('<compound-property name="%s"' % (cprop.getName(),)))
-            w(i, ('                   description="%s"'
-                  % (cprop.getDescription(),)))
+            w(i, ('                   description=%s'
+                  % (e(cprop.getDescription()),)))
             w(i, ('                   required="%s" multiple="%s">'
                   % (cprop.isRequired(), cprop.isMultiple())))
             _dump_proplist(i + ioff, cprop.getProperties())
@@ -990,7 +993,8 @@ class RegistryWriter(log.Loggable):
         for component in self.components:
             w(4, '<component type="%s" base="%s"' % (
                 component.getType(), component.getBase()))
-            w(4, '           description="%s">' % component.getDescription())
+            w(4, '           description=%s>' 
+                % (e(component.getDescription()),))
 
             w(6, '<source location="%s"/>' % component.getSource())
             for x in component.getEaters():

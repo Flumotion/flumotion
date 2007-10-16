@@ -1,5 +1,16 @@
 2007-10-16  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/common/registry.py:
+	  Description attributes can (and sometimes do, in practice) contain
+	  characters that need escaping. So, escape them.
+	  Fixes cases where some (private) components would cause us to never
+	  be able to parse the registry cache.
+	* flumotion/test/test_registry.py:
+	  Add a test for the above; refactor the dumping tests a little to
+	  reduce code duplication.
+
+2007-10-16  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  Make implementation match comments (the comments were correct) when
 	  finding the next scheduled item.

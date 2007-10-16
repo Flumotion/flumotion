@@ -243,6 +243,24 @@ class TestRegistry(unittest.TestCase):
         self.assertRaises(fxml.ParserError, reg.addFromString, xml)
         xml = """<registry><components><foo></foo></components></registry>"""
         self.assertRaises(fxml.ParserError, reg.addFromString, xml)
+
+    def _compareRegistryAfterDump(self, orig, expected):
+        reg = registry.ComponentRegistry()
+        reg.clean()
+        reg.addFromString(orig)
+        import sys, StringIO
+        s = StringIO.StringIO()
+        reg.dump(s)
+        s.seek(0, 0)
+        data = s.read()
+
+        datalines = data.splitlines()
+        targetlines = expected.splitlines()
+        self.assertEquals(len(targetlines), len(datalines))
+        for i, (d, t) in enumerate(zip(datalines, targetlines)):
+            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
+                i + 1, d, t))
+
         
     # addFromString does not parse <directory> toplevel entries since they
     # should not be in partial registry files
@@ -281,14 +299,7 @@ class TestRegistry(unittest.TestCase):
     </bundle>
   </bundles>
 </registry>"""
-        reg = registry.ComponentRegistry()
-        reg.clean()
-        reg.addFromString(xml)
-        import sys, StringIO
-        s = StringIO.StringIO()
-        reg.dump(s)
-        s.seek(0, 0)
-        data = s.read()
+
         target = """<registry>
 
   <components>
@@ -337,17 +348,53 @@ class TestRegistry(unittest.TestCase):
   </bundles>
 </registry>
 """
-        datalines = data.split("\n")
-        targetlines = target.split("\n")
-        datalines.reverse()
-        targetlines.reverse()
-        i = 0
-        while targetlines:
-            i = i + 1
-            d = datalines.pop()
-            t = targetlines.pop()
-            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
-                i, d, t))
+        self._compareRegistryAfterDump(xml, target)
+
+    def testDumpWithEscapedPropertyDescription(self):
+        xml = """
+<registry>
+  <components>
+    <component type="bar" base="base/dir"
+               description="A bar component.">
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
+      <properties>
+        <property name="c" type="int" description="c property %lt;needs escaping&gt;"/>
+      </properties>
+    </component>
+  </components>
+</registry>"""
+
+        target = """<registry>
+
+  <components>
+
+    <component type="bar" base="base/dir"
+               description="A bar component.">
+      <source location="None"/>
+      <synchronization required="no" clock-priority="100"/>
+      <properties>
+        <property name="c" type="int"
+                  description="c property %lt;needs escaping&gt;"
+                  required="False" multiple="False"/>
+      </properties>
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
+    </component>
+
+  </components>
+
+  <plugs>
+
+  </plugs>
+
+  <bundles>
+  </bundles>
+</registry>
+"""
+        self._compareRegistryAfterDump(xml, target)
 
     def testDumpWithCompoundProperties(self):
         xml = """
@@ -393,14 +440,7 @@ class TestRegistry(unittest.TestCase):
     </bundle>
   </bundles>
 </registry>"""
-        reg = registry.ComponentRegistry()
-        reg.clean()
-        reg.addFromString(xml)
-        import sys, StringIO
-        s = StringIO.StringIO()
-        reg.dump(s)
-        s.seek(0, 0)
-        data = s.read()
+
         target = """<registry>
 
   <components>
@@ -466,12 +506,7 @@ class TestRegistry(unittest.TestCase):
   </bundles>
 </registry>
 """
-        datalines = data.splitlines()
-        targetlines = target.splitlines()
-        self.assertEquals(len(targetlines), len(datalines))
-        for i, (d, t) in enumerate(zip(datalines, targetlines)):
-            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
-                i + 1, d, t))
+        self._compareRegistryAfterDump(xml, target)
 
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
