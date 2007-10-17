@@ -1,3 +1,9 @@
+2007-10-17  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_component_playlist.py:
+	  Add a better test for the bug in the playlist fixed yesterday; the
+	  test that caught it mostly did so by accident.
+
 2007-10-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/registry.py:
