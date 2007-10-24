@@ -23,7 +23,8 @@
 from twisted.trial import unittest
 
 from twisted.internet import defer, reactor
-from flumotion.twisted.defer import defer_generator
+from flumotion.twisted.defer import defer_generator, RetryingDeferred
+from flumotion.common import errors
 
 class TestDefer(unittest.TestCase):
     result = None
@@ -194,3 +195,29 @@ class TestDefer(unittest.TestCase):
                    "Unexpected exception chain: %r" % (self.result,)
         d.addCallback(checkResult)
         return d
+
+class TestRetryingDeferred(unittest.TestCase):
+    def testSimple(self):
+        def genDef():
+            return defer.succeed(True)
+
+        rd = RetryingDeferred(genDef)
+        d = rd.start()
+
+        return d
+
+    def testRetryOnce(self):
+        self.__first = True
+        def genDef():
+            if self.__first:
+                self.__first = False
+                return defer.fail(errors.FlumotionError()) 
+            else:
+                return defer.succeed(None)
+    
+        rd = RetryingDeferred(genDef)
+        rd.initialDelay = 0.1 # Set it short so the test isn't long-running.
+        d = rd.start()
+
+        return d
+

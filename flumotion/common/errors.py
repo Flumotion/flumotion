@@ -25,6 +25,9 @@ serializable Flumotion exceptions
 
 from twisted.spread import pb
 
+class CancelledError(Exception):
+    "An operation was cancelled"
+
 class OptionError(Exception):
     "Error in options"
 class ConfigError(Exception):

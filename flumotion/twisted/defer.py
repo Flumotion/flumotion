@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import random
+
 from twisted.internet import defer, reactor
 from twisted.python import reflect
 
@@ -175,3 +177,84 @@ class Resolution:
             self.fired = True
             self.cleanup()
             self.d.errback(exception)
+
+class RetryingDeferred(object):
+    """
+    Provides a mechanism to attempt to run some deferred operation until it 
+    succeeds. On failure, the operation is tried again later, exponentially 
+    backing off.
+    """
+    maxDelay = 1800 # Default to 30 minutes
+    initialDelay = 5.0 
+    # Arbitrarily take these constants from twisted's ReconnectingClientFactory
+    factor = 2.7182818284590451
+    jitter = 0.11962656492
+    delay = None
+
+    def __init__(self, deferredCreate, *args, **kwargs):
+        """
+        Create a new RetryingDeferred. Will call 
+        deferredCreate(*args, **kwargs) each time a new deferred is needed.
+        """
+        self._create = deferredCreate
+        self._args = args
+        self._kwargs = kwargs
+
+        self._masterD = None
+        self._running = False
+        self._callId = None
+
+    def start(self):
+        """
+        Start trying. Returns a deferred that will fire when this operation 
+        eventually succeeds. That deferred will only errback if this 
+        RetryingDeferred is cancelled (it will then errback with the result of 
+        the next attempt if one is in progress, or a CancelledError. # TODO: yeah?
+        """
+        self._masterD = defer.Deferred()
+        self._running = True
+
+        self._retry()
+
+        return self._masterD
+
+    def cancel(self):
+        if self._callId:
+            self._callId.cancel()
+            self._masterD.errback(errors.CancelledError())
+            self._masterD = None
+
+        self._callId = None
+        self._running = False
+
+    def _retry(self):
+        self._callId = None
+        d = self._create(*self._args, **self._kwargs)
+        d.addCallbacks(self._success, self._failed)
+
+    def _success(self, val):
+        # TODO: what if we were cancelled and then get here?
+        self._masterD.callback(val)
+        self._masterD = None
+
+    def _failed(self, failure):
+        if self._running:
+            next = self._nextDelay()
+            self._callId = reactor.callLater(next, self._retry)
+        else:
+            self._masterD.errback(failure)
+            self._masterD = None
+
+    def _nextDelay(self):
+        if self.delay is None:
+            self.delay = self.initialDelay
+        else:
+            self.delay = self.delay * self.factor
+
+        if self.jitter:
+            self.delay = random.normalvariate(self.delay, 
+                self.delay * self.jitter)
+        self.delay = min(self.delay, self.maxDelay)
+
+        return self.delay
+

@@ -1,3 +1,12 @@
+2007-10-24  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/errors.py:
+	  New exception for a cancelled operation.
+	* flumotion/test/test_defer.py:
+	  Tests for new class.
+	* flumotion/twisted/defer.py:
+	  New class for a exponentially-backing-off retriable deferred.
+
 2007-10-17  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_component_playlist.py:
