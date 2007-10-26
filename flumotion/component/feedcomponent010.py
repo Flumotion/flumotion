@@ -708,6 +708,7 @@ class FeedComponent(basecomponent.BaseComponent):
             element.set_state(gst.STATE_READY)
             self.log("setting to ready complete!!!")
             old = element.get_property('fd')
+            self.log("Closing old fd %d", old)
             os.close(old)
             element.set_property('fd', fd)
             parent.add(element)

@@ -408,6 +408,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
                            instance, socket)
                 instance.start(self)
 
+        # Call check methods, starting from the base class and working down to
+        # subclasses.
         checks = common.get_all_methods(self, 'do_check', False)
         return maybe_deferred_chain(checks, self)
 
@@ -423,6 +425,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
             for plug in plugs:
                 self.debug('Stopping plug %r on socket %s', plug, socket)
                 plug.stop(self)
+
+        for message in self.state.get('messages'):
+            self.state.remove('messages', message)
+
+        if self._cpuCallLater:
+            self._cpuCallLater.cancel()
+            self._cpuCallLater = None
 
         if self._shutdownHook:
             self.debug('_stoppedCallback: firing shutdown hook')
@@ -474,21 +483,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
         The connection to the manager will be closed.
         The job process will also finish.
         """
-        def run_stops():
-            stops = common.get_all_methods(self, 'do_stop', True)
-            return maybe_deferred_chain(stops, self)
-
         self.debug('BaseComponent.stop')
 
+        # Set ourselves to waking while we're shutting down.
         self.setMood(moods.waking)
-        for message in self.state.get('messages'):
-            self.state.remove('messages', message)
 
-        if self._cpuCallLater:
-            self._cpuCallLater.cancel()
-            self._cpuCallLater = None
-
-        return run_stops()
+        # Run stop methods, starting from the subclass, up to this base class.
+        stops = common.get_all_methods(self, 'do_stop', True)
+        return maybe_deferred_chain(stops, self)
 
     ### BaseComponent public methods
     def getName(self):

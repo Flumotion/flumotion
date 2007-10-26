@@ -1,3 +1,11 @@
+2007-10-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Add some comments, move some code from stop() to do_stop(), where it
+	  makes more sense.
+	* flumotion/component/feedcomponent010.py:
+	  Add a debug line.
+
 2007-10-24  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/errors.py:
