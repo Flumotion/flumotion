@@ -17,6 +17,7 @@ flumotion/component/feedcomponent.py
 flumotion/component/feedcomponent010.py
 
 flumotion/component/base/admin_gtk.py
+flumotion/component/base/eaters.glade
 flumotion/component/base/feeders.glade
 
 flumotion/component/consumers/httpstreamer/http.py

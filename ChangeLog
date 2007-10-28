@@ -1,3 +1,14 @@
+2007-10-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/component/base/admin_gtk.py:
+	  Fix translation breakage from [5166]
+	* flumotion/component/base/eaters.glade:
+	* po/POTFILES.in:
+	  Add this file, and use colons like we do in other glade files.
+	* configure.ac:
+	  Down boy down.
+
 2007-10-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/component.py:

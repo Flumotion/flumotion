@@ -150,7 +150,7 @@
 		      <child>
 			<widget class="GtkLabel" id="label-desc-connected-since">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Connected since</property>
+			  <property name="label" translatable="yes">Connected since:</property>
 			  <property name="use_underline">False</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -177,7 +177,7 @@
 		      <child>
 			<widget class="GtkLabel" id="label-desc-eating-from">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Eating from</property>
+			  <property name="label" translatable="yes">Eating from:</property>
 			  <property name="use_underline">False</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -204,7 +204,7 @@
 		      <child>
 			<widget class="GtkLabel" id="label-desc-connection-time">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Connection time</property>
+			  <property name="label" translatable="yes">Connection time:</property>
 			  <property name="use_underline">False</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1057,7 +1057,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label26">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Disconnected since</property>
+		      <property name="label" translatable="yes">Disconnected since:</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1140,7 +1140,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label95">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Disconnection time</property>
+		      <property name="label" translatable="yes">Disconnection time:</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1215,7 +1215,7 @@
 		      <child>
 			<widget class="GtkLabel" id="label34">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Connections made</property>
+			  <property name="label" translatable="yes">Connections made:</property>
 			  <property name="use_underline">False</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1330,7 +1330,7 @@
 				  <child>
 				    <widget class="GtkLabel" id="label48">
 				      <property name="visible">True</property>
-				      <property name="label" translatable="yes">Total duration</property>
+				      <property name="label" translatable="yes">Total duration:</property>
 				      <property name="use_underline">False</property>
 				      <property name="use_markup">False</property>
 				      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1415,7 +1415,7 @@
 				  <child>
 				    <widget class="GtkLabel" id="label54">
 				      <property name="visible">True</property>
-				      <property name="label" translatable="yes">Number</property>
+				      <property name="label" translatable="yes">Number:</property>
 				      <property name="use_underline">False</property>
 				      <property name="use_markup">False</property>
 				      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1582,7 +1582,7 @@
 				  <child>
 				    <widget class="GtkLabel" id="label63">
 				      <property name="visible">True</property>
-				      <property name="label" translatable="yes">Number</property>
+				      <property name="label" translatable="yes">Number:</property>
 				      <property name="use_underline">False</property>
 				      <property name="use_markup">False</property>
 				      <property name="justify">GTK_JUSTIFY_LEFT</property>

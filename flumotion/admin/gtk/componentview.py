@@ -29,6 +29,11 @@ from flumotion.common import planet, errors, common, log
 
 class NodeBook(gtk.Notebook):
     def __init__(self, admingtk):
+        """
+        @param admingtk: the GTK Admin with its nodes
+        @type  admingtk: L{flumotion.component.base.admin_gtk.BaseAdminGtk}
+
+        """
         gtk.Notebook.__init__(self)
         self.admingtk = admingtk
         admingtk.setup()
@@ -41,7 +46,17 @@ class NodeBook(gtk.Notebook):
             table = gtk.Table(1,1)
             table.show()
             table.add(gtk.Label('Loading UI for %s...' % name))
-            label = gtk.Label(name)
+            title = node.title
+            if not title:
+                # FIXME: we have no way of showing an error message ?
+                # This should be added so users can file bugs.
+                self.warning("Component node %s does not have a "
+                    "translateable title. Please file a bug." % name)
+
+                # fall back for now
+                title = name
+
+            label = gtk.Label(title)
             label.show()
             self.append_page(table, label)
 
@@ -82,20 +97,26 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         def no_bundle(failure):
             failure.trap(errors.NoBundleError)
+            self.debug(
+                'No specific GTK admin for this component, using default')
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
             
-        def got_file_name((filename, procname)):
+        def got_entry_point((filename, procname)):
+            # getEntryByType for admin/gtk returns a factory function
+            # for creating
+            # flumotion.component.base.admin_gtk.BaseAdminGtk
+            # subclass instances
             modname = common.pathToModuleName(filename)
             return admin.getBundledFunction(modname, procname)
             
-        def got_constructor(proc):
-            return lambda: NodeBook(proc(state, admin))
+        def got_factory(factory):
+            # instantiate from factory and wrap in a NodeBook
+            return lambda: NodeBook(factory(state, admin))
 
         def sleeping_component(failure):
             failure.trap(errors.SleepingComponentError)
             return lambda: gtk.Label('Component %s is still sleeping' %
                                      state.get('name'))
-
 
         admin = self.get_admin_for_object(state)
         if not isinstance(state, planet.AdminComponentState):
@@ -103,8 +124,8 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         d = admin.callRemote('getEntryByType', state, 'admin/gtk')
         d.addErrback(no_bundle)
-        d.addCallback(got_file_name)
-        d.addCallback(got_constructor)
+        d.addCallback(got_entry_point)
+        d.addCallback(got_factory)
         d.addErrback(sleeping_component)
         return d
 

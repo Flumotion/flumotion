@@ -128,47 +128,61 @@ class BaseAdminGtk(log.Loggable):
         """
         self.debug('BaseAdminGtk.setup()')
 
+        # set up translations before loading any UI
+        if hasattr(self, 'gettext_domain'):
+            lang = common.getLL()
+            self.debug("loading bundle for %s locales" % lang)
+            bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
+            d = self.admin.bundleLoader.getBundleByName(bundleName)
+            yield d
+
+            try:
+                localedatadir = d.value()
+            except errors.NoBundleError:
+                self.debug("Failed to find locale bundle %s" % bundleName)
+
+            if localedatadir:
+                localeDir = os.path.join(localedatadir, 'locale')
+                self.debug("Loading locales for %s from %s" % (
+                    self.gettext_domain, localeDir))
+                # import done here due to defgen scoping issues
+                import gettext
+                gettext.bindtextdomain(self.gettext_domain, localeDir)
+                gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
+
+        # FIXME: node order should be fixed somehow, so e.g. Component
+        # always comes last, together with eater/feeder ?
+
+        # add a generic component node
+        self.nodes['Component'] = ComponentAdminGtkNode(self.state, self.admin)
+
+        # if we don't have config, we are done
         config = self.state.get('config') 
         if not config:
             self.debug('self.state %r does not have config' % self.state)
+            return
 
+        # add feeder node, if applicable
         if config['feed']:
             self.debug("Component has feeders, show Feeders node")
             self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
 
+        # add eater node, if applicable
         if 'source' in config:
             self.debug("Component has eaters, show Eaters node")
             self.nodes['Eaters'] = EatersAdminGtkNode(self.state, self.admin)
 
-        # set up translations
-        if not hasattr(self, 'gettext_domain'):
-            yield None
-
-        lang = common.getLL()
-        self.debug("loading bundle for %s locales" % lang)
-        bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
-        d = self.admin.bundleLoader.getBundleByName(bundleName)
-        yield d
-
-        try:
-            localedatadir = d.value()
-        except errors.NoBundleError:
-            self.debug("Failed to find locale bundle %s" % bundleName)
-            yield None
-
-        localeDir = os.path.join(localedatadir, 'locale')
-        self.debug("Loading locales for %s from %s" % (
-            self.gettext_domain, localeDir))
-        # import done here due to defgen scoping issues
-        import gettext
-        gettext.bindtextdomain(self.gettext_domain, localeDir)
-        gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
+        # done
         yield None
+
     setup = defer_generator_method(setup)
 
     def getNodes(self):
         """
         Return a dict of admin UI nodes.
+
+        @rtype:   dict of str -> L{BaseAdminGtkNode}
+        @returns: dict of name (untranslated) -> admin node
         """
         return self.nodes
 
@@ -285,13 +299,18 @@ class BaseAdminGtkNode(log.Loggable):
             if not os.path.exists(path):
                 self.warning("Glade file %s not found in path %s" % (
                     gladeFile, path))
-            self.debug("Switching glade text domain to %s" % domain)
             self.debug("loading widget tree from %s" % path)
-            self._gladefilepath = path
+
             old = gtk.glade.textdomain()
+            self.debug("Switching glade text domain from %s to %s" % (
+                old, domain))
+            self._gladefilepath = path
             gtk.glade.textdomain(domain)
+
             self.wtree = gtk.glade.XML(path)
-            self.debug("Switching glade text domain back to %s" % old)
+
+            self.debug("Switching glade text domain back from %s to %s" % (
+                domain, old))
             gtk.glade.textdomain(old)
             return self.wtree
 
@@ -472,6 +491,14 @@ class _StateWatcher(object):
                     self.onRemove(self.state, k, v)
             self.state.removeListener(self)
             self.state = None
+
+class ComponentAdminGtkNode(BaseAdminGtkNode):
+    glade_file = os.path.join('flumotion', 'component', 'base',
+        'component.glade')
+
+    def __init__(self, state, admin):
+        BaseAdminGtkNode.__init__(self, state, admin, title=_("Component"))
+        print self.state
 
 class FeedersAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'base', 'feeders.glade')
