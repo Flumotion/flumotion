@@ -1,3 +1,15 @@
+2007-10-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py
+	(FeedersAdminGtkNode.setUIState): Fix appearance of feeders tab
+	when initially selected.
+	
+	* flumotion/component/base/feeders.glade: 
+	* flumotion/component/base/admin_gtk.py:
+	(FeedersAdminGtkNode.setFeederClientName)
+	(FeedersAdminGtkNode.haveWidgetTree): Hacks to allow the feeder
+	and eater names to be present at one time. Fixes #540.
+
 2007-10-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/admin_gtk.py:

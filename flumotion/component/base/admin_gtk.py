@@ -524,9 +524,12 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             return clientId
 
     def setFeederClientName(self, state, value):
+        if not value:
+            self.labels['eater-name'].set_markup(_('<i>select an eater</i>'))
+            return
         value = self._mungeClientId(value)
-        self.labels['feeder-name'].set_markup(_('Feeding to <b>%s</b>')
-                                              % (value,))
+        self.labels['eater-name'].set_markup(_('<b>%s</b>')
+                                             % (value,))
 
     def setFeederClientBytesReadCurrent(self, state, value):
         txt = value and (common.formatStorage(value) + _('Byte')) or ''
@@ -656,6 +659,8 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.widget.show_all()
         for feeder in state.get('feeders'):
             self.addFeeder(state, feeder)
+        sel = self.treeview.get_selection()
+        sel.select_iter(self.treemodel.get_iter_first())
 
     def haveWidgetTree(self):
         self.labels = {}
@@ -673,8 +678,11 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             self.select(i and model.get_value(i, 2))
             # don't show the feeder client stuff for a feeder
             if model.get_value(i, 3) == 'feeder':
+                self.setFeederClientName(model.get_value(i, 1), None)
                 self._table_feedclient.hide()
             else:
+                parent = model.get_value(model.iter_parent(i), 1)
+                self.setFeederName(parent, parent.get('feederName'))
                 self._table_feedclient.show()
 
         sel.connect('changed', sel_changed)
@@ -684,14 +692,12 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             # zeroes out all value labels
             self.labels[name].set_text('')
 
-        set_label('feeder-name')
-        for type in (
-            'bytes-read-current', 'buffers-dropped-current',
-            'connected-since', 'connection-time',
-            'disconnected-since', 'disconnection-time',
-            'bytes-read-total', 'buffers-dropped-total',
-            'connections-total', 'last-activity',
-            ):
+        for type in ('feeder-name', 'eater-name',
+                     'bytes-read-current', 'buffers-dropped-current',
+                     'connected-since', 'connection-time',
+                     'disconnected-since', 'disconnection-time',
+                     'bytes-read-total', 'buffers-dropped-total',
+                     'connections-total', 'last-activity'):
             set_label(type)
 
         self._table_connected = self.wtree.get_widget('table-current-connected')
@@ -703,9 +709,6 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self._table_feedclient.hide()
         self.wtree.get_widget('box-right').hide()
 
-        # FIXME: do not show all;
-        # hide bytes fed and buffers dropped until something is selected
-        # see #575
         return self.widget
 
 class EatersAdminGtkNode(BaseAdminGtkNode):
