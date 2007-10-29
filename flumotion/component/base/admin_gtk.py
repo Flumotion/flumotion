@@ -153,9 +153,6 @@ class BaseAdminGtk(log.Loggable):
         # FIXME: node order should be fixed somehow, so e.g. Component
         # always comes last, together with eater/feeder ?
 
-        # add a generic component node
-        self.nodes['Component'] = ComponentAdminGtkNode(self.state, self.admin)
-
         # if we don't have config, we are done
         config = self.state.get('config') 
         if not config:
@@ -491,14 +488,6 @@ class _StateWatcher(object):
                     self.onRemove(self.state, k, v)
             self.state.removeListener(self)
             self.state = None
-
-class ComponentAdminGtkNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'base',
-        'component.glade')
-
-    def __init__(self, state, admin):
-        BaseAdminGtkNode.__init__(self, state, admin, title=_("Component"))
-        print self.state
 
 class FeedersAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'base', 'feeders.glade')
