@@ -474,10 +474,7 @@ class ComponentAvatar(base.ManagerAvatar):
             raise errors.PropertyError(msg)
         self.debug("setting property '%s' on element '%s'" % (property, element))
         
-        d = self.mindCallRemote('setElementProperty', element, property, value)
-        d.addErrback(self._mindPropertyErrback)
-        d.addErrback(self._mindErrback, errors.PropertyError)
-        return d
+        return self.mindCallRemote('setElementProperty', element, property, value)
         
     def getElementProperty(self, element, property):
         """
@@ -505,10 +502,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning(msg)
             raise errors.PropertyError(msg)
         self.debug("getting property %s on element %s" % (element, property))
-        d = self.mindCallRemote('getElementProperty', element, property)
-        d.addErrback(self._mindPropertyErrback)
-        d.addErrback(self._mindErrback, errors.PropertyError)
-        return d
+        return self.mindCallRemote('getElementProperty', element, property)
 
     def reloadComponent(self):
         """
@@ -516,18 +510,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        def _reloadComponentErrback(failure, self):
-            failure.trap(errors.ReloadSyntaxError)
-            self.warning(failure.getErrorMessage())
-            log.safeprintf(sys.stderr,
-                           "Ignore the following Traceback line, issue in "
-                           "Twisted\n")
-            return failure
-
-        d = self.mindCallRemote('reloadComponent')
-        d.addErrback(_reloadComponentErrback, self)
-        d.addErrback(self._mindErrback, errors.ReloadSyntaxError)
-        return d
+        return self.mindCallRemote('reloadComponent')
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
@@ -540,9 +523,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @type  keycard: L{flumotion.common.keycards.Keycard}
         """
-        d = self.mindCallRemote('authenticate', keycard)
-        d.addErrback(self._mindErrback)
-        return d
+        return self.mindCallRemote('authenticate', keycard)
 
     def removeKeycardId(self, keycardId):
         """
@@ -552,9 +533,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @type  keycardId: str
         """
         self.debug('remotecalling removeKeycardId with id %s' % keycardId)
-        d = self.mindCallRemote('removeKeycardId', keycardId)
-        d.addErrback(self._mindErrback)
-        return d
+        return self.mindCallRemote('removeKeycardId', keycardId)
 
     def expireKeycard(self, keycardId):
         """
@@ -564,9 +543,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @type  keycardId: str
         """
         self.debug('remotecalling expireKeycard with id %s' % keycardId)
-        d = self.mindCallRemote('expireKeycard', keycardId)
-        d.addErrback(self._mindErrback)
-        return d
+        return self.mindCallRemote('expireKeycard', keycardId)
 
     ### IPerspective methods, called by the worker's component
     def perspective_cleanShutdown(self):

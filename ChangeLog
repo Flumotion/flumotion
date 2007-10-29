@@ -1,3 +1,12 @@
+2007-10-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.setElementProperty)
+	(ComponentAvatar.getElementProperty)
+	(ComponentAvatar.reloadComponent, ComponentAvatar.authenticate)
+	(ComponentAvatar.removeKeycardId, ComponentAvatar.expireKeycard):
+	Remove references to _mindErrback, which is unnecessary because it
+	is handled by mindCallRemote.
+
 2007-10-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/componentview.py:
