@@ -1,5 +1,28 @@
 2007-10-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.do_setup): try_start_pipeline, not start_pipeline;
+	we can't set the pipeline to PLAYING if it has eaters for which we
+	have not set fd's. Fixes #782. 
+	(FeedComponent.install_eater_event_probes): Moved around.
+	(FeedComponent._setup_pipeline): Add pad monitors and event probes
+	here, before we set the pipeline to PLAYING.
+	(FeedComponent.set_master_clock): try_start_pipeline.
+	(FeedComponent.try_start_pipeline): Renamed from start_pipeline.
+	The eater probes and pad monitors were moved to _setup_pipeline;
+	this function only sets the pipeline to PLAYING if the necessary
+	conditions are fulfilled.
+	(FeedComponent.eatFromFD): Call try_start_pipeline(); with the new
+	code, pipelines don't go to PLAYING until all of their eaters are
+	connected.
+
+	* flumotion/component/eater.py (Eater.__init__): Add an fd
+	attribute, which is None if the eater is disconnected.
+	(Eater.connected): Set the uiState and fd directly, because
+	connected() is only called from the reactor thread.
+	(Eater.disconnected.updateUIState): Null out the fd attribute as
+	well.
+
 	* flumotion/component/base/admin_gtk.py
 	(FeedersAdminGtkNode.setUIState): Fix appearance of feeders tab
 	when initially selected.

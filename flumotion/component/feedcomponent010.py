@@ -122,11 +122,12 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug("FeedComponent.do_setup(): setup finished")
 
-        if self._clock_slaved:
-            # wait to start until clocking details received
-            return defer.succeed(None)
-        else:
-            return self.start_pipeline()
+        self.try_start_pipeline()
+
+        # no race, messages marshalled asynchronously via the bus
+        d = self._change_monitor.add(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
+        d.addCallback(lambda x: self.do_pipeline_playing())
+        return d
 
     ### FeedComponent interface for subclasses
     def create_pipeline(self):
@@ -295,6 +296,43 @@ class FeedComponent(basecomponent.BaseComponent):
         # never gets cleaned up; does that matter?
         bus.connect("message::element", on_element_message)
             
+    def install_eater_event_probes(self, eater):
+        def fdsrc_event(pad, event):
+            # An event probe used to consume unwanted EOS events on eaters.
+            # Called from GStreamer threads.
+            if event.type == gst.EVENT_EOS:    
+                self.info('End of stream for eater %s, disconnect will be '
+                          'triggered', eater.eaterAlias)
+                # We swallow it because otherwise our component acts on the EOS
+                # and we can't recover from that later.  Instead, fdsrc will be
+                # taken out and given a new fd on the next eatFromFD call.
+                return False
+            return True
+
+        def depay_event(pad, event):
+            # An event probe used to consume unwanted duplicate
+            # newsegment events.
+            # Called from GStreamer threads.
+            if event.type == gst.EVENT_NEWSEGMENT:
+                # We do this because we know gdppay/gdpdepay screw up on 2nd
+                # newsegments (unclear what the original reason for this
+                # was, perhaps #349204)
+                if getattr(eater, '_gotFirstNewSegment', False):
+                    self.info("Subsequent new segment event received on "
+                              "depay on eater %s", eater.eaterAlias)
+                    # swallow (gulp)
+                    return False
+                else:
+                    eater._gotFirstNewSegment = True
+            return True
+
+        self.debug('adding event probe for eater %s', eater.eaterAlias)
+        fdsrc = self.get_element(eater.elementName)
+        fdsrc.get_pad("src").add_event_probe(fdsrc_event)
+        if gstreamer.get_plugin_version('gdp') < (0, 10, 10, 1):
+            depay = self.get_element(eater.depayName)
+            depay.get_pad("src").add_event_probe(depay_event)
+
     def _setup_pipeline(self):
         self.debug('setup_pipeline()')
         assert self.bus_signal_id == None
@@ -327,6 +365,15 @@ class FeedComponent(basecomponent.BaseComponent):
                 "Please upgrade '%s' to version %s."), 'gst-plugins-base',
                 '0.10.11'))
             self.addMessage(m)
+
+        for eater in self.eaters.values():
+            self.install_eater_event_probes(eater)
+            pad = self.get_element(eater.elementName).get_pad('src')
+            self._pad_monitors.attach(pad, eater.elementName,
+                                      padmonitor.EaterPadMonitor,
+                                      self.reconnectEater,
+                                      eater.eaterAlias)
+            eater.setPadMonitor(self._pad_monitors[eater.elementName])
 
     def stop_pipeline(self):
         if not self.pipeline:
@@ -390,7 +437,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline.set_base_time(base_time)
         self.pipeline.use_clock(clock)
 
-        return self.start_pipeline()
+        self.try_start_pipeline()
 
     def get_master_clock(self):
         """
@@ -447,45 +494,8 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             return defer.maybeDeferred(pipelinePaused, None)
 
-    def install_eater_event_probes(self, eater):
-        def fdsrc_event(pad, event):
-            # An event probe used to consume unwanted EOS events on eaters.
-            # Called from GStreamer threads.
-            if event.type == gst.EVENT_EOS:    
-                self.info('End of stream for eater %s, disconnect will be '
-                          'triggered', eater.eaterAlias)
-                # We swallow it because otherwise our component acts on the EOS
-                # and we can't recover from that later.  Instead, fdsrc will be
-                # taken out and given a new fd on the next eatFromFD call.
-                return False
-            return True
-
-        def depay_event(pad, event):
-            # An event probe used to consume unwanted duplicate
-            # newsegment events.
-            # Called from GStreamer threads.
-            if event.type == gst.EVENT_NEWSEGMENT:
-                # We do this because we know gdppay/gdpdepay screw up on 2nd
-                # newsegments (unclear what the original reason for this
-                # was, perhaps #349204)
-                if getattr(eater, '_gotFirstNewSegment', False):
-                    self.info("Subsequent new segment event received on "
-                              "depay on eater %s", eater.eaterAlias)
-                    # swallow (gulp)
-                    return False
-                else:
-                    eater._gotFirstNewSegment = True
-            return True
-
-        self.debug('adding event probe for eater %s', eater.eaterAlias)
-        fdsrc = self.get_element(eater.elementName)
-        fdsrc.get_pad("src").add_event_probe(fdsrc_event)
-        if gstreamer.get_plugin_version('gdp') < (0, 10, 10, 1):
-            depay = self.get_element(eater.depayName)
-            depay.get_pad("src").add_event_probe(depay_event)
-
     ### BaseComponent interface implementation
-    def start_pipeline(self):
+    def try_start_pipeline(self):
         """
         Tell the component to start.
         Whatever is using the component is responsible for making sure all
@@ -495,25 +505,23 @@ class FeedComponent(basecomponent.BaseComponent):
                          or None not to slave the clock
         @type  clocking: tuple(str, int, long) or None.
         """
-        self.debug('FeedComponent.start_pipeline')
+        (ret, state, pending) = self.pipeline.get_state(0)
+        if state == gst.STATE_PLAYING:
+            self.log('already PLAYING')
+            return
+
+        if self._clock_slaved and not self._master_clock_info:
+            self.debug("Missing master clock info, deferring set to PLAYING")
+            return
 
         for eater in self.eaters.values():
-            self.install_eater_event_probes(eater)
-            pad = self.get_element(eater.elementName).get_pad('src')
-            self._pad_monitors.attach(pad, eater.elementName,
-                                      padmonitor.EaterPadMonitor,
-                                      self.reconnectEater,
-                                      eater.eaterAlias)
-            eater.setPadMonitor(self._pad_monitors[eater.elementName])
+            if not eater.fd:
+                self.debug('eater %s not yet connected, deferring set to '
+                           'PLAYING', eater.eaterAlias)
+                return
 
         self.debug("Setting pipeline %r to GST_STATE_PLAYING", self.pipeline)
         self.pipeline.set_state(gst.STATE_PLAYING)
-
-        # no race here, change notifications are marshalled through the
-        # bus
-        d = self._change_monitor.add(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
-        d.addCallback(lambda x: self.do_pipeline_playing())
-        return d
 
     def _feeder_probe_calllater(self):
         for feedId, feeder in self.feeders.items():
@@ -722,3 +730,5 @@ class FeedComponent(basecomponent.BaseComponent):
         # update our eater uiState, saying that we are eating from a
         # possibly new feedId
         eater.connected(fd, feedId)
+
+        self.try_start_pipeline()

@@ -39,6 +39,7 @@ class Eater:
         self.eaterAlias = eaterAlias
         self.eaterName = eaterName
         self.feedId = None
+        self.fd = None
         self.elementName = 'eater:' + eaterAlias
         self.depayName = self.elementName + '-depay'
         self.setPadMonitor(None)
@@ -93,24 +94,23 @@ class Eater:
         if not when:
             when = time.time()
 
-        def updateUIState():
-            self.feedId = feedId
-            self.uiState.set('lastConnect', when)
-            self.uiState.set('fd', fd)
-            self.uiState.set('totalConnections',
-                self.uiState.get('totalConnections', 0) + 1)
+        self.feedId = feedId
+        self.fd = fd
 
-            self.uiState.setitem("connection", 'feedId', feedId)
-            self.uiState.setitem("connection", "countTimestampDiscont", 0)
-            self.uiState.setitem("connection", "timeTimestampDiscont",  None)
-            self.uiState.setitem("connection", "lastTimestampDiscont",  0.0)
-            self.uiState.setitem("connection", "totalTimestampDiscont", 0.0)
-            self.uiState.setitem("connection", "countOffsetDiscont",    0)
-            self.uiState.setitem("connection", "timeOffsetDiscont",     None)
-            self.uiState.setitem("connection", "lastOffsetDiscont",     0)
-            self.uiState.setitem("connection", "totalOffsetDiscont",    0)
+        self.uiState.set('lastConnect', when)
+        self.uiState.set('fd', fd)
+        self.uiState.set('totalConnections',
+            self.uiState.get('totalConnections', 0) + 1)
 
-        reactor.callFromThread(updateUIState)
+        self.uiState.setitem("connection", 'feedId', feedId)
+        self.uiState.setitem("connection", "countTimestampDiscont", 0)
+        self.uiState.setitem("connection", "timeTimestampDiscont",  None)
+        self.uiState.setitem("connection", "lastTimestampDiscont",  0.0)
+        self.uiState.setitem("connection", "totalTimestampDiscont", 0.0)
+        self.uiState.setitem("connection", "countOffsetDiscont",    0)
+        self.uiState.setitem("connection", "timeOffsetDiscont",     None)
+        self.uiState.setitem("connection", "lastOffsetDiscont",     0)
+        self.uiState.setitem("connection", "totalOffsetDiscont",    0)
 
     def disconnected(self, when=None):
         """
@@ -122,6 +122,7 @@ class Eater:
 
         def updateUIState():
             self.uiState.set('lastDisconnect', when)
+            self.fd = None
             self.uiState.set('fd', None)
 
         reactor.callFromThread(updateUIState)
