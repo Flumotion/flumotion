@@ -5,7 +5,7 @@
 	(ComponentAvatar.reloadComponent, ComponentAvatar.authenticate)
 	(ComponentAvatar.removeKeycardId, ComponentAvatar.expireKeycard):
 	Remove references to _mindErrback, which is unnecessary because it
-	is handled by mindCallRemote.
+	is handled by mindCallRemote. Fixes #775.
 
 2007-10-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
