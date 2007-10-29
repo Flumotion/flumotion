@@ -5,6 +5,16 @@
 
 2007-10-29  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py: Remove unneeded import.
+
+	* flumotion/common/bundleclient.py: Import things more normally,
+	now that we don't need to fake out pychecker.
+	(BundleLoader.getBundles): Not a defer generator. Don't call
+	getBundleZips on an empty set of bundles. Fix some format string
+	problems.
+	(BundleLoader.loadModule, BundleLoader.getBundleByName)
+	(BundleLoader.getFile): Similar de-generatorification.
+
 	* flumotion/manager/component.py (ComponentAvatar.setElementProperty)
 	(ComponentAvatar.getElementProperty)
 	(ComponentAvatar.reloadComponent, ComponentAvatar.authenticate)

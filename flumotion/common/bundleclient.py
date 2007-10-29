@@ -24,11 +24,13 @@ Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
 """
 
+import os
+import sys
+
 from twisted.internet import error, defer
 
 from flumotion.common import bundle, common, errors, log, package
 from flumotion.configure import configure
-from flumotion.twisted.defer import defer_generator_method
 
 __all__ = ['BundleLoader']
 
@@ -62,61 +64,60 @@ class BundleLoader(log.Loggable):
                   bundlePath is the directory to register
                   for this package.
         """
+        def annotated(d, *extraVals):
+            def annotatedReturn(ret):
+                return (ret,) + extraVals
+            d.addCallback(annotatedReturn)
+            return d
+
+        def getZips(sums):
+            # sums is a list of name, sum tuples, highest to lowest
+            # figure out which bundles we're missing
+            toFetch = []
+            for name, md5 in sums:
+                path = os.path.join(configure.cachedir, name, md5)
+                if os.path.exists(path):
+                    self.log('%s is up to date', name)
+                else:
+                    self.log('%s needs fetching', name)
+                toFetch.append(name)
+            if toFetch:
+                return annotated(self.callRemote('getBundleZips', toFetch),
+                                 toFetch, sums)
+            else:
+                return {}, [], sums
+
+        def unpackAndRegister((zips, toFetch, sums)):
+            for name in toFetch:
+                if name not in zips:
+                    msg = "Missing bundle %s was not received"
+                    self.warning(msg, name)
+                    raise errors.NoBundleError(msg % name)
+
+                b = bundle.Bundle(name)
+                b.setZip(zips[name])
+                path = self._unbundler.unbundle(b)
+
+            # register all package paths; to do so we need to reverse sums
+            sums.reverse()
+            ret = []
+            for name, md5 in sums:
+                self.log('registerPackagePath for %s' % name)
+                path = os.path.join(configure.cachedir, name, md5)
+                if not os.path.exists(path):
+                    self.warning("path %s for bundle %s does not exist",
+                        path, name)
+                else:
+                    package.getPackager().registerPackagePath(path, name)
+                ret.append((name, path))
+
+            return ret
+
         # get sums for all bundles we need
         d = self.callRemote('getBundleSums', **kwargs)
-        yield d
-
-        # sums is a list of name, sum tuples, highest to lowest
-        # figure out which bundles we're missing
-        try:
-            sums = d.value()
-        except Exception, e:
-            # FIXME: this is stupid
-            raise
-        self.debug('Got sums %r' % sums)
-        toFetch = []
-
-        import os # fool pychecker
-
-        for name, md5 in sums:
-            path = os.path.join(configure.cachedir, name, md5)
-            if os.path.exists(path):
-                self.log(name + ' is up to date')
-            else:
-                self.log(name + ' needs fetching')
-                toFetch.append(name)
-
-        # ask for the missing bundles
-        d = self.callRemote('getBundleZips', toFetch)
-        yield d
-
-        # unpack the new bundles
-        result = d.value()
-        for name in toFetch:
-            if name not in result.keys():
-                msg = "Missing bundle %s was not received" % name
-                self.warning(msg)
-                raise errors.NoBundleError(msg)
-
-            b = bundle.Bundle(name)
-            b.setZip(result[name])
-            path = self._unbundler.unbundle(b)
-
-        # register all package paths; to do so we need to reverse sums
-        sums.reverse()
-        ret = []
-        for name, md5 in sums:
-            self.log('registerPackagePath for %s' % name)
-            path = os.path.join(configure.cachedir, name, md5)
-            if not os.path.exists(path):
-                self.warning("path %s for bundle %s does not exist",
-                    path, name)
-            else:
-                package.getPackager().registerPackagePath(path, name)
-            ret.append((name, path))
-
-        yield ret
-    getBundles = defer_generator_method(getBundles)
+        d.addCallback(getZips)
+        d.addCallback(unpackAndRegister)
+        return d
 
     def loadModule(self, moduleName):
         """
@@ -127,25 +128,20 @@ class BundleLoader(log.Loggable):
         @returns: a deferred that will fire when the given module is loaded,
                   giving the loaded module.
         """
-        
-        # fool pychecker
-        import os # fool pychecker
-        import sys
+        def gotBundles(bundles):
+            self.debug('Got bundles %r', bundles)
 
-        self.debug('Loading module %s' % moduleName)
+            # load up the module and return it
+            __import__(moduleName, globals(), locals(), [])
+            self.log('loaded module %s', moduleName)
+            return sys.modules[moduleName]
+
+        self.debug('Loading module %s', moduleName)
 
         # get sums for all bundles we need
         d = self.getBundles(moduleName=moduleName)
-        yield d
-
-        bundles = d.value()
-        self.debug('Got bundles %r' % bundles)
-
-        # load up the module and return it
-        __import__(moduleName, globals(), locals(), [])
-        self.log('loaded module %s' % moduleName)
-        yield sys.modules[moduleName]
-    loadModule = defer_generator_method(loadModule)
+        d.addCallback(gotBundles)
+        return d
 
     def getBundleByName(self, bundleName):
         """
@@ -155,16 +151,17 @@ class BundleLoader(log.Loggable):
         @returns: a deferred returning the absolute path under which the
                   bundle is extracted.
         """
-        self.debug('Getting bundle %s' % bundleName)
-        d = self.getBundles(bundleName=bundleName)
-        yield d
+        def gotBundles(bundles):
+            name, path = bundles[-1]
+            assert name == bundleName
+            self.debug('Got bundle %s in %s', bundleName, path)
+            return path
+            
 
-        bundles = d.value()
-        name, path = bundles[-1]
-        assert name == bundleName
-        self.debug('Got bundle %s in %s' % (bundleName, path))
-        yield path
-    getBundleByName = defer_generator_method(getBundleByName)
+        self.debug('Getting bundle %s', bundleName)
+        d = self.getBundles(bundleName=bundleName)
+        d.addCallback(gotBundles)
+        return d
 
     def getFile(self, fileName):
         """
@@ -173,18 +170,15 @@ class BundleLoader(log.Loggable):
         Returns: a deferred returning the absolute path to a local copy
                  of the given file.
         """
-        self.debug('Getting file %s' % fileName)
+        def gotBundles(bundles):
+            name, bundlePath = bundles[-1]
+            path = os.path.join(bundlePath, fileName)
+            if not os.path.exists(path):
+                self.warning("path %s for file %s does not exist",
+                             path, fileName)
+            return path
+
+        self.debug('Getting file %s', fileName)
         d = self.getBundles(fileName=fileName)
-        yield d
-
-        import os # fool pychecker
-
-        bundles = d.value()
-        name, bundlePath = bundles[-1]
-        path = os.path.join(bundlePath, fileName)
-        if not os.path.exists(path):
-            self.warning("path %s for file %s does not exist" % (
-                path, fileName))
-
-        yield path
-    getFile = defer_generator_method(getFile)
+        d.addCallback(gotBundles)
+        return d

@@ -25,7 +25,6 @@ manager-side objects for components
 API Stability: semi-stable
 """
 
-import sys
 import time
 
 from twisted.spread import pb
