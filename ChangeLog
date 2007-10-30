@@ -4,6 +4,7 @@
 	the Poller. Incidentally fixes #788, and a bug whereby downstream
 	components would not attempt to reconnect to a missing upstream
 	component.
+	(PadMonitor.detach): Fix. Yay previously-written test suites!
 
 	* flumotion/component/feedcomponent010.py
 	(FeedComponent.eatFromFD): No need to try to start the pipeline if

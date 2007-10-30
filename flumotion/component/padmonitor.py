@@ -25,7 +25,7 @@ import time
 
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common, errors
+from flumotion.common import log, common
 
 
 class PadMonitor(log.Loggable):
@@ -63,16 +63,16 @@ class PadMonitor(log.Loggable):
         return self._active
 
     def detach(self):
+        self.check_poller.stop()
+        self.watch_poller.stop()
+
         # implementation closely tied to _check_timeout wrt to GIL
         # tricks, threadsafety, and getting the probe deferred to
         # actually return
         d, probe_id = self._probe_id.pop("id", (None, None))
         if probe_id:
             self._pad.remove_buffer_probe(probe_id)
-            d.errback(errors.CancelledError)
-
-        self.check_poller.stop()
-        self.watch_poller.stop()
+            d.callback(None)
 
     def _check_timeout(self):
         def probe_cb(pad, buffer):
