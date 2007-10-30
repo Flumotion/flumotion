@@ -23,9 +23,9 @@ import gst
 
 import time
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
-from flumotion.common import log
+from flumotion.common import log, common, errors
 
 
 class PadMonitor(log.Loggable):
@@ -45,28 +45,13 @@ class PadMonitor(log.Loggable):
         # This dict sillyness is because python's dict operations are atomic
         # w.r.t. the GIL.
         self._probe_id = {}
-        self._add_probe_dc = None
 
-        self._add_flow_probe()
+        self.check_poller = common.Poller(self._check_timeout,
+                                          self.PAD_MONITOR_PROBE_FREQUENCY,
+                                          immediately=True)
 
-        self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
-            self._check_flow_timeout)
-
-    def isActive(self):
-        return self._active
-
-    def detach(self):
-        probe_id = self._probe_id.pop("id", None)
-        if probe_id:
-            self._pad.remove_buffer_probe(probe_id)
-
-        if self._add_probe_dc:
-            self._add_probe_dc.cancel()
-            self._add_probe_dc = None
-
-        if self._check_flow_dc:
-            self._check_flow_dc.cancel()
-            self._check_flow_dc = None
+        self.watch_poller = common.Poller(self._watch_timeout,
+                                          self.PAD_MONITOR_TIMEOUT)
 
     def logMessage(self, message, *args):
         if self._first:
@@ -74,53 +59,60 @@ class PadMonitor(log.Loggable):
         else:
             self.log(message, *args)
         
-    def _add_flow_probe(self):
-        self._probe_id['id'] = self._pad.add_buffer_probe(
-            self._flow_watch_probe_cb)
-        self._add_probe_dc = None
+    def isActive(self):
+        return self._active
 
-    def _add_flow_probe_later(self):
-        self._add_probe_dc = reactor.callLater(self.PAD_MONITOR_PROBE_FREQUENCY,
-            self._add_flow_probe)
+    def detach(self):
+        # implementation closely tied to _check_timeout wrt to GIL
+        # tricks, threadsafety, and getting the probe deferred to
+        # actually return
+        d, probe_id = self._probe_id.pop("id", (None, None))
+        if probe_id:
+            self._pad.remove_buffer_probe(probe_id)
+            d.errback(errors.CancelledError)
 
-    def _flow_watch_probe_cb(self, pad, buffer):
-        """
-        Periodically scheduled buffer probe, that ensures that we're currently
-        actually having dataflow through our eater elements.
+        self.check_poller.stop()
+        self.watch_poller.stop()
 
-        Called from GStreamer threads.
+    def _check_timeout(self):
+        def probe_cb(pad, buffer):
+            """
+            Periodically scheduled buffer probe, that ensures that we're
+            currently actually having dataflow through our eater
+            elements.
 
-        @param pad:       The gst.Pad srcpad for one eater in this component.
-        @param buffer:    A gst.Buffer that has arrived on this pad
-        """
+            Called from GStreamer threads.
 
-        self._last_data_time = time.time()
+            @param pad:       The gst.Pad srcpad for one eater in this
+                              component.
+            @param buffer:    A gst.Buffer that has arrived on this pad
+            """
+            self._last_data_time = time.time()
 
-        self.logMessage('buffer probe on %s has timestamp %s', self.name,
-             gst.TIME_ARGS(buffer.timestamp))
+            self.logMessage('buffer probe on %s has timestamp %s', self.name,
+                            gst.TIME_ARGS(buffer.timestamp))
 
-        id = self._probe_id.pop("id", None)
-        if id:
-            # This will be None only if detach() has been called.
-            self._pad.remove_buffer_probe(id)
+            deferred, probe_id = self._probe_id.pop("id", (None, None))
+            if probe_id:
+                # This will be None only if detach() has been called.
+                self._pad.remove_buffer_probe(probe_id)
 
-            reactor.callFromThread(self._add_flow_probe_later)
+                reactor.callFromThread(deferred.callback, None)
+                # Data received! Return to happy ASAP:
+                reactor.callFromThread(self.watch_poller.run)
 
-            # Data received! Return to happy ASAP:
-            reactor.callFromThread(self._check_flow_timeout_now)
+            self._first = False
 
-        self._first = False
+            # let the buffer through
+            return True
 
-        return True
+        d = defer.Deferred()
+        # FIXME: this is racy: evaluate RHS, drop GIL, buffer probe
+        # fires before __setitem__ in LHS; need a mutex
+        self._probe_id['id'] = (d, self._pad.add_buffer_probe(probe_cb))
+        return d
 
-    def _check_flow_timeout_now(self):
-        if self._check_flow_dc:
-            self._check_flow_dc.cancel()
-        self._check_flow_timeout()
-        
-    def _check_flow_timeout(self):
-        self._check_flow_dc = None
-
+    def _watch_timeout(self):
         self.log('last buffer for %s at %r', self.name, self._last_data_time)
 
         now = time.time()
@@ -129,8 +121,11 @@ class PadMonitor(log.Loggable):
             # We never received any data in the first timeout period... 
             self._last_data_time = 0
             self.setInactive()
-
-        if self._last_data_time > 0:
+        elif self._last_data_time == 0:
+            # still no data...
+            pass
+        else:
+            # We received data at some time in the past.
             delta = now - self._last_data_time
 
             if self._active and delta > self.PAD_MONITOR_TIMEOUT:
@@ -142,16 +137,13 @@ class PadMonitor(log.Loggable):
                     self.name)
                 self.setActive()
 
-        self._check_flow_dc = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
-            self._check_flow_timeout)
-
     def setInactive(self):
-        self._doSetInactive(self.name)
         self._active = False
+        self._doSetInactive(self.name)
 
     def setActive(self):
-        self._doSetActive(self.name)
         self._active = True
+        self._doSetActive(self.name)
 
 class EaterPadMonitor(PadMonitor):
     def __init__(self, pad, name, setActive, setInactive,
@@ -220,7 +212,7 @@ class PadMonitorSet(dict, log.Loggable):
             self.info('Pad data flow at %s is inactive', name)
             if self._wasActive:
                 self._doSetInactive()
-            self._wasActive = False
+                self._wasActive = False
 
         assert name not in self
         monitor = klass(pad, name, monitorActive, monitorInactive, *args)

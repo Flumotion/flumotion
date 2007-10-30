@@ -834,3 +834,98 @@ def assertSSLAvailable():
 
     if not posixbase.sslEnabled:
         raise errors.NoSSLError()
+
+class Poller(object, log.Loggable):
+    """
+    A class representing a cancellable, periodic call to a procedure,
+    which is robust in the face of exceptions raised by the procedure.
+
+    The poller will wait for a specified number of seconds between
+    calls. The time taken for the procedure to complete is not counted
+    in the timeout. If the procedure returns a deferred, rescheduling
+    will be performed after the deferred fires.
+
+    For example, if the timeout is 10 seconds and the procedure returns
+    a deferred which fires 5 seconds later, the next invocation of the
+    procedure will be performed 15 seconds after the previous
+    invocation.
+    """
+
+    def __init__(self, proc, timeout, immediately=False, start=True):
+        """
+        @param proc: a procedure of no arguments
+        @param timeout: float number of seconds to wait between calls
+        @param immediately: whether to immediately call proc, or to wait
+        until one period has passed
+        @param immediately: whether to start the poller (defaults to
+        True)
+        """
+        from twisted.internet import reactor
+        from twisted.internet import defer
+
+        self._callLater = reactor.callLater
+        self._maybeDeferred = defer.maybeDeferred
+
+        self.proc = proc
+        self.logName = 'poller-%s' % proc.__name__
+        self.timeout = timeout
+
+        self._dc = None
+        self.running = False
+        
+        if start:
+            self.start(immediately)
+
+    def start(self, immediately=False):
+        """Start the poller.
+
+        This procedure is called during __init__, so it is normally not
+        necessary to call it. It will ensure that the poller is running,
+        even after a previous call to stop().
+
+        @param immediately: whether to immediately invoke the poller, or
+        to wait until one period has passed
+        """
+        if self.running:
+            self.debug('already running')
+        else:
+            self.running = True
+            self._reschedule(immediately)
+
+    def _reschedule(self, immediately=False):
+        assert self._dc is None
+        if self.running:
+            if immediately:
+                self.run()
+            else:
+                self._dc = self._callLater(self.timeout, self.run)
+        else:
+            self.debug('shutting down, not rescheduling')
+
+    def run(self):
+        """Run the poller immediately, regardless of when it was last
+        run.
+        """
+        def reschedule(v):
+            self._reschedule()
+            return v
+
+        if self._dc and self._dc.active():
+            # we don't get here in the normal periodic case, only for
+            # explicit run() invocations
+            self._dc.cancel()
+        self._dc = None
+
+        d = self._maybeDeferred(self.proc)
+        d.addBoth(reschedule)
+
+    def stop(self):
+        """Stop the poller.
+
+        This procedure ensures that the poller is stopped. It may be
+        called multiple times.
+        """
+        if self._dc:
+            self._dc.cancel()
+            self._dc = None
+        self.running = False

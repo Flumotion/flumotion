@@ -1,3 +1,17 @@
+2007-10-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/padmonitor.py (PadMonitor): Refactor to use
+	the Poller. Incidentally fixes #788, and a bug whereby downstream
+	components would not attempt to reconnect to a missing upstream
+	component.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.eatFromFD): No need to try to start the pipeline if
+	it was already started.
+
+	* flumotion/common/common.py (Poller): New class, abstracts the
+	process of a periodically calling a procedure.
+
 2007-10-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent010.py

@@ -690,7 +690,8 @@ class FeedComponent(basecomponent.BaseComponent):
  
         # fdsrc only switches to the new fd in ready or below
         (result, current, pending) = element.get_state(0L)
-        if current not in [gst.STATE_NULL, gst.STATE_READY]:
+        pipeline_playing = current not in [gst.STATE_NULL, gst.STATE_READY]
+        if pipeline_playing:
             self.debug('eater %s in state %r, kidnapping it',
                        eaterAlias, current)
 
@@ -731,4 +732,5 @@ class FeedComponent(basecomponent.BaseComponent):
         # possibly new feedId
         eater.connected(fd, feedId)
 
-        self.try_start_pipeline()
+        if not pipeline_playing:
+            self.try_start_pipeline()
