@@ -1,5 +1,9 @@
 2007-10-31  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar.perspective_reservePortsOnWorker): Removed, it
+	had no callers. Fixes #745.
+
 	* flumotion/component/component.py
 	(BaseComponentMedium.remote_callMethod): Removed, it had no
 	callers, and the correct way is to make the component have a
