@@ -551,23 +551,27 @@ def reopenOutputFiles():
     Reopens the stdout and stderr output files, as set by
     L{outputToFiles}.
     """
-    if not (_stdout and _stderr):
+    if not _stdout and not _stderr:
         debug('log', 'told to reopen log files, but log files not set')
         return
 
-    oldmask = os.umask(0026)
-    try:
-        so = open(_stdout, 'a+') 
-        se = open(_stderr, 'a+', 0)
-    finally:
-        os.umask(oldmask)
+    def reopen(name, fileno, *args):
+        oldmask = os.umask(0026)
+        try:
+            f = open(name, 'a+', *args) 
+        finally:
+            os.umask(oldmask)
 
-    os.dup2(so.fileno(), sys.stdout.fileno()) 
-    os.dup2(se.fileno(), sys.stderr.fileno())
+        os.dup2(f.fileno(), fileno)
+        
+    if _stdout:
+        reopen(_stdout, sys.stdout.fileno())
 
-    debug('log', 'opened log %r', _stderr)
+    if _stderr:
+        reopen(_stderr, sys.stderr.fileno(), 0)
+        debug('log', 'opened log %r', _stderr)
 
-def outputToFiles(stdout, stderr):
+def outputToFiles(stdout=None, stderr=None):
     """
     Redirect stdout and stderr to named files.
 

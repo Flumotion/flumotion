@@ -1,3 +1,10 @@
+2007-10-31  Andy Wingo  <wingo@pobox.com>
+
+	Patch by: Philippe Normand <philippe fluendo.com>
+
+	* log.py (reopenOutputFiles, outputToFiles): Allow redirection of
+	e.g. stderr but not stdout. Fixes #748.
+
 2007-07-24  Andy Wingo  <wingo@pobox.com>
 
 	Patch by: Philippe Normand <philippe fluendo.com>
