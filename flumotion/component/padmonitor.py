@@ -150,8 +150,9 @@ class EaterPadMonitor(PadMonitor):
                  reconnectEater, *args):
         PadMonitor.__init__(self, pad, name, setActive, setInactive)
 
-        self._doReconnectEater = lambda: reconnectEater(*args)
-        self._reconnectDC = None
+        self._reconnectPoller = common.Poller(lambda: reconnectEater(*args),
+                                              self.PAD_MONITOR_TIMEOUT,
+                                              start=False)
 
     def setInactive(self):
         PadMonitor.setInactive(self)
@@ -162,27 +163,16 @@ class EaterPadMonitor(PadMonitor):
         # Setting this to 0 here avoids that happening in eaterCheck.
         self._last_data_time = 0
 
-        self._doReconnectEater()
-        def reconnect():
-            self._reconnectDC = None
-            self._doReconnectEater()
-
-        self._reconnectDC = reactor.callLater(self.PAD_MONITOR_TIMEOUT,
-            reconnect)
+        self._reconnectPoller.start(immediately=True)
 
     def setActive(self):
         PadMonitor.setActive(self)
-
-        if self._reconnectDC:
-            self._reconnectDC.cancel()
-            self._reconnectDC = None
+        self._reconnectPoller.stop()
 
     def detach(self):
         PadMonitor.detach(self)
+        self._reconnectPoller.stop()
 
-        if self._reconnectDC:
-            self._reconnectDC.cancel()
-            self._reconnectDC = None
 
 class PadMonitorSet(dict, log.Loggable):
     def __init__(self, setActive, setInactive):

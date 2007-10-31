@@ -1,5 +1,11 @@
 2007-10-31  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/padmonitor.py (EaterPadMonitor.__init__)
+	(EaterPadMonitor.setInactive, EaterPadMonitor.setActive)
+	(EaterPadMonitor.detach): When the eater monitor is inactive,
+	periodically reconnect using another poller. Fixes bug whereby the
+	monitor would only attempt to reconnect once.
+
 	* flumotion/manager/component.py
 	(ComponentAvatar.perspective_reservePortsOnWorker): Removed, it
 	had no callers. Fixes #745.
