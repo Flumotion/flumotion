@@ -1,3 +1,10 @@
+2007-10-31  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_callMethod): Removed, it had no
+	callers, and the correct way is to make the component have a
+	medium that defines the appropriate remote_* method.
+
 2007-10-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/padmonitor.py (PadMonitor): Refactor to use

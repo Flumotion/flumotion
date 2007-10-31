@@ -260,14 +260,6 @@ class BaseComponentMedium(medium.PingingMedium):
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
 
-    def remote_callMethod(self, methodName, *args, **kwargs):
-        method = getattr(self.comp, 'remote_' + methodName, None)
-        if method:
-            return method(*args, **kwargs)
-        msg = "%r doesn't have method remote_%s" % (self.comp, methodName)
-        self.warning(msg)
-        raise errors.MoMethodError(msg)
-
     def remote_getMasterClockInfo(self):
         """
         Base implementation of getMasterClockInfo, can be overridden by
