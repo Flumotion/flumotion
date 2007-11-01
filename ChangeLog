@@ -1,5 +1,17 @@
 2007-11-01  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/authenticate.glade:
+	* data/glade/connections.glade:
+	* data/glade/greeter-authenticate.glade:
+	* data/glade/greeter-initial.glade:
+	* data/glade/greeter-load_connection.glade:
+	* data/glade/greeter-start_new.glade:
+	Set visible to False by default, to avoid flashing
+	windows when starting up the admin interface the first time.
+	Fixes #784.
+
+2007-11-01  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
 	Remove trailing whitespace and prefix all error messages in the render
 	method with render.
