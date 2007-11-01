@@ -129,25 +129,31 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         # add popup menu to let you open url or copy link location
         
         if self._hasgnomevfs:
-            streamurl_widget_eventbox = self.wtree.get_widget('eventbox-stream-url')
+            streamurl_widget_eventbox = self.wtree.get_widget(
+                'eventbox-stream-url')
             streamurl_widget_eventbox.set_visible_window(False)
-            streamurl_widget_eventbox.connect('button-press-event', self._streamurl_clicked)
-            streamurl_widget_eventbox.connect('enter-notify-event', self._streamurl_enter)
-            streamurl_widget_eventbox.connect('leave-notify-event', self._streamurl_leave)
+            streamurl_widget_eventbox.connect('button-press-event',
+                self._streamurl_clicked)
+            streamurl_widget_eventbox.connect('enter-notify-event',
+                self._streamurl_enter)
+            streamurl_widget_eventbox.connect('leave-notify-event',
+                self._streamurl_leave)
             self._streamurl_popupmenu = gtk.Menu()
             item = gtk.ImageMenuItem('_Open Link')
             image = gtk.Image()
             image.set_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU)
             item.set_image(image)
             item.show()
-            item.connect('activate', self._streamurl_openlink, streamurl_widget_eventbox)
+            item.connect('activate', self._streamurl_openlink,
+                streamurl_widget_eventbox)
             self._streamurl_popupmenu.add(item)
             item = gtk.ImageMenuItem('Copy _Link Address')
             image = gtk.Image()
             image.set_from_stock(gtk.STOCK_COPY, gtk.ICON_SIZE_MENU)
             item.set_image(image)
             item.show()
-            item.connect('activate', self._streamurl_copylink, streamurl_widget_eventbox)
+            item.connect('activate', self._streamurl_copylink,
+                streamurl_widget_eventbox)
             self._streamurl_popupmenu.add(item)
             
         return self.statistics
@@ -164,7 +170,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
                 if app_to_run:
                     os.system("%s %s &" % (app_to_run[2],url))
         elif event.button == 3:
-            self._streamurl_popupmenu.popup(None, None, None, event.button, event.time)
+            self._streamurl_popupmenu.popup(None, None, None, event.button,
+                event.time)
         
     # signal handler for open link menu item activation
     # eventbox is the eventbox that contains the label the url is in

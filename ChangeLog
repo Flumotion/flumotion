@@ -1,3 +1,8 @@
+2007-11-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  Respect the 80 character punch card limit more.
+
 2007-10-31  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/padmonitor.py (EaterPadMonitor.__init__)
