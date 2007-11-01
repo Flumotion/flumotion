@@ -1,3 +1,9 @@
+2007-11-01  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
+	Remove trailing whitespace and prefix all error messages in the render
+	method with render.
+
 2007-11-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

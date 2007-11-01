@@ -49,7 +49,7 @@ class BaseAdminGtk(log.Loggable):
     """
 
     logCategory = "admingtk"
-    
+
     def __init__(self, state, admin):
         """
         @param state: state of component this is a UI for
@@ -66,7 +66,7 @@ class BaseAdminGtk(log.Loggable):
 
         d = admin.componentCallRemote(state, 'getUIState')
         d.addCallback(self.setUIState)
-    
+
     def cleanup(self):
         if self.uiState:
             self.uiState.removeListener(self)
@@ -96,11 +96,11 @@ class BaseAdminGtk(log.Loggable):
         d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
-    
+
     def getElementProperty(self, elementName, propertyName):
         """
         Get the value of the given property of the element with the given name.
-        
+
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
         d = self.admin.getProperty(self.state, elementName, propertyName)
@@ -110,7 +110,7 @@ class BaseAdminGtk(log.Loggable):
     def callRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
-        
+
     def propertyChanged(self, name, value):
         """
         Override this method to be notified of component's properties that
@@ -154,7 +154,7 @@ class BaseAdminGtk(log.Loggable):
         # always comes last, together with eater/feeder ?
 
         # if we don't have config, we are done
-        config = self.state.get('config') 
+        config = self.state.get('config')
         if not config:
             self.debug('self.state %r does not have config' % self.state)
             return
@@ -244,7 +244,7 @@ class BaseAdminGtkNode(log.Loggable):
                                     # to load
         ## Absolute path to the glade file.
         ##   e.g. "/home/flu/.flumotion/cache/test/80...df7/flumotion/ui.glade
-        self._gladefilepath = None 
+        self._gladefilepath = None
 
     def cleanup(self):
         if self.uiState:
@@ -271,11 +271,11 @@ class BaseAdminGtkNode(log.Loggable):
         d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
-    
+
     def getElementProperty(self, elementName, propertyName):
         """
         Get the value of the given property of the element with the given name.
-        
+
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
         d = self.admin.getProperty(self.state, elementName, propertyName)
@@ -285,7 +285,7 @@ class BaseAdminGtkNode(log.Loggable):
     def callRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
-       
+
     # FIXME: do this automatically if there is a gladeFile class attr set
     def loadGladeFile(self, gladeFile, domain='flumotion'):
         """
@@ -338,7 +338,7 @@ class BaseAdminGtkNode(log.Loggable):
         widget = wtree.get_widget(name)
         if not widget:
             self.warning('Could not create widget %s' % name)
-        
+
         return widget
 
     def haveWidgetTree(self):
@@ -383,11 +383,11 @@ class BaseAdminGtkNode(log.Loggable):
     def stateRemove(self, state, key, value):
         "Override me"
         pass
-    
+
     def stateSetitem(self, state, key, subkey, value):
         "Override me"
         pass
-    
+
     def stateDelitem(self, state, key, subkey, value):
         "Override me"
         pass
@@ -395,7 +395,7 @@ class BaseAdminGtkNode(log.Loggable):
     def render(self):
         """
         Render the GTK+ admin view for this component.
-        
+
         Returns: a deferred returning the main widget for embedding
         """
         if self.glade_file:
@@ -409,17 +409,17 @@ class BaseAdminGtkNode(log.Loggable):
             except RuntimeError:
                 msg = 'Could not load glade file %s' % self.glade_file
                 self.warning(msg)
-                yield gtk.Label("%s.  Kill the programmer." % msg)
+                yield gtk.Label("render: %s.  Kill the programmer." % msg)
 
             self.debug('render: calling haveWidgetTree')
             self.haveWidgetTree()
-            
+
         if not self.widget:
             self.debug('render: no self.widget, failing')
             yield defer.fail(IndexError)
-            
+
         if self._pendingUIState:
-            self.debug('calling setUIState on the node')
+            self.debug('render: calling setUIState on the node')
             self.setUIState(self._pendingUIState)
 
         self.debug('render: yielding widget %s' % self.widget)
@@ -970,7 +970,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             'vbox-timestamp-discont-total')
         self._vbox_offset_discont_total = self.wtree.get_widget(
             'vbox-offset-discont-total')
-
+        # 
         # show the tree view always
         self.wtree.get_widget('scrolledwindow').show_all()
 
