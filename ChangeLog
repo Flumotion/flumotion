@@ -1,3 +1,9 @@
+2007-11-02  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/effects/volume/volume.glade: Change the
+	shortcut for changing the volume from C to V, C is already used
+	by the Connection menu in the admin interface.
+
 2007-11-01  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/authenticate.glade:
