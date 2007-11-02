@@ -33,10 +33,12 @@ class ProgressDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
 
-                                                                               
+
         self.label = gtk.Label(message)
         self.vbox.pack_start(self.label, True, True, 6)
+        self.label.show()
         self.bar = gtk.ProgressBar()
+        self.bar.show()
         self.vbox.pack_end(self.bar, True, True, 6)
         self.active = False
         self._timeout_id = None
@@ -46,7 +48,7 @@ class ProgressDialog(gtk.Dialog):
     def start(self):
         "Show the dialog and start pulsating."
         self.active = True
-        self.show_all()
+        self.show()
         self.bar.pulse()
         self._timeout_id = gobject.timeout_add(200, self._pulse)
 
@@ -130,9 +132,9 @@ class PropertyChangeDialog(gtk.Dialog):
 
     gsignal('set', str, str, object)
     gsignal('get', str, str)
-    
+
     RESPONSE_FETCH = 0
-    
+
     def __init__(self, name, parent):
         title = "Change element property on '%s'" % name
         gtk.Dialog.__init__(self, title, parent,
@@ -144,7 +146,7 @@ class PropertyChangeDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         hbox.show()
-        
+
         label = gtk.Label('Element')
         label.show()
         hbox.pack_start(label, False, False)
@@ -159,7 +161,7 @@ class PropertyChangeDialog(gtk.Dialog):
         self.property_entry = gtk.Entry()
         self.property_entry.show()
         hbox.pack_start(self.property_entry, False, False)
-        
+
         label = gtk.Label('Value')
         label.show()
         hbox.pack_start(label, False, False)
@@ -168,7 +170,7 @@ class PropertyChangeDialog(gtk.Dialog):
         hbox.pack_start(self.value_entry, False, False)
 
         self.vbox.pack_start(hbox)
-        
+
     def response_cb(self, dialog, response):
         if response == gtk.RESPONSE_APPLY:
             self.emit('set', self.element_entry.get_text(),
@@ -182,5 +184,5 @@ class PropertyChangeDialog(gtk.Dialog):
 
     def update_value_entry(self, value):
         self.value_entry.set_text(str(value))
-    
+
 pygobject.type_register(PropertyChangeDialog)
