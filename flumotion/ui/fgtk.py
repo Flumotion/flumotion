@@ -310,7 +310,7 @@ class FVUMeter(gtk.DrawingArea):
         self.red_gc = gdk.GC(self.window, foreground=red)
         self.yellow_gc = gdk.GC(self.window, foreground=yellow)
 
-            self.window.set_user_data(self)
+        self.window.set_user_data(self)
         self.style.attach(self.window)
         self.style.set_background(self.window, gtk.STATE_NORMAL)
 

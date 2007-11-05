@@ -1,3 +1,10 @@
+2007-11-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/ui/fgtk.py (FVUMeter.do_realize): Fix inconsistent tabbing
+	found by reindent.py
+
+	* flumotion/common/Makefile.am: Remove accidentally commited changes
+
 2007-11-05  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/netutils.py:
