@@ -2,7 +2,7 @@
 
 	* flumotion/common/medium.py (BaseMedium.runBundledFunction)
 	(BaseMedium.getBundledFunction): Refactor to not be defer
-	generators. See #725.
+	generators. See #385.
 
 	* flumotion/manager/manager.py (Vishnu._componentStopNoAvatar)
 	(Vishnu._componentStopWithAvatar, Vishnu.componentStop): Split the
