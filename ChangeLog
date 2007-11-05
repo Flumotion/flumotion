@@ -1,3 +1,8 @@
+2007-11-05  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/netutils.py:
+	  Document two methods in the routing table class.
+
 2007-11-05  Johan Dahlin  <johan@gnome.org>
 
 	* all python files in the tree: run reindent.py, fixes #789

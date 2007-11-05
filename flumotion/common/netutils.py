@@ -208,6 +208,12 @@ class RoutingTable(object):
         return len(self.avltree)
 
     def route(self, ip):
+        """
+        Return the preferred route for this IP.
+        
+        @param ip  The IP to use for routing decisions.
+        @type  ip  An integer or string representing an IPv4 address
+        """
         if isinstance(ip, str):
             ip = ipv4StringToInt(ip)
 
@@ -218,6 +224,12 @@ class RoutingTable(object):
         return None
 
     def route_iter(self, ip):
+        """
+        Return an iterator yielding routes in order of preference.
+        
+        @param ip  The IP to use for routing decisions.
+        @type  ip  An integer or string representing an IPv4 address
+        """
         if isinstance(ip, str):
             ip = ipv4StringToInt(ip)
         for mask, net, route in self:
