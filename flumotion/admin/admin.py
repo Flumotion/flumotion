@@ -35,7 +35,6 @@ from flumotion.common import keycards, worker, planet, medium, package
 from flumotion.common import messages, signals
 # serializable worker and component state
 from flumotion.twisted import flavors
-from flumotion.twisted.defer import defer_generator_method
 
 from flumotion.configure import configure
 from flumotion.common import reload, connection
@@ -98,48 +97,39 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
 
+
     # vmethod implementation
     def gotDeferredLogin(self, d):
-        yield d
+        def success(remote):
+            self.medium.setRemoteReference(remote)
 
-        try:
-            try:
-                result = d.value()
-                assert result
-            except Exception, e:
-                if self.extraTenacious:
-                    self.debug('connection problem: %s',
-                               log.getExceptionMessage(e))
-                    self.debug('we are tenacious, so trying again later')
-                    self.disconnect()
-                    yield None
-                else:
-                    raise
-
-            self.medium.setRemoteReference(result)
-
-        except errors.ConnectionFailedError:
-            self.debug("emitting connection-failed")
-            self.medium.emit('connection-failed', "I failed my master")
-            self.debug("emitted connection-failed")
-
-        except errors.ConnectionRefusedError:
-            self.debug("emitting connection-refused")
-            self.medium.emit('connection-refused')
-            self.debug("emitted connection-refused")
-
-        except errors.NotAuthenticatedError:
-            # FIXME: unauthorized login emit !
-            self.debug("emitting connection-refused")
-            self.medium.emit('connection-refused')
-            self.debug("emitted connection-refused")
-
-        except Exception, e:
-            self.medium.emit('connection-error', e)
-            self.medium._defaultErrback(failure.Failure(e))
-
-    gotDeferredLogin = defer_generator_method(gotDeferredLogin)
-
+        def error(failure):
+            if self.extraTenacious:
+                self.debug('connection problem: %s',
+                           log.getFailureMessage(failure))
+                self.debug('we are tenacious, so trying again later')
+                self.disconnect()
+            elif failure.check(errors.ConnectionFailedError):
+                self.debug("emitting connection-failed")
+                self.medium.emit('connection-failed', "I failed my master")
+                self.debug("emitted connection-failed")
+            elif failure.check(errors.ConnectionRefusedError):
+                self.debug("emitting connection-refused")
+                self.medium.emit('connection-refused')
+                self.debug("emitted connection-refused")
+            elif failure.check(errors.NotAuthenticatedError):
+                # FIXME: unauthorized login emit !
+                self.debug("emitting connection-refused")
+                self.medium.emit('connection-refused')
+                self.debug("emitted connection-refused")
+            else:
+                self.medium.emit('connection-error', e)
+                self.medium._defaultErrback(failure.Failure(e))
+            # swallow error
+                
+        d.addCallbacks(success, error)
+        return d
+        
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
 class AdminModel(medium.PingingMedium, signals.SignalMixin):
@@ -312,7 +302,22 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.debug('emitted connection-failed')
 
     def setRemoteReference(self, remoteReference):
-        self.debug("setRemoteReference %r" % remoteReference)
+        self.debug("setRemoteReference %r", remoteReference)
+        def gotPlanetState(planet):
+            self.planet = planet
+            # monkey, Monkey, MONKEYPATCH!!!!!
+            self.planet.admin = self
+            self.debug('got planet state')
+            return self.callRemote('getWorkerHeavenState')
+
+        def gotWorkerHeavenState(whs):
+            self._workerHeavenState = whs
+            self.debug('got worker state')
+
+            self.debug('Connected to manager and retrieved all state')
+            self.state = 'connected'
+            self.emit('connected')
+            
         def writeConnection():
             i = self.connectionInfo
             if not (i.authenticator.username
@@ -353,23 +358,10 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.remote.notifyOnDisconnect(remoteDisconnected)
 
         d = self.callRemote('getPlanetState')
-        yield d
-        self.planet = d.value()
-        # monkey, Monkey, MONKEYPATCH!!!!!
-        self.planet.admin = self
-        self.debug('got planet state')
-
-        d = self.callRemote('getWorkerHeavenState')
-        yield d
-        self._workerHeavenState = d.value()
-        self.debug('got worker state')
-
-        writeConnection()
-
-        self.debug('Connected to manager and retrieved all state')
-        self.state = 'connected'
-        self.emit('connected')
-    setRemoteReference = defer_generator_method(setRemoteReference)
+        d.addCallback(gotPlanetState)
+        d.addCallback(gotWorkerHeavenState)
+        d.addCallback(lambda _: writeConnection())
+        return d
 
     # IStateListener interface
     def stateSet(self, state, key, value):
@@ -509,31 +501,30 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return d
 
     # used by other admin clients
-    # FIXME: isn't it great how hard it is to guess what duckport is ?
-    def reload_async(self, duckport):
-        name = reflect.filenameToModuleName(__file__)
+    def reload_async(self, write):
+        # FIXME: wtf is this crap
+        # write is the write method on a file object
+        def reloadSelf():
+            name = reflect.filenameToModuleName(__file__)
+            self.info("rebuilding '%s'" % name)
+            rebuild.rebuild(sys.modules[name])
+            write('Reloaded admin')
 
-        self.info("rebuilding '%s'" % name)
-        rebuild.rebuild(sys.modules[name])
-
+        def reloadComponents(_):
+            components = list(self._components.keys())
+            def reloadOne(_, msg):
+                write(msg)
+                if components:
+                    name = components.pop(0)
+                    d = self.reloadComponent(name)
+                    d.addCallback(reloadOne,
+                                  'Reloaded component %s' % name)
+            return reloadOne(_, 'Reloaded manager')
+            
+        reloadSelf()
         d = self.reloadManager()
-        yield d
-        try:
-            d.value()
-            duckport.write('Reloaded manager')
-        except Exception, e:
-            duckport.write('Failed to reload manager: %s' % e)
-
-        for name in self._components.keys():
-            d = self.reloadComponent(name)
-            yield d
-            try:
-                d.value()
-                duckport.write('Reloaded component %s' % name)
-            except Exception, e:
-                duckport.write('Failed to reload component %s: %s' % (name, e))
-        duckport.close()
-    reload_async = defer_generator_method(reload_async)
+        d.addCallback(reloadComponents)
+        return d
 
     def reloadManager(self):
         """
@@ -579,36 +570,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def cleanComponents(self):
         return self.callRemote('cleanComponents')
-
-    # function to get remote code for admin parts
-    # FIXME: rename slightly ?
-    # FIXME: still have hard-coded os.path.join stuff in here for md5sum,
-    # move to bundleloader ?
-    def getEntry(self, componentState, type):
-        """
-        Do everything needed to set up the entry point for the given
-        component and type, including transferring and setting up bundles.
-
-        Caller is responsible for adding errbacks to the deferred.
-
-        Returns: a deferred returning (entryPath, filename, methodName) with
-                 entryPath: the full local path to the bundle's base
-                 fileName:  the relative location of the bundled file
-                methodName: the method to instantiate with
-        """
-        d = self.callRemote('getEntryByType', componentState, type)
-        yield d
-
-        fileName, methodName = d.value()
-
-        self.debug("entry for %r of type %s is in file %s and method %s" % (
-            componentState, type, fileName, methodName))
-        d = self.bundleLoader.getBundles(fileName=fileName)
-        yield d
-
-        name, bundlePath = d.value()[-1]
-        yield (bundlePath, fileName, methodName)
-    getEntry = defer_generator_method(getEntry)
 
     ## worker remote methods
     def checkElements(self, workerName, elements):

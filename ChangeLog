@@ -1,3 +1,18 @@
+2007-11-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/text/view.py (AdminTextView.getEntry): Move here
+	from admin.py:AdminModel, and make not a defgen.
+
+	* flumotion/admin/admin.py
+	(AdminClientFactory.gotDeferredLogin.error): Simplify to not be a
+	defer generator. See #385.
+	(AdminModel.getEntry): Removed this defgen, it has no more
+	callers. componentview.py has what should be done.
+	(AdminModel.reload_async): Refactor to not be a defgen; still
+	krappy.
+
+	* flumotion/admin/gtk/componentview.py: Remove unneeded import.
+
 2007-11-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/ui/fgtk.py (FVUMeter.do_realize): Fix inconsistent tabbing

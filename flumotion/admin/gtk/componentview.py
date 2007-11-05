@@ -23,7 +23,6 @@
 import gobject
 import gtk
 
-from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import planet, errors, common, log
 
 

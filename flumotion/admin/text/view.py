@@ -206,6 +206,37 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     def gotEntrySleepingComponentErrback(self, failure):
         failure.trap(errors.SleepingComponentError)
 
+    def getEntry(self, componentState, type):
+        """
+        Do everything needed to set up the entry point for the given
+        component and type, including transferring and setting up bundles.
+
+        Caller is responsible for adding errbacks to the deferred.
+
+        Returns: a deferred returning (entryPath, filename, methodName) with
+                 entryPath: the full local path to the bundle's base
+                 fileName:  the relative location of the bundled file
+                methodName: the method to instantiate with
+        """
+        lexicalVariableHack = []
+
+        def gotEntry(res):
+            fileName, methodName = res
+            lexicalVariableHack.append(res)
+            self.debug("entry for %r of type %s is in file %s and method %s",
+                       componentState, type, fileName, methodName)
+            return self.bundleLoader.getBundles(fileName=fileName)
+
+        def gotBundles(res):
+            name, bundlePath = res[-1]
+            fileName, methodName = lexicalVariableHack[0]
+            return (bundlePath, fileName, methodName)
+
+        d = self.admin.callRemote('getEntryByType', componentState, type)
+        d.addCallback(gotEntry)
+        d.addCallback(gotBundles)
+        return d
+
     def update_components(self, components):
         for name in self._components.keys():
             component = self._components[name]
