@@ -43,7 +43,7 @@ class FComboBox(gtk.ComboBox):
     COLUMN_VALUE = 2
 
     _column_types = str, str, int
-    
+
     def __len__(self):
         return len(self.get_model())
 
@@ -52,10 +52,10 @@ class FComboBox(gtk.ComboBox):
         if i:
             model = self.get_model()
             return model.get(i, column)[0]
-        
+
     def get_text(self):
         return self.get_column_content(self.COLUMN_NICK)
-    
+
     def get_string(self):
         return self.get_column_content(self.COLUMN_NAME)
 
@@ -78,7 +78,7 @@ class FComboBox(gtk.ComboBox):
             return self.enum_class.get(self.get_value())
         else:
             return self.get_value()
-    
+
     def set_enum(self, enum_class, value_filter=()):
         """
         Set the given enum_class on the combobox.
@@ -109,7 +109,7 @@ class FComboBox(gtk.ComboBox):
         """
         if hasattr(self, 'enum_class'):
             delattr(self, 'enum_class')
-            
+
         self._init_enum_model()
         model = self.get_model()
         for value in list:
@@ -117,10 +117,10 @@ class FComboBox(gtk.ComboBox):
             model.set(i, 0, value, 1, value)
         self.set_active(0)
 
-    def set_multi_active(self, *values): 
+    def set_multi_active(self, *values):
         if not hasattr(self, 'enum_class'):
             raise TypeError
-        
+
         self.set_enum(self.enum_class, values)
 
     def set_active(self, item):
@@ -129,7 +129,7 @@ class FComboBox(gtk.ComboBox):
             gtk.ComboBox.set_active(self, item.value)
         else:
             gtk.ComboBox.set_active(self, item)
-            
+
     def get_active(self):
         """Small wrapper around get_active() to support enums"""
         value = gtk.ComboBox.get_active(self)
@@ -159,7 +159,7 @@ pygobject.type_register(FEntry)
 class FCheckButton(gtk.CheckButton):
     def get_state(self):
         return self.get_active()
-    
+
     def __nonzero__(self):
         return self.get_active()
 pygobject.type_register(FCheckButton)
@@ -216,21 +216,21 @@ class FVUMeter(gtk.DrawingArea):
                          0,
                          -1.0,
                          gobject.PARAM_READWRITE)
-                            
+
     }
     green_gc = None
     orange_gc = None
     red_gc = None
     yellow_gc = None
-    
+
     topborder = 7
     peaklevel = -90.0
     decaylevel = -90.0
     orange_threshold = -10.0
     red_threshold = -1.0
     bottomborder = 25
-    leftborder = 15 
-    rightborder = 65 
+    leftborder = 15
+    rightborder = 65
 
     # Returns the meter deflection percentage given a db value
     def iec_scale(self, db):
@@ -280,16 +280,16 @@ class FVUMeter(gtk.DrawingArea):
             raise AttributeError, 'unknown property %s' % property.name
 
         self.queue_draw()
-                
+
     def do_size_request(self, requisition):
-        requisition.width = 250 
+        requisition.width = 250
         requisition.height = 50
 
     def do_size_allocate(self, allocation):
         self.allocation = allocation
         if self.flags() & gtk.REALIZED:
             self.window.move_resize(*allocation)
-    
+
     def do_realize(self):
         self.set_flags(self.flags() | gtk.REALIZED)
 
@@ -309,20 +309,20 @@ class FVUMeter(gtk.DrawingArea):
         self.orange_gc = gdk.GC(self.window, foreground=orange)
         self.red_gc = gdk.GC(self.window, foreground=red)
         self.yellow_gc = gdk.GC(self.window, foreground=yellow)
- 
-	    self.window.set_user_data(self)
+
+            self.window.set_user_data(self)
         self.style.attach(self.window)
         self.style.set_background(self.window, gtk.STATE_NORMAL)
 
     def do_expose_event(self, event):
         self.chain(event)
-       
+
         x, y, w, h = self.allocation
         vumeter_width = w - (self.leftborder + self.rightborder)
         vumeter_height = h - (self.topborder + self.bottomborder)
         self.window.draw_rectangle(self.style.black_gc, True,
                                    self.leftborder, self.topborder,
-                                   vumeter_width, 
+                                   vumeter_width,
                                    vumeter_height)
         # draw peak level
         # 0 maps to width of 0, full scale maps to total width
@@ -337,7 +337,7 @@ class FVUMeter(gtk.DrawingArea):
             self.window.draw_rectangle(draw_gc, True,
                     self.leftborder, self.topborder,
                     peakwidth, vumeter_height)
-     
+
         # draw yellow decay level
         if self.decaylevel > -90.0:
             decaylevelpct = self.iec_scale(self.decaylevel)
@@ -365,7 +365,7 @@ class FVUMeter(gtk.DrawingArea):
         for level, scale in scalers:
             # tick mark, 6 pixels high
             # we cheat again here by putting the 0 at the first pixel
-            self.window.draw_line(self.style.black_gc, 
+            self.window.draw_line(self.style.black_gc,
                 self.leftborder + int(scale * (vumeter_width - 1)),
                 h - self.bottomborder,
                 self.leftborder + int(scale * (vumeter_width - 1)),
@@ -395,14 +395,14 @@ class WidgetMapping:
     # PyErr_Occurred()), to avoid this, we reimplement the function
     # as it is internally, eg failback to the real GType, by doing
     # this PyMapping_GetItemString will never set the error.
-    
+
     types = { 'GtkCheckButton': FCheckButton,
               'GtkComboBox': FComboBox,
               'GtkEntry': FEntry,
               'GtkRadioButton': FRadioButton,
               'GtkSpinButton': FSpinButton
             }
-    
+
     def __getitem__(self, name):
         if self.types.has_key(name):
             return self.types[name]

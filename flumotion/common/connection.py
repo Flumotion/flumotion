@@ -83,7 +83,7 @@ def parsePBConnectionInfo(string, username='user', password='test',
     """
     auth = fpb.Authenticator(username=username, password=password)
     ret = PBConnectionInfo(None, port, use_ssl, auth)
-    
+
     matched = _pat.search(string)
     if not matched:
         raise TypeError('Invalid connection string: %s '

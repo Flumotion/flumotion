@@ -40,7 +40,7 @@ class TestEnum(unittest.TestCase):
         self.assertEquals(en.get(1).name, 'One')
         self.assertEquals(en.get(2).name, 'Two')
         self.assertRaises(StopIteration, en.__getitem__, 3)
-    
+
     def testEnumValuesWithRepr(self):
         en = enum.EnumClass('TestEnum', ('Zero', 'One', 'Two'),
                                ('This is the first',
@@ -64,11 +64,11 @@ class TestEnum(unittest.TestCase):
         self.assertEquals(e0.nick, 'This is the first')
         self.assertEquals(e1.nick, 'This is the second')
         self.assertEquals(e2.nick, 'This is the third')
-        
+
         self.assertEquals(en.get(0), e0)
         self.assertEquals(en.get(1), e1)
         self.assertEquals(en.get(2), e2)
-        
+
         self.assertEquals(tuple(en), (e0, e1, e2))
 
     def testEnumValuesCmp(self):
@@ -92,7 +92,7 @@ class TestEnum(unittest.TestCase):
         self.assertNotEquals(FooType.Foo, BarType.Barrie)
         self.assertNotEquals(FooType.Foobie, BarType.Bar)
         self.assertNotEquals(FooType.Foobie, BarType.Barrie)
-        
+
         # BarType with FooType
         self.assertNotEquals(BarType.Bar, FooType.Foo)
         self.assertNotEquals(BarType.Bar, FooType.Foobie)

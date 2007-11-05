@@ -93,7 +93,7 @@ class ProcessProtocol(protocol.ProcessProtocol):
                     # if we find any of these, possibly special-case them too
                     obj.info("Reaped child with pid %s signaled by "
                              "signal %d.", pid, signum)
-                    
+
                 if not os.WCOREDUMP(status.value.status):
                     obj.warning("No core dump generated. "
                                 "Were core dumps enabled at the start ?")
@@ -158,7 +158,7 @@ class PortSet(log.Loggable):
                     self.warning('port %d already in use!', port)
                 else:
                     self.used[i] = 1
-        
+
     def releasePorts(self, ports):
         """
         @param ports: list of ports to release
@@ -176,10 +176,10 @@ class PortSet(log.Loggable):
 
     def numFree(self):
         return len(self.ports) - self.numUsed()
-    
+
     def numUsed(self):
         return len(filter(None, self.used))
-    
+
 # worker heaven state proxy objects
 class ManagerWorkerHeavenState(flavors.StateCacheable):
     """

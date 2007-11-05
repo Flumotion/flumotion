@@ -120,7 +120,7 @@ class BaseMedium(fpb.Referenceable):
             self.warning('Tried to callRemote(%s), but we are disconnected'
                          % name)
             return defer.fail(errors.NotConnectedError())
-        
+
         def callback(result):
             format, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
@@ -154,7 +154,7 @@ class BaseMedium(fpb.Referenceable):
         """
         Returns the given function in the given module, loading the
         module from a bundle.
-        
+
         If we can't find the bundle for the given module, or if the
         given module does not contain the requested function, we will
         raise L{flumotion.common.errors.RemoteRunError} (perhaps a
@@ -191,7 +191,7 @@ class BaseMedium(fpb.Referenceable):
         """
         Runs the given function in the given module with the given
         arguments.
-        
+
         This method calls getBundledFunction and then invokes the
         function. Any error raised by getBundledFunction or by invoking
         the function will be passed through unmodified.
@@ -291,4 +291,3 @@ class PingingMedium(BaseMedium):
         self.remote.notifyOnDisconnect(stopPingingCb)
 
         self.startPinging(self._disconnect)
-

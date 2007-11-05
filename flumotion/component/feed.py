@@ -207,7 +207,7 @@ class FeedMedium(fpb.Referenceable):
             t = self.remote.broker.transport
             self.debug('stop reading from transport')
             t.stopReading()
-                        
+
             self.debug('flushing PB write queue')
             t.doWrite()
             self.debug('stop writing to transport')
@@ -215,7 +215,7 @@ class FeedMedium(fpb.Referenceable):
 
             t.keepSocketAlive = True
             fd = os.dup(t.fileno())
-        
+
             # avoid refcount cycles
             self.setRemoteReference(None)
 
@@ -281,7 +281,7 @@ class FeedMedium(fpb.Referenceable):
 
         # make sure shutdown() is not called on the socket
         t.keepSocketAlive = True
-        
+
         fd = os.dup(t.fileno())
         # Similar to feedserver._sendFeedReplyCb, but since we are in a
         # callLater, not doReadOrWrite, we call connectionLost directly

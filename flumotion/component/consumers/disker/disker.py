@@ -103,7 +103,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def get_pipeline_string(self, properties):
         directory = properties['directory']
-    
+
         self.directory = directory
 
         self.fixRenamedProperties(properties, [('rotateType', 'rotate-type')])
@@ -150,10 +150,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         @param size: size of file (in bytes)
         """
         reactor.callLater(5, self._rotateSizeCallback, size)
-        
+
     def _rotateTimeCallback(self, time):
         self.change_filename()
-        
+
         # Add a new one
         reactor.callLater(time, self._rotateTimeCallback, time)
 
@@ -163,10 +163,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         else:
             if os.stat(self.location).st_size > size:
                 self.change_filename()
-        
+
         # Add a new one
         reactor.callLater(5, self._rotateTimeCallback, size)
-        
+
     def get_mime(self):
         if self.caps:
             return self.caps.get_structure(0).get_name()
@@ -176,7 +176,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if mime == 'multipart/x-mixed-replace':
             mime += ";boundary=ThisRandomString"
         return mime
-    
+
     def change_filename(self, filenameTemplate=None, timeOrTuple=None):
         """
         @param filenameTemplate: strftime formatted string to decide filename
@@ -208,7 +208,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             ext = 'ts'
         else:
             ext = 'data'
-        
+
         self.stop_recording()
 
         sink = self.get_element('fdsink')
@@ -225,7 +225,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         try:
             self.file = open(self.location, 'a')
         except IOError, e:
-            self.warning("Failed to open output file %s: %s", 
+            self.warning("Failed to open output file %s: %s",
                        self.location, log.getExceptionMessage(e))
             m = messages.Error(T_(N_("Failed to open output file "
                                        "%s. Check your permissions."
@@ -236,7 +236,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.emit('add', self.file.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
-    
+
         if self.symlink_to_current_recording:
             self.update_symlink(self.location,
                                 self.symlink_to_current_recording)
@@ -283,7 +283,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
-        
+
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
 
@@ -291,12 +291,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if not self.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
             new = False
-            
+
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
         if new and self._recordAtStart:
-            reactor.callLater(0, self.change_filename, 
+            reactor.callLater(0, self.change_filename,
                 self._startFilenameTemplate)
 
     # callback for when a client is removed so we can figure out
@@ -325,7 +325,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.symlink_to_current_recording = \
             properties.get('symlink-to-current-recording', None)
         self._recordAtStart = properties.get('start-recording', True)
-        self._defaultFilenameTemplate = properties.get('filename', 
+        self._defaultFilenameTemplate = properties.get('filename',
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')

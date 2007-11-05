@@ -82,7 +82,7 @@ class Dispatcher(log.Loggable):
     Avatar being returned knows about the mind (client) requesting
     the Avatar.
     """
-    
+
     implements(portal.IRealm)
 
     logCategory = 'dispatcher'
@@ -94,9 +94,9 @@ class Dispatcher(log.Loggable):
         """
         self._interfaceHeavens = {} # interface -> heaven
         self._computeIdentity = computeIdentity
-        self._bouncer = None 
+        self._bouncer = None
         self._avatarKeycards = {} # avatarId -> keycard
-    
+
     def setBouncer(self, bouncer):
         """
         @param bouncer: the bouncer to authenticate with
@@ -112,7 +112,7 @@ class Dispatcher(log.Loggable):
         @param interface: a component interface to register the heaven with.
         """
         assert isinstance(heaven, base.ManagerHeaven)
-       
+
         self._interfaceHeavens[interface] = heaven
 
     ### IRealm methods
@@ -210,7 +210,7 @@ class Vishnu(log.Loggable):
                                                   component.ComponentHeaven)
         self.adminHeaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
-        
+
         if configDir is not None:
             self.configDir = configDir
         else:
@@ -218,7 +218,7 @@ class Vishnu(log.Loggable):
                                           "managers", name)
 
         self.bouncer = None # used by manager to authenticate worker/component
-        
+
         self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
 
         self._componentMappers = {} # any object -> ComponentMapper
@@ -282,7 +282,7 @@ class Vishnu(log.Loggable):
             registry.getRegistry().verify(force=True)
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
-        
+
     def addMessage(self, level, id, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
@@ -300,7 +300,7 @@ class Vishnu(log.Loggable):
         self.addMessageObject(messages.Message(level,
                                                T_(format, *args),
                                                id=id, **kwargs))
-        
+
     def addMessageObject(self, message):
         """
         Add a message to the planet state.
@@ -308,7 +308,7 @@ class Vishnu(log.Loggable):
         @type message: L{flumotion.common.messages.Message}
         """
         self.state.setitem('messages', message.id, message)
-        
+
     def clearMessage(self, mid):
         """
         Clear any messages with the given message ID from the planet
@@ -318,7 +318,7 @@ class Vishnu(log.Loggable):
         """
         if mid in self.state.get('messages'):
             self.state.delitem('messages', mid)
-        
+
     def adminAction(self, identity, message, args, kw):
         """
         @param identity: L{flumotion.common.identity.Identity}
@@ -368,7 +368,7 @@ class Vishnu(log.Loggable):
 
         self.debug('adding component %s to %s'
                    % (conf.name, parent.get('name')))
-        
+
         if identity != LOCAL_IDENTITY:
             self.adminAction(identity, '_addComponent', (conf, parent), {})
 
@@ -392,7 +392,7 @@ class Vishnu(log.Loggable):
                                           configure.versionTuple):
             m = messages.Warning(T_(N_("This component is configured for "
                 "Flumotion version %s, but you are running version %s.\n"
-                "Please update the configuration of the component.\n"), 
+                "Please update the configuration of the component.\n"),
                 common.versionTupleToString(conf.getConfigDict()['version']),
                 configure.version))
             state.append('messages', m)
@@ -416,7 +416,7 @@ class Vishnu(log.Loggable):
 
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing
-        
+
         def checkNotRunning(comp, parentState):
             name = comp.getName()
 
@@ -443,7 +443,7 @@ class Vishnu(log.Loggable):
 
             diff = config.dictDiff(oldConf, newConf)
             diffMsg = config.dictDiffMessageString(diff, 'existing', 'new')
-                
+
             self.addMessage(messages.WARNING,
                             'loadComponent-%s' % oldConf['avatarId'],
                             N_('Could not load component %r into %r: '
@@ -467,7 +467,7 @@ class Vishnu(log.Loggable):
                 self.info('creating flow %r', f.name)
                 flow = planet.ManagerFlowState(name=f.name, parent=state)
                 state.append('flows', flow)
-                
+
             for c in f.components.values():
                 if checkNotRunning(c, flow):
                     added.append(self._addComponent(c, flow, identity))
@@ -484,7 +484,7 @@ class Vishnu(log.Loggable):
                 componentsToStart[workerId] = []
             componentsToStart[workerId].append(c)
         self.debug('_startComponents: componentsToStart %r' % componentsToStart)
-        
+
         for workerId, componentStates in componentsToStart.items():
             self._workerCreateComponents(workerId, componentStates)
 
@@ -494,12 +494,12 @@ class Vishnu(log.Loggable):
         d.addCallback(self._updateStateFromConf, conf, identity)
         d.addCallback(self._startComponents, identity)
         return d
- 
+
     def loadComponentConfigurationXML(self, file, identity):
         """
         Load the configuration from the given XML, merging it on top of
         the currently running configuration.
-        
+
         @param file:     file to parse, either as an open file object,
                          or as the name of a file to open
         @type  file:     str or file
@@ -536,7 +536,7 @@ class Vishnu(log.Loggable):
                             N_('Unknown error while loading configuration.'),
                             debug=log.getExceptionMessage(e))
             return defer.fail(e)
-            
+
     def _loadManagerPlugs(self, conf):
         # Load plugs
         for socket, plugs in conf.plugs.items():
@@ -549,7 +549,7 @@ class Vishnu(log.Loggable):
                 defs = registry.getRegistry().getPlug(args['type'])
                 e = defs.getEntry()
                 call = reflectcall.reflectCallCatching
-            
+
                 plug = call(errors.ConfigError,
                             e.getModuleName(), e.getFunction(), args)
                 self.plugs[socket].append(plug)
@@ -590,7 +590,7 @@ class Vishnu(log.Loggable):
         Load manager configuration from the given XML. The manager
         configuration is currently used to load the manager's bouncer
         and plugs, and is only run once at startup.
-        
+
         @param file:     file to parse, either as an open file object,
                          or as the name of a file to open
         @type  file:     str or file
@@ -602,7 +602,7 @@ class Vishnu(log.Loggable):
         self._loadManagerBouncer(conf)
 
     def loadComponent(self, identity, componentType, componentId,
-                      componentLabel, properties, workerName, 
+                      componentLabel, properties, workerName,
                       plugs, eaters, isClockMaster):
         """
         Load a component into the manager configuration.
@@ -610,7 +610,7 @@ class Vishnu(log.Loggable):
         See L{flumotion.manager.admin.loadComponent} for a definition of
         the argument types.
         """
-        self.debug('loading %s component %s on %s', 
+        self.debug('loading %s component %s on %s',
                    componentType, componentId, workerName)
         parentName, compName = common.parseComponentId(componentId)
 
@@ -625,11 +625,11 @@ class Vishnu(log.Loggable):
         state = self.state
         compState = None
 
-        compConf = config.ConfigEntryComponent(compName, parentName, 
-                                               componentType, 
+        compConf = config.ConfigEntryComponent(compName, parentName,
+                                               componentType,
                                                componentLabel,
                                                properties,
-                                               plugs, workerName, 
+                                               plugs, workerName,
                                                eaters, isClockMaster,
                                                None, None)
 
@@ -675,7 +675,7 @@ class Vishnu(log.Loggable):
         heaven = klass(self)
         self.dispatcher.registerHeaven(heaven, interface)
         return heaven
-    
+
     def setBouncer(self, bouncer):
         """
         @type bouncer: L{flumotion.component.bouncers.bouncer.Bouncer}
@@ -689,7 +689,7 @@ class Vishnu(log.Loggable):
 
     def getFactory(self):
         return self.factory
-       
+
     def componentCreate(self, componentState):
         """
         Create the given component.  This will currently also trigger
@@ -808,7 +808,7 @@ class Vishnu(log.Loggable):
 
         m = self.getComponentMapper(componentState)
         if not m:
-            # We have a stale componentState for an already-deleted 
+            # We have a stale componentState for an already-deleted
             # component
             self.warning("Component mapper for component state %r doesn't "
                 "exist", componentState)
@@ -834,7 +834,7 @@ class Vishnu(log.Loggable):
         if message.level == messages.ERROR:
             self.debug('Error message makes component sad')
             m.state.setMood(moods.sad.value)
-        
+
     # FIXME: unify naming of stuff like this
     def workerAttached(self, workerAvatar):
         # called when a worker logs in
@@ -865,13 +865,13 @@ class Vishnu(log.Loggable):
                         components.remove(compState)
                     if compState in lostComponents:
                         lostComponents.remove(compState)
-            
+
             for compState in lostComponents:
                 self.info(
                     "Restarting previously lost component %s on worker %s",
                     self._componentMappers[compState].id, workerId)
-                # We set mood to sleeping first. This allows things to 
-                # distinguish between a newly-started component and a lost 
+                # We set mood to sleeping first. This allows things to
+                # distinguish between a newly-started component and a lost
                 # component logging back in.
                 compState.set('moodPending', None)
                 compState.setMood(moods.sleeping.value)
@@ -882,11 +882,11 @@ class Vishnu(log.Loggable):
                 self.debug(
                     "vishnu.workerAttached(): no components for this worker")
                 return
-        
+
             self._workerCreateComponents(workerId, allComponents)
         d.addCallback(workerAvatarComponentListReceived)
         self.componentHeaven.feedServerAvailable(workerId)
-            
+
     def _workerCreateComponents(self, workerId, components):
         """
         Create the list of components on the given worker, sequentially, but
@@ -999,7 +999,7 @@ class Vishnu(log.Loggable):
 
         componentState.set('parent', flow)
         flow.append('components', componentState)
-        
+
     def registerComponent(self, componentAvatar):
         # fetch or create a new mapper
         m = (self.getComponentMapper(componentAvatar.avatarId)
@@ -1044,7 +1044,7 @@ class Vishnu(log.Loggable):
         except KeyError:
             self.warning('Could not remove jobState for %r' % componentAvatar)
         m.jobState = None
-        
+
         m.state.set('pid', None)
         m.state.set('cpu', None)
         m.state.set('workerName', None)
@@ -1053,7 +1053,7 @@ class Vishnu(log.Loggable):
         # unmap avatar
         del self._componentMappers[m.avatar]
         m.avatar = None
-        
+
     def getComponentStates(self):
         cList = self.state.getComponents()
         self.debug('getComponentStates(): %d components' % len(cList))
@@ -1085,7 +1085,7 @@ class Vishnu(log.Loggable):
         del self._componentMappers[self._componentMappers[c].id]
         del self._componentMappers[c]
         return flow.remove('components', c)
-        
+
     def deleteFlow(self, flowName):
         """
         Empty the planet of a flow.
@@ -1110,7 +1110,7 @@ class Vishnu(log.Loggable):
         yield flow.empty()
         yield self.state.remove('flows', flow)
     deleteFlow = defer_generator_method(deleteFlow)
-        
+
     def emptyPlanet(self):
         """
         Empty the planet of all components, and flows. Also clears all
@@ -1129,7 +1129,7 @@ class Vishnu(log.Loggable):
         components = filter(isPending, components)
         if len(components) > 0:
             state = components[0]
-            raise errors.BusyComponentError(state, 
+            raise errors.BusyComponentError(state,
                 "moodPending is %s" % moods.get(state.get('moodPending')))
 
         # filter out the ones that aren't sleeping and stop them
@@ -1139,7 +1139,7 @@ class Vishnu(log.Loggable):
 
         # create a big deferred for stopping everything
         d = defer.Deferred()
-        
+
         self.debug('need to stop %d components: %r' % (
             len(components), components))
 
@@ -1152,7 +1152,7 @@ class Vishnu(log.Loggable):
             if avatar:
                 d.addCallback(lambda result, a: a.stop(), avatar)
             else:
-                assert (c.get('mood') is moods.sad.value or 
+                assert (c.get('mood') is moods.sad.value or
                     c.get('mood') is moods.lost.value)
 
         d.addCallback(self._emptyPlanetCallback)
@@ -1161,7 +1161,7 @@ class Vishnu(log.Loggable):
         reactor.callLater(0, d.callback, None)
 
         return d
-        
+
     def _emptyPlanetCallback(self, result):
         # gets called after all components have stopped
         # cleans up the rest of the planet state
@@ -1195,7 +1195,7 @@ class Vishnu(log.Loggable):
 
         dl = defer.DeferredList(dList)
         return dl
-       
+
     def _getComponentsToCreate(self):
         """
         @rtype: list of L{flumotion.common.planet.ManagerComponentState}
@@ -1223,7 +1223,7 @@ class Vishnu(log.Loggable):
         if workerName in self.workerHeaven.avatars:
             return self._getWorker(workerName).feedServerPort
         return None
-    
+
     def reservePortsOnWorker(self, workerName, numPorts):
         """
         Requests a number of ports on the worker named workerName. The
@@ -1233,7 +1233,7 @@ class Vishnu(log.Loggable):
         @returns: a list of ports as integers
         """
         return self._getWorker(workerName).reservePorts(numPorts)
-        
+
     def releasePortsOnWorker(self, workerName, ports):
         """
         Tells the manager that the given ports are no longer being used,
@@ -1243,7 +1243,7 @@ class Vishnu(log.Loggable):
             return self._getWorker(workerName).releasePorts(ports)
         except errors.ComponentNoWorkerError, e:
             self.warning('could not release ports: %r' % e.args)
-        
+
     def getComponentMapper(self, object):
         """
         Look up an object mapper given the object.

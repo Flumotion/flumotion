@@ -37,10 +37,10 @@ class TestSignalMixin(unittest.TestCase):
         emissions = []
         def trackEmission(*args, **kwargs):
             emissions.append((args[-1], args[:-1], kwargs))
-            
+
         o.connect('foo', trackEmission, 'foo')
         o.emit('foo')
-        
+
         self.assertEquals(emissions, [('foo', (o,), {})])
 
     def testMixin(self):
@@ -54,7 +54,7 @@ class TestSignalMixin(unittest.TestCase):
         emissions = []
         def trackEmission(*args, **kwargs):
             emissions.append((args[-1], args[:-1], kwargs))
-            
+
         o.connect('foo', trackEmission, 'foo')
         o.connect('bar', trackEmission, 'bar', baz='qux')
 

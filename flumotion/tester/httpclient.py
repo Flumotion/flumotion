@@ -34,11 +34,11 @@ class HTTPClient(gobject.GObject, log.Loggable):
     """
     Base class for HTTP clients.
     """
-    
+
     __gsignals__ = {
         'stopped': (gobject.SIGNAL_RUN_FIRST, None, (int, int)),
     }
-    
+
     logCategory = "httpclient"
 
     def __init__(self, id, url):
@@ -59,7 +59,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
     #    raise "verify needs to be handed to me by the application"
 
     def next_read_time(self):
-	    """
+        """
         Calculate the next time to read.
 
         @rtype: float
@@ -68,7 +68,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
         raise "next_read_time needs to be implemented by a subclass"
 
     def read_size(self):
-	    """
+        """
         calculate and return the size of the current read'
         raise "read_size needs to be implemented by a subclass"
         """
@@ -79,14 +79,14 @@ class HTTPClient(gobject.GObject, log.Loggable):
         it means the run was successful.
         """
         self._stop_time = stop_time
-        
+
     def set_stop_size(self, stop_size):
         """
         Set a maximum size to read.  If a client reaches this,
         it means the run was successful.
         """
         self._stop_size = stop_size
-         
+
     def open(self):
         'open the connection'
         self._start_time = time.time()
@@ -129,10 +129,10 @@ class HTTPClient(gobject.GObject, log.Loggable):
                 self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
                 return
         if not self._handle:
-           self.warning("%4d: didn't get fd from urlopen" % self._id)
-           self.emit('stopped', self._id, self.stopped_INTERNAL_ERROR)
-           return
-              
+            self.warning("%4d: didn't get fd from urlopen" % self._id)
+            self.emit('stopped', self._id, self.stopped_INTERNAL_ERROR)
+            return
+
         delta = self.next_read_time() - self._start_time
         timeout = int(delta * 1000)
         gobject.timeout_add(timeout, self.read)
@@ -216,9 +216,9 @@ class HTTPClientStatic(HTTPClient):
 
     def next_read_time(self):
         'calculate the next time we want to read.  Could be in the past.'
-	    # calculate the next byte count
+            # calculate the next byte count
         next_byte_count = self._bytes + self._readsize
- 
+
         # calculate the elapsed time corresponding to this read moment
         time_delta = next_byte_count / (float(self._rate))
 
@@ -250,8 +250,8 @@ def verify(client, data):
     #print "comparing buffer to data: %d - %d" % (ord(buffer[0]), ord(data[0]))
     #print "comparing buffer to data: %d - %d" % (ord(buffer[-1]), ord(data[-1]))
     if (buffer != data):
-       print "WOAH NELLY !"
-       return False
+        print "WOAH NELLY !"
+        return False
     return True
 
 pygobject.type_register(HTTPClient)

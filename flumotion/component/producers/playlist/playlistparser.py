@@ -73,19 +73,19 @@ class Playlist(object, log.Loggable):
     def _getCurrentItem(self):
         position = self.producer.getCurrentPosition()
         item = self._findItem(position)
-        self.debug("Item %r found as current for playback position %d", 
+        self.debug("Item %r found as current for playback position %d",
             item, position)
         return item
 
     def removeItems(self, id):
         current = self._getCurrentItem()
-            
+
         if id not in self._itemsById:
             return
 
         items = self._itemsById[id]
         for item in items:
-            if (current and item.timestamp < current.timestamp + 
+            if (current and item.timestamp < current.timestamp +
                     current.duration):
                 self.debug("Not removing current item!")
                 continue
@@ -93,7 +93,7 @@ class Playlist(object, log.Loggable):
             self.producer.unscheduleItem(item)
 
         del self._itemsById[id]
-        
+
     def addItem(self, id, timestamp, uri, offset, duration, hasAudio, hasVideo):
         """
         Add an item to the playlist.
@@ -134,14 +134,14 @@ class Playlist(object, log.Loggable):
             item = prev.next
         while item:
             if (item.timestamp > newitem.timestamp and
-                    item.timestamp + item.duration > 
+                    item.timestamp + item.duration >
                     newitem.timestamp + newitem.duration):
                 next = item
                 break
             item = item.next
 
         if prev:
-            # Then things between prev and next (next might be None) are to be 
+            # Then things between prev and next (next might be None) are to be
             # deleted. Do so.
             cur = prev.next
             while cur != next:
@@ -164,13 +164,13 @@ class Playlist(object, log.Loggable):
 
         # Duration adjustments -> Reflect into gnonlin timeline
         if prev and prev.timestamp + prev.duration > newitem.timestamp:
-            self.debug("Changing duration of previous item from %d to %d", 
+            self.debug("Changing duration of previous item from %d to %d",
                 prev.duration, newitem.timestamp - prev.timestamp)
             prev.duration = newitem.timestamp - prev.timestamp
             self.producer.adjustItemScheduling(prev)
 
         if next and newitem.timestamp + newitem.duration > next.timestamp:
-            self.debug("Changing timestamp of next item from %d to %d to fit", 
+            self.debug("Changing timestamp of next item from %d to %d to fit",
                 newitem.timestamp, newitem.timestamp + newitem.duration)
             ts = newitem.timestamp + newitem.duration
             duration = next.duration - (ts - next.timestamp)
@@ -181,7 +181,7 @@ class Playlist(object, log.Loggable):
         # Then we need to actually add newitem into the gnonlin timeline
         if not self.producer.scheduleItem(newitem):
             self.debug("Failed to schedule item, unlinking")
-            # Failed to schedule it. 
+            # Failed to schedule it.
             self.unlinkItem(newitem)
             return None
 
@@ -277,7 +277,7 @@ class PlaylistParser(object, log.Loggable):
 
                 hasA = disc.is_audio
                 hasV = disc.is_video
-                durationDiscovered = min(disc.audiolength, 
+                durationDiscovered = min(disc.audiolength,
                     disc.videolength)
                 if not duration or duration > durationDiscovered:
                     duration = durationDiscovered
@@ -286,13 +286,13 @@ class PlaylistParser(object, log.Loggable):
                     offset = 0
 
                 if duration > 0:
-                    self.playlist.addItem(id, timestamp, uri, offset, duration, 
+                    self.playlist.addItem(id, timestamp, uri, offset, duration,
                         hasA, hasV)
                 else:
                     self.warning("Duration of item is zero, not adding")
             else:
                 self.warning("Discover failed to find media in %s", item[0])
-    
+
             # We don't want to burn too much cpu discovering all the files;
             # this throttles the discovery rate to a reasonable level
             self.debug("Continuing on to next file in one second")
@@ -309,7 +309,7 @@ class PlaylistParser(object, log.Loggable):
             return
 
         self._discovering = True
-        
+
         item = self._pending_items.pop(0)
 
         self.debug("Discovering file %s", item[0])
@@ -351,7 +351,7 @@ class PlaylistXMLParser(PlaylistParser):
 
     def parseFile(self, file, id=None):
         """
-        Parse a playlist file. Adds the contents of the file to the existing 
+        Parse a playlist file. Adds the contents of the file to the existing
         playlist, overwriting any existing entries for the same time period.
         """
         parser = fxml.Parser()
@@ -373,7 +373,7 @@ class PlaylistXMLParser(PlaylistParser):
         finally:
             self.unblockDiscovery()
 
-    # A simplified private version of this code from fxml without the 
+    # A simplified private version of this code from fxml without the
     # undesirable unicode->str conversions.
     def _parseAttributes(self, node, required, optional):
         out = []
@@ -411,7 +411,7 @@ class PlaylistXMLParser(PlaylistParser):
         self.addItemToPlaylist(filename, timestamp, duration, offset, id)
 
     def _parseTimestamp(self, ts):
-        # Take TS in YYYY-MM-DDThh:mm:ss.ssZ format, return timestamp in 
+        # Take TS in YYYY-MM-DDThh:mm:ss.ssZ format, return timestamp in
         # nanoseconds since the epoch
 
         # time.strptime() doesn't handle the fractional seconds part. We ignore
@@ -427,5 +427,3 @@ class PlaylistXMLParser(PlaylistParser):
             return int(calendar.timegm(timestruct) * gst.SECOND)
         except ValueError:
             raise fxml.ParserError("Invalid timestamp %s" % ts)
-
-

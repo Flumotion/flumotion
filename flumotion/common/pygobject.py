@@ -45,7 +45,7 @@ def gobject_set_property(object, property, value):
         raise errors.PropertyError(
             "Property '%s' in element '%s' does not exist" % (
                 property, object.get_property('name')))
-        
+
     if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
                             gobject.TYPE_INT64, gobject.TYPE_UINT64):
         try:
@@ -54,7 +54,7 @@ def gobject_set_property(object, property, value):
             msg = "Invalid value given for property '%s' in element '%s'" % (
                 property, object.get_property('name'))
             raise errors.PropertyError(msg)
-        
+
     elif pspec.value_type == gobject.TYPE_BOOLEAN:
         if value == 'False':
             value = False
@@ -67,7 +67,7 @@ def gobject_set_property(object, property, value):
     elif pspec.value_type == gobject.TYPE_STRING:
         value = str(value)
     # FIXME: this is superevil ! we really need to find a better way
-    # of checking if this property is a param enum  
+    # of checking if this property is a param enum
     # also, we only allow int for now
     elif repr(pspec.__gtype__).startswith("<GType GParamEnum"):
         value = int(value)
@@ -87,7 +87,7 @@ def gsignal(name, *args):
     """
     frame = sys._getframe(1)
     _locals = frame.f_locals
-    
+
     if not '__gsignals__' in _locals:
         _dict = _locals['__gsignals__'] = {}
     else:
@@ -134,7 +134,7 @@ def gproperty(type_, name, desc, *args, **kwargs):
     frame = sys._getframe(1)
     _locals = frame.f_locals
     flags = 0
-    
+
     def _do_get_property(self, prop):
         try:
             return self._gproperty_values[prop.name]
@@ -145,15 +145,15 @@ def gproperty(type_, name, desc, *args, **kwargs):
         if not getattr(self, '_gproperty_values', None):
             self._gproperty_values = {}
         self._gproperty_values[prop.name] = value
-    
+
     _locals['do_get_property'] = _do_get_property
     _locals['do_set_property'] = _do_set_property
-    
+
     if not '__gproperties__' in _locals:
         _dict = _locals['__gproperties__'] = {}
     else:
         _dict = _locals['__gproperties__']
-    
+
     for i in 'readable', 'writable':
         if not i in kwargs:
             kwargs[i] = True

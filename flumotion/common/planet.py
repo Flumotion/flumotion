@@ -104,7 +104,7 @@ class ManagerAtmosphereState(flavors.StateCacheable):
      - parent:            L{ManagerPlanetState}
      - components (list): list of L{ManagerComponentState}
     """
- 
+
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('parent')
@@ -214,14 +214,14 @@ class ManagerComponentState(flavors.StateCacheable):
 
     It also has a special key, 'mood'. This acts as a proxy for the mood
     in the L{WorkerJobState}, when there is a job attached (the job's copy
-    is authoritative when it connects), and is controlled independently at 
+    is authoritative when it connects), and is controlled independently at
     other times.
 
     I proxy the following keys from the serialized L{WorkerJobState}:
       - mood, manager-ip, pid, workerName, cpu
       - messages (list)
     """
- 
+
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         # our additional keys
@@ -231,7 +231,7 @@ class ManagerComponentState(flavors.StateCacheable):
         self.addKey('moodPending')
         self.addKey('workerRequested')
         self.addKey('config') # dictionary
-        
+
         # proxied from job state or combined with our state (mood)
         for k in _jobStateKeys:
             self.addKey(k)
@@ -263,7 +263,7 @@ class ManagerComponentState(flavors.StateCacheable):
                     self.append(key, v)
         # set mood last; see #552
         self.set('mood', jobState.get('mood'))
-                
+
         # only proxy keys we want proxied; eaterNames and feederNames
         # are ignored for example
         proxiedKeys = _jobStateKeys + _jobStateListKeys
@@ -320,7 +320,7 @@ class WorkerJobState(flavors.StateCacheable):
 
     In addition, if I am the state of a FeedComponent, then I also
     have the following keys:
-    
+
      - eaterNames:        list of feedId being eaten by the eaters
      - feederNames:       list of feedId being fed by the feeders
 

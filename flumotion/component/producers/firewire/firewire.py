@@ -89,7 +89,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # Always scale down to half size to lose interlacing artifacts.
         # FIXME: handle this better when GStreamer provides facilities for it.
         interlaced_height = 288
-            
+
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
@@ -131,7 +131,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
     def getVolume(self):
         return self.volume.get_property('volume')
-        
+
     def setVolume(self, value):
         """
         @param value: float between 0.0 and 4.0
@@ -154,7 +154,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     # we actually have a connect or disconnect of the camera
                     # so first remove all the previous messages warning about a
                     # firewire-bus-reset
-                
+
                     for m in self.state.get('messages'):
                         if m.id.startswith('firewire-bus-reset'):
                             self.state.remove('messages',m)

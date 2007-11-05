@@ -72,7 +72,7 @@ class FakeMind(log.Loggable):
 class FakeWorkerMind(FakeMind):
 
     logCategory = 'fakeworkermind'
-    
+
     def __init__(self, testcase, avatarId):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
@@ -109,7 +109,7 @@ class TestHeaven(unittest.TestCase):
             assert isinstance(avatar, worker.WorkerAvatar)
             cleanup()
             assert not 'foo' in [a.getName() for a in h.getAvatars()]
-            
+
         h = worker.WorkerHeaven(FakeVishnu())
         mind = FakeWorkerMind(self, 'testworker')
         from flumotion.manager.manager import Dispatcher
@@ -119,4 +119,3 @@ class TestHeaven(unittest.TestCase):
                                      interfaces.IWorkerMedium)
         d.addCallback(gotAvatar)
         return d
-

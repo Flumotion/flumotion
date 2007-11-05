@@ -49,7 +49,7 @@ def _getSocketPath():
     import tempfile
     fd, name = tempfile.mkstemp('.%d' % os.getpid(), 'flumotion.worker.')
     os.close(fd)
-    
+
     return name
 
 
@@ -77,7 +77,7 @@ class JobInfo(object):
                  'nice', 'bundles')
     def __init__(self, pid, avatarId, type, moduleName, methodName, nice,
                  bundles):
-        self.pid = pid 
+        self.pid = pid
         self.avatarId = avatarId
         self.type = type
         self.moduleName = moduleName
@@ -103,7 +103,7 @@ class JobProcessProtocol(worker.ProcessProtocol):
         dstarts = self._startSet
         signum = status.value.signal
 
-        # we need to trigger a failure on the create deferred 
+        # we need to trigger a failure on the create deferred
         # if the job failed before logging in to the worker;
         # otherwise the manager still thinks it's starting up when it's
         # dead.  If the job already attached to the worker however,
@@ -117,7 +117,7 @@ class JobProcessProtocol(worker.ProcessProtocol):
             text = "Component '%s' has exited early (%s).  " \
                    "This is sometimes triggered by a corrupt " \
                    "GStreamer registry." % (self.avatarId, reason)
-            dstarts.createFailed(self.avatarId, 
+            dstarts.createFailed(self.avatarId,
                                  errors.ComponentCreateError(text))
 
         if dstarts.shutdownRegistered(self.avatarId):
@@ -127,7 +127,7 @@ class JobProcessProtocol(worker.ProcessProtocol):
 
         # chain up
         worker.ProcessProtocol.processEnded(self, status)
-        
+
 
 class BaseJobHeaven(pb.Root, log.Loggable):
     """
@@ -182,7 +182,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         # pass FDs over.
         port = reactor.listenWith(fdserver.FDPort, self._socketPath, f)
         self._port = port
-        
+
     ### portal.IRealm method
     def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
@@ -216,7 +216,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
 
     def getJobInfos(self):
         return self._jobInfos.values()
-    
+
     def getJobPids(self):
         return self._jobInfos.keys()
 
@@ -305,7 +305,7 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
         self._heaven = heaven
         self.setMind(mind)
         self.pid = None
-            
+
     def setMind(self, mind):
         """
         @param mind: reference to the job's JobMedium on which we can call
@@ -322,7 +322,7 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
         self.log('logout called, %s disconnected', self.avatarId)
 
         self._heaven.removeAvatar(self.avatarId)
-        
+
     def stop(self):
         """
         returns: a deferred marking completed stop.

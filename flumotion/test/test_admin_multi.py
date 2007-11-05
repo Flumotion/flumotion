@@ -69,7 +69,7 @@ class MultiAdminTest(common.TestCaseWithManager):
             def __init__(self):
                 self.disconnectDeferred = defer.Deferred()
                 self.reconnectDeferred = defer.Deferred()
-                
+
             def model_addPlanet(self, admin, planet):
                 self.reconnectDeferred.callback(admin)
                 self.reconnectDeferred = None
@@ -103,4 +103,3 @@ class MultiAdminTest(common.TestCaseWithManager):
         d.addCallback(disconnected)
         d.addCallback(reconnected)
         return d
-

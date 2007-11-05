@@ -39,7 +39,7 @@ except:
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
         return self.comp.switch_to("master")
-    
+
     def remote_switchToBackup(self):
         return self.comp.switch_to("backup")
 
@@ -91,13 +91,13 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                               "scheduling but the necessary modules " \
                               "dateutil and/or icalendar are not installed"
                     self.warning(warnStr)
-                    m = messages.Warning(T_(N_(warnStr)), 
+                    m = messages.Warning(T_(N_(warnStr)),
                         id="error-parsing-ical")
                     self.addMessage(m)
             return result
         d.addCallback(cb)
         return d
-        
+
     def switch_to(self, eaterSubstring):
         raise errors.NotImplementedError('subclasses should implement '
                                          'switch_to')
@@ -153,7 +153,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                     ", will switch when %s is back" % (startOrStopStr,
                     eaterSubstring, eaterSubstring)
                 self.warning(warnStr)
-                m = messages.Warning(T_(N_(warnStr)), 
+                m = messages.Warning(T_(N_(warnStr)),
                         id="error-scheduling-event")
                 self.addMessage(m)
                 self._eaterReadyDefers[eaterSubstring] = defer.Deferred()
@@ -202,13 +202,13 @@ class SingleSwitch(Switch):
             for sinkPad in padPeers:
                 if feedId and feedId in padPeers[sinkPad]:
                     self.switchPads[eaterAlias] = sinkPad
-            if not eaterAlias in self.switchPads:    
-                self.warning("could not find sink pad for eater %s", 
+            if not eaterAlias in self.switchPads:
+                self.warning("could not find sink pad for eater %s",
                              eaterAlias)
         # make sure switch has the correct sink pad as active
-        self.debug("Setting switch's active-pad to %s", 
+        self.debug("Setting switch's active-pad to %s",
             self.switchPads[self._idealEater])
-        self.switchElement.set_property("active-pad", 
+        self.switchElement.set_property("active-pad",
             self.switchPads[self._idealEater])
         self.uiState.set("active-eater", self._idealEater)
 
@@ -277,7 +277,7 @@ class AVSwitch(Switch):
                     nonExistantVideoParams.append(p)
                 else:
                     existsVideoParam = True
-            self.debug("exists video param: %d all: %d nonexistant: %r", 
+            self.debug("exists video param: %d all: %d nonexistant: %r",
                 existsVideoParam, allVideoParams, nonExistantVideoParams)
             if not allVideoParams and existsVideoParam:
                 # message
@@ -320,7 +320,7 @@ class AVSwitch(Switch):
                 " capsfilter caps=video/x-raw-yuv,width=%d,height=%d," \
                 "framerate=%d/%d,pixel-aspect-ratio=%d/%d," \
                 "format=(fourcc)I420 " \
-                "name=capsfilter-%%(eaterName)s ! " % (width, 
+                "name=capsfilter-%%(eaterName)s ! " % (width,
                 height, framerate[0], framerate[1], par[0], par[1])
         if self.config.get("audio-channels", None):
             channels = self.config["audio-channels"]
@@ -352,7 +352,7 @@ class AVSwitch(Switch):
         # figure out how many pads should be connected for the eaters
         # 1 + number of eaters with eaterName *-backup
         numVideoPads = 1 + len(self.config["eater"]["video-backup"])
-        numAudioPads = 1 + len(self.config["eater"]["audio-backup"]) 
+        numAudioPads = 1 + len(self.config["eater"]["audio-backup"])
         padPeers = {} # (padName, switchElement) -> peer element name
         for sinkPadNumber in range(0, numVideoPads):
             padPeers[("sink%d" % sinkPadNumber, vsw)] = \
@@ -365,19 +365,19 @@ class AVSwitch(Switch):
 
         for feedId in self.eater_names:
             eaterName = self.get_eater_name_for_feed_id(feedId)
-            self.debug("feedId %s is mapped to eater name %s", feedId, 
+            self.debug("feedId %s is mapped to eater name %s", feedId,
                 eaterName)
             if eaterName:
                 for sinkPadName, switchElement in padPeers:
                     if feedId in padPeers[(sinkPadName, switchElement)]:
                         self.switchPads[eaterName] = sinkPadName
                 if not self.switchPads.has_key(eaterName):
-                    self.warning("could not find sink pad for eater %s", 
+                    self.warning("could not find sink pad for eater %s",
                         eaterName )
         # make sure switch has the correct sink pad as active
-        self.debug("Setting video switch's active-pad to %s", 
+        self.debug("Setting video switch's active-pad to %s",
             self.switchPads["video-%s" % self._idealEater])
-        vsw.set_property("active-pad", 
+        vsw.set_property("active-pad",
             self.switchPads["video-%s" % self._idealEater])
         self.debug("Setting audio switch's active-pad to %s",
             self.switchPads["audio-%s" % self._idealEater])
@@ -392,7 +392,7 @@ class AVSwitch(Switch):
     # stop value, and the next segment on both to have
     # the same start value to maintain sync.
     # In order to do this:
-    # 1) we need to block all src pads of elements connected 
+    # 1) we need to block all src pads of elements connected
     #    to the switches' sink pads
     # 2) we need to set the property "stop-value" on both the
     #    switches to the highest value of "last-timestamp" on the two
@@ -400,13 +400,13 @@ class AVSwitch(Switch):
     # 3) the pads should be switched (ie active-pad set) on the two switched
     # 4) the switch elements should be told to queue buffers coming on their
     #    active sinkpads by setting the queue-buffers property to TRUE
-    # 5) pad buffer probes should be added to the now active sink pads of the 
+    # 5) pad buffer probes should be added to the now active sink pads of the
     #    switch elements, so that the start value of the enxt new segment can
     #    be determined
     # 6) the src pads we blocked in 1) should be unblocked
     # 7) when both pad probes have fired once, use the lowest timestamp
     #    received as the start value for the switch elements
-    # 8) set the queue-buffers property on the switch elements to FALSE 
+    # 8) set the queue-buffers property on the switch elements to FALSE
     def switch_to(self, eater):
         if not (self.videoSwitchElement and self.audioSwitchElement):
             self.warning("switch_to called with eater %s but before pipeline "
@@ -452,7 +452,7 @@ class AVSwitch(Switch):
                     priority=40)
                 self.state.append('messages', m)
         return False
-    
+
     def _set_last_timestamp(self):
         vswTs = self.videoSwitchElement.get_property("last-timestamp")
         aswTs = self.audioSwitchElement.get_property("last-timestamp")
@@ -503,7 +503,7 @@ class AVSwitch(Switch):
                         self.switchPads[eaterName]).get_peer()
                 if pad:
                     self.pads_awaiting_block.append(pad)
-        
+
         for eaterName in self.switchPads:
             if "audio" in eaterName:
                 pad = self.audioSwitchElement.get_pad(
@@ -557,7 +557,7 @@ class AVSwitch(Switch):
             self._padProbeLock.release()
 
     def _start_time_buffer_probe(self, pad, buffer, eaterName):
-        self.debug("start time buffer probe for %s buf ts: %u", 
+        self.debug("start time buffer probe for %s buf ts: %u",
             eaterName, buffer.timestamp)
         self._padProbeLock.acquire()
         if eaterName in self._startTimeProbeIds:
@@ -582,7 +582,7 @@ class AVSwitch(Switch):
                 lowestTs = self._startTimes[eaterName]
                 self.debug("lowest ts received from buffer probes: %u",
                     lowestTs)
-                
+
         if haveAllStartTimes:
             self.debug("have all start times")
             self.videoSwitchElement.set_property("start-value", lowestTs)
@@ -591,7 +591,7 @@ class AVSwitch(Switch):
             # we can also turn off the queue-buffers property
             self.audioSwitchElement.set_property("queue-buffers", False)
             self.videoSwitchElement.set_property("queue-buffers", False)
-            self.log("eaterSwitchingTo becoming None from %s", 
+            self.log("eaterSwitchingTo becoming None from %s",
                 self.eaterSwitchingTo)
             self.eaterSwitchingTo = None
             self._switchLock.release()
@@ -608,4 +608,3 @@ class AVSwitch(Switch):
             self._eaterReadyDefers["backup"] = None
         if d:
             d.callback(True)
-

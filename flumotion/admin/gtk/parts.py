@@ -57,7 +57,7 @@ class AdminStatusbar:
         @param widget: a gtk.Statusbar to wrap.
         """
         self._widget = widget
-        
+
         self._cids = {} # hash of context -> context id
         self._mids = {} # hash of context -> message id lists
         self._contexts = ['main', 'notebook']
@@ -134,11 +134,11 @@ class ComponentsView(log.Loggable, gobject.GObject):
     """
     I present a view on the list of components logged in to the manager.
     """
-    
+
     implements(flavors.IStateListener)
 
     logCategory = 'components'
-    
+
     gsignal('has-selection', object)  # state-or-None
     gsignal('activated', object, str) # state, action name
     #gsignal('right-clicked', object, int, float)
@@ -148,13 +148,13 @@ class ComponentsView(log.Loggable, gobject.GObject):
     gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
               False, construct=True)
     _model = _view = _moodPixbufs = None # i heart pychecker
-    
+
     def __init__(self, tree_widget):
         """
         @param tree_widget: the gtk.TreeWidget to put the view in.
         """
         self.__gobject_init__()
-        
+
         self._view = tree_widget
         self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int, str)
 
@@ -187,7 +187,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
                                  markup=COL_WORKER)
         col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
-        
+
         def type_pid_datafunc(column, cell, model, iter):
             state = model.get_value(iter, COL_STATE)
             pid = state.get('pid')
@@ -206,7 +206,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 cell.set_property('text', '%.2f' % (cpu * 100.0))
             else:
                 cell.set_property('text', '')
-                
+
         t = gtk.CellRendererText()
         col = gtk.TreeViewColumn('CPU %', t, text=COL_CPU)
         col.set_cell_data_func(t, type_cpu_datafunc)
@@ -233,7 +233,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             self.debug('no component selected, emitting has-selection None')
             self.emit('has-selection', None)
             return
-        
+
         if state == self._last_state:
             return
 
@@ -245,7 +245,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         # right-click ?
         if event.button != 3:
             return
-            
+
         # get iter from coordinates
         x = int(event.x)
         y = int(event.y)
@@ -267,7 +267,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
     def _activated_cb(self, menu, action, state):
         self.debug('emitting activated')
         self.emit('activated', state, action)
-    
+
     def get_selected_name(self):
         """
         Get the name of the currently selected component, or None.
@@ -281,7 +281,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         model, iter = sel
         if not iter:
             return
-        
+
         return model.get(iter, COL_NAME)[0]
 
     def get_selected_state(self):
@@ -299,7 +299,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         model, iter = sel
         if not iter:
             return
-        
+
         return model.get(iter, COL_STATE)[0]
 
     def update_start_stop_props(self):
@@ -317,18 +317,18 @@ class ComponentsView(log.Loggable, gobject.GObject):
         # remove the listener for each state object
         state = model.get(iter, COL_STATE)[0]
         state.removeListener(self)
-        
+
     def update(self, components):
         """
         Update the components view by removing all old components and
         showing the new ones.
 
-        @param components: dictionary of name -> 
+        @param components: dictionary of name ->
                            L{flumotion.common.component.AdminComponentState}
         """
         # remove all Listeners
         self._model.foreach(self._removeListenerForeach)
-        
+
         self.debug('updating components view')
         # clear and rebuild
         self._model.clear()
@@ -345,12 +345,12 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
             iter = self._model.append()
             self._iters[component] = iter
-            
+
             mood = component.get('mood')
             self.debug('component has mood %r' % mood)
             messages = component.get('messages')
             self.debug('component has messages %r' % messages)
-            
+
             if mood != None:
                 self._set_mood_value(iter, mood)
 
@@ -386,7 +386,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         if not isinstance(state, planet.AdminComponentState):
             self.warning('Got state change for unknown object %r' % state)
             return
-            
+
         iter = self._iters[state]
         self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
 
@@ -427,9 +427,9 @@ class ComponentMenu(gtk.Menu):
 
         self.set_title(_('Component'))
 
-        i = gtk.MenuItem(_('_Restart')) 
-        self.append(i) 
-        self._items['restart'] = i 
+        i = gtk.MenuItem(_('_Restart'))
+        self.append(i)
+        self._items['restart'] = i
 
         i = gtk.MenuItem(_('_Start'))
         mood = moods.get(state.get('mood'))
@@ -437,13 +437,13 @@ class ComponentMenu(gtk.Menu):
             i.set_property('sensitive', False)
         self.append(i)
         self._items['start'] = i
-        
+
         i = gtk.MenuItem(_('St_op'))
         if mood == moods.sleeping:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['stop'] = i
-       
+
         i = gtk.MenuItem(_('_Delete'))
         if not (mood == moods.sleeping):
             i.set_property('sensitive', False)
@@ -464,11 +464,10 @@ class ComponentMenu(gtk.Menu):
         for name in self._items.keys():
             i = self._items[name]
             i.connect('activate', self._activated_cb, name)
-            
+
         self.show_all()
 
     def _activated_cb(self, item, name):
         self.emit('activated', name)
 
 pygobject.type_register(ComponentMenu)
-

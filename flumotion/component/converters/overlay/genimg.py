@@ -69,7 +69,7 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
         xiph = ImageChops.offset(xiph, -width + (WIDTH*logos), y_corr)
         image = ImageChops.add_modulo(image, xiph)
         logos -= 1
-        
+
     if show_cc:
         cc = Image.open(ccLogoPath)
         cc = ImageOps.expand(cc, imax)
@@ -85,7 +85,7 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
 
     if os.path.exists(filename):
         os.unlink(filename)
-        
+
     image.save(filename, 'png')
 
     if text:
@@ -93,6 +93,6 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     else:
         return False
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     #generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
     generate_overlay('test.png', 'Testing', True, True, True, 320, 240)

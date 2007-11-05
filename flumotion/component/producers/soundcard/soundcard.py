@@ -78,7 +78,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
                 'gst-python', '0.10.7'))
             self.addMessage(m)
 
-        vol = volume.Volume('inputVolume', comp_level, pipeline, 
+        vol = volume.Volume('inputVolume', comp_level, pipeline,
             allowIncrease=False, allowVolumeSet=allowVolumeSet)
         self.addEffect(vol)
         self._srcelement = pipeline.get_by_name("src")
@@ -91,8 +91,8 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
                 # some low-end sound cards require the Capture track to be
                 # set to recording to get any sound, so set that track and
                 # the input track we selected
-                element.set_record(track, 
-                    (track.get_property("label") == trackLabel or 
+                element.set_record(track,
+                    (track.get_property("label") == trackLabel or
                      track.get_property("label") == "Capture"))
 
     def setVolume(self, value):
@@ -106,8 +106,8 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
             volumeSet = False
             for track in element.list_tracks():
                 if track.get_property("label") == self.inputTrackLabel:
-                    volumeVals = tuple(int(value/1.0 * 
-                        track.get_property("max-volume")) 
+                    volumeVals = tuple(int(value/1.0 *
+                        track.get_property("max-volume"))
                         for _ in xrange(0, track.get_property("num-channels")))
                     element.set_volume(track, volumeVals)
                     volumeSet = True

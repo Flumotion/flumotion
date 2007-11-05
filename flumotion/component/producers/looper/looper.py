@@ -95,7 +95,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
                                             self.videoframerate[1])
 
         vcaps = gst.Caps(vstruct)
-        
+
         self.run_discoverer()
 
         template = (
@@ -145,12 +145,12 @@ class Looper(feedcomponent.ParseLaunchComponent):
         d = discoverer.Discoverer(self.filelocation)
         d.connect('discovered', discovered)
         d.discover()
- 
+
     def on_segment_done(self):
         self.do_seek(False)
         self.nbiterations += 1
         self.uiState.set('num-iterations', self.nbiterations)
-        
+
     def on_pads_blocked(self):
         for src, sink in self.pads_to_link:
             src.link(sink)
@@ -160,17 +160,17 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.pads_to_link = []
         self.nbiterations = 0
         self.uiState.set('num-iterations', self.nbiterations)
-        
+
     def configure_pipeline(self, pipeline, properties):
         def on_message(bus, message):
-            handlers = {(pipeline, gst.MESSAGE_SEGMENT_DONE): 
+            handlers = {(pipeline, gst.MESSAGE_SEGMENT_DONE):
                         self.on_segment_done,
                         (pipeline, gst.MESSAGE_APPLICATION):
                         self.on_pads_blocked}
 
             if (message.src, message.type) in handlers:
                 handlers[(message.src, message.type)]()
-            
+
         self.oggdemux = pipeline.get_by_name("demux")
 
         for name in 'aident', 'vident':
@@ -200,7 +200,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
     def do_seek(self, flushing):
         """
         Restarts the looping.
-        
+
         Returns True if the seeking was accepted,
         Returns False otherwiser
         """

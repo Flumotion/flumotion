@@ -52,7 +52,7 @@ data = ("checkTVCard('/dev/video0')",
 
 def make_model():
     from flumotion.worker.checks import video
-    
+
     m = gtk.ListStore(str, object)
     for s in data:
         i = m.append()
@@ -128,7 +128,7 @@ class Window(gtk.Window):
             m.format_secondary_text(secondary)
         m.run()
         m.destroy()
-                              
+
     def run_check(self):
         from twisted.internet.defer import Deferred
 

@@ -33,10 +33,10 @@ class testDepGraph(unittest.TestCase):
         ret.set("name", defs[0])
         ret.set("type", defs[1])
         ret.set("workerRequested", defs[2])
-        
+
         # now handle eaters and feeders
         conf = {}
-        
+
         conf["source"] = []
         conf["eater"] = {"default": []}
         for eater in defs[4]:
@@ -59,16 +59,16 @@ class testDepGraph(unittest.TestCase):
             self._started.append(name)
 
         dg.addComponent(component, setup, started)
-        
+
     def testVideoOnlyOnOneWorker(self):
         """
         I test the simple videotest -> video encoder -> muxer -> httpstreamer
         with clock master set to videotest
         """
-        
+
         dg = DepGraph()
 
-        videotest_defs = ["video-test", "videotest", "default", 
+        videotest_defs = ["video-test", "videotest", "default",
             ["video-test:default"], [] ]
         videoenc_defs = ["video-encoder", "theora-encoder", "default",
             ["video-encoder:default"], ["video-test:default"] ]
@@ -76,19 +76,19 @@ class testDepGraph(unittest.TestCase):
             ["muxer-video:default"], ["video-encoder:default"] ]
         streamer_defs = ["http-video", "http-streamer", "default", [],
             ["muxer-video:default"]]
-        
+
         videotest = self._createComponent(videotest_defs)
         videoenc = self._createComponent(videoenc_defs)
         muxer = self._createComponent(muxer_defs)
         streamer = self._createComponent(streamer_defs)
-        
+
         self._addComponent(dg, videotest)
         self._addComponent(dg, videoenc)
         self._addComponent(dg, muxer)
         self._addComponent(dg, streamer)
         dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
-        
+
         # now check depgraph is correct
         startorder = dg._dag.sort()
         # check worker is the first node in the depgraph
@@ -115,12 +115,12 @@ class testDepGraph(unittest.TestCase):
                     if happynode[1] == "COMPONENTSTART":
                         happyindex = startorder.index(happynode)
                         self.failUnless(happyindex > clockindex)
-        
+
             # now check that componentsetup before componentstart
             # also check the feeders are before their respective eaters
             elif node[1] == "COMPONENTSETUP":
                 setupindex = startorder.index(node)
-                # feeders = 
+                # feeders =
                 for postnode in startorder:
                     if postnode == (node[0], "COMPONENTSTART"):
                         postindex = startorder.index(postnode)
@@ -131,7 +131,7 @@ class testDepGraph(unittest.TestCase):
                     #elif postnode[1] == dg.FEEDER and postnode[0].component == node[0]:
                     #    postindex = startorder.index(postnode)
                     #    self.failUnless(postindex > jobindex)
-                        
+
         # Nothing should be started yet, because no workers logged in
         self.assertEquals(len(self._setup), 0)
         self.assertEquals(len(self._started), 0)
@@ -151,7 +151,7 @@ class testDepGraph(unittest.TestCase):
 
         dg.setComponentSetup(videotest)
         dg.setClockMasterStarted(videotest)
-        # Now we should have video-encoder asked to setup, and videotest 
+        # Now we should have video-encoder asked to setup, and videotest
         # asked to start.
         self.assertEquals(self._setup, ['video-test', 'video-encoder'])
         self.assertEquals(self._started, ['video-test'])
@@ -161,9 +161,9 @@ class testDepGraph(unittest.TestCase):
         dg.setComponentStarted(videotest)
         # And now everything should be in _setup, and videotest and videoenc in
         # _started
-        self.assertEquals(self._setup, 
+        self.assertEquals(self._setup,
             ['video-test', 'video-encoder', 'muxer-video', 'http-video'])
-        self.assertEquals(self._started, 
+        self.assertEquals(self._started,
             ['video-test', 'video-encoder'])
 
     def testBrokenDepGraph(self):
@@ -175,7 +175,7 @@ class testDepGraph(unittest.TestCase):
         videotest = self._createComponent(videotest_defs)
         muxer = self._createComponent(muxer_defs)
 
-        self.assertRaises(KeyError, dg.addClockMaster, videotest, 
+        self.assertRaises(KeyError, dg.addClockMaster, videotest,
             lambda x: None)
         dg.addComponent(videotest, lambda x: None, lambda x: None)
         dg.addComponent(muxer, lambda x: None, lambda x: None)
@@ -184,7 +184,7 @@ class testDepGraph(unittest.TestCase):
 
     def testCleaningDepgraph(self):
         dg = DepGraph()
-        videotest_defs = ["video-test", "videotest", "default", 
+        videotest_defs = ["video-test", "videotest", "default",
             ["video-test:default"], [] ]
         videoenc_defs = ["video-encoder", "theora-encoder", "default",
             ["video-encoder:default"], ["video-test:default"] ]
@@ -192,19 +192,19 @@ class testDepGraph(unittest.TestCase):
             ["muxer-video:default"], ["video-encoder:default"] ]
         streamer_defs = ["http-video", "http-streamer", "default", [],
             ["muxer-video:default"]]
-        
+
         videotest = self._createComponent(videotest_defs)
         videoenc = self._createComponent(videoenc_defs)
         muxer = self._createComponent(muxer_defs)
         streamer = self._createComponent(streamer_defs)
-        
+
         self._addComponent(dg, videotest)
         self._addComponent(dg, videoenc)
         self._addComponent(dg, muxer)
         self._addComponent(dg, streamer)
         dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
-        
+
         # now cleanup depgraph
         dg.removeComponent(videotest)
         dg.removeComponent(streamer)
@@ -229,14 +229,14 @@ class testDepGraph(unittest.TestCase):
         # sort and see if everything is fine
         for node in dg._dag.sort():
             assert(dg._dag.hasNode(node[0], node[1]))
-        
+
         self._addComponent(dg, videotest)
         self._addComponent(dg, videoenc)
         self._addComponent(dg, muxer)
         self._addComponent(dg, streamer)
         dg.addClockMaster(videotest, lambda x: None)
         dg.mapEatersToFeeders()
-        
+
         # Nothing should be started, no worker logged in
         self.assertEquals(len(self._setup), 0)
         self.assertEquals(len(self._started), 0)
@@ -265,14 +265,13 @@ class testDepGraph(unittest.TestCase):
                     if happynode[1] == "COMPONENTSTART":
                         happyindex = startorder.index(happynode)
                         self.failUnless(happyindex > clockindex)
-        
+
             # now check that componentsetup before componentstart
             # also check the feeders are before their respective eaters
             elif node[1] == "COMPONENTSETUP":
                 setupindex = startorder.index(node)
-                # feeders = 
+                # feeders =
                 for postnode in startorder:
                     if postnode == (node[0], "COMPONENTSTART"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
-

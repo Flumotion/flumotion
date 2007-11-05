@@ -53,10 +53,10 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
     def tearDown(self):
         self.bouncer.stop()
         del self.bouncer
-        
+
     def testInit(self):
         self.assert_(self.bouncer._checker)
-        
+
     def testOk(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
@@ -105,7 +105,7 @@ class TestHTPasswdCryptUACPCC(unittest.TestCase):
                 self.assertEquals(result.state, keycards.AUTHENTICATED)
             dd.addCallback(authenticatedCallback)
             return dd
-            
+
         d.addCallback(okCallback)
         return d
 

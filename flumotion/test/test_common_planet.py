@@ -43,9 +43,9 @@ class ManagerComponentStateTest(unittest.TestCase):
     def testSetWrongArg(self):
         def assign(object):
             object.state.set('wrongarg', 'failure')
-        
+
         self.assertRaises(KeyError, assign, self)
-    
+
 class AllComponentStateTest(unittest.TestCase):
     def setUp(self):
         self.mstate = planet.ManagerComponentState()
@@ -97,7 +97,7 @@ class InvalidateTest(unittest.TestCase):
         self.assertEquals(invalidates, [])
         astate.invalidate()
         self.assertEquals(invalidates, [acomp, aflow, astate])
-        
+
 # FIXME: this test doesn't do anything since unjelly(jelly()) creates a
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
@@ -114,7 +114,7 @@ class ListenerTest(unittest.TestCase):
         # listener "interface" function
         print "state set !"
         self.changes.append((state, key, value))
-        
+
     def mset(self, key, value):
         # helper function to set on job state and propagate
         self.mstate.set(key, value)

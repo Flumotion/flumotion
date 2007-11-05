@@ -40,7 +40,7 @@ class NodeBook(gtk.Notebook):
         self.nodes = admingtk.getNodes()
         self._setup_pages()
         self.show()
-        
+
     def _setup_pages(self):
         for name, node in self.nodes.items():
             table = gtk.Table(1,1)
@@ -100,7 +100,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             self.debug(
                 'No specific GTK admin for this component, using default')
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
-            
+
         def got_entry_point((filename, procname)):
             # getEntryByType for admin/gtk returns a factory function
             # for creating
@@ -108,7 +108,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             # subclass instances
             modname = common.pathToModuleName(filename)
             return admin.getBundledFunction(modname, procname)
-            
+
         def got_factory(factory):
             # instantiate from factory and wrap in a NodeBook
             return lambda: NodeBook(factory(state, admin))
@@ -161,12 +161,12 @@ class ComponentView(gtk.VBox, log.Loggable):
             self.widget.show()
             self.pack_start(self.widget, True, True)
             return self.widget
-            
+
         self._callStamp += 1
         callStamp = self._callStamp
         d = self.get_widget_constructor(self.object)
         d.addCallback(got_widget_constructor, callStamp)
-        
+
     def object_active_to_inactive(self):
         # prevent got_widget_constructor from adding the widget above
         self._callStamp += 1
@@ -180,7 +180,7 @@ class ComponentView(gtk.VBox, log.Loggable):
                         self.widget.admingtk.cleanup()
                     del self.widget.admingtk
             self.widget = None
-        
+
     def object_inactive_to_unset(self):
         self.object.removeListener(self)
         self.object = None

@@ -68,7 +68,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # doc in base class
         base.ManagerAvatar.__init__(self, heaven, avatarId,
                                     remoteIdentity, mind)
-        
+
         self.jobState = jobState
         self.makeComponentState(conf)
         self.clocking = clocking
@@ -78,7 +78,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self._shutdown_requested = False
 
         self._happydefers = [] # deferreds to call when mood changes to happy
-        
+
         self.vishnu.registerComponent(self)
         self.addMoodListener()
         # calllater to allow the component a chance to receive its
@@ -140,7 +140,7 @@ class ComponentAvatar(base.ManagerAvatar):
             return mState
         else:
             return makeNewComponentState(conf)
-            
+
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
                            mind):
         def gotStates(result):
@@ -203,7 +203,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self.addMessageObject(messages.Message(level,
                                                T_(format, *args),
                                                id=id, **kwargs))
-        
+
     def addMessageObject(self, message):
         """
         Add a message to the planet state.
@@ -211,7 +211,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @type message: L{flumotion.common.messages.Message}
         """
         self.componentState.append('messages', message)
-        
+
     def _upgradeConfig(self, state, conf):
         # different from conf['version'], eh...
         version = conf.get('config-version', 0)
@@ -260,7 +260,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # FIXME: why?
         self.componentState.set('moodPending', None)
 
-        # Now we're detached (no longer proxying state from the component) 
+        # Now we're detached (no longer proxying state from the component)
         # clear all remaining messages
         for m in self.componentState.get('messages'):
             self.debug('Removing message %r', m)
@@ -269,7 +269,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # detach componentstate from avatar
         self.componentState = None
         self.jobState = None
-            
+
         self._ports = {}
 
         self.jobState = None
@@ -300,7 +300,7 @@ class ComponentAvatar(base.ManagerAvatar):
     def provideMasterClock(self):
         """
         Tell the component to provide a master clock.
-        
+
         @rtype: L{twisted.internet.defer.Deferred}
         """
         def success(clocking):
@@ -354,7 +354,7 @@ class ComponentAvatar(base.ManagerAvatar):
         if not self.componentState:
             self.warning("detached component")
             return []
-        
+
         feederNames = self.componentState.get('config').get('feed', [])
         theseFeedIds = [common.feedId(self.getName(), feederName)
                         for feederName in feederNames]
@@ -376,7 +376,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @rtype: int
         """
         return self.vishnu.getWorkerFeedServerPort(self.getWorkerName())
- 
+
     def getRemoteManagerIP(self):
         """
         Get the IP address of the manager as seen by the component.
@@ -433,7 +433,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # FIXME: real error handling
         d.addErrback(lambda x: None)
         return d
-            
+
     def setClocking(self, host, port, base_time):
         # setMood on error?
         return self.mindCallRemote('setMasterClock', host, port, base_time)
@@ -447,7 +447,7 @@ class ComponentAvatar(base.ManagerAvatar):
         d = self.mindCallRemote('feedTo', feederName, fullFeedId, host,
                                 port)
         return d
-  
+
     def setElementProperty(self, element, property, value):
         """
         Set a property on an element.
@@ -472,9 +472,9 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning(msg)
             raise errors.PropertyError(msg)
         self.debug("setting property '%s' on element '%s'" % (property, element))
-        
+
         return self.mindCallRemote('setElementProperty', element, property, value)
-        
+
     def getElementProperty(self, element, property):
         """
         Get a property of an element.
@@ -580,7 +580,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         This is called by the bouncer component that authenticated the keycard.
 
-        
+
         @param requesterId: name (avatarId) of the component that originally
                               requested authentication for the given keycardId
         @type  requesterId: str
@@ -607,11 +607,11 @@ class ComponentHeaven(base.ManagerHeaven):
     avatarClass = ComponentAvatar
 
     logCategory = 'comp-heaven'
-    
+
     def __init__(self, vishnu):
         # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
-        
+
     ### our methods
     def _componentIsLocal(self, componentAvatar):
         # gets what we think is the other side's address
@@ -623,14 +623,14 @@ class ComponentHeaven(base.ManagerHeaven):
             return False
 
     def feedServerAvailable(self, workerName):
-        self.debug('feed server %s logged in, we can connect to its port', 
+        self.debug('feed server %s logged in, we can connect to its port',
                    workerName)
         # can be made more efficient
         for avatar in self.avatars.values():
             if avatar.componentState:
                 if avatar.componentState.get('workerRequested') == workerName:
                     self.componentAttached(avatar.avatarId)
-        
+
     def masterClockAvailable(self, avatarId, clocking):
         self.debug('master clock for %r provided on %r', avatarId,
                    clocking)
@@ -667,7 +667,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 else:
                     self.debug('clock master not logged in yet, will '
                                'set clocking later')
-            
+
     def componentAttached(self, avatarId):
         # No need to wait for any of this, they are not interdependent
         if avatarId in self.avatars:
@@ -744,7 +744,7 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectFeeders(self, componentAvatar):
         flowName = componentAvatar.getParentName()
         otherComponents = [c for c in self.avatars.values()
-                           if c.componentState != None and 
+                           if c.componentState != None and
                                c.getParentName() == flowName]
         for feederName, remoteFeedId \
                 in componentAvatar.getEatersForFeeders(otherComponents):
@@ -772,7 +772,7 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectFeederDownstream(self, componentAvatar, feederName,
                                  remoteFeedId):
         def error(format, *args, **kwargs):
-            componentAvatar.addMessage(messages.ERROR, 
+            componentAvatar.addMessage(messages.ERROR,
                                        ("component-start-%s-%s"
                                         % (feederName, remoteFeedId)),
                                        format, *args, **kwargs)
@@ -827,4 +827,3 @@ class ComponentHeaven(base.ManagerHeaven):
             return self.vishnu._componentMappers[state].avatar
         else:
             return None
-

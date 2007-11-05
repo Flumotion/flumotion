@@ -43,13 +43,13 @@ class TestFeeder(unittest.TestCase):
     def testReconnect(self):
         clientId = '/default/muxer-video'
 
-        # This needed because disconnecting clients only updates the stats in 
+        # This needed because disconnecting clients only updates the stats in
         # a callFromThread (which is roughly the same as a callLater).
         d = defer.Deferred()
 
         def checkClientDisconnected():
             self.clientAssertStats(c, 0, 0, 10, 1, 1)
-        
+
             # connect again
             self.feeder.clientConnected(clientId, 3, lambda _: None)
             self.clientAssertStats(c, 0, 0, 10, 1, 2)

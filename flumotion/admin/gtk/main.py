@@ -106,7 +106,7 @@ def main(args):
     parser.add_option('', '--no-ssl',
                       action="store_true", dest="no_ssl",
                       help="disable encryption when connecting to the manager")
- 
+
     options, args = parser.parse_args(args)
 
     if options.version:

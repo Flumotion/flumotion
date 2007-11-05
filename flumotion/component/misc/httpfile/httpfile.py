@@ -61,7 +61,7 @@ class CancellableRequest(server.Request):
 
         self._bytes_written += len(data)
         self._lastTimeWritten = time.time()
-        
+
     def finish(self):
         server.Request.finish(self)
         fd = self.transport.fileno()
@@ -76,10 +76,10 @@ class CancellableRequest(server.Request):
 
     def requestCompleted(self, fd):
         if not self._completed:
-            self._component.requestFinished(self, self._bytes_written, 
+            self._component.requestFinished(self, self._bytes_written,
                 time.time() - self._start_time, fd)
             self._completed = True
-    
+
 class Site(server.Site):
     requestFactory = CancellableRequest
 
@@ -130,7 +130,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     componentMediumClass = HTTPFileMedium
 
-    REQUEST_TIMEOUT = 30 # Time out requests after this many seconds of 
+    REQUEST_TIMEOUT = 30 # Time out requests after this many seconds of
                          # inactivity
 
     def init(self):
@@ -179,10 +179,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                     msg = 'slave mode, missing required property porter-%s' % k
                     return defer.fail(errors.ConfigError(msg))
 
-            path = props.get('path', None) 
-            if path is None: 
+            path = props.get('path', None)
+            if path is None:
                 msg = "missing required property 'path'"
-                return defer.fail(errors.ConfigError(msg)) 
+                return defer.fail(errors.ConfigError(msg))
             if os.path.isfile(path):
                 self._singleFile = True
             elif os.path.isdir(path):
@@ -190,7 +190,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             else:
                 msg = "the file or directory specified in 'path': %s does " \
                     "not exist or is neither a file nor directory" % path
-                return defer.fail(errors.ConfigError(msg)) 
+                return defer.fail(errors.ConfigError(msg))
 
     def have_properties(self, props):
         desc = props.get('description', None)
@@ -267,14 +267,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                     Site(root, self), [self.mountPoint], d)
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    Site(root, self), [], d, 
+                    Site(root, self), [], d,
                     prefixes=[self.mountPoint])
-            creds = credentials.UsernamePassword(self._porterUsername, 
+            creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
             self.debug("Starting porter login!")
             # This will eventually cause d to fire
-            reactor.connectWith(fdserver.FDConnector, self._porterPath, 
+            reactor.connectWith(fdserver.FDConnector, self._porterPath,
                 self._pbclient, 10, checkPID=False)
         else:
             # File Streamer is standalone.
@@ -329,7 +329,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._porterUsername = username
             self._porterPassword = password
 
-            creds = credentials.UsernamePassword(self._porterUsername, 
+            creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
 
@@ -340,7 +340,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                                             # old connector.
                 self._pbclient.resetDelay()
                 reactor.connectWith(
-                    fdserver.FDConnector, self._porterPath, 
+                    fdserver.FDConnector, self._porterPath,
                     self._pbclient, 10, checkPID=False)
         else:
             raise errors.WrongStateError(
@@ -351,16 +351,16 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         for request in self._connected_clients:
             if now - request._lastTimeWritten > self.REQUEST_TIMEOUT:
                 self.debug("Timing out connection")
-                # Apparently this is private API. However, calling 
+                # Apparently this is private API. However, calling
                 # loseConnection is not sufficient - it won't drop the
-                # connection until the send queue is empty, which might never 
+                # connection until the send queue is empty, which might never
                 # happen for an uncooperative client
                 request.channel.transport.connectionLost(
                     errors.TimeoutException())
 
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
-            
+
     def requestStarted(self, request):
         self._connected_clients.append(request)
         self.uiState.set("connected-clients", len(self._connected_clients))
@@ -402,8 +402,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     def getStreamData(self):
         socket = 'flumotion.component.plugs.streamdata.StreamDataProvider'
-        if self.plugs[socket]: 
-            plug = self.plugs[socket][-1] 
+        if self.plugs[socket]:
+            plug = self.plugs[socket][-1]
             return plug.getStreamData()
         else:
             return {
@@ -414,9 +414,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     def getLoadData(self):
         """
-        Return a tuple (deltaadded, deltaremoved, bytes_transferred, 
+        Return a tuple (deltaadded, deltaremoved, bytes_transferred,
         current_clients, current_load) of our current bandwidth and user values.
-        The deltas and current_load are NOT currently implemented here, we set 
+        The deltas and current_load are NOT currently implemented here, we set
         them as zero.
         """
         bytesTransferred = self._total_bytes_written

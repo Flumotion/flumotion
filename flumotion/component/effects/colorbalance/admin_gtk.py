@@ -36,7 +36,7 @@ class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('widget-colorbalance')
         self._createUI()
-        
+
     def _createUI(self):
         for k in 'Hue', 'Saturation', 'Brightness', 'Contrast':
             lower = k.lower()

@@ -63,7 +63,7 @@ def defer_generator(proc):
             # doing a traceback
             if failure.check(errors.HandledException):
                 return failure
-            
+
             def print_traceback(f):
                 import traceback
                 print 'flumotion.twisted.defer: ' + \
@@ -157,7 +157,7 @@ class Resolution:
         Subclasses can implement me.
         """
         pass
-        
+
     def callback(self, result):
         """
         Make the result succeed, triggering the callbacks with the given result.
@@ -167,7 +167,7 @@ class Resolution:
             self.fired = True
             self.cleanup()
             self.d.callback(result)
-    
+
     def errback(self, exception):
         """
         Make the result fail, triggering the errbacks with the given exception.
@@ -180,12 +180,12 @@ class Resolution:
 
 class RetryingDeferred(object):
     """
-    Provides a mechanism to attempt to run some deferred operation until it 
-    succeeds. On failure, the operation is tried again later, exponentially 
+    Provides a mechanism to attempt to run some deferred operation until it
+    succeeds. On failure, the operation is tried again later, exponentially
     backing off.
     """
     maxDelay = 1800 # Default to 30 minutes
-    initialDelay = 5.0 
+    initialDelay = 5.0
     # Arbitrarily take these constants from twisted's ReconnectingClientFactory
     factor = 2.7182818284590451
     jitter = 0.11962656492
@@ -193,7 +193,7 @@ class RetryingDeferred(object):
 
     def __init__(self, deferredCreate, *args, **kwargs):
         """
-        Create a new RetryingDeferred. Will call 
+        Create a new RetryingDeferred. Will call
         deferredCreate(*args, **kwargs) each time a new deferred is needed.
         """
         self._create = deferredCreate
@@ -206,9 +206,9 @@ class RetryingDeferred(object):
 
     def start(self):
         """
-        Start trying. Returns a deferred that will fire when this operation 
-        eventually succeeds. That deferred will only errback if this 
-        RetryingDeferred is cancelled (it will then errback with the result of 
+        Start trying. Returns a deferred that will fire when this operation
+        eventually succeeds. That deferred will only errback if this
+        RetryingDeferred is cancelled (it will then errback with the result of
         the next attempt if one is in progress, or a CancelledError. # TODO: yeah?
         """
         self._masterD = defer.Deferred()
@@ -252,9 +252,8 @@ class RetryingDeferred(object):
             self.delay = self.delay * self.factor
 
         if self.jitter:
-            self.delay = random.normalvariate(self.delay, 
+            self.delay = random.normalvariate(self.delay,
                 self.delay * self.jitter)
         self.delay = min(self.delay, self.maxDelay)
 
         return self.delay
-

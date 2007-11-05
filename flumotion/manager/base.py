@@ -92,7 +92,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         @rtype: bool
         """
         return self.mind != None
-    
+
     def mindCallRemote(self, name, *args, **kwargs):
         """
         Call the given remote method, and log calling and returning nicely.
@@ -103,7 +103,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         level = log.DEBUG
         if name == 'ping':
             level = log.LOG
-        
+
         return self.mindCallRemoteLogging(level, -1, name, *args, **kwargs)
 
     def getClientAddress(self):
@@ -178,7 +178,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
                 raise errors.NoBundleError(msg)
             else:
                 bundleNames.append(bundleName)
-    
+
         deps = []
         for bundleName in bundleNames:
             thisdeps = basket.getDependencies(bundleName)
@@ -335,7 +335,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         self.vishnu = vishnu
         self.avatars = {} # avatarId -> avatar; populated by
                           # manager.Dispatcher
-       
+
     ### ManagerHeaven methods
     def getAvatar(self, avatarId):
         """

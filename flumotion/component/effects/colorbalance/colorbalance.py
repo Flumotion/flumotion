@@ -27,7 +27,7 @@ from flumotion.component import feedcomponent
 class Colorbalance(feedcomponent.Effect):
     logCategory = "colorbalance"
 
-    def __init__(self, name, element, hue, saturation, brightness, contrast, 
+    def __init__(self, name, element, hue, saturation, brightness, contrast,
         pipeline=None):
         """
         @param element: the GStreamer element supporting the colorbalance
@@ -48,10 +48,10 @@ class Colorbalance(feedcomponent.Effect):
         self._element = element
         if pipeline:
             bus = pipeline.get_bus()
-            bus.connect('message::state-changed', 
+            bus.connect('message::state-changed',
                 self._bus_message_received_cb,
                 hue, saturation, brightness, contrast)
-    
+
         self._channels = None
 
     def setUIState(self, state):
@@ -61,7 +61,7 @@ class Colorbalance(feedcomponent.Effect):
                 state.addKey('colorbalance-%s' % k, 0.0)
 
     # State change handling for 0.10
-    def _bus_message_received_cb(self, bus, message, hue, saturation, 
+    def _bus_message_received_cb(self, bus, message, hue, saturation,
         brightness, contrast):
         """
         @param bus: the message bus sending the message
@@ -72,7 +72,7 @@ class Colorbalance(feedcomponent.Effect):
             (old, new, pending) = message.parse_state_changed()
             # we have a state change
             if old == gst.STATE_READY and new == gst.STATE_PAUSED:
-                self._setInitialColorBalance(hue, 
+                self._setInitialColorBalance(hue,
                     saturation, brightness, contrast)
 
     def effect_setColorBalanceProperty(self, which, value):

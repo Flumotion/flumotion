@@ -40,14 +40,14 @@ from flumotion.admin.text import misc_curses
 class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
     implements(flavors.IStateListener)
-    
+
     logCategory = 'admintextview'
 
     global_commands = [ 'startall', 'stopall', 'clearall', 'quit' ]
 
     LINES_BEFORE_COMPONENTS = 5
     LINES_AFTER_COMPONENTS = 6
-  
+
     def __init__(self, model, stdscr):
         self.initialised = False
         self.stdscr = stdscr
@@ -66,7 +66,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self._setAdminModel(model)
         # get initial info we need
         self.setPlanetState(self.admin.planet)
-        
+
 
     def _setAdminModel(self, model):
         self.admin = model
@@ -105,7 +105,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             names.sort()
 
             cury = 4
-            
+
             # if number of components is less than the space add
             # "press page up for previous components" and
             # "press page down for next components" lines
@@ -137,11 +137,11 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 self.stdscr.addstr(cury,0,"%s: %s" % (name, moods[mood].name))
                 cury = cury + 1
                 cur_component = cur_component + 1
-                                
+
             self.lasty = cury
             #self.stdscr.refresh()
 
-    
+
     def gotEntryCallback(self, result, name):
         entryPath, filename, methodName = result
         filepath = os.path.join(entryPath, filename)
@@ -150,7 +150,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         #handle = open(filepath, "r")
         #data = handle.read()
         #handle.close()
-        
+
         # try loading the class
         moduleName = common.pathToModuleName(filename)
         statement = 'import %s' % moduleName
@@ -197,7 +197,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         #moduleName = common.pathToModuleName(fileName)
         #statement = 'import %s' % moduleName
         self._comptextui[name] = instance
-                    
+
 
     def gotEntryNoBundleErrback(self, failure, name):
         failure.trap(errors.NoBundleError)
@@ -214,7 +214,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             except KeyError:
                 # do nothing
                 self.debug("silly")
-            
+
         def compStateSet(state, key, value):
             self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
 
@@ -225,7 +225,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 d.addCallback(self.gotEntryCallback, state.get('name'))
                 d.addErrback(self.gotEntryNoBundleErrback, state.get('name'))
                 d.addErrback(self.gotEntrySleepingComponentErrback)
-     
+
                 self.show()
             elif key == 'name':
                 if value:
@@ -235,7 +235,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         for name in self._components.keys():
             component = self._components[name]
             component.addListener(self, compStateSet)
-            
+
             # get bundle for component
             d = self.admin.getEntry(component, 'admin/text')
             d.addCallback(self.gotEntryCallback, name)
@@ -243,7 +243,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             d.addErrback(self.gotEntrySleepingComponentErrback)
 
         self.show()
-        
+
     def setPlanetState(self, planetState):
         def flowStateAppend(state, key, value):
             self.debug('flow state append: key %s, value %r' % (key, value))
@@ -305,13 +305,13 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                       remove=atmosphereStateRemove)
         for c in a.get('components'):
             atmosphereStateAppend(a, 'components', c)
-            
+
         for f in planetState.get('flows'):
             planetStateAppend(f, 'flows', f)
 
     def _component_stop(self, state):
         return self._component_do(state, 'Stop', 'Stopping', 'Stopped')
-        
+
     def _component_start(self, state):
         return self._component_do(state, 'Start', 'Starting', 'Started')
 
@@ -331,7 +331,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             can_stop = can_stop and (mood != moods.lost and mood != moods.sleeping)
             can_start = can_start and (mood == moods.sleeping)
         can_clear = can_start and not can_stop
-        
+
         if string.lower(command) == 'quit':
             reactor.stop()
         elif string.lower(command) == 'startall':
@@ -341,7 +341,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 self.command_result = 'Attempting to start all components'
             else:
                 self.command_result = 'Components not all in state to be started'
-                
+
 
         elif string.lower(command) == 'stopall':
             if can_stop:
@@ -380,7 +380,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                                     self.debug("textui runcommand defer: %r" % d)
                                     # add a callback
                                     d.addCallback(self._runCommand_cb)
-                                
+
                             except KeyError:
                                 pass
 
@@ -390,7 +390,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.debug("Result received: %s" % result)
         self.show()
 
-            
+
 
 
     def get_available_commands(self, input):
@@ -416,10 +416,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 command_ok = command_ok or (command == 'clearall' and can_clear)
 
                 if command_ok and string.lower(command).startswith(string.lower(last_input)):
-                        available_commands.append(command)
+                    available_commands.append(command)
         else:
             available_commands = available_commands + self.get_available_commands_for_component(input_split[0], input)
-            
+
         return available_commands
 
     def get_available_commands_for_component(self, comp, input):
@@ -433,9 +433,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     textui = self._comptextui[comp]
                 except KeyError:
                     self.debug("no text ui for component %s" % comp)
-                
+
                 input_split = input.split()
-                
+
                 if len(input_split) >= 2 or input.endswith(' '):
                     for command in component_commands:
                         if len(input_split) == 2:
@@ -451,8 +451,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         commands = commands + textui.getCompletions(comp_input)
 
         return commands
-                            
-    
+
+
     def get_available_completions(self,input):
         completions = self.get_available_commands(input)
 
@@ -463,7 +463,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     completions.append(c)
 
         return completions
-    
+
     def display_status(self):
         availablecommands = self.get_available_commands(self.inputText)
         available_commands = ' '.join(availablecommands)
@@ -471,8 +471,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         #    available_commands = '%s %s' % (available_commands, command)
         self.stdscr.move(self.lasty+2,0)
         self.stdscr.clrtoeol()
-        
-        self.stdscr.addstr(self.lasty+2, 0, 
+
+        self.stdscr.addstr(self.lasty+2, 0,
             "Available Commands: %s" % available_commands)
         # display command results
         self.stdscr.move(self.lasty+3,0)
@@ -483,7 +483,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         if self.command_result != "":
             self.stdscr.addstr(self.lasty+4, 0, "Result: %s" % self.command_result)
         self.stdscr.clrtobot()
-    
+
     ### admin model callbacks
     def admin_connected_cb(self, admin):
         self.info('Connected to manager')
@@ -495,7 +495,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
-    
+
     def admin_disconnected_cb(self, admin):
         message = "Lost connection to manager, reconnecting ..."
         print message
@@ -543,10 +543,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         self.inputText = ' '.join(input_split) + ' ' + available_commands[0]
                     else:
                         self.inputText = available_commands[0]
-        
+
             elif c == curses.KEY_ENTER or c == 10:
                 # run command
-                self.run_command(self.inputText) 
+                self.run_command(self.inputText)
                 # re-display status
                 self.display_status()
                 # clear the prompt line
@@ -592,14 +592,14 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 # add to input text
                 if c<=256:
                     self.inputText = self.inputText + chr(c)
-        
+
             # redisplay status
-            self.display_status()    
+            self.display_status()
 
             self.stdscr.move(self.lasty+1,0)
             self.stdscr.clrtoeol()
 
-            self.stdscr.addstr(self.lasty+1, 0, 
+            self.stdscr.addstr(self.lasty+1, 0,
                            'Prompt: %s' % self.inputText)
             self.stdscr.refresh()
         except Exception, e:
@@ -612,17 +612,17 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         # FIXME: for now, we only allow calls to go through that have
         # their UI currently displayed.  In the future, maybe we want
         # to create all UI's at startup regardless and allow all messages
-        # to be processed, since they're here now anyway   
+        # to be processed, since they're here now anyway
         self.log("componentCall received for %r.%s ..." % (
             componentState, methodName))
         localMethodName = "component_%s" % methodName
         name = componentState.get('name')
-        
+
         try:
             textui = self._comptextui[name]
         except KeyError:
             return
-        
+
         if not hasattr(textui, localMethodName):
             self.log("... but does not have method %s" % localMethodName)
             self.warning("Component view %s does not implement %s" % (

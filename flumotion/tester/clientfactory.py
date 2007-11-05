@@ -74,7 +74,7 @@ class ClientFactory(log.Loggable):
 
         self._create_client()
         return True
-        
+
     def _parse_from_range(self, string):
         value = 0
         if string.find("-") > -1:
@@ -98,7 +98,7 @@ class ClientFactory(log.Loggable):
         if not self._options.bytes:
             self._options.bytes = "16384"
         bytes = self._parse_from_range(self._options.bytes)
-         
+
         self.info("%4d: creating, rate %d, readsize %d." %
             (self.count, rate, size))
         client = httpclient.HTTPClientStatic(self.count, self.url, rate, size)

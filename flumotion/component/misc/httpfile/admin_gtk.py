@@ -52,7 +52,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             # widget tree created but not yet shown
             self.shown = True
             self.statistics.show_all()
-       
+
     def registerLabel(self, name):
         #widgetname = name.replace('-', '_')
         #FIXME: make object member directly
@@ -69,14 +69,14 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def updateLabels(self, state):
         if not hasattr(self, 'labels'):
             return
-        
+
         for name in self.labels.keys():
             text = state.get(name)
             if text is not None:
                 if name == 'bytes-transferred':
                     text = common.formatStorage(int(text)) + _('Byte')
                 self.labels[name].set_text(str(text))
-        
+
     def haveWidgetTree(self):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')

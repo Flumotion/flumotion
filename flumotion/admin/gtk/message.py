@@ -143,7 +143,7 @@ class MessagesView(gtk.VBox):
                 text += "\n\n" + _("Debug information:\n") + m.debug
             buf.set_text(text)
             self.textview.set_buffer(buf)
-            self.label.set_markup('<b>%s</b>' % 
+            self.label.set_markup('<b>%s</b>' %
                 _headings.get(m.level, _('Message')))
 
         # FIXME:this clears all messages with the same id as the new one.

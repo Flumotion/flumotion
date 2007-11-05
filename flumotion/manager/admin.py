@@ -51,14 +51,14 @@ class AdminAvatar(base.ManagerAvatar):
     I live in the manager.
     """
     logCategory = 'admin-avatar'
-       
+
     # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
     def getComponentStates(self):
         """
         Return all component states logged in to the manager.
         The list gets serialized to a list of
         L{flumotion.common.planet.AdminComponentState}
-        
+
         @rtype: list of L{planet.ManagerComponentState}
         """
         return self.vishnu.getComponentStates()
@@ -71,7 +71,7 @@ class AdminAvatar(base.ManagerAvatar):
         # this avoids recursion from the remote caller trying to warn
         if self.hasRemoteReference():
             self.mindCallRemote('log', category, type, message)
-        
+
     # override pb.Avatar implementation so we can run admin actions
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args, self)
@@ -88,7 +88,7 @@ class AdminAvatar(base.ManagerAvatar):
 
         # log going into the method
         logKwArgs = self.doLog(level, method, format, *debugArgs)
- 
+
         benignMethods = ('ping',)
         if message not in benignMethods:
             self.vishnu.adminAction(self.remoteIdentity, message, args, kwargs)
@@ -167,7 +167,7 @@ class AdminAvatar(base.ManagerAvatar):
         """
         self.debug('perspective_componentStart(%r)' % componentState)
         return self.vishnu.componentCreate(componentState)
-        
+
     def perspective_componentStop(self, componentState):
         """
         Stop the given component.
@@ -178,7 +178,7 @@ class AdminAvatar(base.ManagerAvatar):
         """
         self.debug('perspective_componentStop(%r)' % componentState)
         return self.vishnu.componentStop(componentState)
-        
+
     def perspective_componentRestart(self, componentState):
         """
         Restart the given component.
@@ -189,13 +189,13 @@ class AdminAvatar(base.ManagerAvatar):
         d = self.perspective_componentStop(componentState)
         d.addCallback(lambda *x: self.perspective_componentStart(componentState))
         return d
-        
+
     # Generic interface to call into a component
     def perspective_componentCallRemote(self, componentState, methodName,
                                         *args, **kwargs):
         """
         Call a method on the given component on behalf of an admin client.
-        
+
         @param componentState: state of the component to call the method on
         @type  componentState: L{planet.ManagerComponentState}
         @param methodName:     name of the method to call.  Gets proxied to
@@ -227,7 +227,7 @@ class AdminAvatar(base.ManagerAvatar):
             msg = "exception on remote call %s: %s" % (methodName,
                 log.getExceptionMessage(e))
             self.warning(msg)
-            raise errors.RemoteMethodError(methodName, 
+            raise errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e))
 
     def perspective_workerCallRemote(self, workerName, methodName,
@@ -244,11 +244,11 @@ class AdminAvatar(base.ManagerAvatar):
                            remote_(methodName)
         @type  methodName: str
         """
-        
+
         self.debug('AdminAvatar.workerCallRemote(%r, %r)' % (
             workerName, methodName))
         workerAvatar = self.vishnu.workerHeaven.getAvatar(workerName)
-        
+
         # XXX: Maybe we need to a prefix, so we can limit what an admin
         # interface can call on a worker
         try:
@@ -258,7 +258,7 @@ class AdminAvatar(base.ManagerAvatar):
                 log.getExceptionMessage(e))
             return failure.Failure(errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e)))
-        
+
     def perspective_getEntryByType(self, componentState=None, type=None,
                                    componentType=None):
         """
@@ -349,14 +349,14 @@ class AdminAvatar(base.ManagerAvatar):
             if not re.match('^[a-zA-Z0-9_' + extra + '-]+$', name):
                 raise errors.ConfigError, \
                       'Invalid planet or saveAs name: %s' % name
-        
+
         ensure_sane(self.vishnu.configDir, '/')
         ensure_sane(filename)
         dir = os.path.join(self.vishnu.configDir, "flows")
         self.debug('told to save flow as %s/%s.xml', dir, filename)
-        try: 
-            os.makedirs(dir, 0770) 
-        except OSError, e: 
+        try:
+            os.makedirs(dir, 0770)
+        except OSError, e:
             if e.errno != 17: # 17 == EEXIST
                 raise e
         prev = os.umask(0007)
@@ -378,7 +378,7 @@ class AdminAvatar(base.ManagerAvatar):
 
         if saveAs:
             output = self._saveFlowFile(saveAs)
- 
+
         f = StringIO(xml)
         res = self.vishnu.loadComponentConfigurationXML(f, self.remoteIdentity)
         f.close()
@@ -400,8 +400,8 @@ class AdminAvatar(base.ManagerAvatar):
 
         return res
 
-    def perspective_loadComponent(self, componentType, componentId, 
-                                  componentLabel, properties, workerName, 
+    def perspective_loadComponent(self, componentType, componentId,
+                                  componentLabel, properties, workerName,
                                   plugs=None, eaters=None,
                                   isClockMaster=None):
         """
@@ -436,11 +436,11 @@ class AdminAvatar(base.ManagerAvatar):
                                for this flow.
         @type  isClockMaster:  bool
         """
-        return self.vishnu.loadComponent(self.remoteIdentity, componentType, 
-                                         componentId, componentLabel, 
+        return self.vishnu.loadComponent(self.remoteIdentity, componentType,
+                                         componentId, componentLabel,
                                          properties, workerName,
                                          plugs or [], eaters or [],
-                                         isClockMaster) 
+                                         isClockMaster)
 
     def perspective_deleteFlow(self, flowName):
         return self.vishnu.deleteFlow(flowName)

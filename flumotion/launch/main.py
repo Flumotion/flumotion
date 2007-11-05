@@ -179,7 +179,7 @@ def start_components(wrappers, fds):
             def addNeedSync(clocking):
                 return need_sync, clocking
             d.addCallback(addNeedSync)
-            return d 
+            return d
         else:
             return defer.succeed((None, None))
 
@@ -245,7 +245,7 @@ def main(args):
     # verbose overrides --debug
     if options.verbose:
         log.setFluDebug("*:3")
- 
+
     # handle all options
     if options.version:
         print common.version("flumotion-launch")

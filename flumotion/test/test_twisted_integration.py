@@ -99,7 +99,7 @@ class IntegrationProcessTest(CompatTestCase):
         self.failUnlessFailure(d, error.ProcessTerminated)
         return d
     testTimeOut = _call_in_reactor(testTimeOut)
-        
+
     def testKill(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
                                 self.tempdir)
@@ -124,7 +124,7 @@ class IntegrationPlanGenerationTest(CompatTestCase):
             for op in got:
                 print op
             self.fail()
-        
+
     def testTransientProcess(self):
         plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')

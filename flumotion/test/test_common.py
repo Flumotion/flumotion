@@ -54,15 +54,15 @@ class TestFormatStorage(unittest.TestCase):
     def testGibibyte(self):
         value = 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.0737 G"
-    
+
     def testTebibyte(self):
         value = 1024 * 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.0995 T"
-    
+
     def testPebibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.1259 P"
-    
+
     def testExbibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.1529 E"
@@ -92,25 +92,25 @@ class TestFormatTime(unittest.TestCase):
     def testDays(self):
         value = 60 * 60 * 24 * 2
         assert common.formatTime(value) == "2 days 00:00"
-    
+
     def testWeek(self):
         value = 60 * 60 * 24 * 7
         assert common.formatTime(value) == "1 week 00:00"
-    
+
     def testWeeks(self):
         value = 60 * 60 * 24 * 7 * 2
         assert common.formatTime(value) == "2 weeks 00:00"
-    
+
     def testYear(self):
         value = 60 * 60 * 24 * 365
         assert common.formatTime(value) == "52 weeks 1 day 00:00"
-    
+
     def testReallyLong(self):
         minute = 60
         hour = minute * 60
         day = hour * 24
         week = day * 7
-        
+
         value = week * 291 + day * 5 + hour * 13 + minute * 5
         assert common.formatTime(value) == "291 weeks 5 days 13:05"
 
@@ -122,13 +122,13 @@ class A:
 
 class B:
     implements(I2)
-    
+
 class C: pass
 
 class TestMergeImplements(unittest.TestCase):
     def testTwoImplements(self):
         self.assertEquals(common.mergeImplements(A, B), (I1, I2))
-        
+
     def testFirstWithout(self):
         self.assertEquals(common.mergeImplements(B, C), (I2, ))
 
@@ -137,7 +137,7 @@ class TestMergeImplements(unittest.TestCase):
 
     def testBothWithout(self):
         self.assertEquals(common.mergeImplements(C, C), ( ))
-     
+
 class TestVersion(unittest.TestCase):
     def testVersion(self):
         self.failUnless(common.version('abinary'))
@@ -152,7 +152,7 @@ class TestVersion(unittest.TestCase):
 class TestArgRepr(unittest.TestCase):
     def testEmpty(self):
         self.assertEqual(common.argRepr(), '')
-        
+
     def testArg(self):
         self.assertEqual(common.argRepr((1, '2')), "1, '2'")
         self.assertEqual(common.argRepr(((None,))), "None")
@@ -164,7 +164,7 @@ class TestArgRepr(unittest.TestCase):
 class TestComponentPath(unittest.TestCase):
     def testPath(self):
         self.assertEqual(common.componentId('Adam', 'Cain'), '/Adam/Cain')
-        
+
     def testArg(self):
         self.assertEqual(common.argRepr((1, '2')), "1, '2'")
         self.assertEqual(common.argRepr(((None,))), "None")
@@ -172,7 +172,7 @@ class TestComponentPath(unittest.TestCase):
     def testKwargs(self):
         self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
         self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
-         
+
 class TestEnsureDir(unittest.TestCase):
     def testNonExisting(self):
         self.tempdir = tempfile.mkdtemp()
@@ -197,7 +197,7 @@ class TestPid(unittest.TestCase):
 class TestAddress(unittest.TestCase):
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
-        
+
     def testGetHost(self):
         self.failUnlessEqual(common.addressGetHost(self.address), 'localhost')
 
@@ -221,7 +221,7 @@ class TestProcess(unittest.TestCase):
             # now that it's gone, it should fail
             self.failIf(common.checkPidRunning(ret))
             self.failIf(common.termPid(ret))
-            
+
     def testKillPid(self):
         ret = os.fork()
         if ret == 0:
@@ -239,7 +239,7 @@ class TestObjRepr(unittest.TestCase):
     def testMe(self):
         self.assertEquals(common.objRepr(self),
             'flumotion.test.test_common.TestObjRepr')
-    
+
 class TestPathToModule(unittest.TestCase):
     def testPaths(self):
         tests = {
@@ -249,7 +249,7 @@ class TestPathToModule(unittest.TestCase):
             'flumotion/common': 'flumotion.common',
             'flumotion/configure/uninstalled.py.in': None,
         }
-        
+
         for (path, module) in tests.items():
             self.assertEquals(common.pathToModuleName(path), module,
                 "path %s did not give end module %s" % (path, module))

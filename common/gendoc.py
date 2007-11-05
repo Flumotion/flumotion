@@ -9,7 +9,7 @@ try:
 except ImportError:
     print "Not importing misc.setup"
     pass
-    
+
 from flumotion.common import boot
 boot.init_gobject()
 boot.init_gst()
@@ -31,37 +31,37 @@ def login(self, credentials, client=None):
 
     @return: Deferred of RemoteReference to the perspective."""
 def getRootObject(self):
-   """Get root object of remote PB server.
+    """Get root object of remote PB server.
 
-   @return: Deferred of the root object.
-   """
+    @return: Deferred of the root object.
+    """
 def getPerspective(self, username, password, serviceName,
                        perspectiveName=None, client=None):
-        """Get perspective from remote PB server.
+    """Get perspective from remote PB server.
 
-        New systems should use login() instead.
-        
-        @return: Deferred of RemoteReference to the perspective.
-        """
+    New systems should use login() instead.
+
+    @return: Deferred of RemoteReference to the perspective.
+    """
 
 pb.PBClientFactory.login = login
-pb.PBClientFactory.getRootObject = getRootObject 
+pb.PBClientFactory.getRootObject = getRootObject
 pb.PBClientFactory.getPerspective = getPerspective
 
 from twisted.internet.default import PosixReactorBase
 
 def listenUDP(self, port, protocol, interface='', maxPacketSize=8192):
     """Connects a given DatagramProtocol to the given numeric UDP port.
-	
+
     EXPERIMENTAL.
 
     @returns: object conforming to IListeningPort.
     """
 
 def connectUDP(self, remotehost, remoteport, protocol, localport=0,
-	       interface='', maxPacketSize=8192):
+               interface='', maxPacketSize=8192):
     """Connects a ConnectedDatagramProtocol instance to a UDP port.
-    
+
     EXPERIMENTAL.
     """
 

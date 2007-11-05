@@ -68,7 +68,7 @@ class BouncerPortal(log.Loggable):
         else:
             list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
             return defer.succeed(list)
-            
+
     def login(self, keycard, mind, *ifaces):
         """
         Log in the keycard to the portal using the bouncer.
@@ -79,7 +79,7 @@ class BouncerPortal(log.Loggable):
         @type  mind:       L{twisted.spread.pb.RemoteReference}
         @param ifaces:     a list of interfaces for the perspective that the
                            mind wishes to attach to
-        
+
         @returns: a deferred, which will fire a tuple of
                   (interface, avatarAspect, logout) or None.
         """
@@ -98,7 +98,7 @@ class BouncerPortal(log.Loggable):
                 remote = '%s:%d' % (host.host, host.port)
             except:
                 remote = '(unknown)'
-                
+
             self.warning('failed login -- closing connection to %s',
                          remote)
             self.debug('failure: %s', log.getFailureMessage(failure))
@@ -109,7 +109,7 @@ class BouncerPortal(log.Loggable):
                           log.getExceptionMessage(e))
                 # ignore it
             return failure
-            
+
         def bouncerResponse(result):
             # we either got a keycard as result, or None from the
             # bouncer; would be better if the bouncers returned failures
@@ -151,5 +151,5 @@ class BouncerPortal(log.Loggable):
         d.addCallback(bouncerResponse)
         d.addErrback(onErrorCloseConnection)
         return d
-    
+
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

@@ -99,7 +99,7 @@ __all__ = ['BouncerPlug']
 class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
     """
     I am the base class for all bouncer plugs.
-    
+
     @cvar keycardClasses: tuple of all classes of keycards this bouncer can
                           authenticate, in order of preference
     @type keycardClasses: tuple of L{flumotion.common.keycards.Keycard}
@@ -167,7 +167,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         else:
             self.debug("Bouncer disabled, refusing authentication")
             return None
-         
+
     def do_authenticate(self, keycard):
         """
         Must be overridden by subclasses.
@@ -182,7 +182,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
     def hasKeycard(self, keycard):
         return keycard in self._keycards.values()
-    
+
     def generateKeycardId(self):
         id = self._idFormat % self._idCounter
         self._idCounter += 1
@@ -255,7 +255,7 @@ class TrivialBouncerPlug(BouncerPlug):
         keycard.state = keycards.AUTHENTICATED
 
         return keycard
-    
+
 class ChallengeResponseBouncerPlug(BouncerPlug):
     """
     A base class for Challenge-Response bouncers
@@ -284,7 +284,7 @@ class ChallengeResponseBouncerPlug(BouncerPlug):
         self.info('authenticated login of "%s"' % keycard.avatarId)
         self.debug('keycard %r authenticated, id %s, avatarId %s' % (
             keycard, keycard.id, keycard.avatarId))
-        
+
         return keycard
 
     def _requestAvatarIdErrback(self, failure, keycard):
@@ -294,7 +294,7 @@ class ChallengeResponseBouncerPlug(BouncerPlug):
         self.removeKeycard(keycard)
         self.info('keycard %r refused, Unauthorized' % keycard)
         return None
-    
+
     def do_authenticate(self, keycard):
         # at this point we add it so there's an ID for challenge-response
         self.addKeycard(keycard)

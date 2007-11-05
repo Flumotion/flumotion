@@ -67,7 +67,7 @@ class WalkableStack:
         if self.height < self.pos:
             self.pos = self.height
         return self.l.pop()
-    
+
 
 class KeyedList(list):
     def __init__(self, *args):
@@ -92,4 +92,3 @@ class KeyedList(list):
         return reduce(list.__add__,
                       [[p(x) for x in self] for p in self.mappers.values()],
                       [])
-

@@ -80,7 +80,7 @@ class TestRoot(testclasses.TestManagerRoot):
 class TestStateSet(unittest.TestCase):
     def setUp(self):
         self.changes = []
-        
+
         self._m = testclasses.TestManager()
         port = self._m.run(TestRoot)
         self.admin = FakeAdmin()
@@ -97,10 +97,10 @@ class TestStateSet(unittest.TestCase):
         yield self.worker.stop()
     tearDown = defer_generator_method(tearDown)
 
-        
+
     def reset(self):
         self.changes = []
-        
+
     def testStateSet(self):
         self.reset()
         # get the state
@@ -224,7 +224,7 @@ class TestStateSet(unittest.TestCase):
             self.failIf(self.changes, self.changes)
             self._state = state
             return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
-                        
+
         def workerBearChildCallback(result):
             state = self._state
             del self._state
@@ -237,13 +237,13 @@ class TestStateSet(unittest.TestCase):
             state.removeListener(self)
             del state
             return self.admin.remoteRoot.callRemote('workerGetState')
-            
+
         def workerGetStateAgainCallback(state):
             self.listen(state)
             self.assertEquals(len(state.get('children')), 1)
             self._state = state
             return self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
-                
+
         def workerBearChildAgainCallback(result):
             state = self._state
             self.failUnless(self.changes)
@@ -253,18 +253,18 @@ class TestStateSet(unittest.TestCase):
             del state
             return self.admin.remoteRoot.callRemote(
                 'workerHaveAdopted', 'batman')
-                        
+
         def workerHaveAdoptedCallback(result):
             state = self._state
             del self._state
             self.failUnless(self.changes)
             c = self.changes.pop()
-            self.failUnlessEqual(c, 
+            self.failUnlessEqual(c,
                 ('remove', state, 'children', 'batman'))
             self.failIf(self.changes, self.changes)
             state.removeListener(self)
             del state
-            
+
         # get the state again
         d = self.admin.remoteRoot.callRemote('workerGetState')
         d.addCallback(workerGetStateCallback)
@@ -273,7 +273,7 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(workerBearChildAgainCallback)
         d.addCallback(workerHaveAdoptedCallback)
         return d
-                        
+
     def testStateSaveReference(self):
         # show that we need to keep the state reference around for listener
         # to work
@@ -295,4 +295,3 @@ class TestStateSet(unittest.TestCase):
             return d
         d.addCallback(workerGetStateCallback)
         return d
-

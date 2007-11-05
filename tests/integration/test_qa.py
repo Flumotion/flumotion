@@ -209,11 +209,11 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.kill(w, 0)
         plan.kill(m, 0)
     testManagerWorker = integration.test(testManagerWorker)
-    
+
     def testHttpFile(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
         httpPort = random.randrange(12800,12899)
-        self.makeFile('httpfile-config.xml', httpFileXML % (httpPort, 
+        self.makeFile('httpfile-config.xml', httpFileXML % (httpPort,
             __file__))
         self.loadConfiguration(plan, 'httpfile-config.xml')
         self.waitForHappyComponent(plan, '/default/httpfile')
@@ -239,7 +239,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
             httpPort,))
         plan.wait(h, 0)
         # now check files saved by disker
-        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+        cft = plan.spawn('check-disker-file-type', 'Ogg',
             'user:test@localhost:%d' % self.managerPort, '/default/disk-video')
         plan.wait(cft, 0)
         # clean up disk files
@@ -253,7 +253,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
     def testVideoTestNoOverlayWithTokenBouncer(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
         httpPort = random.randrange(12800, 12899)
-        self.makeFile('tokenbouncer.xml', 
+        self.makeFile('tokenbouncer.xml',
             videoTestNoOverlayWithTokenBouncerXML % httpPort)
         self.loadConfiguration(plan, 'tokenbouncer.xml')
         self.waitForHappyComponent(plan, '/default/video-source')
@@ -280,7 +280,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
             httpPort,))
         plan.wait(h, 0)
         # now check files saved by disker
-        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+        cft = plan.spawn('check-disker-file-type', 'Ogg',
             'user:test@localhost:%d' % self.managerPort, '/default/disk-audio')
         plan.wait(cft, 0)
         # clean up disk files
@@ -306,7 +306,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
             httpPort,))
         plan.wait(h, 0)
         # change filename with disker
-        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+        cft = plan.spawn('check-disker-file-type', 'Ogg',
             'user:test@localhost:%d' % self.managerPort, '/default/disk-video')
         plan.wait(cft, 0)
         # clean up disk files
@@ -317,4 +317,3 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestWithOverlay = integration.test(testVideoTestWithOverlay)
-

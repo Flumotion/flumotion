@@ -59,7 +59,7 @@ class DAG(log.Loggable):
     adding edges.
     """
     def __init__(self):
-        self._nodes = {} # map of (object, type) -> NodeX    
+        self._nodes = {} # map of (object, type) -> NodeX
         self._tainted = False # True after add/remove and no cycle check done
 
         # topological sort stuff
@@ -118,14 +118,14 @@ class DAG(log.Loggable):
             somenode = self._nodes[(somenodeobj, somenodetype)]
             if node in somenode.children:
                 self.removeEdge(somenodeobj, object, somenodetype, type)
-        
+
         del self._nodes[(object, type)]
-        
+
     def _getNode(self, object, type=0):
         value = self._nodes[(object, type)]
         return value
 
-    
+
     def addEdge(self, parent, child, parenttype=0, childtype=0):
         """
         I add an edge between two nodes in the DAG.
@@ -139,7 +139,7 @@ class DAG(log.Loggable):
         self._assertExists(child, childtype)
         np = self._getNode(parent, parenttype)
         nc = self._getNode(child, childtype)
-        
+
         if nc in np.children:
             raise KeyError(
                 "%r of type %r is already a child of %r of type %r" % (
@@ -162,10 +162,10 @@ class DAG(log.Loggable):
         self._assertExists(child, childtype)
         np = self._nodes[(parent, parenttype)]
         nc = self._nodes[(child, childtype)]
-        
+
         if nc not in np.children:
             raise KeyError("%r is not a child of %r" % (child, parent))
-        self.debug("Removing edge (%r ,%r) -> (%r, %r)" % (parent, parenttype, 
+        self.debug("Removing edge (%r ,%r) -> (%r, %r)" % (parent, parenttype,
             child, childtype))
         self._tainted = True
         np.children.remove(nc)
@@ -174,7 +174,7 @@ class DAG(log.Loggable):
 
     def getChildrenTyped(self, object, objtype=0, types=None):
         """
-        I return a list of (object, type) tuples that are direct children of 
+        I return a list of (object, type) tuples that are direct children of
         this object,objtype.
 
         @param  object:  object to return children of
@@ -182,7 +182,7 @@ class DAG(log.Loggable):
         @param  types:   a list of types of children that you want.
                          None means all.
         @type   types:   list
-        
+
         @rtype: list of (object, object)
         """
         self._assertExists(object, objtype)
@@ -208,7 +208,7 @@ class DAG(log.Loggable):
         @rtype: list of objects
         """
         typedchildren = self.getChildrenTyped(object, objtype, types)
-        
+
         ret = [n[0] for n in typedchildren]
         return ret
 
@@ -227,7 +227,7 @@ class DAG(log.Loggable):
         """
         self._assertExists(object, objtype)
         node = self._getNode(object,objtype)
-        
+
         l = node.parents
         if types:
             l = filter(lambda n: n.type in types, l)
@@ -236,7 +236,7 @@ class DAG(log.Loggable):
 
     def getParents(self, object, objtype=0, types=None):
         """
-        I return a list of objects that are direct parents of this 
+        I return a list of objects that are direct parents of this
         object, objtype.
 
         @param object:  object to return parents of.
@@ -250,10 +250,10 @@ class DAG(log.Loggable):
         ret = [n[0] for n in typedparents]
         return ret
 
-        
+
     def getOffspringTyped(self, object, objtype=0, *types):
         """
-        I return a list of (object, type) tuples that are offspring of 
+        I return a list of (object, type) tuples that are offspring of
         this object,objtype.
 
         @param object: object to return children of.
@@ -261,7 +261,7 @@ class DAG(log.Loggable):
         @type objtype: Integer
         @param types: a list of types of children that you want. None means all.
         @type types: list of Integers
-        
+
         @rtype: list of (object,Integer)
         """
         self._assertExists(object, objtype)
@@ -300,7 +300,7 @@ class DAG(log.Loggable):
         for n in sorted:
             if n in offspring:
                 ret.append((n.object, n.type))
-        
+
         for node in ret:
             self.log("Offspring: (%r, %r)" % (node[0], node[1]))
         return ret
@@ -328,14 +328,14 @@ class DAG(log.Loggable):
 
     def getAncestorsTyped(self, object, objtype=0, *types):
         """
-        I return a list of (object, type) tuples that are ancestors of 
+        I return a list of (object, type) tuples that are ancestors of
         this object,objtype.
 
         @param object: object to return ancestors of.
         @param objtype: type of object (optional).
         @type objtype: Integer
         @param types: types of ancestors that you want ancestors of.
-        
+
         @rtype: list of (object,Integer)
         """
         self._assertExists(object, objtype)
@@ -384,7 +384,7 @@ class DAG(log.Loggable):
         @param objtype: type of object (optional).
         @type objtype: Integer
         @param types: types of ancestors that you want returned.
-        
+
         @rtype: list of objects
         """
         typedancestors = self.getAncestorsTyped(object, objtype, *types)
@@ -402,7 +402,7 @@ class DAG(log.Loggable):
         @param object: object to check if floating.
         @param objtype: type of object (optional).
         @type objtype: Integer
-        
+
         @rtype: Boolean
         """
         self._assertExists(object, objtype)
@@ -425,7 +425,7 @@ class DAG(log.Loggable):
         @rtype: list of (object, type)
         """
         return [(node.object, node.type) for node in self._sortPreferred()]
-        
+
     def _sortPreferred(self, list=None, clearState=True):
         """
         I return a topologically sorted list of nodes, using list as a
@@ -467,16 +467,16 @@ class DAG(log.Loggable):
         # perform depth first search
 
         self._count += 1
-        
+
         self._begin[node] = self._count
-        
+
         # 2.3
         # 2.3.b: detect cycle
         hasCycle = lambda n: self._begin[n] > 0 and self._end[n] == 0
         nodes = filter(hasCycle, node.children)
         if nodes:
             raise CycleError('nodes %r' % nodes)
-            
+
         # 2.3.a: perform dfs
         # don't get a list of zerobegins first; do it step by step
 
@@ -484,7 +484,7 @@ class DAG(log.Loggable):
             if self._begin[n] > 0:
                 continue
             self._dfs(n)
-            
+
         self._count += 1
         self._end[node] = self._count
         if node in self._hasZeroEnd:
@@ -502,7 +502,7 @@ class DAG(log.Loggable):
                 ret.append(self._nodes[node].object)
 
         return ret
-        
+
 
 def topological_sort(items, partial_order):
     """

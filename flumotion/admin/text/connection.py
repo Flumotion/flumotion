@@ -27,7 +27,7 @@ from flumotion.common import errors
 from twisted.internet import reactor
 
 def connect_to_manager(stdscr, info):
-    stdscr.addstr(0,0,"Connecting to %s" % 
+    stdscr.addstr(0,0,"Connecting to %s" %
                   info)
     stdscr.clrtobot()
     stdscr.refresh()
@@ -68,4 +68,3 @@ def connect_to_manager(stdscr, info):
     d.addCallback(connected)
     d.addErrback(refused)
     d.addErrback(failed)
-

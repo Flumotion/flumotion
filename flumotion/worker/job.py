@@ -215,10 +215,10 @@ class ComponentJobHeaven(base.BaseJobHeaven):
             if avatarId in jobnames:
                 realexecutable = 'valgrind'
                 # We can't just valgrind flumotion-job, we have to valgrind
-                # python running flumotion-job, otherwise we'd need 
+                # python running flumotion-job, otherwise we'd need
                 # --trace-children (not quite sure why), which we don't want
-                argv = ['valgrind', '--leak-check=full', '--num-callers=24', 
-                    '--leak-resolution=high', '--show-reachable=yes', 
+                argv = ['valgrind', '--leak-check=full', '--num-callers=24',
+                    '--leak-resolution=high', '--show-reachable=yes',
                     'python'] + argv
 
         childFDs = {0: 0, 1: 1, 2: 2}
@@ -235,7 +235,7 @@ class ComponentJobHeaven(base.BaseJobHeaven):
                                          moduleName, methodName, nice,
                                          bundles, conf))
         return d
-        
+
 
 class CheckJobAvatar(base.BaseJobAvatar):
     def haveMind(self):
@@ -329,7 +329,7 @@ class CheckJobHeaven(base.BaseJobHeaven):
                 else:
                     def expire():
                         if (job, expireDC) in self.jobPool:
-                            self.debug('stopping idle check job process %s', 
+                            self.debug('stopping idle check job process %s',
                                        job.avatarId)
                             self.jobPool.remove((job, expireDC))
                             job.mindCallRemote('stop')

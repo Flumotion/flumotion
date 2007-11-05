@@ -35,13 +35,13 @@ class Component(log.Loggable):
         self.worker = worker
         self.eaters = []
         self.feeders = []
-        
+
     def __repr__(self):
         return '<flumotion.wizard.save.Component name="%s">' % self.name
 
     def addEater(self, component):
         self.eaters.append(component)
-        
+
     def addFeeder(self, component):
         self.feeders.append(component)
 
@@ -60,9 +60,9 @@ class Component(log.Loggable):
                 s.append('%s:%s' % (source.name, feed))
             else:
                 s.append(source.name)
-                
+
         return s
-    
+
     def toXML(self, registry):
         """
         Write out the XML <component> section for this component.
@@ -72,7 +72,7 @@ class Component(log.Loggable):
         regentry = registry.getComponent(self.type)
 
         extra = ' worker="%s"' % self.worker
-            
+
         # FIXME: when the wizard can be split among projects, "project"
         # and "version" should be taken from the relevant project
         s = '    <component name="%s" type="%s" ' \
@@ -84,12 +84,12 @@ class Component(log.Loggable):
             for sourceName in whoIsFeedingUs:
                 s += "        <feed>%s</feed>\n" % sourceName
             s += '      </eater>\n'
-                    
+
         if self.props:
             s += "\n"
             property_names = self.props.keys()
             property_names.sort()
-            
+
             #import code; code.interact(local=locals())
             for name in property_names:
                 # FIXME: warn if a property name is not in the registry
@@ -100,10 +100,10 @@ class Component(log.Loggable):
                     continue
                 value = self.props[name]
                 s += '      <property name="%s">%s</property>\n' % (name, value)
-            
+
         s += "    </component>\n"
         return s
-    
+
     def printTree(self, indent=1):
         print indent * '*', self.name, self.type, \
               tuple([f.name for f in self.feeders]) or ''
@@ -120,7 +120,7 @@ class WizardSaver(log.Loggable):
         options = self.wizard.get_step_options('Source')
         source = options['video']
         video_step = self.wizard[source.step]
-        
+
         if hasattr(video_step, 'worker'):
             props = video_step.get_component_properties()
             worker = video_step.worker
@@ -149,11 +149,11 @@ class WizardSaver(log.Loggable):
         # These were just used to pass capabilities; they shouldn't go into the
         # XML.
         del properties['show-logo']
-        del properties['can-overlay']    
+        del properties['can-overlay']
 
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
-        
+
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
@@ -165,30 +165,30 @@ class WizardSaver(log.Loggable):
     def getAudioSource(self, video_source):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
-        
+
         # If we selected firewire and have selected video
         # and the selected video is Firewire,
         #   return the source
         if (source == enums.AudioDevice.Firewire and video_source and
             options['video'] == enums.VideoDevice.Firewire):
             return video_source
-        
+
         props = {}
-        
+
         audio_step = self.wizard[source.step]
-        
+
         if hasattr(audio_step, 'worker'):
             props = audio_step.get_component_properties()
             worker = audio_step.worker
         else:
             worker = self.wizard['Source'].worker
-        
+
         return Component('producer-audio', source.component_type, worker, props)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['audio']
-        
+
         if encoder == enums.EncodingAudio.Mulaw:
             props = {}
             worker = self.wizard['Source'].worker
@@ -196,7 +196,7 @@ class WizardSaver(log.Loggable):
             encoder_step = self.wizard[encoder.step]
             props = encoder_step.get_component_properties()
             worker = encoder_step.worker
-            
+
         return Component('encoder-audio', encoder.component_type, worker, props)
 
     def getMuxer(self, name):
@@ -211,17 +211,17 @@ class WizardSaver(log.Loggable):
         has_overlay = (overlay_options['can-overlay'] and
                        (overlay_options['show-logo'] or
                         overlay_options['show-text']))
-        
+
         video_source =  self.getVideoSource()
         components.append(video_source)
-            
+
         video_overlay = None
         video_encoder = self.getVideoEncoder()
-            
+
         if has_overlay:
             video_overlay = self.getVideoOverlay(overlay_options['show-logo'])
             components.append(video_overlay)
-                
+
         if video_overlay != None:
             video_overlay.link(video_source)
             video_encoder.link(video_overlay)
@@ -229,19 +229,19 @@ class WizardSaver(log.Loggable):
             video_encoder.link(video_source)
         components.append(video_encoder)
         return video_encoder, video_source
-            
+
     def handleAudio(self, components, video_source):
         audio_source = self.getAudioSource(video_source)
         # In case of firewire component, which can already be there
         if not audio_source in components:
             components.append(audio_source)
-            
+
         audio_encoder = self.getAudioEncoder()
         components.append(audio_encoder)
         audio_encoder.link(audio_source)
 
         return audio_encoder
-    
+
     def handleConsumers(self, components, audio_encoder, video_encoder):
         cons_options = self.wizard.get_step_options('Consumption')
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
@@ -252,7 +252,7 @@ class WizardSaver(log.Loggable):
             audio_muxer = self.getMuxer('audio')
             components.append(audio_muxer)
             audio_muxer.link(audio_encoder)
-            
+
         video_muxer = None
         if has_video:
             video_muxer = self.getMuxer('video')
@@ -266,7 +266,7 @@ class WizardSaver(log.Loggable):
             components.append(both_muxer)
             both_muxer.link(video_encoder)
             both_muxer.link(audio_encoder)
-            
+
             if cons_options['http']:
                 if cons_options['http-audio-video']:
                     steps.append(('http-audio-video',
@@ -346,7 +346,7 @@ class WizardSaver(log.Loggable):
         has_audio = source_options['has-audio']
 
         components = []
-        
+
         video_encoder = None
         video_source = None
         if has_video:
@@ -357,16 +357,16 @@ class WizardSaver(log.Loggable):
         audio_encoder = None
         if has_audio:
             audio_encoder = self.handleAudio(components, video_source)
-            
+
         self.handleConsumers(components, audio_encoder, video_encoder)
 
         return components
-    
+
     def getXML(self):
         # FIXME: allow for naming flows !
         components = self.getComponents()
         self.debug('Got %d components' % len(components))
-        
+
         s = '<planet>\n'
         s += '  <flow name="%s">\n' % self.wizard.flowName
         for component in components:

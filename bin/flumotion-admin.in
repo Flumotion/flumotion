@@ -23,7 +23,7 @@
 import os
 import sys
 
-# Variable templates 
+# Variable templates
 LIBDIR = '@LIBDIR@'
 PROGRAM_PATH = 'flumotion.admin.gtk.main.main'
 

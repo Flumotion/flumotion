@@ -64,14 +64,14 @@ class WorkerConfigXML(log.Loggable):
                 self.doc = minidom.parseString(string)
         except expat.ExpatError, e:
             raise ConfigError("XML parser error: %s" % e)
-        
+
         if filename != None:
             self.path = os.path.split(filename)[0]
         else:
             self.path = None
-            
+
         self.parse()
-        
+
     # FIXME: privatize, called from __init__
     def parse(self):
         # <worker name="default">
@@ -81,7 +81,7 @@ class WorkerConfigXML(log.Loggable):
         # </worker>
 
         root = self.doc.documentElement
-        
+
         if not root.nodeName == 'worker':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
 
@@ -133,12 +133,12 @@ class WorkerConfigXML(log.Loggable):
                 transport = str(child.firstChild.nodeValue)
                 if not transport in ('tcp', 'ssl'):
                     raise ConfigError("<transport> must be ssl or tcp")
-                    
+
             else:
                 raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
 
         return ConfigEntryManager(host, port, transport)
-     
+
     def parseAuthentication(self, node):
         # <authentication>
         #   <username>...</username>
@@ -160,7 +160,7 @@ class WorkerConfigXML(log.Loggable):
                 raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
 
         return ConfigEntryAuthentication(username, password)
-        
+
     def parseFeederports(self, node):
         """
         Returns a list of feeder ports to use (possibly empty),

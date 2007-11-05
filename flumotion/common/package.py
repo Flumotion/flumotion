@@ -92,7 +92,7 @@ class Packager(log.Loggable):
         """
         if not packageName in self._packages.keys():
             return None
-            
+
         return [self._paths[key] for key in self._packages[packageName]]
 
     def registerPackagePath(self, packagePath, key, prefix='flumotion'):
@@ -129,13 +129,13 @@ class Packager(log.Loggable):
                     packagePath, key))
                 return
             new = False
-                
+
         # Find the packages in the path and sort them,
         # the following algorithm only works if they're sorted.
         # By sorting the list we can ensure that a parent package
         # is always processed before one of its children
         packageNames = _findPackageCandidates(packagePath, prefix)
-           
+
         if not packageNames:
             log.log('bundle',
                 'packagePath %s does not have candidates starting with %s' %
@@ -174,9 +174,9 @@ class Packager(log.Loggable):
                 self._packages[name] = [key]
             else:
                 self._packages[name].insert(0, key)
-                
+
         self.log('packagePath %s has packageNames %r' % (
-            packagePath, packageNames)) 
+            packagePath, packageNames))
         # since we want sub-modules to be fixed up before parent packages,
         # we reverse the list
         packageNames.reverse()
@@ -219,7 +219,7 @@ class Packager(log.Loggable):
                 self.log('path %s already at start of %s.__path__' % (
                     newPath, packageName))
                 continue
-                
+
             if newPath in package.__path__:
                 package.__path__.remove(newPath)
                 self.log('moving %s to front of %s.__path__' % (
@@ -282,7 +282,7 @@ def _listDirRecursively(path):
     """
     I'm similar to os.listdir, but I work recursively and only return
     directories containing python code.
-    
+
     @param path: the path
     @type  path: string
     """
@@ -302,14 +302,14 @@ def _listDirRecursively(path):
 
     if glob.glob(os.path.join(path, '*.py*')):
         retval.append(path)
-            
+
     return retval
 
 def _listPyFileRecursively(path):
     """
     I'm similar to os.listdir, but I work recursively and only return
     files representing python non-package modules.
-    
+
     @param path: the path
     @type  path: string
 
@@ -371,12 +371,12 @@ def _findPackageCandidates(path, prefix='flumotion'):
             else:
                 build = build + "." + p
             packages[build] = 1
-            
+
     bundlePackages = packages.keys()
 
     # sort them so that depending packages are after higher-up packages
     bundlePackages.sort()
-        
+
     return bundlePackages
 
 def findEndModuleCandidates(path, prefix='flumotion'):
@@ -386,7 +386,7 @@ def findEndModuleCandidates(path, prefix='flumotion'):
 
     @param path:   the path under which to search for end modules
     @type  path:   string
-    @param prefix: module prefix to check candidates under 
+    @param prefix: module prefix to check candidates under
     @type  prefix: string
     """
     pathPrefix = "/".join(prefix.split("."))

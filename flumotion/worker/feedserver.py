@@ -130,7 +130,7 @@ class FeedAvatar(fpb.Avatar):
 
         # hand off the fd to the component
         self.debug("Attempting to send FD: %d", t.fileno())
-        
+
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         componentId = common.componentId(flowName, componentName)
 
@@ -162,7 +162,7 @@ class FeedAvatar(fpb.Avatar):
 
         # hand off the fd to the component
         self.debug("Attempting to send FD: %d", t.fileno())
-        
+
         (flowName, componentName, eaterAlias) = common.parseFullFeedId(fullFeedId)
         componentId = common.componentId(flowName, componentName)
 

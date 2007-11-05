@@ -55,7 +55,7 @@ def _init_gst_version(gst_majorminor):
     if gst_majorminor not in GST_REQ:
         raise SystemExit('ERROR: Invalid FLU_GST_VERSION: %r (expected '
                          'one of %r)' % (gst_majorminor, GST_REQ.keys()))
-    
+
     pygst_req = GST_REQ[gst_majorminor]['gst-python']
     gst_req = GST_REQ[gst_majorminor]['gstreamer']
 
@@ -79,7 +79,7 @@ def _init_gst_version(gst_majorminor):
     if gst_req[:2] != gst_version[:2]:
         raise SystemExit('ERROR: Expected GStreamer %s, but got incompatible %s'
                          % (gst_majorminor, tup2version(gst_version[:2])))
-    
+
     if gst_version < gst_req:
         raise SystemExit('ERROR: GStreamer %s too old; install %s or newer'
                          % (tup2version(gst_version), tup2version(gst_req)))
@@ -148,7 +148,7 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     # this monkeypatched var exists to let reconnecting factories know
     # when they should warn about a connection being closed, and when
     # they shouldn't because the system is shutting down.
-    # 
+    #
     # there is no race condition here -- the reactor doesn't handle
     # signals until it is run().
     reactor.killed = False
@@ -195,9 +195,9 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     else:
         def catching(proc, *args, **kwargs):
             return proc(*args, **kwargs)
-        
+
     main = reflect.namedAny(path)
-    
+
     try:
         sys.exit(catching(main, sys.argv))
     except (errors.SystemError, SystemError), e:

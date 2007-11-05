@@ -215,7 +215,7 @@ class Authenticate(GladeWidget):
         else:
             self.user_entry.set_text('')
             self.passwd_entry.set_text('')
-            
+
     def get_state(self):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}

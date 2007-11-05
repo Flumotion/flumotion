@@ -46,7 +46,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def error_dialog(self, message):
         # FIXME: dialogize
         print 'ERROR:', message
-        
+
     def cb_getMimeType(self, mime, label):
         label.set_text(_('Mime type:') + " %s" % mime)
         label.show()
@@ -67,7 +67,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             # widget tree created but not yet shown
             self.shown = True
             self.statistics.show_all()
-       
+
     def registerLabel(self, name):
         #widgetname = name.replace('-', '_')
         #FIXME: make object member directly
@@ -89,9 +89,9 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         peakTime = state.get('clients-peak-time')
         if not isinstance(peakTime, str):
             peakTime = time.strftime("%c", time.localtime(peakTime))
-            
+
         self.labels['clients-peak-time'].set_text(peakTime)
-        
+
         for name in self.labels.keys():
             if name == 'clients-peak-time':
                 continue
@@ -105,12 +105,12 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
                 self.labels[name].set_markup(text)
             else:
                 self.labels[name].set_text(text)
-        
+
     def haveWidgetTree(self):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
         self.widget = self.statistics
-        for type in ('uptime', 'mime', 'current-bitrate', 'bitrate', 
+        for type in ('uptime', 'mime', 'current-bitrate', 'bitrate',
                 'totalbytes', 'url'):
             self.registerLabel('stream-' + type)
         for type in ('current', 'average', 'max', 'peak', 'peak-time'):
@@ -127,7 +127,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         # also signal handler to notify when mouse has gone over label
         # so cursor changes
         # add popup menu to let you open url or copy link location
-        
+
         if self._hasgnomevfs:
             streamurl_widget_eventbox = self.wtree.get_widget(
                 'eventbox-stream-url')
@@ -155,7 +155,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             item.connect('activate', self._streamurl_copylink,
                 streamurl_widget_eventbox)
             self._streamurl_popupmenu.add(item)
-            
+
         return self.statistics
 
     # signal handler for button press on stream url
@@ -196,15 +196,15 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         cursor = gtk.gdk.Cursor(widget.get_display(), gtk.gdk.HAND2)
         window = widget.window
         window.set_cursor(cursor)
-            
+
     def _streamurl_leave(self, widget, event):
         window = widget.window
         window.set_cursor(None)
-            
-    
+
+
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
-        statistics = StatisticsAdminGtkNode(self.state, self.admin, 
+        statistics = StatisticsAdminGtkNode(self.state, self.admin,
             _("Statistics"))
         self.nodes['Statistics'] = statistics
         # FIXME: maybe make a protocol instead of overriding
@@ -220,5 +220,5 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
 
     def component_logMessage(self, message):
         self.nodes['Log'].logMessage(message)
- 
+
 GUIClass = HTTPStreamerAdminGtk

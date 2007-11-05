@@ -60,9 +60,9 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         self.hasBeenConnected = 0
 
     def clientConnectionMade(self, broker):
-      self.hasBeenConnected = 1
+        self.hasBeenConnected = 1
 
-      fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
+        fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
 
     def clientConnectionFailed(self, connector, reason):
         """
@@ -76,8 +76,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         elif (reason.check(error.ConnectionRefusedError)
               or reason.check(error.ConnectError)):
             # If we're logging in for the first time, we want to make this a
-            # real error; we present a dialog, etc. 
-            # However, if we fail later on (e.g. manager shut down, and 
+            # real error; we present a dialog, etc.
+            # However, if we fail later on (e.g. manager shut down, and
             # hasn't yet been restarted), we want to keep trying to reconnect,
             # so we just log a message.
             self.debug("Error connecting to %s: %s", connector.getDestination(),
@@ -95,7 +95,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 # return
                 return
 
-        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
+        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
 
     # vmethod implementation
@@ -108,7 +108,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 assert result
             except Exception, e:
                 if self.extraTenacious:
-                    self.debug('connection problem: %s', 
+                    self.debug('connection problem: %s',
                                log.getExceptionMessage(e))
                     self.debug('we are tenacious, so trying again later')
                     self.disconnect()
@@ -139,7 +139,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.medium._defaultErrback(failure.Failure(e))
 
     gotDeferredLogin = defer_generator_method(gotDeferredLogin)
-        
+
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
 class AdminModel(medium.PingingMedium, signals.SignalMixin):
@@ -177,7 +177,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self._components = {} # dict of components
         self.planet = None
         self._workerHeavenState = None
-        
+
     def connectToManager(self, connectionInfo, keepTrying=False):
         'Connect to a host.'
         assert self.clientFactory is None
@@ -328,7 +328,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
                          '<user>%s</user>' % i.authenticator.username,
                          '<passwd>%s</passwd>' % i.authenticator.password,
                          '</connection>'])
-            
+
             import os
             import md5
             sum = md5.new(s).hexdigest()
@@ -399,7 +399,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         @type  componentState: L{flumotion.common.planet.AdminComponentState}
         @param methodName:     name of method to call; serialized to a
                                remote_methodName on the worker's medium
-                           
+
         @rtype: L{twisted.internet.defer.Deferred}
         """
         assert isinstance(componentState, planet.AdminComponentState), \
@@ -438,7 +438,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.debug('Called remote method %s on component %s successfully' % (
             methodName, componentName))
         return result
-    
+
     def workerCallRemote(self, workerName, methodName, *args, **kwargs):
         """
         Call the the given method on the given worker with the given args.
@@ -446,7 +446,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         @param workerName: name of the worker to call the method on
         @param methodName: name of method to call; serialized to a
                            remote_methodName on the worker's medium
-                           
+
         @rtype: L{twisted.internet.defer.Deferred}
         """
         r = common.argRepr(args, kwargs, max=20)
@@ -600,7 +600,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         yield d
 
         fileName, methodName = d.value()
-            
+
         self.debug("entry for %r of type %s is in file %s and method %s" % (
             componentState, type, fileName, methodName))
         d = self.bundleLoader.getBundles(fileName=fileName)
@@ -620,7 +620,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         d = self.workerCallRemote(workerName, 'checkImport', moduleName)
         d.addErrback(self._defaultErrback)
         return d
-     
+
     def workerRun(self, workerName, moduleName, functionName, *args, **kwargs):
         """
         Run the given function and args on the given worker. If the
@@ -632,14 +632,14 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         """
         return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)
-    
+
     # FIXME: this should not be allowed to be called, move away
     # by abstracting callers further
     def get_components(self):
         # returns a dict of name -> component
         return self._components
     getComponents = get_components
-    
+
     def _setWorkerHeavenState(self, state):
         self._workerHeavenState = state
 

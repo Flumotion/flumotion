@@ -42,9 +42,9 @@ class FluTrayIcon(log.Loggable):
     """
 
     implements(flavors.IStateListener)
-    
+
     logCategory = 'trayui'
-    
+
     def __init__ (self, window):
         """
         @type window: L{flumotion.admin.gtk.client.Window}
@@ -55,7 +55,7 @@ class FluTrayIcon(log.Loggable):
         self._components = None
 
         self._create_trayicon()
-        
+
     def _create_trayicon(self):
         # start off with just the fluendo logo
         try:
@@ -87,14 +87,14 @@ class FluTrayIcon(log.Loggable):
         """
         Update the components list
 
-        @param components: dictionary of name -> 
+        @param components: dictionary of name ->
                            L{flumotion.common.component.AdminComponentState}
         """
         if not self._tray_container:
             return
-        
+
         self.debug('updating component in trayicon view')
-        
+
         # get a dictionary of components
         self._components = components
         for component in components.values():
@@ -119,7 +119,7 @@ class FluTrayIcon(log.Loggable):
                 self.window.window.show()
         elif event.button == 3:
             self._show_popup_menu()
-        
+
     # FIXME: looks like cutnpaste from a similar function, squash duplication
     def _update_mood(self):
         """
@@ -136,14 +136,14 @@ class FluTrayIcon(log.Loggable):
             self._tray_image.set_from_pixbuf(scaled_buf)
         else:
             # get overall mood of components
-            overallmood = moods.happy.value 
+            overallmood = moods.happy.value
             for compName in names:
                 component = self._components[compName]
                 mood = component.get('mood')
                 self.debug("component %s has mood %d" % (compName, mood))
                 if mood > overallmood:
                     overallmood = mood
-        
+
             moodname = moods.get(overallmood).name
             self.debug("overall mood: %s %d" % (moodname,overallmood))
             pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join(configure.imagedir, 'mood-%s.png' % moodname))
@@ -154,7 +154,7 @@ class FluTrayIcon(log.Loggable):
         if not isinstance(state, planet.AdminComponentState):
             self.warning('Got state change for unknown object %r' % state)
             return
-        
+
         if key == 'mood':
             # one of the components has changed mood
             self._update_mood()

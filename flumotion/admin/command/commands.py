@@ -142,7 +142,7 @@ def do_showcomponent(model, quit, avatarId):
                 show_uistate(k, v.get(k), indent+4)
         else:
             print '%s%s%s' % (' '*indent, k and k+': ' or '', v)
-        
+
     d = model.callRemote('getPlanetState')
     yield d
     planet = d.value()
@@ -178,12 +178,12 @@ def _parse_typed_args(spec, args):
             return contents
         except:
             raise ParseException("Failed to read file %s" % (filename,))
-            
+
     def _do_parse_typed_args(spec, args):
         accum = []
         while spec:
             argtype = spec.pop(0)
-            parsers = {'i': int, 's': str, 'b': common.strToBool, 
+            parsers = {'i': int, 's': str, 'b': common.strToBool,
                 'F': _readFile}
             if argtype == ')':
                 return tuple(accum)
@@ -208,7 +208,7 @@ def _parse_typed_args(spec, args):
                 except Exception, e:
                     raise ParseException('Failed to parse %s as %r: %s'
                                          % (arg, parser, e))
-            
+
     spec = list(spec) + [')']
     args = list(args)
 
@@ -245,7 +245,7 @@ def do_invoke(model, quit, avatarId, methodName, *args):
 
     try:
         v = d.value()
-        print "Invoke of %s on %s was successful." % (methodName, 
+        print "Invoke of %s on %s was successful." % (methodName,
             avatarId[1])
         print v
     except errors.NoMethodError:
@@ -340,8 +340,8 @@ class MoodListener(defer.Deferred):
     def stateSet(self, object, key, value):
         if key == 'mood' and moods[value] in self._moodsFinal:
             self.callback(moods[value])
-                
-# FIXME: nicer to rewrite do_stop, do_start and do_delete to run some common 
+
+# FIXME: nicer to rewrite do_stop, do_start and do_delete to run some common
 # code
 def do_avatar_action(model, quit, avatarPath, action):
     """
@@ -382,7 +382,7 @@ def do_avatar_action(model, quit, avatarPath, action):
             else:
                 print "Cannot %s component /%s/%s, it is in mood: %s." % (
                     action[0],
-                    c.get("parent").get("name"), c.get("name"), 
+                    c.get("parent").get("name"), c.get("name"),
                     moods[c.get("mood")].name)
                 return None
         dl = []
@@ -418,7 +418,7 @@ def do_start(model, quit, avatarPath):
         (moods.happy, moods.sad), moods.can_start))
 
 def do_delete(model, quit, avatarPath):
-    return do_avatar_action(model, quit, avatarPath, ('delete', 
+    return do_avatar_action(model, quit, avatarPath, ('delete',
         'deleteComponent', None, lambda m: not moods.can_stop(m)))
 
 commands = (('getprop',

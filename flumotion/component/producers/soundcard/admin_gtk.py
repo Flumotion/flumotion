@@ -48,4 +48,3 @@ class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
 
 
 GUIClass = SoundcardAdminGtk
-

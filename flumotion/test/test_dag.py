@@ -45,7 +45,7 @@ class TestDAG(unittest.TestCase):
 
     def testBible(self):
         graph = dag.DAG()
-        
+
         # first line
         graph.addNode('adam')
         graph.addNode('eve')
@@ -101,7 +101,7 @@ class TestDAG(unittest.TestCase):
         self.failUnless('cain' in offspring)
         self.failUnless('abel' in offspring)
         self.failUnless('seth' in offspring)
-        
+
         offspring = graph.getOffspring('cain')
         self.assertEquals(len(offspring), 0)
 
@@ -122,7 +122,7 @@ class TestDAG(unittest.TestCase):
         self.assertEquals(len(offspring), 7)
         for n in ['abel', 'cain', 'enoch', 'irad', 'seth', 'enosh', 'kenan']:
             self.failUnless(n in offspring)
-  
+
         offspring = graph.getOffspring('cain')
         self.assertEquals(len(offspring), 2)
         for n in ['enoch', 'irad']:
@@ -137,7 +137,7 @@ class TestDAG(unittest.TestCase):
         # test whether we get a list of unique children even through
         # common ancestry
         graph = dag.DAG()
-        
+
         # first line
         graph.addNode('A')
         graph.addNode('B1')
@@ -160,7 +160,7 @@ class TestDAG(unittest.TestCase):
 # http://www.cs.cornell.edu/courses/cs312/2004fa/lectures/lecture15.htm
     def testExample(self):
         graph = dag.DAG()
-        
+
         for i in range(1, 10):
             graph.addNode(i)
 
@@ -214,13 +214,13 @@ class FakeComponent(FakeDep): pass
 class TestPlanet(unittest.TestCase):
     def testPlanet(self):
         graph = dag.DAG()
-        
+
         weu = FakeWorker('europe')
         wus = FakeWorker('america')
-        
+
         graph.addNode(weu, worker)
         graph.addNode(wus, worker)
-        
+
         # producer
         kpr = FakeKid('producer')
         cpr = FakeComponent('producer')
@@ -282,7 +282,7 @@ class TestPlanet(unittest.TestCase):
         graph.addEdge(ccs, cte, component, component)
 
         # test offspring filtered
-        
+
         # all components depend on the european worker
         list = graph.getOffspringTyped(weu, worker, component)
         self.assertEquals(len(list), 4)
@@ -294,4 +294,3 @@ class TestPlanet(unittest.TestCase):
         self.assertEquals(len(list), 2)
         for c in [(ccs, component), (cte, component)]:
             self.failUnless(c in list)
-

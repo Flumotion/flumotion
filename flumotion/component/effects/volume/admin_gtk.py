@@ -115,8 +115,8 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
                 levelLabel.set_justify(gtk.JUSTIFY_LEFT)
                 self.widget.attach(levelLabel, 0, 1, chan * 2, chan * 2 + 1,
                     xoptions=gtk.FILL, yoptions=0, xpadding=3, ypadding=3)
-                self.widget.attach(levelWidget, 0, 1, chan * 2 + 1, 
-                    chan * 2 + 2, yoptions=gtk.FILL, 
+                self.widget.attach(levelWidget, 0, 1, chan * 2 + 1,
+                    chan * 2 + 2, yoptions=gtk.FILL,
                     xpadding=6, ypadding=3)
                 levelLabel.show()
                 levelWidget.show()
@@ -126,14 +126,14 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         if len(peak) > len(self.level_widgets):
             self._createEnoughLevelWidgets(len(peak))
         for i in range(0, len(peak)):
-            self.level_widgets[i].set_property('peak', 
+            self.level_widgets[i].set_property('peak',
                 clamp(peak[i], -90.0, 0.0))
 
     def decaySet(self, decay):
         if len(decay) > len(self.level_widgets):
             self._createEnoughLevelWidgets(len(decay))
         for i in range(0, len(decay)):
-            self.level_widgets[i].set_property('decay', 
+            self.level_widgets[i].set_property('decay',
                 clamp(decay[i], -90.0, 0.0))
 
     # when volume has been set by another admin client

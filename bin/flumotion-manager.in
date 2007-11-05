@@ -27,7 +27,7 @@
 import os
 import sys
 
-# Variable templates 
+# Variable templates
 LIBDIR = '@LIBDIR@'
 PROGRAM_PATH = 'flumotion.manager.main.main'
 

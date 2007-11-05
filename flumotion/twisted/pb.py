@@ -105,7 +105,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         d = self.getRootObject()
         d.addCallback(getRootObjectCb)
         return d
-        
+
     def login(self, authenticator):
         """
         Login, respond to challenges, and eventually get perspective
@@ -128,7 +128,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
             interfaces.append(pb.IPerspective)
         interfaces = [reflect.qual(interface)
                           for interface in interfaces]
-            
+
         def getKeycardClassesCb(keycardClasses):
             self.log('supported keycard classes: %r' % keycardClasses)
             d = authenticator.issue(keycardClasses)
@@ -151,7 +151,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
         self.warning("you really want to use cbSendKeycard")
 
-        
+
     def _cbSendKeycard(self, root, authenticator, client, interfaces, count=0):
         self.log("_cbSendKeycard(root=%r, authenticator=%r, client=%r, "
                  "interfaces=%r, count=%d", root, authenticator, client,
@@ -232,7 +232,7 @@ class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
         self._client = client
 
         self._doingLogin = True
-        
+
     # methods to override
     def gotDeferredLogin(self, deferred):
         """
@@ -254,7 +254,7 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
         FPBClientFactory.__init__(self)
         self._doingLogin = False
         self._doingGetPerspective = False
-        
+
     def clientConnectionFailed(self, connector, reason):
         log.msg("connection failed to %s, reason %r" % (
             connector.getDestination(), reason))
@@ -288,7 +288,7 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
         assert not isinstance(authenticator, keycards.Keycard)
         self._authenticator = authenticator
         self._doingLogin = True
-        
+
     # methods to override
     def gotDeferredLogin(self, deferred):
         """
@@ -308,7 +308,7 @@ class _FPortalRoot:
     """
 
     implements(flavors.IPBRoot)
-    
+
     def __init__(self, bouncerPortal):
         """
         @type bouncerPortal: L{flumotion.twisted.portal.BouncerPortal}
@@ -343,7 +343,7 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
         @returns: one of
             - a L{flumotion.common.keycards.Keycard} when more steps
               need to be performed
-            - a L{twisted.spread.pb.AsReferenceable} when authentication 
+            - a L{twisted.spread.pb.AsReferenceable} when authentication
               has succeeded, which will turn into a
               L{twisted.spread.pb.RemoteReference} on the client side
             - a L{flumotion.common.errors.NotAuthenticatedError} when
@@ -412,7 +412,7 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         """
         # this method returns a deferred so we present the same interface
         # as the RemoteAuthenticator adapter
-    
+
         # construct a list of keycard interfaces we can support right now
         supported = []
         # address is allowed to be None
@@ -786,4 +786,3 @@ class PingableAvatar(Avatar):
             if self.mind:
                 self.mind.broker.transport.loseConnection()
         self.startPingChecking(_disconnect)
-

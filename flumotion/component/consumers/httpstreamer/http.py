@@ -53,18 +53,18 @@ __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 
 
 STATS_POLL_INTERVAL = 10
-    
+
 # FIXME: generalize this class and move it out here ?
 class Stats:
     def __init__(self, sink):
         self.sink = sink
-        
-        self.no_clients = 0        
+
+        self.no_clients = 0
         self.clients_added_count = 0
         self.clients_removed_count = 0
         self.start_time = time.time()
         # keep track of the highest number and the last epoch this was reached
-        self.peak_client_number = 0 
+        self.peak_client_number = 0
         self.peak_epoch = self.start_time
         self.load_deltas = [0, 0]
         self._load_deltas_period = 10 # seconds
@@ -79,7 +79,7 @@ class Stats:
         self.hostname = "localhost"
         self.port = 0
         self.mountPoint = "/"
-        
+
     def _updateAverage(self):
         # update running average of clients connected
         now = time.time()
@@ -108,7 +108,7 @@ class Stats:
         if self.no_clients >= self.peak_client_number:
             self.peak_epoch = time.time()
             self.peak_client_number = self.no_clients
-    
+
     def clientRemoved(self):
         self._updateAverage()
         self.no_clients -= 1
@@ -116,7 +116,7 @@ class Stats:
 
     def _updateStats(self):
         """
-        Periodically, update our statistics on load deltas, and update the 
+        Periodically, update our statistics on load deltas, and update the
         UIState with new values for total bytes, bitrate, etc.
         """
 
@@ -124,7 +124,7 @@ class Stats:
         add, remove = self.clients_added_count, self.clients_removed_count
         now = time.time()
         diff = float(now - oldtime)
-            
+
         self.load_deltas = [(add-oldadd)/diff, (remove-oldremove)/diff]
         self._load_deltas_ongoing = [now, add, remove]
 
@@ -133,10 +133,10 @@ class Stats:
             self._currentBitrate = ((bytesReceived - self._lastBytesReceived) *
                  8 / STATS_POLL_INTERVAL)
         self._lastBytesReceived = bytesReceived
-            
+
         self.update_ui_state()
 
-        self._updateCallLaterId = reactor.callLater(STATS_POLL_INTERVAL, 
+        self._updateCallLaterId = reactor.callLater(STATS_POLL_INTERVAL,
             self._updateStats)
 
     def getCurrentBitrate(self):
@@ -147,34 +147,34 @@ class Stats:
 
     def getBytesSent(self):
         return self.sink.get_property('bytes-served')
-    
+
     def getBytesReceived(self):
         return self.sink.get_property('bytes-to-serve')
-    
+
     def getUptime(self):
         return time.time() - self.start_time
-    
+
     def getClients(self):
         return self.no_clients
-    
+
     def getPeakClients(self):
         return self.peak_client_number
 
     def getPeakEpoch(self):
         return self.peak_epoch
-    
+
     def getAverageClients(self):
         return self.average_client_number
 
     def getUrl(self):
-        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint) 
+        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
 
     def getLoadDeltas(self):
         return self.load_deltas
 
     def updateState(self, set):
         c = self
- 
+
         bytes_sent      = c.getBytesSent()
         bytes_received  = c.getBytesReceived()
         uptime          = c.getUptime()
@@ -185,7 +185,7 @@ class Stats:
         bitspeed = bytes_received * 8 / uptime
         currentbitrate = self.getCurrentBitrate()
         set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
-        set('stream-current-bitrate', 
+        set('stream-current-bitrate',
             common.formatStorage(currentbitrate) + 'bit/s')
         set('stream-totalbytes', common.formatStorage(bytes_received) + 'Byte')
         set('stream-bitrate-raw', bitspeed)
@@ -256,7 +256,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
-    
+
     pipe_template = 'multifdsink name=sink ' + \
                                 'sync=false ' + \
                                 'recover-policy=3'
@@ -296,11 +296,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._pending_removals = {}
 
         for i in ('stream-mime', 'stream-uptime', 'stream-current-bitrate',
-                  'stream-bitrate', 'stream-totalbytes', 'clients-current', 
-                  'clients-max', 'clients-peak', 'clients-peak-time', 
-                  'clients-average', 'consumption-bitrate', 
-                  'consumption-totalbytes', 'stream-bitrate-raw', 
-                  'stream-totalbytes-raw', 'consumption-bitrate-raw', 
+                  'stream-bitrate', 'stream-totalbytes', 'clients-current',
+                  'clients-max', 'clients-peak', 'clients-peak-time',
+                  'clients-average', 'consumption-bitrate',
+                  'consumption-totalbytes', 'stream-bitrate-raw',
+                  'stream-totalbytes-raw', 'consumption-bitrate-raw',
                   'consumption-totalbytes-raw', 'stream-url'):
             self.uiState.addKey(i, None)
 
@@ -336,7 +336,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                      'set, cannot satisfy')
 
         # tcp is where multifdsink is
-        version = gstreamer.get_plugin_version('tcp') 
+        version = gstreamer.get_plugin_version('tcp')
         if version < (0, 10, 9, 1):
             m = messages.Error(T_(N_(
                 "Version %s of the '%s' GStreamer plug-in is too old.\n"),
@@ -355,19 +355,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def setup_burst_mode(self, sink):
         if self.burst_on_connect:
             if self.burst_time and self.time_bursting_supported(sink):
-                self.debug("Configuring burst mode for %f second burst", 
+                self.debug("Configuring burst mode for %f second burst",
                     self.burst_time)
                 # Set a burst for configurable minimum time, plus extra to
                 # start from a keyframe if needed.
                 sink.set_property('sync-method', 4) # burst-keyframe
                 sink.set_property('burst-unit', 2) # time
-                sink.set_property('burst-value', 
+                sink.set_property('burst-value',
                     long(self.burst_time * gst.SECOND))
 
                 # We also want to ensure that we have sufficient data available
-                # to satisfy this burst; and an appropriate maximum, all 
+                # to satisfy this burst; and an appropriate maximum, all
                 # specified in units of time.
-                sink.set_property('time-min', 
+                sink.set_property('time-min',
                     long((self.burst_time + 5) * gst.SECOND))
 
                 sink.set_property('unit-type', 2) # time
@@ -376,12 +376,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 sink.set_property('units-max',
                     long((self.burst_time + 10) * gst.SECOND))
             elif self.burst_size:
-                self.debug("Configuring burst mode for %d kB burst", 
+                self.debug("Configuring burst mode for %d kB burst",
                     self.burst_size)
-                # If we have a burst-size set, use modern 
+                # If we have a burst-size set, use modern
                 # needs-recent-multifdsink behaviour to have complex bursting.
-                # In this mode, we burst a configurable minimum, plus extra 
-                # so we start from a keyframe (or less if we don't have a 
+                # In this mode, we burst a configurable minimum, plus extra
+                # so we start from a keyframe (or less if we don't have a
                 # keyframe available)
                 sink.set_property('sync-method', 'burst-keyframe')
                 sink.set_property('burst-unit', 'bytes')
@@ -391,18 +391,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 # has a minimum amount of data available - assume 512 kB beyond
                 # the burst amount so that we should have a keyframe available
                 sink.set_property('bytes-min', (self.burst_size + 512) * 1024)
-                
+
                 # And then we need a maximum still further above that - the
                 # exact value doesn't matter too much, but we want it reasonably
                 # small to limit memory usage. multifdsink doesn't give us much
                 # control here, we can only specify the max values in buffers.
                 # We assume each buffer is close enough to 4kB - true for asf
                 # and ogg, at least
-                sink.set_property('buffers-soft-max', 
+                sink.set_property('buffers-soft-max',
                     (self.burst_size + 1024) / 4)
                 sink.set_property('buffers-max',
                     (self.burst_size + 2048) / 4)
-                
+
             else:
                 # Old behaviour; simple burst-from-latest-keyframe
                 self.debug("simple burst-on-connect, setting sync-method 2")
@@ -416,7 +416,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             sink.set_property('buffers-soft-max', 250)
             sink.set_property('buffers-max', 500)
-    
+
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
 
@@ -426,7 +426,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
-        
+
         # Hostname is used for a variety of purposes. We do a best-effort guess
         # where nothing else is possible, but it's much preferable to just
         # configure this
@@ -442,7 +442,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.description = properties.get('description', None)
         if self.description is None:
             self.description = "Flumotion Stream"
- 
+
         # FIXME: tie these together more nicely
         self.httpauth = http.HTTPAuthentication(self)
         self.resource = resources.HTTPStreamingResource(self,
@@ -556,7 +556,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def getLoadData(self):
         """
-        Return a tuple (deltaadded, deltaremoved, bytes_transferred, 
+        Return a tuple (deltaadded, deltaremoved, bytes_transferred,
         current_clients, current_load) of our current bandwidth and user values.
         The deltas are estimates of how much bitrate is added, removed
         due to client connections, disconnections, per second.
@@ -573,9 +573,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         clients_connected = self.getClients()
         current_load = bitrate * clients_connected
 
-        return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent, 
+        return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent,
             clients_connected, current_load)
-    
+
     def add_client(self, fd):
         sink = self.get_element('sink')
         sink.emit('add', fd)
@@ -596,7 +596,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.log('[fd %5d] client_added_handler', fd)
         Stats.clientAdded(self)
         self.update_ui_state()
-        
+
     def _client_removed_handler(self, sink, fd, reason, stats):
         self.log('[fd %5d] client_removed_handler, reason %s', fd, reason)
         if reason.value_name == 'GST_CLIENT_STATUS_ERROR':
@@ -612,16 +612,16 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
-        
+
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
-        
+
         if not self.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
 
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
-        
+
         reactor.callFromThread(self.update_ui_state)
 
     # We now use both client-removed and client-fd-removed. We call get-stats
@@ -637,7 +637,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def _client_fd_removed_cb(self, sink, fd):
         (stats, reason) = self._pending_removals.pop(fd)
 
-        reactor.callFromThread(self._client_removed_handler, sink, fd, 
+        reactor.callFromThread(self._client_removed_handler, sink, fd,
             reason, stats)
 
     ### END OF THREAD-AWARE CODE
@@ -668,7 +668,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._porterUsername = username
             self._porterPassword = password
 
-            creds = credentials.UsernamePassword(self._porterUsername, 
+            creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
 
@@ -680,7 +680,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                             # old connector.
                 self._pbclient.resetDelay()
                 reactor.connectWith(
-                    fdserver.FDConnector, self._porterPath, 
+                    fdserver.FDConnector, self._porterPath,
                     self._pbclient, 10, checkPID=False)
         else:
             raise errors.WrongStateError(
@@ -712,8 +712,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             # So, we return a DeferredList with a deferred for each of
             # these tasks. The second one's a bit tricky: we pass a dummy
             # deferred to our PorterClientFactory that gets fired once
-            # we've done all of the tasks the first time (it's an 
-            # automatically-reconnecting client factory, and we only fire 
+            # we've done all of the tasks the first time (it's an
+            # automatically-reconnecting client factory, and we only fire
             # this deferred the first time)
 
             self._porterDeferred = d = defer.Deferred()
@@ -721,21 +721,21 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._pbclient = porterclient.HTTPPorterClientFactory(
                 server.Site(resource=root), mountpoints, d)
 
-            creds = credentials.UsernamePassword(self._porterUsername, 
+            creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self.medium)
 
             self.debug("Starting porter login at \"%s\"", self._porterPath)
             # This will eventually cause d to fire
             reactor.connectWith(
-                fdserver.FDConnector, self._porterPath, 
+                fdserver.FDConnector, self._porterPath,
                 self._pbclient, 10, checkPID=False)
         else:
             # Streamer is standalone.
             try:
                 self.debug('Listening on %d' % self.port)
                 iface = self.iface or ""
-                self._tport = reactor.listenTCP(self.port, server.Site(resource=root), 
+                self._tport = reactor.listenTCP(self.port, server.Site(resource=root),
                     interface=iface)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port

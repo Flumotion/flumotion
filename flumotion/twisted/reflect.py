@@ -56,13 +56,13 @@ def namedAny(name):
             if not (r.startswith('No module named') and
                     r.endswith(shortname)):
                 raise
-            
+
             #if str(sys.exc_info()[1]) != "No module named %s" % trialname:
             #    raise
             moduleNames.pop()
-                                                                                
+
     obj = topLevelPackage
     for n in names[1:]:
         obj = getattr(obj, n)
-                                                                                
+
     return obj

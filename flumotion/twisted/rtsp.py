@@ -200,12 +200,12 @@ class RTSPRequest(http.Request, flog.Loggable):
             lines.append("%s: %s" % (key, value))
 
         self.debug('incoming headers:\n%s\n' % "\n".join(lines))
- 
+
         #self.debug('user-agent: %s' % self.received_headers.get('user-agent',
         #    '[Unknown]'))
         #self.debug('clientid: %s' % self.received_headers.get('clientid',
         #    '[Unknown]'))
-       
+
         # don't store site locally; we can't be sure every request has gone
         # through our customized handlers
         site = self.channel.site
@@ -231,7 +231,7 @@ class RTSPRequest(http.Request, flog.Loggable):
                 er = ErrorResource(e.args[0])
                 self.render(er)
         except Exception, e:
-            self.warning('failed to process %s: %s' % 
+            self.warning('failed to process %s: %s' %
                 (lines and lines[0] or "[No headers]",
                     flog.getExceptionMessage(e)))
             self.processingFailed(failure.Failure())
@@ -309,7 +309,7 @@ class RTSPRequest(http.Request, flog.Loggable):
             result.addErrback(self._renderErrback, resrc)
         else:
             self._renderCallback(result, resrc)
-        
+
     # TODO: Refactor this and renderCallback to be cleaner and share code.
     def _renderErrback(self, failure, resrc):
         body = self._error(INTERNAL_SERVER_ERROR,
@@ -320,10 +320,10 @@ class RTSPRequest(http.Request, flog.Loggable):
             lines.append("%s: %s" % (key, value))
 
         self.channel.site.logReply(self.code, self.code_message, lines, body)
- 
+
         self.write(body)
         self.finish()
-        
+
     def _renderCallback(self, result, resrc):
         body = result
         if type(body) is not types.StringType:
@@ -352,7 +352,7 @@ class RTSPRequest(http.Request, flog.Loggable):
         self.log(body)
 
         self.channel.site.logReply(self.code, self.code_message, lines, body)
- 
+
         self.write(body)
         self.finish()
 
@@ -389,7 +389,7 @@ class RTSPSite(server.Site):
 class RTSPResource(resource.Resource, flog.Loggable):
     """
     I am a base class for all RTSP Resource classes.
-    
+
     @type allowedMethods: tuple
     @ivar allowedMethods: a tuple of allowed methods that can be invoked
                           on this resource.
@@ -466,7 +466,7 @@ class RTSPResource(resource.Resource, flog.Loggable):
             # without a RealChallenge1, clients don't even go past OPTIONS
             request.setHeader('RealChallenge1', '28d49444034696e1d523f2819b8dcf4c')
             #request.setHeader('StatsMask', '3')
-    
+
     def render_GET(self, request):
         # the Resource.get_HEAD refers to this -- pacify pychecker
         raise NotImplementedError
@@ -501,5 +501,3 @@ class ErrorResource(RTSPResource):
 class NoResource(ErrorResource):
     def __init__(self, message=None):
         ErrorResource.__init__(self, NOT_FOUND, message)
-
-

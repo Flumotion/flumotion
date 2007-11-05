@@ -36,7 +36,7 @@ class BaseWatcher(log.Loggable):
 
     def __init__(self, timeout):
         """Make a file watcher object.
-        
+
         @param timeout: timeout between checks, in seconds
         @type timeout: int
         """
@@ -74,7 +74,7 @@ class BaseWatcher(log.Loggable):
         @type fileChanged: filename -> None
         @param fileDeleted: A function to call when a file is deleted.
         @type fileDeleted: filename -> None
-        
+
         @returns: A subscription ID that can later be passed to
         unsubscribe().
         """
@@ -101,7 +101,7 @@ class BaseWatcher(log.Loggable):
     # author. make subscribe() call start() if necessary?
     def start(self):
         """Start checking for file changes.
-        
+
         Subscribers will be notified asynchronously of changes to the
         watched files.
         """
@@ -198,7 +198,7 @@ class DirectoryWatcher(BaseWatcher):
     Directory Watcher
     Watches a directory for new files.
     """
-    
+
     def __init__(self, path, ignorefiles=(), timeout=30):
         BaseWatcher.__init__(self, timeout)
         self.path = path
@@ -208,7 +208,7 @@ class DirectoryWatcher(BaseWatcher):
         return [os.path.join(self.path, f)
                 for f in os.listdir(self.path)
                 if f not in self._ignorefiles]
-        
+
 class FilesWatcher(BaseWatcher):
     """
     Watches a collection of files for modifications.

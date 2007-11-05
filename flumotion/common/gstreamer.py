@@ -64,7 +64,7 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
         return
     if pspec.name == 'caps' and output == 'None':
         return
-    
+
     component.debug('%s: %s = %s' % (orig.get_path_string(), pspec.name, output))
 
 def element_factory_has_property(element_factory, property_name):
@@ -94,7 +94,7 @@ def element_factory_has_property_value(element_factory, property_name, value):
         return False
 
     return True
-   
+
 def element_factory_exists(name):
     """
     Check if the given element factory name exists.
@@ -169,7 +169,7 @@ class StateChangeMonitor(dict, log.Loggable):
     def have_error(self, curstate, message):
         # if we have a state change defer that has not yet
         # fired, we should errback it
-        changes = [gst.STATE_CHANGE_NULL_TO_READY, 
+        changes = [gst.STATE_CHANGE_NULL_TO_READY,
                    gst.STATE_CHANGE_READY_TO_PAUSED,
                    gst.STATE_CHANGE_PAUSED_TO_PLAYING]
 
@@ -179,7 +179,7 @@ class StateChangeMonitor(dict, log.Loggable):
         for state, change in extras:
             if curstate <= state:
                 changes.append(change)
-        
+
         for change in changes:
             if change in self:
                 self.log("We have an error, going to errback pending "
@@ -189,4 +189,3 @@ class StateChangeMonitor(dict, log.Loggable):
                     d.errback(errors.GStreamerGstError(
                         message.src, gerror, debug))
                 del self[change]
-

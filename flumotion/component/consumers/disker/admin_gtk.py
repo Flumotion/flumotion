@@ -105,7 +105,7 @@ class FilenameNode(BaseAdminGtkNode):
         scheduleButton.connect("clicked", self.cb_schedule_recordings)
         self.widget.attach(scheduleButton, 0, 1, 1, 2,
             xoptions=0, yoptions=0, xpadding=6, ypadding=6)
-        self.widget.attach(self.filechooser, 1, 2, 1, 2, 
+        self.widget.attach(self.filechooser, 1, 2, 1, 2,
             xoptions = gtk.EXPAND|gtk.FILL, yoptions=0, xpadding=6, ypadding=6)
 
     def cb_schedule_recordings(self, widget):
@@ -122,7 +122,7 @@ class FilenameNode(BaseAdminGtkNode):
         self.warning("Failure %s scheduling recordings: %s" % (
             failure.type, failure.getErrorMessage()))
         return None
-    
+
 class DiskerAdminGtk(BaseAdminGtk):
     def setup(self):
         filename = FilenameNode(self.state, self.admin, "Filename")

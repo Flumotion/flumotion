@@ -125,7 +125,7 @@ class StartSet(log.Loggable):
         del self._createDeferreds[avatarId]
         # return the avatarId the component will use to the original caller
         d.callback(avatarId)
- 
+
     def createFailed(self, avatarId, exception):
         """
         Notify the caller that a create has failed, and remove the create

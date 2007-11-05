@@ -1,3 +1,7 @@
+2007-11-05  Johan Dahlin  <johan@gnome.org>
+
+	* all python files in the tree: run reindent.py, fixes #789
+
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/medium.py (BaseMedium.runBundledFunction)

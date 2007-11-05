@@ -50,7 +50,7 @@ class WorkerAvatar(base.ManagerAvatar):
         base.ManagerAvatar.__init__(self, heaven, avatarId,
                                     remoteIdentity, mind)
         self.feedServerPort = feedServerPort
-        
+
         self._portSet = worker.PortSet(self.avatarId, ports, randomPorts)
 
         self.heaven.workerAttached(self)
@@ -78,7 +78,7 @@ class WorkerAvatar(base.ManagerAvatar):
         self.heaven.workerDetached(self)
         self.vishnu.workerDetached(self)
         base.ManagerAvatar.onShutdown(self)
-    
+
     def reservePorts(self, numPorts):
         """
         Reserve the given number of ports on the worker.
@@ -91,7 +91,7 @@ class WorkerAvatar(base.ManagerAvatar):
     def releasePorts(self, ports):
         """
         Release the given list of ports on the worker.
-    
+
         @param ports: list of ports to release
         @type  ports: list of int
         """
@@ -138,7 +138,7 @@ class WorkerAvatar(base.ManagerAvatar):
         @returns: a deferred that will give the avatarIds running on the
                   worker
         """
-        self.debug('getting component list from worker %s' % 
+        self.debug('getting component list from worker %s' %
             self.avatarId)
         return self.mindCallRemote('getComponents')
 
@@ -147,7 +147,7 @@ class WorkerAvatar(base.ManagerAvatar):
         """
         Called by the worker to tell the manager to add a given message to
         the given component.
-        
+
         Useful in cases where the component can't report messages itself,
         for example because it crashed.
 
@@ -163,15 +163,15 @@ class WorkerHeaven(base.ManagerHeaven):
     For each worker client I create an L{WorkerAvatar} to handle requests.
     I live in the manager.
     """
-    
+
     logCategory = "workerheaven"
     avatarClass = WorkerAvatar
-    
+
     def __init__(self, vishnu):
         base.ManagerHeaven.__init__(self, vishnu)
         self.conf = None
         self.state = worker.ManagerWorkerHeavenState()
-        
+
     ### my methods
     def workerAttached(self, workerAvatar):
         """

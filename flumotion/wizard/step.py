@@ -61,10 +61,10 @@ class WizardStep(GladeWidget, log.Loggable):
 
     def __repr__(self):
         return '<WizardStep object %s>' % self.name
-    
+
     def get_component_properties(self):
         return self.get_state()
-    
+
     def iterate_widgets(self):
         # depth-first
         def iterator(w):
@@ -83,7 +83,7 @@ class WizardStep(GladeWidget, log.Loggable):
                 # only fgtk widgets implement get_state
                 # every widget that implements get_state automatically becomes
                 # a property
-                # spinbutton_some_property -> some-property 
+                # spinbutton_some_property -> some-property
                 name = '-'.join(w.get_name().split('_'))
                 key = name.split('-', 1)[1]
                 state_dict[key] = w.get_state()
@@ -107,7 +107,7 @@ class WizardStep(GladeWidget, log.Loggable):
         self.debug('workerRun(module=%r, function=%r)' % (module, function))
         admin = self.wizard.get_admin()
         worker = self.worker
-        
+
         if not admin:
             self.warning('skipping workerRun, no admin')
             return defer.fail(errors.FlumotionError('no admin'))
@@ -153,11 +153,11 @@ class WizardStep(GladeWidget, log.Loggable):
                 debug=debug)
             self.add_msg(msg)
             raise errors.RemoteRunError(function, 'Internal error.')
-            
+
         d.addErrback(errback)
         d.addCallback(callback)
         return d
-        
+
     # Required vmethods
     def get_next(self):
         """
@@ -165,14 +165,14 @@ class WizardStep(GladeWidget, log.Loggable):
         @rtype   string
 
         Called when the user presses next in the wizard."""
-        
+
         raise NotImplementedError
 
     # Optional vmethods
     def activated(self):
         """Called just before the step is shown, so the step can
         do some logic, eg setup the default state"""
-        
+
     def deactivated(self):
         """Called after the user pressed next"""
 

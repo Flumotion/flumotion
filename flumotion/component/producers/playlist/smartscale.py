@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 
-# Originally part of PiTiVi, 
+# Originally part of PiTiVi,
 # Copyright (C) 2005-2007 Edward Hervey <bilboed@bilboed.com>,
 # Relicensed under the above dual license with his permission.
 

@@ -27,7 +27,7 @@
 import os
 import sys
 
-# Variable templates 
+# Variable templates
 LIBDIR = '@LIBDIR@'
 PROGRAM_PATH = 'flumotion.service.main.main'
 
@@ -41,20 +41,20 @@ def _setup_project_root():
 
 def _run_main(path):
     from flumotion.twisted import reflect
-    
+
     # Import errors first, otherwise the exception fails
     from flumotion.common import errors
     from flumotion.common import setup
     setup.setup()
-    
+
     main = reflect.namedAny(path)
-    
+
     try:
         sys.exit(main(sys.argv))
     except errors.SystemError, e:
         print 'ERROR:', e
         sys.exit(1)
-    
+
 try:
     _setup_project_root()
     _run_main(PROGRAM_PATH)

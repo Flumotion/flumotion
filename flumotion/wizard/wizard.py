@@ -69,7 +69,7 @@ class Scenario:
         self.stack = classes.WalkableStack()
         self.current_step = None
         self.sidebar.connect('step-chosen', self.step_selected)
-    
+
     def add_step(self, step_class):
         # FIXME: remove ref to wiz
         self.steps.append(step_class(self.wizard))
@@ -133,7 +133,7 @@ class Scenario:
         self.stack.push(section)
         self.wizard.set_step(section)
         self.current_step = section
-        
+
         if not interactive:
             while self.show_next():
                 pass
@@ -143,7 +143,7 @@ class Scenario:
         self.wizard.window.grab_focus()
         if not self.wizard._use_main:
             return
-        
+
         try:
             gtk.main()
         except KeyboardInterrupt:
@@ -172,7 +172,7 @@ class BasicScenario(Scenario):
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
-    
+
     logCategory = 'wizard'
 
     flowName = 'default'
@@ -241,7 +241,7 @@ class Wizard(GladeWindow, log.Loggable):
     def get_step_options(self, stepname):
         step = self[stepname]
         return step.get_state()
-    
+
     def block_next(self, block):
         self.button_next.set_sensitive(not block)
         # work around a gtk bug (?)
@@ -263,7 +263,7 @@ class Wizard(GladeWindow, log.Loggable):
 
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
-            
+
         m = '<span size="x-large">%s</span>' % escape(step.name)
         self.label_title.set_markup(m)
 
@@ -271,7 +271,7 @@ class Wizard(GladeWindow, log.Loggable):
             self.current_step.deactivated()
 
         self.current_step = step
-        
+
         self.update_buttons(has_next=True)
         self.block_next(False)
 
@@ -280,7 +280,7 @@ class Wizard(GladeWindow, log.Loggable):
             self.worker_list.notify_selected()
         else:
             self.worker_list.hide()
-        
+
         self._setup_worker(step, self.worker_list.get_worker())
         step.before_show()
 
@@ -304,10 +304,10 @@ class Wizard(GladeWindow, log.Loggable):
                     'properly and try again.')),
                 id='worker-error')
             self.add_msg(msg)
-        
+
     def get_admin(self):
         return self._admin
-    
+
     def check_elements(self, workerName, *elementNames):
         """
         Check if the given list of GStreamer elements exist on the given worker.
@@ -320,13 +320,13 @@ class Wizard(GladeWindow, log.Loggable):
         if not self._admin:
             self.debug('No admin connected, not checking presence of elements')
             return
-        
+
         asked = sets.Set(elementNames)
         def _checkElementsCallback(existing, workerName):
             existing = sets.Set(existing)
             self.block_next(False)
             return tuple(asked.difference(existing))
-        
+
         self.block_next(True)
         d = self._admin.checkElements(workerName, elementNames)
         d.addCallback(_checkElementsCallback, workerName)
@@ -344,7 +344,7 @@ class Wizard(GladeWindow, log.Loggable):
         if not self._admin:
             self.debug('No admin connected, not checking presence of elements')
             return
-        
+
         self.debug('requiring elements %r' % (elementNames,))
         def got_missing_elements(elements, workerName):
             if elements:
@@ -363,7 +363,7 @@ class Wizard(GladeWindow, log.Loggable):
                 message.id = 'element' + '-'.join(elementNames)
                 self.add_msg(message)
             return elements
-        
+
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)
 
@@ -381,7 +381,7 @@ class Wizard(GladeWindow, log.Loggable):
         if not self._admin:
             self.debug('No admin connected, not checking presence of elements')
             return
-        
+
         d = self._admin.checkImport(workerName, moduleName)
         return d
 
@@ -401,25 +401,25 @@ class Wizard(GladeWindow, log.Loggable):
         if not self._admin:
             self.debug('No admin connected, not checking presence of elements')
             return
-        
+
         self.debug('requiring module %s' % moduleName)
         def _checkImportErrback(failure):
-                self.warning('could not import %s', moduleName)
-                message = messages.Error(T_(N_(
-                    "Worker '%s' cannot import module '%s'."),
-                    workerName, moduleName))
-                if projectName:
-                    message.add(T_(N_("\n"
-                        "This module is part of '%s'."), projectName))
-                if projectURL:
-                    message.add(T_(N_("\n"
-                        "The project's homepage is %s"), projectURL))
-                message.add(T_(N_("\n\n"
-                    "You will not be able to go forward using this worker.")))
-                self.block_next(True)
-                message.id = 'module-%s' % moduleName
-                self.add_msg(message)
-        
+            self.warning('could not import %s', moduleName)
+            message = messages.Error(T_(N_(
+                "Worker '%s' cannot import module '%s'."),
+                workerName, moduleName))
+            if projectName:
+                message.add(T_(N_("\n"
+                    "This module is part of '%s'."), projectName))
+            if projectURL:
+                message.add(T_(N_("\n"
+                    "The project's homepage is %s"), projectURL))
+            message.add(T_(N_("\n\n"
+                "You will not be able to go forward using this worker.")))
+            self.block_next(True)
+            message.id = 'module-%s' % moduleName
+            self.add_msg(message)
+
         d = self.check_import(workerName, moduleName)
         d.addErrback(_checkImportErrback)
         return d
@@ -429,7 +429,7 @@ class Wizard(GladeWindow, log.Loggable):
         # get name of active worker
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
-            
+
     def _set_worker_from_step(self, step):
         if not hasattr(step, 'worker'):
             return
@@ -470,7 +470,7 @@ class Wizard(GladeWindow, log.Loggable):
         if save:
             configuration = self._save.getXML()
             self.emit('finished', configuration)
-        
+
         if self._use_main:
             try:
                 gtk.main_quit()

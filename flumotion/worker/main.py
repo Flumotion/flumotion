@@ -157,7 +157,7 @@ def _readConfig(workerFile, options):
     if not options.debug and cfg.fludebug \
         and not os.environ.has_key('FLU_DEBUG'):
         options.debug = cfg.fludebug
-    
+
 def main(args):
     parser = _createParser()
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
@@ -172,7 +172,7 @@ def main(args):
 
     if options.verbose:
         log.setFluDebug("*:3")
- 
+
     # apply the command-line debug level if is given through --verbose or -d
     if options.debug:
         log.setFluDebug(options.debug)

@@ -23,7 +23,7 @@ import fnmatch
 import time
 import types
 import traceback
-    
+
 # environment variables controlling levels for each category
 _DEBUG = "*:1"
 # name of the environment variable controlling our logging
@@ -43,7 +43,7 @@ _initialized = False
 _stdout = None
 _stderr = None
 _old_hup_handler = None
-   
+
 
 # public log levels
 ERROR = 1
@@ -90,12 +90,12 @@ def registerCategory(category):
     for chunk in chunks:
         if not chunk:
             continue
-        if ':' in chunk: 
+        if ':' in chunk:
             spec, value = chunk.split(':')
         else:
             spec = '*'
             value = chunk
-            
+
         # our glob is unix filename style globbing, so cheat with fnmatch
         # fnmatch.fnmatch didn't work for this, so don't use it
         if category in fnmatch.filter((category, ), spec):
@@ -144,7 +144,7 @@ def scrubFilename(filename):
 def getFileLine(where=-1):
     """
     Return the filename and line number for the given location.
-    
+
     If where is a negative integer, look for the code entry in the current
     stack that is the given number of frames above this module.
     If where is a function, look for the code entry of the function.
@@ -157,7 +157,7 @@ def getFileLine(where=-1):
     """
     co = None
     lineno = None
-    
+
     if isinstance(where, types.FunctionType):
         co = where.func_code
         lineno = co.co_firstlineno
@@ -193,7 +193,7 @@ def ellipsize(o):
 
     r = r[:60] + ' ... ' + r[-15:]
     return r
- 
+
 def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     """
     Helper function to create a format and args to use for logging.
@@ -266,7 +266,7 @@ def doLog(level, object, category, format, args, where=-1,
             raise SystemError, "handler %r raised a TypeError" % handler
 
         return ret
-    
+
 def errorObject(object, cat, format, *args):
     """
     Log a fatal error message in the given category.
@@ -406,7 +406,7 @@ def setDebug(string):
     global _DEBUG
     global _ENV_VAR_NAME
     global _categories
-    
+
     _DEBUG = string
     debug('log', "%s set to %s" % (_ENV_VAR_NAME, _DEBUG))
 
@@ -438,7 +438,7 @@ def reset():
     Resets the logging system, removing all log handlers.
     """
     global _log_handlers, _log_handlers_limited, _initialized
-    
+
     _log_handlers = []
     _log_handlers_limited = []
     _initialized = False
@@ -461,7 +461,7 @@ def addLogHandler(func):
 
     if func not in _log_handlers:
         _log_handlers.append(func)
-        
+
 def addLimitedLogHandler(func):
     """
     Add a custom log handler.
@@ -472,14 +472,14 @@ def addLimitedLogHandler(func):
                  getLevelName(level) to get a printable name for the log level.
     @type func:  a callable function
 
-    @raises TypeError: TypeError if func is not a callable    
+    @raises TypeError: TypeError if func is not a callable
     """
     if not callable(func):
         raise TypeError, "func must be callable"
 
     if func not in _log_handlers_limited:
         _log_handlers_limited.append(func)
-    
+
 def removeLogHandler(func):
     """
     Remove a registered log handler.
@@ -494,7 +494,7 @@ def removeLogHandler(func):
     """
     _log_handlers.remove(func)
 
-    
+
 def removeLimitedLogHandler(func):
     """
     Remove a registered limited log handler.
@@ -558,12 +558,12 @@ def reopenOutputFiles():
     def reopen(name, fileno, *args):
         oldmask = os.umask(0026)
         try:
-            f = open(name, 'a+', *args) 
+            f = open(name, 'a+', *args)
         finally:
             os.umask(oldmask)
 
         os.dup2(f.fileno(), fileno)
-        
+
     if _stdout:
         reopen(_stdout, sys.stdout.fileno())
 
@@ -615,21 +615,21 @@ class Loggable:
     """
 
     logCategory = 'default'
-    
+
     def error(self, *args):
         """Log an error.  By default this will also raise an exception."""
         if _canShortcutLogging(self.logCategory, ERROR):
             return
         errorObject(self.logObjectName(), self.logCategory,
             *self.logFunction(*args))
-        
+
     def warning(self, *args):
         """Log a warning.  Used for non-fatal problems."""
         if _canShortcutLogging(self.logCategory, WARN):
             return
         warningObject(self.logObjectName(), self.logCategory,
             *self.logFunction(*args))
-        
+
     def info(self, *args):
         """Log an informational message.  Used for normal operation."""
         if _canShortcutLogging(self.logCategory, INFO):
@@ -804,7 +804,7 @@ class TwistedLogObserver(Loggable):
                     if r:
                         self.debug("Failure of type %r, ignoring" % failureType)
                         return
-                    
+
                 self.log("Failure %r" % f)
 
                 method = debug # tracebacks from errors at debug level

@@ -176,4 +176,4 @@ class TestCryptCheckerAddUser(unittest.TestCase):
         return d
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

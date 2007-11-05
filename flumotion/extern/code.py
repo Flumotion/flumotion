@@ -84,7 +84,7 @@ class Completer:
 
         obj = eval (expr, self.globals, self.locals)
         words = dir(obj)
-            
+
         matches = []
         n = len(attr)
         for word in words:
@@ -99,7 +99,7 @@ class GtkInterpreter (threading.Thread):
     GTK timeout callback.
     """
     TIMEOUT = 100 # Millisecond interval between timeouts.
-    
+
     def __init__ (self, globals=None, locals=None):
         threading.Thread.__init__ (self)
         self.ready = threading.Condition ()
@@ -137,27 +137,27 @@ class GtkInterpreter (threading.Thread):
                 self.main_loop.quit()
             return False
 
-        if self.new_cmd != None:  
-            self.ready.notify ()  
+        if self.new_cmd != None:
+            self.ready.notify ()
             self.cmd = self.cmd + self.new_cmd
             self.new_cmd = None
             try:
-                code = codeop.compile_command (self.cmd[:-1]) 
-                if code: 
+                code = codeop.compile_command (self.cmd[:-1])
+                if code:
                     self.cmd = ''
                     exec code in self.globs, self.locs
                     self.completer.update (self.globs, self.locs)
             except Exception:
                 traceback.print_exc ()
-                self.cmd = ''  
+                self.cmd = ''
 
         self.ready.release()
         return True
-            
+
     def feed_sync (self, code):
         if (not code) or (code[-1]<>'\n'): code = code +'\n' # raw_input strips newline
         self.ready.acquire ()
-        self.completer.update (self.globs, self.locs) 
+        self.completer.update (self.globs, self.locs)
         self.new_cmd = code
         self.code_exec()
         self.ready.release ()
@@ -170,12 +170,12 @@ class GtkInterpreter (threading.Thread):
         Returns false if deferring execution until complete block available.
         """
         if (not code) or (code[-1]<>'\n'): code = code +'\n' # raw_input strips newline
-        self.completer.update (self.globs, self.locs) 
+        self.completer.update (self.globs, self.locs)
         self.ready.acquire()
         self.new_cmd = code
         self.ready.wait ()  # Wait until processed in timeout interval
         self.ready.release ()
-        
+
         return not self.cmd
 
     def interact(self, banner=None, reader=None, block=False):

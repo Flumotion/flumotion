@@ -45,17 +45,17 @@ def arg_filtered(proc, *args):
     return ret
 
 def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
-        def bus_watch_func(bus, message):
-            proc(*args, **kwargs)
-        bus_watch_func = arg_filtered(bus_watch_func,
-            (1, element, lambda x: x.src),
-            (1, [from_state, to_state, gst.STATE_VOID_PENDING],
-             lambda x: x.parse_state_changed()))
-        parent = element
-        while parent.get_parent():
-            parent = parent.get_parent()
-        b = parent.get_bus()
-        b.connect('message::state-changed', bus_watch_func)
+    def bus_watch_func(bus, message):
+        proc(*args, **kwargs)
+    bus_watch_func = arg_filtered(bus_watch_func,
+        (1, element, lambda x: x.src),
+        (1, [from_state, to_state, gst.STATE_VOID_PENDING],
+         lambda x: x.parse_state_changed()))
+    parent = element
+    while parent.get_parent():
+        parent = parent.get_parent()
+    b = parent.get_bus()
+    b.connect('message::state-changed', bus_watch_func)
 
 class BTTV(feedcomponent.ParseLaunchComponent):
 
@@ -72,7 +72,7 @@ class BTTV(feedcomponent.ParseLaunchComponent):
 
         framerate = properties.get('framerate', (25, 1))
         framerate_string = '%d/%d' % (framerate[0], framerate[1])
-        
+
         pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
                     'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
                     'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
@@ -101,7 +101,7 @@ class BTTV(feedcomponent.ParseLaunchComponent):
 
         call_on_state_change(element, gst.STATE_READY, gst.STATE_PAUSED,
             self.set_channel_and_norm, element, channel, norm)
-    
+
     def set_channel_and_norm(self, element, channel, norm):
         self.debug("bttv READY->PAUSED, setting channel %s and norm %s" % (
             channel, norm))

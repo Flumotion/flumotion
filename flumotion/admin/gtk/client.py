@@ -61,13 +61,13 @@ class Window(log.Loggable, gobject.GObject):
     '''
 
     implements(flavors.IStateListener)
-    
+
     logCategory = 'adminview'
     gsignal('connected')
-    
+
     def __init__(self, model):
         self.__gobject_init__()
-        
+
         self.widgets = {}
         self.debug('creating UI')
         self._trayicon = None
@@ -129,19 +129,19 @@ class Window(log.Loggable, gobject.GObject):
         widgets = self.widgets
 
         window = self.window = widgets['main_window']
-        
+
         def set_icon(proc, size, name):
             i = gtk.Image()
             i.set_from_stock('flumotion-'+name, size)
             proc(i)
             i.show()
-        
+
         def make_menu_proc(m): # $%^& pychecker!
             return lambda f: m.set_property('image', f)
         def menu_set_icon(m, name):
             set_icon(make_menu_proc(m), gtk.ICON_SIZE_MENU, name)
             m.show()
-        
+
         def tool_set_icon(m, name):
             set_icon(m.set_icon_widget, gtk.ICON_SIZE_SMALL_TOOLBAR, name)
 
@@ -157,11 +157,11 @@ class Window(log.Loggable, gobject.GObject):
 
         # the widget containing the component view
         self._component_view = widgets['component_view']
- 
+
         window.connect('delete-event', self.close)
 
         self.components_view = parts.ComponentsView(widgets['components_view'])
-        self.components_view.connect('has-selection', 
+        self.components_view.connect('has-selection',
             self._components_view_has_selection_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
@@ -231,7 +231,7 @@ class Window(log.Loggable, gobject.GObject):
             i = gtk.MenuItem(c['name'])
             i.connect('activate', self.on_recent_activate, c['info'])
             append(i)
-            
+
         append(gtk.SeparatorMenuItem())
         map(append_txt, clist[:4], range(1,len(clist[:4])+1))
 
@@ -271,10 +271,10 @@ class Window(log.Loggable, gobject.GObject):
                          % (methodName, label, failure))
             if fail:
                 self.statusbar.push('main', fail % label)
-            
+
         d.addCallback(cb, self, mid)
         d.addErrback(eb, self, mid)
-  
+
     def componentCallRemote(self, state, methodName, *args, **kwargs):
         self.componentCallRemoteStatus(None, None, None, None,
                                        methodName, *args, **kwargs)
@@ -342,17 +342,17 @@ class Window(log.Loggable, gobject.GObject):
                       remove=atmosphereStateRemove)
         for c in a.get('components'):
             atmosphereStateAppend(a, 'components', c)
-            
+
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
- 
+
     def _clearMessages(self):
         self._messages_view.clear()
         pstate = self._planetState
         if pstate and pstate.hasKey('messages'):
             for message in pstate.get('messages').values():
                 self._messages_view.add_message(message)
-        
+
     def stateSet(self, state, key, value):
         # called by model when state of something changes
         if not isinstance(state, planet.AdminComponentState):
@@ -414,7 +414,7 @@ class Window(log.Loggable, gobject.GObject):
             # ensure our window is shown
             self.show()
             self.runWizard()
-    
+
     def admin_disconnected_cb(self, admin):
         self._components = {}
         self.update_components()
@@ -422,7 +422,7 @@ class Window(log.Loggable, gobject.GObject):
         if self._planetState:
             self._planetState.removeListener(self)
             self._planetState = None
-        
+
         message = _("Lost connection to manager, reconnecting ...")
         d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
@@ -441,7 +441,7 @@ class Window(log.Loggable, gobject.GObject):
             return
         elif id == 1:
             self.admin.reconnect()
-        
+
     def admin_connection_refused_later(self, admin):
         message = _("Connection to manager on %s was refused.") % \
             admin.connectionInfoStr()
@@ -587,7 +587,7 @@ class Window(log.Loggable, gobject.GObject):
         pprint.pprint(configation, fd)
         fd.seek(0)
         self.debug('Configuration=%s' % fd.read())
-        
+
     def runWizard(self):
         if self.wizard:
             self.wizard.present()
@@ -609,7 +609,7 @@ class Window(log.Loggable, gobject.GObject):
             self.show_error_dialog(
                 _('The wizard cannot be run because no workers are logged in.'))
             return
-        
+
         wiz = wizard.Wizard(self.window, self.admin)
         wiz.connect('finished', _wizard_finished_cb)
         wiz.run(True, state, False)
@@ -627,7 +627,7 @@ class Window(log.Loggable, gobject.GObject):
         def after_getProperty(value, dialog):
             self.debug('got value %r' % value)
             dialog.update_value_entry(value)
-            
+
         def dialog_set_cb(dialog, element, property, value, state):
             cb = self.admin.setProperty(state, element, property, value)
             cb.addErrback(propertyErrback)
@@ -635,7 +635,7 @@ class Window(log.Loggable, gobject.GObject):
             cb = self.admin.getProperty(state, element, property)
             cb.addCallback(after_getProperty, dialog)
             cb.addErrback(propertyErrback)
-        
+
         name = state.get('name')
         d = dialogs.PropertyChangeDialog(name, self.window)
         d.connect('get', dialog_get_cb, state)
@@ -658,13 +658,13 @@ class Window(log.Loggable, gobject.GObject):
         @returns: a L{twisted.internet.defer.Deferred}
         """
         return self._component_do(state, 'Stop', 'Stopping', 'Stopped')
-        
+
     def _component_start(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
         return self._component_do(state, 'Start', 'Starting', 'Started')
- 
+
     def _component_restart(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
@@ -672,15 +672,15 @@ class Window(log.Loggable, gobject.GObject):
         d = self._component_stop(state)
         d.addCallback(lambda r: self._component_start(state))
         return d
-    
+
     def _component_delete(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
-        return self._component_do(state, '', 'Deleting', 'Deleted', 
+        return self._component_do(state, '', 'Deleting', 'Deleted',
             'deleteComponent')
 
-    def _component_do(self, state, action, doing, done, 
+    def _component_do(self, state, action, doing, done,
         remoteMethodPrefix="component"):
         """
         @param remoteMethodName: prefix for remote method to run
@@ -710,12 +710,12 @@ class Window(log.Loggable, gobject.GObject):
                     'action': action.lower(),
                     'name': name,
                 })
-            
+
         d.addCallback(_actionCallback, self, mid)
         d.addErrback(_actionErrback, self, mid)
 
         return d
- 
+
     # menubar/toolbar callbacks
     def on_have_connection(self, d, connectionInfo):
         d.destroy()
@@ -757,7 +757,7 @@ class Window(log.Loggable, gobject.GObject):
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.show()
         d.connect('response', self.on_import_response)
-    
+
     def getConfiguration_cb(self, conf_xml, name, chooser):
         file_exists = True
         if os.path.exists(name):
@@ -792,30 +792,30 @@ class Window(log.Loggable, gobject.GObject):
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.show()
         d.connect('response', self.on_export_response)
-    
+
     def connection_quit_cb(self, button):
         self.close()
-    
+
     def manage_start_component_cb(self, button):
         self._component_start(None)
-        
+
     def manage_stop_component_cb(self, button):
         self._component_stop(None)
 
     def manage_delete_component_cb(self, button):
         self._component_delete(None)
-        
+
     def manage_start_all_cb(self, button):
         for c in self._components.values():
             self._component_start(c)
-        
+
     def manage_stop_all_cb(self, button):
         for c in self._components.values():
             self._component_stop(c)
-        
+
     def manage_clear_all_cb(self, button):
         self.admin.cleanComponents()
-        
+
     def manage_run_wizard_cb(self, x):
         self.runWizard()
 
@@ -838,13 +838,13 @@ class Window(log.Loggable, gobject.GObject):
                 _("Could not reload component:\n%s.") %
                 failure.getErrorMessage())
             return None
-            
+
         def _callLater(admin, dialog):
             deferred = self.admin.reload()
             deferred.addCallback(lambda result, d: _stop(d), dialog)
             deferred.addErrback(_syntaxErrback, self, dialog)
             deferred.addErrback(self._defaultErrback)
-        
+
         dialog = dialogs.ProgressDialog(_("Reloading ..."),
             _("Reloading client code"), self.window)
         l = lambda admin, text, dialog: dialog.message(
@@ -852,7 +852,7 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.connect('reloading', l, dialog)
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
- 
+
     def debug_start_shell_cb(self, button):
         if sys.version_info[1] >= 4:
             from flumotion.extern import code
@@ -873,7 +873,7 @@ Local variables are:
 You can do remote component calls using:
   admin.componentCallRemote(components['component-name'],
          'methodName', arg1, arg2)
-  
+
 """
         code.interact(local=vars, banner=message)
 
@@ -885,12 +885,12 @@ You can do remote component calls using:
         dialog.set_resizable(False)
         dialog.set_border_width(12)
         dialog.vbox.set_spacing(6)
-        
+
         image = gtk.Image()
         dialog.vbox.pack_start(image)
         image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
         image.show()
-        
+
         version = gtk.Label(
             '<span size="xx-large"><b>Flumotion %s</b></span>' %
                 configure.version)

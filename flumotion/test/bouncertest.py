@@ -90,7 +90,7 @@ class TrivialBouncerTest(unittest.TestCase):
                         d.errback(AssertionError(
                             'comp unexpectedly has keycard'))
                         return
-                        
+
                 if furtherChecks:
                     args = furtherChecks.pop(0)
                     args += (furtherChecks,)

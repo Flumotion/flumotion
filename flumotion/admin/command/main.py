@@ -164,7 +164,7 @@ def main(args):
                       action="store_true", dest="version",
                       default=False,
                       help="show version information")
-    
+
     options, args = parser.parse_args(args)
 
     if options.version:

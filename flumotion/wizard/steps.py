@@ -22,7 +22,7 @@
 import math
 
 import gtk
-        
+
 from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
@@ -74,7 +74,7 @@ class Production(WizardSection):
     name = 'Source'
     section = 'Production'
     icon = 'source.png'
-    
+
     def setup(self):
         self.combobox_video.set_enum(VideoDevice)
         self.combobox_audio.set_enum(AudioDevice)
@@ -83,31 +83,31 @@ class Production(WizardSection):
                      _('If you want to stream video'))
         tips.set_tip(self.checkbutton_has_audio,
                      _('If you want to stream audio'))
-        
+
         self.combobox_video.set_active(VideoDevice.Test)
         self.combobox_audio.set_active(AudioDevice.Test)
 
     def activated(self):
         self.verify()
-        
+
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
         self.verify()
-        
+
     def on_checkbutton_has_audio_toggled(self, button):
         self.combobox_audio.set_sensitive(button.get_active())
         self.verify()
 
     def on_combobox_video_changed(self, button):
         self.verify()
-        
+
     def on_combobox_audio_changed(self, button):
         self.verify()
-        
+
     def verify(self):
         if not hasattr(self.wizard, 'combobox_worker'):
             return
-        
+
         has_audio = self.checkbutton_has_audio
         has_video = self.checkbutton_has_video
         if (not has_audio and not has_video):
@@ -132,13 +132,13 @@ class Production(WizardSection):
         elif self.checkbutton_has_audio:
             audio_source = self.combobox_audio.get_active()
             return audio_source.step
-            
+
         raise AssertionError
 
 class VideoSource(WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
-   
+
     def get_next(self):
         return 'Overlay'
 
@@ -170,26 +170,26 @@ class TVCard(VideoSource):
                                        '/dev/video2',
                                        '/dev/video3'))
         self.in_setup = False
-    
+
     def on_combobox_device_changed(self, combo):
         self.run_checks()
 
     def worker_changed(self):
         self.clear_combos()
         self.run_checks()
-        
+
     def clear_combos(self):
         self.combobox_tvnorm.clear()
         self.combobox_tvnorm.set_sensitive(False)
         self.combobox_source.clear()
         self.combobox_source.set_sensitive(False)
-        
+
     def run_checks(self):
         if self.in_setup:
             yield None
 
         self.wizard.block_next(True)
-        
+
         device = self.combobox_device.get_string()
         assert device
         d = self.workerRun('flumotion.worker.checks.video', 'checkTVCard',
@@ -210,7 +210,7 @@ class TVCard(VideoSource):
         except errors.RemoteRunFailure, e:
             pass
     run_checks = defer_generator_method(run_checks)
-        
+
     def get_state(self):
         options = {}
         options['device'] = self.combobox_device.get_string()
@@ -240,11 +240,11 @@ class FireWire(VideoSource):
     is_square = None
     factor_i = None             # index into self.factors
     width_correction = None     # currently chosen item from width_corrections
-    
+
     def set_sensitive(self, is_sensitive):
         self.vbox_controls.set_sensitive(is_sensitive)
         self.wizard.block_next(not is_sensitive)
-        
+
     def on_update_output_format(self, *args):
         # update label_camera_settings
         standard = 'Unknown'
@@ -269,7 +269,7 @@ class FireWire(VideoSource):
         text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
             nom, den)
         self.label_camera_settings.set_text(text)
-            
+
         # factor is a double
         self.factor_i = self.combobox_scaled_height.get_active()
         self.is_square = self.checkbutton_square_pixels.get_active()
@@ -295,7 +295,7 @@ class FireWire(VideoSource):
             # for GStreamer element sanity, make sw an even number
             # FIXME: check if this can now be removed
             # sw = sw + (2 - (sw % 2)) % 2
-        
+
         # if scaled width (after squaring) is not multiple of 8, present
         # width correction
         self.frame_width_correction.set_sensitive(sw % 8 != 0)
@@ -308,7 +308,7 @@ class FireWire(VideoSource):
         elif self.width_correction == 'stretch':
             ow = sw + (8 - (sw % 8)) % 8
             sw = ow
-        
+
         return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     def update_output_format(self):
@@ -320,7 +320,7 @@ class FireWire(VideoSource):
         msg = _('%dx%d, %d/%d pixel aspect ratio') % (
                    d['ow'], d['oh'], num, den)
         self.label_output_format.set_markup(msg)
-        
+
     def get_state(self):
         options = {} # VideoSource.get_state(self)
         d = self._get_width_height()
@@ -334,7 +334,7 @@ class FireWire(VideoSource):
 
     def worker_changed(self):
         self.run_checks()
-        
+
     def run_checks(self):
         self.set_sensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
@@ -381,7 +381,7 @@ class FireWireAudio(WizardStep):
     is_square = None
     factor_i = None             # index into self.factors
     width_correction = None     # currently chosen item from width_corrections
-   
+
     def setup(self):
         self.frame_scaling.hide()
         self.frame_width_correction.hide()
@@ -391,7 +391,7 @@ class FireWireAudio(WizardStep):
     def set_sensitive(self, is_sensitive):
         self.vbox_controls.set_sensitive(is_sensitive)
         self.wizard.block_next(not is_sensitive)
-        
+
     def on_update_output_format(self, *args):
         # update label_camera_settings
         standard = 'Unknown'
@@ -416,7 +416,7 @@ class FireWireAudio(WizardStep):
         text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
             nom, den)
         self.label_camera_settings.set_text(text)
-            
+
         # factor is a double
         self.factor_i = self.combobox_scaled_height.get_active()
         self.is_square = self.checkbutton_square_pixels.get_active()
@@ -442,7 +442,7 @@ class FireWireAudio(WizardStep):
             # for GStreamer element sanity, make sw an even number
             # FIXME: check if this can now be removed
             # sw = sw + (2 - (sw % 2)) % 2
-        
+
         # if scaled width (after squaring) is not multiple of 8, present
         # width correction
         self.frame_width_correction.set_sensitive(sw % 8 != 0)
@@ -455,7 +455,7 @@ class FireWireAudio(WizardStep):
         elif self.width_correction == 'stretch':
             ow = sw + (8 - (sw % 8)) % 8
             sw = ow
-        
+
         return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     def update_output_format(self):
@@ -467,7 +467,7 @@ class FireWireAudio(WizardStep):
         msg = _('%dx%d, %d/%d pixel aspect ratio') % (
                    d['ow'], d['oh'], num, den)
         self.label_output_format.set_markup(msg)
-        
+
     def get_state(self):
         options = {} # VideoSource.get_state(self)
         d = self._get_width_height()
@@ -481,7 +481,7 @@ class FireWireAudio(WizardStep):
 
     def worker_changed(self):
         self.run_checks()
-        
+
     def run_checks(self):
         self.set_sensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
@@ -513,13 +513,13 @@ class Webcam(VideoSource):
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
     icon = 'webcam.png'
-    
+
     in_setup = False
 
     # _sizes is probed, not set from the UI
     _sizes = None
     _factoryName = None
-    
+
     def setup(self):
         self.in_setup = True
         self.combobox_device.set_list(('/dev/video0',
@@ -554,19 +554,19 @@ class Webcam(VideoSource):
     def worker_changed(self):
         self.clear()
         self.run_checks()
-        
+
     def clear(self):
         self.combobox_size.set_sensitive(False)
         self.combobox_framerate.set_sensitive(False)
         self.label_name.set_label("")
         self.wizard.block_next(True)
-        
+
     def run_checks(self):
         if self.in_setup:
             yield None
-        
+
         self.wizard.block_next(True)
-        
+
         device = self.combobox_device.get_string()
         msg = messages.Info(T_(
                 N_("Probing webcam, this can take a while...")),
@@ -577,7 +577,7 @@ class Webcam(VideoSource):
         yield d
         try:
             result = d.value()
-            
+
             if not result:
                 self.debug('no device %s' % device)
                 yield None
@@ -637,7 +637,7 @@ class TestVideoSource(VideoSource):
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
     icon = 'testsource.png'
-    
+
     def before_show(self):
         self.wizard.require_elements(self.worker, 'videotestsrc')
 
@@ -654,7 +654,7 @@ class TestVideoSource(VideoSource):
             options['format'] = 'video/x-raw-rgb'
         else:
             raise AssertionError
-        
+
         options['pattern'] = self.combobox_pattern.get_value()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
@@ -725,7 +725,7 @@ class Overlay(WizardStep):
         options = WizardStep.get_state(self)
         if self.checkbutton_show_logo:
             options['show-logo'] = True
-            
+
         if self.checkbutton_show_text:
             options['text'] = self.entry_text.get_text()
 
@@ -736,7 +736,7 @@ class Overlay(WizardStep):
         video_source = video_options['video']
         video_step = self.wizard[video_source.step]
         video_props = video_step.get_state()
-        
+
         options['width'] = video_props['width']
         options['height'] = video_props['height']
 
@@ -753,7 +753,7 @@ class Overlay(WizardStep):
             elif audio_source == AudioDevice.Firewire and not \
                 video_source == VideoDevice.Firewire:
                 return 'Firewire audio'
-            
+
         return None
 
 class Soundcard(WizardStep):
@@ -800,7 +800,7 @@ class Soundcard(WizardStep):
         self.combobox_samplerate.set_sensitive(False)
         self.combobox_bitdepth.clear()
         self.combobox_bitdepth.set_sensitive(False)
-        
+
     def update_devices(self):
         self.block_update = True
         enum = self.combobox_system.get_enum()
@@ -816,7 +816,7 @@ class Soundcard(WizardStep):
         if self.block_update:
             return
         self.wizard.block_next(True)
-        
+
         enum = self.combobox_system.get_enum()
         device = self.combobox_device.get_string()
         e = self.combobox_channels.get_enum()
@@ -839,12 +839,12 @@ class Soundcard(WizardStep):
 
             self.combobox_input.set_list(tracks)
             self.combobox_input.set_sensitive(True)
-    
+
         d.addCallback(soundcardCheckComplete)
         # FIXME: when probing failed, do
         # self.clear_combos()
         return d
-                    
+
     def get_state(self):
         # FIXME: this can't be called if the soundcard hasn't been probed yet
         # for example, when going through the testsuite
@@ -859,7 +859,7 @@ class Soundcard(WizardStep):
             channels = 0
             element = "fakesrc"
             bitdepth = "9"
-            samplerate = "12345" 
+            samplerate = "12345"
             input = None
 
         d = dict(device=self.combobox_device.get_string(),
@@ -880,7 +880,7 @@ class TestAudioSource(WizardStep):
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
     icon = 'soundcard.png'
-    
+
     def worker_changed(self):
         self.wizard.require_elements(self.worker, 'audiotestsrc')
 
@@ -894,7 +894,7 @@ class TestAudioSource(WizardStep):
             'volume': float(self.spinbutton_volume.get_value()),
             'rate': self.combobox_samplerate.get_int()
         }
-    
+
     def get_next(self):
         return None
 
@@ -902,7 +902,7 @@ class Conversion(WizardSection):
     glade_file = 'wizard_encoding.glade'
     name = 'Encoding'
     section = 'Conversion'
-    
+
     setup_finished = False
 
     def setup(self):
@@ -910,16 +910,16 @@ class Conversion(WizardSection):
         self.combobox_audio.set_enum(EncodingAudio)
         self.combobox_video.set_enum(EncodingVideo)
         self.setup_finished = True
-        
+
     def on_combobox_format_changed(self, combo):
         self.verify()
-        
+
     def verify(self):
         # XXX: isn't there a better way of doing this, like blocking
         #      the signal
         if not self.setup_finished:
             return
-        
+
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
             self.debug('running Ogg checks')
@@ -929,7 +929,7 @@ class Conversion(WizardSection):
             d = self.workerRun('flumotion.component.muxers.checks', 'checkOgg')
 
             yield d
-     
+
             # XXX: Smoke can't be put in ogg. Poke Wim to fix
             self.combobox_video.set_multi_active(EncodingVideo.Theora)
             self.combobox_audio.set_multi_active(EncodingAudio.Speex,
@@ -942,12 +942,12 @@ class Conversion(WizardSection):
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
         self.combobox_audio.set_property('visible', has_audio)
         self.label_audio.set_property('visible', has_audio)
-            
+
         has_video = self.wizard.get_step_option('Source', 'has-video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
     verify = defer_generator_method(verify)
-    
+
     def activated(self):
         self.verify()
 
@@ -960,9 +960,9 @@ class Conversion(WizardSection):
                 return 'Speex encoder'
             elif codec == EncodingAudio.Mulaw:
                 return None
-            
+
         return None
-        
+
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-video'):
             codec = self.combobox_video.get_enum()
@@ -986,7 +986,7 @@ class Theora(VideoEncoder):
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
     icon = 'xiphfish.png'
-    
+
     def setup(self):
         # XXX: move to glade file
         self.spinbutton_bitrate.set_range(0, 4000)
@@ -998,12 +998,12 @@ class Theora(VideoEncoder):
         d= self.wizard.require_elements(self.worker, 'theoraenc')
 
         yield d
-        
+
         d = self.workerRun('flumotion.worker.checks.encoder', 'checkTheora')
 
         yield d
     worker_changed = defer_generator_method(worker_changed)
-         
+
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(
@@ -1013,7 +1013,7 @@ class Theora(VideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
-    
+
     def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
@@ -1029,7 +1029,7 @@ class Theora(VideoEncoder):
         options['sharpness'] = int(self.spinbutton_sharpness.get_value())
 
         return options
-    
+
 class Smoke(VideoEncoder):
     name = 'Smoke encoder'
     sidebar_name = 'Smoke'
@@ -1039,10 +1039,10 @@ class Smoke(VideoEncoder):
 
     def worker_changed(self):
         self.wizard.require_elements(self.worker, 'smokeenc')
-        
+
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
-    
+
     def get_state(self):
         options = VideoEncoder.get_state(self)
         options['qmin'] = int(options['qmin'])
@@ -1063,17 +1063,17 @@ class JPEG(VideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
-    
+
     def get_state(self):
         options = VideoEncoder.get_state(self)
         options['quality'] = int(options['quality'])
         options['framerate'] = _fraction_from_float(options['framerate'], 2)
         return options
-    
+
 class AudioEncoder(WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
-    
+
     def get_next(self):
         return None
 
@@ -1092,7 +1092,7 @@ class Vorbis(AudioEncoder):
         # mismatch
         self.radiobutton_bitrate.set_active(False)
         self.radiobutton_quality.set_active(True)
-        
+
     def worker_changed(self):
         self.debug('running Vorbis checks')
         d = self.wizard.require_elements(self.worker, 'vorbisenc')
@@ -1102,14 +1102,14 @@ class Vorbis(AudioEncoder):
 
         yield d
     worker_changed = defer_generator_method(worker_changed)
-  
+
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(
             self.radiobutton_bitrate.get_active())
         self.spinbutton_quality.set_sensitive(
             self.radiobutton_quality.get_active())
-        
+
     def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
@@ -1123,15 +1123,15 @@ class Speex(AudioEncoder):
     sidebar_name = 'Speex'
     component_type = 'speex'
     icon = 'xiphfish.png'
-    
+
     def worker_changed(self):
         self.wizard.require_elements(self.worker, 'speexenc')
-        
+
     def setup(self):
         # Should be 2150 instead of 3 -> 3000
         self.spinbutton_bitrate.set_range(3, 30)
         self.spinbutton_bitrate.set_value(11)
-        
+
     def get_state(self):
         options = AudioEncoder.get_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
@@ -1146,7 +1146,7 @@ class Consumption(WizardSection):
 
     def setup(self):
         pass
-        
+
     def on_checkbutton_http_toggled(self, button):
         value = self.checkbutton_http.get_active()
         self.checkbutton_http_audio_video.set_sensitive(value)
@@ -1154,13 +1154,13 @@ class Consumption(WizardSection):
         self.checkbutton_http_video.set_sensitive(value)
 
         self.verify()
-        
+
     def on_checkbutton_disk_toggled(self, button):
         value = self.checkbutton_disk.get_active()
         self.checkbutton_disk_audio_video.set_sensitive(value)
         self.checkbutton_disk_audio.set_sensitive(value)
         self.checkbutton_disk_video.set_sensitive(value)
-        
+
         self.verify()
 
     def on_checkbutton_shout2_toggled(self, button):
@@ -1249,9 +1249,9 @@ class Consumption(WizardSection):
                 items.append('Icecast streamer (audio only)')
         else:
             raise AssertionError
-        
+
         assert items
-        
+
         if not step:
             return items[0]
         else:
@@ -1274,7 +1274,7 @@ class HTTP(WizardStep):
         self._missing_elements = True
         d = self.wizard.require_elements(self.worker, 'multifdsink')
         d.addCallback(got_missing)
-        
+
     def verify(self):
         self.spinbutton_client_limit.set_sensitive(
             self.checkbutton_client_limit.get_active())
@@ -1282,13 +1282,13 @@ class HTTP(WizardStep):
             self.checkbutton_bandwidth_limit.get_active())
         self.wizard.block_next(self._missing_elements or
                                self.entry_mount_point.get_text() == '')
-        
+
     def activated(self):
         self.verify()
-        
+
     def setup(self):
         self.spinbutton_port.set_value(self.port)
-        
+
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
@@ -1304,7 +1304,7 @@ class HTTP(WizardStep):
             del options['client-limit']
 
         options['port'] = int(options['port'])
- 
+
         return options
 
     def on_entry_mount_point_changed(self, entry):
@@ -1335,7 +1335,7 @@ class Disk(WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
     icon = 'kcmdevices.png'
-    
+
     def setup(self):
         self.combobox_time_list.set_enum(RotateTime)
         self.combobox_size_list.set_enum(RotateSize)
@@ -1359,7 +1359,7 @@ class Disk(WizardStep):
             self.combobox_time_list.set_sensitive(True)
             self.spinbutton_size.set_sensitive(False)
             self.combobox_size_list.set_sensitive(False)
-        
+
     def on_checkbutton_rotate_toggled(self, button):
         if self.checkbutton_rotate:
             self.radiobutton_has_size.set_sensitive(True)
@@ -1391,7 +1391,7 @@ class Disk(WizardStep):
         options['start-recording'] = \
             self.checkbutton_record_at_startup.get_active()
         return options
-    
+
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
@@ -1414,7 +1414,7 @@ class Shout2(WizardStep):
 
     def before_show(self):
         self.wizard.check_elements(self.worker, 'shout2send')
-        
+
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
@@ -1450,10 +1450,10 @@ class License(WizardSection):
 
     def setup(self):
         self.combobox_license.set_enum(LicenseType)
-        
+
     def on_checkbutton_set_license_toggled(self, button):
         self.combobox_license.set_sensitive(button.get_active())
-        
+
     def get_next(self):
         return None
 

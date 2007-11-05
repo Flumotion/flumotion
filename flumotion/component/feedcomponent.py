@@ -71,7 +71,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     ### Referenceable remote methods which can be called from manager
     def remote_getElementProperty(self, elementName, property):
         return self.comp.get_element_property(elementName, property)
-        
+
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
 
@@ -100,7 +100,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
                 value = int(value)
             else:
                 self.warning("Cannot parse GStreamer debug setting '%s'." %
-                    part) 
+                    part)
                 continue
 
             if glob:
@@ -298,7 +298,7 @@ class ParseLaunchComponent(FeedComponent):
     def init(self):
         if not gstreamer.get_plugin_version('coreelements'):
             raise errors.MissingElementError('identity')
-        if not gstreamer.element_factory_has_property('identity', 
+        if not gstreamer.element_factory_has_property('identity',
             'check-imperfect-timestamp'):
             self.checkTimestamp = False
             self.checkOffset = False
@@ -314,7 +314,7 @@ class ParseLaunchComponent(FeedComponent):
             self.EATER_TMPL += " check-imperfect-timestamp=1"
         if self.checkOffset:
             self.EATER_TMPL += " check-imperfect-offset=1"
-            
+
     ### FeedComponent interface implementations
     def create_pipeline(self):
         try:
@@ -326,7 +326,7 @@ class ParseLaunchComponent(FeedComponent):
                 "the component.\n"), e.args[0]))
             self.state.append('messages', m)
             raise errors.ComponentSetupHandledError(e)
-        
+
         self.pipeline_string = self.parse_pipeline(unparsed)
 
         try:
@@ -360,7 +360,7 @@ class ParseLaunchComponent(FeedComponent):
         """
         raise NotImplementedError('subclasses should implement '
                                   'get_pipeline_string')
-        
+
     def configure_pipeline(self, pipeline, properties):
         """
         Method that can be implemented by subclasses if they wish to
@@ -402,7 +402,7 @@ class ParseLaunchComponent(FeedComponent):
         if pipeline.count(self.DELIMITER) % 2 != 0:
             raise TypeError("'%s' contains an odd number of '%s'"
                             % (pipeline, self.DELIMITER))
-        
+
         out = []
         for i, block in enumerate(pipeline.split(self.DELIMITER)):
             # when splitting, the even-indexed members will remain, and
@@ -421,11 +421,11 @@ class ParseLaunchComponent(FeedComponent):
                                     % (block, prefix))
                 out.append(templatizers[prefix](block[pos+1:]))
         return ''.join(out)
-        
+
     def parse_pipeline(self, pipeline):
         pipeline = " ".join(pipeline.split())
         self.debug('Creating pipeline, template is %s', pipeline)
-        
+
         if pipeline == '' and not self.eaters:
             raise TypeError, "Need a pipeline or a eater"
 
@@ -433,15 +433,15 @@ class ParseLaunchComponent(FeedComponent):
             # code of dubious value
             assert self.eaters
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
-            
+
         pipeline = self.add_default_eater_feeder(pipeline)
         pipeline = self.parse_tmpl(pipeline,
                                    {'eater:': self.get_eater_template,
                                     'feeder:': self.get_feeder_template})
-        
+
         self.debug('pipeline is %s', pipeline)
         assert self.DELIMITER not in pipeline
-        
+
         return pipeline
 
     def get_eater_template(self, eaterAlias):
@@ -484,10 +484,10 @@ class Effect(log.Loggable):
     def setComponent(self, component):
         """
         Set the given component as the effect's owner.
-        
+
         @param component: the component to set as an owner of this effect
         @type  component: L{FeedComponent}
-        """                               
+        """
         self.component = component
         self.setUIState(component and component.uiState or None)
 
@@ -495,18 +495,18 @@ class Effect(log.Loggable):
         """
         Set the given UI state on the effect. This method is ideal for
         adding keys to the UI state.
-        
+
         @param state: the UI state for the component to use.
         @type  state: L{flumotion.common.componentui.WorkerComponentUIState}
-        """                               
+        """
         self.uiState = state
 
     def getComponent(self):
         """
         Get the component owning this effect.
-        
+
         @rtype:  L{FeedComponent}
-        """                               
+        """
         return self.component
 
 class MultiInputParseLaunchComponent(ParseLaunchComponent):
@@ -557,7 +557,7 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         size = queue.get_property("max-size-buffers")
         queue.set_property("max-size-buffers", size + 1)
 
-        # So, now it's guaranteed to return. However, we want to return the 
+        # So, now it's guaranteed to return. However, we want to return the
         # queue size to its original value. Doing this in a thread-safe manner
         # is rather tricky...
         def _block_cb(pad, blocked):
@@ -566,17 +566,15 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             pass
         def _underrun_cb(element):
             # Called from a streaming thread. The queue element does not hold
-            # the queue lock when this is called, so we block our sinkpad, 
+            # the queue lock when this is called, so we block our sinkpad,
             # then re-check the current level.
             pad = element.get_pad("sink")
             pad.set_blocked_async(True, _block_cb)
             level = element.get_property("current-level-buffers")
             if level < self.QUEUE_SIZE_BUFFERS:
-                element.set_property('max-size-buffers', 
+                element.set_property('max-size-buffers',
                     self.QUEUE_SIZE_BUFFERS)
                 element.disconnect(signalid)
             pad.set_blocked_async(False, _block_cb)
 
         signalid = queue.connect("underrun", _underrun_cb)
-
-

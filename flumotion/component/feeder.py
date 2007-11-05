@@ -54,7 +54,7 @@ class Feeder:
     def clientConnected(self, clientId, fd, cleanup):
         """
         The given client has connected on the given file descriptor, and is
-        being added to multifdsink. This is called solely from the reactor 
+        being added to multifdsink. This is called solely from the reactor
         thread.
 
         @param clientId: id of the client of the feeder
@@ -95,7 +95,7 @@ class Feeder:
 
     def getClients(self):
         """
-        @rtype: list of all L{FeederClient}s ever seen, including currently 
+        @rtype: list of all L{FeederClient}s ever seen, including currently
                 disconnected clients
         """
         return self._clients.values()

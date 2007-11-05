@@ -51,7 +51,7 @@ class PipeTransport:
             except OSError:
                 break
         return data
-        
+
 class FakeRequest:
     transport = PipeTransport()
     method = 'GET'
@@ -76,13 +76,13 @@ class FakeRequest:
         self.postpath = ['']
 
         self.__dict__.update(kwargs)
-        
+
     def setResponseCode(self, code):
         self.response = code
-        
+
     def setHeader(self, field, value):
         self.headers[field] = value
-            
+
     def write(self, text): self.data = self.data + text
     def finish(self): pass
 
@@ -113,7 +113,7 @@ class FakeTokenMedium:
 class FakeStreamer:
     caps = None
     mime = 'application/octet-stream'
-    
+
     def __init__(self, mediumClass=FakeAuthMedium):
         self.medium = mediumClass()
         self.plugs = {'flumotion.component.plugs.loggers.Logger': {}}
@@ -135,7 +135,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
             self.assertEquals(request.headers.get('server', ''),
                 resources.HTTP_VERSION)
             self.assertEquals(request.response, error_code)
-            
+
             expected = resources.ERROR_TEMPLATE % {
                 'code': error_code,
                 'error': http.RESPONSES[error_code]}
@@ -144,7 +144,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
         return d
- 
+
     def deferAssertAuthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
         # the request is authorized
@@ -170,12 +170,12 @@ class TestHTTPStreamingResource(unittest.TestCase):
         self.failIf(resource.isReady())
         streamer.caps = True
         self.failUnless(resource.isReady())
-        
+
         #assert resource.maxAllowedClients() == 974
         resource._requests = ' ' * (resource.maxclients + 1)
-        
+
         self.failUnless(resource.reachedServerLimits())
-        
+
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
         error_code = http.SERVICE_UNAVAILABLE
@@ -195,10 +195,10 @@ class TestHTTPStreamingResource(unittest.TestCase):
         resource = resources.HTTPStreamingResource(streamer, httpauth)
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
-        
+
         streamer.caps = True
         self.failUnless(resource.isReady())
-        
+
         request = FakeRequest(ip='127.0.0.1', user='wronguser')
         return self.deferAssertUnauthorized(httpauth, request)
 
@@ -210,10 +210,10 @@ class TestHTTPStreamingResource(unittest.TestCase):
         httpauth.setIssuerClass('HTTPTokenIssuer')
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
-        
+
         streamer.caps = True
         self.failUnless(resource.isReady())
-        
+
         # wrong token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
         yield self.deferAssertUnauthorized(httpauth, request)
@@ -237,10 +237,10 @@ class TestHTTPStreamingResource(unittest.TestCase):
         httpauth.setIssuerClass('HTTPTokenIssuer')
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
-        
+
         streamer.caps = True
         self.failUnless(resource.isReady())
-        
+
         # right token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
         yield self.deferAssertAuthorized(httpauth, request)
@@ -251,18 +251,18 @@ class TestHTTPStreamingResource(unittest.TestCase):
         yield self.deferAssertAuthorized(httpauth, request)
     testRenderHTTPTokenAuthorized = \
         defer_generator_method(testRenderHTTPTokenAuthorized)
-        
+
     def testRenderNew(self):
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
         resource = resources.HTTPStreamingResource(streamer, httpauth)
         streamer.caps = True
         streamer.mime = 'application/x-ogg'
-        
+
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
         self.failUnless(server.NOT_DONE_YET)
-        
+
         #assert request.headers['Server'] == HTTP_VERSION
         #assert request.headers['Date'] == 'FakeDate'
         #assert request.headers['Content-Type'] == 'application/x-ogg'

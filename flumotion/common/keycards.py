@@ -58,7 +58,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         @type domain: string
         """
         self.domain = domain
-    
+
     def getData(self):
         """
         Return a dictionary of the viewable data on the keycard that can be
@@ -72,7 +72,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
             'requester': self.requesterId,
             'domain':    self.domain
         }
-       
+
     def __repr__(self):
         return "<%s for requesterId %r in state %s>" % (self.__class__.__name__,
             self.requesterId, _statesEnum[self.state])
@@ -195,7 +195,7 @@ class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
     def getData(self):
         d = Keycard.getData(self)
         d['username'] = self.username
-        # Realm? Uri? 
+        # Realm? Uri?
         return d
 
     def __repr__(self):
@@ -204,5 +204,3 @@ class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)
-
-

@@ -24,7 +24,7 @@ small common functions used by all processes
 """
 
 import errno
-import os 
+import os
 import sys
 import time
 import signal
@@ -85,7 +85,7 @@ def formatTime(seconds, fractional=0):
     @returns: a nicely formatted time string.
     """
     chunks = []
-    
+
     week = 60 * 60 * 24 * 7
     weeks = seconds / week
     seconds %= week
@@ -146,7 +146,7 @@ def version(binary):
     block.append("part of Flumotion - a streaming media server")
     block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
     return "\n".join(block)
-             
+
 def mergeImplements(*classes):
     """
     Merge the __implements__ tuples of the given classes into one tuple.
@@ -186,30 +186,30 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
                 e.filename)
 
     # first fork
-    try: 
-        pid = os.fork() 
+    try:
+        pid = os.fork()
         if pid > 0:
             sys.exit(0)   # exit first parent
-    except OSError, e: 
+    except OSError, e:
         sys.stderr.write("Failed to fork: (%d) %s\n" % (e.errno, e.strerror))
         sys.exit(1)
 
     # decouple from parent environment
     try:
-        os.chdir(directory) 
-    except OSError, e: 
+        os.chdir(directory)
+    except OSError, e:
         from flumotion.common import errors
         raise errors.SystemError, "Failed to change directory to %s: %s" % (
             directory, e.strerror)
-    os.umask(0) 
-    os.setsid() 
+    os.umask(0)
+    os.setsid()
 
     # do second fork
-    try: 
-        pid = os.fork() 
+    try:
+        pid = os.fork()
         if pid > 0:
             sys.exit(0)   # exit second parent
-    except OSError, e: 
+    except OSError, e:
         sys.stderr.write("Failed to fork: (%d) %s\n" % (e.errno, e.strerror))
         sys.exit(1)
 
@@ -240,7 +240,7 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
                                   shutdownStarted)
     reactor.addSystemEventTrigger('after', 'shutdown',
                                   shutdownEnded)
-    
+
 def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """
     Daemonize a process, writing log files and PID files to conventional
@@ -265,7 +265,7 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
             "A %s service named '%s' is already running with pid %d"
             % (processType, processName or processType, pid))
 
-    log.debug(processType, "%s service named '%s' daemonizing", 
+    log.debug(processType, "%s service named '%s' daemonizing",
         processType, processName)
 
     if processName:
@@ -295,26 +295,26 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     reactor.addSystemEventTrigger('after', 'shutdown',
                                   _deletePidFile)
 
-    
+
 def argRepr(args=(), kwargs={}, max=-1):
     """
     Return a string representing the given args.
     """
     # FIXME: rename function
     # FIXME: implement max
-    
+
     # check validity of input
     assert (type(args) is tuple or
             type(args) is list)
     assert type(kwargs) is dict
-    
+
     s = ''
     args = list(args)
 
     if args:
         args = map(repr, args)
         s += ', '.join(args)
-    
+
     if kwargs:
         r = [(key + '=' + repr(item))
                 for key, item in kwargs.items()]
@@ -322,7 +322,7 @@ def argRepr(args=(), kwargs={}, max=-1):
         if s:
             s += ', '
         s += ', '.join(r)
-            
+
     return s
 
 def ensureDir(dir, description):
@@ -348,7 +348,7 @@ def getPidPath(type, name=None):
     log.debug('common', 'getPidPath for type %s, name %r: %s' % (
         type, name, path))
     return path
- 
+
 def writePidFile(type, name=None, file=None):
     """
     Write a pid file in the run directory, using the given process type
@@ -369,7 +369,7 @@ def writePidFile(type, name=None, file=None):
         file.write("%d\n" % pid)
         file.close()
         return file.name
- 
+
 def _acquirePidFile(type, name=None):
     """
     Open a PID file for writing, using the given process type and
@@ -382,7 +382,7 @@ def _acquirePidFile(type, name=None):
     ensureDir(configure.rundir, "rundir")
     path = getPidPath(type, name)
     return open(path, 'w')
- 
+
 def deletePidFile(type, name=None):
     """
     Delete the pid file in the run directory, using the given process type
@@ -394,26 +394,26 @@ def deletePidFile(type, name=None):
     path = getPidPath(type, name)
     os.unlink(path)
     return path
- 
+
 def getPid(type, name=None):
     """
     Get the pid from the pid file in the run directory, using the given
     process type and process name for the filename.
-    
+
     @returns: pid of the process, or None if not running or file not found.
     """
-    
+
     pidPath = getPidPath(type, name)
     log.log('common', 'pidfile for %s %s is %s' % (type, name, pidPath))
     if not os.path.exists(pidPath):
         return
-    
+
     file = open(pidPath, 'r')
     pid = file.readline()
     file.close()
     if not pid or int(pid) == 0:
         return
- 
+
     return int(pid)
 
 def signalPid(pid, signum):
@@ -450,11 +450,11 @@ def killPid(pid):
 def checkPidRunning(pid):
     """
     Check if the given pid is currently running.
-    
+
     @returns: whether or not a process with that pid is active.
     """
     return signalPid(pid, 0)
- 
+
 def waitPidFile(type, name=None):
     """
     Wait for the given process type and name to have started and created
@@ -464,7 +464,7 @@ def waitPidFile(type, name=None):
     """
     # getting it from the start avoids an unneeded time.sleep
     pid = getPid(type, name)
-    
+
     while not pid:
         time.sleep(0.1)
         pid = getPid(type, name)
@@ -475,21 +475,21 @@ def waitForTerm():
     """
     Wait until we get killed by a TERM signal (from someone else).
     """
-    
+
     class Waiter:
         def __init__(self):
             self.sleeping = True
             import signal
             self.oldhandler = signal.signal(signal.SIGTERM,
                                             self._SIGTERMHandler)
- 
+
         def _SIGTERMHandler(self, number, frame):
             self.sleeping = False
- 
+
         def sleep(self):
             while self.sleeping:
                 time.sleep(0.1)
- 
+
     waiter = Waiter()
     waiter.sleep()
 
@@ -510,7 +510,7 @@ def addressGetHost(a):
     except AttributeError:
         host = a[1]
     return host
-        
+
 def addressGetPort(a):
     """
     Get the port number of an IPv4 address.
@@ -610,7 +610,7 @@ def parseFullFeedId(fullFeedId):
 def objRepr(object):
     """
     Return a string giving the fully qualified class of the given object.
-    """ 
+    """
     c = object.__class__
     return "%s.%s" % (c.__module__, c.__name__)
 
@@ -646,10 +646,10 @@ def getLL():
     # advanced stuff. If that's not present, just use LANG, as normal.
     language = os.environ.get('LANGUAGE', None)
     if language != None:
-      LL = language[:2]
+        LL = language[:2]
     else:
-      lang = os.environ.get('LANG', 'en')
-      LL = lang[:2]
+        lang = os.environ.get('LANG', 'en')
+        LL = lang[:2]
 
     return LL
 
@@ -794,7 +794,7 @@ def call_each_method_reversed(obj, method, *args, **kwargs):
     """
     for proc in get_all_methods(obj, method, False):
         proc(obj, *args, **kwargs)
-    
+
 class InitMixin(object):
     """
     A mixin class to help with object initialization.
@@ -872,7 +872,7 @@ class Poller(object, log.Loggable):
 
         self._dc = None
         self.running = False
-        
+
         if start:
             self.start(immediately)
 

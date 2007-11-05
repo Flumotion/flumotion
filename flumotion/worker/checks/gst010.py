@@ -34,7 +34,7 @@ from flumotion.worker.checks import check
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
-    
+
 class BusResolution(fdefer.Resolution):
     pipeline = None
     signal_id = None
@@ -54,7 +54,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
     Parse the given pipeline and set it to the given state.
     When the bin reaches that state, perform the given check function on the
     element with the given name.
-    
+
     @param pipeline_str: description of the pipeline used to test
     @param element_name: name of the element being checked
     @param check_proc: a function to call with the GstElement as argument.
@@ -149,12 +149,12 @@ def check1394(id):
      - succesful, with a None value: no device found
      - succesful, with a dictionary of width, height, and par as a num/den pair
      - failed
-    
-    @rtype: L{twisted.internet.defer.Deferred} of 
+
+    @rtype: L{twisted.internet.defer.Deferred} of
             L{flumotion.common.messages.Result}
     """
     result = messages.Result()
-    
+
     def do_check(demux):
         pad = demux.get_pad('video')
 
@@ -169,7 +169,7 @@ def check1394(id):
         result = dict(width=w, height=h, par=(par.num, par.denom))
         log.debug('check', 'returning dict %r' % result)
         return result
-        
+
     # first check if the obvious device node exists
     if not os.path.exists('/dev/raw1394'):
         m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),

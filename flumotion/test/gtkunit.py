@@ -62,7 +62,7 @@ def timeout_add(proc, increase=True):
     if increase:
         timeout_add.n += 1
 timeout_add.n = 0
-         
+
 def find_widget(parent, name):
     if parent.get_name() == name:
         return parent
@@ -72,7 +72,7 @@ def find_widget(parent, name):
             if found:
                 return found
     return None
-            
+
 def call_now(name, method, *args, **kwargs):
     w = find_widget(_WINDOW, name)
     assert w
@@ -152,11 +152,9 @@ class GtkTestCase(unittest.TestCase):
         """
         toggle a gtk.ToggleButton.
         """
-        is_active = call_now(name, 'get_active') 
+        is_active = call_now(name, 'get_active')
         call_inc(name, 'set_sensitive', False)
         call(name, 'set_sensitive', True)
         call_inc(name, 'set_active', not is_active)
         if process:
             self.process()
-
-

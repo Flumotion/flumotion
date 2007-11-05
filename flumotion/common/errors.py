@@ -119,7 +119,7 @@ class PropertyError(pb.Error):
 
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"
-    
+
 class SystemError(pb.Error):
     "A system error, is usually fatal"
 
@@ -139,7 +139,7 @@ class ComponentError(pb.Error):
 
     args[0]: ComponentState
     """
-    
+
 # FIXME: rename, component first
 class SleepingComponentError(ComponentError):
     "Component is sleeping, cannot handle request"

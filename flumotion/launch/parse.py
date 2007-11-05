@@ -178,7 +178,7 @@ class Linker:
             else:
                 if not self._tmp[0]:
                     self._tmp[0] = self.get_last_component()
-            
+
         if self._tmp and self._tmp[0] and self._tmp[2]:
             self.links.append(self._tmp)
             self._tmp = None
@@ -210,7 +210,7 @@ class Linker:
                 if not compreg.getFeeders():
                     err('Component %s has no feeders' % compname)
                 link[1] = compreg.getFeeders()[0]
-    
+
         for link in self.get_links():
             compname = link[2]
             comptype = component_types[compname]
@@ -229,7 +229,7 @@ class Linker:
         for link in self.get_links():
             feeders[link[2]].append('%s:%s' % (link[0], link[1]))
         return feeders
-    
+
     def get_sort_order(self):
         return [(link[0], link[2]) for link in self.get_links()]
 
@@ -309,13 +309,13 @@ def parse_args(args):
         err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
 
     components = ComponentStore()
-        
+
     linker = Linker(components.last)
 
     args.reverse() # so we can pop from the tail
     while args:
         parse_arg(args.pop().strip(), components, linker)
-        
+
     feeders = linker.resolve_links(dict([(name, components[name].type)
                                          for name in components]))
 

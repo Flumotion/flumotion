@@ -87,7 +87,7 @@ class TestGettext(unittest.TestCase):
     def tearDown(self):
         gettext.bindtextdomain('flumotion', self.oldlocaledir)
         locale.setlocale(locale.LC_MESSAGES, self.oldlocale)
- 
+
 class TestSingularGettext(TestGettext):
     def setUp(self):
         TestGettext.setUp(self)
@@ -136,4 +136,3 @@ class TestPluralGettext(TestGettext):
         self.assertEquals(self.edone % 1, "Ik vertaalde 1 ding")
         self.assertEquals(self.edcount, "Ik vertaalde %d dingen")
         self.assertEquals(self.edcount % 5, "Ik vertaalde 5 dingen")
- 

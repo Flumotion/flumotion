@@ -45,15 +45,15 @@ class MyListener(log.Loggable):
     def __init__(self, state):
         self._setters = {} # (state, key, value) tuple -> list of deferred
         state.addListener(self, set=self.stateSet)
-        
+
     def notifyOnSet(self, state, key, value):
         self.debug("notify on state %r key %r set to value %r" % (
             state, key, value))
-        
+
         if state.hasKey(key) and state.get(key) == value:
             self.debug("key already has the given value, firing")
             return defer.succeed(None)
-            
+
         d = defer.Deferred()
         t = (state, key, value)
         if not t in self._setters.keys():
@@ -64,7 +64,7 @@ class MyListener(log.Loggable):
 
     def stateSet(self, object, key, value):
         self.debug("%r key %r set to %r" % (object, key, value))
-        
+
         t = (object, key, value)
         if t in self._setters.keys():
             list = self._setters[t]
@@ -72,7 +72,7 @@ class MyListener(log.Loggable):
                 self.debug("firing deferred %s" % d)
                 d.callback(None)
             del self._setters[t]
-    
+
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
     ### for the tests, ie sourceComponentName:feedName
@@ -84,7 +84,7 @@ class FakeComponentAvatar(log.Loggable):
         self.eaters = eaters
         self.port = port
         self.listen_host = listen_host
-        
+
     def getFeeders(self):
         return [self.name + ':default']
 
@@ -93,13 +93,13 @@ class FakeComponentAvatar(log.Loggable):
 
     def getEaters(self):
         return self.eaters
-    
+
     def getClientAddress(self):
         return self.listen_host
 
     def getListenPort(self, *args):
         return self.port
-    
+
     def getName(self):
         return self.name
 
@@ -129,7 +129,7 @@ class TestComponentMapper(unittest.TestCase):
         id = '/adam/cain'
         m = self._mappers[state]
         self.assertEquals(m, mapper)
-        
+
         m.id = id
         # insert a id -> mapper ref
         self._mappers[id] = m
@@ -152,7 +152,7 @@ class TestComponentMapper(unittest.TestCase):
         m.avatar = avatar
         # insert an avatar -> mapper ref
         self._mappers[avatar] = m
- 
+
         # verify we can do avatar -> (state, id) and other way
         m = self._mappers[avatar]
         self.assertEquals(m.state, state)
@@ -182,7 +182,7 @@ class TestComponentMapper(unittest.TestCase):
         self.failIf(m.id)
         self.failIf(m.avatar)
         self.assertEquals(m.state, state)
-        
+
 class FakeTransport:
     def getPeer(self):
         from twisted.internet.address import IPv4Address
@@ -228,7 +228,7 @@ class FakeMind(log.Loggable):
 class FakeWorkerMind(FakeMind):
 
     logCategory = 'fakeworkermind'
-    
+
     def __init__(self, testcase, avatarId):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
@@ -252,7 +252,7 @@ class FakeWorkerMind(FakeMind):
         # need to return the avatarId for comparison
         d.addCallback(lambda _: avatarId)
         return d
-    
+
     def waitForComponentsCreate(self):
         d = defer.DeferredList(self._createDeferreds)
         self._createDeferreds = []
@@ -309,8 +309,8 @@ class FakeComponentMind(FakeMind):
     def remote_feedTo(self, componentId, feedId, host, port):
         # pretend this works
         return
-    
-    
+
+
 class TestVishnu(log.Loggable, unittest.TestCase):
 
     logCategory = "TestVishnu"
@@ -339,17 +339,17 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             return avatar
         d.addCallback(got_result)
         return d
-        
+
     def _loginWorker(self, avatarId):
         # create a worker and log it in
         # return the avatar
 
         # log in a worker
         return self._requestAvatar(avatarId,
-                                   FakeWorkerMind(self, avatarId), 
+                                   FakeWorkerMind(self, avatarId),
                                    interfaces.IWorkerMedium,
                                    self._workers)
-        
+
     def _loginComponent(self, workerName, avatarId, type, moduleName,
         methodName, config):
         # create a component and log it in
@@ -393,15 +393,15 @@ class TestVishnu(log.Loggable, unittest.TestCase):
     def testLoadConfiguration(self):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
-        
+
         self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
         s = self.vishnu.state
-        
+
         l = s.get('flows')
         self.failUnless(l)
         f = l[0]
         self.failUnlessEqual(f.get('name'), 'testflow')
-        
+
         l = f.get('components')
         self.failUnless(l)
 
@@ -418,7 +418,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compId = common.componentId("testflow", "producer-video-test")
             compProps = [("pipeline", "videotestsrc ! video/x-raw-yuv,width=320,"
                          "height=240,framerate=5/1,format=(fourcc)I420")]
-            return self.vishnu.loadComponent(manager.LOCAL_IDENTITY, 
+            return self.vishnu.loadComponent(manager.LOCAL_IDENTITY,
                                              compType, compId, None, compProps,
                                              "worker", [], [], False)
         # Add more tests if you implement handling of sync-needing components
@@ -450,7 +450,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                 manager.LOCAL_IDENTITY, compType, compId, None, compProps,
                 "worker", [], compEaters, False)
 
-            self.assertEqual(compState.get('config').get('name'), 
+            self.assertEqual(compState.get('config').get('name'),
                              "converter-ogg-theora")
             self.failIf('label' in compState.get('config'))
             self.assertEqual(len(components), 2)
@@ -463,7 +463,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                               manager.LOCAL_IDENTITY, compType, compId,
                               None, compProps, "worker", [], compEaters,
                               False)
-            
+
             compType = "http-streamer"
             compId = common.componentId("testflow", "streamer-ogg-theora")
             compLabel = "Streamer OGG-Theora/Vorbis"
@@ -473,9 +473,9 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                 manager.LOCAL_IDENTITY, compType, compId, compLabel,
                 compProps, "streamer", [], compEaters, False)
 
-            self.assertEqual(compState.get('config').get('name'), 
+            self.assertEqual(compState.get('config').get('name'),
                              "streamer-ogg-theora")
-            self.assertEqual(compState.get('config').get('label'), 
+            self.assertEqual(compState.get('config').get('label'),
                              "Streamer OGG-Theora/Vorbis")
             self.assertEqual(len(components), 3)
             self.assertEqual(components[2].get('name'),
@@ -508,7 +508,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # and their cleanup
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
-        
+
         def confLoaded(_):
             # verify component mapper
             # 3 component states + avatarId's gotten from the config
@@ -525,7 +525,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
-        
+
         def confChecked(workerAvatar):
             # log out the producer and verify the mapper
             id = '/testflow/producer-video-test'
@@ -572,14 +572,14 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             log.debug('unittest', 'loadConfigAndOneWorker')
             self.failUnlessEqual(len(self._workers), 1)
             self.failUnlessEqual(len(self._components), 0)
-            
+
             # load configuration
             d = self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
             d.addCallback(lambda _: self._workers['worker'].mind.waitForComponentsCreate())
             d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
-        
+
         def logoutComponent(workerAvatar):
             log.debug('unittest', 'logoutComponent: producer')
             # log out the producer and verify the mapper
@@ -596,7 +596,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             # We logged it out without it doing a clean shutdown, so it should
             # now be lost.
             self._verifyComponentIdGone(id, moods.lost)
-            
+
             # log out the converter and verify
             log.debug('unittest', 'logoutComponent: converter')
             id = '/testflow/converter-ogg-theora'
@@ -677,7 +677,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.failUnless(avatar.componentState)
         d.addCallback(verifyMoodIsHappy)
         return d
-        
+
     def _verifyConfigAndNoWorker(self):
         mappers = self.vishnu._componentMappers
 
@@ -692,11 +692,11 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         mappers = self.vishnu._componentMappers
         m = mappers[id]
         avatar = self._components[id]
-  
+
         self.failUnless(id in mappers.keys())
         self.assertEqual(m.id, id)
         self.failIf(avatar in mappers.keys())
-        
+
         self.assertEqual(m.avatar, None)
         self.failUnless(m.state)
         state = m.state
@@ -719,4 +719,3 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # verify avatar state
         self.failIf(avatar.jobState)
         self.failIf(avatar.componentState)
-

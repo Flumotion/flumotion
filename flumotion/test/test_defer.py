@@ -32,7 +32,7 @@ class TestDefer(unittest.TestCase):
 
     def testYieldResultAtFirst(self):
         self.result = None
-        
+
         def gen():
             yield 42
         gen = defer_generator(gen)
@@ -48,7 +48,7 @@ class TestDefer(unittest.TestCase):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
-            
+
         def gen():
             yield square_later(0)
             yield 42
@@ -63,12 +63,12 @@ class TestDefer(unittest.TestCase):
 
     def testYieldNothing(self):
         self.result = 42
-        
+
         def square_later(x):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
-            
+
         def gen():
             yield square_later(0)
         gen = defer_generator(gen)
@@ -87,15 +87,15 @@ class TestDefer(unittest.TestCase):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
-            
+
         def gen():
             for i in range(10):
                 d = square_later(i)
                 yield d
-                
+
                 # .value() gets the result of the deferred
                 assert d.value() == i*i
-                
+
             yield d.value()
         gen = defer_generator(gen)
 
@@ -138,7 +138,7 @@ class TestDefer(unittest.TestCase):
             except ZeroDivisionError:
                 d = divide_later(42, 1)
                 yield d
-                
+
                 assert d.value() == 42
                 yield True
         gen = defer_generator(gen)
@@ -211,13 +211,12 @@ class TestRetryingDeferred(unittest.TestCase):
         def genDef():
             if self.__first:
                 self.__first = False
-                return defer.fail(errors.FlumotionError()) 
+                return defer.fail(errors.FlumotionError())
             else:
                 return defer.succeed(None)
-    
+
         rd = RetryingDeferred(genDef)
         rd.initialDelay = 0.1 # Set it short so the test isn't long-running.
         d = rd.start()
 
         return d
-

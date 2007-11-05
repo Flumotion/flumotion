@@ -156,7 +156,7 @@ class BundleLoader(log.Loggable):
             assert name == bundleName
             self.debug('Got bundle %s in %s', bundleName, path)
             return path
-            
+
 
         self.debug('Getting bundle %s', bundleName)
         d = self.getBundles(bundleName=bundleName)

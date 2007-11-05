@@ -121,7 +121,7 @@ class Wizard(GladeWindow):
 
     This wizard runs its own GObject main loop.
     The wizard is run with the run() method.
-    
+
     Example:
       w = Wizard('foo', 'first-step', FirstStep)
       w.show()
@@ -193,7 +193,7 @@ class Wizard(GladeWindow):
 
         w = self.widgets
         page.button_next = w['button_next']
-            
+
         available_pages = [p for p in page.next_pages
                                 if self.pages[p].is_available()]
 
@@ -215,7 +215,7 @@ class Wizard(GladeWindow):
     def on_next(self, button):
         button.set_sensitive(False)
         next_page = self.page.on_next(self.state)
-        
+
         if not next_page:
             # the input is incorrect
             pass
@@ -237,7 +237,7 @@ class Wizard(GladeWindow):
             button.set_sensitive(True)
             self.page_stack.append(self.page)
             self.set_page(next_page)
-        
+
     def on_prev(self, button):
         page = self.page_stack.pop()
         self.set_page(page.name)

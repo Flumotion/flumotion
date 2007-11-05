@@ -41,7 +41,7 @@ def reflectCall(moduleName, methodName, *args, **kwargs):
     log.debug('reflectcall', 'Loading moduleName %s', moduleName)
 
     module = reflect.namedModule(moduleName)
-        
+
     log.debug('reflectcall', 'calling method %s.%s', moduleName,
               methodName)
 
@@ -79,11 +79,11 @@ def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
         raise err("module %s could not be imported (%s)"
                   % (moduleName,
                      log.getExceptionMessage(e, filename='flumotion')))
-        
+
     if not hasattr(module, methodName):
         raise err("module %s has no method named %s"
                   % (moduleName, methodName))
-        
+
     log.debug('reflectcall', 'calling method %s.%s'
               % (moduleName, methodName))
 

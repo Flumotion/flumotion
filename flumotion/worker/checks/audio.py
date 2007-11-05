@@ -37,7 +37,7 @@ def checkMixerTracks(source_factory, device, channels, id=None):
      - succesful, with a human-readable device name and a list of mixer
        track labels.
      - failed
-    
+
     @rtype: L{twisted.internet.defer.Deferred}
     """
     result = messages.Result()
@@ -51,9 +51,9 @@ def checkMixerTracks(source_factory, device, channels, id=None):
             raise check.CheckProcError(msg)
         return (element.get_property('device-name'),
                 [track.label for track in element.list_tracks()])
-                
+
     pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
-    d = do_element_check(pipeline, 'source', get_tracks, 
+    d = do_element_check(pipeline, 'source', get_tracks,
         set_state_deferred = True)
 
     d.addCallback(check.callbackResult, result)

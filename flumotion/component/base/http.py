@@ -62,7 +62,7 @@ class Issuer(log.Loggable):
     """
     def issue(self, *args, **kwargs):
         """
-        Return a keycard, or None, based on the given arguments. 
+        Return a keycard, or None, based on the given arguments.
         """
         raise NotImplementedError
 
@@ -92,7 +92,7 @@ class HTTPAuthIssuer(Issuer):
         self.debug('Asking for authentication, user %s, password %s, ip %s' % (
             keycard.username, keycard.password, keycard.address))
         return keycard
- 
+
 class HTTPTokenIssuer(Issuer):
     """
     I create L{flumotion.common.keycards.KeycardToken} keycards based on
@@ -107,11 +107,11 @@ class HTTPTokenIssuer(Issuer):
         token = request.args['token']
         if not isinstance(token, str):
             token = token[0]
-        
+
         keycard = keycards.KeycardToken(token,
             request.getClientIP())
         return keycard
- 
+
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
 
 class HTTPAuthentication(log.Loggable):
@@ -139,7 +139,7 @@ class HTTPAuthentication(log.Loggable):
                                        # doesn't specify one.
         self._pendingCleanups = []
         self._keepAlive = None
-        
+
         if (BOUNCER_SOCKET in self.component.plugs
             and self.component.plugs[BOUNCER_SOCKET]):
             assert len(self.component.plugs[BOUNCER_SOCKET]) == 1
@@ -185,11 +185,11 @@ class HTTPAuthentication(log.Loggable):
         """
         Set a domain name on the resource, used in HTTP auth challenges and
         on the keycard.
-        
+
         @type domain: string
         """
         self._domain = domain
-        
+
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName
 
@@ -226,7 +226,7 @@ class HTTPAuthentication(log.Loggable):
         keycard.issuerName = self.issuerName
         keycard._fd = request.transport.fileno()
         keycard.setDomain(self._domain)
-        
+
         if self.plug:
             self.debug('authenticating against plug')
             return self.plug.authenticate(keycard)
@@ -291,7 +291,7 @@ class HTTPAuthentication(log.Loggable):
         # we're called from a callLater, so we've already run; just delete
         if self._fdToDurationCall.has_key(fd):
             del self._fdToDurationCall[fd]
-            
+
         self.debug('[fd %5d] asking streamer to remove client' % fd)
         self.clientDone(fd)
 
@@ -326,7 +326,7 @@ class HTTPAuthentication(log.Loggable):
         # and closed
         self.debug('_authenticatedCallback: keycard %r' % keycard)
         if not keycard:
-            raise errors.NotAuthenticatedError() 
+            raise errors.NotAuthenticatedError()
 
         # properly authenticated
         if request.method == 'GET':
@@ -354,7 +354,7 @@ class HTTPAuthentication(log.Loggable):
         failure.trap(errors.UnknownComponentError, errors.NotAuthenticatedError)
         self._handleUnauthorized(request)
         return failure
-        
+
     def _handleUnauthorized(self, request):
         self.debug('client from %s is unauthorized' % (request.getClientIP()))
         request.setHeader('content-type', 'text/html')
@@ -362,10 +362,10 @@ class HTTPAuthentication(log.Loggable):
         if self._domain:
             request.setHeader('WWW-Authenticate',
                               'Basic realm="%s"' % self._domain)
-            
+
         error_code = http.UNAUTHORIZED
         request.setResponseCode(error_code)
-        
+
         # we have to write data ourselves,
         # since we already returned NOT_DONE_YET
         html = ERROR_TEMPLATE % {'code': error_code,
@@ -415,4 +415,3 @@ class LogFilter:
             if (realip & f[1]) == f[0]:
                 return True
         return False
-

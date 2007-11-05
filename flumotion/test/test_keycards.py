@@ -39,13 +39,13 @@ class TestKeycardUACPCC(unittest.TestCase):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
-        
+
 # test sending keycards back and forth
 class Admin(testclasses.TestAdmin):
     pass
 class Worker(testclasses.TestWorker):
     keycard = None
-     
+
     def remote_getKeycard(self):
         if not self.keycard:
             keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
@@ -57,7 +57,7 @@ class Worker(testclasses.TestWorker):
     def remote_giveKeycard(self, keycard):
         #print "Worker keycard %r, id: %d" % (keycard, id(keycard))
         pass
-     
+
 class Root(testclasses.TestManagerRoot):
     def remote_workerGetKeycard(self):
         d = self.workerReference.callRemote('getKeycard')
@@ -102,10 +102,10 @@ class TestKeycardSending(unittest.TestCase):
             return d2
         d.addCallback(getKeycardCallback)
         return d
-        
+
         # while writing this test, I came to the conclusion that since
         # this is a copyable, you really can't say much about the id's
         # of these objects as they get sent back and forth...
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

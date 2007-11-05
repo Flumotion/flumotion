@@ -48,7 +48,7 @@ class KeycardsNode(BaseAdminGtkNode):
 
     def _loadGladeFileCallback(self, widgetTree):
         self.wtree = widgetTree
-        
+
         self.widget = self.wtree.get_widget('keycards-widget')
         self.tree = self.wtree.get_widget('keycards-treeview')
         self.tree.set_model(self.model)
@@ -79,7 +79,7 @@ class KeycardsNode(BaseAdminGtkNode):
         self._uiState = result
         keycardsData = result.get('keycards')
         self.debug('_gotState: got %d keycards' % len(keycardsData))
-        
+
         for data in keycardsData:
             self._append(data)
 
@@ -108,7 +108,7 @@ class KeycardsNode(BaseAdminGtkNode):
                 id)
 
         return d
-        
+
     def _append(self, data):
         id = data['id']
         iter = self.model.append()

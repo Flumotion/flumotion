@@ -70,7 +70,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self._clock_slaved = False
         self.clock_provider = None
-        self._master_clock_info = None # (ip, port, basetime) if we're the 
+        self._master_clock_info = None # (ip, port, basetime) if we're the
                                        # clock master
 
         self._change_monitor = gstreamer.StateChangeMonitor()
@@ -104,7 +104,7 @@ class FeedComponent(basecomponent.BaseComponent):
             for feedId, eaterAlias in eater_config[eaterName]:
                 self.eaters[eaterAlias] = Eater(eaterAlias, eaterName)
                 self.uiState.append('eaters', self.eaters[eaterAlias].uiState)
-                
+
         for feederName in feeder_config:
             self.feeders[feederName] = Feeder(feederName)
             self.uiState.append('feeders',
@@ -137,7 +137,7 @@ class FeedComponent(basecomponent.BaseComponent):
         @rtype: L{gst.Pipeline}
         """
         raise NotImplementedError, "subclass must implement create_pipeline"
-        
+
     def set_pipeline(self, pipeline):
         """
         Subclasses can override me.
@@ -163,7 +163,7 @@ class FeedComponent(basecomponent.BaseComponent):
         effect.setComponent(self)
 
     def connect_feeders(self, pipeline):
-        # Connect to the client-fd-removed signals on each feeder, so we 
+        # Connect to the client-fd-removed signals on each feeder, so we
         # can clean up properly on removal.
         def client_fd_removed(sink, fd, feeder):
             # Called (as a signal callback) when the FD is no longer in
@@ -241,7 +241,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         def default():
             self.log('message received: %r', message)
-            
+
         handlers = {gst.MESSAGE_STATE_CHANGED: state_changed,
                     gst.MESSAGE_ERROR: error,
                     gst.MESSAGE_EOS: eos}
@@ -295,12 +295,12 @@ class FeedComponent(basecomponent.BaseComponent):
         bus = self.pipeline.get_bus()
         # never gets cleaned up; does that matter?
         bus.connect("message::element", on_element_message)
-            
+
     def install_eater_event_probes(self, eater):
         def fdsrc_event(pad, event):
             # An event probe used to consume unwanted EOS events on eaters.
             # Called from GStreamer threads.
-            if event.type == gst.EVENT_EOS:    
+            if event.type == gst.EVENT_EOS:
                 self.info('End of stream for eater %s, disconnect will be '
                           'triggered', eater.eaterAlias)
                 # We swallow it because otherwise our component acts on the EOS
@@ -359,7 +359,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 "gst-plugins-base is too old")
             m = messages.Warning(T_(N_(
                     "Your gst-plugins-base is too old, so "
-                    "feeder statistics will be unavailable.")), 
+                    "feeder statistics will be unavailable.")),
                     id='multifdsink')
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s."), 'gst-plugins-base',
@@ -378,7 +378,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def stop_pipeline(self):
         if not self.pipeline:
             return
-        
+
         if self.clock_provider:
             self.clock_provider.set_property('active', False)
             self.clock_provider = None
@@ -388,7 +388,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def cleanup(self):
         self.debug("cleaning up")
-        
+
         assert self.pipeline != None
 
         self.stop_pipeline()
@@ -418,7 +418,7 @@ class FeedComponent(basecomponent.BaseComponent):
         return defer.succeed(None)
 
     def set_master_clock(self, ip, port, base_time):
-        self.debug("Master clock set to %s:%d with base_time %s", ip, port, 
+        self.debug("Master clock set to %s:%d with base_time %s", ip, port,
             gst.TIME_ARGS(base_time))
 
         assert self._clock_slaved
@@ -463,7 +463,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
             self.clock_provider = gst.NetTimeProvider(clock, None, port)
             realport = self.clock_provider.get_property('port')
-        
+
             base_time = self.pipeline.get_base_time()
 
             self.debug('provided master clock from %r, base time %s',
@@ -471,7 +471,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
             if self.medium:
                 # FIXME: This isn't always correct. We need a more flexible API,
-                # and a proper network map, to do this. Even then, it's not 
+                # and a proper network map, to do this. Even then, it's not
                 # always going to be possible.
                 ip = self.medium.getIP()
             else:
@@ -531,18 +531,18 @@ class FeedComponent(basecomponent.BaseComponent):
                 if client.fd is not None:
                     array = feederElement.emit('get-stats', client.fd)
                     if len(array) == 0:
-                        # There is an unavoidable race here: we can't know 
+                        # There is an unavoidable race here: we can't know
                         # whether the fd has been removed from multifdsink.
-                        # However, if we call get-stats on an fd that 
+                        # However, if we call get-stats on an fd that
                         # multifdsink doesn't know about, we just get a 0-length
                         # array. We ensure that we don't reuse the FD too soon
-                        # so this can't result in calling this on a valid but 
+                        # so this can't result in calling this on a valid but
                         # WRONG fd
                         self.debug('Feeder element for feed %s does not know '
                             'client fd %d' % (feedId, client.fd))
                     else:
                         client.setStats(array)
-        self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY, 
+        self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY,
             self._feeder_probe_calllater)
 
     def unblock_eater(self, eaterAlias):
@@ -566,7 +566,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if not element:
             self.warning("No element named %r in pipeline", element_name)
         return element
-    
+
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
         self.debug("%s: getting property %s of element %s" % (self.getName(), property, element_name))
@@ -575,7 +575,7 @@ class FeedComponent(basecomponent.BaseComponent):
             msg = "Element '%s' does not exist" % element_name
             self.warning(msg)
             raise errors.PropertyError(msg)
-        
+
         self.debug('getting property %s on element %s' % (property, element_name))
         try:
             value = element.get_property(property)
@@ -603,7 +603,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('setting property %s on element %r to %s' %
                    (property, element_name, value))
         pygobject.gobject_set_property(element, property, value)
-    
+
     ### methods to connect component eaters and feeders
     def reconnectEater(self, eaterAlias):
         if not self.medium:
@@ -625,7 +625,7 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         self.debug('FeedToFD(%s, %d)', feedName, fd)
 
-        # We must have a pipeline in READY or above to do this. Do a 
+        # We must have a pipeline in READY or above to do this. Do a
         # non-blocking (zero timeout) get_state.
         if not self.pipeline or self.pipeline.get_state(0)[1] == gst.STATE_NULL:
             self.warning('told to feed %s to fd %d, but pipeline not '
@@ -680,14 +680,14 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('Unknown eater alias: %s', eaterAlias)
             os.close(fd)
             return
-        
+
         eater = self.eaters[eaterAlias]
         element = self.get_element(eater.elementName)
         if not element:
             self.warning('Eater element %s not found', eater.elementName)
             os.close(fd)
             return
- 
+
         # fdsrc only switches to the new fd in ready or below
         (result, current, pending) = element.get_state(0L)
         pipeline_playing = current not in [gst.STATE_NULL, gst.STATE_READY]
@@ -698,11 +698,11 @@ class FeedComponent(basecomponent.BaseComponent):
             # we unlink fdsrc from its peer, take it out of the pipeline
             # so we can set it to READY without having it send EOS,
             # then switch fd and put it back in.
-            # To do this safely, we first block fdsrc:src, then let the 
+            # To do this safely, we first block fdsrc:src, then let the
             # component do any neccesary unlocking (needed for multi-input
             # elements)
             srcpad = element.get_pad('src')
-            
+
             def _block_cb(pad, blocked):
                 pass
             srcpad.set_blocked_async(True, _block_cb)

@@ -16,7 +16,7 @@ def data_get_cb(data):
     loader = gtk.gdk.PixbufLoader('jpeg')
     loader.write(data)
     loader.close()
-    
+
     pixbuf = loader.get_pixbuf()
     image.set_from_pixbuf(pixbuf)
 
@@ -31,7 +31,7 @@ def readsome(f):
         data_get_cb(d)
         d = ''
         return True
-        
+
     d += data
     return True
 

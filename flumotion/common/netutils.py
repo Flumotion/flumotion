@@ -31,9 +31,9 @@ import re
 
 from flumotion.common import avltree
 
-# Thanks to Paul Cannon, see 
+# Thanks to Paul Cannon, see
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439093
-# 
+#
 # WARNING: Horribly linux-specific. Horribly IPv4 specific. Also, just horrible.
 
 def find_all_interface_names():
@@ -225,4 +225,3 @@ class RoutingTable(object):
                 yield route
         # Yield the default route
         yield None
-

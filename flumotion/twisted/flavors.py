@@ -44,7 +44,7 @@ class IStateListener(Interface):
         @type  key:    string
         @param key:    the key being set
         @param value:  the value the key is being set to
-        
+
         The given key on the given object has been set to the given value.
         """
 
@@ -141,7 +141,7 @@ class StateCacheable(pb.Cacheable):
         self._dict[key] = value
         list = [o.callRemote('set', key, value) for o in self._observers]
         return defer.DeferredList(list)
-        
+
     def append(self, key, value):
         """
         Append the given object to the given list.
@@ -153,7 +153,7 @@ class StateCacheable(pb.Cacheable):
         self._dict[key].append(value)
         list = [o.callRemote('append', key, value) for o in self._observers]
         return defer.DeferredList(list)
- 
+
     def remove(self, key, value):
         """
         Remove the given object from the given list.
@@ -170,7 +170,7 @@ class StateCacheable(pb.Cacheable):
         list = [o.callRemote('remove', key, value) for o in self._observers]
         dl = defer.DeferredList(list)
         return dl
- 
+
     def setitem(self, key, subkey, value):
         """
         Set a value in the given dict.
@@ -183,7 +183,7 @@ class StateCacheable(pb.Cacheable):
         list = [o.callRemote('setitem', key, subkey, value)
                 for o in self._observers]
         return defer.DeferredList(list)
- 
+
     def delitem(self, key, subkey):
         """
         Removes an element from the given dict. Note that the key refers
@@ -202,7 +202,7 @@ class StateCacheable(pb.Cacheable):
                 self._observers]
         dl = defer.DeferredList(list)
         return dl
- 
+
     # pb.Cacheable methods
     def getStateToCacheAndObserveFor(self, perspective, observer):
         self._observers.append(observer)
@@ -326,7 +326,7 @@ class StateRemoteCache(pb.RemoteCache):
     # pb.RemoteCache methods
     def setCopyableState(self, dict):
         self._dict = dict
-        
+
     def _notifyListeners(self, index, *args):
         # notify our local listeners; compute set of procs first, so as
         # to allow the listeners set to change during the calls
@@ -340,7 +340,7 @@ class StateRemoteCache(pb.RemoteCache):
                     log.warning("stateremotecache",
                                 'Exception in StateCache handler: %s',
                                 log.getExceptionMessage(e))
-        
+
     def observe_set(self, key, value):
         self._dict[key] = value
         # if we also subclass from Cacheable, then we're a proxy, so proxy

@@ -77,7 +77,7 @@ def _readConfig(confXml, options):
         and not os.environ.has_key('FLU_DEBUG'):
         options.debug = cfg['debug']
     return cfg
-    
+
 def main(args):
     parser = _createParser()
     log.debug('rrdmon', 'Parsing arguments (%r)' % ', '.join(args))
@@ -97,7 +97,7 @@ def main(args):
 
     if options.verbose:
         log.setFluDebug("*:3")
- 
+
     # apply the command-line debug level if is given through --verbose or -d
     if options.debug:
         log.setFluDebug(options.debug)

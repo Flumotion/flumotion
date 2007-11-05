@@ -55,7 +55,7 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         if factory_name == 'v4lsrc':
             factory_name += ' autoprobe=false autoprobe-fps=false copy-mode=1'
         # v4l2src automatically copies
-        
+
         # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
         # hack in 0.9 to work around, not in 0.8
         # correct solution would be to find the colorspaces, see halogen

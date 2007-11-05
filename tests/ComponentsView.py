@@ -44,7 +44,7 @@ class TestComponentsView:
     def _createComponent(self, dict):
         mstate = planet.ManagerComponentState()
         for key in dict.keys():
-            mstate.set(key, dict[key]) 
+            mstate.set(key, dict[key])
         astate = jelly.unjelly(jelly.jelly(mstate))
         return astate
 

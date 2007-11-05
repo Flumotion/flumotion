@@ -67,19 +67,19 @@ class BundledFile:
 
         @rtype: boolean
         """
-        
+
         # if it wasn't zipped yet, it needs zipping, so we pretend it
         # was changed
         # FIXME: move this out here
         if not self.zipped:
             return True
-        
+
         timestamp = self.timestamp()
         # if file still has an old timestamp, it hasn't changed
         if timestamp <= self._last_timestamp:
             return False
         self._last_timestamp = timestamp
-            
+
         # if the md5sum has changed, it has changed
         md5sum = self.md5sum()
         if self._last_md5sum != md5sum:
@@ -87,7 +87,7 @@ class BundledFile:
             return True
 
         return False
-     
+
 class Bundle:
     """
     I am a bundle of files, represented by a zip file and md5sum.
@@ -109,7 +109,7 @@ class Bundle:
         Get the bundle's zip data.
         """
         return self.zip
-        
+
 class Unbundler:
     """
     I unbundle bundles by unpacking them in the given directory
@@ -165,7 +165,7 @@ class Unbundler:
             handle.close()
             os.rename(tempname, path)
         return dir
-        
+
 class Bundler:
     """
     I bundle files into a bundle so they can be cached remotely easily.
@@ -177,11 +177,11 @@ class Bundler:
         self._files = {} # dictionary of BundledFile's indexed on path
         self.name = name
         self._bundle = Bundle(name)
-        
+
     def add(self, source, destination = None):
         """
         Add files to the bundle.
-        
+
         @param source: the path to the file to add to the bundle.
         @param destination: a relative path to store this file in in the bundle.
         If unspecified, this will be stored in the top level.
@@ -192,7 +192,7 @@ class Bundler:
             destination = os.path.split(source)[1]
         self._files[source] = BundledFile(source, destination)
         return destination
-                
+
     def bundle(self):
         """
         Bundle the files registered with the bundler.
@@ -209,12 +209,12 @@ class Bundler:
         for file in self._files.values():
             if file.hasChanged():
                 update = True
-           
+
         if update:
             self._bundle.setZip(self._buildzip())
 
         return self._bundle
-            
+
     # build the zip file containing the files registered in the bundle
     # and return the zip file data
     def _buildzip(self):
@@ -224,7 +224,7 @@ class Bundler:
             bf = self._files[path]
             self._files[path].zipped = True
             zip.write(bf.source, bf.destination)
-        zip.close()    
+        zip.close()
         data = filelike.getvalue()
         filelike.close()
         return data
@@ -238,16 +238,16 @@ class BundlerBasket:
         Create a new bundler basket.
         """
         self._bundlers = {} # bundler name -> bundle
-        
+
         self._files = {}        # filename          -> bundle name
         self._imports = {}      # import statements -> bundle name
 
         self._graph = dag.DAG()
-        
+
     def add(self, bundleName, source, destination = None):
         """
         Add files to the bundler basket for the given bundle.
-        
+
         @param bundleName: the name of the bundle this file is a part of
         @param source: the path to the file to add to the bundle
         @param destination: a relative path to store this file in in the bundle.
@@ -277,7 +277,7 @@ class BundlerBasket:
         if package:
             if package.endswith('__init__'):
                 package = os.path.split(package)[0]
-                
+
             package = ".".join(package.split('/')) # win32 fixme
             if self._imports.has_key(package):
                 raise Exception("Bundler %s already has import %s" % (

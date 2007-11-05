@@ -61,7 +61,7 @@ class Initial(wizard.WizardStep):
             if radio_buttons[i].get_active():
                 return radio_buttons[i].get_name()
         raise AssertionError
-    
+
     def setup(self, state, available_pages):
         # the group of radio buttons is named after the first check button
         radio_buttons = self.load_connection.get_group()
@@ -211,7 +211,7 @@ This mode is only useful for testing Flumotion.
         def pulse():
             self.progressbar_starting.pulse()
             return True
-    
+
         self._timeout_id = gobject.timeout_add(200, pulse)
 
         import tempfile

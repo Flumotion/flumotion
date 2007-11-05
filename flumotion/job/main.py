@@ -34,7 +34,7 @@ def main(args):
     parser.add_option('', '--version',
                       action="store_true", dest="version",
                       help="show version information")
-    
+
     log.debug('job', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
@@ -49,7 +49,7 @@ def main(args):
             args)
     avatarId = args[1]
     socket = args[2]
-        
+
     # log our standardized starting marker
     log.info('job', "Starting job '%s'" % avatarId)
 
@@ -82,9 +82,9 @@ def main(args):
             print ('Profiling requested, but statprof is not available (%s)'
                    % e)
 
-    reactor.addSystemEventTrigger('before', 'shutdown', 
+    reactor.addSystemEventTrigger('before', 'shutdown',
         job_factory.medium.shutdownHandler)
-    
+
     # log our standardized started marker
     log.info('job', "Started job '%s'" % avatarId)
 

@@ -37,7 +37,7 @@ _indent = ''
 def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
                 write=None):
     global _tracing, _indent
-    
+
     if func_filter:
         func_filter = re.compile(func_filter)
 
@@ -47,10 +47,10 @@ def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
     if not write:
         def write(indent, str, *args):
             print (indent + str) % args
-            
+
     def do_trace(frame, event, arg):
         global _tracing, _indent
-        
+
         if not _tracing:
             print '[tracing stopped]'
             return None
@@ -131,10 +131,10 @@ class UncollectableMonitor(object):
         # set this if you want python to print out when uncollectable
         # objects are detected; will print out all objects in the cycle,
         # not just the one(s) that caused the cycle to be uncollectable
-        # 
+        #
         # gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_INSTANCES |
         # gc.DEBUG_OBJECTS)
-        
+
         from twisted.internet import reactor
 
         def sample():
@@ -144,7 +144,7 @@ class UncollectableMonitor(object):
                     known[o] = True
                     self.uncollectable(o)
             reactor.callLater(period, sample)
-            
+
         reactor.callLater(period, sample)
 
     def uncollectable(self, obj):
@@ -198,7 +198,7 @@ class AllocMonitor(object):
 
             self.objset = objset
             reactor.callLater(self.period, sample)
-            
+
         reactor.callLater(self.period, sample)
 
     def analyze(self, old, new):
@@ -275,11 +275,11 @@ class AllocMonitor(object):
 
     def allocPrint(self, allocator, directAllocs):
         allocStack = self._allocStack(allocator, [])
-        
+
         print '\nAlloc by ' + self._wrapperRepr(allocStack.pop(0))
         while allocStack:
             print '  referenced by ' + self._wrapperRepr(allocStack.pop(0))
-        
+
         print "%d new %s:" % (len(directAllocs),
                               len(directAllocs) == 1 and "object" or "objects")
         for wrap in directAllocs:

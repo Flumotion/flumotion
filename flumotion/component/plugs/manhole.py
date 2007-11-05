@@ -72,9 +72,9 @@ class ManagerManholePlug(lifecycle.ManagerLifecycle):
             else:
                 self.port = openAnonymousTelnetManhole(self.namespace,
                                                        self.requestedPortNum)
-            
+
         return self.port.getHost().port
-        
+
     def closeManhole(self):
         if self.port:
             ret = self.port.loseConnection()

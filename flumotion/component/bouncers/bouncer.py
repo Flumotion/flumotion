@@ -141,7 +141,7 @@ class BouncerMedium(component.BaseComponentMedium):
 class Bouncer(component.BaseComponent):
     """
     I am the base class for all bouncers.
-    
+
     @cvar keycardClasses: tuple of all classes of keycards this bouncer can
                           authenticate, in order of preference
     @type keycardClasses: tuple of L{flumotion.common.keycards.Keycard}
@@ -164,13 +164,13 @@ class Bouncer(component.BaseComponent):
                                       self.KEYCARD_EXPIRE_INTERVAL,
                                       start=False)
         self.enabled = True
-        
+
     def setDomain(self, name):
         self.domain = name
 
     def getDomain(self):
         return self.domain
-    
+
     def typeAllowed(self, keycard):
         """
         Verify if the keycard is an instance of a Keycard class specified
@@ -211,7 +211,7 @@ class Bouncer(component.BaseComponent):
         else:
             self.debug("Bouncer disabled, refusing authentication")
             return None
-         
+
     def do_authenticate(self, keycard):
         """
         Must be overridden by subclasses.
@@ -226,7 +226,7 @@ class Bouncer(component.BaseComponent):
 
     def hasKeycard(self, keycard):
         return keycard in self._keycards.values()
-    
+
     def generateKeycardId(self):
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
@@ -312,7 +312,7 @@ class TrivialBouncer(Bouncer):
         keycard.state = keycards.AUTHENTICATED
 
         return keycard
-    
+
 class ChallengeResponseBouncer(Bouncer):
     """
     A base class for Challenge-Response bouncers
@@ -341,7 +341,7 @@ class ChallengeResponseBouncer(Bouncer):
         self.info('authenticated login of "%s"' % keycard.avatarId)
         self.debug('keycard %r authenticated, id %s, avatarId %s' % (
             keycard, keycard.id, keycard.avatarId))
-        
+
         return keycard
 
     def _requestAvatarIdErrback(self, failure, keycard):
@@ -351,7 +351,7 @@ class ChallengeResponseBouncer(Bouncer):
         self.removeKeycard(keycard)
         self.info('keycard %r refused, Unauthorized' % keycard)
         return None
-    
+
     def do_authenticate(self, keycard):
         # at this point we add it so there's an ID for challenge-response
         self.addKeycard(keycard)
@@ -392,5 +392,3 @@ class ChallengeResponseBouncer(Bouncer):
         d.addCallback(self._requestAvatarIdCallback, keycard)
         d.addErrback(self._requestAvatarIdErrback, keycard)
         return d
-
-

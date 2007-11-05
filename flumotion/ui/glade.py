@@ -124,7 +124,7 @@ class GladeBacked:
                 "There is already a widget called %s" % wname
 
             self.widgets[wname] = widget
-            
+
         assert self._window != None, \
             "glade file %s has no Window" % self.glade_file
 
@@ -138,7 +138,7 @@ class GladeWidget(gtk.VBox, GladeBacked):
     The Window contents will be reparented to ourselves.
     All widgets inside the Window will be available as attributes on the
     object (dashes will be replaced with underscores).
-    
+
     Example:
     class MyWidget(GladeWidget):
         glade_file = 'my_glade_file.glade'
@@ -151,7 +151,7 @@ class GladeWidget(gtk.VBox, GladeBacked):
     def __init__(self):
         GladeBacked.__init__(self)
         gtk.VBox.__init__(self)
-            
+
         for name, widget in self.widgets.items():
             # translate - to _ so we can access them as attributes
             if name.find('-') > -1:
@@ -232,7 +232,7 @@ class GladeWindow(gobject.GObject, GladeBacked):
                  attr, widget_name, signal)
         proc = lambda *x: getattr(self, attr)()
         return self.widgets[widget_name].connect(signal, proc)
-        
+
     # somewhat experimental decorator
     # this is only used by flowtester
     # FIXME: if this wants to stay a public method, it should be commented

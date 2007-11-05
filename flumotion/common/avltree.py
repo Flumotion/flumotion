@@ -104,7 +104,7 @@ def _balance(hdiff, l, v, r, b):
                 hdiff += height(new) - height(old)
             else:
                 # we know that for insertion we don't increase in height
-                hdiff = 0 
+                hdiff = 0
 
             return hdiff, new
     elif b > 1:
@@ -146,7 +146,7 @@ def _balance(hdiff, l, v, r, b):
                 hdiff += height(new) - height(old)
             else:
                 # we know that for insertion we don't increase in height
-                hdiff = 0 
+                hdiff = 0
             return hdiff, new
     else:
         return hdiff, node(l, v, r, b)
@@ -189,7 +189,7 @@ def delete(tree, value):
                     # overall height only changes if left was taller before
                     hdiff = 0
                 b += 1
-            
+
             return (minv,) + _balance(hdiff, newl, v, r, b)
 
     if tree is None:
@@ -228,7 +228,7 @@ def delete(tree, value):
                         hdiff = 0
                     b -= 1
                 return _balance(hdiff, l, newv, newr, b)
-                    
+
 def lookup(tree, value):
     """Look up a node in an AVL tree. Returns a node tuple or False if
     the value was not found."""
@@ -242,7 +242,7 @@ def lookup(tree, value):
             return lookup(r, v)
         else:
             return tree
-            
+
 def iterate(tree):
     """Iterate over an AVL tree, starting with the lowest-ordered
     value."""

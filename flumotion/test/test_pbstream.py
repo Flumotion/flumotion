@@ -206,7 +206,7 @@ class Dispatcher(log.Loggable):
 
         reactor.callLater(0, avatar.attached, mind)
         return (pb.IPerspective, avatar, avatar.detached)
-    
+
 class ClientAvatar(pb.Avatar, log.Loggable):
     logCategory = "clientavatar"
     # server-side object for client handling

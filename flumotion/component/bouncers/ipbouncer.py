@@ -62,7 +62,7 @@ class IPBouncer(bouncer.Bouncer):
                     raise errors.ComponentSetupHandledError()
 
         return defer.succeed(None)
-   
+
     def do_authenticate(self, keycard):
         ip = keycard.getData()['address']
         self.debug('authenticating keycard from requester %s', ip)

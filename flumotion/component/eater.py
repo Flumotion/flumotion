@@ -49,7 +49,7 @@ class Eater:
         self.uiState.addKey('eaterName')
         self.uiState.set('eaterName', eaterName)
         # dict for the current connection
-        connectionDict = { 
+        connectionDict = {
             "feedId":                None,
             "timeTimestampDiscont":  None,
             "timestampTimestampDiscont":  0.0,  # ts of buffer after discont,
@@ -152,7 +152,7 @@ class Eater:
         uiState.setitem('connection', 'timeTimestampDiscont', time.time())
         uiState.setitem('connection', 'timestampTimestampDiscont', timestamp)
         uiState.setitem('connection', 'lastTimestampDiscont', seconds)
-        uiState.setitem('connection', 'totalTimestampDiscont', 
+        uiState.setitem('connection', 'totalTimestampDiscont',
             c.get('totalTimestampDiscont', 0) + seconds)
         uiState.set('totalTimestampDiscont',
             uiState.get('totalTimestampDiscont', 0) + seconds)
@@ -173,7 +173,7 @@ class Eater:
         uiState.setitem('connection', 'timeOffsetDiscont', time.time())
         uiState.setitem('connection', 'offsetOffsetDiscont', offset)
         uiState.setitem('connection', 'lastOffsetDiscont', units)
-        uiState.setitem('connection', 'totalOffsetDiscont', 
+        uiState.setitem('connection', 'totalOffsetDiscont',
             c.get('totalOffsetDiscont', 0) + units)
         uiState.set('totalOffsetDiscont',
             uiState.get('totalOffsetDiscont', 0) + units)

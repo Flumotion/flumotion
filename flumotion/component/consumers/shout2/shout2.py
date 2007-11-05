@@ -45,6 +45,6 @@ class Shout2Consumer(feedcomponent.ParseLaunchComponent):
         def _connection_problem(self, error):
             # apparently error is an int
             self.warning('Connection problem: %s', error)
-        
+
         element = pipeline.get_by_name('shout2-streamer')
         element.connect('connection-problem', _connection_problem)

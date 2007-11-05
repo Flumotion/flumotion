@@ -71,7 +71,7 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
     I represent a serializable translatable gettext msg.
     """
     domain = None
-    
+
 # Taken from twisted.python.util; modified so that if compareAttributes
 # grows, but we get a message from a remote side that doesn't have one
 # of the new attributes, that we don't raise an exception
@@ -131,7 +131,7 @@ class TranslatablePlural(Translatable, FancyEqMixin):
     """
 
     compareAttributes = ["domain", "singular", "plural", "count", "args"]
-    
+
     def __init__(self, domain, format, *args):
         """
         @param domain: the text domain for translations of this message
@@ -148,7 +148,7 @@ class TranslatablePlural(Translatable, FancyEqMixin):
     def defaultMessageId(self):
         return self.singular % self.args
 pb.setUnjellyableForClass(TranslatablePlural, TranslatablePlural)
-    
+
 class Translator(log.Loggable):
     """
     I translate translatables and messages.
@@ -190,7 +190,7 @@ class Translator(log.Loggable):
                     pass
         else:
             self.debug('no locales for domain %s' % domain)
-                
+
         format = None
         if not t:
             # if no translation object found, fall back to C
@@ -280,7 +280,7 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         self.debug = debug
         self.id = id or translatable.defaultMessageId()
         self.priority = priority
-        self.timestamp = timestamp or time.time() 
+        self.timestamp = timestamp or time.time()
 
         self.add(translatable)
 
@@ -346,4 +346,3 @@ class Result(pb.Copyable, pb.RemoteCopy):
             self.failed = True
             self.value = None
 pb.setUnjellyableForClass(Result, Result)
-

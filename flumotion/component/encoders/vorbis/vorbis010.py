@@ -35,7 +35,7 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
         d = encoder.checkVorbis()
 
         d.addCallback(self._checkCallback)
-        
+
         return d
 
     def _checkCallback(self, result):

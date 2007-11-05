@@ -40,14 +40,14 @@ class FDPorterServer(Connection):
     def __init__(self, sock, protocol, addr, additionalData):
         Connection.__init__(self, sock, protocol)
         self.client = addr
-        
+
         # Inform the protocol we've made a connection.
         protocol.makeConnection(self)
 
-        # Now, we want to feed in the extra data BEFORE the reactor reads 
+        # Now, we want to feed in the extra data BEFORE the reactor reads
         # anything additional from the socket. However, if we call this in
         # the other order, and the socket gets closed (or passed to something
-        # non-twisted) after just the initial chunk, we'll be calling 
+        # non-twisted) after just the initial chunk, we'll be calling
         # startReading() on something we've already stopped reading. That won't
         # work too well... Fortunately, the reactor runs in this thread, so
         # merely adding it (with startReading()) can't cause a read to happen
@@ -66,9 +66,9 @@ class FDPorterServer(Connection):
 class PorterMedium(medium.BaseMedium):
     """
     A medium we use to talk to the porter.
-    Mostly, we use this to say what mountpoints (or perhaps, later, 
+    Mostly, we use this to say what mountpoints (or perhaps, later,
     (hostname, mountpoint) pairs?) we expect to receive requests for.
-    """ 
+    """
     def registerPath(self, path):
         return self.callRemote("registerPath", path)
 
@@ -80,7 +80,7 @@ class PorterMedium(medium.BaseMedium):
 
     def deregisterPrefix(self, prefix):
         return self.callRemote("deregisterPrefix", prefix)
-        
+
 class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     """
     A PB client factory that knows how to log into a Porter.
@@ -152,10 +152,10 @@ class HTTPPorterClientFactory(PorterClientFactory):
         deferred.addCallback(self.medium.setRemoteReference)
         for mount in self._mountPoints:
             self.debug("Registering mount point %s with porter", mount)
-            deferred.addCallback(lambda r,m: self.registerPath(m), 
+            deferred.addCallback(lambda r,m: self.registerPath(m),
                 mount)
         for mount in self._prefixes:
             self.debug("Registering mount prefix %s with porter", mount)
-            deferred.addCallback(lambda r,m: self.registerPrefix(m), 
+            deferred.addCallback(lambda r,m: self.registerPrefix(m),
                 mount)
         deferred.addCallback(self._fireDeferred)

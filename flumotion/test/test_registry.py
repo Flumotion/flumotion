@@ -33,12 +33,12 @@ class TestRegistry(unittest.TestCase):
     def setUp(self):
         self.reg = registry.ComponentRegistry()
         self.reg.clean()
-        
+
     def testDefault(self):
         self.failUnless(hasattr(registry, 'getRegistry'))
         reg = registry.getRegistry()
         self.failUnless(isinstance(reg, registry.ComponentRegistry))
-        
+
     def testIsTrue(self):
         self.failUnless(common.strToBool('True'))
         self.failUnless(common.strToBool('true'))
@@ -54,14 +54,14 @@ class TestRegistry(unittest.TestCase):
         mtime = registry._getMTime(__file__)
         self.failUnless(mtime)
         self.failUnless(isinstance(mtime, int))
-        
+
     def testParseBasic(self):
         self.failUnless(self.reg.isEmpty())
         self.reg.addFromString('<root></root>')
         self.failUnless(self.reg.isEmpty())
         self.reg.addFromString('<registry><components></components></registry>')
         self.failUnless(self.reg.isEmpty())
-        
+
     def testParseComponents(self):
         self.failUnless(self.reg.isEmpty())
         self.reg.addFromString("""
@@ -75,7 +75,7 @@ class TestRegistry(unittest.TestCase):
 </registry>""")
 
         self.failIf(self.reg.isEmpty())
-        
+
         self.failUnless(self.reg.hasComponent('bar'))
         comp1 = self.reg.getComponent('bar')
         self.failUnless(isinstance(comp1, registry.RegistryEntryComponent))
@@ -89,7 +89,7 @@ class TestRegistry(unittest.TestCase):
         self.assertEquals(len(comps), 2)
         self.failUnless(comp1 in comps)
         self.failUnless(comp2 in comps)
-        
+
     def testParseComponentProperties(self):
         self.failUnless(self.reg.isEmpty())
         self.reg.addFromString("""
@@ -230,8 +230,8 @@ class TestRegistry(unittest.TestCase):
     <component type="bar"></component>
   </components>
 </registry>"""
-        reg.addFromString(xml) 
-       
+        reg.addFromString(xml)
+
     def testAddXmlParseError(self):
         reg = registry.ComponentRegistry()
         xml = """
@@ -261,7 +261,7 @@ class TestRegistry(unittest.TestCase):
             self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
                 i + 1, d, t))
 
-        
+
     # addFromString does not parse <directory> toplevel entries since they
     # should not be in partial registry files
     def testDump(self):
@@ -512,7 +512,7 @@ class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
-        self.entry = rec('filename', 'type', 'source', 'description', 'base', 
+        self.entry = rec('filename', 'type', 'source', 'description', 'base',
                          ['prop'], [self.file], {}, [], [], False, 100, [])
         self.empty_entry = rec('filename', 'type', 'source', 'description', 'base',
                                ['prop'], [], {}, [], [], True, 130, [])
@@ -527,7 +527,7 @@ class TestComponentEntry(unittest.TestCase):
         self.assertEquals(self.entry.getGUIEntry(), 'gui-filename')
         self.assertEquals(self.empty_entry.getGUIEntry(), None)
         self.assertEquals(self.multiple_entry.getGUIEntry(), None)
-        self.assertEquals(self.empty_entry.getNeedsSynchronization(), True) 
+        self.assertEquals(self.empty_entry.getNeedsSynchronization(), True)
         self.assertEquals(self.empty_entry.getClockPriority(), 130)
         self.assertEquals(self.multiple_entry.getNeedsSynchronization(), False)
         self.assertEquals(self.multiple_entry.getClockPriority(), 100)
@@ -541,7 +541,7 @@ def rmdir(root):
         else:
             os.remove(filename)
     os.rmdir(root)
-            
+
 class TestFindComponents(unittest.TestCase):
     def setUp(self):
         self.reg = registry.ComponentRegistry()
@@ -554,7 +554,7 @@ class TestFindComponents(unittest.TestCase):
 
         self.tempdir = tempfile.mkdtemp()
         self.cwd = os.getcwd()
-        os.chdir(self.tempdir) 
+        os.chdir(self.tempdir)
         os.makedirs('subdir')
         os.makedirs('subdir/foo')
         os.makedirs('subdir/bar')
@@ -581,7 +581,7 @@ class TestFindComponents(unittest.TestCase):
     </component>
   </components>
 </registry>""" % name)
-    
+
     def testSimple(self):
         self.reg.addRegistryPath('.', prefix='subdir')
         components = self.reg.getComponents()

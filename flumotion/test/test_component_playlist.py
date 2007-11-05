@@ -120,17 +120,17 @@ class TestPlaylist(unittest.TestCase):
         self.checkItems(1)
 
     def testAddOverlappingItems(self):
-        first = self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, 
+        first = self.playlist.addItem('id1', 0, "file:///testuri", 0, 100,
             True, True)
         self.assertEquals(first.duration, 100)
-        second = self.playlist.addItem('id1', 50, "file:///testuri", 0, 100, 
+        second = self.playlist.addItem('id1', 50, "file:///testuri", 0, 100,
             True, True)
 
         self.checkItems(2)
         # First one should have had duration adjusted
         self.assertEquals(first.duration, 50)
 
-        third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150, 
+        third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150,
             True, True)
         # Second should have been deleted
         self.assert_(second not in self.playlist._itemsById['id1'])
@@ -138,10 +138,10 @@ class TestPlaylist(unittest.TestCase):
         self.assertEquals(first.duration, 25)
 
     def testAddOverlappingItemsReverse(self):
-        first = self.playlist.addItem('id1', 50, "file:///testuri", 0, 100, 
+        first = self.playlist.addItem('id1', 50, "file:///testuri", 0, 100,
             True, True)
         self.assertEquals(first.duration, 100)
-        second = self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, 
+        second = self.playlist.addItem('id1', 0, "file:///testuri", 0, 100,
             True, True)
 
         self.checkItems(2)
@@ -149,7 +149,7 @@ class TestPlaylist(unittest.TestCase):
         self.assertEquals(first.timestamp, 100)
         self.assertEquals(first.duration, 50)
 
-        third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150, 
+        third = self.playlist.addItem('id1', 25, "file:///testuri", 0, 150,
             True, True)
         # First should have been deleted now.
         self.assert_(first not in self.playlist._itemsById['id1'])

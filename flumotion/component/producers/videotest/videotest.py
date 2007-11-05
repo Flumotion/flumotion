@@ -59,7 +59,7 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         if format == 'video/x-raw-rgb':
             struct['red_mask'] = 0xff00
         caps = gst.Caps(struct)
-        
+
         is_live = 'is-live=true'
 
         overlay = ""
@@ -69,7 +69,7 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
 
         return "videotestsrc %s name=source ! " % is_live + overlay + \
             "identity name=identity silent=TRUE ! %s" % caps
-        
+
     # Set properties
     def configure_pipeline(self, pipeline, properties):
         def notify_pattern(obj, pspec):

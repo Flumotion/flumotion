@@ -38,7 +38,7 @@ class FakeTransport:
     def loseConnection(self):
         self.connected = False
         self.protocol.connectionLost(None)
-        
+
     def sendFileDescriptor(self, fd, data):
         pass
 
@@ -57,7 +57,7 @@ class FakePorter:
             return FakeAvatar()
 
         return None
-    
+
 class FakeBroker:
     def __init__(self):
         self.transport = FakeTransport(self)
@@ -168,5 +168,3 @@ class TestHTTPPorterProtocolParser(unittest.TestCase):
 
         result = self.pp.parseLine('GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/')
-    
-

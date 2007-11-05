@@ -30,7 +30,7 @@ import os
 import socket
 import struct
 
-# Heavily based on 
+# Heavily based on
 # http://twistedmatrix.com/trac/browser/sandbox/exarkun/copyover/server.py
 # and client.py
 # Thanks for the inspiration!
@@ -69,15 +69,15 @@ class FDClient(unix.Client): #, log.Loggable):
 
             if len(fds) > 0:
                 # Look for our magic cookie in (possibly) the midst of other
-                # data. Pass surrounding chunks, if any, onto dataReceived(), 
-                # which (undocumentedly) must return None unless a failure 
+                # data. Pass surrounding chunks, if any, onto dataReceived(),
+                # which (undocumentedly) must return None unless a failure
                 # occurred.
-                # Pass the actual FDs and their message to 
+                # Pass the actual FDs and their message to
                 # fileDescriptorsReceived()
                 offset = message.find(MAGIC_SIGNATURE)
                 if offset < 0:
                     # Old servers did not send this; be hopeful that this
-                    # doesn't have bits of other protocol (i.e. PB) mixed up 
+                    # doesn't have bits of other protocol (i.e. PB) mixed up
                     # in it.
                     return self.protocol.fileDescriptorsReceived(fds, message)
                 elif offset > 0:
@@ -87,7 +87,7 @@ class FDClient(unix.Client): #, log.Loggable):
 
                 msglen = struct.unpack("@I", message[offset+16:offset+20])[0]
                 offset += 20
-                ret = self.protocol.fileDescriptorsReceived(fds, 
+                ret = self.protocol.fileDescriptorsReceived(fds,
                     message[offset:offset+msglen])
                 if ret:
                     return ret
@@ -107,7 +107,7 @@ class FDPassingBroker(pb.Broker, log.Loggable):
     """
     A pb.Broker subclass that handles FDs being passed to it (with associated
     data) over the same connection as the normal PB data stream.
-    When an FD is seen, it creates new protocol objects for them from the 
+    When an FD is seen, it creates new protocol objects for them from the
     childFactory attribute.
     """
     # FIXME: looks like we can only use our own subclasses that take
@@ -128,14 +128,14 @@ class FDPassingBroker(pb.Broker, log.Loggable):
         if len(fds) == 1:
             fd = fds[0]
 
-            # Note that we hardcode IPv4 here! 
+            # Note that we hardcode IPv4 here!
             sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
 
             self.debug("Received FD %d->%d" % (fd, sock.fileno()))
 
-            # Undocumentedly (other than a comment in 
-            # Python/Modules/socketmodule.c), socket.fromfd() calls dup() on 
-            # the passed FD before it actually wraps it in a socket object. 
+            # Undocumentedly (other than a comment in
+            # Python/Modules/socketmodule.c), socket.fromfd() calls dup() on
+            # the passed FD before it actually wraps it in a socket object.
             # So, we need to close the FD that we originally had...
             os.close(fd)
 
@@ -145,9 +145,9 @@ class FDPassingBroker(pb.Broker, log.Loggable):
                 self.info("Socket disconnected before being passed to client")
                 sock.close()
                 return
-           
+
             # Based on bits in tcp.Port.doRead()
-            addr = address._ServerFactoryIPv4Address('TCP', 
+            addr = address._ServerFactoryIPv4Address('TCP',
                 peeraddr[0], peeraddr[1])
             protocol = self.childFactory.buildProtocol(addr)
 
@@ -173,11 +173,10 @@ class _SocketMaybeCloser(tcp._SocketCloser):
 
 class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
     """
-    A subclass of tcp.Server that permits passing the FDs used to other 
+    A subclass of tcp.Server that permits passing the FDs used to other
     processes (by just calling close(2) rather than shutdown(2) on them)
     """
     pass
 
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
-

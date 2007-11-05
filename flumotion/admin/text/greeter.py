@@ -34,7 +34,7 @@ import curses
 
 class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     implements(flavors.IStateListener)
-    
+
     logCategory = 'admintextgreeter'
 
     def __init__(self, stdscr):
@@ -93,7 +93,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 self.show()
             elif c == curses.KEY_UP:
                 if self.current_connection == 0:
-                    self.current_connection = self.displayed_connections 
+                    self.current_connection = self.displayed_connections
                 else:
                     self.current_connection = self.current_connection - 1
                 self.show()
@@ -126,7 +126,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         port = int(self.inputs[2])
                     except ValueError:
                         port = 7531
-                    info = fconnection.PBConnectionInfo(self.inputs[1], port, 
+                    info = fconnection.PBConnectionInfo(self.inputs[1], port,
                       self.inputs[3] == 'Yes', fpb.Authenticator(
                         username=self.inputs[4], password=self.inputs[5]))
 

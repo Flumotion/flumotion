@@ -33,7 +33,7 @@ class TestClient(pb.Referenceable):
 
     type = "client" # override in subclass
     remoteRoot = None # RemoteReference to the server-side root
-    
+
     def run(self, port):
         """
         Start the client by connecting to the server on the given port.
@@ -143,7 +143,7 @@ class TestPB(log.Loggable):
         d = self.client.remoteRoot.callRemote('receive', object)
         d.addCallback(lambda r: self.manager.root.object)
         return d
-        
+
     def receive(self, object):
         """
         Receive the object from server to client.
@@ -153,5 +153,3 @@ class TestPB(log.Loggable):
         d = self.manager.root.clientReference.callRemote('receive', object)
         d.addCallback(lambda r: self.client.object)
         return d
-        
-     

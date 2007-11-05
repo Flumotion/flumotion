@@ -34,7 +34,7 @@ def useGtk2Reactor():
         return False
     else:
         return True
-        
+
 if useGtk2Reactor():
     log.info('check', 'using gtk2 reactor')
     from twisted.internet import gtk2reactor
@@ -47,7 +47,7 @@ log.logTwisted()
 
 # FIXME: boot.py does this, but enabling this borks
 # test_common_package.py. I have no idea what that code does, either.
-# 
+#
 # # installing the reactor could override our packager's import hooks ...
 # from twisted.internet import reactor
 # # ... so we install them again here to be safe
@@ -60,7 +60,7 @@ boot.init_gobject()
 boot.init_gst()
 
 # fdpass is a built module,  so it lives in builddir, while the package
-# __init__ is in srcdir.  Append to its __path__ to make the tests work 
+# __init__ is in srcdir.  Append to its __path__ to make the tests work
 i = os.getcwd().find('_build')
 if i > -1:
     top_builddir = os.path.join(os.getcwd()[:i], '_build')
@@ -112,7 +112,7 @@ class TestCaseWithManager(unittest.TestCase):
         s = server.Server(self.vishnu)
         if conf.transport == "ssl":
             p = s.startSSL(conf.host, conf.port, conf.certificate,
-                           configure.configdir) 
+                           configure.configdir)
         elif conf.transport == "tcp":
             p = s.startTCP(conf.host, conf.port)
         self.tport = p
@@ -122,7 +122,7 @@ class TestCaseWithManager(unittest.TestCase):
                                         pb.Authenticator(username='user',
                                                          password='test'))
         self.connectionInfo = i
-        
+
     def tearDown(self):
         from flumotion.common import errors
 

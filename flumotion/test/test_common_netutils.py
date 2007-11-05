@@ -45,7 +45,7 @@ class TestIpv4Parse(unittest.TestCase):
         self.assertParseInvariant('10.0.10.0')
         self.assertParseInvariant('192.168.10.1')
         self.assertParseInvariant('195.10.6.237')
-        
+
     def testIpv4ParseString(self):
         self.assertEquals(ipv4StringToInt('0.0.0.1'), 1<<0)
         self.assertEquals(ipv4StringToInt('0.0.1.0'), 1<<8)
@@ -66,7 +66,7 @@ class TestRoutingTable(unittest.TestCase):
         net.removeSubnet('foo', '192.168.0.0', 24)
         net.removeSubnet('foo', '192.168.1.0', 24)
         self.assertEquals(len(net), 0)
-        
+
     def testBasicRouting(self):
         net = RoutingTable()
 
@@ -74,7 +74,7 @@ class TestRoutingTable(unittest.TestCase):
             self.assertEquals(net.route(ip), route)
 
         ar('192.168.1.0', None)
-        
+
         net.addSubnet('foo', '192.168.1.0', 24)
 
         ar('192.168.1.0', 'foo')
@@ -132,7 +132,7 @@ class TestRoutingTable(unittest.TestCase):
         self.assertRaises(ValueError, RoutingTable.fromFile, f,
                           **kwargs)
         f.close()
-        
+
     def assertParseEquals(self, string, routes, **kwargs):
         f = StringIO.StringIO(string)
         net = RoutingTable.fromFile(f, **kwargs)
@@ -143,7 +143,7 @@ class TestRoutingTable(unittest.TestCase):
             expectednet.addSubnet(*route)
         self.assertEquals(list(iter(net)),
                           list(iter(expectednet)))
-        
+
     def testParseFromFile(self):
         self.assertParseFailure('bad line')
         self.assertParseFailure('# comment\n'
@@ -187,7 +187,7 @@ class TestRoutingTable(unittest.TestCase):
         f.close()
 
         self.assertEquals(net.getRouteNames(), routeNames)
-        
+
     def testRouteNamesOrder(self):
         self.assertRouteNamesOrder('#comment\n'
                                    '  \n'

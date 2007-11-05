@@ -21,7 +21,7 @@
 
 def get_preferred_sample_rate (maxrate):
     """ Get the preferred 'standard' sample rate not exceeded maxrate"""
-    rates = [192000, 96000, 48000, 44100, 32000, 34000, 22050, 16000, 12000, 
+    rates = [192000, 96000, 48000, 44100, 32000, 34000, 22050, 16000, 12000,
              11025, 8000]
 
     for rate in rates:
@@ -55,7 +55,7 @@ def get_max_sample_rate(bitrate, channels):
             retval = 9000
         else:
             retval = -1
-        
+
     elif channels == 1:
         if bitrate >= 32000:
             retval = 50000
@@ -69,5 +69,5 @@ def get_max_sample_rate(bitrate, channels):
             retval = 9000
         else:
             retval = -1
-    
+
     return retval

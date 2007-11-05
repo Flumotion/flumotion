@@ -34,7 +34,7 @@ if gobject.pygtk_version < (2,3,96):
     raise SystemExit
 gobject.threads_init()
 
-# This can't be removed, 
+# This can't be removed,
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '..', 'flumotion', '.svn')):
     root = os.path.split(dir)[0]
@@ -64,7 +64,7 @@ def main(args):
         type="string", dest="bytes", help="Number of bytes to read")
     parser.add_option('-t', '--time', action="store",
         type="string", dest="time", help="Time to live in seconds")
-    
+
     options, args = parser.parse_args(args)
     try:
         options.url = args[1]

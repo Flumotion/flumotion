@@ -154,7 +154,7 @@ class TestFunctions(unittest.TestCase):
         assertEaters('test-component-with-multiple-eater',
                      [(None, 'foo:bar')],
                      {'default': [('foo:bar', 'default')]})
-                       
+
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
         conf = ConfigXML('<planet/>')
@@ -217,7 +217,7 @@ class TestConfig(unittest.TestCase):
         conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
- 
+
     def testParseComponent(self):
         conf = ConfigXML(
              """
@@ -275,7 +275,7 @@ class TestConfig(unittest.TestCase):
         dict = component.getConfigDict()
         self.assertEquals(dict.get('name'), 'component-name', dict['name'])
         self.assertEquals(dict.get('type'), 'test-component', dict['type'])
-        
+
     def testParseComponentWithProject(self):
         conf = ConfigXML(
              """
@@ -295,7 +295,7 @@ class TestConfig(unittest.TestCase):
         conf = flow.components['component-name'].getConfigDict()
         self.assertEquals(conf['project'], 'flumotion', conf['type'])
         self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
-        
+
         # now the same, but without specifying project
         conf = ConfigXML(
              """
@@ -315,7 +315,7 @@ class TestConfig(unittest.TestCase):
         conf = flow.components['component-name'].getConfigDict()
         self.assertEquals(conf['project'], 'flumotion', conf['type'])
         self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
-        
+
     def testParseManager(self):
         conf = ManagerConfigXML(
              """
@@ -427,7 +427,7 @@ class TestConfig(unittest.TestCase):
         conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
-        
+
     def testParseFlowError(self):
         xml = """<planet>
             <flow>
@@ -490,7 +490,7 @@ class TestConfig(unittest.TestCase):
              </planet>"""
         self.assertRaises(config.ConfigError,
             ManagerConfigXML, xml)
-  
+
         xml = """<planet>
                <manager name="aname">
                  <notanode/>
@@ -498,7 +498,7 @@ class TestConfig(unittest.TestCase):
              </planet>"""
         self.assertRaises(config.ConfigError,
             ManagerConfigXML, xml)
-   
+
     def testParseProperties(self):
         planet = ConfigXML(
              """<planet><flow name="default">

@@ -64,10 +64,10 @@ class IUsernameCryptPassword(credentials.ICredentials):
     def checkCryptPassword(self, cryptPassword):
         """
         Validate these credentials against the correct crypt password.
-                                                                                
+
         @param cryptPassword: The correct, crypt password against which to
         check.
-                                                                                
+
         @return: a deferred which becomes, or a boolean indicating if the
         password matches.
         """
@@ -77,7 +77,7 @@ class UsernameCryptPasswordPlaintext:
     I take a username and a plaintext password.
     I implement IUsernameCryptPassword.
     """
-    
+
     implements(IUsernameCryptPassword)
     def __init__(self, username, password):
         self.username = username
@@ -98,7 +98,7 @@ class UsernameCryptPasswordCrypt:
     with a different salt.
     I implement IUsernameCryptPassword.
     """
-    
+
     implements(IUsernameCryptPassword)
     def __init__(self, username, cryptPassword=None):
         self.username = username
@@ -137,7 +137,7 @@ def dataToHex(data):
     for c in data:
         l.append("%02x" % ord(c))
     return "".join(l)
-        
+
 # copied from twisted.spread.pb.challenge()
 def cryptChallenge():
     """
@@ -148,11 +148,11 @@ def cryptChallenge():
         crap = crap + chr(random.randint(65,90) + x - x) # pychecker madness
     crap = md5.new(crap).digest()
     return crap
-    
+
 class UsernameCryptPasswordCryptChallenger:
     """
     I take a username.
-    
+
     Authenticator will give me a salt and challenge me.
     Requester will respond to the challenge.
     At that point I'm ready to be used by a checker.
@@ -161,7 +161,7 @@ class UsernameCryptPasswordCryptChallenger:
 
     I implement IUsernameCryptPassword.
     """
-    
+
     implements(IUsernameCryptPassword)
 
     def __init__(self, username):
@@ -223,7 +223,7 @@ class IUsernameSha256Password(credentials.ICredentials):
     def checkSha256Password(self, sha256Password):
         """
         Validate these credentials against the correct SHA-256 password.
-                                                                                
+
         @param sha256Password: The correct SHA-256 password against which to
         check.
 
@@ -236,7 +236,7 @@ class IUsernameSha256Password(credentials.ICredentials):
 class UsernameSha256PasswordCryptChallenger:
     """
     I take a username.
-    
+
     Authenticator will give me a salt and challenge me.
     Requester will respond to the challenge.
     At that point I'm ready to be used by a checker.
@@ -245,7 +245,7 @@ class UsernameSha256PasswordCryptChallenger:
 
     I implement IUsernameSha256Password.
     """
-    
+
     implements(IUsernameSha256Password)
 
     def __init__(self, username):
@@ -312,7 +312,7 @@ class HTTPDigestChallenger(log.Loggable):
         Calculate H(A1) as from specification (RFC2617) section 3.2.2, given
         the initial hash H(username:realm:passwd), hex-encoded.
 
-        This basically applies the second-level hashing for MD5-sess, if 
+        This basically applies the second-level hashing for MD5-sess, if
         required.
         """
         if self._algorithm == 'MD5':
@@ -353,10 +353,9 @@ class HTTPDigestChallenger(log.Loggable):
             m.update(ncvalue)
             m.update(':')
             m.update(cnonce)
-            m.update(':') 
+            m.update(':')
             m.update(qop) # Must be 'auth', others not supported
         m.update(':')
         m.update(HA2)
 
         return m.digest().encode('hex')
-

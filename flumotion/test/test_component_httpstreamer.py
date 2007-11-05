@@ -69,6 +69,6 @@ class TestOldProperties(unittest.TestCase):
         self.assertEquals(props['bandwidth-limit'], 10)
         self.assertEquals(props['mount-point'], '/')
         self.assertEquals(props['burst-on-connect'], True)
-   
+
 if __name__ == '__main__':
     unittest.main()

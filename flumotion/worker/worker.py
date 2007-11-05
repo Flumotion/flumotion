@@ -105,7 +105,7 @@ class WorkerBrain(log.Loggable):
 
         self.medium = medium.WorkerMedium(self)
 
-        # really should be componentJobHeaven, but this is shorter :)    
+        # really should be componentJobHeaven, but this is shorter :)
         self.jobHeaven = job.ComponentJobHeaven(self)
         # for ephemeral checks
         self.checkHeaven = job.CheckJobHeaven(self)
@@ -138,7 +138,7 @@ class WorkerBrain(log.Loggable):
 
     def listen(self):
         """
-        Start listening on FeedServer (incoming eater requests) and 
+        Start listening on FeedServer (incoming eater requests) and
         JobServer (through which we communicate with our children) ports
 
         @returns: True if we successfully listened on both ports
@@ -229,7 +229,7 @@ class WorkerBrain(log.Loggable):
 
         avatar = self.jobHeaven.avatars[componentId]
         return avatar.receiveFeed(eaterAlias, fd, feedId)
-   
+
     ### these methods called by WorkerMedium
     def getPorts(self):
         return self.ports, self.options.randomFeederports

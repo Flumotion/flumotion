@@ -49,7 +49,7 @@ class RegistryEntryComponent:
     # but that's ok here. Allow it through pychecker.
     __pychecker__ = 'maxargs=14'
 
-    def __init__(self, filename, type, 
+    def __init__(self, filename, type,
                  source, description, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority,
                  sockets):
@@ -79,7 +79,7 @@ class RegistryEntryComponent:
         self.needs_sync = needs_sync
         self.clock_priority = clock_priority
         self.sockets = sockets
-        
+
     def getProperties(self):
         """
         Get a list of all properties.
@@ -107,17 +107,17 @@ class RegistryEntryComponent:
         @type type: string
         """
         return self.entries[type]
-    
+
     def getGUIEntry(self):
         if not self.files:
             return
-        
+
         # FIXME: Handle multiple files
         if len(self.files) > 1:
             return
-        
+
         return self.files[0].getFilename()
-    
+
     def getType(self):
         return self.type
 
@@ -129,7 +129,7 @@ class RegistryEntryComponent:
 
     def getSource(self):
         return self.source
-    
+
     def getEaters(self):
         return self.eaters
 
@@ -169,7 +169,7 @@ class RegistryEntryPlug:
         self.socket = socket
         self.entry = entry
         self.properties = properties
-        
+
     def getProperties(self):
         """
         Get a list of all properties.
@@ -204,7 +204,7 @@ class RegistryEntryBundle:
 
     def __repr__(self):
         return '<Bundle name=%s>' % self.name
-    
+
     def getName(self):
         return self.name
 
@@ -213,7 +213,7 @@ class RegistryEntryBundle:
 
     def getDirectories(self):
         return self.directories
-    
+
     def getProject(self):
         return self.project
 
@@ -226,7 +226,7 @@ class RegistryEntryBundle:
 
         from flumotion.project import project
         return project.get(self.project, self.under)
-    
+
 class RegistryEntryBundleDirectory:
     "This class represents a <directory> entry in the registry"
     def __init__(self, name, files):
@@ -238,7 +238,7 @@ class RegistryEntryBundleDirectory:
 
     def getFiles(self):
         return self.files
-    
+
 class RegistryEntryBundleFilename:
     "This class represents a <filename> entry in the registry"
     def __init__(self, location, relative):
@@ -265,7 +265,7 @@ class RegistryEntryProperty:
 
     def __repr__(self):
         return '<Property name=%s>' % self.name
-    
+
     def getName(self):
         return self.name
 
@@ -274,7 +274,7 @@ class RegistryEntryProperty:
 
     def getDescription(self):
         return self.description
-    
+
     def isRequired(self):
         return self.required
 
@@ -318,13 +318,13 @@ class RegistryEntryFile:
 
     def getType(self):
         return self.type
-    
+
     def getFilename(self):
         return self.filename
 
     def isType(self, type):
         return self.type == type
-    
+
 class RegistryEntryEntry:
     "This class represents a <entry> entry in the registry"
     def __init__(self, type, location, function):
@@ -347,7 +347,7 @@ class RegistryEntryEntry:
 
     def getFunction(self):
         return self.function
-    
+
 class RegistryEntryEater:
     "This class represents a <eater> entry in the registry"
     def __init__(self, name, required=True, multiple=False):
@@ -363,7 +363,7 @@ class RegistryEntryEater:
 
     def getMultiple(self):
         return self.multiple
-    
+
 class RegistryParser(fxml.Parser):
     """
     Registry parser
@@ -377,16 +377,16 @@ class RegistryParser(fxml.Parser):
     I also have a list of all components and directories which the
     registry uses (instead of saving its own copy)
     """
-    
+
     def __init__(self):
         self.clean()
-        
+
     def clean(self):
         self._components = {}
         self._directories = {} # path -> RegistryDirectory
         self._bundles = {}
         self._plugs = {}
-        
+
     def getComponents(self):
         return self._components.values()
 
@@ -411,16 +411,16 @@ class RegistryParser(fxml.Parser):
         # <components>
         #   <component>
         # </components>
-        
+
         components = {}
         def addComponent(comp):
             components[comp.getType()] = comp
-        
+
         parsers = {'component': (self._parseComponent, addComponent)}
         self.parseFromTable(node, parsers)
 
         return components
-    
+
     def _parseComponent(self, node):
         # <component type="..." base="..." description="...">
         #   <source>
@@ -431,7 +431,7 @@ class RegistryParser(fxml.Parser):
         #   <synchronization>
         #   <sockets>
         # </component>
-        
+
         #FIXME: make sure base is in all components
         type, baseDir, description = self.parseAttributes(node,
             required=('type', ), optional=('base', 'description'))
@@ -523,7 +523,7 @@ class RegistryParser(fxml.Parser):
         #   <property>*
         #   <compound-proerty>*
         # </properties>
-        
+
         properties = {}
         def addProperty(prop):
             properties[prop.getName()] = prop
@@ -636,7 +636,7 @@ class RegistryParser(fxml.Parser):
         #   <entry>
         #   <properties>
         # </plug>
-        
+
         type, socket = self.parseAttributes(node, ('type', 'socket'))
 
         entry = fxml.Box(None)
@@ -657,7 +657,7 @@ class RegistryParser(fxml.Parser):
         # <plugs>
         #   <plug>
         # </plugs>
-        
+
         self.checkAttributes(node)
 
         plugs = {}
@@ -668,7 +668,7 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         return plugs
-    
+
     ## Component registry specific functions
     def parseRegistryFile(self, file):
         """
@@ -693,7 +693,7 @@ class RegistryParser(fxml.Parser):
         # <bundles>
         #   <bundle>
         # </bundles>
-        
+
         bundles = {}
         def addBundle(bundle):
             bundles[bundle.getName()] = bundle
@@ -702,13 +702,13 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         return bundles
-    
+
     def _parseBundle(self, node):
         # <bundle name="...">
         #   <dependencies>
         #   <directories>
         # </bundle>
-        
+
         attrs = self.parseAttributes(node, ('name',), ('project', 'under'))
         name, project, under = attrs
         project = project or 'flumotion'
@@ -738,7 +738,7 @@ class RegistryParser(fxml.Parser):
         parsers = {'dependency': (self._parseBundleDependency,
                                   dependencies.append)}
         self.parseFromTable(node, parsers)
-            
+
         return dependencies
 
     def _parseBundleDirectories(self, node):
@@ -750,16 +750,16 @@ class RegistryParser(fxml.Parser):
         parsers = {'directory': (self._parseBundleDirectory,
                                  directories.append)}
         self.parseFromTable(node, parsers)
-            
+
         return directories
 
     def _parseBundleDirectoryFilename(self, node, name):
         attrs = self.parseAttributes(node, ('location',), ('relative',))
         location, relative = attrs
-            
+
         if not relative:
             relative = os.path.join(name, location)
-                
+
         return RegistryEntryBundleFilename(location, relative)
 
     def _parseBundleDirectory(self, node):
@@ -827,16 +827,16 @@ class RegistryParser(fxml.Parser):
                 del parsers[k]
 
         self.parseFromTable(node, parsers)
-        
-    def _parseDirectories(self, node): 
+
+    def _parseDirectories(self, node):
         # <directories>
         #   <directory>
         # </directories>
-        
+
         directories = {}
         def addDirectory(d):
             directories[d.getPath()] = d
-        
+
         parsers = {'directory': (self._parseDirectory, addDirectory)}
         self.parseFromTable(node, parsers)
 
@@ -847,7 +847,7 @@ class RegistryParser(fxml.Parser):
         filename, = self.parseAttributes(node, ('filename',))
         return RegistryDirectory(filename)
 
-    
+
 # FIXME: filename -> path
 class RegistryDirectory(log.Loggable):
     """
@@ -860,7 +860,7 @@ class RegistryDirectory(log.Loggable):
         self._prefix = prefix
         scanPath = os.path.join(path, prefix)
         self._files, self._dirs = self._getFileLists(scanPath)
-        
+
     def __repr__(self):
         return "<RegistryDirectory %s>" % self._path
 
@@ -870,12 +870,12 @@ class RegistryDirectory(log.Loggable):
 
         @type  root: string
         @param root: the root directory under which to search
-        
+
         @returns: a list of .xml files, relative to the given root directory
         """
         files = []
         dirs = []
-        
+
         if os.path.exists(root):
             try:
                 directory_files = os.listdir(root)
@@ -884,7 +884,7 @@ class RegistryDirectory(log.Loggable):
                     return files, dirs
                 else:
                     raise
-                
+
             dirs.append(root)
 
             for dir in directory_files:
@@ -899,7 +899,7 @@ class RegistryDirectory(log.Loggable):
                     newFiles, newDirs = self._getFileLists(filename)
                     files.extend(newFiles)
                     dirs.extend(newDirs)
-                
+
         return files, dirs
 
     def rebuildNeeded(self, mtime):
@@ -932,7 +932,7 @@ class RegistryDirectory(log.Loggable):
 
     def getPath(self):
         return self._path
-    
+
 class RegistryWriter(log.Loggable):
     def __init__(self, components, plugs, bundles, directories):
         """
@@ -957,7 +957,7 @@ class RegistryWriter(log.Loggable):
         @type  fd: integer
         @param fd: open file descriptor to write to
         """
-        
+
         def w(i, msg):
             print >> fd, ' '*i + msg
         def e(attr):
@@ -993,7 +993,7 @@ class RegistryWriter(log.Loggable):
         for component in self.components:
             w(4, '<component type="%s" base="%s"' % (
                 component.getType(), component.getBase()))
-            w(4, '           description=%s>' 
+            w(4, '           description=%s>'
                 % (e(component.getDescription()),))
 
             w(6, '<source location="%s"/>' % component.getSource())
@@ -1038,7 +1038,7 @@ class RegistryWriter(log.Loggable):
                 w(6, '</entries>')
             w(4, '</component>')
             w(0, '')
-                
+
         w(2, '</components>')
         w(0, '')
 
@@ -1059,7 +1059,7 @@ class RegistryWriter(log.Loggable):
 
             w(4, '</plug>')
             w(0, '')
-                
+
         w(2, '</plugs>')
         w(0, '')
 
@@ -1086,7 +1086,7 @@ class RegistryWriter(log.Loggable):
                             filename.getLocation(), filename.getRelative()))
                     w(8, '</directory>')
                 w(6, '</directories>')
-                
+
             w(4, '</bundle>')
             w(0, '')
         w(2, '</bundles>')
@@ -1101,12 +1101,12 @@ class RegistryWriter(log.Loggable):
                 w(4, '<directory filename="%s"/>' % d.getPath())
             w(2, '</directories>')
             w(0, '')
-        
+
         w(0, '</registry>')
 
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
-    
+
     logCategory = 'registry'
     filename = os.path.join(configure.registrydir, 'registry.xml')
 
@@ -1127,7 +1127,7 @@ class ComponentRegistry(log.Loggable):
                 self.debug('fxml.ParserError: %s' % log.getExceptionMessage(e))
 
         self.verify()
-    
+
     def addFile(self, file):
         """
         @param file: The file to add, either as an open file object, or
@@ -1139,12 +1139,12 @@ class ComponentRegistry(log.Loggable):
                          'please remove it', file)
         self.debug('Adding file: %r', file)
         self._parser.parseRegistryFile(file)
-        
+
     def addFromString(self, string):
         f = StringIO(string)
         self.addFile(f)
         f.close()
-        
+
     def addRegistryPath(self, path, prefix='flumotion'):
         """
         Add a registry path to this registry, scanning it for registry
@@ -1172,10 +1172,10 @@ class ComponentRegistry(log.Loggable):
         files = registryPath.getFiles()
         self.debug('Found %d possible registry files' % len(files))
         map(self.addFile, files)
-        
+
         self._parser.addDirectory(registryPath)
         return True
-        
+
     # fixme: these methods inconsistenly molest and duplicate those of
     # the parser.
     def isEmpty(self):
@@ -1207,7 +1207,7 @@ class ComponentRegistry(log.Loggable):
 
     def getBundles(self):
         return self._parser._bundles.values()
-        
+
     def getDirectories(self):
         return self._parser.getDirectories()
 
@@ -1277,7 +1277,7 @@ class ComponentRegistry(log.Loggable):
     def rebuildNeeded(self):
         if not os.path.exists(self.filename):
             return True
-        
+
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
         # point to nonexistent directories
         registryPaths = sets.Set(self._getRegistryPathsFromEnviron())
@@ -1295,13 +1295,13 @@ class ComponentRegistry(log.Loggable):
                 return True
 
         return False
-    
+
     def save(self, force=False):
         if not force and not self.rebuildNeeded():
             return
-        
+
         self.info('Saving registry to %s' % self.filename)
-        
+
         # create parent directory
         dir = os.path.split(self.filename)[0]
         if not os.path.exists(dir):
@@ -1313,7 +1313,7 @@ class ComponentRegistry(log.Loggable):
                         dir)
                 else:
                     raise
-                
+
         if not os.path.isdir(dir):
             self.error('Registry directory %s is not a directory !')
         try:

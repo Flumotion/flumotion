@@ -25,6 +25,5 @@ class GDPProducer(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         host = properties['host']
         port = properties['port']
-        
-        return 'tcpclientsrc host=%s port=%d ! gdpdepay' % (host, port)
 
+        return 'tcpclientsrc host=%s port=%d ! gdpdepay' % (host, port)

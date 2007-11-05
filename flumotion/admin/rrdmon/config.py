@@ -48,7 +48,7 @@ their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.
     <manager>user:test@localhost:7531</manager>
 
     <!-- the L{flumotion.common.common.componentId} of the component we
-         will poll --> 
+         will poll -->
     <component-id>/default/http-audio-video</component-id>
 
     <!-- the key of the L{flumotion.common.componentui} UIState that we
@@ -142,7 +142,7 @@ class ConfigParser(config.BaseConfigParser):
             if v[0] != os.sep:
                 raise config.ConfigError('rrdfile paths should be absolute')
             return str(v)
-                
+
         name, = self.parseAttributes(node, ('name',))
 
         res = {'name': name}
@@ -172,7 +172,7 @@ class ConfigParser(config.BaseConfigParser):
         if not res['archives']:
             raise config.ConfigError('must specify at least one '
                                      '<archive> per <source>')
-            
+
         return res
 
     def parse(self):
@@ -181,7 +181,7 @@ class ConfigParser(config.BaseConfigParser):
         root = self.doc.documentElement
         if not root.nodeName == 'rrdmon':
             raise ConfigError("unexpected root node: %s" % root.nodeName)
-        
+
         def strparser(parser):
             def parsestr(node):
                 return self.parseTextNode(node, parser)

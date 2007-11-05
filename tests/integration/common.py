@@ -84,7 +84,7 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
         self.__cleanfiles.append(name)
 
     def loadConfiguration(self, plan, filename):
-        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' % 
+        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' %
             self.managerPort, 'loadconfiguration', filename)
         plan.wait(c, 0)
 
@@ -103,8 +103,8 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
         plan.wait(c, 0)
 
     def waitForHappyComponent(self, plan, componentName):
-        happy = plan.spawn('wait-for-component-mood', 
-            'user:test@localhost:%d' % self.managerPort, 
+        happy = plan.spawn('wait-for-component-mood',
+            'user:test@localhost:%d' % self.managerPort,
             componentName, 'happy')
         plan.wait(happy, 0)
 

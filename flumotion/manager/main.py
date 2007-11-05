@@ -57,7 +57,7 @@ def _createParser():
                       action="store_true", dest="version",
                       default=False,
                       help="show version information")
-    
+
     group = optparse.OptionGroup(parser, "manager options")
     group.add_option('-H', '--hostname',
                      action="store", type="string", dest="host",
@@ -97,11 +97,11 @@ def _createParser():
                       action="store", dest="rundir",
                       help="flumotion run directory (default: %s)" %
                         configure.rundir)
-    
+
     parser.add_option_group(group)
 
     return parser
- 
+
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     # since this is run after daemonizing, it should show errors, but not stop
@@ -111,7 +111,7 @@ def _initialLoadConfig(vishnu, paths):
 
 def main(args):
     parser = _createParser()
-   
+
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
@@ -218,7 +218,7 @@ def main(args):
 
     # register package path
     setup.setupPackagePath()
-    
+
     # log our standardized starting marker
     log.info('manager', "Starting manager '%s'" % options.name)
 
@@ -239,7 +239,7 @@ def main(args):
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
     reactor.callLater(0, vishnu.startManagerPlugs)
-    
+
     # set up server based on transport
     myServer = server.Server(vishnu)
     try:
@@ -272,7 +272,7 @@ def main(args):
         if not options.daemonizeTo:
             options.daemonizeTo = "/"
 
-    common.startup("manager", name, options.daemonize, 
+    common.startup("manager", name, options.daemonize,
         options.daemonizeTo)
 
     reactor.run()

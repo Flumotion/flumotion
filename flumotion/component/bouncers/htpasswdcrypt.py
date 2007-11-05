@@ -80,4 +80,3 @@ class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
             len(lines)))
 
         return defer.succeed(None)
-   

@@ -31,7 +31,7 @@ _enumClassRegistry = {}
 class EnumMetaClass(type):
     # pychecker likes this attribute to be there since we use it in this class
     __enums__ = {}
-    
+
     def __len__(self):
         return len(self.__enums__)
 
@@ -47,15 +47,15 @@ class EnumMetaClass(type):
 
 
 class Enum(object, jelly.Jellyable):
-    
+
     __metaclass__ = EnumMetaClass
     def __init__(self, value, name, nick=None):
         self.value = value
         self.name = name
-        
+
         if nick == None:
             nick = name
-            
+
         self.nick = nick
         self._enumClassName = self.__class__.__name__
 
@@ -70,7 +70,7 @@ class Enum(object, jelly.Jellyable):
     def set(klass, value, item):
         klass[value] = item
     set = classmethod(set)
-    
+
     def jellyFor(self, jellier):
         sxp = jellier.prepare(self)
         sxp.extend([
@@ -91,11 +91,11 @@ class EnumClass(object):
         for extra in extras.values():
             if not isinstance(extra, tuple):
                 raise TypeError('extra must be a tuple, not %s' % type(extra))
-                
+
             if len(extra) != len(names):
                 raise TypeError("extra items must have a length of %d" %
                                 len(names))
-            
+
         # we reset __enums__ to {} otherwise it retains the other registered
         # ones
         etype = EnumMetaClass(type_name, (Enum,), {'__enums__': {}})
@@ -105,7 +105,7 @@ class EnumClass(object):
                 assert not hasattr(enum, extra_key)
                 setattr(enum, extra_key, extra_values[value])
             etype[value] = enum
-            
+
         _enumClassRegistry[type_name] = etype
         return etype
 
@@ -113,7 +113,7 @@ class EnumClass(object):
 # Enum unjellyer should not be a new style class,
 # otherwise Twsited 2.0.1 will not recognise it.
 class EnumUnjellyer(jelly.Unjellyable):
-    
+
     def unjellyFor(self, unjellier, jellyList):
         enumClassName, value, name, nick = jellyList[1:]
         enumClass = _enumClassRegistry.get(enumClassName, None)

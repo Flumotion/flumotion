@@ -68,7 +68,7 @@ class SSHPublicKeyChecker(log.Loggable):
         log.warning('manhole', 'ssh manhole unavailable (old twisted)')
         # you won't be able to log anything in
         credentialInterfaces = ()
-        
+
     interface.implements(ICredentialsChecker)
 
     def __init__(self, authorizedKeysFile):

@@ -46,17 +46,17 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             'filesrc name=source blocksize=100000 ! pngdec ! alphacolor ! '
             'videomixer name=mix ! @feeder:default@ '
             '@eater:default@ ! ffmpegcolorspace ! mix.')
-        
+
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):
         p = properties
-        self.fixRenamedProperties(p, [ 
-                ('show_text',    'show-text'), 
-                ('fluendo_logo', 'fluendo-logo'), 
-                ('cc_logo',      'cc-logo'), 
+        self.fixRenamedProperties(p, [
+                ('show_text',    'show-text'),
+                ('fluendo_logo', 'fluendo-logo'),
+                ('cc_logo',      'cc-logo'),
                 ('xiph_logo',    'xiph-logo')
-            ]) 
+            ])
 
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
@@ -67,7 +67,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             text = p.get('text', 'set the "text" property')
         overflow = genimg.generate_overlay(self._filename,
                                            text,
-                                           p.get('fluendo-logo', False), 
+                                           p.get('fluendo-logo', False),
                                            p.get('cc-logo', False),
                                            p.get('xiph-logo', False),
                                            p['width'],
@@ -77,7 +77,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
                 T_(N_("Overlayed text '%s' too wide for the video image."),
                    text), id = "text-too-wide")
             self.addMessage(m)
-        
+
         source = self.get_element('source')
         source.set_property('location', self._filename)
 
@@ -90,4 +90,3 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         else:
             self.debug("Temporary overlay already gone, " \
                 "did we not start up correctly ?")
-        

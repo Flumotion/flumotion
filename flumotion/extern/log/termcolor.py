@@ -8,8 +8,8 @@ import sys, re
 class TerminalController:
     """
     A class that can be used to portably generate formatted output to
-    a terminal.  
-    
+    a terminal.
+
     `TerminalController` defines a set of instance variables whose
     values are initialized to the control sequence necessary to
     perform a given action.  These can be simply included in normal
@@ -69,11 +69,11 @@ class TerminalController:
 
     # Foreground colors:
     BLACK = BLUE = GREEN = CYAN = RED = MAGENTA = YELLOW = WHITE = ''
-    
+
     # Background colors:
     BG_BLACK = BG_BLUE = BG_GREEN = BG_CYAN = ''
     BG_RED = BG_MAGENTA = BG_YELLOW = BG_WHITE = ''
-    
+
     _STRING_CAPABILITIES = """
     BOL=cr UP=cuu1 DOWN=cud1 LEFT=cub1 RIGHT=cuf1
     CLEAR_SCREEN=clear CLEAR_EOL=el CLEAR_BOL=el1 CLEAR_EOS=ed BOLD=bold
@@ -105,7 +105,7 @@ class TerminalController:
         # Look up numeric capabilities.
         self.COLS = curses.tigetnum('cols')
         self.LINES = curses.tigetnum('lines')
-        
+
         # Look up string capabilities.
         for capability in self._STRING_CAPABILITIES:
             (attrib, cap_name) = capability.split('=')
@@ -157,7 +157,7 @@ class TerminalController:
 class ProgressBar:
     """
     A 3-line progress bar, which looks like::
-    
+
                                 Header
         20% [===========----------------------------------]
                            progress message
@@ -167,7 +167,7 @@ class ProgressBar:
     """
     BAR = '%3d%% ${GREEN}[${BOLD}%s%s${NORMAL}${GREEN}]${NORMAL}\n'
     HEADER = '${BOLD}${CYAN}%s${NORMAL}\n\n'
-        
+
     def __init__(self, term, header):
         self.term = term
         if not (self.term.CLEAR_EOL and self.term.UP and self.term.BOL):

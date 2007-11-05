@@ -51,7 +51,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
         props = ('bitrate',
                  'quality',
                  'keyframe-threshold',
-                 'keyframe-mindistance', 
+                 'keyframe-mindistance',
                  ('quick-compress', 'quick'),
                  ('keyframe-maxdistance', 'keyframe-freq'),
                  ('keyframe-maxdistance', 'keyframe-force'),
@@ -82,8 +82,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
                 # FIXME: GStreamer 0.10 has bitrate in kbps, inconsistent
                 # with all other elements, so fix it up
                 if pproperty == 'bitrate':
-                    element.set_property(eproperty, 
+                    element.set_property(eproperty,
                         int(properties[pproperty]/1000))
                 else:
                     element.set_property(eproperty, properties[pproperty])
-

@@ -28,7 +28,7 @@ from twisted.cred import portal
 
 from flumotion.common import medium, log, messages
 from flumotion.twisted import credentials, fdserver, checkers
-from flumotion.twisted import reflect 
+from flumotion.twisted import reflect
 
 from flumotion.component import component
 from flumotion.component.component import moods
@@ -46,7 +46,7 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.avatarId = avatarId
         self.porter = porter
 
-        # The underlying transport is now accessible as 
+        # The underlying transport is now accessible as
         # self.mind.broker.transport, on which we can call sendFileDescriptor
         self.mind = mind
 
@@ -87,7 +87,7 @@ class PorterRealm(log.Loggable):
         self.porter = porter
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        self.log("Avatar requested for avatarId %s, mind %r, interfaces %r" % 
+        self.log("Avatar requested for avatarId %s, mind %r, interfaces %r" %
             (avatarId, mind, interfaces))
         if pb.IPerspective in interfaces:
             avatar = PorterAvatar(avatarId, self.porter, mind)
@@ -103,9 +103,9 @@ class PorterMedium(component.BaseComponentMedium):
         and interface for the porter as a tuple (path, username,
         password, port, interface).
         """
-        return (self.comp._socketPath, self.comp._username, 
+        return (self.comp._socketPath, self.comp._username,
                 self.comp._password, self.comp._iptablesPort,
-                self.comp._interface) 
+                self.comp._interface)
 
 class Porter(component.BaseComponent, log.Loggable):
     """
@@ -136,7 +136,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
     def registerPath(self, path, avatar):
         """
-        Register a path as being served by a streamer represented by this 
+        Register a path as being served by a streamer represented by this
         avatar. Will remove any previous registration at this path.
 
         @param path:   The path to register
@@ -188,7 +188,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
     def deregisterPrefix(self, prefix, avatar):
         """
-        Attempt to deregister a default destination for all requests not 
+        Attempt to deregister a default destination for all requests not
         directed to a specifically-mapped path. This will only succeed if the
         default is currently equal to this avatar.
 
@@ -255,9 +255,9 @@ class Porter(component.BaseComponent, log.Loggable):
     def have_properties(self):
         props = self.config['properties']
 
-        self.fixRenamedProperties(props, 
+        self.fixRenamedProperties(props,
             [('socket_path',        'socket-path')])
-    
+
         # We can operate in two modes: explicitly configured (neccesary if you
         # want to handle connections from components in other managers), and
         # self-configured (which is sufficient for slaving only streamers
@@ -276,7 +276,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
         self._port = int(props['port'])
         self._iptablesPort = int(props.get('iptables-port', self._port))
-        self._porterProtocol = props.get('protocol', 
+        self._porterProtocol = props.get('protocol',
             'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
         self._interface = props.get('interface', '')
 
@@ -288,22 +288,22 @@ class Porter(component.BaseComponent, log.Loggable):
             d = self._socketlistener.stopListening()
         self._socketlistener = None
         return d
-    
+
     def do_setup(self):
         # Create our combined PB-server/fd-passing channel
         self.have_properties()
         realm = PorterRealm(self)
         checker = checkers.FlexibleCredentialsChecker()
         checker.addUser(self._username, self._password)
-        
+
         p = portal.Portal(realm, [checker])
         serverfactory = pb.PBServerFactory(p)
 
         # FIXME: shouldn't we be raising handled errors here?
 
         try:
-            # Rather than a normal listenTCP() or listenUNIX(), we use 
-            # listenWith so that we can specify our particular Port, which 
+            # Rather than a normal listenTCP() or listenUNIX(), we use
+            # listenWith so that we can specify our particular Port, which
             # creates Transports that we know how to pass FDs over.
             try:
                 os.unlink(self._socketPath)
@@ -316,7 +316,7 @@ class Porter(component.BaseComponent, log.Loggable):
         except error.CannotListenError, e:
             self.warning("Failed to create socket %s" % self._socketPath)
             m = messages.Error(T_(N_(
-                "Network error: socket path %s is not available."), 
+                "Network error: socket path %s is not available."),
                 self._socketPath))
             self.addMessage(m)
             self.setMood(moods.sad)
@@ -328,7 +328,7 @@ class Porter(component.BaseComponent, log.Loggable):
             proto = reflect.namedAny(self._porterProtocol)
             self.debug("Created proto %r" % proto)
         except:
-            self.warning("Failed to import protocol '%s', defaulting to HTTP" % 
+            self.warning("Failed to import protocol '%s', defaulting to HTTP" %
                 self._porterProtocol)
             proto = HTTPPorterProtocol
 
@@ -337,7 +337,7 @@ class Porter(component.BaseComponent, log.Loggable):
         factory = PorterProtocolFactory(self, proto)
         try:
             reactor.listenWith(
-                fdserver.PassableServerPort, self._port, factory, 
+                fdserver.PassableServerPort, self._port, factory,
                     interface=self._interface)
             self.debug("Now listening on port %d" % self._port)
         except error.CannotListenError, e:
@@ -360,11 +360,11 @@ class PorterProtocolFactory(protocol.Factory):
 
 class PorterProtocol(protocol.Protocol, log.Loggable):
     """
-    The base porter is capable of accepting HTTP-like protocols (including 
+    The base porter is capable of accepting HTTP-like protocols (including
     RTSP) - it reads the first line of a request, and makes the decision
     solely on that.
 
-    We can't guarantee that we read precisely a line, so the buffer we 
+    We can't guarantee that we read precisely a line, so the buffer we
     accumulate will actually be larger than what we actually parse.
 
     @cvar MAX_SIZE:   the maximum number of bytes allowed for the first line
@@ -394,7 +394,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
     def _timeout(self):
         self._timeoutDC = None
-        self.debug("Timing out porter client after %d seconds", 
+        self.debug("Timing out porter client after %d seconds",
             self.PORTER_CLIENT_TIMEOUT)
         self.transport.loseConnection()
 
@@ -406,7 +406,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
     def dataReceived(self, data):
         self._buffer = self._buffer + data
         self.log("Got data, buffer now \"%s\"" % self._buffer)
-        # We accept more than just '\r\n' (the true HTTP line end) in the 
+        # We accept more than just '\r\n' (the true HTTP line end) in the
         # interests of compatibility.
         for delim in self.delimiters:
             try:
@@ -416,7 +416,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
                 # We didn't find this delimiter; continue with the others.
                 pass
         else:
-            # Failed to find a valid delimiter. 
+            # Failed to find a valid delimiter.
             self.log("No valid delimiter found")
             if len(self._buffer) > self.MAX_SIZE:
                 self.log("Dropping connection!")
@@ -429,7 +429,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # Got a line. self._buffer is still our entire buffer, should be
         # provided to the slaved process.
         identifier = self.parseLine(line)
-        
+
         if not identifier:
             self.log("Couldn't find identifier in first line")
             return self.transport.loseConnection()
@@ -449,7 +449,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # along in the same message. The receiver will push that data into
         # the Twisted Protocol object as if it had been normally received,
         # so it looks to the receiver like it has read the entire data stream
-        # itself. 
+        # itself.
 
         # TODO: Check out blocking characteristics of sendFileDescriptor, fix
         # if it blocks.
@@ -459,7 +459,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
         # After this, we don't want to do anything with the FD, other than
         # close our reference to it - but not close the actual TCP connection.
-        # We set keepSocketAlive to make loseConnection() only call close() 
+        # We set keepSocketAlive to make loseConnection() only call close()
         # rather than shutdown() then close()
         self.transport.keepSocketAlive = True
         self.transport.loseConnection()
@@ -490,12 +490,12 @@ class HTTPPorterProtocol(PorterProtocol):
     def parseLine(self, line):
         try:
             (method, location, proto) = map(string.strip, line.split(' ', 2))
-            
+
             if proto not in self.protos:
                 return None
 
             # Currently, we just return the path part of the URL.
-            # Use the URL parsing from urllib2. 
+            # Use the URL parsing from urllib2.
             location = urlparse.urlparse(location, 'http')[2]
             self.log('parsed %s %s %s' % (method, location, proto))
             if not location or location == '':
@@ -508,11 +508,10 @@ class HTTPPorterProtocol(PorterProtocol):
 
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
-    
+
 class RTSPPorterProtocol(HTTPPorterProtocol):
     scheme = 'rtsp'
     protos = ["RTSP/1.0"]
 
     def writeNotFoundResponse(self):
         self.transport.write("RTSP/1.0 404 Not Found\r\n\r\nResource unknown")
-

@@ -42,7 +42,7 @@ class FakeObject: pass
 class FakeListener:
     # listener interface
     implements(flavors.IStateListener)
-    
+
     def stateSet(self, state, key, value): pass
     def stateAppend(self, state, key, value): pass
     def stateRemove(self, state, key, value): pass
@@ -83,7 +83,7 @@ class StateTest(unittest.TestCase):
 
     def tearDown(self):
         return self.stopServer()
-        
+
     def runClient(self):
         f = pb.PBClientFactory()
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
@@ -352,7 +352,7 @@ class TestFullListener(StateTest):
             state.addListener(2, invalidate=invalidate)
             self.assertEquals(calls, [('invalidate', state),
                                       ('invalidate', state)])
-            
+
             state.addListener(3, set=unused)
             self.assertEquals(calls, [('invalidate', state),
                                       ('invalidate', state)])
@@ -386,7 +386,7 @@ class TestState(unittest.TestCase):
         l = c.get('two')
         self.assertEqual(len(l), 1)
         self.assertEqual(l[0], 'B')
-        
+
     def testStateGet(self):
         c = flavors.StateCacheable()
 
@@ -394,7 +394,7 @@ class TestState(unittest.TestCase):
         c.set('akey', 'avalue')
         self.assertEquals(c.get('akey'), 'avalue')
         self.assertRaises(KeyError, c.get, 'randomkey')
-  
+
     def testStateAppendRemove(self):
         c = flavors.StateCacheable()
 

@@ -529,4 +529,3 @@ def pipeline_cnv(pipelinestr='identity'):
 
     return ComponentWrapper('pipeline-converter', Converter, name=fs_name,
                             props={'pipeline': pipelinestr})
-

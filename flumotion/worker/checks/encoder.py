@@ -45,7 +45,7 @@ def checkVorbis():
             "Please upgrade '%s' to version %s."), 'gst-plugins-base',
                 '0.10.3'))
         result.add(m)
- 
+
     result.succeed(None)
     return defer.succeed(result)
 

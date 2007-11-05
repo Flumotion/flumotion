@@ -26,4 +26,3 @@ if version[0] >= '2':
     from twisted.web.http import *
 else:
     from twisted.protocols.http import *
-

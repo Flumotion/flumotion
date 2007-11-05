@@ -46,7 +46,7 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
     keycardClasses = (keycards.KeycardUASPCC, )
     challengeResponseClasses = (keycards.KeycardUASPCC, )
 
- 
+
     def do_setup(self):
         conf = self.config
 
@@ -84,4 +84,3 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
             len(lines)))
 
         return defer.succeed(None)
-   

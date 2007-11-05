@@ -69,7 +69,7 @@ def get_recent_connections():
 def parsePBConnectionInfo(managerString, use_ssl=True,
                           defaultPort=configure.defaultSSLManagerPort):
     """The same as L{flumotion.common.connection.parsePBConnectionInfo},
-    but fills in missing information from the recent connections cache 
+    but fills in missing information from the recent connections cache
     if possible.
     """
     recent = get_recent_connections()

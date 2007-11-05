@@ -44,4 +44,4 @@ class TestConfig(unittest.TestCase):
         assert configure.isinstalled == False
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

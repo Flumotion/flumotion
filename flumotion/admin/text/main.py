@@ -47,7 +47,7 @@ def cleanup_curses(stdscr):
 
 def _runInterface(options):
     # initialise curses
-       
+
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
@@ -75,14 +75,14 @@ def _runInterface(options):
         if options.insecure:
             insecure = True
         connection.connect_to_manager(stdscr, hostname, port, insecure, username, password)
-                   
+
     else:
         # do greeter
         # get recent connections
         greeter = AdminTextGreeter(stdscr)
         reactor.addReader(greeter)
         greeter.show()
-    
+
 def main(args):
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
@@ -110,7 +110,7 @@ def main(args):
     parser.add_option('', '--insecure',
                       action="store_true", dest="insecure",
                       help="make insecure connection")
-    
+
     options, args = parser.parse_args(args)
 
     if options.version:
@@ -126,5 +126,5 @@ def main(args):
 
 
     _runInterface(options)
-    
+
     reactor.run()

@@ -37,7 +37,7 @@ class TestInit(unittest.TestCase):
             # skip test components - see test_config.py
             if type.startswith('test-'):
                 continue
-                
+
             log.debug('test', 'testing component type %s' % type)
             defs = r.getComponent(type)
             try:

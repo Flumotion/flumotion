@@ -73,27 +73,27 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     # further down the path to other resource providers through
     # getChildWithDefault
     isLeaf = True
-    
+
     def __init__(self, streamer, httpauth):
         """
         @param streamer: L{MultifdSinkStreamer}
         """
         self.streamer = streamer
         self.httpauth = httpauth
-        
+
         self._requests = {}            # request fd -> Request
-        
+
         self.maxclients = self.getMaxAllowedClients(-1)
         self.maxbandwidth = -1 # not limited by default
 
         # If set, a URL to redirect a user to when the limits above are reached
         self._redirectOnFull = None
-        
+
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
 
         self.logfilter = None
-            
+
         web_resource.Resource.__init__(self)
 
     def clientRemoved(self, sink, fd, reason, stats):
@@ -110,7 +110,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def setLogFilter(self, logfilter):
         self.logfilter = logfilter
-        
+
     def rotateLogs(self):
         """
         Close the logfile, then reopen using the previous logfilename
@@ -118,7 +118,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         for logger in self.loggers:
             self.debug('rotating logger %r' % logger)
             logger.rotate()
-            
+
     def logWrite(self, fd, ip, request, stats):
 
         headers = request.getAllHeaders()
@@ -162,7 +162,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     # FIXME: rename to writeHeaders
     """
     Write out the HTTP headers for the incoming HTTP request.
-    
+
     @rtype:   boolean
     @returns: whether or not the file descriptor can be used further.
     """
@@ -192,7 +192,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         setHeader('Cache-Control', 'no-cache')
         setHeader('Cache-Control', 'private')
         setHeader('Content-type', content)
-        
+
         # ASF needs a Pragma header for live broadcasts
         # Apparently ASF breaks on WMP port 80 if you use the pragma header
         # - Sep 5 2006
@@ -201,7 +201,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         #    "audio/x-ms-asf",
         #]:
             #setHeader('Pragma', 'features=broadcast')
-            
+
         #self.debug('setting Content-type to %s' % mime)
         ### FIXME: there's a window where Twisted could have removed the
         # fd because the client disconnected.  Catch EBADF correctly here.
@@ -229,7 +229,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if self.streamer.caps == None:
             self.debug('We have no caps yet')
             return False
-        
+
         return True
 
     def getMaxAllowedClients(self, maxclients):
@@ -263,11 +263,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return True
         elif self.maxbandwidth >= 0:
             # Reject if adding one more client would take us over the limit.
-            if ((len(self._requests) + 1) * 
+            if ((len(self._requests) + 1) *
                     self.streamer.getCurrentBitrate() >= self.maxbandwidth):
                 return True
         return False
-    
+
     def _addClient(self, request):
         """
         Add a request, so it can be used for statistics.
@@ -295,7 +295,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         Note that it does not disconnect the client; it is called in reaction
         to a client disconnecting.
         It also removes the keycard if one was created.
-        
+
         @param request: the request
         @type request: L{twisted.protocols.http.Request}
         @param fd: the file descriptor for the client being removed
@@ -309,8 +309,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
 
-        # We can't call request.finish(), since we already "stole" the fd, we 
-        # just loseConnection on the transport directly, and delete the 
+        # We can't call request.finish(), since we already "stole" the fd, we
+        # just loseConnection on the transport directly, and delete the
         # Request object, after cleaning up the bouncer bits.
         self.httpauth.cleanupAuth(fd)
 
@@ -357,7 +357,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.debug('_render(): asked for (possible) authentication')
         d = self.httpauth.startAuthentication(request)
         d.addCallback(self.handleAuthenticatedRequest, request)
-        # Authentication has failed and we've written a response; nothing 
+        # Authentication has failed and we've written a response; nothing
         # more to do
         d.addErrback(lambda x: None)
 
@@ -367,10 +367,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
-        
+
     def _handleServerFull(self, request):
         if self._redirectOnFull:
-            self.debug("Redirecting client, client limit %d reached", 
+            self.debug("Redirecting client, client limit %d reached",
                 self.maxclients)
             error_code = http.FOUND
             request.setHeader('location', self._redirectOnFull)
@@ -380,10 +380,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             error_code = http.SERVICE_UNAVAILABLE
 
         request.setHeader('content-type', 'text/html')
-        
+
         request.setHeader('server', HTTP_VERSION)
         request.setResponseCode(error_code)
-        
+
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
 
@@ -394,7 +394,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug("[fd %5d] not adding as a client" % fdi)
             return
         self._addClient(request)
-        
+
         # take over the file descriptor from Twisted by removing them from
         # the reactor
         # spiv told us to remove* on request.transport, and that works
@@ -406,7 +406,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.debug("taking away [fd %5d] from Twisted" % fd)
         reactor.removeReader(request.transport)
         #reactor.removeWriter(request.transport)
-    
+
         # check if it's really an open fd (i.e. that twisted didn't close it
         # before the removeReader() call)
         import fcntl
@@ -425,7 +425,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         ip = request.getClientIP()
 
         self.info('[fd %5d] Started streaming to %s' % (fd, ip))
- 
+
     render_GET = _render
     render_HEAD = _render
 

@@ -45,5 +45,3 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
         v.volumeSet(volume)
 
 GUIClass = FirewireAdminGtk
-
-

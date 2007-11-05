@@ -49,7 +49,7 @@ class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
                                     'rate': self.rateSet}
         for k, handler in self.uiStateHandlers.items():
             handler(state.get(k))
-                                    
+
     def frequency_changed_cb(self, widget):
         value = widget.get_value()
         d = self.callRemote("setFrequency", value)
@@ -64,11 +64,11 @@ class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
         waveName = widget.get_active()
         d = self.callRemote("setWave", waveName)
         d.addErrback(self.warningFailure)
-        
+
     def rateSet(self, rate):
         self._scale.set_range(1, rate)
         self._spinbutton.set_range(1, rate)
-        
+
     def frequencySet(self, value):
         self._scale.handler_block(self._scale_change_id)
         self._scale.set_value(value)

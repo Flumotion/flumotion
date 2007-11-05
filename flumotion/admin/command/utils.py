@@ -41,7 +41,7 @@ def avatarPath(string):
             return ['root']
         else:
             return ['flow'] + split[1:]
-    
+
 def find_component(planet, avatarId):
     if avatarId[0] == 'atmosphere':
         for c in planet.get('atmosphere').get('components'):
@@ -50,7 +50,7 @@ def find_component(planet, avatarId):
         print ('Could not find component named %s in flow %s'
                % (avatarId[1], avatarId[0]))
         return None
-    
+
     for f in planet.get('flows'):
         if f.get('name') == avatarId[0]:
             for c in f.get('components'):

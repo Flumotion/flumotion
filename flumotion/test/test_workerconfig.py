@@ -30,11 +30,11 @@ class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
         conf = parse('<worker></worker>')
         self.assertEquals(conf.name, None)
-        
+
     def testParseError(self):
         s = """<bad-root-node></bad-root-node>"""
         self.assertRaises(config.ConfigError, parse, s)
-        
+
     def testParseWorkerName(self):
         conf = parse('<worker name="myname"></worker>')
         self.assertEquals(conf.name, 'myname')
@@ -62,7 +62,7 @@ class TestConfig(unittest.TestCase):
         <port>9999</port>
         <transport>ssl</transport>
         </manager></worker>""")
-        
+
         self.assertEquals(conf.manager.host, 'hostname')
         self.assertEquals(conf.manager.port, 9999)
         self.assertEquals(conf.manager.transport, 'ssl')
@@ -70,19 +70,19 @@ class TestConfig(unittest.TestCase):
     def testParseManagerError(self):
         s = """<worker><manager><invalid-name/></manager></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
-        
+
         s = """<worker><manager><port>badport</port></manager></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
 
         s = """<worker><manager><transport>badtransport</transport></manager></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
-        
+
     def testParseAuthentication(self):
         conf = parse("""<worker><authentication>
         <username>foobie</username>
         <password>boobie</password>
         </authentication></worker>""")
-        
+
         self.assertEquals(conf.authentication.username, 'foobie')
         self.assertEquals(conf.authentication.password, 'boobie')
 

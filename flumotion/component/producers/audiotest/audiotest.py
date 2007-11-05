@@ -69,9 +69,9 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
 
-        self.fixRenamedProperties(properties, [ 
-             ('freq', 'frequency'), 
-             ]) 
+        self.fixRenamedProperties(properties, [
+             ('freq', 'frequency'),
+             ])
 
         element = self.get_element('source')
         if properties.has_key('frequency'):
@@ -115,7 +115,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
     def getVolume(self):
         element = self.get_element('volume')
         return element.get_property('volume')
-    
+
     def setFrequency(self, frequency):
         element = self.get_element('source')
         element.set_property('freq', frequency)

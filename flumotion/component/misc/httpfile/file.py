@@ -108,7 +108,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         return server.NOT_DONE_YET
 
     def renderAuthenticated(self, _, request):
-        # Now that we're authenticated (or authentication wasn't requested), 
+        # Now that we're authenticated (or authentication wasn't requested),
         # write the file (or appropriate other response) to the client.
         # We override static.File to implement Range requests, and to get access
         # to the transfer object to abort it later; the bulk of this is a direct
@@ -130,9 +130,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             self.debug("%s is a directory, can't be GET", self.path)
             return self.childNotFound.render(request)
 
-        # Different headers not normally set in static.File...        
+        # Different headers not normally set in static.File...
         # Specify that we will close the connection after this request, and
-        # that the client must not issue further requests. 
+        # that the client must not issue further requests.
         # We do this because future requests on this server might actually need
         # to go to a different process (because of the porter)
         request.setHeader('Server', 'Flumotion/%s' % configure.version)
@@ -205,7 +205,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             # FIXME: is it still partial if the request was for the complete
             # file ? Couldn't find a conclusive answer in the spec.
             request.setResponseCode(http.PARTIAL_CONTENT)
-            request.setHeader('Content-Range', "bytes %d-%d/%d" % 
+            request.setHeader('Content-Range', "bytes %d-%d/%d" %
                 (first, last, fileSize))
             # Start sending from the requested position in the file
             if first:
@@ -214,7 +214,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
                 self.debug("Request for range \"%s\" of file, seeking to "
                     "%d of total file size %d", ranges, first, fileSize)
                 f.seek(first)
-          
+
         self.do_prepareBody(request, f, first, last)
 
         if request.method == 'HEAD':
@@ -309,7 +309,7 @@ class FileTransfer:
     def resumeProducing(self):
         if not self.request:
             return
-        data = self.file.read(min(abstract.FileDescriptor.bufferSize, 
+        data = self.file.read(min(abstract.FileDescriptor.bufferSize,
             self.size - self.written))
         if data:
             self.written += len(data)
@@ -328,4 +328,3 @@ class FileTransfer:
     def stopProducing(self):
         self.file.close()
         self.request = None
-

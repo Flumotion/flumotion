@@ -26,4 +26,3 @@ else:
 
     hash = _calculateHA1MD5(username, realm, password)
     print "%s:%s" % (username, hash)
-

@@ -66,7 +66,7 @@ def audiotest_gnl_src(name, start, duration, priority, wave=None):
         src.props.wave = wave
     else:
         # Set audiotestsrc to use silence.
-        src.props.wave = 4 
+        src.props.wave = 4
     gnlsrc = gst.element_factory_make('gnlsource', name)
     gnlsrc.props.start = start
     gnlsrc.props.duration = duration
@@ -121,7 +121,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         audioconvert = gst.element_factory_make('audioconvert')
         audioresample = gst.element_factory_make('audioresample')
         outcaps = gst.Caps(
-            "audio/x-raw-int,channels=%d,rate=%d,width=16,depth=16" % 
+            "audio/x-raw-int,channels=%d,rate=%d,width=16,depth=16" %
             (self._channels, self._samplerate))
 
         capsfilter = gst.element_factory_make("capsfilter")
@@ -138,8 +138,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
     def _buildVideoPipeline(self, pipeline, src):
         outcaps = gst.Caps(
             "video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d,"
-            "pixel-aspect-ratio=1/1" % 
-                (self._width, self._height, self._framerate[0], 
+            "pixel-aspect-ratio=1/1" %
+                (self._width, self._height, self._framerate[0],
                  self._framerate[1]))
 
         cspace = gst.element_factory_make("ffmpegcolorspace")
@@ -165,13 +165,13 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 mediatype == 'video' and not self._hasVideo):
                 continue
 
-            # For each of audio, video, we build a pipeline that looks roughly 
+            # For each of audio, video, we build a pipeline that looks roughly
             # like:
-            # 
+            #
             # gnlcomposition ! identity single-segment=true !
             #    audio/video-elements ! identity sync=true ! sink
 
-            composition = gst.element_factory_make("gnlcomposition", 
+            composition = gst.element_factory_make("gnlcomposition",
                 mediatype + "-composition")
 
             segmentidentity = gst.element_factory_make("identity")
@@ -186,7 +186,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             def _padAddedCb(element, pad, target):
                 self.debug("Pad added, linking")
                 pad.link(target)
-            composition.connect('pad-added', _padAddedCb, 
+            composition.connect('pad-added', _padAddedCb,
                 segmentidentity.get_pad("sink"))
 
             if mediatype == 'audio':
@@ -215,12 +215,12 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
     def _createDefaultSources(self, properties):
         if self._hasVideo:
-            vsrc = videotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
+            vsrc = videotest_gnl_src("videotestdefault", 0, 2**63 - 1,
                 2**31 - 1, properties.get('video-pattern', None))
             self.videocomp.add(vsrc)
 
         if self._hasAudio:
-            asrc = audiotest_gnl_src("videotestdefault", 0, 2**63 - 1, 
+            asrc = audiotest_gnl_src("videotestdefault", 0, 2**63 - 1,
                 2**31 - 1, properties.get('audio-wave', None))
             self.audiocomp.add(asrc)
 
@@ -275,11 +275,11 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         Schedule a given playlist item in our playback compositions.
         """
         start = item.timestamp - self.basetime
-        self.debug("Starting item %s at %d seconds from start: %s", item.uri, 
+        self.debug("Starting item %s at %d seconds from start: %s", item.uri,
             start/gst.SECOND, _tsToString(item.timestamp))
 
         # If we schedule things to start before the current pipeline position,
-        # gnonlin will adjust this to start now. However, it does this 
+        # gnonlin will adjust this to start now. However, it does this
         # separately for audio and video, so we start from different points,
         # thus we're out of sync.
         # So, always start slightly in the future... 5 seconds seems to work
@@ -302,7 +302,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         timeuntilend = end - now
         # After the end time, remove this item from the composition, otherwise
         # it will continue to use huge gobs of memory and lots of threads.
-        reactor.callLater(timeuntilend/gst.SECOND + 5, 
+        reactor.callLater(timeuntilend/gst.SECOND + 5,
             self.unscheduleItem, item)
 
         if self._hasVideo and item.hasVideo:
@@ -319,8 +319,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 start, item.duration, item.offset, 0)
             self.audiocomp.add(asrc)
             self._asrcs[item] = asrc
-        self.debug("Done scheduling: start at %s, end at %s", 
-            _tsToString(start + self.basetime), 
+        self.debug("Done scheduling: start at %s, end at %s",
+            _tsToString(start + self.basetime),
             _tsToString(start + self.basetime + item.duration))
         return True
 
@@ -330,7 +330,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             vsrc = self._vsrcs.pop(item)
             self.videocomp.remove(vsrc)
             vsrc.set_state(gst.STATE_NULL)
-        if self._hasAudio and item.hasAudio and item in self._asrcs: 
+        if self._hasAudio and item.hasAudio and item in self._asrcs:
             asrc = self._asrcs.pop(item)
             self.audiocomp.remove(asrc)
             asrc.set_state(gst.STATE_NULL)
@@ -366,7 +366,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._hasAudio = props.get('audio', True)
         self._hasVideo = props.get('video', True)
 
-        pipeline = self._buildPipeline() 
+        pipeline = self._buildPipeline()
         self._setupClock(pipeline)
 
         self._createDefaultSources(props)
@@ -378,7 +378,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._filesAdded = {}
 
         self._directoryWatcher = watcher.DirectoryWatcher(dir)
-        self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged, 
+        self._directoryWatcher.subscribe(fileChanged=self._watchFileChanged,
             fileDeleted=self._watchFileDeleted)
 
         # in the start call watcher should find all the existing
@@ -417,14 +417,14 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self.playlistparser.parseFile(file, id=file)
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
-            # Since this isn't done directly via the remote method, add a 
+            # Since this isn't done directly via the remote method, add a
             # message so people can find out that it failed...
             # Use a tuple including the filename to identify the warning, so we
             # can add/remove one per file
             msgid = ("playlist-parse-error", file)
             self.addMessage(
                 messages.Warning(T_(N_(
-                    "Failed to parse a playlist from file %s: %s" % 
+                    "Failed to parse a playlist from file %s: %s" %
                         (file, e))), id=msgid))
 
     def do_setup(self):

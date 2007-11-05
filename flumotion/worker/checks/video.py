@@ -31,7 +31,7 @@ def checkTVCard(device, id='check-tvcard'):
     Probe the given device node as a TV card.
     Return a deferred firing a human-readable device name, a list of channel
     names (Tuner/Composite/...), and a list of norms (PAL/NTSC/SECAM/...).
-    
+
     @rtype: L{twisted.internet.defer.Deferred}
     """
     result = messages.Result()
@@ -61,7 +61,7 @@ def checkWebcam(device, id):
                   - device name
                   - dict of mime, format, width, height, fps pair
      - failed
-    
+
     @rtype: L{flumotion.common.messages.Result}
     """
     # FIXME: add code that checks permissions and ownership on errors,
@@ -75,7 +75,7 @@ def checkWebcam(device, id):
                    #                                    framerate_denom),
                    #                      'mime': str,
                    #                      'fourcc': fourcc}]
-        
+
         def forAllStructValues(struct, key, proc):
             vals = struct[key]
             if isinstance(vals, list):
@@ -114,7 +114,7 @@ def checkWebcam(device, id):
             forAllStructValues(struct, 'width', addRatesForWidth)
 
         return (name, element.get_factory().get_name(), sizes)
-                
+
     def tryV4L2():
         log.debug('webcam', 'trying v4l2')
         version = gstreamer.get_plugin_version('video4linux2')
@@ -125,14 +125,14 @@ def checkWebcam(device, id):
             return defer.fail(NotImplementedError())
 
         pipeline = 'v4l2src name=source device=%s ! fakesink' % (device,)
-        d = do_element_check(pipeline, 'source', probeDevice, 
+        d = do_element_check(pipeline, 'source', probeDevice,
                              state=gst.STATE_PAUSED, set_state_deferred=True)
-        return d 
+        return d
 
     def tryV4L1(_):
         log.debug('webcam', 'trying v4l1')
         pipeline = 'v4lsrc name=source device=%s ! fakesink' % (device,)
-        d = do_element_check(pipeline, 'source', probeDevice, 
+        d = do_element_check(pipeline, 'source', probeDevice,
                              state=gst.STATE_PAUSED, set_state_deferred=True)
         return d
 

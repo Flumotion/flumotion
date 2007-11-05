@@ -34,7 +34,7 @@ class FakeOptions:
         self.feederports = [9998]
         self.randomFeederports = False
         self.name = 'fakeworker'
-    
+
 class TestBrain(unittest.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())

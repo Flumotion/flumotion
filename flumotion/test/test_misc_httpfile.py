@@ -34,7 +34,7 @@ from flumotion.test import test_http
 
 from twisted.web import http
 
-       
+
 # FIXME: maybe merge into test_http's fake request ?
 class FakeRequest(test_http.FakeRequest):
     def __init__(self, **kwargs):
@@ -46,7 +46,7 @@ class FakeRequest(test_http.FakeRequest):
             return self.headers[field]
         except KeyError:
             return None
-            
+
     def setLastModified(self, last):
         pass
 
@@ -220,7 +220,7 @@ class TestDirectory(unittest.TestCase):
         fr.finishDeferred.addCallback(finish)
 
         return fr.finishDeferred
-        
+
     def testFLVStartZero(self):
         fr = FakeRequest(args={'start': [0]})
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),

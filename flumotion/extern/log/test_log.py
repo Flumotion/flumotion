@@ -55,13 +55,13 @@ class TestLog(unittest.TestCase):
     def testLimitInvisible(self):
         log.setDebug("testlog:3")
         log.addLimitedLogHandler(self.handler)
-        
+
         # log 2 we shouldn't get
         self.tester.log("not visible")
         assert not self.category
         assert not self.level
         assert not self.message
-        
+
         self.tester.debug("not visible")
         assert not self.category
         assert not self.level
@@ -70,31 +70,31 @@ class TestLog(unittest.TestCase):
     def testLimitedVisible(self):
         log.setDebug("testlog:3")
         log.addLimitedLogHandler(self.handler)
-        
+
         # log 3 we should get
         self.tester.info("visible")
         assert self.category == 'testlog'
         assert self.level == log.INFO
         assert self.message == 'visible'
-  
+
         self.tester.warning("also visible")
         assert self.category == 'testlog'
         assert self.level == log.WARN
         assert self.message == 'also visible'
-  
+
     def testFormatStrings(self):
         log.setDebug("testlog:3")
         log.addLimitedLogHandler(self.handler)
-        
+
         self.tester.info("%d %s", 42, 'the answer')
         assert self.category == 'testlog'
         assert self.level == log.INFO
         assert self.message == '42 the answer'
-  
+
     def testLimitedError(self):
         log.setDebug("testlog:3")
         log.addLimitedLogHandler(self.handler)
-        
+
         self.assertRaises(SystemExit, self.tester.error, "error")
         assert self.category == 'testlog'
         assert self.level == log.ERROR
@@ -103,7 +103,7 @@ class TestLog(unittest.TestCase):
     def testLogHandlerLimitedLevels(self):
         log.setDebug("testlog:3")
         log.addLimitedLogHandler(self.handler)
-        
+
         # now try debug and log again too
         log.setDebug("testlog:5")
 
@@ -111,7 +111,7 @@ class TestLog(unittest.TestCase):
         assert self.category == 'testlog'
         assert self.level == log.DEBUG
         assert self.message == 'debug'
-  
+
         self.tester.log("log")
         assert self.category == 'testlog'
         assert self.level == log.LOG
@@ -145,13 +145,13 @@ class TestOwnLogHandler(unittest.TestCase):
     def testOwnLogHandlerLimited(self):
         log.setDebug("testlog:3")
         log.addLogHandler(self.handler)
-        
+
         self.tester.log("visible")
         assert self.message == 'override visible'
-  
+
     def testLogHandlerAssertion(self):
         self.assertRaises(TypeError, log.addLimitedLogHandler, None)
-  
+
 class TestGetExceptionMessage(unittest.TestCase):
     def func3(self):
         self.func2()
@@ -183,4 +183,4 @@ class TestGetExceptionMessage(unittest.TestCase):
         self.failUnless("TypeError" in message)
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

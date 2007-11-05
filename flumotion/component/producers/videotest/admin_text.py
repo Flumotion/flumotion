@@ -46,7 +46,7 @@ class VideoTestAdminText(BaseAdminText):
                 for p in self.patterns:
                     if p.startswith(string.lower(input_split[1])):
                         available_commands.append(p)
-        
+
         return available_commands
 
     def runCommand(self, command):
@@ -68,7 +68,7 @@ class VideoTestAdminText(BaseAdminText):
             # get pattern
             d = self.callRemote("getElementProperty", "source", "pattern")
             newd = defer.Deferred()
-            d.addCallback(self._getpattern_cb, newd) 
+            d.addCallback(self._getpattern_cb, newd)
             return newd
         else:
             return None
@@ -76,7 +76,6 @@ class VideoTestAdminText(BaseAdminText):
     def _getpattern_cb(self, result, newd):
         pattern = self.patterns[result]
         newd.callback(pattern)
-                
-            
+
+
 UIClass = VideoTestAdminText
-        

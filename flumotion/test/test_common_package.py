@@ -40,7 +40,7 @@ class TestPackagePath(unittest.TestCase):
     def setUp(self):
         # store our old sys.path
         self.syspath = sys.path[:]
-        
+
         self._assertions = 0
 
         self.cwd = os.getcwd()
@@ -64,7 +64,7 @@ class TestPackagePath(unittest.TestCase):
                 del sys.modules[n]
         sys.path = self.syspath
         os.system("rm -r %s" % self.tempdir)
-        
+
         # sanity checks
         self.failIf('mypackage' in globals())
         self.failIf('mypackage' in sys.modules.keys())
@@ -129,7 +129,7 @@ class TestPackagePath(unittest.TestCase):
         packager = package.getPackager()
         packager.registerPackagePath(self.tempdir, 'tempdir')
         packager.unregister()
- 
+
     def testTwoStackedProjects(self):
         # we create two stacked projects both with a "mypackage" import space
         # project one:
@@ -138,7 +138,7 @@ class TestPackagePath(unittest.TestCase):
         # project two:
         #   tempdir/two/mypackage/__init__.py
         #   tempdir/two/mypackage/B.py
-        
+
         # each has parts of a common namespace
         # set up stuff so we can import from both
         # this shows we can develop uninstalled against uninstalled

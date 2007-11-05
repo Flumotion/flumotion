@@ -56,7 +56,7 @@ class FakeKeycard(pb.Cacheable, pb.RemoteCache):
             # we are being sent through a different broker than the one
             # that actually created us, so again, treat us as a cacheable
             return pb.Cacheable.jellyFor(self, jellier)
-            
+
         # we've already been seen by a broker, so we should be jellied as
         # a remotecache
         return pb.RemoteCache.jellyFor(self, jellier)
@@ -74,9 +74,9 @@ class FakeKeycard(pb.Cacheable, pb.RemoteCache):
         log.debug("fakekeycard", "%r.observe_setName, %r" % (self, name))
         # invoke the setter so our RemoteCache's in turn get notified
         return self.setName(name)
-        
+
     def stoppedObserving(self, perspective, observer):
-            self.observers.remove(observer)
+        self.observers.remove(observer)
 
 pb.setUnjellyableForClass(FakeKeycard, FakeKeycard)
 
@@ -91,14 +91,14 @@ class TestOnePB(unittest.TestCase):
 
     def tearDown(self):
         return self.pb.stop()
-        
+
     def testFakeKeycard(self):
         keycard = FakeKeycard()
         keycard.name = "tarzan"
         keycard.password = "jane"
 
         def _send():
-            # sending it should result in a keycard that does not have password
+        # sending it should result in a keycard that does not have password
             d = self.pb.send(keycard)
             return d
 
@@ -150,7 +150,7 @@ class TestTwoPB(unittest.TestCase):
         d = self.pb1.stop()
         d.addCallback(lambda r: self.pb2.stop())
         return d
-        
+
     def testFakeKeycard(self):
         keycard = FakeKeycard()
         keycard.name = "tarzan"
@@ -193,7 +193,7 @@ class TestTwoPB(unittest.TestCase):
         def _receive1(received2):
             d = self.pb1.receive(received2)
             return d
-            
+
         def _receive1Cb(received1):
             # receive in pb 1
             self.failUnless(received1)
@@ -218,5 +218,3 @@ class TestTwoPB(unittest.TestCase):
         d.addCallback(_setName)
         d.addCallback(_setNameCb)
         return d
-
-

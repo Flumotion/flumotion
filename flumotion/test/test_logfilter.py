@@ -52,9 +52,7 @@ class TestLogFilter(unittest.TestCase):
     def testParseFailure(self):
         filter = http.LogFilter()
         self.assertRaises(errors.ConfigError, filter.addIPFilter, "192.12")
-        self.assertRaises(errors.ConfigError, filter.addIPFilter, 
+        self.assertRaises(errors.ConfigError, filter.addIPFilter,
             "192.168.0.0/33")
-        self.assertRaises(errors.ConfigError, filter.addIPFilter, 
+        self.assertRaises(errors.ConfigError, filter.addIPFilter,
             "192.168.0.0/30/1")
-        
-

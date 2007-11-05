@@ -31,6 +31,6 @@ for name in sys.argv[1:]:
     fd = open(name)
     data = fd.read()
     fd.close()
-    
+
     data = data.replace(orig, new)
     open(name, 'w').write(data)

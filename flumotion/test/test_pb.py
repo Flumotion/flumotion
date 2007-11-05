@@ -80,7 +80,7 @@ class FakeBouncerPortal:
 class FakeAvatar(tpb.Avatar):
     implements(tpb.IPerspective)
     loggedIn = loggedOut = False
-    
+
     def __init__(self):
         pass
 
@@ -114,7 +114,7 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         # PB server creates a challenge
         self.challenge = tpb.challenge()
         # and a challenger to send to the client
-        self.challenger = tpb._PortalAuthChallenger(FakePortalWrapperPlaintext(), 
+        self.challenger = tpb._PortalAuthChallenger(FakePortalWrapperPlaintext(),
             'username', self.challenge)
 
     def testRightPassword(self):
@@ -127,7 +127,7 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         # client is asked to respond, so generate the response
         response = tpb.respond(self.challenge, 'wrong')
         d = self.challenger.remote_respond(response, None)
-        
+
         def wrongPasswordErrback(wrongpasserror):
             self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
 
@@ -145,7 +145,7 @@ class Test_BouncerWrapper(unittest.TestCase):
 
     def tearDown(self):
         self.bouncer.stop()
-        
+
     def testUACPPOk(self):
         mind = FakeMind()
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
@@ -155,18 +155,18 @@ class Test_BouncerWrapper(unittest.TestCase):
         def uacppOkCallback(result):
             self.assert_(isinstance(result, tpb.AsReferenceable))
             return result
-        
+
         d.addCallback(uacppOkCallback)
         return d
-    
+
     def testUACPPWrongPassword(self):
         keycard = keycards.KeycardUACPP('user', 'tes', '127.0.0.1')
-        d = self.wrapper.remote_login(keycard, "avatarId", 
+        d = self.wrapper.remote_login(keycard, "avatarId",
             'twisted.spread.pb.IPerspective')
-        
+
         def uacppWrongPasswordErrback(wrongpasserror):
             self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
-        
+
         d.addErrback(uacppWrongPasswordErrback)
         return d
 
@@ -175,30 +175,30 @@ class Test_BouncerWrapper(unittest.TestCase):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
 
         # send
-        d = self.wrapper.remote_login(keycard, None, 
+        d = self.wrapper.remote_login(keycard, None,
             'twisted.spread.pb.IPerspective')
-        
+
         def uacpccOkCallback(keycard):
             self.assertEquals(keycard.state, keycards.REQUESTING)
             # respond to challenge
             keycard.setPassword('test')
-            d = self.wrapper.remote_login(keycard, None, 
+            d = self.wrapper.remote_login(keycard, None,
                 'twisted.spread.pb.IPerspective')
             def uacpccOkCallback2(result):
                 self.assert_(isinstance(result, tpb.AsReferenceable))
                 return result
             d.addCallback(uacpccOkCallback2)
             return d
-        
+
         d.addCallback(uacpccOkCallback)
         return d
-            
+
     def testUACPCCWrongUser(self):
         # create
         keycard = keycards.KeycardUACPCC('wronguser', '127.0.0.1')
 
         # send
-        d = self.wrapper.remote_login(keycard, "avatarId", 
+        d = self.wrapper.remote_login(keycard, "avatarId",
             'twisted.spread.pb.IPerspective')
 
         def uacpccWrongUserCallback(keycard):
@@ -213,7 +213,7 @@ class Test_BouncerWrapper(unittest.TestCase):
                 return True
             d.addErrback(uacpccWrongUserErrback)
             return d
-        
+
         d.addCallback(uacpccWrongUserCallback)
         return d
 
@@ -321,7 +321,7 @@ class Test_FPBClientFactory(unittest.TestCase):
             self.flushLoggedErrors(errors.NotAuthenticatedError)
         except AttributeError:
             tlog.flushErrors(errors.NotAuthenticatedError)
-        
+
     def tearDown(self):
         self.bouncer.stop()
         self.flushNotAuthenticatedError()
@@ -345,16 +345,16 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         a = pb.Authenticator(username="user", password="test",
             address="127.0.0.1")
 
-        # send 
+        # send
         d = factory.login(a)
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def OkCallback(result):
             # make sure we really used challenge/response keycard
             self.failUnless(isinstance(factory.keycard, keycards.KeycardUACPCC))
             self.assert_(isinstance(result, tpb.RemoteReference))
             return self.clientDisconnect(factory, result)
-        
+
         d.addCallback(OkCallback)
         return d
 
@@ -378,7 +378,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             return True
         d.addErrback(WrongPasswordErrback)
         return d
-        
+
 # FIXME: rewrite such that we can enforce a challenger, possibly
 # by setting a property on the bouncer
     def notestUACPCCOk(self):
@@ -387,7 +387,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         # send
         d = factory.login(self.authenticator, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def OkCallback(keycard):
             # get result
             self.assertEquals(keycard.state, keycards.REQUESTING)
@@ -400,7 +400,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
                 return self.clientDisconnect(factory, result)
             d.addCallback(uacpccOkCallback2)
             return d
-        
+
         d.addCallback(uacpccOkCallback)
         return d
 
@@ -414,19 +414,19 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         # send
         d = factory.login(a)
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def WrongUserCb(keycard):
             self.fail("Should have returned NotAuthenticatedError")
-            
+
         def WrongUserEb(failure):
             # find copied failure
             self.failUnless(failure.check(
                 "flumotion.common.errors.NotAuthenticatedError"))
             return self.clientDisconnect(factory, None)
-    
+
         d.addCallback(WrongUserCb)
         d.addErrback(WrongUserEb)
-    
+
         return d
 
     def notestUACPCCWrongPassword(self):
@@ -438,7 +438,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def uacpccWrongPasswordCallback(keycard):
             self.assertEquals(keycard.state, keycards.REQUESTING)
 
@@ -451,10 +451,10 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
                 self.failUnless(failure.check(
                     "flumotion.common.errors.NotAuthenticatedError"))
                 return self.clientDisconnect(factory, None)
-            
+
             d.addErrback(uacpccWrongPasswordErrback)
             return d
-        
+
         d.addCallback(uacpccWrongPasswordCallback)
         return d
 
@@ -469,7 +469,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def uacpccTamperCallback(keycard):
             self.assertEquals(keycard.state, keycards.REQUESTING)
 
@@ -477,7 +477,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             keycard.challenge = "I am a h4x0r"
             keycard.setPassword('test')
             d = factory.login(keycard, 'MIND')
-            
+
             def uacpccTamperErrback(failure):
                 # find copied failure
                 self.failUnless(failure.check(
@@ -498,16 +498,16 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         factory = pb.FPBClientFactory()
         a = pb.Authenticator(username="user", password="test",
             address="127.0.0.1")
-        # send 
+        # send
         d = factory.login(a)
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def OkCallback(result):
             # make sure we really used an SHA256 challenge/response keycard
             self.failUnless(isinstance(factory.keycard, keycards.KeycardUASPCC))
             self.assert_(isinstance(result, tpb.RemoteReference))
             return self.clientDisconnect(factory, result)
-        
+
         d.addCallback(OkCallback)
         return d
 
@@ -531,7 +531,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             return True
         d.addErrback(WrongPasswordErrback)
         return d
-        
+
     def testWrongUser(self):
         factory = pb.FPBClientFactory()
 
@@ -542,19 +542,19 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         # send
         d = factory.login(a)
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def WrongUserCb(keycard):
             self.fail("Should have returned NotAuthenticatedError")
-            
+
         def WrongUserEb(failure):
             # find copied failure
             self.failUnless(failure.check(
                 "flumotion.common.errors.NotAuthenticatedError"))
             return self.clientDisconnect(factory, None)
-    
+
         d.addCallback(WrongUserCb)
         d.addErrback(WrongUserEb)
-    
+
         return d
 
 # FIXME: do this with a fake authenticator that tampers with the challenge
@@ -569,7 +569,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        
+
         def uacpccTamperCallback(keycard):
             self.assertEquals(keycard.state, keycards.REQUESTING)
 
@@ -577,7 +577,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             keycard.challenge = "I am a h4x0r"
             keycard.setPassword('test')
             d = factory.login(keycard, 'MIND')
-            
+
             def uacpccTamperErrback(failure):
                 # find copied failure
                 self.failUnless(failure.check(
@@ -591,4 +591,4 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
 
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

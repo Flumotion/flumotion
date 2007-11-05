@@ -28,7 +28,7 @@ class Servicer(log.Loggable):
     """
     I manage running managers and workers on behalf of a service script.
     """
-    
+
     logCategory = 'servicer'
 
     def __init__(self, configDir=None, logDir=None, runDir=None):
@@ -63,7 +63,7 @@ class Servicer(log.Loggable):
         which = args[0]
         if which not in ['manager', 'worker']:
             raise errors.SystemError, 'Please specify either manager or worker'
-            
+
         if len(args) < 2:
             raise errors.SystemError, 'Please specify which %s to %s' % (
                 which, command)
@@ -79,7 +79,7 @@ class Servicer(log.Loggable):
             if not name in workers:
                 raise errors.SystemError, 'No worker with name %s' % name
             workers = [name, ]
-            
+
         return (managers, workers)
 
     def _getDirOptions(self):
@@ -186,7 +186,7 @@ class Servicer(log.Loggable):
         for name in managers:
             if not self.stopManager(name):
                 exitvalue += 1
-            
+
         return exitvalue
 
     def status(self, args):
@@ -341,7 +341,7 @@ user:PSfNpHTkpTx1M
 
         return True
 
- 
+
     def startManager(self, name, flowNames):
         """
         Start the manager as configured in the manager directory for the given
@@ -376,7 +376,7 @@ user:PSfNpHTkpTx1M
             else:
                 raise errors.SystemError, \
                     "Manager %s is dead (stale pid %d)" % (name, pid)
-            
+
         dirOptions = self._getDirOptions()
         command = "flumotion-manager %s -D --daemonize-to %s " \
             "--service-name %s %s %s" % (
@@ -420,7 +420,7 @@ user:PSfNpHTkpTx1M
             else:
                 raise errors.SystemError, \
                     "Worker %s is dead (stale pid %d)" % (name, pid)
-            
+
         # we are sure the worker is not running and there's no pid file
         self.info("Loading worker %s" % workerFile)
 
@@ -533,7 +533,7 @@ user:PSfNpHTkpTx1M
             # busy loop until kill is done
 
         return True
-  
+
     def list(self):
         """
         List all service parts managed.
@@ -544,9 +544,8 @@ user:PSfNpHTkpTx1M
             print "manager %s" % name
             if flows:
                 for flow in flows:
-                   print "        flow %s" % flow
+                    print "        flow %s" % flow
 
         workers = self.getWorkers()
         for worker in workers:
             print "worker  %s" % worker
-

@@ -226,7 +226,7 @@ class WizardSidebar(gtk.EventBox):
             self.set_active(self.active + 1)
             self.top += 1
             self.sections[self.active].push_header()
-            
+
     def pop(self):
         if self.sections[self.top].steps:
             self.sections[self.top].pop_step()

@@ -41,7 +41,7 @@ def _debug(*args):
 
 # only Controller is to be shown in epydoc
 __all__ = ('Controller', )
-    
+
 class Controller(gobject.GObject):
     """
     Controller for a spyglass, used for viewing a video feed.
@@ -51,7 +51,7 @@ class Controller(gobject.GObject):
     # now"
     gsignal('prepared')
     gsignal('focus-changed', object)
-    
+
     def __init__(self):
         """
         Create a new spyglass controller.
@@ -147,11 +147,11 @@ class View(gobject.GObject):
         row = self._focus_model[combo.get_active()]
         key = row[1]
         self.emit('focus-changed', key)
-        
+
     def view_exposed_cb(self, widget, event):
         'store our xid now that we are exposed'
         widget.disconnect(self._expose_id)
-        self._xid = widget.window.xid 
+        self._xid = widget.window.xid
         _debug("view_exposed_cb, got xid %d" % self._xid)
         self.emit('have-xid', self._xid)
 
@@ -166,7 +166,7 @@ class Model:
     def set_xid(self, xid):
         # use of long is due to a pygtk bug
         self._sink.set_xwindow_id(long(xid))
-        
+
 # register our types globally
 pygobject.type_register(View)
 pygobject.type_register(Controller)
@@ -216,6 +216,6 @@ if __name__ == '__main__':
         thread.add(e)
         if prev: prev.link(e)
         prev = e
-    
+
     _debug("going into gtk.main")
     gtk.main()

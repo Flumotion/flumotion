@@ -84,11 +84,11 @@ class Event(log.Loggable):
             if now is None:
                 now = datetime.now(LOCAL)
             if end.tzinfo is None:
-                end = datetime(end.year, end.month, end.day, end.hour, 
+                end = datetime(end.year, end.month, end.day, end.hour,
                     end.minute, end.second, end.microsecond, LOCAL)
             if start.tzinfo is None:
-                start = datetime(start.year, start.month, start.day, 
-                    start.hour, start.minute, start.second, 
+                start = datetime(start.year, start.month, start.day,
+                    start.hour, start.minute, start.second,
                     start.microsecond, LOCAL)
 
             if isinstance(recur, timedelta):
@@ -100,7 +100,7 @@ class Event(log.Loggable):
                                              interval=interval,
                                              dtstart=start)
             else:
-                endRecurRule = rrule.rrulestr(recur, dtstart=end) 
+                endRecurRule = rrule.rrulestr(recur, dtstart=end)
                 startRecurRule = rrule.rrulestr(recur, dtstart=start)
 
             if end < now:
@@ -165,7 +165,7 @@ class EventStore(avltree.AVLTree, log.Loggable):
 class Scheduler(log.Loggable):
     """
     I keep track of upcoming events.
-    
+
     I can provide notifications when events stop and start, and maintain
     a set of current events.
     """
@@ -267,7 +267,7 @@ class Scheduler(log.Loggable):
                 self._eventStarted(event)
         assert self.current == current
         self._reschedule()
-        
+
     def subscribe(self, eventStarted, eventStopped):
         """Subscribe to event happenings in the scheduler.
 
@@ -322,7 +322,7 @@ class Scheduler(log.Loggable):
         def doStart(e):
             self._eventStarted(e)
             self._reschedule()
-            
+
         def doStop(e):
             self._eventStopped(e)
             self.events.delete(e)
@@ -330,7 +330,7 @@ class Scheduler(log.Loggable):
             if new:
                 self.events.insert(new)
             self._reschedule()
-            
+
         if self._delayedCall:
             if self._delayedCall.active():
                 self._delayedCall.cancel()
@@ -395,7 +395,7 @@ class ICalScheduler(Scheduler):
                 summary = event.decoded('summary', None)
                 recur = event.get('rrule', None)
                 if start and end:
-                    self.debug("start %r tzname %s end %r recur %r", start, 
+                    self.debug("start %r tzname %s end %r recur %r", start,
                         start.tzname(), end, recur)
                     if recur:
                         e = Event(start, end, summary, recur.ical())

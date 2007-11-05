@@ -34,7 +34,7 @@ from flumotion.common import log
 class _ServerContextFactory(log.Loggable):
 
     logCategory = "SSLServer"
-    
+
     def __init__(self, pemFile):
         self._pemFile = pemFile
 
@@ -71,14 +71,14 @@ class IServable(Interface):
         @param useSSL: whether this connection uses SSL
         @type  useSSL: bool
         """
-    
+
 class Server(log.Loggable):
     logCategory = "server"
 
     def __init__(self, servable):
         """
         I expose a servable to the network using TCP or SSL.
-        
+
         @type servable: an implemtor of L{IServable}
         """
         self._servable = servable
@@ -104,7 +104,7 @@ class Server(log.Loggable):
                 "chapter-security.html" % pemFile)
         log.debug('manager', 'Using PEM certificate file %s' % pemFile)
         ctxFactory = _ServerContextFactory(pemFile)
-        
+
         self.info('Starting on port %d using SSL' % port)
         if not host == "":
             self.info('Listening as host %s' % host)

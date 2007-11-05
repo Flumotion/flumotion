@@ -47,10 +47,10 @@ class FlexibleCredentialsChecker(log.Loggable):
     def __init__(self, **users):
         self.users = users
         self._passwordless = False # do we allow passwordless logins ?
-        
+
     def allowPasswordless(self, wellDoWeQuestionMark):
         self._passwordless = wellDoWeQuestionMark
-                         
+
     def addUser(self, username, password):
         self.users[username] = password
 

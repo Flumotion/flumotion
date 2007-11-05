@@ -34,16 +34,16 @@ def get_gst_version(gst):
         return gst.version()
     else:
         return gst.gst_version + (0,)
-    
+
 def get_pygst_version(gst):
     if hasattr(gst, 'get_pygst_version'):
         return gst.get_pygst_version()
     else:
         return gst.pygst_version + (0,)
-    
+
 def checkTicket347():
     """
-    Check for a recent enough PyGTK to not leak python integers in message 
+    Check for a recent enough PyGTK to not leak python integers in message
     processing (mostly affects soundcard, firewire)
     """
     result = messages.Result()
@@ -55,10 +55,10 @@ def checkTicket347():
     (major, minor, nano) = gobject.pygtk_version
     if (major, minor, nano) < (2, 8, 6):
         m = messages.Warning(T_(
-            N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"), 
+            N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"),
             major, minor, nano),
             id = 'ticket-347')
-        m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
+        m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of "
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
             'pygtk', '2.8.6'))
@@ -75,10 +75,10 @@ def checkTicket348():
     (major, minor, nano) = gst.pygst_version
     if (major, minor, nano) < (0, 10, 3):
         m = messages.Warning(T_(
-            N_("Version %d.%d.%d of the gst-python library contains a large memory leak.\n"), 
+            N_("Version %d.%d.%d of the gst-python library contains a large memory leak.\n"),
             major, minor, nano),
             id = 'ticket-348')
-        m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
+        m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of "
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
             'gst-python', '0.10.3'))

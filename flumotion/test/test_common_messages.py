@@ -98,7 +98,7 @@ class TranslatorTest(unittest.TestCase):
         translator.addLocaleDir('flumotion', localedir)
         text = translator.translateTranslatable(t, lang=["nl_NL"])
         self.assertEquals(text, 'Andy kan vertaald worden')
-        
+
     def testTranslateMessage(self):
         cmsg = messages.Error(T_(N_("Something is really wrong. ")))
         t = T_(N_("But does %s know what ?"), "Andy")
@@ -142,7 +142,7 @@ class ResultTest(unittest.TestCase):
         self.assertEquals(m.level, messages.ERROR)
         text = self.translator.translate(m, lang=["nl_NL",])
         self.assertEquals(text, "o jeetje")
-      
+
 # test if appending and removing messages works across a PB connection
 class TestStateCacheable(flavors.StateCacheable):
     pass
@@ -153,7 +153,7 @@ pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
 class TestRoot(testclasses.TestManagerRoot, log.Loggable):
 
     logCategory = "testroot"
-    
+
     def setup(self):
         self.translatable = (T_(N_("Note")))
         self.message = messages.Info(self.translatable)
@@ -179,7 +179,7 @@ class TestRoot(testclasses.TestManagerRoot, log.Loggable):
         # just return a message, to test serialization
         self.debug("remote_getMessage: returning %r" % self.message)
         return self.message
-        
+
     def remote_appendMessage(self):
         self.state.append('messages', self.message)
 
@@ -201,7 +201,7 @@ class PBSerializationTest(unittest.TestCase):
         d = self.stopServer()
         yield d
     tearDown = defer_generator_method(tearDown)
-        
+
     # helper functions to start PB comms
     def runClient(self):
         f = pb.PBClientFactory()
@@ -238,7 +238,7 @@ class PBSerializationTest(unittest.TestCase):
     def testGetSameTranslatableTwice(self):
         # getting the remote translatable twice
         # should result in equal (but not necessarily the same) object
-    
+
         # start everything
         d = self.runClient()
         def runClientCallback(result):
@@ -255,7 +255,7 @@ class PBSerializationTest(unittest.TestCase):
                     self.assertEquals(t1, t2)
                     self.failUnless(t1 == t2)
                     self.failIf(t1 is t2)
-     
+
                     # stop
                     d = self.stopClient()
                     def stopClientCallback(res):
@@ -272,7 +272,7 @@ class PBSerializationTest(unittest.TestCase):
     def testGetEqualTranslatableTwice(self):
         # getting two different but equal translatable twice
         # will also result in equal (but not necessarily the same) object
-    
+
         # start everything
         d = self.runClient()
         def runClientCallback(result):
@@ -300,7 +300,7 @@ class PBSerializationTest(unittest.TestCase):
     def testGetSameMessageTwice(self):
         # getting two proxied reference of the same ManagerMessage
         # should result in equal, but different objects
-    
+
         # start everything
         d = self.runClient()
         def runClientCallback(result):

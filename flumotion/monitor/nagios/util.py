@@ -38,7 +38,7 @@ class LogCommand(command.Command, log.Loggable):
 def findComponent(planet, avatarId):
     """
     Finds the component with the given avatarId in the given planet.
-    
+
     returns: the component state or None.
     """
     flowName, componentName = common.parseComponentId(avatarId)
@@ -48,7 +48,7 @@ def findComponent(planet, avatarId):
             if c.get('name') == componentName:
                 return c
         return None
-    
+
     for f in planet.get('flows'):
         if f.get('name') == flowName:
             for c in f.get('components'):

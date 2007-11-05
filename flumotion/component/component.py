@@ -56,7 +56,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         """
         # doing this as a class method triggers a doc error
         fpb.ReconnectingFPBClientFactory.__init__(self)
-        
+
         self.component = component
         # make a medium to interface with the manager
         self.medium = component.componentMediumClass(component)
@@ -86,23 +86,23 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
             self._previously_connected = True
-        
+
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def accessDeniedErrback(failure):
             failure.trap(errors.NotAuthenticatedError)
             self.warning('Access denied.')
-            
+
         def connectionRefusedErrback(failure):
             failure.trap(error.ConnectionRefusedError)
             self.warning('Connection to manager refused.')
-                                                          
+
         def alreadyLoggedInErrback(failure):
             failure.trap(errors.AlreadyConnectedError)
             self.warning('Component with id %s is already logged in.',
                 self.medium.authenticator.avatarId)
-                                                          
+
         def loginFailedErrback(failure):
             self.warning('Login failed, reason: %s' % failure)
 
@@ -178,7 +178,7 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         Return the IP of this component based on connection to the manager.
 
-        Note: this is insufficient in general, and should be replaced by 
+        Note: this is insufficient in general, and should be replaced by
         network mapping stuff later.
         """
         assert self.remote
@@ -211,7 +211,7 @@ class BaseComponentMedium(medium.PingingMedium):
         # here
         self.comp.state.set('manager-ip', self.getManagerIP())
         return self.comp.state
-        
+
     def remote_getConfig(self):
         """
         Return the configuration of the component.
@@ -224,7 +224,7 @@ class BaseComponentMedium(medium.PingingMedium):
         except AttributeError:
             self.debug('getConfig(), but component is not set up yet')
             return None
-        
+
     def remote_stop(self):
         self.info('Stopping component')
         return self.comp.stop()
@@ -282,13 +282,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
     logCategory = 'basecomp'
     componentMediumClass = BaseComponentMedium
-    
+
     def __init__(self, config, haveError=None):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
         Subclasses should not override __init__ at all.
-        
+
         Instead, they should implement init(), which will be called
         by this implementation automatically.
 
@@ -316,13 +316,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.state = planet.WorkerJobState()
 
         self.name = self.config['name']
-        
+
         #self.state.set('name', name)
         self.state.set('pid', os.getpid())
         self.setMood(moods.waking)
 
         self.medium = None # the medium connecting us to the manager's avatar
- 
+
         self.uiState = componentui.WorkerComponentUIState()
 
         # FIXME: when we need this somewhere else, put this in a class and
@@ -428,7 +428,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         if self._shutdownHook:
             self.debug('_stoppedCallback: firing shutdown hook')
             self._shutdownHook()
- 
+
     ### BaseComponent implementation related to compoment protocol
     def setup(self):
         """
@@ -439,7 +439,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         def run_setups():
             setups = common.get_all_methods(self, 'do_setup', False)
             return maybe_deferred_chain(setups, self)
-            
+
         def go_happy(_):
             self.debug('setup complete, going happy')
             self.setMood(moods.happy)
@@ -468,7 +468,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         When a component is stopped, then this hook will be fired.
         """
         self._shutdownHook = shutdownHook
-        
+
     def stop(self):
         """
         Tell the component to stop.
@@ -541,7 +541,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
             d = defer.Deferred()
             self._happyWaits.append(d)
             return d
-        
+
     def addMessage(self, message):
         """
         Add a message to the component.
@@ -555,7 +555,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self.setMood(moods.sad)
             if self._haveError:
                 self._haveError(message)
-        
+
     def fixRenamedProperties(self, properties, list):
         """
         Fix properties that have been renamed from a previous version,

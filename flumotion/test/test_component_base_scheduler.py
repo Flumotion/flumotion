@@ -63,7 +63,7 @@ class EventTest(unittest.TestCase):
         self.assertEquals(e.end, end + timedelta(hours=4))
         self.assertEquals(e.content, 'foo')
         self.assertEquals(e.recur, recur)
-        
+
     def testComparison(self):
         now = scheduler.now()
         hour = timedelta(hours=1)
@@ -74,7 +74,7 @@ class EventTest(unittest.TestCase):
                         scheduler.Event(now, now+hour, 'foo'))
         self.failUnless(scheduler.Event(now+hour, now+2*hour, 'foo') >
                         scheduler.Event(now, now+hour, 'foo'))
-        
+
     def testTimeZones(self):
         now = datetime.now()
         hour = timedelta(hours=1)
@@ -98,7 +98,7 @@ class SchedulerTest(unittest.TestCase):
         calls = []
         started = lambda c: calls.append(('started', c.content))
         stopped = lambda c: calls.append(('stopped', c.content))
-            
+
         s = scheduler.Scheduler()
         sid = s.subscribe(started, stopped)
 

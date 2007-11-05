@@ -45,7 +45,7 @@ class TestProgressDialog(unittest.TestCase):
         def stop(dialog):
             dialog.stop()
             gtk.main_quit()
-            
+
         gobject.timeout_add(1 * INTERVAL,
             lambda dialog: dialog.message('Step 1'), dialog)
         gobject.timeout_add(2 * INTERVAL,
@@ -68,7 +68,7 @@ class TestPropertyChangeDialog(unittest.TestCase):
         dialog.connect('get', self.get_cb)
         dialog.connect('set', self.set_cb)
         dialog.show_all()
-        
+
         dialog.element_entry.set_text('fakesrc')
         dialog.property_entry.set_text('silent')
         gobject.timeout_add(1 * INTERVAL,
@@ -94,7 +94,7 @@ class TestPropertyChangeDialog(unittest.TestCase):
         self.failUnlessEqual(value, 'True')
         dialog._close.emit('clicked')
         gtk.main_quit()
- 
+
 class TestErrorDialog(unittest.TestCase):
     def setUp(self):
         self.window = gtk.Window()
@@ -107,18 +107,18 @@ class TestErrorDialog(unittest.TestCase):
         self.failUnlessEqual(dialog.get_property('visible'), False)
         dialog.show_all()
         self.failUnlessEqual(dialog.get_property('visible'), True)
-        
+
         # find the button and "click" it
         hbox = dialog.action_area
         list = hbox.get_children()
         button = list[0]
         self.failUnless(isinstance(button, gtk.Button))
-        
+
         gobject.timeout_add(1 * INTERVAL, lambda b: b.emit('clicked'), button)
         dialog.connect('unmap', lambda w: gtk.main_quit())
-        
+
         gtk.main()
-        
+
         self.failUnlessEqual(dialog.get_property('visible'), False)
 
     def testDialogRun(self):
@@ -126,13 +126,13 @@ class TestErrorDialog(unittest.TestCase):
         self.failUnlessEqual(dialog.get_property('visible'), False)
         dialog.show_all()
         self.failUnlessEqual(dialog.get_property('visible'), True)
-        
+
         # find the button and "click" it
         hbox = dialog.action_area
         list = hbox.get_children()
         button = list[0]
         self.failUnless(isinstance(button, gtk.Button))
-        
+
         gobject.timeout_add(1 * INTERVAL, lambda b: b.emit('clicked'), button)
         d = dialog.run()
         def check_visibility():

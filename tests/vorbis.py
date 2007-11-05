@@ -70,5 +70,5 @@ if __name__ == '__main__':
     p = setup_pipeline()
 
     p.set_state(gst.STATE_PLAYING)
-    
+
     p.get_bus().poll(gst.MESSAGE_EOS, -1)

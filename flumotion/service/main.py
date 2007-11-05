@@ -84,7 +84,7 @@ def main(args):
     except IndexError:
         print "Usage: flumotion {list|start|stop|restart|status|clean} [which]"
         sys.exit(0)
-    
+
     if command == "list":
         return servicer.list()
     elif command == "start":

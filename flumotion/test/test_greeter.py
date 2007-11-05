@@ -33,7 +33,7 @@ def prev():
     click('button_prev')
 def next():
     click('button_next')
-        
+
 def check_prev_next(can_prev, can_next):
     def assert_sensitive(name, s):
         assert_call_returns(name, 'get_property', s, 'sensitive')
@@ -83,7 +83,7 @@ class WizardTest(unittest.TestCase):
         # I don't know why it needs so many, but it seems it does to actually
         # unmap the window
         for i in range(1, 32): gtk.main_iteration()
-        
+
         refstate = {'passwd': 'baz', 'host': 'foolio', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         self.assertEquals(state, refstate)

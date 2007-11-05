@@ -46,7 +46,7 @@ class IcalBouncer(bouncer.Bouncer):
     logCategory = 'icalbouncer'
     keycardClasses = (KeycardGeneric)
     events = []
-    
+
     def do_setup(self):
         if not HAS_ICAL:
             return defer.fail(
@@ -76,4 +76,3 @@ class IcalBouncer(bouncer.Bouncer):
             return keycard
         self.info("failed in authentication, outside hours")
         return None
-

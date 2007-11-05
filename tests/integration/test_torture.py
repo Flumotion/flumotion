@@ -78,4 +78,3 @@ class TestStopStart(common.FlumotionManagerWorkerTest):
 
     testAudioTestMultipleStopStarts = integration.test(
         testAudioTestMultipleStopStarts)
-

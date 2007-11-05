@@ -26,7 +26,7 @@ from flumotion.common import errors, log, messages, gstreamer
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
-    
+
 def handleGStreamerDeviceError(failure, device):
     """
     Handle common GStreamer GstErrors or other.
@@ -39,7 +39,7 @@ def handleGStreamerDeviceError(failure, device):
         log.debug('check',
             'GStreamer GError: %s (domain %s, code %d, debug %s)' % (
                 gerror.message, gerror.domain, gerror.code, debug))
-        
+
         if gerror.domain == "gst-resource-error-quark":
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
                 m = messages.Error(T_(
@@ -62,8 +62,8 @@ def handleGStreamerDeviceError(failure, device):
                 debug="%s\n%s: %d\n%s" % (
                     gerror.message, gerror.domain, gerror.code, debug))
     elif failure.check(errors.GStreamerError):
-            m = messages.Error(T_(N_("Internal GStreamer error.")),
-                debug=debugFailure(failure))
+        m = messages.Error(T_(N_("Internal GStreamer error.")),
+            debug=debugFailure(failure))
     log.debug('check', 'handleGStreamerError: returning %r' % m)
     return m
 
@@ -128,7 +128,7 @@ class CheckProcError(Exception):
 
 def checkImport(moduleName):
     log.debug('check', 'checkImport: %s', moduleName)
-    __import__(moduleName) 
+    __import__(moduleName)
 
 def checkElements(elementNames):
     log.debug('check', 'checkElements: element names to check %r',
@@ -153,7 +153,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
     result = messages.Result()
     version = gstreamer.get_plugin_version(pluginName)
     if not version:
-        m = messages.Error(T_( 
+        m = messages.Error(T_(
             N_("This host is missing the '%s' GStreamer plug-in.\n"),
                 pluginName))
         m.add(T_(N_(
@@ -161,7 +161,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
         result.add(m)
     else:
         if version < minimumVersion:
-            m = messages.Error(T_( 
+            m = messages.Error(T_(
                 N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
                    ".".join([str(x) for x in version]), pluginName),
                 id = 'plugin-%s-check' % pluginName)

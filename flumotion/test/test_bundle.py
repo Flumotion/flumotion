@@ -57,7 +57,7 @@ class TestBundler(unittest.TestCase):
     def testBundlerTwoSum(self):
         b = self.bundler.bundle()
         sum = b.md5sum
-        
+
         (handle, path) = tempfile.mkstemp()
         os.write(handle, "a bit of text to test")
         os.close(handle)
@@ -136,7 +136,7 @@ class TestUnbundler(unittest.TestCase):
         b = bundler.bundle()
 
         unbundler = bundle.Unbundler(self.tempdir)
-        
+
         dir = unbundler.unbundle(b)
 
         # make sure it unpacked
@@ -153,7 +153,7 @@ class TestUnbundler(unittest.TestCase):
         bundler.add(self.filename, 'this/is/a/test.py')
         b = bundler.bundle()
         unbundler = bundle.Unbundler(self.tempdir)
-        
+
         dir = unbundler.unbundle(b)
 
         # make sure it unpacked
@@ -171,7 +171,7 @@ class TestBundlerBasket(unittest.TestCase):
         # create test files
         self.tempdir = tempfile.mkdtemp()
 
-        
+
         self.packagedir = os.path.join(self.tempdir, 'package')
         os.mkdir(self.packagedir)
         self.packagefile = os.path.join(self.packagedir, '__init__.py')
@@ -183,7 +183,7 @@ class TestBundlerBasket(unittest.TestCase):
         handle = open(self.pythonfile, 'w')
         handle.write("print 'I am a bit of python'")
         handle.close()
-        
+
         self.pythoncfile = os.path.join(self.tempdir, 'test.pyc')
         handle = open(self.pythoncfile, 'w')
         handle.write("XXXX I am fake bytecode")
@@ -268,6 +268,6 @@ class TestBundlerBasket(unittest.TestCase):
         os.unlink(self.pythoncfile)
         os.unlink(self.textfile)
         os.rmdir(self.tempdir)
- 
+
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

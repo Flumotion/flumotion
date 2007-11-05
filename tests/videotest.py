@@ -48,7 +48,7 @@ def _debug(*args):
 
 # only Controller is to be shown in epydoc
 __all__ = ('Controller', )
-    
+
 class Controller(gobject.GObject):
     """
     Controller for a video test producer, used to generate a video test feed.
@@ -57,7 +57,7 @@ class Controller(gobject.GObject):
 # FIXME: decide on a good name for prepared that says "you can do stuff with me
 # now"
     gsignal('prepared')
-    
+
     def __init__(self):
         """
         Create a new video test controller.
@@ -120,7 +120,7 @@ class View(gobject.GObject):
     gsignal('framerate-changed', float)
     gsignal('format-changed', int)
     gsignal('pattern-changed', int)
-   
+
     latency = 100 # latency for timeouts on config changes
 
     def __init__(self):
@@ -199,7 +199,7 @@ class View(gobject.GObject):
         self.emit('format-changed', format)
         self._format_timeout = 0
         return gtk.FALSE
- 
+
     ### callbacks
     def width_changed_cb(self, widget):
         if not self._width_timeout:
@@ -231,7 +231,7 @@ class Model:
     def get_element(self):
         'Gets the element we should link and put in our main bin'
         return self._src
-        
+
     def get_caps(self):
         'Gets the caps that should be used as filter'
         return self._caps
@@ -369,7 +369,7 @@ if __name__ == '__main__':
     box.add(area)
     window.add(box)
     window.show_all()
-    
+
     # embed the model in our fake toplevel model
     src = controller.model.get_element()
     prev = None

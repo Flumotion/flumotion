@@ -58,7 +58,7 @@ the RRD resource poller.
 
 def sourceGetFileName(source):
     return source['rrd-file']
-    
+
 def sourceGetName(source):
     return source['name']
 
@@ -100,7 +100,7 @@ class RRDMonitor(log.Loggable):
         self.ensureRRDFiles(sources)
         self.connectToManagers(sources)
         self.startScheduler(sources)
-        
+
     def ensureRRDFiles(self, sources):
         for source in sources:
             rrdfile = sourceGetFileName(source)

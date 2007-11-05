@@ -36,7 +36,7 @@ class TestPadMonitor(unittest.TestCase):
         pipeline.set_state(gst.STATE_PLAYING)
         pipeline.get_bus().poll(gst.MESSAGE_EOS, -1)
         pipeline.set_state(gst.STATE_NULL)
-        
+
     def testPadMonitorActivation(self):
         pipeline = gst.parse_launch(
             'fakesrc num-buffers=1 ! identity name=id ! fakesink')
@@ -78,7 +78,7 @@ class TestPadMonitor(unittest.TestCase):
             # We can't detach the monitor from this callback safely, so do
             # it from a reactor.callLater()
             reactor.callLater(0, finished)
-            
+
         def hasActivated():
             self.assertEquals(monitor.isActive(), True)
             # Now, we don't send any more data, and after our 0.5 second timeout

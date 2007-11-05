@@ -34,7 +34,7 @@ class TokenTestBase(log.Loggable):
 
     def haveProperties(self, properties):
         self._authtoken = properties['authorized-token']
-   
+
     def do_authenticate(self, keycard):
         keycard_data = keycard.getData()
         self.debug('authenticating keycard from requester %s with token %s',

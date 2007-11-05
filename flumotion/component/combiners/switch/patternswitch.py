@@ -41,17 +41,17 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
                     "eater-with-stream-markers property " \
                     "must be one of video-backup, video-master."
                 self.warning(warnStr)
-                self.addMessage(messages.Error(T_(N_(warnStr)), 
+                self.addMessage(messages.Error(T_(N_(warnStr)),
                     id="eater-with-stream-markers-wrong"))
             return result
         d.addCallback(checkConfig)
         return d
 
     def configure_pipeline(self, pipeline, properties):
-        basicwatchdog.AVBasicWatchdog.configure_pipeline(self, pipeline, 
+        basicwatchdog.AVBasicWatchdog.configure_pipeline(self, pipeline,
             properties)
         # set event probe to react to video mark events
-        eaterName = properties.get('eater-with-stream-markers', 
+        eaterName = properties.get('eater-with-stream-markers',
             'video-backup')
         sinkpad = self.videoSwitchElement.get_pad(self.switchPads[eaterName])
         sinkpad.add_event_probe(self._markers_event_probe)

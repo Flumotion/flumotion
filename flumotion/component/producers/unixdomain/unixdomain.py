@@ -34,7 +34,7 @@ class DumbProtocol(Protocol):
     def connectionMade(self):
         """ Stop reading/writing """
         if self.factory.component.currentTransport:
-            
+
             self.transport.loseConnection()
             return
         self.transport.stopReading()

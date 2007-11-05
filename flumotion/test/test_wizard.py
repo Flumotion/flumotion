@@ -41,7 +41,7 @@ class WizardStepTest(unittest.TestCase):
     def setUpClass(self):
         wiz = wizard.Wizard()
         self.steps = wiz.scenario.steps
-        
+
     def testLoadSteps(self):
         for s in self.steps:
             self.assert_(isinstance(s, step.WizardStep))
@@ -58,7 +58,7 @@ class WizardStepTest(unittest.TestCase):
                 get_next_ret = s.get_next()
                 self.assert_(not get_next_ret or isinstance(get_next_ret, str))
     testLoadSteps.skip = 'Andy, maybe your generator work broke this ?'
-                
+
     def testStepWidgets(self):
         widgets = [widget for s in self.steps if s.get_name() != 'Firewire'
                               for widget in s.iterate_widgets()]
@@ -96,7 +96,7 @@ class TestAdmin(admin.AdminModel):
         success = {('localhost', 'flumotion.worker.checks.video', 'checkTVCard'):
                    {'height': 576, 'width': 720, 'par': (59,54)}}
         failures = {}
-        
+
         key = (worker, module, function)
         if key in success:
             return defer.succeed(success[key])
@@ -126,7 +126,7 @@ class WizardSaveTest(unittest.TestCase):
         self.assert_(not config.has_key('audio-source'))
         videoSource = config['video-source']
         self.failUnlessEqual(videoSource.type, 'firewire')
-        
+
         self.failUnlessEqual(config['audio-encoder'].getFeeders(), ['video-source:audio'])
         self.failUnlessEqual(config['video-overlay'].getFeeders(), ['video-source:video'])
     testFirewireAudioAndVideo.skip = 'Andy, maybe your generator work broke this ?'
@@ -137,7 +137,7 @@ class WizardSaveTest(unittest.TestCase):
         source.combobox_audio.set_active(enums.AudioDevice.Test)
 
         self.wizard.run(False, ['first', 'second'], True)
-        
+
         self.wizard['Source'].worker = 'second'
         self.wizard['Webcam'].worker = 'second'
         self.wizard['Overlay'].worker = 'second'
@@ -145,10 +145,9 @@ class WizardSaveTest(unittest.TestCase):
         self.wizard['Theora'].worker = 'second'
         self.wizard['Vorbis'].worker = 'second'
         self.wizard['HTTP Streamer (audio & video)'].worker = 'first'
-        
+
         config = self.wizard.getConfig()
         for item in config.values():
             print item.name, item.worker
         #print self.wizard.printOut()
     testAudioTestWorkers.skip = 'Andy, maybe your generator work broke this ?'
-

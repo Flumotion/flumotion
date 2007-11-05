@@ -179,7 +179,7 @@ class ProcessProtocol(protocol.ProcessProtocol):
         info('forcing timeout for process protocol %r', self)
         self.timedOut = True
         self.exitDeferred.errback(TimeoutException(process, status))
-        
+
     def processEnded(self, status):
         info('process ended with status %r, exit code %r', status, status.value.exitCode)
         if self.timedOut:
@@ -208,7 +208,7 @@ class Process:
         assert self.state == self.NOT_STARTED
 
         self.protocol = ProcessProtocol()
-        
+
         stdout = open(os.path.join(self.testDir, self.name + '.stdout'), 'w')
         stderr = open(os.path.join(self.testDir, self.name + '.stderr'), 'w')
         # don't give it a stdin, output to log files
@@ -244,7 +244,7 @@ class Process:
         self.state = self.STARTED
 
         def got_exit(res):
-            self.state = self.STOPPED 
+            self.state = self.STOPPED
             info('process %r has stopped', self)
             return res
         self.protocol.getDeferred().addCallback(got_exit)
@@ -338,7 +338,7 @@ class PlanExecutor:
             d.addCallback(error)
             return d
         return failure
-            
+
     def run(self, ops, timeout=20):
         self.timeout = timeout
         d = defer.Deferred()
@@ -412,7 +412,7 @@ class Plan:
         allArgs = (command,) + args
         process, = self.spawnPar(allArgs)
         return process
-        
+
     def spawnPar(self, *argvs):
         processes = []
         self._appendOp(self.vm.checkExits, ())
@@ -429,7 +429,7 @@ class Plan:
 
     def wait(self, process, status):
         self.waitPar((process, status))
-        
+
     def waitPar(self, *processStatusPairs):
         processes = tuple([p for p,s in processStatusPairs])
         self._appendOp(self.vm.checkExits, processes)

@@ -58,7 +58,7 @@ class PadMonitor(log.Loggable):
             self.debug(message, *args)
         else:
             self.log(message, *args)
-        
+
     def isActive(self):
         return self._active
 
@@ -118,7 +118,7 @@ class PadMonitor(log.Loggable):
         now = time.time()
 
         if self._last_data_time < 0:
-            # We never received any data in the first timeout period... 
+            # We never received any data in the first timeout period...
             self._last_data_time = 0
             self.setInactive()
         elif self._last_data_time == 0:
@@ -133,7 +133,7 @@ class PadMonitor(log.Loggable):
                     "to hungry", self.name, self.PAD_MONITOR_TIMEOUT)
                 self.setInactive()
             elif not self._active and delta < self.PAD_MONITOR_TIMEOUT:
-                self.info("Receiving data again on pad %s, flow active", 
+                self.info("Receiving data again on pad %s, flow active",
                     self.name)
                 self.setActive()
 
@@ -222,4 +222,3 @@ class PadMonitorSet(dict, log.Loggable):
             if not monitor.isActive():
                 return False
         return True
-

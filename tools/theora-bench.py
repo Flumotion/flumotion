@@ -36,7 +36,7 @@ class SlidingWindow:
             self.max = self.average
 
 class TheoraBench:
-    def __init__(self, filename, outTemplate, width=None, height=None, 
+    def __init__(self, filename, outTemplate, width=None, height=None,
         framerate=None):
         self.framerate = None
         self.width = None
@@ -63,7 +63,7 @@ class TheoraBench:
 
         filesrc.set_property("location", filename)
 
-        pipeline.add(filesrc, decodebin, self.ffmpegcolorspace, videorate, 
+        pipeline.add(filesrc, decodebin, self.ffmpegcolorspace, videorate,
                 videoscale, self.theoraenc, fakesink)
 
         filesrc.link(decodebin)
@@ -83,14 +83,14 @@ class TheoraBench:
 
     def _eos_cb(self, bus, msg):
         print "Done"
-        fn = self.outfileTemplate % (self.width, self.height, 
+        fn = self.outfileTemplate % (self.width, self.height,
                 float(self.framerate))
         print "Writing file: ", fn
-        self.writeGraph(fn, self.data, 
+        self.writeGraph(fn, self.data,
                 "Frame number",
                 "CPU Percentage required",
-                ("Frame)", 
-                 "Sliding Average (%d frames)" % self.window.windowSize, 
+                ("Frame)",
+                 "Sliding Average (%d frames)" % self.window.windowSize,
                  "Sliding Average Peak"))
         self.mainloop.quit()
 
@@ -157,14 +157,14 @@ class TheoraBench:
         self.data[1].append(self.window.average * float(self.framerate) * 100.0)
         self.data[2].append(self.window.max * float(self.framerate) * 100.0)
         print "This frame: %.2f: %.2f%%. Average: %.2f%%. Peak: %.2f%%" % (
-                processing_time, 
-                processing_time * float(self.framerate) * 100.0, 
+                processing_time,
+                processing_time * float(self.framerate) * 100.0,
                 self.window.average * float(self.framerate) * 100.0,
                 self.window.max * float(self.framerate) * 100.0)
         return True
 
 if len(sys.argv) == 2:
-    framerates = [(30,1), (25,1), (25,2), (None, None)] 
+    framerates = [(30,1), (25,1), (25,2), (None, None)]
     sizes = [(800, 600), (400,300), (None, None)] # Other useful sizes here
     for framerate in framerates:
         for size in sizes:
@@ -174,10 +174,8 @@ if len(sys.argv) == 2:
                 fr = None
             infile = sys.argv[1]
             outfileTemplate = sys.argv[1] + ".%dx%d@%.2f.png"
-            bench = TheoraBench(sys.argv[1], outfileTemplate, size[0], 
+            bench = TheoraBench(sys.argv[1], outfileTemplate, size[0],
                 size[1], fr)
             bench.run()
 else:
     print "Usage: %s filename.ogg" % sys.argv[0]
-
- 

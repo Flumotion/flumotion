@@ -68,4 +68,4 @@ class TestAdminAvatar(unittest.TestCase):
         self.avatar.hasRemoteReference()
 
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

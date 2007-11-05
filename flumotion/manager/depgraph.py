@@ -82,7 +82,7 @@ class DepGraph(log.Loggable):
     I contain a DAG to help with resolving dependencies.
     """
     logCategory = "depgraph"
-    
+
     typeNames = ("WORKER", "JOB", "COMPONENTSETUP", "CLOCKMASTER",
         "COMPONENTSTART")
 
@@ -92,7 +92,7 @@ class DepGraph(log.Loggable):
         # objects are states - componentState, jobState, workerState.
         self._dag = dag.DAG()
 
-        # (object,type) -> (callable, boolean) mapping. 
+        # (object,type) -> (callable, boolean) mapping.
         # The boolean is true if the action needed at this node has completed.
         # The callable should take some action to (eventually) set the state to
         # True so we can progress further through the depgraph.
@@ -131,14 +131,14 @@ class DepGraph(log.Loggable):
             self._addNode(component, "CLOCKMASTER", setupClockMasterCallable)
             self._addEdge(component, component, "COMPONENTSETUP",
                 "CLOCKMASTER")
-        
+
             # now go through all the component starts and make them dep on the
             # clock master
             startnodes = self._dag.getAllNodesByType("COMPONENTSTART")
             for start in startnodes:
                 # only add if they share the same parent flow
                 if start.get('parent') == component.get('parent'):
-                    self._addEdge(component, start, "CLOCKMASTER", 
+                    self._addEdge(component, start, "CLOCKMASTER",
                         "COMPONENTSTART")
         else:
             raise KeyError("Component %r has not been added" % component)
@@ -158,7 +158,7 @@ class DepGraph(log.Loggable):
             self.debug('component %r already in depgraph, ignoring',
                        component)
             return
-        
+
         self.debug('adding component %r to depgraph' % component)
         # Starting jobs is handled elsewhere, not by the depgraph, so we don't
         # need a function to do anything in particular.
@@ -170,7 +170,7 @@ class DepGraph(log.Loggable):
         if workername:
             self.addWorker(workername)
             self.setComponentWorker(component, workername)
-        self._addEdge(component, component, "COMPONENTSETUP", 
+        self._addEdge(component, component, "COMPONENTSETUP",
             "COMPONENTSTART")
 
     def addWorker(self, worker):
@@ -242,7 +242,7 @@ class DepGraph(log.Loggable):
                                             a non-existant component
         """
         toSetup = self._dag.getAllNodesByType("COMPONENTSETUP")
-        
+
         for eatingComponent in toSetup:
             # for this component setup, go through all the feeders in it
             config = eatingComponent.get('config')
@@ -309,9 +309,9 @@ class DepGraph(log.Loggable):
                     continue
                 # For each of these we need to check that ALL the parents are
                 # now true before we can go further
-                if reduce(lambda x,y: x and self._state[y][1], 
+                if reduce(lambda x,y: x and self._state[y][1],
                         self._dag.getParentsTyped(kid, kidtype), True):
-                    self.debug("Calling callable %r", 
+                    self.debug("Calling callable %r",
                         self._state[(kid, kidtype)][0])
                     self._state[(kid,kidtype)][0](kid)
 
@@ -392,7 +392,7 @@ class DepGraph(log.Loggable):
         @type  worker: str
         """
         self._setState(worker, "WORKER", False)
-    
+
     def setClockMasterStarted(self, component):
         """
         Set a CLOCKMASTER node to have state of True

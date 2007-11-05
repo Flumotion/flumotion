@@ -27,7 +27,7 @@ import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from twisted.python import reflect 
+from twisted.python import reflect
 
 from flumotion.common import log, errors, common, registry, fxml
 from flumotion.configure import configure
@@ -41,7 +41,7 @@ def _ignore(*args):
     pass
 
 def upgradeEaters(conf):
-    def parseFeedId(feedId): 
+    def parseFeedId(feedId):
         if feedId.find(':') == -1:
             return "%s:default" % feedId
         else:
@@ -112,7 +112,7 @@ def buildEatersDict(eatersList, eaterDefs):
                 eaterAlias = eaterName
             return (eaterName, feedId, eaterAlias)
         return parse(*tup)
-        
+
     eaters = {}
     for eater, feedId, alias in [parseEaterTuple(t) for t in eatersList]:
         if eater is None:
@@ -154,7 +154,7 @@ def buildEatersDict(eatersList, eaterDefs):
         if alias in aliases:
             raise ConfigError("Duplicate alias: %s" % alias)
 
-    return eaters        
+    return eaters
 
 def parsePropertyValue(propName, type, value):
     # XXX: We might end up calling float(), which breaks
@@ -401,7 +401,7 @@ class ConfigEntryComponent(log.Loggable):
                 raise ConfigError("<component> version not "
                                   "parseable")
         raise ConfigError("<component> version not parseable")
-        
+
     def _buildConfig(self, propertyList, plugsList, eatersList,
                      isClockMaster, project, version):
         """
@@ -440,7 +440,7 @@ class ConfigEntryComponent(log.Loggable):
 
     def getType(self):
         return self.type
-    
+
     def getLabel(self):
         return self.label
 
@@ -567,7 +567,7 @@ class BaseConfigParser(fxml.Parser):
         #   <clock-master>...</clock-master>?
         #   <plugs>...</plugs>*
         # </component>
-        
+
         attrs = self.parseAttributes(node, ('name', 'type'),
                 ('label', 'worker', 'project', 'version',))
         name, type, label, worker, project, version = attrs
@@ -583,7 +583,7 @@ class BaseConfigParser(fxml.Parser):
         eaters = []
         clockmasters = []
         sources = []
-        
+
         def parseBool(node):
             return self.parseTextNode(node, common.strToBool)
         parsers = {'property': (self._parseProperty, properties.append),
@@ -614,8 +614,8 @@ class BaseConfigParser(fxml.Parser):
                                     isClockMaster, project, version)
 
     def _parseSource(self, node):
-        return self._parseFeedId(self.parseTextNode(node)) 
-    
+        return self._parseFeedId(self.parseTextNode(node))
+
     def _parseEater(self, node):
         # <eater name="eater-name">
         #   <feed>feeding-component:feed-name</feed>*
@@ -666,7 +666,7 @@ class FlumotionConfigXML(BaseConfigParser):
 
         self.flows = []
         self.atmosphere = ConfigEntryAtmosphere()
-        
+
     def parse(self):
         # <planet>
         #     <manager>?
@@ -676,7 +676,7 @@ class FlumotionConfigXML(BaseConfigParser):
         root = self.doc.documentElement
         if root.nodeName != 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
-        
+
         parsers = {'atmosphere': (self._parseAtmosphere,
                                   self.atmosphere.components.update),
                    'flow': (self._parseFlow,
@@ -697,7 +697,7 @@ class FlumotionConfigXML(BaseConfigParser):
         parsers = {'component': (parseComponent, gotComponent)}
         self.parseFromTable(node, parsers)
         return ret
-     
+
     def _parseFlow(self, node):
         # <flow name="...">
         #   <component>
@@ -760,7 +760,7 @@ class FlumotionConfigXML(BaseConfigParser):
             for c in self.atmosphere.components.values():
                 path = common.componentId('atmosphere', c.name)
                 entries[path] = c
-            
+
         for flowEntry in self.flows:
             for c in flowEntry.components.values():
                 path = common.componentId(c.parent, c.name)
@@ -798,12 +798,12 @@ class ManagerConfigParser(BaseConfigParser):
             self.plugs[socket] = []
 
         self._parseParameters()
-        
+
     def _parseParameters(self):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
-        
+
         parsers = {'atmosphere': (_ignore, _ignore),
                    'flow': (_ignore, _ignore),
                    'manager': (lambda n: self._parseManagerWithoutRegistry(n),
@@ -838,7 +838,7 @@ class ManagerConfigParser(BaseConfigParser):
         parsers = {'host': (simpleparse(str), recordval('host')),
                    'port': (simpleparse(int), recordval('port')),
                    'transport': (simpleparse(enum('tcp', 'ssl')),
-                                 recordval('transport')), 
+                                 recordval('transport')),
                    'certificate': (simpleparse(str), recordval('certificate')),
                    'component': (_ignore, _ignore),
                    'plugs': (_ignore, _ignore),
@@ -881,7 +881,7 @@ class ManagerConfigParser(BaseConfigParser):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
-        
+
         parsers = {'atmosphere': (_ignore, _ignore),
                    'flow': (_ignore, _ignore),
                    'manager': (self._parseManagerWithRegistry, _ignore)}
@@ -905,14 +905,14 @@ class AdminConfigParser(BaseConfigParser):
 
         # will start the parse via self.add()
         BaseConfigParser.__init__(self, file)
-        
+
     def _parse(self):
         # <admin>
         #   <plugs>
         root = self.doc.documentElement
         if not root.nodeName == 'admin':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
-        
+
         def parseplugs(node):
             return buildPlugsSet(self.parsePlugs(node),
                                  self.plugs.keys())

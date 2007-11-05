@@ -126,7 +126,7 @@ class MultiAdminModel(log.Loggable):
             del self.admins[admin.managerId]
         else:
             self.warning('Could not find admin model %r', admin)
-        
+
     def addManager(self, connectionInfo, tenacious=False):
         i = connectionInfo
         managerId = str(i)
@@ -147,7 +147,7 @@ class MultiAdminModel(log.Loggable):
 
         def connect_callback(_):
             self._startSet.avatarStarted(managerId)
-            
+
         def connect_errback(failure):
             self._startSet.avatarStopped(managerId, lambda _: failure)
 
@@ -155,7 +155,7 @@ class MultiAdminModel(log.Loggable):
 
         def start_callback(_):
             self._managerConnected(a)
-            
+
         def start_errback(failure):
             a.shutdown()
             return failure

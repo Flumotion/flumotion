@@ -41,5 +41,5 @@ class Rtsp(feedcomponent.ParseLaunchComponent):
                 " ! %s ffmpegcolorspace ! video/x-raw-yuv "
                 " ! videorate ! video/x-raw-yuv,framerate=%d/%d ! "
                 " @feeder:video@ %s ! @feeder:audio@"
-                % (location, scaling_template, framerate[0], 
+                % (location, scaling_template, framerate[0],
                    framerate[1], audio_template))

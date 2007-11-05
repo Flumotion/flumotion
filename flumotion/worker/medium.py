@@ -56,13 +56,13 @@ class WorkerClientFactory(factoryClass):
         factoryClass.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
-        
+
     def clientConnectionFailed(self, connector, reason):
         """
         @param reason: L{twisted.spread.pb.failure.Failure}
         """
         # this method exists so that we log the failure
-        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
+        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
         # delay is now updated
         self.debug("failed to connect, will try to reconnect in %f seconds" % self.delay)
@@ -81,7 +81,7 @@ class WorkerClientFactory(factoryClass):
         def loginCallback(reference):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
-           
+
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
@@ -93,12 +93,12 @@ class WorkerClientFactory(factoryClass):
         def accessDeniedErrback(failure):
             failure.trap(errors.NotAuthenticatedError)
             self.warning('Access denied.')
-            
+
         def connectionRefusedErrback(failure):
             failure.trap(error.ConnectionRefusedError)
             self.warning('Connection to %s:%d refused.' % (self._managerHost,
                                                          self._managerPort))
-                                                          
+
         def NoSuchMethodErrback(failure):
             failure.trap(flavors.NoSuchMethod)
             # failure.value is a str
@@ -119,7 +119,7 @@ class WorkerClientFactory(factoryClass):
         d.addErrback(alreadyConnectedErrback)
         d.addErrback(NoSuchMethodErrback)
         d.addErrback(loginFailedErrback)
-            
+
 class WorkerMedium(medium.PingingMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
@@ -127,18 +127,18 @@ class WorkerMedium(medium.PingingMedium):
     @ivar brain: the worker brain
     @type brain: L{WorkerBrain}
     """
-    
+
     logCategory = 'workermedium'
 
     implements(interfaces.IWorkerMedium)
-    
+
     def __init__(self, brain):
         """
         @type brain: L{WorkerBrain}
         """
         self.brain = brain
         self.factory = None
-        
+
     def startConnecting(self, connectionInfo):
         info = connectionInfo
 
@@ -153,7 +153,7 @@ class WorkerMedium(medium.PingingMedium):
                                ssl.ClientContextFactory())
         else:
             reactor.connectTCP(info.host, info.port, self.factory)
-        
+
     def stopConnecting(self):
         # only called by test suites
         self.factory.disconnect()
@@ -233,7 +233,7 @@ class WorkerMedium(medium.PingingMedium):
     def remote_runCheck(self, module, function, *args, **kwargs):
         """
         Runs the given function in the given module with the given arguments.
-        
+
         @param module:   module the function lives in
         @type  module:   str
         @param function: function to run

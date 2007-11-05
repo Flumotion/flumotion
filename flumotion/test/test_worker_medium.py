@@ -46,12 +46,12 @@ class TestWorkerRealm(realm.TestRealm):
         if self.deferredAvatar is None:
             self.deferredAvatar = defer.Deferred()
         return self.deferredAvatar
-        
+
     def getDeferredLogout(self):
         if self.deferredLogout is None:
             self.deferredLogout = defer.Deferred()
         return self.deferredLogout
-        
+
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
         avatar = TestWorkerAvatar(avatarId, mind)
         self.getDeferredAvatar().callback(avatar)
@@ -69,7 +69,7 @@ class TestWorkerMedium(unittest.TestCase):
 
     def tearDown(self):
         return self.realm.shutdown()
-        
+
     def testConnect(self):
         m = medium.WorkerMedium(None)
         connectionInfo = self.realm.getConnectionInfo()

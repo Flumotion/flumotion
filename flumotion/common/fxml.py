@@ -68,7 +68,7 @@ class Parser(log.Loggable):
     I am here so that the config parser and the registry parser can
     share code.
     """
-    
+
     parserError = ParserError
 
     def getRoot(self, file):
@@ -89,7 +89,7 @@ class Parser(log.Loggable):
         except expat.ExpatError, e:
             raise self.parserError('Error parsing XML from %r: %s' % (
                 file, log.getExceptionMessage(e)))
-        
+
     def checkAttributes(self, node, required=None, optional=None):
         """
         Checks that a given XML node has all of the required attributes,

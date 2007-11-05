@@ -33,7 +33,7 @@ class BaseAdminText(log.Loggable):
     implements(flavors.IStateListener)
 
     logCategory = "admintext"
-    
+
     state = admin = 'hello pychecker'
 
     def __init__(self, state, admin):
@@ -47,7 +47,7 @@ class BaseAdminText(log.Loggable):
         self.name = state.get('name')
         self.admin = admin
         self.debug('creating admin text for state %r' % state)
-        
+
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
         self.warning("%s." % failure.getErrorMessage())
@@ -61,11 +61,11 @@ class BaseAdminText(log.Loggable):
         d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
-    
+
     def getElementProperty(self, elementName, propertyName):
         """
         Get the value of the given property of the element with the given name.
-        
+
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
         d = self.admin.getProperty(self.state, elementName, propertyName)
@@ -75,7 +75,7 @@ class BaseAdminText(log.Loggable):
     def callRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
-        
+
     ### child class methods to be overridden
 
     def propertyChanged(self, name, value):
@@ -99,25 +99,20 @@ class BaseAdminText(log.Loggable):
 
     def stateSet(self, object, key, value):
         self.uiStateChanged(object)
-        
+
 
     def stateAppend(self, object, key, value):
         self.uiStateChanged(object)
-        
+
 
     def stateRemove(self, object, key, value):
-    	self.uiStateChanged(object)
-        
-    
+        self.uiStateChanged(object)
+
+
     # given an input text return possible completions
     def getCompletions(self, input):
-    	return []
+        return []
 
     # run command, return string with result
     def runCommand(self, command):
-    	return ""
-
-	
-
-
-
+        return ""

@@ -43,7 +43,7 @@ class MountTest(log.Loggable, unittest.TestCase):
         C = os.path.join(self.path, 'B', 'C')
         open(C, "w").write('test file C')
         self.component = None
-        
+
     def tearDown(self):
         if self.component:
             self.component.stop()
@@ -119,7 +119,7 @@ class MountTest(log.Loggable, unittest.TestCase):
         d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/D')))
         d.addErrback(lambda f: f.trap(error.Error))
         return d
-  
+
     def testFileMountEmpty(self):
         properties = {
             u'mount-point': '',
@@ -156,6 +156,6 @@ class MountTest(log.Loggable, unittest.TestCase):
         d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/D')))
         d.addErrback(lambda f: f.trap(error.Error))
         return d
-  
+
 if __name__ == '__main__':
     unittest.main()

@@ -27,7 +27,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
         return "gnomevfssrc name=src ! typefind name=tf"
-        
+
     def configure_pipeline(self, pipeline, properties):
         # Later, when the typefind element has successfully found the type
         # of the data, we'll rebuild the pipeline.
@@ -36,7 +36,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
             # We should add appropriate parsers for any given format here. For
             # some it's critical for this to work at all, for others it's needed
             # for timestamps (thus for things like time-based burst-on-connect)
-            # Currently, we only handle ogg. 
+            # Currently, we only handle ogg.
             parser = None
             if capsname == 'application/ogg':
                 parser = gst.element_factory_make('oggparse')
@@ -59,4 +59,3 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
         typefind = pipeline.get_by_name('tf')
         typefind.connect('have-type', have_caps)
-

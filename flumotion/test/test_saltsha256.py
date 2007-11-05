@@ -74,7 +74,7 @@ class TestSaltSha256USCPCC(unittest.TestCase):
                 self.assertEquals(result.state, keycards.AUTHENTICATED)
             dd.addCallback(authenticatedCallback)
             return dd
-            
+
         d.addCallback(okCallback)
         return d
 

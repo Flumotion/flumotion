@@ -104,7 +104,7 @@ class Mood(util.LogCommand):
 
 # The Nagios root command will take care of stopping the reactor and returning
 # the exit value.
-   
+
 class Nagios(util.LogCommand):
     usage = "%prog %command"
     description = "Run Nagios checks on Flumotion manager."
@@ -227,4 +227,3 @@ def main(args):
     ret = c.parse(args[1:])
 
     return ret
-

@@ -56,7 +56,7 @@ class FakeWorkerBrain(log.Loggable):
         self.info('eat from fd: %s %s %d %s', componentId, eaterAlias, fd, feedId)
         self.waitForFD().callback((componentId, eaterAlias, fd, feedId))
         return True
-   
+
 def countOpenFileDescriptors():
     import resource
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -119,7 +119,7 @@ class FeedTestCase(unittest.TestCase, log.Loggable):
         d.addCallback(lambda _: self._bouncer.stop())
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
         return d
-        
+
 class TestFeedClient(FeedTestCase, log.Loggable):
     def testConnectWithoutDroppingPB(self):
         client = feed.FeedMedium(logName='test')
@@ -153,7 +153,7 @@ class TestFeedClient(FeedTestCase, log.Loggable):
 
         def checkfds(res):
             self.assertAdditionalFDsOpen(1, 'cleanup (socket)')
-            
+
         d = login()
         d.addCallback(cleanup)
         d.addCallback(checkfds)
@@ -179,7 +179,7 @@ class TestFeedClient(FeedTestCase, log.Loggable):
                 # an idempotent method, should return a network failure if
                 # the remote side disconnects as it should
                 return root.callRemote('getKeycardClasses')
-            
+
             def gotError(failure):
                 self.assertAdditionalFDsOpen(1, 'feedSent (socket)')
                 self.info('success')
@@ -326,14 +326,14 @@ class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
             t = client.remote.broker.transport
             self.info('stop reading from transport')
             t.stopReading()
-                        
+
             self.info('flushing PB write queue')
             t.doWrite()
             self.info('stop writing to transport')
             t.stopWriting()
 
             t.keepSocketAlive = True
-        
+
             # avoid refcount cycles
             client.setRemoteReference(None)
 

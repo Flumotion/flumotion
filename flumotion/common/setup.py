@@ -45,7 +45,7 @@ def setupPackagePath():
     if os.environ.has_key('FLU_PROJECT_PATH'):
         paths = os.environ['FLU_PROJECT_PATH']
         registryPaths += paths.split(':')
-    
+
     log.debug('setup', 'registry paths: %s' % ", ".join(registryPaths))
     for path in registryPaths:
         log.debug('setup', 'registering package path: %s' % path)
@@ -53,4 +53,3 @@ def setupPackagePath():
         # these aren't meant to be replaced
         package.getPackager().registerPackagePath(path,
             "FLU_PROJECT_PATH_" + path)
-

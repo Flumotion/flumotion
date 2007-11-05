@@ -148,7 +148,7 @@ RotateSize = enum.EnumClass('RotateSize',
                               1 << 20L,
                               1 << 30L,
                               1 << 40L))
- 
+
 LicenseType = enum.EnumClass('LicenseType',
                         ('CC', 'Commercial'),
                         ('Creative Commons', 'Commercial'))

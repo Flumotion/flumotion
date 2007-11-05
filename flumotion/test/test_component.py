@@ -60,10 +60,10 @@ class PipelineTest(ParseLaunchComponent):
 
     def connect_feeders(self, pipeline):
         pass
-        
+
     def set_pipeline(self, pipeline):
         self.pipeline = pipeline
-        
+
 class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
@@ -109,23 +109,23 @@ class TestParser(unittest.TestCase):
                    {}, ['bar'])
 
     def testTwoSources(self):
-        self.parse('@eater:foo@ ! @eater:bar@ ! baz', 
-                   lambda p: '%s ! %s ! baz' % (p.get_eater_template('foo'), 
+        self.parse('@eater:foo@ ! @eater:bar@ ! baz',
+                   lambda p: '%s ! %s ! baz' % (p.get_eater_template('foo'),
                                       p.get_eater_template('bar')),
                    {'qux': [('baz:default', 'foo')],
                     'zag': [('qux:default', 'bar')]})
 
     def testTwoFeeds(self):
         self.parse('foo ! @feeder:bar@ ! @feeder:baz@',
-                   lambda p: 'foo ! %s ! %s' % (p.get_feeder_template('bar'), 
+                   lambda p: 'foo ! %s ! %s' % (p.get_feeder_template('bar'),
                                       p.get_feeder_template('baz')),
                    {}, ['bar', 'baz'])
 
     def testTwoBoth(self):
         self.parse('@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
-                   lambda p: '%s ! %s ! %s ! %s' % (p.get_eater_template('src1'), 
+                   lambda p: '%s ! %s ! %s ! %s' % (p.get_eater_template('src1'),
                                           p.get_eater_template('src2'),
-                                          p.get_feeder_template('feed1'), 
+                                          p.get_feeder_template('feed1'),
                                           p.get_feeder_template('feed2')),
                    {'qux': [('comp1:default', 'src1')],
                     'zag': [('comp2:default', 'src2')]},
@@ -135,6 +135,6 @@ class TestParser(unittest.TestCase):
         comp = PipelineTest(None, None, '')
         d = self.assertFailure(comp.waitForHappy(), errors.ComponentStartError)
         d.addCallback(lambda _: comp.stop())
-    
+
 if __name__ == '__main__':
     unittest.main()

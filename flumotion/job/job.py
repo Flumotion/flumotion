@@ -83,9 +83,9 @@ class JobMedium(medium.BaseMedium):
         """
         I receive the information on how to connect to the manager. I also set
         up package paths to be able to run the component.
-        
+
         Called by the worker's JobAvatar.
-        
+
         @param workerName:    the name of the worker running this job
         @type  workerName:    str
         @param host:          the host that is running the manager
@@ -111,7 +111,7 @@ class JobMedium(medium.BaseMedium):
             self.debug('no authenticator, will not be able to log '
                        'into manager')
             self._authenticator = None
-        
+
         packager = package.getPackager()
         for name, path in packagePaths:
             self.debug('registering package path for %s' % name)
@@ -125,7 +125,7 @@ class JobMedium(medium.BaseMedium):
         """
         I am called on by the worker's JobAvatar to run a function,
         normally on behalf of the flumotion wizard.
-        
+
         @param moduleName: name of the module containing the function
         @type  moduleName: str
         @param methodName: the method to run
@@ -141,7 +141,7 @@ class JobMedium(medium.BaseMedium):
                                                 args, kwargs))
         # FIXME: do we want to do this?
         self._enableCoreDumps()
-        
+
         return reflectCallCatching(errors.RemoteRunError, moduleName,
                                    methodName, *args, **kwargs)
 
@@ -149,7 +149,7 @@ class JobMedium(medium.BaseMedium):
                       nice, conf):
         """
         I am called on by the worker's JobAvatar to create a component.
-        
+
         @param avatarId:   avatarId for component to log in to manager
         @type  avatarId:   str
         @param type:       type of component to start
@@ -191,7 +191,7 @@ class JobMedium(medium.BaseMedium):
             if medium.hasRemoteReference():
                 dlist.append(medium.callRemote("cleanShutdown"))
 
-        # We mustn't fire the deferred returned from here except from a 
+        # We mustn't fire the deferred returned from here except from a
         # callLater.
         dl = defer.DeferredList(dlist, fireOnOneErrback=False)
         return fdefer.defer_call_later(dl)
@@ -212,7 +212,7 @@ class JobMedium(medium.BaseMedium):
     def _setNice(self, nice):
         if not nice:
             return
-        
+
         try:
             os.nice(nice)
         except OSError, e:
@@ -227,9 +227,9 @@ class JobMedium(medium.BaseMedium):
                          'setting to %d instead' % hard)
         else:
             self.debug('Enabling core dumps of unlimited size')
-            
+
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
-        
+
     def _createComponent(self, avatarId, type, moduleName, methodName,
                          nice, conf):
         """
@@ -253,7 +253,7 @@ class JobMedium(medium.BaseMedium):
 
         self._setNice(nice)
         self._enableCoreDumps()
-        
+
         try:
             comp = createComponent(moduleName, methodName, conf)
         except Exception, e:
@@ -266,7 +266,7 @@ class JobMedium(medium.BaseMedium):
             self.warning(
                 "raising ComponentCreateError(%s) and stopping job" % msg)
             # This is a Nasty Hack. We raise ComponentCreateError, which can be
-            # caught on the other side and marshalled as a reasonably 
+            # caught on the other side and marshalled as a reasonably
             # comprehensible error message. However, if we shutdown immediately,
             # the PB connection won't be available, so the worker will just get
             # an error about that! So, instead, we shut down in a tenth of a
@@ -303,7 +303,7 @@ class JobMedium(medium.BaseMedium):
             self.warning('Unknown transport protocol %s' % self._managerTransport)
 
         return comp
-        
+
 class JobClientBroker(pb.Broker, log.Loggable):
     """
     A pb.Broker subclass that handles FDs being passed (with associated data)
@@ -356,7 +356,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     @type medium: L{JobMedium}
     """
     logCategory = "job"
-    perspectiveInterface = interfaces.IJobMedium    
+    perspectiveInterface = interfaces.IJobMedium
 
     def __init__(self, id):
         """
@@ -364,14 +364,14 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         @type  id:      str
         """
         pb.PBClientFactory.__init__(self)
-        
+
         self.medium = JobMedium()
         self.logName = id
         self.login(id)
 
         # use an FD-passing broker instead
         self.protocol = JobClientBroker
-            
+
     ### pb.PBClientFactory methods
     def buildProtocol(self, addr):
         p = self.protocol(fdserver.FDServer)
@@ -381,7 +381,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     # FIXME: might be nice if jobs got a password to use to log in to brain
     def login(self, username):
         self.info('Logging in to worker')
-        d = pb.PBClientFactory.login(self, 
+        d = pb.PBClientFactory.login(self,
             credentials.UsernamePassword(username, ''),
             self.medium)
         yield d
@@ -396,7 +396,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
                    % (os.getpid(), log.getExceptionMessage(e)))
             # raise error
     login = defer_generator_method(login)
-    
+
     # the only way stopFactory can be called is if the WorkerBrain closes
     # the pb server.  Ideally though we would have gotten a notice before.
     # This ensures we shut down the component/job in ALL cases where the worker
@@ -405,4 +405,3 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.debug('shutting down medium')
         self.medium.shutdown()
         self.debug('shut down medium')
-

@@ -38,7 +38,7 @@ def time_to_string(value):
     hours = mins / 60
     mins = mins % 60
     return "%02d:%02d:%02d" % (hours, mins, sec)
-    
+
 
 class FileInfo(GladeWidget):
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -60,7 +60,7 @@ class FileInfo(GladeWidget):
 
 class LooperNode(BaseAdminGtkNode):
     logCategory = 'looper'
-    
+
     uiStateHandlers = None
     glade_file = os.path.join('flumotion', 'component', 'producers',
                               'looper', 'looper.glade')

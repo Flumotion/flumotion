@@ -82,8 +82,8 @@ class ClickyURL(gtk.EventBox):
             self.open_url()
         elif event.button == 3:
             self._streamurl_popupmenu.popup(None, None, None,
-                                            event.button, event.time) 
-        
+                                            event.button, event.time)
+
     # signal handler for open link menu item activation
     def _streamurl_openlink(self, widget):
         self.open_url()
@@ -97,7 +97,7 @@ class ClickyURL(gtk.EventBox):
         cursor = gtk.gdk.Cursor(widget.get_display(), gtk.gdk.HAND2)
         window = widget.window
         window.set_cursor(cursor)
-            
+
     def _streamurl_leave(self, widget, event):
         window = widget.window
         window.set_cursor(None)

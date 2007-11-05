@@ -109,7 +109,7 @@ class TestComponentsView(unittest.TestCase):
     def _createComponent(self, dict):
         mstate = planet.ManagerComponentState()
         for key in dict.keys():
-            mstate.set(key, dict[key]) 
+            mstate.set(key, dict[key])
         astate = jelly.unjelly(jelly.jelly(mstate))
         return astate
 
@@ -142,7 +142,7 @@ class TestComponentsView(unittest.TestCase):
             name = state.get('name')
             test.assertEqual(name, 'one', 'name %s is not one' % name)
             test.asserted = True
-            
+
         self.testUpdate()
         self.view.connect('has-selection', assertSelected, self)
         self.asserted = False
