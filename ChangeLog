@@ -1,5 +1,9 @@
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_component_bouncers_component.py
+	(TrivialBouncerTest.setKeycardExpireInterval): Fondle the bouncer
+	better.
+
 	* flumotion/component/bouncers/plug.py (BouncerPlug): Fix up to
 	use a Poller instead of rolling our own timeouts, like in
 	bouncer.py.

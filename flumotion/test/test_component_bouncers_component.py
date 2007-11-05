@@ -55,4 +55,4 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
 
     def setKeycardExpireInterval(self, interval):
         # can be overridden
-        self.obj.plug.KEYCARD_EXPIRE_INTERVAL = interval
+        self.obj.plug._expirer.timeout = interval
