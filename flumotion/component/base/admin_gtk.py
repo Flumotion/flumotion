@@ -35,7 +35,6 @@ from zope.interface import implements
 
 from flumotion.common import errors, log, common
 from flumotion.twisted import flavors
-from flumotion.twisted.defer import defer_generator_method
 
 from gettext import gettext as _
 
@@ -128,20 +127,11 @@ class BaseAdminGtk(log.Loggable):
         """
         self.debug('BaseAdminGtk.setup()')
 
-        # set up translations before loading any UI
-        if hasattr(self, 'gettext_domain'):
-            lang = common.getLL()
-            self.debug("loading bundle for %s locales" % lang)
-            bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
-            d = self.admin.bundleLoader.getBundleByName(bundleName)
-            yield d
+        def fetchTranslations():
+            if not hasattr(self, 'gettext_domain'):
+                return defer.succeed(None)
 
-            try:
-                localedatadir = d.value()
-            except errors.NoBundleError:
-                self.debug("Failed to find locale bundle %s" % bundleName)
-
-            if localedatadir:
+            def haveBundle(localedatadir):
                 localeDir = os.path.join(localedatadir, 'locale')
                 self.debug("Loading locales for %s from %s" % (
                     self.gettext_domain, localeDir))
@@ -150,29 +140,28 @@ class BaseAdminGtk(log.Loggable):
                 gettext.bindtextdomain(self.gettext_domain, localeDir)
                 gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
 
-        # FIXME: node order should be fixed somehow, so e.g. Component
-        # always comes last, together with eater/feeder ?
 
-        # if we don't have config, we are done
-        config = self.state.get('config')
-        if not config:
-            self.debug('self.state %r does not have config' % self.state)
-            return
+            lang = common.getLL()
+            self.debug("loading bundle for %s locales" % lang)
+            bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
+            d = self.admin.bundleLoader.getBundleByName(bundleName)
+            d.addCallbacks(haveBundle, lambda _: None)
+            return d
 
-        # add feeder node, if applicable
-        if config['feed']:
-            self.debug("Component has feeders, show Feeders node")
-            self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
+        def addPages(_):
+            config = self.state.get('config')
 
-        # add eater node, if applicable
-        if 'source' in config:
-            self.debug("Component has eaters, show Eaters node")
-            self.nodes['Eaters'] = EatersAdminGtkNode(self.state, self.admin)
+            if config['feed']:
+                self.debug("Component has feeders, show Feeders node")
+                self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
 
-        # done
-        yield None
+            if 'eater' in config and config['eater']:
+                self.debug("Component has eaters, show Eaters node")
+                self.nodes['Eaters'] = EatersAdminGtkNode(self.state, self.admin)
 
-    setup = defer_generator_method(setup)
+        d = fetchTranslations()
+        d.addCallback(addPages)
+        return
 
     def getNodes(self):
         """
@@ -398,33 +387,43 @@ class BaseAdminGtkNode(log.Loggable):
 
         Returns: a deferred returning the main widget for embedding
         """
-        if self.glade_file:
-            self.debug('render: loading glade file %s in text domain %s' % (
-                self.glade_file, self.gettext_domain))
-            dl = self.loadGladeFile(self.glade_file, self.gettext_domain)
-            yield dl
+        def loadGladeFile():
+            if not self.glade_file:
+                return defer.succeed(None)
 
-            try:
-                self.wtree = dl.value()
-            except RuntimeError:
-                msg = 'Could not load glade file %s' % self.glade_file
-                self.warning(msg)
-                yield gtk.Label("render: %s.  Kill the programmer." % msg)
+            def haveWtree(wtree):
+                self.wtree = wtree
+                self.debug('render: calling haveWidgetTree')
+                self.haveWidgetTree()
 
-            self.debug('render: calling haveWidgetTree')
-            self.haveWidgetTree()
+            self.debug('render: loading glade file %s in text domain %s',
+                       self.glade_file, self.gettext_domain)
 
-        if not self.widget:
-            self.debug('render: no self.widget, failing')
-            yield defer.fail(IndexError)
+            d = self.loadGladeFile(self.glade_file, self.gettext_domain)
+            d.addCallback(haveWtree)
+            return d
 
-        if self._pendingUIState:
-            self.debug('render: calling setUIState on the node')
-            self.setUIState(self._pendingUIState)
+        def renderFinished(_):
+            if not self.widget:
+                self.debug('render: no self.widget, failing')
+                raise TypeError('no self.widget')
 
-        self.debug('render: yielding widget %s' % self.widget)
-        yield self.widget
-    render = defer_generator_method(render)
+            if self._pendingUIState:
+                self.debug('render: calling setUIState on the node')
+                self.setUIState(self._pendingUIState)
+
+            self.debug('render: yielding widget %s', self.widget)
+            return self.widget
+
+        def error(failure):
+            msg = log.getFailureMessage(failure)
+            self.warning('Failed to render: %s', msg)
+            return gtk.Label("Failed to load component UI.\n\n%s" % msg)
+                
+        d = loadGladeFile()
+        d.addCallback(renderFinished)
+        d.addErrback(error)
+        return d
 
 # this class is a bit of an experiment
 # editor's note: "experiment" is an excuse for undocumented and uncommented

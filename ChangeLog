@@ -1,3 +1,8 @@
+2007-11-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py: Exorcise defer_generator
+	from another file.
+
 2007-11-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/options.py: Don't assume gobject.pygobject_version
