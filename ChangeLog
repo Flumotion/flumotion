@@ -1,5 +1,9 @@
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/bouncers/plug.py (BouncerPlug): Fix up to
+	use a Poller instead of rolling our own timeouts, like in
+	bouncer.py.
+
 	* flumotion/component/bouncers/bouncer.py (Bouncer): Expire
 	keycards every 2 minutes instead of every 60. Makes memory usage
 	more stable.
