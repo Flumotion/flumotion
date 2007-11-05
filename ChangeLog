@@ -1,3 +1,13 @@
+2007-11-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py: 
+	* flumotion/manager/worker.py: 
+	* flumotion/worker/feedserver.py: Remove unneeded import.
+
+	* flumotion/job/job.py (JobClientFactory.login): 
+	* flumotion/manager/manager.py (Vishnu.deleteFlow): Adeu,
+	generator.
+
 2007-11-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/job/main.py (main): Remove --version here,

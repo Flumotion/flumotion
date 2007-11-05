@@ -47,8 +47,6 @@ from flumotion.twisted import fdserver
 from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
 
-from flumotion.twisted.defer import defer_generator_method
-
 class JobMedium(medium.BaseMedium):
     """
     I am a medium between the job and the worker's job avatar.
@@ -380,22 +378,17 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
 
     # FIXME: might be nice if jobs got a password to use to log in to brain
     def login(self, username):
+        def haveReference(remoteReference):
+            self.info('Logged in to worker')
+            self.debug('perspective %r connected', remoteReference)
+            self.medium.setRemoteReference(remoteReference)
+
         self.info('Logging in to worker')
         d = pb.PBClientFactory.login(self,
             credentials.UsernamePassword(username, ''),
             self.medium)
-        yield d
-        try:
-            remoteReference = d.value()
-            self.info('Logged in to worker')
-            self.debug('perspective %r connected' % remoteReference)
-            self.medium.setRemoteReference(remoteReference)
-        except Exception, e:
-            from flumotion.common import debug; debug.print_stack()
-            print ('ERROR connecting job to worker [%d]: %s'
-                   % (os.getpid(), log.getExceptionMessage(e)))
-            # raise error
-    login = defer_generator_method(login)
+        d.addCallback(haveReference)
+        return d
 
     # the only way stopFactory can be called is if the WorkerBrain closes
     # the pb server.  Ideally though we would have gotten a notice before.

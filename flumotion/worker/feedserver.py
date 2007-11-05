@@ -34,7 +34,6 @@ from flumotion.common import log, common, interfaces
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
-from flumotion.twisted.defer import defer_generator_method
 
 class FeedServer(log.Loggable):
     """

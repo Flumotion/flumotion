@@ -29,7 +29,6 @@ from twisted.internet import defer
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
-from flumotion.twisted.defer import defer_generator_method
 
 class WorkerAvatar(base.ManagerAvatar):
     """

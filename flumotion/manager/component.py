@@ -39,7 +39,6 @@ from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.common import messages, common
 from flumotion.twisted import flavors
-from flumotion.twisted.defer import defer_generator_method
 from flumotion.common.planet import moods
 
 from flumotion.common.messages import N_

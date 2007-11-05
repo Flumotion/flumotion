@@ -48,7 +48,6 @@ from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
-from flumotion.twisted.defer import defer_generator_method
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -1107,9 +1106,9 @@ class Vishnu(log.Loggable):
         for c in components:
             del self._componentMappers[self._componentMappers[c].id]
             del self._componentMappers[c]
-        yield flow.empty()
-        yield self.state.remove('flows', flow)
-    deleteFlow = defer_generator_method(deleteFlow)
+        d = flow.empty()
+        d.addCallback(lambda _: self.state.remove('flows', flow))
+        return d
 
     def emptyPlanet(self):
         """
