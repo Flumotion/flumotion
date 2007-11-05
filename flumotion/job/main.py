@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import os
 
 from twisted.internet import reactor
@@ -28,20 +27,16 @@ from flumotion.configure import configure
 from flumotion.common import log, keycards, common, errors
 from flumotion.job import job
 from flumotion.twisted import credentials, fdserver
+from flumotion.common.options import OptionParser
 
 def main(args):
-    parser = optparse.OptionParser()
+    parser = OptionParser(domain="flumotion-job")
     parser.add_option('', '--version',
                       action="store_true", dest="version",
                       help="show version information")
 
     log.debug('job', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
-
-    # handle all options
-    if options.version:
-        print common.version("flumotion-job")
-        return 0
 
     # check if a config file was specified; if so, parse config and copy over
     if len(args) != 3:

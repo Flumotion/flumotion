@@ -23,7 +23,6 @@
 manager main function
 """
 
-import optparse
 import os
 import sys
 
@@ -33,6 +32,7 @@ from flumotion.manager import manager
 from flumotion.common import log, config, common, errors, setup
 from flumotion.configure import configure
 from flumotion.common import server
+from flumotion.common.options import OptionGroup, OptionParser
 
 defaultSSLPort = configure.defaultSSLManagerPort
 defaultTCPPort = configure.defaultTCPManagerPort
@@ -46,19 +46,10 @@ def _createParser():
  can be provided, these are used to configure flows that the manager should run\
  on available workers."
 
-    parser = optparse.OptionParser(usage=usagemessage, description=desc)
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(usage=usagemessage, description=desc,
+                          domain="flumotion-manager")
 
-    group = optparse.OptionGroup(parser, "manager options")
+    group = OptionGroup(parser, "manager options")
     group.add_option('-H', '--hostname',
                      action="store", type="string", dest="host",
                      help="hostname to listen as")
@@ -121,15 +112,6 @@ def main(args):
         if o:
             log.debug('manager', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
-
-    # verbose sets a baseline for --debug
-    if options.verbose:
-        log.setFluDebug("*:3")
-
-    # Handle options that don't require a configuration file.
-    if options.version:
-        print common.version("flumotion-manager")
-        return 0
 
     # parse planet config file
     if len(args) <= 1:

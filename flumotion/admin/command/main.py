@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import sys
 import re
 
@@ -34,6 +33,7 @@ from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
 from flumotion.admin.command.commands import commands
+from flumotion.common.options import OptionParser
 
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')
@@ -147,10 +147,7 @@ def setup_reactor(info):
 pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
 
 def main(args):
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
+    parser = OptionParser(domain="flumotion-command")
     parser.add_option('-u', '--usage',
                       action="store_true", dest="usage",
                       help="show a usage message")
@@ -160,20 +157,8 @@ def main(args):
     parser.add_option('', '--no-ssl',
                       action="store_true", dest="no_ssl",
                       help="disable encryption when connecting to the manager")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
 
     options, args = parser.parse_args(args)
-
-    if options.version:
-        from flumotion.common import common
-        print common.version("flumotion-command")
-        return 0
-
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     if options.usage or not args[1:]:
         usage(args)

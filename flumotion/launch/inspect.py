@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import sys
 
 from flumotion.common import log, common, registry
+from flumotion.common.options import OptionParser
 
 
 def printMultiline(indent, data):
@@ -93,32 +93,11 @@ def main(args):
                   " property name, including the names of the containing"
                   " properties: "
                   "...[property-name:]property-name")
-    parser = optparse.OptionParser(usage=usage_str, description=fpname_str)
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(usage=usage_str, description=fpname_str,
+                          domain="flumotion-inspect")
 
     log.debug('inspect', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
-
-    # verbose overrides --debug
-    if options.verbose:
-        options.debug = "*:3"
-
-    # handle all options
-    if options.version:
-        print common.version("flumotion-inspect")
-        return 0
-
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     r = registry.getRegistry()
 

@@ -16,21 +16,14 @@
 
 import os
 import sys
-import optparse
 
 from flumotion.common import common, log
 from flumotion.configure import configure
 from flumotion.service import service
+from flumotion.common.options import OptionParser
 
 def main(args):
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(domain="flumotion")
 
     parser.add_option('-l', '--logfile',
                       action="store", dest="logfile",
@@ -56,13 +49,6 @@ def main(args):
         if o:
             log.debug('service', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
-
-    if options.version:
-        print common.version("flumotion")
-        return 0
-
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     # if log file is specified, redirect stdout and stderr
     if options.logfile:

@@ -58,7 +58,6 @@ low-level interface is useful in debugging problems and should be kept.
 """
 
 
-import optparse
 import os
 import sys
 
@@ -67,6 +66,7 @@ from twisted.internet import reactor, defer
 
 from flumotion.common import log, common, registry, errors, messages
 from flumotion.twisted import flavors
+from flumotion.common.options import OptionParser
 
 from flumotion.launch import parse
 
@@ -217,7 +217,7 @@ def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
     from flumotion.configure import configure
-    log.debug('manager', 'Running Flumotion version %s' %
+    log.debug('launch', 'Running Flumotion version %s' %
         configure.version)
     import twisted.copyright
     log.debug('launch', 'Running against Twisted version %s' %
@@ -227,19 +227,9 @@ def main(args):
         log.debug('launch', 'Registered project %s version %s' % (
             p, project.get(p, 'version')))
 
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(domain="flumotion-launch")
 
-    log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
+    log.debug('launch', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
     # verbose overrides --debug

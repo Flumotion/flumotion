@@ -19,12 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
-
 from twisted.internet import reactor
 from twisted.python import rebuild
 
 from flumotion.common import log, errors, worker, planet, common
+from flumotion.common.options import OptionGroup, OptionParser
 
 # make Message proxyable
 from flumotion.common import messages
@@ -84,17 +83,7 @@ def _runInterface(options):
         greeter.show()
 
 def main(args):
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(domain="flumotion-admin-text")
     parser.add_option('-u', '--username',
                       action="store", type="string", dest="username",
                       help="set username to connect to manager")
@@ -112,18 +101,6 @@ def main(args):
                       help="make insecure connection")
 
     options, args = parser.parse_args(args)
-
-    if options.version:
-        from flumotion.common import common
-        print common.version("flumotion-admin-text")
-        return 0
-
-    if options.verbose:
-        log.setFluDebug("*:3")
-
-    if options.debug:
-        log.setFluDebug(options.debug)
-
 
     _runInterface(options)
 

@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import os
 import sys
 
@@ -30,20 +29,12 @@ from flumotion.common import log, keycards, common, errors
 from flumotion.common import connection
 from flumotion.worker import worker, config
 from flumotion.twisted import pb
+from flumotion.common.options import OptionGroup, OptionParser
 
 def _createParser():
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      help="show version information")
+    parser = OptionParser(domain="flumotion-worker")
 
-    group = optparse.OptionGroup(parser, "worker options")
+    group = OptionGroup(parser, "worker options")
     group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      help="manager host to connect to [default localhost]")
@@ -170,13 +161,6 @@ def main(args):
             log.debug('worker', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
 
-    if options.verbose:
-        log.setFluDebug("*:3")
-
-    # apply the command-line debug level if is given through --verbose or -d
-    if options.debug:
-        log.setFluDebug(options.debug)
-
     # translate feederports string to range
     if options.feederports:
         if not '-' in options.feederports:
@@ -222,11 +206,6 @@ def main(args):
         sys.stderr.write('ERROR: wrong transport %s, must be ssl or tcp\n' %
             options.transport)
         return 1
-
-    # handle all options
-    if options.version:
-        print common.version("flumotion-worker")
-        return 0
 
     # reset FLU_DEBUG which could be different after parsing XML file
     if options.debug:

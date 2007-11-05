@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import os
 import sys
 
@@ -30,21 +29,13 @@ from flumotion.common import log, keycards, common, errors
 from flumotion.common import connection
 from flumotion.admin.rrdmon import rrdmon, config
 from flumotion.twisted import pb
+from flumotion.common.options import OptionGroup, OptionParser
 
 # more standard helper functions necessary...
 def _createParser():
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      help="show version information")
+    parser = OptionParser(domain="flumotion-rrdmon")
 
-    group = optparse.OptionGroup(parser, "rrdmon options")
+    group = OptionGroup(parser, "rrdmon")
     group.add_option('-s', '--service-name',
                      action="store", type="string", dest="serviceName",
                      help="name to use for log and pid files "
@@ -89,18 +80,6 @@ def main(args):
         if o:
             log.debug('rrdmon', 'Setting configure.%s to %s' % (d, o))
             setattr(configure, d, o)
-
-    # handle all options
-    if options.version:
-        print common.version("flumotion-rrdmon")
-        return 0
-
-    if options.verbose:
-        log.setFluDebug("*:3")
-
-    # apply the command-line debug level if is given through --verbose or -d
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     # check if a config file was specified; if so, parse config and copy over
     if len(args) != 2:

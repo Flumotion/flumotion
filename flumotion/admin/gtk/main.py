@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import optparse
 import os
 import sys
 
@@ -34,6 +33,7 @@ from flumotion.admin.gtk.client import Window
 from flumotion.common import log, errors, connection
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
+from flumotion.common.options import OptionParser
 
 # FIXME: a function with a capital is extremely poor style.
 def Greeter():
@@ -89,17 +89,7 @@ def startAdminFromManagerString(managerString, useSSL):
     return model.connectToManager(info)
 
 def main(args):
-    parser = optparse.OptionParser()
-    parser.add_option('-d', '--debug',
-                      action="store", type="string", dest="debug",
-                      help="set debug levels")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
+    parser = OptionParser(domain="flumotion-admin")
     parser.add_option('-m', '--manager',
                       action="store", type="string", dest="manager",
                       help="the manager to connect to, e.g. localhost:7531")
@@ -108,17 +98,6 @@ def main(args):
                       help="disable encryption when connecting to the manager")
 
     options, args = parser.parse_args(args)
-
-    if options.version:
-        from flumotion.common import common
-        print common.version("flumotion-admin")
-        return 0
-
-    if options.verbose:
-        log.setFluDebug("*:3")
-
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     # set up gettext
     localedir = os.path.join(configure.localedatadir, 'locale')
