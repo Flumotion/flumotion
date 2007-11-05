@@ -1,5 +1,11 @@
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu._componentStopNoAvatar)
+	(Vishnu._componentStopWithAvatar, Vishnu.componentStop): Split the
+	ballooning componentStop function into parts. Only set lost
+	components to sleeping if the worker does not detect a running job
+	with that PID. Fixes #787.
+
 	* flumotion/test/test_component_bouncers_component.py
 	(TrivialBouncerTest.setKeycardExpireInterval): Fondle the bouncer
 	better.

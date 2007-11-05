@@ -719,55 +719,58 @@ class Vishnu(log.Loggable):
         else:
             return self._workerCreateComponents(workerId, [componentState])
 
-    def componentStop(self, componentState):
-        """
-        Stop the given component.
-        If the component was sad, we clear its sad state as well,
-        since the stop was explicitly requested by the admin.
+    def _componentStopNoAvatar(self, componentState, avatarId):
+        # NB: reset moodPending if asked to stop without an avatar
+        # because we changed above to allow stopping even if moodPending
+        # is happy
+        def stopSad():
+            # FIXME: clear messages?
+            self.debug('asked to stop a sad component without avatar')
+            componentState.setMood(moods.sleeping.value)
+            componentState.set('moodPending', None)
+            return defer.succeed(None)
 
-        @type componentState: L{planet.ManagerComponentState}
+        def stopLost():
+            def gotComponents(comps):
+                return avatarId in comps
+            def gotError(failure):
+                sdfa
+            def gotJobRunning(running):
+                if running:
+                    self.warning('asked to stop lost component %r, but '
+                                 'it is still running', avatarId)
+                    # FIXME: put a message on the state to suggest a
+                    # kill?
+                else:
+                    self.debug('component %r seems to be really lost, '
+                               'setting to sleeping')
+                    componentState.setMood(moods.sleeping.value)
+                    componentState.set('moodPending', None)
+            self.debug('asked to stop a lost component without avatar')
+            workerName = componentState.get('workerRequested')
+            if workerName and self.workerHeaven.hasAvatar(workerName):
+                self.debug('checking if component has job process running')
+                d = self.workerHeaven.getAvatar(workerName).getComponents()
+                d.addCallbacks(gotComponents, gotError)
+                d.addCallback(gotJobRunning)
+                return d
+            else:
+                self.debug('component lacks a worker, setting to sleeping')
+                d = defer.maybeDeferred(gotJobRunning, False)
+                return d
 
-        @rtype: L{defer.Deferred}
-        """
-        self.debug('componentStop(%r)' % componentState)
-        # We permit stopping a component even if it has a pending mood of
-        # happy, so that if it never gets to happy, we can still stop it.
-        if (componentState.get('moodPending') != None and
-            componentState.get('moodPending') != moods.happy.value):
-            self.debug("Pending mood is %r", componentState.get('moodPending'))
-            raise errors.BusyComponentError(componentState)
-
-        m = self.getComponentMapper(componentState)
-        if not m:
-            # We have a stale componentState for an already-deleted 
-            # component
-            self.warning("Component mapper for component state %r doesn't "
-                "exist", componentState)
-            raise errors.UnknownComponentError(componentState)
-
-        componentAvatar = m.avatar
-
-        if not componentAvatar:
-            # reset moodPending if asked to stop without an avatar
-            # because we changed above to allow stopping even if
-            # moodPending is happy
-            if componentState.get('mood') == moods.sad.value:
-                self.debug('asked to stop a sad component without avatar')
-                componentState.setMood(moods.sleeping.value)
-                componentState.set('moodPending', None)
-                return defer.succeed(None)
-            if componentState.get('mood') == moods.lost.value:
-                self.debug('asked to stop a lost component without avatar')
-                componentState.setMood(moods.sleeping.value)
-                componentState.set('moodPending', None)
-                return defer.succeed(None)
-
-            msg = 'asked to stop a component without avatar in mood %s' % \
-                    moods.get(componentState.get('mood'))
+        def stopUnknown():
+            msg = ('asked to stop a component without avatar in mood %s'
+                   % moods.get(mood))
             self.warning(msg)
             return defer.fail(errors.ComponentMoodError(msg))
+            
+        mood = componentState.get('mood')
+        stoppers = {moods.sad.value: stopSad,
+                    moods.lost.value: stopLost}
+        return stoppers.get(mood, stopUnknown)()
 
-        d = componentAvatar.mindCallRemote('stop')
+    def _componentStopWithAvatar(self, componentState, componentAvatar):
         def cleanupAndDisconnectComponent(result):
             return componentAvatar.disconnect()
 
@@ -778,10 +781,42 @@ class Vishnu(log.Loggable):
 
             return result
 
+        d = componentAvatar.mindCallRemote('stop')
         d.addCallback(cleanupAndDisconnectComponent)
         d.addCallback(setSleeping)
 
         return d
+        
+    def componentStop(self, componentState):
+        """
+        Stop the given component.
+        If the component was sad, we clear its sad state as well,
+        since the stop was explicitly requested by the admin.
+
+        @type componentState: L{planet.ManagerComponentState}
+
+        @rtype: L{defer.Deferred}
+        """
+        self.debug('componentStop(%r)', componentState)
+        # We permit stopping a component even if it has a pending mood of
+        # happy, so that if it never gets to happy, we can still stop it.
+        if (componentState.get('moodPending') != None and
+            componentState.get('moodPending') != moods.happy.value):
+            self.debug("Pending mood is %r", componentState.get('moodPending'))
+
+            raise errors.BusyComponentError(componentState)
+
+        m = self.getComponentMapper(componentState)
+        if not m:
+            # We have a stale componentState for an already-deleted 
+            # component
+            self.warning("Component mapper for component state %r doesn't "
+                "exist", componentState)
+            raise errors.UnknownComponentError(componentState)
+        elif not m.avatar:
+            return self._componentStopNoAvatar(componentState, m.id)
+        else:
+            return self._componentStopWithAvatar(componentState, m.avatar)
 
     def componentAddMessage(self, avatarId, message):
         """
