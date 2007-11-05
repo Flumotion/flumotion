@@ -1,3 +1,20 @@
+2007-11-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/bouncer.py (Bouncer): Expire
+	keycards every 2 minutes instead of every 60. Makes memory usage
+	more stable.
+	(Bouncer.init, Bouncer.setEnabled, Bouncer._expire)
+	(Bouncer.authenticate, Bouncer.addKeycard, Bouncer.removeKeycard)
+	(Bouncer.expireKeycardId): Use a Poller instead of rolling our
+	own.
+	(Bouncer.expireKeycardId): Remove the keycard properly, which
+	takes care of the keycardData / uiState structures, preventing
+	memleaks. Fixes #723. Already fixed in the bouncer plug code.
+
+	* flumotion/test/bouncertest.py
+	(TrivialBouncerTest.setKeycardExpireInterval): Use private API to
+	set the expirer timeout. Hacky, but hey.
+
 2007-11-02  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/dialogs.py (PropertyChangeDialog): Use show()

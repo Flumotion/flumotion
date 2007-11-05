@@ -89,7 +89,7 @@ import time
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import interfaces, keycards, errors
+from flumotion.common import interfaces, keycards, errors, common
 from flumotion.common.componentui import WorkerComponentUIState
 
 from flumotion.component import component
@@ -151,7 +151,7 @@ class Bouncer(component.BaseComponent):
     componentMediumClass = BouncerMedium
     logCategory = 'bouncer'
 
-    KEYCARD_EXPIRE_INTERVAL = 60 * 60
+    KEYCARD_EXPIRE_INTERVAL = 2 * 60 # expire every 2 minutes
 
     def init(self):
         self._idCounter = 0
@@ -160,7 +160,9 @@ class Bouncer(component.BaseComponent):
         self._keycardDatas = {} # keycard id -> data in uiState
         self.uiState.addListKey('keycards')
 
-        self.__timeout = None
+        self._expirer = common.Poller(self._expire,
+                                      self.KEYCARD_EXPIRE_INTERVAL,
+                                      start=False)
         self.enabled = True
         
     def setDomain(self, name):
@@ -181,7 +183,7 @@ class Bouncer(component.BaseComponent):
             # If we were enabled and are being set to disabled, eject the warp
             # core^w^w^w^wexpire all existing keycards
             self.expireAllKeycards()
-            self._unscheduleTimeout()
+            self._expirer.stop()
 
         self.enabled = enabled
 
@@ -189,23 +191,12 @@ class Bouncer(component.BaseComponent):
         self.setEnabled(False)
         return defer.succeed(True)
 
-    def _scheduleTimeout(self):
-        def timeout():
-            for k in self._keycards.values():
-                if hasattr(k, 'ttl'):
-                    k.ttl -= self.KEYCARD_EXPIRE_INTERVAL
-                    if k.ttl <= 0:
-                        self.expireKeycardId(k.id)
-            self.__timeout = None
-            self._scheduleTimeout()
-        if self.__timeout is None:
-            self.__timeout = reactor.callLater(self.KEYCARD_EXPIRE_INTERVAL,
-                                               timeout)
-
-    def _unscheduleTimeout(self):
-        if self.__timeout is not None:
-            self.__timeout.cancel()
-            self.__timeout = None
+    def _expire(self):
+        for k in self._keycards.values():
+            if hasattr(k, 'ttl'):
+                k.ttl -= self._expirer.timeout
+                if k.ttl <= 0:
+                    self.expireKeycardId(k.id)
 
     def authenticate(self, keycard):
         if not self.typeAllowed(keycard):
@@ -213,9 +204,9 @@ class Bouncer(component.BaseComponent):
             return None
 
         if self.enabled:
-            if self.__timeout is None and hasattr(keycard, 'ttl'):
+            if not self._expirer.running and hasattr(keycard, 'ttl'):
                 self.debug('installing keycard timeout poller')
-                self._scheduleTimeout()
+                self._expirer.start()
             return defer.maybeDeferred(self.do_authenticate, keycard)
         else:
             self.debug("Bouncer disabled, refusing authentication")
@@ -261,7 +252,8 @@ class Bouncer(component.BaseComponent):
         self._keycardDatas[id] = data
 
         self.uiState.append('keycards', data)
-        self.debug("added keycard with id %s" % keycard.id)
+        self.debug("added keycard with id %s, ttl %r", keycard.id,
+                   getattr(keycard, 'ttl', None))
 
     def removeKeycard(self, keycard):
         id = keycard.id
@@ -273,7 +265,7 @@ class Bouncer(component.BaseComponent):
         data = self._keycardDatas[id]
         self.uiState.remove('keycards', data)
         del self._keycardDatas[id]
-        self.debug("removed keycard with id %s" % id)
+        self.info("removed keycard with id %s" % id)
 
     def removeKeycardId(self, id):
         self.debug("removing keycard with id %s" % id)
@@ -297,7 +289,8 @@ class Bouncer(component.BaseComponent):
         if not self._keycards.has_key(id):
             raise KeyError
 
-        keycard = self._keycards.pop(id)
+        keycard = self._keycards[id]
+        self.removeKeycardId(id)
 
         if self.medium:
             return self.medium.callRemote('expireKeycard',

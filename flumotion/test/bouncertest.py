@@ -62,7 +62,7 @@ class TrivialBouncerTest(unittest.TestCase):
 
     def setKeycardExpireInterval(self, interval):
         # can be overridden
-        self.obj.KEYCARD_EXPIRE_INTERVAL = interval
+        self.obj._expirer.timeout = interval
 
     def testTimeoutAlgorithm(self):
         # the plan: make a keycard that expires in 0.75 seconds, and
