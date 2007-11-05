@@ -1,5 +1,10 @@
 2007-11-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/job/main.py (main): Remove --version here,
+	it's already added by the common optparse options.
+
+2007-11-05  Johan Dahlin  <johan@gnome.org>
+
        * flumotion/admin/command/main.py:
        * flumotion/admin/gtk/main.py:
        * flumotion/admin/rrdmon/main.py:

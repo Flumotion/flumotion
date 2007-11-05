@@ -31,9 +31,6 @@ from flumotion.common.options import OptionParser
 
 def main(args):
     parser = OptionParser(domain="flumotion-job")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      help="show version information")
 
     log.debug('job', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
