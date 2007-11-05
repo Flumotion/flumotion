@@ -1,3 +1,24 @@
+2007-11-05  Johan Dahlin  <johan@gnome.org>
+
+       * flumotion/admin/command/main.py:
+       * flumotion/admin/gtk/main.py:
+       * flumotion/admin/rrdmon/main.py:
+       * flumotion/admin/text/main.py:
+       * flumotion/common/options.py:
+       * flumotion/job/main.py:
+       * flumotion/launch/inspect.py:
+       * flumotion/launch/main.py:
+       * flumotion/manager/main.py:
+       * flumotion/service/main.py:
+       * flumotion/test/test_options.py:
+       * flumotion/worker/main.py:
+       * misc/pycheckerrc:
+       Refactor command-line parsing to use a base class which
+       provides the common options and optinally uses GOption if
+       we use a sufficiently new pygobject.
+       Ignore optparse in pychecker since we're not interested in bugs
+       in the standard library.
+
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/admin_gtk.py: Exorcise defer_generator
