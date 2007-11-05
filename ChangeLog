@@ -1,3 +1,8 @@
+2007-11-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/options.py: Don't assume gobject.pygobject_version
+	is present, fixes build on FC5.
+
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/admin.py

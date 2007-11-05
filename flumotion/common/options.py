@@ -35,7 +35,7 @@ import gobject
 # version of pygobject on our system. There were bugs in
 # the GOption parsing until pygobject 2.15.0, so just
 # revert to optparse if our pygobject is too old
-USE_GOPTION = (gobject.pygobject_version >= (2, 15, 0))
+USE_GOPTION = (getattr(gobject, 'pygobject_version', ()) >= (2, 15, 0))
 if USE_GOPTION:
     from gobject.option import (OptionParser as BaseOP,
                                 OptionGroup as BaseOG)
