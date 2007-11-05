@@ -29,7 +29,6 @@ from twisted.spread import pb
 from twisted.internet import defer, reactor
 from zope.interface import implements
 
-from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
 from flumotion.common import messages
 from flumotion.configure import configure
@@ -169,28 +168,24 @@ class BaseMedium(fpb.Referenceable):
 
         @returns: a callable, the given function in the given module.
         """
-        self.debug('remote runFunction(%r, %r)' % (module, function))
-        d = self.bundleLoader.loadModule(module)
-        yield d
+        def gotModule(mod):
+            if hasattr(mod, function):
+                return getattr(mod, function)
+            else:
+                msg = 'No procedure named %s in module %s' % (function,
+                                                              module)
+                self.warning('%s', msg)
+                raise errors.RemoteRunError(msg)
 
-        try:
-            mod = d.value()
-        except errors.NoBundleError:
+        def gotModuleError(failure):
+            failure.trap(errors.NoBundleError)
             msg = 'Failed to find bundle for module %s' % module
-            self.warning(msg)
+            self.warning('%s', msg)
             raise errors.RemoteRunError(msg)
-        except Exception, e:
-            self.warning('Exception raised while loading bundle for '
-                         'module %s: %s', module, e)
-            raise
 
-        try:
-            yield getattr(mod, function)
-        except AttributeError:
-            msg = 'No procedure named %s in module %s' % (function, module)
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
-    getBundledFunction = defer_generator_method(getBundledFunction)
+        d = self.bundleLoader.loadModule(module)
+        d.addCallbacks(gotModule, gotModuleError)
+        return d
 
     def runBundledFunction(self, module, function, *args, **kwargs):
         """
@@ -212,36 +207,24 @@ class BaseMedium(fpb.Referenceable):
 
         @returns: the return value of the given function in the module.
         """
-        self.debug('remote runFunction(%r, %r)' % (module, function))
+        self.debug('runBundledFunction(%r, %r)', module, function)
+        def gotFunction(proc):
+            def invocationError(failure):
+                self.warning('Exception raised while calling '
+                             '%s.%s(*args=%r, **kwargs=%r): %s',
+                             module, function, args, kwargs,
+                             log.getFailureMessage(failure))
+                return failure
+            
+            self.debug('calling %s.%s(%r, %r)', module, function, args,
+                       kwargs)
+            d = defer.maybeDeferred(proc, *args, **kwargs)
+            d.addErrback(invocationError)
+            return d
+            
         d = self.getBundledFunction(module, function)
-        yield d
-        proc = d.value()
-
-        try:
-            self.debug('calling %s.%s(%r, %r)' % (
-                module, function, args, kwargs))
-            d = proc(*args, **kwargs)
-        except Exception, e:
-            self.warning('Exception raised while calling '
-                         '%s.%s(*args=%r, **kwargs=%r): %s',
-                         module, function, args, kwargs,
-                         log.getExceptionMessage(e))
-            raise
- 
-        # at this point, we have our result. it could be a value or a
-        # deferred. in the latter case we will need to yield again.
-        yield d
-
-        # only if d was actually a deferred will we get here
-        try:
-            yield d.value()
-        except Exception, e:
-            self.warning('Deferred failure from '
-                         '%s.%s(*args=%r, **kwargs=%r): %s',
-                         module, function, args, kwargs,
-                         log.getExceptionMessage(e))
-            raise
-    runBundledFunction = defer_generator_method(runBundledFunction)
+        d.addCallback(gotFunction)
+        return d
 
 class PingingMedium(BaseMedium):
     _pingInterval = configure.heartbeatInterval
