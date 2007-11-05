@@ -123,8 +123,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 self.medium.emit('connection-refused')
                 self.debug("emitted connection-refused")
             else:
-                self.medium.emit('connection-error', e)
-                self.medium._defaultErrback(failure.Failure(e))
+                self.medium.emit('connection-error', failure)
+                self.medium._defaultErrback(failure)
             # swallow error
                 
         d.addCallbacks(success, error)
@@ -215,9 +215,9 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
             if not keepTrying:
                 d.errback(errors.ConnectionFailedError(reason))
 
-        def connection_error(model, exception, d):
+        def connection_error(model, failure, d):
             if not keepTrying:
-                d.errback(exception)
+                d.errback(failure)
 
         d = defer.Deferred()
         ids = []

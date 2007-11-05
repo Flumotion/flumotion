@@ -1,5 +1,10 @@
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py
+	(AdminClientFactory.gotDeferredLogin.error)
+	(AdminModel.connectToManager.connection_error): Fix for
+	refactoring.
+
 	* flumotion/admin/text/view.py (AdminTextView.getEntry): Move here
 	from admin.py:AdminModel, and make not a defgen.
 
