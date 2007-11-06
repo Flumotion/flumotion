@@ -578,6 +578,8 @@ def parseFeedId(feedId):
     @rtype:  tuple of (str, str)
     @return: tuple of (componentName, feedName)
     """
+    assert not feedId.startswith('/'), \
+           "feedId must not start with '/': %s" % feedId
     list = feedId.split(":")
     assert len(list) == 2, "feedId %s should contain exactly one ':'" % feedId
     return (list[0], list[1])

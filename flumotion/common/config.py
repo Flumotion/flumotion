@@ -289,10 +289,10 @@ def buildVirtualFeeds(feedPairs, feeders):
     component config.
 
     @param feedPairs: List of virtual feeds, as name-feederName pairs. For
-                      example, [('/foo/bar:baz', 'qux')] defines one
-                      virtual feed '/foo/bar:baz', which is provided by
+                      example, [('bar:baz', 'qux')] defines one
+                      virtual feed 'bar:baz', which is provided by
                       the component's 'qux' feed.
-    @type  feedPairs: List of (fullFeedId, feedName) -- both strings.
+    @type  feedPairs: List of (feedId, feedName) -- both strings.
     @param feeders: The feeders exported by this component, from the
                     registry.
     @type  feeders: List of str.
@@ -303,9 +303,9 @@ def buildVirtualFeeds(feedPairs, feeders):
             raise ConfigError('virtual feed maps to unknown feeder: '
                               '%s -> %s' % (virtual, real))
         try:
-            common.parseFullFeedId(virtual)
+            common.parseFeedId(virtual)
         except:
-            raise ConfigError('virtual feed name not a valid fullFeedId: %s'
+            raise ConfigError('virtual feed name not a valid feedId: %s'
                               % (virtual,))
         ret[virtual] = real
     return ret

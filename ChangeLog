@@ -1,5 +1,12 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (buildVirtualFeeds): 
+	* flumotion/test/test_config.py (TestConfig.testVirtualFeeds):
+	Expect a feedId, not a fullFeedId, like in the eaters dict.
+
+	* flumotion/common/common.py (parseFeedId): Assert that we do not
+	have a fullFeedId.
+
 	* flumotion/manager/manager.py (Vishnu.__pychecker__): Pacify
 	pychecker.
 

@@ -1045,7 +1045,17 @@ class TestConfig(unittest.TestCase):
                <flow name="default">
                  <component name="component-name" type="test-component-with-feeder"
                             worker="foo">
-                   <virtual-feed name="/valid/feed:name" real="not-existing"/>
+                   <virtual-feed name="/invalid/feed:name" real="default"/>
+                 </component>
+               </flow>
+             </planet>
+             """)
+        assertFail("""
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component-with-feeder"
+                            worker="foo">
+                   <virtual-feed name="valid:name" real="not-existing"/>
                  </component>
                </flow>
              </planet>
@@ -1064,11 +1074,11 @@ class TestConfig(unittest.TestCase):
                <flow name="default">
                  <component name="component-name" type="test-component-with-feeder"
                             worker="foo">
-                   <virtual-feed name="/valid/feed:name" real="default"/>
+                   <virtual-feed name="valid:name" real="default"/>
                  </component>
                </flow>
              </planet>
-             """, {'/valid/feed:name': 'default'})
+             """, {'valid:name': 'default'})
         
 
 def AdminConfig(sockets, string):
