@@ -1020,6 +1020,57 @@ class TestConfig(unittest.TestCase):
         conf = ConfigXML(xml)
         self.assertRaises(config.ConfigError, conf.parse)
 
+    def testVirtualFeeds(self):
+        def assertFail(s):
+            conf = ConfigXML(s)
+            self.assertRaises(config.ConfigError, conf.parse)
+        def assertPass(s, feeds):
+            conf = ConfigXML(s)
+            conf.parse()
+            cons = conf.getComponentEntries()['/default/component-name'].getConfigDict()
+            self.assertEquals(cons['virtual-feeds'], feeds)
+            
+        assertFail("""
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component-with-feeder"
+                            worker="foo">
+                   <virtual-feed name="invalid-name" real="default"/>
+                 </component>
+               </flow>
+             </planet>
+             """)
+        assertFail("""
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component-with-feeder"
+                            worker="foo">
+                   <virtual-feed name="/valid/feed:name" real="not-existing"/>
+                 </component>
+               </flow>
+             </planet>
+             """)
+        assertPass("""
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component-with-feeder"
+                            worker="foo">
+                 </component>
+               </flow>
+             </planet>
+             """, {})
+        assertPass("""
+             <planet>
+               <flow name="default">
+                 <component name="component-name" type="test-component-with-feeder"
+                            worker="foo">
+                   <virtual-feed name="/valid/feed:name" real="default"/>
+                 </component>
+               </flow>
+             </planet>
+             """, {'/valid/feed:name': 'default'})
+        
+
 def AdminConfig(sockets, string):
     f = StringIO(string)
     conf = config.AdminConfigParser(sockets, f)

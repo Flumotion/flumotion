@@ -1,3 +1,11 @@
+2007-11-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (buildVirtualFeeds): New helper
+	procedure.
+
+	* flumotion/test/test_config.py (TestConfig.testVirtualFeeds): New
+	test.
+
 2007-11-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py: 

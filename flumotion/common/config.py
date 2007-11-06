@@ -284,6 +284,32 @@ def buildPlugsSet(plugsList, sockets):
         ret[plug.socket].append(plug.config)
     return ret
 
+def buildVirtualFeeds(feedPairs, feeders):
+    """Build a virtual feeds dict suitable for forming part of a
+    component config.
+
+    @param feedPairs: List of virtual feeds, as name-feederName pairs. For
+                      example, [('/foo/bar:baz', 'qux')] defines one
+                      virtual feed '/foo/bar:baz', which is provided by
+                      the component's 'qux' feed.
+    @type  feedPairs: List of (fullFeedId, feedName) -- both strings.
+    @param feeders: The feeders exported by this component, from the
+                    registry.
+    @type  feeders: List of str.
+    """
+    ret = {}
+    for virtual, real in feedPairs:
+        if real not in feeders:
+            raise ConfigError('virtual feed maps to unknown feeder: '
+                              '%s -> %s' % (virtual, real))
+        try:
+            common.parseFullFeedId(virtual)
+        except:
+            raise ConfigError('virtual feed name not a valid fullFeedId: %s'
+                              % (virtual,))
+        ret[virtual] = real
+    return ret
+
 def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
              keyBase=None):
     """Compute the difference between two config dicts.
@@ -366,10 +392,11 @@ class ConfigEntryComponent(log.Loggable):
     nice = 0
     logCategory = 'config'
 
-    __pychecker__ = 'maxargs=12'
+    __pychecker__ = 'maxargs=13'
 
     def __init__(self, name, parent, type, label, propertyList, plugList,
-                 worker, eatersList, isClockMaster, project, version):
+                 worker, eatersList, isClockMaster, project, version,
+                 virtualFeeds=None):
         self.name = name
         self.parent = parent
         self.type = type
@@ -379,7 +406,8 @@ class ConfigEntryComponent(log.Loggable):
         try:
             self.config = self._buildConfig(propertyList, plugList,
                                             eatersList, isClockMaster,
-                                            project, version)
+                                            project, version,
+                                            virtualFeeds)
         except ConfigError, e:
             # reuse the original exception?
             e.args = ("While parsing component %s: %s"
@@ -403,7 +431,7 @@ class ConfigEntryComponent(log.Loggable):
         raise ConfigError("<component> version not parseable")
 
     def _buildConfig(self, propertyList, plugsList, eatersList,
-                     isClockMaster, project, version):
+                     isClockMaster, project, version, virtualFeeds):
         """
         Build a component configuration dictionary.
         """
@@ -425,7 +453,9 @@ class ConfigEntryComponent(log.Loggable):
                                          self.defs.getSockets()),
                   'eater': buildEatersDict(eatersList,
                                            self.defs.getEaters()),
-                  'source': [feedId for eater, feedId in eatersList]}
+                  'source': [feedId for eater, feedId in eatersList],
+                  'virtual-feeds': buildVirtualFeeds(virtualFeeds,
+                                                     self.defs.getFeeders())}
 
         if self.label:
             # only add a label attribute if it was specified
@@ -566,6 +596,7 @@ class BaseConfigParser(fxml.Parser):
         #   <property name="name">value</property>*
         #   <clock-master>...</clock-master>?
         #   <plugs>...</plugs>*
+        #   <virtual-feed name="foo" real="bar"/>*
         # </component>
 
         attrs = self.parseAttributes(node, ('name', 'type'),
@@ -583,6 +614,7 @@ class BaseConfigParser(fxml.Parser):
         eaters = []
         clockmasters = []
         sources = []
+        virtual_feeds = []
 
         def parseBool(node):
             return self.parseTextNode(node, common.strToBool)
@@ -594,7 +626,9 @@ class BaseConfigParser(fxml.Parser):
         if isFeedComponent:
             parsers.update({'eater': (self._parseEater, eaters.extend),
                             'clock-master': (parseBool, clockmasters.append),
-                            'source': (self._parseSource, sources.append)})
+                            'source': (self._parseSource, sources.append),
+                            'virtual-feed': (self._parseVirtualFeed,
+                                             virtual_feeds.append)})
 
         self.parseFromTable(node, parsers)
 
@@ -611,7 +645,8 @@ class BaseConfigParser(fxml.Parser):
 
         return ConfigEntryComponent(name, parent, type, label, properties,
                                     plugs, worker, eaters,
-                                    isClockMaster, project, version)
+                                    isClockMaster, project, version,
+                                    virtual_feeds)
 
     def _parseSource(self, node):
         return self._parseFeedId(self.parseTextNode(node))
@@ -647,6 +682,12 @@ class BaseConfigParser(fxml.Parser):
         self.parseFromTable(node, parsers)
         return name, properties
 
+    def _parseVirtualFeed(self, node):
+        #  <virtual-feed name="foo" real="bar"/>
+        name, real = self.parseAttributes(node, ('name', 'real'))
+        # assert no content
+        self.parseFromTable(node, {})
+        return name, real
 
 # FIXME: rename to PlanetConfigParser or something (should include the
 # word 'planet' in the name)
