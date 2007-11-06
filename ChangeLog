@@ -1,5 +1,27 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentHeaven._connectEatersAndFeeders): Coalesce
+	_connectEaters, _connectEaterUpstream, _connectFeeders, and
+	_connectFeederDownstream into this one laconism.
+	(ComponentHeaven.mapNetFeed): "Implement" a network map.
+	(ComponentHeaven._getFeedersForEaters)
+	(ComponentHeaven._getEatersForFeeders): Return more info.
+	(ComponentHeaven.componentAttached): Adapt to call
+	_connectEatersAndFeeders.
+	(ComponentHeaven.masterClockAvailable): Prevent endless loops.
+	(ComponentHeaven._componentIsLocal): 
+	(ComponentHeaven.getComponentAvatarForState): Removed, no callers.
+	(TryAgain): An exception for local use.
+	(ComponentAvatar.feedTo, ComponentAvatar.eatFrom): More debug.
+	(ComponentAvatar.getFullFeedId): New function.
+	(ComponentAvatar.provideMasterClock): Call masterClockAvailable in
+	the case where the clock has already been provided, it's just a
+	component logging in again.
+	(ComponentAvatar.onShutdown): Fold the mood functions in here,
+	they are not public and may only be called in certain
+	circumstances.
+
 	* flumotion/manager/manager.py (Vishnu.workerAttached): Unhappily,
 	the worker is not in the avatars dict at this point, so
 	callLater(0) on a function that requires it to be there. Boo.
