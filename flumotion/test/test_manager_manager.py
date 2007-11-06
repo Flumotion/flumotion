@@ -420,7 +420,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                          "height=240,framerate=5/1,format=(fourcc)I420")]
             return self.vishnu.loadComponent(manager.LOCAL_IDENTITY,
                                              compType, compId, None, compProps,
-                                             "worker", [], [], False)
+                                             "worker", [], [], False, [])
         # Add more tests if you implement handling of sync-needing components
         self.assertRaises(NotImplementedError, loadProducer)
 
@@ -448,7 +448,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                          "keyframe-force=5 ! oggmux")]
             compState = self.vishnu.loadComponent(
                 manager.LOCAL_IDENTITY, compType, compId, None, compProps,
-                "worker", [], compEaters, False)
+                "worker", [], compEaters, False, [])
 
             self.assertEqual(compState.get('config').get('name'),
                              "converter-ogg-theora")
@@ -462,7 +462,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
                               self.vishnu.loadComponent,
                               manager.LOCAL_IDENTITY, compType, compId,
                               None, compProps, "worker", [], compEaters,
-                              False)
+                              False, [])
 
             compType = "http-streamer"
             compId = common.componentId("testflow", "streamer-ogg-theora")
@@ -471,7 +471,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compProps = [("port", 8800)]
             compState = self.vishnu.loadComponent(
                 manager.LOCAL_IDENTITY, compType, compId, compLabel,
-                compProps, "streamer", [], compEaters, False)
+                compProps, "streamer", [], compEaters, False, [])
 
             self.assertEqual(compState.get('config').get('name'),
                              "streamer-ogg-theora")
@@ -487,7 +487,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             compProps = [("file", "icalfile")]
             compState = self.vishnu.loadComponent(
                 manager.LOCAL_IDENTITY, compType, compId, None,
-                compProps, "worker", [], [], False)
+                compProps, "worker", [], [], False, [])
 
             atmosphere = self.vishnu.state.get('atmosphere')
             components = atmosphere.get('components')

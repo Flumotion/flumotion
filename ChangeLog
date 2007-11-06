@@ -1,5 +1,8 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_manager_manager.py: Update calls to
+	loadComponent for the virtualFeeds argument.
+
 	* flumotion/manager/component.py (ComponentAvatar.getEaters)
 	(ComponentAvatar.getFeeders, ComponentAvatar.getVirtualFeeds): New
 	accessors.
