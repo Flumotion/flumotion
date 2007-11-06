@@ -1,5 +1,11 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.getEaters)
+	(ComponentAvatar.getFeeders, ComponentAvatar.getVirtualFeeds): New
+	accessors.
+	(ComponentAvatar.getFeedersForEaters)
+	(ComponentAvatar.getEatersForFeeders): Use accessors.
+
 	* flumotion/common/config.py (buildVirtualFeeds): 
 	* flumotion/test/test_config.py (TestConfig.testVirtualFeeds):
 	Expect a feedId, not a fullFeedId, like in the eaters dict.

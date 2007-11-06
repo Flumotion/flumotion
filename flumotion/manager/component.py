@@ -333,7 +333,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning("detached component")
             return []
         concat = lambda lists: reduce(list.__add__, lists, [])
-        eaterDict = self.componentState.get('config').get('eater', {})
+        eaterDict = self.getEaters()
         return concat([[(alias, feedId) for feedId, alias in tups]
                        for tups in eaterDict.values()])
 
@@ -354,7 +354,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning("detached component")
             return []
 
-        feederNames = self.componentState.get('config').get('feed', [])
+        feederNames = self.getFeeders()
         theseFeedIds = [common.feedId(self.getName(), feederName)
                         for feederName in feederNames]
 
@@ -423,6 +423,30 @@ class ComponentAvatar(base.ManagerAvatar):
         @rtype: str
         """
         return self.componentState.get('type')
+
+    def getEaters(self):
+        """
+        Get the set of eaters that this component eats from.
+
+        @rtype: dict of eaterName -> [(feedId, eaterAlias)]
+        """
+        return self.componentState.get('config').get('eater', {})
+
+    def getFeeders(self):
+        """
+        Get the list of feeders that this component provides.
+
+        @rtype: list of feederName
+        """
+        return self.componentState.get('config').get('feed', [])
+
+    def getVirtualFeeds(self):
+        """
+        Get the set of virtual feeds provided by this component.
+
+        @rtype: dict of feedId -> feederName
+        """
+        return self.componentState.get('config').get('virtual-feeds', {})
 
     def stop(self):
         """
