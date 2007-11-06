@@ -355,14 +355,13 @@ class ComponentAvatar(base.ManagerAvatar):
             return []
 
         feederNames = self.getFeeders()
-        theseFeedIds = [common.feedId(self.getName(), feederName)
-                        for feederName in feederNames]
+        theseFeedIds = [self.getFeedId(x) for x in feederNames]
 
         ret = []
         for comp in otherComponents:
             for eaterAlias, feedId in comp.getFeedersForEaters():
                 if feedId in theseFeedIds:
-                    remoteFeedId = common.feedId(comp.getName(), eaterAlias)
+                    remoteFeedId = comp.getFeedId(eaterAlias)
                     ret.append((feederNames[theseFeedIds.index(feedId)],
                                 remoteFeedId))
         return ret
@@ -439,6 +438,16 @@ class ComponentAvatar(base.ManagerAvatar):
         @rtype: list of feederName
         """
         return self.componentState.get('config').get('feed', [])
+
+    def getFeedId(self, feedName):
+        """
+        Get the feedId of a feed provided or consumed by this component.
+
+        @param feedName: The name of the feed (i.e., eater alias or
+                         feeder name)
+        @rtype: L{flumotion.common.common.feedId}
+        """
+        return common.feedId(self.getName(), feedName)
 
     def getVirtualFeeds(self):
         """
@@ -755,8 +764,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 flowName = componentAvatar.getParentName()
                 feedCompId = common.componentId(flowName, feedCompName)
                 feedCompAvatar = self.avatars.get(feedCompId, None)
-                feedId = common.feedId(componentAvatar.getName(),
-                                       eaterAlias)
+                feedId = componentAvatar.getFeedId(eaterAlias)
                 if feedCompAvatar and feedCompAvatar.componentState:
                     self._connectFeederDownstream(feedCompAvatar,
                                                   feederName, feedId)
@@ -779,8 +787,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 eaterCompName, eaterAlias = common.parseFeedId(remoteFeedId)
                 eaterCompId = common.componentId(flowName, eaterCompName)
                 eaterCompAvatar = self.avatars.get(eaterCompId, None)
-                feedId = common.feedId(componentAvatar.getName(),
-                                       feederName)
+                feedId = componentAvatar.getFeedId(feederName)
                 if eaterCompAvatar and eaterCompAvatar.componentState:
                     self._connectEaterUpstream(eaterCompAvatar,
                                                eaterAlias, feedId)

@@ -1,5 +1,11 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.getFeedId): New
+	function.
+	(ComponentAvatar.getEatersForFeeders)
+	(ComponentHeaven._connectEaters)
+	(ComponentHeaven._connectFeeders): Use new function.
+
 	* flumotion/test/test_manager_manager.py: Update calls to
 	loadComponent for the virtualFeeds argument.
 
