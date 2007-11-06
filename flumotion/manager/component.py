@@ -322,50 +322,6 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addCallbacks(success, error)
         return d
 
-    def getFeedersForEaters(self):
-        """Get the set of feeds that this component is eating from,
-        keyed by eater alias.
-
-        @return: a list of (eaterAlias, feedId) tuples
-        @rtype:  list of (str, str)
-        """
-        if not self.componentState:
-            self.warning("detached component")
-            return []
-        concat = lambda lists: reduce(list.__add__, lists, [])
-        eaterDict = self.getEaters()
-        return concat([[(alias, feedId) for feedId, alias in tups]
-                       for tups in eaterDict.values()])
-
-    def getEatersForFeeders(self, otherComponents):
-        """Get the set of eaters that this component feeds, keyed by
-        feeder name.
-
-        Note that you need to pass a list of other components to this
-        function; it has to search them all.
-
-        @param otherComponents: Other components that might eat from
-        this component.
-        @type  otherComponents: list of ComponentAvatar
-        @return: a list of (feederName, feedId) tuples
-        @rtype:  list of (str, str)
-        """
-        if not self.componentState:
-            self.warning("detached component")
-            return []
-
-        feederNames = self.getFeeders()
-        theseFeedIds = [self.getFeedId(x) for x in feederNames]
-
-        ret = []
-        for comp in otherComponents:
-            for eaterAlias, feedId in comp.getFeedersForEaters():
-                if feedId in theseFeedIds:
-                    remoteFeedId = comp.getFeedId(eaterAlias)
-                    ret.append((feederNames[theseFeedIds.index(feedId)],
-                                remoteFeedId))
-        return ret
-
     def getFeedServerPort(self):
         """
         Returns the port on which a feed server for this component is
@@ -711,6 +667,52 @@ class ComponentHeaven(base.ManagerHeaven):
             self.debug('avatar %s seems to have logged out rather quickly',
                        avatarId)
 
+    def _getFeedersForEaters(self, avatar):
+        """Get the set of feeds that this component is eating from,
+        keyed by eater alias.
+
+        @return: a list of (eaterAlias, feedId) tuples
+        @rtype:  list of (str, str)
+        """
+        if not avatar.componentState:
+            self.warning("detached component")
+            return []
+        concat = lambda lists: reduce(list.__add__, lists, [])
+        eaterDict = avatar.getEaters()
+        return concat([[(alias, feedId) for feedId, alias in tups]
+                       for tups in eaterDict.values()])
+
+    def _getEatersForFeeders(self, avatar):
+        """Get the set of eaters that this component feeds, keyed by
+        feeder name.
+
+        Note that you need to pass a list of other components to this
+        function; it has to search them all.
+
+        @return: a list of (feederName, feedId) tuples
+        @rtype:  list of (str, str)
+        """
+        if not avatar.componentState:
+            self.warning("detached component")
+            return []
+
+        flowName = avatar.getParentName()
+        otherComponents = [c for c in self.avatars.values()
+                           if c.componentState != None and
+                               c.getParentName() == flowName]
+
+        feederNames = avatar.getFeeders()
+        theseFeedIds = [avatar.getFeedId(x) for x in feederNames]
+
+        ret = []
+        for comp in otherComponents:
+            for eaterAlias, feedId in self._getFeedersForEaters(comp):
+                if feedId in theseFeedIds:
+                    remoteFeedId = comp.getFeedId(eaterAlias)
+                    ret.append((feederNames[theseFeedIds.index(feedId)],
+                                remoteFeedId))
+        return ret
+
     def _connectEaterUpstream(self, componentAvatar, eaterAlias,
                               remoteFeedId):
         self.debug('connecting from eater to feeder')
@@ -751,7 +753,8 @@ class ComponentHeaven(base.ManagerHeaven):
 
     def _connectEaters(self, componentAvatar):
         # connect the component's eaters
-        for eaterAlias, remoteFeedId in componentAvatar.getFeedersForEaters():
+        for eaterAlias, remoteFeedId \
+                in self._getFeedersForEaters(componentAvatar):
             self.debug('connecting eater %s to feed %s', eaterAlias,
                        remoteFeedId)
             # FIXME: all connections are upstream for now
@@ -773,18 +776,15 @@ class ComponentHeaven(base.ManagerHeaven):
                                'connect later', remoteFeedId)
 
     def _connectFeeders(self, componentAvatar):
-        flowName = componentAvatar.getParentName()
-        otherComponents = [c for c in self.avatars.values()
-                           if c.componentState != None and
-                               c.getParentName() == flowName]
         for feederName, remoteFeedId \
-                in componentAvatar.getEatersForFeeders(otherComponents):
+                in self._getEatersForFeeders(componentAvatar):
             self.debug('connecting feeder %s to feed %s', feederName,
                        remoteFeedId)
             # FIXME: all connections are upstream for now
             connection = "upstream"
             if connection == "upstream":
                 eaterCompName, eaterAlias = common.parseFeedId(remoteFeedId)
+                flowName = componentAvatar.getParentName()
                 eaterCompId = common.componentId(flowName, eaterCompName)
                 eaterCompAvatar = self.avatars.get(eaterCompId, None)
                 feedId = componentAvatar.getFeedId(feederName)

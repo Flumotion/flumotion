@@ -1,5 +1,12 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentHeaven._getEatersForFeeders)
+	(ComponentHeaven._getFeedersForEaters): Moved here, off of the
+	component avatar.
+	(ComponentHeaven._connectEaters)
+	(ComponentHeaven._connectFeeders): Use the new functions.
+
 	* flumotion/manager/component.py (ComponentAvatar.getFeedId): New
 	function.
 	(ComponentAvatar.getEatersForFeeders)
