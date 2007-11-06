@@ -885,7 +885,9 @@ class Vishnu(log.Loggable):
 
             self._workerCreateComponents(workerId, allComponents)
         d.addCallback(workerAvatarComponentListReceived)
-        self.componentHeaven.feedServerAvailable(workerId)
+        
+        reactor.callLater(0, self.componentHeaven.feedServerAvailable,
+                          workerId)
 
     def _workerCreateComponents(self, workerId, components):
         """

@@ -1,5 +1,10 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu.workerAttached): Unhappily,
+	the worker is not in the avatars dict at this point, so
+	callLater(0) on a function that requires it to be there. Boo.
+	Maybe fix later.
+
 	* flumotion/manager/component.py
 	(ComponentHeaven._getEatersForFeeders)
 	(ComponentHeaven._getFeedersForEaters): Moved here, off of the
