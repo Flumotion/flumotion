@@ -602,7 +602,7 @@ class Vishnu(log.Loggable):
 
     def loadComponent(self, identity, componentType, componentId,
                       componentLabel, properties, workerName,
-                      plugs, eaters, isClockMaster):
+                      plugs, eaters, isClockMaster, virtualFeeds):
         """
         Load a component into the manager configuration.
 
@@ -630,7 +630,7 @@ class Vishnu(log.Loggable):
                                                properties,
                                                plugs, workerName,
                                                eaters, isClockMaster,
-                                               None, None)
+                                               None, None, virtualFeeds)
 
         if compConf.defs.getNeedsSynchronization():
             raise NotImplementedError("Components that need "

@@ -1,7 +1,26 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_loadComponent): 
+	* flumotion/manager/manager.py (Vishnu.loadComponent): Add virtual
+	feeds support to loadComponent().
+
+2007-11-06  Andy Wingo  <wingo@pobox.com>
+
+	Add concept of "virtual feeds" to component configuration; a
+	component can provide a number of "virtual feeds", which in the
+	future will be used by the manager to provide failover between
+	separate components.
+	
 	* flumotion/common/config.py (buildVirtualFeeds): New helper
 	procedure.
+	(ConfigEntryComponent.__pychecker__): Muahahahahahaha
+	(ConfigEntryComponent.__init__): Take optional thirteenth
+	argument, virtualFeeds.
+	(ConfigEntryComponent._buildConfig): Set conf['virtual-feeds'].
+	(BaseConfigParser.parseComponent)
+	(BaseConfigParser._parseVirtualFeed): Parse virtual feeds out of
+	configuration.
 
 	* flumotion/test/test_config.py (TestConfig.testVirtualFeeds): New
 	test.

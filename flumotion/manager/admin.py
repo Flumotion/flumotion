@@ -403,7 +403,7 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_loadComponent(self, componentType, componentId,
                                   componentLabel, properties, workerName,
                                   plugs=None, eaters=None,
-                                  isClockMaster=None):
+                                  isClockMaster=None, virtualFeeds=None):
         """
         Load a component into the manager configuration.
         Returns a deferred that will be called with the component state.
@@ -435,12 +435,15 @@ class AdminAvatar(base.ManagerAvatar):
                                component, if any, will be clock master
                                for this flow.
         @type  isClockMaster:  bool
+        @param virtualFeeds:   List of (virtual feed, feeder name) pairs.
+                               See L{flumotion.common.config.buildVirtualFeeds}
+        @type  virtualFeeds:   [(str, str)]
         """
         return self.vishnu.loadComponent(self.remoteIdentity, componentType,
                                          componentId, componentLabel,
                                          properties, workerName,
                                          plugs or [], eaters or [],
-                                         isClockMaster)
+                                         isClockMaster, virtualFeeds or [])
 
     def perspective_deleteFlow(self, flowName):
         return self.vishnu.deleteFlow(flowName)
