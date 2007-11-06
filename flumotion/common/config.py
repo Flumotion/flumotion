@@ -454,7 +454,7 @@ class ConfigEntryComponent(log.Loggable):
                   'eater': buildEatersDict(eatersList,
                                            self.defs.getEaters()),
                   'source': [feedId for eater, feedId in eatersList],
-                  'virtual-feeds': buildVirtualFeeds(virtualFeeds,
+                  'virtual-feeds': buildVirtualFeeds(virtualFeeds or [],
                                                      self.defs.getFeeders())}
 
         if self.label:
