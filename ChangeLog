@@ -1,5 +1,8 @@
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu.__pychecker__): Pacify
+	pychecker.
+
 	* flumotion/common/config.py (ConfigEntryComponent._buildConfig):
 	Fix bug when virtualFeeds is not specified.
 

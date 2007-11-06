@@ -600,6 +600,7 @@ class Vishnu(log.Loggable):
         self._loadManagerPlugs(conf)
         self._loadManagerBouncer(conf)
 
+    __pychecker__ = 'maxargs=11' # hahaha
     def loadComponent(self, identity, componentType, componentId,
                       componentLabel, properties, workerName,
                       plugs, eaters, isClockMaster, virtualFeeds):
