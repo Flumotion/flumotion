@@ -1,5 +1,13 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py
+	(ComponentAvatar.getVirtualFeeds): Return a dict more similar to
+	the return of getFeedersForEaters.
+	(FeedMap.__init__, FeedMap.componentAttached)
+	(FeedMap.componentDetached): Manage a dict of virtual feeds.
+	(FeedMap.getFeederAvatar): If there is no component with a given
+	feed name, check to see if someone is offering a virtual feed.
+
 	* flumotion/admin/gtk/componentview.py
 	(ComponentView.logCategory): Satisfy the swedish mafia.
 

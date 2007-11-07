@@ -414,9 +414,15 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Get the set of virtual feeds provided by this component.
 
-        @rtype: dict of feedId -> feederName
+        @rtype: dict of fullFeedId -> (ComponentAvatar, feederName)
         """
-        return self.componentState.get('config').get('virtual-feeds', {})
+        conf = self.componentState.get('config')
+        ret = {}
+        for feedId, feederName in conf.get('virtual-feeds', {}):
+            vComp, vFeed = common.parseFeedId(feedId)
+            ffid = common.fullFeedId(self.getParentName(), vComp, vFeed)
+            ret[ffid] = (self, feederName)
+        return ret
 
     def getWorker(self):
         """
@@ -607,17 +613,28 @@ class FeedMap(object, log.Loggable):
         self.avatars = {}
         self.feedersForEaters = {}
         self.eatersForFeeders = {}
+        self.virtualFeeds = {}
         self._dirty = False
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
         self.avatars[avatar.avatarId] = avatar
+        for ffid, pair in avatar.getVirtualFeeds():
+            if ffid not in self.virtualFeeds:
+                self.virtualFeeds[ffid] = []
+            self.virtualFeeds[ffid].append(pair)
         self._dirty = True
 
     def componentDetached(self, avatar):
         # returns the a list of other components that will need to be
         # reconnected
         del self.avatars[avatar.avatarId]
+        for ffid, pair in avatar.getVirtualFeeds():
+            if ffid in self.virtualFeeds:
+                if pair in self.virtualFeeds[ffid]:
+                    self.virtualFeeds[ffid].remove(pair)
+                if not self.virtualFeeds[ffid]:
+                    del self.virtualFeeds[ffid]
         self._dirty = True
         return []
 
@@ -625,6 +642,12 @@ class FeedMap(object, log.Loggable):
         compName, feedName = common.parseFeedId(feedId)
         compId = common.componentId(flowName, compName)
         feederAvatar = self.avatars.get(compId, None)
+        if not feederAvatar:
+            ffid = common.fullFeedId(flowName, compName, feedName)
+            if ffid in self.virtualFeeds:
+                feederAvatar, feedName = self.virtualFeeds[ffid][0]
+                self.debug('chose %s for virtual feed %s',
+                           feederAvatar.getFeedId(feedName), feedId)
         # FIXME: check that feedName is actually in avatar's feeders
         return feederAvatar, feedName
         
