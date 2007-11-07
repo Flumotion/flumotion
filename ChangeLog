@@ -8,6 +8,9 @@
 	change, treat virtualFeeds purely as a cache -- don't manage it in
 	attached()/detached().
 	(FeedMap.getEatersForFeeders): Make documentation match intent.
+	(FeedMap.__init__, FeedMap.componentDetached)
+	(FeedMap.getFeederAvatar, FeedMap._recalc): s/virtual//, we manage
+	all feeds generically now. Yay.
 
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 

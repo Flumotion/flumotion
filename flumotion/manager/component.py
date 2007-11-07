@@ -624,11 +624,8 @@ class FeedMap(object, log.Loggable):
         self.avatars = {}
         # all four data sets are caches whose validity is marked by
         # self._dirty
-        self._dirty = False
-        self.feedersForEaters = {}
-        self.eatersForFeeders = dictlist()
-        self.virtualFeeds = dictlist()
-        self.virtualFeedDeps = dictlist()
+        self._dirty = True
+        self._recalc()
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
@@ -640,21 +637,18 @@ class FeedMap(object, log.Loggable):
         # reconnected
         del self.avatars[avatar.avatarId]
         self._dirty = True
-        return self.virtualFeedDeps.pop(avatar, [])
+        return self.feedDeps.pop(avatar, [])
 
     def getFeederAvatar(self, eater, feedId):
         flowName = eater.getParentName()
         compName, feedName = common.parseFeedId(feedId)
-        compId = common.componentId(flowName, compName)
-        feeder = self.avatars.get(compId, None)
-        if not feeder:
-            ffid = common.fullFeedId(flowName, compName, feedName)
-            if ffid in self.virtualFeeds:
-                feeder, feedName = self.virtualFeeds[ffid][0]
-                self.virtualFeedDeps.add(feeder, eater)
-                self.debug('chose %s for virtual feed %s',
-                           feeder.getFeedId(feedName), feedId)
-        # FIXME: check that feedName is actually in avatar's feeders
+        ffid = common.fullFeedId(flowName, compName, feedName)
+        feeder = None
+        if ffid in self.feeds:
+            feeder, feedName = self.feeds[ffid][0]
+            self.feedDeps.add(feeder, eater)
+            self.debug('chose %s for feed %s',
+                       feeder.getFeedId(feedName), feedId)
         return feeder, feedName
         
     def _recalc(self):
@@ -662,17 +656,20 @@ class FeedMap(object, log.Loggable):
             return
         self.feedersForEaters = ffe = {}
         self.eatersForFeeders = eff = dictlist()
-        self.virtualFeeds = dictlist()
-        self.virtualFeedDeps = dictlist()
+        self.feeds = dictlist()
+        self.feedDeps = dictlist()
 
+        # FIXME: does not choose feeds in a predictable order
         for comp in self.avatars.values():
+            for feederName in comp.getFeeders():
+                self.feeds.add(comp.getFullFeedId(feederName),
+                               (comp, feederName))
             for ffid, pair in comp.getVirtualFeeds():
-                self.virtualFeeds.add(ffid, pair)
+                self.feeds.add(ffid, pair)
                 
         for eater in self.avatars.values():
-            for tups in eater.getEaters().values():
-                for feedId, eName in tups:
-                    flowName = eater.getParentName()
+            for pairs in eater.getEaters().values():
+                for feedId, eName in pairs:
                     feeder, fName = self.getFeederAvatar(eater, feedId)
                     if feeder:
                         ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
