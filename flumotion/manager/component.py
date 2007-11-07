@@ -620,7 +620,7 @@ class ComponentHeaven(base.ManagerHeaven):
                    workerName)
         # can be made more efficient
         for avatar in self.avatars.values():
-            if avatar.getWorker(workerName):
+            if avatar.getWorker(workerName) == workerName:
                 self.componentAttached(avatar.avatarId)
 
     def masterClockAvailable(self, avatarId, clocking):

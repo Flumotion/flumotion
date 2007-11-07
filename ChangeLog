@@ -8,6 +8,7 @@
 	(ComponentHeaven._setupClocking): Use accessors.
 	(ComponentHeaven.masterClockAvailable): Remove check for detached
 	component.
+	(ComponentHeaven.feedServerAvailable): Fix broken refactor.
 
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_manager_depgraph.py: Remove.
