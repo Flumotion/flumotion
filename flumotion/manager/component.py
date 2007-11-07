@@ -622,50 +622,58 @@ class FeedMap(object, log.Loggable):
     logName = 'feed-map'
     def __init__(self):
         self.avatars = {}
+        # all four data sets are caches whose validity is marked by
+        # self._dirty
+        self._dirty = False
         self.feedersForEaters = {}
         self.eatersForFeeders = dictlist()
         self.virtualFeeds = dictlist()
-        self._dirty = False
+        self.virtualFeedDeps = dictlist()
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
         self.avatars[avatar.avatarId] = avatar
-        for ffid, pair in avatar.getVirtualFeeds():
-            self.virtualFeeds.add(ffid, pair)
         self._dirty = True
 
     def componentDetached(self, avatar):
         # returns the a list of other components that will need to be
         # reconnected
         del self.avatars[avatar.avatarId]
-        for ffid, pair in avatar.getVirtualFeeds():
-            self.virtualFeeds.remove(ffid, pair)
         self._dirty = True
-        return []
+        return self.virtualFeedDeps.pop(avatar, [])
 
-    def getFeederAvatar(self, flowName, feedId):
+    def getFeederAvatar(self, eater, feedId):
+        flowName = eater.getParentName()
         compName, feedName = common.parseFeedId(feedId)
         compId = common.componentId(flowName, compName)
-        feederAvatar = self.avatars.get(compId, None)
-        if not feederAvatar:
+        feeder = self.avatars.get(compId, None)
+        if not feeder:
             ffid = common.fullFeedId(flowName, compName, feedName)
             if ffid in self.virtualFeeds:
-                feederAvatar, feedName = self.virtualFeeds[ffid][0]
+                feeder, feedName = self.virtualFeeds[ffid][0]
+                self.virtualFeedDeps.add(feeder, eater)
                 self.debug('chose %s for virtual feed %s',
-                           feederAvatar.getFeedId(feedName), feedId)
+                           feeder.getFeedId(feedName), feedId)
         # FIXME: check that feedName is actually in avatar's feeders
-        return feederAvatar, feedName
+        return feeder, feedName
         
     def _recalc(self):
         if not self._dirty:
             return
         self.feedersForEaters = ffe = {}
         self.eatersForFeeders = eff = dictlist()
+        self.virtualFeeds = dictlist()
+        self.virtualFeedDeps = dictlist()
+
+        for comp in self.avatars.values():
+            for ffid, pair in comp.getVirtualFeeds():
+                self.virtualFeeds.add(ffid, pair)
+                
         for eater in self.avatars.values():
             for tups in eater.getEaters().values():
                 for feedId, eName in tups:
                     flowName = eater.getParentName()
-                    feeder, fName = self.getFeederAvatar(flowName, feedId)
+                    feeder, fName = self.getFeederAvatar(eater, feedId)
                     if feeder:
                         ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
                         eff.add(feeder.getFullFeedId(fName),
@@ -695,7 +703,7 @@ class FeedMap(object, log.Loggable):
         """Get the set of eaters that this component feeds, keyed by
         feeder name.
 
-        @return: a list of (feederName, eaterAvatar, fullFeedId) tuples
+        @return: a list of (feederName, eaterAvatar, eaterAlias) tuples
         @rtype:  list of (str, ComponentAvatar, str)
         """
         self._recalc()
