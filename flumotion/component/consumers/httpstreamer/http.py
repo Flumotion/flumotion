@@ -54,6 +54,9 @@ __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 
 STATS_POLL_INTERVAL = 10
 
+UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two 
+                                # seconds
+
 # FIXME: generalize this class and move it out here ?
 class Stats:
     def __init__(self, sink):
@@ -292,6 +295,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._tport = None
 
         self._updateCallLaterId = None
+        self._lastUpdate = 0
+        self._updateUI_DC = None
 
         self._pending_removals = {}
 
@@ -585,12 +590,33 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.emit('remove', fd)
 
     def update_ui_state(self):
+        """
+        Update the uiState object.
+        Such updates (through this function) are throttled to a maximum rate,
+        to avoid saturating admin clients with traffic when many clients are
+        connecting/disconnecting.
+        """
         def set(k, v):
             if self.uiState.get(k) != v:
                 self.uiState.set(k, v)
-        # fixme: have updateState just update what changed itself
-        # without the hack above
-        self.updateState(set)
+        now = time.time()
+        self._updateUI_DC = None
+
+        # If we haven't updated too recently, do it immediately.
+        if now - self._lastUpdate >= UI_UPDATE_THROTTLE_PERIOD:
+            if self._updateUI_DC:
+                self._updateUI_DC.cancel()
+                self._updateUI_DC = None
+
+            self._lastUpdate = now
+            # fixme: have updateState just update what changed itself
+            # without the hack above
+            self.updateState(set)
+        elif not self._updateUI_DC:
+            # Otherwise, schedule doing this in a few seconds (unless an update
+            # was already scheduled)
+            self._updateUI_DC = reactor.callLater(UI_UPDATE_THROTTLE_PERIOD,
+                self.update_ui_state)
 
     def _client_added_handler(self, sink, fd):
         self.log('[fd %5d] client_added_handler', fd)

@@ -1,3 +1,8 @@
+2007-11-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Throttle uiState updates in the streamer.
+
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.getWorker)
