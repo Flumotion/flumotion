@@ -416,6 +416,22 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         return self.componentState.get('config').get('virtual-feeds', {})
 
+    def getWorker(self):
+        """
+        Get the worker that this component should run on.
+
+        @rtype: str
+        """
+        return self.componentState.get('workerRequested')
+
+    def getClockMaster(self):
+        """
+        Get this component's clock master, if any.
+
+        @rtype: avatarId or None
+        """
+        return self.componentState.get('config')['clock-master']
+
     def stop(self):
         """
         Tell the avatar to stop the component.
@@ -554,15 +570,12 @@ class ComponentAvatar(base.ManagerAvatar):
         @param keycardId:   id of keycard to remove
         @type  keycardId:   str
         """
-        self.debug('asked to remove keycard %s on bouncer %s' % (
-            keycardId, bouncerName))
-        avatarId = '/atmosphere/%s' % bouncerName
+        avatarId = common.componentId('atmosphere', bouncerName)
         if not self.heaven.hasAvatar(avatarId):
-            self.warning('No bouncer with id %s registered' % avatarId)
+            self.warning('No bouncer with id %s registered', avatarId)
             raise errors.UnknownComponentError(avatarId)
 
-        bouncerAvatar = self.heaven.getAvatar(avatarId)
-        return bouncerAvatar.removeKeycardId(keycardId)
+        return self.heaven.getAvatar(avatarId).removeKeycardId(keycardId)
 
     def perspective_expireKeycard(self, requesterId, keycardId):
         """
@@ -570,7 +583,6 @@ class ComponentAvatar(base.ManagerAvatar):
         issued to the given requester.
 
         This is called by the bouncer component that authenticated the keycard.
-
 
         @param requesterId: name (avatarId) of the component that originally
                               requested authentication for the given keycardId
@@ -580,13 +592,12 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         # FIXME: we should also be able to expire manager bouncer keycards
         if not self.heaven.hasAvatar(requesterId):
-            self.warning('asked to expire keycard %s for requester %s, ' % (
-                keycardId, requesterId) +
-                'but no such component registered')
+            self.warning('asked to expire keycard %s for requester %s, '
+                         'but no such component registered',
+                         keycardId, requesterId)
             raise errors.UnknownComponentError(requesterId)
 
-        componentAvatar = self.heaven.getAvatar(requesterId)
-        return componentAvatar.expireKeycard(keycardId)
+        return self.heaven.getAvatar(requesterId).expireKeycard(keycardId)
 
 class ComponentHeaven(base.ManagerHeaven):
     """
@@ -609,26 +620,24 @@ class ComponentHeaven(base.ManagerHeaven):
                    workerName)
         # can be made more efficient
         for avatar in self.avatars.values():
-            if avatar.componentState:
-                if avatar.componentState.get('workerRequested') == workerName:
-                    self.componentAttached(avatar.avatarId)
+            if avatar.getWorker(workerName):
+                self.componentAttached(avatar.avatarId)
 
     def masterClockAvailable(self, avatarId, clocking):
         self.debug('master clock for %r provided on %r', avatarId,
                    clocking)
         # can be made more efficient
         for avatar in self.avatars.values():
-            if avatar.componentState and avatar.avatarId != avatarId:
+            if avatar.avatarId != avatarId:
                 self._setupClocking(avatar)
 
-    def _setupClocking(self, componentAvatar):
-        conf = componentAvatar.componentState.get('config')
-        master = conf['clock-master'] # avatarId of the clock master
+    def _setupClocking(self, avatar):
+        master = avatar.getClockMaster()
         if master:
-            if master == componentAvatar.avatarId:
+            if master == avatar.avatarId:
                 self.debug('Need for %r to provide a clock master',
                            master)
-                componentAvatar.provideMasterClock()
+                avatar.provideMasterClock()
             else:
                 self.debug('Need to synchronize with clock master %r',
                            master)
@@ -641,7 +650,7 @@ class ComponentHeaven(base.ManagerHeaven):
                     clocking = m.avatar.clocking
                     if clocking:
                         host, port, base_time = clocking
-                        componentAvatar.setClocking(host, port, base_time)
+                        avatar.setClocking(host, port, base_time)
                     else:
                         self.warning('%r should provide a clock master '
                                      'but is not doing so', master)
