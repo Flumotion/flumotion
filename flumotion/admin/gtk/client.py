@@ -1,5 +1,4 @@
 # -*- Mode: Python -*-
-# -*- coding: UTF-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -880,54 +879,9 @@ You can do remote component calls using:
         code.interact(local=vars, banner=message)
 
     def help_about_cb(self, button):
-        dialog = gtk.Dialog(_('About Flumotion'), self.window,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
-        dialog.set_has_separator(False)
-        dialog.set_resizable(False)
-        dialog.set_border_width(12)
-        dialog.vbox.set_spacing(6)
-
-        image = gtk.Image()
-        dialog.vbox.pack_start(image)
-        image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
-        image.show()
-
-        version = gtk.Label(
-            '<span size="xx-large"><b>Flumotion %s</b></span>' %
-                configure.version)
-        version.set_selectable(True)
-        dialog.vbox.pack_start(version)
-        version.set_use_markup(True)
-        version.show()
-
-        text = _('Flumotion is a streaming media server.\n\n'
-            '© 2004, 2005, 2006, 2007 Fluendo S.L.')
-        authors = (
-                   'Johan Dahlin',
-                   'Arek Korbik',
-                   'Zaheer Abbas Merali',
-                   'Sébastien Merle',
-                   'Mike Smith',
-                   'Wim Taymans',
-                   'Thomas Vander Stichele',
-                   'Andy Wingo',
-        )
-        text += '\n\n<small>' + _('Authors') + ':\n'
-        for author in authors:
-            text += '  %s\n' % author
-        text += '</small>'
-        info = gtk.Label(text)
-        dialog.vbox.pack_start(info)
-        info.set_use_markup(True)
-        info.set_selectable(True)
-        info.set_justify(gtk.JUSTIFY_FILL)
-        info.set_line_wrap(True)
-        info.show()
-
-        dialog.show()
-        dialog.run()
-        dialog.destroy()
+        about = dialogs.AboutDialog(self.window)
+        about.run()
+        about.destroy()
 
     def show(self):
         # XXX: Use show()

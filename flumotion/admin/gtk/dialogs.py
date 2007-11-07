@@ -1,4 +1,5 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_dialogs -*-
+# -*- coding: UTF-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -20,10 +21,12 @@
 # Headers in this file shall remain intact.
 
 from gettext import gettext as _
+import os
 
 import gtk
 import gobject
 
+from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
 from flumotion.common import pygobject
 
@@ -186,3 +189,50 @@ class PropertyChangeDialog(gtk.Dialog):
         self.value_entry.set_text(str(value))
 
 pygobject.type_register(PropertyChangeDialog)
+
+class AboutDialog(gtk.Dialog):
+    def __init__(self, parent=None):
+        gtk.Dialog.__init__(self, _('About Flumotion'), parent,
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                            (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        self.set_has_separator(False)
+        self.set_resizable(False)
+        self.set_border_width(12)
+        self.vbox.set_spacing(6)
+
+        image = gtk.Image()
+        self.vbox.pack_start(image)
+        image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
+        image.show()
+
+        version = gtk.Label(
+            '<span size="xx-large"><b>Flumotion %s</b></span>' %
+                configure.version)
+        version.set_selectable(True)
+        self.vbox.pack_start(version)
+        version.set_use_markup(True)
+        version.show()
+
+        text = _('Flumotion is a streaming media server.\n\n'
+            '© 2004, 2005, 2006, 2007 Fluendo S.L.')
+        authors = (
+                   'Johan Dahlin',
+                   'Arek Korbik',
+                   'Zaheer Abbas Merali',
+                   'Sébastien Merle',
+                   'Mike Smith',
+                   'Wim Taymans',
+                   'Thomas Vander Stichele',
+                   'Andy Wingo',
+        )
+        text += '\n\n<small>' + _('Authors') + ':\n'
+        for author in authors:
+            text += '  %s\n' % author
+        text += '</small>'
+        info = gtk.Label(text)
+        self.vbox.pack_start(info)
+        info.set_use_markup(True)
+        info.set_selectable(True)
+        info.set_justify(gtk.JUSTIFY_FILL)
+        info.set_line_wrap(True)
+        info.show()
