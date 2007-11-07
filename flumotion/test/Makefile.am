@@ -58,7 +58,6 @@ EXTRA_DIST = 				\
 	test_i18n.py 			\
 	test_keycards.py 		\
 	test_manager_admin.py 		\
-	test_manager_depgraph.py	\
 	test_manager_manager.py 	\
 	test_manager_worker.py		\
 	test_misc_httpfile.py		\

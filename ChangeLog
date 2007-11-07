@@ -1,5 +1,8 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_manager_depgraph.py: Remove.
+
 	* flumotion/manager/depgraph.py: Removed, no more users. Add back
 	when we decide that we need more complexity?
 
