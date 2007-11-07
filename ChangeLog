@@ -1,3 +1,11 @@
+2007-11-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/common.py:
+	* flumotion/common/config.py:
+	Avoid importing locale in a non-global scope, should help us
+	avoid some locking. Also only modify LC_NUMERIC on 2.3 since 
+	PEP 331 went into 2.4.
+
 2007-11-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

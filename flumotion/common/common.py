@@ -28,6 +28,7 @@ import os
 import sys
 import time
 import signal
+import locale
 
 from twisted.internet import address
 
@@ -56,9 +57,10 @@ def formatStorage(units, precision=2):
     """
 
     # XXX: We might end up calling float(), which breaks
-    #      when using LC_NUMERIC when it is not C
-    import locale
-    locale.setlocale(locale.LC_NUMERIC, "C")
+    #      when using LC_NUMERIC when it is not C -- only in python
+    #      2.3 though, no prob in 2.4
+    if sys.version_info < (2, 4):
+        locale.setlocale(locale.LC_NUMERIC, "C")
 
     prefixes = ['E', 'P', 'T', 'G', 'M', 'k', '']
 

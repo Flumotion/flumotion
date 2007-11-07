@@ -24,6 +24,8 @@ parsing of configuration files
 """
 
 import os
+import locale
+import sys
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
@@ -159,9 +161,9 @@ def buildEatersDict(eatersList, eaterDefs):
 def parsePropertyValue(propName, type, value):
     # XXX: We might end up calling float(), which breaks
     #      when using LC_NUMERIC when it is not C -- only in python
-    #      2.3 though, no prob in 2.4
-    import locale
-    locale.setlocale(locale.LC_NUMERIC, "C")
+    #      2.3 though, no prob in 2.4. See PEP 331
+    if sys.version_info < (2, 4):
+        locale.setlocale(locale.LC_NUMERIC, "C")
     def tryStr(s):
         try:
             return str(s)
