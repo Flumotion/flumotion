@@ -82,7 +82,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self.addMoodListener()
         # calllater to allow the component a chance to receive its
         # avatar, so that it has set medium.remote
-        reactor.callLater(0, self.heaven.componentAttached, avatarId)
+        reactor.callLater(0, self.heaven.componentAttached, self)
 
     def makeComponentState(self, conf):
         # the component just logged in with good credentials. we fetched
@@ -257,6 +257,8 @@ class ComponentAvatar(base.ManagerAvatar):
         for m in self.componentState.get('messages'):
             self.debug('Removing message %r', m)
             self.componentState.remove('messages', m)
+
+        self.heaven.componentDetached(self)
 
         # detach componentstate from avatar
         self.componentState = None
@@ -599,6 +601,61 @@ class ComponentAvatar(base.ManagerAvatar):
 
         return self.heaven.getAvatar(requesterId).expireKeycard(keycardId)
 
+class FeedMap(object, log.Loggable):
+    logName = 'feed-map'
+    def __init__(self):
+        self.avatars = {}
+
+    def componentAttached(self, avatar):
+        assert avatar.avatarId not in self.avatars
+        self.avatars[avatar.avatarId] = avatar
+
+    def componentDetached(self, avatar):
+        # returns the a list of other components that will need to be
+        # reconnected
+        del self.avatars[avatar.avatarId]
+        return []
+
+    def getFeederAvatar(self, flowName, feedId):
+        compName, feedName = common.parseFeedId(feedId)
+        compId = common.componentId(flowName, compName)
+        feederAvatar = self.avatars.get(compId, None)
+        # FIXME: check that feedName is actually in avatar's feeders
+        return feederAvatar, feedName
+        
+    def getFeedersForEaters(self, avatar):
+        """Get the set of feeds that this component is eating from,
+        keyed by eater alias.
+
+        @return: a list of (eaterAlias, feederAvatar, feedName) tuples
+        @rtype:  list of (str, ComponentAvatar, str)
+        """
+        ret = []
+        for tups in avatar.getEaters().values():
+            for feedId, alias in tups:
+                flowName = avatar.getParentName()
+                feederAvatar, feedName = self.getFeederAvatar(flowName,
+                                                              feedId)
+                ret.append((alias, feederAvatar, feedName))
+        return ret
+
+    def getEatersForFeeders(self, avatar):
+        """Get the set of eaters that this component feeds, keyed by
+        feeder name.
+
+        @return: a list of (feederName, eaterAvatar, fullFeedId) tuples
+        @rtype:  list of (str, ComponentAvatar, str)
+        """
+        ret = []
+        # algorithmically suboptimal
+        for comp in self.avatars.values():
+            if comp.getParentName() == avatar.getParentName():
+                for eaterAlias, feederAvatar, feederName \
+                        in self.getFeedersForEaters(comp):
+                    if feederAvatar == avatar:
+                        ret.append((feederName, comp, eaterAlias))
+        return ret
+
 class ComponentHeaven(base.ManagerHeaven):
     """
     I handle all registered components and provide L{ComponentAvatar}s
@@ -613,6 +670,7 @@ class ComponentHeaven(base.ManagerHeaven):
     def __init__(self, vishnu):
         # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
+        self.feedMap = FeedMap()
 
     ### our methods
     def feedServerAvailable(self, workerName):
@@ -620,8 +678,9 @@ class ComponentHeaven(base.ManagerHeaven):
                    workerName)
         # can be made more efficient
         for avatar in self.avatars.values():
-            if avatar.getWorker(workerName) == workerName:
-                self.componentAttached(avatar.avatarId)
+            if avatar.getWorkerName() == workerName:
+                self._setupClocking(avatar)
+                self._connectEatersAndFeeders(avatar)
 
     def masterClockAvailable(self, avatarId, clocking):
         self.debug('master clock for %r provided on %r', avatarId,
@@ -659,55 +718,17 @@ class ComponentHeaven(base.ManagerHeaven):
                     self.debug('clock master not logged in yet, will '
                                'set clocking later')
 
-    def componentAttached(self, avatarId):
+    def componentAttached(self, avatar):
         # No need to wait for any of this, they are not interdependent
-        if avatarId in self.avatars:
-            avatar = self.avatars[avatarId]
-            self._setupClocking(avatar)
-            self._connectEatersAndFeeders(avatar)
-        else:
-            self.debug('avatar %s seems to have logged out rather quickly',
-                       avatarId)
+        assert avatar.avatarId in self.avatars
+        self.feedMap.componentAttached(avatar)
+        self._setupClocking(avatar)
+        self._connectEatersAndFeeders(avatar)
 
-    def _getFeederAvatar(self, flowName, feedId):
-        compName, feedName = common.parseFeedId(feedId)
-        compId = common.componentId(flowName, compName)
-        feederAvatar = self.avatars.get(compId, None)
-        # FIXME: check that feedName is actually in avatar's feeders
-        return feederAvatar, feedName
-        
-    def _getFeedersForEaters(self, avatar):
-        """Get the set of feeds that this component is eating from,
-        keyed by eater alias.
-
-        @return: a list of (eaterAlias, feederAvatar, feedName) tuples
-        @rtype:  list of (str, ComponentAvatar, str)
-        """
-        ret = []
-        for tups in avatar.getEaters().values():
-            for feedId, alias in tups:
-                flowName = avatar.getParentName()
-                feederAvatar, feedName = self._getFeederAvatar(flowName,
-                                                               feedId)
-                ret.append((alias, feederAvatar, feedName))
-        return ret
-
-    def _getEatersForFeeders(self, avatar):
-        """Get the set of eaters that this component feeds, keyed by
-        feeder name.
-
-        @return: a list of (feederName, eaterAvatar, fullFeedId) tuples
-        @rtype:  list of (str, ComponentAvatar, str)
-        """
-        ret = []
-        # algorithmically suboptimal
-        for comp in self.avatars.values():
-            if comp.getParentName() == avatar.getParentName():
-                for eaterAlias, feederAvatar, feederName \
-                        in self._getFeedersForEaters(comp):
-                    if feederAvatar == avatar:
-                        ret.append((feederName, comp, eaterAlias))
-        return ret
+    def componentDetached(self, avatar):
+        assert avatar.avatarId not in self.avatars
+        for comp in self.feedMap.componentDetached(avatar):
+            self._connectEatersAndFeeders(comp)
 
     def mapNetFeed(self, fromAvatar, toAvatar):
         toHost = toAvatar.getClientAddress()
@@ -741,8 +762,10 @@ class ComponentHeaven(base.ManagerHeaven):
             return True
         def never(otherComp):
             return False
-        directions = [(self._getFeedersForEaters, always, 'eatFrom', 'feedTo'),
-                      (self._getEatersForFeeders, never, 'feedTo', 'eatFrom')]
+        directions = [(self.feedMap.getFeedersForEaters,
+                       always, 'eatFrom', 'feedTo'),
+                      (self.feedMap.getEatersForFeeders,
+                       never, 'feedTo', 'eatFrom')]
 
         myComp = avatar
         for getPeers, initiate, directMethod, reversedMethod in directions:

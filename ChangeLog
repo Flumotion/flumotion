@@ -1,3 +1,21 @@
+2007-11-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.getWorker):
+	Remove, there was already getWorkerName.
+	(ComponentHeaven.feedServerAvailable): Fix crack.
+	(FeedMap): Factor getEatersForFeeders and getFeedersForEaters into
+	a separate object -- will allow some memoization opportunities.
+	(ComponentHeaven.__init__):
+	(ComponentHeaven._connectEatersAndFeeders): Make and use the
+	feedMap.
+	(ComponentAvatar.onShutdown): Notify the heaven on logout so that
+	it can e.g. reconnect other components that eat from virtual
+	feeds.
+	(ComponentHeaven.componentAttached): Take the avatar directly.
+	Change some warnings into asserts.
+	(ComponentHeaven.componentDetached): New function. Notify the feed
+	map, and reconnect any components that need to be reconnected.
+
 2007-11-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
