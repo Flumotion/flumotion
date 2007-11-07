@@ -1,5 +1,12 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentHeaven.mapNetFeed):
+	Instead of raising TryAgain on failure, debug and return None,
+	None.
+	(ComponentHeaven._connectEatersAndFeeders.connect): Handle a
+	mapNetFeed failure with a nice debug statement.
+	(ComponentHeaven._connectEatersAndFeeders): Remove TryAgain foo.
+
 	* flumotion/manager/component.py
 	(ComponentHeaven._getFeedersForEaters)
 	(ComponentHeaven._getEatersForFeeders)

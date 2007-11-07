@@ -588,11 +588,6 @@ class ComponentAvatar(base.ManagerAvatar):
         componentAvatar = self.heaven.getAvatar(requesterId)
         return componentAvatar.expireKeycard(keycardId)
 
-class TryAgain(Exception):
-    def __init__(self, reason):
-        Exception.__init__(self)
-        self.reason = reason
-
 class ComponentHeaven(base.ManagerHeaven):
     """
     I handle all registered components and provide L{ComponentAvatar}s
@@ -703,8 +698,7 @@ class ComponentHeaven(base.ManagerHeaven):
     def mapNetFeed(self, fromAvatar, toAvatar):
         toHost = toAvatar.getClientAddress()
         toPort = toAvatar.getFeedServerPort()
-        if not toPort:
-            raise TryAgain('feed server not available')
+        return None, None
 
         # FIXME: until network map is implemented, hack to assume that
         # connections from what appears to us to be the same IP go
@@ -721,9 +715,13 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectEatersAndFeeders(self, avatar):
         def connect(fromComp, fromFeed, toComp, toFeed, method):
             host, port = self.mapNetFeed(fromComp, toComp)
-            fullFeedId = toComp.getFullFeedId(toFeed)
-            proc = getattr(fromComp, method)
-            return proc(fromFeed, fullFeedId, host, port)
+            if host:
+                fullFeedId = toComp.getFullFeedId(toFeed)
+                proc = getattr(fromComp, method)
+                proc(fromFeed, fullFeedId, host, port)
+            else:
+                self.debug('postponing connection to %s: feed server '
+                           'unavailable', toComp.getFeedId(toFeed))
 
         # FIXME: all connections are upstream for now
         def always(otherComp):
@@ -736,10 +734,7 @@ class ComponentHeaven(base.ManagerHeaven):
         myComp = avatar
         for getPeers, initiate, directMethod, reversedMethod in directions:
             for myFeedName, otherComp, otherFeedName in getPeers(myComp):
-                try:
-                    if not otherComp:
-                        raise TryAgain('remote component not logged in')
-                
+                if otherComp:
                     if initiate(otherComp):
                         # we initiate the connection
                         connect(myComp, myFeedName, otherComp, otherFeedName,
@@ -748,7 +743,6 @@ class ComponentHeaven(base.ManagerHeaven):
                         # make the other component initiate connection
                         connect(otherComp, otherFeedName, myComp, myFeedName,
                                 reversedMethod)
-                except TryAgain, e:
-                    # FIXME: more debug here
-                    self.debug('postponing connection of %r: %s',
-                               myComp, e.reason)
+                else:
+                    self.debug('postponing connection of %r: remote '
+                               'component not logged in yet', myComp)
