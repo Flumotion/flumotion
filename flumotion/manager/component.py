@@ -605,15 +605,20 @@ class FeedMap(object, log.Loggable):
     logName = 'feed-map'
     def __init__(self):
         self.avatars = {}
+        self.feedersForEaters = {}
+        self.eatersForFeeders = {}
+        self._dirty = False
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
         self.avatars[avatar.avatarId] = avatar
+        self._dirty = True
 
     def componentDetached(self, avatar):
         # returns the a list of other components that will need to be
         # reconnected
         del self.avatars[avatar.avatarId]
+        self._dirty = True
         return []
 
     def getFeederAvatar(self, flowName, feedId):
@@ -623,6 +628,24 @@ class FeedMap(object, log.Loggable):
         # FIXME: check that feedName is actually in avatar's feeders
         return feederAvatar, feedName
         
+    def _recalc(self):
+        if not self._dirty:
+            return
+        self.feedersForEaters = ffe = {}
+        self.eatersForFeeders = eff = {}
+        for eater in self.avatars.values():
+            for tups in eater.getEaters().values():
+                for feedId, eName in tups:
+                    flowName = eater.getParentName()
+                    feeder, fName = self.getFeederAvatar(flowName, feedId)
+                    if feeder:
+                        ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
+                        eff[feeder.getFullFeedId(fName)] = (fName, eater, eName)
+                    else:
+                        self.debug('eater %s waiting for feed %s to log in',
+                                   eater.getFeedId(eName), feedId)
+        self._dirty = False
+
     def getFeedersForEaters(self, avatar):
         """Get the set of feeds that this component is eating from,
         keyed by eater alias.
@@ -630,13 +653,13 @@ class FeedMap(object, log.Loggable):
         @return: a list of (eaterAlias, feederAvatar, feedName) tuples
         @rtype:  list of (str, ComponentAvatar, str)
         """
+        self._recalc()
         ret = []
         for tups in avatar.getEaters().values():
             for feedId, alias in tups:
-                flowName = avatar.getParentName()
-                feederAvatar, feedName = self.getFeederAvatar(flowName,
-                                                              feedId)
-                ret.append((alias, feederAvatar, feedName))
+                ffid = avatar.getFullFeedId(alias)
+                if ffid in self.feedersForEaters:
+                    ret.append(self.feedersForEaters[ffid])
         return ret
 
     def getEatersForFeeders(self, avatar):
@@ -646,14 +669,12 @@ class FeedMap(object, log.Loggable):
         @return: a list of (feederName, eaterAvatar, fullFeedId) tuples
         @rtype:  list of (str, ComponentAvatar, str)
         """
+        self._recalc()
         ret = []
-        # algorithmically suboptimal
-        for comp in self.avatars.values():
-            if comp.getParentName() == avatar.getParentName():
-                for eaterAlias, feederAvatar, feederName \
-                        in self.getFeedersForEaters(comp):
-                    if feederAvatar == avatar:
-                        ret.append((feederName, comp, eaterAlias))
+        for feedName in avatar.getFeeders():
+            ffid = avatar.getFullFeedId(feedName)
+            if ffid in self.eatersForFeeders:
+                ret.append(self.eatersForFeeders[ffid])
         return ret
 
 class ComponentHeaven(base.ManagerHeaven):
@@ -770,15 +791,11 @@ class ComponentHeaven(base.ManagerHeaven):
         myComp = avatar
         for getPeers, initiate, directMethod, reversedMethod in directions:
             for myFeedName, otherComp, otherFeedName in getPeers(myComp):
-                if otherComp:
-                    if initiate(otherComp):
-                        # we initiate the connection
-                        connect(myComp, myFeedName, otherComp, otherFeedName,
-                                directMethod)
-                    else:
-                        # make the other component initiate connection
-                        connect(otherComp, otherFeedName, myComp, myFeedName,
-                                reversedMethod)
+                if initiate(otherComp):
+                    # we initiate the connection
+                    connect(myComp, myFeedName, otherComp, otherFeedName,
+                            directMethod)
                 else:
-                    self.debug('postponing connection of %r: remote '
-                               'component not logged in yet', myComp)
+                    # make the other component initiate connection
+                    connect(otherComp, otherFeedName, myComp, myFeedName,
+                            reversedMethod)
