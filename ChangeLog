@@ -14,6 +14,9 @@
 
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py (Window.debug_reload_all_cb): 
+	Refactor, use consistent naming for call/errbacks
+
 	* flumotion/test/test_options.py: 
 	Use the new log settings APIs and renable commented out tests.
 	

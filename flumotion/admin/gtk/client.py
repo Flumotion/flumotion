@@ -112,12 +112,6 @@ class Window(log.Loggable, gobject.GObject):
                            self.admin_connection_failed_cb)
         self.admin.connect('update', self.admin_update_cb)
 
-    # default Errback
-    def _defaultErrback(self, failure):
-        self.warning('Errback: unhandled failure: %s' %
-            failure.getErrorMessage())
-        return failure
-
     def _create_ui(self):
         # returns the window
         # called from __init__
@@ -826,32 +820,40 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.reloadAdmin()
 
     def debug_reload_all_cb(self, button):
+        dialog = dialogs.ProgressDialog(_("Reloading ..."),
+            _("Reloading client code"), self.window)
+
         # FIXME: move all of the reloads over to this dialog
-        def _stop(dialog):
+        def _stopCallback(result):
             dialog.stop()
             dialog.destroy()
 
-        def _syntaxErrback(failure, self, progress):
+        def _syntaxErrback(failure):
             failure.trap(errors.ReloadSyntaxError)
-            _stop(progress)
+            dialog.stop()
+            dialog.destroy()
             self.show_error_dialog(
                 _("Could not reload component:\n%s.") %
                 failure.getErrorMessage())
             return None
 
-        def _callLater(admin, dialog):
-            deferred = self.admin.reload()
-            deferred.addCallback(lambda result, d: _stop(d), dialog)
-            deferred.addErrback(_syntaxErrback, self, dialog)
-            deferred.addErrback(self._defaultErrback)
+        def _defaultErrback(failure):
+            self.warning('Errback: unhandled failure: %s' %
+                failure.getErrorMessage())
+            return failure
 
-        dialog = dialogs.ProgressDialog(_("Reloading ..."),
-            _("Reloading client code"), self.window)
-        l = lambda admin, text, dialog: dialog.message(
-            _("Reloading %s code") % text)
-        self.admin.connect('reloading', l, dialog)
+        def _callLater(admin):
+            d = self.admin.reload()
+            d.addCallback(_stopCallback)
+            d.addErrback(_syntaxErrback)
+            d.addErrback(_defaultErrback)
+
+        def _reloadCallback(admin, text):
+            dialog.message(_("Reloading %s code") % text)
+
+        self.admin.connect('reloading', _reloadCallback)
         dialog.start()
-        reactor.callLater(0.2, _callLater, self.admin, dialog)
+        reactor.callLater(0.2, _callLater, self.admin)
 
     def debug_start_shell_cb(self, button):
         if sys.version_info[1] >= 4:
