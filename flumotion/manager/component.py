@@ -673,17 +673,14 @@ class ComponentHeaven(base.ManagerHeaven):
         @rtype:  list of (str, ComponentAvatar, str)
         """
         ret = []
-        if not avatar.componentState:
-            self.warning("detached component")
-        else:
-            for tups in avatar.getEaters().values():
-                for feedId, alias in tups:
-                    compName, feedName = common.parseFeedId(feedId)
-                    compId = common.componentId(avatar.getParentName(),
-                                                compName)
-                    feederAvatar = self.avatars.get(compId, None)
-                    # FIXME: check that feedName is actually in avatar's feeders
-                    ret.append((alias, feederAvatar, feedName))
+        for tups in avatar.getEaters().values():
+            for feedId, alias in tups:
+                compName, feedName = common.parseFeedId(feedId)
+                compId = common.componentId(avatar.getParentName(),
+                                            compName)
+                feederAvatar = self.avatars.get(compId, None)
+                # FIXME: check that feedName is actually in avatar's feeders
+                ret.append((alias, feederAvatar, feedName))
         return ret
 
     def _getEatersForFeeders(self, avatar):
@@ -694,15 +691,13 @@ class ComponentHeaven(base.ManagerHeaven):
         @rtype:  list of (str, ComponentAvatar, str)
         """
         ret = []
-        if not avatar.componentState:
-            self.warning("detached component")
-        else:
-            for comp in self.avatars.values():
-                if comp.getParentName() == avatar.getParentName():
-                    for eaterAlias, feederAvatar, feederName \
-                            in self._getFeedersForEaters(comp):
-                        if feederAvatar == avatar:
-                            ret.append((feederName, comp, eaterAlias))
+        # algorithmically suboptimal
+        for comp in self.avatars.values():
+            if comp.getParentName() == avatar.getParentName():
+                for eaterAlias, feederAvatar, feederName \
+                        in self._getFeedersForEaters(comp):
+                    if feederAvatar == avatar:
+                        ret.append((feederName, comp, eaterAlias))
         return ret
 
     def mapNetFeed(self, fromAvatar, toAvatar):
@@ -744,8 +739,6 @@ class ComponentHeaven(base.ManagerHeaven):
                 try:
                     if not otherComp:
                         raise TryAgain('remote component not logged in')
-                    if not otherComp.componentState:
-                        raise TryAgain('detached component')
                 
                     if initiate(otherComp):
                         # we initiate the connection

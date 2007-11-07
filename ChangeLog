@@ -1,3 +1,13 @@
+2007-11-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py
+	(ComponentHeaven._getFeedersForEaters)
+	(ComponentHeaven._getEatersForFeeders)
+	(ComponentHeaven._connectEatersAndFeeders): It's not possible to
+	have what we used to call a "detached avatar", due to the ordering
+	in the cleanup() function in Vishnu.requestAvatar(), so remove
+	those code paths. Note that getEatersForFeeders is suboptimal.
+
 2007-11-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py
