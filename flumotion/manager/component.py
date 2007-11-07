@@ -607,22 +607,31 @@ class ComponentAvatar(base.ManagerAvatar):
 
         return self.heaven.getAvatar(requesterId).expireKeycard(keycardId)
 
+class dictlist(dict):
+    def add(self, key, value):
+        if key not in self:
+            self[key] = []
+        self[key].append(value)
+
+    def remove(self, key, value):
+        self[key].remove(value)
+        if not self[key]:
+            del self[key]
+        
 class FeedMap(object, log.Loggable):
     logName = 'feed-map'
     def __init__(self):
         self.avatars = {}
         self.feedersForEaters = {}
-        self.eatersForFeeders = {}
-        self.virtualFeeds = {}
+        self.eatersForFeeders = dictlist()
+        self.virtualFeeds = dictlist()
         self._dirty = False
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
         self.avatars[avatar.avatarId] = avatar
         for ffid, pair in avatar.getVirtualFeeds():
-            if ffid not in self.virtualFeeds:
-                self.virtualFeeds[ffid] = []
-            self.virtualFeeds[ffid].append(pair)
+            self.virtualFeeds.add(ffid, pair)
         self._dirty = True
 
     def componentDetached(self, avatar):
@@ -630,11 +639,7 @@ class FeedMap(object, log.Loggable):
         # reconnected
         del self.avatars[avatar.avatarId]
         for ffid, pair in avatar.getVirtualFeeds():
-            if ffid in self.virtualFeeds:
-                if pair in self.virtualFeeds[ffid]:
-                    self.virtualFeeds[ffid].remove(pair)
-                if not self.virtualFeeds[ffid]:
-                    del self.virtualFeeds[ffid]
+            self.virtualFeeds.remove(ffid, pair)
         self._dirty = True
         return []
 
@@ -655,7 +660,7 @@ class FeedMap(object, log.Loggable):
         if not self._dirty:
             return
         self.feedersForEaters = ffe = {}
-        self.eatersForFeeders = eff = {}
+        self.eatersForFeeders = eff = dictlist()
         for eater in self.avatars.values():
             for tups in eater.getEaters().values():
                 for feedId, eName in tups:
@@ -663,7 +668,8 @@ class FeedMap(object, log.Loggable):
                     feeder, fName = self.getFeederAvatar(flowName, feedId)
                     if feeder:
                         ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
-                        eff[feeder.getFullFeedId(fName)] = (fName, eater, eName)
+                        eff.add(feeder.getFullFeedId(fName),
+                                (fName, eater, eName))
                     else:
                         self.debug('eater %s waiting for feed %s to log in',
                                    eater.getFeedId(eName), feedId)
@@ -697,7 +703,7 @@ class FeedMap(object, log.Loggable):
         for feedName in avatar.getFeeders():
             ffid = avatar.getFullFeedId(feedName)
             if ffid in self.eatersForFeeders:
-                ret.append(self.eatersForFeeders[ffid])
+                ret.extend(self.eatersForFeeders[ffid])
         return ret
 
 class ComponentHeaven(base.ManagerHeaven):

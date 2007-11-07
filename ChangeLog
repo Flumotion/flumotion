@@ -1,5 +1,13 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (dictlist): New class, a dict of
+	nonempty lists.
+	(FeedMap.__init__, FeedMap.componentAttached)
+	(FeedMap.componentDetached, FeedMap._recalc)
+	(FeedMap.getEatersForFeeders): Use dictlists for virtualFeeds,
+	simplifying code, and for eatersForFeeders, which was erroneously
+	assuming one eater per feeder before. Oops.
+
 	* flumotion/manager/component.py
 	(ComponentAvatar.getVirtualFeeds): Return a dict more similar to
 	the return of getFeedersForEaters.
