@@ -1,3 +1,9 @@
+2007-11-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_options.py (TestOptions): Make sure to turn
+	all logging of after running the OptionParser tests.
+	Also remove a whole copy of the file.
+	
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.getWorker):
