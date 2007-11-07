@@ -25,6 +25,7 @@ import time
 import errno
 import string
 import resource
+import fcntl
 
 import gst
 
@@ -409,7 +410,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         # check if it's really an open fd (i.e. that twisted didn't close it
         # before the removeReader() call)
-        import fcntl
         try:
             fcntl.fcntl(fd, fcntl.F_GETFL)
         except IOError, e:

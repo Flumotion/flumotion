@@ -1,3 +1,9 @@
+2007-11-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Import fcntl in global scope as well. There's no reason to do this
+	  locally, and it's somewhat of a hot path (client connection).
+
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/common.py:
