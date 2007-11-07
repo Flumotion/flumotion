@@ -72,7 +72,7 @@ NUM_STATES = 3
 OBJECT_UNSET, OBJECT_INACTIVE, OBJECT_ACTIVE = range(NUM_STATES)
 
 class ComponentView(gtk.VBox, log.Loggable):
-    logCategory='componentview'
+    logCategory = 'componentview'
 
     def __init__(self):
         gtk.VBox.__init__(self)

@@ -170,9 +170,9 @@ class MultiAdminModel(log.Loggable):
         # stop listening to admin's signals, if the manager had actually
         # connected at some point
         if managerId in self._reconnectHandlerIds:
-            disconnect = self._reconnectHandlerIds[managerId][0]
-            ids = self._reconnectHandlerIds[managerId][1:]
-            map(disconnect, ids)
+            handlerIds = self._reconnectHandlerIds.pop(managerId)
+            disconnect = handlerIds.pop(0)
+            map(disconnect, handlerIds)
 
         if managerId in self.admins:
             admin = self.admins[managerId]

@@ -1,5 +1,11 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView.logCategory): Satisfy the swedish mafia.
+
+	* flumotion/admin/multi.py (MultiAdminModel.removeManager): Avoid
+	disconnecting from signals twice.
+
 	* flumotion/manager/component.py (FeedMap.__init__)
 	(FeedMap.componentAttached, FeedMap.componentDetached)
 	(FeedMap._recalc, FeedMap.getFeedersForEaters)
