@@ -244,8 +244,7 @@ class Wizard(GladeWindow, log.Loggable):
 
     def block_next(self, block):
         self.button_next.set_sensitive(not block)
-        # work around a gtk bug (?)
-        # see http://mail.gnome.org/archives/gtk-app-devel-list/2005-November/msg00019.html
+        # work around a gtk+ bug #56070
         if not block:
             self.button_next.hide()
             self.button_next.show()
