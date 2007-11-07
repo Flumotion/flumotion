@@ -58,7 +58,7 @@ def formatStorage(units, precision=2):
 
     # XXX: We might end up calling float(), which breaks
     #      when using LC_NUMERIC when it is not C -- only in python
-    #      2.3 though, no prob in 2.4
+    #      2.3 though, no prob in 2.4. See PEP 331
     if sys.version_info < (2, 4):
         locale.setlocale(locale.LC_NUMERIC, "C")
 
