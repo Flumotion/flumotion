@@ -1,3 +1,8 @@
+2007-11-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_options.py: 
+	Use the new log settings APIs and renable commented out tests.
+	
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (dictlist): New class, a dict of
@@ -37,7 +42,9 @@
 	* flumotion/test/test_options.py (TestOptions): Make sure to turn
 	all logging of after running the OptionParser tests.
 	Also remove a whole copy of the file.
-	
+	(TestOptions.testParser): Disable the logging tests until we 
+	can restore the logging options set before we modify them.
+
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.getWorker):

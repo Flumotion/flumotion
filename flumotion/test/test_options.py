@@ -21,21 +21,27 @@
 
 from twisted.trial import unittest
 from flumotion.common.options import OptionGroup, OptionParser
-from flumotion.common.log import reset
+from flumotion.common.log import getLogSettings, setLogSettings
 
 import common
 
 class TestOptions(unittest.TestCase):
+    def setUp(self):
+        self.log_settings = getLogSettings()
+
+    def tearDown(self):
+        setLogSettings(self.log_settings)
+
     def testParser(self):
         parser = OptionParser()
 
-        #options, rest = parser.parse_args(['--verbose'])
-        #self.failUnless(options.verbose)
-        #self.failIf(rest)
+        options, rest = parser.parse_args(['--verbose'])
+        self.failUnless(options.verbose)
+        self.failIf(rest)
 
-        #options, rest = parser.parse_args(['--debug', '*:5'])
-        #self.assertEqual(options.debug, "*:5")
-        #self.failIf(rest)
+        options, rest = parser.parse_args(['--debug', '*:5'])
+        self.assertEqual(options.debug, "*:5")
+        self.failIf(rest)
 
         options, rest = parser.parse_args(['rest'])
         self.assertEqual(rest, ["rest"])
@@ -57,7 +63,7 @@ class TestOptions(unittest.TestCase):
         self.failUnless(options.test)
         self.failIf(rest)
 
-        #options, rest = parser.parse_args(['--test', '--verbose', 'rest'])
-        #self.failUnless(options.test)
-        #self.failUnless(options.verbose)
-        #self.assertEqual(rest, ["rest"])
+        options, rest = parser.parse_args(['--test', '--verbose', 'rest'])
+        self.failUnless(options.test)
+        self.failUnless(options.verbose)
+        self.assertEqual(rest, ["rest"])

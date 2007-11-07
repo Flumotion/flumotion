@@ -182,5 +182,14 @@ class TestGetExceptionMessage(unittest.TestCase):
         self.failUnless("test_log.py" in message)
         self.failUnless("TypeError" in message)
 
+class TestLogSettings(unittest.TestCase):
+    def testSet(self):
+        old = log.getLogSettings()
+        log.setDebug('*:5')
+        self.assertNotEquals(old, log.getLogSettings())
+
+        log.setLogSettings(old)
+        self.assertEquals(old, log.getLogSettings())
+
 if __name__ == '__main__':
     unittest.main()

@@ -121,6 +121,36 @@ def getCategoryLevel(category):
         registerCategory(category)
     return _categories[category]
 
+def setLogSettings(state):
+    """Update the current log settings.
+    This can restore an old saved log settings object returned by
+    getLogSettings
+    @param settings: the settings to set
+    """
+
+    global _DEBUG
+    global _log_handlers
+    global _log_handlers_limited
+
+    (_DEBUG,
+     _categories,
+     _log_handlers,
+     _log_handlers_limited) = state
+
+    for category in _categories:
+        registerCategory(category)
+
+def getLogSettings():
+    """Fetches the current log settings.
+    The returned object can be sent to setLogSettings to restore the
+    returned settings
+    @returns: the current settings
+    """
+    return (_DEBUG,
+            _categories,
+            _log_handlers,
+            _log_handlers_limited)
+
 def _canShortcutLogging(category, level):
     if _log_handlers:
         # we have some loggers operating without filters, have to do
