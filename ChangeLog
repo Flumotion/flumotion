@@ -1,5 +1,12 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentHeaven.mapNetFeed): Fix
+	poor implementation of the last changeset; allow a None toPort to
+	just fall through.
+	(ComponentHeaven._getFeedersForEaters)
+	(ComponentHeaven._getFeederAvatar): Factor out the process of
+	mapping a feedId to an avatar/feedName pair into another method.
+
 	* flumotion/manager/component.py (ComponentHeaven.mapNetFeed):
 	Instead of raising TryAgain on failure, debug and return None,
 	None.

@@ -660,6 +660,13 @@ class ComponentHeaven(base.ManagerHeaven):
             self.debug('avatar %s seems to have logged out rather quickly',
                        avatarId)
 
+    def _getFeederAvatar(self, flowName, feedId):
+        compName, feedName = common.parseFeedId(feedId)
+        compId = common.componentId(flowName, compName)
+        feederAvatar = self.avatars.get(compId, None)
+        # FIXME: check that feedName is actually in avatar's feeders
+        return feederAvatar, feedName
+        
     def _getFeedersForEaters(self, avatar):
         """Get the set of feeds that this component is eating from,
         keyed by eater alias.
@@ -670,11 +677,9 @@ class ComponentHeaven(base.ManagerHeaven):
         ret = []
         for tups in avatar.getEaters().values():
             for feedId, alias in tups:
-                compName, feedName = common.parseFeedId(feedId)
-                compId = common.componentId(avatar.getParentName(),
-                                            compName)
-                feederAvatar = self.avatars.get(compId, None)
-                # FIXME: check that feedName is actually in avatar's feeders
+                flowName = avatar.getParentName()
+                feederAvatar, feedName = self._getFeederAvatar(flowName,
+                                                               feedId)
                 ret.append((alias, feederAvatar, feedName))
         return ret
 
@@ -697,8 +702,7 @@ class ComponentHeaven(base.ManagerHeaven):
 
     def mapNetFeed(self, fromAvatar, toAvatar):
         toHost = toAvatar.getClientAddress()
-        toPort = toAvatar.getFeedServerPort()
-        return None, None
+        toPort = toAvatar.getFeedServerPort() # can be None
 
         # FIXME: until network map is implemented, hack to assume that
         # connections from what appears to us to be the same IP go
@@ -715,7 +719,7 @@ class ComponentHeaven(base.ManagerHeaven):
     def _connectEatersAndFeeders(self, avatar):
         def connect(fromComp, fromFeed, toComp, toFeed, method):
             host, port = self.mapNetFeed(fromComp, toComp)
-            if host:
+            if port:
                 fullFeedId = toComp.getFullFeedId(toFeed)
                 proc = getattr(fromComp, method)
                 proc(fromFeed, fullFeedId, host, port)
