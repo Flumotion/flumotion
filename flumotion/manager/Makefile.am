@@ -7,7 +7,6 @@ flumotion_PYTHON =	\
 	admin.py	\
 	base.py		\
 	component.py	\
-	depgraph.py	\
 	main.py		\
 	manager.py	\
 	worker.py

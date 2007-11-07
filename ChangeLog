@@ -1,5 +1,8 @@
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/depgraph.py: Removed, no more users. Add back
+	when we decide that we need more complexity?
+
 	* flumotion/manager/component.py (ComponentHeaven.mapNetFeed): Fix
 	poor implementation of the last changeset; allow a None toPort to
 	just fall through.
