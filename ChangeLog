@@ -2,6 +2,7 @@
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
 	Unbreak the flumotion-template test.
+	(BaseAdminGtk): Set gettext_domain to silent pychecker.
 
 2007-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 

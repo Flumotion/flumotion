@@ -51,6 +51,7 @@ class BaseAdminGtk(log.Loggable):
     """
 
     logCategory = "admingtk"
+    gettext_domain = 'flumotion'
 
     def __init__(self, state, admin):
         """
