@@ -33,8 +33,11 @@ from twisted.python import util
 from twisted.internet import defer
 from zope.interface import implements
 
-from flumotion.common import errors, log, common
+from flumotion.common import errors, log, common, messages
 from flumotion.twisted import flavors
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 from gettext import gettext as _
 
@@ -387,6 +390,25 @@ class BaseAdminGtkNode(log.Loggable):
 
         Returns: a deferred returning the main widget for embedding
         """
+        def error(debug):
+            # add an error message to the component and return
+            # an error label, given a debug string
+            self.warning("error rendering component UI; debug %s", debug)
+            m = messages.Error(T_(N_(
+                "Internal error in component UI.  "
+                "Please file a bug against the component.")),
+                debug=debug)
+            self.addMessage(m)
+
+            label = gtk.Label(_("Internal error.\nSee component error "
+                    "message\nfor more details."))
+
+            # if we don't set this error as our label, we will raise
+            # a TypeError below and obscure this more meaningful error
+            self.widget = label
+
+            return label
+
         def loadGladeFile():
             if not self.glade_file:
                 return defer.succeed(None)
@@ -394,7 +416,10 @@ class BaseAdminGtkNode(log.Loggable):
             def haveWtree(wtree):
                 self.wtree = wtree
                 self.debug('render: calling haveWidgetTree')
-                self.haveWidgetTree()
+                try:
+                    self.haveWidgetTree()
+                except Exception, e:
+                    return error(log.getExceptionMessage(e))
 
             self.debug('render: loading glade file %s in text domain %s',
                        self.glade_file, self.gettext_domain)
@@ -402,6 +427,16 @@ class BaseAdminGtkNode(log.Loggable):
             d = self.loadGladeFile(self.glade_file, self.gettext_domain)
             d.addCallback(haveWtree)
             return d
+
+        def loadGladeFileErrback(failure):
+            if failure.check(RuntimeError):
+                return error(
+                    'Could not load glade file %s.' % self.glade_file)
+            if failure.check(errors.NoBundleError):
+                return error(
+                    'No bundle found containing %s.' % self.glade_file)
+
+            return failure
 
         def renderFinished(_):
             if not self.widget:
@@ -412,18 +447,30 @@ class BaseAdminGtkNode(log.Loggable):
                 self.debug('render: calling setUIState on the node')
                 self.setUIState(self._pendingUIState)
 
-            self.debug('render: yielding widget %s', self.widget)
+            self.debug('renderFinished: returning widget %s', self.widget)
             return self.widget
 
-        def error(failure):
-            msg = log.getFailureMessage(failure)
-            self.warning('Failed to render: %s', msg)
-            return gtk.Label("Failed to load component UI.\n\n%s" % msg)
-                
+        def renderFinishedErrback(failure):
+            return error(log.getFailureMessage(failure))
+
         d = loadGladeFile()
+        d.addErrback(loadGladeFileErrback)
         d.addCallback(renderFinished)
-        d.addErrback(error)
+        d.addErrback(renderFinishedErrback)
         return d
+
+    def addMessage(self, message):
+        """
+        Add a message to the component.
+        Since this is called in a component view and only relevant to the
+        component view, the message only exists in the view, and is not
+        replicated to the manager state.
+
+        The message will be displayed in the usual message view.
+
+        @type  message: L{flumotion.common.messages.Message}
+        """
+        self.state.observe_append('messages', message)
 
 # this class is a bit of an experiment
 # editor's note: "experiment" is an excuse for undocumented and uncommented

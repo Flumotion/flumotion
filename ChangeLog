@@ -1,3 +1,16 @@
+2007-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.error,
+	  BaseAdminGtkNode.haveWtree, BaseAdminGtkNode.loadGladeFileErrback,
+	  BaseAdminGtkNode.renderFinished,
+	  BaseAdminGtkNode.renderFinishedErrback, BaseAdminGtkNode.addMessage):
+	  This should teach me to fix code being refactored.
+	  Handle errors in component UI code better.
+	  Don't put anything in the UI (except for debug info) that is
+	  not translated.
+	  Put error messages in the message area where they belong, and add
+	  a method for it to do it consistently.
+
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py (Window.help_about_cb): 
