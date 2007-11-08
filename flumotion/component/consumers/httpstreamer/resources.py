@@ -90,6 +90,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # If set, a URL to redirect a user to when the limits above are reached
         self._redirectOnFull = None
 
+        self._removing = {} # Optional deferred notification of client removals.
+
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
 
@@ -103,8 +105,28 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if fd in self._requests:
             request = self._requests[fd]
             self._removeClient(request, fd, stats)
+
+            if fd in self._removing:
+                self.debug("client is removed; firing deferred")
+                d = self._removing.pop(fd)
+                d.callback(None)
         else:
             self.warning('[fd %5d] not found in _requests' % fd)
+
+    def removeAllClients(self):
+        """
+        Start to remove all the clients connected (this will complete 
+        asynchronously from another thread)
+
+        Returns a deferred that will fire once they're all removed.
+        """
+        l = []
+        for fd in self._requests:
+            self._removing[fd] = defer.Deferred()
+            l.append(self._removing[fd])
+            self.streamer.remove_client(fd)
+
+        return defer.DeferredList(l)
 
     def setRoot(self, path):
         self.putChild(path, self)

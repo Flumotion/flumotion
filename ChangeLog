@@ -1,3 +1,12 @@
+2007-11-08  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Add removeAllClients() method; returns a deferred firing once all
+	  clients have been removed successfully.
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Remove all clients on stop, don't continue shutdown until removal is
+	  complete.
+
 2007-11-08  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 

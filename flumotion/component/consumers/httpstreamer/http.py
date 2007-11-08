@@ -589,6 +589,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink = self.get_element('sink')
         sink.emit('remove', fd)
 
+    def remove_all_clients(self):
+        """
+        Remove all the clients.
+
+        Returns a deferred fired once all clients have been removed.
+        """
+        self.debug("Asking for all clients to be removed")
+        return self.resource.removeAllClients()
+
     def update_ui_state(self):
         """
         Update the uiState object.
@@ -679,8 +688,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self._tport:
             self._tport.stopListening()
 
+        # After we stop listening (so new connections aren't possible), 
+        # disconnect (and thus log) all the old ones.
+        l = [self.remove_all_clients()]
+
         if self.type == 'slave' and self._pbclient:
-            return self._pbclient.deregisterPath(self.mountPoint)
+            l.append(self._pbclient.deregisterPath(self.mountPoint))
+
+        return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):
         """
