@@ -34,6 +34,20 @@
 	
 2007-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (FeedMap.__init__)
+	(FeedMap.componentAttached, FeedMap.componentDetached)
+	(FeedMap.getFeederAvatar, FeedMap._recalc): Add a new dataset,
+	virtualfeeddeps, which is the set of components that should be
+	reconnected when one virtual feed provider logs out. As a separate
+	change, treat virtualFeeds purely as a cache -- don't manage it in
+	attached()/detached().
+	(FeedMap.getEatersForFeeders): Make documentation match intent.
+	(FeedMap.__init__, FeedMap.componentDetached)
+	(FeedMap.getFeederAvatar, FeedMap._recalc): s/virtual//, we manage
+	all feeds generically now. Yay.
+
+2007-11-07  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/manager/component.py (dictlist): New class, a dict of
 	nonempty lists.
 	(FeedMap.__init__, FeedMap.componentAttached)
