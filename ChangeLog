@@ -1,5 +1,12 @@
 2007-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  Add a debug line.
+	* flumotion/component/base/admin_gtk.py:
+	  Clean up previous error messages about rendering.
+
+2007-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.error,
 	  BaseAdminGtkNode.haveWtree, BaseAdminGtkNode.loadGladeFileErrback,
 	  BaseAdminGtkNode.renderFinished,

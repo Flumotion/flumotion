@@ -390,6 +390,12 @@ class BaseAdminGtkNode(log.Loggable):
 
         Returns: a deferred returning the main widget for embedding
         """
+        # clear up previous error messages
+        for message in self.state.get('messages'):
+            if message.id == 'render':
+                self.debug('Removing previous messages %r' % message)
+                self.state.observe_remove('messages', message)
+
         def error(debug):
             # add an error message to the component and return
             # an error label, given a debug string
@@ -397,7 +403,7 @@ class BaseAdminGtkNode(log.Loggable):
             m = messages.Error(T_(N_(
                 "Internal error in component UI.  "
                 "Please file a bug against the component.")),
-                debug=debug)
+                debug=debug, id="render")
             self.addMessage(m)
 
             label = gtk.Label(_("Internal error.\nSee component error "

@@ -504,6 +504,7 @@ class Window(log.Loggable, gobject.GObject):
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
+        self.debug('component %s has selection', state)
         def compSet(state, key, value):
             if key == 'mood':
                 self._set_stop_start_component_sensitive()
