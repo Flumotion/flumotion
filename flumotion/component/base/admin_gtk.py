@@ -391,7 +391,8 @@ class BaseAdminGtkNode(log.Loggable):
         Returns: a deferred returning the main widget for embedding
         """
         # clear up previous error messages
-        for message in self.state.get('messages'):
+        messages = self.state.get('messages', [])
+        for message in messages:
             if message.id == 'render':
                 self.debug('Removing previous messages %r' % message)
                 self.state.observe_remove('messages', message)

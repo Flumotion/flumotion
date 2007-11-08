@@ -1,3 +1,8 @@
+2007-11-08  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
+	Unbreak the flumotion-template test.
+
 2007-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:
