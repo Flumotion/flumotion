@@ -1,3 +1,14 @@
+2007-11-09  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Rename a variable that was shadowing an import that we were then trying
+	  to use.
+	* flumotion/component/effects/volume/volume.py:
+	  If we have an invalid value in the list, change the value in the list
+	  rather than in a local variable that we then discard. Fixes #792.
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  Update for component API changes.
+
 2007-11-08  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

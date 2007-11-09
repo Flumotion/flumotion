@@ -71,12 +71,13 @@ class Volume(feedcomponent.Effect):
             decay = list(s['decay'])
             rms = list(s['rms'])
             for l in peak, decay, rms:
-                for v in l:
+                for index, v in enumerate(l):
                     try:
                         v = frexp(v)
                     except (SystemError, OverflowError, ValueError):
-                        # something confused log10() on the C side, punt
-                        v = -100.0
+                        # It was an invalid value (e.g. -Inf), so clamp to
+                        # something appropriate
+                        l[index] = -100.0
             if not self.uiState:
                 self.warning("effect %s doesn't have a uiState" %
                              self.name)

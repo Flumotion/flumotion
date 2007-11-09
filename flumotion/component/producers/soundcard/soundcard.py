@@ -52,7 +52,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         depth = properties.get('depth', 16)
         channels = properties.get('channels', 2)
         self.inputTrackLabel = properties.get('input-track', None)
-        d = self._addStateChangeDeferred(gst.STATE_CHANGE_NULL_TO_READY)
+        d = self._change_monitor.add(gst.STATE_CHANGE_NULL_TO_READY)
         d.addCallback(self._set_input_track, self.inputTrackLabel)
         # FIXME: we should find a way to figure out what the card supports,
         # so we can add in correct elements on the fly
