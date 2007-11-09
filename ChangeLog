@@ -1,3 +1,7 @@
+2007-11-09  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_component_playlist.py: assertTrue -> failUnles
+
 2007-11-09  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py:

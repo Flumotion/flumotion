@@ -74,7 +74,7 @@ class TestPlaylist(unittest.TestCase):
 
         while cur:
             all.append(cur)
-            self.assertTrue(cur in self.playlist._itemsById[cur.id])
+            self.failUnless(cur in self.playlist._itemsById[cur.id])
             l += 1
             # Check consistency of links
             if cur.next:
@@ -87,7 +87,7 @@ class TestPlaylist(unittest.TestCase):
 
         for id in self.playlist._itemsById:
             for item in self.playlist._itemsById[id]:
-                self.assertTrue(item in all)
+                self.failUnless(item in all)
                 itemsbyidtotal += 1
         self.assertEquals(itemsbyidtotal, expectedlen)
 
