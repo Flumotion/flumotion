@@ -1,6 +1,6 @@
 2007-11-09  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/test_component_playlist.py: assertTrue -> failUnles
+	* flumotion/test/test_component_playlist.py: assertTrue -> failUnless
 
 2007-11-09  Michael Smith <msmith@fluendo.com>
 
