@@ -19,17 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-import common
-import testclasses
-import twisted
-
-from twisted.trial import unittest
-
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from zope.interface import implements
 
+from flumotion.common import testsuite
 from flumotion.twisted import flavors
+
 
 class TestStateCacheable(flavors.StateCacheable):
     pass
@@ -47,7 +43,7 @@ class FakeListener:
     def stateAppend(self, state, key, value): pass
     def stateRemove(self, state, key, value): pass
 
-class TestRoot(testclasses.TestManagerRoot):
+class TestRoot(testsuite.TestManagerRoot):
     def remote_getState(self):
         self.state = TestStateCacheable()
         self.state.addKey('name', 'lois')
@@ -76,7 +72,7 @@ class TestRoot(testclasses.TestManagerRoot):
     def remote_haveAdopted(self, name):
         return self.state.remove('children', name)
 
-class StateTest(unittest.TestCase):
+class StateTest(testsuite.TestCase):
     def setUp(self):
         self.changes = []
         self.runServer()
@@ -365,7 +361,7 @@ class TestFullListener(StateTest):
         return d
 
 
-class TestState(unittest.TestCase):
+class TestState(testsuite.TestCase):
     def testStateAddKey(self):
         c = flavors.StateCacheable()
 

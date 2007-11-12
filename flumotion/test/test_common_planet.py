@@ -21,17 +21,15 @@
 
 from twisted.trial import unittest
 from twisted.spread import jelly
-from twisted.internet import reactor
 from zope.interface import implements
 
-import common as mcommon
-
-from flumotion.twisted import flavors
+from flumotion.common import testsuite
 from flumotion.common import planet
-
 from flumotion.common.planet import moods
+from flumotion.twisted import flavors
 
-class ManagerComponentStateTest(unittest.TestCase):
+
+class ManagerComponentStateTest(testsuite.TestCase):
     def setUp(self):
         self.state = planet.ManagerComponentState()
 
@@ -46,7 +44,7 @@ class ManagerComponentStateTest(unittest.TestCase):
 
         self.assertRaises(KeyError, assign, self)
 
-class AllComponentStateTest(unittest.TestCase):
+class AllComponentStateTest(testsuite.TestCase):
     def setUp(self):
         self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
@@ -71,7 +69,7 @@ class AllComponentStateTest(unittest.TestCase):
         self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
         self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
-class InvalidateTest(unittest.TestCase):
+class InvalidateTest(testsuite.TestCase):
     def testInvalidate(self):
         mcomp = planet.ManagerComponentState()
         mflow = planet.ManagerFlowState()
@@ -101,7 +99,7 @@ class InvalidateTest(unittest.TestCase):
 # FIXME: this test doesn't do anything since unjelly(jelly()) creates a
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
-class ListenerTest(unittest.TestCase):
+class ListenerTest(testsuite.TestCase):
     implements(flavors.IStateListener)
 
     def setUp(self):

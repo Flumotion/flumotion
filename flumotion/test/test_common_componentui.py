@@ -19,25 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-import common
-import testclasses
-
-from twisted.trial import unittest
-
-from twisted.internet import reactor, defer
-from twisted.spread import pb
-
-from flumotion.twisted import flavors
 from flumotion.common import componentui
-
+from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
+
 
 class FakeObject: pass
 
-class FakeAdmin(testclasses.TestAdmin):
+class FakeAdmin(testsuite.TestAdmin):
     pass
 
-class FakeWorker(testclasses.TestWorker):
+class FakeWorker(testsuite.TestWorker):
     def remote_getState(self):
         if not hasattr(self, 'state'):
             self.state = componentui.WorkerComponentUIState()
@@ -54,7 +46,7 @@ class FakeWorker(testclasses.TestWorker):
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
 
-class TestRoot(testclasses.TestManagerRoot):
+class TestRoot(testsuite.TestManagerRoot):
     def remote_workerGetState(self):
         d = self.workerReference.callRemote('getState')
         d.addCallback(self._workerGotState)
@@ -77,11 +69,11 @@ class TestRoot(testclasses.TestManagerRoot):
     def remote_workerHaveAdopted(self, name):
         return self.workerReference.callRemote('haveAdopted', name)
 
-class TestStateSet(unittest.TestCase):
+class TestStateSet(testsuite.TestCase):
     def setUp(self):
         self.changes = []
 
-        self._m = testclasses.TestManager()
+        self._m = testsuite.TestManager()
         port = self._m.run(TestRoot)
         self.admin = FakeAdmin()
         d = self.admin.run(port)

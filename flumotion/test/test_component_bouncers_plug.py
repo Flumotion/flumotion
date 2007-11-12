@@ -19,13 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
 from twisted.internet import defer
 
 from flumotion.component.bouncers import plug
+from flumotion.test import bouncertest
 
-import bouncertest
 
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
     def setUp(self):

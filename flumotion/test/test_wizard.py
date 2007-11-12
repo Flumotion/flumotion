@@ -19,25 +19,23 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
+from twisted.internet import defer
 from twisted.spread import jelly
-from twisted.trial import unittest
 
 from flumotion.common import worker
+from flumotion.common import testsuite
 
 try:
-    import gtk
+    from flumotion.ui import fgtk
 except RuntimeError:
     import os
     os._exit(0)
 
-from flumotion.ui import fgtk
 from flumotion.common import enum
 from flumotion.wizard import enums, wizard, step
 from flumotion.admin import admin
 
-class WizardStepTest(unittest.TestCase):
+class WizardStepTest(testsuite.TestCase):
     def setUpClass(self):
         wiz = wizard.Wizard()
         self.steps = wiz.scenario.steps
@@ -105,7 +103,7 @@ class TestAdmin(admin.AdminModel):
         else:
             assert False
 
-class WizardSaveTest(unittest.TestCase):
+class WizardSaveTest(testsuite.TestCase):
     def setUp(self):
         self.wizard = wizard.Wizard()
         self.wizard.admin = TestAdmin('user', 'test')

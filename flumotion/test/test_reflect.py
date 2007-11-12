@@ -19,11 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
 from flumotion.twisted import reflect
+from flumotion.common import testsuite
 
-class TestSimple(unittest.TestCase):
+class TestSimple(testsuite.TestCase):
     def testSimple(self):
         s = reflect.namedAny('flumotion.test.test_reflect.TestSimple')
         self.failUnlessIdentical(s, TestSimple)

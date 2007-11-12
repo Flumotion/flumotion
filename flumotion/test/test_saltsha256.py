@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 from twisted.trial import unittest
 from twisted.internet import defer
 
@@ -35,7 +35,7 @@ bouncerconf = {
 }
 
 # this is a type that should not be allowed
-class TestWrongKeycardClass(unittest.TestCase):
+class TestWrongKeycardClass(testsuite.TestCase):
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256(bouncerconf)
 
@@ -50,7 +50,7 @@ class TestWrongKeycardClass(unittest.TestCase):
         d.addCallback(wrongKeycardClassCallback)
         return d
 
-class TestSaltSha256USCPCC(unittest.TestCase):
+class TestSaltSha256USCPCC(testsuite.TestCase):
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256(bouncerconf)
 

@@ -19,14 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-
-from twisted.trial import unittest
-
-from flumotion.test.gtkunit import *
-import gobject
 import gtk
 
 from flumotion.admin.gtk import greeter, wizard
+from flumotion.test.gtkunit import *
 
 
 def prev():
@@ -40,7 +36,7 @@ def check_prev_next(can_prev, can_next):
     assert_sensitive('button_prev', can_prev)
     assert_sensitive('button_next', can_next)
 
-class WizardTest(unittest.TestCase):
+class WizardTest(testsuite.TestCase):
     def testGreeter(self):
         wiz = greeter.Greeter()
         ass = self.assert_

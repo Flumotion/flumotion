@@ -19,24 +19,18 @@
 
 # Headers in this file shall remain intact.
 
-import common as testcommon
-
 import os
 import sys
-import time
 import tempfile
 
-from twisted.trial import unittest
-from twisted.spread import pb
-from twisted.internet import reactor, address
-
 from flumotion.common import common, package
+from flumotion.common import testsuite
 
 # for our simulation of failIfRaises
 import twisted.python.util
 from twisted.trial.unittest import FailTest
 
-class TestPackagePath(unittest.TestCase):
+class TestPackagePath(testsuite.TestCase):
     def setUp(self):
         # store our old sys.path
         self.syspath = sys.path[:]
@@ -253,9 +247,10 @@ class TestPackagePath(unittest.TestCase):
         # see if import hooks don't mess up non prefix hooks
         packager = package.Packager()
         from xml.dom.html import HTMLDOMImplementation
+        HTMLDOMImplementation
         packager.unregister()
 
-class TestRecursively(unittest.TestCase):
+class TestRecursively(testsuite.TestCase):
     def testListDir(self):
         self.tempdir = tempfile.mkdtemp()
 

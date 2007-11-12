@@ -19,18 +19,16 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
 import gst
 
-from twisted.python import failure
 from twisted.internet import defer, reactor
+from twisted.trial import unittest
 
+from flumotion.common import testsuite
 from flumotion.component import padmonitor
 
-class TestPadMonitor(unittest.TestCase):
+
+class TestPadMonitor(testsuite.TestCase):
 
     def _run_pipeline(self, pipeline):
         pipeline.set_state(gst.STATE_PLAYING)

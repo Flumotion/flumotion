@@ -19,15 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-import common
-from twisted.trial import unittest
-
-import testclasses
-
 from twisted.internet import defer
-from twisted.spread import pb, jelly
+from twisted.spread import pb
 
 from flumotion.common import log
+from flumotion.common import testsuite
+
 
 # an object that subclasses from both Cacheable and RemoteCache
 # can be serialized over more than one PB connection
@@ -84,9 +81,9 @@ class FakeCacheable(pb.Cacheable): pass
 class FakeRemoteCache(pb.RemoteCache): pass
 pb.setUnjellyableForClass(FakeCacheable, FakeRemoteCache)
 
-class TestOnePB(unittest.TestCase):
+class TestOnePB(testsuite.TestCase):
     def setUp(self):
-        self.pb = testclasses.TestPB()
+        self.pb = testsuite.TestPB()
         return self.pb.start()
 
     def tearDown(self):
@@ -137,11 +134,11 @@ class TestOnePB(unittest.TestCase):
         d.addCallback(_receiveCb)
         return d
 
-class TestTwoPB(unittest.TestCase):
+class TestTwoPB(testsuite.TestCase):
     # test if our classes work over two chained PB connections
     def setUp(self):
-        self.pb1 = testclasses.TestPB()
-        self.pb2 = testclasses.TestPB()
+        self.pb1 = testsuite.TestPB()
+        self.pb2 = testsuite.TestPB()
         d = self.pb1.start()
         d.addCallback(lambda r: self.pb2.start())
         return d

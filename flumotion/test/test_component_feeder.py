@@ -21,15 +21,13 @@
 
 import time
 
-from twisted.trial import unittest
-
-import common
+from flumotion.common import testsuite
 
 from twisted.internet import defer, reactor
 
 from flumotion.component import feeder
 
-class TestFeeder(unittest.TestCase):
+class TestFeeder(testsuite.TestCase):
     def setUp(self):
         self.feeder = feeder.Feeder('video:default')
 

@@ -19,9 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 
-from twisted.trial import unittest
 from twisted.internet import defer, reactor
 
 from flumotion.common import keycards
@@ -37,7 +36,7 @@ class FakeMedium:
         self.calls.append((method, args, kwargs))
         return defer.succeed(None)
 
-class TrivialBouncerTest(unittest.TestCase):
+class TrivialBouncerTest(testsuite.TestCase):
     obj = None
     medium = None
 

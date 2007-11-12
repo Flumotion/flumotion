@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
-import testclasses
+from flumotion.common import testsuite
 
 from twisted.trial import unittest
 
@@ -28,22 +27,22 @@ from flumotion.twisted import credentials
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
 
-class TestKeycardUACPP(unittest.TestCase):
+class TestKeycardUACPP(testsuite.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
 
-class TestKeycardUACPCC(unittest.TestCase):
+class TestKeycardUACPCC(testsuite.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
 
 # test sending keycards back and forth
-class Admin(testclasses.TestAdmin):
+class Admin(testsuite.TestAdmin):
     pass
-class Worker(testclasses.TestWorker):
+class Worker(testsuite.TestWorker):
     keycard = None
 
     def remote_getKeycard(self):
@@ -58,7 +57,7 @@ class Worker(testclasses.TestWorker):
         #print "Worker keycard %r, id: %d" % (keycard, id(keycard))
         pass
 
-class Root(testclasses.TestManagerRoot):
+class Root(testsuite.TestManagerRoot):
     def remote_workerGetKeycard(self):
         d = self.workerReference.callRemote('getKeycard')
         d.addCallback(self._printKeycard)
@@ -73,9 +72,9 @@ class Root(testclasses.TestManagerRoot):
         #print "Manager keycard %r, id: %d" % (keycard, id(keycard))
         return keycard
 
-class TestKeycardSending(unittest.TestCase):
+class TestKeycardSending(testsuite.TestCase):
     def setUp(self):
-        self.m = testclasses.TestManager()
+        self.m = testsuite.TestManager()
         port = self.m.run(Root)
         self.a = Admin()
         d = self.a.run(port)

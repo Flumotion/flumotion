@@ -19,17 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from twisted.internet import defer
 
-from twisted.trial import unittest
-from twisted.internet import reactor, defer
-
-from flumotion.common import connection, log
-from flumotion.twisted import pb
 from flumotion.admin import admin
+from flumotion.common import connection
+from flumotion.common import testsuite
+from flumotion.twisted import pb
 
 
-class AdminTest(common.TestCaseWithManager):
+class AdminTest(testsuite.TestCaseWithManager):
     def testConstructor(self):
         model = admin.AdminModel()
 

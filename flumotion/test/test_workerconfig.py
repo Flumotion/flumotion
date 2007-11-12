@@ -19,14 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
+from flumotion.common import testsuite
 from flumotion.worker import config
+
 
 def parse(string):
     return config.WorkerConfigXML(None, string)
 
-class TestConfig(unittest.TestCase):
+class TestConfig(testsuite.TestCase):
     def testParseEmpty(self):
         conf = parse('<worker></worker>')
         self.assertEquals(conf.name, None)

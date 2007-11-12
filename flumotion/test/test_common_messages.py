@@ -23,8 +23,7 @@ from twisted.trial import unittest
 from twisted.spread import jelly, pb
 from twisted.internet import reactor, defer
 
-import common
-import testclasses
+from flumotion.common import testsuite
 
 import os
 import gettext
@@ -40,7 +39,7 @@ from flumotion.common.messages import N_, ngettext
 # translatablers
 T_ = messages.gettexter('flumotion')
 
-class SerializeTest(unittest.TestCase):
+class SerializeTest(testsuite.TestCase):
     def testSerialize(self):
         text = N_("Something is really wrong.")
         self.cmsg = messages.Error(T_(text))
@@ -64,7 +63,7 @@ class SerializeTest(unittest.TestCase):
         self.failUnless(messages.Info(T_(N_("Note"))))
         self.failUnless(messages.Warning(T_(N_("warning"))))
 
-class TranslatableTest(unittest.TestCase):
+class TranslatableTest(testsuite.TestCase):
     def testTranslatable(self):
         t = T_(N_("%s can be translated"), "I")
         self.assertEquals(t.domain, "flumotion")
@@ -89,7 +88,7 @@ class TranslatableTest(unittest.TestCase):
         text = self.nl.ngettext(t.singular, t.plural, t.count) % t.args
         self.assertEquals(text, "Andy 3 heeft 5 dingen")
 
-class TranslatorTest(unittest.TestCase):
+class TranslatorTest(testsuite.TestCase):
     def testTranslateOne(self):
         t = T_(N_("%s can be translated"), "Andy")
 
@@ -112,7 +111,7 @@ class TranslatorTest(unittest.TestCase):
         text = translator.translate(mmsg, lang=["nl_NL"])
         self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
 
-class ResultTest(unittest.TestCase):
+class ResultTest(testsuite.TestCase):
     def setUp(self):
         self.translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
@@ -150,7 +149,7 @@ class TestStateRemoteCache(flavors.StateRemoteCache):
     pass
 pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
 
-class TestRoot(testclasses.TestManagerRoot, log.Loggable):
+class TestRoot(testsuite.TestManagerRoot, log.Loggable):
 
     logCategory = "testroot"
 
@@ -192,7 +191,7 @@ class TestRoot(testclasses.TestManagerRoot, log.Loggable):
     def remote_removeOtherMessage(self):
         self.state.remove('messages', self.other)
 
-class PBSerializationTest(unittest.TestCase):
+class PBSerializationTest(testsuite.TestCase):
     def setUp(self):
         self.changes = []
         self.runServer()

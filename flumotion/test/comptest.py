@@ -19,14 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-__all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
-           'pipeline_cnv']
-
-import common
-
-import os
-import tempfile
 import new
+import os
 import sys
 
 from twisted.internet import gtk2reactor
@@ -40,12 +34,14 @@ except AssertionError:
 
 from twisted.python import failure
 from twisted.internet import reactor, defer, interfaces
-from twisted.web import client, error
 
-from flumotion.common import registry, log, errors, common
+from flumotion.common import registry, log, common
 from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.twisted import flavors
+
+__all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
+           'pipeline_cnv']
 
 
 class ComponentTestException(Exception):

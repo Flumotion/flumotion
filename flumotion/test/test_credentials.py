@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 
 from twisted.trial import unittest
 
@@ -31,7 +31,7 @@ CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredUCPCC = credentials.UsernameCryptPasswordCryptChallenger
 CredUSPCC = credentials.UsernameSha256PasswordCryptChallenger
 
-class TestUsername(unittest.TestCase):
+class TestUsername(testsuite.TestCase):
     def testWithPlaintext(self):
         cred = credentials.Username('user', 'test')
         self.failUnless(cred.checkPassword('test'))
@@ -42,7 +42,7 @@ class TestUsername(unittest.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
-class TestUsernameCryptPasswordCrypt(unittest.TestCase):
+class TestUsernameCryptPasswordCrypt(testsuite.TestCase):
     def testWithPlaintext(self):
         cred = CredCrypt('user')
         cred.setPasswordSalt('test', 'qi')
@@ -67,7 +67,7 @@ class TestUsernameCryptPasswordCrypt(unittest.TestCase):
         self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
-class TestUsernameCryptPasswordPlaintext(unittest.TestCase):
+class TestUsernameCryptPasswordPlaintext(testsuite.TestCase):
     def testWithPlaintext(self):
         cred = CredPlaintext('user', 'test')
         self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
@@ -78,7 +78,7 @@ class TestUsernameCryptPasswordPlaintext(unittest.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
-class TestUsernameCryptPasswordCryptChallenger(unittest.TestCase):
+class TestUsernameCryptPasswordCryptChallenger(testsuite.TestCase):
     def testWithPlaintext(self):
         cred = CredUCPCC('user')
 
@@ -110,7 +110,7 @@ class TestUsernameCryptPasswordCryptChallenger(unittest.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
-class TestUsernameSha256PasswordCryptChallenger(unittest.TestCase):
+class TestUsernameSha256PasswordCryptChallenger(testsuite.TestCase):
     def setUp(self):
         self.salt = 'iamsalt'
         # known good salted sha-256 password

@@ -19,20 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-from twisted.internet import reactor
-
-import common
-
 import gobject
 import gtk
 
-from flumotion.common import pygobject, errors, pygobject
-
+from flumotion.common import testsuite
+from flumotion.common import errors, pygobject
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
 
-class SetProperty(unittest.TestCase):
+class SetProperty(testsuite.TestCase):
     def testButton(self):
         b = gtk.Button()
 
@@ -56,7 +51,7 @@ class SetProperty(unittest.TestCase):
         pygobject.gobject_set_property(b, 'can-focus', [])
         self.assertEquals(b.get_property('can-focus'), False)
 
-class TestPyGObject(unittest.TestCase):
+class TestPyGObject(testsuite.TestCase):
     def testPyGObject(self):
         class Foo(gobject.GObject):
             gsignal('hcf', bool, str)

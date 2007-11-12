@@ -19,20 +19,16 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
-import gobject
 import gtk
-
 from twisted.spread import jelly
+
 from flumotion.admin.gtk import parts
 from flumotion.common import planet
-
+from flumotion.common import testsuite
 from flumotion.common.planet import moods
 
-class TestAdminStatusbar(unittest.TestCase):
+
+class TestAdminStatusbar(testsuite.TestCase):
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.Statusbar()
@@ -90,7 +86,7 @@ class TestAdminStatusbar(unittest.TestCase):
         self.failIf(self.bar.pop('main'))
         self.failIf(self.bar.pop('notebook'))
 
-class TestComponentsView(unittest.TestCase):
+class TestComponentsView(testsuite.TestCase):
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.TreeView()

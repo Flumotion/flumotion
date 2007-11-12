@@ -19,13 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from twisted.trial import unittest
-
 from flumotion.common import dag
+from flumotion.common import testsuite
 
-class TestDAG(unittest.TestCase):
+class TestDAG(testsuite.TestCase):
     def testSort(self):
         nodes = ['a','b','c','d','e','f']
         edges = [('a','f'),
@@ -211,7 +208,7 @@ class FakeComponent(FakeDep): pass
 
 (feeder, eater, worker, kid, component) = range(0, 5)
 
-class TestPlanet(unittest.TestCase):
+class TestPlanet(testsuite.TestCase):
     def testPlanet(self):
         graph = dag.DAG()
 

@@ -19,24 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-import common
-from twisted.trial import unittest
-
 import os
-import sys
-
-# needed so we can have multifdsink streaming thread signal handlers
-import gobject
-gobject.threads_init()
 
 import gst
-
-from flumotion.common import log
-
 from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.cred import credentials
 from twisted.cred import checkers, portal
+
+from flumotion.common import log
+from flumotion.common import testsuite
+
 
 # this example sets up a PB connection from client to server,
 # then steals the connection to do raw streaming instead
@@ -200,7 +193,8 @@ class Dispatcher(log.Loggable):
     def requestAvatar(self, avatarID, mind, *interfaces):
         self.debug("dispatcher: avatar being requested: %s" % avatarID)
         if avatarID == "admin":
-            avatar = AdminAvatar(self.server)
+            raise AssertionError
+            # AdminAvatar(self.server)
         else:
             avatar = ClientAvatar(self.server)
 
@@ -261,7 +255,7 @@ class ClientAvatar(pb.Avatar, log.Loggable):
             self.debug("adding fd %d to multifdsink" % fd)
             self.server.sink.emit('add', fd)
 
-class TestClientEater(unittest.TestCase):
+class TestClientEater(testsuite.TestCase):
     def startClient(self):
         factory = pb.PBClientFactory()
         factory.unsafeTracebacks = 1

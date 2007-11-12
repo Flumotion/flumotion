@@ -19,15 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from StringIO import StringIO
-
-from twisted.trial import unittest
-
+from flumotion.common import testsuite
 from flumotion.worker import config
 
-class WorkerConfigTest(unittest.TestCase):
+
+class WorkerConfigTest(testsuite.TestCase):
     def testRandomFeederPorts(self):
         conf = config.WorkerConfigXML(None, string="""
 <worker>

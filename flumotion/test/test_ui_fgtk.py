@@ -19,24 +19,20 @@
 
 # Headers in this file shall remain intact.
 
-import common
+import gobject
 
-from twisted.spread import jelly
-from twisted.trial import unittest
-from twisted.internet import reactor
+from flumotion.common import testsuite
 
 try:
-    import gobject
     import gtk
+    from flumotion.ui import fgtk
 except RuntimeError:
     import os
     os._exit(0)
 
-from flumotion.ui import fgtk
-
 INTERVAL = 100 # in ms
 
-class VUTest(unittest.TestCase):
+class VUTest(testsuite.TestCase):
     def testScale(self):
         w = fgtk.FVUMeter()
 

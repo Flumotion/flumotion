@@ -19,15 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-import common
 import random
 
-from twisted.trial import unittest
-
 from flumotion.common import avltree
+from flumotion.common import testsuite
 
 
-class TestAVLTree(unittest.TestCase):
+class TestAVLTree(testsuite.TestCase):
     def assertBalanced(self, tree):
         if tree is None:
             return 0

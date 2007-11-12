@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 from twisted.trial import unittest
 from twisted.internet import defer
 
@@ -31,7 +31,7 @@ bouncerconf = {'name': 'testbouncer',
                'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
 # this is a type that should not be allowed
-class TestHTPasswdCryptKeycard(unittest.TestCase):
+class TestHTPasswdCryptKeycard(testsuite.TestCase):
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
@@ -46,7 +46,7 @@ class TestHTPasswdCryptKeycard(unittest.TestCase):
         d.addCallback(wrongKeycardClassCallback)
         return d
 
-class TestHTPasswdCryptUACPP(unittest.TestCase):
+class TestHTPasswdCryptUACPP(testsuite.TestCase):
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
@@ -81,7 +81,7 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
         d.addCallback(wrongPasswordCallback)
         return d
 
-class TestHTPasswdCryptUACPCC(unittest.TestCase):
+class TestHTPasswdCryptUACPCC(testsuite.TestCase):
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 

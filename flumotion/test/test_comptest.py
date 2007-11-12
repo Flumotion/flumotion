@@ -19,52 +19,27 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
+import sys
 
-import common
+from twisted.internet import defer, reactor, gtk2reactor
 
-import sys, time, os
-
-from twisted.python import failure
-from twisted.internet import defer, interfaces, reactor, gtk2reactor
-from twisted.web import client, error
-
+from flumotion.common import testsuite
 from flumotion.common import log, errors
 from flumotion.common.planet import moods
-
+from flumotion.component.producers.pipeline.pipeline import Producer
+from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.test import comptest
 from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
      ComponentUnitTestMixin, pipeline_src, pipeline_cnv
 
-from flumotion.component.producers.pipeline.pipeline import Producer
-from flumotion.component.converters.pipeline.pipeline import Converter
 
-class CompatTestCase(unittest.TestCase):
-    """TestCase in Twisted 2.0 doesn't define 'failUnlessFailure' method.
-
-    This class adds it, if necessary.
-    """
-    if not getattr(unittest.TestCase, 'failUnlessFailure', None):
-        try:
-            def failUnlessFailure(self, deferred, *expectedFailures):
-                def _cb(result):
-                    self.fail("did not catch an error, instead got %r" %
-                              (result,))
-                def _eb(failure):
-                    failure.trap(*expectedFailures)
-                    return failure.value
-                return deferred.addCallbacks(_cb, _eb)
-        except ImportError:
-            # must not be Twisted 2.0, let the test fail
-            pass
-
-class CompTestTestCase(log.Loggable, CompatTestCase,
+class CompTestTestCase(log.Loggable, testsuite.TestCase,
                        ComponentUnitTestMixin):
     logCategory = 'comptest-test'
 
-class TestCompTestGtk2Reactorness(unittest.TestCase):
+class TestCompTestGtk2Reactorness(testsuite.TestCase):
     def test_mixin_class(self):
-        class TestCompTestUnitTestMixin(unittest.TestCase,
+        class TestCompTestUnitTestMixin(testsuite.TestCase,
                                         ComponentUnitTestMixin):
             pass
         if not isinstance(sys.modules['twisted.internet.reactor'],
@@ -87,7 +62,7 @@ class TestCompTestGtk2Reactorness(unittest.TestCase):
         else:
             self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
 
-class TestComponentWrapper(CompatTestCase):
+class TestComponentWrapper(testsuite.TestCase):
     def test_get_unique_name(self):
         self.failIfEquals(ComponentWrapper.get_unique_name(),
                           ComponentWrapper.get_unique_name())

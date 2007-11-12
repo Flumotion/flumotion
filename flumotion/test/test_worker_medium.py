@@ -19,17 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-
-import common
-
-
-from twisted.trial import unittest
 from twisted.internet import defer
 from twisted.spread import pb
 
-from flumotion.twisted import pb as fpb
+from flumotion.common import testsuite
 from flumotion.test import realm
-
+from flumotion.twisted import pb as fpb
 from flumotion.worker import medium
 
 
@@ -63,7 +58,7 @@ class TestWorkerRealm(realm.TestRealm):
         self.getDeferredLogout().callback(avatar)
 
 
-class TestWorkerMedium(unittest.TestCase):
+class TestWorkerMedium(testsuite.TestCase):
     def setUp(self):
         self.realm = TestWorkerRealm()
 

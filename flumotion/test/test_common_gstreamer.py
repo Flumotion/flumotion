@@ -19,13 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-from twisted.internet import reactor
-
-import common
-
 import gst
+from twisted.trial import unittest
+
 from flumotion.common import gstreamer
+
 
 class Factory(unittest.TestCase):
     def testFakeSrc(self):

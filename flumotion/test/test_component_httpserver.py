@@ -19,21 +19,19 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
 import os
 import tempfile
 
-from twisted.python import failure
 from twisted.internet import defer
+from twisted.trial import unittest
 from twisted.web import client, error
 
 from flumotion.common import log
+from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import httpfile
 
-class MountTest(log.Loggable, unittest.TestCase):
+
+class MountTest(log.Loggable, testsuite.TestCase):
     def setUp(self):
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
         A = os.path.join(self.path, 'A')

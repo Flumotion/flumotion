@@ -19,18 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-import common
-import random
-
-from twisted.trial import unittest
-
 from flumotion.common import signals
+from flumotion.common import testsuite
 
 
 class TestObject(signals.SignalMixin):
     __signals__ = ('foo', 'bar')
 
-class TestSignalMixin(unittest.TestCase):
+class TestSignalMixin(testsuite.TestCase):
     def testEmitSelf(self):
         o = TestObject()
 

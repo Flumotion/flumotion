@@ -19,23 +19,19 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
 import os
-import exceptions
 
 from twisted.spread import pb
-from twisted.internet import reactor, defer
+from twisted.internet import defer
 from zope.interface import implements
 
-from flumotion.common.planet import moods
-
-from flumotion.manager import component, manager
 from flumotion.common import log, planet, interfaces, common
-from flumotion.common import setup, errors
+from flumotion.common import errors
+from flumotion.common import testsuite
+from flumotion.common.planet import moods
+from flumotion.manager import component, manager
 from flumotion.twisted import flavors
+
 
 class MyListener(log.Loggable):
     # a helper object that you can get deferreds from that fire when
@@ -109,7 +105,7 @@ class FakeComponentAvatar(log.Loggable):
     def cleanup(self):
         pass
 
-class TestComponentMapper(unittest.TestCase):
+class TestComponentMapper(testsuite.TestCase):
     def setUp(self):
         self._mappers = {}
         self.heaven = component.ComponentHeaven(manager.Vishnu('test'))
@@ -311,7 +307,7 @@ class FakeComponentMind(FakeMind):
         return
 
 
-class TestVishnu(log.Loggable, unittest.TestCase):
+class TestVishnu(log.Loggable, testsuite.TestCase):
 
     logCategory = "TestVishnu"
 

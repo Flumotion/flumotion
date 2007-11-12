@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-from flumotion.common import enum
 from twisted.spread import jelly
 
-class TestEnum(unittest.TestCase):
+from flumotion.common import enum
+from flumotion.common import testsuite
+
+class TestEnum(testsuite.TestCase):
     def testEnumSimple(self):
         en = enum.EnumClass('TestEnum')
         self.assertEquals(en.__name__, 'TestEnum')

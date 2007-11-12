@@ -19,9 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 
-from twisted.trial import unittest
 from twisted.internet import defer
 
 from flumotion.admin import multi
@@ -29,7 +28,7 @@ from flumotion.common import connection
 from flumotion.twisted import pb
 
 
-class MultiAdminTest(common.TestCaseWithManager):
+class MultiAdminTest(testsuite.TestCaseWithManager):
     def testConstructor(self):
         model = multi.MultiAdminModel()
 

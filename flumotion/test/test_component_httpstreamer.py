@@ -21,14 +21,11 @@
 
 from twisted.trial import unittest
 
-import common
-
-from twisted.python import failure
-from twisted.internet import defer
-
+from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer import http
 
-class TestOldProperties(unittest.TestCase):
+
+class TestOldProperties(testsuite.TestCase):
     def setUp(self):
         # config and properties copied from an actual log file, which
         # explains the unicode keys

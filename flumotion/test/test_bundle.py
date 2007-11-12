@@ -21,7 +21,7 @@
 
 from twisted.trial import unittest
 
-import common
+from flumotion.common import testsuite
 
 from flumotion.common import bundle
 import tempfile
@@ -31,7 +31,7 @@ import zipfile
 import md5
 import time
 
-class TestBundler(unittest.TestCase):
+class TestBundler(testsuite.TestCase):
     # everything we need to set up the test environment
     def setUp(self):
         # create test file
@@ -117,7 +117,7 @@ class TestBundler(unittest.TestCase):
         os.unlink(path)
 
 # we test the Unbundler using the Bundler, should be enough
-class TestUnbundler(unittest.TestCase):
+class TestUnbundler(testsuite.TestCase):
 
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
@@ -165,7 +165,7 @@ class TestUnbundler(unittest.TestCase):
         two = open(newfile, "r").read()
         self.assertEquals(one, two)
 
-class TestBundlerBasket(unittest.TestCase):
+class TestBundlerBasket(testsuite.TestCase):
     # everything we need to set up the test environment
     def setUp(self):
         # create test files

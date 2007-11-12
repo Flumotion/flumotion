@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_testclasses -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -19,12 +19,26 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from twisted.internet import reactor, defer
 from twisted.spread import pb
+from twisted.internet import reactor, defer
+from twisted.trial import unittest
 
 from flumotion.common import log
+from flumotion.configure import configure
+
+class TestCase(unittest.TestCase):
+
+    # TestCase in Twisted 2.0 doesn't define failUnlessFailure method.
+    if not hasattr(unittest.TestCase, 'failUnlessFailure'):
+        def failUnlessFailure(self, deferred, *expectedFailures):
+            def _cb(result):
+                self.fail("did not catch an error, instead got %r" %
+                          (result,))
+            def _eb(failure):
+                failure.trap(*expectedFailures)
+                return failure.value
+            return deferred.addCallbacks(_cb, _eb)
+
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
@@ -71,11 +85,14 @@ class TestClient(pb.Referenceable):
         # called by the server to send us an object
         self.object = object
 
+
 class TestAdmin(TestClient):
     type = 'admin'
 
+
 class TestWorker(TestClient):
     type = 'worker'
+
 
 class TestManagerRoot(pb.Root, log.Loggable):
     logCategory = "testmanagerroot"
@@ -91,6 +108,7 @@ class TestManagerRoot(pb.Root, log.Loggable):
     def remote_receive(self, object):
         # called by the client to send us an object
         self.object = object
+
 
 class TestManager:
     def run(self, rootClass):
@@ -113,6 +131,7 @@ class TestManager:
         Stop the server.
         """
         return self._p.stopListening()
+
 
 class TestPB(log.Loggable):
     """
@@ -152,4 +171,61 @@ class TestPB(log.Loggable):
         self.debug('receiving object %r' % object)
         d = self.manager.root.clientReference.callRemote('receive', object)
         d.addCallback(lambda r: self.client.object)
+        return d
+
+
+class TestCaseWithManager(TestCase):
+    def setUp(self):
+        from flumotion.twisted import pb
+        from flumotion.common import config, server, connection
+        from flumotion.manager import manager
+        from StringIO import StringIO
+
+        managerConf = """
+        <planet>
+        <manager name="planet">
+            <host>localhost</host>
+            <port>0</port>
+            <transport>tcp</transport>
+            <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
+              <property name="data"><![CDATA[
+        user:PSfNpHTkpTx1M
+        ]]></property>
+            </component>
+          </manager>
+        </planet>
+        """
+
+        conf = config.ManagerConfigParser(StringIO(managerConf)).manager
+        self.vishnu = manager.Vishnu(conf.name,
+                                     unsafeTracebacks=True)
+        self.vishnu.loadManagerConfigurationXML(StringIO(managerConf))
+        s = server.Server(self.vishnu)
+        if conf.transport == "ssl":
+            p = s.startSSL(conf.host, conf.port, conf.certificate,
+                           configure.configdir)
+        elif conf.transport == "tcp":
+            p = s.startTCP(conf.host, conf.port)
+        self.tport = p
+        self.port = p.getHost().port
+        i = connection.PBConnectionInfo('localhost', self.port,
+                                        conf.transport == 'ssl',
+                                        pb.Authenticator(username='user',
+                                                         password='test'))
+        self.connectionInfo = i
+
+    def _flushErrors(self, *types):
+        # This bit about log flushing seems to be necessary with twisted < 2.5.
+        try:
+            self.flushLoggedErrors(*types)
+        except AttributeError:
+            from twisted.python import log as tlog
+            tlog.flushErrors(*types)
+
+    def tearDown(self):
+        from flumotion.common import errors
+        self._flushErrors(errors.NotAuthenticatedError)
+
+        d = self.vishnu.shutdown()
+        d.addCallback(lambda _: self.tport.stopListening())
         return d

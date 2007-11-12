@@ -22,17 +22,12 @@
 import os
 import tempfile
 
-import common
-
 from twisted.internet import defer
-from twisted.trial import unittest
-from twisted.web import server, resource, http
+from twisted.web import server, http
 
+from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import file
-
 from flumotion.test import test_http
-
-from twisted.web import http
 
 
 # FIXME: maybe merge into test_http's fake request ?
@@ -63,7 +58,7 @@ class FakeComponent:
     def startAuthentication(self, request):
         return defer.succeed(None)
 
-class TestTextFile(unittest.TestCase):
+class TestTextFile(testsuite.TestCase):
     def setUp(self):
         fd, self.path = tempfile.mkstemp()
         os.write(fd, 'a text file')
@@ -177,7 +172,7 @@ class TestTextFile(unittest.TestCase):
             http.PARTIAL_CONTENT, '', 4)
         return fr.finishDeferred
 
-class TestDirectory(unittest.TestCase):
+class TestDirectory(testsuite.TestCase):
     def setUp(self):
         self.path = tempfile.mkdtemp()
         h = open(os.path.join(self.path, 'test.flv'), 'w')

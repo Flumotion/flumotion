@@ -21,15 +21,11 @@
 
 from twisted.trial import unittest
 
-import common
-
-
-# test importing modules for every component in the registry
-
+from flumotion.common import testsuite
 from flumotion.common import registry, log, reflectcall
-from flumotion.job import job
 
-class TestInit(unittest.TestCase):
+
+class TestInit(testsuite.TestCase):
     def testInit(self):
         r = registry.getRegistry()
         components = [c.getType() for c in r.getComponents()]

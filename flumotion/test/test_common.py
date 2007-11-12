@@ -20,18 +20,16 @@
 # Headers in this file shall remain intact.
 
 import os
-import sys
 import time
 import tempfile
 
-from twisted.trial import unittest
-from twisted.spread import pb
-from twisted.internet import reactor, address
+from twisted.internet import address
 from zope.interface import implements,Interface
 
 from flumotion.common import common
+from flumotion.common import testsuite
 
-class TestFormatStorage(unittest.TestCase):
+class TestFormatStorage(testsuite.TestCase):
     def testBytes(self):
         value = 4
         assert common.formatStorage(value) == "4.00 "
@@ -67,7 +65,7 @@ class TestFormatStorage(unittest.TestCase):
         value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.1529 E"
 
-class TestFormatTime(unittest.TestCase):
+class TestFormatTime(testsuite.TestCase):
     def testFractionalSecond(self):
         value = 1.1
         self.assertEquals(common.formatTime(value, fractional=2),
@@ -125,7 +123,7 @@ class B:
 
 class C: pass
 
-class TestMergeImplements(unittest.TestCase):
+class TestMergeImplements(testsuite.TestCase):
     def testTwoImplements(self):
         self.assertEquals(common.mergeImplements(A, B), (I1, I2))
 
@@ -138,7 +136,7 @@ class TestMergeImplements(unittest.TestCase):
     def testBothWithout(self):
         self.assertEquals(common.mergeImplements(C, C), ( ))
 
-class TestVersion(unittest.TestCase):
+class TestVersion(testsuite.TestCase):
     def testVersion(self):
         self.failUnless(common.version('abinary'))
 
@@ -149,7 +147,7 @@ class TestVersion(unittest.TestCase):
         self.assertEquals(common.versionTupleToString((1, 2, 3, 0,)), "1.2.3")
         self.assertEquals(common.versionTupleToString((1, 2, 3, 1,)), "1.2.3.1")
 
-class TestArgRepr(unittest.TestCase):
+class TestArgRepr(testsuite.TestCase):
     def testEmpty(self):
         self.assertEqual(common.argRepr(), '')
 
@@ -161,7 +159,7 @@ class TestArgRepr(unittest.TestCase):
         self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
         self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
 
-class TestComponentPath(unittest.TestCase):
+class TestComponentPath(testsuite.TestCase):
     def testPath(self):
         self.assertEqual(common.componentId('Adam', 'Cain'), '/Adam/Cain')
 
@@ -173,7 +171,7 @@ class TestComponentPath(unittest.TestCase):
         self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
         self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
 
-class TestEnsureDir(unittest.TestCase):
+class TestEnsureDir(testsuite.TestCase):
     def testNonExisting(self):
         self.tempdir = tempfile.mkdtemp()
         os.system("rm -r %s" % self.tempdir)
@@ -184,7 +182,7 @@ class TestEnsureDir(unittest.TestCase):
         common.ensureDir(self.tempdir, "a description")
         os.system("rm -r %s" % self.tempdir)
 
-class TestPid(unittest.TestCase):
+class TestPid(testsuite.TestCase):
     def testAll(self):
         pid = common.getPid('test', 'default')
         self.failIf(pid)
@@ -194,7 +192,7 @@ class TestPid(unittest.TestCase):
         self.assertEquals(os.getpid(), pid)
         common.deletePidFile('test', 'default')
 
-class TestAddress(unittest.TestCase):
+class TestAddress(testsuite.TestCase):
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
 
@@ -204,7 +202,7 @@ class TestAddress(unittest.TestCase):
     def testGetPort(self):
         self.failUnlessEqual(common.addressGetPort(self.address), '8000')
 
-class TestProcess(unittest.TestCase):
+class TestProcess(testsuite.TestCase):
     def testTermPid(self):
         ret = os.fork()
         if ret == 0:
@@ -235,12 +233,12 @@ class TestProcess(unittest.TestCase):
             # now that it's gone, it should fail
             self.failIf(common.killPid(ret))
 
-class TestObjRepr(unittest.TestCase):
+class TestObjRepr(testsuite.TestCase):
     def testMe(self):
         self.assertEquals(common.objRepr(self),
             'flumotion.test.test_common.TestObjRepr')
 
-class TestPathToModule(unittest.TestCase):
+class TestPathToModule(testsuite.TestCase):
     def testPaths(self):
         tests = {
             'flumotion/common/common.py': 'flumotion.common.common',
@@ -254,7 +252,7 @@ class TestPathToModule(unittest.TestCase):
             self.assertEquals(common.pathToModuleName(path), module,
                 "path %s did not give end module %s" % (path, module))
 
-class TestCompareVersions(unittest.TestCase):
+class TestCompareVersions(testsuite.TestCase):
     def testBadVersion(self):
         self.assertRaises(ValueError, common.compareVersions, "no", "version")
 
@@ -296,7 +294,7 @@ class InitD(InitC):
     def init(self, *args, **kwargs):
         self.inited.append((InitD, args, kwargs))
 
-class TestInitMixin(unittest.TestCase):
+class TestInitMixin(testsuite.TestCase):
     def testInitA(self):
         self.assertEquals(InitA().inited, [])
 

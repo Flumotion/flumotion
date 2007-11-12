@@ -19,12 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-import common
-from twisted.trial import unittest
-
-from twisted.internet import reactor, defer
-
+from flumotion.common import testsuite
 from flumotion.worker import worker
+
 
 class FakeOptions:
     def __init__(self):
@@ -35,6 +32,6 @@ class FakeOptions:
         self.randomFeederports = False
         self.name = 'fakeworker'
 
-class TestBrain(unittest.TestCase):
+class TestBrain(testsuite.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())

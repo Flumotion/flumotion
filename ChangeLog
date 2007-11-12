@@ -1,3 +1,14 @@
+2007-11-12  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/testsuite.py (TestCase): New class with backwards
+	compatibility API for twisted 2.0.01
+
+	* flumotion/test/__init__.py: New file, move everything from f.t.common
+	here
+
+	* flumotion/common/testsuite.py: New file with a TestCase and the
+	old parts of f.t.testclasses.
+
 2007-11-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py

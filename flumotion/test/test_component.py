@@ -19,16 +19,13 @@
 
 # Headers in this file shall remain intact.
 
+import gobject
 from twisted.trial import unittest
 
-import common
-
-from twisted.python import failure
-from twisted.internet import defer
-
-from flumotion.common import errors, planet
+from flumotion.common import testsuite
+from flumotion.common import errors
 from flumotion.component.feedcomponent import ParseLaunchComponent
-from flumotion.twisted.defer import defer_generator_method
+
 
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
@@ -64,7 +61,7 @@ class PipelineTest(ParseLaunchComponent):
     def set_pipeline(self, pipeline):
         self.pipeline = pipeline
 
-class TestExpandElementNames(unittest.TestCase):
+class TestExpandElementNames(testsuite.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
 
@@ -75,7 +72,7 @@ class TestExpandElementNames(unittest.TestCase):
         self.assertRaises(TypeError, self.p.parse_pipeline,
                           '@ this:is:wrong @ ! because ! @')
 
-class TestParser(unittest.TestCase):
+class TestParser(testsuite.TestCase):
     def parse(self, unparsed, correctresultproc, eaters=None, feeders=None):
         comp = PipelineTest(eaters, feeders, unparsed)
         result = comp.parse_pipeline(unparsed)

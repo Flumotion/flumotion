@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 from twisted.trial import unittest
 
 import crypt
@@ -32,7 +32,7 @@ from flumotion.common import errors
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredCrypt = credentials.UsernameCryptPasswordCrypt
 
-class TestFlexibleWithPassword(unittest.TestCase):
+class TestFlexibleWithPassword(testsuite.TestCase):
     def setUp(self):
         self.checker = checkers.FlexibleCredentialsChecker(user='test')
 
@@ -63,7 +63,7 @@ class TestFlexibleWithPassword(unittest.TestCase):
         d.addErrback(credPlaintextWrongErrback)
         return d
 
-class TestFlexibleWithoutPassword(unittest.TestCase):
+class TestFlexibleWithoutPassword(testsuite.TestCase):
     def setUp(self):
         self.checker = checkers.FlexibleCredentialsChecker(user='test')
         self.checker.allowPasswordless(True)
@@ -87,7 +87,7 @@ class TestFlexibleWithoutPassword(unittest.TestCase):
         d.addCallback(credPlaintextCorrectWithIdCallback)
         return d
 
-class TestCryptCheckerInit(unittest.TestCase):
+class TestCryptCheckerInit(testsuite.TestCase):
     def setUp(self):
         self.checker = checkers.CryptChecker(user='qi1Lftt0GZC0o')
 
@@ -100,7 +100,7 @@ class TestCryptCheckerInit(unittest.TestCase):
         d.addCallback(credPlaintextCallback)
         return d
 
-class TestCryptCheckerAddUser(unittest.TestCase):
+class TestCryptCheckerAddUser(testsuite.TestCase):
     def setUp(self):
         username = 'user'
         cryptPassword = crypt.crypt('test', 'qi')

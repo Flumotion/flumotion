@@ -19,16 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-import common
 import StringIO
-
-from twisted.trial import unittest
 
 from flumotion.common.netutils import ipv4StringToInt, ipv4IntToString
 from flumotion.common.netutils import RoutingTable
+from flumotion.common import testsuite
 
 
-class TestIpv4Parse(unittest.TestCase):
+class TestIpv4Parse(testsuite.TestCase):
     def assertParseInvariant(self, ipv4String):
         self.assertEquals(ipv4IntToString(ipv4StringToInt(ipv4String)),
                           ipv4String)
@@ -57,7 +55,7 @@ class TestIpv4Parse(unittest.TestCase):
         self.assertParseFails('1.1.1.256')
         self.assertParseFails('1.1.1.-3')
 
-class TestRoutingTable(unittest.TestCase):
+class TestRoutingTable(testsuite.TestCase):
     def testAddRemove(self):
         net = RoutingTable()
         net.addSubnet('foo', '192.168.0.0', 24)

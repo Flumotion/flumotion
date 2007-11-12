@@ -19,13 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
+from flumotion.common import testsuite
 from flumotion.common.options import OptionGroup, OptionParser
 from flumotion.common.log import getLogSettings, setLogSettings
 
-import common
 
-class TestOptions(unittest.TestCase):
+class TestOptions(testsuite.TestCase):
     def setUp(self):
         self.log_settings = getLogSettings()
 

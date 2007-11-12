@@ -19,24 +19,21 @@
 
 # Headers in this file shall remain intact.
 
-import common
-from twisted.trial import unittest
-
 import crypt
 
+from twisted.cred import portal
 from twisted.internet import defer, reactor
 from twisted.python import log as tlog
 from twisted.spread import pb as tpb
-from twisted.cred import credentials as tcredentials
-from twisted.cred import checkers as tcheckers
-from twisted.cred import portal
+from twisted.trial import unittest
 from zope.interface import implements
 
-from flumotion.twisted import checkers, credentials, pb
+from flumotion.common import testsuite
+from flumotion.common import keycards, log, errors
+from flumotion.component.bouncers import htpasswdcrypt, saltsha256
+from flumotion.twisted import checkers, pb
 from flumotion.twisted import portal as fportal
 
-from flumotion.common import keycards, log, interfaces, errors
-from flumotion.component.bouncers import htpasswdcrypt, saltsha256
 
 htpasswdcryptConf = {
     'name':  'testbouncer',
@@ -109,7 +106,7 @@ class FakeBroker(tpb.Broker):
 
 # our test for twisted's challenger
 # this is done for comparison with our challenger
-class TestTwisted_PortalAuthChallenger(unittest.TestCase):
+class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
     def setUp(self):
         # PB server creates a challenge
         self.challenge = tpb.challenge()
@@ -135,7 +132,7 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         return d
 
 ### SHINY NEW FPB
-class Test_BouncerWrapper(unittest.TestCase):
+class Test_BouncerWrapper(testsuite.TestCase):
     def setUp(self):
         broker = FakeBroker()
 
@@ -268,7 +265,7 @@ class Test_BouncerWrapper(unittest.TestCase):
         d.addCallback(uacpccTamperCallback)
         return d
 
-class Test_FPortalRoot(unittest.TestCase):
+class Test_FPortalRoot(testsuite.TestCase):
     def setUp(self):
         self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), 'bouncer')
         self.root = pb._FPortalRoot(self.bouncerPortal)
@@ -278,7 +275,7 @@ class Test_FPortalRoot(unittest.TestCase):
         self.failUnless(isinstance(root, pb._BouncerWrapper))
         self.assertEquals(root.broker, 'a')
 
-class TestAuthenticator(unittest.TestCase):
+class TestAuthenticator(testsuite.TestCase):
     def testIssueNoInfo(self):
         # not setting any useful auth info on the authenticator does not
         # allow us to issue a keycard
@@ -304,7 +301,7 @@ class TestAuthenticator(unittest.TestCase):
 
 # time for the big kahuna
 # base class so we can use different bouncers
-class Test_FPBClientFactory(unittest.TestCase):
+class Test_FPBClientFactory(testsuite.TestCase):
 
     def setUp(self):
         self.realm = FakeFRealm()
@@ -388,7 +385,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         d = factory.login(self.authenticator, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
 
-        def OkCallback(keycard):
+        def uacpccOkCallback(keycard):
             # get result
             self.assertEquals(keycard.state, keycards.REQUESTING)
             # respond to challenge

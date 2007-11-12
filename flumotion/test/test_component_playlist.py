@@ -19,18 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
 import time
 import tempfile
 
-from twisted.python import failure
-from twisted.internet import defer, reactor
+from twisted.trial import unittest
 
 from flumotion.component.producers.playlist import playlistparser
 from flumotion.common import fxml
+from flumotion.common import testsuite
+
 
 class FakeProducer(object):
     position = -1
@@ -58,7 +55,7 @@ class FakeDiscoverer(object):
     connect = noop
     discover = noop
 
-class TestPlaylist(unittest.TestCase):
+class TestPlaylist(testsuite.TestCase):
     def setUp(self):
         producer = FakeProducer()
 
@@ -167,7 +164,7 @@ class TestPlaylist(unittest.TestCase):
         self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
         self.checkItems(2)
 
-class TestPlaylistXMLParser(unittest.TestCase):
+class TestPlaylistXMLParser(testsuite.TestCase):
     def setUp(self):
         # plant a fake Discoverer class - we're _not_ testing its
         # functionality here

@@ -22,7 +22,7 @@
 import os
 
 from twisted.internet import reactor
-from twisted.trial import unittest
+from flumotion.common import testsuite
 
 try:
     import gobject
@@ -131,7 +131,7 @@ def pause():
     timeout_add(lambda: 0)
 
 # FIXME: maybe move methods above to this class instead ?
-class GtkTestCase(unittest.TestCase):
+class GtkTestCase(testsuite.TestCase):
     def process(self):
         """
         Make sure all previous timeouts are processed, so that all state

@@ -19,17 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-from StringIO import StringIO
-
-from twisted.trial import unittest
-
+from flumotion.common import errors
+from flumotion.common import testsuite
 from flumotion.component.base import http
 
-from flumotion.common import errors
 
-import common
-
-class TestLogFilter(unittest.TestCase):
+class TestLogFilter(testsuite.TestCase):
     def testSimpleFilter(self):
         filterdef = "192.168.1.0/24"
         filter = http.LogFilter()

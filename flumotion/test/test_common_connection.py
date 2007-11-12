@@ -19,13 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from twisted.trial import unittest
-
 from flumotion.common import connection
+from flumotion.common import testsuite
 
-class TestConnection(unittest.TestCase):
+class TestConnection(testsuite.TestCase):
     def assertParseEquals(self, _in, out, **kwargs):
         self.assertEquals(str(connection.parsePBConnectionInfo(_in,
                                                                **kwargs)),

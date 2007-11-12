@@ -20,12 +20,12 @@
 # Headers in this file shall remain intact.
 
 from twisted.internet import defer
-from twisted.trial import unittest
 from twisted.web import server
 
 from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.consumers.httpstreamer import resources
-from flumotion.common import interfaces, keycards, log
+from flumotion.common import keycards, log
+from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
 
 # From twisted/test/proto_helpers.py
@@ -124,7 +124,7 @@ class FakeStreamer:
     def debug(self, *args): pass
     def getName(self): return "fakestreamer"
 
-class TestHTTPStreamingResource(unittest.TestCase):
+class TestHTTPStreamingResource(testsuite.TestCase):
     # helpers
     def deferAssertUnauthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
@@ -267,7 +267,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         #assert request.headers['Date'] == 'FakeDate'
         #assert request.headers['Content-Type'] == 'application/x-ogg'
 
-class TestHTTPRoot(unittest.TestCase):
+class TestHTTPRoot(testsuite.TestCase):
     def testRenderRootStreamer(self):
         # a streamer that is at /
         root = resources.HTTPRoot()

@@ -19,13 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from twisted.trial import unittest
-
-from twisted.web import server
-
+from flumotion.common import testsuite
 from flumotion.component.misc.porter import porter
+
 
 class FakeTransport:
     connected = True
@@ -73,7 +69,7 @@ class FakeAvatar:
     def isAttached(self):
         return True
 
-class TestPorterProtocol(unittest.TestCase):
+class TestPorterProtocol(testsuite.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
@@ -96,7 +92,7 @@ class TestPorterProtocol(unittest.TestCase):
         self.failIf(self.t.connected)
 
 
-class TestHTTPPorterProtocol(unittest.TestCase):
+class TestHTTPPorterProtocol(testsuite.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
@@ -132,7 +128,7 @@ class TestHTTPPorterProtocol(unittest.TestCase):
         self.failUnless(self.p.foundDestination)
         self.failIf(self.t.written)
 
-class TestHTTPPorterProtocolParser(unittest.TestCase):
+class TestHTTPPorterProtocolParser(testsuite.TestCase):
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)

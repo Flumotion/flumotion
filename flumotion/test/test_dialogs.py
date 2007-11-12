@@ -19,18 +19,16 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.trial import unittest
-
-import common
-
 import gobject
 import gtk
 
 from flumotion.admin.gtk import dialogs
+from flumotion.common import testsuite
+
 
 INTERVAL = 100 # in ms
 
-class TestProgressDialog(unittest.TestCase):
+class TestProgressDialog(testsuite.TestCase):
     def setUp(self):
         self.window = gtk.Window()
 
@@ -56,7 +54,7 @@ class TestProgressDialog(unittest.TestCase):
         gobject.timeout_add(5 * INTERVAL, stop, dialog)
         gtk.main()
 
-class TestPropertyChangeDialog(unittest.TestCase):
+class TestPropertyChangeDialog(testsuite.TestCase):
     def setUp(self):
         self.window = gtk.Window()
 
@@ -95,7 +93,7 @@ class TestPropertyChangeDialog(unittest.TestCase):
         dialog._close.emit('clicked')
         gtk.main_quit()
 
-class TestErrorDialog(unittest.TestCase):
+class TestErrorDialog(testsuite.TestCase):
     def setUp(self):
         self.window = gtk.Window()
 

@@ -19,14 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-
-from twisted.trial import unittest
-
 from twisted.internet import defer, reactor
-from flumotion.twisted.defer import defer_generator, RetryingDeferred
-from flumotion.common import errors
 
-class TestDefer(unittest.TestCase):
+from flumotion.common import errors
+from flumotion.common import testsuite
+from flumotion.twisted.defer import defer_generator, RetryingDeferred
+
+
+class TestDefer(testsuite.TestCase):
     result = None
     error = None
 
@@ -196,7 +196,7 @@ class TestDefer(unittest.TestCase):
         d.addCallback(checkResult)
         return d
 
-class TestRetryingDeferred(unittest.TestCase):
+class TestRetryingDeferred(testsuite.TestCase):
     def testSimple(self):
         def genDef():
             return defer.succeed(True)

@@ -19,23 +19,16 @@
 
 # Headers in this file shall remain intact.
 
+import locale
+import gettext
 import os
-import sys
-import time
-import tempfile
 
-from twisted.trial import unittest
-from twisted.spread import pb
-from twisted.internet import reactor, address
-
-from flumotion.common import common
+from flumotion.common import testsuite
 from flumotion.configure import configure
 
-import gettext
-import locale
 
 # marking/translating for singulars
-from gettext import gettext as _
+_ = gettext.gettext
 def N_(format): return format
 
 # marking for plurals can only be done with a "fake" ngettext
@@ -47,7 +40,7 @@ def N_(format): return format
 def ngettext(singular, plural, count): return (singular, plural, count)
 
 # this test uses the class-based gettext API
-class TestSingularClassbased(unittest.TestCase):
+class TestSingularClassbased(testsuite.TestCase):
     def setUp(self):
         localedir = os.path.join(configure.localedatadir, 'locale')
         mo = gettext.find("flumotion", localedir, ["nl_NL"])
@@ -68,7 +61,7 @@ class TestSingularClassbased(unittest.TestCase):
 # these tests use the regular gettext API
 
 # helper class for gettext API tests
-class TestGettext(unittest.TestCase):
+class TestGettext(testsuite.TestCase):
     def setUp(self):
         self.oldlocaledir = gettext.bindtextdomain('flumotion')
         self.oldlocale = locale.setlocale(locale.LC_MESSAGES)

@@ -24,10 +24,11 @@ from datetime import datetime, timedelta
 
 from twisted.trial import unittest
 
+from flumotion.common import testsuite
 from flumotion.component.base import scheduler
 
 
-class EventTest(unittest.TestCase):
+class EventTest(testsuite.TestCase):
     def testSimple(self):
         now = scheduler.now()
         start = now - timedelta(hours=1)
@@ -86,7 +87,7 @@ class EventTest(unittest.TestCase):
         self.assertEquals(event.start, now.replace(tzinfo=scheduler.LOCAL))
 
 
-class SchedulerTest(unittest.TestCase):
+class SchedulerTest(testsuite.TestCase):
     def testInstantiate(self):
         scheduler.Scheduler()
 

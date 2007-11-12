@@ -19,14 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
-from twisted.trial import unittest
 from twisted.internet import defer
 from twisted.spread import pb
 
-from flumotion.manager import worker, manager
 from flumotion.common import log, interfaces
+from flumotion.common import testsuite
+from flumotion.manager import worker
+
 
 class FakeTransport:
     def getPeer(self):
@@ -97,7 +96,7 @@ class FakeVishnu:
     def workerDetached(self, avatar):
         pass
 
-class TestHeaven(unittest.TestCase):
+class TestHeaven(testsuite.TestCase):
     def testConstructor(self):
         h = worker.WorkerHeaven(None)
         assert isinstance(h, worker.WorkerHeaven)
@@ -113,7 +112,7 @@ class TestHeaven(unittest.TestCase):
         h = worker.WorkerHeaven(FakeVishnu())
         mind = FakeWorkerMind(self, 'testworker')
         from flumotion.manager.manager import Dispatcher
-        dispatcher = manager.Dispatcher(lambda x, y: defer.succeed(None))
+        dispatcher = Dispatcher(lambda x, y: defer.succeed(None))
         dispatcher.registerHeaven(h, interfaces.IWorkerMedium)
         d = dispatcher.requestAvatar('foo', None, mind, pb.IPerspective,
                                      interfaces.IWorkerMedium)

@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-
 import os
 import signal
 import tempfile
+
 from twisted.internet import defer, error, reactor
-from twisted.trial import unittest
+
+from flumotion.common import testsuite
 from flumotion.twisted import integration
 
 
@@ -44,20 +45,7 @@ def _call_in_reactor(proc):
         pass
     return test
 
-class CompatTestCase(unittest.TestCase):
-    if not getattr(unittest.TestCase, 'failUnlessFailure', None):
-        # FIXME: T2.0
-        def failUnlessFailure(self, d, type):
-            def unexpected(res):
-                self.fail('Expected exception %s, but got '
-                          'result %r.' % (type, res))
-                raise AssertionError
-            def errback(failure):
-                failure.trap(type)
-            d.addCallbacks(unexpected, errback)
-            d.addErrback(unexpected)
-
-class IntegrationProcessTest(CompatTestCase):
+class IntegrationProcessTest(testsuite.TestCase):
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
 
@@ -112,7 +100,7 @@ class IntegrationProcessTest(CompatTestCase):
     testKill = _call_in_reactor(testKill)
 
 
-class IntegrationPlanGenerationTest(CompatTestCase):
+class IntegrationPlanGenerationTest(testsuite.TestCase):
     def assertPlansEqual(self, expected, got):
         if got != expected:
             # pretty-print first
@@ -146,7 +134,7 @@ class IntegrationPlanGenerationTest(CompatTestCase):
                                          (plan.vm.wait, process, None)])
         plan._cleanOutputDir()
 
-class IntegrationPlanExecuteTest(CompatTestCase):
+class IntegrationPlanExecuteTest(testsuite.TestCase):
     def testTransientProcess(self):
         plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')
@@ -190,7 +178,7 @@ class IntegrationPlanExecuteTest(CompatTestCase):
         return d
 
 # the decorator handles compat issues
-class IntegrationTestDecoratorTest(CompatTestCase):
+class IntegrationTestDecoratorTest(testsuite.TestCase):
     #@integration.test <- FIXME: P2.3
     def testTransientProcess(self, plan):
         p = plan.spawn('echo', 'foo')

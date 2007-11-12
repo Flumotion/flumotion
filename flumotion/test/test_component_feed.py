@@ -19,23 +19,19 @@
 
 # Headers in this file shall remain intact.
 
-
-import common
-
 import errno
 import os
 
-from twisted.trial import unittest
 from twisted.internet import reactor, defer, main
 from twisted.python import log as tlog
 from twisted.python import failure
 
-from flumotion.twisted import pb as fpb
+from flumotion.common import testsuite
 from flumotion.common import log, errors
-from flumotion.component.bouncers import htpasswdcrypt
-
-from flumotion.worker import feedserver
 from flumotion.component import feed
+from flumotion.component.bouncers import htpasswdcrypt
+from flumotion.twisted import pb as fpb
+from flumotion.worker import feedserver
 
 
 class FakeWorkerBrain(log.Loggable):
@@ -89,7 +85,7 @@ class FeedServer(feedserver.FeedServer):
 
 # these tests test both flumotion.worker.feedserver and
 # flumotion.component.feed.
-class FeedTestCase(unittest.TestCase, log.Loggable):
+class FeedTestCase(testsuite.TestCase, log.Loggable):
     bouncerconf = {'name': 'testbouncer',
                    'plugs': {},
                    # user:test

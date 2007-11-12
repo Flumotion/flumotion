@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from flumotion.common import testsuite
 from twisted.trial import unittest
 
-from flumotion.manager import admin, component
+from flumotion.manager import admin
 
 # our test for twisted's challenger
 # this is done for comparison with our challenger
@@ -54,7 +54,7 @@ class FakeMind:
     def notifyOnDisconnect(self, proc):
         pass
 
-class TestAdminAvatar(unittest.TestCase):
+class TestAdminAvatar(testsuite.TestCase):
     def setUp(self):
         vishnu = FakeVishnu()
         self.heaven = FakeHeaven(vishnu)

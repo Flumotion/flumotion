@@ -19,17 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-import common
-from twisted.trial import unittest
-
+import StringIO
 import os
 import warnings
 import tempfile
 warnings.filterwarnings('ignore', category=FutureWarning)
 
+from flumotion.common import testsuite
 from flumotion.common import registry, fxml, common
 
-class TestRegistry(unittest.TestCase):
+
+class TestRegistry(testsuite.TestCase):
     def setUp(self):
         self.reg = registry.ComponentRegistry()
         self.reg.clean()
@@ -248,7 +248,6 @@ class TestRegistry(unittest.TestCase):
         reg = registry.ComponentRegistry()
         reg.clean()
         reg.addFromString(orig)
-        import sys, StringIO
         s = StringIO.StringIO()
         reg.dump(s)
         s.seek(0, 0)
@@ -508,7 +507,7 @@ class TestRegistry(unittest.TestCase):
 """
         self._compareRegistryAfterDump(xml, target)
 
-class TestComponentEntry(unittest.TestCase):
+class TestComponentEntry(testsuite.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
@@ -542,7 +541,7 @@ def rmdir(root):
             os.remove(filename)
     os.rmdir(root)
 
-class TestFindComponents(unittest.TestCase):
+class TestFindComponents(testsuite.TestCase):
     def setUp(self):
         self.reg = registry.ComponentRegistry()
         self.reg.clean()

@@ -19,14 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-
-from datetime import datetime, timedelta
-
-from twisted.trial import unittest
-
+from flumotion.common import testsuite
 from flumotion.component.base import watcher
 
 
-class WatcherTest(unittest.TestCase):
+class WatcherTest(testsuite.TestCase):
     def testInstantiate(self):
         watcher.BaseWatcher(30)

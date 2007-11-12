@@ -19,11 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-import common
-
 from flumotion.component.bouncers import component
+from flumotion.test import bouncertest
 
-import bouncertest
 
 class FakeBouncerMedium(bouncertest.FakeMedium, component.BouncerMedium):
     def __init__(self):

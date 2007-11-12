@@ -21,11 +21,8 @@
 
 from StringIO import StringIO
 
-from twisted.trial import unittest
-
 from flumotion.common import config, registry, errors
-
-import common
+from flumotion.common import testsuite
 
 regchunk = """
 <registry>
@@ -129,7 +126,7 @@ def ConfigXML(string, parser=config.FlumotionConfigXML):
 def ManagerConfigXML(string):
     return ConfigXML(string, config.ManagerConfigParser)
 
-class TestFunctions(unittest.TestCase):
+class TestFunctions(testsuite.TestCase):
     def testBuildEatersDict(self):
         def assertEaters(comptype, l, expected):
             defs = reg.getComponent(comptype)
@@ -155,7 +152,7 @@ class TestFunctions(unittest.TestCase):
                      [(None, 'foo:bar')],
                      {'default': [('foo:bar', 'default')]})
 
-class TestConfig(unittest.TestCase):
+class TestConfig(testsuite.TestCase):
     def testParseEmpty(self):
         conf = ConfigXML('<planet/>')
         self.failIf(conf.getPath())
@@ -1087,7 +1084,7 @@ def AdminConfig(sockets, string):
     f.close()
     return conf
 
-class AdminConfigTest(unittest.TestCase):
+class AdminConfigTest(testsuite.TestCase):
     def testMinimal(self):
         doc = ('<admin>'
                '<plugs>'
@@ -1132,7 +1129,7 @@ class AdminConfigTest(unittest.TestCase):
         self.assertRaises(config.ConfigError,
                           lambda: AdminConfig(('foo.bar',), doc))
 
-class TestDictDiff(unittest.TestCase):
+class TestDictDiff(testsuite.TestCase):
     def assertOND(self, d1, d2, old, new, diff):
         o, n, d = config.dictDiff(d1, d2)
         self.assertEquals(old, o)
