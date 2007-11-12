@@ -1,3 +1,8 @@
+2007-11-12  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py (Webcam.run_checks): Reverse the list of
+	resolution so we get the largest one first instead of last.
+
 2007-11-09  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_component_playlist.py: assertTrue -> failUnless

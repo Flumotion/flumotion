@@ -592,7 +592,7 @@ class Webcam(VideoSource):
             self.combobox_framerate.set_sensitive(True)
             store = gtk.ListStore(str, int, int)
 
-            for w, h in sorted(sizes.keys()):
+            for w, h in sorted(sizes.keys(), reverse=True):
                 store.set(store.append(), 0, '%d x %d' % (w,h),
                           1, w, 2, h)
             self.combobox_size.set_model(store)
