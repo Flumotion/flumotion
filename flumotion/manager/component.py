@@ -418,7 +418,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         conf = self.componentState.get('config')
         ret = {}
-        for feedId, feederName in conf.get('virtual-feeds', {}):
+        for feedId, feederName in conf.get('virtual-feeds', {}).items():
             vComp, vFeed = common.parseFeedId(feedId)
             ffid = common.fullFeedId(self.getParentName(), vComp, vFeed)
             ret[ffid] = (self, feederName)
@@ -664,7 +664,7 @@ class FeedMap(object, log.Loggable):
             for feederName in comp.getFeeders():
                 self.feeds.add(comp.getFullFeedId(feederName),
                                (comp, feederName))
-            for ffid, pair in comp.getVirtualFeeds():
+            for ffid, pair in comp.getVirtualFeeds().items():
                 self.feeds.add(ffid, pair)
                 
         for eater in self.avatars.values():

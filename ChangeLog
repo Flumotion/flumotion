@@ -1,5 +1,11 @@
 2007-11-12  Andy Wingo  <wingo@pobox.com>
 
+	* conf/managers/default/failover.xml: New file, demonstrates
+	failover.
+
+	* flumotion/manager/component.py (ComponentAvatar.getVirtualFeeds)
+	(FeedMap._recalc): Fix.
+
 	* flumotion/component/base/admin_gtk.py
 	(BaseAdminGtk.gettext_domain): Set to None instead of 'flumotion'
 	so that we hit the non-translated codepath; otherwise some kind of

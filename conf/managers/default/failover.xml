@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <!-- production line 1 -->
+
+    <component name="producer-video1" project="flumotion" type="videotest-producer" version="0.5.0.1" worker="localhost">
+
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+
+    <component name="overlay-video1" project="flumotion" type="overlay-converter" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>producer-video1</feed>
+      </eater>
+
+      <property name="cc-logo">True</property>
+      <property name="fluendo-logo">True</property>
+      <property name="height">240</property>
+      <property name="show-text">True</property>
+      <property name="text">Fluendo</property>
+      <property name="width">320</property>
+      <property name="xiph-logo">True</property>
+    </component>
+
+    <component name="encoder-video1" project="flumotion" type="theora-encoder" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>overlay-video1</feed>
+      </eater>
+
+      <property name="bitrate">400000</property>
+      <property name="keyframe-maxdistance">64</property>
+      <property name="noise-sensitivity">1</property>
+      <property name="sharpness">0</property>
+    </component>
+
+    <component name="muxer-video1" project="flumotion" type="ogg-muxer" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>encoder-video1</feed>
+      </eater>
+      <virtual-feed name="production:video" real="default" />
+    </component>
+
+    <!-- production line 2 -->
+
+    <component name="producer-video2" project="flumotion" type="videotest-producer" version="0.5.0.1" worker="localhost">
+
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+
+    <component name="overlay-video2" project="flumotion" type="overlay-converter" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>producer-video2</feed>
+      </eater>
+
+      <property name="cc-logo">True</property>
+      <property name="fluendo-logo">True</property>
+      <property name="height">240</property>
+      <property name="show-text">True</property>
+      <property name="text">Fluendo</property>
+      <property name="width">320</property>
+      <property name="xiph-logo">True</property>
+    </component>
+
+    <component name="encoder-video2" project="flumotion" type="theora-encoder" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>overlay-video2</feed>
+      </eater>
+
+      <property name="bitrate">400000</property>
+      <property name="keyframe-maxdistance">64</property>
+      <property name="noise-sensitivity">1</property>
+      <property name="sharpness">0</property>
+    </component>
+
+    <component name="muxer-video2" project="flumotion" type="ogg-muxer" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>encoder-video2</feed>
+      </eater>
+      <virtual-feed name="production:video" real="default" />
+    </component>
+
+    <!-- streamer eats from a virtual feed -->
+
+    <component name="http-video" project="flumotion" type="http-streamer" version="0.5.0.1" worker="localhost">
+      <eater name="default">
+        <feed>production:video</feed>
+      </eater>
+
+      <property name="burst-on-connect">True</property>
+      <property name="client-limit">500</property>
+      <property name="mount-point">/</property>
+      <property name="port">8802</property>
+    </component>
+
+  </flow>
+</planet>
