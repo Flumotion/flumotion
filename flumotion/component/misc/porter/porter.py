@@ -54,6 +54,7 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         return self.mind != None
 
     def logout(self):
+        self.debug("porter client %s logging out", self.avatarId)
         self.mind = None
 
     def perspective_registerPath(self, path):
@@ -87,8 +88,8 @@ class PorterRealm(log.Loggable):
         self.porter = porter
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        self.log("Avatar requested for avatarId %s, mind %r, interfaces %r" %
-            (avatarId, mind, interfaces))
+        self.log("Avatar requested for avatarId %s, mind %r, interfaces %r",
+                 avatarId, mind, interfaces)
         if pb.IPerspective in interfaces:
             avatar = PorterAvatar(avatarId, self.porter, mind)
             return pb.IPerspective, avatar, avatar.logout

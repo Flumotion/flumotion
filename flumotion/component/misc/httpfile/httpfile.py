@@ -271,7 +271,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                     prefixes=[self.mountPoint])
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
-            self._pbclient.startLogin(creds, self.medium)
+            self._pbclient.startLogin(creds, self._pbclient.medium)
             self.debug("Starting porter login!")
             # This will eventually cause d to fire
             reactor.connectWith(fdserver.FDConnector, self._porterPath,

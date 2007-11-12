@@ -1,3 +1,16 @@
+2007-11-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/misc/porter/porter.py (PorterAvatar.logout)
+	(PorterRealm.requestAvatar): More debugging.
+
+	* conf/managers/default/flows/porter.xml: Add http-server to the
+	mix.
+
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer.do_setup): Pass a valid remote referenceable
+	object when we start to log in. Fixes problem where the porter
+	thinks we logged out.
+
 2007-11-12  Johan Dahlin  <johan@gnome.org>
 
 	* common/epydoc.mk (EPYDOC_ARGS): Remove the --ignore-mismatch-parameter
