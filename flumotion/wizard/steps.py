@@ -41,6 +41,16 @@ from gettext import gettext as _
 from flumotion.common.messages import N_, ngettext
 T_ = messages.gettexter('flumotion')
 
+# Make it run on 2.3
+try:
+    sorted
+except NameError:
+    def sorted(seq, reverse=False):
+        seq = seq[:]
+        seq.sort()
+        if reversed:
+            seq = seq[::-1]
+        return seq
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -545,8 +555,7 @@ class Webcam(VideoSource):
             store = gtk.ListStore(str, object)
             for d in self._sizes[(w,h)]:
                 num, denom = d['framerate']
-                store.set(store.append(), 0, '%.2f fps' % (1.0*num/denom),
-                          1, d)
+                store.append(['%.2f fps' % (1.0*num/denom), 1])
             # add custom
             self.combobox_framerate.set_model(store)
             self.combobox_framerate.set_active(0)
@@ -593,8 +602,7 @@ class Webcam(VideoSource):
             store = gtk.ListStore(str, int, int)
 
             for w, h in sorted(sizes.keys(), reverse=True):
-                store.set(store.append(), 0, '%d x %d' % (w,h),
-                          1, w, 2, h)
+                store.append(['%d x %d' % (w,h), w, h])
             self.combobox_size.set_model(store)
             self.combobox_size.set_active(0)
         except errors.RemoteRunFailure, e:

@@ -2,6 +2,8 @@
 
 	* flumotion/wizard/steps.py (Webcam.run_checks): Reverse the list of
 	resolution so we get the largest one first instead of last.
+	(FireWire.run_checks): Make it work on 2.3. Use a nicer api to append
+	data to the tree model.
 
 2007-11-09  Johan Dahlin  <johan@gnome.org>
 
