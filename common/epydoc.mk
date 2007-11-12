@@ -1,7 +1,7 @@
 if HAVE_EPYDOC
 
 EPYDOC_HTML = html
-EPYDOC_ARGS = -q --no-frames --html --ignore-param-mismatch
+EPYDOC_ARGS = -q --no-frames --html
 
 MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))
 
