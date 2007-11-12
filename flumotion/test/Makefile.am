@@ -6,7 +6,6 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/test
 
 flumotion_PYTHON =			\
         __init__.py			\
-	testclasses.py			\
 	comptest.py			\
 	gtkunit.py			\
 	realm.py
@@ -60,6 +59,7 @@ EXTRA_DIST = 				\
 	test_manager_manager.py 	\
 	test_manager_worker.py		\
 	test_misc_httpfile.py		\
+	test_options.py			\
 	test_parts.py	 		\
 	test_pb.py	 		\
 	test_pbstream.py		\
