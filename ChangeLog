@@ -1,7 +1,14 @@
 2007-11-12  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/testsuite.py (TestCase): Add a assertFailure
+	alias for failUnlessFailure
+
+	* flumotion/commmon/test_*.py: Use testsuite.TestCase, fix imports
+	to be pep-8 compatible, get rid of sibling imports, remove unused
+	imports. This replaces two old CompatTestCases.
+
 	* flumotion/common/testsuite.py (TestCase): New class with backwards
-	compatibility API for twisted 2.0.01
+	compatibility API for twisted 2.0.x
 
 	* flumotion/test/__init__.py: New file, move everything from f.t.common
 	here

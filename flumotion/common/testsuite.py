@@ -38,7 +38,7 @@ class TestCase(unittest.TestCase):
                 failure.trap(*expectedFailures)
                 return failure.value
             return deferred.addCallbacks(_cb, _eb)
-
+        assertFailure = failUnlessFailure
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
