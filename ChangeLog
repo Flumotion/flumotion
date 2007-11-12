@@ -13,6 +13,10 @@
 
 2007-11-12  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py:
+	Reorder methods, rename to gtk-style namings, mark methods and attributes
+	as private, fix imports etc.
+
 	* common/epydoc.mk (EPYDOC_ARGS): Remove the --ignore-mismatch-parameter
 	argument which is not present in epydoc 3.0, fixes #783
 

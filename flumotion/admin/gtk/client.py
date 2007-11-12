@@ -19,39 +19,36 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import os
-import os.path
 import sys
 
-from gettext import gettext as _
-
 import gobject
-from gtk import gdk
 import gtk
 import gtk.glade
-
-from twisted.internet import reactor, defer
-from twisted.python import rebuild
+from twisted.internet import reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
-from flumotion.admin.gtk import dialogs, parts, message
+from flumotion.admin.gtk import dialogs, parts
 from flumotion.admin.gtk.parts import getComponentLabel
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
-from flumotion.common import errors, log, worker, planet, common, pygobject
+from flumotion.common import errors, log, planet, pygobject
 from flumotion.common import connection
 from flumotion.manager import admin # Register types
-from flumotion.twisted import flavors, reflect, pb as fpb
-from flumotion.ui import icons, trayicon
+from flumotion.twisted import flavors, pb as fpb
+from flumotion.ui import trayicon
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.common import messages
-from flumotion.common.messages import N_
+
+_ = gettext.gettext
 T_ = messages.gettexter('flumotion')
+
 
 class Window(log.Loggable, gobject.GObject):
     '''
@@ -65,63 +62,98 @@ class Window(log.Loggable, gobject.GObject):
     gsignal('connected')
 
     def __init__(self, model):
-        self.__gobject_init__()
+        gobject.GObject.__init__(self)
 
-        self.widgets = {}
-        self.debug('creating UI')
+
         self._trayicon = None
-
-        self.current_component_state = None # its state
-
-        self._create_ui()
-
-        self._append_recent_connections()
-
-        self._disconnected_dialog = None # set to a dialog if we're
-                                         # disconnected
-
+        self._current_component_state = None
+        self._disconnected_dialog = None # set to a dialog when disconnected
         self._planetState = None
         self._components = None # name -> planet.AdminComponentState
+        self._wizard = None
+        self._admin = None
+        self._widgets = {}
+        self._window = None
 
-        self.debug('setting model')
-        self.admin = None
-        self.wizard = None
-        self._setAdminModel(model)
+        self._create_ui()
+        self._append_recent_connections()
+        self._set_admin_model(model)
 
-    def _setAdminModel(self, model):
-        'set the model to which we are a view/controller'
-        # it's ok if we've already been connected
-        if self.admin:
-            self.debug('Connecting to new model %r' % model)
-            if self.wizard:
-                self.wizard.destroy()
+    # Public API
 
-        self.admin = model
+    def stateSet(self, state, key, value):
+        # called by model when state of something changes
+        if not isinstance(state, planet.AdminComponentState):
+            return
 
-        # window gets created after model connects initially, so check
-        # here
-        if self.admin.isConnected():
-            self.admin_connected_cb(model)
+        if key == 'message':
+            self.statusbar.set('main', value)
+        elif key == 'mood':
+            self._set_stop_start_component_sensitive()
+            current = self.components_view.get_selected_name()
+            if value == moods.sleeping.value:
+                if state.get('name') == current:
+                    self._clear_messages()
 
-        self.admin.connect('connected', self.admin_connected_cb)
-        self.admin.connect('disconnected', self.admin_disconnected_cb)
-        self.admin.connect('connection-refused',
-                           self.admin_connection_refused_cb)
-        self.admin.connect('connection-failed',
-                           self.admin_connection_failed_cb)
-        self.admin.connect('update', self.admin_update_cb)
+    def componentCallRemoteStatus(self, state, pre, post, fail,
+                                  methodName, *args, **kwargs):
+        if not state:
+            state = self.components_view.get_selected_state()
+            if not state:
+                return
+
+        label = getComponentLabel(state)
+        if not label:
+            return
+
+        mid = None
+        if pre:
+            mid = self.statusbar.push('main', pre % label)
+        d = self._admin.componentCallRemote(state, methodName, *args, **kwargs)
+
+        def cb(result, self, mid):
+            if mid:
+                self.statusbar.remove('main', mid)
+            if post:
+                self.statusbar.push('main', post % label)
+        def eb(failure, self, mid):
+            if mid:
+                self.statusbar.remove('main', mid)
+            self.warning("Failed to execute %s on component %s: %s"
+                         % (methodName, label, failure))
+            if fail:
+                self.statusbar.push('main', fail % label)
+
+        d.addCallback(cb, self, mid)
+        d.addErrback(eb, self, mid)
+
+    def componentCallRemote(self, state, methodName, *args, **kwargs):
+        self.componentCallRemoteStatus(None, None, None, None,
+                                       methodName, *args, **kwargs)
+
+    def whsAppend(self, state, key, value):
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged in.' % value)
+
+    def whsRemove(self, state, key, value):
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged out.' % value)
+
+    # Private
 
     def _create_ui(self):
+        self.debug('creating UI')
         # returns the window
         # called from __init__
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         wtree.signal_autoconnect(self)
 
         for widget in wtree.get_widget_prefix(''):
-            self.widgets[widget.get_name()] = widget
-        widgets = self.widgets
+            self._widgets[widget.get_name()] = widget
+        widgets = self._widgets
 
-        window = self.window = widgets['main_window']
+        window = self._window = widgets['main_window']
+        window.connect('delete-event', self._on_window_delete_event)
 
         def set_icon(proc, size, name):
             i = gtk.Image()
@@ -151,7 +183,6 @@ class Window(log.Loggable, gobject.GObject):
         # the widget containing the component view
         self._component_view = widgets['component_view']
 
-        window.connect('delete-event', self.close)
 
         self.components_view = parts.ComponentsView(widgets['components_view'])
         self.components_view.connect('has-selection',
@@ -160,49 +191,21 @@ class Window(log.Loggable, gobject.GObject):
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
         self._set_stop_start_component_sensitive()
-        self.components_view.connect('notify::can-start-any',
-                                     self.start_stop_notify_cb)
-        self.components_view.connect('notify::can-stop-any',
-                                     self.start_stop_notify_cb)
-        self.start_stop_notify_cb()
+        self.components_view.connect(
+            'notify::can-start-any',
+            self._component_view_start_stop_notify_cb)
+        self.components_view.connect(
+            'notify::can-stop-any',
+            self._component_view_start_stop_notify_cb)
+        self._component_view_start_stop_notify_cb()
 
         self._messages_view = widgets['messages_view']
         self._messages_view.hide()
 
         return window
 
-    def on_open_connection(self, connectionInfo):
-        i = connectionInfo
-        model = AdminModel()
-        d = model.connectToManager(i)
-
-        self._trayicon.set_tooltip(_("Connecting to %(host)s:%(port)s") % {
-            'host': i.host,
-            'port': i.port,
-        })
-
-        def connected(model):
-            self.window.set_sensitive(True)
-            self._setAdminModel(model)
-            self._append_recent_connections()
-
-        def refused(failure):
-            if failure.check(errors.ConnectionRefusedError):
-                d = dialogs.connection_refused_message(i.host,
-                                                       self.window)
-            else:
-                d = dialogs.connection_failed_message(i, str(failure),
-                                                      self.window)
-            d.addCallback(lambda _: self.window.set_sensitive(True))
-
-        d.addCallbacks(connected, refused)
-        self.window.set_sensitive(False)
-
-    def on_recent_activate(self, widget, connectionInfo):
-        self.on_open_connection(connectionInfo)
-
     def _append_recent_connections(self):
-        menu = self.widgets['connection_menu'].get_submenu()
+        menu = self._widgets['connection_menu'].get_submenu()
 
         # first clean any old entries
         kids = menu.get_children()
@@ -222,63 +225,125 @@ class Window(log.Loggable, gobject.GObject):
             gtk.MenuShell.append(menu, i) # $%^&* pychecker
         def append_txt(c, n):
             i = gtk.MenuItem(c['name'])
-            i.connect('activate', self.on_recent_activate, c['info'])
+            i.connect('activate', self._on_recent_activate, c['info'])
             append(i)
 
         append(gtk.SeparatorMenuItem())
         map(append_txt, clist[:4], range(1,len(clist[:4])+1))
 
-    # UI helper functions
-    def show_error_dialog(self, message, parent=None, close_on_response=True):
-        if not parent:
-            parent = self.window
-        d = dialogs.ErrorDialog(message, parent, close_on_response)
-        d.show_all()
-        return d
+    def _set_admin_model(self, model):
+        'set the model to which we are a view/controller'
+        # it's ok if we've already been connected
+        self.debug('setting model')
 
-    def componentCallRemoteStatus(self, state, pre, post, fail,
-                                  methodName, *args, **kwargs):
-        if not state:
-            state = self.components_view.get_selected_state()
-            if not state:
-                return
+        if self._admin:
+            self.debug('Connecting to new model %r' % model)
+            if self._wizard:
+                self._wizard.destroy()
 
-        label = getComponentLabel(state)
-        if not label:
+        self._admin = model
+
+        # window gets created after model connects initially, so check
+        # here
+        if self._admin.isConnected():
+            self._admin_connected_cb(model)
+
+        self._admin.connect('connected', self._admin_connected_cb)
+        self._admin.connect('disconnected', self._admin_disconnected_cb)
+        self._admin.connect('connection-refused',
+                           self._admin_connection_refused_cb)
+        self._admin.connect('connection-failed',
+                           self._admin_connection_failed_cb)
+        self._admin.connect('update', self._admin_update_cb)
+
+    def _close(self, *args):
+        reactor.stop()
+
+    def _dump_config(self, configation):
+        import pprint
+        import cStringIO
+        fd = cStringIO.StringIO()
+        pprint.pprint(configation, fd)
+        fd.seek(0)
+        self.debug('Configuration=%s' % fd.read())
+
+    def _run_wizard(self):
+        if self._wizard:
+            self._wizard.present()
+
+        from flumotion.wizard import wizard
+
+        def _wizard_finished_cb(wizard, configuration):
+            wizard.destroy()
+            self._dump_config(configuration)
+            self._admin.loadConfiguration(configuration)
+            self.show()
+
+        def nullwizard(*args):
+            self._wizard = None
+
+        state = self._admin.getWorkerHeavenState()
+        if not state.get('names'):
+            self._show_error_dialog(
+                _('The wizard cannot be run because no workers are logged in.'))
             return
 
-        mid = None
-        if pre:
-            mid = self.statusbar.push('main', pre % label)
-        d = self.admin.componentCallRemote(state, methodName, *args, **kwargs)
+        wizard = wizard.Wizard(self._window, self._admin)
+        wizard.connect('finished', _wizard_finished_cb)
+        wizard.run(True, state, False)
 
-        def cb(result, self, mid):
-            if mid:
-                self.statusbar.remove('main', mid)
-            if post:
-                self.statusbar.push('main', post % label)
-        def eb(failure, self, mid):
-            if mid:
-                self.statusbar.remove('main', mid)
-            self.warning("Failed to execute %s on component %s: %s"
-                         % (methodName, label, failure))
-            if fail:
-                self.statusbar.push('main', fail % label)
+        self._wizard = wizard
+        self._wizard.connect('destroy', nullwizard)
 
-        d.addCallback(cb, self, mid)
-        d.addErrback(eb, self, mid)
+    def _open_connection(self, connectionInfo):
+        i = connectionInfo
+        model = AdminModel()
+        d = model.connectToManager(i)
 
-    def componentCallRemote(self, state, methodName, *args, **kwargs):
-        self.componentCallRemoteStatus(None, None, None, None,
-                                       methodName, *args, **kwargs)
+        self._trayicon.set_tooltip(_("Connecting to %(host)s:%(port)s") % {
+            'host': i.host,
+            'port': i.port,
+        })
 
-    def setPlanetState(self, planetState):
+        def connected(model):
+            self._window.set_sensitive(True)
+            self._set_admin_model(model)
+            self._append_recent_connections()
+
+        def refused(failure):
+            if failure.check(errors.ConnectionRefusedError):
+                d = dialogs.connection_refused_message(i.host,
+                                                       self._window)
+            else:
+                d = dialogs.connection_failed_message(i, str(failure),
+                                                      self._window)
+            d.addCallback(lambda _: self._window.set_sensitive(True))
+
+        d.addCallbacks(connected, refused)
+        self._window.set_sensitive(False)
+
+    def _show_about_dialog(self):
+        about = dialogs.AboutDialog(self._window)
+        about.run()
+        about.destroy()
+
+    def _show_error_dialog(self, message):
+        d = dialogs.ErrorDialog(message, self._window,
+                                close_on_response=True)
+        d.show_all()
+
+    def _update_components(self):
+        self.components_view.update(self._components)
+        self._trayicon.update(self._components)
+
+    def _set_planet_state(self, planetState):
+
         def flowStateAppend(state, key, value):
             self.debug('flow state append: key %s, value %r' % (key, value))
             if key == 'components':
                 self._components[value.get('name')] = value
                 # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
+                self._update_components()
 
         def flowStateRemove(state, key, value):
             if key == 'components':
@@ -288,7 +353,7 @@ class Window(log.Loggable, gobject.GObject):
             if key == 'components':
                 self._components[value.get('name')] = value
                 # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
+                self._update_components()
 
         def atmosphereStateRemove(state, key, value):
             if key == 'components':
@@ -328,7 +393,7 @@ class Window(log.Loggable, gobject.GObject):
                                 setitem=planetStateSetitem,
                                 delitem=planetStateDelitem)
 
-        self._clearMessages()
+        self._clear_messages()
 
         a = planetState.get('atmosphere')
         a.addListener(self, append=atmosphereStateAppend,
@@ -339,283 +404,12 @@ class Window(log.Loggable, gobject.GObject):
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
 
-    def _clearMessages(self):
-        self._messages_view.clear()
-        pstate = self._planetState
-        if pstate and pstate.hasKey('messages'):
-            for message in pstate.get('messages').values():
-                self._messages_view.add_message(message)
-
-    def stateSet(self, state, key, value):
-        # called by model when state of something changes
-        if not isinstance(state, planet.AdminComponentState):
-            return
-
-        if key == 'message':
-            self.statusbar.set('main', value)
-        elif key == 'mood':
-            self._set_stop_start_component_sensitive()
-            current = self.components_view.get_selected_name()
-            if value == moods.sleeping.value:
-                if state.get('name') == current:
-                    self._clearMessages()
-
-    def whsAppend(self, state, key, value):
-        if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged in.' % value)
-
-    def whsRemove(self, state, key, value):
-        if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged out.' % value)
-
-    def _remove_component(self, state):
-        name = state.get('name')
-        self.debug('removing component %s' % name)
-        del self._components[name]
-
-        # if this component was selected, clear selection
-        if self.current_component_state == state:
-            self.debug('removing currently selected component state')
-            self.current_component_state = None
-        # FIXME: would be nicer to do this incrementally instead
-        self.update_components()
-
-        # a component being removed means our selected component could
-        # have gone away
-        self._set_stop_start_component_sensitive()
-
-    ### admin model callbacks
-    def admin_connected_cb(self, admin):
-        self.info('Connected to manager')
-        if self._disconnected_dialog:
-            self._disconnected_dialog.destroy()
-            self._disconnected_dialog = None
-
-        # FIXME: have a method for this
-        self.window.set_title(_('%s - Flumotion Administration') %
-            self.admin.adminInfoStr())
-        self._trayicon.set_tooltip(self.admin.adminInfoStr())
-
-        self.emit('connected')
-
-        self._component_view.set_single_admin(admin)
-
-        self.setPlanetState(self.admin.planet)
-
-        if not self._components:
-            self.debug('no components detected, running wizard')
-            # ensure our window is shown
-            self.show()
-            self.runWizard()
-
-    def admin_disconnected_cb(self, admin):
-        self._components = {}
-        self.update_components()
-        self._clearMessages()
-        if self._planetState:
-            self._planetState.removeListener(self)
-            self._planetState = None
-
-        message = _("Lost connection to manager, reconnecting ...")
-        d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
-        # FIXME: move this somewhere
-        RESPONSE_REFRESH = 1
-        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
-        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        d.connect("response", self._dialog_disconnected_response_cb)
-        d.show_all()
-        self._disconnected_dialog = d
-
-    def _dialog_disconnected_response_cb(self, dialog, id):
-        if id == gtk.RESPONSE_CANCEL:
-            # FIXME: notify admin of cancel
-            dialog.destroy()
-            return
-        elif id == 1:
-            self.admin.reconnect()
-
-    def admin_connection_refused_later(self, admin):
-        message = _("Connection to manager on %s was refused.") % \
-            admin.connectionInfoStr()
-        self._trayicon.set_tooltip(_("Connection to %s was refused") %
-            self.admin.adminInfoStr())
-        self.info(message)
-        d = dialogs.ErrorDialog(message, self)
-        d.show_all()
-        d.connect('response', self.close)
-
-    def admin_connection_refused_cb(self, admin):
-        log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, self.admin_connection_refused_later, admin)
-        log.debug('adminclient', "handled connection-refused")
-
-    def admin_connection_failed_later(self, admin, reason):
-        message = (
-            _("Connection to manager on %(conn)s failed (%(reason)s).") % {
-                'conn': admin.connectionInfoStr(),
-                'reason': reason,
-            })
-        self._trayicon.set_tooltip("Connection to %s failed" %
-            self.admin.adminInfoStr())
-        self.info(message)
-        d = dialogs.ErrorDialog(message, self.window)
-        d.show_all()
-        d.connect('response', self.close)
-
-    def admin_connection_failed_cb(self, admin, reason):
-        log.debug('adminclient', "handling connection-failed")
-        reactor.callLater(0, self.admin_connection_failed_later, admin, reason)
-        log.debug('adminclient', "handled connection-failed")
-
-    def start_stop_notify_cb(self, *args):
-        can_start = self.components_view.get_property('can-start-any')
-        can_stop = self.components_view.get_property('can-stop-any')
-        self.widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
-        self.widgets['menuitem_manage_start_all'].set_sensitive(can_start)
-        # they're all in sleeping or lost
-        s = self.widgets['menuitem_manage_clear_all'].set_sensitive
-        s(can_start and not can_stop)
-
-    def admin_update_cb(self, admin):
-        self.update_components()
-
-    def update_components(self):
-        self.components_view.update(self._components)
-        self._trayicon.update(self._components)
-
-    def _set_stop_start_component_sensitive(self):
-        state = self.current_component_state
-        d = self.widgets
-        can_start = bool(state
-                         and moods.get(state.get('mood')).name == 'sleeping')
-        d['menuitem_manage_start_component'].set_sensitive(can_start)
-        d['toolbutton_start_component'].set_sensitive(can_start)
-
-        moodname = state and moods.get(state.get('mood')).name
-        can_stop = bool(moodname and moodname != 'sleeping')
-        can_delete = bool(state and not can_stop)
-        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
-        d['toolbutton_stop_component'].set_sensitive(can_stop)
-
-        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
-        d['toolbutton_delete_component'].set_sensitive(can_delete)
-        self.debug('can start %r, can stop %r' % (can_start, can_stop))
-
-    ### ui callbacks
-    def _components_view_has_selection_cb(self, view, state):
-        self.debug('component %s has selection', state)
-        def compSet(state, key, value):
-            if key == 'mood':
-                self._set_stop_start_component_sensitive()
-
-        def compAppend(state, key, value):
-            name = state.get('name')
-            self.debug('stateAppend on component state of %s' % name)
-            if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
-                    self._messages_view.add_message(value)
-
-        def compRemove(state, key, value):
-            name = state.get('name')
-            self.debug('stateRemove on component state of %s' % name)
-            if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
-                    self._messages_view.clear_message(value.id)
-
-        if self.current_component_state:
-            self.current_component_state.removeListener(self)
-        self.current_component_state = state
-        if self.current_component_state:
-            self.current_component_state.addListener(
-                self, compSet, compAppend, compRemove)
-
-        self._set_stop_start_component_sensitive()
-        self._component_view.show_object(state)
-        self._clearMessages()
-
-        if state:
-            name = getComponentLabel(state)
-
-            messages = state.get('messages')
-            if messages:
-                for m in messages:
-                    self.debug('have message %r' % m)
-                    self._messages_view.add_message(m)
-
-            if state.get('mood') == moods.sad.value:
-                self.debug('component %s is sad' % name)
-                self.statusbar.set('main',
-                    _("Component %s is sad") % name)
-
-        # FIXME: show statusbar things
-        # self.statusbar.set('main', _('Showing UI for %s') % name)
-        # self.statusbar.set('main',
-        #       _("Component %s is still sleeping") % name)
-        # self.statusbar.set('main', _("Requesting UI for %s ...") % name)
-        # self.statusbar.set('main', _("Loading UI for %s ...") % name)
-        # self.statusbar.clear('main')
-        # mid = self.statusbar.push('notebook',
-        #         _("Loading tab %s for %s ...") % (node.title, name))
-        # node.statusbar = self.statusbar # hack
-
-
-    def _components_view_activated_cb(self, view, state, action):
-        self.debug('action %s on component %s' % (action, state.get('name')))
-        method_name = '_component_' + action
-        if hasattr(self, method_name):
-            getattr(self, method_name)(state)
-        else:
-            self.warning("No method '%s' implemented" % method_name)
-
-    ### glade callbacks
-    def close(self, *args):
-        reactor.stop()
-
-    def _logConfig(self, configation):
-        import pprint
-        import cStringIO
-        fd = cStringIO.StringIO()
-        pprint.pprint(configation, fd)
-        fd.seek(0)
-        self.debug('Configuration=%s' % fd.read())
-
-    def runWizard(self):
-        if self.wizard:
-            self.wizard.present()
-            return
-
-        from flumotion.wizard import wizard
-
-        def _wizard_finished_cb(wizard, configuration):
-            wizard.destroy()
-            self._logConfig(configuration)
-            self.admin.loadConfiguration(configuration)
-            self.show()
-
-        def nullwizard(*args):
-            self.wizard = None
-
-        state = self.admin.getWorkerHeavenState()
-        if not state.get('names'):
-            self.show_error_dialog(
-                _('The wizard cannot be run because no workers are logged in.'))
-            return
-
-        wiz = wizard.Wizard(self.window, self.admin)
-        wiz.connect('finished', _wizard_finished_cb)
-        wiz.run(True, state, False)
-
-        self.wizard = wiz
-        self.wizard.connect('destroy', nullwizard)
-
     # component view activation functions
+
     def _component_modify(self, state):
         def propertyErrback(failure):
             failure.trap(errors.PropertyError)
-            self.show_error_dialog("%s." % failure.getErrorMessage())
+            self._show_error_dialog("%s." % failure.getErrorMessage())
             return None
 
         def after_getProperty(value, dialog):
@@ -623,25 +417,41 @@ class Window(log.Loggable, gobject.GObject):
             dialog.update_value_entry(value)
 
         def dialog_set_cb(dialog, element, property, value, state):
-            cb = self.admin.setProperty(state, element, property, value)
+            cb = self._admin.setProperty(state, element, property, value)
             cb.addErrback(propertyErrback)
         def dialog_get_cb(dialog, element, property, state):
-            cb = self.admin.getProperty(state, element, property)
+            cb = self._admin.getProperty(state, element, property)
             cb.addCallback(after_getProperty, dialog)
             cb.addErrback(propertyErrback)
 
         name = state.get('name')
-        d = dialogs.PropertyChangeDialog(name, self.window)
+        d = dialogs.PropertyChangeDialog(name, self._window)
         d.connect('get', dialog_get_cb, state)
         d.connect('set', dialog_set_cb, state)
         d.run()
+
+    def _remove_component(self, state):
+        name = state.get('name')
+        self.debug('removing component %s' % name)
+        del self._components[name]
+
+        # if this component was selected, clear selection
+        if self._current_component_state == state:
+            self.debug('removing currently selected component state')
+            self._current_component_state = None
+        # FIXME: would be nicer to do this incrementally instead
+        self._update_components()
+
+        # a component being removed means our selected component could
+        # have gone away
+        self._set_stop_start_component_sensitive()
 
     def _component_reload(self, state):
         name = getComponentLabel(state)
 
         dialog = dialogs.ProgressDialog("Reloading",
-            _("Reloading component code for %s") % name, self.window)
-        d = self.admin.reloadComponent(state)
+            _("Reloading component code for %s") % name, self._window)
+        d = self._admin.reloadComponent(state)
         d.addCallback(lambda result, d: d.destroy(), dialog)
         # add error
         d.addErrback(lambda failure, d: d.destroy(), dialog)
@@ -690,7 +500,7 @@ class Window(log.Loggable, gobject.GObject):
             return None
 
         mid = self.statusbar.push('main', "%s component %s" % (doing, name))
-        d = self.admin.callRemote(remoteMethodPrefix + action, state)
+        d = self._admin.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)
@@ -710,15 +520,212 @@ class Window(log.Loggable, gobject.GObject):
 
         return d
 
+    def _clear_messages(self):
+        self._messages_view.clear()
+        pstate = self._planetState
+        if pstate and pstate.hasKey('messages'):
+            for message in pstate.get('messages').values():
+                self._messages_view.add_message(message)
+
+    def _set_stop_start_component_sensitive(self):
+        state = self._current_component_state
+        d = self._widgets
+        can_start = bool(state
+                         and moods.get(state.get('mood')).name == 'sleeping')
+        d['menuitem_manage_start_component'].set_sensitive(can_start)
+        d['toolbutton_start_component'].set_sensitive(can_start)
+
+        moodname = state and moods.get(state.get('mood')).name
+        can_stop = bool(moodname and moodname != 'sleeping')
+        can_delete = bool(state and not can_stop)
+        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
+        d['toolbutton_stop_component'].set_sensitive(can_stop)
+
+        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
+        d['toolbutton_delete_component'].set_sensitive(can_delete)
+        self.debug('can start %r, can stop %r' % (can_start, can_stop))
+
+    ### admin model callbacks
+
+    def _admin_connected_cb(self, admin):
+        self.info('Connected to manager')
+        if self._disconnected_dialog:
+            self._disconnected_dialog.destroy()
+            self._disconnected_dialog = None
+
+        # FIXME: have a method for this
+        self._window.set_title(_('%s - Flumotion Administration') %
+            self._admin.adminInfoStr())
+        self._trayicon.set_tooltip(self._admin.adminInfoStr())
+
+        self.emit('connected')
+
+        self._component_view.set_single_admin(admin)
+
+        self._set_planet_state(self._admin.planet)
+
+        if not self._components:
+            self.debug('no components detected, running wizard')
+            # ensure our window is shown
+            self.show()
+            self._run_wizard()
+
+    def _admin_disconnected_cb(self, admin):
+        self._components = {}
+        self._update_components()
+        self._clear_messages()
+        if self._planetState:
+            self._planetState.removeListener(self)
+            self._planetState = None
+
+        message = _("Lost connection to manager, reconnecting ...")
+        d = gtk.MessageDialog(self._window, gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
+        # FIXME: move this somewhere
+        RESPONSE_REFRESH = 1
+        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
+        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        d.connect("response", self._dialog_disconnected_response_cb)
+        d.show_all()
+        self._disconnected_dialog = d
+
+    def _dialog_disconnected_response_cb(self, dialog, id):
+        if id == gtk.RESPONSE_CANCEL:
+            # FIXME: notify admin of cancel
+            dialog.destroy()
+            return
+        elif id == 1:
+            self._admin.reconnect()
+
+    def _admin_connection_refused_later(self, admin):
+        message = _("Connection to manager on %s was refused.") % \
+            admin.connectionInfoStr()
+        self._trayicon.set_tooltip(_("Connection to %s was refused") %
+            self._admin.adminInfoStr())
+        self.info(message)
+        d = dialogs.ErrorDialog(message, self)
+        d.show_all()
+        d.connect('response', self._close)
+
+    def _admin_connection_refused_cb(self, admin):
+        log.debug('adminclient', "handling connection-refused")
+        reactor.callLater(0, self._admin_connection_refused_later, admin)
+        log.debug('adminclient', "handled connection-refused")
+
+    def _admin_connection_failed_later(self, admin, reason):
+        message = (
+            _("Connection to manager on %(conn)s failed (%(reason)s).") % {
+                'conn': admin.connectionInfoStr(),
+                'reason': reason,
+            })
+        self._trayicon.set_tooltip("Connection to %s failed" %
+            self._admin.adminInfoStr())
+        self.info(message)
+        d = dialogs.ErrorDialog(message, self._window)
+        d.show_all()
+        d.connect('response', self._close)
+
+    def _admin_connection_failed_cb(self, admin, reason):
+        log.debug('adminclient', "handling connection-failed")
+        reactor.callLater(0, self._admin_connection_failed_later,
+                          admin, reason)
+        log.debug('adminclient', "handled connection-failed")
+
+    def _admin_update_cb(self, admin):
+        self._update_components()
+
+    ### ui callbacks
+
+    def _on_recent_activate(self, widget, connectionInfo):
+        self._open_connection(connectionInfo)
+
+    def _on_window_delete_event(self, window, event):
+        self._close()
+
+    def _components_view_has_selection_cb(self, view, state):
+        self.debug('component %s has selection', state)
+        def compSet(state, key, value):
+            if key == 'mood':
+                self._set_stop_start_component_sensitive()
+
+        def compAppend(state, key, value):
+            name = state.get('name')
+            self.debug('stateAppend on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.add_message(value)
+
+        def compRemove(state, key, value):
+            name = state.get('name')
+            self.debug('stateRemove on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.clear_message(value.id)
+
+        if self._current_component_state:
+            self._current_component_state.removeListener(self)
+        self._current_component_state = state
+        if self._current_component_state:
+            self._current_component_state.addListener(
+                self, compSet, compAppend, compRemove)
+
+        self._set_stop_start_component_sensitive()
+        self._component_view.show_object(state)
+        self._clear_messages()
+
+        if state:
+            name = getComponentLabel(state)
+
+            messages = state.get('messages')
+            if messages:
+                for m in messages:
+                    self.debug('have message %r' % m)
+                    self._messages_view.add_message(m)
+
+            if state.get('mood') == moods.sad.value:
+                self.debug('component %s is sad' % name)
+                self.statusbar.set('main',
+                    _("Component %s is sad") % name)
+
+        # FIXME: show statusbar things
+        # self.statusbar.set('main', _('Showing UI for %s') % name)
+        # self.statusbar.set('main',
+        #       _("Component %s is still sleeping") % name)
+        # self.statusbar.set('main', _("Requesting UI for %s ...") % name)
+        # self.statusbar.set('main', _("Loading UI for %s ...") % name)
+        # self.statusbar.clear('main')
+        # mid = self.statusbar.push('notebook',
+        #         _("Loading tab %s for %s ...") % (node.title, name))
+        # node.statusbar = self.statusbar # hack
+
+    def _components_view_activated_cb(self, view, state, action):
+        self.debug('action %s on component %s' % (action, state.get('name')))
+        method_name = '_component_' + action
+        if hasattr(self, method_name):
+            getattr(self, method_name)(state)
+        else:
+            self.warning("No method '%s' implemented" % method_name)
+
+    def _component_view_start_stop_notify_cb(self, *args):
+        can_start = self.components_view.get_property('can-start-any')
+        can_stop = self.components_view.get_property('can-stop-any')
+        self._widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
+        self._widgets['menuitem_manage_start_all'].set_sensitive(can_start)
+        # they're all in sleeping or lost
+        s = self._widgets['menuitem_manage_clear_all'].set_sensitive
+        s(can_start and not can_stop)
+
     # menubar/toolbar callbacks
-    def on_have_connection(self, d, connectionInfo):
-        d.destroy()
-        self.on_open_connection(connectionInfo)
 
     def connection_open_recent_cb(self, button):
-        d = gtkconnections.ConnectionsDialog(self.window)
+        d = gtkconnections.ConnectionsDialog(self._window)
+        def on_have_connection(d, connectionInfo):
+            d.destroy()
+            self._open_connection(connectionInfo)
+        d.connect('have-connection', on_have_connection)
         d.show()
-        d.connect('have-connection', self.on_have_connection)
 
     def connection_open_existing_cb(self, button):
         def got_state(state, g):
@@ -729,66 +736,65 @@ class Window(log.Loggable, gobject.GObject):
                                                not state['use_insecure'],
                                                authenticator)
             g.destroy()
-            self.on_open_connection(info)
+            self._open_connection(info)
 
         from flumotion.admin.gtk import greeter
         wiz = greeter.ConnectExisting()
         d = wiz.run_async()
         d.addCallback(got_state, wiz)
 
-    def on_import_response(self, d, response):
-        if response==gtk.RESPONSE_ACCEPT:
-            name = d.get_filename()
-            conf_xml = open(name, 'r').read()
-            self.admin.loadConfiguration(conf_xml)
-        d.destroy()
-
     def connection_import_configuration_cb(self, button):
-        d = gtk.FileChooserDialog(_("Import Configuration..."), self.window,
+        d = gtk.FileChooserDialog(_("Import Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         d.set_default_response(gtk.RESPONSE_ACCEPT)
-        d.show()
-        d.connect('response', self.on_import_response)
-
-    def getConfiguration_cb(self, conf_xml, name, chooser):
-        file_exists = True
-        if os.path.exists(name):
-            d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
-                                  gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
-                                  _("File already exists.\nOverwrite?"))
-            d.connect("response", lambda self, response: d.hide())
-            if d.run() == gtk.RESPONSE_YES:
-                file_exists = False
-        else:
-            file_exists = False
-
-        if not file_exists:
-            f = open(name, 'w')
-            f.write(conf_xml)
-            f.close()
-            chooser.destroy()
-
-    def on_export_response(self, d, response):
-        if response==gtk.RESPONSE_ACCEPT:
-            deferred = self.admin.getConfiguration()
-            name = d.get_filename()
-            deferred.addCallback(self.getConfiguration_cb, name, d)
-        else:
+        def on_import_response(d, response):
+            if response == gtk.RESPONSE_ACCEPT:
+                name = d.get_filename()
+                conf_xml = open(name, 'r').read()
+                self._admin.loadConfiguration(conf_xml)
             d.destroy()
+        d.connect('response', on_import_response)
+        d.show()
 
     def connection_export_configuration_cb(self, button):
-        d = gtk.FileChooserDialog(_("Export Configuration..."), self.window,
+        d = gtk.FileChooserDialog(_("Export Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         d.set_default_response(gtk.RESPONSE_ACCEPT)
+
+        def _get_configuration_cb(conf_xml, name, chooser):
+            file_exists = True
+            if os.path.exists(name):
+                d = gtk.MessageDialog(self._window, gtk.DIALOG_MODAL,
+                                      gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
+                                      _("File already exists.\nOverwrite?"))
+                d.connect("response", lambda self, response: d.hide())
+                if d.run() == gtk.RESPONSE_YES:
+                    file_exists = False
+            else:
+                file_exists = False
+
+            if not file_exists:
+                f = open(name, 'w')
+                f.write(conf_xml)
+                f.close()
+                chooser.destroy()
+
+        def on_export_response(d, response):
+            if response == gtk.RESPONSE_ACCEPT:
+                deferred = self._admin.getConfiguration()
+                name = d.get_filename()
+                deferred.addCallback(_get_configuration_cb, name, d)
+            else:
+                d.destroy()
+        d.connect('response', on_export_response)
         d.show()
-        d.connect('response', self.on_export_response)
 
     def connection_quit_cb(self, button):
-        self.close()
+        self._close()
 
     def manage_start_component_cb(self, button):
         self._component_start(None)
@@ -808,20 +814,20 @@ class Window(log.Loggable, gobject.GObject):
             self._component_stop(c)
 
     def manage_clear_all_cb(self, button):
-        self.admin.cleanComponents()
+        self._admin.cleanComponents()
 
     def manage_run_wizard_cb(self, x):
-        self.runWizard()
+        self._run_wizard()
 
     def debug_reload_manager_cb(self, button):
-        self.admin.reloadManager()
+        self._admin.reloadManager()
 
     def debug_reload_admin_cb(self, button):
-        self.admin.reloadAdmin()
+        self._admin.reloadAdmin()
 
     def debug_reload_all_cb(self, button):
         dialog = dialogs.ProgressDialog(_("Reloading ..."),
-            _("Reloading client code"), self.window)
+            _("Reloading client code"), self._window)
 
         # FIXME: move all of the reloads over to this dialog
         def _stopCallback(result):
@@ -832,7 +838,7 @@ class Window(log.Loggable, gobject.GObject):
             failure.trap(errors.ReloadSyntaxError)
             dialog.stop()
             dialog.destroy()
-            self.show_error_dialog(
+            self._show_error_dialog(
                 _("Could not reload component:\n%s.") %
                 failure.getErrorMessage())
             return None
@@ -843,7 +849,7 @@ class Window(log.Loggable, gobject.GObject):
             return failure
 
         def _callLater(admin):
-            d = self.admin.reload()
+            d = self._admin.reload()
             d.addCallback(_stopCallback)
             d.addErrback(_syntaxErrback)
             d.addErrback(_defaultErrback)
@@ -851,19 +857,19 @@ class Window(log.Loggable, gobject.GObject):
         def _reloadCallback(admin, text):
             dialog.message(_("Reloading %s code") % text)
 
-        self.admin.connect('reloading', _reloadCallback)
+        self._admin.connect('reloading', _reloadCallback)
         dialog.start()
-        reactor.callLater(0.2, _callLater, self.admin)
+        reactor.callLater(0.2, _callLater, self._admin)
 
     def debug_start_shell_cb(self, button):
-        if sys.version_info[1] >= 4:
+        if sys.version_info >= (2, 4):
             from flumotion.extern import code
         else:
             import code
 
         vars = \
             {
-                "admin": self.admin,
+                "admin": self._admin,
                 "components": self._components
             }
         message = """Flumotion Admin Debug Shell
@@ -880,12 +886,10 @@ You can do remote component calls using:
         code.interact(local=vars, banner=message)
 
     def help_about_cb(self, button):
-        about = dialogs.AboutDialog(self.window)
-        about.run()
-        about.destroy()
+        self._show_about_dialog()
 
     def show(self):
         # XXX: Use show()
-        self.window.show()
+        self._window.show()
 
 pygobject.type_register(Window)
