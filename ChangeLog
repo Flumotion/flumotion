@@ -1,3 +1,12 @@
+2007-11-12  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/plugs/loggers.py:
+	  Logger plug can now optionally return a deferred from event handlers.
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Use maybeDeferred() on logger plug return; move firing disconnect
+	  deferreds to after logging successfully completes.
+
 2007-11-12  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/steps.py (Webcam.run_checks): Reverse the list of

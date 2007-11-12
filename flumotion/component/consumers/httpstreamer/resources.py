@@ -105,11 +105,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if fd in self._requests:
             request = self._requests[fd]
             self._removeClient(request, fd, stats)
-
-            if fd in self._removing:
-                self.debug("client is removed; firing deferred")
-                d = self._removing.pop(fd)
-                d.callback(None)
         else:
             self.warning('[fd %5d] not found in _requests' % fd)
 
@@ -166,8 +161,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'user-agent': headers.get('user-agent', None),
                 'time-connected': time_connected}
 
+        l = []
         for logger in self.loggers:
-            logger.event('http_session_completed', args)
+            l.append(defer.maybeDeferred(
+                logger.event('http_session_completed', args)))
+
+        return defer.DeferredList(l)
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)
@@ -329,7 +328,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         ip = request.getClientIP()
         if self._logRequestFromIP(ip):
-            self.logWrite(fd, ip, request, stats)
+            d = self.logWrite(fd, ip, request, stats)
+        else:
+            d = defer.succeed(True)
         self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
 
         # We can't call request.finish(), since we already "stole" the fd, we
@@ -345,6 +346,14 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         request.transport.loseConnection()
 
         self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
+
+        def _done(_):
+            if fd in self._removing:
+                self.debug("client is removed; firing deferred")
+                removeD = self._removing.pop(fd)
+                removeD.callback(None)
+        d.addCallback(_done)
+        return d
 
     def handleAuthenticatedRequest(self, res, request):
         if request.method == 'GET':
