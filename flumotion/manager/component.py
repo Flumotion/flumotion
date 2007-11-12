@@ -111,7 +111,8 @@ class ComponentAvatar(base.ManagerAvatar):
                                    "the manager."),
                                 debug=("Updating internal conf from "
                                        "running conf:\n" + diffMsg))
-                self.warning('updating internal component state for %r')
+                self.warning('updating internal component state for %r',
+                             state)
                 self.debug('changes to conf: %s',
                            config.dictDiffMessageString(diff))
                 state.set('config', conf)

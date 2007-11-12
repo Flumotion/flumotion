@@ -595,8 +595,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         Returns a deferred fired once all clients have been removed.
         """
-        self.debug("Asking for all clients to be removed")
-        return self.resource.removeAllClients()
+        if self.resource:
+            # can be None if we never went happy
+            self.debug("Asking for all clients to be removed")
+            return self.resource.removeAllClients()
 
     def update_ui_state(self):
         """
