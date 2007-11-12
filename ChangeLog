@@ -1,5 +1,9 @@
 2007-11-12  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/Makefile.am (flumotion_PYTHON): 
+	* flumotion/test/Makefile.am (flumotion_PYTHON): 
+	Update, remove removed, add added.
+
 	* flumotion/common/testsuite.py (TestCase): Add a assertFailure
 	alias for failUnlessFailure
 

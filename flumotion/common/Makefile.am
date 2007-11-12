@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
 flumotion_PYTHON = \
@@ -26,6 +26,7 @@ flumotion_PYTHON = \
 	medium.py \
 	messages.py \
 	netutils.py \
+	options.py \
 	package.py \
 	planet.py \
 	pygobject.py \
@@ -36,6 +37,7 @@ flumotion_PYTHON = \
 	setup.py \
 	signals.py \
 	startset.py \
+	testsuite.py \
 	watched.py \
 	worker.py
 
