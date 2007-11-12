@@ -43,7 +43,7 @@ T_ = messages.gettexter('flumotion')
 
 # Make it run on 2.3
 try:
-    sorted
+    sorted([])
 except NameError:
     def sorted(seq, reverse=False):
         seq = seq[:]
