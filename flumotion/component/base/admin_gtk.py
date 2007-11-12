@@ -51,7 +51,7 @@ class BaseAdminGtk(log.Loggable):
     """
 
     logCategory = "admingtk"
-    gettext_domain = 'flumotion'
+    gettext_domain = None
 
     def __init__(self, state, admin):
         """
@@ -132,7 +132,7 @@ class BaseAdminGtk(log.Loggable):
         self.debug('BaseAdminGtk.setup()')
 
         def fetchTranslations():
-            if not hasattr(self, 'gettext_domain'):
+            if not self.gettext_domain:
                 return defer.succeed(None)
 
             def haveBundle(localedatadir):

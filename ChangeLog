@@ -1,3 +1,13 @@
+2007-11-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtk.gettext_domain): Set to None instead of 'flumotion'
+	so that we hit the non-translated codepath; otherwise some kind of
+	error makes us not add the feeders and eaters tabs.
+	(BaseAdminGtk.setup.fetchTranslations): Assume that gettext_domain
+	is there, an interface that checks for an attr is pretty bad.
+	Instead check if it is None.
+
 2007-11-12  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/plugs/loggers.py:
