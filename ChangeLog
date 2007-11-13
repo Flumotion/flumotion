@@ -31,8 +31,11 @@
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Use maybeDeferred properly. Not sure how this worked previously.
 	* flumotion/component/misc/httpfile/httpfile.py:
+	  Add remote expireKeycard method (as in httpstreamer), so that explicit
+	  keycard expiry will cause client disconnection as intended.
+
 	  Implement waiting for clients to disconnect and loggers to complete
-	  logging on shutdown.
+	  logging on shutdown, so we log properly on shutdown.
 
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
