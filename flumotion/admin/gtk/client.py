@@ -410,7 +410,7 @@ class Window(log.Loggable, gobject.GObject):
 
         def connected(model):
             self._window.set_sensitive(True)
-            self._set_admin_model(model)
+            self.setAdminModel(model)
             self._append_recent_connections()
 
         def refused(failure):
