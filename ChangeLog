@@ -1,3 +1,10 @@
+2007-11-13  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py:
+	Continue to refactor all the code in the callbacks
+	to separate methods, to have a clear separation
+	between internal api and callbacks used by the ui.
+
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.__init__)

@@ -40,7 +40,6 @@ from flumotion.common import connection
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, pb as fpb
 from flumotion.ui import trayicon
-
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
@@ -48,7 +47,6 @@ from flumotion.common import messages
 
 _ = gettext.gettext
 T_ = messages.gettexter('flumotion')
-
 
 class Window(log.Loggable, gobject.GObject):
     '''
@@ -137,6 +135,9 @@ class Window(log.Loggable, gobject.GObject):
     def whsRemove(self, state, key, value):
         if key == 'names':
             self.statusbar.set('main', 'Worker %s logged out.' % value)
+
+    def show(self):
+        self._window.show()
 
     # Private
 
@@ -285,7 +286,7 @@ class Window(log.Loggable, gobject.GObject):
 
         state = self._admin.getWorkerHeavenState()
         if not state.get('names'):
-            self._show_error_dialog(
+            self._error(
                 _('The wizard cannot be run because no workers are logged in.'))
             return
 
@@ -323,19 +324,16 @@ class Window(log.Loggable, gobject.GObject):
         d.addCallbacks(connected, refused)
         self._window.set_sensitive(False)
 
-    def _show_about_dialog(self):
-        about = dialogs.AboutDialog(self._window)
-        about.run()
-        about.destroy()
-
-    def _show_error_dialog(self, message):
-        d = dialogs.ErrorDialog(message, self._window,
-                                close_on_response=True)
-        d.show_all()
-
     def _update_components(self):
         self.components_view.update(self._components)
         self._trayicon.update(self._components)
+
+    def _clear_messages(self):
+        self._messages_view.clear()
+        pstate = self._planetState
+        if pstate and pstate.hasKey('messages'):
+            for message in pstate.get('messages').values():
+                self._messages_view.add_message(message)
 
     def _set_planet_state(self, planetState):
 
@@ -410,7 +408,7 @@ class Window(log.Loggable, gobject.GObject):
     def _component_modify(self, state):
         def propertyErrback(failure):
             failure.trap(errors.PropertyError)
-            self._show_error_dialog("%s." % failure.getErrorMessage())
+            self._error("%s." % failure.getErrorMessage())
             return None
 
         def after_getProperty(value, dialog):
@@ -521,125 +519,16 @@ class Window(log.Loggable, gobject.GObject):
 
         return d
 
-    def _clear_messages(self):
-        self._messages_view.clear()
-        pstate = self._planetState
-        if pstate and pstate.hasKey('messages'):
-            for message in pstate.get('messages').values():
-                self._messages_view.add_message(message)
+    def _component_activate(self, state, action):
+        self.debug('action %s on component %s' % (action,
+                                                  state.get('name')))
+        method_name = '_component_' + action
+        if hasattr(self, method_name):
+            getattr(self, method_name)(state)
+        else:
+            self.warning("No method '%s' implemented" % method_name)
 
-    def _set_stop_start_component_sensitive(self):
-        state = self._current_component_state
-        d = self._widgets
-        can_start = bool(state
-                         and moods.get(state.get('mood')).name == 'sleeping')
-        d['menuitem_manage_start_component'].set_sensitive(can_start)
-        d['toolbutton_start_component'].set_sensitive(can_start)
-
-        moodname = state and moods.get(state.get('mood')).name
-        can_stop = bool(moodname and moodname != 'sleeping')
-        can_delete = bool(state and not can_stop)
-        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
-        d['toolbutton_stop_component'].set_sensitive(can_stop)
-
-        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
-        d['toolbutton_delete_component'].set_sensitive(can_delete)
-        self.debug('can start %r, can stop %r' % (can_start, can_stop))
-
-    ### admin model callbacks
-
-    def _admin_connected_cb(self, admin):
-        self.info('Connected to manager')
-        if self._disconnected_dialog:
-            self._disconnected_dialog.destroy()
-            self._disconnected_dialog = None
-
-        # FIXME: have a method for this
-        self._window.set_title(_('%s - Flumotion Administration') %
-            self._admin.adminInfoStr())
-        self._trayicon.set_tooltip(self._admin.adminInfoStr())
-
-        self.emit('connected')
-
-        self._component_view.set_single_admin(admin)
-
-        self._set_planet_state(self._admin.planet)
-
-        if not self._components:
-            self.debug('no components detected, running wizard')
-            # ensure our window is shown
-            self.show()
-            self._run_wizard()
-
-    def _admin_disconnected_cb(self, admin):
-        self._components = {}
-        self._update_components()
-        self._clear_messages()
-        if self._planetState:
-            self._planetState.removeListener(self)
-            self._planetState = None
-
-        message = _("Lost connection to manager, reconnecting ...")
-        d = gtk.MessageDialog(self._window, gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
-        # FIXME: move this somewhere
-        RESPONSE_REFRESH = 1
-        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
-        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        d.connect("response", self._dialog_disconnected_response_cb)
-        d.show_all()
-        self._disconnected_dialog = d
-
-    def _dialog_disconnected_response_cb(self, dialog, id):
-        if id == gtk.RESPONSE_CANCEL:
-            # FIXME: notify admin of cancel
-            dialog.destroy()
-            return
-        elif id == 1:
-            self._admin.reconnect()
-
-    def _admin_connection_refused_cb(self, admin):
-        def refused_later():
-            message = _("Connection to manager on %s was refused.") % \
-                admin.connectionInfoStr()
-            self._trayicon.set_tooltip(_("Connection to %s was refused") %
-                self._admin.adminInfoStr())
-            self.info(message)
-            d = dialogs.ErrorDialog(message, self)
-            d.show_all()
-            d.connect('response', self._close)
-
-        log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, refused_later)
-        log.debug('adminclient', "handled connection-refused")
-
-    def _admin_connection_failed_cb(self, admin, reason):
-        def failed_later():
-            message = (
-                _("Connection to manager on %(conn)s failed (%(reason)s).") % {
-                    'conn': admin.connectionInfoStr(),
-                    'reason': reason,
-                })
-            self._trayicon.set_tooltip("Connection to %s failed" %
-                self._admin.adminInfoStr())
-            self.info(message)
-            d = dialogs.ErrorDialog(message, self._window)
-            d.show_all()
-            d.connect('response', self._close)
-
-        log.debug('adminclient', "handling connection-failed")
-        reactor.callLater(0, failed_later)
-        log.debug('adminclient', "handled connection-failed")
-
-    def _admin_update_cb(self, admin):
-        self._update_components()
-
-    ### ui callbacks
-
-    def _window_delete_event_cb(self, window, event):
-        self._close()
-
-    def _components_view_selection_changed_cb(self, view, state):
+    def _component_selection_changed(self, state):
         self.debug('component %s has selection', state)
         def compSet(state, key, value):
             if key == 'mood':
@@ -697,15 +586,108 @@ class Window(log.Loggable, gobject.GObject):
         #         _("Loading tab %s for %s ...") % (node.title, name))
         # node.statusbar = self.statusbar # hack
 
-    def _components_view_activated_cb(self, view, state, action):
-        self.debug('action %s on component %s' % (action, state.get('name')))
-        method_name = '_component_' + action
-        if hasattr(self, method_name):
-            getattr(self, method_name)(state)
-        else:
-            self.warning("No method '%s' implemented" % method_name)
+    def _connection_opened(self, admin):
+        self.info('Connected to manager')
+        if self._disconnected_dialog:
+            self._disconnected_dialog.destroy()
+            self._disconnected_dialog = None
 
-    def _component_view_start_stop_notify_cb(self, *args):
+        # FIXME: have a method for this
+        self._window.set_title(_('%s - Flumotion Administration') %
+            self._admin.adminInfoStr())
+        self._trayicon.set_tooltip(self._admin.adminInfoStr())
+
+        self.emit('connected')
+
+        self._component_view.set_single_admin(admin)
+
+        self._set_planet_state(admin.planet)
+
+        if not self._components:
+            self.debug('no components detected, running wizard')
+            # ensure our window is shown
+            self.show()
+            self._run_wizard()
+
+    def _connection_lost(self):
+        self._components = {}
+        self._update_components()
+        self._clear_messages()
+        if self._planetState:
+            self._planetState.removeListener(self)
+            self._planetState = None
+
+        def response(dialog, id):
+            if id == gtk.RESPONSE_CANCEL:
+                # FIXME: notify admin of cancel
+                dialog.destroy()
+                return
+            elif id == 1:
+                self._admin.reconnect()
+
+        message = _("Lost connection to manager, reconnecting ...")
+        d = gtk.MessageDialog(self._window, gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
+        # FIXME: move this somewhere
+        RESPONSE_REFRESH = 1
+        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
+        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        d.connect("response", response)
+        d.show_all()
+        self._disconnected_dialog = d
+
+    def _connection_refused(self):
+        def refused_later():
+            message = _("Connection to manager on %s was refused.") % \
+                self._admin.connectionInfoStr()
+            self._trayicon.set_tooltip(_("Connection to %s was refused") %
+                self._admin.adminInfoStr())
+            self.info(message)
+            d = dialogs.ErrorDialog(message, self)
+            d.show_all()
+            d.connect('response', self._close)
+
+        log.debug('adminclient', "handling connection-refused")
+        reactor.callLater(0, refused_later)
+        log.debug('adminclient', "handled connection-refused")
+
+    def _connection_failed(self, reason):
+        def failed_later():
+            message = (
+                _("Connection to manager on %(conn)s failed (%(reason)s).") % {
+                    'conn': self._admin.connectionInfoStr(),
+                    'reason': reason,
+                })
+            self._trayicon.set_tooltip("Connection to %s failed" %
+                self._admin.adminInfoStr())
+            self.info(message)
+            d = dialogs.ErrorDialog(message, self._window)
+            d.show_all()
+            d.connect('response', self._close)
+
+        log.debug('adminclient', "handling connection-failed")
+        reactor.callLater(0, failed_later)
+        log.debug('adminclient', "handled connection-failed")
+
+    def _set_stop_start_component_sensitive(self):
+        state = self._current_component_state
+        d = self._widgets
+        can_start = bool(state
+                         and moods.get(state.get('mood')).name == 'sleeping')
+        d['menuitem_manage_start_component'].set_sensitive(can_start)
+        d['toolbutton_start_component'].set_sensitive(can_start)
+
+        moodname = state and moods.get(state.get('mood')).name
+        can_stop = bool(moodname and moodname != 'sleeping')
+        can_delete = bool(state and not can_stop)
+        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
+        d['toolbutton_stop_component'].set_sensitive(can_stop)
+
+        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
+        d['toolbutton_delete_component'].set_sensitive(can_delete)
+        self.debug('can start %r, can stop %r' % (can_start, can_stop))
+
+    def _update_start_stop(self):
         can_start = self.components_view.get_property('can-start-any')
         can_stop = self.components_view.get_property('can-stop-any')
         self._widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
@@ -714,17 +696,25 @@ class Window(log.Loggable, gobject.GObject):
         s = self._widgets['menuitem_manage_clear_all'].set_sensitive
         s(can_start and not can_stop)
 
-    # menubar/toolbar callbacks
+    def _error(self, message):
+        d = dialogs.ErrorDialog(message, self._window,
+                                close_on_response=True)
+        d.show_all()
 
-    def connection_open_recent_cb(self, button):
+    def _open_recent_connection(self):
         d = gtkconnections.ConnectionsDialog(self._window)
+
         def on_have_connection(d, connectionInfo):
             d.destroy()
             self._open_connection(connectionInfo)
+
         d.connect('have-connection', on_have_connection)
         d.show()
 
-    def connection_open_existing_cb(self, button):
+    def _open_existing_connection(self):
+        from flumotion.admin.gtk import greeter
+        wiz = greeter.ConnectExisting()
+
         def got_state(state, g):
             g.set_sensitive(False)
             authenticator = fpb.Authenticator(username=state['user'],
@@ -735,34 +725,34 @@ class Window(log.Loggable, gobject.GObject):
             g.destroy()
             self._open_connection(info)
 
-        from flumotion.admin.gtk import greeter
-        wiz = greeter.ConnectExisting()
         d = wiz.run_async()
         d.addCallback(got_state, wiz)
 
-    def connection_import_configuration_cb(self, button):
+    def _import_configuration(self):
         d = gtk.FileChooserDialog(_("Import Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         d.set_default_response(gtk.RESPONSE_ACCEPT)
-        def on_import_response(d, response):
+
+        def response(d, response):
             if response == gtk.RESPONSE_ACCEPT:
                 name = d.get_filename()
                 conf_xml = open(name, 'r').read()
                 self._admin.loadConfiguration(conf_xml)
             d.destroy()
-        d.connect('response', on_import_response)
+
+        d.connect('response', response)
         d.show()
 
-    def connection_export_configuration_cb(self, button):
+    def _export_configuration(self):
         d = gtk.FileChooserDialog(_("Export Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         d.set_default_response(gtk.RESPONSE_ACCEPT)
 
-        def _get_configuration_cb(conf_xml, name, chooser):
+        def get_configuration(conf_xml, name, chooser):
             file_exists = True
             if os.path.exists(name):
                 d = gtk.MessageDialog(self._window, gtk.DIALOG_MODAL,
@@ -780,15 +770,132 @@ class Window(log.Loggable, gobject.GObject):
                 f.close()
                 chooser.destroy()
 
-        def on_export_response(d, response):
+        def response(d, response):
             if response == gtk.RESPONSE_ACCEPT:
                 deferred = self._admin.getConfiguration()
                 name = d.get_filename()
-                deferred.addCallback(_get_configuration_cb, name, d)
+                deferred.addCallback(get_configuration, name, d)
             else:
                 d.destroy()
-        d.connect('response', on_export_response)
+
+        d.connect('response', response)
         d.show()
+
+    def _reload_manager(self):
+        self._admin.reloadManager()
+
+    def _reload_admin(self):
+        self._admin.reloadAdmin()
+
+    def _reload_all(self):
+        dialog = dialogs.ProgressDialog(_("Reloading ..."),
+            _("Reloading client code"), self._window)
+
+        # FIXME: move all of the reloads over to this dialog
+        def _stopCallback(result):
+            dialog.stop()
+            dialog.destroy()
+
+        def _syntaxErrback(failure):
+            failure.trap(errors.ReloadSyntaxError)
+            dialog.stop()
+            dialog.destroy()
+            self._error(
+                _("Could not reload component:\n%s.") %
+                failure.getErrorMessage())
+            return None
+
+        def _defaultErrback(failure):
+            self.warning('Errback: unhandled failure: %s' %
+                failure.getErrorMessage())
+            return failure
+
+        def _callLater(admin):
+            d = self._admin.reload()
+            d.addCallback(_stopCallback)
+            d.addErrback(_syntaxErrback)
+            d.addErrback(_defaultErrback)
+
+        def _reloadCallback(admin, text):
+            dialog.message(_("Reloading %s code") % text)
+
+        self._admin.connect('reloading', _reloadCallback)
+        dialog.start()
+        reactor.callLater(0.2, _callLater, self._admin)
+
+    def _start_shell(self):
+        if sys.version_info >= (2, 4):
+            from flumotion.extern import code
+        else:
+            import code
+
+        vars = \
+            {
+                "admin": self._admin,
+                "components": self._components
+            }
+        message = """Flumotion Admin Debug Shell
+
+Local variables are:
+  admin      (flumotion.admin.admin.AdminModel)
+  components (dict: name -> flumotion.common.planet.AdminComponentState)
+
+You can do remote component calls using:
+  admin.componentCallRemote(components['component-name'],
+         'methodName', arg1, arg2)
+
+"""
+        code.interact(local=vars, banner=message)
+
+    def _about(self):
+        about = dialogs.AboutDialog(self._window)
+        about.run()
+        about.destroy()
+
+    ### admin model callbacks
+
+    def _admin_connected_cb(self, admin):
+        self._connection_opened(admin)
+
+    def _admin_disconnected_cb(self, admin):
+        self._connection_lost()
+
+    def _admin_connection_refused_cb(self, admin):
+        self._connection_refused()
+
+    def _admin_connection_failed_cb(self, admin, reason):
+        self._connection_failed(admin, reason)
+
+    def _admin_update_cb(self, admin):
+        self._update_components()
+
+    ### ui callbacks
+
+    def _window_delete_event_cb(self, window, event):
+        self._close()
+
+    def _components_view_selection_changed_cb(self, view, state):
+        self._component_selection_changed(state)
+
+    def _components_view_activated_cb(self, view, state, action):
+        self._component_activate(state, action)
+
+    def _component_view_start_stop_notify_cb(self, *args):
+        self._update_start_stop()
+
+    # menubar/toolbar callbacks
+
+    def connection_open_recent_cb(self, button):
+        self._open_recent_connection()
+
+    def connection_open_existing_cb(self, button):
+        self._open_existing_connection()
+
+    def connection_import_configuration_cb(self, button):
+        self._import_configuration()
+
+    def connection_export_configuration_cb(self, button):
+        self._export_configuration()
 
     def connection_quit_cb(self, button):
         self._close()
@@ -817,76 +924,18 @@ class Window(log.Loggable, gobject.GObject):
         self._run_wizard()
 
     def debug_reload_manager_cb(self, button):
-        self._admin.reloadManager()
+        self._reload_manager()
 
     def debug_reload_admin_cb(self, button):
-        self._admin.reloadAdmin()
+        self._reload_admin()
 
     def debug_reload_all_cb(self, button):
-        dialog = dialogs.ProgressDialog(_("Reloading ..."),
-            _("Reloading client code"), self._window)
-
-        # FIXME: move all of the reloads over to this dialog
-        def _stopCallback(result):
-            dialog.stop()
-            dialog.destroy()
-
-        def _syntaxErrback(failure):
-            failure.trap(errors.ReloadSyntaxError)
-            dialog.stop()
-            dialog.destroy()
-            self._show_error_dialog(
-                _("Could not reload component:\n%s.") %
-                failure.getErrorMessage())
-            return None
-
-        def _defaultErrback(failure):
-            self.warning('Errback: unhandled failure: %s' %
-                failure.getErrorMessage())
-            return failure
-
-        def _callLater(admin):
-            d = self._admin.reload()
-            d.addCallback(_stopCallback)
-            d.addErrback(_syntaxErrback)
-            d.addErrback(_defaultErrback)
-
-        def _reloadCallback(admin, text):
-            dialog.message(_("Reloading %s code") % text)
-
-        self._admin.connect('reloading', _reloadCallback)
-        dialog.start()
-        reactor.callLater(0.2, _callLater, self._admin)
+        self._reload_all()
 
     def debug_start_shell_cb(self, button):
-        if sys.version_info >= (2, 4):
-            from flumotion.extern import code
-        else:
-            import code
-
-        vars = \
-            {
-                "admin": self._admin,
-                "components": self._components
-            }
-        message = """Flumotion Admin Debug Shell
-
-Local variables are:
-  admin      (flumotion.admin.admin.AdminModel)
-  components (dict: name -> flumotion.common.planet.AdminComponentState)
-
-You can do remote component calls using:
-  admin.componentCallRemote(components['component-name'],
-         'methodName', arg1, arg2)
-
-"""
-        code.interact(local=vars, banner=message)
+        self._start_shell()
 
     def help_about_cb(self, button):
-        self._show_about_dialog()
-
-    def show(self):
-        # XXX: Use show()
-        self._window.show()
+        self._about()
 
 pygobject.type_register(Window)
