@@ -623,20 +623,21 @@ class FeedMap(object, log.Loggable):
     logName = 'feed-map'
     def __init__(self):
         self.avatars = {}
-        # all four data sets are caches whose validity is marked by
-        # self._dirty
+        self._ordered_avatars = []
         self._dirty = True
         self._recalc()
 
     def componentAttached(self, avatar):
         assert avatar.avatarId not in self.avatars
         self.avatars[avatar.avatarId] = avatar
+        self._ordered_avatars.append(avatar)
         self._dirty = True
 
     def componentDetached(self, avatar):
         # returns the a list of other components that will need to be
         # reconnected
         del self.avatars[avatar.avatarId]
+        self._ordered_avatars.remove(avatar)
         self._dirty = True
         return self.feedDeps.pop(avatar, [])
 
@@ -660,8 +661,7 @@ class FeedMap(object, log.Loggable):
         self.feeds = dictlist()
         self.feedDeps = dictlist()
 
-        # FIXME: does not choose feeds in a predictable order
-        for comp in self.avatars.values():
+        for comp in self._ordered_avatars:
             for feederName in comp.getFeeders():
                 self.feeds.add(comp.getFullFeedId(feederName),
                                (comp, feederName))

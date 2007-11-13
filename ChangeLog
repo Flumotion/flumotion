@@ -1,3 +1,11 @@
+2007-11-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (FeedMap.__init__)
+	(FeedMap.componentAttached, FeedMap.componentDetached): Maintain
+	an ordered list of avatars.
+	(FeedMap._recalc): If multiple components supply a feed, prefer
+	the one that has been logged in longer.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
