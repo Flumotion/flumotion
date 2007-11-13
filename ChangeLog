@@ -1,3 +1,9 @@
+2007-11-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.__init__)
+	(ComponentAvatar.onShutdown, ComponentAvatar.onShutdown): Remove
+	some unused code.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:

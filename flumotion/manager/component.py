@@ -72,8 +72,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self.makeComponentState(conf)
         self.clocking = clocking
 
-        self._ports = {}
-
         self._shutdown_requested = False
 
         self._happydefers = [] # deferreds to call when mood changes to happy
@@ -222,9 +220,6 @@ class ComponentAvatar(base.ManagerAvatar):
             ip, port, base_time = self.clocking
             self.vishnu.releasePortsOnWorker(self.getWorkerName(),
                                              [port])
-        if self._ports:
-            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
-                                             self._ports.values())
 
         self.componentState.clearJobState()
 
@@ -263,10 +258,6 @@ class ComponentAvatar(base.ManagerAvatar):
 
         # detach componentstate from avatar
         self.componentState = None
-        self.jobState = None
-
-        self._ports = {}
-
         self.jobState = None
 
         base.ManagerAvatar.onShutdown(self)
