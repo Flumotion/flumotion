@@ -1,5 +1,12 @@
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/main.py (main): 
+	* flumotion/admin/gtk/client.py (Window.setAdminModel): 
+	Add setAdminModel as public API.
+	Call the constructor before connecting and setAdminModel
+	when connected, this makes it less painful to debug errors 
+	in the admin client happening at the startup.
+	
 	* data/glade/admin.glade:
 	* flumotion/admin/gtk/client.py:
 	Move over to using GtkUIManager, which has proper UI merging

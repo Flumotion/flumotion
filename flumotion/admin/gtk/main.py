@@ -117,6 +117,15 @@ def main(args):
     else:
         d = startAdminFromGreeter(Greeter())
 
+    from flumotion.ui.icons import register_icons
+    register_icons()
+
+    win = Window()
+
+    def adminStarted(admin):
+        win.setAdminModel(admin)
+        win.show()
+
     def failure(failure):
         message = "".join(failure.value.args)
         log.warning('admin', "Failed to connect: %s",
@@ -124,9 +133,6 @@ def main(args):
         sys.stderr.write("Connection to manager failed: %s\n" % message)
         reactor.stop()
 
-    from flumotion.ui.icons import register_icons
-    register_icons()
-
-    d.addCallbacks(lambda model: Window(model).show(), failure)
+    d.addCallbacks(adminStarted, failure)
 
     reactor.run()

@@ -118,7 +118,7 @@ class Window(log.Loggable, gobject.GObject):
     logCategory = 'adminview'
     gsignal('connected')
 
-    def __init__(self, model):
+    def __init__(self):
         gobject.GObject.__init__(self)
 
         self._trayicon = None
@@ -134,7 +134,6 @@ class Window(log.Loggable, gobject.GObject):
 
         self._create_ui()
         self._append_recent_connections()
-        self._set_admin_model(model)
 
     # Public API
 
@@ -198,6 +197,31 @@ class Window(log.Loggable, gobject.GObject):
 
     def show(self):
         self._window.show()
+
+    def setAdminModel(self, model):
+        'set the model to which we are a view/controller'
+        # it's ok if we've already been connected
+        self.debug('setting model')
+
+        if self._admin:
+            self.debug('Connecting to new model %r' % model)
+            if self._wizard:
+                self._wizard.destroy()
+
+        self._admin = model
+
+        # window gets created after model connects initially, so check
+        # here
+        if self._admin.isConnected():
+            self._admin_connected_cb(model)
+
+        self._admin.connect('connected', self._admin_connected_cb)
+        self._admin.connect('disconnected', self._admin_disconnected_cb)
+        self._admin.connect('connection-refused',
+                           self._admin_connection_refused_cb)
+        self._admin.connect('connection-failed',
+                           self._admin_connection_failed_cb)
+        self._admin.connect('update', self._admin_update_cb)
 
     # Private
 
@@ -334,31 +358,6 @@ class Window(log.Loggable, gobject.GObject):
 
         self._recent_menu_uid = self._uimgr.add_ui_from_string(
             RECENT_UI_TEMPLATE % ui)
-
-    def _set_admin_model(self, model):
-        'set the model to which we are a view/controller'
-        # it's ok if we've already been connected
-        self.debug('setting model')
-
-        if self._admin:
-            self.debug('Connecting to new model %r' % model)
-            if self._wizard:
-                self._wizard.destroy()
-
-        self._admin = model
-
-        # window gets created after model connects initially, so check
-        # here
-        if self._admin.isConnected():
-            self._admin_connected_cb(model)
-
-        self._admin.connect('connected', self._admin_connected_cb)
-        self._admin.connect('disconnected', self._admin_disconnected_cb)
-        self._admin.connect('connection-refused',
-                           self._admin_connection_refused_cb)
-        self._admin.connect('connection-failed',
-                           self._admin_connection_failed_cb)
-        self._admin.connect('update', self._admin_update_cb)
 
     def _close(self, *args):
         reactor.stop()
