@@ -276,22 +276,51 @@ class ManagerComponentState(flavors.StateCacheable):
         jobState.addListener(self, proxy('set'), proxy('append'),
                              proxy('remove'))
 
+    def set(self, key, value):
+        # extend set so we can log mood changes
+        if key == 'mood':
+            log.info('componentstate', 'mood of %s changed to %s',
+                     self.get('name'), moods.get(value).name)
+        flavors.StateCacheable.set(self, key, value)
+
     def setMood(self, moodValue):
-        log.debug('componentstate', 'told to change mood from %s to %d',
-                  self.get('mood'), moodValue)
         if self._jobState and moodValue != moods.sad.value:
             log.warning('componentstate', 'cannot set component mood to '
                         'something other than sad when we have a '
                         'jobState -- fix your code!')
+        elif moodValue == self.get('mood'):
+            log.log('componentstate', '%s already in mood %d',
+                    self.get('name'), moodValue)
         else:
+            log.debug('componentstate', 'manager sets mood of %s from %s to %d',
+                      self.get('name'), self.get('mood'), moodValue)
             self.set('mood', moodValue)
 
-    def clearJobState(self):
+    def clearJobState(self, shutdownRequested):
         """
         Remove the job state.
         """
+        # Clear messages proxied from job
+        for m in self._jobState.get('messages'):
+            self.remove('messages', m)
+
         self._jobState.removeListener(self)
         self._jobState = None
+
+        # Clearing a job state means that a component logged out. If we
+        # were sad, leave the mood as it is. Otherwise if shut down due
+        # to an explicit manager request, go to sleeping. Otherwise, go
+        # to lost, because it got disconnected for an unknown reason
+        # (probably network related)
+        if self.get('mood') != moods.sad.value:
+            if shutdownRequested:
+                log.debug('componentstate', "Shutdown was requested, %s"
+                          " now sleeping", self.get('name'))
+                self.setMood(moods.sleeping.value)
+            else:
+                log.debug('componentstate', "Shutdown was NOT requested,"
+                          " %s now lost", self.get('name'))
+                self.setMood(moods.lost.value)
 
 class AdminComponentState(flavors.StateRemoteCache):
     """

@@ -1,3 +1,31 @@
+2007-11-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentAvatar.__init__)
+	(ComponentAvatar.addMoodListener, ComponentAvatar.stateSet):
+	Remove happydefer code, as it's unused. Remove mood logger, it
+	was leaky and the code is now in planet.py.
+	(ComponentAvatar.__repr__, ComponentAvatar.makeComponentState):
+	Move around.
+	(ComponentAvatar.upgradeConfig): Nationalize.
+	(ComponentAvatar.onShutdown): Move some logic to planet.py.
+	(FeedMap.getFeederAvatar): Log feed choices only for virtual
+	feeds.
+	(ComponentHeaven.componentDetached): Don't reconnect components if
+	we are shutting down.
+
+	* flumotion/manager/manager.py (Vishnu.__init__.setStopped):
+	Manager a self.running attribute, False when we are shutting down.
+
+	* flumotion/common/planet.py (ManagerComponentState.set): Log mood
+	changes here; removes the need for extra StateCache listeners in
+	other places.
+	(ManagerComponentState.setMood): Don't do anything if the mood is
+	the same. Add more debugging.
+	(ManagerComponentState.clearJobState): Add more logic from
+	manager/component.py, clearing out any messages proxied from the
+	job state, and setting the mood to sleeping or lost, depending on
+	whether the logout was forseen or not.
+
 2007-11-13  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

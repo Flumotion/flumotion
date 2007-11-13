@@ -210,6 +210,11 @@ class Vishnu(log.Loggable):
         self.adminHeaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
 
+        self.running = True
+        def setStopped():
+            self.running = False
+        reactor.addSystemEventTrigger('before', 'shutdown', setStopped)
+
         if configDir is not None:
             self.configDir = configDir
         else:

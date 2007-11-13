@@ -74,71 +74,22 @@ class ComponentAvatar(base.ManagerAvatar):
 
         self._shutdown_requested = False
 
-        self._happydefers = [] # deferreds to call when mood changes to happy
-
         self.vishnu.registerComponent(self)
-        self.addMoodListener()
         # calllater to allow the component a chance to receive its
         # avatar, so that it has set medium.remote
         reactor.callLater(0, self.heaven.componentAttached, self)
 
-    def makeComponentState(self, conf):
-        # the component just logged in with good credentials. we fetched
-        # its config and job state. now there are two possibilities:
-        #  (1) we were waiting for such a component to start. There was
-        #      a ManagerComponentState and an avatarId in the
-        #      componentMappers waiting for us.
-        #  (2) we don't know anything about this component, but it has a
-        #      state and config. We deal with it, creating all the
-        #      neccesary internal state.
-        def verifyExistingComponentState(conf, state):
-            # condition (1)
-            state.setJobState(self.jobState)
-            self.componentState = state
+    ### python methods
+    def __repr__(self):
+        mood = '(unknown)'
+        if self.componentState:
+            moodValue = self.componentState.get('mood')
+            if moodValue is not None:
+                mood = moods.get(moodValue).name
+        return '<%s %s (mood %s)>' % (self.__class__.__name__,
+                                      self.avatarId, mood)
 
-            self._upgradeConfig(state, conf)
-            if state.get('config') != conf:
-                diff = config.dictDiff(state.get('config'), conf)
-                diffMsg = config.dictDiffMessageString(diff,
-                                                   'internal conf',
-                                                   'running conf')
-                self.addMessage(messages.WARNING, 'stale-config',
-                                N_("Component logged in with stale "
-                                   "configuration. Consider stopping "
-                                   "this component and restarting "
-                                   "the manager."),
-                                debug=("Updating internal conf from "
-                                       "running conf:\n" + diffMsg))
-                self.warning('updating internal component state for %r',
-                             state)
-                self.debug('changes to conf: %s',
-                           config.dictDiffMessageString(diff))
-                state.set('config', conf)
-
-        def makeNewComponentState(conf):
-            # condition (2)
-            state = planet.ManagerComponentState()
-            state.setJobState(self.jobState)
-            self.componentState = state
-
-            self._upgradeConfig(state, conf)
-
-            flowName, compName = conf['parent'], conf['name']
-
-            state.set('name', compName)
-            state.set('type', conf['type'])
-            state.set('workerRequested', self.jobState.get('workerName'))
-            state.set('config', conf)
-            self.vishnu.addComponentToFlow(state, flowName)
-            return state
-
-        mState = self.vishnu.getManagerComponentState(self.avatarId)
-        if mState:
-            verifyExistingComponentState(conf, mState)
-            return mState
-        else:
-            return makeNewComponentState(conf)
-
+    ### ComponentAvatar methods
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
                            mind):
         def gotStates(result):
@@ -156,17 +107,30 @@ class ComponentAvatar(base.ManagerAvatar):
         return d
     makeAvatarInitArgs = classmethod(makeAvatarInitArgs)
 
-    ### python methods
-    def __repr__(self):
-        mood = '(unknown)'
-        if self.componentState:
-            moodValue = self.componentState.get('mood')
-            if moodValue is not None:
-                mood = moods.get(moodValue).name
-        return '<%s %s (mood %s)>' % (self.__class__.__name__,
-                                      self.avatarId, mood)
+    def onShutdown(self):
+        # doc in base class
+        self.info('component "%s" logged out', self.avatarId)
 
-    ### ComponentAvatar methods
+        self.vishnu.unregisterComponent(self)
+
+        if self.clocking:
+            ip, port, base_time = self.clocking
+            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
+                                             [port])
+
+        self.componentState.clearJobState(self._shutdown_requested)
+
+        # FIXME: why?
+        self.componentState.set('moodPending', None)
+
+        self.componentState = None
+        self.jobState = None
+
+        self.heaven.componentDetached(self)
+
+        base.ManagerAvatar.onShutdown(self)
+
+    # my methods
     def addMessage(self, level, id, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
@@ -193,7 +157,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         self.componentState.append('messages', message)
 
-    def _upgradeConfig(self, state, conf):
+    def upgradeConfig(self, state, conf):
         # different from conf['version'], eh...
         version = conf.get('config-version', 0)
         while version < config.CURRENT_VERSION:
@@ -210,79 +174,62 @@ class ComponentAvatar(base.ManagerAvatar):
                                 debug=log.getExceptionMessage(e))
                 return
 
-    def onShutdown(self):
-        # doc in base class
-        self.vishnu.unregisterComponent(self)
+    def makeComponentState(self, conf):
+        # the component just logged in with good credentials. we fetched
+        # its config and job state. now there are two possibilities:
+        #  (1) we were waiting for such a component to start. There was
+        #      a ManagerComponentState and an avatarId in the
+        #      componentMappers waiting for us.
+        #  (2) we don't know anything about this component, but it has a
+        #      state and config. We deal with it, creating all the
+        #      neccesary internal state.
+        def verifyExistingComponentState(conf, state):
+            # condition (1)
+            state.setJobState(self.jobState)
+            self.componentState = state
 
-        self.info('component "%s" logged out', self.avatarId)
+            self.upgradeConfig(state, conf)
+            if state.get('config') != conf:
+                diff = config.dictDiff(state.get('config'), conf)
+                diffMsg = config.dictDiffMessageString(diff,
+                                                   'internal conf',
+                                                   'running conf')
+                self.addMessage(messages.WARNING, 'stale-config',
+                                N_("Component logged in with stale "
+                                   "configuration. Consider stopping "
+                                   "this component and restarting "
+                                   "the manager."),
+                                debug=("Updating internal conf from "
+                                       "running conf:\n" + diffMsg))
+                self.warning('updating internal component state for %r',
+                             state)
+                self.debug('changes to conf: %s',
+                           config.dictDiffMessageString(diff))
+                state.set('config', conf)
 
-        if self.clocking:
-            ip, port, base_time = self.clocking
-            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
-                                             [port])
+        def makeNewComponentState(conf):
+            # condition (2)
+            state = planet.ManagerComponentState()
+            state.setJobState(self.jobState)
+            self.componentState = state
 
-        self.componentState.clearJobState()
+            self.upgradeConfig(state, conf)
 
-        # Now that we have detached the job state, we might need to
-        # munge the mood.
-        def setMood(mood):
-            if self.componentState.get('mood') != mood.value:
-                self.debug('Setting mood to %r' % mood)
-                self.componentState.setMood(mood.value)
+            flowName, compName = conf['parent'], conf['name']
 
-        def getMoodValue():
-            return self.componentState.get('mood')
+            state.set('name', compName)
+            state.set('type', conf['type'])
+            state.set('workerRequested', self.jobState.get('workerName'))
+            state.set('config', conf)
+            self.vishnu.addComponentToFlow(state, flowName)
+            return state
 
-        # If we were sad, leave the mood as it is. Otherwise if shut
-        # down due to an explicit manager request, go to sleeping.
-        # Otherwise, go to lost, because it got disconnected for an
-        # unknown reason (probably network related)
-        if getMoodValue() != moods.sad.value:
-            if self._shutdown_requested:
-                self.debug("Shutdown was requested, component now sleeping")
-                setMood(moods.sleeping)
-            else:
-                self.debug("Shutdown was NOT requested, component now lost")
-                setMood(moods.lost)
+        mState = self.vishnu.getManagerComponentState(self.avatarId)
+        if mState:
+            verifyExistingComponentState(conf, mState)
+        else:
+            makeNewComponentState(conf)
 
-        # FIXME: why?
-        self.componentState.set('moodPending', None)
-
-        # Now we're detached (no longer proxying state from the component)
-        # clear all remaining messages
-        for m in self.componentState.get('messages'):
-            self.debug('Removing message %r', m)
-            self.componentState.remove('messages', m)
-
-        self.heaven.componentDetached(self)
-
-        # detach componentstate from avatar
-        self.componentState = None
-        self.jobState = None
-
-        base.ManagerAvatar.onShutdown(self)
-
-    def addMoodListener(self):
-        # Handle initial state appropriately.
-        if self.jobState.get('mood') == moods.happy.value:
-            for d in self._happydefers:
-                d.callback(True)
-            self._happydefers = []
-        self.jobState.addListener(self, set=self.stateSet)
-
-    # IStateListener methods
-    def stateSet(self, state, key, value):
-        self.log("state set on %r: %s now %r" % (state, key, value))
-        if key == 'mood':
-            self.info('Mood changed to %s' % moods.get(value).name)
-
-            if value == moods.happy.value:
-                # callback any deferreds waiting on this -- what is this
-                # for?
-                while self._happydefers:
-                    self._happydefers.pop(0).callback(True)
-
-    # my methods
     def provideMasterClock(self):
         """
         Tell the component to provide a master clock.
@@ -640,8 +587,9 @@ class FeedMap(object, log.Loggable):
         if ffid in self.feeds:
             feeder, feedName = self.feeds[ffid][0]
             self.feedDeps.add(feeder, eater)
-            self.debug('chose %s for feed %s',
-                       feeder.getFeedId(feedName), feedId)
+            if feeder.getFeedId(feedName) != feedId:
+                self.debug('chose %s for feed %s',
+                           feeder.getFeedId(feedName), feedId)
         return feeder, feedName
         
     def _recalc(self):
@@ -774,8 +722,10 @@ class ComponentHeaven(base.ManagerHeaven):
 
     def componentDetached(self, avatar):
         assert avatar.avatarId not in self.avatars
-        for comp in self.feedMap.componentDetached(avatar):
-            self._connectEatersAndFeeders(comp)
+        compsNeedingReconnect = self.feedMap.componentDetached(avatar)
+        if self.vishnu.running:
+            for comp in compsNeedingReconnect:
+                self._connectEatersAndFeeders(comp)
 
     def mapNetFeed(self, fromAvatar, toAvatar):
         toHost = toAvatar.getClientAddress()
