@@ -68,8 +68,9 @@ class NodeBook(gtk.Notebook):
                 w.show()
             node.render().addCallback(got_widget, name, table, node)
 
-NUM_STATES = 3
-OBJECT_UNSET, OBJECT_INACTIVE, OBJECT_ACTIVE = range(NUM_STATES)
+(OBJECT_UNSET,
+ OBJECT_INACTIVE,
+ OBJECT_ACTIVE) = range(3)
 
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'

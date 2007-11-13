@@ -38,9 +38,9 @@ class FComboBox(gtk.ComboBox):
     I am an extended combobox that can be used as a string list combobox
     or with enums, with nick/name/value columns.
     """
-    COLUMN_NICK = 0
-    COLUMN_NAME = 1
-    COLUMN_VALUE = 2
+    (COLUMN_NICK,
+     COLUMN_NAME,
+     COLUMN_VALUE) = range(3)
 
     _column_types = str, str, int
 

@@ -36,13 +36,13 @@ from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
 
-COL_MOOD       = 0
-COL_NAME       = 1
-COL_WORKER     = 2
-COL_PID        = 3
-COL_STATE      = 4
-COL_MOOD_VALUE = 5 # to sort COL_MOOD
-COL_CPU        = 6
+(COL_MOOD,
+ COL_NAME,
+ COL_WORKER,
+ COL_PID,
+ COL_STATE,
+ COL_MOOD_VALUE, # to sort COL_MOOD
+ COL_CPU) = range(7)
 
 def getComponentLabel(state):
     config = state.get('config')

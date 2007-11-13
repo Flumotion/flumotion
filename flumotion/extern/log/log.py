@@ -46,11 +46,11 @@ _old_hup_handler = None
 
 
 # public log levels
-ERROR = 1
-WARN = 2
-INFO = 3
-DEBUG = 4
-LOG = 5
+(ERROR,
+ WARN,
+ INFO,
+ DEBUG,
+ LOG) = range(1, 6)
 
 COLORS = {ERROR: 'RED',
           WARN: 'YELLOW',

@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+import code
+
+# Variable templates
+LIBDIR = '/opt/flumotion//lib'
+PROGRAM_PATH = 'flumotion.manager.main.main'
+
+# setup the project root
+dirx = os.path.dirname(os.path.abspath(__file__))
+if os.path.exists(os.path.join(dirx, '..', 'flumotion', '.svn')):
+    root = os.path.split(dirx)[0]
+else:
+    root = os.path.join(LIBDIR, 'flumotion', 'python')
+sys.path.insert(0, root)
+
+from flumotion.common import setup
+from flumotion.common import bundle, config, errors, interfaces, log, registry
+from flumotion.common.options import OptionParser
+from flumotion.manager.manager import Vishnu
+from flumotion.manager.admin import AdminAvatar
+
+class FakeTransport:
+    def getPeer(self):
+        from twisted.internet.address import IPv4Address
+        return IPv4Address('TCP', 'nullhost', 1)
+    getHost = getPeer
+
+class FakeBroker:
+    def __init__(self):
+        self.transport = FakeTransport()
+
+class FakeMind:
+    def __init__(self):
+        self.broker = FakeBroker()
+
+    def notifyOnDisconnect(self, proc):
+        pass
+
+def _setup(ns):
+    setup.setupPackagePath()
+
+    ns['vishnu'] = vishnu = Vishnu('debug')
+    ns['avatar'] = AdminAvatar(vishnu.adminHeaven, 'admin', None, FakeMind())
+
+def main(args):
+    parser = OptionParser()
+    parser.add_option('-c', '--command',
+                     action="store", type="string", dest="command",
+                     help="ogram passed in as string (terminates option list)")
+    options, args = parser.parse_args(args)
+
+    ns = globals().copy()
+
+    _setup(ns)
+
+    if options.command:
+        exec options.command in ns
+        return
+
+    code.interact('flumotion', local=ns)
+
+main(sys.argv)

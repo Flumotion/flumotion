@@ -1,3 +1,13 @@
+2007-11-13  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/messages.py:
+	* flumotion/tester/client.py:
+	* flumotion/ui/fgtk.py:
+	use range() for enums
+
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py (AdminAvatar.perspective_shutdown):

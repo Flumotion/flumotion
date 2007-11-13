@@ -1,3 +1,9 @@
+2007-11-13  Johan Dahlin,,,  <jdahlin@plasttroll>
+
+	reviewed by: <delete if not using a buddy>
+
+	* log.py:
+
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
 	* log.py (getLoggingSettings, setLoggingSettings): 

@@ -31,9 +31,9 @@ from flumotion.twisted import credentials
 from flumotion.common import common
 
 # state enum values
-REFUSED = 0
-REQUESTING = 1
-AUTHENTICATED = 2
+(REFUSED,
+ REQUESTING,
+ AUTHENTICATED) = range(3)
 _statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 
 class Keycard(pb.Copyable, pb.RemoteCopy):

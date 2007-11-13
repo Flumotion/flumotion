@@ -29,9 +29,9 @@ import gettext
 from flumotion.common import log
 from twisted.spread import pb
 
-ERROR = 1
-WARNING = 2
-INFO = 3
+(ERROR,
+ WARNING,
+ INFO) = range(1, 4)
 
 def N_(format):
     """
