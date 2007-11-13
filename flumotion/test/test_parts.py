@@ -140,7 +140,7 @@ class TestComponentsView(testsuite.TestCase):
             test.asserted = True
 
         self.testUpdate()
-        self.view.connect('has-selection', assertSelected, self)
+        self.view.connect('selection-changed', assertSelected, self)
         self.asserted = False
         self.view._view.set_cursor('0')
         self.failUnless(self.asserted)

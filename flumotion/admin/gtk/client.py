@@ -185,8 +185,8 @@ class Window(log.Loggable, gobject.GObject):
 
 
         self.components_view = parts.ComponentsView(widgets['components_view'])
-        self.components_view.connect('has-selection',
-            self._components_view_has_selection_cb)
+        self.components_view.connect('selection_changed',
+            self._components_view_selection_changed_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
@@ -642,7 +642,7 @@ class Window(log.Loggable, gobject.GObject):
     def _on_window_delete_event(self, window, event):
         self._close()
 
-    def _components_view_has_selection_cb(self, view, state):
+    def _components_view_selection_changed_cb(self, view, state):
         self.debug('component %s has selection', state)
         def compSet(state, key, value):
             if key == 'mood':

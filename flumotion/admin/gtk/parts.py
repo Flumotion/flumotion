@@ -139,7 +139,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
     logCategory = 'components'
 
-    gsignal('has-selection', object)  # state-or-None
+    gsignal('selection-changed', object)  # state-or-None
     gsignal('activated', object, str) # state, action name
     #gsignal('right-clicked', object, int, float)
 
@@ -230,16 +230,16 @@ class ComponentsView(log.Loggable, gobject.GObject):
         state = self.get_selected_state()
 
         if not state:
-            self.debug('no component selected, emitting has-selection None')
-            self.emit('has-selection', None)
+            self.debug('no component selected, emitting selection-changed None')
+            self.emit('selection-changed', None)
             return
 
         if state == self._last_state:
             return
 
         self._last_state = state
-        self.debug('component selected, emitting has-selection')
-        self.emit('has-selection', state)
+        self.debug('component selected, emitting selection-changed')
+        self.emit('selection-changed', state)
 
     def _view_button_press_event_cb(self, treeview, event):
         # right-click ?
