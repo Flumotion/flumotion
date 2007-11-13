@@ -54,6 +54,8 @@ class CancellableRequest(server.Request):
         self._start_time = time.time()
         self._lastTimeWritten = self._start_time
 
+        self._fd = self.transport.fileno()
+
         self._component.requestStarted(self)
 
     def write(self, data):
@@ -70,9 +72,8 @@ class CancellableRequest(server.Request):
         self.requestCompleted(fd)
 
     def connectionLost(self, reason):
-        fd = self.transport.fileno()
         server.Request.connectionLost(self, reason)
-        self.requestCompleted(fd)
+        self.requestCompleted(self._fd)
 
     def requestCompleted(self, fd):
         if not self._completed:
@@ -113,6 +114,9 @@ class HTTPFileMedium(component.BaseComponentMedium):
         """
         return self.callRemote('removeKeycardId', bouncerName, keycardId)
 
+    def remote_expireKeycard(self, keycardId):
+        return self.comp.httpauth.expireKeycard(keycardId)
+
     def remote_getStreamData(self):
         return self.comp.getStreamData()
 
@@ -145,13 +149,15 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._description = 'On-Demand Flumotion Stream'
 
         self._singleFile = False
-        self._connected_clients = []
+        self._connected_clients = {} # fd -> CancellableRequest
         self._total_bytes_written = 0
 
         self._pbclient = None
 
         self._twistedPort = None
         self._timeoutRequestsCallLater = None
+
+        self._pendingDisconnects = {}
 
         # FIXME: maybe we want to allow the configuration to specify
         # additional mime -> File class mapping ?
@@ -314,8 +320,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if self._twistedPort:
             self._twistedPort.stopListening()
 
+        l = [self.remove_all_clients()]
         if self.type == 'slave' and self._pbclient:
-            return self._pbclient.deregisterPath(self.mountPoint)
+            l.append(self._pbclient.deregisterPath(self.mountPoint))
+        return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):
         """
@@ -348,7 +356,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     def _timeoutRequests(self):
         now = time.time()
-        for request in self._connected_clients:
+        for request in self._connected_clients.values():
             if now - request._lastTimeWritten > self.REQUEST_TIMEOUT:
                 self.debug("Timing out connection")
                 # Apparently this is private API. However, calling
@@ -361,14 +369,43 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
+    def remove_client(self, fd):
+        """
+        Remove a client when requested.
+
+        Used by keycard expiry.
+        """
+        if fd in self._connected_clients:
+            request = self._connected_clients[fd]
+            self.debug("Removing client for fd %d", fd)
+            request.unregisterProducer()
+            request.channel.transport.loseConnection()
+        else:
+            self.debug("No client with fd %d found", fd)
+
+    def remove_all_clients(self):
+        l = []
+        for fd in self._connected_clients:
+            d = defer.Deferred()
+            self._pendingDisconnects[fd] = d
+            l.append(d)
+
+            request = self._connected_clients[fd]
+            request.unregisterProducer()
+            request.channel.transport.loseConnection()
+
+        self.debug("Waiting for %d clients to finish", len(l))
+        return defer.DeferredList(l)
+
     def requestStarted(self, request):
-        self._connected_clients.append(request)
+        fd = request.transport.fileno() # ugly!
+        self._connected_clients[fd] = request
         self.uiState.set("connected-clients", len(self._connected_clients))
 
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
         self.httpauth.cleanupAuth(fd)
         headers = request.getAllHeaders()
-
+        
         ip = request.getClientIP()
         if not self._logfilter or not self._logfilter.isInRange(ip):
             args = {'ip': ip,
@@ -384,15 +421,28 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                     'user-agent': headers.get('user-agent', None),
                     'time-connected': timeConnected}
 
+            l = []
             for logger in self._loggers:
-                logger.event('http_session_completed', args)
+                l.append(defer.maybeDeferred(
+                    logger.event, 'http_session_completed', args))
+            d = defer.DeferredList(l)
+        else:
+            d = defer.succeed(None)
 
-        self._connected_clients.remove(request)
+        del self._connected_clients[fd]
 
         self.uiState.set("connected-clients", len(self._connected_clients))
 
         self._total_bytes_written += bytesWritten
         self.uiState.set("bytes-transferred", self._total_bytes_written)
+
+        def firePendingDisconnect(_):
+            self.debug("Logging completed")
+            if fd in self._pendingDisconnects:
+                pending = self._pendingDisconnects.pop(fd)
+                self.debug("Firing pending disconnect deferred")
+                pending.callback(None)
+        d.addCallback(firePendingDisconnect)
 
     def getDescription(self):
         return self._description
@@ -420,7 +470,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         them as zero.
         """
         bytesTransferred = self._total_bytes_written
-        for request in self._connected_clients:
+        for request in self._connected_clients.values():
             if request._transfer:
                 bytesTransferred += request._transfer.bytesWritten
 

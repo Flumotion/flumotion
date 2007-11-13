@@ -1,3 +1,11 @@
+2007-11-13  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Use maybeDeferred properly. Not sure how this worked previously.
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Implement waiting for clients to disconnect and loggers to complete
+	  logging on shutdown.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
