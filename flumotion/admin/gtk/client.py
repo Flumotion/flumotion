@@ -242,7 +242,7 @@ class Window(log.Loggable, gobject.GObject):
 
         actions = [
             # Connection
-            ('connection', None, _("Connection")),
+            ('connection', None, _("_Connection")),
             ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'), None,
              None, self._connection_open_recent_cb),
             ('open-existing', None, _('Open _Existing Connection...'), None,
