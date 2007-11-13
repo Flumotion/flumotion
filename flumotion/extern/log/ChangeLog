@@ -1,8 +1,6 @@
-2007-11-13  Johan Dahlin,,,  <jdahlin@plasttroll>
+2007-11-07  Johan Dahlin  <johan@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
-
-	* log.py:
+	* log.py: use range() for an enum
 
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
