@@ -1,6 +1,9 @@
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
+	(Window._admin_connected_cb): Use consistent naming and 
+	put private callLater callbacks in nested scopes
+
 	* flumotion/admin/gtk/parts.py:
 	* flumotion/test/test_parts.py:
 	* tests/ComponentsView.py:

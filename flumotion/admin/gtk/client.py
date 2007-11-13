@@ -64,7 +64,6 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, model):
         gobject.GObject.__init__(self)
 
-
         self._trayicon = None
         self._current_component_state = None
         self._disconnected_dialog = None # set to a dialog when disconnected
@@ -153,7 +152,7 @@ class Window(log.Loggable, gobject.GObject):
         widgets = self._widgets
 
         window = self._window = widgets['main_window']
-        window.connect('delete-event', self._on_window_delete_event)
+        window.connect('delete-event', self._window_delete_event_cb)
 
         def set_icon(proc, size, name):
             i = gtk.Image()
@@ -220,12 +219,14 @@ class Window(log.Loggable, gobject.GObject):
         if not clist:
             return
 
+        def recent_activate(widget, connectionInfo):
+            self._open_connection(connectionInfo)
         def append(i):
             i.show()
             gtk.MenuShell.append(menu, i) # $%^&* pychecker
         def append_txt(c, n):
             i = gtk.MenuItem(c['name'])
-            i.connect('activate', self._on_recent_activate, c['info'])
+            i.connect('activate', recent_activate, c['info'])
             append(i)
 
         append(gtk.SeparatorMenuItem())
@@ -597,38 +598,37 @@ class Window(log.Loggable, gobject.GObject):
         elif id == 1:
             self._admin.reconnect()
 
-    def _admin_connection_refused_later(self, admin):
-        message = _("Connection to manager on %s was refused.") % \
-            admin.connectionInfoStr()
-        self._trayicon.set_tooltip(_("Connection to %s was refused") %
-            self._admin.adminInfoStr())
-        self.info(message)
-        d = dialogs.ErrorDialog(message, self)
-        d.show_all()
-        d.connect('response', self._close)
-
     def _admin_connection_refused_cb(self, admin):
+        def refused_later():
+            message = _("Connection to manager on %s was refused.") % \
+                admin.connectionInfoStr()
+            self._trayicon.set_tooltip(_("Connection to %s was refused") %
+                self._admin.adminInfoStr())
+            self.info(message)
+            d = dialogs.ErrorDialog(message, self)
+            d.show_all()
+            d.connect('response', self._close)
+
         log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, self._admin_connection_refused_later, admin)
+        reactor.callLater(0, refused_later)
         log.debug('adminclient', "handled connection-refused")
 
-    def _admin_connection_failed_later(self, admin, reason):
-        message = (
-            _("Connection to manager on %(conn)s failed (%(reason)s).") % {
-                'conn': admin.connectionInfoStr(),
-                'reason': reason,
-            })
-        self._trayicon.set_tooltip("Connection to %s failed" %
-            self._admin.adminInfoStr())
-        self.info(message)
-        d = dialogs.ErrorDialog(message, self._window)
-        d.show_all()
-        d.connect('response', self._close)
-
     def _admin_connection_failed_cb(self, admin, reason):
+        def failed_later():
+            message = (
+                _("Connection to manager on %(conn)s failed (%(reason)s).") % {
+                    'conn': admin.connectionInfoStr(),
+                    'reason': reason,
+                })
+            self._trayicon.set_tooltip("Connection to %s failed" %
+                self._admin.adminInfoStr())
+            self.info(message)
+            d = dialogs.ErrorDialog(message, self._window)
+            d.show_all()
+            d.connect('response', self._close)
+
         log.debug('adminclient', "handling connection-failed")
-        reactor.callLater(0, self._admin_connection_failed_later,
-                          admin, reason)
+        reactor.callLater(0, failed_later)
         log.debug('adminclient', "handled connection-failed")
 
     def _admin_update_cb(self, admin):
@@ -636,10 +636,7 @@ class Window(log.Loggable, gobject.GObject):
 
     ### ui callbacks
 
-    def _on_recent_activate(self, widget, connectionInfo):
-        self._open_connection(connectionInfo)
-
-    def _on_window_delete_event(self, window, event):
+    def _window_delete_event_cb(self, window, event):
         self._close()
 
     def _components_view_selection_changed_cb(self, view, state):
