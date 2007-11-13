@@ -1,5 +1,8 @@
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/admin.py (AdminAvatar.perspective_shutdown):
+	Remove some poorly-considered, uncalled code from July 2004.
+
 	* flumotion/admin/admin.py (AdminModel.setProperty)
 	(AdminModel.getProperty): 
 	* flumotion/admin/text/admin_text.py

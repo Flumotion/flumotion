@@ -151,13 +151,6 @@ class AdminAvatar(base.ManagerAvatar):
         self.debug("returning worker heaven state %r" % self.vishnu.state)
         return self.vishnu.workerHeaven.state
 
-    def perspective_shutdown(self):
-        """
-        Shut down the manager.
-        """
-        self.warning("Shutdown requested, shutting down...")
-        reactor.stop()
-
     def perspective_componentStart(self, componentState):
         """
         Start the given component.  The component should be sleeping before
