@@ -34,7 +34,6 @@ from twisted.python.failure import Failure
 from zope.interface import implements
 
 from flumotion.configure import configure
-# rename to base
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.common import messages, common
@@ -485,7 +484,6 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @type  keycardId: str
         """
-        self.debug('remotecalling removeKeycardId with id %s' % keycardId)
         return self.mindCallRemote('removeKeycardId', keycardId)
 
     def expireKeycard(self, keycardId):
@@ -495,7 +493,6 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @type  keycardId: str
         """
-        self.debug('remotecalling expireKeycard with id %s' % keycardId)
         return self.mindCallRemote('expireKeycard', keycardId)
 
     ### IPerspective methods, called by the worker's component

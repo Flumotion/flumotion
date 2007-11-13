@@ -78,15 +78,6 @@ class BaseAdminText(log.Loggable):
 
     ### child class methods to be overridden
 
-    def propertyChanged(self, name, value):
-        """
-        Override this method to be notified of component's properties that
-        have changed.
-
-        I am meant to be overridden.
-        """
-        self.debug("property %s changed to %r" % (name, value))
-
     def setup(self):
         """
         Set up the admin view so it can display nodes.

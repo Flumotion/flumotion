@@ -1,3 +1,21 @@
+2007-11-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py: Remove a comment bitrotten since
+	December 2004.
+	(ComponentAvatar.removeKeycardId)
+	(ComponentAvatar.expireKeycard): Remove redundant debug.
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtk.propertyChanged): 
+	* flumotion/component/base/admin_text.py
+	(BaseAdminText.propertyChanged): 
+	* flumotion/admin/text/admin_text.py
+	(BaseAdminText.propertyChanged): Removed unused interface.
+
+	* flumotion/component/bouncers/admin_gtk.py
+	(KeycardsNode.propertyChanged): Removed, a vestigial
+	copy-and-pasteo.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/main.py (main): 

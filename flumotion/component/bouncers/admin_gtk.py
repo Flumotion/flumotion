@@ -127,15 +127,6 @@ class KeycardsNode(BaseAdminGtkNode):
         del self._iters[id]
         self.model.remove(iter)
 
-    def propertyChanged(self, name, value):
-        if name == "pattern":
-            self.debug("pattern changed to %r" % value)
-            c = self.combobox_pattern
-            id = self.pattern_changed_id
-            c.handler_block(id)
-            c.set_active(value)
-            c.handler_unblock(id)
-
     def cleanup(self):
         self._uiState.removeListener(self)
 

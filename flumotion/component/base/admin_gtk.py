@@ -114,15 +114,6 @@ class BaseAdminGtk(log.Loggable):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
 
-    def propertyChanged(self, name, value):
-        """
-        Override this method to be notified of component's properties that
-        have changed.
-
-        I am meant to be overridden.
-        """
-        self.debug("property %s changed to %r" % (name, value))
-
     # FIXME: .setup() is subclassable, while .render() on nodes has
     # haveWidgetTree.  choose one of the two patterns in general
     def setup(self):
@@ -342,12 +333,6 @@ class BaseAdminGtkNode(log.Loggable):
         Override me to act on it.
         """
         pass
-
-    def propertyChanged(self, name, value):
-        """
-        I am meant to be overridden.
-        """
-        self.debug("property %s changed to %r" % (name, value))
 
     def gotUIState(self, state):
         if self.widget:
