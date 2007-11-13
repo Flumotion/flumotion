@@ -86,30 +86,6 @@ class BaseAdminGtk(log.Loggable):
             node.gotUIState(state)
         self.uiStateChanged(state)
 
-    def propertyErrback(self, failure, window):
-        failure.trap(errors.PropertyError)
-        self.warning("%s." % failure.getErrorMessage())
-        #window.error_dialog("%s." % failure.getErrorMessage())
-        return None
-
-    def setElementProperty(self, elementName, propertyName, value):
-        """
-        Set the given property on the element with the given name.
-        """
-        d = self.admin.setProperty(self.state, elementName, propertyName, value)
-        d.addErrback(self.propertyErrback, self)
-        return d
-
-    def getElementProperty(self, elementName, propertyName):
-        """
-        Get the value of the given property of the element with the given name.
-
-        Returns: L{twisted.internet.defer.Deferred} returning the value.
-        """
-        d = self.admin.getProperty(self.state, elementName, propertyName)
-        d.addErrback(self.propertyErrback, self)
-        return d
-
     def callRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
@@ -241,30 +217,6 @@ class BaseAdminGtkNode(log.Loggable):
     def status_pop(self, mid):
         if self.statusbar:
             return self.statusbar.remove('notebook', mid)
-
-    def propertyErrback(self, failure, window):
-        failure.trap(errors.PropertyError)
-        self.warning("%s." % failure.getErrorMessage())
-        #window.error_dialog("%s." % failure.getErrorMessage())
-        return None
-
-    def setElementProperty(self, elementName, propertyName, value):
-        """
-        Set the given property on the element with the given name.
-        """
-        d = self.admin.setProperty(self.state, elementName, propertyName, value)
-        d.addErrback(self.propertyErrback, self)
-        return d
-
-    def getElementProperty(self, elementName, propertyName):
-        """
-        Get the value of the given property of the element with the given name.
-
-        Returns: L{twisted.internet.defer.Deferred} returning the value.
-        """
-        d = self.admin.getProperty(self.state, elementName, propertyName)
-        d.addErrback(self.propertyErrback, self)
-        return d
 
     def callRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state, methodName,

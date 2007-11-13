@@ -1,5 +1,38 @@
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py (AdminModel.setProperty)
+	(AdminModel.getProperty): 
+	* flumotion/admin/text/admin_text.py
+	(BaseAdminText.setElementProperty)
+	(BaseAdminText.propertyErrback)
+	(BaseAdminText.getElementProperty): 
+	* flumotion/manager/component.py
+	(ComponentAvatar.setElementProperty)
+	(ComponentAvatar.getElementProperty): 
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.remote_setElementProperty)
+	(FeedComponentMedium.remote_getElementProperty): 
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtk.propertyErrback, BaseAdminGtk.setElementProperty)
+	(BaseAdminGtk.getElementProperty)
+	(BaseAdminGtkNode.getElementProperty)
+	(BaseAdminGtkNode.setElementProperty)
+	(BaseAdminGtkNode.propertyErrback): 
+	* flumotion/component/base/admin_text.py
+	(BaseAdminText.propertyErrback, BaseAdminText.setElementProperty)
+	(BaseAdminText.getElementProperty): Remove getElementProperty /
+	setElementProperty interfaces; users of the former should use
+	uiStates, and users of the latter should use custom interfaces.
+
+	* flumotion/component/producers/videotest/admin_gtk.py
+	(PatternNode.cb_pattern_changed): 
+	* flumotion/component/producers/videotest/admin_text.py
+	(VideoTestAdminText.runCommand): 
+	* flumotion/component/producers/videotest/videotest.py
+	(VideoTestMedium, VideoTestMedium.remote_setPattern): Rework to
+	use a custom interface rather than getElementProperty and
+	setElementProperty.
+
 	* flumotion/manager/component.py: Remove a comment bitrotten since
 	December 2004.
 	(ComponentAvatar.removeKeycardId)

@@ -62,20 +62,17 @@ class VideoTestAdminText(BaseAdminText):
                 elif string.lower(command_split[1]) == 'black':
                     pattern = 2
                 if pattern > -1:
-                    d = self.callRemote("setElementProperty", "source", "pattern", pattern)
+                    d = self.callRemote("setPattern", pattern)
                     return d
         elif string.lower(command_split[0]) == 'getpattern':
             # get pattern
-            d = self.callRemote("getElementProperty", "source", "pattern")
-            newd = defer.Deferred()
-            d.addCallback(self._getpattern_cb, newd)
-            return newd
+            def getpattern_cb(uiState):
+                return self.patterns[uiState.get('pattern')]
+            d = self.callRemote("getUIState")
+            d.addCallback(getpattern_cb)
+            return d
         else:
             return None
-
-    def _getpattern_cb(self, result, newd):
-        pattern = self.patterns[result]
-        newd.callback(pattern)
 
 
 UIClass = VideoTestAdminText

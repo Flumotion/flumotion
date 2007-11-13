@@ -61,7 +61,7 @@ class PatternNode(BaseAdminGtkNode):
             return None
 
         pattern = combobox.get_value()
-        d = self.callRemote("setElementProperty", "source", "pattern", pattern)
+        d = self.callRemote("setPattern", pattern)
         d.addErrback(_setPatternErrback)
 
     def patternSet(self, value):

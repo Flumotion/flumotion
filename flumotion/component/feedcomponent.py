@@ -69,12 +69,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.logName = component.name
 
     ### Referenceable remote methods which can be called from manager
-    def remote_getElementProperty(self, elementName, property):
-        return self.comp.get_element_property(elementName, property)
-
-    def remote_setElementProperty(self, elementName, property, value):
-        self.comp.set_element_property(elementName, property, value)
-
     def remote_attachPadMonitorToFeeder(self, feederName):
         self.comp.attachPadMonitorToFeeder(feederName)
 

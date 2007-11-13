@@ -461,21 +461,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         # FIXME: throw up some sort of dialog with debug info
         return failure
 
-    ## component remote methods
-    def setProperty(self, componentState, element, property, value):
-        """
-        @type  componentState: L{flumotion.common.planet.AdminComponentState}
-        """
-        return self.componentCallRemote(componentState, 'setElementProperty',
-                                        element, property, value)
-
-    def getProperty(self, componentState, element, property):
-        """
-        @type  componentState: L{flumotion.common.planet.AdminComponentState}
-        """
-        return self.componentCallRemote(componentState, 'getElementProperty',
-                                        element, property)
-
     ## reload methods for everything
     def reloadAdmin(self):
         name = reflect.filenameToModuleName(__file__)

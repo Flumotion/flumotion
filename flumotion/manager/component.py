@@ -401,61 +401,6 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.mindCallRemote('feedTo', feederName, fullFeedId,
                                    host, port)
 
-    def setElementProperty(self, element, property, value):
-        """
-        Set a property on an element.
-
-        @param element:  the element to set the property on
-        @type  element:  str
-        @param property: the property to set
-        @type  property: str
-        @param value:    the value to set the property to
-        @type  value:    mixed
-        """
-        if not element:
-            msg = "%s: no element specified" % self.avatarId
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        if not element in self.jobState.get('elements'):
-            msg = "%s: element '%s' does not exist" % (self.avatarId, element)
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        if not property:
-            msg = "%s: no property specified" % self.avatarId
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        self.debug("setting property '%s' on element '%s'" % (property, element))
-
-        return self.mindCallRemote('setElementProperty', element, property, value)
-
-    def getElementProperty(self, element, property):
-        """
-        Get a property of an element.
-
-        @param element:  the element to get the property of
-        @type  element:  str
-        @param property: the property to get
-        @type  property: str
-        """
-        if not element:
-            msg = "%s: no element specified" % self.avatarId
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        # FIXME: this is wrong, since it's not dynamic.  Elements can be
-        # renamed
-        # this will work automatically though if the component updates its
-        # state
-        if not element in self.jobState.get('elements'):
-            msg = "%s: element '%s' does not exist" % (self.avatarId, element)
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        if not property:
-            msg = "%s: no property specified" % self.avatarId
-            self.warning(msg)
-            raise errors.PropertyError(msg)
-        self.debug("getting property %s on element %s" % (element, property))
-        return self.mindCallRemote('getElementProperty', element, property)
-
     def reloadComponent(self):
         """
         Tell the component to reload itself.

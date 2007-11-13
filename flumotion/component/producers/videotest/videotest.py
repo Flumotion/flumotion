@@ -28,7 +28,13 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
 
+class VideoTestMedium(feedcomponent.FeedComponentMedium):
+    def remote_setPattern(self, pattern):
+        return self.comp.set_element_property('source', 'pattern',
+                                              pattern)
+
 class VideoTest(feedcomponent.ParseLaunchComponent):
+    componentMediumClass = VideoTestMedium
 
     def init(self):
         self.uiState.addKey('pattern', 0)
