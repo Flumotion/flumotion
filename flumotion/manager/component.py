@@ -519,7 +519,10 @@ class FeedMap(object, log.Loggable):
         del self.avatars[avatar.avatarId]
         self._ordered_avatars.remove(avatar)
         self._dirty = True
-        return self.feedDeps.pop(avatar, [])
+        # NB, feedDeps is dirty. Scrub it of avatars that have logged
+        # out
+        return [a for a in self.feedDeps.pop(avatar, [])
+                if a.avatarId in self.avatars]
 
     def getFeederAvatar(self, eater, feedId):
         flowName = eater.getParentName()

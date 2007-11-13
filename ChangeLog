@@ -1,5 +1,8 @@
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (FeedMap.componentDetached): Fix
+	my premature optimization. DAMN YOU DONALD KNUTH
+
 	* flumotion/manager/admin.py (AdminAvatar.sendLog)
 	(AdminAvatar.getComponentStates, AdminHeaven.avatarsCallRemote)
 	(AdminHeaven.__init__): Remove more unused code.
