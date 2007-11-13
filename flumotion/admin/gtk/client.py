@@ -314,7 +314,8 @@ class Window(log.Loggable, gobject.GObject):
         self._start_all_action = group.get_action("start-all")
         self._clear_all_action = group.get_action("clear-all")
 
-        self._trayicon = trayicon.FluTrayIcon(self)
+        self._trayicon = trayicon.FluTrayIcon(window)
+        self._trayicon.connect("quit", self._trayicon_quit_cb)
         self._trayicon.set_tooltip(_('Not connected'))
 
         # the widget containing the component view
@@ -969,6 +970,9 @@ You can do remote component calls using:
     ### ui callbacks
 
     def _window_delete_event_cb(self, window, event):
+        self._close()
+
+    def _trayicon_quit_cb(self, trayicon):
         self._close()
 
     def _components_view_selection_changed_cb(self, view, state):

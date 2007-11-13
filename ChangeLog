@@ -1,3 +1,14 @@
+2007-11-13  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/ui/trayicon.py (FluTrayIcon): 
+	* flumotion/admin/gtk/client.py (Window): 
+	Refactor trayicon integration, avoid poking at private client functions,
+	emit a signal to tell the window that we want to quit instead.
+
+	* flumotion/admin/gtk/connections.py (Connections): fix one more range
+	I forgot last time.
+
+
 2007-11-13  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

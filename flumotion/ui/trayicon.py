@@ -25,16 +25,18 @@ Flumotion tray icon widget.
 
 import os
 
+import gobject
 import gtk
 
 from zope.interface import implements
 
-from flumotion.configure import configure
 from flumotion.common import log, planet
-from flumotion.twisted import flavors
 from flumotion.common.planet import moods
+from flumotion.common.pygobject import gsignal, type_register
+from flumotion.configure import configure
+from flumotion.twisted import flavors
 
-class FluTrayIcon(log.Loggable):
+class FluTrayIcon(log.Loggable, gobject.GObject):
     """
     I represent a tray icon in GNOME's notification area for the Admin UI.
 
@@ -45,14 +47,17 @@ class FluTrayIcon(log.Loggable):
 
     logCategory = 'trayui'
 
+    gsignal("quit")
+
     def __init__ (self, window):
         """
         @type window: L{flumotion.admin.gtk.client.Window}
         """
-        self.window = window
+        gobject.GObject.__init__(self)
 
         self._tray_container = None
         self._components = None
+        self._window = window
 
         self._create_trayicon()
 
@@ -113,10 +118,10 @@ class FluTrayIcon(log.Loggable):
         # left click triggers window visibility
         # TODO: implement right click for popup menu
         if event.button == 1:
-            if self.window.window.get_property('visible'):
-                self.window.window.hide()
+            if self._window.get_property('visible'):
+                self._window.hide()
             else:
-                self.window.window.show()
+                self._window.show()
         elif event.button == 3:
             self._show_popup_menu()
 
@@ -164,10 +169,13 @@ class FluTrayIcon(log.Loggable):
             if self._tray_container:
                 self._tray_container.send_message(1000, value)
 
+    def _quit_activate_cb(self, menu):
+        self.emit('quit')
+
     def _show_popup_menu(self):
         self.popupMenu = gtk.Menu()
         self.popupMenuQuititem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
-        self.popupMenuQuititem.connect('activate', self.window.connection_quit_cb)
+        self.popupMenuQuititem.connect('activate', self._quit_activate_cb)
         self.popupMenu.add(self.popupMenuQuititem)
         self.popupMenu.popup(None, None, None, 3, gtk.get_current_event_time())
         self.popupMenu.show_all()
@@ -175,3 +183,5 @@ class FluTrayIcon(log.Loggable):
     def set_tooltip(self, tooltip):
         if self._tray_container:
             self._tray_container.set_tooltip(tooltip)
+
+type_register(FluTrayIcon)

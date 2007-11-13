@@ -36,9 +36,9 @@ from flumotion.admin import connections
 class Connections(GladeWidget):
     glade_file = 'connections.glade'
 
-    STR_COL = 0
-    FILE_COL = 1
-    STATE_COL = 2
+    (STR_COL,
+     FILE_COL,
+     STATE_COL) = range(3)
 
     model = None
     gsignal('has-selection', bool)
