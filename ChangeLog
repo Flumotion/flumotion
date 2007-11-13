@@ -6,6 +6,10 @@
 
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
+	* bin/flumotion-debug: Add a new script which
+	makes it easier to debug a manager. So far only a vishnu
+	and admin avatar are exposed.
+
 	* flumotion/admin/gtk/componentview.py:
 	* flumotion/admin/gtk/parts.py:
 	* flumotion/common/keycards.py:
