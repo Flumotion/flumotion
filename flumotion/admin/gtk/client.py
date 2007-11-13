@@ -48,6 +48,65 @@ from flumotion.common import messages
 _ = gettext.gettext
 T_ = messages.gettexter('flumotion')
 
+MAIN_UI = """
+<ui>
+  <menubar name="menubar">
+    <menu action="connection">
+      <menuitem action="open-recent"/>
+      <menuitem action="open-existing"/>
+      <menuitem action="import-config"/>
+      <menuitem action="export-config"/>
+      <separator name="sep1"/>
+      <placeholder name="recent"/>
+      <separator name="sep2"/>
+      <menuitem action="quit"/>
+    </menu>
+    <menu action="manage">
+      <menuitem action="start-component"/>
+      <menuitem action="stop-component"/>
+      <menuitem action="delete-component"/>
+      <separator name="sep3"/>
+      <menuitem action="start-all"/>
+      <menuitem action="stop-all"/>
+      <menuitem action="clear-all"/>
+      <separator name="sep4"/>
+      <menuitem action="run-wizard"/>
+    </menu>
+    <menu action="debug">
+      <menuitem action="reload-manager"/>
+      <menuitem action="reload-admin"/>
+      <menuitem action="reload-all"/>
+      <menuitem action="start-shell"/>
+    </menu>
+    <menu action="help">
+      <menuitem action="about"/>
+    </menu>
+  </menubar>
+  <toolbar name="toolbar">
+    <toolitem action="open-recent"/>
+    <separator name="sep5"/>
+    <toolitem action="start-component"/>
+    <toolitem action="stop-component"/>
+    <toolitem action="delete-component"/>
+    <separator name="sep6"/>
+    <toolitem action="run-wizard"/>
+  </toolbar>
+</ui>
+"""
+
+RECENT_UI_TEMPLATE = '''<ui>
+  <menubar name="menubar">
+    <menu action="connection">
+      <placeholder name="recent">
+      %s
+      </placeholder>
+    </menu>
+  </menubar>
+</ui>'''
+
+MAX_RECENT_ITEMS = 4
+
+
 class Window(log.Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
@@ -71,6 +130,7 @@ class Window(log.Loggable, gobject.GObject):
         self._admin = None
         self._widgets = {}
         self._window = None
+        self._recent_menu_uid = None
 
         self._create_ui()
         self._append_recent_connections()
@@ -86,7 +146,7 @@ class Window(log.Loggable, gobject.GObject):
         if key == 'message':
             self.statusbar.set('main', value)
         elif key == 'mood':
-            self._set_stop_start_component_sensitive()
+            self._update_component_actions()
             current = self.components_view.get_selected_name()
             if value == moods.sleeping.value:
                 if state.get('name') == current:
@@ -148,34 +208,87 @@ class Window(log.Loggable, gobject.GObject):
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         wtree.signal_autoconnect(self)
 
-        for widget in wtree.get_widget_prefix(''):
-            self._widgets[widget.get_name()] = widget
         widgets = self._widgets
+        for widget in wtree.get_widget_prefix(''):
+            widgets[widget.get_name()] = widget
 
         window = self._window = widgets['main_window']
+        vbox = widgets['vbox1']
         window.connect('delete-event', self._window_delete_event_cb)
 
-        def set_icon(proc, size, name):
-            i = gtk.Image()
-            i.set_from_stock('flumotion-'+name, size)
-            proc(i)
-            i.show()
+        actions = [
+            # Connection
+            ('connection', None, _("Connection")),
+            ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'), None,
+             None, self._connection_open_recent_cb),
+            ('open-existing', None, _('Open _Existing Connection...'), None,
+             None, self._connection_open_existing_cb),
+            ('import-config', None, _('_Import Configuration...'), None,
+             None, self._connection_import_configuration_cb),
+            ('export-config', None, _('_Export Configuration...'), None,
+             None, self._connection_export_configuration_cb),
+            ('quit', gtk.STOCK_QUIT, _('_Quit'), None,
+             None, self._connection_quit_cb),
 
-        def make_menu_proc(m): # $%^& pychecker!
-            return lambda f: m.set_property('image', f)
-        def menu_set_icon(m, name):
-            set_icon(make_menu_proc(m), gtk.ICON_SIZE_MENU, name)
-            m.show()
+            # Manage
+            ('manage', None, _('_Manage')),
+            ('start-component', 'flumotion-play', _('_S_tart Component'), None,
+             None, self._manage_start_component_cb),
+            ('stop-component', 'flumotion-pause', _('St_op Component'), None,
+             None, self._manage_stop_component_cb),
+            ('delete-component', gtk.STOCK_DELETE, _('_Delete Component'), None,
+             None, self._manage_delete_component_cb),
+            ('start-all', None, _('Start _All'), None,
+             None, self._manage_start_all_cb),
+            ('stop-all', None, _('Stop A_ll'), None,
+             None, self._manage_stop_all_cb),
+            ('clear-all', gtk.STOCK_CLEAR, _('_Clear All'), None,
+             None, self._manage_clear_all_cb),
+            ('run-wizard', 'flumotion-wizard', _('Run _Wizard'), None,
+             None, self._manage_run_wizard_cb),
 
-        def tool_set_icon(m, name):
-            set_icon(m.set_icon_widget, gtk.ICON_SIZE_SMALL_TOOLBAR, name)
+            # Debug
+            ('debug', None, _('_Debug')),
+            ('reload-manager', gtk.STOCK_REFRESH, _('Reload _Manager'), None,
+             None, self._debug_reload_manager_cb),
+            ('reload-admin', gtk.STOCK_REFRESH, _('Reload _Admin'), None,
+             None, self._debug_reload_admin_cb),
+            ('reload-all', gtk.STOCK_REFRESH, _('Reload A_ll'), None,
+             None, self._debug_reload_all_cb),
+            ('start-shell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
+             None, self._debug_start_shell_cb),
 
-        menu_set_icon(widgets['menuitem_manage_run_wizard'], 'wizard')
-        tool_set_icon(widgets['toolbutton_wizard'], 'wizard')
-        menu_set_icon(widgets['menuitem_manage_start_component'], 'play')
-        tool_set_icon(widgets['toolbutton_start_component'], 'play')
-        menu_set_icon(widgets['menuitem_manage_stop_component'], 'pause')
-        tool_set_icon(widgets['toolbutton_stop_component'], 'pause')
+            # Help
+            ('help', None, _('_Help')),
+            ('about', gtk.STOCK_ABOUT, _('_About'), None,
+             None, self._help_about_cb),
+            ]
+        uimgr = gtk.UIManager()
+        group = gtk.ActionGroup('actions')
+        group.add_actions(actions)
+        uimgr.insert_action_group(group, 0)
+        uimgr.add_ui_from_string(MAIN_UI)
+        window.add_accel_group(uimgr.get_accel_group())
+        menubar = uimgr.get_widget('/menubar')
+        vbox.pack_start(menubar, expand=False)
+        vbox.reorder_child(menubar, 0)
+
+        toolbar = uimgr.get_widget('/toolbar')
+        toolbar.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        toolbar.set_style(gtk.TOOLBAR_ICONS)
+        vbox.pack_start(toolbar, expand=False)
+        vbox.reorder_child(toolbar, 1)
+
+        menubar.show_all()
+
+        self._actiongroup = group
+        self._uimgr = uimgr
+        self._start_component_action = group.get_action("start-component")
+        self._stop_component_action = group.get_action("stop-component")
+        self._delete_component_action = group.get_action("delete-component")
+        self._stop_all_action = group.get_action("stop-all")
+        self._start_all_action = group.get_action("start-all")
+        self._clear_all_action = group.get_action("clear-all")
 
         self._trayicon = trayicon.FluTrayIcon(self)
         self._trayicon.set_tooltip(_('Not connected'))
@@ -183,14 +296,13 @@ class Window(log.Loggable, gobject.GObject):
         # the widget containing the component view
         self._component_view = widgets['component_view']
 
-
         self.components_view = parts.ComponentsView(widgets['components_view'])
         self.components_view.connect('selection_changed',
             self._components_view_selection_changed_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
-        self._set_stop_start_component_sensitive()
+        self._update_component_actions()
         self.components_view.connect(
             'notify::can-start-any',
             self._component_view_start_stop_notify_cb)
@@ -205,33 +317,23 @@ class Window(log.Loggable, gobject.GObject):
         return window
 
     def _append_recent_connections(self):
-        menu = self._widgets['connection_menu'].get_submenu()
+        if self._recent_menu_uid:
+            self._uimgr.remove_ui(self._recent_menu_uid)
+            self._uimgr.ensure_update()
 
-        # first clean any old entries
-        kids = menu.get_children()
-        while True:
-            w = kids.pop()
-            if w.get_name() == 'connection_quit':
-                break
-            else:
-                menu.remove(w)
+        def recent_activate(action, conn):
+            self._open_connection(conn['info'])
 
-        clist = connections.get_recent_connections()
-        if not clist:
-            return
+        ui = ""
+        for conn in connections.get_recent_connections()[:MAX_RECENT_ITEMS]:
+            name = conn['name']
+            ui += '<menuitem action="%s"/>' % name
+            action = gtk.Action(name, name, '', '')
+            action.connect('activate', recent_activate, conn)
+            self._actiongroup.add_action(action)
 
-        def recent_activate(widget, connectionInfo):
-            self._open_connection(connectionInfo)
-        def append(i):
-            i.show()
-            gtk.MenuShell.append(menu, i) # $%^&* pychecker
-        def append_txt(c, n):
-            i = gtk.MenuItem(c['name'])
-            i.connect('activate', recent_activate, c['info'])
-            append(i)
-
-        append(gtk.SeparatorMenuItem())
-        map(append_txt, clist[:4], range(1,len(clist[:4])+1))
+        self._recent_menu_uid = self._uimgr.add_ui_from_string(
+            RECENT_UI_TEMPLATE % ui)
 
     def _set_admin_model(self, model):
         'set the model to which we are a view/controller'
@@ -323,6 +425,29 @@ class Window(log.Loggable, gobject.GObject):
 
         d.addCallbacks(connected, refused)
         self._window.set_sensitive(False)
+
+    def _update_component_actions(self):
+        state = self._current_component_state
+        if state:
+            moodname = moods.get(state.get('mood')).name
+            can_start = moodname == 'sleeping'
+            can_stop = moodname != 'sleeping'
+        else:
+            can_start = False
+            can_stop = False
+        can_delete = bool(state and not can_stop)
+        can_start_all = self.components_view.get_property('can-start-any')
+        can_stop_all = self.components_view.get_property('can-stop-any')
+        # they're all in sleeping or lost
+        can_clear_all = can_start_all and not can_stop_all
+
+        self._stop_all_action.set_sensitive(can_stop_all)
+        self._start_all_action.set_sensitive(can_start_all)
+        self._clear_all_action.set_sensitive(can_clear_all)
+        self._start_component_action.set_sensitive(can_start)
+        self._stop_component_action.set_sensitive(can_stop)
+        self._delete_component_action.set_sensitive(can_delete)
+        self.debug('can start %r, can stop %r' % (can_start, can_stop))
 
     def _update_components(self):
         self.components_view.update(self._components)
@@ -443,7 +568,7 @@ class Window(log.Loggable, gobject.GObject):
 
         # a component being removed means our selected component could
         # have gone away
-        self._set_stop_start_component_sensitive()
+        self._update_component_actions()
 
     def _component_reload(self, state):
         name = getComponentLabel(state)
@@ -532,7 +657,7 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('component %s has selection', state)
         def compSet(state, key, value):
             if key == 'mood':
-                self._set_stop_start_component_sensitive()
+                self._update_component_actions()
 
         def compAppend(state, key, value):
             name = state.get('name')
@@ -557,7 +682,7 @@ class Window(log.Loggable, gobject.GObject):
             self._current_component_state.addListener(
                 self, compSet, compAppend, compRemove)
 
-        self._set_stop_start_component_sensitive()
+        self._update_component_actions()
         self._component_view.show_object(state)
         self._clear_messages()
 
@@ -668,33 +793,6 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handling connection-failed")
         reactor.callLater(0, failed_later)
         log.debug('adminclient', "handled connection-failed")
-
-    def _set_stop_start_component_sensitive(self):
-        state = self._current_component_state
-        d = self._widgets
-        can_start = bool(state
-                         and moods.get(state.get('mood')).name == 'sleeping')
-        d['menuitem_manage_start_component'].set_sensitive(can_start)
-        d['toolbutton_start_component'].set_sensitive(can_start)
-
-        moodname = state and moods.get(state.get('mood')).name
-        can_stop = bool(moodname and moodname != 'sleeping')
-        can_delete = bool(state and not can_stop)
-        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
-        d['toolbutton_stop_component'].set_sensitive(can_stop)
-
-        d['menuitem_manage_delete_component'].set_sensitive(can_delete)
-        d['toolbutton_delete_component'].set_sensitive(can_delete)
-        self.debug('can start %r, can stop %r' % (can_start, can_stop))
-
-    def _update_start_stop(self):
-        can_start = self.components_view.get_property('can-start-any')
-        can_stop = self.components_view.get_property('can-stop-any')
-        self._widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
-        self._widgets['menuitem_manage_start_all'].set_sensitive(can_start)
-        # they're all in sleeping or lost
-        s = self._widgets['menuitem_manage_clear_all'].set_sensitive
-        s(can_start and not can_stop)
 
     def _error(self, message):
         d = dialogs.ErrorDialog(message, self._window,
@@ -881,61 +979,61 @@ You can do remote component calls using:
         self._component_activate(state, action)
 
     def _component_view_start_stop_notify_cb(self, *args):
-        self._update_start_stop()
+        self._update_component_actions()
 
-    # menubar/toolbar callbacks
+    ### action callbacks
 
-    def connection_open_recent_cb(self, button):
+    def _connection_open_recent_cb(self, action):
         self._open_recent_connection()
 
-    def connection_open_existing_cb(self, button):
+    def _connection_open_existing_cb(self, action):
         self._open_existing_connection()
 
-    def connection_import_configuration_cb(self, button):
+    def _connection_import_configuration_cb(self, action):
         self._import_configuration()
 
-    def connection_export_configuration_cb(self, button):
+    def _connection_export_configuration_cb(self, action):
         self._export_configuration()
 
-    def connection_quit_cb(self, button):
+    def _connection_quit_cb(self, action):
         self._close()
 
-    def manage_start_component_cb(self, button):
+    def _manage_start_component_cb(self, action):
         self._component_start(None)
 
-    def manage_stop_component_cb(self, button):
+    def _manage_stop_component_cb(self, action):
         self._component_stop(None)
 
-    def manage_delete_component_cb(self, button):
+    def _manage_delete_component_cb(self, action):
         self._component_delete(None)
 
-    def manage_start_all_cb(self, button):
+    def _manage_start_all_cb(self, action):
         for c in self._components.values():
             self._component_start(c)
 
-    def manage_stop_all_cb(self, button):
+    def _manage_stop_all_cb(self, action):
         for c in self._components.values():
             self._component_stop(c)
 
-    def manage_clear_all_cb(self, button):
+    def _manage_clear_all_cb(self, action):
         self._admin.cleanComponents()
 
-    def manage_run_wizard_cb(self, x):
+    def _manage_run_wizard_cb(self, action):
         self._run_wizard()
 
-    def debug_reload_manager_cb(self, button):
+    def _debug_reload_manager_cb(self, action):
         self._reload_manager()
 
-    def debug_reload_admin_cb(self, button):
+    def _debug_reload_admin_cb(self, action):
         self._reload_admin()
 
-    def debug_reload_all_cb(self, button):
+    def _debug_reload_all_cb(self, action):
         self._reload_all()
 
-    def debug_start_shell_cb(self, button):
+    def _debug_start_shell_cb(self, action):
         self._start_shell()
 
-    def help_about_cb(self, button):
+    def _help_about_cb(self, action):
         self._about()
 
 pygobject.type_register(Window)

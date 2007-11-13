@@ -1,3 +1,12 @@
+2007-11-13  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py:
+	Move over to using GtkUIManager, which has proper UI merging
+	(used by recent connections) and proper stock icon support,
+	and actions which makes it easier to set state on more than
+	one item (menu, toolbar)
+
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.__init__)
@@ -43,7 +52,7 @@
 	Continue to refactor all the code in the callbacks
 	to separate methods, to have a clear separation
 	between internal api and callbacks used by the ui.
-
+	
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.__init__)
