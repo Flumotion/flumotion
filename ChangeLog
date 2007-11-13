@@ -1,3 +1,9 @@
+2007-11-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/admin.py (AdminAvatar.sendLog)
+	(AdminAvatar.getComponentStates, AdminHeaven.avatarsCallRemote)
+	(AdminHeaven.__init__): Remove more unused code.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/componentview.py:

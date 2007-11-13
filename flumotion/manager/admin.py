@@ -52,26 +52,6 @@ class AdminAvatar(base.ManagerAvatar):
     """
     logCategory = 'admin-avatar'
 
-    # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
-    def getComponentStates(self):
-        """
-        Return all component states logged in to the manager.
-        The list gets serialized to a list of
-        L{flumotion.common.planet.AdminComponentState}
-
-        @rtype: list of L{planet.ManagerComponentState}
-        """
-        return self.vishnu.getComponentStates()
-
-    def sendLog(self, category, type, message):
-        """
-        Send the given log message to the peer.
-        """
-        # don't send if we don't have a remote reference yet.
-        # this avoids recursion from the remote caller trying to warn
-        if self.hasRemoteReference():
-            self.mindCallRemote('log', category, type, message)
-
     # override pb.Avatar implementation so we can run admin actions
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args, self)
@@ -471,21 +451,3 @@ class AdminHeaven(base.ManagerHeaven):
     logCategory = "admin-heaven"
     implements(interfaces.IHeaven)
     avatarClass = AdminAvatar
-
-    def __init__(self, vishnu):
-        # doc in base class
-        base.ManagerHeaven.__init__(self, vishnu)
-
-    ### my methods
-
-    def avatarsCallRemote(self, methodName, *args, **kwargs):
-        """
-        Call a remote method on all AdminAvatars in this heaven.
-
-        @param methodName: Name of the method to call.  Gets proxied to
-                           L{flumotion.admin.admin.AdminModel}'s
-                           remote_(methodName)
-        @type  methodName: str
-        """
-        for avatar in self.getAvatars():
-            avatar.mindCallRemote(methodName, *args, **kwargs)
