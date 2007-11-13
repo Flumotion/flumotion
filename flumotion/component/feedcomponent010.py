@@ -229,7 +229,7 @@ class FeedComponent(basecomponent.BaseComponent):
             m = self.make_message_for_gstreamer_error(gerror, debug)
             self.state.append('messages', m)
             self._change_monitor.have_error(self.pipeline.get_state(),
-                                            gerror.message)
+                                            message)
 
         def eos():
             name = src.get_name()
