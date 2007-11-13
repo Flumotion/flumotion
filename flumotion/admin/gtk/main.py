@@ -124,6 +124,9 @@ def main(args):
         sys.stderr.write("Connection to manager failed: %s\n" % message)
         reactor.stop()
 
+    from flumotion.ui.icons import register_icons
+    register_icons()
+
     d.addCallbacks(lambda model: Window(model).show(), failure)
 
     reactor.run()

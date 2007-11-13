@@ -19,20 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-
 import os
+
 import gtk
+
 from flumotion.configure import configure
 
+__all__ = ['register_icons']
 
-__all__ = []
-
-
-iconfile = os.path.join(configure.imagedir, 'fluendo.png')
-gtk.window_set_default_icon_from_file(iconfile)
-
-
-def load_stock(*names):
+def _register_stock_icons(names):
     ifact = gtk.IconFactory()
     sizes = {gtk.ICON_SIZE_MENU:16, gtk.ICON_SIZE_SMALL_TOOLBAR:24}
     for name in names:
@@ -47,4 +42,8 @@ def load_stock(*names):
         ifact.add('flumotion-' + name, iset)
     ifact.add_default()
 
-load_stock('wizard', 'play', 'pause', 'about')
+def register_icons():
+    iconfile = os.path.join(configure.imagedir, 'fluendo.png')
+    gtk.window_set_default_icon_from_file(iconfile)
+
+    _register_stock_icons(['wizard', 'play', 'pause', 'about'])
