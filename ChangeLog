@@ -1,3 +1,9 @@
+2007-11-13  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/gstreamer.py:
+	  Wingo doesn't like punctuation. Add more punctuation to make this into a
+	  tuple instead of a call.
+
 2007-11-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (FeedMap.componentDetached): Fix

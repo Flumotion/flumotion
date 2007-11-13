@@ -174,7 +174,7 @@ class StateChangeMonitor(dict, log.Loggable):
                    gst.STATE_CHANGE_PAUSED_TO_PLAYING]
 
         extras = ((gst.STATE_PAUSED, gst.STATE_CHANGE_PLAYING_TO_PAUSED),
-                  (gst.STATE_READY, gst.STATE_CHANGE_PAUSED_TO_READY)
+                  (gst.STATE_READY, gst.STATE_CHANGE_PAUSED_TO_READY),
                   (gst.STATE_NULL, gst.STATE_CHANGE_READY_TO_NULL))
         for state, change in extras:
             if curstate <= state:
