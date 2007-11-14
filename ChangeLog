@@ -4,6 +4,7 @@
 	Attempt to fix pychecker.
 	(sorted): Okay, slice the first two items, <= doesn't work,
 	only < and >.
+	(any): Try to use getattr to get around pychecker being too smart.
 
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 

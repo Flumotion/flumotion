@@ -34,7 +34,8 @@ if sys.version_info[:2] <= (2, 3):
             seq = seq[::-1]
         return seq
 else:
-    sorted = __builtin__.sorted
+    # pychecker!
+    sorted = getattr(__builtin__, 'sorted')
 
 if sys.version_info[:2] <= (2, 4):
     def any(seq):
@@ -43,5 +44,6 @@ if sys.version_info[:2] <= (2, 4):
                 return True
         return False
 else:
-    any = __builtin__.any
+    # pychecker!
+    any = getattr(__builtin__, 'any')
 
