@@ -52,6 +52,16 @@ except NameError:
             seq = seq[::-1]
         return seq
 
+# Make it run on 2.4
+try:
+    any([])
+except NameError:
+    def any(seq):
+        for item in seq:
+            if item:
+                return True
+        return False
+
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
@@ -729,10 +739,10 @@ class Overlay(WizardStep):
 
     def get_state(self):
         options = WizardStep.get_state(self)
-        if self.checkbutton_show_logo:
+        if self.checkbutton_show_logo.get_active():
             options['show-logo'] = True
 
-        if self.checkbutton_show_text:
+        if self.checkbutton_show_text.get_active():
             options['text'] = self.entry_text.get_text()
 
         options['can-overlay'] = self.can_overlay
@@ -1181,19 +1191,25 @@ class Consumption(WizardSection):
         self.verify()
 
     def verify(self):
-        if (not self.checkbutton_disk and not self.checkbutton_http
-            and not self.checkbutton_shout2):
-            self.wizard.block_next(True)
-        else:
-            if ((self.checkbutton_disk and not self.checkbutton_disk_audio and
-                 not self.checkbutton_disk_video and not self.checkbutton_disk_audio_video) or
-                (self.checkbutton_http and not self.checkbutton_http_audio and
-                 not self.checkbutton_http_video and not self.checkbutton_http_audio_video) or
-                (self.checkbutton_shout2 and not self.checkbutton_shout2_audio and
-                 not self.checkbutton_shout2_video and not self.checkbutton_shout2_audio_video)):
-                self.wizard.block_next(True)
-            else:
-                self.wizard.block_next(False)
+        disk = self.checkbutton_disk.get_active()
+        disk_audio = self.checkbutton_disk_audio.get_active()
+        disk_video = self.checkbutton_disk_video.get_active()
+        disk_audio_video = self.checkbutton_disk_audio_video.get_active()
+        http = self.checkbutton_http.get_active()
+        http_audio = self.checkbutton_http_audio.get_active()
+        http_video = self.checkbutton_http_video.get_active()
+        http_audio_video = self.checkbutton_http_audio_video.get_active()
+        shout2 = self.checkbutton_shout2.get_active()
+        shout2_audio = self.checkbutton_shout2_audio.get_active()
+        shout2_video = self.checkbutton_shout2_video.get_active()
+        shout2_audio_video = self.checkbutton_shout2_audio_video.get_active()
+
+        block_next = True
+        if ((disk and any([disk_audio, disk_video, disk_audio_video])) or
+            (http and any([http_audio, http_video, http_audio_video])) or
+            (shout2 and any([shout2_audio, shout2_video, shout2_audio_video]))):
+            block_next = False
+        self.wizard.block_next(block_next)
 
     def activated(self):
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
@@ -1218,40 +1234,40 @@ class Consumption(WizardSection):
         has_video = self.wizard.get_step_option('Source', 'has-video')
 
         if has_audio and has_video:
-            if self.checkbutton_http:
-                if self.checkbutton_http_audio_video:
+            if self.checkbutton_http.get_active():
+                if self.checkbutton_http_audio_video.get_active():
                     items.append('HTTP Streamer (audio & video)')
-                if self.checkbutton_http_audio:
+                if self.checkbutton_http_audio.get_active():
                     items.append('HTTP Streamer (audio only)')
-                if self.checkbutton_http_video:
+                if self.checkbutton_http_video.get_active():
                     items.append('HTTP Streamer (video only)')
-            if self.checkbutton_disk:
-                if self.checkbutton_disk_audio_video:
+            if self.checkbutton_disk.get_active():
+                if self.checkbutton_disk_audio_video.get_active():
                     items.append('Disk (audio & video)')
-                if self.checkbutton_disk_audio:
+                if self.checkbutton_disk_audio.get_active():
                     items.append('Disk (audio only)')
-                if self.checkbutton_disk_video:
+                if self.checkbutton_disk_video.get_active():
                     items.append('Disk (video only)')
-            if self.checkbutton_shout2:
-                if self.checkbutton_shout2_audio_video:
+            if self.checkbutton_shout2.get_active():
+                if self.checkbutton_shout2_audio_video.get_active():
                     items.append('Icecast streamer (audio & video)')
-                if self.checkbutton_shout2_audio:
+                if self.checkbutton_shout2_audio.get_active():
                     items.append('Icecast streamer (audio only)')
-                if self.checkbutton_shout2_video:
+                if self.checkbutton_shout2_video.get_active():
                     items.append('Icecast streamer (video only)')
         elif has_video and not has_audio:
-            if self.checkbutton_http:
+            if self.checkbutton_http.get_active():
                 items.append('HTTP Streamer (video only)')
-            if self.checkbutton_disk:
+            if self.checkbutton_disk.get_active():
                 items.append('Disk (video only)')
-            if self.checkbutton_shout2:
+            if self.checkbutton_shout2.get_active():
                 items.append('Icecast streamer (video only)')
         elif has_audio and not has_video:
-            if self.checkbutton_http:
+            if self.checkbutton_http.get_active():
                 items.append('HTTP Streamer (audio only)')
-            if self.checkbutton_disk:
+            if self.checkbutton_disk.get_active():
                 items.append('Disk (audio only)')
-            if self.checkbutton_shout2:
+            if self.checkbutton_shout2.get_active():
                 items.append('Icecast streamer (audio only)')
         else:
             raise AssertionError
@@ -1367,7 +1383,7 @@ class Disk(WizardStep):
             self.combobox_size_list.set_sensitive(False)
 
     def on_checkbutton_rotate_toggled(self, button):
-        if self.checkbutton_rotate:
+        if self.checkbutton_rotate.get_active():
             self.radiobutton_has_size.set_sensitive(True)
             self.radiobutton_has_time.set_sensitive(True)
             self.update_radio()
@@ -1381,7 +1397,7 @@ class Disk(WizardStep):
 
     def get_state(self):
         options = {}
-        if not self.checkbutton_rotate:
+        if not self.checkbutton_rotate.get_active():
             options['rotate-type'] = 'none'
         else:
             if self.radiobutton_has_time:

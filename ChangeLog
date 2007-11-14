@@ -1,5 +1,12 @@
 2007-11-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/steps.py (Consumption): More __nonzero__ cleanups,
+	(Consumption.activated): Simplify logic and use the any() concept
+	from python 2.5
+
+	* data/glade/wizard_consumption.glade: Connect all shout checkbuttons
+	to the signal, just as for disk/http.
+
 	* flumotion/wizard/steps.py (Production): Clean up the production step
 	a little, avoid some code duplication and depending on __nonzero__.
 
