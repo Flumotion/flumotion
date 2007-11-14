@@ -380,17 +380,9 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        assert isinstance(componentState, planet.AdminComponentState), \
-            "componentState %r is of the wrong type calling %s" % (
-                componentState, methodName)
-        componentName = componentState.get('name')
-
-        self.debug('Calling remote method %s on component %s' % (
-            methodName, componentName))
         d = self.callRemote('componentCallRemote',
                             componentState, methodName,
                             *args, **kwargs)
-        d.addCallback(self._callRemoteCallback, methodName, componentName)
         def errback(failure):
             msg = None
             if failure.check(errors.NoMethodError):
@@ -412,11 +404,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         # FIXME: dialog for other errors ?
         return d
 
-    def _callRemoteCallback(self, result, methodName, componentName):
-        self.debug('Called remote method %s on component %s successfully' % (
-            methodName, componentName))
-        return result
-
     def workerCallRemote(self, workerName, methodName, *args, **kwargs):
         """
         Call the the given method on the given worker with the given args.
@@ -427,25 +414,9 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        r = common.argRepr(args, kwargs, max=20)
-        self.debug('calling remote method %s(%s) on worker %s' % (methodName, r,
-                                                                 workerName))
         d = self.callRemote('workerCallRemote', workerName,
                             methodName, *args, **kwargs)
-        d.addErrback(self._callRemoteErrback, "worker",
-                     workerName, methodName)
         return d
-
-    def _callRemoteErrback(self, failure, type, name, methodName):
-        if failure.check(errors.NoMethodError):
-            self.warning("method '%s' on component '%s' does not exist, "
-                "component bug" % (methodName, name))
-        else:
-            self.debug("passing through failure on remote call to %s(%s): %r" %
-                (name, methodName, failure))
-
-        # FIXME: throw up some sort of dialog with debug info
-        return failure
 
     ## reload methods for everything
     def reloadAdmin(self):
