@@ -123,7 +123,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 self.debug("emitted connection-refused")
             else:
                 self.medium.emit('connection-error', failure)
-                self.medium._defaultErrback(failure)
+                self.warning('connection error: %s',
+                             log.getFailureMessage(failure))
             # swallow error
                 
         d.addCallbacks(success, error)
@@ -260,13 +261,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.debug('asked to log in again')
         self.shutdown()
         return self.connectToManager(self.connectionInfo, keepTrying)
-
-    # default Errback
-    # FIXME: we can set it up with a list of types not to warn for ?
-    def _defaultErrback(self, failure):
-        self.debug('Possibly unhandled deferred failure: %r (%s)' % (
-            failure, failure.getErrorMessage()))
-        return failure
 
     # FIXME: give these three sensible names
     def adminInfoStr(self):
@@ -414,9 +408,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        d = self.callRemote('workerCallRemote', workerName,
-                            methodName, *args, **kwargs)
-        return d
+        return self.callRemote('workerCallRemote', workerName,
+                               methodName, *args, **kwargs)
 
     ## reload methods for everything
     def reloadAdmin(self):
@@ -432,14 +425,11 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
     def reload(self):
         # XXX: reload admin.py too
         d = defer.execute(self.reloadAdmin)
-
-        d = d.addCallback(lambda result, self: self.reloadManager(), self)
-        d.addErrback(self._defaultErrback)
+        d.addCallback(lambda result, self: self.reloadManager(), self)
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
         for name in self._components.keys():
-            d = d.addCallback(lambda result, name: self.reloadComponent(name), name)
-            d.addErrback(self._defaultErrback)
+            d.addCallback(lambda result, name: self.reloadComponent(name), name)
         return d
 
     # used by other admin clients
@@ -481,7 +471,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.info("reloading manager code")
         d = self.callRemote('reloadManager')
         d.addCallback(_reloaded, self)
-        d.addErrback(self._defaultErrback)
         return d
 
     def reloadComponent(self, componentState):
@@ -493,14 +482,13 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         def _reloaded(result, self, state):
-            self.info("reloaded component %s code" % state.get('name'))
+            self.info("reloaded component %s code", state.get('name'))
 
         name = componentState.get('name')
-        self.info("reloading component %s code" % name)
+        self.info("reloading component %s code", name)
         self.emit('reloading', name)
         d = self.callRemote('reloadComponent', componentState)
         d.addCallback(_reloaded, self, componentState)
-        d.addErrback(self._defaultErrback)
         return d
 
     ## manager remote methods
@@ -515,14 +503,10 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     ## worker remote methods
     def checkElements(self, workerName, elements):
-        d = self.workerCallRemote(workerName, 'checkElements', elements)
-        d.addErrback(self._defaultErrback)
-        return d
+        return self.workerCallRemote(workerName, 'checkElements', elements)
 
     def checkImport(self, workerName, moduleName):
-        d = self.workerCallRemote(workerName, 'checkImport', moduleName)
-        d.addErrback(self._defaultErrback)
-        return d
+        return self.workerCallRemote(workerName, 'checkImport', moduleName)
 
     def workerRun(self, workerName, moduleName, functionName, *args, **kwargs):
         """

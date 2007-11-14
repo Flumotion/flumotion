@@ -10,6 +10,14 @@
 	class does this for us.
 	(AdminModel.workerCallRemote, AdminModel.componentCallRemote):
 	Remove some unnecessary debug.
+	(AdminClientFactory.gotDeferredLogin.error): More specific log
+	here.
+	(AdminModel._defaultErrback): Removed; this was always used after
+	a remote call, which now logs exceptions via the BaseMedium
+	callRemote logging infrastructure.
+	(AdminModel.reload, AdminModel.reloadManager)
+	(AdminModel.reloadComponent, AdminModel.checkElements)
+	(AdminModel.checkImport): Remove _defaultErrback usage.
 
 	* flumotion/test/test_manager_admin.py (TestAdminAvatar): Rewrite
 	test to use real objects, and no useless functions.
