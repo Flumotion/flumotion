@@ -35,6 +35,8 @@ if sys.version_info[:2] < (2, 4):
         if reversed:
             seq = seq[::-1]
         return seq
+else:
+    sorted = sorted
 
 # any() was introduced in 2.5
 if sys.version_info[:2] < (2, 5):
@@ -43,4 +45,5 @@ if sys.version_info[:2] < (2, 5):
             if item:
                 return True
         return False
-
+else:
+    any = any
