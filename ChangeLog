@@ -1,3 +1,8 @@
+2007-11-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/python.py:
+	Attempt to fix pychecker.
+
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py

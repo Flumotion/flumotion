@@ -24,6 +24,7 @@ forward compatibility with future python versions
 """
 
 import sys
+import __builtin__
 
 if sys.version_info <= (2, 3):
     def sorted(seq, reverse=False):
@@ -33,7 +34,7 @@ if sys.version_info <= (2, 3):
             seq = seq[::-1]
         return seq
 else:
-    sorted = sorted
+    sorted = __builtin__.sorted
 
 if sys.version_info <= (2, 4):
     def any(seq):
@@ -42,5 +43,5 @@ if sys.version_info <= (2, 4):
                 return True
         return False
 else:
-    any = any
+    any = __builtin__.any
 
