@@ -380,12 +380,9 @@ class ComponentAvatar(base.ManagerAvatar):
 
     def stop(self):
         """
-        Tell the avatar to stop the component.
+        Tell the remote component to shut down.
         """
-        d = self.mindCallRemote('stop')
-        # FIXME: real error handling
-        d.addErrback(lambda x: None)
-        return d
+        return self.mindCallRemote('stop')
 
     def setClocking(self, host, port, base_time):
         # setMood on error?

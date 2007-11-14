@@ -1,5 +1,11 @@
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu._componentStopWithAvatar):
+	Call methods on the componentAvatar, not callRemote directly.
+
+	* flumotion/manager/component.py (ComponentAvatar.stop): Remove
+	silliness.
+
 	* flumotion/admin/multi.py (MultiAdminModel.removeManager)
 	(MultiAdminModel._managerConnected): Fix removing a manager to
 	which we connected one or more times, but is disconnected now.

@@ -786,7 +786,7 @@ class Vishnu(log.Loggable):
 
             return result
 
-        d = componentAvatar.mindCallRemote('stop')
+        d = componentAvatar.stop()
         d.addCallback(cleanupAndDisconnectComponent)
         d.addCallback(setSleeping)
 
