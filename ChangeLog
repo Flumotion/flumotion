@@ -1,3 +1,10 @@
+2007-11-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/multi.py (MultiAdminModel.removeManager)
+	(MultiAdminModel._managerConnected): Fix removing a manager to
+	which we connected one or more times, but is disconnected now.
+	Case (4) in the comment.
+
 2007-11-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/Makefile.am (EXTRA_DIST): Add test_public_ui_api.py
@@ -23,7 +30,6 @@
 
 	* flumotion/admin/gtk/connections.py (Connections): fix one more range
 	I forgot last time.
-
 
 2007-11-13  Michael Smith <msmith@fluendo.com>
 

@@ -106,12 +106,12 @@ class MultiAdminModel(log.Loggable):
         if admin.managerId not in self._reconnectHandlerIds:
             # the first time a manager is connected to, start listening
             # for reconnections; intertwingled with removeManager()
-            ids = [admin.disconnect]
+            ids = []
             ids.append(admin.connect('connected',
                                      self._managerConnected))
             ids.append(admin.connect('disconnected',
                                      self._managerDisconnected))
-            self._reconnectHandlerIds[admin.managerId] = ids
+            self._reconnectHandlerIds[admin.managerId] = admin, ids
 
         planet = admin.planet
         self.info('Connected to manager %s (planet %s)',
@@ -167,23 +167,38 @@ class MultiAdminModel(log.Loggable):
     def removeManager(self, managerId):
         self.info('disconnecting from %s', managerId)
 
+        # Four cases:
+        # (1) We have no idea about this managerId, the caller is
+        # confused -- do nothing
+        # (2) We started connecting to this managerId, but never
+        # succeeded -- cancel pending connections
+        # (3) We connected at least once, and are connected now -- we
+        # have entries in the _reconnectHandlerIds and in self.admins --
+        # disconnect from the signals, disconnect from the remote
+        # manager, and don't try to reconnect
+        # (4) We connected at least once, but are disconnected now -- we
+        # have an entry in _reconnectHandlerIds but not self.admins --
+        # disconnect from the signals, and stop trying to reconnect
+
         # stop listening to admin's signals, if the manager had actually
         # connected at some point
         if managerId in self._reconnectHandlerIds:
-            handlerIds = self._reconnectHandlerIds.pop(managerId)
-            disconnect = handlerIds.pop(0)
-            map(disconnect, handlerIds)
+            admin, handlerIds = self._reconnectHandlerIds.pop(managerId)
+            map(admin.disconnect, handlerIds) # (3) and (4)
+            if managerId not in self.admins:
+                admin.shutdown() # (4)
 
-        if managerId in self.admins:
+        if managerId in self.admins: # (3)
             admin = self.admins[managerId]
             admin.shutdown()
             self._managerDisconnected(admin)
 
         # Firing this has the side effect of errbacking on any pending
-        # start, calling start_errback above if appropriate.
+        # start, calling start_errback above if appropriate. (2)
         self._startSet.avatarStopped(
             managerId, lambda _: errors.ConnectionCancelledError())
 
+        # always succeed, see (1)
         return defer.succeed(managerId)
 
     def for_each_component(self, object, proc):
