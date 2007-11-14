@@ -26,24 +26,24 @@ forward compatibility with future python versions
 import sys
 import __builtin__
 
-if sys.version_info[:2] <= (2, 3):
+# sorted() was introduced in 2.4
+try:
+    sorted([])
+except NameError:
     def sorted(seq, reverse=False):
         seq = seq[:]
         seq.sort()
         if reversed:
             seq = seq[::-1]
         return seq
-else:
-    # pychecker!
-    sorted = getattr(__builtin__, 'sorted')
 
-if sys.version_info[:2] <= (2, 4):
+# any() was introduced in 2.5
+try:
+    any([])
+except:
     def any(seq):
         for item in seq:
             if item:
                 return True
         return False
-else:
-    # pychecker!
-    any = getattr(__builtin__, 'any')
 
