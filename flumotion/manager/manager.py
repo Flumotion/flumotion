@@ -1043,7 +1043,6 @@ class Vishnu(log.Loggable):
         m.jobState = None
 
         m.state.set('pid', None)
-        m.state.set('cpu', None)
         m.state.set('workerName', None)
         m.state.set('moodPending', None)
 

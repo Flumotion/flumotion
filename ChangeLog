@@ -1,3 +1,19 @@
+2007-11-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.unregisterComponent): 
+	* flumotion/component/component.py (BaseComponent.init)
+	(BaseComponent.do_stop, BaseComponent._pollCPU): Add CPU to the
+	uistate.
+
+	* flumotion/admin/gtk/parts.py
+	(ComponentsView._add_columns.type_cpu_datafunc): Hack around CPU
+	usage being absent.
+
+	* flumotion/common/planet.py (_jobStateKeys, WorkerJobState)
+	(ManagerComponentState): 
+	* flumotion/test/test_manager_manager.py
+	(FakeComponentMind.__init__): Remove cpu from the jobstate.
+
 2007-11-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/python.py:

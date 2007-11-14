@@ -273,7 +273,6 @@ class FakeComponentMind(FakeMind):
         state._dict = {
             'type': type,
             'pid': 1,
-            'cpu': 0.1,
             'mood': moods.waking.value,
             'manager-ip': '0.0.0.0',
             'workerName': workerName,

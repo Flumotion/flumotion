@@ -311,13 +311,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         self.name = self.config['name']
 
-        #self.state.set('name', name)
         self.state.set('pid', os.getpid())
         self.setMood(moods.waking)
 
         self.medium = None # the medium connecting us to the manager's avatar
 
         self.uiState = componentui.WorkerComponentUIState()
+        self.uiState.addKey('cpu-percent')
 
         self.plugs = {}
 
@@ -410,11 +410,12 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 plug.stop(self)
 
         for message in self.state.get('messages'):
+            # FIXME: not necessary
             self.state.remove('messages', message)
 
-        if self._cpuCallLater:
-            self._cpuCallLater.cancel()
-            self._cpuCallLater = None
+        if self._cpuPoller:
+            self._cpuPoller.stop()
+            self._cpuPoller = None
 
         if self._shutdownHook:
             self.debug('_stoppedCallback: firing shutdown hook')
@@ -608,6 +609,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
             return
         CPU = deltaClock/deltaTime
         self.log('latest CPU use: %r', CPU)
-        self.state.set('cpu', CPU)
+        self.uiState.set('cpu-percent', CPU)
         self._lastTime = nowTime
         self._lastClock = nowClock

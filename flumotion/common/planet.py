@@ -192,7 +192,7 @@ moods = enum.EnumClass(
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
-_jobStateKeys = ['mood', 'manager-ip', 'pid', 'workerName', 'cpu']
+_jobStateKeys = ['mood', 'manager-ip', 'pid', 'workerName']
 _jobStateListKeys = ['messages', ]
 
 # FIXME: maybe make Atmosphere and Flow subclass from a ComponentGroup class ?
@@ -218,7 +218,7 @@ class ManagerComponentState(flavors.StateCacheable):
     other times.
 
     I proxy the following keys from the serialized L{WorkerJobState}:
-      - mood, manager-ip, pid, workerName, cpu
+      - mood, manager-ip, pid, workerName
       - messages (list)
     """
 
@@ -347,7 +347,6 @@ class WorkerJobState(flavors.StateCacheable):
      - ip:                string, IP address of the worker
      - pid:               int, PID of the job process
      - workerName:        string, name of the worker I'm running on
-     - cpu:               float, CPU usage
      - messages:          list of L{flumotion.common.messages.Message}
 
     In addition, if I am the state of a FeedComponent, then I also

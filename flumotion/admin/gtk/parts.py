@@ -201,7 +201,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         def type_cpu_datafunc(column, cell, model, iter):
             state = model.get_value(iter, COL_STATE)
-            cpu = state.get('cpu')
+            cpu = state.get('cpu', None)
             if isinstance(cpu, float):
                 cell.set_property('text', '%.2f' % (cpu * 100.0))
             else:
