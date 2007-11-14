@@ -1,3 +1,12 @@
+2007-11-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_getConfig): With trunk, components
+	always have their config, no need for special cases.
+	(BaseComponent.__init__): Remove obsolete comment from Feb 05.
+	(BaseComponent.init, BaseComponent._pollCPU): Move the CPU poller
+	to be a common.Poller.
+
 2007-11-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/steps.py: 

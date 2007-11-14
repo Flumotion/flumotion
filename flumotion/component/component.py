@@ -219,11 +219,7 @@ class BaseComponentMedium(medium.PingingMedium):
         @rtype:   dict
         @returns: component's current configuration
         """
-        try:
-            return self.comp.config
-        except AttributeError:
-            self.debug('getConfig(), but component is not set up yet')
-            return None
+        return self.comp.config
 
     def remote_stop(self):
         self.info('Stopping component')
@@ -284,8 +280,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
     componentMediumClass = BaseComponentMedium
 
     def __init__(self, config, haveError=None):
-        # FIXME: name is unique where ? only in flow, so not in worker
-        # need to use full path maybe ?
         """
         Subclasses should not override __init__ at all.
 
@@ -325,17 +319,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         self.uiState = componentui.WorkerComponentUIState()
 
-        # FIXME: when we need this somewhere else, put this in a class and
-        # use it that way
-        self.baseTime = time.time()
-        self.lastTime = time.time()
-        self.lastClock = time.clock()
-
         self.plugs = {}
 
-        # Start the cpu-usage updating.
         self._happyWaits = []
-        self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
+
+        # Start the cpu-usage updating.
+        self._lastTime = time.time()
+        self._lastClock = time.clock()
+        self._cpuPoller = common.Poller(self._pollCPU, 5)
 
         self._shutdownHook = None
 
@@ -606,19 +597,17 @@ class BaseComponent(common.InitMixin, log.Loggable):
                        'no manager.'
                        % (methodName, args, kwargs))
 
-    def _updateCPUUsage(self):
+    def _pollCPU(self):
         # update CPU time stats
         nowTime = time.time()
         nowClock = time.clock()
-        deltaTime = nowTime - self.lastTime
-        deltaClock = nowClock - self.lastClock
+        deltaTime = nowTime - self._lastTime
+        deltaClock = nowClock - self._lastClock
+        if deltaClock <= 0:
+            # time.clock() wrapped around, shit happens periodically
+            return
         CPU = deltaClock/deltaTime
-        self.log('latest CPU use: %r' % CPU)
+        self.log('latest CPU use: %r', CPU)
         self.state.set('cpu', CPU)
-        deltaTime = nowTime - self.baseTime
-        deltaClock = nowClock
-        CPU = deltaClock/deltaTime
-        self.lastTime = nowTime
-        self.lastClock = nowClock
-
-        self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
+        self._lastTime = nowTime
+        self._lastClock = nowClock
