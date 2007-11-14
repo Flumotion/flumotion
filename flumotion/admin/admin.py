@@ -566,13 +566,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)
 
-    # FIXME: this should not be allowed to be called, move away
-    # by abstracting callers further
-    def get_components(self):
-        # returns a dict of name -> component
-        return self._components
-    getComponents = get_components
-
     def _setWorkerHeavenState(self, state):
         self._workerHeavenState = state
 

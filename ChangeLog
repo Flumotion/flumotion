@@ -2,6 +2,8 @@
 
 	* flumotion/admin/admin.py (AdminModel): Remove IStateListener
 	implementation, we do not use this any more.
+	(AdminModel.get_components, AdminModel.getComponents): Remove
+	function without callers.
 
 	* flumotion/manager/base.py (ManagerAvatar.hasRemoteReference):
 	Remove unused method, there for a case that cannot exist.
