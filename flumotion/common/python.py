@@ -24,12 +24,11 @@ forward compatibility with future python versions
 """
 
 import sys
-import __builtin__
+
+__pychecker__ = 'no-shadowbuiltin'
 
 # sorted() was introduced in 2.4
-try:
-    sorted([])
-except NameError:
+if sys.version_info[:2] < (2, 4):
     def sorted(seq, reverse=False):
         seq = seq[:]
         seq.sort()
@@ -38,9 +37,7 @@ except NameError:
         return seq
 
 # any() was introduced in 2.5
-try:
-    any([])
-except:
+if sys.version_info[:2] < (2, 5):
     def any(seq):
         for item in seq:
             if item:
