@@ -1,3 +1,9 @@
+2007-11-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): Add test_public_ui_api.py
+	* flumotion/test/test_public_ui_api.py (TestPublicUI): 
+	New test to check our public API UI API
+
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu.unregisterComponent): No

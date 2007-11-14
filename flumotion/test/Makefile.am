@@ -64,6 +64,7 @@ EXTRA_DIST = 				\
 	test_pb.py	 		\
 	test_pbstream.py		\
 	test_porter.py	 		\
+	test_public_ui_api.py 		\
 	test_reflect.py 		\
 	test_registry.py 		\
 	test_testclasses.py 		\
