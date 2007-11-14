@@ -1,5 +1,10 @@
 2007-11-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/steps.py: 
+	* flumotion/common/Makefile.am (flumotion_PYTHON): 
+	* flumotion/common/python.py: New file, forward compatibility with
+	python 2.4 and 2.5.
+
 	* flumotion/wizard/steps.py (Consumption): More __nonzero__ cleanups,
 	(Consumption.activated): Simplify logic and use the any() concept
 	from python 2.5

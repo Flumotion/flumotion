@@ -27,6 +27,7 @@ from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors, messages
+from flumotion.common.python import sorted, any
 from flumotion.configure import configure
 from flumotion.wizard.step import WizardStep, WizardSection
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
@@ -41,26 +42,6 @@ from gettext import gettext as _
 from flumotion.common.messages import N_, ngettext
 T_ = messages.gettexter('flumotion')
 
-# Make it run on 2.3
-try:
-    sorted([])
-except NameError:
-    def sorted(seq, reverse=False):
-        seq = seq[:]
-        seq.sort()
-        if reversed:
-            seq = seq[::-1]
-        return seq
-
-# Make it run on 2.4
-try:
-    any([])
-except NameError:
-    def any(seq):
-        for item in seq:
-            if item:
-                return True
-        return False
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
