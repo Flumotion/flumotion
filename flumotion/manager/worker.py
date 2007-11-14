@@ -25,7 +25,6 @@ manager-side objects to handle worker clients
 
 from twisted.internet import defer
 
-# FIXME: rename to base
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
@@ -168,7 +167,6 @@ class WorkerHeaven(base.ManagerHeaven):
 
     def __init__(self, vishnu):
         base.ManagerHeaven.__init__(self, vishnu)
-        self.conf = None
         self.state = worker.ManagerWorkerHeavenState()
 
     ### my methods
@@ -186,8 +184,8 @@ class WorkerHeaven(base.ManagerHeaven):
             self.state.append('names', workerName)
             self.state.append('workers', state)
         else:
-            self.warning('worker %s was already registered in the heaven' %
-                workerName)
+            self.warning('worker %s was already registered in the heaven',
+                         workerName)
             raise errors.AlreadyConnectedError()
 
     def workerDetached(self, workerAvatar):
@@ -203,5 +201,5 @@ class WorkerHeaven(base.ManagerHeaven):
                 if state.get('name') == workerName:
                     self.state.remove('workers', state)
         except ValueError:
-            self.warning('worker %s was never registered in the heaven' %
-                workerName)
+            self.warning('worker %s was never registered in the heaven',
+                         workerName)

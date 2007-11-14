@@ -1,5 +1,10 @@
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/worker.py: Comments from 2004 la la la
+	(WorkerHeaven.__init__): Remove unused instance var.
+	(WorkerHeaven.workerAttached, WorkerHeaven.workerDetached):
+	Prettify logging.
+
 	* flumotion/admin/admin.py (AdminModel.__init__)
 	(AdminModel.setRemoteReference.gotWorkerHeavenState)
 	(AdminModel.setRemoteReference.remoteDisconnected)
