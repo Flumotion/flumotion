@@ -97,7 +97,6 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
 
-
     # vmethod implementation
     def gotDeferredLogin(self, d):
         def success(remote):
@@ -147,7 +146,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     logCategory = 'adminmodel'
 
-    implements(interfaces.IAdminMedium, flavors.IStateListener)
+    implements(interfaces.IAdminMedium)
 
     # Public instance variables (read-only)
     planet = None
@@ -362,18 +361,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         d.addCallback(gotWorkerHeavenState)
         d.addCallback(lambda _: writeConnection())
         return d
-
-    # IStateListener interface
-    def stateSet(self, state, key, value):
-        self.debug("state set on %r: key %s" % (state, key))
-
-    def stateAppend(self, state, key, value):
-        self.debug("state append on %r: key %s" % (state, key))
-
-        # if a flow gets added to a planet, add ourselves as a listener
-
-    def stateRemove(self, state, key, value):
-        self.debug("state remove on %r: key %s" % (state, key))
 
     ### model functions; called by UI's to send requests to manager or comp
 
