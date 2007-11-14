@@ -566,8 +566,5 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)
 
-    def _setWorkerHeavenState(self, state):
-        self._workerHeavenState = state
-
     def getWorkerHeavenState(self):
         return self._workerHeavenState

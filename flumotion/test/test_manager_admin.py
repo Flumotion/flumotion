@@ -19,21 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import testsuite
-from twisted.trial import unittest
+from twisted.spread import pb
 
-from flumotion.manager import admin
-
-# our test for twisted's challenger
-# this is done for comparison with our challenger
-class FakeVishnu:
-    def __init__(self):
-        self.componentHeaven = FakeHeaven(self)
-        self.workerHeaven = FakeHeaven(self)
-
-class FakeHeaven:
-    def __init__(self, vishnu):
-        self.vishnu = vishnu
+from flumotion.common import keycards, testsuite, interfaces
+from flumotion.manager import admin, manager
 
 class FakeTransport:
     def getPeer(self):
@@ -56,16 +45,23 @@ class FakeMind:
 
 class TestAdminAvatar(testsuite.TestCase):
     def setUp(self):
-        vishnu = FakeVishnu()
-        self.heaven = FakeHeaven(vishnu)
-        self.avatar = admin.AdminAvatar(self.heaven, 'admin', None,
-                                        FakeMind())
+        self.vishnu = manager.Vishnu('test', unsafeTracebacks=True)
+        keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
+        self.heaven = self.vishnu.adminHeaven
+        d = self.vishnu.dispatcher.requestAvatar('foo-avatar-id',
+                                                 keycard,
+                                                 FakeMind(),
+                                                 pb.IPerspective,
+                                                 interfaces.IAdminMedium)
+        def gotAvatar((iface, avatar, cleanup)):
+            self.avatar = avatar
+            self._cleanup = cleanup
+        d.addCallback(gotAvatar)
+        return d
 
     def tearDown(self):
-        self.avatar.onShutdown()
+        self._cleanup()
+        self.assertEquals(self.heaven.getAvatars(), [])
 
-    def testHasRemoteReference(self):
-        self.avatar.hasRemoteReference()
-
-if __name__ == '__main__':
-    unittest.main()
+    def testAvatarSet(self):
+        self.assertEquals(self.heaven.getAvatars(), [self.avatar])
