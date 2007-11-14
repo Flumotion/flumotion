@@ -26,7 +26,7 @@ forward compatibility with future python versions
 import sys
 import __builtin__
 
-if sys.version_info <= (2, 3):
+if sys.version_info[:2] <= (2, 3):
     def sorted(seq, reverse=False):
         seq = seq[:]
         seq.sort()
@@ -36,7 +36,7 @@ if sys.version_info <= (2, 3):
 else:
     sorted = __builtin__.sorted
 
-if sys.version_info <= (2, 4):
+if sys.version_info[:2] <= (2, 4):
     def any(seq):
         for item in seq:
             if item:

@@ -2,6 +2,8 @@
 
 	* flumotion/common/python.py:
 	Attempt to fix pychecker.
+	(sorted): Okay, slice the first two items, <= doesn't work,
+	only < and >.
 
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
