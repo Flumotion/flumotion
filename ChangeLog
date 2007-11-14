@@ -1,3 +1,13 @@
+2007-11-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.unregisterComponent): No
+	need to muck with the component state here, planet.py does
+	everything we need.
+
+	* flumotion/common/planet.py (ManagerComponentState.set): If we
+	are setting the mood to a value equal to the moodPending, clear
+	moodPending. Restores previous behaviour.
+
 2007-11-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/ui/trayicon.py (FluTrayIcon): 

@@ -282,6 +282,9 @@ class ManagerComponentState(flavors.StateCacheable):
             log.info('componentstate', 'mood of %s changed to %s',
                      self.get('name'), moods.get(value).name)
         flavors.StateCacheable.set(self, key, value)
+        if key == 'mood' and value == self.get('moodPending'):
+            # we have reached our pending mood
+            self.set('moodPending', None)
 
     def setMood(self, moodValue):
         if self._jobState and moodValue != moods.sad.value:

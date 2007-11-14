@@ -1022,16 +1022,6 @@ class Vishnu(log.Loggable):
         self._componentMappers[m.id] = m
         self._componentMappers[m.avatar] = m
 
-        # FIXME: should we really be poking around the componentState
-        # here?
-
-        # If mood is happy or hungry, then the component is running, and
-        # a reconnecting worker should not trigger a start of this
-        # component, should it ever be stopped by the admin.
-        mood = m.state.get('mood')
-        if mood == moods.happy.value or mood == moods.hungry.value:
-            m.state.set('moodPending', None)
-
     def unregisterComponent(self, componentAvatar):
         # called when the component is logging out
         # clear up jobState and avatar
