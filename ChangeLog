@@ -1,5 +1,8 @@
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/base.py (ManagerAvatar.hasRemoteReference):
+	Remove unused method, there for a case that cannot exist.
+
 	* flumotion/manager/manager.py (Vishnu._componentStopWithAvatar):
 	Call methods on the componentAvatar, not callRemote directly.
 

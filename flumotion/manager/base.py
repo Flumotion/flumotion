@@ -85,14 +85,6 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     def onShutdown(self):
         self.stopPingChecking()
 
-    def hasRemoteReference(self):
-        """
-        Check if the avatar has a remote reference to the peer.
-
-        @rtype: bool
-        """
-        return self.mind != None
-
     def mindCallRemote(self, name, *args, **kwargs):
         """
         Call the given remote method, and log calling and returning nicely.
