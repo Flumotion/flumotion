@@ -5,7 +5,8 @@
 	(sorted): Okay, slice the first two items, <= doesn't work,
 	only < and >.
 	(any): Try to use getattr to get around pychecker being too smart.
-	(any): Use try/except technique
+	(any): Use try/except technique, disable shadowing of builtins
+	(sorted): Revert to earlier attempt, disable __pychecker__
 
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
