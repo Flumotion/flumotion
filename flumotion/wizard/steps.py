@@ -115,35 +115,33 @@ class Production(WizardSection):
         self.verify()
 
     def verify(self):
-        if not hasattr(self.wizard, 'combobox_worker'):
-            return
+        has_audio = self.checkbutton_has_audio.get_active()
+        has_video = self.checkbutton_has_video.get_active()
+        can_continue = False
+        can_select_worker = False
+        if has_audio or has_video:
+            can_continue = True
 
-        has_audio = self.checkbutton_has_audio
-        has_video = self.checkbutton_has_video
-        if (not has_audio and not has_video):
-            self.wizard.block_next(True)
-            self.wizard.combobox_worker.set_sensitive(False)
-            return
-        else:
-            self.wizard.block_next(False)
+            video_source = self.combobox_video.get_active()
+            audio_source = self.combobox_audio.get_active()
+            if (has_audio and audio_source == AudioDevice.Firewire and
+                not (has_video and video_source == VideoDevice.Firewire)):
+                can_select_worker = True
+        self.wizard.block_next(not can_continue)
 
-        video_source = self.combobox_video.get_active()
-        audio_source = self.combobox_audio.get_active()
-        if (has_audio and audio_source == AudioDevice.Firewire and not
-            (has_video and video_source == VideoDevice.Firewire)):
-            self.wizard.combobox_worker.set_sensitive(True)
-        else:
-            self.wizard.combobox_worker.set_sensitive(False)
+        # FIXME: Figure out why this is needed -- Johan 2007-11-14
+        if hasattr(self.wizard, 'combobox_worker'):
+            self.wizard.combobox_worker.set_sensitive(can_select_worker)
 
     def get_next(self):
-        if self.checkbutton_has_video:
-            video_source = self.combobox_video.get_active()
-            return video_source.step
-        elif self.checkbutton_has_audio:
-            audio_source = self.combobox_audio.get_active()
-            return audio_source.step
+        if self.checkbutton_has_video.get_active():
+            source = self.combobox_video.get_active()
+        elif self.checkbutton_has_audio.get_active():
+            source = self.combobox_audio.get_active()
+        else:
+            raise AssertionError
+        return source.step
 
-        raise AssertionError
 
 class VideoSource(WizardStep):
     section = 'Production'

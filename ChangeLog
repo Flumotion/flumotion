@@ -1,3 +1,8 @@
+2007-11-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py (Production): Clean up the production step
+	a little, avoid some code duplication and depending on __nonzero__.
+
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/multi.py (MultiAdminModel.addManager):
