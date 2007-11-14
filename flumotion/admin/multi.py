@@ -127,7 +127,8 @@ class MultiAdminModel(log.Loggable):
         else:
             self.warning('Could not find admin model %r', admin)
 
-    def addManager(self, connectionInfo, tenacious=False):
+    def addManager(self, connectionInfo, tenacious=False,
+                   writeConnection=True):
         i = connectionInfo
         managerId = str(i)
 
@@ -142,7 +143,8 @@ class MultiAdminModel(log.Loggable):
             return defer.fail(e)
 
         a = admin.AdminModel()
-        connectD = a.connectToManager(i, tenacious)
+        connectD = a.connectToManager(i, tenacious,
+                                      writeConnection=writeConnection)
         assert a.managerId == managerId
 
         def connect_callback(_):

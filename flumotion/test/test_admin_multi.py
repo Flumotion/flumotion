@@ -39,7 +39,7 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
             return m.removeManager(str(self.connectionInfo))
 
         m = multi.MultiAdminModel()
-        d = m.addManager(self.connectionInfo)
+        d = m.addManager(self.connectionInfo, writeConnection=False)
         d.addCallback(connected)
         return d
 
@@ -59,7 +59,7 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
                                         self.connectionInfo.use_ssl,
                                         pb.Authenticator(username='user',
                                                          password='pest'))
-        d = m.addManager(i)
+        d = m.addManager(i, writeConnection=False)
         d.addCallbacks(connected, failure)
         return d
 
@@ -97,7 +97,7 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
             return m.removeManager(str(self.connectionInfo))
 
         m = multi.MultiAdminModel()
-        d = m.addManager(self.connectionInfo)
+        d = m.addManager(self.connectionInfo, writeConnection=False)
         d.addCallback(connected)
         d.addCallback(disconnected)
         d.addCallback(reconnected)

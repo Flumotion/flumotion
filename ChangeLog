@@ -1,5 +1,21 @@
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/multi.py (MultiAdminModel.addManager):
+	* flumotion/admin/admin.py (AdminModel.__init__)
+	(AdminModel.connectToManager, AdminModel.setRemoteReference): Add
+	keyword argument to addManager/connnectToManager to control
+	generation of the connection XML cache file.
+
+	* flumotion/test/test_admin_admin.py
+	(AdminTest.testConnectSuccess)
+	(AdminTest.testReconnect, AdminTest.testConnectFailure): 
+	* flumotion/test/test_admin_multi.py
+	(MultiAdminTest.testConnectSuccess)
+	(MultiAdminTest.testConnectFailure)
+	(MultiAdminTest.testReconnect): Don't record manager connection
+	details when connecting to test managers. Fixes tests adding to
+	the recent connections box in the admin UI.
+
 	* flumotion/manager/worker.py: Comments from 2004 la la la
 	(WorkerHeaven.__init__): Remove unused instance var.
 	(WorkerHeaven.workerAttached, WorkerHeaven.workerDetached):

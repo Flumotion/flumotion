@@ -39,7 +39,8 @@ class AdminTest(testsuite.TestCaseWithManager):
             a.shutdown()
 
         a = admin.AdminModel()
-        d = a.connectToManager(self.connectionInfo)
+        d = a.connectToManager(self.connectionInfo,
+                               writeConnection=False)
         d.addCallback(connected)
         return d
 
@@ -72,7 +73,8 @@ class AdminTest(testsuite.TestCaseWithManager):
             a.shutdown()
 
         a = admin.AdminModel()
-        d = a.connectToManager(self.connectionInfo)
+        d = a.connectToManager(self.connectionInfo,
+                               writeConnection=False)
         d.addCallback(connected)
         d.addCallback(disconnected)
         d.addCallback(reconnected)
@@ -93,6 +95,6 @@ class AdminTest(testsuite.TestCaseWithManager):
                                         self.connectionInfo.use_ssl,
                                         pb.Authenticator(username='user',
                                                          password='pest'))
-        d = a.connectToManager(i)
+        d = a.connectToManager(i, writeConnection=False)
         d.addCallbacks(connected, failure)
         return d

@@ -156,6 +156,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         # All of these instance variables are private. Cuidado cabrones!
         self.connectionInfo = None
         self.keepTrying = None
+        self._writeConnection = True
 
         self.managerId = '<uninitialized>'
 
@@ -168,11 +169,13 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.planet = None
         self._workerHeavenState = None
 
-    def connectToManager(self, connectionInfo, keepTrying=False):
+    def connectToManager(self, connectionInfo, keepTrying=False,
+                         writeConnection=True):
         'Connect to a host.'
         assert self.clientFactory is None
 
         self.connectionInfo = connectionInfo
+        self._writeConnection = writeConnection
 
         # give the admin an id unique to the manager -- if a program is
         # adminning multiple managers, this id should tell them apart
@@ -353,7 +356,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         d = self.callRemote('getPlanetState')
         d.addCallback(gotPlanetState)
         d.addCallback(gotWorkerHeavenState)
-        d.addCallback(lambda _: writeConnection())
+        if self._writeConnection:
+            d.addCallback(lambda _: writeConnection())
         return d
 
     ### model functions; called by UI's to send requests to manager or comp
