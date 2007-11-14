@@ -158,7 +158,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         self.managerId = '<uninitialized>'
 
-        self.state = 'disconnected'
+        self.connected = False
         self.clientFactory = None
 
         self._deferredConnect = None
@@ -314,7 +314,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
             self.debug('got worker state')
 
             self.debug('Connected to manager and retrieved all state')
-            self.state = 'connected'
+            self.connected = True
             self.emit('connected')
             
         def writeConnection():
@@ -351,7 +351,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         # fixme: push the disconnect notification upstream
         def remoteDisconnected(remoteReference):
             self.debug("emitting disconnected")
-            self.state = 'disconnected'
+            self.connected = False
             self.emit('disconnected')
             self.debug("emitted disconnected")
         self.remote.notifyOnDisconnect(remoteDisconnected)
@@ -365,9 +365,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
     ### model functions; called by UI's to send requests to manager or comp
 
     ## view management functions
-    # FIXME: what is this crap ? strings as enums ?
     def isConnected(self):
-        return self.state == 'connected'
+        return self.connected
 
     ## generic remote call methods
     def componentCallRemote(self, componentState, methodName, *args, **kwargs):
