@@ -199,20 +199,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
         col.set_sort_column_id(COL_PID)
         self._view.append_column(col)
 
-        def type_cpu_datafunc(column, cell, model, iter):
-            state = model.get_value(iter, COL_STATE)
-            cpu = state.get('cpu', None)
-            if isinstance(cpu, float):
-                cell.set_property('text', '%.2f' % (cpu * 100.0))
-            else:
-                cell.set_property('text', '')
-
-        t = gtk.CellRendererText()
-        col = gtk.TreeViewColumn('CPU %', t, text=COL_CPU)
-        col.set_cell_data_func(t, type_cpu_datafunc)
-        col.set_sort_column_id(COL_CPU)
-        self._view.append_column(col)
-
         # the additional columns need not be added
 
     # load all pixbufs for the moods
@@ -398,8 +384,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._model.set(iter, COL_NAME, value)
         elif key == 'workerName':
             self._updateWorker(iter, state)
-        elif key == 'cpu':
-            self._model.set(iter, COL_CPU, value)
 
     def _set_mood_value(self, iter, value):
         """

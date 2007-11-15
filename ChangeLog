@@ -1,3 +1,9 @@
+2007-11-15  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/parts.py:
+	  Remove CPU column, since we no longer have CPU in the jobState, and
+	  we're going to show this in the component tab soon.
+
 2007-11-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu.unregisterComponent): 
