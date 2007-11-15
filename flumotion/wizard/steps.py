@@ -106,6 +106,11 @@ class Production(WizardSection):
         self.verify()
 
     def verify(self):
+        # FIXME: We should wait for the first worker to connect before
+        #        opening the wizard or so
+        if not hasattr(self.wizard, 'combobox_worker'):
+            return
+
         has_audio = self.checkbutton_has_audio.get_active()
         has_video = self.checkbutton_has_video.get_active()
         can_continue = False
@@ -120,9 +125,7 @@ class Production(WizardSection):
                 can_select_worker = True
         self.wizard.block_next(not can_continue)
 
-        # FIXME: Figure out why this is needed -- Johan 2007-11-14
-        if hasattr(self.wizard, 'combobox_worker'):
-            self.wizard.combobox_worker.set_sensitive(can_select_worker)
+        self.wizard.combobox_worker.set_sensitive(can_select_worker)
 
     def get_next(self):
         if self.checkbutton_has_video.get_active():
@@ -1199,70 +1202,59 @@ class Consumption(WizardSection):
 
         # Most of the options only makes sense if we selected audio
         # and video in the first page. If we didn't just hide them
-        self.checkbutton_http_audio_video.set_property('visible', has_both)
-        self.checkbutton_http_audio.set_property('visible', has_both)
-        self.checkbutton_http_video.set_property('visible', has_both)
-        self.checkbutton_disk_audio_video.set_property('visible', has_both)
-        self.checkbutton_disk_audio.set_property('visible', has_both)
-        self.checkbutton_disk_video.set_property('visible', has_both)
-        self.checkbutton_shout2_audio_video.set_property('visible', has_both)
-        self.checkbutton_shout2_audio.set_property('visible', has_both)
-        self.checkbutton_shout2_video.set_property('visible', has_both)
+        for checkbutton in (self.checkbutton_http_audio_video,
+                            self.checkbutton_http_audio,
+                            self.checkbutton_http_video,
+                            self.checkbutton_disk_audio_video,
+                            self.checkbutton_disk_audio,
+                            self.checkbutton_disk_video,
+                            self.checkbutton_shout2_audio_video,
+                            self.checkbutton_shout2_audio,
+                            self.checkbutton_shout2_video):
+            checkbutton.set_property('visible', has_both)
 
     def get_next(self, step=None):
-        items = []
+        uielements = []
+        if self.checkbutton_http.get_active():
+            uielements.append(('HTTP Streamer',
+                               [self.checkbutton_http_audio,
+                                self.checkbutton_http_video,
+                                self.checkbutton_http_audio_video]))
+        if self.checkbutton_disk.get_active():
+            uielements.append(('Disk',
+                               [self.checkbutton_disk_audio,
+                                self.checkbutton_disk_video,
+                                self.checkbutton_disk_audio_video]))
+        if self.checkbutton_shout2.get_active():
+            uielements.append(('Icecast streamer',
+                               [self.checkbutton_shout2_audio,
+                                self.checkbutton_shout2_video,
+                                self.checkbutton_shout2_audio_video]))
+
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
         has_video = self.wizard.get_step_option('Source', 'has-video')
 
-        if has_audio and has_video:
-            if self.checkbutton_http.get_active():
-                if self.checkbutton_http_audio_video.get_active():
-                    items.append('HTTP Streamer (audio & video)')
-                if self.checkbutton_http_audio.get_active():
-                    items.append('HTTP Streamer (audio only)')
-                if self.checkbutton_http_video.get_active():
-                    items.append('HTTP Streamer (video only)')
-            if self.checkbutton_disk.get_active():
-                if self.checkbutton_disk_audio_video.get_active():
-                    items.append('Disk (audio & video)')
-                if self.checkbutton_disk_audio.get_active():
-                    items.append('Disk (audio only)')
-                if self.checkbutton_disk_video.get_active():
-                    items.append('Disk (video only)')
-            if self.checkbutton_shout2.get_active():
-                if self.checkbutton_shout2_audio_video.get_active():
-                    items.append('Icecast streamer (audio & video)')
-                if self.checkbutton_shout2_audio.get_active():
-                    items.append('Icecast streamer (audio only)')
-                if self.checkbutton_shout2_video.get_active():
-                    items.append('Icecast streamer (video only)')
-        elif has_video and not has_audio:
-            if self.checkbutton_http.get_active():
-                items.append('HTTP Streamer (video only)')
-            if self.checkbutton_disk.get_active():
-                items.append('Disk (video only)')
-            if self.checkbutton_shout2.get_active():
-                items.append('Icecast streamer (video only)')
-        elif has_audio and not has_video:
-            if self.checkbutton_http.get_active():
-                items.append('HTTP Streamer (audio only)')
-            if self.checkbutton_disk.get_active():
-                items.append('Disk (audio only)')
-            if self.checkbutton_shout2.get_active():
-                items.append('Icecast streamer (audio only)')
-        else:
-            raise AssertionError
+        items = []
+        for name, (audio, video, audio_video) in uielements:
+            if has_audio and has_video and audio_video.get_active():
+                items.append("%s (audio & video)" % (name,))
+            if has_audio and audio.get_active():
+                items.append("%s (audio only)" % (name,))
+            if has_video and video.get_active():
+                items.append("%s (video only)" % (name,))
 
         assert items
 
-        if not step:
-            return items[0]
-        else:
+        if step:
             stepname = step.get_name()
             if stepname in items and items[-1] != stepname:
-                return items[items.index(stepname)+1]
+                step = items[items.index(stepname)+1]
             else:
-                return None
+                step = None
+        else:
+            step = items[0]
+        return step
+
 
 # XXX: If audio codec is speex, disable java applet option
 class HTTP(WizardStep):

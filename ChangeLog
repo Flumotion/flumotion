@@ -1,3 +1,10 @@
+2007-11-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py (Consumption.activated, 
+	Consumption.get_next): Continue refactoring, avoids plenty
+	of duplication here
+	(Production.verify): Revert the hasattr change
+
 2007-11-15  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/parts.py:
