@@ -1,5 +1,8 @@
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_consumption.glade: Set the audio/video only
+	sub checkbuttons to true by default
+
 	* flumotion/wizard/steps.py:
 	Remove unused imports, refactor method order in the overlay step,
 	make a few methods private. Make sure that all audio sources inherit
