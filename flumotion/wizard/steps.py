@@ -124,12 +124,12 @@ class ProductionStep(WizardSection):
 
     def get_next(self):
         if self.checkbutton_has_video.get_active():
-            return self.get_video_step()
+            source = self.combobox_video.get_active()
         elif self.checkbutton_has_audio.get_active():
-            return self.get_audio_step()
+            source = self.combobox_audio.get_active()
         else:
             raise AssertionError
-
+        return source.step
 
     # Private API
 
@@ -154,15 +154,6 @@ class ProductionStep(WizardSection):
         self.wizard.block_next(not can_continue)
 
         self.wizard.combobox_worker.set_sensitive(can_select_worker)
-
-    def get_next(self):
-        if self.checkbutton_has_video.get_active():
-            source = self.combobox_video.get_active()
-        elif self.checkbutton_has_audio.get_active():
-            source = self.combobox_audio.get_active()
-        else:
-            raise AssertionError
-        return source.step
 
 
 # note:

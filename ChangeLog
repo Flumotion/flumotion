@@ -4,7 +4,8 @@
 	Remove unused imports, refactor method order in the overlay step,
 	make a few methods private. Make sure that all audio sources inherit
 	from the audio source step.
-	
+	(ProductionStep.get_next): Remove duplicated get_next()
+
 	* flumotion/wizard/wizard.py (BasicScenario.__init__):
 	Rename all step classes to end with Step
 	
