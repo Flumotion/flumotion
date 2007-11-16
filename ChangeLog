@@ -1,5 +1,21 @@
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_encoding.glade: Remove parts which are going to 
+	be overwritten in runtime
+	* data/glade/wizard_testsource.glade: Listen to two new signals
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	First step of MVC migration of the wizard.
+	Add a Flow and Component model, start using them
+	in parts of the wizard, but don't use them to do much interesting.
+
+	Make some of the indivudal steps create the upcoming step instead of just
+	returning the name, this allows us to pass the model on to the next step. 
+
+2007-11-16  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard_consumption.glade: Set the audio/video only
 	sub checkbuttons to true by default
 

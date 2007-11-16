@@ -31,7 +31,8 @@ from flumotion.configure import configure
 from flumotion.common import log, pygobject, messages
 from flumotion.common.pygobject import gsignal
 from flumotion.common.messages import N_, ngettext
-from flumotion.wizard import  save, step, classes
+from flumotion.wizard import save, step, classes
+from flumotion.wizard.models import Flow
 from flumotion.ui.glade import GladeWindow
 
 T_ = messages.gettexter('flumotion')
@@ -176,6 +177,7 @@ class BasicScenario(Scenario):
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
+    gsignal('option-changed', object, str, object)
 
     logCategory = 'wizard'
 
@@ -188,6 +190,7 @@ class Wizard(GladeWindow, log.Loggable):
         for k, v in self.widgets.items():
             setattr(self, k, v)
 
+        self.flow = Flow("default")
         self.scenario = BasicScenario(self)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))

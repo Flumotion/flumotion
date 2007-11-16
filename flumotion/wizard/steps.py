@@ -35,6 +35,8 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      RotateTime, SoundcardBitdepth, SoundcardChannels, SoundcardSystem, \
      SoundcardAlsaDevice, SoundcardOSSDevice, SoundcardSamplerate, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
+from flumotion.wizard.models import AudioProducer, VideoProducer, \
+    AudioEncoder, VideoEncoder, Muxer
 
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
@@ -55,15 +57,21 @@ def _fraction_from_float(number, denominator):
 
 
 class AudioSourceStep(WizardStep):
-    pass
+    def __init__(self, wizard, model):
+        self.model = model
+        WizardStep.__init__(self, wizard)
 
 
 class VideoSourceStep(WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
 
+    def __init__(self, wizard, model):
+        self.model = model
+        WizardStep.__init__(self, wizard)
+
     def get_next(self):
-        return 'Overlay'
+        return OverlayStep(self.wizard, self.model)
 
     def get_state(self):
         options = WizardStep.get_state(self)
@@ -75,10 +83,18 @@ class VideoSourceStep(WizardStep):
 class VideoEncoderStep(WizardStep):
     section = 'Conversion'
 
+    def __init__(self, wizard, model):
+        self.model = model
+        WizardStep.__init__(self, wizard)
+
 
 class AudioEncoderStep(WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
+
+    def __init__(self, wizard, model):
+        self.model = model
+        WizardStep.__init__(self, wizard)
 
     def get_next(self):
         return None
@@ -105,7 +121,88 @@ class ProductionStep(WizardSection):
     section = 'Production'
     icon = 'source.png'
 
-    def setup(self):
+    def __init__(self, wizard):
+        WizardSection.__init__(self, wizard)
+        self._audio_producer = None
+        self._video_producer = None
+        # FIXME: Why isn't setup() called for WizardSections?
+        self._setup()
+
+    def get_audio_producer(self):
+        """Returns the selected audio producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.AudioProducer}
+        """
+        return self._audio_producer
+
+    def get_video_producer(self):
+        """Returns the selected video producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.VideoProducer}
+        """
+        return self._video_producer
+
+    def get_video_step(self):
+        """Return the video step to be shown, given the currently
+        selected values in this step
+        @returns: video step
+        @rtype: a L{VideoSourceStep} subclass
+        """
+        source = self.combobox_video.get_active()
+        if source == VideoDevice.Test:
+            step_class = TestVideoSourceStep
+        elif source == VideoDevice.Webcam:
+            step_class = WebcamStep
+        elif source == VideoDevice.TVCard:
+            step_class = TVCardStep
+        elif source == VideoDevice.Firewire:
+            step_class = FireWireStep
+        else:
+            raise AssertionError(source)
+
+        return step_class(self.wizard, self._video_producer)
+
+    def get_audio_step(self):
+        """Return the audio step to be shown, given the currently
+        selected values in this step
+        @returns: audio step
+        @rtype: a L{AudioSourceStep} subclass
+        """
+        source = self.combobox_audio.get_active()
+        if source == AudioDevice.Test:
+            step_class = TestAudioSourceStep
+        elif source == AudioDevice.Soundcard:
+            step_class = SoundcardStep
+        elif source == AudioDevice.Firewire:
+            # Only show firewire audio if we're using firewire video
+            if self.combobox_video.get_active() == VideoDevice.Firewire:
+                return
+            step_class = FireWireAudioStep
+        else:
+            raise AssertionError(source)
+        return step_class(self.wizard, self._audio_producer)
+
+    # WizardStep
+
+    def activated(self):
+        self._verify()
+
+    def get_next(self):
+        if self.checkbutton_has_video.get_active():
+            return self.get_video_step()
+        elif self.checkbutton_has_audio.get_active():
+            return self.get_audio_step()
+        else:
+            raise AssertionError
+
+    # Private API
+
+    def _setup(self):
+        self._audio_producer = AudioProducer()
+        self.wizard.flow.addComponent(self._audio_producer)
+        self._video_producer = VideoProducer()
+        self.wizard.flow.addComponent(self._video_producer)
+
         self.combobox_video.set_enum(VideoDevice)
         self.combobox_audio.set_enum(AudioDevice)
         tips = gtk.Tooltips()
@@ -116,22 +213,6 @@ class ProductionStep(WizardSection):
 
         self.combobox_video.set_active(VideoDevice.Test)
         self.combobox_audio.set_active(AudioDevice.Test)
-
-    # WizardStep
-
-    def activated(self):
-        self._verify()
-
-    def get_next(self):
-        if self.checkbutton_has_video.get_active():
-            source = self.combobox_video.get_active()
-        elif self.checkbutton_has_audio.get_active():
-            source = self.combobox_audio.get_active()
-        else:
-            raise AssertionError
-        return source.step
-
-    # Private API
 
     def _verify(self):
         # FIXME: We should wait for the first worker to connect before
@@ -154,6 +235,40 @@ class ProductionStep(WizardSection):
         self.wizard.block_next(not can_continue)
 
         self.wizard.combobox_worker.set_sensitive(can_select_worker)
+
+    # Callbacks
+
+    def on_checkbutton_has_video_toggled(self, button):
+        self.combobox_video.set_sensitive(button.get_active())
+        if button.get_active():
+            self.wizard.flow.addComponent(self._video_producer)
+        else:
+            self.wizard.flow.removeComponent(self._video_producer)
+        self._verify()
+
+    def on_checkbutton_has_audio_toggled(self, button):
+        self.combobox_audio.set_sensitive(button.get_active())
+        if button.get_active():
+            self.wizard.flow.addComponent(self._audio_producer)
+        else:
+            self.wizard.flow.removeComponent(self._audio_producer)
+        self._verify()
+
+    def on_combobox_video_changed(self, button):
+        video_source = self.combobox_video.get_active()
+        # FIXME!!!
+        if type(video_source) == int:
+            return
+        self._video_producer.name = video_source.component_type
+        self._verify()
+
+    def on_combobox_audio_changed(self, button):
+        audio_source = self.combobox_audio.get_active()
+        # FIXME!!!
+        if type(audio_source) == int:
+            return
+        self._audio_producer.name = audio_source.component_type
+        self._verify()
 
 
 # note:
@@ -647,14 +762,17 @@ class TestVideoSourceStep(VideoSourceStep):
     component_type = 'videotestsrc'
     icon = 'testsource.png'
 
-    def before_show(self):
-        self.wizard.require_elements(self.worker, 'videotestsrc')
-
     def setup(self):
         self.combobox_pattern.set_enum(VideoTestPattern)
         self.combobox_format.set_enum(VideoTestFormat)
+
         # FIXME: Remember to remove the values from the glade file
         #        when we use proxy widgets
+        self.model.width = 320
+        self.model.height = 240
+
+    def before_show(self):
+        self.wizard.require_elements(self.worker, 'videotestsrc')
 
     def get_state(self):
         format = self.combobox_format.get_enum()
@@ -673,6 +791,12 @@ class TestVideoSourceStep(VideoSourceStep):
             self.spinbutton_framerate.get_value(), 10)
         return options
 
+    def on_spinbutton_height_value_changed(self, spinbutton):
+        self.model.height = spinbutton.get_value()
+
+    def on_spinbutton_width_value_changed(self, spinbutton):
+        self.model.width = spinbutton.get_value()
+
 
 class OverlayStep(WizardStep):
     name = 'Overlay'
@@ -682,6 +806,10 @@ class OverlayStep(WizardStep):
     icon = 'overlay.png'
 
     can_overlay = True
+
+    def __init__(self, wizard, video_producer):
+        WizardStep.__init__(self, wizard)
+        self._video_producer = video_producer
 
     # Wizard Step
 
@@ -695,28 +823,14 @@ class OverlayStep(WizardStep):
 
         options['can-overlay'] = self.can_overlay
 
-        # XXX: Serious refactoring needed.
-        video_options = self.wizard.get_step_options('Source')
-        video_source = video_options['video']
-        video_step = self.wizard[video_source.step]
-        video_props = video_step.get_state()
-
-        options['width'] = video_props['width']
-        options['height'] = video_props['height']
+        options['width'] = self._video_producer.width
+        options['height'] = self._video_producer.height
 
         return options
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-audio'):
-            audio_source = self.wizard.get_step_option('Source', 'audio')
-            video_source = self.wizard.get_step_option('Source', 'video')
-            if audio_source == AudioDevice.Soundcard:
-                return 'Soundcard'
-            elif audio_source == AudioDevice.Test:
-                return 'Test Audio Source'
-            elif audio_source == AudioDevice.Firewire and not \
-                video_source == VideoDevice.Firewire:
-                return 'Firewire audio'
+            return self.wizard['Source'].get_audio_step()
 
         return None
 
@@ -920,17 +1034,50 @@ class ConversionStep(WizardSection):
     name = 'Encoding'
     section = 'Conversion'
 
-    def setup(self):
+    def __init__(self, wizard):
+        WizardSection.__init__(self, wizard)
+        self._muxer = Muxer()
+        self._audio_encoder = AudioEncoder()
+        self._video_encoder = VideoEncoder()
+        self.wizard.flow.addComponent(self._muxer)
+
+    def before_show(self):
         self.combobox_format.set_enum(EncodingFormat)
         self.combobox_audio.set_enum(EncodingAudio)
         self.combobox_video.set_enum(EncodingVideo)
+
+        flow = self.wizard.flow
+        production = self.wizard['Source']
+
+        audio_producer = production.get_audio_producer()
+        if audio_producer and self._audio_encoder not in flow:
+            flow.addComponent(self._audio_encoder)
+
+        video_producer = production.get_video_producer()
+        if video_producer and self._video_encoder not in flow:
+            flow.addComponent(self._video_encoder)
 
     def on_combobox_format_changed(self, combo):
         format = combo.get_active()
         if format == 0:
             return
 
+        self._muxer.name = combo.get_active().component_type
         self._verify()
+
+    def on_combobox_audio_changed(self, combo):
+        audio = combo.get_active()
+        if audio == 0:
+            return
+
+        self._audio_encoder.name = combo.get_active().component_type
+
+    def on_combobox_video_changed(self, combo):
+        video = combo.get_active()
+        if video == 0:
+            return
+
+        self._video_encoder.name = combo.get_active().component_type
 
     def _verify(self):
         # XXX: isn't there a better way of doing this, like blocking
@@ -971,23 +1118,26 @@ class ConversionStep(WizardSection):
         if self.wizard.get_step_option('Source', 'has-audio'):
             codec = self.combobox_audio.get_enum()
             if codec == EncodingAudio.Vorbis:
-                return 'Vorbis encoder'
+                step_class = VorbisStep
             elif codec == EncodingAudio.Speex:
-                return 'Speex encoder'
+                step_class = SpeexStep
             elif codec == EncodingAudio.Mulaw:
                 return None
-
+            return step_class(self.wizard, self._audio_encoder)
         return None
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-video'):
             codec = self.combobox_video.get_enum()
             if codec == EncodingVideo.Theora:
-                return 'Theora encoder'
+                step_class = TheoraStep
             elif codec == EncodingVideo.Smoke:
-                return 'Smoke encoder'
+                step_class = SmokeStep
             elif codec == EncodingVideo.JPEG:
-                return 'JPEG encoder'
+                step_class = JPEGStep
+            else:
+                raise AssertionError(codec)
+            return step_class(self.wizard, self._video_encoder)
         elif self.wizard.get_step_option('Source', 'has-audio'):
             return self.get_audio_page()
         else:

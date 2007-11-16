@@ -28,9 +28,7 @@
       <child>
 	<widget class="GtkComboBox" id="combobox_video">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="no">Theora
-Smoke
-JPEG</property>
+	  <signal name="changed" handler="on_combobox_video_changed"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -45,9 +43,7 @@ JPEG</property>
       <child>
 	<widget class="GtkComboBox" id="combobox_audio">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="no">Vorbis
-Speex
-Mulaw</property>
+	  <signal name="changed" handler="on_combobox_audio_changed"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -62,8 +58,6 @@ Mulaw</property>
       <child>
 	<widget class="GtkComboBox" id="combobox_format">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="no">Ogg
-Multipart</property>
 	  <signal name="changed" handler="on_combobox_format_changed" last_modification_time="Thu, 30 Sep 2004 09:10:22 GMT"/>
 	</widget>
 	<packing>
