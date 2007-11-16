@@ -152,8 +152,12 @@ class BasicScenario(Scenario):
     def __init__(self, wizard):
         from flumotion.wizard import steps
         self.sections = Sections()
-        for klass in (steps.Welcome, steps.Production, steps.Conversion,
-                      steps.Consumption, steps.License, steps.Summary):
+        for klass in (steps.WelcomeStep,
+                      steps.ProductionStep,
+                      steps.ConversionStep,
+                      steps.ConsumptionStep,
+                      steps.LicenseStep,
+                      steps.SummaryStep):
             self.sections.append(klass(wizard))
 
         Scenario.__init__(self, wizard)

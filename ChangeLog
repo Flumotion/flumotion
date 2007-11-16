@@ -1,8 +1,12 @@
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/steps.py (HTTPAudioStep): 
+	* flumotion/wizard/wizard.py (BasicScenario.__init__):
+	Rename all step classes to end with Step
+	
 	* flumotion/wizard/wizard.py (BasicScenario.__init__): Allow us to
 	return a WizardStep instance instead of a string in get_next()
-	methods
+	methods.
 
 	* flumotion/ui/fgtk.py (FCheckButton): Remove the __nonzero__
 	hack.

@@ -56,7 +56,7 @@ def _fraction_from_float(number, denominator):
     """
     return "%d/%d" % (number * denominator, denominator)
 
-class Welcome(WizardSection):
+class WelcomeStep(WizardSection):
     glade_file = 'wizard_welcome.glade'
     section = 'Welcome'
     icon = 'wizard.png'
@@ -70,7 +70,7 @@ class Welcome(WizardSection):
     def get_next(self):
         return None
 
-class Production(WizardSection):
+class ProductionStep(WizardSection):
     glade_file = 'wizard_source.glade'
     name = 'Source'
     section = 'Production'
@@ -137,7 +137,7 @@ class Production(WizardSection):
         return source.step
 
 
-class VideoSource(WizardStep):
+class VideoSourceStep(WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
 
@@ -157,7 +157,7 @@ class VideoSource(WizardStep):
 # and frequency
 # apps (and flumotion) talk about "TV Norm" and "source",
 # and channel (corresponding to frequency)
-class TVCard(VideoSource):
+class TVCardStep(VideoSourceStep):
     name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
@@ -224,7 +224,7 @@ class TVCard(VideoSource):
             _fraction_from_float(self.spinbutton_framerate.get_value(), 10)
         return options
 
-class FireWire(VideoSource):
+class FireWireStep(VideoSourceStep):
     name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
@@ -324,7 +324,7 @@ class FireWire(VideoSource):
         self.label_output_format.set_markup(msg)
 
     def get_state(self):
-        options = {} # VideoSource.get_state(self)
+        options = {} # VideoSourceStep.get_state(self)
         d = self._get_width_height()
         options['height'] = d['oh']
         options['scaled-width'] = d['sw']
@@ -364,7 +364,7 @@ class FireWire(VideoSource):
     run_checks = defer_generator_method(run_checks)
 
 
-class FireWireAudio(WizardStep):
+class FireWireAudioStep(WizardStep):
     name = 'Firewire audio'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
@@ -471,7 +471,7 @@ class FireWireAudio(WizardStep):
         self.label_output_format.set_markup(msg)
 
     def get_state(self):
-        options = {} # VideoSource.get_state(self)
+        options = {} # VideoSourceStep.get_state(self)
         d = self._get_width_height()
         options['height'] = d['oh']
         options['scaled-width'] = d['sw']
@@ -510,7 +510,7 @@ class FireWireAudio(WizardStep):
     def get_next(self):
         return None
 
-class Webcam(VideoSource):
+class WebcamStep(VideoSourceStep):
     name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
@@ -632,7 +632,7 @@ class Webcam(VideoSource):
             options['format'] = format
         return options
 
-class TestVideoSource(VideoSource):
+class TestVideoSourceStep(VideoSourceStep):
     name = 'Test Video Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
@@ -662,7 +662,7 @@ class TestVideoSource(VideoSource):
             self.spinbutton_framerate.get_value(), 10)
         return options
 
-class Overlay(WizardStep):
+class OverlayStep(WizardStep):
     name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
@@ -756,7 +756,7 @@ class Overlay(WizardStep):
 
         return None
 
-class Soundcard(WizardStep):
+class SoundcardStep(WizardStep):
     name = 'Soundcard'
     glade_file = 'wizard_soundcard.glade'
     section = 'Production'
@@ -875,7 +875,7 @@ class Soundcard(WizardStep):
     def get_next(self):
         return None
 
-class TestAudioSource(WizardStep):
+class TestAudioSourceStep(WizardStep):
     name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
@@ -898,7 +898,7 @@ class TestAudioSource(WizardStep):
     def get_next(self):
         return None
 
-class Conversion(WizardSection):
+class ConversionStep(WizardSection):
     glade_file = 'wizard_encoding.glade'
     name = 'Encoding'
     section = 'Conversion'
@@ -977,10 +977,10 @@ class Conversion(WizardSection):
         else:
             return None
 
-class VideoEncoder(WizardStep):
+class VideoEncoderStep(WizardStep):
     section = 'Conversion'
 
-class Theora(VideoEncoder):
+class TheoraStep(VideoEncoderStep):
     name = 'Theora encoder'
     sidebar_name = 'Theora'
     glade_file = 'wizard_theora.glade'
@@ -1030,7 +1030,7 @@ class Theora(VideoEncoder):
 
         return options
 
-class Smoke(VideoEncoder):
+class SmokeStep(VideoEncoderStep):
     name = 'Smoke encoder'
     sidebar_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
@@ -1044,14 +1044,14 @@ class Smoke(VideoEncoder):
         return self.wizard['Encoding'].get_audio_page()
 
     def get_state(self):
-        options = VideoEncoder.get_state(self)
+        options = VideoEncoderStep.get_state(self)
         options['qmin'] = int(options['qmin'])
         options['qmax'] = int(options['qmax'])
         options['threshold'] = int(options['threshold'])
         options['keyframe'] = int(options['keyframe'])
         return options
 
-class JPEG(VideoEncoder):
+class JPEGStep(VideoEncoderStep):
     name = 'JPEG encoder'
     sidebar_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
@@ -1065,12 +1065,12 @@ class JPEG(VideoEncoder):
         return self.wizard['Encoding'].get_audio_page()
 
     def get_state(self):
-        options = VideoEncoder.get_state(self)
+        options = VideoEncoderStep.get_state(self)
         options['quality'] = int(options['quality'])
         options['framerate'] = _fraction_from_float(options['framerate'], 2)
         return options
 
-class AudioEncoder(WizardStep):
+class AudioEncoderStep(WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
 
@@ -1078,7 +1078,7 @@ class AudioEncoder(WizardStep):
         return None
 
 # Worker?
-class Vorbis(AudioEncoder):
+class VorbisStep(AudioEncoderStep):
     glade_file = 'wizard_vorbis.glade'
     name = 'Vorbis encoder'
     sidebar_name = 'Vorbis'
@@ -1118,7 +1118,7 @@ class Vorbis(AudioEncoder):
             options['quality'] = self.spinbutton_quality.get_value()
         return options
 
-class Speex(AudioEncoder):
+class SpeexStep(AudioEncoderStep):
     name = 'Speex encoder'
     sidebar_name = 'Speex'
     component_type = 'speex'
@@ -1133,11 +1133,11 @@ class Speex(AudioEncoder):
         self.spinbutton_bitrate.set_value(11)
 
     def get_state(self):
-        options = AudioEncoder.get_state(self)
+        options = AudioEncoderStep.get_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         return options
 
-class Consumption(WizardSection):
+class ConsumptionStep(WizardSection):
     name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
@@ -1257,7 +1257,7 @@ class Consumption(WizardSection):
 
 
 # XXX: If audio codec is speex, disable java applet option
-class HTTP(WizardStep):
+class HTTPStep(WizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
     component_type = 'http-streamer'
@@ -1311,22 +1311,22 @@ class HTTP(WizardStep):
     def on_checkbutton_bandwidth_limit_toggled(self, *args):
         self.verify()
 
-class HTTPBoth(HTTP):
+class HTTPBothStep(HTTPStep):
     name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
 
-class HTTPAudio(HTTP):
+class HTTPAudioStep(HTTPStep):
     name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
 
-class HTTPVideo(HTTP):
+class HTTPVideoStep(HTTPStep):
     name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
 
-class Disk(WizardStep):
+class DiskStep(WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
     icon = 'kcmdevices.png'
@@ -1390,19 +1390,19 @@ class Disk(WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
-class DiskBoth(Disk):
+class DiskBothStep(DiskStep):
     name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
 
-class DiskAudio(Disk):
+class DiskAudioStep(DiskStep):
     name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
 
-class DiskVideo(Disk):
+class DiskVideoStep(DiskStep):
     name = 'Disk (video only)'
     sidebar_name = 'Disk video'
 
-class Shout2(WizardStep):
+class Shout2Step(WizardStep):
     glade_file = 'wizard_shout2.glade'
     section = 'Consumption'
     component_type = 'shout2'
@@ -1424,19 +1424,19 @@ class Shout2(WizardStep):
 
         return options
 
-class Shout2Both(Shout2):
+class Shout2BothStep(Shout2Step):
     name = 'Icecast streamer (audio & video)'
     sidebar_name = 'Icecast audio/video'
 
-class Shout2Audio(Shout2):
+class Shout2AudioStep(Shout2Step):
     name = 'Icecast streamer (audio only)'
     sidebar_name = 'Icecast audio'
 
-class Shout2Video(Shout2):
+class Shout2VideoStep(Shout2Step):
     name = 'Icecast streamer (video only)'
     sidebar_name = 'Icecast video'
 
-class License(WizardSection):
+class LicenseStep(WizardSection):
     name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
@@ -1452,7 +1452,7 @@ class License(WizardSection):
     def get_next(self):
         return None
 
-class Summary(WizardSection):
+class SummaryStep(WizardSection):
     section = "Summary"
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
