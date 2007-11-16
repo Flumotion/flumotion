@@ -1,10 +1,11 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/wizard
 
 flumotion_PYTHON = \
 	__init__.py \
 	enums.py \
+	models.py \
 	save.py \
 	sidebar.py \
 	step.py \

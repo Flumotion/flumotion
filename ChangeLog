@@ -1,8 +1,12 @@
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/Makefile.am (flumotion_PYTHON): 
+	* flumotion/test/Makefile.am: (EXTRA_DIST): 
+	Update these, add the new files in the repo.
+
 	* data/glade/wizard_encoding.glade: Remove parts which are going to 
 	be overwritten in runtime
-	* data/glade/wizard_testsource.glade: Listen to two new signals
+	* data/glade/wizard_testsource.glade: Connect to two more signals
 	* flumotion/test/test_wizard_models.py:
 	* flumotion/wizard/models.py:
 	* flumotion/wizard/steps.py:

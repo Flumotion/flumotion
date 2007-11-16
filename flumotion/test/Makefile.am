@@ -71,6 +71,7 @@ EXTRA_DIST = 				\
 	test_twisted_integration.py 	\
 	test_ui_fgtk.py 		\
 	test_wizard.py 			\
+	test_wizard_models.py		\
 	test_workerconfig.py		\
 	test_worker_config.py		\
 	test_worker_medium.py		\
