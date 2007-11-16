@@ -1,3 +1,8 @@
+2007-11-16  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/admin.glade: center the window when displaying it
+	for the first time.
+
 2007-11-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/steps.py (Consumption.activated, 
