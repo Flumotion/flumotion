@@ -1,5 +1,8 @@
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/fgtk.py (FCheckButton): Remove the __nonzero__
+	hack.
+
 	* data/glade/admin.glade: center the window when displaying it
 	for the first time.
 

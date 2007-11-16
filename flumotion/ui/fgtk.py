@@ -159,9 +159,6 @@ pygobject.type_register(FEntry)
 class FCheckButton(gtk.CheckButton):
     def get_state(self):
         return self.get_active()
-
-    def __nonzero__(self):
-        return self.get_active()
 pygobject.type_register(FCheckButton)
 
 class FRadioButton(gtk.RadioButton):
