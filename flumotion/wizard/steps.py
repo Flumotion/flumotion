@@ -19,28 +19,25 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import math
 
 import gtk
 
-from twisted.internet import defer
-
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors, messages
+from flumotion.common.messages import N_, ngettext
 from flumotion.common.python import sorted, any
 from flumotion.configure import configure
 from flumotion.wizard.step import WizardStep, WizardSection
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
-     EncodingFormat, EncodingVideo, \
-     LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
-     SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, \
-     SoundcardOSSDevice, SoundcardInput, SoundcardSamplerate, \
-     AudioTestSamplerate, TVCardDevice, TVCardSignal, \
-     VideoDevice, VideoTestFormat, VideoTestPattern
+     EncodingFormat, EncodingVideo, LicenseType, RotateSize, \
+     RotateTime, SoundcardBitdepth, SoundcardChannels, SoundcardSystem, \
+     SoundcardAlsaDevice, SoundcardOSSDevice, SoundcardSamplerate, \
+     AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 
-from gettext import gettext as _
-from flumotion.common.messages import N_, ngettext
 T_ = messages.gettexter('flumotion')
+_ = gettext.gettext
 
 
 # pychecker doesn't like the auto-generated widget attrs
@@ -56,6 +53,37 @@ def _fraction_from_float(number, denominator):
     """
     return "%d/%d" % (number * denominator, denominator)
 
+
+class AudioSourceStep(WizardStep):
+    pass
+
+
+class VideoSourceStep(WizardStep):
+    section = 'Production'
+    icon = 'widget_doc.png'
+
+    def get_next(self):
+        return 'Overlay'
+
+    def get_state(self):
+        options = WizardStep.get_state(self)
+        options['width'] = int(options['width'])
+        options['height'] = int(options['height'])
+        return options
+
+
+class VideoEncoderStep(WizardStep):
+    section = 'Conversion'
+
+
+class AudioEncoderStep(WizardStep):
+    glade_file = 'wizard_audio_encoder.glade'
+    section = 'Conversion'
+
+    def get_next(self):
+        return None
+
+
 class WelcomeStep(WizardSection):
     glade_file = 'wizard_welcome.glade'
     section = 'Welcome'
@@ -69,6 +97,7 @@ class WelcomeStep(WizardSection):
 
     def get_next(self):
         return None
+
 
 class ProductionStep(WizardSection):
     glade_file = 'wizard_source.glade'
@@ -88,24 +117,23 @@ class ProductionStep(WizardSection):
         self.combobox_video.set_active(VideoDevice.Test)
         self.combobox_audio.set_active(AudioDevice.Test)
 
+    # WizardStep
+
     def activated(self):
-        self.verify()
+        self._verify()
 
-    def on_checkbutton_has_video_toggled(self, button):
-        self.combobox_video.set_sensitive(button.get_active())
-        self.verify()
+    def get_next(self):
+        if self.checkbutton_has_video.get_active():
+            return self.get_video_step()
+        elif self.checkbutton_has_audio.get_active():
+            return self.get_audio_step()
+        else:
+            raise AssertionError
 
-    def on_checkbutton_has_audio_toggled(self, button):
-        self.combobox_audio.set_sensitive(button.get_active())
-        self.verify()
 
-    def on_combobox_video_changed(self, button):
-        self.verify()
+    # Private API
 
-    def on_combobox_audio_changed(self, button):
-        self.verify()
-
-    def verify(self):
+    def _verify(self):
         # FIXME: We should wait for the first worker to connect before
         #        opening the wizard or so
         if not hasattr(self.wizard, 'combobox_worker'):
@@ -136,19 +164,6 @@ class ProductionStep(WizardSection):
             raise AssertionError
         return source.step
 
-
-class VideoSourceStep(WizardStep):
-    section = 'Production'
-    icon = 'widget_doc.png'
-
-    def get_next(self):
-        return 'Overlay'
-
-    def get_state(self):
-        options = WizardStep.get_state(self)
-        options['width'] = int(options['width'])
-        options['height'] = int(options['height'])
-        return options
 
 # note:
 # v4l talks about "signal" (PAL/...) and "channel" (TV/Composite/...)
@@ -223,6 +238,7 @@ class TVCardStep(VideoSourceStep):
         options['framerate'] = \
             _fraction_from_float(self.spinbutton_framerate.get_value(), 10)
         return options
+
 
 class FireWireStep(VideoSourceStep):
     name = 'Firewire'
@@ -364,7 +380,7 @@ class FireWireStep(VideoSourceStep):
     run_checks = defer_generator_method(run_checks)
 
 
-class FireWireAudioStep(WizardStep):
+class FireWireAudioStep(AudioSourceStep):
     name = 'Firewire audio'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
@@ -510,6 +526,7 @@ class FireWireAudioStep(WizardStep):
     def get_next(self):
         return None
 
+
 class WebcamStep(VideoSourceStep):
     name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
@@ -632,6 +649,7 @@ class WebcamStep(VideoSourceStep):
             options['format'] = format
         return options
 
+
 class TestVideoSourceStep(VideoSourceStep):
     name = 'Test Video Source'
     glade_file = 'wizard_testsource.glade'
@@ -644,6 +662,8 @@ class TestVideoSourceStep(VideoSourceStep):
     def setup(self):
         self.combobox_pattern.set_enum(VideoTestPattern)
         self.combobox_format.set_enum(VideoTestFormat)
+        # FIXME: Remember to remove the values from the glade file
+        #        when we use proxy widgets
 
     def get_state(self):
         format = self.combobox_format.get_enum()
@@ -662,6 +682,7 @@ class TestVideoSourceStep(VideoSourceStep):
             self.spinbutton_framerate.get_value(), 10)
         return options
 
+
 class OverlayStep(WizardStep):
     name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
@@ -671,7 +692,49 @@ class OverlayStep(WizardStep):
 
     can_overlay = True
 
-    def worker_changed_010(self):
+    # Wizard Step
+
+    def get_state(self):
+        options = WizardStep.get_state(self)
+        if self.checkbutton_show_logo.get_active():
+            options['show-logo'] = True
+
+        if self.checkbutton_show_text.get_active():
+            options['text'] = self.entry_text.get_text()
+
+        options['can-overlay'] = self.can_overlay
+
+        # XXX: Serious refactoring needed.
+        video_options = self.wizard.get_step_options('Source')
+        video_source = video_options['video']
+        video_step = self.wizard[video_source.step]
+        video_props = video_step.get_state()
+
+        options['width'] = video_props['width']
+        options['height'] = video_props['height']
+
+        return options
+
+    def get_next(self):
+        if self.wizard.get_step_option('Source', 'has-audio'):
+            audio_source = self.wizard.get_step_option('Source', 'audio')
+            video_source = self.wizard.get_step_option('Source', 'video')
+            if audio_source == AudioDevice.Soundcard:
+                return 'Soundcard'
+            elif audio_source == AudioDevice.Test:
+                return 'Test Audio Source'
+            elif audio_source == AudioDevice.Firewire and not \
+                video_source == VideoDevice.Firewire:
+                return 'Firewire audio'
+
+        return None
+
+    def worker_changed(self):
+        self._worker_changed_010()
+
+    # Private API
+
+    def _worker_changed_010(self):
         self.can_overlay = False
         self.set_sensitive(False)
 
@@ -713,50 +776,13 @@ class OverlayStep(WizardStep):
             self.add_msg(message)
             self.can_overlay = False
 
-    worker_changed_010 = defer_generator_method(worker_changed_010)
-
-    def worker_changed(self):
-        self.worker_changed_010()
+    _worker_changed_010 = defer_generator_method(_worker_changed_010)
 
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
 
-    def get_state(self):
-        options = WizardStep.get_state(self)
-        if self.checkbutton_show_logo.get_active():
-            options['show-logo'] = True
 
-        if self.checkbutton_show_text.get_active():
-            options['text'] = self.entry_text.get_text()
-
-        options['can-overlay'] = self.can_overlay
-
-        # XXX: Serious refactoring needed.
-        video_options = self.wizard.get_step_options('Source')
-        video_source = video_options['video']
-        video_step = self.wizard[video_source.step]
-        video_props = video_step.get_state()
-
-        options['width'] = video_props['width']
-        options['height'] = video_props['height']
-
-        return options
-
-    def get_next(self):
-        if self.wizard.get_step_option('Source', 'has-audio'):
-            audio_source = self.wizard.get_step_option('Source', 'audio')
-            video_source = self.wizard.get_step_option('Source', 'video')
-            if audio_source == AudioDevice.Soundcard:
-                return 'Soundcard'
-            elif audio_source == AudioDevice.Test:
-                return 'Test Audio Source'
-            elif audio_source == AudioDevice.Firewire and not \
-                video_source == VideoDevice.Firewire:
-                return 'Firewire audio'
-
-        return None
-
-class SoundcardStep(WizardStep):
+class SoundcardStep(AudioSourceStep):
     name = 'Soundcard'
     glade_file = 'wizard_soundcard.glade'
     section = 'Production'
@@ -875,7 +901,8 @@ class SoundcardStep(WizardStep):
     def get_next(self):
         return None
 
-class TestAudioSourceStep(WizardStep):
+
+class TestAudioSourceStep(AudioSourceStep):
     name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
@@ -889,36 +916,34 @@ class TestAudioSourceStep(WizardStep):
         self.combobox_samplerate.set_sensitive(True)
 
     def get_state(self):
-        return {
-            'frequency': int(self.spinbutton_freq.get_value()),
-            'volume': float(self.spinbutton_volume.get_value()),
-            'rate': self.combobox_samplerate.get_int()
-        }
+        return dict(frequency=int(self.spinbutton_freq.get_value()),
+                    volume=float(self.spinbutton_volume.get_value()),
+                    rate=self.combobox_samplerate.get_int())
 
     def get_next(self):
         return None
+
 
 class ConversionStep(WizardSection):
     glade_file = 'wizard_encoding.glade'
     name = 'Encoding'
     section = 'Conversion'
 
-    setup_finished = False
-
     def setup(self):
         self.combobox_format.set_enum(EncodingFormat)
         self.combobox_audio.set_enum(EncodingAudio)
         self.combobox_video.set_enum(EncodingVideo)
-        self.setup_finished = True
 
     def on_combobox_format_changed(self, combo):
-        self.verify()
+        format = combo.get_active()
+        if format == 0:
+            return
 
-    def verify(self):
+        self._verify()
+
+    def _verify(self):
         # XXX: isn't there a better way of doing this, like blocking
         #      the signal
-        if not self.setup_finished:
-            return
 
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
@@ -946,10 +971,10 @@ class ConversionStep(WizardSection):
         has_video = self.wizard.get_step_option('Source', 'has-video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
-    verify = defer_generator_method(verify)
+    _verify = defer_generator_method(_verify)
 
     def activated(self):
-        self.verify()
+        self._verify()
 
     def get_audio_page(self):
         if self.wizard.get_step_option('Source', 'has-audio'):
@@ -977,8 +1002,6 @@ class ConversionStep(WizardSection):
         else:
             return None
 
-class VideoEncoderStep(WizardStep):
-    section = 'Conversion'
 
 class TheoraStep(VideoEncoderStep):
     name = 'Theora encoder'
@@ -995,7 +1018,7 @@ class TheoraStep(VideoEncoderStep):
         self.spinbutton_quality.set_value(16)
 
     def worker_changed(self):
-        d= self.wizard.require_elements(self.worker, 'theoraenc')
+        d = self.wizard.require_elements(self.worker, 'theoraenc')
 
         yield d
 
@@ -1030,6 +1053,7 @@ class TheoraStep(VideoEncoderStep):
 
         return options
 
+
 class SmokeStep(VideoEncoderStep):
     name = 'Smoke encoder'
     sidebar_name = 'Smoke'
@@ -1051,6 +1075,7 @@ class SmokeStep(VideoEncoderStep):
         options['keyframe'] = int(options['keyframe'])
         return options
 
+
 class JPEGStep(VideoEncoderStep):
     name = 'JPEG encoder'
     sidebar_name = 'JPEG'
@@ -1070,12 +1095,6 @@ class JPEGStep(VideoEncoderStep):
         options['framerate'] = _fraction_from_float(options['framerate'], 2)
         return options
 
-class AudioEncoderStep(WizardStep):
-    glade_file = 'wizard_audio_encoder.glade'
-    section = 'Conversion'
-
-    def get_next(self):
-        return None
 
 # Worker?
 class VorbisStep(AudioEncoderStep):
@@ -1118,6 +1137,7 @@ class VorbisStep(AudioEncoderStep):
             options['quality'] = self.spinbutton_quality.get_value()
         return options
 
+
 class SpeexStep(AudioEncoderStep):
     name = 'Speex encoder'
     sidebar_name = 'Speex'
@@ -1136,6 +1156,7 @@ class SpeexStep(AudioEncoderStep):
         options = AudioEncoderStep.get_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         return options
+
 
 class ConsumptionStep(WizardSection):
     name = 'Consumption'
@@ -1311,20 +1332,24 @@ class HTTPStep(WizardStep):
     def on_checkbutton_bandwidth_limit_toggled(self, *args):
         self.verify()
 
+
 class HTTPBothStep(HTTPStep):
     name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
+
 
 class HTTPAudioStep(HTTPStep):
     name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
 
+
 class HTTPVideoStep(HTTPStep):
     name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
+
 
 class DiskStep(WizardStep):
     glade_file = 'wizard_disk.glade'
@@ -1390,17 +1415,21 @@ class DiskStep(WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
+
 class DiskBothStep(DiskStep):
     name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
+
 
 class DiskAudioStep(DiskStep):
     name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
 
+
 class DiskVideoStep(DiskStep):
     name = 'Disk (video only)'
     sidebar_name = 'Disk video'
+
 
 class Shout2Step(WizardStep):
     glade_file = 'wizard_shout2.glade'
@@ -1424,17 +1453,21 @@ class Shout2Step(WizardStep):
 
         return options
 
+
 class Shout2BothStep(Shout2Step):
     name = 'Icecast streamer (audio & video)'
     sidebar_name = 'Icecast audio/video'
+
 
 class Shout2AudioStep(Shout2Step):
     name = 'Icecast streamer (audio only)'
     sidebar_name = 'Icecast audio'
 
+
 class Shout2VideoStep(Shout2Step):
     name = 'Icecast streamer (video only)'
     sidebar_name = 'Icecast video'
+
 
 class LicenseStep(WizardSection):
     name = "Content License"
@@ -1451,6 +1484,7 @@ class LicenseStep(WizardSection):
 
     def get_next(self):
         return None
+
 
 class SummaryStep(WizardSection):
     section = "Summary"
