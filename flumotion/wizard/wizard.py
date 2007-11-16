@@ -23,24 +23,17 @@
 import os
 import sets
 
-import gobject
 import gtk
 import gtk.gdk
 import gtk.glade
 
-from twisted.internet import defer
-
 from flumotion.configure import configure
-from flumotion.common import log, errors, worker, pygobject, messages
-
-from flumotion.wizard import enums, save, step, classes
-#from flumotion.wizard.sidebar import WizardSidebar
-from flumotion.ui import fgtk
-from flumotion.ui.glade import GladeWindow
-from flumotion.twisted import flavors
-
+from flumotion.common import log, pygobject, messages
 from flumotion.common.pygobject import gsignal
 from flumotion.common.messages import N_, ngettext
+from flumotion.wizard import  save, step, classes
+from flumotion.ui.glade import GladeWindow
+
 T_ = messages.gettexter('flumotion')
 
 # pychecker doesn't like the auto-generated widget attrs
@@ -97,18 +90,24 @@ class Scenario:
         self.wizard._setup_worker(self.current_step,
                                   self.wizard.worker_list.get_worker())
         next = self.current_step.get_next()
-        if not next:
+        if isinstance(next, basestring):
+            try:
+                next_step = self.wizard[next]
+            except KeyError:
+                raise TypeError("%r: Wizard step %s is missing" % (
+                    self, next))
+        elif isinstance(next, step.WizardStep):
+            next_step = next
+            if not next_step in self.steps:
+                self.steps.append(next_step)
+        elif next is None:
             if self.current_section + 1 == len(self.sections):
                 self.wizard.finish(save=True)
                 return
             self.current_section += 1
             next_step = self.sections[self.current_section]
         else:
-            try:
-                next_step = self.wizard[next]
-            except KeyError:
-                raise TypeError("%r: Wizard step %s is missing" % (
-                    self, next))
+            raise AssertionError
 
         while not self.stack.push(next_step):
             s = self.stack.pop()
@@ -169,6 +168,7 @@ class BasicScenario(Scenario):
             except TypeError:
                 pass
 
+
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
@@ -185,7 +185,6 @@ class Wizard(GladeWindow, log.Loggable):
             setattr(self, k, v)
 
         self.scenario = BasicScenario(self)
-
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
         self._admin = admin
@@ -223,7 +222,7 @@ class Wizard(GladeWindow, log.Loggable):
             if item.get_name() == stepname:
                 return item
         else:
-            raise KeyError
+            raise KeyError(stepname)
 
     def __len__(self):
         return len(self.scenario.steps)
