@@ -29,7 +29,6 @@ from flumotion.common import errors, messages
 from flumotion.common.messages import N_, ngettext
 from flumotion.common.python import sorted, any
 from flumotion.configure import configure
-from flumotion.wizard.step import WizardStep, WizardSection
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, LicenseType, RotateSize, \
      RotateTime, SoundcardBitdepth, SoundcardChannels, SoundcardSystem, \
@@ -37,6 +36,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer, \
     AudioEncoder, VideoEncoder, Muxer
+from flumotion.wizard.wizard import WizardStep, WizardSection
 
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext

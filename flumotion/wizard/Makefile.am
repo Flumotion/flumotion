@@ -8,7 +8,6 @@ flumotion_PYTHON = \
 	models.py \
 	save.py \
 	sidebar.py \
-	step.py \
 	steps.py \
 	classes.py \
 	wizard.py \

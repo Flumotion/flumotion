@@ -122,7 +122,7 @@ class WizardSaver(log.Loggable):
         video_step = self.wizard[source.step]
 
         if hasattr(video_step, 'worker'):
-            props = video_step.get_component_properties()
+            props = video_step.get_state()
             worker = video_step.worker
         else:
             props = {}
@@ -133,7 +133,7 @@ class WizardSaver(log.Loggable):
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
         step = self.wizard['Overlay']
-        properties = step.get_component_properties()
+        properties = step.get_state()
         if show_logo:
             properties['fluendo-logo'] = True
             encoding_options = self.wizard.get_step_options('Encoding')
@@ -160,7 +160,7 @@ class WizardSaver(log.Loggable):
         encoder_step = self.wizard[encoder.step]
         return Component('encoder-video', encoder.component_type,
                          encoder_step.worker,
-                         encoder_step.get_component_properties())
+                         encoder_step.get_state())
 
     def getAudioSource(self, video_source):
         options = self.wizard.get_step_options('Source')
@@ -178,7 +178,7 @@ class WizardSaver(log.Loggable):
         audio_step = self.wizard[source.step]
 
         if hasattr(audio_step, 'worker'):
-            props = audio_step.get_component_properties()
+            props = audio_step.get_state()
             worker = audio_step.worker
         else:
             worker = self.wizard['Source'].worker
@@ -194,7 +194,7 @@ class WizardSaver(log.Loggable):
             worker = self.wizard['Source'].worker
         else:
             encoder_step = self.wizard[encoder.step]
-            props = encoder_step.get_component_properties()
+            props = encoder_step.get_state()
             worker = encoder_step.worker
 
         return Component('encoder-audio', encoder.component_type, worker, props)
@@ -328,7 +328,7 @@ class WizardSaver(log.Loggable):
                 continue
             step = self.wizard[step_name]
             consumer = Component(name, comp_type, step.worker,
-                                 step.get_component_properties())
+                                 step.get_state())
             consumer.link(muxer)
             components.append(consumer)
 

@@ -1,3 +1,13 @@
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/step.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	Move WizardStep and WizardSection into wizard.py,
+	remove unused api.
+
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/config.py (exportPlanetXml): Remove a print.
