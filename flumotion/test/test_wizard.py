@@ -32,7 +32,7 @@ except RuntimeError:
     os._exit(0)
 
 from flumotion.common import enum
-from flumotion.wizard import enums, wizard, step
+from flumotion.wizard import enums, wizard
 from flumotion.admin import admin
 
 class WizardStepTest(testsuite.TestCase):
@@ -42,7 +42,7 @@ class WizardStepTest(testsuite.TestCase):
 
     def testLoadSteps(self):
         for s in self.steps:
-            self.assert_(isinstance(s, step.WizardStep))
+            self.assert_(isinstance(s, wizard.WizardStep))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'glade_file'))

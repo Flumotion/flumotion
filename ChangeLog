@@ -1,5 +1,8 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps): 
+	Update WizardStep import
+
 	* po/POTFILES.in: Remove step.py
 
 2007-11-19  Andy Wingo  <wingo@pobox.com>
