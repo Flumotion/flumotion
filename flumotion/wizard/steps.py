@@ -1040,7 +1040,7 @@ class OverlayStep(WizardStep):
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-audio'):
-            return self.wizard['Source'].get_audio_step()
+            return self.wizard.get_step('Source').get_audio_step()
 
         return None
 
@@ -1128,7 +1128,7 @@ class ConversionStep(WizardSection):
         self.combobox_video.set_enum(EncodingVideo)
 
         flow = self.wizard.flow
-        production = self.wizard['Source']
+        production = self.wizard.get_step('Source')
 
         audio_producer = production.get_audio_producer()
         if audio_producer and self._audio_encoder not in flow:
@@ -1260,7 +1260,7 @@ class TheoraStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard['Encoding'].get_audio_page()
+        return self.wizard.get_step('Encoding').get_audio_page()
 
     # Callbacks
 
@@ -1293,7 +1293,7 @@ class SmokeStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard['Encoding'].get_audio_page()
+        return self.wizard.get_step('Encoding').get_audio_page()
 
 
 
@@ -1316,7 +1316,7 @@ class JPEGStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard['Encoding'].get_audio_page()
+        return self.wizard.get_step('Encoding').get_audio_page()
 
 
 # Worker?
@@ -1574,7 +1574,7 @@ class HTTPStep(WizardStep):
         return options
 
     def get_next(self):
-        return self.wizard['Consumption'].get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
     # Private
 
@@ -1651,7 +1651,7 @@ class DiskStep(WizardStep):
         return options
 
     def get_next(self):
-        return self.wizard['Consumption'].get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
     # Private
 
@@ -1713,7 +1713,7 @@ class Shout2Step(WizardStep):
         self.wizard.check_elements(self.worker, 'shout2send')
 
     def get_next(self):
-        return self.wizard['Consumption'].get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
     def get_state(self):
         options = WizardStep.get_state(self)

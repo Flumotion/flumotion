@@ -201,7 +201,7 @@ class Scenario:
         next = self.current_step.get_next()
         if isinstance(next, basestring):
             try:
-                next_step = self.wizard[next]
+                next_step = self.wizard.get_step(next)
             except KeyError:
                 raise TypeError("%r: Wizard step %s is missing" % (
                     self, next))
@@ -314,24 +314,29 @@ class Wizard(GladeWindow, log.Loggable):
         self.window.connect_after('realize', self.on_window_realize)
         self.window.connect('destroy', self.on_window_destroy)
 
-    def __getitem__(self, stepname):
+    def __len__(self):
+        return len(self.scenario.steps)
+
+    # Public API
+
+    def get_step(self, stepname):
+        """Fetches a step. KeyError is raised when the step is not found.
+        @param stepname: name of the step to fetch
+        @type stepname: str
+        @returns: a L{WizardStep} instance or raises KeyError
+        """
         for item in self.scenario.steps:
             if item.get_name() == stepname:
                 return item
         else:
             raise KeyError(stepname)
 
-    def __len__(self):
-        return len(self.scenario.steps)
-
-    # Public API
-
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
         return state[option]
 
     def get_step_options(self, stepname):
-        step = self[stepname]
+        step = self.get_step(stepname)
         return step.get_state()
 
     def present_and_grab(self):

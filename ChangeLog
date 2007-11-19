@@ -1,3 +1,9 @@
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/wizard.py (Wizard.__getitem__): 
+	Rename to get_step() and update callsits
+	* flumotion/wizard/steps.py: Update callsites
+
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/reload.py (reload): Adjust the ignore list to
