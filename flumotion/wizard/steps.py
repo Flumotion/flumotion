@@ -1362,8 +1362,7 @@ class ConsumptionStep(WizardSection):
         has_video = self.wizard.get_step_option('Source', 'has-video')
         has_both = has_audio and has_video
 
-        # Most of the options only makes sense if we selected audio
-        # and video in the first page. If we didn't just hide them
+        # Hide all checkbuttons if we don't have both audio and video selected
         for checkbutton in (self.checkbutton_http_audio_video,
                             self.checkbutton_http_audio,
                             self.checkbutton_http_video,
@@ -1398,11 +1397,32 @@ class ConsumptionStep(WizardSection):
 
         items = []
         for name, (audio, video, audio_video) in uielements:
-            if has_audio and has_video and audio_video.get_active():
+            # Audio & Video, all checkbuttons are visible and
+            # changeable by the user
+            if has_audio and has_video:
+                enable_audio_video = audio_video.get_active()
+                enable_audio = audio.get_active()
+                enable_video = video.get_active()
+            # Audio only, user cannot chose, the checkbuttons are not
+            # visible and it is not possible for the user to change,
+            # just add audio, and nothing else
+            elif has_audio and not has_video:
+                enable_audio_video = False
+                enable_audio = True
+                enable_video = False
+            # Video only, like audio only but with video
+            elif has_video and not has_audio:
+                enable_audio_video = False
+                enable_audio = False
+                enable_video = True
+            else:
+                raise AssertionError
+
+            if enable_audio_video:
                 items.append("%s (audio & video)" % (name,))
-            if has_audio and audio.get_active():
+            if enable_audio:
                 items.append("%s (audio only)" % (name,))
-            if has_video and video.get_active():
+            if enable_video:
                 items.append("%s (video only)" % (name,))
 
         assert items

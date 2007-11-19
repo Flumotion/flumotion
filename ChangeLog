@@ -1,3 +1,12 @@
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py (ConsumptionStep.activated): improve
+	comment
+	(ConsumptionStep.get_next): Refactor a bit and sort out my 
+	misunderstanding of the audio/video only code paths. 
+	Add comments explaining what's going on here, since it's non-obvious
+	at a first glance.
+
 2007-11-16  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): 
