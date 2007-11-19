@@ -49,6 +49,7 @@ class Sections(classes.KeyedList):
         classes.KeyedList.__init__(self, *args)
         self.add_key(str, lambda x: x.section)
 
+
 class Scenario:
     # to be provided by subclasses
     sections = None
@@ -139,8 +140,8 @@ class Scenario:
                 pass
             return self.wizard.finish(False)
 
-        self.wizard.window.present()
-        self.wizard.window.grab_focus()
+        self.wizard.present_and_grab()
+
         if not self.wizard._use_main:
             return
 
@@ -148,6 +149,7 @@ class Scenario:
             gtk.main()
         except KeyboardInterrupt:
             pass
+
 
 class BasicScenario(Scenario):
     def __init__(self, wizard):
@@ -177,7 +179,6 @@ class BasicScenario(Scenario):
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
-    gsignal('option-changed', object, str, object)
 
     logCategory = 'wizard'
 
@@ -194,35 +195,17 @@ class Wizard(GladeWindow, log.Loggable):
         self.scenario = BasicScenario(self)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
+        self.current_step = None
         self._admin = admin
         self._save = save.WizardSaver(self)
         self._use_main = True
-        self.current_step = None
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
         self.worker_list.connect('worker-selected',
-                                 self._combobox_worker_changed)
+                                 self.on_combobox_worker_changed)
 
-        self.window.connect_after('realize', self.on_realize)
-        self.window.connect('destroy', lambda *x: self.emit('destroy'))
-
-    def on_realize(self, window):
-        # have to get the style from the theme, but it's not really
-        # there until it's attached
-        style = self.eventbox_top.get_style()
-        bg = style.bg[gtk.STATE_SELECTED]
-        fg = style.fg[gtk.STATE_SELECTED]
-        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)
-        self.hbuttonbox2.modify_bg(gtk.STATE_NORMAL, bg)
-        self.label_title.modify_fg(gtk.STATE_NORMAL, fg)
-
-    def present(self):
-        self.window.present()
-
-    def destroy(self):
-        GladeWindow.destroy(self)
-        del self._admin
-        del self._save
+        self.window.connect_after('realize', self.on_window_realize)
+        self.window.connect('destroy', self.on_window_destroy)
 
     def __getitem__(self, stepname):
         for item in self.scenario.steps:
@@ -234,11 +217,10 @@ class Wizard(GladeWindow, log.Loggable):
     def __len__(self):
         return len(self.scenario.steps)
 
-    def clear_msg(self, id):
-        self.message_area.clear_message(id)
+    # Public API
 
-    def add_msg(self, msg):
-        self.message_area.add_message(msg)
+    def get_admin(self):
+        return self._admin
 
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
@@ -248,15 +230,47 @@ class Wizard(GladeWindow, log.Loggable):
         step = self[stepname]
         return step.get_state()
 
+    def present_and_grab(self):
+        self.window.present()
+        self.window.grab_focus()
+
+    def destroy(self):
+        GladeWindow.destroy(self)
+        del self._admin
+        del self._save
+
+    def hide(self):
+        self.window.hide()
+
+    def finish(self, main=True, save=True):
+        if save:
+            configuration = self._save.getXML()
+            self.emit('finished', configuration)
+
+        if self._use_main:
+            try:
+                gtk.main_quit()
+            except RuntimeError:
+                pass
+
+    def run(self, interactive, workerHeavenState, main=True):
+        self._workerHeavenState = workerHeavenState
+        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
+        self._use_main = main
+        self.scenario.run(interactive)
+
+    def clear_msg(self, id):
+        self.message_area.clear_message(id)
+
+    def add_msg(self, msg):
+        self.message_area.add_message(msg)
+
     def block_next(self, block):
         self.button_next.set_sensitive(not block)
         # work around a gtk+ bug #56070
         if not block:
             self.button_next.hide()
             self.button_next.show()
-
-    def block_prev(self, block):
-        self.button_prev.set_sensitive(not block)
 
     def set_step(self, step):
         # Remove previous step
@@ -292,26 +306,6 @@ class Wizard(GladeWindow, log.Loggable):
         self.debug('showing step %r' % step)
         step.show()
         step.activated()
-
-    def _combobox_worker_changed(self, combobox, worker):
-        self.debug('combobox_worker_changed, worker %r' % worker)
-        if worker:
-            self.clear_msg('worker-error')
-            self._last_worker = worker
-            if self.current_step:
-                self._setup_worker(self.current_step, worker)
-                self.debug('calling %r.worker_changed' % self.current_step)
-                self.current_step.worker_changed()
-        else:
-            msg = messages.Error(T_(
-                    N_('All workers have logged out.\n'
-                    'Make sure your Flumotion network is running '
-                    'properly and try again.')),
-                id='worker-error')
-            self.add_msg(msg)
-
-    def get_admin(self):
-        return self._admin
 
     def check_elements(self, workerName, *elementNames):
         """
@@ -429,6 +423,22 @@ class Wizard(GladeWindow, log.Loggable):
         d.addErrback(_checkImportErrback)
         return d
 
+    def update_buttons(self, has_next):
+        # update the forward and next buttons
+        # has_next: whether or not there is a next step
+        if self.scenario.stack.pos == 0:
+            self.button_prev.set_sensitive(False)
+        else:
+            self.button_prev.set_sensitive(True)
+
+        # XXX: Use the current step, not the one on the top of the stack
+        if has_next:
+            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
+        else:
+            # use APPLY, just like in gnomemeeting
+            self.button_next.set_label(gtk.STOCK_APPLY)
+
+    # Private
 
     def _setup_worker(self, step, worker):
         # get name of active worker
@@ -447,22 +457,22 @@ class Wizard(GladeWindow, log.Loggable):
                 self.combobox_worker.set_active_iter(row.iter)
                 break
 
-    def update_buttons(self, has_next):
-        # update the forward and next buttons
-        # has_next: whether or not there is a next step
-        if self.scenario.stack.pos == 0:
-            self.button_prev.set_sensitive(False)
-        else:
-            self.button_prev.set_sensitive(True)
+    # Callbacks
 
-        # XXX: Use the current step, not the one on the top of the stack
-        if has_next:
-            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
-        else:
-            # use APPLY, just like in gnomemeeting
-            self.button_next.set_label(gtk.STOCK_APPLY)
+    def on_window_realize(self, window):
+        # have to get the style from the theme, but it's not really
+        # there until it's attached
+        style = self.eventbox_top.get_style()
+        bg = style.bg[gtk.STATE_SELECTED]
+        fg = style.fg[gtk.STATE_SELECTED]
+        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)
+        self.hbuttonbox2.modify_bg(gtk.STATE_NORMAL, bg)
+        self.label_title.modify_fg(gtk.STATE_NORMAL, fg)
 
-    def on_wizard_delete_event(self, wizard, event):
+    def on_window_destroy(self, window):
+        self.emit('destroy')
+
+    def on_window_delete_event(self, wizard, event):
         self.finish(self._use_main, save=False)
 
     def on_button_prev_clicked(self, button):
@@ -471,33 +481,22 @@ class Wizard(GladeWindow, log.Loggable):
     def on_button_next_clicked(self, button):
         self.scenario.show_next()
 
-    def finish(self, main=True, save=True):
-        if save:
-            configuration = self._save.getXML()
-            self.emit('finished', configuration)
+    def on_combobox_worker_changed(self, combobox, worker):
+        self.debug('combobox_worker_changed, worker %r' % worker)
+        if worker:
+            self.clear_msg('worker-error')
+            self._last_worker = worker
+            if self.current_step:
+                self._setup_worker(self.current_step, worker)
+                self.debug('calling %r.worker_changed' % self.current_step)
+                self.current_step.worker_changed()
+        else:
+            msg = messages.Error(T_(
+                    N_('All workers have logged out.\n'
+                    'Make sure your Flumotion network is running '
+                    'properly and try again.')),
+                id='worker-error')
+            self.add_msg(msg)
 
-        if self._use_main:
-            try:
-                gtk.main_quit()
-            except RuntimeError:
-                pass
 
-    def hide(self):
-        self.window.hide()
-
-    def run(self, interactive, workerHeavenState, main=True):
-        self._workerHeavenState = workerHeavenState
-        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
-        self._use_main = main
-        self.scenario.run(interactive)
-
-    def printOut(self):
-        print self._save.getXML()[:-1]
-
-    def getConfig(self):
-        d = {}
-        for component in self._save.getComponents():
-            d[component.name] = component
-
-        return d
 pygobject.type_register(Wizard)

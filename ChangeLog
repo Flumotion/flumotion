@@ -1,5 +1,11 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/wizard.py:
+	Reorganize, group the methods by their type. Remove unused
+	API.
+
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard_tvcard.glade:
 	* flumotion/wizard/steps.py:
 	Unbreak the non-testsource video producers.
@@ -13,7 +19,7 @@
 	Store instance variables in the instances instead of in classes, 
 	really. Also mark them as private.
 	(VideoEncoderStep.__init__): Re-order the video/audio steps
-	Add section comments and sort the methods by their function.
+	Add section comments and group the methods by their type.
 	Mark a few more methods as private
 
 2007-11-19  Johan Dahlin  <johan@gnome.org>
