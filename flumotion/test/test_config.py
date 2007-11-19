@@ -156,7 +156,6 @@ class TestConfig(testsuite.TestCase):
     def testParseEmpty(self):
         conf = ConfigXML('<planet/>')
         self.failIf(conf.getPath())
-        self.failUnless(conf.export())
 
     def testParseWrongConfig(self):
         conf = ConfigXML('<somethingorother/>')

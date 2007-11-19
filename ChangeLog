@@ -1,3 +1,8 @@
+2007-11-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_config.py (TestConfig.testParseEmpty):
+	Remove call to nonexistent function.
+
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/Makefile.am:
