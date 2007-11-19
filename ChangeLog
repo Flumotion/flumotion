@@ -3,7 +3,8 @@
 	* data/glade/wizard_tvcard.glade:
 	* flumotion/wizard/steps.py:
 	Unbreak the non-testsource video producers.
-	
+	Fix two typos.
+
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 	
 	* flumotion/wizard/steps.py: 

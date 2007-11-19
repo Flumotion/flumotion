@@ -339,7 +339,7 @@ class WebcamStep(VideoSourceStep):
     # WizardStep
 
     def setup(self):
-        self._in_setup = False
+        self._in_setup = True
         self.combobox_device.set_list(('/dev/video0',
                                        '/dev/video1',
                                        '/dev/video2',
@@ -621,7 +621,7 @@ class FireWireStep(VideoSourceStep):
                 store.set(store.append(), 0, '%d pixels' % i)
             self.combobox_scaled_height.set_model(store)
             self.combobox_scaled_height.set_active(1)
-            self.set_sensitive(True)
+            self._set_sensitive(True)
             self.on_update_output_format()
         except errors.RemoteRunFailure:
             pass
