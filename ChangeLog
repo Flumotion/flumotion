@@ -1,4 +1,9 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
+	
+	* flumotion/wizard/steps.py: Store instance variables in the instances
+	instead of in classes, really. Also mark them as private.
+
+2007-11-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/steps.py (ConsumptionStep.activated): improve
 	comment
