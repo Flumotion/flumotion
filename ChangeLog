@@ -1,3 +1,7 @@
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* po/POTFILES.in: Remove step.py
+
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py

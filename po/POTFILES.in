@@ -8,7 +8,6 @@ flumotion/admin/gtk/parts.py
 flumotion/wizard/enums.py
 flumotion/wizard/wizard.py
 flumotion/wizard/steps.py
-flumotion/wizard/step.py
 
 flumotion/common/worker.py
 
