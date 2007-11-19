@@ -119,20 +119,20 @@ class WizardSaver(log.Loggable):
     def getVideoSource(self):
         options = self.wizard.get_step_options('Source')
         source = options['video']
-        video_step = self.wizard[source.step]
+        video_step = self.wizard.get_step(source.step)
 
         if hasattr(video_step, 'worker'):
             props = video_step.get_state()
             worker = video_step.worker
         else:
             props = {}
-            worker = self.wizard['Source'].worker
+            worker = self.wizard.get_step('Source').worker
 
         return Component('producer-video', source.component_type, worker, props)
 
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
-        step = self.wizard['Overlay']
+        step = self.wizard.get_step('Overlay')
         properties = step.get_state()
         if show_logo:
             properties['fluendo-logo'] = True
@@ -157,7 +157,7 @@ class WizardSaver(log.Loggable):
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
-        encoder_step = self.wizard[encoder.step]
+        encoder_step = self.wizard.get_step(encoder.step)
         return Component('encoder-video', encoder.component_type,
                          encoder_step.worker,
                          encoder_step.get_state())
@@ -175,13 +175,13 @@ class WizardSaver(log.Loggable):
 
         props = {}
 
-        audio_step = self.wizard[source.step]
+        audio_step = self.wizard.get_step(source.step)
 
         if hasattr(audio_step, 'worker'):
             props = audio_step.get_state()
             worker = audio_step.worker
         else:
-            worker = self.wizard['Source'].worker
+            worker = self.wizard.get_step('Source').worker
 
         return Component('producer-audio', source.component_type, worker, props)
 
@@ -191,9 +191,9 @@ class WizardSaver(log.Loggable):
 
         if encoder == enums.EncodingAudio.Mulaw:
             props = {}
-            worker = self.wizard['Source'].worker
+            worker = self.wizard.get_step('Source').worker
         else:
-            encoder_step = self.wizard[encoder.step]
+            encoder_step = self.wizard.get_step(encoder.step)
             props = encoder_step.get_state()
             worker = encoder_step.worker
 
@@ -201,7 +201,7 @@ class WizardSaver(log.Loggable):
 
     def getMuxer(self, name):
         options = self.wizard.get_step_options('Encoding')
-        step = self.wizard['Encoding']
+        step = self.wizard.get_step('Encoding')
         muxer = options['format']
         return Component('muxer-' + name, muxer.component_type,
                          step.worker)
@@ -326,7 +326,7 @@ class WizardSaver(log.Loggable):
         for name, comp_type, step_name, muxer in steps:
             if not cons_options.has_key(name):
                 continue
-            step = self.wizard[step_name]
+            step = self.wizard.get_step(step_name)
             consumer = Component(name, comp_type, step.worker,
                                  step.get_state())
             consumer.link(muxer)
