@@ -1,5 +1,8 @@
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/text/view.py: Remove unused import. Stupid
+	pychecker.
+
 	* flumotion/component/component.py
 	(BaseComponentMedium.remote_reloadComponent): Streamline.
 	(BaseComponentMedium._reloaded): Remove useless method.

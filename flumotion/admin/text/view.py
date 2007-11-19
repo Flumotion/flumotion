@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import sys
 import gobject
 import os
 import string
