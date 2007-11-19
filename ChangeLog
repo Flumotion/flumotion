@@ -1,5 +1,8 @@
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (exportPlanetXml): Remove a print.
+	Thanks Arek.
+
 	* flumotion/manager/manager.py (Vishnu.getConfiguration): Call the
 	new exportPlanetXml with the whole planet state -- makes it so
 	that you can always export a manager's configuration, regardless

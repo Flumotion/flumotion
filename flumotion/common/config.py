@@ -1010,5 +1010,4 @@ def exportPlanetXml(p):
         return ([X.planet(name=p.get('name')),
                  atmosphere(p.get('atmosphere'))]
                 + [flow(f) for f in p.get('flows')])
-    print planet(p)
     return fxml.sxml2unicode(planet(p))
