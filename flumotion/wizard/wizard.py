@@ -64,107 +64,29 @@ class WizardStep(GladeWidget, log.Loggable):
     sidebar_name = None
     has_worker = True
 
-    # set by Wizard when going through steps
-    visited = False
-    worker = None
-
     def __init__(self, wizard):
         """
         @param wizard: the wizard this step is a part of
         @type  wizard: L{Wizard}
         """
+        self.visited = False
+        self.worker = None
+        self.wizard = wizard
+
         GladeWidget.__init__(self)
         self.set_name(self.name)
         if not self.sidebar_name:
             self.sidebar_name = self.name
-        self.wizard = wizard
         self.setup()
 
     def __repr__(self):
         return '<WizardStep object %r>' % self.name
 
-    # returns a new dict. is this necessary?
-    def get_state(self):
-        state_dict = {}
-        for w in self._iterate_widgets():
-            if hasattr(w, 'get_state') and w != self:
-                # only fgtk widgets implement get_state
-                # every widget that implements get_state automatically becomes
-                # a property
-                # spinbutton_some_property -> some-property
-                name = '-'.join(w.get_name().split('_'))
-                key = name.split('-', 1)[1]
-                state_dict[key] = w.get_state()
+    # Public API
 
-        return state_dict
-
-    def clear_msg(self, *args, **kwargs):
-        self.wizard.clear_msg(*args, **kwargs)
-
-    def add_msg(self, msg):
-        self.debug('adding message %r' % msg)
-        self.wizard.add_msg(msg)
-
-    # FIXME: maybe add id here for return messages ?
-    def workerRun(self, module, function, *args, **kwargs):
-        """
-        Run the given function and arguments on the selected worker.
-
-        @returns: L{twisted.internet.defer.Deferred}
-        """
-        self.debug('workerRun(module=%r, function=%r)' % (module, function))
-        admin = self.wizard.get_admin()
-        worker = self.worker
-
-        if not admin:
-            self.warning('skipping workerRun, no admin')
-            return defer.fail(errors.FlumotionError('no admin'))
-
-        if not worker:
-            self.warning('skipping workerRun, no worker')
-            return defer.fail(errors.FlumotionError('no worker'))
-
-        d = admin.workerRun(worker, module, function, *args, **kwargs)
-
-        def callback(result):
-            self.debug('workerRun callbacked a result')
-            self.clear_msg(function)
-
-            if not isinstance(result, messages.Result):
-                msg = messages.Error(T_(
-                    N_("Internal error: could not run check code on worker.")),
-                    debug=('function %r returned a non-Result %r'
-                           % (function, result)))
-                self.add_msg(msg)
-                raise errors.RemoteRunError(function, 'Internal error.')
-
-            for m in result.messages:
-                self.debug('showing msg %r' % m)
-                self.add_msg(m)
-
-            if result.failed:
-                self.debug('... that failed')
-                raise errors.RemoteRunFailure(function, 'Result failed')
-            self.debug('... that succeeded')
-            return result.value
-
-        def errback(failure):
-            self.debug('workerRun errbacked, showing error msg')
-            if failure.check(errors.RemoteRunError):
-                debug = failure.value
-            else:
-                debug = "Failure while running %s.%s:\n%s" % (
-                    module, function, failure.getTraceback())
-
-            msg = messages.Error(T_(
-                N_("Internal error: could not run check code on worker.")),
-                debug=debug)
-            self.add_msg(msg)
-            raise errors.RemoteRunError(function, 'Internal error.')
-
-        d.addErrback(errback)
-        d.addCallback(callback)
-        return d
+    def run_in_worker(self, module, function, *args, **kwargs):
+        return self.wizard.run_in_worker(self.worker, module, function,
+                                         *args, **kwargs)
 
     # Required vmethods
 
@@ -194,7 +116,25 @@ class WizardStep(GladeWidget, log.Loggable):
     def worker_changed(self):
         pass
 
+    def get_state(self):
+        return self._get_widget_states()
+
     # Private API
+
+    def _get_widget_states(self):
+        # returns a new dict. is this necessary?
+        state_dict = {}
+        for w in self._iterate_widgets():
+            if hasattr(w, 'get_state') and w != self:
+                # only fgtk widgets implement get_state
+                # every widget that implements get_state automatically becomes
+                # a property
+                # spinbutton_some_property -> some-property
+                name = '-'.join(w.get_name().split('_'))
+                key = name.split('-', 1)[1]
+                state_dict[key] = w.get_state()
+
+        return state_dict
 
     def _iterate_widgets(self):
         # depth-first
@@ -385,9 +325,6 @@ class Wizard(GladeWindow, log.Loggable):
         return len(self.scenario.steps)
 
     # Public API
-
-    def get_admin(self):
-        return self._admin
 
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
@@ -588,6 +525,68 @@ class Wizard(GladeWindow, log.Loggable):
 
         d = self.check_import(workerName, moduleName)
         d.addErrback(_checkImportErrback)
+        return d
+
+    # FIXME: maybe add id here for return messages ?
+    def run_in_worker(self, worker, module, function, *args, **kwargs):
+        """
+        Run the given function and arguments on the selected worker.
+
+        @param worker:
+        @param module:
+        @param function:
+        @returns: L{twisted.internet.defer.Deferred}
+        """
+        self.debug('run_in_worker(module=%r, function=%r)' % (module, function))
+        admin = self._admin
+        if not admin:
+            self.warning('skipping run_in_worker, no admin')
+            return defer.fail(errors.FlumotionError('no admin'))
+
+        if not worker:
+            self.warning('skipping run_in_worker, no worker')
+            return defer.fail(errors.FlumotionError('no worker'))
+
+        d = admin.workerRun(worker, module, function, *args, **kwargs)
+
+        def callback(result):
+            self.debug('run_in_worker callbacked a result')
+            self.clear_msg(function)
+
+            if not isinstance(result, messages.Result):
+                msg = messages.Error(T_(
+                    N_("Internal error: could not run check code on worker.")),
+                    debug=('function %r returned a non-Result %r'
+                           % (function, result)))
+                self.add_msg(msg)
+                raise errors.RemoteRunError(function, 'Internal error.')
+
+            for m in result.messages:
+                self.debug('showing msg %r' % m)
+                self.add_msg(m)
+
+            if result.failed:
+                self.debug('... that failed')
+                raise errors.RemoteRunFailure(function, 'Result failed')
+            self.debug('... that succeeded')
+            return result.value
+
+        def errback(failure):
+            self.debug('run_in_worker errbacked, showing error msg')
+            if failure.check(errors.RemoteRunError):
+                debug = failure.value
+            else:
+                debug = "Failure while running %s.%s:\n%s" % (
+                    module, function, failure.getTraceback())
+
+            msg = messages.Error(T_(
+                N_("Internal error: could not run check code on worker.")),
+                debug=debug)
+            self.add_msg(msg)
+            raise errors.RemoteRunError(function, 'Internal error.')
+
+        d.addErrback(errback)
+        d.addCallback(callback)
         return d
 
     def update_buttons(self, has_next):

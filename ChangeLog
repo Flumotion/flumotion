@@ -7,6 +7,10 @@
 	* flumotion/wizard/wizard.py:
 	Move WizardStep and WizardSection into wizard.py,
 	remove unused api.
+	(WizardStep, Wizard): rename workerRun to run_in_worker
+	and move most of the code to the wizard so we can remove
+	a few public apis. Remove add_msg/clear_msg aliases in 
+	the steps.
 
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 

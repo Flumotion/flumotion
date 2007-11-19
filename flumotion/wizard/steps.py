@@ -404,8 +404,8 @@ class WebcamStep(VideoSourceStep):
         msg = messages.Info(T_(
                 N_("Probing webcam, this can take a while...")),
             id='webcam-check')
-        self.add_msg(msg)
-        d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
+        self.wizard.add_msg(msg)
+        d = self.run_in_worker('flumotion.worker.checks.video', 'checkWebcam',
                            device, id='webcam-check')
         yield d
         try:
@@ -418,7 +418,7 @@ class WebcamStep(VideoSourceStep):
             deviceName, factoryName, sizes = result
             self._factoryName = factoryName
             self._sizes = sizes
-            self.clear_msg('webcam-check')
+            self.wizard.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
             self.combobox_size.set_sensitive(True)
@@ -513,7 +513,7 @@ class TVCardStep(VideoSourceStep):
 
         device = self.combobox_device.get_string()
         assert device
-        d = self.workerRun('flumotion.worker.checks.video', 'checkTVCard',
+        d = self.run_in_worker('flumotion.worker.checks.video', 'checkTVCard',
                            device, id='tvcard-check')
         yield d
         try:
@@ -522,7 +522,7 @@ class TVCardStep(VideoSourceStep):
                 yield None
 
             deviceName, channels, norms = value
-            self.clear_msg('tvcard-check')
+            self.wizard.clear_msg('tvcard-check')
             self.wizard.block_next(False)
             self.combobox_tvnorm.set_list(norms)
             self.combobox_tvnorm.set_sensitive(True)
@@ -605,13 +605,13 @@ class FireWireStep(VideoSourceStep):
         self._set_sensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
             id='firewire-check')
-        self.add_msg(msg)
-        d = self.workerRun('flumotion.worker.checks.video', 'check1394',
+        self.wizard.add_msg(msg)
+        d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
             id='firewire-check')
         yield d
         try:
             options = d.value()
-            self.clear_msg('firewire-check')
+            self.wizard.clear_msg('firewire-check')
             self._dims = (options['width'], options['height'])
             self._par = options['par']
             self._input_heights = [self._dims[1]/i for i in self._factors]
@@ -809,10 +809,10 @@ class SoundcardStep(AudioSourceStep):
         e = self.combobox_channels.get_enum()
         channels = 2
         if e: channels = e.intvalue
-        d = self.workerRun('flumotion.worker.checks.audio', 'checkMixerTracks',
+        d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
                            enum.element, device, channels, id='soundcard-check')
         def soundcardCheckComplete((deviceName, tracks)):
-            self.clear_msg('soundcard-check')
+            self.wizard.clear_msg('soundcard-check')
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
             self._block_update = True
@@ -918,11 +918,11 @@ class FireWireAudioStep(AudioSourceStep):
         self._set_sensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
             id='firewire-check')
-        self.add_msg(msg)
-        d = self.workerRun('flumotion.worker.checks.video', 'check1394',
+        self.wizard.add_msg(msg)
+        d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
             id='firewire-check')
         def firewireCheckDone(options):
-            self.clear_msg('firewire-check')
+            self.wizard.clear_msg('firewire-check')
             self._dims = (options['width'], options['height'])
             self._par = options['par']
             self._input_heights = [self._dims[1]/i for i in self._factors]
@@ -1063,9 +1063,9 @@ class OverlayStep(WizardStep):
             message = messages.Warning(
                 T_(f, self.worker, "', '".join(elements)), id='overlay')
             message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
-            self.add_msg(message)
+            self.wizard.add_msg(message)
         else:
-            self.clear_msg('overlay')
+            self.wizard.clear_msg('overlay')
 
         # now check import
         d = self.wizard.check_import(self.worker, 'PIL')
@@ -1085,7 +1085,7 @@ class OverlayStep(WizardStep):
                            'http://www.pythonware.com/products/pil/'))
             message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
             message.id = 'module-PIL'
-            self.add_msg(message)
+            self.wizard.add_msg(message)
             self._can_overlay = False
 
     _worker_changed_010 = defer_generator_method(_worker_changed_010)
@@ -1170,7 +1170,7 @@ class ConversionStep(WizardSection):
             d = self.wizard.require_elements(self.worker, 'oggmux')
 
             yield d
-            d = self.workerRun('flumotion.component.muxers.checks', 'checkOgg')
+            d = self.run_in_worker('flumotion.component.muxers.checks', 'checkOgg')
 
             yield d
 
@@ -1238,7 +1238,7 @@ class TheoraStep(VideoEncoderStep):
 
         yield d
 
-        d = self.workerRun('flumotion.worker.checks.encoder', 'checkTheora')
+        d = self.run_in_worker('flumotion.worker.checks.encoder', 'checkTheora')
 
         yield d
     worker_changed = defer_generator_method(worker_changed)
@@ -1342,7 +1342,7 @@ class VorbisStep(AudioEncoderStep):
         d = self.wizard.require_elements(self.worker, 'vorbisenc')
 
         yield d
-        d = self.workerRun('flumotion.worker.checks.encoder', 'checkVorbis')
+        d = self.run_in_worker('flumotion.worker.checks.encoder', 'checkVorbis')
 
         yield d
     worker_changed = defer_generator_method(worker_changed)
