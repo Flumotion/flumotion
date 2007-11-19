@@ -550,38 +550,24 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         logKwArgs = self.doLog(level, method, format, *debugArgs)
 
         # invoke the remote_ method
-        try:
-            state = method(*args, **kwargs)
-        except TypeError:
-            self.warning("%s didn't accept %s and %s" % (method, args, kwargs))
-            raise
+        d = defer.maybeDeferred(method, *args, **kwargs)
 
         # log coming out of the method
-        if isinstance(state, defer.Deferred):
-            # for a deferred, we currently can't log a better location than
-            # the def line for the function/instance that we called above
-            def callback(result):
-                format, debugArgs = flog.getFormatArgs(
-                    '%s <-- %s: remote_%s(', startArgs,
-                    '): %r', (flog.ellipsize(result), ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return result
-            def errback(failure):
-                format, debugArgs = flog.getFormatArgs(
-                    '%s <-- %s: remote_%s(', startArgs,
-                    '): failure %r', (failure, ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return failure
-
-            state.addCallback(callback)
-            state.addErrback(errback)
-        else:
+        def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): %r', (flog.ellipsize(state), ), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return result
+        def errback(failure):
+            format, debugArgs = flog.getFormatArgs(
+                '%s <-- %s: remote_%s(', startArgs,
+                '): failure %r', (failure, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return failure
 
-        return broker.serialize(state, self.perspective)
+        d.addCallbacks(callback, errback)
+        return broker.serialize(d, self.perspective)
 
 class Avatar(pb.Avatar, flog.Loggable):
     """
@@ -616,44 +602,25 @@ class Avatar(pb.Avatar, flog.Loggable):
         logKwArgs = self.doLog(level, method, format, *debugArgs)
 
         # invoke the perspective_ method
-        try:
-            state = method(*args, **kwargs)
-        except TypeError:
-            self.debug("%s didn't accept %s and %s" % (method, args, kwargs))
-            raise
-        except pb.Error, e:
-            format, debugArgs = flog.getFormatArgs(
-                '%s <-- %s: perspective_%s(', startArgs,
-                '): pb.Error %r', (e, ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-            raise e
+        d = defer.maybeDeferred(method, *args, **kwargs)
 
         # log coming out of the method
-        if isinstance(state, defer.Deferred):
-            # for a deferred, we currently can't log a better location than
-            # the def line for the function/instance that we called above
-            def callback(result):
-                format, debugArgs = flog.getFormatArgs(
-                    '%s <-- %s: perspective_%s(', startArgs,
-                    '): %r', (flog.ellipsize(result), ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return result
-            def errback(failure):
-                format, debugArgs = flog.getFormatArgs(
-                    '%s <-- %s: perspective_%s(', startArgs,
-                    '): failure %r', (failure, ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return failure
-
-            state.addCallback(callback)
-            state.addErrback(errback)
-        else:
+        def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): %r', (flog.ellipsize(state), ), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return result
+        def errback(failure):
+            format, debugArgs = flog.getFormatArgs(
+                '%s <-- %s: perspective_%s(', startArgs,
+                '): failure %r', (failure, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return failure
 
-        return broker.serialize(state, self, method, args, kwargs)
+        d.addCallbacks(callback, errback)
+
+        return broker.serialize(d, self, method, args, kwargs)
 
     def setMind(self, mind):
         """

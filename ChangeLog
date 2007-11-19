@@ -1,3 +1,13 @@
+2007-11-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspectiveMessageReceived): Chain up instead of cut
+	and paste.
+
+	* flumotion/twisted/pb.py (Referenceable.remoteMessageReceived)
+	(Avatar.perspectiveMessageReceived): Use maybeDeferred to reduce
+	duplicate code paths.
+
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/step.py: svn remove this

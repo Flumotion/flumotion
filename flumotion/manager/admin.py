@@ -54,63 +54,12 @@ class AdminAvatar(base.ManagerAvatar):
 
     # override pb.Avatar implementation so we can run admin actions
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
-        args = broker.unserialize(args, self)
-        kwargs = broker.unserialize(kwargs, self)
-        method = getattr(self, "perspective_%s" % message)
-
-        level = log.DEBUG
-        if message == 'ping': level = log.LOG
-        debugClass = self.logCategory.upper()
-        startArgs = [self.remoteLogName, debugClass, message]
-        format, debugArgs = log.getFormatArgs(
-            '%s --> %s: perspective_%s(', startArgs,
-            ')', (), args, kwargs)
-
-        # log going into the method
-        logKwArgs = self.doLog(level, method, format, *debugArgs)
-
         benignMethods = ('ping',)
         if message not in benignMethods:
             self.vishnu.adminAction(self.remoteIdentity, message, args, kwargs)
 
-        try:
-            state = method(*args, **kwargs)
-        except TypeError:
-            self.debug("%s didn't accept %s and %s" % (method, args, kwargs))
-            raise
-        except pb.Error, e:
-            format, debugArgs = log.getFormatArgs(
-                '%s <-- %s: perspective_%s(', startArgs,
-                '): pb.Error %r', (e, ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-            raise e
-
-        # log coming out of the method
-        if isinstance(state, defer.Deferred):
-            # for a deferred, we currently can't log a better location than
-            # the def line for the function/instance that we called above
-            def callback(result):
-                format, debugArgs = log.getFormatArgs(
-                    '%s <-- %s: perspective_%s(', startArgs,
-                    '): %r', (result, ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return result
-            def errback(failure):
-                format, debugArgs = log.getFormatArgs(
-                    '%s <-- %s: perspective_%s(', startArgs,
-                    '): failure %r', (failure, ), args, kwargs)
-                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-                return failure
-
-            state.addCallback(callback)
-            state.addErrback(errback)
-        else:
-            format, debugArgs = log.getFormatArgs(
-                '%s <-- %s: perspective_%s(', startArgs,
-                '): %r', (state, ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
-
-        return broker.serialize(state, self, method, args, kwargs)
+        return base.ManagerAvatar.perspectiveMessageReceived(
+            self, broker, message, args, kwargs)
 
     ### pb.Avatar IPerspective methods
     def perspective_getPlanetState(self):
