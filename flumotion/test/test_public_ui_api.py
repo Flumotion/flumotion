@@ -30,8 +30,7 @@ class TestPublicUI(testsuite.TestCase):
         from flumotion.admin.gtk.dialogs import ProgressDialog
         from flumotion.ui.glade import GladeWidget, GladeWindow
         from flumotion.wizard import steps
-        from flumotion.wizard import wizard, step
-        import flumotion.wizard.steps
+        from flumotion.wizard.wizard import WizardSection, WizardStep
 
         from flumotion.ui import icons
         icons.register_icons()

@@ -1,5 +1,9 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/step.py: svn remove this
+	* flumotion/test/test_public_ui_api.py (TestPublicUI.testPublicUIAPI): 
+	Update the public API, f.w.step is gone
+
 	* flumotion/wizard/sidebar.py:
 	* flumotion/wizard/wizard.py:
 	Clean up the sidebar API and avoid class variables
