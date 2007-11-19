@@ -1,3 +1,9 @@
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/sidebar.py:
+	* flumotion/wizard/wizard.py:
+	Clean up the sidebar API and avoid class variables
+
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/disker/disker.py

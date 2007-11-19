@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 
-import gobject
 import gtk
 
 from flumotion.common import pygobject
@@ -31,13 +30,14 @@ __all__ = ['WizardSidebar']
 
 
 class SidebarButton(gtk.Button):
-    bg = None
-    fg = None
-    fgi = None
-    pre_bg = None
-    sensitive = False
 
     def __init__(self, name, padding=0):
+        self.bg = None
+        self.fg = None
+        self.fgi = None
+        self.pre_bg = None
+        self.sensitive = False
+
         gtk.Button.__init__(self)
         self.set_name(name)
         a = gtk.Alignment(0.0, 0.5)
@@ -94,9 +94,6 @@ pygobject.type_register(SidebarButton)
 
 
 class SidebarSection(gtk.VBox):
-    title = None
-    steps = None
-
     gsignal('step-chosen', str)
 
     def __init__(self, title, name):
@@ -156,86 +153,97 @@ class WizardSidebar(gtk.EventBox):
 
     def __init__(self):
         gtk.EventBox.__init__(self)
+        self._active = -1
+        self._top = -1
+        self._sections = []
+
         self.set_size_request(160, -1)
         self.vbox = gtk.VBox()
         self.vbox.set_border_width(5)
         self.vbox.show()
         self.add(self.vbox)
-        self.active = -1
-        self.top = -1
-        self.sections = []
-        self.connect_after('realize', WizardSidebar.on_realize)
+        self.connect_after('realize', self.after_realize)
 
-    # private
-    def on_realize(self):
-        # have to get the style from the theme, but it's not really
-        # there until we're realized
-        style = self.get_style()
-        self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
+    # Public API
 
-    def set_active(self, i):
-        if self.active >= 0:
-            self.sections[self.active].set_active(False)
-        self.active = i
-        if self.active >= 0:
-            self.sections[self.active].set_active(True)
-        csp = self.vbox.child_set_property
-        l = len(self.sections)
-        for i in range(l):
-            if i <= self.active:
-                csp(self.sections[i], 'pack_type', gtk.PACK_START)
-                self.vbox.reorder_child(self.sections[i], i)
-            else:
-                csp(self.sections[i], 'pack_type', gtk.PACK_END)
-                self.vbox.reorder_child(self.sections[i], l - i)
-
-    # public
     def set_sections(self, titles_and_names):
-        for w in self.sections:
+        for w in self._sections:
             self.vbox.remove(w)
             del w
 
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
-        self.sections = []
-        self.active = self.top = -1
+        sections = []
+        self._active = self._top = -1
 
-        for x in titles_and_names:
-            w = SidebarSection(*x)
+        for title, name in titles_and_names:
+            w = SidebarSection(title, name)
             w.connect('step-chosen', clicked_cb)
             w.show()
             w.set_active(False)
             self.vbox.pack_start(w, False, False)
-            self.sections.append(w)
+            sections.append(w)
+        self._sections = sections
 
-    def show_step(self, section_name, step_name):
-        for i in range(len(self.sections)):
-            if self.sections[i].name == section_name:
-                self.set_active(i)
+    def show_step(self, section_name):
+        for i, section in enumerate(self._sections):
+            if section.name == section_name:
+                self._set_active(i)
                 return
         raise AssertionError()
 
     def push(self, section_name, step_name, step_title):
-        if self.sections[self.active].name == section_name:
+        active_section = self._sections[self._active]
+        if active_section.name == section_name:
             # same section
-            self.sections[self.active].push_step(step_name, step_title)
+            active_section.push_step(step_name, step_title)
         else:
             # new section
-            assert self.sections[self.active + 1].name == section_name
-            self.set_active(self.active + 1)
-            self.top += 1
-            self.sections[self.active].push_header()
+            assert self._sections[self._active + 1].name == section_name
+            self._set_active(self._active + 1)
+            self._top += 1
+            self._sections[self._active].push_header()
 
     def pop(self):
-        if self.sections[self.top].steps:
-            self.sections[self.top].pop_step()
+        top_section = self._sections[self._top]
+        if top_section.steps:
+            top_section.pop_step()
         else:
-            self.sections[self.top].pop_header()
-            self.top -= 1
-            if self.top < 0:
+            top_section.pop_header()
+            self._top -= 1
+            if self._top < 0:
                 return False
-            if self.top < self.active:
-                self.set_active(self.top)
+            if self._top < self._active:
+                self._set_active(self._top)
         return True
+
+    # Private
+
+    def _set_active(self, i):
+        if self._active >= 0:
+            self._sections[self._active].set_active(False)
+        self._active = i
+        if self._active >= 0:
+            self._sections[self._active].set_active(True)
+
+        l = len(self._sections)
+        for i, section in enumerate(self._sections):
+            if i <= self._active:
+                pos = i
+                pack_type = gtk.PACK_START
+            else:
+                pos = l - i
+                pack_type = gtk.PACK_END
+            self.vbox.child_set_property(section, 'pack_type', pack_type)
+            self.vbox.reorder_child(section, pos)
+
+    # Callbacks
+
+    def after_realize(self, eventbox):
+        # have to get the style from the theme, but it's not really
+        # there until we're realized
+        style = self.get_style()
+        self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
+
 pygobject.type_register(WizardSidebar)

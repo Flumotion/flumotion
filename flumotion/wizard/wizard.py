@@ -180,7 +180,7 @@ class Scenario:
         self.stack.skip_to(lambda x: x.name == name)
         step = self.stack.current()
         self.current_step = step
-        self.sidebar.show_step(step.section, step.name)
+        self.sidebar.show_step(step.section)
         self.current_section = self.sections.index(self.sections[step.section])
         self.wizard.set_step(step)
 
@@ -191,7 +191,7 @@ class Scenario:
         self.current_step = step
         #self._set_worker_from_step(prev_step)
         self.wizard.update_buttons(has_next=True)
-        self.sidebar.show_step(step.section, step.name)
+        self.sidebar.show_step(step.section)
         has_next = not hasattr(step, 'last_step')
         self.wizard.update_buttons(has_next)
 
@@ -227,7 +227,7 @@ class Scenario:
             self.sidebar.push(next_step.section, next_step.name,
                               next_step.sidebar_name)
         else:
-            self.sidebar.show_step(next_step.section, next_step.name)
+            self.sidebar.show_step(next_step.section)
         next_step.visited = True
         self.wizard.set_step(next_step)
         self.current_step = next_step
