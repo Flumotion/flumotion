@@ -904,34 +904,6 @@ class FireWireAudioStep(AudioSourceStep):
         self.vbox_controls.set_sensitive(is_sensitive)
         self.wizard.block_next(not is_sensitive)
 
-    def _get_width_height(self):
-        # returns dict with sw, sh, ow, oh
-        # which are scaled width and height, and output width and height
-        sh = self._input_heights[self._factor_i]
-        sw = self._input_widths[self._factor_i]
-        par = 1. * self._par[0] / self._par[1]
-
-        if self._is_square:
-            sw = int(math.ceil(sw * par))
-            # for GStreamer element sanity, make sw an even number
-            # FIXME: check if this can now be removed
-            # sw = sw + (2 - (sw % 2)) % 2
-
-        # if scaled width (after squaring) is not multiple of 8, present
-        # width correction
-        self.frame_width_correction.set_sensitive(sw % 8 != 0)
-
-        # actual output
-        ow = sw
-        oh = sh
-        if self._width_correction == 'pad':
-            ow = sw + (8 - (sw % 8)) % 8
-        elif self._width_correction == 'stretch':
-            ow = sw + (8 - (sw % 8)) % 8
-            sw = ow
-
-        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
-
     def _update_output_format(self):
         d = self._get_width_height()
         num, den = 1, 1
@@ -964,6 +936,34 @@ class FireWireAudioStep(AudioSourceStep):
             self.on_update_output_format()
         d.addCallback(firewireCheckDone)
         return d
+
+    def _get_width_height(self):
+        # returns dict with sw, sh, ow, oh
+        # which are scaled width and height, and output width and height
+        sh = self._input_heights[self._factor_i]
+        sw = self._input_widths[self._factor_i]
+        par = 1. * self._par[0] / self._par[1]
+
+        if self._is_square:
+            sw = int(math.ceil(sw * par))
+            # for GStreamer element sanity, make sw an even number
+            # FIXME: check if this can now be removed
+            # sw = sw + (2 - (sw % 2)) % 2
+
+        # if scaled width (after squaring) is not multiple of 8, present
+        # width correction
+        self.frame_width_correction.set_sensitive(sw % 8 != 0)
+
+        # actual output
+        ow = sw
+        oh = sh
+        if self._width_correction == 'pad':
+            ow = sw + (8 - (sw % 8)) % 8
+        elif self._width_correction == 'stretch':
+            ow = sw + (8 - (sw % 8)) % 8
+            sw = ow
+
+        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     # Callbacks
 
@@ -1591,10 +1591,10 @@ class HTTPStep(WizardStep):
     def on_entry_mount_point_changed(self, entry):
         self._verify()
 
-    def on_checkbutton_client_limit_toggled(self, *args):
+    def on_checkbutton_client_limit_toggled(self, checkbutton):
         self._verify()
 
-    def on_checkbutton_bandwidth_limit_toggled(self, *args):
+    def on_checkbutton_bandwidth_limit_toggled(self, checkbutton):
         self._verify()
 
 

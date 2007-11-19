@@ -4,6 +4,8 @@
 	* flumotion/wizard/steps.py:
 	Unbreak the non-testsource video producers.
 	Fix two typos.
+	(FireWireAudioStep): Move down _get_width_height to have a similar
+	order to the firewire video step. *args -> checkbutton
 
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 	
