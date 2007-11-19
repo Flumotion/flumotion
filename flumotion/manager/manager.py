@@ -241,8 +241,6 @@ class Vishnu(log.Loggable):
         self.connectionInfo = {}
         self.setConnectionInfo(None, None, None)
 
-        self.configuration = None
-
     def shutdown(self):
         """Cancel any pending operations in preparation for shutdown.
 
@@ -267,10 +265,7 @@ class Vishnu(log.Loggable):
         """Returns the manager's configuration as a string suitable for
         importing via loadConfiguration().
         """
-        if self.configuration:
-            return self.configuration.export()
-        else:
-            return None
+        return config.exportPlanetXml(self.state)
 
     def getBundlerBasket(self):
         """
@@ -518,7 +513,7 @@ class Vishnu(log.Loggable):
             mid += '-%s' % file
         try:
             self.clearMessage(mid)
-            self.configuration = conf = config.FlumotionConfigXML(file)
+            conf = config.FlumotionConfigXML(file)
             conf.parse()
             return self._loadComponentConfiguration(conf, identity)
         except errors.ConfigError, e:

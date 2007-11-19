@@ -1,3 +1,21 @@
+2007-11-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.getConfiguration): Call the
+	new exportPlanetXml with the whole planet state -- makes it so
+	that you can always export a manager's configuration, regardless
+	of how the manager got configured that way.
+	(Vishnu.loadComponentConfigurationXML): Don't hold onto the
+	configuration object, it's unnecessary.
+
+	* flumotion/common/fxml.py (sxml2unicode, SXML): Code to write
+	XML as s-expressions. See exportPlanetXml for a use example.
+
+	* flumotion/common/config.py (CURRENT_VERSION): Remove duplicate
+	and incorrect definition; the real one is later in the file.
+	(BaseConfigParser.export): Removed, no longer used.
+	(exportPlanetXml): New function, takes a planet state and makes
+	XML out of it. Nifty, and somewhat evil.
+
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/wizard.py:

@@ -31,8 +31,10 @@ import sets
 
 from xml.dom import minidom, Node
 from xml.parsers import expat
+from xml.sax.saxutils import escape, quoteattr
 
 from flumotion.common import log, common
+
 
 class Box:
     """
@@ -213,3 +215,34 @@ class Parser(log.Loggable):
         except Exception, e:
             raise self.parserError('failed to parse %s as %s: %s', node,
                                    type, log.getExceptionMessage(e))
+
+
+# this xml generation thingie is from a friday project, woo
+def sxml2unicode(expr):
+    if not isinstance(expr, list):
+        return escape(unicode(expr))
+    operator = expr[0]
+    args = [sxml2unicode(arg) for arg in expr[1:]]
+    return unicode(operator(args))
+
+def _trans(k):
+    table = {'klass': 'class'}
+    return '-'.join(table.get(k, k).split('_'))
+
+## element := [tag, expression, expression...]
+## tag := xml.tagname | xml.tagname(attr=val, attr=val...)
+## expression := element | atom
+## atom := any non-list python object, unicode() will be called on it
+class SXML:
+    def __getattr__(self, attr):
+        def tag(**kw):
+            pre = '<%s%s>' % (_trans(attr),
+                              ''.join([' %s=%s' % (_trans(k), quoteattr(v))
+                                       for k, v in kw.items()]))
+            post = '</%s>' % (_trans(attr),)
+            def render(args):
+                return pre + '\n'.join(args) + post
+            render.__name__ = pre
+            return render
+        tag.__name__ = attr 
+        return tag

@@ -36,9 +36,6 @@ from flumotion.configure import configure
 
 from errors import ConfigError
 
-# Update component.py's _upgradeComponentConfig if you increment this
-CURRENT_VERSION = 1
-
 def _ignore(*args):
     pass
 
@@ -551,9 +548,6 @@ class BaseConfigParser(fxml.Parser):
     def getPath(self):
         return self.path
 
-    def export(self):
-        return self.doc.toxml()
-
     def parsePlugs(self, node):
         # <plugs>
         #  <plug>
@@ -974,3 +968,47 @@ class AdminConfigParser(BaseConfigParser):
         """
         BaseConfigParser.add(self, file)
         self._parse()
+
+def exportPlanetXml(p):
+    from flumotion.common.fxml import SXML
+    X = SXML()
+
+    def component(c):
+        concat = lambda lists: reduce(list.__add__, lists, [])
+        C = c.get('config')
+        return ([X.component(name=c.get('name'),
+                             type=c.get('type'),
+                             label=C.get('label', c.get('name')),
+                             worker=c.get('workerRequested'),
+                             project=C['project'],
+                             version=common.versionTupleToString(C['version']))]
+                + concat([[[X.eater(name=name, alias=alias), feedId]
+                           for feedId, alias in feeders]
+                          for name, feeders in  C['eater'].items()])
+                + [[X.property(name=name), value]
+                   for name, value in C['properties'].items()]
+                + [[X.clock_master(),
+                    C['clock-master'] == C['avatarId'] and 'true' or 'false']]
+                + [[X.plugs()]
+                   + concat([[[X.plug(socket=socket, type=plug['type'])]
+                              + [[X.property(name=name), value]
+                                 for name, value in plug['properties'].items()]
+                              for plug in plugs]
+                             for socket, plugs in C['plugs'].items()])]
+                + [[X.virtual_feed(name=name, real=real)]
+                   for name, real in C['virtual-feeds'].items()])
+
+    def flow(f):
+        return ([X.flow(name=f.get('name'))]
+                 + [component(c) for c in f.get('components')])
+
+    def atmosphere(a):
+        return ([X.atmosphere()]
+                + [component(c) for c in a.get('components')])
+
+    def planet(p):
+        return ([X.planet(name=p.get('name')),
+                 atmosphere(p.get('atmosphere'))]
+                + [flow(f) for f in p.get('flows')])
+    print planet(p)
+    return fxml.sxml2unicode(planet(p))
