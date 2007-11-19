@@ -265,7 +265,13 @@ class Wizard(GladeWindow, log.Loggable):
 
     glade_file = 'wizard.glade'
 
+    sections = None
+
     def __init__(self, parent_window=None, admin=None):
+        if self.sections is None:
+            raise TypeError("%r needs to have a class attribute called %r" % (
+                    self, 'sections'))
+
         self.current_step = None
         self._admin = admin
         self._use_main = True

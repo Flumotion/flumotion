@@ -1,5 +1,10 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/wizard.py (Wizard.__init__): 
+	Check before trying to access self.sections and raise
+	an exception if it's not set properly
+	* flumotion/test/test_wizard.py: Fix test
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/wizard/steps.py:
 	* flumotion/wizard/wizard.py:
