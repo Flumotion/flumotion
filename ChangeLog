@@ -5,6 +5,8 @@
 	log.py causes logging to stop. Perhaps it is because of the global
 	variables in the module getting reset? At least it appears to work
 	now. See #260.
+	(reload): Remove the ignore hack, it was just that the log system
+	needed reinitialization.
 
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 

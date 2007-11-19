@@ -29,17 +29,8 @@ from flumotion.common import log
 
 def reload():
     """Properly reload all flumotion-related modules currently loaded."""
-    _ignore = (
-        # added because for some reason rebuilding it makes all log.Loggable
-        # subclass objects lose their log methods ...
-        'flumotion.extern.log.log',
-    )
-    for name in sys.modules.keys():
-        if name in _ignore:
-            continue
-        if not name.startswith('flumotion'):
-            continue
-
+    needs_reload = lambda name: name.startswith('flumotion')
+    for name in filter(needs_reload, sys.modules.keys()):
         if not sys.modules.has_key(name):
             log.warning("reload", "hm, %s disappeared from the modules" % name)
             continue
@@ -49,3 +40,11 @@ def reload():
             continue
         log.log("reload", "rebuilding %s" % module)
         rebuild(module, doLog=0)
+
+    # FIXME: ignores programmatic FLU_DEBUG changes over the life of a
+    # process
+    reinitialize = {'flumotion.extern.log.log':
+                    lambda mod: mod.init('FLU_DEBUG')}
+    for name in reinitialize:
+        if name in sys.modules:
+            reinitialize[name](sys.modules[name])
