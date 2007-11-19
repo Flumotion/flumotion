@@ -1,4 +1,10 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_tvcard.glade:
+	* flumotion/wizard/steps.py:
+	Unbreak the non-testsource video producers.
+	
+2007-11-19  Johan Dahlin  <johan@gnome.org>
 	
 	* flumotion/wizard/steps.py: 
 	Store instance variables in the instances instead of in classes, 

@@ -126,6 +126,7 @@ RCA</property>
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
 	      <property name="adjustment">352 0 8192 8 32 8</property>
+	      <signal name="value-changed" handler="on_spinbutton_width_value_changed"/>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -148,6 +149,7 @@ RCA</property>
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
 	      <property name="adjustment">288 0 8192 8 32 8</property>
+	      <signal name="value-changed" handler="on_spinbutton_height_value_changed"/>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>

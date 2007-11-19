@@ -447,10 +447,12 @@ class WebcamStep(VideoSourceStep):
             store = gtk.ListStore(str, object)
             for d in self._sizes[(w,h)]:
                 num, denom = d['framerate']
-                store.append(['%.2f fps' % (1.0*num/denom), 1])
+                store.append(['%.2f fps' % (1.0*num/denom), d])
             # add custom
             self.combobox_framerate.set_model(store)
             self.combobox_framerate.set_active(0)
+            self.model.width = w
+            self.model.height = w
 
 
 # note:
@@ -535,6 +537,12 @@ class TVCardStep(VideoSourceStep):
     def on_combobox_device_changed(self, combo):
         self._run_checks()
 
+    def on_spinbutton_height_value_changed(self, spinbutton):
+        self.model.height = spinbutton.get_value()
+
+    def on_spinbutton_width_value_changed(self, spinbutton):
+        self.model.width = spinbutton.get_value()
+
 
 class FireWireStep(VideoSourceStep):
     name = 'Firewire'
@@ -583,6 +591,8 @@ class FireWireStep(VideoSourceStep):
 
     def _update_output_format(self):
         d = self._get_width_height()
+        self.model.width = d['ow']
+        self.model.height = d['oh']
         num, den = 1, 1
         if not self._is_square:
             num, den = self._par[0], self._par[1]
@@ -683,7 +693,7 @@ class FireWireStep(VideoSourceStep):
                 break
         assert self._width_correction
 
-        self.update_output_format()
+        self._update_output_format()
 
 
 
