@@ -4,6 +4,8 @@
 	Store instance variables in the instances instead of in classes, 
 	really. Also mark them as private.
 	(VideoEncoderStep.__init__): Re-order the video/audio steps
+	Add section comments and sort the methods by their function.
+	Mark a few more methods as private
 
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
