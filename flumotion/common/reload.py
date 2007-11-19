@@ -30,12 +30,9 @@ from flumotion.common import log
 def reload():
     """Properly reload all flumotion-related modules currently loaded."""
     _ignore = (
-        'flumotion.twisted.pygtk',
-        'flumotion.twisted.gst',
-        'flumotion.twisted.gobject',
         # added because for some reason rebuilding it makes all log.Loggable
         # subclass objects lose their log methods ...
-        'flumotion.common.log',
+        'flumotion.extern.log.log',
     )
     for name in sys.modules.keys():
         if name in _ignore:
