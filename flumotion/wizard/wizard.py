@@ -84,6 +84,16 @@ class WizardStep(GladeWidget, log.Loggable):
 
     # Public API
 
+    def iterate_widgets(self):
+        # depth-first
+        def iterator(w):
+            if isinstance(w, gtk.Container):
+                for c in w.get_children():
+                    for cc in iterator(c):
+                        yield cc
+            yield w
+        return iterator(self)
+
     def run_in_worker(self, module, function, *args, **kwargs):
         return self.wizard.run_in_worker(self.worker, module, function,
                                          *args, **kwargs)
@@ -124,7 +134,7 @@ class WizardStep(GladeWidget, log.Loggable):
     def _get_widget_states(self):
         # returns a new dict. is this necessary?
         state_dict = {}
-        for w in self._iterate_widgets():
+        for w in self.iterate_widgets():
             if hasattr(w, 'get_state') and w != self:
                 # only fgtk widgets implement get_state
                 # every widget that implements get_state automatically becomes
@@ -135,16 +145,6 @@ class WizardStep(GladeWidget, log.Loggable):
                 state_dict[key] = w.get_state()
 
         return state_dict
-
-    def _iterate_widgets(self):
-        # depth-first
-        def iterator(w):
-            if isinstance(w, gtk.Container):
-                for c in w.get_children():
-                    for cc in iterator(c):
-                        yield cc
-            yield w
-        return iterator(self)
 
 
 class WizardSection(WizardStep):

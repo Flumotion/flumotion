@@ -11,6 +11,8 @@
 	and move most of the code to the wizard so we can remove
 	a few public apis. Remove add_msg/clear_msg aliases in 
 	the steps.
+	(WizardStep.iterate_widgets): Move back to public API, since
+	it's used by the tests.
 
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
