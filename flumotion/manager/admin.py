@@ -216,39 +216,13 @@ class AdminAvatar(base.ManagerAvatar):
             filename, entry.function))
         return (filename, entry.function)
 
-    def perspective_reloadComponent(self, componentState):
-        """
-        Reload modules in the given component.
-
-        @param componentState: state of the component to reload
-        @type  componentState: L{planet.ManagerComponentState}
-        """
-        def _reloaded(result, self, name):
-            self.info("reloaded component %s code" % name)
-
-        name = componentState.get('name')
-        self.info("reloading component %s code" % name)
-        m = self.vishnu.getComponentMapper(componentState)
-        avatar = m.avatar
-        d = avatar.reloadComponent()
-        d.addCallback(_reloaded, self, name)
-        return d
-
     def perspective_reloadManager(self):
         """
         Reload modules in the manager.
         """
-        import sys
-        from twisted.python.rebuild import rebuild
         self.info('reloading manager code')
-        # reload ourselves first
-        rebuild(sys.modules[__name__])
-
-        # now rebuild relevant modules
-        import flumotion.common.reload
-        rebuild(sys.modules['flumotion.common'])
-        flumotion.common.reload.reload()
-        self._reloaded()
+        from flumotion.common.reload import reload as freload
+        freload()
 
     def perspective_getConfiguration(self):
         """
@@ -386,9 +360,6 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_cleanComponents(self):
         return self.vishnu.emptyPlanet()
 
-    # separate method so it runs the newly reloaded one :)
-    def _reloaded(self):
-        self.info('reloaded manager code')
 
 class AdminHeaven(base.ManagerHeaven):
     """

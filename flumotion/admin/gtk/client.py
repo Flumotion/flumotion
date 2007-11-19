@@ -575,10 +575,10 @@ class Window(log.Loggable, gobject.GObject):
 
         dialog = dialogs.ProgressDialog("Reloading",
             _("Reloading component code for %s") % name, self._window)
-        d = self._admin.reloadComponent(state)
-        d.addCallback(lambda result, d: d.destroy(), dialog)
-        # add error
-        d.addErrback(lambda failure, d: d.destroy(), dialog)
+        dlg = self._admin.callRemote('reloadComponent', state)
+        d.addCallback(lambda result, dlg: dlg.destroy(), dialog)
+        # FIXME: better error handling
+        d.addErrback(lambda failure, dlg: dlg.destroy(), dialog)
         dialog.start()
 
     def _component_stop(self, state):
@@ -880,10 +880,13 @@ class Window(log.Loggable, gobject.GObject):
         d.show()
 
     def _reload_manager(self):
-        self._admin.reloadManager()
+        return self._admin.callRemote('reloadManager')
 
     def _reload_admin(self):
-        self._admin.reloadAdmin()
+        self.info('Reloading admin code')
+        from flumotion.common.reload import reload as freload
+        freload()
+        self.info('Reloaded admin code')
 
     def _reload_all(self):
         dialog = dialogs.ProgressDialog(_("Reloading ..."),
@@ -908,18 +911,25 @@ class Window(log.Loggable, gobject.GObject):
                 failure.getErrorMessage())
             return failure
 
-        def _callLater(admin):
-            d = self._admin.reload()
+        def _callLater():
+            d = defer.maybeDeferred(self._reload_admin)
+            d.addCallback(self._reload_manager)
+            # stack callbacks so that a new one only gets sent after the
+            # previous one has completed
+            for c in self._components.values():
+                # FIXME: race condition if components log in or out.
+                d.addCallback(lambda _, c: self._component_reload(c), c)
             d.addCallback(_stopCallback)
             d.addErrback(_syntaxErrback)
             d.addErrback(_defaultErrback)
+            # FIXME: errback to close the reloading dialog?
 
         def _reloadCallback(admin, text):
             dialog.message(_("Reloading %s code") % text)
 
         self._admin.connect('reloading', _reloadCallback)
         dialog.start()
-        reactor.callLater(0.2, _callLater, self._admin)
+        reactor.callLater(0.2, _callLater)
 
     def _start_shell(self):
         if sys.version_info >= (2, 4):

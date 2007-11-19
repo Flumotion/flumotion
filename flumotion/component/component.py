@@ -227,34 +227,14 @@ class BaseComponentMedium(medium.PingingMedium):
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
-        import sys
-        from twisted.python.rebuild import rebuild
-        from twisted.python.reflect import filenameToModuleName
-        name = filenameToModuleName(__file__)
-
-        ## fixme: re-fetch bundles
-
-        # reload ourselves first
-        rebuild(sys.modules[name])
-
-        # now rebuild relevant modules
-        import flumotion.common.reload
-        rebuild(sys.modules['flumotion.common'])
-        try:
-            flumotion.common.reload.reload()
-        except SyntaxError, msg:
-            raise errors.ReloadSyntaxError(msg)
-        self._reloaded()
+        from flumotion.common.reload import reload as freload
+        freload()
 
     def remote_getUIState(self):
         """Get a WorkerComponentUIState containing details needed to
         present an admin-side UI state
         """
         return self.comp.uiState
-
-    # separate method so it runs the newly reloaded one :)
-    def _reloaded(self):
-        self.info('reloaded module code for %s' % __name__)
 
     def remote_getMasterClockInfo(self):
         """

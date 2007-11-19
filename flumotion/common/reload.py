@@ -39,7 +39,11 @@ def reload():
             log.log("reload", "hm, module '%s' == None" % name)
             continue
         log.log("reload", "rebuilding %s" % module)
-        rebuild(module, doLog=0)
+        try:
+            rebuild(module, doLog=0)
+        except SyntaxError, msg:
+            from flumotion.common import errors
+            raise errors.ReloadSyntaxError(msg)
 
     # FIXME: ignores programmatic FLU_DEBUG changes over the life of a
     # process

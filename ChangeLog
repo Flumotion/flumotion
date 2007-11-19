@@ -1,3 +1,34 @@
+2007-11-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_reloadComponent): Streamline.
+	(BaseComponentMedium._reloaded): Remove useless method.
+
+	* flumotion/common/reload.py (reload): Wrap SyntaxError in a
+	pb.Error, as callers of reload() were doing; I am unclear how
+	useful this is.
+
+	* flumotion/admin/gtk/client.py (Window._component_reload)
+	(Window._reload_manager, Window._reload_admin)
+	(Window._reload_all): Push the reload implementation up the stack.
+	See #260.
+
+	* flumotion/admin/admin.py: Clean up imports.
+	(AdminModel.reloadAdmin, AdminModel.reload)
+	(AdminModel.reload_async, AdminModel.reloadManager): Removed, the
+	form of these interfaces is specific to the needs of the admin
+	client.
+
+	* flumotion/manager/component.py
+	(ComponentAvatar.reloadComponent): Remove, callers now use
+	componentCallRemote directly.
+
+	* flumotion/manager/admin.py (AdminAvatar._reloaded)
+	(AdminAvatar.perspective_reloadComponent): Remove some needless
+	proxy methods, just do a componentCallRemote to reload a
+	component.
+	(AdminAvatar.perspective_reloadManager): Streamline.
+
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/wizard.py (Wizard.__getitem__): 

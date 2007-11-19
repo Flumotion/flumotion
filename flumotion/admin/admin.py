@@ -23,23 +23,18 @@
 model abstraction for administration clients supporting different views
 """
 
-import sys
-
-from twisted.spread import pb
 from twisted.internet import error, defer, reactor
-from twisted.python import rebuild, reflect, failure
 from zope.interface import implements
 
 from flumotion.common import common, errors, interfaces, log
-from flumotion.common import keycards, worker, planet, medium, package
-from flumotion.common import messages, signals
-# serializable worker and component state
-from flumotion.twisted import flavors
-
+from flumotion.common import keycards, planet, medium, package
+from flumotion.common import messages, signals, connection
 from flumotion.configure import configure
-from flumotion.common import reload, connection
-from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
+
+# these two imports are for their side effects of jelly type
+# registration
+from flumotion.common import planet, worker
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -414,86 +409,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         """
         return self.callRemote('workerCallRemote', workerName,
                                methodName, *args, **kwargs)
-
-    ## reload methods for everything
-    def reloadAdmin(self):
-        name = reflect.filenameToModuleName(__file__)
-
-        self.info('Reloading admin code')
-        self.debug("rebuilding '%s'" % name)
-        rebuild.rebuild(sys.modules[name])
-        self.debug("reloading '%s'" % name)
-        reload.reload()
-        self.info('Reloaded admin code')
-
-    def reload(self):
-        # XXX: reload admin.py too
-        d = defer.execute(self.reloadAdmin)
-        d.addCallback(lambda result, self: self.reloadManager(), self)
-        # stack callbacks so that a new one only gets sent after the previous
-        # one has completed
-        for name in self._components.keys():
-            d.addCallback(lambda result, name: self.reloadComponent(name), name)
-        return d
-
-    # used by other admin clients
-    def reload_async(self, write):
-        # FIXME: wtf is this crap
-        # write is the write method on a file object
-        def reloadSelf():
-            name = reflect.filenameToModuleName(__file__)
-            self.info("rebuilding '%s'" % name)
-            rebuild.rebuild(sys.modules[name])
-            write('Reloaded admin')
-
-        def reloadComponents(_):
-            components = list(self._components.keys())
-            def reloadOne(_, msg):
-                write(msg)
-                if components:
-                    name = components.pop(0)
-                    d = self.reloadComponent(name)
-                    d.addCallback(reloadOne,
-                                  'Reloaded component %s' % name)
-            return reloadOne(_, 'Reloaded manager')
-            
-        reloadSelf()
-        d = self.reloadManager()
-        d.addCallback(reloadComponents)
-        return d
-
-    def reloadManager(self):
-        """
-        Tell the manager to reload its code.
-
-        @rtype: deferred
-        """
-        def _reloaded(result, self):
-            self.info("reloaded manager code")
-
-        self.emit('reloading', 'manager')
-        self.info("reloading manager code")
-        d = self.callRemote('reloadManager')
-        d.addCallback(_reloaded, self)
-        return d
-
-    def reloadComponent(self, componentState):
-        """
-        Tell the manager to reload code for a component.
-
-        @type  componentState: L{flumotion.common.planet.AdminComponentState}
-
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        def _reloaded(result, self, state):
-            self.info("reloaded component %s code", state.get('name'))
-
-        name = componentState.get('name')
-        self.info("reloading component %s code", name)
-        self.emit('reloading', name)
-        d = self.callRemote('reloadComponent', componentState)
-        d.addCallback(_reloaded, self, componentState)
-        return d
 
     ## manager remote methods
     def loadConfiguration(self, xml_string):

@@ -398,14 +398,6 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.mindCallRemote('feedTo', feederName, fullFeedId,
                                    host, port)
 
-    def reloadComponent(self):
-        """
-        Tell the component to reload itself.
-
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        return self.mindCallRemote('reloadComponent')
-
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
         """
