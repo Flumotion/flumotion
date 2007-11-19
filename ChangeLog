@@ -1,5 +1,15 @@
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	Rework the way steps are added to the wizard, require 
+	a subclass to be made with)
+	- a list of sections to be provieded
+	- the initial step
+
+2007-11-19  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/save.py:
 	Update getitem callsites here too.
 

@@ -36,7 +36,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer, \
     AudioEncoder, VideoEncoder, Muxer
-from flumotion.wizard.wizard import WizardStep, WizardSection
+from flumotion.wizard.wizard import Wizard, WizardStep, WizardSection
 
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
@@ -1423,12 +1423,27 @@ class ConsumptionStep(WizardSection):
         if step:
             stepname = step.get_name()
             if stepname in items and items[-1] != stepname:
-                step = items[items.index(stepname)+1]
+                stepname = items[items.index(stepname)+1]
             else:
-                step = None
+                stepname = None
         else:
-            step = items[0]
-        return step
+            stepname = items[0]
+
+        steps = {
+            'HTTP Streamer (audio & video)': HTTPBothStep,
+            'HTTP Streamer (audio only)': HTTPAudioStep,
+            'HTTP Streamer (video only)': HTTPVideoStep,
+            'Disk (audio & video)': DiskBothStep,
+            'Disk (audio only)': DiskAudioStep,
+            'Disk (video only)': DiskVideoStep,
+            'Icecast streamer (audio & video)': Shout2BothStep,
+            'Icecast streamer (audio only)': Shout2AudioStep,
+            'Icecast streamer (video only)': Shout2VideoStep,
+        }
+
+        if stepname in steps:
+            step_class = steps[stepname]
+            return step_class(self.wizard)
 
     # Private
 
@@ -1779,3 +1794,16 @@ class SummaryStep(WizardSection):
 
     def get_next(self):
         return None
+
+
+class FirstTimeWizard(Wizard):
+    sections = [
+        WelcomeStep,
+        ProductionStep,
+        ConversionStep,
+        ConsumptionStep,
+        LicenseStep,
+        SummaryStep]
+
+    def get_first_step(self):
+        return WelcomeStep(self)

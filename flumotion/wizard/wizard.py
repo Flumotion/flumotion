@@ -158,35 +158,36 @@ class WizardSection(WizardStep):
 
 
 class Scenario:
-    # to be provided by subclasses
-    sections = None
 
     def __init__(self, wizard):
+        self.steps = {}
         self.wizard = wizard # remove?
         self.sidebar = wizard.sidebar
+        self.sections = wizard.sections
         assert self.sections
         self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.current_section = 0
-        self.steps = list(self.sections)
         self.stack = classes.WalkableStack()
         self.current_step = None
         self.sidebar.connect('step-chosen', self.step_selected)
 
-    def add_step(self, step_class):
-        # FIXME: remove ref to wiz
-        self.steps.append(step_class(self.wizard))
+    def _get_section_by_name(self, section_name):
+        print section_name
+        for section_class in self.sections:
+            if section_class.section == section_name:
+                return self.sections.index(section_class)
 
     def step_selected(self, sidebar, name):
         self.stack.skip_to(lambda x: x.name == name)
         step = self.stack.current()
         self.current_step = step
         self.sidebar.show_step(step.section)
-        self.current_section = self.sections.index(self.sections[step.section])
+        self.current_section = self._get_section_by_name(step.section)
         self.wizard.set_step(step)
 
     def show_previous(self):
         step = self.stack.back()
-        self.current_section = self.sections.index(self.sections[step.section])
+        self.current_section = self._get_section_by_name(step.section)
         self.wizard.set_step(step)
         self.current_step = step
         #self._set_worker_from_step(prev_step)
@@ -199,24 +200,19 @@ class Scenario:
         self.wizard._setup_worker(self.current_step,
                                   self.wizard.worker_list.get_worker())
         next = self.current_step.get_next()
-        if isinstance(next, basestring):
-            try:
-                next_step = self.wizard.get_step(next)
-            except KeyError:
-                raise TypeError("%r: Wizard step %s is missing" % (
-                    self, next))
-        elif isinstance(next, WizardStep):
+        if isinstance(next, WizardStep):
             next_step = next
-            if not next_step in self.steps:
-                self.steps.append(next_step)
         elif next is None:
             if self.current_section + 1 == len(self.sections):
                 self.wizard.finish(save=True)
                 return
             self.current_section += 1
-            next_step = self.sections[self.current_section]
+            next_step_class = self.sections[self.current_section]
+            next_step = next_step_class(self.wizard)
         else:
-            raise AssertionError
+            raise AssertionError(next)
+
+        self.steps[next_step.name] = next_step
 
         while not self.stack.push(next_step):
             s = self.stack.pop()
@@ -236,7 +232,8 @@ class Scenario:
         self.wizard.update_buttons(has_next)
 
     def run(self, interactive):
-        section = self.sections[self.current_section]
+        section_class = self.sections[self.current_section]
+        section = section_class(self.wizard)
         self.sidebar.push(section.section, None, section.section)
         self.stack.push(section)
         self.wizard.set_step(section)
@@ -258,31 +255,6 @@ class Scenario:
             pass
 
 
-class BasicScenario(Scenario):
-    def __init__(self, wizard):
-        from flumotion.wizard import steps
-        self.sections = Sections()
-        for klass in (steps.WelcomeStep,
-                      steps.ProductionStep,
-                      steps.ConversionStep,
-                      steps.ConsumptionStep,
-                      steps.LicenseStep,
-                      steps.SummaryStep):
-            self.sections.append(klass(wizard))
-
-        Scenario.__init__(self, wizard)
-
-        for k in dir(steps):
-            v = getattr(steps, k)
-            try:
-                if issubclass(v, WizardSection):
-                    pass
-                elif issubclass(v, WizardStep) and v.name:
-                    self.add_step(v)
-            except TypeError:
-                pass
-
-
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
@@ -294,25 +266,26 @@ class Wizard(GladeWindow, log.Loggable):
     glade_file = 'wizard.glade'
 
     def __init__(self, parent_window=None, admin=None):
-        GladeWindow.__init__(self, parent_window)
-        for k, v in self.widgets.items():
-            setattr(self, k, v)
-
-        self.flow = Flow("default")
-        self.scenario = BasicScenario(self)
-        self.window.set_icon_from_file(os.path.join(configure.imagedir,
-                                                    'fluendo.png'))
         self.current_step = None
         self._admin = admin
-        self._save = save.WizardSaver(self)
         self._use_main = True
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
+
+        GladeWindow.__init__(self, parent_window)
+        for k, v in self.widgets.items():
+            setattr(self, k, v)
+        self.window.set_icon_from_file(os.path.join(configure.imagedir,
+                                                    'fluendo.png'))
+        self.window.connect_after('realize', self.on_window_realize)
+        self.window.connect('destroy', self.on_window_destroy)
         self.worker_list.connect('worker-selected',
                                  self.on_combobox_worker_changed)
 
-        self.window.connect_after('realize', self.on_window_realize)
-        self.window.connect('destroy', self.on_window_destroy)
+        self.flow = Flow("default")
+        self.scenario = Scenario(self)
+        self._save = save.WizardSaver(self)
+        self.scenario.current_step = self.get_first_step()
 
     def __len__(self):
         return len(self.scenario.steps)
@@ -325,9 +298,9 @@ class Wizard(GladeWindow, log.Loggable):
         @type stepname: str
         @returns: a L{WizardStep} instance or raises KeyError
         """
-        for item in self.scenario.steps:
-            if item.get_name() == stepname:
-                return item
+        for step in self.scenario.steps.values():
+            if step.get_name() == stepname:
+                return step
         else:
             raise KeyError(stepname)
 
