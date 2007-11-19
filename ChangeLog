@@ -1,5 +1,11 @@
 2007-11-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.change_filename): Use common.strftime. Fixes #740.
+
+	* flumotion/common/common.py (strftime): A slow wrapper around
+	python's strftime() that can support unicode inputs.
+
 	* flumotion/test/test_config.py (TestConfig.testParseEmpty):
 	Remove call to nonexistent function.
 

@@ -32,6 +32,7 @@ from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
+from flumotion.common import common
 
 # proxy import
 from flumotion.component.component import moods
@@ -218,7 +219,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         filename = ""
         if not filenameTemplate:
             filenameTemplate = self._defaultFilenameTemplate
-        filename = "%s.%s" % (time.strftime(filenameTemplate,
+        filename = "%s.%s" % (common.strftime(filenameTemplate,
             timeOrTuple or time.localtime()), ext)
         self.location = os.path.join(self.directory, filename)
         self.info("Changing filename to %s", self.location)
