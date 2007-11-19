@@ -271,6 +271,172 @@ class ProductionStep(WizardSection):
         self._verify()
 
 
+class TestVideoSourceStep(VideoSourceStep):
+    name = 'Test Video Source'
+    glade_file = 'wizard_testsource.glade'
+    component_type = 'videotestsrc'
+    icon = 'testsource.png'
+
+    def setup(self):
+        self.combobox_pattern.set_enum(VideoTestPattern)
+        self.combobox_format.set_enum(VideoTestFormat)
+
+        # FIXME: Remember to remove the values from the glade file
+        #        when we use proxy widgets
+        self.model.width = 320
+        self.model.height = 240
+
+    def before_show(self):
+        self.wizard.require_elements(self.worker, 'videotestsrc')
+
+    def get_state(self):
+        format = self.combobox_format.get_enum()
+        options = {}
+        if format == VideoTestFormat.YUV:
+            options['format'] = 'video/x-raw-yuv'
+        elif format == VideoTestFormat.RGB:
+            options['format'] = 'video/x-raw-rgb'
+        else:
+            raise AssertionError
+
+        options['pattern'] = self.combobox_pattern.get_value()
+        options['width'] = int(self.spinbutton_width.get_value())
+        options['height'] = int(self.spinbutton_height.get_value())
+        options['framerate'] = _fraction_from_float(
+            self.spinbutton_framerate.get_value(), 10)
+        return options
+
+    def on_spinbutton_height_value_changed(self, spinbutton):
+        self.model.height = spinbutton.get_value()
+
+    def on_spinbutton_width_value_changed(self, spinbutton):
+        self.model.width = spinbutton.get_value()
+
+
+class WebcamStep(VideoSourceStep):
+    name = 'Webcam'
+    glade_file = 'wizard_webcam.glade'
+    component_type = 'video4linux'
+    icon = 'webcam.png'
+
+    def __init__(self, wizard, model):
+        VideoSourceStep.__init__(self, wizard, model)
+        self._in_setup = False
+        # _sizes is probed, not set from the UI
+        self._sizes = None
+        self._factoryName = None
+
+    def setup(self):
+        self._in_setup = False
+        self.combobox_device.set_list(('/dev/video0',
+                                       '/dev/video1',
+                                       '/dev/video2',
+                                       '/dev/video3'))
+        cell = gtk.CellRendererText()
+        self.combobox_size.pack_start(cell, True)
+        self.combobox_size.add_attribute(cell, 'text', 0)
+        cell = gtk.CellRendererText()
+        self.combobox_framerate.pack_start(cell, True)
+        self.combobox_framerate.add_attribute(cell, 'text', 0)
+        self._in_setup = False
+
+    def on_combobox_device_changed(self, combo):
+        self.run_checks()
+
+    def on_combobox_size_changed(self, combo):
+        # check for custom
+        i = self.combobox_size.get_active_iter()
+        if i:
+            w, h = self.combobox_size.get_model().get(i, 1, 2)
+            store = gtk.ListStore(str, object)
+            for d in self._sizes[(w,h)]:
+                num, denom = d['framerate']
+                store.append(['%.2f fps' % (1.0*num/denom), 1])
+            # add custom
+            self.combobox_framerate.set_model(store)
+            self.combobox_framerate.set_active(0)
+
+    def worker_changed(self):
+        self.clear()
+        self.run_checks()
+
+    def clear(self):
+        self.combobox_size.set_sensitive(False)
+        self.combobox_framerate.set_sensitive(False)
+        self.label_name.set_label("")
+        self.wizard.block_next(True)
+
+    def run_checks(self):
+        if self._in_setup:
+            yield None
+
+        self.wizard.block_next(True)
+
+        device = self.combobox_device.get_string()
+        msg = messages.Info(T_(
+                N_("Probing webcam, this can take a while...")),
+            id='webcam-check')
+        self.add_msg(msg)
+        d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
+                           device, id='webcam-check')
+        yield d
+        try:
+            result = d.value()
+
+            if not result:
+                self.debug('no device %s' % device)
+                yield None
+
+            deviceName, factoryName, sizes = result
+            self._factoryName = factoryName
+            self._sizes = sizes
+            self.clear_msg('webcam-check')
+            self.label_name.set_label(deviceName)
+            self.wizard.block_next(False)
+            self.combobox_size.set_sensitive(True)
+            self.combobox_framerate.set_sensitive(True)
+            store = gtk.ListStore(str, int, int)
+
+            for w, h in sorted(sizes.keys(), reverse=True):
+                store.append(['%d x %d' % (w,h), w, h])
+            self.combobox_size.set_model(store)
+            self.combobox_size.set_active(0)
+        except errors.RemoteRunFailure, e:
+            self.debug('a RemoteRunFailure happened')
+            self.clear()
+    run_checks = defer_generator_method (run_checks)
+
+    def get_state(self):
+        options = {}
+        i = self.combobox_size.get_active_iter()
+        if i:
+            w, h = self.combobox_size.get_model().get(i, 1, 2)
+        else:
+            self.warning('something bad happened: no height/width selected?')
+            w, h = 320, 240
+        i = self.combobox_framerate.get_active_iter()
+        if i:
+            d = self.combobox_framerate.get_model().get_value(i, 1)
+            num, denom = d['framerate']
+            mime = d['mime']
+            format = d.get('format', None)
+        else:
+            self.warning('something bad happened: no framerate selected?')
+            num, denom = 15, 2
+            mime = 'video/x-raw-yuv'
+            format = None
+
+        options['device'] = self.combobox_device.get_string()
+        options['width'] = w
+        options['element-factory'] = self._factoryName
+        options['height'] = h
+        options['framerate'] = '%d/%d' % (num, denom)
+        options['mime'] = mime
+        if format:
+            options['format'] = format
+        return options
+
+
 # note:
 # v4l talks about "signal" (PAL/...) and "channel" (TV/Composite/...)
 # and frequency
@@ -492,6 +658,150 @@ class FireWireStep(VideoSourceStep):
     run_checks = defer_generator_method(run_checks)
 
 
+class TestAudioSourceStep(AudioSourceStep):
+    name = 'Test Audio Source'
+    glade_file = 'wizard_audiotest.glade'
+    section = 'Production'
+    icon = 'soundcard.png'
+
+    def worker_changed(self):
+        self.wizard.require_elements(self.worker, 'audiotestsrc')
+
+    def before_show(self):
+        self.combobox_samplerate.set_enum(AudioTestSamplerate)
+        self.combobox_samplerate.set_sensitive(True)
+
+    def get_state(self):
+        return dict(frequency=int(self.spinbutton_freq.get_value()),
+                    volume=float(self.spinbutton_volume.get_value()),
+                    rate=self.combobox_samplerate.get_int())
+
+    def get_next(self):
+        return None
+
+
+class SoundcardStep(AudioSourceStep):
+    name = 'Soundcard'
+    glade_file = 'wizard_soundcard.glade'
+    section = 'Production'
+    component_type = 'osssrc'
+    icon = 'soundcard.png'
+
+    def __init__(self, wizard, model):
+        AudioSourceStep.__init__(self, wizard, model)
+        self._block_update = False
+
+    def on_combobox_system_changed(self, combo):
+        if not self._block_update:
+            self.update_devices()
+            self.update_inputs()
+
+    def on_combobox_device_changed(self, combo):
+        self.update_inputs()
+
+    def on_combobox_channels_changed(self, combo):
+        # FIXME: make it so that the number of channels can be changed
+        # and the check gets executed with the new number
+        # self.update_inputs()
+        pass
+
+    def worker_changed(self):
+        self.clear_combos()
+        self.update_devices()
+        self.update_inputs()
+
+    def setup(self):
+        # block updates, because populating a shown combobox will of course
+        # trigger the callback
+        self._block_update = True
+        self.combobox_system.set_enum(SoundcardSystem)
+        self._block_update = False
+
+    def clear_combos(self):
+        self.combobox_input.clear()
+        self.combobox_input.set_sensitive(False)
+        self.combobox_channels.clear()
+        self.combobox_channels.set_sensitive(False)
+        self.combobox_samplerate.clear()
+        self.combobox_samplerate.set_sensitive(False)
+        self.combobox_bitdepth.clear()
+        self.combobox_bitdepth.set_sensitive(False)
+
+    def update_devices(self):
+        self._block_update = True
+        enum = self.combobox_system.get_enum()
+        if enum == SoundcardSystem.Alsa:
+            self.combobox_device.set_enum(SoundcardAlsaDevice)
+        elif enum == SoundcardSystem.OSS:
+            self.combobox_device.set_enum(SoundcardOSSDevice)
+        else:
+            raise AssertionError
+        self._block_update = False
+
+    def update_inputs(self):
+        if self._block_update:
+            return
+        self.wizard.block_next(True)
+
+        enum = self.combobox_system.get_enum()
+        device = self.combobox_device.get_string()
+        e = self.combobox_channels.get_enum()
+        channels = 2
+        if e: channels = e.intvalue
+        d = self.workerRun('flumotion.worker.checks.audio', 'checkMixerTracks',
+                           enum.element, device, channels, id='soundcard-check')
+        def soundcardCheckComplete((deviceName, tracks)):
+            self.clear_msg('soundcard-check')
+            self.wizard.block_next(False)
+            self.label_devicename.set_label(deviceName)
+            self._block_update = True
+            self.combobox_channels.set_enum(SoundcardChannels)
+            self.combobox_channels.set_sensitive(True)
+            self.combobox_samplerate.set_enum(SoundcardSamplerate)
+            self.combobox_samplerate.set_sensitive(True)
+            self.combobox_bitdepth.set_enum(SoundcardBitdepth)
+            self.combobox_bitdepth.set_sensitive(True)
+            self._block_update = False
+
+            self.combobox_input.set_list(tracks)
+            self.combobox_input.set_sensitive(True)
+
+        d.addCallback(soundcardCheckComplete)
+        # FIXME: when probing failed, do
+        # self.clear_combos()
+        return d
+
+    def get_state(self):
+        # FIXME: this can't be called if the soundcard hasn't been probed yet
+        # for example, when going through the testsuite
+        try:
+            channels = self.combobox_channels.get_enum().intvalue
+            element = self.combobox_system.get_enum().element
+            bitdepth = self.combobox_bitdepth.get_string()
+            samplerate = self.combobox_samplerate.get_string()
+            input = self.combobox_input.get_string()
+        except AttributeError:
+            # when called without enum setup
+            channels = 0
+            element = "fakesrc"
+            bitdepth = "9"
+            samplerate = "12345"
+            input = None
+
+        d = dict(device=self.combobox_device.get_string(),
+                    depth=int(bitdepth),
+                    rate=int(samplerate),
+                    channels=channels)
+        if input:
+            d['input-track'] = input
+        # FIXME: can a key with a dash be specified ?
+        d['source-element'] = element
+        return d
+
+    def get_next(self):
+        return None
+
+
 class FireWireAudioStep(AudioSourceStep):
     name = 'Firewire audio'
     glade_file = 'wizard_firewire.glade'
@@ -643,172 +953,6 @@ class FireWireAudioStep(AudioSourceStep):
         return None
 
 
-class WebcamStep(VideoSourceStep):
-    name = 'Webcam'
-    glade_file = 'wizard_webcam.glade'
-    component_type = 'video4linux'
-    icon = 'webcam.png'
-
-    def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
-        self._in_setup = False
-        # _sizes is probed, not set from the UI
-        self._sizes = None
-        self._factoryName = None
-
-    def setup(self):
-        self._in_setup = False
-        self.combobox_device.set_list(('/dev/video0',
-                                       '/dev/video1',
-                                       '/dev/video2',
-                                       '/dev/video3'))
-        cell = gtk.CellRendererText()
-        self.combobox_size.pack_start(cell, True)
-        self.combobox_size.add_attribute(cell, 'text', 0)
-        cell = gtk.CellRendererText()
-        self.combobox_framerate.pack_start(cell, True)
-        self.combobox_framerate.add_attribute(cell, 'text', 0)
-        self._in_setup = False
-
-    def on_combobox_device_changed(self, combo):
-        self.run_checks()
-
-    def on_combobox_size_changed(self, combo):
-        # check for custom
-        i = self.combobox_size.get_active_iter()
-        if i:
-            w, h = self.combobox_size.get_model().get(i, 1, 2)
-            store = gtk.ListStore(str, object)
-            for d in self._sizes[(w,h)]:
-                num, denom = d['framerate']
-                store.append(['%.2f fps' % (1.0*num/denom), 1])
-            # add custom
-            self.combobox_framerate.set_model(store)
-            self.combobox_framerate.set_active(0)
-
-    def worker_changed(self):
-        self.clear()
-        self.run_checks()
-
-    def clear(self):
-        self.combobox_size.set_sensitive(False)
-        self.combobox_framerate.set_sensitive(False)
-        self.label_name.set_label("")
-        self.wizard.block_next(True)
-
-    def run_checks(self):
-        if self._in_setup:
-            yield None
-
-        self.wizard.block_next(True)
-
-        device = self.combobox_device.get_string()
-        msg = messages.Info(T_(
-                N_("Probing webcam, this can take a while...")),
-            id='webcam-check')
-        self.add_msg(msg)
-        d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
-                           device, id='webcam-check')
-        yield d
-        try:
-            result = d.value()
-
-            if not result:
-                self.debug('no device %s' % device)
-                yield None
-
-            deviceName, factoryName, sizes = result
-            self._factoryName = factoryName
-            self._sizes = sizes
-            self.clear_msg('webcam-check')
-            self.label_name.set_label(deviceName)
-            self.wizard.block_next(False)
-            self.combobox_size.set_sensitive(True)
-            self.combobox_framerate.set_sensitive(True)
-            store = gtk.ListStore(str, int, int)
-
-            for w, h in sorted(sizes.keys(), reverse=True):
-                store.append(['%d x %d' % (w,h), w, h])
-            self.combobox_size.set_model(store)
-            self.combobox_size.set_active(0)
-        except errors.RemoteRunFailure, e:
-            self.debug('a RemoteRunFailure happened')
-            self.clear()
-    run_checks = defer_generator_method (run_checks)
-
-    def get_state(self):
-        options = {}
-        i = self.combobox_size.get_active_iter()
-        if i:
-            w, h = self.combobox_size.get_model().get(i, 1, 2)
-        else:
-            self.warning('something bad happened: no height/width selected?')
-            w, h = 320, 240
-        i = self.combobox_framerate.get_active_iter()
-        if i:
-            d = self.combobox_framerate.get_model().get_value(i, 1)
-            num, denom = d['framerate']
-            mime = d['mime']
-            format = d.get('format', None)
-        else:
-            self.warning('something bad happened: no framerate selected?')
-            num, denom = 15, 2
-            mime = 'video/x-raw-yuv'
-            format = None
-
-        options['device'] = self.combobox_device.get_string()
-        options['width'] = w
-        options['element-factory'] = self._factoryName
-        options['height'] = h
-        options['framerate'] = '%d/%d' % (num, denom)
-        options['mime'] = mime
-        if format:
-            options['format'] = format
-        return options
-
-
-class TestVideoSourceStep(VideoSourceStep):
-    name = 'Test Video Source'
-    glade_file = 'wizard_testsource.glade'
-    component_type = 'videotestsrc'
-    icon = 'testsource.png'
-
-    def setup(self):
-        self.combobox_pattern.set_enum(VideoTestPattern)
-        self.combobox_format.set_enum(VideoTestFormat)
-
-        # FIXME: Remember to remove the values from the glade file
-        #        when we use proxy widgets
-        self.model.width = 320
-        self.model.height = 240
-
-    def before_show(self):
-        self.wizard.require_elements(self.worker, 'videotestsrc')
-
-    def get_state(self):
-        format = self.combobox_format.get_enum()
-        options = {}
-        if format == VideoTestFormat.YUV:
-            options['format'] = 'video/x-raw-yuv'
-        elif format == VideoTestFormat.RGB:
-            options['format'] = 'video/x-raw-rgb'
-        else:
-            raise AssertionError
-
-        options['pattern'] = self.combobox_pattern.get_value()
-        options['width'] = int(self.spinbutton_width.get_value())
-        options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = _fraction_from_float(
-            self.spinbutton_framerate.get_value(), 10)
-        return options
-
-    def on_spinbutton_height_value_changed(self, spinbutton):
-        self.model.height = spinbutton.get_value()
-
-    def on_spinbutton_width_value_changed(self, spinbutton):
-        self.model.width = spinbutton.get_value()
-
-
 class OverlayStep(WizardStep):
     name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
@@ -895,150 +1039,6 @@ class OverlayStep(WizardStep):
 
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
-
-
-class SoundcardStep(AudioSourceStep):
-    name = 'Soundcard'
-    glade_file = 'wizard_soundcard.glade'
-    section = 'Production'
-    component_type = 'osssrc'
-    icon = 'soundcard.png'
-
-    def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
-        self._block_update = False
-
-    def on_combobox_system_changed(self, combo):
-        if not self._block_update:
-            self.update_devices()
-            self.update_inputs()
-
-    def on_combobox_device_changed(self, combo):
-        self.update_inputs()
-
-    def on_combobox_channels_changed(self, combo):
-        # FIXME: make it so that the number of channels can be changed
-        # and the check gets executed with the new number
-        # self.update_inputs()
-        pass
-
-    def worker_changed(self):
-        self.clear_combos()
-        self.update_devices()
-        self.update_inputs()
-
-    def setup(self):
-        # block updates, because populating a shown combobox will of course
-        # trigger the callback
-        self._block_update = True
-        self.combobox_system.set_enum(SoundcardSystem)
-        self._block_update = False
-
-    def clear_combos(self):
-        self.combobox_input.clear()
-        self.combobox_input.set_sensitive(False)
-        self.combobox_channels.clear()
-        self.combobox_channels.set_sensitive(False)
-        self.combobox_samplerate.clear()
-        self.combobox_samplerate.set_sensitive(False)
-        self.combobox_bitdepth.clear()
-        self.combobox_bitdepth.set_sensitive(False)
-
-    def update_devices(self):
-        self._block_update = True
-        enum = self.combobox_system.get_enum()
-        if enum == SoundcardSystem.Alsa:
-            self.combobox_device.set_enum(SoundcardAlsaDevice)
-        elif enum == SoundcardSystem.OSS:
-            self.combobox_device.set_enum(SoundcardOSSDevice)
-        else:
-            raise AssertionError
-        self._block_update = False
-
-    def update_inputs(self):
-        if self._block_update:
-            return
-        self.wizard.block_next(True)
-
-        enum = self.combobox_system.get_enum()
-        device = self.combobox_device.get_string()
-        e = self.combobox_channels.get_enum()
-        channels = 2
-        if e: channels = e.intvalue
-        d = self.workerRun('flumotion.worker.checks.audio', 'checkMixerTracks',
-                           enum.element, device, channels, id='soundcard-check')
-        def soundcardCheckComplete((deviceName, tracks)):
-            self.clear_msg('soundcard-check')
-            self.wizard.block_next(False)
-            self.label_devicename.set_label(deviceName)
-            self._block_update = True
-            self.combobox_channels.set_enum(SoundcardChannels)
-            self.combobox_channels.set_sensitive(True)
-            self.combobox_samplerate.set_enum(SoundcardSamplerate)
-            self.combobox_samplerate.set_sensitive(True)
-            self.combobox_bitdepth.set_enum(SoundcardBitdepth)
-            self.combobox_bitdepth.set_sensitive(True)
-            self._block_update = False
-
-            self.combobox_input.set_list(tracks)
-            self.combobox_input.set_sensitive(True)
-
-        d.addCallback(soundcardCheckComplete)
-        # FIXME: when probing failed, do
-        # self.clear_combos()
-        return d
-
-    def get_state(self):
-        # FIXME: this can't be called if the soundcard hasn't been probed yet
-        # for example, when going through the testsuite
-        try:
-            channels = self.combobox_channels.get_enum().intvalue
-            element = self.combobox_system.get_enum().element
-            bitdepth = self.combobox_bitdepth.get_string()
-            samplerate = self.combobox_samplerate.get_string()
-            input = self.combobox_input.get_string()
-        except AttributeError:
-            # when called without enum setup
-            channels = 0
-            element = "fakesrc"
-            bitdepth = "9"
-            samplerate = "12345"
-            input = None
-
-        d = dict(device=self.combobox_device.get_string(),
-                    depth=int(bitdepth),
-                    rate=int(samplerate),
-                    channels=channels)
-        if input:
-            d['input-track'] = input
-        # FIXME: can a key with a dash be specified ?
-        d['source-element'] = element
-        return d
-
-    def get_next(self):
-        return None
-
-
-class TestAudioSourceStep(AudioSourceStep):
-    name = 'Test Audio Source'
-    glade_file = 'wizard_audiotest.glade'
-    section = 'Production'
-    icon = 'soundcard.png'
-
-    def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'audiotestsrc')
-
-    def before_show(self):
-        self.combobox_samplerate.set_enum(AudioTestSamplerate)
-        self.combobox_samplerate.set_sensitive(True)
-
-    def get_state(self):
-        return dict(frequency=int(self.spinbutton_freq.get_value()),
-                    volume=float(self.spinbutton_volume.get_value()),
-                    rate=self.combobox_samplerate.get_int())
-
-    def get_next(self):
-        return None
 
 
 class ConversionStep(WizardSection):
