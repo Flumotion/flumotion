@@ -178,6 +178,7 @@ flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/volume/Makefile
 flumotion/component/encoders/Makefile
 flumotion/component/combiners/Makefile
+flumotion/component/combiners/composite/Makefile
 flumotion/component/combiners/switch/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile

@@ -1,3 +1,13 @@
+2007-11-20  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/combiners/composite/composite.py:
+	* flumotion/component/combiners/composite/composite.xml:
+	* flumotion/component/combiners/composite/__init__.py:
+	* flumotion/component/combiners/composite/Makefile.am:
+	* flumotion/component/combiners/Makefile.am:
+	* configure.ac:
+	Initial import of the composite combiner component.
+
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): Add 
