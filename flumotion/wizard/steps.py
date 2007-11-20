@@ -1830,7 +1830,7 @@ class FirstTimeWizard(Wizard):
         LicenseStep,
         SummaryStep]
 
-    def __init__(self, parent, admin):
+    def __init__(self, parent=None, admin=None):
         Wizard.__init__(self, parent)
         self._admin = admin
         self._save = save.WizardSaver(self)

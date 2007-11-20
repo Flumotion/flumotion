@@ -3,6 +3,8 @@
 	* data/glade/wizard.glade:
 	* flumotion/wizard/steps.py:
 	(FirstTimeWizard): remove extra erroeous run_in_worker method
+	(FirstTimeWizard.show_next_step): Set default values on constructor,
+	the tests depends on this
 
 	* flumotion/wizard/wizard.py:
 	Split out the specific parts of the first time wizard:
