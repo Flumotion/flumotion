@@ -238,7 +238,8 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     debugArgs.extend(endArgs)
     format = startFormat \
               + ', '.join(('%s', ) * len(args)) \
-              + ', '.join(('%s=%r, ', ) * len(kwargs)) \
+              + (kwargs and ', ' or '') \
+              + ', '.join(('%s=%r', ) * len(kwargs)) \
               + endFormat
     return format, debugArgs
 

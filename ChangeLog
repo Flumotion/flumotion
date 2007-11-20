@@ -1,3 +1,8 @@
+2007-11-20  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/extern/log/log.py:
+	  Build the debug format string correctly when it includes kwargs.
+
 2007-11-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/config.py (ConfigEntryComponent._buildConfig):
