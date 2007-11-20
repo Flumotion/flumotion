@@ -4,6 +4,7 @@
 	* flumotion/wizard/steps.py:
 	* flumotion/wizard/wizard.py:
 	Replace WizardSection with WizardStep
+	(Wizard.__init__): Merge in Scenario, make plenty of apis private.
 
 2007-11-19  Johan Dahlin  <johan@gnome.org>
 

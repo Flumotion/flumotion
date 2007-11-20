@@ -46,11 +46,6 @@ __pychecker__ = 'no-classattr no-argsused'
 def escape(text):
     return text.replace('&', '&amp;')
 
-class Sections(classes.KeyedList):
-    def __init__(self, *args):
-        classes.KeyedList.__init__(self, *args)
-        self.add_key(str, lambda x: x.section)
-
 
 class WizardStep(GladeWidget, log.Loggable):
     glade_typedict = fgtk.WidgetMapping()
@@ -147,104 +142,6 @@ class WizardStep(GladeWidget, log.Loggable):
         return state_dict
 
 
-class Scenario:
-
-    def __init__(self, wizard):
-        self.steps = {}
-        self.wizard = wizard # remove?
-        self.sidebar = wizard.sidebar
-        self.sections = wizard.sections
-        assert self.sections
-        self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
-        self.current_section = 0
-        self.stack = classes.WalkableStack()
-        self.current_step = None
-        self.sidebar.connect('step-chosen', self.step_selected)
-
-    def _get_section_by_name(self, section_name):
-        print section_name
-        for section_class in self.sections:
-            if section_class.section == section_name:
-                return self.sections.index(section_class)
-
-    def step_selected(self, sidebar, name):
-        self.stack.skip_to(lambda x: x.name == name)
-        step = self.stack.current()
-        self.current_step = step
-        self.sidebar.show_step(step.section)
-        self.current_section = self._get_section_by_name(step.section)
-        self.wizard.set_step(step)
-
-    def show_previous(self):
-        step = self.stack.back()
-        self.current_section = self._get_section_by_name(step.section)
-        self.wizard.set_step(step)
-        self.current_step = step
-        #self._set_worker_from_step(prev_step)
-        self.wizard.update_buttons(has_next=True)
-        self.sidebar.show_step(step.section)
-        has_next = not hasattr(step, 'last_step')
-        self.wizard.update_buttons(has_next)
-
-    def show_next(self):
-        self.wizard._setup_worker(self.current_step,
-                                  self.wizard.worker_list.get_worker())
-        next = self.current_step.get_next()
-        if isinstance(next, WizardStep):
-            next_step = next
-        elif next is None:
-            if self.current_section + 1 == len(self.sections):
-                self.wizard.finish(save=True)
-                return
-            self.current_section += 1
-            next_step_class = self.sections[self.current_section]
-            next_step = next_step_class(self.wizard)
-        else:
-            raise AssertionError(next)
-
-        self.steps[next_step.name] = next_step
-
-        while not self.stack.push(next_step):
-            s = self.stack.pop()
-            s.visited = False
-            self.sidebar.pop()
-
-        if not next_step.visited:
-            self.sidebar.push(next_step.section, next_step.name,
-                              next_step.sidebar_name)
-        else:
-            self.sidebar.show_step(next_step.section)
-        next_step.visited = True
-        self.wizard.set_step(next_step)
-        self.current_step = next_step
-
-        has_next = not hasattr(next_step, 'last_step')
-        self.wizard.update_buttons(has_next)
-
-    def run(self, interactive):
-        section_class = self.sections[self.current_section]
-        section = section_class(self.wizard)
-        self.sidebar.push(section.section, None, section.section)
-        self.stack.push(section)
-        self.wizard.set_step(section)
-        self.current_step = section
-
-        if not interactive:
-            while self.show_next():
-                pass
-            return self.wizard.finish(False)
-
-        self.wizard.present_and_grab()
-
-        if not self.wizard._use_main:
-            return
-
-        try:
-            gtk.main()
-        except KeyboardInterrupt:
-            pass
-
-
 class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
@@ -262,7 +159,10 @@ class Wizard(GladeWindow, log.Loggable):
             raise TypeError("%r needs to have a class attribute called %r" % (
                     self, 'sections'))
 
-        self.current_step = None
+        self._steps = {}
+        self._current_section = 0
+        self._stack = classes.WalkableStack()
+        self._current_step = None
         self._admin = admin
         self._use_main = True
         self._workerHeavenState = None
@@ -278,13 +178,16 @@ class Wizard(GladeWindow, log.Loggable):
         self.worker_list.connect('worker-selected',
                                  self.on_combobox_worker_changed)
 
+        self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
+        self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
+
         self.flow = Flow("default")
-        self.scenario = Scenario(self)
         self._save = save.WizardSaver(self)
-        self.scenario.current_step = self.get_first_step()
+
+        self._current_step = self.get_first_step()
 
     def __len__(self):
-        return len(self.scenario.steps)
+        return len(self._steps)
 
     # Public API
 
@@ -294,7 +197,7 @@ class Wizard(GladeWindow, log.Loggable):
         @type stepname: str
         @returns: a L{WizardStep} instance or raises KeyError
         """
-        for step in self.scenario.steps.values():
+        for step in self._steps.values():
             if step.get_name() == stepname:
                 return step
         else:
@@ -308,10 +211,6 @@ class Wizard(GladeWindow, log.Loggable):
         step = self.get_step(stepname)
         return step.get_state()
 
-    def present_and_grab(self):
-        self.window.present()
-        self.window.grab_focus()
-
     def destroy(self):
         GladeWindow.destroy(self)
         del self._admin
@@ -319,23 +218,6 @@ class Wizard(GladeWindow, log.Loggable):
 
     def hide(self):
         self.window.hide()
-
-    def finish(self, main=True, save=True):
-        if save:
-            configuration = self._save.getXML()
-            self.emit('finished', configuration)
-
-        if self._use_main:
-            try:
-                gtk.main_quit()
-            except RuntimeError:
-                pass
-
-    def run(self, interactive, workerHeavenState, main=True):
-        self._workerHeavenState = workerHeavenState
-        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
-        self._use_main = main
-        self.scenario.run(interactive)
 
     def clear_msg(self, id):
         self.message_area.clear_message(id)
@@ -349,41 +231,6 @@ class Wizard(GladeWindow, log.Loggable):
         if not block:
             self.button_next.hide()
             self.button_next.show()
-
-    def set_step(self, step):
-        # Remove previous step
-        map(self.content_area.remove, self.content_area.get_children())
-        self.message_area.clear()
-
-        # Add current
-        self.content_area.pack_start(step, True, True, 0)
-
-        icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
-        self.image_icon.set_from_file(icon_filename)
-
-        m = '<span size="x-large">%s</span>' % escape(step.name)
-        self.label_title.set_markup(m)
-
-        if self.current_step:
-            self.current_step.deactivated()
-
-        self.current_step = step
-
-        self.update_buttons(has_next=True)
-        self.block_next(False)
-
-        if step.has_worker:
-            self.worker_list.show()
-            self.worker_list.notify_selected()
-        else:
-            self.worker_list.hide()
-
-        self._setup_worker(step, self.worker_list.get_worker())
-        step.before_show()
-
-        self.debug('showing step %r' % step)
-        step.show()
-        step.activated()
 
     def check_elements(self, workerName, *elementNames):
         """
@@ -563,10 +410,40 @@ class Wizard(GladeWindow, log.Loggable):
         d.addCallback(callback)
         return d
 
-    def update_buttons(self, has_next):
+    def run(self, interactive, workerHeavenState, main=True):
+        self._workerHeavenState = workerHeavenState
+        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
+        self._use_main = main
+
+        section_class = self.sections[self._current_section]
+        section = section_class(self)
+        self.sidebar.push(section.section, None, section.section)
+        self._stack.push(section)
+        self._set_step(section)
+        self._current_step = section
+
+        if not interactive:
+            while self.show_next():
+                pass
+            return self._finish(False)
+
+        self.window.present()
+        self.window.grab_focus()
+
+        if not self._use_main:
+            return
+
+        try:
+            gtk.main()
+        except KeyboardInterrupt:
+            pass
+
+    # Private
+
+    def _update_buttons(self, has_next):
         # update the forward and next buttons
         # has_next: whether or not there is a next step
-        if self.scenario.stack.pos == 0:
+        if self._stack.pos == 0:
             self.button_prev.set_sensitive(False)
         else:
             self.button_prev.set_sensitive(True)
@@ -578,7 +455,101 @@ class Wizard(GladeWindow, log.Loggable):
             # use APPLY, just like in gnomemeeting
             self.button_next.set_label(gtk.STOCK_APPLY)
 
-    # Private
+    def _finish(self, main=True, save=True):
+        if save:
+            configuration = self._save.getXML()
+            self.emit('finished', configuration)
+
+        if self._use_main:
+            try:
+                gtk.main_quit()
+            except RuntimeError:
+                pass
+
+    def _set_step(self, step):
+        # Remove previous step
+        map(self.content_area.remove, self.content_area.get_children())
+        self.message_area.clear()
+
+        # Add current
+        self.content_area.pack_start(step, True, True, 0)
+
+        icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
+        self.image_icon.set_from_file(icon_filename)
+
+        m = '<span size="x-large">%s</span>' % escape(step.name)
+        self.label_title.set_markup(m)
+
+        if self._current_step:
+            self._current_step.deactivated()
+
+        self._current_step = step
+
+        self._update_buttons(has_next=True)
+        self.block_next(False)
+
+        if step.has_worker:
+            self.worker_list.show()
+            self.worker_list.notify_selected()
+        else:
+            self.worker_list.hide()
+
+        self._setup_worker(step, self.worker_list.get_worker())
+        step.before_show()
+
+        self.debug('showing step %r' % step)
+        step.show()
+        step.activated()
+
+    def _show_next_step(self):
+        self._setup_worker(self._current_step,
+                           self.worker_list.get_worker())
+        next = self._current_step.get_next()
+        if isinstance(next, WizardStep):
+            next_step = next
+        elif next is None:
+            if self._current_section + 1 == len(self.sections):
+                self._finish(save=True)
+                return
+            self._current_section += 1
+            next_step_class = self.sections[self._current_section]
+            next_step = next_step_class(self)
+        else:
+            raise AssertionError(next)
+
+        self._steps[next_step.name] = next_step
+
+        while not self._stack.push(next_step):
+            s = self._stack.pop()
+            s.visited = False
+            self.sidebar.pop()
+
+        if not next_step.visited:
+            self.sidebar.push(next_step.section, next_step.name,
+                              next_step.sidebar_name)
+        else:
+            self.sidebar.show_step(next_step.section)
+        next_step.visited = True
+        self._set_step(next_step)
+        self._current_step = next_step
+
+        has_next = not hasattr(next_step, 'last_step')
+        self._update_buttons(has_next)
+
+    def _show_previous_step(self):
+        step = self._stack.back()
+        self._current_section = self._get_section_by_name(step.section)
+        self._set_step(step)
+        self._current_step = step
+        self._update_buttons(has_next=True)
+        self.sidebar.show_step(step.section)
+        has_next = not hasattr(step, 'last_step')
+        self._update_buttons(has_next)
+
+    def _get_section_by_name(self, section_name):
+        for section_class in self.sections:
+            if section_class.section == section_name:
+                return self.sections.index(section_class)
 
     def _setup_worker(self, step, worker):
         # get name of active worker
@@ -613,23 +584,23 @@ class Wizard(GladeWindow, log.Loggable):
         self.emit('destroy')
 
     def on_window_delete_event(self, wizard, event):
-        self.finish(self._use_main, save=False)
+        self._finish(self._use_main, save=False)
 
     def on_button_prev_clicked(self, button):
-        self.scenario.show_previous()
+        self._show_previous_step()
 
     def on_button_next_clicked(self, button):
-        self.scenario.show_next()
+        self._show_next_step()
 
     def on_combobox_worker_changed(self, combobox, worker):
         self.debug('combobox_worker_changed, worker %r' % worker)
         if worker:
             self.clear_msg('worker-error')
             self._last_worker = worker
-            if self.current_step:
-                self._setup_worker(self.current_step, worker)
-                self.debug('calling %r.worker_changed' % self.current_step)
-                self.current_step.worker_changed()
+            if self._current_step:
+                self._setup_worker(self._current_step, worker)
+                self.debug('calling %r.worker_changed' % self._current_step)
+                self._current_step.worker_changed()
         else:
             msg = messages.Error(T_(
                     N_('All workers have logged out.\n'
@@ -637,6 +608,14 @@ class Wizard(GladeWindow, log.Loggable):
                     'properly and try again.')),
                 id='worker-error')
             self.add_msg(msg)
+
+    def on_sidebar_step_chosen(self, sidebar, name):
+        self._stack.skip_to(lambda x: x.name == name)
+        step = self._stack.current()
+        self._current_step = step
+        self.sidebar.show_step(step.section)
+        self._current_section = self._get_section_by_name(step.section)
+        self._set_step(step)
 
 
 pygobject.type_register(Wizard)
