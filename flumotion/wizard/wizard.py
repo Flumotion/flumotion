@@ -147,16 +147,6 @@ class WizardStep(GladeWidget, log.Loggable):
         return state_dict
 
 
-class WizardSection(WizardStep):
-    def __init__(self, *args):
-        if not self.name:
-            self.name = self.section
-        WizardStep.__init__(self, *args)
-
-    def __repr__(self):
-        return '<WizardSection object %s>' % self.name
-
-
 class Scenario:
 
     def __init__(self, wizard):

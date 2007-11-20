@@ -36,7 +36,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer, \
     AudioEncoder, VideoEncoder, Muxer
-from flumotion.wizard.wizard import Wizard, WizardStep, WizardSection
+from flumotion.wizard.wizard import Wizard, WizardStep
 
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
@@ -104,8 +104,9 @@ class AudioEncoderStep(WizardStep):
         return None
 
 
-class WelcomeStep(WizardSection):
+class WelcomeStep(WizardStep):
     glade_file = 'wizard_welcome.glade'
+    name = 'Welcome'
     section = 'Welcome'
     icon = 'wizard.png'
     has_worker = False
@@ -119,17 +120,17 @@ class WelcomeStep(WizardSection):
         return None
 
 
-class ProductionStep(WizardSection):
+class ProductionStep(WizardStep):
     glade_file = 'wizard_source.glade'
     name = 'Source'
     section = 'Production'
     icon = 'source.png'
 
     def __init__(self, wizard):
-        WizardSection.__init__(self, wizard)
+        WizardStep.__init__(self, wizard)
         self._audio_producer = None
         self._video_producer = None
-        # FIXME: Why isn't setup() called for WizardSections?
+        # FIXME: Why isn't setup() called for WizardSteps?
         self._setup()
 
     # Public API
@@ -1094,13 +1095,13 @@ class OverlayStep(WizardStep):
         self.entry_text.set_sensitive(button.get_active())
 
 
-class ConversionStep(WizardSection):
+class ConversionStep(WizardStep):
     glade_file = 'wizard_encoding.glade'
     name = 'Encoding'
     section = 'Conversion'
 
     def __init__(self, wizard):
-        WizardSection.__init__(self, wizard)
+        WizardStep.__init__(self, wizard)
         self._muxer = Muxer()
         self._audio_encoder = AudioEncoder()
         self._video_encoder = VideoEncoder()
@@ -1387,7 +1388,7 @@ class SpeexStep(AudioEncoderStep):
         return options
 
 
-class ConsumptionStep(WizardSection):
+class ConsumptionStep(WizardStep):
     name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
@@ -1757,7 +1758,7 @@ class Shout2VideoStep(Shout2Step):
     sidebar_name = 'Icecast video'
 
 
-class LicenseStep(WizardSection):
+class LicenseStep(WizardStep):
     name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
@@ -1778,7 +1779,8 @@ class LicenseStep(WizardSection):
         self.combobox_license.set_sensitive(button.get_active())
 
 
-class SummaryStep(WizardSection):
+class SummaryStep(WizardStep):
+    name = "Summary"
     section = "Summary"
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
