@@ -974,6 +974,37 @@ class TestConfig(testsuite.TestCase):
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
 
+        conf = ConfigXML(
+            """
+            <planet>
+              <flow name="default">
+                <component name="prod" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="prod2" type="test-component-with-feeder"
+                           worker="foo"/>
+                <component name="cons" type="test-component-with-multiple-eater"
+                           worker="foo">
+                  <eater name="default">
+                    <feed alias="one">prod:default</feed>
+                    <feed alias="two">prod2:default</feed>
+                  </eater>
+                </component>
+              </flow>
+            </planet>
+            """)
+        conf.parse()
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('/default/prod'))
+        self.failUnless(entries.has_key('/default/cons'))
+        cons = entries['/default/cons'].getConfigDict()
+        self.failUnless(cons.has_key('eater'))
+        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless(cons['eater']['default'] == [
+            ("prod:default", 'one'), ("prod2:default", 'two')])
+        self.failUnless(cons.has_key('source'))
+        self.failUnless(cons['source'] == [
+            "prod:default", "prod2:default"])
+
     def testParseComponentsWithMultipleSources(self):
         conf = ConfigXML(
             """

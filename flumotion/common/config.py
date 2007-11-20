@@ -452,7 +452,7 @@ class ConfigEntryComponent(log.Loggable):
                                          self.defs.getSockets()),
                   'eater': buildEatersDict(eatersList,
                                            self.defs.getEaters()),
-                  'source': [feedId for eater, feedId in eatersList],
+                  'source': [tup[1] for tup in eatersList],
                   'virtual-feeds': buildVirtualFeeds(virtualFeeds or [],
                                                      self.defs.getFeeders())}
 
@@ -647,19 +647,24 @@ class BaseConfigParser(fxml.Parser):
     def _parseSource(self, node):
         return self._parseFeedId(self.parseTextNode(node))
 
+    def _parseFeed(self, node):
+        alias, = self.parseAttributes(node, (), ('alias',))
+        feedId = self._parseFeedId(self.parseTextNode(node))
+        return feedId, alias
+
     def _parseEater(self, node):
         # <eater name="eater-name">
-        #   <feed>feeding-component:feed-name</feed>*
+        #   <feed alias="foo"?>feeding-component:feed-name</feed>*
         # </eater>
         name, = self.parseAttributes(node, ('name',))
-        feedIds = []
-        parsers = {'feed': (self.parseTextNode, feedIds.append)}
+        feeds = []
+        parsers = {'feed': (self._parseFeed, feeds.append)}
         self.parseFromTable(node, parsers)
-        if len(feedIds) == 0:
+        if len(feeds) == 0:
             # we have an eater node with no feeds
             raise ConfigError(
                 "Eater node %s with no <feed> nodes, is not allowed" % name)
-        return [(name, self._parseFeedId(feedId)) for feedId in feedIds]
+        return [(name, feedId, alias) for feedId, alias in feeds]
 
     def _parseProperty(self, node):
         name, = self.parseAttributes(node, ('name',))

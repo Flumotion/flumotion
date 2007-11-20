@@ -1,3 +1,14 @@
+2007-11-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (ConfigEntryComponent._buildConfig):
+	Cope with 2- or	3-tuples for the eaters list.
+	(BaseConfigParser._parseFeed, BaseConfigParser._parseEater): Parse
+	out an "alias" attribute on <feed>.
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseComponentsWithMultipleSources): Add test for
+	specifying aliases for eaters.
+
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_public_ui_api.py:
