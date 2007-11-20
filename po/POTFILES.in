@@ -5,8 +5,16 @@ flumotion/admin/gtk/message.py
 flumotion/admin/gtk/greeter.py
 flumotion/admin/gtk/parts.py
 
+flumotion/wizard/basesteps.py
+flumotion/wizard/configurationwizard.py
+flumotion/wizard/consumptionsteps.py
+flumotion/wizard/conversionsteps.py
 flumotion/wizard/enums.py
-flumotion/wizard/steps.py
+flumotion/wizard/models.py
+flumotion/wizard/productionsteps.py
+flumotion/wizard/save.py
+flumotion/wizard/sidebar.py
+flumotion/wizard/worker.py
 
 flumotion/common/worker.py
 

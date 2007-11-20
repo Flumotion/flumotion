@@ -1,3 +1,7 @@
+2007-11-20  Johan Dahlin  <johan@gnome.org>
+
+	* po/POTFILES.in: Update
+
 2007-11-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/options.py: Rewrite with some crazy crack so
