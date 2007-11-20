@@ -4,6 +4,7 @@
 	Cope with 2- or	3-tuples for the eaters list.
 	(BaseConfigParser._parseFeed, BaseConfigParser._parseEater): Parse
 	out an "alias" attribute on <feed>.
+	(exportPlanetXml.component): Fix serialization of eaters.
 
 	* flumotion/test/test_config.py
 	(TestConfig.testParseComponentsWithMultipleSources): Add test for

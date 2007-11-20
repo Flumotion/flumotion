@@ -987,9 +987,10 @@ def exportPlanetXml(p):
                              worker=c.get('workerRequested'),
                              project=C['project'],
                              version=common.versionTupleToString(C['version']))]
-                + concat([[[X.eater(name=name, alias=alias), feedId]
-                           for feedId, alias in feeders]
-                          for name, feeders in  C['eater'].items()])
+                + [[X.eater(name=name)]
+                   + [[X.feed(alias=alias), feedId]
+                      for feedId, alias in feeders]
+                   for name, feeders in  C['eater'].items()]
                 + [[X.property(name=name), value]
                    for name, value in C['properties'].items()]
                 + [[X.clock_master(),
