@@ -31,19 +31,19 @@ except RuntimeError:
     import os
     os._exit(0)
 
-from flumotion.common import enum
-from flumotion.wizard import enums, wizard
 from flumotion.admin import admin
-from flumotion.wizard.steps import FirstTimeWizard
+from flumotion.common import enum
+from flumotion.wizard import enums
+from flumotion.wizard.steps import FirstTimeWizard, WizardStep
 
 class WizardStepTest(testsuite.TestCase):
     def setUpClass(self):
         wiz = FirstTimeWizard()
-        self.steps = wiz.scenario.steps
+        self.steps = wiz._steps
 
     def testLoadSteps(self):
         for s in self.steps:
-            self.assert_(isinstance(s, wizard.WizardStep))
+            self.assert_(isinstance(s, WizardStep))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'glade_file'))
