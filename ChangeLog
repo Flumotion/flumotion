@@ -1,3 +1,12 @@
+2007-11-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/options.py: Rewrite with some crazy crack so
+	that we don't import gobject unless boot.py tells us that we
+	should.
+
+	* flumotion/common/boot.py (boot, init_option_parser): Detect at
+	boot-time whether or not we should use gobject.option.
+
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): fix typo

@@ -117,6 +117,25 @@ def init_gst():
 
     return gst_majorminor
 
+USE_GOPTION_PARSER = False
+def init_option_parser(gtk, gst):
+    # We should only use the GOption parser if we are already going to
+    # import gobject, and if we can find a recent enough version of
+    # pygobject on our system. There were bugs in the GOption parsing
+    # until pygobject 2.15.0, so just revert to optparse if our
+    # pygobject is too old.
+    global USE_GOPTION_PARSER
+    if not gtk and not gst:
+        USE_GOPTION_PARSER = False
+    else:
+        import gobject
+        if getattr(gobject, 'pygobject_version', ()) >= (2, 15, 0):
+            USE_GOPTION_PARSER = True
+        else:
+            USE_GOPTION_PARSER = False
+
+USE_GTK = False
+USE_GST = True
 def boot(path, gtk=False, gst=True, installReactor=True):
     # python 2.5 and twisted < 2.5 don't work together
     pythonMM = sys.version_info[0:2]
@@ -134,6 +153,11 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     if gst:
         from flumotion.configure import configure
         configure.gst_version = init_gst()
+
+    global USE_GTK, USE_GST
+    USE_GTK=gtk
+    USE_GST=gst
+    init_option_parser(gtk, gst)
 
     # installing the reactor could override our packager's import hooks ...
     if installReactor:
