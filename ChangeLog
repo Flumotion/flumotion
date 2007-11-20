@@ -1,3 +1,10 @@
+2007-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/redhat/flumotion:
+	* flumotion/service/main.py:
+	* flumotion/service/service.py:
+	  Forward-port of platform-3 [5820]
+
 2007-11-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py

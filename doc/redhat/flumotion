@@ -63,6 +63,13 @@ start() {
 startone() {
 	type=$1
 	name=$2
+
+	if test "x$name" == "x"
+	then
+		echo $"Please specify a $type name"
+		exit 1
+	fi
+
 	echo -n $"Starting $type $name: "
 	daemon --user flumotion $prog -d 3 -l $logfile start $type $name
 	RETVAL=$?
@@ -93,6 +100,12 @@ stopone() {
 	type=$1
 	name=$2
 
+	if test "x$name" == "x"
+	then
+		echo $"Please specify a $type name"
+		exit 1
+	fi
+
 	touch_logfile
 
 	RETVAL=0
@@ -103,6 +116,26 @@ stopone() {
 	echo
 	[ $RETVAL = 0 ] && update_lockfile
 
+	return $RETVAL
+}
+
+condrestart() {
+	RETVAL=0
+	if test "x$*" != "x"
+	then
+		stopone $* || RETVAL=1
+		startone $* || RETVAL=1
+		return $RETVAL
+	fi
+
+	$prog status | cut -f1,2 -d' ' | while read type name
+	do
+		if test -e ${rundir}/$type.$name.pid
+		then
+		    stopone $type $name || RETVAL=1
+		    startone $type $name || RETVAL=1
+		fi
+	done
 	return $RETVAL
 }
 
@@ -119,6 +152,12 @@ status() {
 statusone() {
 	type=$1
 	name=$2
+
+	if test "x$name" == "x"
+	then
+		echo $"Please specify a $type name"
+		exit 1
+	fi
 
 	touch_logfile
 
@@ -147,10 +186,16 @@ case "$1" in
 	shift
 	stop $*
 	;;
+# FIXME: now that we have condrestart, maybe restart should also handle
+# stop/start per process, instead of global stop and global start ?
   restart)
 	shift
 	stop $*
 	start $*
+	;;
+  condrestart)
+	shift
+	condrestart $*
 	;;
   status)
 	shift

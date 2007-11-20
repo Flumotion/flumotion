@@ -140,10 +140,8 @@ class Servicer(log.Loggable):
         Start processes as given in the args.
 
         If nothing specified, start all managers and workers.
-        If first argument is "manager", start given manager,
-        or all if none specified.
-        If first argument is "worker", start given worker,
-        or all if none specified.
+        If first argument is "manager", start given manager.
+        If first argument is "worker", start given worker.
 
         @returns: an exit value reflecting the number of processes that failed
                   to start
@@ -167,10 +165,8 @@ class Servicer(log.Loggable):
         Stop processes as given in the args.
 
         If nothing specified, stop all managers and workers.
-        If first argument is "manager", stop given manager,
-        or all if none specified.
-        If first argument is "worker", stop given worker,
-        or all if none specified.
+        If first argument is "manager", stop given manager.
+        If first argument is "worker", stop given worker.
 
         @returns: an exit value reflecting the number of processes that failed
                   to stop
@@ -225,6 +221,46 @@ class Servicer(log.Loggable):
                         pid, kind, name))
                     print "deleting stale pid file for %s %s" % (kind, name)
                     common.deletePidFile(kind, name)
+
+    def condrestart(self, args):
+        """
+        Restart running processes as given in the args.
+
+        If nothing specified, condrestart all managers and workers.
+        If first argument is "manager", condrestart given manager.
+        If first argument is "worker", condrestart given worker.
+
+        @returns: an exit value reflecting the number of processes that failed
+                  to start
+        """
+        (managers, workers) = self._parseManagersWorkers('condrestart', args)
+        self.debug("condrestart managers %r and workers %r" % (
+            managers, workers))
+        managersDict = self.getManagers()
+        exitvalue = 0
+
+        for kind, names in [('manager', managers), ('worker', workers)]:
+            for name in names:
+                pid = common.getPid(kind, name)
+                if not pid:
+                    continue
+                if common.checkPidRunning(pid):
+                    if kind == 'manager':
+                        if not self.stopManager(name):
+                            exitvalue += 1
+                            continue
+                        if not self.startManager(name, managersDict[name]):
+                            exitvalue += 1
+                    elif kind == 'worker':
+                        if not self.stopWorker(name):
+                            exitvalue += 1
+                            continue
+                        if not self.startWorker(name):
+                            exitvalue += 1
+                else:
+                    print "%s %s dead (stale pid %d)" % (kind, name, pid)
+
+        return exitvalue
 
     def create(self, args):
         # TODO: Andy suggested we should be able to customize the
