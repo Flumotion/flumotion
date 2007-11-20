@@ -1,5 +1,8 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/Makefile.am (flumotion_PYTHON): Add 
+	configurationwizard.py here
+
 	* po/POTFILES.in: Update
 
 2007-11-20  Andy Wingo  <wingo@pobox.com>
