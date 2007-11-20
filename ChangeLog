@@ -1,3 +1,15 @@
+2007-11-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py
+	(Vishnu.loadManagerConfigurationXML): 
+	* flumotion/common/registry.py (RegistryParser.parseRegistryFile)
+	(RegistryParser.parseRegistry): 
+	* flumotion/common/config.py (FlumotionConfigXML.parse)
+	(ManagerConfigParser._parseManagerWithoutRegistry)
+	(ManagerConfigParser._parseManagerWithRegistry)
+	(ManagerConfigParser.unlink, AdminConfigParser._parse): Unlink DOM
+	objects, and try not to hold onto them. Frees up some memory.
+
 2007-11-20  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/combiners/composite/composite.py:

@@ -688,6 +688,7 @@ class RegistryParser(fxml.Parser):
 
         # shouldn't have <directories> elements in registry fragments
         self._parseRoot(node, disallowed=['directories'])
+        root.unlink()
 
     def _parseBundles(self, node):
         # <bundles>
@@ -787,6 +788,7 @@ class RegistryParser(fxml.Parser):
         self.filename = getattr(file, 'name', '<string>')
         root = self.getRoot(file)
         self._parseRoot(root.documentElement)
+        root.unlink()
 
     def getDirectories(self):
         return self._directories.values()

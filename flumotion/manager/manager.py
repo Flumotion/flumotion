@@ -599,6 +599,7 @@ class Vishnu(log.Loggable):
         conf.parseBouncerAndPlugs()
         self._loadManagerPlugs(conf)
         self._loadManagerBouncer(conf)
+        conf.unlink()
 
     __pychecker__ = 'maxargs=11' # hahaha
     def loadComponent(self, identity, componentType, componentId,

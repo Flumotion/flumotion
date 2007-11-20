@@ -725,7 +725,9 @@ class FlumotionConfigXML(BaseConfigParser):
                             self.flows.append),
                    'manager': (_ignore, _ignore)}
         self.parseFromTable(root, parsers)
-
+        self.doc.unlink()
+        self.doc = None
+        
     def _parseAtmosphere(self, node):
         # <atmosphere>
         #   <component>
@@ -912,7 +914,6 @@ class ManagerConfigParser(BaseConfigParser):
                    'plugs': (parseplugs, gotplugs),
                    'debug': (_ignore, _ignore)}
         self.parseFromTable(node, parsers)
-        return None
 
     def parseBouncerAndPlugs(self):
         # <planet>
@@ -928,6 +929,10 @@ class ManagerConfigParser(BaseConfigParser):
                    'flow': (_ignore, _ignore),
                    'manager': (self._parseManagerWithRegistry, _ignore)}
         self.parseFromTable(root, parsers)
+
+    def unlink(self):
+        self.doc.unlink()
+        self.doc = None
 
 class AdminConfigParser(BaseConfigParser):
     """
@@ -964,6 +969,8 @@ class AdminConfigParser(BaseConfigParser):
         parsers = {'plugs': (parseplugs, addplugs)}
 
         self.parseFromTable(root, parsers)
+        self.doc.unlink()
+        self.doc = None
 
     def add(self, file):
         """
