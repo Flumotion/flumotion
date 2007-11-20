@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 
-import gobject
 import gtk
 from zope.interface import implements
 

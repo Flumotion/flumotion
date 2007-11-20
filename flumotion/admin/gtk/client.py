@@ -375,8 +375,6 @@ class Window(log.Loggable, gobject.GObject):
         if self._wizard:
             self._wizard.present()
 
-        from flumotion.wizard import steps
-
         def _wizard_finished_cb(wizard, configuration):
             wizard.destroy()
             self._dump_config(configuration)
@@ -392,7 +390,8 @@ class Window(log.Loggable, gobject.GObject):
                 _('The wizard cannot be run because no workers are logged in.'))
             return
 
-        wizard = steps.FirstTimeWizard(self._window, self._admin)
+        from flumotion.wizard.configurationwizard import ConfigurationWizard
+        wizard = ConfigurationWizard(self._window, self._admin)
         wizard.connect('finished', _wizard_finished_cb)
         wizard.run(True, state, False)
 

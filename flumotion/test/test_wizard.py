@@ -33,12 +33,13 @@ except RuntimeError:
 
 from flumotion.admin import admin
 from flumotion.common import enum
+from flumotion.ui.wizard import WizardStep
 from flumotion.wizard import enums
-from flumotion.wizard.steps import FirstTimeWizard, WizardStep
+from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 class WizardStepTest(testsuite.TestCase):
     def setUpClass(self):
-        wiz = FirstTimeWizard()
+        wiz = ConfigurationWizard()
         self.steps = wiz._steps
 
     def testLoadSteps(self):
@@ -106,7 +107,7 @@ class TestAdmin(admin.AdminModel):
 
 class WizardSaveTest(testsuite.TestCase):
     def setUp(self):
-        self.wizard = FirstTimeWizard()
+        self.wizard = ConfigurationWizard()
         self.wizard.admin = TestAdmin('user', 'test')
         s = worker.ManagerWorkerHeavenState()
         s.set('names', ['localhost'])

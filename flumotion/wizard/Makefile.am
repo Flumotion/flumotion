@@ -4,11 +4,14 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/wizard
 
 flumotion_PYTHON = \
 	__init__.py \
+	basesteps.py \
+	consumptionsteps.py \
+	conversionsteps.py \
 	enums.py \
 	models.py \
+	productionnsteps.py \
 	save.py \
 	sidebar.py \
-	steps.py \
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)
