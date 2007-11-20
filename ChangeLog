@@ -1,5 +1,12 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py: 
+	* flumotion/wizard/consumptionsteps.py: 
+	Make it work on pre python 2.5 by importing
+	our sorted/any re-implementations.
+
+2007-11-20  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/test/test_public_ui_api.py:
 	* flumotion/test/test_wizard.py:

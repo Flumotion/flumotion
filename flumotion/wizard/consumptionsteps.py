@@ -20,9 +20,9 @@
 # Headers in this file shall remain intact.
 
 from flumotion.configure import configure
+from flumotion.common.python import any
 from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.enums import RotateSize, RotateTime
-
 
 class ConsumptionStep(WorkerWizardStep):
     name = 'Consumption'
