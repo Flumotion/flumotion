@@ -21,22 +21,27 @@
 
 import gettext
 import math
+import sets
 
 import gtk
+from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_, ngettext
+from flumotion.common.pygobject import gsignal
 from flumotion.common.python import sorted, any
 from flumotion.configure import configure
+from flumotion.wizard import save
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, LicenseType, RotateSize, \
      RotateTime, SoundcardBitdepth, SoundcardChannels, SoundcardSystem, \
      SoundcardAlsaDevice, SoundcardOSSDevice, SoundcardSamplerate, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer, \
-    AudioEncoder, VideoEncoder, Muxer
+    AudioEncoder, VideoEncoder, Muxer, Flow
 from flumotion.wizard.wizard import Wizard, WizardStep
+from flumotion.wizard.worker import WorkerList
 
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
@@ -56,19 +61,35 @@ def _fraction_from_float(number, denominator):
     return "%d/%d" % (number * denominator, denominator)
 
 
-class AudioSourceStep(WizardStep):
+class WorkerWizardStep(WizardStep):
+    # optional
+    has_worker = True
+
+    def __init__(self, wizard):
+        WizardStep.__init__(self, wizard)
+        self.worker = None
+
+    def worker_changed(self):
+        pass
+
+    def run_in_worker(self, module, function, *args, **kwargs):
+        return self.wizard.run_in_worker(self.worker, module, function,
+                                         *args, **kwargs)
+
+
+class AudioSourceStep(WorkerWizardStep):
     def __init__(self, wizard, model):
         self.model = model
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
 
 
-class VideoSourceStep(WizardStep):
+class VideoSourceStep(WorkerWizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
 
     def __init__(self, wizard, model):
         self.model = model
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
 
     # WizardStep
 
@@ -76,27 +97,27 @@ class VideoSourceStep(WizardStep):
         return OverlayStep(self.wizard, self.model)
 
     def get_state(self):
-        options = WizardStep.get_state(self)
+        options = WorkerWizardStep.get_state(self)
         options['width'] = int(options['width'])
         options['height'] = int(options['height'])
         return options
 
 
-class VideoEncoderStep(WizardStep):
+class VideoEncoderStep(WorkerWizardStep):
     section = 'Conversion'
 
     def __init__(self, wizard, model):
         self.model = model
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
 
 
-class AudioEncoderStep(WizardStep):
+class AudioEncoderStep(WorkerWizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
 
     def __init__(self, wizard, model):
         self.model = model
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
 
     # WizardStep
 
@@ -104,7 +125,7 @@ class AudioEncoderStep(WizardStep):
         return None
 
 
-class WelcomeStep(WizardStep):
+class WelcomeStep(WorkerWizardStep):
     glade_file = 'wizard_welcome.glade'
     name = 'Welcome'
     section = 'Welcome'
@@ -120,17 +141,17 @@ class WelcomeStep(WizardStep):
         return None
 
 
-class ProductionStep(WizardStep):
+class ProductionStep(WorkerWizardStep):
     glade_file = 'wizard_source.glade'
     name = 'Source'
     section = 'Production'
     icon = 'source.png'
 
     def __init__(self, wizard):
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
         self._audio_producer = None
         self._video_producer = None
-        # FIXME: Why isn't setup() called for WizardSteps?
+        # FIXME: Why isn't setup() called for WorkerWizardSteps?
         self._setup()
 
     # Public API
@@ -1007,7 +1028,7 @@ class FireWireAudioStep(AudioSourceStep):
         self._update_output_format()
 
 
-class OverlayStep(WizardStep):
+class OverlayStep(WorkerWizardStep):
     name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
@@ -1015,7 +1036,7 @@ class OverlayStep(WizardStep):
     icon = 'overlay.png'
 
     def __init__(self, wizard, video_producer):
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
         self._video_producer = video_producer
         self._can_overlay = True
 
@@ -1025,7 +1046,7 @@ class OverlayStep(WizardStep):
         self._worker_changed_010()
 
     def get_state(self):
-        options = WizardStep.get_state(self)
+        options = WorkerWizardStep.get_state(self)
         if self.checkbutton_show_logo.get_active():
             options['show-logo'] = True
 
@@ -1095,13 +1116,13 @@ class OverlayStep(WizardStep):
         self.entry_text.set_sensitive(button.get_active())
 
 
-class ConversionStep(WizardStep):
+class ConversionStep(WorkerWizardStep):
     glade_file = 'wizard_encoding.glade'
     name = 'Encoding'
     section = 'Conversion'
 
     def __init__(self, wizard):
-        WizardStep.__init__(self, wizard)
+        WorkerWizardStep.__init__(self, wizard)
         self._muxer = Muxer()
         self._audio_encoder = AudioEncoder()
         self._video_encoder = VideoEncoder()
@@ -1388,7 +1409,7 @@ class SpeexStep(AudioEncoderStep):
         return options
 
 
-class ConsumptionStep(WizardStep):
+class ConsumptionStep(WorkerWizardStep):
     name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
@@ -1553,7 +1574,7 @@ class ConsumptionStep(WizardStep):
 
 
 # XXX: If audio codec is speex, disable java applet option
-class HTTPStep(WizardStep):
+class HTTPStep(WorkerWizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
     component_type = 'http-streamer'
@@ -1575,7 +1596,7 @@ class HTTPStep(WizardStep):
         d.addCallback(got_missing)
 
     def get_state(self):
-        options = WizardStep.get_state(self)
+        options = WorkerWizardStep.get_state(self)
 
         options['bandwidth-limit'] = int(options['bandwidth-limit'] * 1e6)
         options['client-limit'] = int(options['client-limit'])
@@ -1632,7 +1653,7 @@ class HTTPVideoStep(HTTPStep):
     port = configure.defaultStreamPortRange[2]
 
 
-class DiskStep(WizardStep):
+class DiskStep(WorkerWizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
     icon = 'kcmdevices.png'
@@ -1718,7 +1739,7 @@ class DiskVideoStep(DiskStep):
     sidebar_name = 'Disk video'
 
 
-class Shout2Step(WizardStep):
+class Shout2Step(WorkerWizardStep):
     glade_file = 'wizard_shout2.glade'
     section = 'Consumption'
     component_type = 'shout2'
@@ -1732,7 +1753,7 @@ class Shout2Step(WizardStep):
         return self.wizard.get_step('Consumption').get_next(self)
 
     def get_state(self):
-        options = WizardStep.get_state(self)
+        options = WorkerWizardStep.get_state(self)
 
         options['port'] = int(options['port'])
 
@@ -1758,7 +1779,7 @@ class Shout2VideoStep(Shout2Step):
     sidebar_name = 'Icecast video'
 
 
-class LicenseStep(WizardStep):
+class LicenseStep(WorkerWizardStep):
     name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
@@ -1779,7 +1800,7 @@ class LicenseStep(WizardStep):
         self.combobox_license.set_sensitive(button.get_active())
 
 
-class SummaryStep(WizardStep):
+class SummaryStep(WorkerWizardStep):
     name = "Summary"
     section = "Summary"
     glade_file = "wizard_summary.glade"
@@ -1799,6 +1820,8 @@ class SummaryStep(WizardStep):
 
 
 class FirstTimeWizard(Wizard):
+    gsignal('finished', str)
+
     sections = [
         WelcomeStep,
         ProductionStep,
@@ -1807,5 +1830,272 @@ class FirstTimeWizard(Wizard):
         LicenseStep,
         SummaryStep]
 
+    def __init__(self, parent, admin):
+        Wizard.__init__(self, parent)
+        self._admin = admin
+        self._save = save.WizardSaver(self)
+        self._workerHeavenState = None
+        self._last_worker = 0 # combo id last worker from step to step
+
+        self.flow = Flow("default")
+
+        self.worker_list = WorkerList()
+        self.top_vbox.pack_start(self.worker_list, False, False)
+        self.worker_list.connect('worker-selected',
+                                 self.on_combobox_worker_changed)
+
+    # Wizard
+
     def get_first_step(self):
         return WelcomeStep(self)
+
+    def completed(self):
+        configuration = self._save.getXML()
+        self.emit('finished', configuration)
+
+    def destroy(self):
+        Wizard.destroy(self)
+        del self._admin
+        del self._save
+
+    def run(self, interactive, workerHeavenState, main=True):
+        self._workerHeavenState = workerHeavenState
+        self.worker_list.set_worker_heaven_state(workerHeavenState)
+
+        Wizard.run(self, interactive, main)
+
+    def before_show_step(self, step):
+        if step.has_worker:
+            self.worker_list.show()
+            self.worker_list.notify_selected()
+        else:
+            self.worker_list.hide()
+
+        self._setup_worker(step, self.worker_list.get_worker())
+
+    def show_next_step(self, step):
+        self._setup_worker(step, self.worker_list.get_worker())
+        Wizard.show_next_step(self, step)
+
+    # Public API
+
+    def run_in_worker(self, module, function, *args, **kwargs):
+        return self.wizard.run_in_worker(self.worker, module, function,
+                                         *args, **kwargs)
+
+    def check_elements(self, workerName, *elementNames):
+        """
+        Check if the given list of GStreamer elements exist on the given worker.
+
+        @param workerName: name of the worker to check on
+        @param elementNames: names of the elements to check
+
+        @returns: a deferred returning a tuple of the missing elements
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+
+        asked = sets.Set(elementNames)
+        def _checkElementsCallback(existing, workerName):
+            existing = sets.Set(existing)
+            self.block_next(False)
+            return tuple(asked.difference(existing))
+
+        self.block_next(True)
+        d = self._admin.checkElements(workerName, elementNames)
+        d.addCallback(_checkElementsCallback, workerName)
+        return d
+
+    def require_elements(self, workerName, *elementNames):
+        """
+        Require that the given list of GStreamer elements exists on the
+        given worker. If the elements do not exist, an error message is
+        posted and the next button remains blocked.
+
+        @param workerName: name of the worker to check on
+        @param elementNames: names of the elements to check
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+
+        self.debug('requiring elements %r' % (elementNames,))
+        def got_missing_elements(elements, workerName):
+            if elements:
+                self.warning('elements %r do not exist' % (elements,))
+                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
+                    "Worker '%s' is missing GStreamer elements '%s'.",
+                    len(elements))
+                message = messages.Error(T_(f, workerName,
+                    "', '".join(elements)))
+                message.add(T_(N_("\n"
+                    "Please install the necessary GStreamer plug-ins that "
+                    "provide these elements and restart the worker.")))
+                message.add(T_(N_("\n\n"
+                    "You will not be able to go forward using this worker.")))
+                self.block_next(True)
+                message.id = 'element' + '-'.join(elementNames)
+                self.add_msg(message)
+            return elements
+
+        d = self.check_elements(workerName, *elementNames)
+        d.addCallback(got_missing_elements, workerName)
+
+        return d
+
+    def check_import(self, workerName, moduleName):
+        """
+        Check if the given module can be imported.
+
+        @param workerName:  name of the worker to check on
+        @param moduleName:  name of the module to import
+
+        @returns: a deferred returning None or Failure.
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+
+        d = self._admin.checkImport(workerName, moduleName)
+        return d
+
+
+    def require_import(self, workerName, moduleName, projectName=None,
+                       projectURL=None):
+        """
+        Require that the given module can be imported on the given worker.
+        If the module cannot be imported, an error message is
+        posted and the next button remains blocked.
+
+        @param workerName:  name of the worker to check on
+        @param moduleName:  name of the module to import
+        @param projectName: name of the module to import
+        @param projectURL:  URL of the project
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+
+        self.debug('requiring module %s' % moduleName)
+        def _checkImportErrback(failure):
+            self.warning('could not import %s', moduleName)
+            message = messages.Error(T_(N_(
+                "Worker '%s' cannot import module '%s'."),
+                workerName, moduleName))
+            if projectName:
+                message.add(T_(N_("\n"
+                    "This module is part of '%s'."), projectName))
+            if projectURL:
+                message.add(T_(N_("\n"
+                    "The project's homepage is %s"), projectURL))
+            message.add(T_(N_("\n\n"
+                "You will not be able to go forward using this worker.")))
+            self.block_next(True)
+            message.id = 'module-%s' % moduleName
+            self.add_msg(message)
+
+        d = self.check_import(workerName, moduleName)
+        d.addErrback(_checkImportErrback)
+        return d
+
+    # FIXME: maybe add id here for return messages ?
+    def run_in_worker(self, worker, module, function, *args, **kwargs):
+        """
+        Run the given function and arguments on the selected worker.
+
+        @param worker:
+        @param module:
+        @param function:
+        @returns: L{twisted.internet.defer.Deferred}
+        """
+        self.debug('run_in_worker(module=%r, function=%r)' % (module, function))
+        admin = self._admin
+        if not admin:
+            self.warning('skipping run_in_worker, no admin')
+            return defer.fail(errors.FlumotionError('no admin'))
+
+        if not worker:
+            self.warning('skipping run_in_worker, no worker')
+            return defer.fail(errors.FlumotionError('no worker'))
+
+        d = admin.workerRun(worker, module, function, *args, **kwargs)
+
+        def callback(result):
+            self.debug('run_in_worker callbacked a result')
+            self.clear_msg(function)
+
+            if not isinstance(result, messages.Result):
+                msg = messages.Error(T_(
+                    N_("Internal error: could not run check code on worker.")),
+                    debug=('function %r returned a non-Result %r'
+                           % (function, result)))
+                self.add_msg(msg)
+                raise errors.RemoteRunError(function, 'Internal error.')
+
+            for m in result.messages:
+                self.debug('showing msg %r' % m)
+                self.add_msg(m)
+
+            if result.failed:
+                self.debug('... that failed')
+                raise errors.RemoteRunFailure(function, 'Result failed')
+            self.debug('... that succeeded')
+            return result.value
+
+        def errback(failure):
+            self.debug('run_in_worker errbacked, showing error msg')
+            if failure.check(errors.RemoteRunError):
+                debug = failure.value
+            else:
+                debug = "Failure while running %s.%s:\n%s" % (
+                    module, function, failure.getTraceback())
+
+            msg = messages.Error(T_(
+                N_("Internal error: could not run check code on worker.")),
+                debug=debug)
+            self.add_msg(msg)
+            raise errors.RemoteRunError(function, 'Internal error.')
+
+        d.addErrback(errback)
+        d.addCallback(callback)
+        return d
+
+    # Private
+
+    def _setup_worker(self, step, worker):
+        # get name of active worker
+        self.debug('%r setting worker to %s' % (step, worker))
+        step.worker = worker
+
+    def _set_worker_from_step(self, step):
+        if not hasattr(step, 'worker'):
+            return
+
+        model = self.combobox_worker.get_model()
+        current_text = step.worker
+        for row in model:
+            text = model.get(row.iter, 0)[0]
+            if current_text == text:
+                self.combobox_worker.set_active_iter(row.iter)
+                break
+
+    # Callbacks
+
+    def on_combobox_worker_changed(self, combobox, worker):
+        self.debug('combobox_worker_changed, worker %r' % worker)
+        if worker:
+            self.clear_msg('worker-error')
+            self._last_worker = worker
+            if self._current_step:
+                self._setup_worker(self._current_step, worker)
+                self.debug('calling %r.worker_changed' % self._current_step)
+                self._current_step.worker_changed()
+        else:
+            msg = messages.Error(T_(
+                    N_('All workers have logged out.\n'
+                    'Make sure your Flumotion network is running '
+                    'properly and try again.')),
+                id='worker-error')
+            self.add_msg(msg)
+

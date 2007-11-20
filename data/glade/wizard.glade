@@ -151,25 +151,10 @@
 			  </child>
 
 			  <child>
-			    <widget class="GtkVBox" id="vbox3">
+			    <widget class="GtkVBox" id="top_vbox">
 			      <property name="visible">True</property>
 			      <property name="homogeneous">False</property>
 			      <property name="spacing">0</property>
-
-			      <child>
-				<widget class="Custom" id="worker_list">
-				  <property name="visible">True</property>
-				  <property name="creation_function">flumotion.wizard.worker.WorkerList()</property>
-				  <property name="int1">0</property>
-				  <property name="int2">0</property>
-				  <property name="last_modification_time">Wed, 08 Jun 2005 16:04:58 GMT</property>
-				</widget>
-				<packing>
-				  <property name="padding">0</property>
-				  <property name="expand">False</property>
-				  <property name="fill">False</property>
-				</packing>
-			      </child>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>

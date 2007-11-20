@@ -21,19 +21,15 @@
 
 
 import os
-import sets
 
 import gtk
 import gtk.gdk
 import gtk.glade
-from twisted.internet import defer
 
 from flumotion.configure import configure
-from flumotion.common import errors, log, pygobject, messages
+from flumotion.common import log, pygobject, messages
 from flumotion.common.pygobject import gsignal
-from flumotion.common.messages import N_, ngettext
-from flumotion.wizard import save, classes
-from flumotion.wizard.models import Flow
+from flumotion.wizard import classes
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -57,7 +53,6 @@ class WizardStep(GladeWidget, log.Loggable):
 
     # optional
     sidebar_name = None
-    has_worker = True
 
     def __init__(self, wizard):
         """
@@ -65,7 +60,6 @@ class WizardStep(GladeWidget, log.Loggable):
         @type  wizard: L{Wizard}
         """
         self.visited = False
-        self.worker = None
         self.wizard = wizard
 
         GladeWidget.__init__(self)
@@ -88,10 +82,6 @@ class WizardStep(GladeWidget, log.Loggable):
                         yield cc
             yield w
         return iterator(self)
-
-    def run_in_worker(self, module, function, *args, **kwargs):
-        return self.wizard.run_in_worker(self.worker, module, function,
-                                         *args, **kwargs)
 
     # Required vmethods
 
@@ -118,9 +108,6 @@ class WizardStep(GladeWidget, log.Loggable):
         """This is called just before we show the widget, everything
         is created and in place"""
 
-    def worker_changed(self):
-        pass
-
     def get_state(self):
         return self._get_widget_states()
 
@@ -143,7 +130,6 @@ class WizardStep(GladeWidget, log.Loggable):
 
 
 class Wizard(GladeWindow, log.Loggable):
-    gsignal('finished', str)
     gsignal('destroy')
 
     logCategory = 'wizard'
@@ -154,7 +140,7 @@ class Wizard(GladeWindow, log.Loggable):
 
     sections = None
 
-    def __init__(self, parent_window=None, admin=None):
+    def __init__(self, parent_window=None):
         if self.sections is None:
             raise TypeError("%r needs to have a class attribute called %r" % (
                     self, 'sections'))
@@ -163,10 +149,7 @@ class Wizard(GladeWindow, log.Loggable):
         self._current_section = 0
         self._stack = classes.WalkableStack()
         self._current_step = None
-        self._admin = admin
         self._use_main = True
-        self._workerHeavenState = None
-        self._last_worker = 0 # combo id last worker from step to step
 
         GladeWindow.__init__(self, parent_window)
         for k, v in self.widgets.items():
@@ -175,19 +158,22 @@ class Wizard(GladeWindow, log.Loggable):
                                                     'fluendo.png'))
         self.window.connect_after('realize', self.on_window_realize)
         self.window.connect('destroy', self.on_window_destroy)
-        self.worker_list.connect('worker-selected',
-                                 self.on_combobox_worker_changed)
 
         self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
-
-        self.flow = Flow("default")
-        self._save = save.WizardSaver(self)
 
         self._current_step = self.get_first_step()
 
     def __len__(self):
         return len(self._steps)
+
+
+    # Override this in subclass
+    def get_first_step(self):
+        raise NotImplementedError
+
+    def completed(self):
+        pass
 
     # Public API
 
@@ -211,11 +197,6 @@ class Wizard(GladeWindow, log.Loggable):
         step = self.get_step(stepname)
         return step.get_state()
 
-    def destroy(self):
-        GladeWindow.destroy(self)
-        del self._admin
-        del self._save
-
     def hide(self):
         self.window.hide()
 
@@ -232,189 +213,8 @@ class Wizard(GladeWindow, log.Loggable):
             self.button_next.hide()
             self.button_next.show()
 
-    def check_elements(self, workerName, *elementNames):
-        """
-        Check if the given list of GStreamer elements exist on the given worker.
-
-        @param workerName: name of the worker to check on
-        @param elementNames: names of the elements to check
-
-        @returns: a deferred returning a tuple of the missing elements
-        """
-        if not self._admin:
-            self.debug('No admin connected, not checking presence of elements')
-            return
-
-        asked = sets.Set(elementNames)
-        def _checkElementsCallback(existing, workerName):
-            existing = sets.Set(existing)
-            self.block_next(False)
-            return tuple(asked.difference(existing))
-
-        self.block_next(True)
-        d = self._admin.checkElements(workerName, elementNames)
-        d.addCallback(_checkElementsCallback, workerName)
-        return d
-
-    def require_elements(self, workerName, *elementNames):
-        """
-        Require that the given list of GStreamer elements exists on the
-        given worker. If the elements do not exist, an error message is
-        posted and the next button remains blocked.
-
-        @param workerName: name of the worker to check on
-        @param elementNames: names of the elements to check
-        """
-        if not self._admin:
-            self.debug('No admin connected, not checking presence of elements')
-            return
-
-        self.debug('requiring elements %r' % (elementNames,))
-        def got_missing_elements(elements, workerName):
-            if elements:
-                self.warning('elements %r do not exist' % (elements,))
-                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
-                    "Worker '%s' is missing GStreamer elements '%s'.",
-                    len(elements))
-                message = messages.Error(T_(f, workerName,
-                    "', '".join(elements)))
-                message.add(T_(N_("\n"
-                    "Please install the necessary GStreamer plug-ins that "
-                    "provide these elements and restart the worker.")))
-                message.add(T_(N_("\n\n"
-                    "You will not be able to go forward using this worker.")))
-                self.block_next(True)
-                message.id = 'element' + '-'.join(elementNames)
-                self.add_msg(message)
-            return elements
-
-        d = self.check_elements(workerName, *elementNames)
-        d.addCallback(got_missing_elements, workerName)
-
-        return d
-
-    def check_import(self, workerName, moduleName):
-        """
-        Check if the given module can be imported.
-
-        @param workerName:  name of the worker to check on
-        @param moduleName:  name of the module to import
-
-        @returns: a deferred returning None or Failure.
-        """
-        if not self._admin:
-            self.debug('No admin connected, not checking presence of elements')
-            return
-
-        d = self._admin.checkImport(workerName, moduleName)
-        return d
-
-
-    def require_import(self, workerName, moduleName, projectName=None,
-                       projectURL=None):
-        """
-        Require that the given module can be imported on the given worker.
-        If the module cannot be imported, an error message is
-        posted and the next button remains blocked.
-
-        @param workerName:  name of the worker to check on
-        @param moduleName:  name of the module to import
-        @param projectName: name of the module to import
-        @param projectURL:  URL of the project
-        """
-        if not self._admin:
-            self.debug('No admin connected, not checking presence of elements')
-            return
-
-        self.debug('requiring module %s' % moduleName)
-        def _checkImportErrback(failure):
-            self.warning('could not import %s', moduleName)
-            message = messages.Error(T_(N_(
-                "Worker '%s' cannot import module '%s'."),
-                workerName, moduleName))
-            if projectName:
-                message.add(T_(N_("\n"
-                    "This module is part of '%s'."), projectName))
-            if projectURL:
-                message.add(T_(N_("\n"
-                    "The project's homepage is %s"), projectURL))
-            message.add(T_(N_("\n\n"
-                "You will not be able to go forward using this worker.")))
-            self.block_next(True)
-            message.id = 'module-%s' % moduleName
-            self.add_msg(message)
-
-        d = self.check_import(workerName, moduleName)
-        d.addErrback(_checkImportErrback)
-        return d
-
-    # FIXME: maybe add id here for return messages ?
-    def run_in_worker(self, worker, module, function, *args, **kwargs):
-        """
-        Run the given function and arguments on the selected worker.
-
-        @param worker:
-        @param module:
-        @param function:
-        @returns: L{twisted.internet.defer.Deferred}
-        """
-        self.debug('run_in_worker(module=%r, function=%r)' % (module, function))
-        admin = self._admin
-        if not admin:
-            self.warning('skipping run_in_worker, no admin')
-            return defer.fail(errors.FlumotionError('no admin'))
-
-        if not worker:
-            self.warning('skipping run_in_worker, no worker')
-            return defer.fail(errors.FlumotionError('no worker'))
-
-        d = admin.workerRun(worker, module, function, *args, **kwargs)
-
-        def callback(result):
-            self.debug('run_in_worker callbacked a result')
-            self.clear_msg(function)
-
-            if not isinstance(result, messages.Result):
-                msg = messages.Error(T_(
-                    N_("Internal error: could not run check code on worker.")),
-                    debug=('function %r returned a non-Result %r'
-                           % (function, result)))
-                self.add_msg(msg)
-                raise errors.RemoteRunError(function, 'Internal error.')
-
-            for m in result.messages:
-                self.debug('showing msg %r' % m)
-                self.add_msg(m)
-
-            if result.failed:
-                self.debug('... that failed')
-                raise errors.RemoteRunFailure(function, 'Result failed')
-            self.debug('... that succeeded')
-            return result.value
-
-        def errback(failure):
-            self.debug('run_in_worker errbacked, showing error msg')
-            if failure.check(errors.RemoteRunError):
-                debug = failure.value
-            else:
-                debug = "Failure while running %s.%s:\n%s" % (
-                    module, function, failure.getTraceback())
-
-            msg = messages.Error(T_(
-                N_("Internal error: could not run check code on worker.")),
-                debug=debug)
-            self.add_msg(msg)
-            raise errors.RemoteRunError(function, 'Internal error.')
-
-        d.addErrback(errback)
-        d.addCallback(callback)
-        return d
-
-    def run(self, interactive, workerHeavenState, main=True):
-        self._workerHeavenState = workerHeavenState
-        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
+    def run(self, interactive, main=True):
         self._use_main = main
-
         section_class = self.sections[self._current_section]
         section = section_class(self)
         self.sidebar.push(section.section, None, section.section)
@@ -438,6 +238,39 @@ class Wizard(GladeWindow, log.Loggable):
         except KeyboardInterrupt:
             pass
 
+    def show_next_step(self, step):
+        next = step.get_next()
+        if isinstance(next, WizardStep):
+            next_step = next
+        elif next is None:
+            if self._current_section + 1 == len(self.sections):
+                self._finish(completed=True)
+                return
+            self._current_section += 1
+            next_step_class = self.sections[self._current_section]
+            next_step = next_step_class(self)
+        else:
+            raise AssertionError(next)
+
+        self._steps[next_step.name] = next_step
+
+        while not self._stack.push(next_step):
+            s = self._stack.pop()
+            s.visited = False
+            self.sidebar.pop()
+
+        if not next_step.visited:
+            self.sidebar.push(next_step.section, next_step.name,
+                              next_step.sidebar_name)
+        else:
+            self.sidebar.show_step(next_step.section)
+        next_step.visited = True
+        self._set_step(next_step)
+        self._current_step = next_step
+
+        has_next = not hasattr(next_step, 'last_step')
+        self._update_buttons(has_next)
+
     # Private
 
     def _update_buttons(self, has_next):
@@ -455,10 +288,9 @@ class Wizard(GladeWindow, log.Loggable):
             # use APPLY, just like in gnomemeeting
             self.button_next.set_label(gtk.STOCK_APPLY)
 
-    def _finish(self, main=True, save=True):
-        if save:
-            configuration = self._save.getXML()
-            self.emit('finished', configuration)
+    def _finish(self, main=True, completed=True):
+        if completed:
+            self.completed()
 
         if self._use_main:
             try:
@@ -488,53 +320,13 @@ class Wizard(GladeWindow, log.Loggable):
         self._update_buttons(has_next=True)
         self.block_next(False)
 
-        if step.has_worker:
-            self.worker_list.show()
-            self.worker_list.notify_selected()
-        else:
-            self.worker_list.hide()
+        self.before_show_step(step)
 
-        self._setup_worker(step, self.worker_list.get_worker())
         step.before_show()
 
         self.debug('showing step %r' % step)
         step.show()
         step.activated()
-
-    def _show_next_step(self):
-        self._setup_worker(self._current_step,
-                           self.worker_list.get_worker())
-        next = self._current_step.get_next()
-        if isinstance(next, WizardStep):
-            next_step = next
-        elif next is None:
-            if self._current_section + 1 == len(self.sections):
-                self._finish(save=True)
-                return
-            self._current_section += 1
-            next_step_class = self.sections[self._current_section]
-            next_step = next_step_class(self)
-        else:
-            raise AssertionError(next)
-
-        self._steps[next_step.name] = next_step
-
-        while not self._stack.push(next_step):
-            s = self._stack.pop()
-            s.visited = False
-            self.sidebar.pop()
-
-        if not next_step.visited:
-            self.sidebar.push(next_step.section, next_step.name,
-                              next_step.sidebar_name)
-        else:
-            self.sidebar.show_step(next_step.section)
-        next_step.visited = True
-        self._set_step(next_step)
-        self._current_step = next_step
-
-        has_next = not hasattr(next_step, 'last_step')
-        self._update_buttons(has_next)
 
     def _show_previous_step(self):
         step = self._stack.back()
@@ -550,23 +342,6 @@ class Wizard(GladeWindow, log.Loggable):
         for section_class in self.sections:
             if section_class.section == section_name:
                 return self.sections.index(section_class)
-
-    def _setup_worker(self, step, worker):
-        # get name of active worker
-        self.debug('%r setting worker to %s' % (step, worker))
-        step.worker = worker
-
-    def _set_worker_from_step(self, step):
-        if not hasattr(step, 'worker'):
-            return
-
-        model = self.combobox_worker.get_model()
-        current_text = step.worker
-        for row in model:
-            text = model.get(row.iter, 0)[0]
-            if current_text == text:
-                self.combobox_worker.set_active_iter(row.iter)
-                break
 
     # Callbacks
 
@@ -584,30 +359,13 @@ class Wizard(GladeWindow, log.Loggable):
         self.emit('destroy')
 
     def on_window_delete_event(self, wizard, event):
-        self._finish(self._use_main, save=False)
+        self._finish(self._use_main, completed=False)
 
     def on_button_prev_clicked(self, button):
         self._show_previous_step()
 
     def on_button_next_clicked(self, button):
-        self._show_next_step()
-
-    def on_combobox_worker_changed(self, combobox, worker):
-        self.debug('combobox_worker_changed, worker %r' % worker)
-        if worker:
-            self.clear_msg('worker-error')
-            self._last_worker = worker
-            if self._current_step:
-                self._setup_worker(self._current_step, worker)
-                self.debug('calling %r.worker_changed' % self._current_step)
-                self._current_step.worker_changed()
-        else:
-            msg = messages.Error(T_(
-                    N_('All workers have logged out.\n'
-                    'Make sure your Flumotion network is running '
-                    'properly and try again.')),
-                id='worker-error')
-            self.add_msg(msg)
+        self.show_next_step(self._current_step)
 
     def on_sidebar_step_chosen(self, sidebar, name):
         self._stack.skip_to(lambda x: x.name == name)

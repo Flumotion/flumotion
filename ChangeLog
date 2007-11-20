@@ -1,5 +1,13 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard.glade:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	Split out the specific parts of the first time wizard:
+	worker, admin, workers to the subclass
+
+2007-11-20  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard.py: Fix test after the latest
 	wizard changes
 
