@@ -1,5 +1,8 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/steps.py:
+	(FirstTimeWizard): cp is the best merge tool ever
+
 	* flumotion/ui/Makefile.am:
 	* flumotion/ui/wizard.py:
 	* flumotion/wizard/Makefile.am:
