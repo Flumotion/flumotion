@@ -2,9 +2,11 @@
 
 	* data/glade/wizard.glade:
 	* flumotion/wizard/steps.py:
+	(FirstTimeWizard): remove extra erroeous run_in_worker method
+
 	* flumotion/wizard/wizard.py:
 	Split out the specific parts of the first time wizard:
-	worker, admin, workers to the subclass
+	workers, admin etc to the subclass
 
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 

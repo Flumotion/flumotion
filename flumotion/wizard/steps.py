@@ -1879,10 +1879,6 @@ class FirstTimeWizard(Wizard):
 
     # Public API
 
-    def run_in_worker(self, module, function, *args, **kwargs):
-        return self.wizard.run_in_worker(self.worker, module, function,
-                                         *args, **kwargs)
-
     def check_elements(self, workerName, *elementNames):
         """
         Check if the given list of GStreamer elements exist on the given worker.
