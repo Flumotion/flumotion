@@ -29,7 +29,6 @@ import gtk.glade
 from flumotion.configure import configure
 from flumotion.common import log, pygobject, messages
 from flumotion.common.pygobject import gsignal
-from flumotion.wizard import classes
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -41,6 +40,52 @@ __pychecker__ = 'no-classattr no-argsused'
 
 def escape(text):
     return text.replace('&', '&amp;')
+
+
+class _WalkableStack(object):
+    def __init__(self):
+        self.l = []
+        self.height = -1
+        self.pos = -1
+
+    def __repr__(self):
+        return '<stack %r>' % self.l
+
+    def __len__(self):
+        return len(self.l)
+
+    def push(self, x):
+        if self.pos == self.height:
+            self.height += 1
+            self.pos += 1
+            self.l.append(x)
+            return True
+        elif x == self.l[self.pos + 1]:
+            self.pos += 1
+            return True
+        else:
+            return False
+
+    def current(self):
+        return self.l[self.pos]
+
+    def skip_to(self, key):
+        for i in range(0, len(self.l)):
+            if key(self.l[i]):
+                self.pos = i
+                return
+        raise AssertionError()
+
+    def back(self):
+        assert self.pos > 0
+        self.pos -= 1
+        return self.l[self.pos]
+
+    def pop(self):
+        self.height -= 1
+        if self.height < self.pos:
+            self.pos = self.height
+        return self.l.pop()
 
 
 class WizardStep(GladeWidget, log.Loggable):
@@ -129,7 +174,7 @@ class WizardStep(GladeWidget, log.Loggable):
         return state_dict
 
 
-class Wizard(GladeWindow, log.Loggable):
+class SectionWizard(GladeWindow, log.Loggable):
     gsignal('destroy')
 
     logCategory = 'wizard'
@@ -147,7 +192,7 @@ class Wizard(GladeWindow, log.Loggable):
 
         self._steps = {}
         self._current_section = 0
-        self._stack = classes.WalkableStack()
+        self._stack = _WalkableStack()
         self._current_step = None
         self._use_main = True
 
@@ -166,7 +211,6 @@ class Wizard(GladeWindow, log.Loggable):
 
     def __len__(self):
         return len(self._steps)
-
 
     # Override this in subclass
     def get_first_step(self):
@@ -376,4 +420,4 @@ class Wizard(GladeWindow, log.Loggable):
         self._set_step(step)
 
 
-pygobject.type_register(Wizard)
+pygobject.type_register(SectionWizard)

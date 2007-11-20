@@ -1,5 +1,16 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	* po/POTFILES.in:
+	Move flumotion.wizard.wizard.Wizard to 
+	flumotion.ui.wizard.SectionWizard
+
+2007-11-20  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard.glade:
 	* flumotion/wizard/steps.py:
 	(FirstTimeWizard): remove extra erroeous run_in_worker method

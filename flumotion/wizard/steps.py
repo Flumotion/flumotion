@@ -32,6 +32,7 @@ from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
 from flumotion.common.python import sorted, any
 from flumotion.configure import configure
+from flumotion.ui.wizard import WizardStep, SectionWizard
 from flumotion.wizard import save
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, LicenseType, RotateSize, \
@@ -40,7 +41,6 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer, \
     AudioEncoder, VideoEncoder, Muxer, Flow
-from flumotion.wizard.wizard import Wizard, WizardStep
 from flumotion.wizard.worker import WorkerList
 
 T_ = messages.gettexter('flumotion')
@@ -1819,7 +1819,7 @@ class SummaryStep(WorkerWizardStep):
         return None
 
 
-class FirstTimeWizard(Wizard):
+class FirstTimeWizard(SectionWizard):
     gsignal('finished', str)
 
     sections = [
@@ -1830,8 +1830,8 @@ class FirstTimeWizard(Wizard):
         LicenseStep,
         SummaryStep]
 
-    def __init__(self, parent=None, admin=None):
-        Wizard.__init__(self, parent)
+    def __init__(self, parent, admin):
+        SectionWizard.__init__(self, parent)
         self._admin = admin
         self._save = save.WizardSaver(self)
         self._workerHeavenState = None
@@ -1844,7 +1844,7 @@ class FirstTimeWizard(Wizard):
         self.worker_list.connect('worker-selected',
                                  self.on_combobox_worker_changed)
 
-    # Wizard
+    # SectionWizard
 
     def get_first_step(self):
         return WelcomeStep(self)
@@ -1854,7 +1854,7 @@ class FirstTimeWizard(Wizard):
         self.emit('finished', configuration)
 
     def destroy(self):
-        Wizard.destroy(self)
+        SectionWizard.destroy(self)
         del self._admin
         del self._save
 
@@ -1862,7 +1862,7 @@ class FirstTimeWizard(Wizard):
         self._workerHeavenState = workerHeavenState
         self.worker_list.set_worker_heaven_state(workerHeavenState)
 
-        Wizard.run(self, interactive, main)
+        SectionWizard.run(self, interactive, main)
 
     def before_show_step(self, step):
         if step.has_worker:
@@ -1875,7 +1875,7 @@ class FirstTimeWizard(Wizard):
 
     def show_next_step(self, step):
         self._setup_worker(step, self.worker_list.get_worker())
-        Wizard.show_next_step(self, step)
+        SectionWizard.show_next_step(self, step)
 
     # Public API
 

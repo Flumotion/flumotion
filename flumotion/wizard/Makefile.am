@@ -9,8 +9,6 @@ flumotion_PYTHON = \
 	save.py \
 	sidebar.py \
 	steps.py \
-	classes.py \
-	wizard.py \
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)

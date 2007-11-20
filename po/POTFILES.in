@@ -6,7 +6,6 @@ flumotion/admin/gtk/greeter.py
 flumotion/admin/gtk/parts.py
 
 flumotion/wizard/enums.py
-flumotion/wizard/wizard.py
 flumotion/wizard/steps.py
 
 flumotion/common/worker.py
@@ -37,6 +36,8 @@ flumotion/component/producers/videotest/videotest.py
 
 flumotion/manager/component.py
 flumotion/manager/manager.py
+
+flumotion/ui/wizard.py
 
 flumotion/worker/worker.py
 
