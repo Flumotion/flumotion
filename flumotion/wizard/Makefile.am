@@ -9,7 +9,7 @@ flumotion_PYTHON = \
 	conversionsteps.py \
 	enums.py \
 	models.py \
-	productionnsteps.py \
+	productionsteps.py \
 	save.py \
 	sidebar.py \
 	worker.py

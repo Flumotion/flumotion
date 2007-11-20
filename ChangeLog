@@ -1,5 +1,7 @@
 2007-11-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/Makefile.am (flumotion_PYTHON): fix typo
+
 	* flumotion/wizard/productionsteps.py: 
 	* flumotion/wizard/consumptionsteps.py: 
 	Make it work on pre python 2.5 by importing
