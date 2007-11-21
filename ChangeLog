@@ -1,3 +1,9 @@
+2007-11-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/registry.py (READ_CACHE)
+	(ComponentRegistry.__init__): Don't read the cache on startup, so
+	as not to cause a memory usage spike. See #799.
+
 2007-11-21  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/config.py:

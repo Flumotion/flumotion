@@ -36,6 +36,10 @@ from xml.sax import saxutils
 from flumotion.common import common, log, package, bundle, errors, fxml
 from flumotion.configure import configure
 
+# Re-enable when reading the registry cache is lighter-weight, or we
+# decide that it's a good idea, or something. See #799.
+READ_CACHE = False
+
 __all__ = ['ComponentRegistry', 'registry']
 
 def _getMTime(file):
@@ -1115,7 +1119,8 @@ class ComponentRegistry(log.Loggable):
     def __init__(self):
         self._parser = RegistryParser()
 
-        if (os.path.exists(self.filename) and
+        if (READ_CACHE and
+            os.path.exists(self.filename) and
             os.access(self.filename, os.R_OK)):
             self.info('Parsing registry: %s' % self.filename)
             try:
@@ -1128,7 +1133,7 @@ class ComponentRegistry(log.Loggable):
                 self.warning('Could not parse registry %s.' % self.filename)
                 self.debug('fxml.ParserError: %s' % log.getExceptionMessage(e))
 
-        self.verify()
+        self.verify(force=not READ_CACHE)
 
     def addFile(self, file):
         """
