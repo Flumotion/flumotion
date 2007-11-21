@@ -42,8 +42,8 @@ class BundledFile:
     def __init__(self, source, destination):
         self.source = source
         self.destination = destination
-        self._last_md5sum = self.md5sum()
-        self._last_timestamp = self.timestamp()
+        self._last_md5sum = None
+        self._last_timestamp = None
         self.zipped = False
 
     def md5sum(self):
@@ -76,7 +76,8 @@ class BundledFile:
 
         timestamp = self.timestamp()
         # if file still has an old timestamp, it hasn't changed
-        if timestamp <= self._last_timestamp:
+        # FIXME: looks bogus, shouldn't this check be != instead of <= ?
+        if self._last_timestamp and timestamp <= self._last_timestamp:
             return False
         self._last_timestamp = timestamp
 
@@ -87,6 +88,12 @@ class BundledFile:
             return True
 
         return False
+
+    def pack(self, zip):
+        self._last_timestamp = self.timestamp()
+        self._last_md5sum = self.md5sum()
+        zip.write(self.source, self.destination)
+        self.zipped = True
 
 class Bundle:
     """
@@ -209,6 +216,7 @@ class Bundler:
         for file in self._files.values():
             if file.hasChanged():
                 update = True
+                break
 
         if update:
             self._bundle.setZip(self._buildzip())
@@ -220,10 +228,8 @@ class Bundler:
     def _buildzip(self):
         filelike = StringIO.StringIO()
         zip = zipfile.ZipFile(filelike, "w")
-        for path in self._files.keys():
-            bf = self._files[path]
-            self._files[path].zipped = True
-            zip.write(bf.source, bf.destination)
+        for bundledFile in self._files.values():
+            bundledFile.pack(zip)
         zip.close()
         data = filelike.getvalue()
         filelike.close()
@@ -254,7 +260,7 @@ class BundlerBasket:
         If unspecified, this will be stored in the top level
         """
         # get the bundler and create it if need be
-        if not bundleName in self._bundlers.keys():
+        if not bundleName in self._bundlers:
             bundler = Bundler(bundleName)
             self._bundlers[bundleName] = bundler
         else:
@@ -262,7 +268,7 @@ class BundlerBasket:
 
         # add the file to the bundle and register
         location = bundler.add(source, destination)
-        if self._files.has_key(location):
+        if location in self._files:
             raise Exception("Cannot add %s to bundle %s, already in %s" % (
                 location, bundleName, self._files[location]))
         self._files[location] = bundleName
@@ -279,7 +285,7 @@ class BundlerBasket:
                 package = os.path.split(package)[0]
 
             package = ".".join(package.split('/')) # win32 fixme
-            if self._imports.has_key(package):
+            if package in self._imports:
                 raise Exception("Bundler %s already has import %s" % (
                     bundleName, package))
             self._imports[package] = bundleName

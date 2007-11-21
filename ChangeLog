@@ -1,3 +1,13 @@
+2007-11-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/bundle.py (BundledFile.__init__)
+	(BundledFile.hasChanged, BundledFile.pack, Bundler.bundle)
+	(Bundler._buildzip, BundlerBasket.add, BundlerBasket.add)
+	(BundlerBasket.add): Don't stat and md5sum files as they are
+	registered, rather, only as they are zipped up. Saves I/O costs on
+	startup, and over the long term because normally we only serve a
+	fraction of bundles.
+
 2007-11-21  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_consumption.glade: Revert the defaults to
