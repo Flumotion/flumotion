@@ -63,14 +63,10 @@ class Component(log.Loggable):
 
         return s
 
-    def toXML(self, registry):
+    def toXML(self):
         """
         Write out the XML <component> section for this component.
-
-        @type registry: L{flumotion.common.registry.ComponentRegistry}
         """
-        regentry = registry.getComponent(self.type)
-
         extra = ' worker="%s"' % self.worker
 
         # FIXME: when the wizard can be split among projects, "project"
@@ -92,12 +88,6 @@ class Component(log.Loggable):
 
             #import code; code.interact(local=locals())
             for name in property_names:
-                # FIXME: warn if a property name is not in the registry
-                # change to a more visible warning once we fix all of these
-                if not regentry.hasProperty(name):
-                    self.warning('property named %s in component '
-                        'config, but not in registry.  Fix wizard !' % name)
-                    continue
                 value = self.props[name]
                 s += '      <property name="%s">%s</property>\n' % (name, value)
 
@@ -114,7 +104,6 @@ class WizardSaver(log.Loggable):
     logCategory = 'wizard-saver'
     def __init__(self, wizard):
         self.wizard = wizard
-        self.registry = registry.getRegistry()
 
     def getVideoSource(self):
         options = self.wizard.get_step_options('Source')
@@ -370,7 +359,7 @@ class WizardSaver(log.Loggable):
         s = '<planet>\n'
         s += '  <flow name="%s">\n' % self.wizard.flowName
         for component in components:
-            s += component.toXML(self.registry) + "\n"
+            s += component.toXML() + "\n"
         s += '  </flow>\n'
         s += '</planet>\n'
 

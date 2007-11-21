@@ -1,3 +1,10 @@
+2007-11-21  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/wizard/save.py:
+	  Don't use the registry here; it's the only thing in the admin that does,
+	  and it's slow and memory-hungry. The bugs we were using this to detect
+	  haven't existed in a couple of years.
+
 2007-11-21  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_consumption.glade: 
