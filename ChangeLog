@@ -1,3 +1,8 @@
+2007-11-21  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_consumption.glade: Revert the defaults to
+	False for all video only/audio only consumptions.
+
 2007-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/redhat/flumotion:
