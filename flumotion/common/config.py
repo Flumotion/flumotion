@@ -985,6 +985,11 @@ def exportPlanetXml(p):
     from flumotion.common.fxml import SXML
     X = SXML()
 
+    def serialise(propVal):
+        if isinstance(propVal, tuple): # fractions are our only tuple type
+            return "%d/%d" % propVal
+        return propVal
+
     def component(c):
         concat = lambda lists: reduce(list.__add__, lists, [])
         C = c.get('config')
@@ -998,7 +1003,7 @@ def exportPlanetXml(p):
                    + [[X.feed(alias=alias), feedId]
                       for feedId, alias in feeders]
                    for name, feeders in  C['eater'].items()]
-                + [[X.property(name=name), value]
+                + [[X.property(name=name), serialise(value)]
                    for name, value in C['properties'].items()]
                 + [[X.clock_master(),
                     C['clock-master'] == C['avatarId'] and 'true' or 'false']]

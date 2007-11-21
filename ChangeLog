@@ -1,5 +1,13 @@
 2007-11-21  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/common/config.py:
+	  Serialise fractions correctly.
+	* flumotion/manager/admin.py:
+	  Verify the registry when loading a new configuration, so that new
+	  or changed components can be loaded successfully.
+
+2007-11-21  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/wizard/save.py:
 	  Don't use the registry here; it's the only thing in the admin that does,
 	  and it's slow and memory-hungry. The bugs we were using this to detect

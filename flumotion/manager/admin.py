@@ -275,6 +275,10 @@ class AdminAvatar(base.ManagerAvatar):
         if saveAs:
             output = self._saveFlowFile(saveAs)
 
+        # Update the registry if needed, so that new/changed component types
+        # can be parsed.
+        registry.getRegistry().verify()
+
         f = StringIO(xml)
         res = self.vishnu.loadComponentConfigurationXML(f, self.remoteIdentity)
         f.close()
