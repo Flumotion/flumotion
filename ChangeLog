@@ -1,3 +1,8 @@
+2007-11-21  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_consumption.glade: 
+	Set inconsistent to false for checkbutton_shout2_audio_video
+
 2007-11-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/package.py (Packager.getPathsForPackage):
