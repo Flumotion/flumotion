@@ -90,7 +90,7 @@ class Packager(log.Loggable):
         Return all absolute paths to the top level of a tree from which
         (part of) the given package name can be imported.
         """
-        if not packageName in self._packages.keys():
+        if packageName not in self._packages:
             return None
 
         return [self._paths[key] for key in self._packages[packageName]]
@@ -122,7 +122,7 @@ class Packager(log.Loggable):
         self.log('registering packagePath %s' % packagePath)
 
         # check if a packagePath for this bundle was already registered
-        if key in self._paths.keys():
+        if key in self._paths:
             oldPath = self._paths[key]
             if packagePath == oldPath:
                 self.log('already registered %s for key %s' % (
@@ -134,7 +134,12 @@ class Packager(log.Loggable):
         # the following algorithm only works if they're sorted.
         # By sorting the list we can ensure that a parent package
         # is always processed before one of its children
-        packageNames = _findPackageCandidates(packagePath, prefix)
+        if not os.path.isdir(packagePath):
+            log.warning('bundle', 'package path not a dir: %s',
+                        packagePath)
+            packageNames = []
+        else:
+            packageNames = _findPackageCandidates(packagePath, prefix)
 
         if not packageNames:
             log.log('bundle',
@@ -170,7 +175,7 @@ class Packager(log.Loggable):
 
         # update our name->keys cache
         for name in packageNames:
-            if not name in self._packages.keys():
+            if name not in self._packages:
                 self._packages[name] = [key]
             else:
                 self._packages[name].insert(0, key)
@@ -182,7 +187,7 @@ class Packager(log.Loggable):
         packageNames.reverse()
 
         for packageName in packageNames:
-            if packageName not in sys.modules.keys():
+            if packageName not in sys.modules:
                 continue
             self.log('fixing up %s ...' % packageName)
 
@@ -242,7 +247,12 @@ class Packager(log.Loggable):
         # is not a new package
         if not new:
             self.log('finding end module candidates')
-            moduleNames = findEndModuleCandidates(packagePath, prefix)
+            if not os.path.isdir(packagePath):
+                log.warning('bundle', 'package path not a dir: %s',
+                            path)
+                moduleNames = []
+            else:
+                moduleNames = findEndModuleCandidates(packagePath, prefix)
             self.log('end module candidates to rebuild: %r' % moduleNames)
             for name in moduleNames:
                 if name in sys.modules:
@@ -287,10 +297,6 @@ def _listDirRecursively(path):
     @type  path: string
     """
     retval = []
-    # files are never returned, only directories
-    if not os.path.isdir(path):
-        return retval
-
     try:
         files = os.listdir(path)
     except OSError:
@@ -298,7 +304,9 @@ def _listDirRecursively(path):
     else:
         for f in files:
             # this only adds directories since files are not returned
-            retval += _listDirRecursively(os.path.join(path, f))
+            p = os.path.join(path, f)
+            if os.path.isdir(p) and f != '.svn':
+                retval += _listDirRecursively(p)
 
     if glob.glob(os.path.join(path, '*.py*')):
         retval.append(path)

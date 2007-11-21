@@ -1,5 +1,15 @@
 2007-11-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/package.py (Packager.getPathsForPackage):
+	Style.
+	(Packager.registerPackagePath): Style, and a couple of checks that
+	we don't pass files to dir-walking functions. Potentially one of
+	the checks is redundant, but this function is so sucky that I
+	cannot be arsed to refactor.
+	(_listDirRecursively): Rework to require a directory, and to not
+	recurse into .svn directories. Reduces the IO load when running
+	uninstalled.
+
 	* flumotion/common/bundle.py (BundledFile.__init__)
 	(BundledFile.hasChanged, BundledFile.pack, Bundler.bundle)
 	(Bundler._buildzip, BundlerBasket.add, BundlerBasket.add)
