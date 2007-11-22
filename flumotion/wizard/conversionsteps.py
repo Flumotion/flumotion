@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.twisted.defer import defer_generator_method
 from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
     AudioEncoderStep
 from flumotion.wizard.enums import EncodingAudio, EncodingFormat, EncodingVideo
@@ -108,17 +107,18 @@ class ConversionStep(WorkerWizardStep):
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
             self.debug('running Ogg checks')
+            def hasOgg(unused):
+                # XXX: Smoke can't be put in ogg. Poke Wim to fix
+                self.combobox_video.set_multi_active(EncodingVideo.Theora)
+                self.combobox_audio.set_multi_active(EncodingAudio.Speex,
+                                                     EncodingAudio.Vorbis)
+
+            def hasOggmux(unused):
+                d = self.run_in_worker('flumotion.component.muxers.checks', 'checkOgg')
+                d.addCallback(hasOgg)
             d = self.wizard.require_elements(self.worker, 'oggmux')
+            d.addCallback(hasOggmux)
 
-            yield d
-            d = self.run_in_worker('flumotion.component.muxers.checks', 'checkOgg')
-
-            yield d
-
-            # XXX: Smoke can't be put in ogg. Poke Wim to fix
-            self.combobox_video.set_multi_active(EncodingVideo.Theora)
-            self.combobox_audio.set_multi_active(EncodingAudio.Speex,
-                                                 EncodingAudio.Vorbis)
         elif format == EncodingFormat.Multipart:
             self.combobox_video.set_multi_active(EncodingVideo.Smoke,
                                                  EncodingVideo.JPEG)
@@ -131,7 +131,6 @@ class ConversionStep(WorkerWizardStep):
         has_video = self.wizard.get_step_option('Source', 'has-video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
-    _verify = defer_generator_method(_verify)
 
     # Callbacks
 
@@ -175,14 +174,12 @@ class TheoraStep(VideoEncoderStep):
         self.spinbutton_quality.set_value(16)
 
     def worker_changed(self):
+        self.debug('running Theora checks')
+        def hasTheora(unused):
+            self.run_in_worker('flumotion.worker.checks.encoder', 'checkTheora')
+
         d = self.wizard.require_elements(self.worker, 'theoraenc')
-
-        yield d
-
-        d = self.run_in_worker('flumotion.worker.checks.encoder', 'checkTheora')
-
-        yield d
-    worker_changed = defer_generator_method(worker_changed)
+        d.addCallback(hasTheora)
 
     def get_state(self):
         options = {}
@@ -279,13 +276,11 @@ class VorbisStep(AudioEncoderStep):
 
     def worker_changed(self):
         self.debug('running Vorbis checks')
+        def hasVorbis(unused):
+            self.run_in_worker('flumotion.worker.checks.encoder', 'checkVorbis')
+
         d = self.wizard.require_elements(self.worker, 'vorbisenc')
-
-        yield d
-        d = self.run_in_worker('flumotion.worker.checks.encoder', 'checkVorbis')
-
-        yield d
-    worker_changed = defer_generator_method(worker_changed)
+        d.addCallback(hasVorbis)
 
     def get_state(self):
         options = {}

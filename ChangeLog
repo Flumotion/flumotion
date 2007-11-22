@@ -1,5 +1,9 @@
 2007-11-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/conversionsteps.py (TheoraStep.worker_changed)
+	(VorbisStep.worker_changed.hasVorbis, ConversionStep._verify): 
+	Get rid of defer_generator_method.
+	
 	* flumotion/wizard/basesteps.py: 
 	(OverlayStep._worker_changed.importError): Get rid
 	of defer_generator_method.
