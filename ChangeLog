@@ -1,3 +1,9 @@
+2007-11-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/redhat/flumotion:
+	  Make a better condrestart for the case where you restart only one
+	  specific manager/worker.
+
 2007-11-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/registry.py (READ_CACHE)
@@ -15,9 +21,9 @@
 2007-11-21  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/wizard/save.py:
-	  Don't use the registry here; it's the only thing in the admin that does,
-	  and it's slow and memory-hungry. The bugs we were using this to detect
-	  haven't existed in a couple of years.
+	  Don't use the registry here; it's the only thing in the admin that
+	  does, and it's slow and memory-hungry. The bugs we were using this
+	  to detect haven't existed in a couple of years.
 
 2007-11-21  Johan Dahlin  <johan@gnome.org>
 
