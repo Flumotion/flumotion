@@ -1,5 +1,9 @@
 2007-11-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/connections.py (Connections.__init__): 
+	use scroll_to_cell instead of set_cursor, to actually go to the select
+	the connection used the last time.
+
 	* flumotion/wizard/conversionsteps.py (TheoraStep.worker_changed)
 	(VorbisStep.worker_changed.hasVorbis, ConversionStep._verify): 
 	Get rid of defer_generator_method.

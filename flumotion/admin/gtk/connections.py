@@ -85,8 +85,8 @@ class Connections(GladeWidget):
         v = self.treeview_connections
         model, i = v.get_selection().get_selected()
         if model:
-            v.set_cursor(model.get_path(i), None, False)
-            self.treeview_connections.grab_focus()
+            v.scroll_to_cell(model[i].path, None, True, 0.5, 0)
+            v.grab_focus()
         return True
 
     def on_clear_all(self, *args):
