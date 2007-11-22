@@ -1,3 +1,9 @@
+2007-11-22  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/basesteps.py: 
+	(OverlayStep._worker_changed.importError): Get rid
+	of defer_generator_method.
+
 2007-11-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/redhat/flumotion:

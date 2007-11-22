@@ -21,7 +21,6 @@
 
 import gettext
 
-from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import messages
 from flumotion.common.messages import N_, ngettext
 from flumotion.ui.wizard import WizardStep
@@ -108,7 +107,7 @@ class OverlayStep(WorkerWizardStep):
     # Wizard Step
 
     def worker_changed(self):
-        self._worker_changed_010()
+        self._worker_changed()
 
     def get_state(self):
         options = WorkerWizardStep.get_state(self)
@@ -133,35 +132,11 @@ class OverlayStep(WorkerWizardStep):
 
     # Private API
 
-    def _worker_changed_010(self):
+    def _worker_changed(self):
         self._can_overlay = False
         self.set_sensitive(False)
 
-        # first check elements
-        d = self.wizard.check_elements(self.worker, 'pngenc',
-            'ffmpegcolorspace', 'videomixer')
-        yield d
-
-        elements = d.value()
-        if elements:
-            f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
-                "Worker '%s' is missing GStreamer elements '%s'.",
-                len(elements))
-            message = messages.Warning(
-                T_(f, self.worker, "', '".join(elements)), id='overlay')
-            message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
-            self.wizard.add_msg(message)
-        else:
-            self.wizard.clear_msg('overlay')
-
-        # now check import
-        d = self.wizard.check_import(self.worker, 'PIL')
-        yield d
-        try:
-            d.value()
-            self._can_overlay = True
-            self.set_sensitive(True)
-        except ImportError:
+        def importError(error):
             self.info('could not import PIL')
             message = messages.Warning(T_(N_(
                 "Worker '%s' cannot import module '%s'."),
@@ -175,7 +150,31 @@ class OverlayStep(WorkerWizardStep):
             self.wizard.add_msg(message)
             self._can_overlay = False
 
-    _worker_changed_010 = defer_generator_method(_worker_changed_010)
+        def checkImport(unused):
+            self._can_overlay = True
+            self.set_sensitive(True)
+
+        def checkElements(elements):
+            if elements:
+                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
+                    "Worker '%s' is missing GStreamer elements '%s'.",
+                    len(elements))
+                message = messages.Warning(
+                    T_(f, self.worker, "', '".join(elements)), id='overlay')
+                message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
+                self.wizard.add_msg(message)
+            else:
+                self.wizard.clear_msg('overlay')
+
+            # now check import
+            d = self.wizard.check_import(self.worker, 'PIL')
+            d.addCallback(checkImport)
+            d.addErrback(importError)
+
+        # first check elements
+        d = self.wizard.check_elements(
+            self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
+        d.addCallback(checkElements)
 
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
