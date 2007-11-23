@@ -1,5 +1,7 @@
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/text/Makefile.am (component_PYTHON): Add admin_text.py
+
 	* flumotion/test/Makefile.am (EXTRA_DIST): Add all python files.
 
 	* flumotion/extern/pytrayicon/Makefile.am (flumotion_PYTHON): 

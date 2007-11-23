@@ -3,6 +3,7 @@ include $(top_srcdir)/common/python.mk
 componentdir = $(libdir)/flumotion/python/flumotion/admin/text
 component_PYTHON = \
 	__init__.py \
+	admin_text.py \
 	main.py \
 	connection.py \
 	greeter.py \
