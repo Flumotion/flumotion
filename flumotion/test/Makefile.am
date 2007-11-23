@@ -56,6 +56,7 @@ EXTRA_DIST = 				\
 	test_http.py 			\
 	test_i18n.py 			\
 	test_keycards.py 		\
+	test_logfilter.py 		\
 	test_manager_admin.py 		\
 	test_manager_manager.py 	\
 	test_manager_worker.py		\

@@ -1,7 +1,7 @@
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/Makefile.am (EXTRA_DIST): Add test_worker_job.py
-	and test_configure.py
+	* flumotion/test/Makefile.am (EXTRA_DIST): Add test_worker_job.py,
+	test_configure.py and test_logfilter.py.
 
 	* flumotion/extern/pytrayicon/Makefile.am (flumotion_PYTHON): 
 	Add ltihooks.py
