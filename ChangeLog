@@ -1,5 +1,7 @@
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am (glade_DATA): Add videotest.glade
+
 	* flumotion/admin/gtk/Makefile.am (component_PYTHON): Add spyglass.py
 
 	* flumotion/admin/text/Makefile.am (component_PYTHON): Add admin_text.py
