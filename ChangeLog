@@ -1,5 +1,8 @@
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/extern/pytrayicon/Makefile.am (flumotion_PYTHON): 
+	Add ltihooks.py
+
 	* po/POTFILES.in: 
 	* flumotion/component/producers/jukebox: Remove all traces of the
 	jukebox component

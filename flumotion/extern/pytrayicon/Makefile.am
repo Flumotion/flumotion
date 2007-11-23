@@ -1,9 +1,10 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/extern/pytrayicon
 
 flumotion_PYTHON = \
-	__init__.py
+	__init__.py \
+	ltihooks.py
 
 CLEANFILES = pytrayicon.c
 
