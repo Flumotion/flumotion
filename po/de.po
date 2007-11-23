@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-24 18:47+0200\n"
+"POT-Creation-Date: 2007-11-23 10:16+0100\n"
 "PO-Revision-Date: 2006-03-03 18:02+0000\n"
 "Last-Translator: Benjamin Kampmann ( big dot master dot ben | at | web dot "
 "de>\n"
@@ -22,180 +22,728 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/admin.py:417
-msgid "Internal error in component."
-msgstr "Fehler innerhalb einer Komponente"
-
-#: flumotion/admin/gtk/client.py:160
-msgid "Not connected"
-msgstr "nicht verbunden"
-
-#: flumotion/admin/gtk/client.py:190
-#, python-format
-msgid "Connecting to %s:%s"
-msgstr "Verbinde mit %s:%s"
-
-#: flumotion/admin/gtk/client.py:275 flumotion/admin/gtk/client.py:360
-#, python-format
-msgid "Loading UI for %s ..."
-msgstr "Lade Oberfläche für %s"
-
-#: flumotion/admin/gtk/client.py:313 flumotion/admin/gtk/client.py:342
-#: flumotion/admin/gtk/client.py:394
-#, fuzzy
-msgid "This component has a UI bug."
-msgstr "Diese Komponente hat einen Fehler in der Oberfläche."
-
-#: flumotion/admin/gtk/client.py:375
-#, python-format
-msgid "Loading tab %s for %s ..."
-msgstr "Lade Tab %s für %s"
-
-#: flumotion/admin/gtk/client.py:412
-#, python-format
-msgid "%s does not have a UI yet"
-msgstr "%s hat keine Oberfläche"
-
-#: flumotion/admin/gtk/client.py:429
+#: flumotion/manager/manager.py:392
 #, fuzzy, python-format
-msgid "This component has a UI bug in the %s tab."
-msgstr "Diese Komponente hat einen Oberflächen-Fehler im Tab %s ."
-
-#: flumotion/admin/gtk/client.py:580
-#, python-format
-msgid "%s - Flumotion Administration"
-msgstr "%s - Flumotion Administration"
-
-#: flumotion/admin/gtk/client.py:596
-msgid "Lost connection to manager, reconnecting ..."
-msgstr "Verbindung zum Manager verloren, versuche es erneut"
-
-#: flumotion/admin/gtk/client.py:616
-#, python-format
-msgid "Connection to manager on %s was refused."
-msgstr "Die Verbindung zum Manager auf %s wurde verweigert."
-
-#: flumotion/admin/gtk/client.py:618
-#, python-format
-msgid "Connection to %s was refused"
-msgstr "Verbindung %s wurde verweigert."
-
-#: flumotion/admin/gtk/client.py:631
-#, python-format
-msgid "Connection to manager on %s failed (%s)."
-msgstr "Verbindung zum Manager auf %s schlug fehl (%s)."
-
-#: flumotion/admin/gtk/client.py:761
-#, python-format
-msgid "Component %s is sad"
-msgstr "Die Komponente %s ist traurig"
-
-#: flumotion/admin/gtk/client.py:768
-#, python-format
-msgid "Showing UI for %s"
-msgstr "Zeige Oberfläche für %s"
-
-#: flumotion/admin/gtk/client.py:797
-#, python-format
-msgid "Component %s is still sleeping"
-msgstr "Komponente %s schläft noch"
-
-#: flumotion/admin/gtk/client.py:799
-#, python-format
-msgid "Requesting UI for %s ..."
-msgstr "Frage nach der Oberfläche für %s ..."
-
-#: flumotion/admin/gtk/client.py:852
-msgid "The wizard cannot be run because no workers are logged in."
+msgid ""
+"This component is configured for Flumotion version %s, but you are running "
+"version %s.\n"
+"Please update the configuration of the component.\n"
 msgstr ""
-"Der Wizard kann nicht gestartet werden, wenn keine Arbeiter angemeldet sind."
+"Diese Komponente ist für Flumtion %r eingestellt, aber hier wird %r "
+"verwendet.\n"
 
-#: flumotion/admin/gtk/client.py:893
+#: flumotion/manager/manager.py:448
 #, python-format
-msgid "Reloading component code for %s"
-msgstr "Lade den  Code für die Komponente %s"
-
-#: flumotion/admin/gtk/client.py:935
-msgid "No component selected."
-msgstr "Keine Komponente ausgewählt."
-
-#: flumotion/admin/gtk/client.py:952
-#, python-format
-msgid "Failed to %s component %s"
+msgid ""
+"Could not load component %r into %r: a component is already running with "
+"this name, but has a different configuration."
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:994
-msgid "Import Configuration..."
+#: flumotion/manager/manager.py:521
+#, fuzzy
+msgid "Invalid component configuration."
 msgstr "Einstellungen laden"
 
-#: flumotion/admin/gtk/client.py:1007
-msgid ""
-"File already exists.\n"
-"Overwrite?"
+#: flumotion/manager/manager.py:530
+#, fuzzy, python-format
+msgid "Unknown component in configuration: %s."
+msgstr "Die Komponente ist falsch eingestellt."
+
+#: flumotion/manager/manager.py:535
+msgid "Unknown error while loading configuration."
 msgstr ""
-"Diese Datei existiert bereits.\n"
-"Soll sie überschrieben werden?"
 
-#: flumotion/admin/gtk/client.py:1029
-msgid "Export Configuration..."
-msgstr "Einstellungen speichern"
+#: flumotion/manager/manager.py:975
+msgid "The component could not be started."
+msgstr "Die Komponente konnte nicht gestartet werden."
 
-#: flumotion/admin/gtk/client.py:1079
+#: flumotion/manager/component.py:170
 #, python-format
-msgid ""
-"Could not reload component:\n"
-"%s."
+msgid "Failed to upgrade config %r from version %d. Please file a bug."
 msgstr ""
-"Konnte die Komponente nicht neuladen:\n"
-"%s."
 
-#: flumotion/admin/gtk/client.py:1089
-msgid "Reloading ..."
-msgstr "Erneut Laden"
-
-#: flumotion/admin/gtk/client.py:1090
-msgid "Reloading client code"
-msgstr "Den Code des Klienten neuladen"
-
-#: flumotion/admin/gtk/client.py:1092
-#, python-format
-msgid "Reloading %s code"
-msgstr "Lade den Code von %s neu"
-
-#: flumotion/admin/gtk/client.py:1121
-msgid "About Flumotion"
-msgstr "Über Flumotion"
-
-#: flumotion/admin/gtk/client.py:1140
+#: flumotion/manager/component.py:197
 #, fuzzy
 msgid ""
-"Flumotion is a streaming media server.\n"
-"\n"
-"© 2004, 2005, 2006, 2007 Fluendo S.L."
+"Component logged in with stale configuration. Consider stopping this "
+"component and restarting the manager."
 msgstr ""
-"Flumotion ist eine Streaming Media Server.\n"
+"Komponente meldete sich mit abgestandenen Einstellungen an.Es wäre besser "
+"die Komponente neu zu starten."
+
+#: flumotion/manager/component.py:244
+msgid "Failed to provide the master clock"
+msgstr ""
+
+#: flumotion/common/worker.py:78
+#, python-format
+msgid "The %s was killed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:81
+#, python-format
+msgid "The %s crashed.\n"
+msgstr ""
+
+#: flumotion/common/worker.py:101
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
+msgstr ""
+
+#: flumotion/common/worker.py:110
+#, python-format
+msgid "The core dump is '%s' on the host running '%s'."
+msgstr ""
+
+#: flumotion/component/feedcomponent.py:301
+msgid ""
+"You will get more debugging information if you upgrade to GStreamer 0.10.13 "
+"or later."
+msgstr ""
+
+#: flumotion/component/feedcomponent.py:318
+#, python-format
+msgid ""
+"The worker does not have the '%s' element installed.\n"
+"Please install the necessary plug-in and restart the component.\n"
+msgstr ""
+"Beim Arbeiter ist das Element'%s' nicht installiert.\n"
+"Bitte das notwendige Plugin installieren und die Komponente neustarten.\n"
+
+#: flumotion/component/feedcomponent.py:331
+msgid "GStreamer error: could not parse component pipeline."
+msgstr "GStreamer-Fehler: konnte die Pipeline nicht parsen."
+
+#: flumotion/component/producers/audiotest/audiotest.py:88
+#: flumotion/component/producers/videotest/videotest.py:96
+#: flumotion/component/misc/repeater/repeater.py:38
+msgid ""
+"The 'drop-probability' property is specified, but it only works with "
+"GStreamer core newer than 0.10.12. You should update your version of "
+"GStreamer."
+msgstr ""
+
+#: flumotion/component/producers/audiotest/audiotest.py:96
+#: flumotion/component/producers/videotest/videotest.py:104
+#: flumotion/component/misc/repeater/repeater.py:46
+msgid "The 'drop-probability' property can only be between 0.0 and 1.0."
+msgstr ""
+
+#: flumotion/component/producers/audiotest/admin_gtk.py:88
+#, fuzzy
+msgid "Volume"
+msgstr "Lautstärke:"
+
+#: flumotion/component/producers/audiotest/admin_gtk.py:91
+#, fuzzy
+msgid "Audio Test"
+msgstr "Audiotest"
+
+#: flumotion/component/producers/soundcard/soundcard.py:76
+msgid ""
+"The soundcard volume cannot be changed with this version of the 'gst-python' "
+"library.\n"
+msgstr ""
+
+#: flumotion/component/producers/soundcard/soundcard.py:77
+#, fuzzy, python-format
+msgid ""
+"Please upgrade '%s' to version %s or later if you desire this functionality."
+msgstr "Bitte '%s' auf Version %s aktualisieren."
+
+#: flumotion/component/producers/firewire/firewire.py:165
+msgid "The camera has now been reconnected."
+msgstr ""
+
+#: flumotion/component/producers/firewire/firewire.py:172
+msgid "The camera has been disconnected."
+msgstr ""
+
+#: flumotion/component/producers/looper/looper.py:121
+#, fuzzy, python-format
+msgid "Could not open file %r."
+msgstr "Überprüfung von '%s' nicht möglich"
+
+#: flumotion/component/producers/looper/admin_gtk.py:123
+msgid "Looper"
+msgstr ""
+
+#: flumotion/component/producers/checks.py:58
+#, python-format
+msgid "Version %d.%d.%d of the PyGTK library contains a memory leak.\n"
+msgstr ""
+
+#: flumotion/component/producers/checks.py:61
+#: flumotion/component/producers/checks.py:81
+msgid ""
+"The Soundcard and Firewire sources may leak a lot of memory as a result, and "
+"need to be restarted frequently.\n"
+msgstr ""
+
+#: flumotion/component/producers/checks.py:63
+#: flumotion/component/producers/checks.py:83
+#: flumotion/component/producers/checks.py:104
+#: flumotion/component/producers/checks.py:116
+#, fuzzy, python-format
+msgid "Please upgrade '%s' to version %s or later."
+msgstr "Bitte '%s' auf Version %s aktualisieren."
+
+#: flumotion/component/producers/checks.py:78
+#, python-format
+msgid ""
+"Version %d.%d.%d of the gst-python library contains a large memory leak.\n"
+msgstr ""
+
+#: flumotion/component/producers/checks.py:99
+#, fuzzy, python-format
+msgid "Version %d.%d.%d of the GStreamer library is too old.\n"
+msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
+
+#: flumotion/component/producers/checks.py:102
+#: flumotion/component/producers/checks.py:114
+#, python-format
+msgid "The '%s' component needs a newer version of '%s'.\n"
+msgstr ""
+
+#: flumotion/component/producers/checks.py:111
+#, fuzzy, python-format
+msgid "Version %d.%d.%d of the gst-python library is too old.\n"
+msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
+
+#: flumotion/component/producers/playlist/playlist.py:427
+#, python-format
+msgid "Failed to parse a playlist from file %s: %s"
+msgstr ""
+
+#: flumotion/component/producers/videotest/admin_gtk.py:39
+msgid "Pattern:"
+msgstr "Motiv:"
+
+#: flumotion/component/producers/videotest/admin_gtk.py:83
+msgid "Pattern"
+msgstr "Motiv"
+
+#: flumotion/component/combiners/switch/switch.py:86
+#: flumotion/component/consumers/disker/disker.py:348
+#, python-format
+msgid "Error parsing ical file %s, so not scheduling any events."
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:285
+#, python-format
+msgid ""
+"Video parameter(s) were specified but not all. Missing parameters are: %r"
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:301
+#, python-format
+msgid ""
+"Audio parameter(s) were specified but not all. Missing parameters are: %r"
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:440
+#, python-format
+msgid ""
+"Could not switch to %s because at least one of the %s eaters is not active."
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:449
+#, python-format
+msgid "Could not switch to %s because startTimes is %r."
+msgstr ""
+
+#: flumotion/component/misc/httpfile/httpfile.py:300
+#: flumotion/component/misc/porter/porter.py:347
+#: flumotion/component/consumers/httpstreamer/http.py:787
+#, python-format
+msgid "Network error: TCP port %d is not available."
+msgstr "Netzwerk-Fehler: der TCP-Port %d ist nicht benutzbar."
+
+#: flumotion/component/misc/httpfile/admin_gtk.py:77
+#: flumotion/component/base/admin_gtk.py:526
+#: flumotion/component/base/admin_gtk.py:540
+#: flumotion/component/base/admin_gtk.py:740
+msgid "Byte"
+msgstr ""
+
+#: flumotion/component/misc/httpfile/admin_gtk.py:101
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:208
+msgid "Statistics"
+msgstr "Statistik"
+
+#: flumotion/component/misc/porter/porter.py:320
+#, fuzzy, python-format
+msgid "Network error: socket path %s is not available."
+msgstr "Netzwerk-Fehler: der TCP-Port %d ist nicht benutzbar."
+
+#: flumotion/component/muxers/checks.py:38
+#: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
+#, python-format
+msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
+msgstr "Die Version %s des GStreamer-Plugins '%s' enthält einen Fehler.\n"
+
+#: flumotion/component/muxers/checks.py:41
+msgid ""
+"The generated Ogg stream will not be fully compliant, and possibly not even "
+"play correctly.\n"
+msgstr ""
+"Der generierte OGG-Strom wird nicht ganz konform sein und deswegeneventuell "
+"nicht korrekt abgespielt.\n"
+
+#: flumotion/component/muxers/checks.py:43
+#: flumotion/component/consumers/httpstreamer/http.py:349
+#: flumotion/component/feedcomponent010.py:365
+#: flumotion/worker/checks/encoder.py:45 flumotion/worker/checks/encoder.py:66
+#: flumotion/worker/checks/check.py:169
+#, python-format
+msgid "Please upgrade '%s' to version %s."
+msgstr "Bitte '%s' auf Version %s aktualisieren."
+
+#: flumotion/component/encoders/theora/theora.py:70
+msgid ""
+"Your configuration uses 'bitrate' expressed in kbit/sec.  Please convert it "
+"to a value in bit/sec by multiplying the value by 1000."
+msgstr ""
+
+#: flumotion/component/consumers/disker/disker.py:117
+#, python-format
+msgid ""
+"The configuration property 'rotate-type' should be set to 'size', time', or "
+"'none', not '%s'. Please fix the configuration."
+msgstr ""
+
+#: flumotion/component/consumers/disker/disker.py:128
+#, python-format
+msgid ""
+"The configuration property '%s' should be set. Please fix the configuration."
+msgstr ""
+
+#: flumotion/component/consumers/disker/disker.py:231
+#, fuzzy, python-format
+msgid "Failed to open output file %s. Check your permissions."
+msgstr "Konnte Gerät '%s' nicht öffnen. Bitte die Reche überprüfen."
+
+#: flumotion/component/consumers/disker/disker.py:261
+#, python-format
+msgid "Failed to update symbolic link %s. Check your permissions."
+msgstr ""
+
+#: flumotion/component/consumers/disker/disker.py:317
+#, python-format
+msgid "Error writing to file %s.  Maybe disk is full."
+msgstr ""
+
+#: flumotion/component/consumers/disker/disker.py:430
+#, python-format
+msgid "Failed expanding filename prefix: %r <-- %r."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/http.py:347
+#: flumotion/worker/checks/check.py:165
+#, fuzzy, python-format
+msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
+msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
+
+#: flumotion/component/consumers/httpstreamer/http.py:479
+#, python-format
+msgid "Unable to set the maximum client limit to %d clients."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:51
+msgid "Mime type:"
+msgstr "MIME-Type:"
+
+#: flumotion/component/feedcomponent010.py:212
+#: flumotion/worker/checks/check.py:61 flumotion/worker/checks/check.py:65
+msgid "Internal GStreamer error."
+msgstr "Fehler in GStreamer"
+
+#: flumotion/component/feedcomponent010.py:361
+msgid ""
+"Your gst-plugins-base is too old, so feeder statistics will be unavailable."
+msgstr ""
+
+#: flumotion/component/feedcomponent010.py:641
+#, fuzzy
+msgid "Internal Flumotion error."
+msgstr "Fehler in GStreamer"
+
+#: flumotion/component/component.py:423
+#, fuzzy
+msgid "Could not setup component."
+msgstr "Konnte Komponente nicht einrichten:"
+
+#: flumotion/component/component.py:548
+msgid ""
+"Your configuration uses deprecated properties.  Please update your "
+"configuration and correct them.\n"
+msgstr "Die Einstellungsdatei benutzt veraltete Eigenschaften.\n"
+
+#: flumotion/component/component.py:553
+#, fuzzy, python-format
+msgid "Please rename '%s' to '%s'.\n"
+msgstr "Bitte '%s' in %s umbenennen."
+
+#: flumotion/component/bouncers/ipbouncer.py:58
+#, python-format
+msgid "Invalid value for property %r: %s"
+msgstr ""
+
+#: flumotion/component/converters/overlay/overlay.py:77
+#, python-format
+msgid "Overlayed text '%s' too wide for the video image."
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:343
+msgid ""
+"Internal error in component UI.  Please file a bug against the component."
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:348
+msgid ""
+"Internal error.\n"
+"See component error message\n"
+"for more details."
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:487
+msgid "Feeders"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:508
+#, python-format
+msgid "Feeder <b>%s</b>"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:519
+msgid "<i>select an eater</i>"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:522
+#, fuzzy, python-format
+msgid "<b>%s</b>"
+msgstr "<b>Klienten</b>"
+
+#: flumotion/component/base/admin_gtk.py:534
+#: flumotion/component/base/admin_gtk.py:546
+msgid "Unknown"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:709
+#, fuzzy
+msgid "Eaters"
+msgstr "Motiv"
+
+#: flumotion/component/base/admin_gtk.py:737
+#, python-format
+msgid "Eater <b>%s</b>"
+msgstr ""
+
+#: flumotion/component/base/admin_gtk.py:784
+#: flumotion/component/base/admin_gtk.py:789
+#: flumotion/component/base/admin_gtk.py:796
+#: flumotion/component/base/admin_gtk.py:826
+#, python-format
+msgid "%d units"
+msgstr ""
+
+#: flumotion/component/effects/volume/admin_gtk.py:104
+msgid "Left channel level:"
+msgstr ""
+
+#: flumotion/component/effects/volume/admin_gtk.py:106
+msgid "Mono channel level:"
+msgstr ""
+
+#: flumotion/component/effects/volume/admin_gtk.py:108
+msgid "Right channel level:"
+msgstr ""
+
+#: flumotion/component/effects/volume/admin_gtk.py:110
+#, python-format
+msgid "Channel %d level:"
+msgstr ""
+
+#: flumotion/wizard/enums.py:83
+msgid "SMPTE Color bars"
+msgstr "SMPTE Farbbalken"
+
+#: flumotion/wizard/enums.py:84
+msgid "Random (television snow)"
+msgstr "Zufall (Fernseh-Schnee)"
+
+#: flumotion/wizard/enums.py:85
+msgid "Totally black"
+msgstr "Schwarz"
+
+#: flumotion/wizard/productionsteps.py:150
+msgid "If you want to stream video"
+msgstr "Wenn Video gesendet werden soll"
+
+#: flumotion/wizard/productionsteps.py:152
+msgid "If you want to stream audio"
+msgstr "Wenn Audio gesendet werden soll"
+
+#: flumotion/wizard/productionsteps.py:339
+msgid "Probing webcam, this can take a while..."
+msgstr "Überprüfe die Webcam. Dies kann einen Moment dauern..."
+
+#: flumotion/wizard/productionsteps.py:534
+#: flumotion/wizard/productionsteps.py:847
+#, python-format
+msgid "%dx%d, %d/%d pixel aspect ratio"
+msgstr "%dx%d,·Pixelseitenverhältnis %d/%d"
+
+#: flumotion/wizard/productionsteps.py:540
+#: flumotion/wizard/productionsteps.py:853
+msgid "Checking for Firewire device..."
+msgstr "Überprüfe Firewire-geräte"
+
+#: flumotion/wizard/productionsteps.py:615
+#: flumotion/wizard/productionsteps.py:925
+#, python-format
+msgid "%s, %s (%d/%d pixel aspect ratio)"
+msgstr "%s,·%s·(Pixelseitenverhältnis %d/%d)"
+
+#: flumotion/wizard/configurationwizard.py:216
+#: flumotion/wizard/basesteps.py:159
+#, python-format
+msgid "Worker '%s' is missing GStreamer element '%s'."
+msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
+msgstr[0] "Die Komponente '%s' vermisst das GStreamer-Element '%s'."
+msgstr[1] "Die Komponente '%s' vermisst die GStreamer-Elemente '%s'."
+
+#: flumotion/wizard/configurationwizard.py:221
+msgid ""
 "\n"
-"(C)·2004-2005·Fluendo·S.L."
+"Please install the necessary GStreamer plug-ins that provide these elements "
+"and restart the worker."
+msgstr ""
+"\n"
+"Bitte die notwendigen GStreamer-Plugins installierenund den Arbeiter "
+"neustarten."
 
-#: flumotion/admin/gtk/client.py:1150
-msgid "Authors"
-msgstr "Autoren"
+#: flumotion/wizard/configurationwizard.py:224
+#: flumotion/wizard/configurationwizard.py:280
+msgid ""
+"\n"
+"\n"
+"You will not be able to go forward using this worker."
+msgstr ""
+"\n"
+"\n"
+"Es ist nich möglich fortzusetzen, wenn dieser Arbeiter benutzt werden soll."
 
-#: flumotion/admin/gtk/message.py:35
+#: flumotion/wizard/configurationwizard.py:272
+#: flumotion/wizard/basesteps.py:142
+#, python-format
+msgid "Worker '%s' cannot import module '%s'."
+msgstr "Arbeiter '%s' kann das Module '%s' nicht importieren."
+
+#: flumotion/wizard/configurationwizard.py:275
+#: flumotion/wizard/basesteps.py:144
+#, python-format
+msgid ""
+"\n"
+"This module is part of '%s'."
+msgstr ""
+"\n"
+"Dieses Modul ist teil von '%s'."
+
+#: flumotion/wizard/configurationwizard.py:278
+#: flumotion/wizard/basesteps.py:146
+#, python-format
+msgid ""
+"\n"
+"The project's homepage is %s"
+msgstr ""
+"\n"
+"Die Homepage des Projekts ist %s"
+
+#: flumotion/wizard/configurationwizard.py:318
+#: flumotion/wizard/configurationwizard.py:343
+msgid "Internal error: could not run check code on worker."
+msgstr ""
+"Interner Fehler: konnte die Überprüfung bei einem Arbeiter nicht durchführen."
+
+#: flumotion/wizard/configurationwizard.py:384
+msgid ""
+"All workers have logged out.\n"
+"Make sure your Flumotion network is running properly and try again."
+msgstr ""
+"Alle Arbeiter haben sich abgemeldet.\n"
+"Gehe sicher, dass das Flumotion Netzwerk ordentlich funktioniert und "
+"versuche es erneut."
+
+#: flumotion/wizard/basesteps.py:148 flumotion/wizard/basesteps.py:164
+msgid ""
+"\n"
+"\n"
+"Click Next to proceed without overlay."
+msgstr ""
+"\n"
+"\n"
+"Bitte 'Weiter' klicke, um ohne Overlay fortzufahren."
+
+#: flumotion/worker/job.py:327
+msgid "Check timed out."
+msgstr ""
+
+#: flumotion/worker/checks/gst010.py:175
+msgid "Device node /dev/raw1394 does not exist."
+msgstr "Geräte-Knoten /dev/raw1394 existiert nicht."
+
+#: flumotion/worker/checks/gst010.py:197
+msgid ""
+"Could not find or open the Firewire device. Check the device node and its "
+"permissions."
+msgstr ""
+"Konnte das Firewiregerät nicht finden oder öffnen. Bitte den Gerät-Knotenund "
+"die Rechte überprüfen."
+
+#: flumotion/worker/checks/gst010.py:201
+msgid "No Firewire device found."
+msgstr "Kein Firewiregerät gefunden."
+
+#: flumotion/worker/checks/gst010.py:204
+#, fuzzy
+msgid ""
+"Could not open Firewire device for reading. Check permissions on the device."
+msgstr ""
+"Konnte das Firewiregerät nicht zum Lesen öffnen. Bitte die Rechte überprüfen."
+
+#: flumotion/worker/checks/gst010.py:211
+msgid "Could not probe Firewire device."
+msgstr "Konnte das Firewiregerät nicht überprüfen."
+
+#: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
+msgid "Synchronization between audio and video may not be correct.\n"
+msgstr "Audio und Video sind eventuell asynchron .\n"
+
+#: flumotion/worker/checks/check.py:46
+#, python-format
+msgid ""
+"Could not open device '%s' for reading.  Check permissions on the device."
+msgstr "Konnte Gerät '%s' nicht zum Lesen öffnen. Bitte die Reche überprüfen."
+
+#: flumotion/worker/checks/check.py:49
+#, python-format
+msgid "Could not open device '%s'.  Check permissions on the device."
+msgstr "Konnte Gerät '%s' nicht öffnen. Bitte die Reche überprüfen."
+
+#: flumotion/worker/checks/check.py:52
+#, python-format
+msgid "Device '%s' is already in use."
+msgstr "Gerät '%s' wird bereits benutzt."
+
+#: flumotion/worker/checks/check.py:55
+#, python-format
+msgid "Device '%s' did not accept the requested settings."
+msgstr "Gerät '%s' nahm die erforderten Einstellungen nicht an."
+
+#: flumotion/worker/checks/check.py:97
+#, python-format
+msgid "Could not probe device '%s'."
+msgstr "Überprüfung von '%s' nicht möglich"
+
+#: flumotion/worker/checks/check.py:115
+#, python-format
+msgid "No device found on %s."
+msgstr "Kein Gerät bei %s gefunden."
+
+#: flumotion/worker/checks/check.py:157
+#, fuzzy, python-format
+msgid "This host is missing the '%s' GStreamer plug-in.\n"
+msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
+
+#: flumotion/worker/checks/check.py:160
+#, fuzzy, python-format
+msgid "Please install '%s'.\n"
+msgstr "Bitte '%s' in %s umbenennen."
+
+#: flumotion/launch/main.py:76 flumotion/admin/gtk/message.py:35
 msgid "Error"
 msgstr "Fehler"
 
+#: flumotion/launch/main.py:77 flumotion/test/test_common_messages.py:122
+#: flumotion/test/test_common_messages.py:159
 #: flumotion/admin/gtk/message.py:36
-#: flumotion/test/test_common_messages.py:116
-#: flumotion/test/test_common_messages.py:153
 msgid "Warning"
 msgstr "Warnung"
 
-#: flumotion/admin/gtk/message.py:37 flumotion/test/test_common_messages.py:57
-#: flumotion/test/test_common_messages.py:151
-#: flumotion/test/test_common_messages.py:167
+#: flumotion/launch/main.py:78 flumotion/test/test_common_messages.py:63
+#: flumotion/test/test_common_messages.py:157
+#: flumotion/test/test_common_messages.py:173
+#: flumotion/admin/gtk/message.py:37
 msgid "Note"
 msgstr "Notiz"
+
+#: flumotion/test/test_common_messages.py:44
+#: flumotion/test/test_common_messages.py:56
+msgid "Something is really wrong."
+msgstr "Etwas läuft wirklich falsch."
+
+#: flumotion/test/test_common_messages.py:59
+#, fuzzy, python-format
+msgid "%s is really wrong."
+msgstr "Etwas läuft wirklich falsch."
+
+#: flumotion/test/test_common_messages.py:64
+msgid "warning"
+msgstr "Warnung"
+
+#: flumotion/test/test_common_messages.py:68
+#: flumotion/test/test_common_messages.py:93
+#, python-format
+msgid "%s can be translated"
+msgstr "%s kann übersetzt werden."
+
+#: flumotion/test/test_common_messages.py:75
+#, python-format
+msgid "%s %d has %d thing"
+msgid_plural "%s %d has %d things"
+msgstr[0] "%s %d hat %d Dinge"
+msgstr[1] "%s %d bei %d Dingen"
+
+#: flumotion/test/test_common_messages.py:102
+msgid "Something is really wrong. "
+msgstr "Etwas läuft wirklich falsch"
+
+#: flumotion/test/test_common_messages.py:103
+#, python-format
+msgid "But does %s know what ?"
+msgstr "Aber weiß %s das?"
+
+#: flumotion/test/test_common_messages.py:135
+msgid "uh oh"
+msgstr "oh oh"
+
+#: flumotion/test/test_i18n.py:50 flumotion/test/test_i18n.py:87
+msgid "I am a translatable string"
+msgstr "Ich bin ein übersetzbarer Text"
+
+#: flumotion/test/test_i18n.py:51 flumotion/test/test_i18n.py:88
+msgid "I am a translated string"
+msgstr "Ich bin ein übersetzter Text"
+
+#: flumotion/test/test_i18n.py:104 flumotion/test/test_i18n.py:109
+#, python-format
+msgid "I can translate %d thing"
+msgid_plural "I can translate %d things"
+msgstr[0] "Ich kann %d übersetzten"
+msgstr[1] "Ich kann %d übersetzten"
+
+#: flumotion/test/test_i18n.py:107 flumotion/test/test_i18n.py:111
+#, python-format
+msgid "I translated %d thing"
+msgid_plural "I translated %d things"
+msgstr[0] "Ich übersetzte %d Ding"
+msgstr[1] "Ich übersetze %d Dinge"
+
+#: flumotion/admin/admin.py:391
+msgid "Internal error in component."
+msgstr "Fehler innerhalb einer Komponente"
 
 #: flumotion/admin/gtk/message.py:140
 #, python-format
@@ -271,7 +819,7 @@ msgstr ""
 msgid "Could not create manager."
 msgstr "Konnte Komponente nicht einrichten:"
 
-#: flumotion/admin/gtk/greeter.py:260
+#: flumotion/admin/gtk/greeter.py:260 data/glade/greeter-start_new.glade:33
 msgid "Starting manager ..."
 msgstr ""
 
@@ -336,800 +884,514 @@ msgid ""
 "<i>%s</i>\n"
 msgstr ""
 
-#: flumotion/admin/gtk/parts.py:172
+#: flumotion/admin/gtk/parts.py:176
 msgid "Mood"
 msgstr "Stimmung"
 
-#: flumotion/admin/gtk/parts.py:177 flumotion/admin/gtk/parts.py:424
+#: flumotion/admin/gtk/parts.py:181 flumotion/admin/gtk/parts.py:412
 msgid "Component"
 msgstr "Komponente"
 
-#: flumotion/admin/gtk/parts.py:182
+#: flumotion/admin/gtk/parts.py:186
 msgid "Worker"
 msgstr "Arbeiter"
 
-#: flumotion/admin/gtk/parts.py:373
+#: flumotion/admin/gtk/parts.py:363
 msgid "[any worker]"
 msgstr "[irgendein Arbeiter]"
 
-#: flumotion/admin/gtk/parts.py:426
+#: flumotion/admin/gtk/parts.py:414
 msgid "_Restart"
 msgstr "_Neustart"
 
-#: flumotion/admin/gtk/parts.py:430
+#: flumotion/admin/gtk/parts.py:418
 msgid "_Start"
 msgstr "_Start"
 
-#: flumotion/admin/gtk/parts.py:437
+#: flumotion/admin/gtk/parts.py:425
 msgid "St_op"
 msgstr "St_opp"
 
-#: flumotion/admin/gtk/parts.py:443
+#: flumotion/admin/gtk/parts.py:431
 msgid "_Delete"
 msgstr ""
 
-#: flumotion/admin/gtk/parts.py:451
+#: flumotion/admin/gtk/parts.py:439
 msgid "Reload _code"
 msgstr "_Code neuladen"
 
-#: flumotion/admin/gtk/parts.py:455
+#: flumotion/admin/gtk/parts.py:443
 msgid "_Modify element property ..."
 msgstr "_Eigenschaften des Elements editieren..."
 
-#: flumotion/wizard/enums.py:83
-msgid "SMPTE Color bars"
-msgstr "SMPTE Farbbalken"
-
-#: flumotion/wizard/enums.py:84
-msgid "Random (television snow)"
-msgstr "Zufall (Fernseh-Schnee)"
-
-#: flumotion/wizard/enums.py:85
-msgid "Totally black"
-msgstr "Schwarz"
-
-#: flumotion/wizard/wizard.py:302
-msgid ""
-"All workers have logged out.\n"
-"Make sure your Flumotion network is running properly and try again."
-msgstr ""
-"Alle Arbeiter haben sich abgemeldet.\n"
-"Gehe sicher, dass das Flumotion Netzwerk ordentlich funktioniert und "
-"versuche es erneut."
-
-#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:646
-#, python-format
-msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "Die Komponente '%s' vermisst das GStreamer-Element '%s'."
-msgstr[1] "Die Komponente '%s' vermisst die GStreamer-Elemente '%s'."
-
-#: flumotion/wizard/wizard.py:357
-msgid ""
-"\n"
-"Please install the necessary GStreamer plug-ins that provide these elements "
-"and restart the worker."
-msgstr ""
-"\n"
-"Bitte die notwendigen GStreamer-Plugins installierenund den Arbeiter "
-"neustarten."
-
-#: flumotion/wizard/wizard.py:360 flumotion/wizard/wizard.py:417
-msgid ""
-"\n"
-"\n"
-"You will not be able to go forward using this worker."
-msgstr ""
-"\n"
-"\n"
-"Es ist nich möglich fortzusetzen, wenn dieser Arbeiter benutzt werden soll."
-
-#: flumotion/wizard/wizard.py:409
-#, python-format
-msgid "Worker '%s' cannot import module '%s'."
-msgstr "Arbeiter '%s' kann das Module '%s' nicht importieren."
-
-#: flumotion/wizard/wizard.py:412
-#, python-format
-msgid ""
-"\n"
-"This module is part of '%s'."
-msgstr ""
-"\n"
-"Dieses Modul ist teil von '%s'."
-
-#: flumotion/wizard/wizard.py:415
-#, python-format
-msgid ""
-"\n"
-"The project's homepage is %s"
-msgstr ""
-"\n"
-"Die Homepage des Projekts ist %s"
-
-#: flumotion/wizard/steps.py:83
-msgid "If you want to stream video"
-msgstr "Wenn Video gesendet werden soll"
-
-#: flumotion/wizard/steps.py:85
-msgid "If you want to stream audio"
-msgstr "Wenn Audio gesendet werden soll"
-
-#: flumotion/wizard/steps.py:269 flumotion/wizard/steps.py:416
-#, python-format
-msgid "%s, %s (%d/%d pixel aspect ratio)"
-msgstr "%s,·%s·(Pixelseitenverhältnis %d/%d)"
-
-#: flumotion/wizard/steps.py:320 flumotion/wizard/steps.py:467
-#, python-format
-msgid "%dx%d, %d/%d pixel aspect ratio"
-msgstr "%dx%d,·Pixelseitenverhältnis %d/%d"
-
-#: flumotion/wizard/steps.py:340 flumotion/wizard/steps.py:487
-msgid "Checking for Firewire device..."
-msgstr "Überprüfe Firewire-geräte"
-
-#: flumotion/wizard/steps.py:553
-msgid "Probing webcam, this can take a while..."
-msgstr "Überprüfe die Webcam. Dies kann einen Moment dauern..."
-
-#: flumotion/wizard/steps.py:651
-msgid ""
-"\n"
-"\n"
-"Click Next to proceed without overlay."
-msgstr ""
-"\n"
-"\n"
-"Bitte 'Weiter' klicke, um ohne Overlay fortzufahren."
-
-#: flumotion/wizard/step.py:127 flumotion/wizard/step.py:152
-msgid "Internal error: could not run check code on worker."
-msgstr ""
-"Interner Fehler: konnte die Überprüfung bei einem Arbeiter nicht durchführen."
-
-#: flumotion/common/worker.py:78
-#, python-format
-msgid "The %s was killed.\n"
-msgstr ""
-
-#: flumotion/common/worker.py:81
-#, python-format
-msgid "The %s crashed.\n"
-msgstr ""
-
-#: flumotion/common/worker.py:101
-msgid ""
-"However, no core dump was generated. You may need to configure the "
-"environment if you want to further debug this problem."
-msgstr ""
-
-#: flumotion/common/worker.py:110
-#, python-format
-msgid "The core dump is '%s' on the host running '%s'."
-msgstr ""
-
-#: flumotion/component/component.py:480 flumotion/manager/component.py:853
-#: flumotion/manager/component.py:981
-#, fuzzy
-msgid "Could not setup component."
-msgstr "Konnte Komponente nicht einrichten:"
-
-#: flumotion/component/component.py:640
-msgid ""
-"Your configuration uses deprecated properties.  Please update your "
-"configuration and correct them.\n"
-msgstr "Die Einstellungsdatei benutzt veraltete Eigenschaften.\n"
-
-#: flumotion/component/component.py:645
+#: flumotion/admin/gtk/dialogs.py:121
 #, fuzzy, python-format
-msgid "Please rename '%s' to '%s'.\n"
-msgstr "Bitte '%s' in %s umbenennen."
+msgid "Connection to manager on %s failed (%s)."
+msgstr "Verbindung zum Manager auf %s schlug fehl (%s)."
 
-#: flumotion/component/feedcomponent.py:268
+#: flumotion/admin/gtk/dialogs.py:195
+msgid "About Flumotion"
+msgstr "Über Flumotion"
+
+#: flumotion/admin/gtk/dialogs.py:216
+#, fuzzy
+msgid ""
+"Flumotion is a streaming media server.\n"
+"\n"
+"© 2004, 2005, 2006, 2007 Fluendo S.L."
+msgstr ""
+"Flumotion ist eine Streaming Media Server.\n"
+"\n"
+"(C)·2004-2005·Fluendo·S.L."
+
+#: flumotion/admin/gtk/dialogs.py:228
+msgid "Authors"
+msgstr "Autoren"
+
+#: flumotion/admin/gtk/client.py:245
+msgid "_Connection"
+msgstr "_Verbindung"
+
+#: flumotion/admin/gtk/client.py:246
+#, fuzzy
+msgid "_Open Recent Connection..."
+msgstr "Alte Verbinsung öffnen"
+
+#: flumotion/admin/gtk/client.py:248
+#, fuzzy
+msgid "Open _Existing Connection..."
+msgstr "Öffne Verbindung..."
+
+#: flumotion/admin/gtk/client.py:250
+msgid "_Import Configuration..."
+msgstr "Einstellungen _laden..."
+
+#: flumotion/admin/gtk/client.py:252
+msgid "_Export Configuration..."
+msgstr "Einstellungen _speichern..."
+
+#: flumotion/admin/gtk/client.py:254
+#, fuzzy
+msgid "_Quit"
+msgstr "_Qualität:"
+
+#: flumotion/admin/gtk/client.py:258
+msgid "_Manage"
+msgstr "_Managen"
+
+#: flumotion/admin/gtk/client.py:259
+#, fuzzy
+msgid "_S_tart Component"
+msgstr "Komponente s_tarten"
+
+#: flumotion/admin/gtk/client.py:261
+msgid "St_op Component"
+msgstr "Komponente st_oppen"
+
+#: flumotion/admin/gtk/client.py:263
+#, fuzzy
+msgid "_Delete Component"
+msgstr "Komponente s_tarten"
+
+#: flumotion/admin/gtk/client.py:265
+msgid "Start _All"
+msgstr "_Alle Starten"
+
+#: flumotion/admin/gtk/client.py:267
+msgid "Stop A_ll"
+msgstr "Alle sto_ppen"
+
+#: flumotion/admin/gtk/client.py:269
+msgid "_Clear All"
+msgstr "Alle _entfernen"
+
+#: flumotion/admin/gtk/client.py:271
+msgid "Run _Wizard"
+msgstr "_Wizard starten"
+
+#: flumotion/admin/gtk/client.py:275
+msgid "_Debug"
+msgstr "_Debug"
+
+#: flumotion/admin/gtk/client.py:276
+msgid "Reload _Manager"
+msgstr "_Manager neustarten"
+
+#: flumotion/admin/gtk/client.py:278
+#, fuzzy
+msgid "Reload _Admin"
+msgstr "_Admin neuladen"
+
+#: flumotion/admin/gtk/client.py:280
+#, fuzzy
+msgid "Reload A_ll"
+msgstr "A_lle neuladen"
+
+#: flumotion/admin/gtk/client.py:282
+msgid "Start _Shell"
+msgstr "starte _Kommandozeile"
+
+#: flumotion/admin/gtk/client.py:286
+msgid "_Help"
+msgstr "_Aide"
+
+#: flumotion/admin/gtk/client.py:287
+msgid "_About"
+msgstr ""
+
+#: flumotion/admin/gtk/client.py:319
+msgid "Not connected"
+msgstr "nicht verbunden"
+
+#: flumotion/admin/gtk/client.py:390
+msgid "The wizard cannot be run because no workers are logged in."
+msgstr ""
+"Der Wizard kann nicht gestartet werden, wenn keine Arbeiter angemeldet sind."
+
+#: flumotion/admin/gtk/client.py:406
+#, fuzzy, python-format
+msgid "Connecting to %(host)s:%(port)s"
+msgstr "Verbinde mit %s:%s"
+
+#: flumotion/admin/gtk/client.py:576
+#, python-format
+msgid "Reloading component code for %s"
+msgstr "Lade den  Code für die Komponente %s"
+
+#: flumotion/admin/gtk/client.py:618
+msgid "No component selected."
+msgstr "Keine Komponente ausgewählt."
+
+#: flumotion/admin/gtk/client.py:636
+#, python-format
+msgid "Failed to %(action)s component %(name)s"
+msgstr ""
+
+#: flumotion/admin/gtk/client.py:700
+#, python-format
+msgid "Component %s is sad"
+msgstr "Die Komponente %s ist traurig"
+
+#: flumotion/admin/gtk/client.py:720
+#, python-format
+msgid "%s - Flumotion Administration"
+msgstr "%s - Flumotion Administration"
+
+#: flumotion/admin/gtk/client.py:752
+msgid "Lost connection to manager, reconnecting ..."
+msgstr "Verbindung zum Manager verloren, versuche es erneut"
+
+#: flumotion/admin/gtk/client.py:765
+#, python-format
+msgid "Connection to manager on %s was refused."
+msgstr "Die Verbindung zum Manager auf %s wurde verweigert."
+
+#: flumotion/admin/gtk/client.py:767
+#, python-format
+msgid "Connection to %s was refused"
+msgstr "Verbindung %s wurde verweigert."
+
+#: flumotion/admin/gtk/client.py:781
+#, fuzzy, python-format
+msgid "Connection to manager on %(conn)s failed (%(reason)s)."
+msgstr "Verbindung zum Manager auf %s schlug fehl (%s)."
+
+#: flumotion/admin/gtk/client.py:829
+msgid "Import Configuration..."
+msgstr "Einstellungen laden"
+
+#: flumotion/admin/gtk/client.py:846
+msgid "Export Configuration..."
+msgstr "Einstellungen speichern"
+
+#: flumotion/admin/gtk/client.py:857
+msgid ""
+"File already exists.\n"
+"Overwrite?"
+msgstr ""
+"Diese Datei existiert bereits.\n"
+"Soll sie überschrieben werden?"
+
+#: flumotion/admin/gtk/client.py:891
+msgid "Reloading ..."
+msgstr "Erneut Laden"
+
+#: flumotion/admin/gtk/client.py:892
+msgid "Reloading client code"
+msgstr "Den Code des Klienten neuladen"
+
+#: flumotion/admin/gtk/client.py:904
 #, python-format
 msgid ""
-"The worker does not have the '%s' element installed.\n"
-"Please install the necessary plug-in and restart the component.\n"
+"Could not reload component:\n"
+"%s."
 msgstr ""
-"Beim Arbeiter ist das Element'%s' nicht installiert.\n"
-"Bitte das notwendige Plugin installieren und die Komponente neustarten.\n"
+"Konnte die Komponente nicht neuladen:\n"
+"%s."
 
-#: flumotion/component/feedcomponent.py:281
-msgid "GStreamer error: could not parse component pipeline."
-msgstr "GStreamer-Fehler: konnte die Pipeline nicht parsen."
-
-#: flumotion/component/base/admin_gtk.py:467
-msgid "Feeders"
-msgstr ""
-
-#: flumotion/component/base/admin_gtk.py:488
+#: flumotion/admin/gtk/client.py:927
 #, python-format
-msgid "Feeder <b>%s</b>"
-msgstr ""
+msgid "Reloading %s code"
+msgstr "Lade den Code von %s neu"
 
-#: flumotion/component/base/admin_gtk.py:491
-#, python-format
-msgid "Feeding to <b>%s</b>"
-msgstr ""
-
-#: flumotion/component/base/admin_gtk.py:495
-#: flumotion/component/base/admin_gtk.py:509
-#: flumotion/component/base/admin_gtk.py:709
-msgid "Byte"
-msgstr ""
-
-#: flumotion/component/base/admin_gtk.py:503
-#: flumotion/component/base/admin_gtk.py:515
-msgid "Unknown"
-msgstr ""
-
-#: flumotion/component/base/admin_gtk.py:678
-#, fuzzy
-msgid "Eaters"
-msgstr "Motiv"
-
-#: flumotion/component/base/admin_gtk.py:706
-#, python-format
-msgid "Eater <b>%s</b>"
-msgstr ""
-
-#: flumotion/component/base/admin_gtk.py:751
-#: flumotion/component/base/admin_gtk.py:756
-#: flumotion/component/base/admin_gtk.py:763
-#: flumotion/component/base/admin_gtk.py:793
-#, python-format
-msgid "%d units"
-msgstr ""
-
-#: flumotion/component/base/feeders.glade:7
-#: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
-msgid "Statistics"
-msgstr "Statistik"
-
-#: flumotion/component/base/feeders.glade:113
-#, fuzzy
-msgid "<b>Current connection</b>"
-msgstr "<b>Klientenkonsum</b>"
-
-#: flumotion/component/base/feeders.glade:136
-#, fuzzy
-msgid "Connections made:"
-msgstr "_Verbindung"
-
-#: flumotion/component/base/feeders.glade:183
-#: flumotion/component/base/feeders.glade:309
-#, fuzzy
-msgid "Bytes read:"
-msgstr "Bitrate:"
-
-#: flumotion/component/base/feeders.glade:230
-#: flumotion/component/base/feeders.glade:332
-msgid "Buffers dropped: "
-msgstr ""
-
-#: flumotion/component/base/feeders.glade:286
-#, fuzzy
-msgid "Connected since:"
-msgstr "_Verbindung"
-
-#: flumotion/component/base/feeders.glade:355
-#, fuzzy
-msgid "Connection time:"
-msgstr "_Verbindung"
-
-#: flumotion/component/base/feeders.glade:493
-msgid "Disconnected since:"
-msgstr ""
-
-#: flumotion/component/base/feeders.glade:516
-#, fuzzy
-msgid "Disconnection time:"
-msgstr "_Verbindung"
-
-#: flumotion/component/base/feeders.glade:598
-#, fuzzy
-msgid "<b>All Connections</b>"
-msgstr "<b>Klientenkonsum</b>"
-
-#: flumotion/component/base/feeders.glade:622
-msgid "Last buffer read:"
-msgstr ""
-
-#: flumotion/component/consumers/httpstreamer/http.py:336
-#: flumotion/worker/checks/check.py:148
-#, fuzzy, python-format
-msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
-msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
-
-#: flumotion/component/consumers/httpstreamer/http.py:338
-#: flumotion/component/muxers/checks.py:43
-#: flumotion/worker/checks/check.py:152 flumotion/worker/checks/encoder.py:45
-#: flumotion/worker/checks/encoder.py:66
-#, python-format
-msgid "Please upgrade '%s' to version %s."
-msgstr "Bitte '%s' auf Version %s aktualisieren."
-
-#: flumotion/component/consumers/httpstreamer/http.py:724
-#, python-format
-msgid "Network error: TCP port %d is not available."
-msgstr "Netzwerk-Fehler: der TCP-Port %d ist nicht benutzbar."
-
-#: flumotion/component/consumers/httpstreamer/http.glade:33
-msgid "<b>Stream</b>"
-msgstr "<b>Strom</b>"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:58
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:51
-msgid "Mime type:"
-msgstr "MIME-Type:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:84
-msgid "Uptime:"
-msgstr "Uptime:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:110
-#: flumotion/component/consumers/httpstreamer/http.glade:488
-msgid "Bit rate:"
-msgstr "Bitrate:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:136
-#: flumotion/component/consumers/httpstreamer/http.glade:514
-msgid "Total bytes:"
-msgstr "Total (bytes):"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:162
-msgid "<b>Clients</b>"
-msgstr "<b>Klienten</b>"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:187
-msgid "Current:"
-msgstr "Zur Zeit:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:213
-msgid "Average:"
-msgstr "Im Schnitt:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:239
-msgid "Peak:"
-msgstr "Maximum:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:313
-msgid "of"
-msgstr "von"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:389
-msgid "at"
-msgstr "bei"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:440
-msgid "<b>Client Consumption</b>"
-msgstr "<b>Klientenkonsum</b>"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:655
-msgid "Web URL:"
-msgstr "Internet URL:"
-
-#: flumotion/component/effects/volume/volume.glade:7
-#: data/glade/authenticate.glade:8 data/glade/connections.glade:8
-#: data/glade/greeter-authenticate.glade:8
+#: data/glade/wizard_smoke.glade:7 data/glade/wizard_welcome.glade:7
+#: data/glade/wizard_overview.glade:7 data/glade/wizard_source.glade:7
+#: data/glade/wizard_tvcard.glade:7 data/glade/wizard_theora.glade:7
+#: data/glade/connections.glade:7 data/glade/wizard_webcam.glade:7
+#: data/glade/wizard_overlay.glade:7 data/glade/wizard_audio_encoder.glade:7
+#: data/glade/wizard_license.glade:7 data/glade/authenticate.glade:7
+#: data/glade/wizard_encoding.glade:7 data/glade/open-connection.glade:7
+#: data/glade/greeter-load_connection.glade:7
+#: data/glade/greeter-start_new.glade:7
+#: data/glade/greeter-start_new_success.glade:8
+#: data/glade/greeter-start_new_error.glade:8
+#: data/glade/wizard_summary.glade:7 data/glade/wizard_soundcard.glade:7
+#: data/glade/wizard_http.glade:7 data/glade/greeter-initial.glade:7
+#: data/glade/wizard_vorbis.glade:7 data/glade/wizard_consumption.glade:7
+#: data/glade/spyglass.glade:8 data/glade/greeter-authenticate.glade:7
+#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_testsource.glade:7
 #: data/glade/greeter-connect_to_existing.glade:7
-#: data/glade/greeter-initial.glade:8
-#: data/glade/greeter-load_connection.glade:8
-#: data/glade/open-connection.glade:7 data/glade/wizard_audio_encoder.glade:7
-#: data/glade/wizard_audiotest.glade:8 data/glade/wizard_consumption.glade:7
-#: data/glade/wizard_disk.glade:8 data/glade/wizard_encoding.glade:8
-#: data/glade/wizard_firewire.glade:7 data/glade/wizard_http.glade:8
-#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_license.glade:7
-#: data/glade/wizard_overlay.glade:7 data/glade/wizard_overview.glade:8
-#: data/glade/wizard_smoke.glade:8 data/glade/wizard_soundcard.glade:8
-#: data/glade/wizard_source.glade:8 data/glade/wizard_summary.glade:8
-#: data/glade/wizard_testsource.glade:8 data/glade/wizard_theora.glade:8
-#: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
-#: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
+#: data/glade/wizard_disk.glade:7 data/glade/wizard_audiotest.glade:7
+#: data/glade/wizard_shout2.glade:7 data/glade/wizard_firewire.glade:7
 msgid "window1"
 msgstr "hmm... Grünkohl !"
 
-#: flumotion/component/effects/volume/volume.glade:33
-#, fuzzy
-msgid "_Change volume:"
-msgstr "_Kanäle:"
+#: data/glade/wizard_smoke.glade:31
+msgid "M_inimum quality:"
+msgstr "m_inimale Qualität:"
 
-#: flumotion/component/effects/volume/volume.glade:61
-msgid "_Allow increasing the volume"
-msgstr ""
+#: data/glade/wizard_smoke.glade:56
+msgid "M_aximum quality:"
+msgstr "m_aximale Qualität:"
 
-#: flumotion/component/misc/repeater/repeater.py:38
-#: flumotion/component/producers/audiotest/audiotest.py:88
-#: flumotion/component/producers/videotest/videotest.py:84
+#: data/glade/wizard_smoke.glade:81
+msgid "_Threshold:"
+msgstr "_Grenze:"
+
+#: data/glade/wizard_smoke.glade:106
+msgid "_Keyframe spacing: every"
+msgstr "Abstand zwischen _Keyframes: jeder"
+
+#: data/glade/wizard_smoke.glade:268 data/glade/wizard_theora.glade:184
+msgid "frames"
+msgstr "Bilder"
+
+#: data/glade/wizard.glade:7 data/glade/admin-wizard.glade:7
+msgid "Flumotion Configuration Wizard"
+msgstr "Flumotion Einstellungs Wizard"
+
+#: data/glade/wizard_welcome.glade:36
 msgid ""
-"The 'drop-probability' property is specified, but it only works with "
-"GStreamer core newer than 0.10.12. You should update your version of "
-"GStreamer."
+"Welcome to the Flumotion configuration wizard.\n"
+"\n"
+"This wizard will guide you through the required steps to help you configure "
+"your streaming media server."
 msgstr ""
+"Willkommen im Flumotion Einstellungs Wizard.\n"
+"\n"
+"Dieser Assistent hilft bei der Einrichtung des Flumotion Streamer Servers."
 
-#: flumotion/component/misc/repeater/repeater.py:46
-#: flumotion/component/producers/audiotest/audiotest.py:96
-#: flumotion/component/producers/videotest/videotest.py:92
-msgid "The 'drop-probability' property can only be between 0.0 and 1.0."
-msgstr ""
+#: data/glade/wizard_source.glade:32 data/glade/wizard_encoding.glade:126
+msgid "_Audio:"
+msgstr "_Audio:"
 
-#: flumotion/component/muxers/checks.py:38
-#: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
-#, python-format
-msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
-msgstr "Die Version %s des GStreamer-Plugins '%s' enthält einen Fehler.\n"
-
-#: flumotion/component/muxers/checks.py:41
+#: data/glade/wizard_source.glade:53
 msgid ""
-"The generated Ogg stream will not be fully compliant, and possibly not even "
-"play correctly.\n"
+"TV Card\n"
+"Firewire \n"
+"Webcam\n"
+"Test"
 msgstr ""
-"Der generierte OGG-Strom wird nicht ganz konform sein und deswegeneventuell "
-"nicht korrekt abgespielt.\n"
+"TV-Karte\n"
+"Firewire\n"
+"Webcam\n"
+"Test"
 
-#: flumotion/component/producers/audiotest/admin_gtk.py:88
-#, fuzzy
-msgid "Volume"
-msgstr "Lautstärke:"
-
-#: flumotion/component/producers/audiotest/admin_gtk.py:91
-#: flumotion/component/producers/audiotest/audiotest.glade:8
-#, fuzzy
-msgid "Audio Test"
-msgstr "Audiotest"
-
-#: flumotion/component/producers/audiotest/audiotest.glade:106
+#: data/glade/wizard_source.glade:72
 msgid ""
-"Sine\n"
-"Square\n"
-"Saw"
+"Firewire\n"
+"Sound card\n"
+"Test"
+msgstr ""
+"Firewire\n"
+"Sound-Karte\n"
+"Test"
+
+#: data/glade/wizard_source.glade:91 data/glade/wizard_encoding.glade:101
+msgid "_Video:"
+msgstr "_Video:"
+
+#: data/glade/wizard_tvcard.glade:37
+msgid ""
+"Television\n"
+"Composite1\n"
+"S-Video\n"
+"Composite3"
+msgstr ""
+"Fernsehn\n"
+"Composite1\n"
+"S-Video\n"
+"Composite3"
+
+#: data/glade/wizard_tvcard.glade:55
+msgid ""
+"Composite\n"
+"RCA"
+msgstr ""
+"Composite\n"
+"RCA"
+
+#: data/glade/wizard_tvcard.glade:71 data/glade/videotest.glade:60
+#: data/glade/wizard_testsource.glade:32
+msgid "_Width:"
+msgstr "_Breite"
+
+#: data/glade/wizard_tvcard.glade:96 data/glade/videotest.glade:85
+#: data/glade/wizard_testsource.glade:61
+msgid "_Height:"
+msgstr "_Höhe"
+
+#: data/glade/wizard_tvcard.glade:167 data/glade/wizard_webcam.glade:79
+#: data/glade/wizard_testsource.glade:90
+msgid "F_ramerate:"
+msgstr "F_ramerate:"
+
+#: data/glade/wizard_tvcard.glade:214
+msgid "Video _source:"
+msgstr "_Videoquelle:"
+
+#: data/glade/wizard_tvcard.glade:238
+msgid "TV _norm:"
+msgstr "TV-_Norm:"
+
+#: data/glade/wizard_tvcard.glade:262 data/glade/wizard_webcam.glade:33
+#: data/glade/wizard_soundcard.glade:31
+msgid "_Device:"
+msgstr "_Gerät:"
+
+#: data/glade/wizard_theora.glade:31 data/glade/wizard_audio_encoder.glade:78
+#: data/glade/wizard_vorbis.glade:31
+msgid "kbit/s"
+msgstr "kbit/s"
+
+#: data/glade/wizard_theora.glade:101 data/glade/wizard_audio_encoder.glade:31
+#: data/glade/wizard_vorbis.glade:101
+msgid "Bit _rate:"
+msgstr "Bit-_rate:"
+
+#: data/glade/wizard_theora.glade:123 data/glade/wizard_vorbis.glade:123
+#: data/glade/wizard_jpeg.glade:31
+msgid "_Quality:"
+msgstr "_Qualität:"
+
+#: data/glade/wizard_theora.glade:230
+msgid "%"
 msgstr ""
 
-#: flumotion/component/producers/audiotest/audiotest.glade:125
+#: data/glade/wizard_theora.glade:276
 #, fuzzy
-msgid "_Frequency:"
+msgid "_Keyframe frequency:"
 msgstr "F_requenz:"
 
-#: flumotion/component/producers/audiotest/audiotest.glade:154
-msgid "_Wave form:"
+#: data/glade/wizard_theora.glade:302
+msgid "_Noise sensitivity:"
 msgstr ""
 
-#: flumotion/component/producers/videotest/admin_gtk.py:39
-msgid "Pattern:"
-msgstr "Motiv:"
-
-#: flumotion/component/producers/videotest/admin_gtk.py:83
-msgid "Pattern"
-msgstr "Motiv"
-
-#: flumotion/manager/component.py:414 flumotion/manager/component.py:901
-msgid "Could not start component."
-msgstr "Konnte Komponente nicht starten:"
-
-#: flumotion/manager/component.py:739
+#: data/glade/wizard_theora.glade:328
 #, fuzzy
-msgid "Configuration problem."
-msgstr "Probleme in der Einstellung."
+msgid "_Sharpness:"
+msgstr "_Kanäle:"
 
-#: flumotion/manager/component.py:766
-#, fuzzy, python-format
-msgid "Could not connect component to %s:%d for feed %s."
-msgstr "Konnte Komponente nicht nach %s:%d zur Einspeisung %s verbinden."
-
-#: flumotion/manager/component.py:791
-#, python-format
-msgid "Could not connect to %s:%d for feed %s."
-msgstr "Konnte nicht nach %s:%d zur Einspeisung %s verbinden."
-
-#: flumotion/manager/component.py:929
-#, fuzzy
-msgid "Could not setup component's master clock."
-msgstr "Konnte die Hauptuhr der Komponenten nicht einstellen."
-
-#: flumotion/manager/manager.py:366
-#, fuzzy, python-format
-msgid ""
-"This component is configured for Flumotion version %s, but you are running "
-"version %s.\n"
-"Please update the configuration of the component.\n"
+#: data/glade/wizard_theora.glade:356
+msgid "Advanced settings"
 msgstr ""
-"Diese Komponente ist für Flumtion %r eingestellt, aber hier wird %r "
-"verwendet.\n"
 
-#: flumotion/manager/manager.py:444
+#: data/glade/videotest.glade:30
 #, fuzzy
-msgid "The component is misconfigured."
-msgstr "Die Komponente ist falsch eingestellt."
+msgid "<b>Options</b>"
+msgstr "<b>Klienten</b>"
 
-#: flumotion/manager/manager.py:826
-msgid "The component could not be started."
-msgstr "Die Komponente konnte nicht gestartet werden."
-
-#: flumotion/manager/manager.py:856
+#: data/glade/videotest.glade:110
 #, fuzzy
+msgid "_Framerate:"
+msgstr "F_ramerate:"
+
+#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:76
+#: data/glade/wizard_testsource.glade:119
+msgid "F_ormat:"
+msgstr "F_ormat:"
+
+#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:148
+msgid "_Pattern:"
+msgstr "M_otiv:"
+
+#: data/glade/videotest.glade:183 data/glade/wizard_testsource.glade:177
 msgid ""
-"Component logged in with stale configuration. Consider stopping this "
-"component and restarting the manager."
+"Snow\n"
+"Black"
 msgstr ""
-"Komponente meldete sich mit abgestandenen Einstellungen an.Es wäre besser "
-"die Komponente neu zu starten."
+"Schnee\n"
+"Schwarz"
 
-#: flumotion/worker/checks/check.py:46
-#, python-format
-msgid ""
-"Could not open device '%s' for reading.  Check permissions on the device."
-msgstr "Konnte Gerät '%s' nicht zum Lesen öffnen. Bitte die Reche überprüfen."
+#: data/glade/connections.glade:78
+msgid "Clear _All"
+msgstr "_Alle entfernen"
 
-#: flumotion/worker/checks/check.py:49
-#, python-format
-msgid "Could not open device '%s'.  Check permissions on the device."
-msgstr "Konnte Gerät '%s' nicht öffnen. Bitte die Reche überprüfen."
-
-#: flumotion/worker/checks/check.py:52
-#, python-format
-msgid "Device '%s' is already in use."
-msgstr "Gerät '%s' wird bereits benutzt."
-
-#: flumotion/worker/checks/check.py:55
-#, python-format
-msgid "Device '%s' did not accept the requested settings."
-msgstr "Gerät '%s' nahm die erforderten Einstellungen nicht an."
-
-#: flumotion/worker/checks/check.py:61 flumotion/worker/checks/check.py:65
-msgid "Internal GStreamer error."
-msgstr "Fehler in GStreamer"
-
-#: flumotion/worker/checks/check.py:97
-#, python-format
-msgid "Could not probe device '%s'."
-msgstr "Überprüfung von '%s' nicht möglich"
-
-#: flumotion/worker/checks/check.py:115
-#, python-format
-msgid "No device found on %s."
-msgstr "Kein Gerät bei %s gefunden."
-
-#: flumotion/worker/checks/check.py:140
-#, fuzzy, python-format
-msgid "This host is missing the '%s' GStreamer plug-in.\n"
-msgstr "Version %s des GStreamer-Plugin '%s' ist zu alt.\n"
-
-#: flumotion/worker/checks/check.py:143
-#, fuzzy, python-format
-msgid "Please install '%s'.\n"
-msgstr "Bitte '%s' in %s umbenennen."
-
-#: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
-msgid "Synchronization between audio and video may not be correct.\n"
-msgstr "Audio und Video sind eventuell asynchron .\n"
-
-#: flumotion/worker/checks/gst010.py:175
-msgid "Device node /dev/raw1394 does not exist."
-msgstr "Geräte-Knoten /dev/raw1394 existiert nicht."
-
-#: flumotion/worker/checks/gst010.py:197
-msgid ""
-"Could not find or open the Firewire device. Check the device node and its "
-"permissions."
-msgstr ""
-"Konnte das Firewiregerät nicht finden oder öffnen. Bitte den Gerät-Knotenund "
-"die Rechte überprüfen."
-
-#: flumotion/worker/checks/gst010.py:201
-msgid "No Firewire device found."
-msgstr "Kein Firewiregerät gefunden."
-
-#: flumotion/worker/checks/gst010.py:204
+#: data/glade/wizard_webcam.glade:107
 #, fuzzy
-msgid ""
-"Could not open Firewire device for reading. Check permissions on the device."
-msgstr ""
-"Konnte das Firewiregerät nicht zum Lesen öffnen. Bitte die Rechte überprüfen."
+msgid "_Size:"
+msgstr "_Video:"
 
-#: flumotion/worker/checks/gst010.py:211
-msgid "Could not probe Firewire device."
-msgstr "Konnte das Firewiregerät nicht überprüfen."
-
-#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94
-msgid "I am a translatable string"
-msgstr "Ich bin ein übersetzbarer Text"
-
-#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:95
-msgid "I am a translated string"
-msgstr "Ich bin ein übersetzter Text"
-
-#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
-#, python-format
-msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] "Ich kann %d übersetzten"
-msgstr[1] "Ich kann %d übersetzten"
-
-#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
-#, python-format
-msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] "Ich übersetzte %d Ding"
-msgstr[1] "Ich übersetze %d Dinge"
-
-#: flumotion/test/test_common_messages.py:45
-msgid "Something is really wrong."
-msgstr "Etwas läuft wirklich falsch."
-
-#: flumotion/test/test_common_messages.py:58
-msgid "warning"
-msgstr "Warnung"
-
-#: flumotion/test/test_common_messages.py:62
-#: flumotion/test/test_common_messages.py:87
-#, python-format
-msgid "%s can be translated"
-msgstr "%s kann übersetzt werden."
-
-#: flumotion/test/test_common_messages.py:69
-#, python-format
-msgid "%s %d has %d thing"
-msgid_plural "%s %d has %d things"
-msgstr[0] "%s %d hat %d Dinge"
-msgstr[1] "%s %d bei %d Dingen"
-
-#: flumotion/test/test_common_messages.py:96
-msgid "Something is really wrong. "
-msgstr "Etwas läuft wirklich falsch"
-
-#: flumotion/test/test_common_messages.py:97
-#, python-format
-msgid "But does %s know what ?"
-msgstr "Aber weiß %s das?"
-
-#: flumotion/test/test_common_messages.py:129
-msgid "uh oh"
-msgstr "oh oh"
+#: data/glade/wizard_webcam.glade:135 data/glade/wizard_soundcard.glade:291
+msgid "Name:"
+msgstr "Name:"
 
 #: data/glade/admin.glade:7
 msgid "Flumotion Administration"
 msgstr "Flumotion-Administration"
 
-#: data/glade/admin.glade:38
-msgid "_Connection"
-msgstr "_Verbindung"
-
-#: data/glade/admin.glade:47
-#, fuzzy
-msgid "_Open Recent Connection..."
-msgstr "Alte Verbinsung öffnen"
-
-#: data/glade/admin.glade:67
-#, fuzzy
-msgid "Open _Existing Connection..."
-msgstr "Öffne Verbindung..."
-
-#: data/glade/admin.glade:83
-msgid "_Import Configuration..."
-msgstr "Einstellungen _laden..."
-
-#: data/glade/admin.glade:92
-msgid "_Export Configuration..."
-msgstr "Einstellungen _speichern..."
-
-#: data/glade/admin.glade:107
-#, fuzzy
-msgid "_Quit"
-msgstr "_Qualität:"
-
-#: data/glade/admin.glade:132
-msgid "_Manage"
-msgstr "_Managen"
-
-#: data/glade/admin.glade:141
-msgid "S_tart Component"
-msgstr "Komponente s_tarten"
-
-#: data/glade/admin.glade:162
-msgid "St_op Component"
-msgstr "Komponente st_oppen"
-
-#: data/glade/admin.glade:182
-#, fuzzy
-msgid "_Delete Component"
-msgstr "Komponente s_tarten"
-
-#: data/glade/admin.glade:209
-msgid "Start _All"
-msgstr "_Alle Starten"
-
-#: data/glade/admin.glade:218
-msgid "Stop A_ll"
-msgstr "Alle sto_ppen"
-
-#: data/glade/admin.glade:227
-msgid "_Clear All"
-msgstr "Alle _entfernen"
-
-#: data/glade/admin.glade:254
-msgid "Run _Wizard"
-msgstr "_Wizard starten"
-
-#: data/glade/admin.glade:279
-msgid "_Debug"
-msgstr "_Debug"
-
-#: data/glade/admin.glade:288
-msgid "Reload _Manager"
-msgstr "_Manager neustarten"
-
-#: data/glade/admin.glade:309
-#, fuzzy
-msgid "Reload _Admin"
-msgstr "_Admin neuladen"
-
-#: data/glade/admin.glade:330
-#, fuzzy
-msgid "Reload A_ll"
-msgstr "A_lle neuladen"
-
-#: data/glade/admin.glade:351
-msgid "Start _Shell"
-msgstr "starte _Kommandozeile"
-
-#: data/glade/admin.glade:376
-msgid "_Help"
-msgstr "_Aide"
-
-#: data/glade/admin.glade:385
-msgid "_About"
-msgstr ""
-
-#: data/glade/admin.glade:425
-#, fuzzy
-msgid "Open a recent connection"
-msgstr "Alte Verbinsung öffnen"
-
-#: data/glade/admin-wizard.glade:8 data/glade/wizard.glade:8
-msgid "Flumotion Configuration Wizard"
-msgstr "Flumotion Einstellungs Wizard"
-
-#: data/glade/admin-wizard.glade:43
+#: data/glade/admin-wizard.glade:42
 msgid "Name of step"
 msgstr "Name der Stufe"
 
-#: data/glade/authenticate.glade:32
+#: data/glade/wizard_overlay.glade:34
+msgid "Show _text in upper left corner:"
+msgstr "_Text in der oberen linken Ecke anzeigen:"
+
+#: data/glade/wizard_overlay.glade:57
+#, fuzzy
+msgid "Show _logos in bottom left corner"
+msgstr "_Logo in der unteren linken Ecke anzeigen:"
+
+#: data/glade/wizard_license.glade:32
+msgid "Specify _license:"
+msgstr "Lizenz festlegen:"
+
+#: data/glade/wizard_license.glade:53
+msgid ""
+"Creative Commons\n"
+"GNU FDL\n"
+"Commercial"
+msgstr ""
+"Creative·Commons\n"
+"GNU·FDL\n"
+"Komerziell"
+
+#: data/glade/authenticate.glade:31
 msgid "_Password"
 msgstr "Passwort"
 
-#: data/glade/authenticate.glade:118
+#: data/glade/authenticate.glade:117
 msgid "Name and Password"
 msgstr "Name und Passwort"
 
-#: data/glade/authenticate.glade:148
+#: data/glade/authenticate.glade:147
 msgid "_Authentication Method"
 msgstr "Anmelde-Methode"
 
-#: data/glade/authenticate.glade:175
+#: data/glade/authenticate.glade:174
 msgid "_Username"
 msgstr "_Benutzername"
-
-#: data/glade/connection-dialog.glade:8
-msgid "Open Connection..."
-msgstr "Öffne Verbindung..."
-
-#: data/glade/connections.glade:79
-msgid "Clear _All"
-msgstr "_Alle entfernen"
-
-#: data/glade/greeter-initial.glade:30
-msgid "_Open recent connection"
-msgstr "Alte Verbinsung öffnen"
-
-#: data/glade/greeter-initial.glade:48
-msgid "Connect to a _running manager"
-msgstr "Verbindung zu einem laufenden manager"
-
-#: data/glade/greeter-initial.glade:68
-msgid "Start a _new manager and connect to it"
-msgstr "Einen neuen Manager starten und zu ihm verbinden"
 
 #: data/glade/open-connection.glade:90
 msgid "_Host"
@@ -1143,27 +1405,123 @@ msgstr "_Port"
 msgid "_Secure connection via SSL"
 msgstr "_Sichere Verbindung per SSL"
 
-#: data/glade/wizard_audio_encoder.glade:31 data/glade/wizard_theora.glade:102
-#: data/glade/wizard_vorbis.glade:102
-msgid "Bit _rate:"
-msgstr "Bit-_rate:"
+#: data/glade/greeter-start_new_success.glade:33
+msgid ""
+"The manager and worker have been created.\n"
+"\n"
+"You can connect to the manager.\n"
+"\n"
+"You can shut it down later:"
+msgstr ""
 
-#: data/glade/wizard_audio_encoder.glade:78 data/glade/wizard_theora.glade:32
-#: data/glade/wizard_vorbis.glade:32
-msgid "kbit/s"
-msgstr "kbit/s"
+#: data/glade/connection-dialog.glade:8
+msgid "Open Connection..."
+msgstr "Öffne Verbindung..."
 
-#: data/glade/wizard_audiotest.glade:32
-msgid "_Volume:"
-msgstr "_Lautstärle:"
+#: data/glade/greeter-start_new_error.glade:38
+#, fuzzy
+msgid "The manager could not be created."
+msgstr "Die Komponente konnte nicht gestartet werden."
 
-#: data/glade/wizard_audiotest.glade:57
-msgid "_Sample rate:"
+#: data/glade/greeter-start_new_error.glade:82
+msgid "But it had a very good reason."
+msgstr ""
+
+#: data/glade/wizard_summary.glade:42
+msgid ""
+"Congratulations ! You are now ready to use \n"
+"your streaming server.\n"
+"\n"
+"When you press \"Apply\", your configuration will be automatically loaded on "
+"your network.  This will take some time."
+msgstr ""
+"Herzlichen Glühstrumpf! Es ist alles fertig für die Benutzung des Flumotion "
+"Streaming Server\n"
+"\n"
+"Bei einem Klick auf \"Anwenden\" werden ist Einstellungen automatisch "
+"geladen.Das kann ein wenig dauern."
+
+#: data/glade/wizard_soundcard.glade:56
+msgid "_Input:"
+msgstr "_Eingang:"
+
+#: data/glade/wizard_soundcard.glade:81
+msgid "_Channels:"
+msgstr "_Kanäle:"
+
+#: data/glade/wizard_soundcard.glade:106
+msgid "Sample _rate:"
 msgstr "_Abtastrate:"
 
-#: data/glade/wizard_audiotest.glade:82
-msgid "F_requency:"
-msgstr "F_requenz:"
+#: data/glade/wizard_soundcard.glade:131
+msgid "Bi_t depth:"
+msgstr "Bittiefe:"
+
+#: data/glade/wizard_soundcard.glade:156
+msgid ""
+"Line in\n"
+"Microphone\n"
+"CD"
+msgstr ""
+"Line-In\n"
+"Mikrophone\n"
+"CD"
+
+#: data/glade/wizard_soundcard.glade:174
+msgid ""
+"Stereo\n"
+"Mono\n"
+"5.1"
+msgstr ""
+"Stereo\n"
+"Mono\n"
+"5.1"
+
+#: data/glade/wizard_soundcard.glade:248
+msgid "Sound _system:"
+msgstr "_Sound System:"
+
+#: data/glade/wizard_http.glade:33 data/glade/wizard_shout2.glade:38
+msgid "_Port:"
+msgstr "_Port:"
+
+#: data/glade/wizard_http.glade:128
+msgid "Mbit/s"
+msgstr "Mbit/s"
+
+#: data/glade/wizard_http.glade:156
+msgid "clients"
+msgstr "Klienten"
+
+#: data/glade/wizard_http.glade:184 data/glade/wizard_shout2.glade:85
+msgid "_Mount point:"
+msgstr "Einbindungspunkt:"
+
+#: data/glade/wizard_http.glade:237
+msgid "Bu_rst on connect"
+msgstr "_Fülle bei Verbindungsbeginn"
+
+#: data/glade/wizard_http.glade:259
+#, fuzzy
+msgid "User limit:"
+msgstr "Benutzerbegrenzung:"
+
+#: data/glade/wizard_http.glade:282
+#, fuzzy
+msgid "Bandwidth limit:"
+msgstr "Bandbreitenbegrenzung:"
+
+#: data/glade/greeter-initial.glade:29
+msgid "_Open recent connection"
+msgstr "Alte Verbinsung öffnen"
+
+#: data/glade/greeter-initial.glade:47
+msgid "Connect to a _running manager"
+msgstr "Verbindung zu einem laufenden manager"
+
+#: data/glade/greeter-initial.glade:67
+msgid "Start a _new manager and connect to it"
+msgstr "Einen neuen Manager starten und zu ihm verbinden"
 
 #: data/glade/wizard_consumption.glade:29
 msgid "S_tream over HTTP"
@@ -1177,13 +1535,13 @@ msgstr "Audio und Video"
 
 #: data/glade/wizard_consumption.glade:79
 #: data/glade/wizard_consumption.glade:183
-#: data/glade/wizard_consumption.glade:287
+#: data/glade/wizard_consumption.glade:288
 msgid "Audio only"
 msgstr "nur Audio"
 
 #: data/glade/wizard_consumption.glade:98
 #: data/glade/wizard_consumption.glade:203
-#: data/glade/wizard_consumption.glade:306
+#: data/glade/wizard_consumption.glade:308
 msgid "Video only"
 msgstr "nur Video"
 
@@ -1195,11 +1553,24 @@ msgstr "_Auf Festplatte speichern"
 msgid "Stream to _Icecast2"
 msgstr ""
 
-#: data/glade/wizard_disk.glade:39
+#: data/glade/spyglass.glade:33
+#, fuzzy
+msgid "<b>Preview</b>"
+msgstr "<b>Strom</b>"
+
+#: data/glade/wizard_jpeg.glade:56 data/glade/wizard_firewire.glade:448
+msgid "Frame _rate:"
+msgstr "Bildrate:"
+
+#: data/glade/wizard_jpeg.glade:149
+msgid "frames/s"
+msgstr "Bilder/s"
+
+#: data/glade/wizard_disk.glade:38
 msgid "_Choose location:"
 msgstr "_Speicherort wählen:"
 
-#: data/glade/wizard_disk.glade:120
+#: data/glade/wizard_disk.glade:119
 msgid ""
 "minute\n"
 "hour\n"
@@ -1213,25 +1584,60 @@ msgstr ""
 "Woche\n"
 "Monat"
 
-#: data/glade/wizard_disk.glade:237
+#: data/glade/wizard_disk.glade:236
 msgid "_Rotate entry every"
 msgstr "_Rotiere alle"
 
-#: data/glade/wizard_disk.glade:260
+#: data/glade/wizard_disk.glade:259
 msgid "Record at startup"
 msgstr "Vom Start mitschneiden"
 
-#: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:120
-msgid "F_ormat:"
-msgstr "F_ormat:"
+#: data/glade/wizard_audiotest.glade:31
+msgid "_Volume:"
+msgstr "_Lautstärle:"
 
-#: data/glade/wizard_encoding.glade:108 data/glade/wizard_source.glade:92
-msgid "_Video:"
-msgstr "_Video:"
+#: data/glade/wizard_audiotest.glade:56
+msgid "_Sample rate:"
+msgstr "_Abtastrate:"
 
-#: data/glade/wizard_encoding.glade:133 data/glade/wizard_source.glade:33
-msgid "_Audio:"
-msgstr "_Audio:"
+#: data/glade/wizard_audiotest.glade:81
+msgid "F_requency:"
+msgstr "F_requenz:"
+
+#: data/glade/wizard_shout2.glade:115
+msgid "/demo.ogg"
+msgstr ""
+
+#: data/glade/wizard_shout2.glade:132
+#, fuzzy
+msgid "P_assword"
+msgstr "Passwort"
+
+#: data/glade/wizard_shout2.glade:161
+msgid "hackme"
+msgstr ""
+
+#: data/glade/wizard_shout2.glade:178
+msgid "_IP"
+msgstr ""
+
+#: data/glade/wizard_shout2.glade:207
+msgid "127.0.0.1"
+msgstr ""
+
+#: data/glade/wizard_shout2.glade:224
+#, fuzzy
+msgid "_Name"
+msgstr "Name:"
+
+#: data/glade/wizard_shout2.glade:270
+#, fuzzy
+msgid "_Description"
+msgstr "_Verbindung"
+
+#: data/glade/wizard_shout2.glade:316
+msgid "_URL"
+msgstr ""
 
 #: data/glade/wizard_firewire.glade:55
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
@@ -1273,10 +1679,6 @@ msgstr "Fülle auf 8 Pixel"
 msgid "<b>Width correction</b>"
 msgstr "<b>Breitenkorrektur</b>"
 
-#: data/glade/wizard_firewire.glade:448 data/glade/wizard_jpeg.glade:56
-msgid "Frame _rate:"
-msgstr "Bildrate:"
-
 #: data/glade/wizard_firewire.glade:493
 msgid "frames per second"
 msgstr "Bilder pro Sekunde"
@@ -1289,258 +1691,147 @@ msgstr "keine"
 msgid "<b>Output format</b>"
 msgstr "<b>Ausgabe-format</b>"
 
-#: data/glade/wizard_http.glade:33
-msgid "_Port:"
-msgstr "_Port:"
-
-#: data/glade/wizard_http.glade:84
-msgid "B_andwidth limit:"
-msgstr "Bandbreitenbegrenzung:"
-
-#: data/glade/wizard_http.glade:113
-msgid "_User limit:"
-msgstr "Benutzerbegrenzung:"
-
-#: data/glade/wizard_http.glade:186
-msgid "Mbit/s"
-msgstr "Mbit/s"
-
-#: data/glade/wizard_http.glade:214
-msgid "clients"
-msgstr "Klienten"
-
-#: data/glade/wizard_http.glade:242
-msgid "_Mount point:"
-msgstr "Einbindungspunkt:"
-
-#: data/glade/wizard_http.glade:295
-msgid "Bu_rst on connect"
-msgstr "_Fülle bei Verbindungsbeginn"
-
-#: data/glade/wizard_jpeg.glade:31 data/glade/wizard_theora.glade:124
-#: data/glade/wizard_vorbis.glade:124
-msgid "_Quality:"
-msgstr "_Qualität:"
-
-#: data/glade/wizard_jpeg.glade:149
-msgid "frames/s"
-msgstr "Bilder/s"
-
-#: data/glade/wizard_license.glade:32
-msgid "Specify _license:"
-msgstr "Lizenz festlegen:"
-
-#: data/glade/wizard_license.glade:53
-msgid ""
-"Creative Commons\n"
-"GNU FDL\n"
-"Commercial"
-msgstr ""
-"Creative·Commons\n"
-"GNU·FDL\n"
-"Komerziell"
-
-#: data/glade/wizard_overlay.glade:34
-msgid "Show _text in upper left corner:"
-msgstr "_Text in der oberen linken Ecke anzeigen:"
-
-#: data/glade/wizard_overlay.glade:57
 #, fuzzy
-msgid "Show _logos in bottom left corner"
-msgstr "_Logo in der unteren linken Ecke anzeigen:"
+#~ msgid "<b>Current connection</b>"
+#~ msgstr "<b>Klientenkonsum</b>"
 
-#: data/glade/wizard_smoke.glade:32
-msgid "M_inimum quality:"
-msgstr "m_inimale Qualität:"
-
-#: data/glade/wizard_smoke.glade:57
-msgid "M_aximum quality:"
-msgstr "m_aximale Qualität:"
-
-#: data/glade/wizard_smoke.glade:82
-msgid "_Threshold:"
-msgstr "_Grenze:"
-
-#: data/glade/wizard_smoke.glade:107
-msgid "_Keyframe spacing: every"
-msgstr "Abstand zwischen _Keyframes: jeder"
-
-#: data/glade/wizard_smoke.glade:269 data/glade/wizard_theora.glade:185
-msgid "frames"
-msgstr "Bilder"
-
-#: data/glade/wizard_soundcard.glade:32 data/glade/wizard_tvcard.glade:261
-#: data/glade/wizard_webcam.glade:32
-msgid "_Device:"
-msgstr "_Gerät:"
-
-#: data/glade/wizard_soundcard.glade:57
-msgid "_Input:"
-msgstr "_Eingang:"
-
-#: data/glade/wizard_soundcard.glade:82
-msgid "_Channels:"
-msgstr "_Kanäle:"
-
-#: data/glade/wizard_soundcard.glade:107
-msgid "Sample _rate:"
-msgstr "_Abtastrate:"
-
-#: data/glade/wizard_soundcard.glade:132
-msgid "Bi_t depth:"
-msgstr "Bittiefe:"
-
-#: data/glade/wizard_soundcard.glade:157
-msgid ""
-"Line in\n"
-"Microphone\n"
-"CD"
-msgstr ""
-"Line-In\n"
-"Mikrophone\n"
-"CD"
-
-#: data/glade/wizard_soundcard.glade:175
-msgid ""
-"Stereo\n"
-"Mono\n"
-"5.1"
-msgstr ""
-"Stereo\n"
-"Mono\n"
-"5.1"
-
-#: data/glade/wizard_soundcard.glade:249
-msgid "Sound _system:"
-msgstr "_Sound System:"
-
-#: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
-msgid "Name:"
-msgstr "Name:"
-
-#: data/glade/wizard_source.glade:54
-msgid ""
-"TV Card\n"
-"Firewire \n"
-"Webcam\n"
-"Test"
-msgstr ""
-"TV-Karte\n"
-"Firewire\n"
-"Webcam\n"
-"Test"
-
-#: data/glade/wizard_source.glade:73
-msgid ""
-"Firewire\n"
-"Sound card\n"
-"Test"
-msgstr ""
-"Firewire\n"
-"Sound-Karte\n"
-"Test"
-
-#: data/glade/wizard_summary.glade:43
-msgid ""
-"Congratulations ! You are now ready to use \n"
-"your streaming server.\n"
-"\n"
-"When you press \"Apply\", your configuration will be automatically loaded on "
-"your network.  This will take some time."
-msgstr ""
-"Herzlichen Glühstrumpf! Es ist alles fertig für die Benutzung des Flumotion "
-"Streaming Server\n"
-"\n"
-"Bei einem Klick auf \"Anwenden\" werden ist Einstellungen automatisch "
-"geladen.Das kann ein wenig dauern."
-
-#: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
-#: data/glade/wizard_webcam.glade:166
-msgid "_Width:"
-msgstr "_Breite"
-
-#: data/glade/wizard_testsource.glade:62 data/glade/wizard_tvcard.glade:97
-#: data/glade/wizard_webcam.glade:119
-msgid "_Height:"
-msgstr "_Höhe"
-
-#: data/glade/wizard_testsource.glade:91 data/glade/wizard_tvcard.glade:166
-#: data/glade/wizard_webcam.glade:72
-msgid "F_ramerate:"
-msgstr "F_ramerate:"
-
-#: data/glade/wizard_testsource.glade:149
-msgid "_Pattern:"
-msgstr "M_otiv:"
-
-#: data/glade/wizard_testsource.glade:178
-msgid ""
-"Snow\n"
-"Black"
-msgstr ""
-"Schnee\n"
-"Schwarz"
-
-#: data/glade/wizard_theora.glade:231
-msgid "%"
-msgstr ""
-
-#: data/glade/wizard_theora.glade:277
 #, fuzzy
-msgid "_Keyframe frequency:"
-msgstr "F_requenz:"
+#~ msgid "Connected since:"
+#~ msgstr "_Verbindung"
 
-#: data/glade/wizard_theora.glade:303
-msgid "_Noise sensitivity:"
-msgstr ""
-
-#: data/glade/wizard_theora.glade:329
 #, fuzzy
-msgid "_Sharpness:"
-msgstr "_Kanäle:"
+#~ msgid "Connection time:"
+#~ msgstr "_Verbindung"
 
-#: data/glade/wizard_theora.glade:357
-msgid "Advanced settings"
-msgstr ""
+#, fuzzy
+#~ msgid "Time of last"
+#~ msgstr "Name der Stufe"
 
-#: data/glade/wizard_tvcard.glade:38
-msgid ""
-"Television\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
-msgstr ""
-"Fernsehn\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
+#, fuzzy
+#~ msgid "Total duration"
+#~ msgstr "Host Informationen"
 
-#: data/glade/wizard_tvcard.glade:56
-msgid ""
-"Composite\n"
-"RCA"
-msgstr ""
-"Composite\n"
-"RCA"
+#, fuzzy
+#~ msgid "Total size"
+#~ msgstr "Total (bytes):"
 
-#: data/glade/wizard_tvcard.glade:213
-msgid "Video _source:"
-msgstr "_Videoquelle:"
+#, fuzzy
+#~ msgid "Discontinuities ..."
+#~ msgstr "_Verbindung"
 
-#: data/glade/wizard_tvcard.glade:237
-msgid "TV _norm:"
-msgstr "TV-_Norm:"
+#, fuzzy
+#~ msgid "Disconnection time:"
+#~ msgstr "_Verbindung"
 
-#: data/glade/wizard_welcome.glade:36
-msgid ""
-"Welcome to the Flumotion configuration wizard.\n"
-"\n"
-"This wizard will guide you through the required steps to help you configure "
-"your streaming media server."
-msgstr ""
-"Willkommen im Flumotion Einstellungs Wizard.\n"
-"\n"
-"Dieser Assistent hilft bei der Einrichtung des Flumotion Streamer Servers."
+#, fuzzy
+#~ msgid "<b>All Connections</b>"
+#~ msgstr "<b>Klientenkonsum</b>"
+
+#, fuzzy
+#~ msgid "Connections made:"
+#~ msgstr "_Verbindung"
+
+#, fuzzy
+#~ msgid "Number:"
+#~ msgstr "Name:"
+
+#, fuzzy
+#~ msgid "Bytes read:"
+#~ msgstr "Bitrate:"
+
+#~ msgid "Uptime:"
+#~ msgstr "Uptime:"
+
+#~ msgid "Total bytes:"
+#~ msgstr "Total (bytes):"
+
+#~ msgid "Current:"
+#~ msgstr "Zur Zeit:"
+
+#~ msgid "Average:"
+#~ msgstr "Im Schnitt:"
+
+#~ msgid "Peak:"
+#~ msgstr "Maximum:"
+
+#~ msgid "of"
+#~ msgstr "von"
+
+#~ msgid "at"
+#~ msgstr "bei"
+
+#~ msgid "<b>Client Consumption</b>"
+#~ msgstr "<b>Klientenkonsum</b>"
+
+#~ msgid "Bit rate:"
+#~ msgstr "Bitrate:"
+
+#~ msgid "Web URL:"
+#~ msgstr "Internet URL:"
+
+#, fuzzy
+#~ msgid "Average bitrate:"
+#~ msgstr "Im Schnitt:"
+
+#, fuzzy
+#~ msgid "Current bitrate:"
+#~ msgstr "Zur Zeit:"
+
+#, fuzzy
+#~ msgid "Change _volume:"
+#~ msgstr "_Kanäle:"
+
+#, fuzzy
+#~ msgid "_Frequency:"
+#~ msgstr "F_requenz:"
+
+#~ msgid "Loading UI for %s ..."
+#~ msgstr "Lade Oberfläche für %s"
+
+#, fuzzy
+#~ msgid "This component has a UI bug."
+#~ msgstr "Diese Komponente hat einen Fehler in der Oberfläche."
+
+#~ msgid "Loading tab %s for %s ..."
+#~ msgstr "Lade Tab %s für %s"
+
+#~ msgid "%s does not have a UI yet"
+#~ msgstr "%s hat keine Oberfläche"
+
+#, fuzzy
+#~ msgid "This component has a UI bug in the %s tab."
+#~ msgstr "Diese Komponente hat einen Oberflächen-Fehler im Tab %s ."
+
+#~ msgid "Showing UI for %s"
+#~ msgstr "Zeige Oberfläche für %s"
+
+#~ msgid "Component %s is still sleeping"
+#~ msgstr "Komponente %s schläft noch"
+
+#~ msgid "Requesting UI for %s ..."
+#~ msgstr "Frage nach der Oberfläche für %s ..."
+
+#~ msgid "Could not start component."
+#~ msgstr "Konnte Komponente nicht starten:"
+
+#, fuzzy
+#~ msgid "Configuration problem."
+#~ msgstr "Probleme in der Einstellung."
+
+#, fuzzy
+#~ msgid "Could not connect component to %s:%d for feed %s."
+#~ msgstr "Konnte Komponente nicht nach %s:%d zur Einspeisung %s verbinden."
+
+#~ msgid "Could not connect to %s:%d for feed %s."
+#~ msgstr "Konnte nicht nach %s:%d zur Einspeisung %s verbinden."
+
+#, fuzzy
+#~ msgid "Could not setup component's master clock."
+#~ msgstr "Konnte die Hauptuhr der Komponenten nicht einstellen."
+
+#, fuzzy
+#~ msgid "Open a recent connection"
+#~ msgstr "Alte Verbinsung öffnen"
 
 #~ msgid "Open a stored configuration"
 #~ msgstr "Einstellung laden"

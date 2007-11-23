@@ -40,8 +40,11 @@ import struct
 # unrelated data.
 # So, we prefix the message with a 16 byte magic signature, and a length,
 # and if we receive file descriptors decode based on this.
-MAGIC_SIGNATURE = "\xfd\xfc\x8e\x7f\x07\x47\xb9\xea" \
-                  "\xa1\x75\xee\xd8\xdc\x36\xc8\xa3"
+#
+# map() instead of a string to workaround gettext encoding problems.
+#
+MAGIC_SIGNATURE = ''.join(map(chr, [253, 252, 142, 127, 7, 71, 185, 234,
+                                    161, 117, 238, 216, 220, 54, 200, 163]))
 
 class FDServer(unix.Server):
     def sendFileDescriptor(self, fileno, data=""):

@@ -1,3 +1,12 @@
+2007-11-23  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/twisted/fdserver.py: 
+	use map() instead of a string to workaround gettext encoding problems.
+
+	* po/POTFILES.in: Add all glade files and python files here.
+
+	* po/*.po: Update
+
 2007-11-22  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/connections.py (Connections.__init__): 
