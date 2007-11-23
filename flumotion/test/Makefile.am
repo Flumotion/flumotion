@@ -44,6 +44,7 @@ EXTRA_DIST = 				\
 	test_component_playlist.py 	\
 	test_comptest.py 		\
 	test_config.py 			\
+	test_configure.py		\
 	test_credentials.py 		\
 	test_dag.py	 		\
 	test_defer.py			\
