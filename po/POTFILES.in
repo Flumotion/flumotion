@@ -254,13 +254,6 @@ flumotion/extern/pytrayicon/ltihooks.py
 flumotion/extern/pytrayicon/__init__.py
 flumotion/extern/code.py
 flumotion/extern/fdpass/__init__.py
-flumotion/extern/command/test_command.py
-flumotion/extern/command/__init__.py
-flumotion/extern/command/command.py
-flumotion/extern/log/termcolor.py
-flumotion/extern/log/log.py
-flumotion/extern/log/test_log.py
-flumotion/extern/log/__init__.py
 flumotion/extern/__init__.py
 flumotion/__init__.py
 flumotion/test/test_worker_job.py
