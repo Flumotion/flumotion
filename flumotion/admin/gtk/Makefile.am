@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
 component_PYTHON = \
 	__init__.py \
@@ -11,6 +11,7 @@ component_PYTHON = \
 	message.py \
 	parts.py \
 	main.py \
+	spyglass.py \
 	wizard.py
 
 all-local:
