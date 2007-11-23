@@ -71,7 +71,6 @@ flumotion/component/producers/audiotest/admin_gtk.py
 flumotion/component/producers/soundcard/soundcard.py
 flumotion/component/producers/soundcard/__init__.py
 flumotion/component/producers/soundcard/admin_gtk.py
-flumotion/component/producers/jukebox/__init__.py
 flumotion/component/producers/bttv/bttv.py
 flumotion/component/producers/bttv/__init__.py
 flumotion/component/producers/bttv/admin_gtk.py

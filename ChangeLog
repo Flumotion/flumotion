@@ -1,5 +1,9 @@
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
+	* po/POTFILES.in: 
+	* flumotion/component/producers/jukebox: Remove all traces of the
+	jukebox component
+
 	* flumotion/twisted/fdserver.py: 
 	use map() instead of a string to workaround gettext encoding problems.
 
