@@ -12,7 +12,7 @@ glade_DATA = \
 	greeter-start_new_error.glade 	\
 	greeter-start_new_success.glade \
 	open-connection.glade		\
-	spyclass.glade			\
+	spyglass.glade			\
 	videotest.glade			\
 	wizard.glade 			\
 	wizard_audiotest.glade		\
