@@ -18,6 +18,7 @@
 
       <sockets>
         <socket type="flumotion.component.plugs.loggers.Logger" />
+        <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider" />
         <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
       </sockets>

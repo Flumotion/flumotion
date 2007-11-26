@@ -1,5 +1,15 @@
 2007-11-26  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/plugs/lifecycle.py:
+	* flumotion/component/plugs/plugs.xml:
+	  Add component lifecycle plug (and sample implementation) mirroring the
+	  manager lifecycle plug.
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	  Add socket for lifecycle plug to both streamers.
+
+2007-11-26  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/test/test_config.py:
 	* flumotion/test/test_registry.py:
 	  Fix tests to provide base attribute now that the parser checks for it.

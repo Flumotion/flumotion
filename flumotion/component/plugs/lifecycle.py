@@ -47,3 +47,23 @@ class ManagerLifecyclePrinter(ManagerLifecycle):
         print ('stopped manager running on %s:%d (%s)'
                % (info['host'], info['port'],
                   info['using_ssl'] and 'with ssl' or 'without ssl'))
+
+class ComponentLifecycle(base.ComponentPlug):
+    """
+    Base class for plugs that are started when a component is started,
+    and stopped when the component is stopped. ComponentLifecycle plugs
+    have no special methods; they are expected to do their interesting
+    actions in response to the ComponentPlug start() and stop() methods.
+    """
+
+class ComponentLifecyclePrinter(ComponentLifecycle):
+    """
+    Example implementation of the ComponentLifecyle socket, just prints
+    things on the console. Pretty stupid!
+    """
+    def start(self, component):
+        print 'Component has been started'
+
+    def stop(self, component):
+        print 'Component is stopping'
+

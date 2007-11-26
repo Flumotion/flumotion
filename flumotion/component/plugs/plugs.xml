@@ -44,6 +44,12 @@
              function="ExampleIdentityProvider"/>
     </plug>
 
+    <plug socket="flumotion.component.plugs.lifecycle.ComponentLifecycle"
+          type="componentlifecycleprinter">
+      <entry location="flumotion/component/plugs/lifecycle.py"
+             function="ComponentLifecyclePrinter"/>
+    </plug>
+
     <plug socket="flumotion.component.plugs.streamdata.StreamDataProvider"
           type="examplestreamdataprovider">
       <entry location="flumotion/component/plugs/streamdata.py"
