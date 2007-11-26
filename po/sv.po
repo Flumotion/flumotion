@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-11-23 10:16+0100\n"
-"PO-Revision-Date: 2007-11-26 16:51+0100\n"
+"PO-Revision-Date: 2007-11-26 18:30+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -617,7 +617,7 @@ msgstr "Kunde inte starta sökningen efter Firewire enheter."
 
 #: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
 msgid "Synchronization between audio and video may not be correct.\n"
-msgstr "Synkronizering mellan ljud och bild kan vara felaktig."
+msgstr "Synkronizering mellan ljud och bild kan vara felaktig.\n"
 
 #: flumotion/worker/checks/check.py:46
 #, python-format
@@ -658,7 +658,7 @@ msgstr "Den här värden saknar GStreamer-plugin:et '%s'.\n"
 #: flumotion/worker/checks/check.py:160
 #, python-format
 msgid "Please install '%s'.\n"
-msgstr "Var god installera '%s'.\\n"
+msgstr "Var god installera '%s'.\n"
 
 #: flumotion/launch/main.py:76 flumotion/admin/gtk/message.py:35
 msgid "Error"
@@ -810,7 +810,7 @@ msgstr ""
 "\n"
 "Föreståndaren och arbetaren kommer att köras under ditt användarkonto.\n"
 "Föreståndaren kommer endast att acceptera anslutningar från din dator.\n"
-"Detta läge är enbart användbart för att testa Flumotion."
+"Detta läge är enbart användbart för att testa Flumotion.\n"
 
 #: flumotion/admin/gtk/greeter.py:255
 msgid "Creating manager ..."
@@ -1014,7 +1014,7 @@ msgstr "Kör _Wizard"
 
 #: flumotion/admin/gtk/client.py:275
 msgid "_Debug"
-msgstr "_Avlusa"
+msgstr "_Felsök"
 
 #: flumotion/admin/gtk/client.py:276
 msgid "Reload _Manager"

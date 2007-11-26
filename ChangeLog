@@ -1,9 +1,13 @@
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
+	* po/LINGUAS: Add swedish here
+
+	* po/sv.po: Fix errors and update translation
+
 	* flumotion/admin/gtk/wizard.py:
 	(Wizard.__init__): Don't put state in the class, we have more
 	than one subclass of the wizard and we really want the steps
-	to be specific to one instance, really.
+	to be specific to instances, really.
 
 2007-11-26  Michael Smith <msmith@fluendo.com>
 
