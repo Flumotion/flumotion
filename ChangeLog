@@ -1,5 +1,7 @@
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
+	* po/sv.po: Add swedish translation
+
 	* flumotion/wizard/productionsteps.py (FireWireAudioStep.on_update_output_format)
 	(FireWireStep.on_update_output_format): width_corrections is not
 	private a class variable.
