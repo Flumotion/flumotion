@@ -744,7 +744,7 @@ class SoundcardStep(AudioSourceStep):
         channels = 2
         if e: channels = e.intvalue
         d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
-                           enum.element, device, channels, id='soundcard-check')
+                               enum.element, device, channels, id='soundcard-check')
         def soundcardCheckComplete((deviceName, tracks)):
             self.wizard.clear_msg('soundcard-check')
             self.wizard.block_next(False)
@@ -770,11 +770,11 @@ class SoundcardStep(AudioSourceStep):
 
     def on_combobox_system_changed(self, combo):
         if not self._block_update:
-            self.update_devices()
-            self.update_inputs()
+            self._update_devices()
+            self._update_inputs()
 
     def on_combobox_device_changed(self, combo):
-        self.update_inputs()
+        self._update_inputs()
 
     def on_combobox_channels_changed(self, combo):
         # FIXME: make it so that the number of channels can be changed

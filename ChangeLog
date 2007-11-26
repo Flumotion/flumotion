@@ -3,6 +3,7 @@
 	* flumotion/wizard/productionsteps.py (FireWireAudioStep.on_update_output_format)
 	(FireWireStep.on_update_output_format): width_corrections is not
 	private a class variable.
+	(SoundcardStep): Some methods are private now.
 
 2007-11-26  Pedro Gracia  <pedro@flumotion.com>
 
