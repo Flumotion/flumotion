@@ -131,12 +131,16 @@ class ConnectionsDialog(GladeWindow):
     def on_connection_activated(self, widget, state):
         self.emit('have-connection', state)
 
-    def on_cancel(self, widget):
+    def on_cancel(self, button):
         self.destroy()
 
-    def on_ok(self, x):
+    def on_ok(self, button):
         self.emit('have-connection',
                   self.widgets['connections'].get_selected())
+
+    def on_delete_event(self, dialog, event):
+        self.destroy()
+
 pygobject.type_register(ConnectionsDialog)
 
 
