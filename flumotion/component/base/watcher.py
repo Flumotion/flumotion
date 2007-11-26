@@ -53,7 +53,7 @@ class BaseWatcher(log.Loggable):
     def _subscribe(self, **events):
         """Subscribe to events.
 
-        @param kwargs: The events to subscribe to. Subclasses are
+        @param events: The events to subscribe to. Subclasses are
         expected to formalize this dict, specifying which events they
         support via declaring their kwargs explicitly.
 

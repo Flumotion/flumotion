@@ -109,7 +109,7 @@ class KeycardUACPP(Keycard, UCPP):
 
 pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 
-#: username, address, crypt password
+# username, address, crypt password
 #       from UsernameCryptPasswordCrypt
 
 UCPCC = credentials.UsernameCryptPasswordCryptChallenger

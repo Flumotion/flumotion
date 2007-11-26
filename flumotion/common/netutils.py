@@ -211,8 +211,8 @@ class RoutingTable(object):
         """
         Return the preferred route for this IP.
         
-        @param ip  The IP to use for routing decisions.
-        @type  ip  An integer or string representing an IPv4 address
+        @param ip: The IP to use for routing decisions.
+        @type  ip: An integer or string representing an IPv4 address
         """
         if isinstance(ip, str):
             ip = ipv4StringToInt(ip)
@@ -227,8 +227,8 @@ class RoutingTable(object):
         """
         Return an iterator yielding routes in order of preference.
         
-        @param ip  The IP to use for routing decisions.
-        @type  ip  An integer or string representing an IPv4 address
+        @param ip: The IP to use for routing decisions.
+        @type  ip: An integer or string representing an IPv4 address
         """
         if isinstance(ip, str):
             ip = ipv4StringToInt(ip)

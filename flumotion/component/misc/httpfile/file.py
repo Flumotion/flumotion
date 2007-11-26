@@ -51,9 +51,6 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
     childNotFound = weberror.NoResource("File not found.")
 
     def __init__(self, path, httpauth, mimeToResource=None):
-        """
-        @param component: L{flumotion.component.component.BaseComponent}
-        """
         resource.Resource.__init__(self)
         filepath.FilePath.__init__(self, path)
 

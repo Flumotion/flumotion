@@ -291,7 +291,7 @@ class Vishnu(log.Loggable):
         L{flumotion.common.messages.Message} for the meanings of the
         rest of the arguments.
 
-        For example:
+        For example::
 
           self.addMessage(messages.WARNING, 'foo-warning',
                           N_('The answer is %d'), 42, debug='not really')
@@ -608,8 +608,8 @@ class Vishnu(log.Loggable):
         """
         Load a component into the manager configuration.
 
-        See L{flumotion.manager.admin.loadComponent} for a definition of
-        the argument types.
+        See L{flumotion.manager.admin.AdminAvatar.perspective_loadComponent} 
+        for a definition of the argument types.
         """
         self.debug('loading %s component %s on %s',
                    componentType, componentId, workerName)
@@ -796,7 +796,7 @@ class Vishnu(log.Loggable):
 
         @type componentState: L{planet.ManagerComponentState}
 
-        @rtype: L{defer.Deferred}
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('componentStop(%r)', componentState)
         # We permit stopping a component even if it has a pending mood of

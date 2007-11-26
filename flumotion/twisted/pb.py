@@ -97,7 +97,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         """
         Ask the remote PB server for all the keycard interfaces it supports.
 
-        @rtype: L{defer.Deferred} returning list of str
+        @rtype: L{twisted.internet.defer.Deferred} returning list of str
         """
         def getRootObjectCb(root):
             return root.callRemote('getKeycardClasses')
@@ -330,7 +330,7 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
         """
         @returns: the fully-qualified class names of supported keycard
                   interfaces
-        @rtype:   L{defer.Deferred} firing list of str
+        @rtype:   L{twisted.internet.defer.Deferred} firing list of str
         """
         return self.bouncerPortal.getKeycardClasses()
 
@@ -408,7 +408,7 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         @param keycardClasses: list of fully qualified keycard classes
         @type  keycardClasses: list of str
 
-        @rtype: L{defer.Deferred} firing L{keycards.Keycard}
+        @rtype: L{twisted.internet.defer.Deferred} firing L{keycards.Keycard}
         """
         # this method returns a deferred so we present the same interface
         # as the RemoteAuthenticator adapter
@@ -463,7 +463,7 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         @param keycard: the keycard with the challenge to respond to
         @type  keycard: L{keycards.Keycard}
 
-        @rtype:   L{defer.Deferred} firing a {keycards.Keycard}
+        @rtype:   L{twisted.internet.defer.Deferred} firing a {keycards.Keycard}
         @returns: a deferred firing the keycard with a response set
         """
         self.debug('responding to challenge on keycard %r' % keycard)

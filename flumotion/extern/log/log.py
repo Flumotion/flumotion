@@ -125,7 +125,7 @@ def setLogSettings(state):
     """Update the current log settings.
     This can restore an old saved log settings object returned by
     getLogSettings
-    @param settings: the settings to set
+    @param state: the settings to set
     """
 
     global _DEBUG

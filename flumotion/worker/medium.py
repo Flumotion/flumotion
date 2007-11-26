@@ -195,8 +195,8 @@ class WorkerMedium(medium.PingingMedium):
         @type  methodName: str
         @param nice:       nice level
         @type  nice:       int
-        @param nice:       component config
-        @type  nice:       dict
+        @param conf:       component config
+        @type  conf:       dict
 
         @returns: a deferred fired when the process has started and created
                   the component

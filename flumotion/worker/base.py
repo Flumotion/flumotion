@@ -135,9 +135,9 @@ class BaseJobHeaven(pb.Root, log.Loggable):
     I manage avatars inside the worker for job processes spawned by the worker.
 
     @ivar avatars: dict of avatarId -> avatar
-    @type avatars: dict of str -> L{JobAvatar}
+    @type avatars: dict of str -> L{base.BaseJobAvatar}
     @ivar brain:   the worker brain
-    @type brain:   L{WorkerBrain}
+    @type brain:   L{worker.WorkerBrain}
     """
 
     logCategory = "job-heaven"
@@ -298,7 +298,7 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
 
     def __init__(self, heaven, avatarId, mind):
         """
-        @type  heaven:   L{flumotion.worker.worker.JobHeaven}
+        @type  heaven:   L{flumotion.worker.base.BaseJobHeaven}
         @type  avatarId: str
         """
         fpb.Avatar.__init__(self, avatarId)

@@ -54,7 +54,7 @@ class TestClient(pb.Referenceable):
 
         @type port: int
 
-        @rtype: L{defer.Deferred}
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self._f = pb.PBClientFactory()
         self._p = reactor.connectTCP("127.0.0.1", port, self._f)
@@ -66,7 +66,7 @@ class TestClient(pb.Referenceable):
         """
         Stop the client.
 
-        @rtype: L{defer.Deferred}
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self._p.disconnect()
         return self._dDisconnect

@@ -388,7 +388,7 @@ class ParseLaunchComponent(FeedComponent):
                              with the result of calling the procedure
                              with what is left of the template after
                              taking off the prefix.
-        Returns: a new pipeline string representation.
+        @returns: a new pipeline string representation.
         """
         assert pipeline != ''
 

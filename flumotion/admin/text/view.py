@@ -212,10 +212,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
         Caller is responsible for adding errbacks to the deferred.
 
-        Returns: a deferred returning (entryPath, filename, methodName) with
-                 entryPath: the full local path to the bundle's base
-                 fileName:  the relative location of the bundled file
-                methodName: the method to instantiate with
+        @returns: a deferred returning (entryPath, filename, methodName) with
+                  entryPath: the full local path to the bundle's base
+                  fileName:  the relative location of the bundled file
+                  methodName: the method to instantiate with
         """
         lexicalVariableHack = []
 

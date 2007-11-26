@@ -139,7 +139,7 @@ class ComponentAvatar(base.ManagerAvatar):
         constructor. See L{flumotion.common.messages.Message} for the
         meanings of the rest of the arguments.
 
-        For example:
+        For example::
 
           self.addMessage(messages.WARNING, 'foo-warning',
                           N_('The answer is %d'), 42, debug='not really')

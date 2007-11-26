@@ -1,3 +1,31 @@
+2007-11-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/netutils.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/testsuite.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/watcher.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/httpfile/file.py:
+	* flumotion/extern/log/log.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/twisted/rtsp.py:
+	* flumotion/ui/glade.py:
+	* flumotion/worker/base.py:
+	* flumotion/worker/medium.py:
+	* flumotion/worker/worker.py:
+	  Documentation fixes to produce fewer epydoc warnings.
+
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py: 

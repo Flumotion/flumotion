@@ -949,7 +949,7 @@ class RegistryWriter(log.Loggable):
         @param bundles: bundles to write
         @type  bundles: list of L{RegistryEntryBundle}
         @param directories: directories to write
-        @type  directories: list of L{RegistryEntryDirectory}
+        @type  directories: list of L{RegistryEntryBundleDirectory}
         """
         self.components = components
         self.plugs = plugs

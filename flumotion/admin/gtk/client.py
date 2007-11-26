@@ -610,7 +610,7 @@ class Window(log.Loggable, gobject.GObject):
     def _component_do(self, state, action, doing, done,
         remoteMethodPrefix="component"):
         """
-        @param remoteMethodName: prefix for remote method to run
+        @param remoteMethodPrefix: prefix for remote method to run
         """
         if not state:
             state = self.components_view.get_selected_state()

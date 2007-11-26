@@ -182,13 +182,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._redirectOnFull = url
 
     # FIXME: rename to writeHeaders
-    """
-    Write out the HTTP headers for the incoming HTTP request.
-
-    @rtype:   boolean
-    @returns: whether or not the file descriptor can be used further.
-    """
     def _writeHeaders(self, request):
+        """
+        Write out the HTTP headers for the incoming HTTP request.
+
+        @rtype:   boolean
+        @returns: whether or not the file descriptor can be used further.
+        """
         fd = request.transport.fileno()
         fdi = request.fdIncoming
 

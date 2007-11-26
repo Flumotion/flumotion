@@ -198,13 +198,13 @@ class FeedComponent(basecomponent.BaseComponent):
         will make a generic message.
 
         @param gerror: The GError from the error message posted on the
-        GStreamer message bus.
+                       GStreamer message bus.
         @type  gerror: L{gst.GError}
         @param  debug: A string with debugging information.
         @type   debug: str
 
-        @returns A L{flumotion.common.messages.Message} to show to the
-        user.
+        @returns: A L{flumotion.common.messages.Message} to show to the
+                 user.
         """
         # generate a unique id
         mid = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
@@ -500,10 +500,6 @@ class FeedComponent(basecomponent.BaseComponent):
         Tell the component to start.
         Whatever is using the component is responsible for making sure all
         eaters have received their file descriptor to eat from.
-
-        @param clocking: tuple of (ip, port, base_time) of a master clock,
-                         or None not to slave the clock
-        @type  clocking: tuple(str, int, long) or None.
         """
         (ret, state, pending) = self.pipeline.get_state(0)
         if state == gst.STATE_PLAYING:

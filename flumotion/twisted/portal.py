@@ -56,7 +56,7 @@ class BouncerPortal(log.Loggable):
         """
         Return the Keycard interfaces supported by this portal's bouncer.
 
-        @rtype: L{defer.Deferred} firing list of str
+        @rtype: L{twisted.internet.defer.Deferred} firing list of str
         """
         if not self.bouncer:
             # no logins will be possible, but we can wait until they try

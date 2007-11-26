@@ -167,8 +167,8 @@ class BundleLoader(log.Loggable):
         """
         Do everything needed to get the given bundled file.
 
-        Returns: a deferred returning the absolute path to a local copy
-                 of the given file.
+        @returns: a deferred returning the absolute path to a local copy
+                  of the given file.
         """
         def gotBundles(bundles):
             name, bundlePath = bundles[-1]

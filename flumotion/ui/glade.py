@@ -139,11 +139,11 @@ class GladeWidget(gtk.VBox, GladeBacked):
     All widgets inside the Window will be available as attributes on the
     object (dashes will be replaced with underscores).
 
-    Example:
-    class MyWidget(GladeWidget):
-        glade_file = 'my_glade_file.glade'
-        ...
-    gobject.type_register(MyWidget)
+    Example::
+      class MyWidget(GladeWidget):
+          glade_file = 'my_glade_file.glade'
+          ...
+      gobject.type_register(MyWidget)
 
     Remember to chain up if you customize __init__().
 
@@ -170,10 +170,10 @@ class GladeWindow(gobject.GObject, GladeBacked):
     """
     Base class for dialogs or windows backed by glade interface definitions.
 
-    Example:
-    class MyWindow(GladeWindow):
-        glade_file = 'my_glade_file.glade'
-        ...
+    Example::
+      class MyWindow(GladeWindow):
+          glade_file = 'my_glade_file.glade'
+          ...
 
     Remember to chain up if you customize __init__(). Also note that GladeWindow
     does *not* descend from GtkWindow, so you can't treat the resulting object
@@ -216,9 +216,10 @@ class GladeWindow(gobject.GObject, GladeBacked):
         """
         Connect a conventionally-named signal handler.
 
-        For example:
+        For example::
           connect_signal('window-foo', 'delete-event')
-        is equivalent to:
+
+        is equivalent to::
           proc = self.on_window_foo_delete_event
           self.widgets['window-foo'].connect('delete-event', proc)
 

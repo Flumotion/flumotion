@@ -122,7 +122,7 @@ class Wizard(GladeWindow):
     This wizard runs its own GObject main loop.
     The wizard is run with the run() method.
 
-    Example:
+    Example::
       w = Wizard('foo', 'first-step', FirstStep)
       w.show()
       w.run() => {'bank-account': 'foo'}
