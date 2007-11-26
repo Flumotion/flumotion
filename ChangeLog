@@ -4,6 +4,8 @@
 	(FireWireStep.on_update_output_format): width_corrections is not
 	private a class variable.
 	(SoundcardStep): Some methods are private now.
+	(SoundcardStep._update_inputs): Add an errback which clears the combos
+	and prevents the user from going forward, fixes #803
 
 2007-11-26  Pedro Gracia  <pedro@flumotion.com>
 

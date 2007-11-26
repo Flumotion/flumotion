@@ -745,6 +745,10 @@ class SoundcardStep(AudioSourceStep):
         if e: channels = e.intvalue
         d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
                                enum.element, device, channels, id='soundcard-check')
+        def checkFailed(failure):
+            self._clear_combos()
+            self.wizard.block_next(True)
+
         def soundcardCheckComplete((deviceName, tracks)):
             self.wizard.clear_msg('soundcard-check')
             self.wizard.block_next(False)
@@ -761,9 +765,9 @@ class SoundcardStep(AudioSourceStep):
             self.combobox_input.set_list(tracks)
             self.combobox_input.set_sensitive(True)
 
+
         d.addCallback(soundcardCheckComplete)
-        # FIXME: when probing failed, do
-        # self.clear_combos()
+        d.addErrback(checkFailed)
         return d
 
     # Callbacks
