@@ -1,3 +1,7 @@
+2007-11-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/greeter.py: Remove unused imports
+
 2007-11-23  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/Makefile.am (glade_DATA): Add videotest.glade

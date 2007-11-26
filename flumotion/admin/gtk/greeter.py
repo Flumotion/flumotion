@@ -23,16 +23,14 @@ import os
 import errno
 
 import gobject
-import gtk
 
 from gettext import gettext as _
 
 from twisted.internet import reactor, protocol, defer, error
 
 from flumotion.common.pygobject import gsignal
-from flumotion.common import log
 from flumotion.configure import configure
-from flumotion.admin.gtk import wizard, connections, dialogs
+from flumotion.admin.gtk import wizard
 
 
 
