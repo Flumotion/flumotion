@@ -129,15 +129,11 @@ class Wizard(GladeWindow):
     """
     # should by filled by subclasses
     name = None
-    steps = []
+    steps = None
 
     # private
     # well really, if they're private, why not prefix them with _
     glade_file = 'admin-wizard.glade'
-    page = None
-    page_stack = []
-    pages = {}
-    state = {}
 
     gsignal('finished')
 
@@ -147,6 +143,11 @@ class Wizard(GladeWindow):
         @param initial_page: name of the WizardStep to start on
         """
         GladeWindow.__init__(self)
+
+        self.page = None
+        self.page_stack = []
+        self.pages = {}
+        self.state = {}
 
         # these should be filled by subclasses
         assert self.name
