@@ -1,3 +1,7 @@
+2007-11-26  Pedro Gracia  <pedro@flumotion.com>
+
+	* po/es.po: Spanish translation updated.
+
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/greeter.py: Remove unused imports
