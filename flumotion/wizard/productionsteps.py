@@ -621,7 +621,7 @@ class FireWireStep(VideoSourceStep):
         self._is_square = self.checkbutton_square_pixels.get_active()
 
         self._width_correction = None
-        for i in self._width_corrections:
+        for i in FireWireStep.width_corrections:
             if getattr(self,'radiobutton_width_'+i).get_active():
                 self._width_correction = i
                 break
@@ -931,7 +931,7 @@ class FireWireAudioStep(AudioSourceStep):
         self._is_square = self.checkbutton_square_pixels.get_active()
 
         self._width_correction = None
-        for i in self._width_corrections:
+        for i in FireWireAudioStep.width_corrections:
             if getattr(self,'radiobutton_width_'+i).get_active():
                 self._width_correction = i
                 break
