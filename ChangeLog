@@ -1,5 +1,11 @@
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py: 
+	* flumotion/admin/gtk/wizard.py:
+	Handle WizardCancelled for the ConnectionDialog
+
+2007-11-26  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/connection-dialog.glade: 
 	* flumotion/admin/gtk/connections.py (ConnectionsDialog): 
 	Don't connect ::delete-event directly to self.destroy(), 

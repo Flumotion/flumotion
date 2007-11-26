@@ -258,6 +258,9 @@ class Wizard(GladeWindow):
         loop.run()
         return self.state
 
+    def stop(self):
+        self.window.destroy()
+
     def run_async(self):
         """
         Show the wizard. Returns a deferred that fires when the user has

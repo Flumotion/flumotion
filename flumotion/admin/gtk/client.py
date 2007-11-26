@@ -810,6 +810,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def _open_existing_connection(self):
         from flumotion.admin.gtk import greeter
+        from flumotion.admin.gtk.wizard import WizardCancelled
         wiz = greeter.ConnectExisting()
 
         def got_state(state, g):
@@ -822,8 +823,13 @@ class Window(log.Loggable, gobject.GObject):
             g.destroy()
             self._open_connection(info)
 
+        def cancel(failure):
+            failure.trap(WizardCancelled)
+            wiz.stop()
+
         d = wiz.run_async()
         d.addCallback(got_state, wiz)
+        d.addErrback(cancel)
 
     def _import_configuration(self):
         d = gtk.FileChooserDialog(_("Import Configuration..."), self._window,
