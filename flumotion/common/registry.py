@@ -436,9 +436,8 @@ class RegistryParser(fxml.Parser):
         #   <sockets>
         # </component>
 
-        #FIXME: make sure base is in all components
         type, baseDir, description = self.parseAttributes(node,
-            required=('type', ), optional=('base', 'description'))
+            required=('type', 'base'), optional=('description',))
 
         files = []
         source = fxml.Box(None)
@@ -450,11 +449,11 @@ class RegistryParser(fxml.Parser):
         properties = {}
 
         # Merge in options for inherit
-        if node.hasAttribute('inherit'):
-            base_type = str(node.getAttribute('inherit'))
-            base = self.getComponent(base_type)
-            for prop in base.getProperties():
-                properties[prop.getName()] = prop
+        #if node.hasAttribute('inherit'):
+        #    base_type = str(node.getAttribute('inherit'))
+        #    base = self.getComponent(base_type)
+        #    for prop in base.getProperties():
+        #        properties[prop.getName()] = prop
 
         parsers = {
             'source':          (self._parseSource, source.set),

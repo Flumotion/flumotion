@@ -1,3 +1,11 @@
+2007-11-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/registry.py:
+	  Make 'base' on components required (it is present on all of them
+	  currently, and should be required.
+	  Comment out 'inherit' handling; it's unreachable ('inherit' is not an
+	  optional attribute in the parser) and needs redesigning anyway.
+
 2007-11-26  Johan Dahlin  <johan@gnome.org>
 
 	* po/LINGUAS: Add swedish here
