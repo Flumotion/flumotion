@@ -27,7 +27,7 @@ from flumotion.common import testsuite
 regchunk = """
 <registry>
   <components>
-    <component type="test-component">
+    <component type="test-component" base="/">
       <properties>
         <property name="one" type="string"/>
         <property name="two" type="int"/>
@@ -42,26 +42,26 @@ regchunk = """
         <socket type="foo.bar"/>
       </sockets>
     </component>
-    <component type="test-component-sync">
+    <component type="test-component-sync" base="/">
       <synchronization required="true" />
     </component>
-    <component type="test-component-sync-provider">
+    <component type="test-component-sync-provider" base="/">
       <synchronization required="true" clock-priority="130"/>
     </component>
-    <component type="test-component-with-feeder">
+    <component type="test-component-with-feeder" base="/">
       <feeder name="default" />
     </component>
-    <component type="test-component-with-one-eater">
+    <component type="test-component-with-one-eater" base="/">
       <eater name="default" required="true" />
     </component>
-    <component type="test-component-with-two-eaters">
+    <component type="test-component-with-two-eaters" base="/">
       <eater name="video" required="true" />
       <eater name="audio" required="true" />
     </component>
-    <component type="test-component-with-multiple-eater">
+    <component type="test-component-with-multiple-eater" base="/">
       <eater name="default" multiple="true" />
     </component>
-    <component type="test-component-with-compound-properties">
+    <component type="test-component-with-compound-properties" base="/">
       <properties>
         <compound-property name="one">
           <property name="one" type="string" />

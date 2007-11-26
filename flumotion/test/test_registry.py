@@ -67,9 +67,9 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="bar">
+    <component type="bar" base="/">
     </component>
-    <component type="baz">
+    <component type="baz" base="/">
     </component>
   </components>
 </registry>""")
@@ -95,7 +95,7 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="component">
+    <component type="component" base="/">
       <properties>
         <property name="source" type="string" required="yes" multiple="yes" description="a source property" />
       </properties>
@@ -119,7 +119,7 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="component">
+    <component type="component" base="/">
       <properties>
         <property name="source" type="string" required="yes" multiple="no" description="a source property" />
         <compound-property name="group" required="yes" multiple="yes"
@@ -189,7 +189,7 @@ class TestRegistry(testsuite.TestCase):
         template = """
 <registry>
   <components>
-    <component type="component">
+    <component type="component" base="/">
       <properties>
         %s
       </properties>
@@ -213,7 +213,7 @@ class TestRegistry(testsuite.TestCase):
         xml = """
 <registry>
   <components>
-    <component type="bar">
+    <component type="bar" base="/">
     </component>
   </components>
 </registry>"""
@@ -227,7 +227,7 @@ class TestRegistry(testsuite.TestCase):
         xml = """
 <registry>
   <components>
-    <component type="bar"></component>
+    <component type="bar" base="/"></component>
   </components>
 </registry>"""
         reg.addFromString(xml)
@@ -574,7 +574,7 @@ class TestFindComponents(testsuite.TestCase):
         open(filename, 'w').write("""
 <registry>
   <components>
-    <component type="%s">
+    <component type="%s" base="/">
       <properties>
       </properties>
     </component>
