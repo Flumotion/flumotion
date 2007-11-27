@@ -1,3 +1,11 @@
+2007-11-27  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/open-connection.glade: Avoid alignments where
+	not necessary, shrink the size of the port entry, align the
+	labels to the right, add trailing : to their labels, and
+	put the radiobutton in alignment with the entries, not the
+	labels. 
+
 2007-11-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/plugs/lifecycle.py:
