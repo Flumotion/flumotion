@@ -27,6 +27,7 @@ import gobject
 import gtk
 import gtk.glade
 from twisted.internet import reactor
+from twisted.internet.defer import maybeDeferred
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
@@ -574,7 +575,7 @@ class Window(log.Loggable, gobject.GObject):
 
         dialog = dialogs.ProgressDialog("Reloading",
             _("Reloading component code for %s") % name, self._window)
-        dlg = self._admin.callRemote('reloadComponent', state)
+        d = self._admin.callRemote('reloadComponent', state)
         d.addCallback(lambda result, dlg: dlg.destroy(), dialog)
         # FIXME: better error handling
         d.addErrback(lambda failure, dlg: dlg.destroy(), dialog)
@@ -917,8 +918,8 @@ class Window(log.Loggable, gobject.GObject):
             return failure
 
         def _callLater():
-            d = defer.maybeDeferred(self._reload_admin)
-            d.addCallback(self._reload_manager)
+            d = maybeDeferred(self._reload_admin)
+            d.addCallback(lambda _: self._reload_manager())
             # stack callbacks so that a new one only gets sent after the
             # previous one has completed
             for c in self._components.values():

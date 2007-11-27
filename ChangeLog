@@ -1,5 +1,10 @@
 2007-11-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py:
+	Test all reload code and avoid throwing errors
+
+2007-11-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/base/admin_gtk.py (FeedersAdminGtkNode.setUIState): 
 	Check if selection is not None, fixes a startup race.
 
