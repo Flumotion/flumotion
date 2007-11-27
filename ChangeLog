@@ -1,4 +1,10 @@
+=== release 0.5.1 ===
+
 2007-11-27  Andy Wingo  <wingo@pobox.com>
+
+	* NEWS: 
+	* RELEASE: 
+	* configure.ac: Update for release
 
 	* po/*.po: For some reason svn wants me to commit these.
 

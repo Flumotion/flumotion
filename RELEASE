@@ -1,41 +1,211 @@
-
-Release notes for Flumotion 0.4.2 "Belchica Strikes Back"
+Release notes for Flumotion 0.5.1 "Thales"
         
 
-The Flumotion team is happy to announce
-a new release of the
-stable 0.4 branch
-of the Flumotion Streaming Server.
+Hackers of Flumotion giddily announce a new release of the development
+0.5 branch of the Flumotion Streaming Server.
 
-Flumotion is a streaming server for GNU/Linux
-systems featuring an easy to use configuration and administration GUI. 
-Implemented using GStreamer as the processing backend and using python and
-Twisted for the high-level operations and GUI, it combines a wide feature set
-with ease of use.
+Flumotion is a streaming media server created with the backing of
+Fluendo. It features intuitive graphical administration tools, making
+the task of setting up and manipulating audio and video streams easy for
+even novice system administrators. Flumotion is released under the GPL.
 
-  
+
+Overview
+
+6500 lines of changelog. 471 files changed. 28808 lines of source code
+changed. 88 bugs fixed and enhancement requests closed. This is quite a
+big release!
+
+The major focus of this development cycle has been on improving quality,
+by simplifying the system and removing entire classes of bugs. Of
+course, ongoing feature development continued apace, adding eight new
+components, enriching the graphical monitoring and control interface,
+and rounding out the capabilities of our existing components.
+
+Below is an abridged list of user-visible features. A full list of all
+closed tickets can be found at the end of this announcement. Existing
+Flumotion users are strongly encouraged to upgrade and report on your
+experiences. If you haven't yet tried Flumotion, now is a great time to
+start!
+
+
 Features of this release
     
-      * Full support for running under Python 2.5
-      * The GTK admin can now start a manager and worker for you automatically
-      * Messages now have timestamps to allow better diagnosis of failures
-      * Improvements for service scripts to allow better recovery from failure states
-      * With sufficiently recent GStreamer, components now provide much more information about errors in the data stream
-      * Error resilience is drastically improved compared to older versions
+      * Much more robust and efficient protocol between manager and
+        component. It is now impossible to get a component in a "stuck"
+        state. The manager's code was dramatically simplified,
+        decreasing manager CPU usage when many components decide to
+        reconnect at once.
+
+      * A feed may be provided by more than one component. If one
+        component providing a feed goes away, and another component is
+        available for that feed, the manager will reconnect downstream
+        components, providing redundancy and failover.
+
+      * New components! Use Flumotion as a source to Icecast streamers
+        with the shout2-consumer component, thanks to Gergely Nagy. Make
+        picture-in-picture streams with composite-combiner. Dynamically
+        switch between different feeds with the various switch
+        components. The switch may occur manually, or automatically
+        based on data flow or on a schedule expressed in an ical file.
+        Use GNonLin to stream a dynamically-reschedulable sequence of
+        files with playlist-producer. Broadcast your screen with
+        screencast-producer, data from an IP camera with rtsp-producer,
+        or live MPEG captures with ivtv-producer. Finally you can limit
+        access to a manager or to a stream by IP with the ip-bouncer.
+        Good times! See the output of flumotion-inspect for more
+        information.
+
+      * Improved components! You can now capture the raw DV from a
+        firewire-producer. The webcam component supports V4L2, and HTTP
+        streamers finally implement bandwidth limiting. You can now
+        tweak the theora encoding parameters (there's even an interface
+        for it in the wizard), and the on-demand HTTP streamer better
+        supports Flash video seeking. Finally, we now have per-channel
+        volume meters for audio sources in the GTK+ admin.
+
+      * Faster component startup. Components no longer parse the
+        registry, which greatly improves component startup time. In
+        addition, the manager-component protocol revisions reduce the
+        number of remote calls needed for a component to go happy.
+
+      * A comprehensive reduction of Flumotion's memory footprint. In a
+        still-ongoing effort, we have reduced memory usage by 20 percent
+        or more in all processes. In addition, via revising how we
+        handle authentication credentials, we have plugged all known
+        memory leaks.
+
+      * The amount of steady-state network chitchat between components
+        and admins was reduced. Admins will only receive CPU usage
+        updates from components if they subscribe to updates.
+
+      * Detailed statistics and diagnostics of the state of data flow
+        in a component can now be viewed from the GTK+ administration
+        interface.
+
+      * Better informational messages for debugging misconfigured
+        components. These messages show up in the GTK+ admin. Also, the
+        manager's "export configuration" feature works much more
+        reliably now.
+
+      * HAL integration for allowing Flumotion access to media devices.
+        No more chmod a+rw /dev/raw1394!
+
+      * Better debugging and programmatic interfaces to the Flumotion
+        system, with the addition of manhole support (SSH into your
+        manager!), improvements to flumotion-command, Nagios
+        integration, a tool for logging UIState keys to an RRD file, and
+        more. Admit it, the part about "and more" piqued your curiosity.
+
+
+Known issues
+    
+      * The GTK+ admin no longer shows components' CPU usage. This useful
+        capability will return when bug #704 is fixed.
+
+      * Managers from 0.5.1 will not interoperate with workers from
+        0.4.x, and vice versa. We have had to make incompatible changes
+        in order to remove some systematic bugs. However, 0.5.1 admin
+        clients will work with older managers.
+
+      * Likewise, those users that maintain components and software
+        outside the Flumotion source tree will probably need to update
+        their code to work with 0.5.1. Drop by the IRC channel and we'll
+        help you port. It's worth it!
+
 
 Bugs fixed in this release
     
-      * 500 : fix flumotion's configure.ac to use runtime tests, not pkg-config
-      * 568 : when master clock provider goes sad, starting it again compains about not able to reserve ports
-      * 571 : theora encoder reporting bogus info about bitrate even though manager config has it in correct units
-      * 573 : Rewrite daemonisation and shutdown code some more
-      * 577 : FeedComponent, HTTP streamer are not threadsafe
-      * 583 : clean up the worker's error handling
-      * 588 : The manager don't close the connection of a worker if its name is already used
-      * 590 : add timestamps to messages
-      * 592 : GStreamer errors can cause the manager to have inconsistent state
-      * 596 : default admin pages not working
-      * 603 : Admin failed to load UI bundle after update to feisty (Python 2.5?)
+      * 22 : [wizard] Smoke settings screen should probably have better name
+      * 44 : Don't print in manager when logging in with bad credentials
+      * 68 : Wizard click on left summary does not update back/forward buttons
+      * 74 : [patch] Theora settings window should have keyframe option
+      * 102 : ability to specify default registry location
+      * 106 : Being able to serve a looping file when stream not connected
+      * 107 : Kill dead code in admin heaven
+      * 111 : Firewire audio broken
+      * 116 : Fixing device access in a nice way
+      * 167 : worker without user/pass can't connect to manager
+      * 187 : a worker being shut down triggers a notifyOnDisconnect on remote reference + wrong warning
+      * 200 : Need to rethink an important flaw in our xml config file format
+      * 208 : flumotion service script should allow system-style running completely from homedir
+      * 214 : Maximum clients is incorrect or under-explained.
+      * 224 : make flumotion-manager/-worker installable without X
+      * 239 : shout2 (icecast2) consumer
+      * 244 : --help prints gst's help, while -h gives flumotion's help
+      * 260 : [gtk admin] 'reload code' on admin components fails
+      * 299 : UI does not allow you to make a new connection
+      * 371 : flumotion startup message with no SSL
+      * 373 : cache has race conditions
+      * 379 : http streamer needs to check for twisted-web
+      * 385 : defer_generator_method screws with the docs
+      * 393 : Firewire worker traceback
+      * 418 : porter shutdown throws exceptions
+      * 445 : admin should allow deleting only one component
+      * 459 : segfault in admin when switching between component UI's
+      * 465 : Components need a .medium set to be able to ask for reconnection
+      * 512 : Exceptions raised inside StateCache update methods don't print tracebacks
+      * 520 : tracebacks in admin when disconnected from manager
+      * 521 : another admin traceback
+      * 538 : Wizard should limit video size to known max size
+      * 540 : some UI suggestions on Plumbing
+      * 547 : Firewire-Cam:Video and Producer-Soundcard won't work together
+      * 558 : flumotion service script hangs if manager can't write the pid file
+      * 567 : http-server doesn't work with mount-point set to /
+      * 569 : testsuite uses deprecated methods
+      * 575 : component GTK UI can not hide widgets during haveWidgetTree
+      * 578 : loading a config with bad properties doesn't give a good error
+      * 591 : feeder tab shows disconnected when actually connected
+      * 594 : Make common.log less specific to Flumotion
+      * 595 : remove raise common.errors.SystemError from common.log.errorObject
+      * 598 : GStreamer errors in feedcomponents should be handled more nicely
+      * 604 : [gtk admin] UI bug showing volume widget in completely the wrong place
+      * 605 : cleanup of properties in component protocol
+      * 612 : fpbclientfactory debug should tell us what ip it failed to connect to
+      * 613 : instances of print in flumotion can cause 100% CPU
+      * 614 : no useful feedback if you daemonize a manager with an invalid config
+      * 616 : flumotion-launch when reconnecting eaters causes exceptions
+      * 618 : support FLV start= GET parameters in httpfile
+      * 619 : refactor feedcomponent.py to use the feed medium's requestFeed
+      * 621 : refactor adminmodel to offer a deferred connection interface
+      * 622 : log.removeLogHandler
+      * 626 : component UI state keys need to be graphable
+      * 631 : add file monitoring to ical handling code such that component updates it's schedule from changes to file
+      * 632 : Firewire producer should allow saving of the raw stream
+      * 639 : bug in parsing eater nodes when feed nodes not specified
+      * 641 : manager's registry code should be more robust wrt. to registry changes
+      * 642 : extern.log color output
+      * 644 : v4l2 support should be added to the current webcam and tvcard producer
+      * 645 : flumotion admin UI does not report parsing errors in the XML configuration file
+      * 646 : Base Component Classes are insufficient
+      * 649 : wizard outputs new config format with some defects
+      * 656 : traceback during stopping of http-server prevents component from being stopped
+      * 661 : fxml calls str() on unicode objects incorrectly
+      * 664 : The flumotion multiadmin do not call the model_addPlanet on reconnection
+      * 665 : registry will not notice new .xml files at runtime in directories that had no .xml files at startup
+      * 667 : Worker shouldn't import gst, and checks should be out-of-process
+      * 675 : choose appropriate reactor for manager, worker, tests
+      * 682 : The component properties parser should handle native types uniformly.
+      * 688 : manager never removes keycard from manager bouncer
+      * 694 : components need to name their eaters according to their eater names, not according to the names of their initial feeders
+      * 698 : The Manager do not catch ComponentSetupHandledError
+      * 700 : warning about upgrading component config is useless
+      * 705 : refactor bouncers so as not to leak keycards
+      * 709 : flumotion/manager/depgrah.py:mapFeedersToEaters is wider than 80 chars and has too many indentation levels to avoid being dodgy
+      * 715 : soundcard continuously tracebacks
+      * 716 : any kind of pb.Error subclass turns up as an InsecureJelly
+      * 735 : Bouncers need some redesign
+      * 737 : segfault stopping streamer component
+      * 740 : disker cannot create unicode filenames
+      * 744 : reservePorts doesn't work when feederport is set to random
+      * 745 : Why does manager.ComponentAvatar have a method to allow jobs to request ports on any worker?
+      * 748 : [logging] optional arguments in outputToFiles()
+      * 774 : Problem with authenticacition in 'videotest with http and disker' test
+      * 775 : Problem with authenticacition in 'videotest-bouncer' test
+      * 781 : Stopping a streamer can't complete logging properly
+      * 787 : Stopping a lost component behaves poorly
+      * 788 : in some circumstances, component mood is hungry, but flow is fine
+      * 803 : wizard error when configuring soundcard
 
 Download
 
@@ -63,10 +233,13 @@ It is hosted on https://core.fluendo.com/svn/
 Contributors to this release
     
       * Andy Wingo
+      * Arek Korbik
+      * Christian Schaller
+      * Gergely Nagy
+      * Johan Dahlin
       * Michael Smith
+      * Pedro Gracia
       * Sebastien Merle
       * Thomas Vander Stichele
-      * Zaheer Merali
- 
-        
- 
+      * Zaheer Abbas Merali
+      * daniel.hnn at gmail
