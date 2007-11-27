@@ -651,7 +651,8 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         for feeder in state.get('feeders'):
             self.addFeeder(state, feeder)
         sel = self.treeview.get_selection()
-        sel.select_iter(self.treemodel.get_iter_first())
+        if sel is not None:
+            sel.select_iter(self.treemodel.get_iter_first())
 
     def haveWidgetTree(self):
         self.labels = {}
