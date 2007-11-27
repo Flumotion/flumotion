@@ -84,7 +84,8 @@
 
 	* po/sv.po: Add swedish translation
 
-	* flumotion/wizard/productionsteps.py (FireWireAudioStep.on_update_output_format)
+	* flumotion/wizard/productionsteps.py
+	(FireWireAudioStep.on_update_output_format)
 	(FireWireStep.on_update_output_format): width_corrections is not
 	private a class variable.
 	(SoundcardStep): Some methods are private now.
