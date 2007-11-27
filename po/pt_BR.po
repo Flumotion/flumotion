@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-23 10:16+0100\n"
+"POT-Creation-Date: 2007-11-27 16:54+0100\n"
 "PO-Revision-Date: 2006-04-21 11:36-0300\n"
 "Last-Translator: Pablo Lorenzzoni <spectra@debian.org>\n"
 "Language-Team: pt_BR <spectra@debian.org>\n"
@@ -254,7 +254,7 @@ msgstr "Erro de rede: porta TCP %d não está disponível."
 #: flumotion/component/misc/httpfile/admin_gtk.py:77
 #: flumotion/component/base/admin_gtk.py:526
 #: flumotion/component/base/admin_gtk.py:540
-#: flumotion/component/base/admin_gtk.py:740
+#: flumotion/component/base/admin_gtk.py:741
 msgid "Byte"
 msgstr ""
 
@@ -357,7 +357,7 @@ msgid ""
 "Your gst-plugins-base is too old, so feeder statistics will be unavailable."
 msgstr ""
 
-#: flumotion/component/feedcomponent010.py:641
+#: flumotion/component/feedcomponent010.py:637
 #, fuzzy
 msgid "Internal Flumotion error."
 msgstr "Erro GStreamer interno."
@@ -423,20 +423,20 @@ msgstr "<b>Clientes</b>"
 msgid "Unknown"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:709
+#: flumotion/component/base/admin_gtk.py:710
 #, fuzzy
 msgid "Eaters"
 msgstr "Padrão"
 
-#: flumotion/component/base/admin_gtk.py:737
+#: flumotion/component/base/admin_gtk.py:738
 #, python-format
 msgid "Eater <b>%s</b>"
 msgstr ""
 
-#: flumotion/component/base/admin_gtk.py:784
-#: flumotion/component/base/admin_gtk.py:789
-#: flumotion/component/base/admin_gtk.py:796
-#: flumotion/component/base/admin_gtk.py:826
+#: flumotion/component/base/admin_gtk.py:785
+#: flumotion/component/base/admin_gtk.py:790
+#: flumotion/component/base/admin_gtk.py:797
+#: flumotion/component/base/admin_gtk.py:827
 #, python-format
 msgid "%d units"
 msgstr ""
@@ -483,18 +483,18 @@ msgid "Probing webcam, this can take a while..."
 msgstr "Verificando webcam, isto pode levar algum tempo..."
 
 #: flumotion/wizard/productionsteps.py:534
-#: flumotion/wizard/productionsteps.py:847
+#: flumotion/wizard/productionsteps.py:851
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr ""
 
 #: flumotion/wizard/productionsteps.py:540
-#: flumotion/wizard/productionsteps.py:853
+#: flumotion/wizard/productionsteps.py:857
 msgid "Checking for Firewire device..."
 msgstr "Checando dispositivo Firewire"
 
 #: flumotion/wizard/productionsteps.py:615
-#: flumotion/wizard/productionsteps.py:925
+#: flumotion/wizard/productionsteps.py:929
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr ""
@@ -751,51 +751,51 @@ msgstr "Informações de debug:\n"
 msgid "Message"
 msgstr "Mensagem"
 
-#: flumotion/admin/gtk/greeter.py:51
+#: flumotion/admin/gtk/greeter.py:49
 msgid "Connect to Flumotion manager"
 msgstr "Conectar ao gerenciador Flumotion"
 
-#: flumotion/admin/gtk/greeter.py:52
+#: flumotion/admin/gtk/greeter.py:50
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
 msgstr ""
 "Administrador do Flumotion precisa conectar-se a um gerenciador do "
 "Flumotion.\n"
 
-#: flumotion/admin/gtk/greeter.py:53
+#: flumotion/admin/gtk/greeter.py:51
 msgid "Choose an option from the list and click \"Forward\" to begin."
 msgstr "Escolha uma opção da lista e clique \"Avançar\" para começar."
 
-#: flumotion/admin/gtk/greeter.py:76
+#: flumotion/admin/gtk/greeter.py:74
 msgid "Host information"
 msgstr "Informações do host"
 
-#: flumotion/admin/gtk/greeter.py:77
+#: flumotion/admin/gtk/greeter.py:75
 msgid "Please enter the address where the manager is running."
 msgstr ""
 "Por favor, entre com o endereço onde o gerenciador está sendo executado;"
 
-#: flumotion/admin/gtk/greeter.py:100
+#: flumotion/admin/gtk/greeter.py:98
 msgid "Authentication"
 msgstr "Autenticação"
 
-#: flumotion/admin/gtk/greeter.py:101
+#: flumotion/admin/gtk/greeter.py:99
 msgid "Please select among the following authentication methods."
 msgstr "Por favor, selecione entre os seguintes métodos de autenticação."
 
-#: flumotion/admin/gtk/greeter.py:127
+#: flumotion/admin/gtk/greeter.py:125
 msgid "Recent connections"
 msgstr "Conexões recentes"
 
-#: flumotion/admin/gtk/greeter.py:128 data/glade/connection-dialog.glade:84
+#: flumotion/admin/gtk/greeter.py:126 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
 msgstr "Por favor, escolha uma conexão da caixa abaixo."
 
-#: flumotion/admin/gtk/greeter.py:166
+#: flumotion/admin/gtk/greeter.py:164
 #, fuzzy
 msgid "Start a new manager and worker"
 msgstr "Iniciar um _novo gerenciador e conectar-se a ele"
 
-#: flumotion/admin/gtk/greeter.py:167
+#: flumotion/admin/gtk/greeter.py:165
 msgid ""
 "This will start a new manager and worker for you.\n"
 "\n"
@@ -804,53 +804,53 @@ msgid ""
 "This mode is only useful for testing Flumotion.\n"
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:255
+#: flumotion/admin/gtk/greeter.py:253
 msgid "Creating manager ..."
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:256
+#: flumotion/admin/gtk/greeter.py:254
 #, fuzzy
 msgid "Could not create manager."
 msgstr "Não foi possível iniciar o componente."
 
-#: flumotion/admin/gtk/greeter.py:260 data/glade/greeter-start_new.glade:33
+#: flumotion/admin/gtk/greeter.py:258 data/glade/greeter-start_new.glade:33
 msgid "Starting manager ..."
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:261
+#: flumotion/admin/gtk/greeter.py:259
 #, fuzzy
 msgid "Could not start manager."
 msgstr "Não foi possível iniciar o componente."
 
-#: flumotion/admin/gtk/greeter.py:265
+#: flumotion/admin/gtk/greeter.py:263
 msgid "Creating worker ..."
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:266
+#: flumotion/admin/gtk/greeter.py:264
 #, fuzzy
 msgid "Could not create worker."
 msgstr "Não foi possível iniciar o componente."
 
-#: flumotion/admin/gtk/greeter.py:270
+#: flumotion/admin/gtk/greeter.py:268
 msgid "Starting worker ..."
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:271
+#: flumotion/admin/gtk/greeter.py:269
 #, fuzzy
 msgid "Could not start worker."
 msgstr "Não foi possível iniciar o componente."
 
-#: flumotion/admin/gtk/greeter.py:305
+#: flumotion/admin/gtk/greeter.py:303
 #, fuzzy
 msgid "Failed to start"
 msgstr "Erro ao %s componente %s"
 
-#: flumotion/admin/gtk/greeter.py:316
+#: flumotion/admin/gtk/greeter.py:314
 #, python-format
 msgid "The command exited with an exit code of %d."
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:318
+#: flumotion/admin/gtk/greeter.py:316
 #, python-format
 msgid ""
 "The command that failed was:\n"
@@ -858,12 +858,12 @@ msgid ""
 "%s"
 msgstr ""
 
-#: flumotion/admin/gtk/greeter.py:325
+#: flumotion/admin/gtk/greeter.py:323
 #, fuzzy
 msgid "Started manager and worker"
 msgstr "Iniciar um _novo gerenciador e conectar-se a ele"
 
-#: flumotion/admin/gtk/greeter.py:338
+#: flumotion/admin/gtk/greeter.py:336
 #, python-format
 msgid ""
 "The admin client will now connect to the manager.\n"
@@ -942,162 +942,162 @@ msgstr ""
 msgid "Authors"
 msgstr "Autores"
 
-#: flumotion/admin/gtk/client.py:245
+#: flumotion/admin/gtk/client.py:246
 msgid "_Connection"
 msgstr "_Conexão"
 
-#: flumotion/admin/gtk/client.py:246
+#: flumotion/admin/gtk/client.py:247
 #, fuzzy
 msgid "_Open Recent Connection..."
 msgstr "_Abrir conexão recente"
 
-#: flumotion/admin/gtk/client.py:248
+#: flumotion/admin/gtk/client.py:249
 #, fuzzy
 msgid "Open _Existing Connection..."
 msgstr "Abrir Conexão..."
 
-#: flumotion/admin/gtk/client.py:250
+#: flumotion/admin/gtk/client.py:251
 msgid "_Import Configuration..."
 msgstr "_Importar Configuração..."
 
-#: flumotion/admin/gtk/client.py:252
+#: flumotion/admin/gtk/client.py:253
 msgid "_Export Configuration..."
 msgstr "_Exportar Configuração..."
 
-#: flumotion/admin/gtk/client.py:254
+#: flumotion/admin/gtk/client.py:255
 #, fuzzy
 msgid "_Quit"
 msgstr "_Qualidade:"
 
-#: flumotion/admin/gtk/client.py:258
+#: flumotion/admin/gtk/client.py:259
 msgid "_Manage"
 msgstr "_Gerenciar"
 
-#: flumotion/admin/gtk/client.py:259
+#: flumotion/admin/gtk/client.py:260
 #, fuzzy
 msgid "_S_tart Component"
 msgstr "_Iniciar Componente"
 
-#: flumotion/admin/gtk/client.py:261
+#: flumotion/admin/gtk/client.py:262
 msgid "St_op Component"
 msgstr "_Parar Componente"
 
-#: flumotion/admin/gtk/client.py:263
+#: flumotion/admin/gtk/client.py:264
 #, fuzzy
 msgid "_Delete Component"
 msgstr "_Iniciar Componente"
 
-#: flumotion/admin/gtk/client.py:265
+#: flumotion/admin/gtk/client.py:266
 msgid "Start _All"
 msgstr "Iniciar _Todos"
 
-#: flumotion/admin/gtk/client.py:267
+#: flumotion/admin/gtk/client.py:268
 msgid "Stop A_ll"
 msgstr "Parar T_odos"
 
-#: flumotion/admin/gtk/client.py:269
+#: flumotion/admin/gtk/client.py:270
 msgid "_Clear All"
 msgstr "_Limpar Todos"
 
-#: flumotion/admin/gtk/client.py:271
+#: flumotion/admin/gtk/client.py:272
 msgid "Run _Wizard"
 msgstr "Executar _Wizard"
 
-#: flumotion/admin/gtk/client.py:275
+#: flumotion/admin/gtk/client.py:276
 msgid "_Debug"
 msgstr "_Debug"
 
-#: flumotion/admin/gtk/client.py:276
+#: flumotion/admin/gtk/client.py:277
 msgid "Reload _Manager"
 msgstr "Recarregar _Gerenciador"
 
-#: flumotion/admin/gtk/client.py:278
+#: flumotion/admin/gtk/client.py:279
 #, fuzzy
 msgid "Reload _Admin"
 msgstr "Recarregar _Tudo"
 
-#: flumotion/admin/gtk/client.py:280
+#: flumotion/admin/gtk/client.py:281
 #, fuzzy
 msgid "Reload A_ll"
 msgstr "Recarregar _Tudo"
 
-#: flumotion/admin/gtk/client.py:282
+#: flumotion/admin/gtk/client.py:283
 msgid "Start _Shell"
 msgstr "Inicar _Shell"
 
-#: flumotion/admin/gtk/client.py:286
+#: flumotion/admin/gtk/client.py:287
 msgid "_Help"
 msgstr "_Ajuda"
 
-#: flumotion/admin/gtk/client.py:287
+#: flumotion/admin/gtk/client.py:288
 msgid "_About"
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:319
+#: flumotion/admin/gtk/client.py:320
 msgid "Not connected"
 msgstr "Desconectado"
 
-#: flumotion/admin/gtk/client.py:390
+#: flumotion/admin/gtk/client.py:391
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "O wizard não pode ser executado porque não há workers conectados."
 
-#: flumotion/admin/gtk/client.py:406
+#: flumotion/admin/gtk/client.py:407
 #, fuzzy, python-format
 msgid "Connecting to %(host)s:%(port)s"
 msgstr "Conectando em %s:%s"
 
-#: flumotion/admin/gtk/client.py:576
+#: flumotion/admin/gtk/client.py:577
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Recarregando código do componente %s"
 
-#: flumotion/admin/gtk/client.py:618
+#: flumotion/admin/gtk/client.py:619
 msgid "No component selected."
 msgstr "Nenhum componente selecionado."
 
-#: flumotion/admin/gtk/client.py:636
+#: flumotion/admin/gtk/client.py:637
 #, fuzzy, python-format
 msgid "Failed to %(action)s component %(name)s"
 msgstr "Erro ao %s componente %s"
 
-#: flumotion/admin/gtk/client.py:700
+#: flumotion/admin/gtk/client.py:701
 #, python-format
 msgid "Component %s is sad"
 msgstr "Componente %s está triste"
 
-#: flumotion/admin/gtk/client.py:720
+#: flumotion/admin/gtk/client.py:721
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administração do Flumotion"
 
-#: flumotion/admin/gtk/client.py:752
+#: flumotion/admin/gtk/client.py:753
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Conexão com o gerenciador perdida, reconectando ..."
 
-#: flumotion/admin/gtk/client.py:765
+#: flumotion/admin/gtk/client.py:766
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Conexão com o gerenciador em %s foi recusada."
 
-#: flumotion/admin/gtk/client.py:767
+#: flumotion/admin/gtk/client.py:768
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Conexão com %s foi recusada"
 
-#: flumotion/admin/gtk/client.py:781
+#: flumotion/admin/gtk/client.py:782
 #, fuzzy, python-format
 msgid "Connection to manager on %(conn)s failed (%(reason)s)."
 msgstr "Conexão com o gerenciador em %s falhou (%s)."
 
-#: flumotion/admin/gtk/client.py:829
+#: flumotion/admin/gtk/client.py:836
 msgid "Import Configuration..."
 msgstr "Importar Configuração..."
 
-#: flumotion/admin/gtk/client.py:846
+#: flumotion/admin/gtk/client.py:853
 msgid "Export Configuration..."
 msgstr "Exportar Configuração..."
 
-#: flumotion/admin/gtk/client.py:857
+#: flumotion/admin/gtk/client.py:864
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -1105,15 +1105,15 @@ msgstr ""
 "Arquivo já existente.\n"
 "Sobrescrever?"
 
-#: flumotion/admin/gtk/client.py:891
+#: flumotion/admin/gtk/client.py:898
 msgid "Reloading ..."
 msgstr "Recarregando ..."
 
-#: flumotion/admin/gtk/client.py:892
+#: flumotion/admin/gtk/client.py:899
 msgid "Reloading client code"
 msgstr "Recarregando código do cliente"
 
-#: flumotion/admin/gtk/client.py:904
+#: flumotion/admin/gtk/client.py:911
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -1122,7 +1122,7 @@ msgstr ""
 "Não foi possível recarregar o componente:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:927
+#: flumotion/admin/gtk/client.py:934
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregando código de %s"
@@ -1364,31 +1364,36 @@ msgstr ""
 "GNU FDL\n"
 "Comercial"
 
-#: data/glade/authenticate.glade:31
-msgid "_Password"
+#: data/glade/authenticate.glade:33
+#, fuzzy
+msgid "_Password:"
 msgstr "_Senha"
 
-#: data/glade/authenticate.glade:117
+#: data/glade/authenticate.glade:62
+#, fuzzy
+msgid "_Username:"
+msgstr "_Nome de usuário"
+
+#: data/glade/authenticate.glade:91
+#, fuzzy
+msgid "_Method:"
+msgstr "_Limiar:"
+
+#: data/glade/authenticate.glade:171
 msgid "Name and Password"
 msgstr "Nome e Senha"
 
-#: data/glade/authenticate.glade:147
-msgid "_Authentication Method"
-msgstr "_Método de Autenticação"
-
-#: data/glade/authenticate.glade:174
-msgid "_Username"
-msgstr "_Nome de usuário"
-
-#: data/glade/open-connection.glade:90
-msgid "_Host"
+#: data/glade/open-connection.glade:33
+#, fuzzy
+msgid "_Host:"
 msgstr "_Host"
 
-#: data/glade/open-connection.glade:129
-msgid "_Port"
-msgstr "_Porta"
+#: data/glade/open-connection.glade:62 data/glade/wizard_http.glade:33
+#: data/glade/wizard_shout2.glade:38
+msgid "_Port:"
+msgstr "_Porta:"
 
-#: data/glade/open-connection.glade:169
+#: data/glade/open-connection.glade:156
 msgid "_Secure connection via SSL"
 msgstr "Conexão _segura via SSL"
 
@@ -1464,10 +1469,6 @@ msgstr ""
 #: data/glade/wizard_soundcard.glade:248
 msgid "Sound _system:"
 msgstr "Sistema de som:"
-
-#: data/glade/wizard_http.glade:33 data/glade/wizard_shout2.glade:38
-msgid "_Port:"
-msgstr "_Porta:"
 
 #: data/glade/wizard_http.glade:128
 msgid "Mbit/s"
@@ -1672,6 +1673,12 @@ msgstr "nenhum"
 #: data/glade/wizard_firewire.glade:595
 msgid "<b>Output format</b>"
 msgstr "<b>Formato de saída</b>"
+
+#~ msgid "_Authentication Method"
+#~ msgstr "_Método de Autenticação"
+
+#~ msgid "_Port"
+#~ msgstr "_Porta"
 
 #, fuzzy
 #~ msgid "<b>Current connection</b>"

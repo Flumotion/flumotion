@@ -1,3 +1,7 @@
+2007-11-27  Andy Wingo  <wingo@pobox.com>
+
+	* po/*.po: For some reason svn wants me to commit these.
+
 2007-11-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
