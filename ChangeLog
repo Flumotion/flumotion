@@ -1,8 +1,12 @@
+=== release 0.5.1 ===
+
 2007-11-27  Andy Wingo  <wingo@pobox.com>
 
+	* NEWS:
+	* RELEASE:
+	* configure.ac: Retag as 0.5.1 to change release name
+	
 	* configure.ac: Back to dev
-
-=== release 0.5.1 ===
 
 2007-11-27  Andy Wingo  <wingo@pobox.com>
 
