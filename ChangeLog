@@ -1,5 +1,8 @@
 2007-11-27  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/authenticate.glade: Avoid aligments,
+	label alignment fix and add trailing :
+
 	* data/glade/open-connection.glade: Avoid alignments where
 	not necessary, shrink the size of the port entry, align the
 	labels to the right, add trailing : to their labels, and
