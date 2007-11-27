@@ -249,4 +249,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.4.2.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.5.1</revision>
+   <branch>0.5</branch>
+   <name>Can Margarit</name>
+   <created>2007-11-27</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.1.tar.bz2" />
+  </Version>
+ </release>
 </Project>

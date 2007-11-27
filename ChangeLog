@@ -1,5 +1,7 @@
 2007-11-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion.doap: Update for release.
+
 	* configure.ac: Back to dev, again
 
 === release 0.5.1 ===
