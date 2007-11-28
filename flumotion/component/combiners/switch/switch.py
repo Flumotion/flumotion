@@ -41,12 +41,24 @@ class SwitchMedium(feedcomponent.FeedComponentMedium):
         return self.comp.switch_to("backup")
 
 class Switch(feedcomponent.MultiInputParseLaunchComponent):
-    logCategory = 'comb-switch'
+    logCategory = 'switch'
     componentMediumClass = SwitchMedium
 
     def init(self):
         self.uiState.addKey("active-eater")
         self.icalScheduler = None
+
+        # This structure maps logical feeds to sets of eaters. For
+        # example, "master" and "backup" could be logical feeds, and
+        # would be the keys in this dict, mapping to lists of eater
+        # aliases corresponding to those feeds. The lengths of those
+        # lists is equal to the number of feeders that the element has,
+        # which is the number of individual streams in a logical feed.
+        # 
+        # For example, {"master": ["audio-master", "video-master"],
+        #               "backup": ["audio-backup", "video-backup"]}
+        self.logicalFeeds = {}
+
         # _idealEater is used to determine what the ideal eater at the current
         # time is.
         self._idealEater = "master"
@@ -54,16 +66,16 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # usually these will be None, but when a scheduled switch
         # was requested and the eater wasn't ready, it'll fire when ready
         # so the switch can be made
-        self._eaterReadyDefers = { "master": None, "backup": None }
+        self._eaterReadyDefers = {}
         self._started = False
 
-    def _create_scheduler(self, filename):
-        def addWarning(id, format, *args, **kwargs):
-            self.warning(format, *args)
-            m = messages.Message(messages.WARNING, T_(format, *args),
-                                 id=id, **kwargs)
-            self.addMessage(m)
+    def addWarning(self, id, format, *args, **kwargs):
+        self.warning(format, *args)
+        m = messages.Message(messages.WARNING, T_(format, *args),
+                             id=id, **kwargs)
+        self.addMessage(m)
 
+    def _create_scheduler(self, filename):
         try:
             def eventStarted(event):
                 self.debug("event started %r", event)
@@ -81,11 +93,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         except ValueError:
             fmt = N_("Error parsing ical file %s, so not scheduling "
                      "any events.")
-            addWarning("error-parsing-ical", fmt, filename)
+            self.addWarning("error-parsing-ical", fmt, filename)
         except ImportError, e:
             fmt = N_("An ical file has been specified for scheduling, "
                      "but the necessary modules are not installed.")
-            addWarning("error-parsing-ical", fmt, debug=e.message)
+            self.addWarning("error-parsing-ical", fmt, debug=e.message)
         else:
             return sched
         
@@ -105,16 +117,28 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if icalFileName:
             self.icalScheduler = self._create_scheduler(icalFileName)
 
-    def switch_to(self, eaterSubstring):
+    def create_pipeline(self):
+        for name, aliases in self.get_logical_feeds().items():
+            assert name not in self.logicalFeeds
+            for alias in aliases:
+                assert alias in self.eaters
+            self.logicalFeeds[name] = aliases
+            self._eaterReadyDefers[name] = None
+
+        return feedcomponent.MultiInputParseLaunchComponent.create_pipeline()
+
+    def get_logical_feeds(self):
+        raise errors.NotImplementedError('subclasses should implement '
+                                         'get_logical_feeds')
+
+    def switch_to(self, logicalFeed):
         raise errors.NotImplementedError('subclasses should implement '
                                          'switch_to')
 
-    def is_active(self, eaterSubstring):
-        # eaterSubstring is "master" or "backup"
-        for eaterAlias in self.eaters:
-            if eaterSubstring in eaterAlias:
-                return self.eaters[eaterAlias].isActive()
-        return True
+    def is_active(self, feed):
+        all = lambda seq: reduce(int.__mul__, seq, True)
+        return all([self.eaters[alias].isActive()
+                    for alias in self.logicalFeeds[feed]])
 
     def do_pipeline_playing(self):
         feedcomponent.MultiInputParseLaunchComponent.do_pipeline_playing(self)
@@ -130,48 +154,50 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if not self._started and moods.get(self.getMood()) == moods.happy:
             self._started = True
 
-    def switch_to_for_event(self, eaterSubstring, startOrStop):
+    def switch_to_for_event(self, feed, started):
         """
-        @param eaterSubstring: either "master" or "backup"
-        @param startOrStop: True if start of event, False if stop
+        @param feed: a logical feed
+        @param started: True if start of event, False if stop
         """
+        def switch_to_cb(success):
+            if not success:
+                feed_unavailable()
+
+        def feed_unavailable():
+            if started:
+                fmt = N_("Event started but could not switch to %s, "
+                         "will switch when %s is back")
+            else:
+                fmt = N_("Event stopped but could not switch to %s, "
+                         "will switch when %s is back")
+            self.addWarning("error-scheduling-event", fmt, feed, feed)
+
+            while self._eaterReadyDefers:
+                self._eaterReadyDefers.pop()
+
+            self._eaterReadyDefers[feed] = d2 = defer.Deferred()
+            d2.addCallback(lambda x: self.switch_to(feed))
+
         if not self.pipeline:
             return
-        if eaterSubstring != "master" and eaterSubstring != "backup":
-            self.warning("switch_to_for_event should be called with 'master'"
-                " or 'backup'")
+        if feed not in self.logicalFeeds:
+            self.warning("unknown logical feed: %s", feed)
             return None
-        self._idealEater = eaterSubstring
-        d = defer.maybeDeferred(self.switch_to, eaterSubstring)
-        def switch_to_cb(res):
-            if not res :
-                startOrStopStr = "stopped"
-                if startOrStop:
-                    startOrStopStr = "started"
-                warnStr = "Event %s but could not switch to %s" \
-                    ", will switch when %s is back" % (startOrStopStr,
-                    eaterSubstring, eaterSubstring)
-                self.warning(warnStr)
-                m = messages.Warning(T_(N_(warnStr)),
-                        id="error-scheduling-event")
-                self.addMessage(m)
-                self._eaterReadyDefers[eaterSubstring] = defer.Deferred()
-                self._eaterReadyDefers[eaterSubstring].addCallback(
-                    lambda x: self.switch_to(eaterSubstring))
-                otherEater = "backup"
-                if eaterSubstring == "backup":
-                    otherEater = "master"
-                self._eaterReadyDefers[otherEater] = None
+        self._idealEater = feed
+        d = defer.maybeDeferred(self.switch_to, feed)
         d.addCallback(switch_to_cb)
         return d
 
 class SingleSwitch(Switch):
-    logCategory = "comb-single-switch"
+    logCategory = "single-switch"
 
     def init(self):
         self.switchElement = None
         # eater name -> name of sink pad on switch element
         self.switchPads = {}
+
+    def get_logical_feeds(self):
+        return {'master': ['master'], 'backup': ['backup']}
 
     def get_pipeline_string(self, properties):
         pipeline = "switch name=switch ! " \
@@ -212,22 +238,19 @@ class SingleSwitch(Switch):
             self.switchPads[self._idealEater])
         self.uiState.set("active-eater", self._idealEater)
 
-    def switch_to(self, eater):
+    def switch_to(self, feed):
         if not self.switchElement:
             self.warning("switch_to called with eater %s but before pipeline "
                 "configured")
             return False
-        if not eater in [ "backup", "master" ]:
-            self.warning ("%s is not master or backup", eater)
-            return False
-        if self.is_active(eater):
+        if self.is_active(feed):
             self.switchElement.set_property("active-pad",
-                self.switchPads[eater])
-            self.uiState.set("active-eater", eater)
+                self.switchPads[feed])
+            self.uiState.set("active-eater", feed)
             return True
         else:
             self.warning("Could not switch to %s because the %s eater "
-                "is not active." % (eater, eater))
+                "is not active.", feed, feed)
         return False
 
     #FIXME: bitrotten
@@ -240,7 +263,7 @@ class SingleSwitch(Switch):
         self._eaterReadyDefers[eaterName] = None
 
 class AVSwitch(Switch):
-    logCategory = "comb-av-switch"
+    logCategory = "av-switch"
 
     def init(self):
         self.audioSwitchElement = None
@@ -253,6 +276,10 @@ class AVSwitch(Switch):
         self._switchLock = threading.Lock()
         self.pads_awaiting_block = []
         self.padsBlockedDefer = None
+
+    def get_logical_feeds(self):
+        return {'master': ['video-master', 'audio-master'],
+                'backup': ['video-backup', 'audio-backup']}
 
     def do_check(self):
         d = Switch.do_check(self)

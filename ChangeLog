@@ -1,3 +1,15 @@
+2007-11-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py: Shorten logging
+	categories.
+	(Switch.logicalFeeds, Switch.create_pipeline)
+	(Switch.get_logical_feeds, SingleSwitch.get_logical_feeds)
+	(AVSwitch.get_logical_feeds): There are only three important
+	numbers in computer science: 0, 1, and N. We have passed one.
+	(Switch.addWarning, Switch._create_scheduler, Switch.is_active)
+	(Switch.switch_to_for_event, SingleSwitch.switch_to): More
+	flagellation.
+
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
 	* README:
