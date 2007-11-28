@@ -1,3 +1,24 @@
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/worker.py:
+	Mark strings visible in the user interface as translatable.
+	
+	* po/ca.po:
+	* po/de.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	* po/pt_BR.po:
+	* po/sv.po:
+	Update translation files and update swedish translation.
+
 2007-11-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/switch.py: Shorten logging

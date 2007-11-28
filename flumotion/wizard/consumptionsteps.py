@@ -19,15 +19,21 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
+
 from flumotion.configure import configure
 from flumotion.common.python import any
 from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.enums import RotateSize, RotateTime
 
+_ = gettext.gettext
+X_ = _
+
+
 class ConsumptionStep(WorkerWizardStep):
-    name = 'Consumption'
+    name = _('Consumption')
     glade_file = 'wizard_consumption.glade'
-    section = 'Consumption'
+    section = _('Consumption')
     icon = 'consumption.png'
     has_worker = False
 
@@ -37,8 +43,8 @@ class ConsumptionStep(WorkerWizardStep):
         pass
 
     def activated(self):
-        has_audio = self.wizard.get_step_option('Source', 'has-audio')
-        has_video = self.wizard.get_step_option('Source', 'has-video')
+        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
+        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
         has_both = has_audio and has_video
 
         # Hide all checkbuttons if we don't have both audio and video selected
@@ -67,15 +73,15 @@ class ConsumptionStep(WorkerWizardStep):
             stepname = items[0]
 
         steps = {
-            'HTTP Streamer (audio & video)': HTTPBothStep,
-            'HTTP Streamer (audio only)': HTTPAudioStep,
-            'HTTP Streamer (video only)': HTTPVideoStep,
-            'Disk (audio & video)': DiskBothStep,
-            'Disk (audio only)': DiskAudioStep,
-            'Disk (video only)': DiskVideoStep,
-            'Icecast streamer (audio & video)': Shout2BothStep,
-            'Icecast streamer (audio only)': Shout2AudioStep,
-            'Icecast streamer (video only)': Shout2VideoStep,
+            _('HTTP Streamer (audio & video)'): HTTPBothStep,
+            _('HTTP Streamer (audio only)'): HTTPAudioStep,
+            _('HTTP Streamer (video only)'): HTTPVideoStep,
+            _('Disk (audio & video)'): DiskBothStep,
+            _('Disk (audio only)'): DiskAudioStep,
+            _('Disk (video only)'): DiskVideoStep,
+            _('Icecast streamer (audio & video)'): Shout2BothStep,
+            _('Icecast streamer (audio only)'): Shout2AudioStep,
+            _('Icecast streamer (video only)'): Shout2VideoStep,
         }
 
         if stepname in steps:
@@ -123,8 +129,8 @@ class ConsumptionStep(WorkerWizardStep):
                                 self.checkbutton_shout2_video,
                                 self.checkbutton_shout2_audio_video]))
 
-        has_audio = self.wizard.get_step_option('Source', 'has-audio')
-        has_video = self.wizard.get_step_option('Source', 'has-video')
+        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
+        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
 
         items = []
         for name, (audio, video, audio_video) in uielements:
@@ -149,12 +155,14 @@ class ConsumptionStep(WorkerWizardStep):
             else:
                 raise AssertionError
 
+            # These strings here should be translated but not marked
+            # for translation
             if enable_audio_video:
-                items.append("%s (audio & video)" % (name,))
+                items.append(X_("%s (audio & video)" % (name,)))
             if enable_audio:
-                items.append("%s (audio only)" % (name,))
+                items.append(X_("%s (audio only)" % (name,)))
             if enable_video:
-                items.append("%s (video only)" % (name,))
+                items.append(X_("%s (video only)" % (name,)))
 
         return items
 
@@ -191,7 +199,7 @@ class ConsumptionStep(WorkerWizardStep):
 # XXX: If audio codec is speex, disable java applet option
 class HTTPStep(WorkerWizardStep):
     glade_file = 'wizard_http.glade'
-    section = 'Consumption'
+    section = _('Consumption')
     component_type = 'http-streamer'
 
     # WizardStep
@@ -226,7 +234,7 @@ class HTTPStep(WorkerWizardStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
+        return self.wizard.get_step(_('Consumption')).get_next(self)
 
     # Private
 
@@ -251,26 +259,26 @@ class HTTPStep(WorkerWizardStep):
 
 
 class HTTPBothStep(HTTPStep):
-    name = 'HTTP Streamer (audio & video)'
-    sidebar_name = 'HTTP audio/video'
+    name = _('HTTP Streamer (audio & video)')
+    sidebar_name = _('HTTP audio/video')
     port = configure.defaultStreamPortRange[0]
 
 
 class HTTPAudioStep(HTTPStep):
-    name = 'HTTP Streamer (audio only)'
-    sidebar_name = 'HTTP audio'
+    name = _('HTTP Streamer (audio only)')
+    sidebar_name = _('HTTP audio')
     port = configure.defaultStreamPortRange[1]
 
 
 class HTTPVideoStep(HTTPStep):
-    name = 'HTTP Streamer (video only)'
-    sidebar_name = 'HTTP video'
+    name = _('HTTP Streamer (video only)')
+    sidebar_name = _('HTTP video')
     port = configure.defaultStreamPortRange[2]
 
 
 class DiskStep(WorkerWizardStep):
     glade_file = 'wizard_disk.glade'
-    section = 'Consumption'
+    section = _('Consumption')
     icon = 'kcmdevices.png'
 
     # WizardStep
@@ -303,7 +311,7 @@ class DiskStep(WorkerWizardStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
+        return self.wizard.get_step(_('Consumption')).get_next(self)
 
     # Private
 
@@ -340,23 +348,23 @@ class DiskStep(WorkerWizardStep):
 
 
 class DiskBothStep(DiskStep):
-    name = 'Disk (audio & video)'
-    sidebar_name = 'Disk audio/video'
+    name = _('Disk (audio & video)')
+    sidebar_name = _('Disk audio/video')
 
 
 class DiskAudioStep(DiskStep):
-    name = 'Disk (audio only)'
-    sidebar_name = 'Disk audio'
+    name = _('Disk (audio only)')
+    sidebar_name = _('Disk audio')
 
 
 class DiskVideoStep(DiskStep):
-    name = 'Disk (video only)'
-    sidebar_name = 'Disk video'
+    name = _('Disk (video only)')
+    sidebar_name = _('Disk video')
 
 
 class Shout2Step(WorkerWizardStep):
     glade_file = 'wizard_shout2.glade'
-    section = 'Consumption'
+    section = _('Consumption')
     component_type = 'shout2'
 
     # WizardStep
@@ -365,7 +373,7 @@ class Shout2Step(WorkerWizardStep):
         self.wizard.check_elements(self.worker, 'shout2send')
 
     def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
+        return self.wizard.get_step(_('Consumption')).get_next(self)
 
     def get_state(self):
         options = WorkerWizardStep.get_state(self)
@@ -380,17 +388,17 @@ class Shout2Step(WorkerWizardStep):
 
 
 class Shout2BothStep(Shout2Step):
-    name = 'Icecast streamer (audio & video)'
-    sidebar_name = 'Icecast audio/video'
+    name = _('Icecast streamer (audio & video)')
+    sidebar_name = _('Icecast audio/video')
 
 
 class Shout2AudioStep(Shout2Step):
-    name = 'Icecast streamer (audio only)'
-    sidebar_name = 'Icecast audio'
+    name = _('Icecast streamer (audio only)')
+    sidebar_name = _('Icecast audio')
 
 
 class Shout2VideoStep(Shout2Step):
-    name = 'Icecast streamer (video only)'
-    sidebar_name = 'Icecast video'
+    name = _('Icecast streamer (video only)')
+    sidebar_name = _('Icecast video')
 
 

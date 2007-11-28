@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-28 12:40+0100\n"
-"PO-Revision-Date: 2007-11-28 12:47+0100\n"
+"POT-Creation-Date: 2007-11-28 17:13+0100\n"
+"PO-Revision-Date: 2007-11-28 17:14+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -236,35 +236,41 @@ msgstr "Mönster:"
 msgid "Pattern"
 msgstr "Mönster"
 
-#: flumotion/component/combiners/switch/switch.py:86
+#: flumotion/component/combiners/switch/switch.py:82
 #: flumotion/component/consumers/disker/disker.py:348
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
 msgstr ""
 "Misslyckades att tolka icalfil %s, inga händelser kommer att schemaläggas."
 
-#: flumotion/component/combiners/switch/switch.py:285
+#: flumotion/component/combiners/switch/switch.py:86
+msgid ""
+"An ical file has been specified for scheduling, but the necessary modules "
+"are not installed."
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:287
 #, python-format
 msgid ""
 "Video parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
 "Videoparameter(ar) angavs men inte alla. Följande parametrar saknas: %r<<"
 
-#: flumotion/component/combiners/switch/switch.py:301
+#: flumotion/component/combiners/switch/switch.py:303
 #, python-format
 msgid ""
 "Audio parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
 "Ljudparameter(ar) angavs men inte alla. Följande parametrar saknas: %r<"
 
-#: flumotion/component/combiners/switch/switch.py:440
+#: flumotion/component/combiners/switch/switch.py:441
 #, python-format
 msgid ""
 "Could not switch to %s because at least one of the %s eaters is not active."
 msgstr ""
 "Kunde inte byta till %s på grund av att minst en av %s-ätare är inte aktiv."
 
-#: flumotion/component/combiners/switch/switch.py:449
+#: flumotion/component/combiners/switch/switch.py:450
 #, python-format
 msgid "Could not switch to %s because startTimes is %r."
 msgstr "Kunde inte byta till %s för att startTimes är %r."
@@ -478,22 +484,137 @@ msgstr "Ätare <b>%s</b>"
 msgid "%d units"
 msgstr "%d enheter"
 
-#: flumotion/component/effects/volume/admin_gtk.py:104
+#: flumotion/component/effects/volume/admin_gtk.py:102
 msgid "Left channel level:"
 msgstr "Vänster kanalnivå:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:106
+#: flumotion/component/effects/volume/admin_gtk.py:104
 msgid "Mono channel level:"
 msgstr "Mono kanalnivå:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:108
+#: flumotion/component/effects/volume/admin_gtk.py:106
 msgid "Right channel level:"
 msgstr "Höger kanalnivå:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:110
+#: flumotion/component/effects/volume/admin_gtk.py:108
 #, python-format
 msgid "Channel %d level:"
 msgstr "Kanal %d-nivå:"
+
+#: flumotion/wizard/consumptionsteps.py:34
+#: flumotion/wizard/consumptionsteps.py:36
+#: flumotion/wizard/consumptionsteps.py:202
+#: flumotion/wizard/consumptionsteps.py:237
+#: flumotion/wizard/consumptionsteps.py:281
+#: flumotion/wizard/consumptionsteps.py:314
+#: flumotion/wizard/consumptionsteps.py:367 flumotion/wizard/save.py:242
+msgid "Consumption"
+msgstr "Konsumering"
+
+#: flumotion/wizard/consumptionsteps.py:46
+#: flumotion/wizard/consumptionsteps.py:47
+#: flumotion/wizard/consumptionsteps.py:132
+#: flumotion/wizard/consumptionsteps.py:133 flumotion/wizard/save.py:116
+#: flumotion/wizard/save.py:125 flumotion/wizard/save.py:162
+#: flumotion/wizard/save.py:180 flumotion/wizard/save.py:190
+#: flumotion/wizard/save.py:243 flumotion/wizard/save.py:244
+#: flumotion/wizard/save.py:346 flumotion/wizard/productionsteps.py:61
+#: flumotion/wizard/conversionsteps.py:57
+#: flumotion/wizard/conversionsteps.py:76
+#: flumotion/wizard/conversionsteps.py:90
+#: flumotion/wizard/conversionsteps.py:101
+#: flumotion/wizard/conversionsteps.py:132
+#: flumotion/wizard/conversionsteps.py:136 flumotion/wizard/basesteps.py:128
+#: flumotion/wizard/basesteps.py:129
+msgid "Source"
+msgstr "Källa"
+
+#: flumotion/wizard/consumptionsteps.py:76
+#: flumotion/wizard/consumptionsteps.py:262 flumotion/wizard/save.py:270
+msgid "HTTP Streamer (audio & video)"
+msgstr "HTTP-strömmare (ljud och bild)"
+
+#: flumotion/wizard/consumptionsteps.py:77
+#: flumotion/wizard/consumptionsteps.py:268 flumotion/wizard/save.py:274
+#: flumotion/wizard/save.py:318
+msgid "HTTP Streamer (audio only)"
+msgstr "HTTP-strömmare (endast ljud)"
+
+#: flumotion/wizard/consumptionsteps.py:78
+#: flumotion/wizard/consumptionsteps.py:274 flumotion/wizard/save.py:278
+#: flumotion/wizard/save.py:308
+msgid "HTTP Streamer (video only)"
+msgstr "HTTP-strömmare (endast bild)"
+
+#: flumotion/wizard/consumptionsteps.py:79
+#: flumotion/wizard/consumptionsteps.py:351 flumotion/wizard/save.py:284
+msgid "Disk (audio & video)"
+msgstr "Disk (ljud och bild)"
+
+#: flumotion/wizard/consumptionsteps.py:80
+#: flumotion/wizard/consumptionsteps.py:356 flumotion/wizard/save.py:288
+#: flumotion/wizard/save.py:321
+msgid "Disk (audio only)"
+msgstr "Disk (endast ljud)"
+
+#: flumotion/wizard/consumptionsteps.py:81
+#: flumotion/wizard/consumptionsteps.py:361 flumotion/wizard/save.py:291
+#: flumotion/wizard/save.py:311
+msgid "Disk (video only)"
+msgstr "Disk (endast bild)"
+
+#: flumotion/wizard/consumptionsteps.py:82
+#: flumotion/wizard/consumptionsteps.py:391 flumotion/wizard/save.py:295
+msgid "Icecast streamer (audio & video)"
+msgstr "Icecast-strömmare (ljud och bild)"
+
+#: flumotion/wizard/consumptionsteps.py:83
+#: flumotion/wizard/consumptionsteps.py:396 flumotion/wizard/save.py:299
+#: flumotion/wizard/save.py:324
+msgid "Icecast streamer (audio only)"
+msgstr "Icecast-strömmare (endast ljud)"
+
+#: flumotion/wizard/consumptionsteps.py:84
+#: flumotion/wizard/consumptionsteps.py:401 flumotion/wizard/save.py:303
+#: flumotion/wizard/save.py:314
+msgid "Icecast streamer (video only)"
+msgstr "Icecast-strömmare (endast bild)"
+
+#: flumotion/wizard/consumptionsteps.py:263
+msgid "HTTP audio/video"
+msgstr "HTTP: ljud/bild"
+
+#: flumotion/wizard/consumptionsteps.py:269
+msgid "HTTP audio"
+msgstr "HTTP: ljud/bild"
+
+#: flumotion/wizard/consumptionsteps.py:275
+msgid "HTTP video"
+msgstr "HTTP: ljud"
+
+#: flumotion/wizard/consumptionsteps.py:352
+msgid "Disk audio/video"
+msgstr "Disk: ljud/bild"
+
+#: flumotion/wizard/consumptionsteps.py:357
+msgid "Disk audio"
+msgstr "Disk: ljud"
+
+#: flumotion/wizard/consumptionsteps.py:362
+msgid "Disk video"
+msgstr "Disk: bild"
+
+#: flumotion/wizard/consumptionsteps.py:392
+msgid "Icecast audio/video"
+msgstr "Icecast: ljud/bild"
+
+#: flumotion/wizard/consumptionsteps.py:397
+msgid "Icecast audio"
+msgstr "Icecast: ljud"
+
+#: flumotion/wizard/consumptionsteps.py:402
+msgid "Icecast video"
+msgstr "Icecast: bild"
 
 #: flumotion/wizard/enums.py:36
 msgid "Test video source"
@@ -511,150 +632,256 @@ msgstr "TV-kort"
 msgid "Firewire video"
 msgstr "Firewire-video"
 
-#: flumotion/wizard/enums.py:57
+#: flumotion/wizard/enums.py:62
 msgid "Test audio source"
 msgstr "Testljudkälla"
 
-#: flumotion/wizard/enums.py:58
+#: flumotion/wizard/enums.py:63
 msgid "Sound card"
 msgstr "Ljudkort"
 
-#: flumotion/wizard/enums.py:59
+#: flumotion/wizard/enums.py:64 flumotion/wizard/productionsteps.py:801
 msgid "Firewire audio"
 msgstr "Firewireljud"
 
-#: flumotion/wizard/enums.py:80
+#: flumotion/wizard/enums.py:89
 msgid "Composite"
 msgstr "Composite"
 
-#: flumotion/wizard/enums.py:80
+#: flumotion/wizard/enums.py:89
 msgid "RCA"
 msgstr "RCA"
 
-#: flumotion/wizard/enums.py:90
+#: flumotion/wizard/enums.py:99
 msgid "SMPTE Color bars"
 msgstr "SMTPE-färgband"
 
-#: flumotion/wizard/enums.py:91
+#: flumotion/wizard/enums.py:100
 msgid "Random (television snow)"
 msgstr "Slumpmässig (myrornas krig)"
 
-#: flumotion/wizard/enums.py:92
+#: flumotion/wizard/enums.py:101
 msgid "Totally black"
 msgstr "Helt svart"
 
-#: flumotion/wizard/enums.py:97
+#: flumotion/wizard/enums.py:106
 msgid "YUV"
 msgstr "YUV"
 
-#: flumotion/wizard/enums.py:97
+#: flumotion/wizard/enums.py:106
 msgid "RGB"
 msgstr "RGB"
 
-#: flumotion/wizard/enums.py:131
+#: flumotion/wizard/enums.py:140
 msgid "Line in"
 msgstr "Linje in"
 
-#: flumotion/wizard/enums.py:132
+#: flumotion/wizard/enums.py:141
 msgid "Microphone"
 msgstr "Mikrofon"
 
-#: flumotion/wizard/enums.py:133
+#: flumotion/wizard/enums.py:142
 msgid "CD"
 msgstr "CD"
 
-#: flumotion/wizard/enums.py:138
+#: flumotion/wizard/enums.py:147
 msgid "Stereo"
 msgstr "Stereo"
 
-#: flumotion/wizard/enums.py:138
+#: flumotion/wizard/enums.py:147
 msgid "Mono"
 msgstr "qqMono"
 
-#: flumotion/wizard/enums.py:154
+#: flumotion/wizard/enums.py:163
 msgid "16-bit"
 msgstr "16-bitars"
 
-#: flumotion/wizard/enums.py:155
+#: flumotion/wizard/enums.py:164
 msgid "8-bit"
 msgstr "8-bitars"
 
-#: flumotion/wizard/enums.py:164
+#: flumotion/wizard/enums.py:173
 msgid "Ogg"
 msgstr "Ogg"
 
-#: flumotion/wizard/enums.py:164
+#: flumotion/wizard/enums.py:173
 msgid "Multipart"
 msgstr "Multipart"
 
-#: flumotion/wizard/enums.py:188
+#: flumotion/wizard/enums.py:201
 msgid "minute(s)"
 msgstr "minut(er)"
 
-#: flumotion/wizard/enums.py:189
+#: flumotion/wizard/enums.py:202
 msgid "hour(s)"
 msgstr "timma(r)"
 
-#: flumotion/wizard/enums.py:190
+#: flumotion/wizard/enums.py:203
 msgid "day(s)"
 msgstr "dag(ar)"
 
-#: flumotion/wizard/enums.py:191
+#: flumotion/wizard/enums.py:204
 msgid "week(s)"
 msgstr "vecka(or)"
 
-#: flumotion/wizard/enums.py:199
+#: flumotion/wizard/enums.py:212
 msgid "kB"
 msgstr "kB"
 
-#: flumotion/wizard/enums.py:199
+#: flumotion/wizard/enums.py:212
 msgid "MB"
 msgstr "MB"
 
-#: flumotion/wizard/enums.py:199
+#: flumotion/wizard/enums.py:212
 msgid "GB"
 msgstr "GB"
 
-#: flumotion/wizard/enums.py:199
+#: flumotion/wizard/enums.py:212
 msgid "TB"
 msgstr "TB"
 
-#: flumotion/wizard/enums.py:208
+#: flumotion/wizard/enums.py:221
 msgid "Creative Commons"
 msgstr "Creative Commons"
 
-#: flumotion/wizard/enums.py:209
+#: flumotion/wizard/enums.py:222
 msgid "Commercial"
 msgstr "Kommersiell"
 
-#: flumotion/wizard/productionsteps.py:150
+#: flumotion/wizard/save.py:131 flumotion/wizard/save.py:206
+#: flumotion/wizard/basesteps.py:96
+msgid "Overlay"
+msgstr "Bildpåläggning"
+
+#: flumotion/wizard/save.py:135 flumotion/wizard/save.py:154
+#: flumotion/wizard/save.py:185 flumotion/wizard/save.py:199
+#: flumotion/wizard/save.py:200 flumotion/wizard/conversionsteps.py:44
+#: flumotion/wizard/conversionsteps.py:206
+#: flumotion/wizard/conversionsteps.py:239
+#: flumotion/wizard/conversionsteps.py:261
+msgid "Encoding"
+msgstr "Kodning"
+
+#: flumotion/wizard/save.py:140 flumotion/wizard/configurationwizard.py:76
+msgid "Content License"
+msgstr "Innehållslicens"
+
+#: flumotion/wizard/worker.py:70
+msgid "Worker:"
+msgstr "Arbetare:"
+
+#: flumotion/wizard/productionsteps.py:62
+#: flumotion/wizard/productionsteps.py:647
+#: flumotion/wizard/productionsteps.py:671
+#: flumotion/wizard/productionsteps.py:802 flumotion/wizard/basesteps.py:54
+#: flumotion/wizard/basesteps.py:98
+msgid "Production"
+msgstr "Produktion"
+
+#: flumotion/wizard/productionsteps.py:161
 msgid "If you want to stream video"
 msgstr "Om du vill strömma video"
 
-#: flumotion/wizard/productionsteps.py:152
+#: flumotion/wizard/productionsteps.py:163
 msgid "If you want to stream audio"
 msgstr "Om du vill strömma ljud"
 
-#: flumotion/wizard/productionsteps.py:339
+#: flumotion/wizard/productionsteps.py:223
+msgid "Test Video Source"
+msgstr "Testvideokälla"
+
+#: flumotion/wizard/productionsteps.py:269
+msgid "Webcam"
+msgstr "Webbkamera"
+
+#: flumotion/wizard/productionsteps.py:347
 msgid "Probing webcam, this can take a while..."
 msgstr "Söker efter webbkamera, det här kan ta en stund..."
 
-#: flumotion/wizard/productionsteps.py:536
-#: flumotion/wizard/productionsteps.py:853
+#: flumotion/wizard/productionsteps.py:410
+msgid "TV Card"
+msgstr "TV-kort"
+
+#: flumotion/wizard/productionsteps.py:492
+msgid "Firewire"
+msgstr "Firewire"
+
+#: flumotion/wizard/productionsteps.py:544
+#: flumotion/wizard/productionsteps.py:861
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspektratio"
 
-#: flumotion/wizard/productionsteps.py:542
-#: flumotion/wizard/productionsteps.py:859
+#: flumotion/wizard/productionsteps.py:550
+#: flumotion/wizard/productionsteps.py:867
 msgid "Checking for Firewire device..."
 msgstr "Söker efter Firewire-enheter..."
 
-#: flumotion/wizard/productionsteps.py:617
-#: flumotion/wizard/productionsteps.py:931
+#: flumotion/wizard/productionsteps.py:625
+#: flumotion/wizard/productionsteps.py:939
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspektratio)"
+
+#: flumotion/wizard/productionsteps.py:645
+msgid "Test Audio Source"
+msgstr "Testljudkälla"
+
+#: flumotion/wizard/productionsteps.py:669
+msgid "Soundcard"
+msgstr "Ljudkort"
+
+#: flumotion/wizard/conversionsteps.py:45
+#: flumotion/wizard/conversionsteps.py:222 flumotion/wizard/basesteps.py:74
+#: flumotion/wizard/basesteps.py:83
+msgid "Conversion"
+msgstr "Konvertering"
+
+#: flumotion/wizard/conversionsteps.py:166
+msgid "Theora encoder"
+msgstr "Theora-kodare"
+
+#: flumotion/wizard/conversionsteps.py:167
+msgid "Theora"
+msgstr "Theora"
+
+#: flumotion/wizard/conversionsteps.py:219
+msgid "Smoke encoder"
+msgstr "Smoke-kodning"
+
+#: flumotion/wizard/conversionsteps.py:220
+msgid "Smoke"
+msgstr "Smoke"
+
+#: flumotion/wizard/conversionsteps.py:267
+msgid "Vorbis encoder"
+msgstr "Vorbis-kodare"
+
+#: flumotion/wizard/conversionsteps.py:268
+msgid "Vorbis"
+msgstr "Vorbis"
+
+#: flumotion/wizard/conversionsteps.py:309
+msgid "Speex encoder"
+msgstr "Speex-kodare"
+
+#: flumotion/wizard/conversionsteps.py:310
+msgid "Speex"
+msgstr "Speex"
+
+#: flumotion/wizard/configurationwizard.py:61
+#: flumotion/wizard/configurationwizard.py:62
+msgid "Welcome"
+msgstr "Välkommen"
+
+#: flumotion/wizard/configurationwizard.py:78
+msgid "License"
+msgstr "Licens"
+
+#: flumotion/wizard/configurationwizard.py:97
+#: flumotion/wizard/configurationwizard.py:98
+msgid "Summary"
+msgstr "Summering"
 
 #: flumotion/wizard/configurationwizard.py:216
 #: flumotion/wizard/basesteps.py:159
@@ -1738,6 +1965,18 @@ msgstr "ingen"
 #: data/glade/wizard_firewire.glade:594
 msgid "<b>Output format</b>"
 msgstr "<b></b>"
+
+#, fuzzy
+#~ msgid "%s (audio & video)"
+#~ msgstr "Ljud & Bild"
+
+#, fuzzy
+#~ msgid "%s (audio only)"
+#~ msgstr "Endast ljud"
+
+#, fuzzy
+#~ msgid "%s (video only)"
+#~ msgstr "Endast bild"
 
 #~ msgid ""
 #~ "TV Card\n"

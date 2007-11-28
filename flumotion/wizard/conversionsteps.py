@@ -19,10 +19,15 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
+
 from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
     AudioEncoderStep
 from flumotion.wizard.enums import EncodingAudio, EncodingFormat, EncodingVideo
 from flumotion.wizard.models import AudioEncoder, VideoEncoder, Muxer
+
+_ = gettext.gettext
+
 
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
@@ -36,8 +41,8 @@ def _fraction_from_float(number, denominator):
 
 class ConversionStep(WorkerWizardStep):
     glade_file = 'wizard_encoding.glade'
-    name = 'Encoding'
-    section = 'Conversion'
+    name = _('Encoding')
+    section = _('Conversion')
 
     def __init__(self, wizard):
         WorkerWizardStep.__init__(self, wizard)
@@ -49,7 +54,7 @@ class ConversionStep(WorkerWizardStep):
     # Public API
 
     def get_audio_page(self):
-        if self.wizard.get_step_option('Source', 'has-audio'):
+        if self.wizard.get_step_option(_('Source'), 'has-audio'):
             codec = self.combobox_audio.get_enum()
             if codec == EncodingAudio.Vorbis:
                 step_class = VorbisStep
@@ -68,7 +73,7 @@ class ConversionStep(WorkerWizardStep):
         self.combobox_video.set_enum(EncodingVideo)
 
         flow = self.wizard.flow
-        production = self.wizard.get_step('Source')
+        production = self.wizard.get_step(_('Source'))
 
         audio_producer = production.get_audio_producer()
         if audio_producer and self._audio_encoder not in flow:
@@ -82,7 +87,7 @@ class ConversionStep(WorkerWizardStep):
         self._verify()
 
     def get_next(self):
-        if self.wizard.get_step_option('Source', 'has-video'):
+        if self.wizard.get_step_option(_('Source'), 'has-video'):
             codec = self.combobox_video.get_enum()
             if codec == EncodingVideo.Theora:
                 step_class = TheoraStep
@@ -93,7 +98,7 @@ class ConversionStep(WorkerWizardStep):
             else:
                 raise AssertionError(codec)
             return step_class(self.wizard, self._video_encoder)
-        elif self.wizard.get_step_option('Source', 'has-audio'):
+        elif self.wizard.get_step_option(_('Source'), 'has-audio'):
             return self.get_audio_page()
         else:
             return None
@@ -124,11 +129,11 @@ class ConversionStep(WorkerWizardStep):
                                                  EncodingVideo.JPEG)
             self.combobox_audio.set_multi_active(EncodingAudio.Mulaw)
 
-        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
         self.combobox_audio.set_property('visible', has_audio)
         self.label_audio.set_property('visible', has_audio)
 
-        has_video = self.wizard.get_step_option('Source', 'has-video')
+        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
 
@@ -158,8 +163,8 @@ class ConversionStep(WorkerWizardStep):
 
 
 class TheoraStep(VideoEncoderStep):
-    name = 'Theora encoder'
-    sidebar_name = 'Theora'
+    name = _('Theora encoder')
+    sidebar_name = _('Theora')
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
     icon = 'xiphfish.png'
@@ -198,7 +203,7 @@ class TheoraStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
+        return self.wizard.get_step(_('Encoding')).get_audio_page()
 
     # Callbacks
 
@@ -211,10 +216,10 @@ class TheoraStep(VideoEncoderStep):
 
 
 class SmokeStep(VideoEncoderStep):
-    name = 'Smoke encoder'
-    sidebar_name = 'Smoke'
+    name = _('Smoke encoder')
+    sidebar_name = _('Smoke')
     glade_file = 'wizard_smoke.glade'
-    section = 'Conversion'
+    section = _('Conversion')
     component_type = 'smoke'
 
     # WizardStep
@@ -231,7 +236,7 @@ class SmokeStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
+        return self.wizard.get_step(_('Encoding')).get_audio_page()
 
 
 class JPEGStep(VideoEncoderStep):
@@ -253,14 +258,14 @@ class JPEGStep(VideoEncoderStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
+        return self.wizard.get_step(_('Encoding')).get_audio_page()
 
 
 # Worker?
 class VorbisStep(AudioEncoderStep):
     glade_file = 'wizard_vorbis.glade'
-    name = 'Vorbis encoder'
-    sidebar_name = 'Vorbis'
+    name = _('Vorbis encoder')
+    sidebar_name = _('Vorbis')
     component_type = 'vorbis'
     icon = 'xiphfish.png'
 
@@ -301,8 +306,8 @@ class VorbisStep(AudioEncoderStep):
 
 
 class SpeexStep(AudioEncoderStep):
-    name = 'Speex encoder'
-    sidebar_name = 'Speex'
+    name = _('Speex encoder')
+    sidebar_name = _('Speex')
     component_type = 'speex'
     icon = 'xiphfish.png'
 

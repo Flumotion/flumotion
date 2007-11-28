@@ -58,8 +58,8 @@ class ProductionStep(WorkerWizardStep):
     glade_typedict = ProxyWidgetMapping()
 
     glade_file = 'wizard_source.glade'
-    name = 'Source'
-    section = 'Production'
+    name = _('Source')
+    section = _('Production')
     icon = 'source.png'
 
     def __init__(self, wizard):
@@ -220,7 +220,7 @@ class ProductionStep(WorkerWizardStep):
 
 
 class TestVideoSourceStep(VideoSourceStep):
-    name = 'Test Video Source'
+    name = _('Test Video Source')
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
     icon = 'testsource.png'
@@ -266,7 +266,7 @@ class TestVideoSourceStep(VideoSourceStep):
 
 
 class WebcamStep(VideoSourceStep):
-    name = 'Webcam'
+    name = _('Webcam')
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
     icon = 'webcam.png'
@@ -407,7 +407,7 @@ class WebcamStep(VideoSourceStep):
 # apps (and flumotion) talk about "TV Norm" and "source",
 # and channel (corresponding to frequency)
 class TVCardStep(VideoSourceStep):
-    name = 'TV Card'
+    name = _('TV Card')
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
     icon = 'tv.png'
@@ -489,7 +489,7 @@ class TVCardStep(VideoSourceStep):
 
 
 class FireWireStep(VideoSourceStep):
-    name = 'Firewire'
+    name = _('Firewire')
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
@@ -642,9 +642,9 @@ class FireWireStep(VideoSourceStep):
 
 
 class TestAudioSourceStep(AudioSourceStep):
-    name = 'Test Audio Source'
+    name = _('Test Audio Source')
     glade_file = 'wizard_audiotest.glade'
-    section = 'Production'
+    section = _('Production')
     icon = 'soundcard.png'
 
     # WizardStep
@@ -666,9 +666,9 @@ class TestAudioSourceStep(AudioSourceStep):
 
 
 class SoundcardStep(AudioSourceStep):
-    name = 'Soundcard'
+    name = _('Soundcard')
     glade_file = 'wizard_soundcard.glade'
-    section = 'Production'
+    section = _('Production')
     component_type = 'osssrc'
     icon = 'soundcard.png'
 
@@ -798,12 +798,12 @@ class SoundcardStep(AudioSourceStep):
 
 
 class FireWireAudioStep(AudioSourceStep):
-    name = 'Firewire audio'
+    name = _('Firewire audio')
+    section = _('Production')
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
     width_corrections = ['none', 'pad', 'stretch']
-    section = 'Production'
 
     def __init__(self, wizard, model):
         AudioSourceStep.__init__(self, wizard, model)

@@ -58,8 +58,8 @@ def _fraction_from_float(number, denominator):
 
 class WelcomeStep(WorkerWizardStep):
     glade_file = 'wizard_welcome.glade'
-    name = 'Welcome'
-    section = 'Welcome'
+    name = _('Welcome')
+    section = _('Welcome')
     icon = 'wizard.png'
     has_worker = False
 
@@ -73,9 +73,9 @@ class WelcomeStep(WorkerWizardStep):
 
 
 class LicenseStep(WorkerWizardStep):
-    name = "Content License"
+    name = _("Content License")
     glade_file = "wizard_license.glade"
-    section = 'License'
+    section = _('License')
     icon = 'licenses.png'
     has_worker = False
 
@@ -94,8 +94,8 @@ class LicenseStep(WorkerWizardStep):
 
 
 class SummaryStep(WorkerWizardStep):
-    name = "Summary"
-    section = "Summary"
+    name = _("Summary")
+    section = _("Summary")
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
     has_worker = False

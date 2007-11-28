@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-27 16:54+0100\n"
+"POT-Creation-Date: 2007-11-28 17:13+0100\n"
 "PO-Revision-Date: 2007-04-15 12:58+0100\n"
 "Last-Translator: Thomas Vander Stichele <thomas at apestaart dot org>\n"
 "Language-Team: nl\n"
@@ -223,31 +223,37 @@ msgstr "Patroon:"
 msgid "Pattern"
 msgstr "Patroon"
 
-#: flumotion/component/combiners/switch/switch.py:86
+#: flumotion/component/combiners/switch/switch.py:82
 #: flumotion/component/consumers/disker/disker.py:348
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
 msgstr ""
 
-#: flumotion/component/combiners/switch/switch.py:285
+#: flumotion/component/combiners/switch/switch.py:86
+msgid ""
+"An ical file has been specified for scheduling, but the necessary modules "
+"are not installed."
+msgstr ""
+
+#: flumotion/component/combiners/switch/switch.py:287
 #, python-format
 msgid ""
 "Video parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
 
-#: flumotion/component/combiners/switch/switch.py:301
+#: flumotion/component/combiners/switch/switch.py:303
 #, python-format
 msgid ""
 "Audio parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
 
-#: flumotion/component/combiners/switch/switch.py:440
+#: flumotion/component/combiners/switch/switch.py:441
 #, python-format
 msgid ""
 "Could not switch to %s because at least one of the %s eaters is not active."
 msgstr ""
 
-#: flumotion/component/combiners/switch/switch.py:449
+#: flumotion/component/combiners/switch/switch.py:450
 #, python-format
 msgid "Could not switch to %s because startTimes is %r."
 msgstr ""
@@ -447,63 +453,431 @@ msgstr "Eter <b>%s</b>"
 msgid "%d units"
 msgstr "%d eenheden"
 
-#: flumotion/component/effects/volume/admin_gtk.py:104
+#: flumotion/component/effects/volume/admin_gtk.py:102
 msgid "Left channel level:"
 msgstr ""
 
-#: flumotion/component/effects/volume/admin_gtk.py:106
+#: flumotion/component/effects/volume/admin_gtk.py:104
 msgid "Mono channel level:"
 msgstr ""
 
-#: flumotion/component/effects/volume/admin_gtk.py:108
+#: flumotion/component/effects/volume/admin_gtk.py:106
 msgid "Right channel level:"
 msgstr ""
 
-#: flumotion/component/effects/volume/admin_gtk.py:110
+#: flumotion/component/effects/volume/admin_gtk.py:108
 #, python-format
 msgid "Channel %d level:"
 msgstr ""
 
-#: flumotion/wizard/enums.py:83
+#: flumotion/wizard/consumptionsteps.py:34
+#: flumotion/wizard/consumptionsteps.py:36
+#: flumotion/wizard/consumptionsteps.py:202
+#: flumotion/wizard/consumptionsteps.py:237
+#: flumotion/wizard/consumptionsteps.py:281
+#: flumotion/wizard/consumptionsteps.py:314
+#: flumotion/wizard/consumptionsteps.py:367 flumotion/wizard/save.py:242
+msgid "Consumption"
+msgstr "Consumptie"
+
+#: flumotion/wizard/consumptionsteps.py:46
+#: flumotion/wizard/consumptionsteps.py:47
+#: flumotion/wizard/consumptionsteps.py:132
+#: flumotion/wizard/consumptionsteps.py:133 flumotion/wizard/save.py:116
+#: flumotion/wizard/save.py:125 flumotion/wizard/save.py:162
+#: flumotion/wizard/save.py:180 flumotion/wizard/save.py:190
+#: flumotion/wizard/save.py:243 flumotion/wizard/save.py:244
+#: flumotion/wizard/save.py:346 flumotion/wizard/productionsteps.py:61
+#: flumotion/wizard/conversionsteps.py:57
+#: flumotion/wizard/conversionsteps.py:76
+#: flumotion/wizard/conversionsteps.py:90
+#: flumotion/wizard/conversionsteps.py:101
+#: flumotion/wizard/conversionsteps.py:132
+#: flumotion/wizard/conversionsteps.py:136 flumotion/wizard/basesteps.py:128
+#: flumotion/wizard/basesteps.py:129
+msgid "Source"
+msgstr "Bron"
+
+#: flumotion/wizard/consumptionsteps.py:76
+#: flumotion/wizard/consumptionsteps.py:262 flumotion/wizard/save.py:270
+msgid "HTTP Streamer (audio & video)"
+msgstr "HTTP Streamer (audio & video)"
+
+#: flumotion/wizard/consumptionsteps.py:77
+#: flumotion/wizard/consumptionsteps.py:268 flumotion/wizard/save.py:274
+#: flumotion/wizard/save.py:318
+msgid "HTTP Streamer (audio only)"
+msgstr "HTTP Streamer (enkel audio)"
+
+#: flumotion/wizard/consumptionsteps.py:78
+#: flumotion/wizard/consumptionsteps.py:274 flumotion/wizard/save.py:278
+#: flumotion/wizard/save.py:308
+msgid "HTTP Streamer (video only)"
+msgstr "HTTP Streamer (enkel video)"
+
+#: flumotion/wizard/consumptionsteps.py:79
+#: flumotion/wizard/consumptionsteps.py:351 flumotion/wizard/save.py:284
+msgid "Disk (audio & video)"
+msgstr "Schijf (audio & video)"
+
+#: flumotion/wizard/consumptionsteps.py:80
+#: flumotion/wizard/consumptionsteps.py:356 flumotion/wizard/save.py:288
+#: flumotion/wizard/save.py:321
+msgid "Disk (audio only)"
+msgstr "Schijf (enkel audio)"
+
+#: flumotion/wizard/consumptionsteps.py:81
+#: flumotion/wizard/consumptionsteps.py:361 flumotion/wizard/save.py:291
+#: flumotion/wizard/save.py:311
+msgid "Disk (video only)"
+msgstr "Schijf (enkel video)"
+
+#: flumotion/wizard/consumptionsteps.py:82
+#: flumotion/wizard/consumptionsteps.py:391 flumotion/wizard/save.py:295
+#, fuzzy
+msgid "Icecast streamer (audio & video)"
+msgstr "HTTP Streamer (audio & video)"
+
+#: flumotion/wizard/consumptionsteps.py:83
+#: flumotion/wizard/consumptionsteps.py:396 flumotion/wizard/save.py:299
+#: flumotion/wizard/save.py:324
+#, fuzzy
+msgid "Icecast streamer (audio only)"
+msgstr "HTTP Streamer (enkel audio)"
+
+#: flumotion/wizard/consumptionsteps.py:84
+#: flumotion/wizard/consumptionsteps.py:401 flumotion/wizard/save.py:303
+#: flumotion/wizard/save.py:314
+#, fuzzy
+msgid "Icecast streamer (video only)"
+msgstr "HTTP Streamer (enkel video)"
+
+#: flumotion/wizard/consumptionsteps.py:263
+msgid "HTTP audio/video"
+msgstr "HTTP audio/video"
+
+#: flumotion/wizard/consumptionsteps.py:269
+msgid "HTTP audio"
+msgstr "HTTP audio"
+
+#: flumotion/wizard/consumptionsteps.py:275
+msgid "HTTP video"
+msgstr "HTTP video"
+
+#: flumotion/wizard/consumptionsteps.py:352
+msgid "Disk audio/video"
+msgstr "Schijf audio/video"
+
+#: flumotion/wizard/consumptionsteps.py:357
+msgid "Disk audio"
+msgstr "Schijf audio"
+
+#: flumotion/wizard/consumptionsteps.py:362
+msgid "Disk video"
+msgstr "Schijf video"
+
+#: flumotion/wizard/consumptionsteps.py:392
+#, fuzzy
+msgid "Icecast audio/video"
+msgstr "Schijf audio/video"
+
+#: flumotion/wizard/consumptionsteps.py:397
+#, fuzzy
+msgid "Icecast audio"
+msgstr "Schijf audio"
+
+#: flumotion/wizard/consumptionsteps.py:402
+#, fuzzy
+msgid "Icecast video"
+msgstr "Schijf video"
+
+#: flumotion/wizard/enums.py:36
+#, fuzzy
+msgid "Test video source"
+msgstr "Testvideobron"
+
+#: flumotion/wizard/enums.py:37
+#, fuzzy
+msgid "Web camera"
+msgstr "Webcam"
+
+#: flumotion/wizard/enums.py:38
+#, fuzzy
+msgid "TV card"
+msgstr "TV-kaart"
+
+#: flumotion/wizard/enums.py:39
+#, fuzzy
+msgid "Firewire video"
+msgstr "Vuurdraad"
+
+#: flumotion/wizard/enums.py:62
+#, fuzzy
+msgid "Test audio source"
+msgstr "Test-audiobron"
+
+#: flumotion/wizard/enums.py:63
+#, fuzzy
+msgid "Sound card"
+msgstr "Geluidskaart"
+
+#: flumotion/wizard/enums.py:64 flumotion/wizard/productionsteps.py:801
+#, fuzzy
+msgid "Firewire audio"
+msgstr "Vuurdraad"
+
+#: flumotion/wizard/enums.py:89
+#, fuzzy
+msgid "Composite"
+msgstr ""
+"Composite\n"
+"RCA"
+
+#: flumotion/wizard/enums.py:89
+msgid "RCA"
+msgstr ""
+
+#: flumotion/wizard/enums.py:99
 msgid "SMPTE Color bars"
 msgstr "SMPTE Kleurbalken"
 
-#: flumotion/wizard/enums.py:84
+#: flumotion/wizard/enums.py:100
 msgid "Random (television snow)"
 msgstr "Willekeurig (televisiesneeuw)"
 
-#: flumotion/wizard/enums.py:85
+#: flumotion/wizard/enums.py:101
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/productionsteps.py:150
+#: flumotion/wizard/enums.py:106
+msgid "YUV"
+msgstr ""
+
+#: flumotion/wizard/enums.py:106
+msgid "RGB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:140
+msgid "Line in"
+msgstr ""
+
+#: flumotion/wizard/enums.py:141
+#, fuzzy
+msgid "Microphone"
+msgstr ""
+"Lijningang\n"
+"Microfoon\n"
+"CD"
+
+#: flumotion/wizard/enums.py:142
+msgid "CD"
+msgstr ""
+
+#: flumotion/wizard/enums.py:147
+msgid "Stereo"
+msgstr ""
+
+#: flumotion/wizard/enums.py:147
+#, fuzzy
+msgid "Mono"
+msgstr "Humeur"
+
+#: flumotion/wizard/enums.py:163
+msgid "16-bit"
+msgstr ""
+
+#: flumotion/wizard/enums.py:164
+msgid "8-bit"
+msgstr ""
+
+#: flumotion/wizard/enums.py:173
+msgid "Ogg"
+msgstr ""
+
+#: flumotion/wizard/enums.py:173
+msgid "Multipart"
+msgstr ""
+
+#: flumotion/wizard/enums.py:201
+msgid "minute(s)"
+msgstr ""
+
+#: flumotion/wizard/enums.py:202
+msgid "hour(s)"
+msgstr ""
+
+#: flumotion/wizard/enums.py:203
+msgid "day(s)"
+msgstr ""
+
+#: flumotion/wizard/enums.py:204
+msgid "week(s)"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "kB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "MB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "GB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "TB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:221
+#, fuzzy
+msgid "Creative Commons"
+msgstr ""
+"Creative Commons\n"
+"GNU FDL\n"
+"Commercieel"
+
+#: flumotion/wizard/enums.py:222
+msgid "Commercial"
+msgstr ""
+
+#: flumotion/wizard/save.py:131 flumotion/wizard/save.py:206
+#: flumotion/wizard/basesteps.py:96
+msgid "Overlay"
+msgstr "Overlay"
+
+#: flumotion/wizard/save.py:135 flumotion/wizard/save.py:154
+#: flumotion/wizard/save.py:185 flumotion/wizard/save.py:199
+#: flumotion/wizard/save.py:200 flumotion/wizard/conversionsteps.py:44
+#: flumotion/wizard/conversionsteps.py:206
+#: flumotion/wizard/conversionsteps.py:239
+#: flumotion/wizard/conversionsteps.py:261
+msgid "Encoding"
+msgstr "Encodering"
+
+#: flumotion/wizard/save.py:140 flumotion/wizard/configurationwizard.py:76
+msgid "Content License"
+msgstr "Inhoudslicensie"
+
+#: flumotion/wizard/worker.py:70
+#, fuzzy
+msgid "Worker:"
+msgstr "Worker"
+
+#: flumotion/wizard/productionsteps.py:62
+#: flumotion/wizard/productionsteps.py:647
+#: flumotion/wizard/productionsteps.py:671
+#: flumotion/wizard/productionsteps.py:802 flumotion/wizard/basesteps.py:54
+#: flumotion/wizard/basesteps.py:98
+msgid "Production"
+msgstr "Productie"
+
+#: flumotion/wizard/productionsteps.py:161
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
 
-#: flumotion/wizard/productionsteps.py:152
+#: flumotion/wizard/productionsteps.py:163
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
-#: flumotion/wizard/productionsteps.py:339
+#: flumotion/wizard/productionsteps.py:223
+msgid "Test Video Source"
+msgstr "Testvideobron"
+
+#: flumotion/wizard/productionsteps.py:269
+msgid "Webcam"
+msgstr "Webcam"
+
+#: flumotion/wizard/productionsteps.py:347
 msgid "Probing webcam, this can take a while..."
 msgstr "Webcam aan het onderzoeken, dit kan even duren..."
 
-#: flumotion/wizard/productionsteps.py:534
-#: flumotion/wizard/productionsteps.py:851
+#: flumotion/wizard/productionsteps.py:410
+msgid "TV Card"
+msgstr "TV-kaart"
+
+#: flumotion/wizard/productionsteps.py:492
+msgid "Firewire"
+msgstr "Vuurdraad"
+
+#: flumotion/wizard/productionsteps.py:544
+#: flumotion/wizard/productionsteps.py:861
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspectverhouding"
 
-#: flumotion/wizard/productionsteps.py:540
-#: flumotion/wizard/productionsteps.py:857
+#: flumotion/wizard/productionsteps.py:550
+#: flumotion/wizard/productionsteps.py:867
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/productionsteps.py:615
-#: flumotion/wizard/productionsteps.py:929
+#: flumotion/wizard/productionsteps.py:625
+#: flumotion/wizard/productionsteps.py:939
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspectverhouding)"
+
+#: flumotion/wizard/productionsteps.py:645
+msgid "Test Audio Source"
+msgstr "Test-audiobron"
+
+#: flumotion/wizard/productionsteps.py:669
+msgid "Soundcard"
+msgstr "Geluidskaart"
+
+#: flumotion/wizard/conversionsteps.py:45
+#: flumotion/wizard/conversionsteps.py:222 flumotion/wizard/basesteps.py:74
+#: flumotion/wizard/basesteps.py:83
+msgid "Conversion"
+msgstr "Conversie"
+
+#: flumotion/wizard/conversionsteps.py:166
+#, fuzzy
+msgid "Theora encoder"
+msgstr "Herlaad _code"
+
+#: flumotion/wizard/conversionsteps.py:167
+msgid "Theora"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:219
+msgid "Smoke encoder"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:220
+msgid "Smoke"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:267
+msgid "Vorbis encoder"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:268
+msgid "Vorbis"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:309
+msgid "Speex encoder"
+msgstr ""
+
+#: flumotion/wizard/conversionsteps.py:310
+msgid "Speex"
+msgstr ""
+
+#: flumotion/wizard/configurationwizard.py:61
+#: flumotion/wizard/configurationwizard.py:62
+msgid "Welcome"
+msgstr "Welkom"
+
+#: flumotion/wizard/configurationwizard.py:78
+msgid "License"
+msgstr "Licensie"
+
+#: flumotion/wizard/configurationwizard.py:97
+#: flumotion/wizard/configurationwizard.py:98
+msgid "Summary"
+msgstr "Samenvatting"
 
 #: flumotion/wizard/configurationwizard.py:216
 #: flumotion/wizard/basesteps.py:159
@@ -1164,23 +1538,23 @@ msgstr "%s code aan het herladen"
 msgid "window1"
 msgstr "window1"
 
-#: data/glade/wizard_smoke.glade:31
+#: data/glade/wizard_smoke.glade:33
 msgid "M_inimum quality:"
 msgstr "M_inimum kwaliteit:"
 
-#: data/glade/wizard_smoke.glade:56
+#: data/glade/wizard_smoke.glade:62
 msgid "M_aximum quality:"
 msgstr "M_aximum kwaliteit:"
 
-#: data/glade/wizard_smoke.glade:81
+#: data/glade/wizard_smoke.glade:91
 msgid "_Threshold:"
 msgstr "_Drempel:"
 
-#: data/glade/wizard_smoke.glade:106
+#: data/glade/wizard_smoke.glade:120
 msgid "_Keyframe spacing: every"
 msgstr "_Sleutelbeeldafstand: elke"
 
-#: data/glade/wizard_smoke.glade:268 data/glade/wizard_theora.glade:184
+#: data/glade/wizard_smoke.glade:294 data/glade/wizard_theora.glade:184
 msgid "frames"
 msgstr "beelden"
 
@@ -1200,81 +1574,39 @@ msgstr ""
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
 
-#: data/glade/wizard_source.glade:32 data/glade/wizard_encoding.glade:126
+#: data/glade/wizard_source.glade:80 data/glade/wizard_encoding.glade:142
 msgid "_Audio:"
 msgstr "_Audio:"
 
-#: data/glade/wizard_source.glade:53
-msgid ""
-"TV Card\n"
-"Firewire \n"
-"Webcam\n"
-"Test"
-msgstr ""
-"TVkaart\n"
-"Vuurdraad \n"
-"Webcam\n"
-"Test"
-
-#: data/glade/wizard_source.glade:72
-msgid ""
-"Firewire\n"
-"Sound card\n"
-"Test"
-msgstr ""
-"Vuurdraad\n"
-"Geluidskaart\n"
-"Test"
-
-#: data/glade/wizard_source.glade:91 data/glade/wizard_encoding.glade:101
+#: data/glade/wizard_source.glade:117 data/glade/wizard_encoding.glade:113
 msgid "_Video:"
 msgstr "V_ideo:"
 
-#: data/glade/wizard_tvcard.glade:37
-msgid ""
-"Television\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
-msgstr ""
-"Televisie\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
-
-#: data/glade/wizard_tvcard.glade:55
-msgid ""
-"Composite\n"
-"RCA"
-msgstr ""
-"Composite\n"
-"RCA"
-
-#: data/glade/wizard_tvcard.glade:71 data/glade/videotest.glade:60
-#: data/glade/wizard_testsource.glade:32
+#: data/glade/wizard_tvcard.glade:65 data/glade/videotest.glade:60
+#: data/glade/wizard_testsource.glade:33
 msgid "_Width:"
 msgstr "_Breedte:"
 
-#: data/glade/wizard_tvcard.glade:96 data/glade/videotest.glade:85
-#: data/glade/wizard_testsource.glade:61
+#: data/glade/wizard_tvcard.glade:90 data/glade/videotest.glade:85
+#: data/glade/wizard_testsource.glade:62
 msgid "_Height:"
 msgstr "_Hoogte:"
 
-#: data/glade/wizard_tvcard.glade:167 data/glade/wizard_webcam.glade:79
-#: data/glade/wizard_testsource.glade:90
+#: data/glade/wizard_tvcard.glade:161 data/glade/wizard_webcam.glade:78
+#: data/glade/wizard_testsource.glade:91
 msgid "F_ramerate:"
 msgstr "B_eeldsnelheid:"
 
-#: data/glade/wizard_tvcard.glade:214
+#: data/glade/wizard_tvcard.glade:208
 msgid "Video _source:"
 msgstr "Video_bron:"
 
-#: data/glade/wizard_tvcard.glade:238
+#: data/glade/wizard_tvcard.glade:232
 msgid "TV _norm:"
 msgstr "TV _norm:"
 
-#: data/glade/wizard_tvcard.glade:262 data/glade/wizard_webcam.glade:33
-#: data/glade/wizard_soundcard.glade:31
+#: data/glade/wizard_tvcard.glade:256 data/glade/wizard_webcam.glade:33
+#: data/glade/wizard_soundcard.glade:33
 msgid "_Device:"
 msgstr "T_oestel:"
 
@@ -1289,7 +1621,7 @@ msgid "Bit _rate:"
 msgstr "Bit_snelheid:"
 
 #: data/glade/wizard_theora.glade:123 data/glade/wizard_vorbis.glade:123
-#: data/glade/wizard_jpeg.glade:31
+#: data/glade/wizard_jpeg.glade:33
 msgid "_Quality:"
 msgstr "_Kwaliteit:"
 
@@ -1325,33 +1657,25 @@ msgstr "<b>Cliënten</b>"
 msgid "_Framerate:"
 msgstr "B_eeldsnelheid:"
 
-#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:76
-#: data/glade/wizard_testsource.glade:119
+#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:84
+#: data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
 msgstr "F_ormaat:"
 
-#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:148
+#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
 msgstr "_Patroon:"
-
-#: data/glade/videotest.glade:183 data/glade/wizard_testsource.glade:177
-msgid ""
-"Snow\n"
-"Black"
-msgstr ""
-"Sneeuw\n"
-"Zwart"
 
 #: data/glade/connections.glade:78
 msgid "Clear _All"
 msgstr "Wis _Alles"
 
-#: data/glade/wizard_webcam.glade:107
+#: data/glade/wizard_webcam.glade:106
 #, fuzzy
 msgid "_Size:"
 msgstr "V_ideo:"
 
-#: data/glade/wizard_webcam.glade:135 data/glade/wizard_soundcard.glade:291
+#: data/glade/wizard_webcam.glade:134 data/glade/wizard_soundcard.glade:306
 msgid "Name:"
 msgstr "Naam:"
 
@@ -1374,16 +1698,6 @@ msgstr "Toon _logos in de linkeronderhoek"
 #: data/glade/wizard_license.glade:32
 msgid "Specify _license:"
 msgstr "Kies _licentie:"
-
-#: data/glade/wizard_license.glade:53
-msgid ""
-"Creative Commons\n"
-"GNU FDL\n"
-"Commercial"
-msgstr ""
-"Creative Commons\n"
-"GNU FDL\n"
-"Commercieel"
 
 #: data/glade/authenticate.glade:33
 #, fuzzy
@@ -1410,7 +1724,7 @@ msgid "_Host:"
 msgstr "_Gast"
 
 #: data/glade/open-connection.glade:62 data/glade/wizard_http.glade:33
-#: data/glade/wizard_shout2.glade:38
+#: data/glade/wizard_shout2.glade:39
 msgid "_Port:"
 msgstr "_Poort:"
 
@@ -1454,71 +1768,51 @@ msgstr ""
 "Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
 "worden op uw netwerk.  Dit zal enige tijd duren."
 
-#: data/glade/wizard_soundcard.glade:56
+#: data/glade/wizard_soundcard.glade:62
 msgid "_Input:"
 msgstr "_Invoer:"
 
-#: data/glade/wizard_soundcard.glade:81
+#: data/glade/wizard_soundcard.glade:91
 msgid "_Channels:"
 msgstr "_Kanalen:"
 
-#: data/glade/wizard_soundcard.glade:106
+#: data/glade/wizard_soundcard.glade:120
 msgid "Sample _rate:"
 msgstr "Samples_nelheid:"
 
-#: data/glade/wizard_soundcard.glade:131
+#: data/glade/wizard_soundcard.glade:149
 msgid "Bi_t depth:"
 msgstr "Bi_tdiepte:"
 
-#: data/glade/wizard_soundcard.glade:156
-msgid ""
-"Line in\n"
-"Microphone\n"
-"CD"
-msgstr ""
-"Lijningang\n"
-"Microfoon\n"
-"CD"
-
-#: data/glade/wizard_soundcard.glade:174
-msgid ""
-"Stereo\n"
-"Mono\n"
-"5.1"
-msgstr ""
-"Stereo\n"
-"Mono\n"
-"5.1"
-
-#: data/glade/wizard_soundcard.glade:248
+#: data/glade/wizard_soundcard.glade:260
 msgid "Sound _system:"
 msgstr "Geluids_systeem"
 
-#: data/glade/wizard_http.glade:128
+#: data/glade/wizard_http.glade:106
 msgid "Mbit/s"
 msgstr "Mbit/s"
 
-#: data/glade/wizard_http.glade:156
+#: data/glade/wizard_http.glade:134
 msgid "clients"
 msgstr "cliënten"
 
-#: data/glade/wizard_http.glade:184 data/glade/wizard_shout2.glade:85
+#: data/glade/wizard_http.glade:162 data/glade/wizard_shout2.glade:68
 msgid "_Mount point:"
 msgstr "_Mountpunt:"
 
-#: data/glade/wizard_http.glade:237
-msgid "Bu_rst on connect"
-msgstr "Uitba_rsten bij verbinding"
-
-#: data/glade/wizard_http.glade:259
+#: data/glade/wizard_http.glade:204
 #, fuzzy
 msgid "User limit:"
 msgstr "_Gebruikerslimiet:"
 
-#: data/glade/wizard_http.glade:282
+#: data/glade/wizard_http.glade:241
 #, fuzzy
 msgid "Bandwidth limit:"
 msgstr "B_andbreedtelimiet:"
+
+#: data/glade/wizard_http.glade:278
+msgid "Bu_rst on connect"
+msgstr "Uitba_rsten bij verbinding"
 
 #: data/glade/greeter-initial.glade:29
 msgid "_Open recent connection"
@@ -1567,92 +1861,81 @@ msgstr ""
 msgid "<b>Preview</b>"
 msgstr "<b>Stream</b>"
 
-#: data/glade/wizard_jpeg.glade:56 data/glade/wizard_firewire.glade:448
+#: data/glade/wizard_jpeg.glade:62 data/glade/wizard_firewire.glade:447
 msgid "Frame _rate:"
 msgstr "Beeld_snelheid:"
 
-#: data/glade/wizard_jpeg.glade:149
+#: data/glade/wizard_jpeg.glade:163
 msgid "frames/s"
 msgstr "beelden/seconde"
 
-#: data/glade/wizard_disk.glade:38
+#: data/glade/wizard_disk.glade:39
 msgid "_Choose location:"
 msgstr "_Kies locatie:"
 
-#: data/glade/wizard_disk.glade:119
-msgid ""
-"minute\n"
-"hour\n"
-"day\n"
-"week\n"
-"month"
-msgstr ""
-"minuut\n"
-"uur\n"
-"dag\n"
-"week\n"
-"maand"
-
-#: data/glade/wizard_disk.glade:236
-msgid "_Rotate entry every"
+#: data/glade/wizard_disk.glade:245
+#, fuzzy
+msgid "_Rotate entry every:"
 msgstr "_Roteer opslag elke"
 
-#: data/glade/wizard_disk.glade:259
+#: data/glade/wizard_disk.glade:270
 msgid "Record at startup"
 msgstr "Opnemen bij het starten"
 
-#: data/glade/wizard_audiotest.glade:31
+#: data/glade/wizard_audiotest.glade:33
 msgid "_Volume:"
 msgstr "V_olume:"
 
-#: data/glade/wizard_audiotest.glade:56
+#: data/glade/wizard_audiotest.glade:62
 msgid "_Sample rate:"
 msgstr "_Samplesnelheid:"
 
-#: data/glade/wizard_audiotest.glade:81
+#: data/glade/wizard_audiotest.glade:91
 msgid "F_requency:"
 msgstr "F_requentie:"
 
-#: data/glade/wizard_shout2.glade:115
+#: data/glade/wizard_shout2.glade:102
 msgid "/demo.ogg"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:132
+#: data/glade/wizard_shout2.glade:119
 #, fuzzy
-msgid "P_assword"
+msgid "P_assword:"
 msgstr "_Paswoord"
 
-#: data/glade/wizard_shout2.glade:161
+#: data/glade/wizard_shout2.glade:152
 msgid "hackme"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:178
-msgid "_IP"
-msgstr ""
+#: data/glade/wizard_shout2.glade:169
+#, fuzzy
+msgid "_Hostname:"
+msgstr "_Gast"
 
-#: data/glade/wizard_shout2.glade:207
+#: data/glade/wizard_shout2.glade:202
 msgid "127.0.0.1"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:224
+#: data/glade/wizard_shout2.glade:219
 #, fuzzy
-msgid "_Name"
+msgid "_Name:"
 msgstr "Naam:"
 
-#: data/glade/wizard_shout2.glade:270
+#: data/glade/wizard_shout2.glade:269
 #, fuzzy
-msgid "_Description"
+msgid "_Description:"
 msgstr "_Verbinding"
 
-#: data/glade/wizard_shout2.glade:316
-msgid "_URL"
-msgstr ""
+#: data/glade/wizard_shout2.glade:319
+#, fuzzy
+msgid "_URL:"
+msgstr "Web-URL:"
 
 #: data/glade/wizard_firewire.glade:55
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
 
-#: data/glade/wizard_firewire.glade:77 data/glade/wizard_firewire.glade:522
+#: data/glade/wizard_firewire.glade:77 data/glade/wizard_firewire.glade:521
 msgid "<b>Camera settings</b>"
 msgstr "<b>Camera-instellingen</b>"
 
@@ -1668,37 +1951,113 @@ msgstr "Aanbevolen als je naar een computerscherm afbeeldt"
 msgid "Convert to s_quare pixels"
 msgstr "Omzetten naar v_ierkante pixels"
 
-#: data/glade/wizard_firewire.glade:221
+#: data/glade/wizard_firewire.glade:220
 msgid "<b>Scaling</b>"
 msgstr "<b>Schaling</b>"
 
-#: data/glade/wizard_firewire.glade:298
+#: data/glade/wizard_firewire.glade:297
 msgid "_No width correction"
 msgstr "_Geen breedtecorrectie"
 
-#: data/glade/wizard_firewire.glade:321
+#: data/glade/wizard_firewire.glade:320
 msgid "_Stretch to multiple of 8 pixels"
 msgstr "_Uitrekken tot een veelvoud van 8 pixels"
 
-#: data/glade/wizard_firewire.glade:345
+#: data/glade/wizard_firewire.glade:344
 msgid "_Pad to multiple of 8 pixels"
 msgstr "_Opvullen tot een veelvoud van 8 pixels"
 
-#: data/glade/wizard_firewire.glade:379
+#: data/glade/wizard_firewire.glade:378
 msgid "<b>Width correction</b>"
 msgstr "<b>Breedtecorrectie</b>"
 
-#: data/glade/wizard_firewire.glade:493
+#: data/glade/wizard_firewire.glade:492
 msgid "frames per second"
 msgstr "beelden per seconde"
 
-#: data/glade/wizard_firewire.glade:573
+#: data/glade/wizard_firewire.glade:572
 msgid "none"
 msgstr "geen"
 
-#: data/glade/wizard_firewire.glade:595
+#: data/glade/wizard_firewire.glade:594
 msgid "<b>Output format</b>"
 msgstr "<b>Uitvoerformaat</b>"
+
+#, fuzzy
+#~ msgid "%s (audio & video)"
+#~ msgstr "Schijf (audio & video)"
+
+#, fuzzy
+#~ msgid "%s (audio only)"
+#~ msgstr "Schijf (enkel audio)"
+
+#, fuzzy
+#~ msgid "%s (video only)"
+#~ msgstr "Schijf (enkel video)"
+
+#~ msgid ""
+#~ "TV Card\n"
+#~ "Firewire \n"
+#~ "Webcam\n"
+#~ "Test"
+#~ msgstr ""
+#~ "TVkaart\n"
+#~ "Vuurdraad \n"
+#~ "Webcam\n"
+#~ "Test"
+
+#~ msgid ""
+#~ "Firewire\n"
+#~ "Sound card\n"
+#~ "Test"
+#~ msgstr ""
+#~ "Vuurdraad\n"
+#~ "Geluidskaart\n"
+#~ "Test"
+
+#~ msgid ""
+#~ "Television\n"
+#~ "Composite1\n"
+#~ "S-Video\n"
+#~ "Composite3"
+#~ msgstr ""
+#~ "Televisie\n"
+#~ "Composite1\n"
+#~ "S-Video\n"
+#~ "Composite3"
+
+#~ msgid ""
+#~ "Snow\n"
+#~ "Black"
+#~ msgstr ""
+#~ "Sneeuw\n"
+#~ "Zwart"
+
+#~ msgid ""
+#~ "Stereo\n"
+#~ "Mono\n"
+#~ "5.1"
+#~ msgstr ""
+#~ "Stereo\n"
+#~ "Mono\n"
+#~ "5.1"
+
+#~ msgid ""
+#~ "minute\n"
+#~ "hour\n"
+#~ "day\n"
+#~ "week\n"
+#~ "month"
+#~ msgstr ""
+#~ "minuut\n"
+#~ "uur\n"
+#~ "dag\n"
+#~ "week\n"
+#~ "maand"
+
+#, fuzzy
+#~ msgid "_Name"
+#~ msgstr "Naam:"
 
 #~ msgid "_Authentication Method"
 #~ msgstr "_Authenticatiemethode"
@@ -1786,9 +2145,6 @@ msgstr "<b>Uitvoerformaat</b>"
 
 #~ msgid "Bit rate:"
 #~ msgstr "Bitsnelheid:"
-
-#~ msgid "Web URL:"
-#~ msgstr "Web-URL:"
 
 #, fuzzy
 #~ msgid "Average bitrate:"
@@ -1913,87 +2269,3 @@ msgstr "<b>Uitvoerformaat</b>"
 
 #~ msgid "Failed to probe webcam."
 #~ msgstr "Kon webcam niet onderzoeken."
-
-#~ msgid "Welcome"
-#~ msgstr "Welkom"
-
-#~ msgid "Source"
-#~ msgstr "Bron"
-
-#~ msgid "Production"
-#~ msgstr "Productie"
-
-#~ msgid "TV Card"
-#~ msgstr "TV-kaart"
-
-#~ msgid "Firewire"
-#~ msgstr "Vuurdraad"
-
-#~ msgid "Webcam"
-#~ msgstr "Webcam"
-
-#~ msgid "Test Video Source"
-#~ msgstr "Testvideobron"
-
-#~ msgid "Overlay"
-#~ msgstr "Overlay"
-
-#~ msgid "Soundcard"
-#~ msgstr "Geluidskaart"
-
-#~ msgid "Test Audio Source"
-#~ msgstr "Test-audiobron"
-
-#~ msgid "Encoding"
-#~ msgstr "Encodering"
-
-#~ msgid "Conversion"
-#~ msgstr "Conversie"
-
-#~ msgid "Consumption"
-#~ msgstr "Consumptie"
-
-#~ msgid "HTTP Streamer (audio & video)"
-#~ msgstr "HTTP Streamer (audio & video)"
-
-#~ msgid "HTTP audio/video"
-#~ msgstr "HTTP audio/video"
-
-#~ msgid "HTTP Streamer (audio only)"
-#~ msgstr "HTTP Streamer (enkel audio)"
-
-#~ msgid "HTTP audio"
-#~ msgstr "HTTP audio"
-
-#~ msgid "HTTP Streamer (video only)"
-#~ msgstr "HTTP Streamer (enkel video)"
-
-#~ msgid "HTTP video"
-#~ msgstr "HTTP video"
-
-#~ msgid "Disk (audio & video)"
-#~ msgstr "Schijf (audio & video)"
-
-#~ msgid "Disk audio/video"
-#~ msgstr "Schijf audio/video"
-
-#~ msgid "Disk (audio only)"
-#~ msgstr "Schijf (enkel audio)"
-
-#~ msgid "Disk audio"
-#~ msgstr "Schijf audio"
-
-#~ msgid "Disk (video only)"
-#~ msgstr "Schijf (enkel video)"
-
-#~ msgid "Disk video"
-#~ msgstr "Schijf video"
-
-#~ msgid "Content License"
-#~ msgstr "Inhoudslicensie"
-
-#~ msgid "License"
-#~ msgstr "Licensie"
-
-#~ msgid "Summary"
-#~ msgstr "Samenvatting"

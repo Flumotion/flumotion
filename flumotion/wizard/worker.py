@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 
 import gtk
 from zope.interface import implements
@@ -26,6 +27,9 @@ from zope.interface import implements
 from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
+
+_ = gettext.gettext
+
 
 class WorkerListStore(gtk.ListStore):
     implements(flavors.IStateListener)
@@ -63,7 +67,7 @@ class WorkerList(gtk.HBox):
         gtk.HBox.__init__(self)
 
         self._combobox = gtk.ComboBox()
-        self._label = gtk.Label('Worker: ')
+        self._label = gtk.Label(_('Worker:'))
 
         self._label.show()
         self.pack_start(self._label, False, False, 0)

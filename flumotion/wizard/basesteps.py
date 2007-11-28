@@ -51,7 +51,7 @@ class AudioSourceStep(WorkerWizardStep):
 
 
 class VideoSourceStep(WorkerWizardStep):
-    section = 'Production'
+    section = _('Production')
     icon = 'widget_doc.png'
 
     def __init__(self, wizard, model):
@@ -71,7 +71,7 @@ class VideoSourceStep(WorkerWizardStep):
 
 
 class VideoEncoderStep(WorkerWizardStep):
-    section = 'Conversion'
+    section = _('Conversion')
 
     def __init__(self, wizard, model):
         self.model = model
@@ -80,7 +80,7 @@ class VideoEncoderStep(WorkerWizardStep):
 
 class AudioEncoderStep(WorkerWizardStep):
     glade_file = 'wizard_audio_encoder.glade'
-    section = 'Conversion'
+    section = _('Conversion')
 
     def __init__(self, wizard, model):
         self.model = model
@@ -93,9 +93,9 @@ class AudioEncoderStep(WorkerWizardStep):
 
 
 class OverlayStep(WorkerWizardStep):
-    name = 'Overlay'
+    name = _('Overlay')
     glade_file = 'wizard_overlay.glade'
-    section = 'Production'
+    section = _('Production')
     component_type = 'overlay'
     icon = 'overlay.png'
 
@@ -125,8 +125,8 @@ class OverlayStep(WorkerWizardStep):
         return options
 
     def get_next(self):
-        if self.wizard.get_step_option('Source', 'has-audio'):
-            return self.wizard.get_step('Source').get_audio_step()
+        if self.wizard.get_step_option(_('Source'), 'has-audio'):
+            return self.wizard.get_step(_('Source')).get_audio_step()
 
         return None
 
