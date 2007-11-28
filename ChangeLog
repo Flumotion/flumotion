@@ -1,5 +1,17 @@
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* flumotion/common/boot.py:
+	* flumotion/common/pygobject.py:
+
+	Require PyGTK 2.8.4 and Twisted 2.0.1
+	Remove PyGTK 2.6 comaptibility
+
+	* README:
+	Document the new requirements
+
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/fvumeter.py: 
 	* flumotion/ui/fgtk.py:
 	Fixup imports in these two files, oops.
