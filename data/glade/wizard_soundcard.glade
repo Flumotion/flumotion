@@ -15,6 +15,8 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
+  <property name="urgency_hint">False</property>
 
   <child>
     <widget class="GtkTable" id="table1">
@@ -34,11 +36,15 @@
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_device</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -59,11 +65,15 @@
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_input</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -84,11 +94,15 @@
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_channels</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -109,11 +123,15 @@
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_samplerate</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -134,11 +152,15 @@
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_bitdepth</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -156,6 +178,7 @@
 	  <property name="items" translatable="yes">Line in
 Microphone
 CD</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	</widget>
 	<packing>
@@ -174,6 +197,7 @@ CD</property>
 	  <property name="items" translatable="yes">Stereo
 Mono
 5.1</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	  <signal name="changed" handler="on_combobox_channels_changed" last_modification_time="Sat, 28 Jan 2006 18:09:03 GMT"/>
 	</widget>
@@ -194,6 +218,7 @@ Mono
 22050
 11025
 8000</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	</widget>
 	<packing>
@@ -211,6 +236,7 @@ Mono
 	  <property name="visible">True</property>
 	  <property name="items">16
 8</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	</widget>
 	<packing>
@@ -229,6 +255,7 @@ Mono
 	  <property name="items">/dev/dsp
 /dev/dsp1
 /dev/dsp2</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	  <signal name="changed" handler="on_combobox_device_changed" last_modification_time="Thu, 04 Nov 2004 10:10:56 GMT"/>
 	</widget>
@@ -251,11 +278,15 @@ Mono
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
 	  <property name="mnemonic_widget">combobox_system</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -272,6 +303,7 @@ Mono
 	  <property name="visible">True</property>
 	  <property name="items">Alsa
 OSS</property>
+	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	  <signal name="changed" handler="on_combobox_system_changed" last_modification_time="Thu, 04 Nov 2004 10:04:15 GMT"/>
 	</widget>
@@ -294,10 +326,14 @@ OSS</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">0</property>
+	  <property name="xalign">1</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -322,6 +358,10 @@ OSS</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
+	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	  <property name="width_chars">-1</property>
+	  <property name="single_line_mode">False</property>
+	  <property name="angle">0</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>

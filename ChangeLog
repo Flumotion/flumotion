@@ -1,3 +1,19 @@
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_http.glade:
+	* data/glade/wizard_jpeg.glade:
+	* data/glade/wizard_shout2.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_testsource.glade:
+	Set label/checkbutton alignments, table width
+	
+	* po/sv.po: Update swedish translation
+
 2007-11-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/combiners/switch/switch.py:

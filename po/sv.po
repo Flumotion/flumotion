@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-27 16:54+0100\n"
-"PO-Revision-Date: 2007-11-26 18:30+0100\n"
+"POT-Creation-Date: 2007-11-28 11:50+0100\n"
+"PO-Revision-Date: 2007-11-28 11:51+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -519,19 +519,19 @@ msgstr "Om du vill strömma ljud"
 msgid "Probing webcam, this can take a while..."
 msgstr "Söker efter webbkamera, det här kan ta en stund..."
 
-#: flumotion/wizard/productionsteps.py:534
-#: flumotion/wizard/productionsteps.py:851
+#: flumotion/wizard/productionsteps.py:536
+#: flumotion/wizard/productionsteps.py:853
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspektratio"
 
-#: flumotion/wizard/productionsteps.py:540
-#: flumotion/wizard/productionsteps.py:857
+#: flumotion/wizard/productionsteps.py:542
+#: flumotion/wizard/productionsteps.py:859
 msgid "Checking for Firewire device..."
 msgstr "Söker efter Firewire-enheter..."
 
-#: flumotion/wizard/productionsteps.py:615
-#: flumotion/wizard/productionsteps.py:929
+#: flumotion/wizard/productionsteps.py:617
+#: flumotion/wizard/productionsteps.py:931
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspektratio)"
@@ -1192,23 +1192,23 @@ msgstr "Laddar om %s code"
 msgid "window1"
 msgstr "window1"
 
-#: data/glade/wizard_smoke.glade:31
+#: data/glade/wizard_smoke.glade:33
 msgid "M_inimum quality:"
 msgstr "_Minimal kvalité:"
 
-#: data/glade/wizard_smoke.glade:56
+#: data/glade/wizard_smoke.glade:62
 msgid "M_aximum quality:"
 msgstr "M_aximal kvalité:"
 
-#: data/glade/wizard_smoke.glade:81
+#: data/glade/wizard_smoke.glade:91
 msgid "_Threshold:"
 msgstr ""
 
-#: data/glade/wizard_smoke.glade:106
+#: data/glade/wizard_smoke.glade:120
 msgid "_Keyframe spacing: every"
 msgstr ""
 
-#: data/glade/wizard_smoke.glade:268 data/glade/wizard_theora.glade:184
+#: data/glade/wizard_smoke.glade:294 data/glade/wizard_theora.glade:184
 msgid "frames"
 msgstr "bildruta"
 
@@ -1224,11 +1224,7 @@ msgid ""
 "your streaming media server."
 msgstr ""
 
-#: data/glade/wizard_source.glade:32 data/glade/wizard_encoding.glade:126
-msgid "_Audio:"
-msgstr "_Ljud:"
-
-#: data/glade/wizard_source.glade:53
+#: data/glade/wizard_source.glade:33
 msgid ""
 "TV Card\n"
 "Firewire \n"
@@ -1240,7 +1236,7 @@ msgstr ""
 "Webbkamera\n"
 "Test"
 
-#: data/glade/wizard_source.glade:72
+#: data/glade/wizard_source.glade:54
 msgid ""
 "Firewire\n"
 "Sound card\n"
@@ -1250,7 +1246,11 @@ msgstr ""
 "Ljudkot\n"
 "Test"
 
-#: data/glade/wizard_source.glade:91 data/glade/wizard_encoding.glade:101
+#: data/glade/wizard_source.glade:87 data/glade/wizard_encoding.glade:142
+msgid "_Audio:"
+msgstr "_Ljud:"
+
+#: data/glade/wizard_source.glade:124 data/glade/wizard_encoding.glade:113
 msgid "_Video:"
 msgstr "_Video:"
 
@@ -1275,17 +1275,17 @@ msgstr ""
 "RCA"
 
 #: data/glade/wizard_tvcard.glade:71 data/glade/videotest.glade:60
-#: data/glade/wizard_testsource.glade:32
+#: data/glade/wizard_testsource.glade:33
 msgid "_Width:"
 msgstr "_Bredd:"
 
 #: data/glade/wizard_tvcard.glade:96 data/glade/videotest.glade:85
-#: data/glade/wizard_testsource.glade:61
+#: data/glade/wizard_testsource.glade:62
 msgid "_Height:"
 msgstr "_Höjd:"
 
 #: data/glade/wizard_tvcard.glade:167 data/glade/wizard_webcam.glade:79
-#: data/glade/wizard_testsource.glade:90
+#: data/glade/wizard_testsource.glade:91
 msgid "F_ramerate:"
 msgstr "B_ildruta:"
 
@@ -1298,7 +1298,7 @@ msgid "TV _norm:"
 msgstr "TV-_norm:"
 
 #: data/glade/wizard_tvcard.glade:262 data/glade/wizard_webcam.glade:33
-#: data/glade/wizard_soundcard.glade:31
+#: data/glade/wizard_soundcard.glade:33
 msgid "_Device:"
 msgstr "_Enhet:"
 
@@ -1313,7 +1313,7 @@ msgid "Bit _rate:"
 msgstr "Bit _rate:"
 
 #: data/glade/wizard_theora.glade:123 data/glade/wizard_vorbis.glade:123
-#: data/glade/wizard_jpeg.glade:31
+#: data/glade/wizard_jpeg.glade:33
 msgid "_Quality:"
 msgstr "_Kvalité:"
 
@@ -1345,16 +1345,16 @@ msgstr "<b>Alternativ</b>"
 msgid "_Framerate:"
 msgstr "_Bildrutehastighet:"
 
-#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:76
-#: data/glade/wizard_testsource.glade:119
+#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:84
+#: data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
 msgstr "F_ormat:"
 
-#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:148
+#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
-msgstr "_Mönster"
+msgstr "_Mönster:"
 
-#: data/glade/videotest.glade:183 data/glade/wizard_testsource.glade:177
+#: data/glade/videotest.glade:183 data/glade/wizard_testsource.glade:178
 msgid ""
 "Snow\n"
 "Black"
@@ -1370,7 +1370,7 @@ msgstr "Rensa _alla"
 msgid "_Size:"
 msgstr "_Storlek:"
 
-#: data/glade/wizard_webcam.glade:135 data/glade/wizard_soundcard.glade:291
+#: data/glade/wizard_webcam.glade:135 data/glade/wizard_soundcard.glade:323
 msgid "Name:"
 msgstr "Namn:"
 
@@ -1405,30 +1405,27 @@ msgstr ""
 "Kommersiell"
 
 #: data/glade/authenticate.glade:33
-#, fuzzy
 msgid "_Password:"
-msgstr "_Lösenord"
+msgstr "_Lösenord:"
 
 #: data/glade/authenticate.glade:62
-#, fuzzy
 msgid "_Username:"
-msgstr "_Användarnamn"
+msgstr "_Användarnamn:"
 
 #: data/glade/authenticate.glade:91
 msgid "_Method:"
-msgstr ""
+msgstr "_Metod:"
 
 #: data/glade/authenticate.glade:171
 msgid "Name and Password"
 msgstr "Namn och lösenord"
 
 #: data/glade/open-connection.glade:33
-#, fuzzy
 msgid "_Host:"
-msgstr "_Värd"
+msgstr "_Värd:"
 
 #: data/glade/open-connection.glade:62 data/glade/wizard_http.glade:33
-#: data/glade/wizard_shout2.glade:38
+#: data/glade/wizard_shout2.glade:39
 msgid "_Port:"
 msgstr "_Port:"
 
@@ -1476,23 +1473,23 @@ msgstr ""
 "När du klickar på \"Verkställ\" kommer din konfiguration automatiskt att\n"
 "laddas in i ditt nätverk. Detta kommer att ta en stund."
 
-#: data/glade/wizard_soundcard.glade:56
+#: data/glade/wizard_soundcard.glade:62
 msgid "_Input:"
 msgstr "_Input:"
 
-#: data/glade/wizard_soundcard.glade:81
+#: data/glade/wizard_soundcard.glade:91
 msgid "_Channels:"
 msgstr "_Kanaler:"
 
-#: data/glade/wizard_soundcard.glade:106
+#: data/glade/wizard_soundcard.glade:120
 msgid "Sample _rate:"
 msgstr "Sample _rate:"
 
-#: data/glade/wizard_soundcard.glade:131
+#: data/glade/wizard_soundcard.glade:149
 msgid "Bi_t depth:"
 msgstr "Bittdjup"
 
-#: data/glade/wizard_soundcard.glade:156
+#: data/glade/wizard_soundcard.glade:178
 msgid ""
 "Line in\n"
 "Microphone\n"
@@ -1502,7 +1499,7 @@ msgstr ""
 "Mikrofon\n"
 "CD"
 
-#: data/glade/wizard_soundcard.glade:174
+#: data/glade/wizard_soundcard.glade:197
 msgid ""
 "Stereo\n"
 "Mono\n"
@@ -1512,33 +1509,33 @@ msgstr ""
 "Mono\n"
 "5.1"
 
-#: data/glade/wizard_soundcard.glade:248
+#: data/glade/wizard_soundcard.glade:275
 msgid "Sound _system:"
 msgstr "Ljud_system:"
 
-#: data/glade/wizard_http.glade:128
+#: data/glade/wizard_http.glade:106
 msgid "Mbit/s"
 msgstr "Mbit/s"
 
-#: data/glade/wizard_http.glade:156
+#: data/glade/wizard_http.glade:134
 msgid "clients"
 msgstr "klienter"
 
-#: data/glade/wizard_http.glade:184 data/glade/wizard_shout2.glade:85
+#: data/glade/wizard_http.glade:162 data/glade/wizard_shout2.glade:68
 msgid "_Mount point:"
 msgstr "_Monteringspunkt"
 
-#: data/glade/wizard_http.glade:237
-msgid "Bu_rst on connect"
-msgstr ""
-
-#: data/glade/wizard_http.glade:259
+#: data/glade/wizard_http.glade:204
 msgid "User limit:"
 msgstr "Användargräns:"
 
-#: data/glade/wizard_http.glade:282
+#: data/glade/wizard_http.glade:241
 msgid "Bandwidth limit:"
 msgstr "Bandbredsgräns:"
+
+#: data/glade/wizard_http.glade:278
+msgid "Bu_rst on connect"
+msgstr ""
 
 #: data/glade/greeter-initial.glade:29
 msgid "_Open recent connection"
@@ -1586,19 +1583,19 @@ msgstr "Strömma till _Icecast2"
 msgid "<b>Preview</b>"
 msgstr "<b>Förhandsgranskning</b>"
 
-#: data/glade/wizard_jpeg.glade:56 data/glade/wizard_firewire.glade:448
+#: data/glade/wizard_jpeg.glade:62 data/glade/wizard_firewire.glade:448
 msgid "Frame _rate:"
 msgstr "Bildrute_hasighet:"
 
-#: data/glade/wizard_jpeg.glade:149
+#: data/glade/wizard_jpeg.glade:163
 msgid "frames/s"
 msgstr "bildrutor/s"
 
-#: data/glade/wizard_disk.glade:38
+#: data/glade/wizard_disk.glade:39
 msgid "_Choose location:"
 msgstr "_Välj plats:"
 
-#: data/glade/wizard_disk.glade:119
+#: data/glade/wizard_disk.glade:124
 msgid ""
 "minute\n"
 "hour\n"
@@ -1612,57 +1609,57 @@ msgstr ""
 "vecka\n"
 "månad"
 
-#: data/glade/wizard_disk.glade:236
-msgid "_Rotate entry every"
-msgstr "_Rotera varje"
+#: data/glade/wizard_disk.glade:255
+msgid "_Rotate entry every:"
+msgstr "_Rotera varje:"
 
-#: data/glade/wizard_disk.glade:259
+#: data/glade/wizard_disk.glade:280
 msgid "Record at startup"
 msgstr "Spela in vid upstart"
 
-#: data/glade/wizard_audiotest.glade:31
+#: data/glade/wizard_audiotest.glade:33
 msgid "_Volume:"
 msgstr "_Volym:"
 
-#: data/glade/wizard_audiotest.glade:56
+#: data/glade/wizard_audiotest.glade:62
 msgid "_Sample rate:"
 msgstr "_Sample rate:"
 
-#: data/glade/wizard_audiotest.glade:81
+#: data/glade/wizard_audiotest.glade:91
 msgid "F_requency:"
-msgstr "F_rekvens"
+msgstr "F_rekvens:"
 
-#: data/glade/wizard_shout2.glade:115
+#: data/glade/wizard_shout2.glade:102
 msgid "/demo.ogg"
 msgstr "/demo.ogg"
 
-#: data/glade/wizard_shout2.glade:132
-msgid "P_assword"
-msgstr "_Lösenord"
+#: data/glade/wizard_shout2.glade:119
+msgid "P_assword:"
+msgstr "_Lösenord:"
 
-#: data/glade/wizard_shout2.glade:161
+#: data/glade/wizard_shout2.glade:152
 msgid "hackme"
 msgstr "hackme"
 
-#: data/glade/wizard_shout2.glade:178
-msgid "_IP"
-msgstr "_IP"
+#: data/glade/wizard_shout2.glade:169
+msgid "_Hostname:"
+msgstr "_Värdnamn:"
 
-#: data/glade/wizard_shout2.glade:207
+#: data/glade/wizard_shout2.glade:202
 msgid "127.0.0.1"
 msgstr "127.0.0.1"
 
-#: data/glade/wizard_shout2.glade:224
-msgid "_Name"
-msgstr "_Namn"
+#: data/glade/wizard_shout2.glade:219
+msgid "_Name:"
+msgstr "_Namn:"
 
-#: data/glade/wizard_shout2.glade:270
-msgid "_Description"
-msgstr "_Beskrivning"
+#: data/glade/wizard_shout2.glade:269
+msgid "_Description:"
+msgstr "_Beskrivning:"
 
-#: data/glade/wizard_shout2.glade:316
-msgid "_URL"
-msgstr "_URL"
+#: data/glade/wizard_shout2.glade:319
+msgid "_URL:"
+msgstr "_URL:"
 
 #: data/glade/wizard_firewire.glade:55
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
@@ -1715,6 +1712,12 @@ msgstr "ingen"
 #: data/glade/wizard_firewire.glade:595
 msgid "<b>Output format</b>"
 msgstr "<b></b>"
+
+#~ msgid "_IP"
+#~ msgstr "_IP"
+
+#~ msgid "_Name"
+#~ msgstr "_Namn"
 
 #~ msgid "_Port"
 #~ msgstr "_Port"
