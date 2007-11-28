@@ -19,22 +19,19 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component import feedcomponent
-from flumotion.common import errors, messages
-from flumotion.common.planet import moods
-from twisted.internet import defer
 import threading
-from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
 import gst
 
-try:
-    # icalendar and dateutil modules needed for scheduling recordings
-    from icalendar import Calendar
-    from dateutil import rrule
-    HAVE_ICAL = True
-except:
-    HAVE_ICAL = False
+from twisted.internet import defer
+
+from flumotion.common import errors, messages
+from flumotion.common.planet import moods
+from flumotion.worker.checks import check
+from flumotion.component import feedcomponent
+from flumotion.component.base import scheduler
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
@@ -60,43 +57,53 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self._eaterReadyDefers = { "master": None, "backup": None }
         self._started = False
 
+    def _create_scheduler(self, filename):
+        def addWarning(id, format, *args, **kwargs):
+            self.warning(format, *args)
+            m = messages.Message(messages.WARNING, T_(format, *args),
+                                 id=id, **kwargs)
+            self.addMessage(m)
+
+        try:
+            def eventStarted(event):
+                self.debug("event started %r", event)
+                self.switch_to_for_event("backup", True)
+            def eventStopped(event):
+                self.debug("event stopped %r", event)
+                self.switch_to_for_event("master", False)
+
+            # if an event starts, semantics are to switch to backup
+            # if an event stops, semantics are to switch to master
+            sched = scheduler.ICalScheduler(open(filename, 'r'))
+            sched.subscribe(eventStarted, eventStopped)
+            if sched.getCurrentEvents():
+                self._idealEater = "backup"
+        except ValueError:
+            fmt = N_("Error parsing ical file %s, so not scheduling "
+                     "any events.")
+            addWarning("error-parsing-ical", fmt, filename)
+        except ImportError, e:
+            fmt = N_("An ical file has been specified for scheduling, "
+                     "but the necessary modules are not installed.")
+            addWarning("error-parsing-ical", fmt, debug=e.message)
+        else:
+            return sched
+        
     def do_check(self):
-        self.debug("checking whether switch element exists")
-        from flumotion.worker.checks import check
-        d = check.checkPlugin('switch', 'gst-plugins-bad')
         def cb(result):
             for m in result.messages:
                 self.addMessage(m)
-            # if we have been passed an ical file to use for scheduling
-            # then start the ical monitor
-            props = self.config['properties']
-            icalfn = props.get('ical-schedule')
-            if icalfn:
-                if HAVE_ICAL:
-                    try:
-                        from flumotion.component.base import scheduler
-                        self.icalScheduler = scheduler.ICalScheduler(open(
-                            icalfn, 'r'))
-                        self.icalScheduler.subscribe(self.eventStarted,
-                            self.eventStopped)
-                        if self.icalScheduler.getCurrentEvents():
-                            self._idealEater = "backup"
-                    except ValueError:
-                        m = messages.Warning(T_(N_(
-                            "Error parsing ical file %s, so not scheduling any"
-                            " events." % icalfn)), id="error-parsing-ical")
-                        self.addMessage(m)
-                else:
-                    warnStr = "An ical file has been specified for " \
-                              "scheduling but the necessary modules " \
-                              "dateutil and/or icalendar are not installed"
-                    self.warning(warnStr)
-                    m = messages.Warning(T_(N_(warnStr)),
-                        id="error-parsing-ical")
-                    self.addMessage(m)
-            return result
+            return result.value
+
+        self.debug("checking for switch element")
+        d = check.checkPlugin('switch', 'gst-plugins-bad')
         d.addCallback(cb)
         return d
+
+    def do_setup(self):
+        icalFileName = self.config['properties']['ical-schedule']
+        if icalFileName:
+            self.icalScheduler = self._create_scheduler(icalFileName)
 
     def switch_to(self, eaterSubstring):
         raise errors.NotImplementedError('subclasses should implement '
@@ -108,18 +115,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             if eaterSubstring in eaterAlias:
                 return self.eaters[eaterAlias].isActive()
         return True
-
-    # if an event starts, semantics are to switch to backup
-    # if an event stops, semantics are to switch to master
-    def eventStarted(self, event):
-        self.debug("event started %r", event)
-        if self.pipeline:
-            self.switch_to_for_event("backup", True)
-
-    def eventStopped(self, event):
-        self.debug("event stopped %r", event)
-        if self.pipeline:
-            self.switch_to_for_event("master", False)
 
     def do_pipeline_playing(self):
         feedcomponent.MultiInputParseLaunchComponent.do_pipeline_playing(self)
@@ -140,6 +135,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         @param eaterSubstring: either "master" or "backup"
         @param startOrStop: True if start of event, False if stop
         """
+        if not self.pipeline:
+            return
         if eaterSubstring != "master" and eaterSubstring != "backup":
             self.warning("switch_to_for_event should be called with 'master'"
                 " or 'backup'")

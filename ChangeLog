@@ -1,3 +1,11 @@
+2007-11-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py: Rework imports.
+	(Switch._create_scheduler.addWarning, Switch.do_check)
+	(Switch.do_setup): Reflaggelate some setup code.
+
+	* configure.ac: Back to dev?
+
 2007-11-28  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po: updated spanish translation again
