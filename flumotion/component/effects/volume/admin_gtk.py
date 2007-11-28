@@ -25,11 +25,9 @@ import gtk
 import os
 import math
 
-from flumotion.common import errors, log
-
 # import custom glade handler
-from flumotion.ui import glade, fgtk
-
+from flumotion.ui import glade
+from flumotion.ui.fvumeter import FVUMeter
 from flumotion.component.base import admin_gtk
 
 def clamp(x, min, max):
@@ -98,7 +96,7 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         if numchannels > len(self.level_widgets):
             totalLevelWidgets = len(self.level_widgets)
             for chan in range(totalLevelWidgets, numchannels):
-                levelWidget = fgtk.FVUMeter()
+                levelWidget = FVUMeter()
                 levelLabel = gtk.Label()
                 if chan == 0 and numchannels > 1:
                     levelLabel.set_text(_("Left channel level:"))

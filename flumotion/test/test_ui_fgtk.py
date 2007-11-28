@@ -25,7 +25,7 @@ from flumotion.common import testsuite
 
 try:
     import gtk
-    from flumotion.ui import fgtk
+    from flumotion.ui.fvumeter import FVUMeter
 except RuntimeError:
     import os
     os._exit(0)
@@ -34,7 +34,7 @@ INTERVAL = 100 # in ms
 
 class VUTest(testsuite.TestCase):
     def testScale(self):
-        w = fgtk.FVUMeter()
+        w = FVUMeter()
 
         self.assertEquals(w.iec_scale(-80.0), 0.0)
         self.assertEquals(w.iec_scale(-70.0), 0.0)
@@ -47,7 +47,7 @@ class VUTest(testsuite.TestCase):
         self.assertEquals(w.iec_scale(0.0), 100)
 
     def testGetSet(self):
-        w = fgtk.FVUMeter()
+        w = FVUMeter()
         w.set_property('peak', -50.0)
         self.assertEquals(w.get_property('peak'), -50.0)
         w.set_property('decay', -50.0)
@@ -58,7 +58,7 @@ class VUTest(testsuite.TestCase):
         self.assertEquals(w.get_property('red-threshold'), -50.0)
 
     def testWidget(self):
-        w = fgtk.FVUMeter()
+        w = FVUMeter()
         window = gtk.Window()
         window.add(w)
         window.show_all()

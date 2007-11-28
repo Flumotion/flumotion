@@ -1,5 +1,15 @@
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/test/test_ui_fgtk.py:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/fgtk.py:
+	* flumotion/ui/fvumeter.py:
+
+	Move FVUMeter out of fgtk.py to a separate file, update callsites.
+
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/fgtk.py (FComboBox._get_column_content): Mark as private
 	(FComboBox.__len__) Remove,
 	Reorganize method order
