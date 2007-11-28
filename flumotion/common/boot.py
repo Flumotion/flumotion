@@ -23,7 +23,8 @@ import os
 import sys
 from flumotion.common.log import safeprintf
 
-PYGTK_REQ = (2, 6, 3)
+# Keep in sync with configure.ac
+PYGTK_REQ = (2, 8, 4)
 
 GST_REQ = {'0.10': {'gstreamer': (0, 10, 0, 1),
                     'gst-python': (0, 10, 0, 1)}}
