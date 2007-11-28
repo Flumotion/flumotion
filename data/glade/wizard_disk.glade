@@ -121,11 +121,6 @@
 	      <child>
 		<widget class="GtkComboBox" id="combobox_time_list">
 		  <property name="visible">True</property>
-		  <property name="items" translatable="yes">minute
-hour
-day
-week
-month</property>
 		  <property name="add_tearoffs">False</property>
 		  <property name="focus_on_click">True</property>
 		</widget>
@@ -186,11 +181,6 @@ month</property>
 		<widget class="GtkComboBox" id="combobox_size_list">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
-		  <property name="items">KB
-MB
-GB
-TB
-</property>
 		  <property name="add_tearoffs">False</property>
 		  <property name="focus_on_click">True</property>
 		</widget>

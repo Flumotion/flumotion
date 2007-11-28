@@ -89,8 +89,8 @@ class EnumClass(object):
             nicks = names
 
         for extra in extras.values():
-            if not isinstance(extra, tuple):
-                raise TypeError('extra must be a tuple, not %s' % type(extra))
+            if not isinstance(extra, (tuple, list)):
+                raise TypeError('extra must be a sequence, not %s' % type(extra))
 
             if len(extra) != len(names):
                 raise TypeError("extra items must have a length of %d" %

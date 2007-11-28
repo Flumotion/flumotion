@@ -180,8 +180,6 @@
 	  <child>
 	    <widget class="GtkComboBox" id="pattern-combo">
 	      <property name="visible">True</property>
-	      <property name="items" translatable="yes">Snow
-Black</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -262,8 +260,6 @@ Black</property>
 	  <child>
 	    <widget class="GtkComboBox" id="format-combo">
 	      <property name="visible">True</property>
-	      <property name="items" translatable="no">RGB
-YUV</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>

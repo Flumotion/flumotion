@@ -1,5 +1,29 @@
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/videotest.glade:
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_firewire.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_webcam.glade:
+	Remove all static ComboBox item strings, they are overwritten by the
+	enums later anyway.
+	
+	* flumotion/common/enum.py:
+	* flumotion/wizard/enums.py:
+	Mark strings that should be translatable as such.
+	Use lists instead of tuples for elements of the same kind,
+	reorganize to make it a bit more readable
+	
+	* po/sv.po:
+	Update swedish translation
+
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_disk.glade:
 	* data/glade/wizard_encoding.glade:

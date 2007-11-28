@@ -50,9 +50,6 @@
       <child>
 	<widget class="GtkComboBox" id="combobox_license">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Creative Commons
-GNU FDL
-Commercial</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
