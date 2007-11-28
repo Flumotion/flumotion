@@ -23,15 +23,11 @@
 I am a collection of extended GTK widgets for use in Flumotion.
 """
 
-import gtk
-import gtk.gdk
-from gtk import gdk
-# FIXME: done for pychecker; apparently these imports before make
-# import gtk; import gtk.glade in later files in the checking fail
-import gtk.glade
 import gobject
+import gtk
 
 from flumotion.common import enum, pygobject
+
 
 class FComboBox(gtk.ComboBox):
     """
@@ -202,3 +198,4 @@ class WidgetMapping:
             return self.types[name]
         else:
             return gobject.type_from_name(name)
+

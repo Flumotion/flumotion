@@ -1,5 +1,9 @@
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/fvumeter.py: 
+	* flumotion/ui/fgtk.py:
+	Fixup imports in these two files, oops.
+
 	* flumotion/component/effects/volume/admin_gtk.py:
 	* flumotion/test/test_ui_fgtk.py:
 	* flumotion/ui/Makefile.am:

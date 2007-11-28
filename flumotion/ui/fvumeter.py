@@ -20,6 +20,10 @@
 # Headers in this file shall remain intact.
 #
 
+import gobject
+import gtk
+from gtk import gdk
+
 # this VUMeter respects IEC standard
 # BS 6840-18:1996/IEC-268-18
 # and is inspired by JACK's meterbridge dpm_meters.c
@@ -229,5 +233,5 @@ class FVUMeter(gtk.DrawingArea):
             self.topborder + int(vumeter_height / 2 - layout_height / 2),
             layout)
 
-pygobject.type_register(FVUMeter)
+gobject.type_register(FVUMeter)
 
