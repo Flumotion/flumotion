@@ -9,12 +9,12 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-11-27 16:54+0100\n"
-"PO-Revision-Date: 2007-11-26 11:40+0000\n"
+"PO-Revision-Date: 2007-11-28 15:54+0100\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: flumotion/manager/manager.py:392
 #, python-format
@@ -543,11 +543,9 @@ msgstr "%s, %s (%d/%d relación de aspecto del pixel)"
 
 #: flumotion/wizard/configurationwizard.py:216
 #: flumotion/wizard/basesteps.py:159
-#, fuzzy, python-format
+#, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "\"Worker\" '%s' está dejando el elemento de GStremaer '%s'."
-msgstr[1] "\"Worker\" '%s' está dejando el elemento de GStremaer '%s'."
+msgstr "\"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
 
 #: flumotion/wizard/configurationwizard.py:221
 msgid ""
@@ -738,11 +736,9 @@ msgid "%s can be translated"
 msgstr "%s puede ser transladado"
 
 #: flumotion/test/test_common_messages.py:75
-#, fuzzy, python-format
+#, python-format
 msgid "%s %d has %d thing"
-msgid_plural "%s %d has %d things"
-msgstr[0] "%s %d tiene algo %d"
-msgstr[1] "%s %d tiene algo %d"
+msgstr "%s %d tiene %d"
 
 #: flumotion/test/test_common_messages.py:102
 msgid "Something is really wrong. "
@@ -766,18 +762,14 @@ msgid "I am a translated string"
 msgstr "Soy una cadena traducida"
 
 #: flumotion/test/test_i18n.py:104 flumotion/test/test_i18n.py:109
-#, fuzzy, python-format
+#, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] "Puedo traducir la cosa %d"
-msgstr[1] "Puedo traducir la cosa %d"
+msgstr "Puedo traducir %d"
 
 #: flumotion/test/test_i18n.py:107 flumotion/test/test_i18n.py:111
-#, fuzzy, python-format
+#, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] "Traduje la cosa %d"
-msgstr[1] "Traduje la cosa %d"
+msgstr "Traduje %d"
 
 #: flumotion/admin/admin.py:391
 msgid "Internal error in component."
@@ -1419,28 +1411,24 @@ msgstr ""
 "Comercial"
 
 #: data/glade/authenticate.glade:33
-#, fuzzy
 msgid "_Password:"
 msgstr "_Contraseña"
 
 #: data/glade/authenticate.glade:62
-#, fuzzy
 msgid "_Username:"
-msgstr "_Nombre del usuario"
+msgstr "_Nombre de usuario"
 
 #: data/glade/authenticate.glade:91
-#, fuzzy
 msgid "_Method:"
-msgstr "_Umbral:"
+msgstr "_Método:"
 
 #: data/glade/authenticate.glade:171
 msgid "Name and Password"
 msgstr "Nombre y contraseña"
 
 #: data/glade/open-connection.glade:33
-#, fuzzy
 msgid "_Host:"
-msgstr "_Host"
+msgstr "_Servidor"
 
 #: data/glade/open-connection.glade:62 data/glade/wizard_http.glade:33
 #: data/glade/wizard_shout2.glade:38
