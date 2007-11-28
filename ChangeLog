@@ -1,3 +1,9 @@
+2007-11-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/combiners/switch/switch.py:
+	  First steps towards making switch work again (it still doesn't work, but
+	  some bits are cleaned up?)
+
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py (WebcamStep._run_checks.errback): 

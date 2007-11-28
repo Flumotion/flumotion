@@ -127,9 +127,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # in the watchdogs if the starting state is backup
         self._started = True
 
+    #FIXME: This is bitrotten
     def eaterSetActive(self, feedId):
         # need to just set _started to True if False and mood is happy
-        feedcomponent.MultiInputParseLaunchComponent.eaterSetActive(self, feedId)
+        feedcomponent.MultiInputParseLaunchComponent.eaterSetActive(
+            self, feedId)
         if not self._started and moods.get(self.getMood()) == moods.happy:
             self._started = True
 
@@ -170,7 +172,6 @@ class SingleSwitch(Switch):
     logCategory = "comb-single-switch"
 
     def init(self):
-        Switch.init(self)
         self.switchElement = None
         # eater name -> name of sink pad on switch element
         self.switchPads = {}
@@ -190,8 +191,10 @@ class SingleSwitch(Switch):
         self.switchElement = sw = pipeline.get_by_name("switch")
         # figure out the pads connected for the eaters
         padPeers = {} # padName -> peer element name
+        # FIXME: this is bitrotten
         for sinkPadNumber in range(0, len(self.eaters)):
-            self.debug("sink pad %d %r", sinkPadNumber, sw.get_pad("sink%d" % sinkPadNumber))
+            self.debug("sink pad %d %r", sinkPadNumber, 
+                sw.get_pad("sink%d" % sinkPadNumber))
             self.debug("peer pad %r", sw.get_pad("sink%d" % (
                 sinkPadNumber)).get_peer())
             padPeers["sink%d" % sinkPadNumber] = sw.get_pad("sink%d" % (
@@ -230,6 +233,7 @@ class SingleSwitch(Switch):
                 "is not active." % (eater, eater))
         return False
 
+    #FIXME: bitrotten
     def eaterSetActive(self, feedId):
         Switch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
@@ -242,7 +246,6 @@ class AVSwitch(Switch):
     logCategory = "comb-av-switch"
 
     def init(self):
-        Switch.init(self)
         self.audioSwitchElement = None
         self.videoSwitchElement = None
         # eater name -> name of sink pad on switch element
@@ -264,9 +267,11 @@ class AVSwitch(Switch):
             videoParams["video-width"] = props.get("video-width", None)
             videoParams["video-height"] = props.get("video-height", None)
             videoParams["video-framerate"] = props.get("video-framerate", None)
-            videoParams["video-pixel-aspect-ratio"] = props.get("video-pixel-aspect-ratio", None)
+            videoParams["video-pixel-aspect-ratio"] = props.get(
+                "video-pixel-aspect-ratio", None)
             audioParams["audio-channels"] = props.get("audio-channels", None)
-            audioParams["audio-samplerate"] = props.get("audio-samplerate", None)
+            audioParams["audio-samplerate"] = props.get(
+                "audio-samplerate", None)
 
             nonExistantVideoParams = []
             existsVideoParam = False
@@ -307,7 +312,6 @@ class AVSwitch(Switch):
         return d
 
     def get_pipeline_string(self, properties):
-        eaters = self.eater_names
         videoForceCapsTemplate = ""
         audioForceCapsTemplate = ""
         if properties.get("video-width", None):
@@ -335,12 +339,13 @@ class AVSwitch(Switch):
             "identity silent=true single-segment=true name=viden " \
             "switch name=aswitch ! " \
             "identity silent=true single-segment=true name=aiden "
-        for eater in eaters:
-            if "video" in eater:
-                tmpl = '@ eater:%%(eaterName)s @ ! %s vswitch. ' % videoForceCapsTemplate
-            if "audio" in eater:
-                tmpl = '@ eater:%%(eaterName)s @ ! %s aswitch. ' % audioForceCapsTemplate
-            pipeline += tmpl % dict(eaterName=eater)
+        for eaterAlias in self.eaters:
+            if "video" in eaterAlias:
+                pipeline += '@ eater:%s @ ! %s vswitch. ' % (
+                    eaterAlias, videoForceCapsTemplate)
+            if "audio" in eaterAlias:
+                pipeline += '@ eater:%s @ ! %s aswitch. ' % (
+                    eaterAlias, audioForceCapsTemplate)
 
         pipeline += 'viden. ! @feeder:video@ aiden. ! @feeder:audio@'
         return pipeline
@@ -353,27 +358,26 @@ class AVSwitch(Switch):
         # 1 + number of eaters with eaterName *-backup
         numVideoPads = 1 + len(self.config["eater"]["video-backup"])
         numAudioPads = 1 + len(self.config["eater"]["audio-backup"])
-        padPeers = {} # (padName, switchElement) -> peer element name
+        padPeers = {} # peer element name -> (switchSinkPadName, switchElement)
         for sinkPadNumber in range(0, numVideoPads):
-            padPeers[("sink%d" % sinkPadNumber, vsw)] = \
-                vsw.get_pad("sink%d" % (
-                sinkPadNumber)).get_peer().get_parent().get_name()
+            padPeers[vsw.get_pad("sink%d" % (
+                    sinkPadNumber)).get_peer().get_parent().get_name()] = \
+                ("sink%d" % sinkPadNumber, vsw)
         for sinkPadNumber in range(0, numAudioPads):
-            padPeers[("sink%d" % sinkPadNumber, asw)] = \
-                asw.get_pad("sink%d" % (
-                sinkPadNumber)).get_peer().get_parent().get_name()
+            padPeers[asw.get_pad("sink%d" % (
+                    sinkPadNumber)).get_peer().get_parent().get_name()] = \
+                ("sink%d" % sinkPadNumber, asw)
 
-        for feedId in self.eater_names:
-            eaterName = self.get_eater_name_for_feed_id(feedId)
-            self.debug("feedId %s is mapped to eater name %s", feedId,
-                eaterName)
-            if eaterName:
-                for sinkPadName, switchElement in padPeers:
-                    if feedId in padPeers[(sinkPadName, switchElement)]:
-                        self.switchPads[eaterName] = sinkPadName
-                if not self.switchPads.has_key(eaterName):
-                    self.warning("could not find sink pad for eater %s",
-                        eaterName )
+        # Figure out for each eater what switch sink pad is associated.
+        for eaterAlias in self.eaters:
+            # The eater depayloader is linked to our switch.
+            peer = self.eaters[eaterAlias].depayName
+            if peer in padPeers:
+                self.switchPads[eaterAlias] = padPeers[peer]
+            else:
+                self.warning("could not find sink pad for eater %s",
+                             eaterAlias)
+
         # make sure switch has the correct sink pad as active
         self.debug("Setting video switch's active-pad to %s",
             self.switchPads["video-%s" % self._idealEater])
@@ -596,6 +600,7 @@ class AVSwitch(Switch):
             self.eaterSwitchingTo = None
             self._switchLock.release()
 
+    #FIXME: bitrotten
     def eaterSetActive(self, feedId):
         Switch.eaterSetActive(self, feedId)
         eaterName = self.get_eater_name_for_feed_id(feedId)
