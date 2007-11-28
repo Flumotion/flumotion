@@ -44,20 +44,18 @@ class FComboBox(gtk.ComboBox):
 
     _column_types = str, str, int
 
-    def __len__(self):
-        return len(self.get_model())
-
-    def get_column_content(self, column):
-        i = self.get_active_iter()
-        if i:
-            model = self.get_model()
-            return model.get(i, column)[0]
+    #
+    # Public API
+    #
 
     def get_text(self):
-        return self.get_column_content(self.COLUMN_NICK)
+        return self._get_column_content(self.COLUMN_NICK)
 
     def get_string(self):
-        return self.get_column_content(self.COLUMN_NAME)
+        return self._get_column_content(self.COLUMN_NAME)
+
+    def get_value(self):
+        return self._get_column_content(self.COLUMN_VALUE)
 
     def get_int(self):
         """
@@ -67,9 +65,6 @@ class FComboBox(gtk.ComboBox):
         if s:
             return int(s)
         return -1
-
-    def get_value(self):
-        return self.get_column_content(self.COLUMN_VALUE)
 
     def get_enum(self):
         # FIXME: EVIL, this should not return an integer as a fallback,
@@ -137,6 +132,13 @@ class FComboBox(gtk.ComboBox):
             value = self.enum_class.get(value)
         return value
 
+    def get_state(self):
+        return self.get_enum()
+
+    #
+    # Private
+    #
+
     def _init_enum_model(self):
         # give ourselves a fresh enum_model
         model = gtk.ListStore(*self._column_types)
@@ -147,8 +149,13 @@ class FComboBox(gtk.ComboBox):
         self.add_attribute(cell, 'text', 0)
         return model
 
-    def get_state(self):
-        return self.get_enum()
+    def _get_column_content(self, column):
+        i = self.get_active_iter()
+        if i:
+            model = self.get_model()
+            return model.get(i, column)[0]
+
+
 pygobject.type_register(FComboBox)
 
 class FEntry(gtk.Entry):

@@ -1,5 +1,9 @@
 2007-11-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/fgtk.py (FComboBox._get_column_content): Mark as private
+	(FComboBox.__len__) Remove,
+	Reorganize method order
+
 	* data/glade/videotest.glade:
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_disk.glade:
