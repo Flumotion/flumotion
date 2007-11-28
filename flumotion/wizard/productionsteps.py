@@ -330,7 +330,7 @@ class WebcamStep(VideoSourceStep):
 
     def _run_checks(self):
         if self._in_setup:
-            yield None
+            return None
 
         self.wizard.block_next(True)
 
@@ -341,13 +341,16 @@ class WebcamStep(VideoSourceStep):
         self.wizard.add_msg(msg)
         d = self.run_in_worker('flumotion.worker.checks.video', 'checkWebcam',
                            device, id='webcam-check')
-        yield d
-        try:
-            result = d.value()
 
+        def errback(failure):
+            failure.trap(errors.RemoteRunFailure)
+            self.debug('a RemoteRunFailure happened')
+            self._clear()
+
+        def deviceFound(result):
             if not result:
                 self.debug('no device %s' % device)
-                yield None
+                return None
 
             deviceName, factoryName, sizes = result
             self._factoryName = factoryName
@@ -363,10 +366,9 @@ class WebcamStep(VideoSourceStep):
                 store.append(['%d x %d' % (w,h), w, h])
             self.combobox_size.set_model(store)
             self.combobox_size.set_active(0)
-        except errors.RemoteRunFailure, e:
-            self.debug('a RemoteRunFailure happened')
-            self._clear()
-    _run_checks = defer_generator_method(_run_checks)
+
+        d.addCallback(deviceFound)
+        d.addErrback(errback)
 
     # Callbacks
 

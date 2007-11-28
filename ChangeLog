@@ -1,3 +1,8 @@
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py (WebcamStep._run_checks.errback): 
+	Get rid of a defer generator method
+
 2007-11-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion.doap: Update for release.
