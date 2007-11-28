@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-27 16:54+0100\n"
-"PO-Revision-Date: 2007-11-28 15:54+0100\n"
+"POT-Creation-Date: 2007-11-28 16:01+0100\n"
+"PO-Revision-Date: 2007-11-28 16:22+0100\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -246,7 +246,7 @@ msgstr ""
 "Error leyendo el fichero ical %s, así que no se puede programar ningún "
 "evento."
 
-#: flumotion/component/combiners/switch/switch.py:285
+#: flumotion/component/combiners/switch/switch.py:290
 #, python-format
 msgid ""
 "Video parameter(s) were specified but not all. Missing parameters are: %r"
@@ -254,7 +254,7 @@ msgstr ""
 "El/los parámetro/s de video fueron especificados, pero no todos. Los "
 "parámetros pendientes son: %r"
 
-#: flumotion/component/combiners/switch/switch.py:301
+#: flumotion/component/combiners/switch/switch.py:306
 #, python-format
 msgid ""
 "Audio parameter(s) were specified but not all. Missing parameters are: %r"
@@ -262,7 +262,7 @@ msgstr ""
 "El/los parámetro/s de Audio fueron especificados, pero no todos. Los "
 "parámetros pendientes son: %r"
 
-#: flumotion/component/combiners/switch/switch.py:440
+#: flumotion/component/combiners/switch/switch.py:444
 #, python-format
 msgid ""
 "Could not switch to %s because at least one of the %s eaters is not active."
@@ -270,7 +270,7 @@ msgstr ""
 "No puedo pasar a %s debido a que al menos uno de los %s \"eaters\" no está "
 "activo."
 
-#: flumotion/component/combiners/switch/switch.py:449
+#: flumotion/component/combiners/switch/switch.py:453
 #, python-format
 msgid "Could not switch to %s because startTimes is %r."
 msgstr "No puedo pasar a %s debido a que startTimes es %r."
@@ -483,34 +483,155 @@ msgstr "\"Eater\" <b>%s</b>"
 msgid "%d units"
 msgstr "%d unidades"
 
-#: flumotion/component/effects/volume/admin_gtk.py:104
+#: flumotion/component/effects/volume/admin_gtk.py:102
 msgid "Left channel level:"
 msgstr "Nivel del canal izquierdo:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:106
+#: flumotion/component/effects/volume/admin_gtk.py:104
 msgid "Mono channel level:"
 msgstr "Nivel del canal mono:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:108
+#: flumotion/component/effects/volume/admin_gtk.py:106
 msgid "Right channel level:"
 msgstr "Nivel del canal derecho:"
 
-#: flumotion/component/effects/volume/admin_gtk.py:110
+#: flumotion/component/effects/volume/admin_gtk.py:108
 #, python-format
 msgid "Channel %d level:"
 msgstr "Nivel del canal %d:"
 
-#: flumotion/wizard/enums.py:83
+#: flumotion/wizard/enums.py:36
+msgid "Test video source"
+msgstr "Fuente del video de prueba"
+
+#: flumotion/wizard/enums.py:37
+msgid "Web camera"
+msgstr "Cámara web"
+
+#: flumotion/wizard/enums.py:38
+msgid "TV card"
+msgstr "Tarjeta de TV"
+
+#: flumotion/wizard/enums.py:39
+msgid "Firewire video"
+msgstr "Video Firewire"
+
+#: flumotion/wizard/enums.py:62
+msgid "Test audio source"
+msgstr "Fuente de audio de prueba"
+
+#: flumotion/wizard/enums.py:63
+msgid "Sound card"
+msgstr "Tarjeta de sonido"
+
+#: flumotion/wizard/enums.py:64
+msgid "Firewire audio"
+msgstr "Audio Firewire"
+
+#: flumotion/wizard/enums.py:89
+msgid "Composite"
+msgstr "Compuesto"
+
+#: flumotion/wizard/enums.py:89
+msgid "RCA"
+msgstr ""
+
+#: flumotion/wizard/enums.py:99
 msgid "SMPTE Color bars"
 msgstr "Barras de color SMPTE"
 
-#: flumotion/wizard/enums.py:84
+#: flumotion/wizard/enums.py:100
 msgid "Random (television snow)"
 msgstr "Aleatorio (nieve de la televisión)"
 
-#: flumotion/wizard/enums.py:85
+#: flumotion/wizard/enums.py:101
 msgid "Totally black"
 msgstr "Totalmente negro"
+
+#: flumotion/wizard/enums.py:106
+msgid "YUV"
+msgstr ""
+
+#: flumotion/wizard/enums.py:106
+msgid "RGB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:140
+msgid "Line in"
+msgstr "Entrada"
+
+#: flumotion/wizard/enums.py:141
+msgid "Microphone"
+msgstr "Micrófono"
+
+#: flumotion/wizard/enums.py:142
+msgid "CD"
+msgstr ""
+
+#: flumotion/wizard/enums.py:147
+msgid "Stereo"
+msgstr "Estéreo"
+
+#: flumotion/wizard/enums.py:147
+msgid "Mono"
+msgstr "Mono"
+
+#: flumotion/wizard/enums.py:163
+msgid "16-bit"
+msgstr ""
+
+#: flumotion/wizard/enums.py:164
+msgid "8-bit"
+msgstr ""
+
+#: flumotion/wizard/enums.py:173
+msgid "Ogg"
+msgstr ""
+
+#: flumotion/wizard/enums.py:173
+msgid "Multipart"
+msgstr ""
+
+#: flumotion/wizard/enums.py:201
+msgid "minute(s)"
+msgstr "Minuto(s)"
+
+#: flumotion/wizard/enums.py:202
+msgid "hour(s)"
+msgstr "hora(s)"
+
+#: flumotion/wizard/enums.py:203
+msgid "day(s)"
+msgstr "día(s)"
+
+#: flumotion/wizard/enums.py:204
+msgid "week(s)"
+msgstr "semana(s)"
+
+#: flumotion/wizard/enums.py:212
+msgid "kB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "MB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "GB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:212
+msgid "TB"
+msgstr ""
+
+#: flumotion/wizard/enums.py:221
+msgid "Creative Commons"
+msgstr "Creative Commons"
+""
+
+#: flumotion/wizard/enums.py:222
+msgid "Commercial"
+msgstr "Comercial"
 
 #: flumotion/wizard/productionsteps.py:150
 msgid "If you want to stream video"
@@ -524,19 +645,19 @@ msgstr "Si desea un flujo de audio"
 msgid "Probing webcam, this can take a while..."
 msgstr "Probando la \"webcam\". Esto podría llevar un rato..."
 
-#: flumotion/wizard/productionsteps.py:534
-#: flumotion/wizard/productionsteps.py:851
+#: flumotion/wizard/productionsteps.py:536
+#: flumotion/wizard/productionsteps.py:853
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d relación de aspecto del pixel"
 
-#: flumotion/wizard/productionsteps.py:540
-#: flumotion/wizard/productionsteps.py:857
+#: flumotion/wizard/productionsteps.py:542
+#: flumotion/wizard/productionsteps.py:859
 msgid "Checking for Firewire device..."
 msgstr "Comprobando el dispositivo Firewire..."
 
-#: flumotion/wizard/productionsteps.py:615
-#: flumotion/wizard/productionsteps.py:929
+#: flumotion/wizard/productionsteps.py:617
+#: flumotion/wizard/productionsteps.py:931
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d relación de aspecto del pixel)"
@@ -545,7 +666,7 @@ msgstr "%s, %s (%d/%d relación de aspecto del pixel)"
 #: flumotion/wizard/basesteps.py:159
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgstr "\"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
+msgstr "El \"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
 
 #: flumotion/wizard/configurationwizard.py:221
 msgid ""
@@ -1194,23 +1315,23 @@ msgstr "Recargando el código del %s"
 msgid "window1"
 msgstr "ventana1"
 
-#: data/glade/wizard_smoke.glade:31
+#: data/glade/wizard_smoke.glade:33
 msgid "M_inimum quality:"
 msgstr "Calidad _mínima:"
 
-#: data/glade/wizard_smoke.glade:56
+#: data/glade/wizard_smoke.glade:62
 msgid "M_aximum quality:"
 msgstr "Calidad má_xima:"
 
-#: data/glade/wizard_smoke.glade:81
+#: data/glade/wizard_smoke.glade:91
 msgid "_Threshold:"
 msgstr "_Umbral:"
 
-#: data/glade/wizard_smoke.glade:106
+#: data/glade/wizard_smoke.glade:120
 msgid "_Keyframe spacing: every"
 msgstr "_Distancia del fotograma clave: cada"
 
-#: data/glade/wizard_smoke.glade:268 data/glade/wizard_theora.glade:184
+#: data/glade/wizard_smoke.glade:294 data/glade/wizard_theora.glade:184
 msgid "frames"
 msgstr "fotogramas"
 
@@ -1230,81 +1351,39 @@ msgstr ""
 "Este asistente le guiará a través de los pasos necesarios para ayudarle a "
 "configurar su servidor de \"streaming\"."
 
-#: data/glade/wizard_source.glade:32 data/glade/wizard_encoding.glade:126
+#: data/glade/wizard_source.glade:80 data/glade/wizard_encoding.glade:142
 msgid "_Audio:"
 msgstr "_Audio:"
 
-#: data/glade/wizard_source.glade:53
-msgid ""
-"TV Card\n"
-"Firewire \n"
-"Webcam\n"
-"Test"
-msgstr ""
-"Tarjeta de TV\n"
-"FireWire\n"
-"Webcam\n"
-"Test"
-
-#: data/glade/wizard_source.glade:72
-msgid ""
-"Firewire\n"
-"Sound card\n"
-"Test"
-msgstr ""
-"FireWire\n"
-"Tarjeta de sonido\n"
-"Test"
-
-#: data/glade/wizard_source.glade:91 data/glade/wizard_encoding.glade:101
+#: data/glade/wizard_source.glade:117 data/glade/wizard_encoding.glade:113
 msgid "_Video:"
 msgstr "_Video:"
 
-#: data/glade/wizard_tvcard.glade:37
-msgid ""
-"Television\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
-msgstr ""
-"Televisión\n"
-"Compuesto 1\n"
-"S-Video\n"
-"Compuesto 3"
-
-#: data/glade/wizard_tvcard.glade:55
-msgid ""
-"Composite\n"
-"RCA"
-msgstr ""
-"Compuesto\n"
-"RCA"
-
-#: data/glade/wizard_tvcard.glade:71 data/glade/videotest.glade:60
-#: data/glade/wizard_testsource.glade:32
+#: data/glade/wizard_tvcard.glade:65 data/glade/videotest.glade:60
+#: data/glade/wizard_testsource.glade:33
 msgid "_Width:"
 msgstr "_Ancho:"
 
-#: data/glade/wizard_tvcard.glade:96 data/glade/videotest.glade:85
-#: data/glade/wizard_testsource.glade:61
+#: data/glade/wizard_tvcard.glade:90 data/glade/videotest.glade:85
+#: data/glade/wizard_testsource.glade:62
 msgid "_Height:"
 msgstr "Al_to:"
 
-#: data/glade/wizard_tvcard.glade:167 data/glade/wizard_webcam.glade:79
-#: data/glade/wizard_testsource.glade:90
+#: data/glade/wizard_tvcard.glade:161 data/glade/wizard_webcam.glade:78
+#: data/glade/wizard_testsource.glade:91
 msgid "F_ramerate:"
 msgstr "Tasa de fotogramas:"
 
-#: data/glade/wizard_tvcard.glade:214
+#: data/glade/wizard_tvcard.glade:208
 msgid "Video _source:"
 msgstr "Fuente de _video:"
 
-#: data/glade/wizard_tvcard.glade:238
+#: data/glade/wizard_tvcard.glade:232
 msgid "TV _norm:"
 msgstr "_Norma de TV:"
 
-#: data/glade/wizard_tvcard.glade:262 data/glade/wizard_webcam.glade:33
-#: data/glade/wizard_soundcard.glade:31
+#: data/glade/wizard_tvcard.glade:256 data/glade/wizard_webcam.glade:33
+#: data/glade/wizard_soundcard.glade:33
 msgid "_Device:"
 msgstr "_Dispositivo:"
 
@@ -1319,7 +1398,7 @@ msgid "Bit _rate:"
 msgstr "Tasa de _transferencia:"
 
 #: data/glade/wizard_theora.glade:123 data/glade/wizard_vorbis.glade:123
-#: data/glade/wizard_jpeg.glade:31
+#: data/glade/wizard_jpeg.glade:33
 msgid "_Quality:"
 msgstr "_Calidad:"
 
@@ -1351,32 +1430,24 @@ msgstr "<b>Opciones</b>"
 msgid "_Framerate:"
 msgstr "Tasa de fotogramas:"
 
-#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:76
-#: data/glade/wizard_testsource.glade:119
+#: data/glade/videotest.glade:135 data/glade/wizard_encoding.glade:84
+#: data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
 msgstr "F_ormato:"
 
-#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:148
+#: data/glade/videotest.glade:159 data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
 msgstr "_Patrón:"
-
-#: data/glade/videotest.glade:183 data/glade/wizard_testsource.glade:177
-msgid ""
-"Snow\n"
-"Black"
-msgstr ""
-"Nieve\n"
-"Negro"
 
 #: data/glade/connections.glade:78
 msgid "Clear _All"
 msgstr "Despejar _ Todos"
 
-#: data/glade/wizard_webcam.glade:107
+#: data/glade/wizard_webcam.glade:106
 msgid "_Size:"
 msgstr "_Tamaño:"
 
-#: data/glade/wizard_webcam.glade:135 data/glade/wizard_soundcard.glade:291
+#: data/glade/wizard_webcam.glade:134 data/glade/wizard_soundcard.glade:306
 msgid "Name:"
 msgstr "Nombre"
 
@@ -1400,16 +1471,6 @@ msgstr "Mostrar _logos en la esquina inferior derecha "
 msgid "Specify _license:"
 msgstr "Especificar _ la licencia:"
 
-#: data/glade/wizard_license.glade:53
-msgid ""
-"Creative Commons\n"
-"GNU FDL\n"
-"Commercial"
-msgstr ""
-"Creative Commons\n"
-"GNU FDL\n"
-"Comercial"
-
 #: data/glade/authenticate.glade:33
 msgid "_Password:"
 msgstr "_Contraseña"
@@ -1431,7 +1492,7 @@ msgid "_Host:"
 msgstr "_Servidor"
 
 #: data/glade/open-connection.glade:62 data/glade/wizard_http.glade:33
-#: data/glade/wizard_shout2.glade:38
+#: data/glade/wizard_shout2.glade:39
 msgid "_Port:"
 msgstr "_Puerto:"
 
@@ -1478,69 +1539,49 @@ msgstr ""
 "Cuando presione \"Aplicar\", su configuración será cargada automáticamente "
 "en su red. Esto tardará un poco."
 
-#: data/glade/wizard_soundcard.glade:56
+#: data/glade/wizard_soundcard.glade:62
 msgid "_Input:"
 msgstr "_Entrada:"
 
-#: data/glade/wizard_soundcard.glade:81
+#: data/glade/wizard_soundcard.glade:91
 msgid "_Channels:"
 msgstr "_Canales:"
 
-#: data/glade/wizard_soundcard.glade:106
+#: data/glade/wizard_soundcard.glade:120
 msgid "Sample _rate:"
 msgstr "Tasa de muestreo:"
 
-#: data/glade/wizard_soundcard.glade:131
+#: data/glade/wizard_soundcard.glade:149
 msgid "Bi_t depth:"
 msgstr "Profundidad de bi_t:"
 
-#: data/glade/wizard_soundcard.glade:156
-msgid ""
-"Line in\n"
-"Microphone\n"
-"CD"
-msgstr ""
-"Entrada\n"
-"Microfono\n"
-"CD"
-
-#: data/glade/wizard_soundcard.glade:174
-msgid ""
-"Stereo\n"
-"Mono\n"
-"5.1"
-msgstr ""
-"Estéreo\n"
-"Mono\n"
-"5.1"
-
-#: data/glade/wizard_soundcard.glade:248
+#: data/glade/wizard_soundcard.glade:260
 msgid "Sound _system:"
 msgstr "Sistema de sonido"
 
-#: data/glade/wizard_http.glade:128
+#: data/glade/wizard_http.glade:106
 msgid "Mbit/s"
 msgstr "Mbit/s"
 
-#: data/glade/wizard_http.glade:156
+#: data/glade/wizard_http.glade:134
 msgid "clients"
 msgstr "clientes"
 
-#: data/glade/wizard_http.glade:184 data/glade/wizard_shout2.glade:85
+#: data/glade/wizard_http.glade:162 data/glade/wizard_shout2.glade:68
 msgid "_Mount point:"
 msgstr "_Punto de anclaje:"
 
-#: data/glade/wizard_http.glade:237
-msgid "Bu_rst on connect"
-msgstr "_Ráfaga de conexión"
-
-#: data/glade/wizard_http.glade:259
+#: data/glade/wizard_http.glade:204
 msgid "User limit:"
 msgstr "_Límite del usuario:"
 
-#: data/glade/wizard_http.glade:282
+#: data/glade/wizard_http.glade:241
 msgid "Bandwidth limit:"
 msgstr "Límite en el ancho de banda: "
+
+#: data/glade/wizard_http.glade:278
+msgid "Bu_rst on connect"
+msgstr "_Ráfaga de conexión"
 
 #: data/glade/greeter-initial.glade:29
 msgid "_Open recent connection"
@@ -1588,89 +1629,75 @@ msgstr "Flujo hacia _Icecast2"
 msgid "<b>Preview</b>"
 msgstr "<b>Previsualizar</b>"
 
-#: data/glade/wizard_jpeg.glade:56 data/glade/wizard_firewire.glade:448
+#: data/glade/wizard_jpeg.glade:62 data/glade/wizard_firewire.glade:447
 msgid "Frame _rate:"
 msgstr "Tasa de _fotogramas:"
 
-#: data/glade/wizard_jpeg.glade:149
+#: data/glade/wizard_jpeg.glade:163
 msgid "frames/s"
 msgstr "fotogramas/s"
 
-#: data/glade/wizard_disk.glade:38
+#: data/glade/wizard_disk.glade:39
 msgid "_Choose location:"
 msgstr "_Elija una localización:"
 
-#: data/glade/wizard_disk.glade:119
-msgid ""
-"minute\n"
-"hour\n"
-"day\n"
-"week\n"
-"month"
-msgstr ""
-"minuto\n"
-"hora\n"
-"día\n"
-"semana\n"
-"mes"
+#: data/glade/wizard_disk.glade:245
+msgid "_Rotate entry every:"
+msgstr "_Rotar la entrada cada:"
 
-#: data/glade/wizard_disk.glade:236
-msgid "_Rotate entry every"
-msgstr "_Rotar la entrada cada"
-
-#: data/glade/wizard_disk.glade:259
+#: data/glade/wizard_disk.glade:270
 msgid "Record at startup"
 msgstr "Grabar al inicio"
 
-#: data/glade/wizard_audiotest.glade:31
+#: data/glade/wizard_audiotest.glade:33
 msgid "_Volume:"
 msgstr "_Volumen:"
 
-#: data/glade/wizard_audiotest.glade:56
+#: data/glade/wizard_audiotest.glade:62
 msgid "_Sample rate:"
 msgstr "_Tasa de muestreo:"
 
-#: data/glade/wizard_audiotest.glade:81
+#: data/glade/wizard_audiotest.glade:91
 msgid "F_requency:"
 msgstr "F_recuencia:"
 
-#: data/glade/wizard_shout2.glade:115
+#: data/glade/wizard_shout2.glade:102
 msgid "/demo.ogg"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:132
-msgid "P_assword"
-msgstr "_Contraseña"
+#: data/glade/wizard_shout2.glade:119
+msgid "P_assword:"
+msgstr "_Contraseña:"
 
-#: data/glade/wizard_shout2.glade:161
+#: data/glade/wizard_shout2.glade:152
 msgid "hackme"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:178
-msgid "_IP"
-msgstr ""
+#: data/glade/wizard_shout2.glade:169
+msgid "_Hostname:"
+msgstr "_Servidor:"
 
-#: data/glade/wizard_shout2.glade:207
+#: data/glade/wizard_shout2.glade:202
 msgid "127.0.0.1"
 msgstr ""
 
-#: data/glade/wizard_shout2.glade:224
-msgid "_Name"
-msgstr "Nombre"
+#: data/glade/wizard_shout2.glade:219
+msgid "_Name:"
+msgstr "Nombre:"
 
-#: data/glade/wizard_shout2.glade:270
-msgid "_Description"
-msgstr "_Descripcción"
+#: data/glade/wizard_shout2.glade:269
+msgid "_Description:"
+msgstr "_Descripcción:"
 
-#: data/glade/wizard_shout2.glade:316
-msgid "_URL"
-msgstr ""
+#: data/glade/wizard_shout2.glade:319
+msgid "_URL:"
+msgstr "_URL:"
 
 #: data/glade/wizard_firewire.glade:55
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 tasa de aspecto del pixel)"
 
-#: data/glade/wizard_firewire.glade:77 data/glade/wizard_firewire.glade:522
+#: data/glade/wizard_firewire.glade:77 data/glade/wizard_firewire.glade:521
 msgid "<b>Camera settings</b>"
 msgstr "<b>Ajustes de la cámara</b>"
 
@@ -1686,37 +1713,100 @@ msgstr "Recomendado si está visualizando en un monitor de ordenador"
 msgid "Convert to s_quare pixels"
 msgstr "Convertir a pixels _cuadrados"
 
-#: data/glade/wizard_firewire.glade:221
+#: data/glade/wizard_firewire.glade:220
 msgid "<b>Scaling</b>"
 msgstr "<b>Escalando</b>"
 
-#: data/glade/wizard_firewire.glade:298
+#: data/glade/wizard_firewire.glade:297
 msgid "_No width correction"
 msgstr "_Sin corrección de ancho"
 
-#: data/glade/wizard_firewire.glade:321
+#: data/glade/wizard_firewire.glade:320
 msgid "_Stretch to multiple of 8 pixels"
 msgstr "_Estirar a un múltiplo de 8 pixels"
 
-#: data/glade/wizard_firewire.glade:345
+#: data/glade/wizard_firewire.glade:344
 msgid "_Pad to multiple of 8 pixels"
 msgstr "_Rellenar al múltiplo de 8 pixeles"
 
-#: data/glade/wizard_firewire.glade:379
+#: data/glade/wizard_firewire.glade:378
 msgid "<b>Width correction</b>"
 msgstr "<b>Corrección del ancho</b>"
 
-#: data/glade/wizard_firewire.glade:493
+#: data/glade/wizard_firewire.glade:492
 msgid "frames per second"
 msgstr "Fotogramas por segundo"
 
-#: data/glade/wizard_firewire.glade:573
+#: data/glade/wizard_firewire.glade:572
 msgid "none"
 msgstr "nada"
 
-#: data/glade/wizard_firewire.glade:595
+#: data/glade/wizard_firewire.glade:594
 msgid "<b>Output format</b>"
 msgstr "<b>Formato de salida</b>"
+
+#~ msgid ""
+#~ "TV Card\n"
+#~ "Firewire \n"
+#~ "Webcam\n"
+#~ "Test"
+#~ msgstr ""
+#~ "Tarjeta de TV\n"
+#~ "FireWire\n"
+#~ "Webcam\n"
+#~ "Test"
+
+#~ msgid ""
+#~ "Firewire\n"
+#~ "Sound card\n"
+#~ "Test"
+#~ msgstr ""
+#~ "FireWire\n"
+#~ "Tarjeta de sonido\n"
+#~ "Test"
+
+#~ msgid ""
+#~ "Television\n"
+#~ "Composite1\n"
+#~ "S-Video\n"
+#~ "Composite3"
+#~ msgstr ""
+#~ "Televisión\n"
+#~ "Compuesto 1\n"
+#~ "S-Video\n"
+#~ "Compuesto 3"
+
+#~ msgid ""
+#~ "Snow\n"
+#~ "Black"
+#~ msgstr ""
+#~ "Nieve\n"
+#~ "Negro"
+
+#~ msgid ""
+#~ "Stereo\n"
+#~ "Mono\n"
+#~ "5.1"
+#~ msgstr ""
+#~ "Estéreo\n"
+#~ "Mono\n"
+#~ "5.1"
+
+#~ msgid ""
+#~ "minute\n"
+#~ "hour\n"
+#~ "day\n"
+#~ "week\n"
+#~ "month"
+#~ msgstr ""
+#~ "minuto\n"
+#~ "hora\n"
+#~ "día\n"
+#~ "semana\n"
+#~ "mes"
+
+#~ msgid "_Name"
+#~ msgstr "Nombre"
 
 #~ msgid "_Authentication Method"
 #~ msgstr "_Método de Autenticación"
@@ -1804,9 +1894,6 @@ msgstr "<b>Formato de salida</b>"
 
 #~ msgid "Bit rate:"
 #~ msgstr "Tasa de transferencia:"
-
-#~ msgid "Web URL:"
-#~ msgstr "URL de la Web:"
 
 #~ msgid "Average bitrate:"
 #~ msgstr "Promedio de transferencia:"
