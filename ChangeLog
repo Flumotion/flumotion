@@ -10,7 +10,8 @@
 	* data/glade/wizard_soundcard.glade:
 	* data/glade/wizard_source.glade:
 	* data/glade/wizard_testsource.glade:
-	Set label/checkbutton alignments, table width
+	Set label/checkbutton alignments, table width,
+	do not expand port spinbuttons
 	
 	* po/sv.po: Update swedish translation
 
