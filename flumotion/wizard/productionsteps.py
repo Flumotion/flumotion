@@ -28,6 +28,7 @@ from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_
 from flumotion.common.python import sorted
+from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WorkerWizardStep, \
     AudioSourceStep, VideoSourceStep
 from flumotion.wizard.enums import AudioDevice, \
@@ -54,6 +55,8 @@ def _fraction_from_float(number, denominator):
 
 
 class ProductionStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
+
     glade_file = 'wizard_source.glade'
     name = 'Source'
     section = 'Production'
@@ -88,7 +91,7 @@ class ProductionStep(WorkerWizardStep):
         @returns: video step
         @rtype: a L{VideoSourceStep} subclass
         """
-        source = self.combobox_video.get_active()
+        source = self.combobox_video.get_selected()
         if source == VideoDevice.Test:
             step_class = TestVideoSourceStep
         elif source == VideoDevice.Webcam:
@@ -108,7 +111,7 @@ class ProductionStep(WorkerWizardStep):
         @returns: audio step
         @rtype: a L{AudioSourceStep} subclass
         """
-        source = self.combobox_audio.get_active()
+        source = self.combobox_audio.get_selected()
         if source == AudioDevice.Test:
             step_class = TestAudioSourceStep
         elif source == AudioDevice.Soundcard:
@@ -135,6 +138,14 @@ class ProductionStep(WorkerWizardStep):
         else:
             raise AssertionError
 
+    def get_state(self):
+        return {
+            'audio': self.combobox_audio.get_selected(),
+            'video': self.combobox_video.get_selected(),
+            'has-audio': self.checkbutton_has_audio.get_active(),
+            'has-video': self.checkbutton_has_video.get_active(),
+            }
+
     # Private API
 
     def _setup(self):
@@ -150,9 +161,6 @@ class ProductionStep(WorkerWizardStep):
                      _('If you want to stream video'))
         tips.set_tip(self.checkbutton_has_audio,
                      _('If you want to stream audio'))
-
-        self.combobox_video.set_active(VideoDevice.Test)
-        self.combobox_audio.set_active(AudioDevice.Test)
 
     def _verify(self):
         # FIXME: We should wait for the first worker to connect before

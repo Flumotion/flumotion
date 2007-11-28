@@ -25,6 +25,7 @@ from flumotion.common.log import safeprintf
 
 # Keep in sync with configure.ac
 PYGTK_REQ = (2, 8, 4)
+KIWI_REQ = (1, 9, 13)
 
 GST_REQ = {'0.10': {'gstreamer': (0, 10, 0, 1),
                     'gst-python': (0, 10, 0, 1)}}
@@ -117,6 +118,18 @@ def init_gst():
                              '(looking for versions %r)' % (GST_REQ.keys(),))
 
     return gst_majorminor
+
+def init_kiwi():
+    try:
+        from kiwi.__version__ import version as kiwi_version
+    except ImportError:
+        return False
+
+    if kiwi_version < KIWI_REQ:
+        raise SystemExit('ERROR: Kiwi %s or higher is required'
+                         % '.'.join(map(str, KIWI_REQ)))
+
+    return True
 
 USE_GOPTION_PARSER = False
 def init_option_parser(gtk, gst):

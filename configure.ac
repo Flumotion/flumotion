@@ -6,7 +6,8 @@ AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
-dnl keep in sync with flumotion/common/boot.py
+dnl keep in sync with flumotion/common/boot.py and
+dnl                   flumotion.spec.in
 AC_SUBST(PYGTK_010_REQ, 2.8.4)
 AC_SUBST(PYGST_010_REQ, 0.10.0)
 AC_SUBST(GST_010_REQ, 0.10.0.1)
@@ -60,9 +61,13 @@ dnl check for pygtk
 AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject()])
 
-dnl check for gstreamer
+dnl check for gstreamer and gst-python
 AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])
+
+dnl check for kiwi
+AS_PYTHON_IMPORT(kiwi,,AC_MSG_ERROR([kiwi found or too old]),,
+    [from flumotion.common import boot; boot.init_kiwi()])
 
 PYTHONPATH=$as_save_PYTHONPATH
 export PYTHONPATH

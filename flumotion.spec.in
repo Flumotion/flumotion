@@ -1,7 +1,8 @@
 %define         gst_minver      0.10.10
 %define         gstpb_minver    0.10.10
 %define         gstpy_minver    0.10.4
-%define         pygtk_minver    2.8.0
+%define         pygtk_minver    2.8.4
+%define         kiwi_minver     1.9.13
 
 %{!?gstreamer:  %define         gstreamer       gstreamer}
 
@@ -26,6 +27,7 @@ Requires:	python-imaging
 Requires:	pyOpenSSL
 Requires:	pkgconfig
 Requires:       python-crypto
+Requires:	python-kiwi >= %{kiwi_minver}
 
 # for make-dummy-cert to work
 Requires(post):	openssl
@@ -38,6 +40,7 @@ BuildRequires:	python-twisted-web
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel
+Requires:	python-kiwi >= %{kiwi_minver}
 
 # docs
 BuildRequires:	epydoc
@@ -258,6 +261,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Wed Nov 28 2007 Johan Dahlin <johan at gnome dot org>
+- Add kiwi dependency and bump pygtk to 2.8.4
+
 * Fri Aug 24 2007 Zaheer Abbas Merali <zaheerabbas at merali dot org>
 - Add flumotion-nagios
 

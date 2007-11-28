@@ -25,6 +25,8 @@ I am a collection of extended GTK widgets for use in Flumotion.
 
 import gobject
 import gtk
+from kiwi.ui.widgets.checkbutton import ProxyCheckButton
+from kiwi.ui.widgets.combo import ProxyComboBox
 
 from flumotion.common import enum, pygobject
 
@@ -154,6 +156,23 @@ class FComboBox(gtk.ComboBox):
 
 pygobject.type_register(FComboBox)
 
+class FProxyComboBox(ProxyComboBox):
+    def set_enum(self, enum_class, value_filter=()):
+        """
+        Set the given enum_class on the combobox.
+        As a side effect, this makes the combobox an enum-based one.
+        This also sets the combobox to the first enum value.
+        """
+
+        values = []
+        for enum in enum_class:
+            # If values are specified, filter them out
+            if value_filter and not enum in value_filter:
+                continue
+            values.append((enum.nick, enum))
+        self.prefill(values)
+
+
 class FEntry(gtk.Entry):
     def get_state(self):
         return self.get_text()
@@ -190,7 +209,7 @@ class WidgetMapping:
               'GtkComboBox': FComboBox,
               'GtkEntry': FEntry,
               'GtkRadioButton': FRadioButton,
-              'GtkSpinButton': FSpinButton
+              'GtkSpinButton': FSpinButton,
             }
 
     def __getitem__(self, name):
@@ -199,3 +218,10 @@ class WidgetMapping:
         else:
             return gobject.type_from_name(name)
 
+
+class ProxyWidgetMapping(WidgetMapping):
+    types = WidgetMapping.types.copy()
+    types.update({
+        'GtkComboBox': FProxyComboBox,
+        'GtkCheckButton': ProxyCheckButton,
+        })

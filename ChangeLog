@@ -1,3 +1,18 @@
+2007-11-28  Johan Dahlin  <johan@gnome.org>
+
+	* README:
+	* configure.ac:
+	* flumotion.spec.in:
+	* flumotion/common/boot.py:
+	Add a dependency on Kiwi 1.9.13
+
+	* flumotion/ui/fgtk.py:
+	Add a ProxyWidgetMapping and a custom subclass of the
+	proxy that can handle flumotion enums
+
+	* flumotion/wizard/productionsteps.py:
+	Use proxy comboboxes in the source step
+
 2007-11-28  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po: 100% traslated 100% to spanish

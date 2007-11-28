@@ -35,6 +35,7 @@ For 0.10.x:
 PyGTK - 2.8.3 or higher
 Python - 2.3 or higher
 Twisted - 2.0.1 or higher
+Kiwi - 1.9.13 or higher
 Python Imaging Library
 
 And depending on what codecs you want to use:
