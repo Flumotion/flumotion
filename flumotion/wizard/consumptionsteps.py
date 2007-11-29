@@ -23,19 +23,20 @@ import gettext
 
 from flumotion.configure import configure
 from flumotion.common.python import any
-from flumotion.wizard.basesteps import WorkerWizardStep
+from flumotion.ui.fgtk import ProxyWidgetMapping
+from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
 from flumotion.wizard.enums import RotateSize, RotateTime
 
 _ = gettext.gettext
 X_ = _
 
 
-class ConsumptionStep(WorkerWizardStep):
+class ConsumptionStep(WizardStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Consumption')
     glade_file = 'wizard_consumption.glade'
     section = _('Consumption')
     icon = 'consumption.png'
-    has_worker = False
 
     # WizardStep
 
@@ -87,6 +88,22 @@ class ConsumptionStep(WorkerWizardStep):
         if stepname in steps:
             step_class = steps[stepname]
             return step_class(self.wizard)
+
+    def get_state(self):
+        return {
+            'disk': self.checkbutton_disk.get_active(),
+            'disk-audio': self.checkbutton_disk_audio.get_active(),
+            'disk-video': self.checkbutton_disk_video.get_active(),
+            'disk-audio-video': self.checkbutton_disk_audio_video.get_active(),
+            'http': self.checkbutton_http.get_active(),
+            'http-audio': self.checkbutton_http_audio.get_active(),
+            'http-video': self.checkbutton_http_video.get_active(),
+            'http-audio-video': self.checkbutton_http_audio_video.get_active(),
+            'shout2': self.checkbutton_shout2.get_active(),
+            'shout2-audio': self.checkbutton_shout2_audio.get_active(),
+            'shout2-video': self.checkbutton_shout2_video.get_active(),
+            'shout2-audio-video': self.checkbutton_shout2_audio_video.get_active(),
+            }
 
     # Private
 
@@ -198,6 +215,7 @@ class ConsumptionStep(WorkerWizardStep):
 
 # XXX: If audio codec is speex, disable java applet option
 class HTTPStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_http.glade'
     section = _('Consumption')
     component_type = 'http-streamer'
@@ -219,18 +237,18 @@ class HTTPStep(WorkerWizardStep):
         d.addCallback(got_missing)
 
     def get_state(self):
-        options = WorkerWizardStep.get_state(self)
-
-        options['bandwidth-limit'] = int(options['bandwidth-limit'] * 1e6)
-        options['client-limit'] = int(options['client-limit'])
+        options = {
+            'mount-point': self.entry_mount_point.get_text(),
+            'burst-on-connect': self.checkbutton_burst_on_connect.get_active(),
+            'port': int(self.spinbutton_port.get_value()),
+            }
 
         if not self.checkbutton_bandwidth_limit.get_active():
-            del options['bandwidth-limit']
+            options['bandwidth-limit'] = int(
+                self.spinbutton_bandwidth_limit.get_value() * 1e6)
         if not self.checkbutton_client_limit.get_active():
-            del options['client-limit']
-
-        options['port'] = int(options['port'])
-
+            options['client-limit'] = int(
+                self.spinbutton_client_limit.get_value())
         return options
 
     def get_next(self):
@@ -277,6 +295,7 @@ class HTTPVideoStep(HTTPStep):
 
 
 class DiskStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_disk.glade'
     section = _('Consumption')
     icon = 'kcmdevices.png'
@@ -288,7 +307,7 @@ class DiskStep(WorkerWizardStep):
         self.combobox_size_list.set_enum(RotateSize)
         self.radiobutton_has_time.set_active(True)
         self.spinbutton_time.set_value(12)
-        self.combobox_time_list.set_active(RotateTime.Hours)
+        self.combobox_time_list.select(RotateTime.Hours)
         self.checkbutton_record_at_startup.set_active(True)
 
     def get_state(self):
@@ -298,12 +317,14 @@ class DiskStep(WorkerWizardStep):
         else:
             if self.radiobutton_has_time:
                 options['rotate-type'] = 'time'
-                unit = self.combobox_time_list.get_enum().unit
-                options['time'] = long(self.spinbutton_time.get_value() * unit)
+                time_value = self.combobox_time_list.get_selected()
+                options['time'] = long(
+                    self.spinbutton_time.get_value() * time_value.unit)
             elif self.radiobutton_has_size:
                 options['rotate-type'] = 'size'
-                unit = self.combobox_size_list.get_enum().unit
-                options['size'] = long(self.spinbutton_size.get_value() * unit)
+                size_value = self.combobox_size_list.get_selected()
+                options['size'] = long(
+                    self.spinbutton_size.get_value() * size_value.unit)
 
         options['directory'] = self.entry_location.get_text()
         options['start-recording'] = \
@@ -363,6 +384,7 @@ class DiskVideoStep(DiskStep):
 
 
 class Shout2Step(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_shout2.glade'
     section = _('Consumption')
     component_type = 'shout2'
@@ -376,9 +398,15 @@ class Shout2Step(WorkerWizardStep):
         return self.wizard.get_step(_('Consumption')).get_next(self)
 
     def get_state(self):
-        options = WorkerWizardStep.get_state(self)
-
-        options['port'] = int(options['port'])
+        options = {
+            'short-name': self.entry_short_name.get_text(),
+            'description': self.entry_description.get_text(),
+            'url': self.entry_url.get_text(),
+            'ip': self.entry_ip.get_text(),
+            'mount-point': self.entry_mount_point.get_text(),
+            'password': self.entry_password.get_text(),
+            'port': int(self.spinbutton_port.get_text())
+            }
 
         for option in options.keys():
             if options[option] == '':

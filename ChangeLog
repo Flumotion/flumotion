@@ -1,5 +1,12 @@
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.before_show_step): 
+	Only do something interesting in workersteps.
+
+	* flumotion/wizard/consumptionsteps.py: 
+	Convert to ProxyWidgetMapping,
+	avoid inheriting workerstep where not necessary
+
 	* flumotion/wizard/basesteps.py (WorkerWizardStep.run_in_worker): 
 	* flumotion/wizard/productionsteps.py: 
 	Move ProxyWidgetMapping to base classes, remove production section

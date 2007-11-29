@@ -158,6 +158,8 @@ class ConfigurationWizard(SectionWizard):
         SectionWizard.run(self, interactive, main)
 
     def before_show_step(self, step):
+        if not isinstance(step, WorkerWizardStep):
+            return
         if step.has_worker:
             self.worker_list.show()
             self.worker_list.notify_selected()
