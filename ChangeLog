@@ -1,3 +1,31 @@
+2007-11-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.configure_pipeline): Populate an internal dict,
+	switchPads, mapping eater aliases to switch elements and the
+	corresponding sink pad. Watch feeds for activity, and set the
+	initially active pads on the switch elements.
+	(Switch.get_switch_elements, SingleSwitch.get_switch_elements)
+	(AVSwitch.get_switch_elements): New vmethod, returns a list of
+	switch elements in the pipeline.
+	(Switch.switch_to): Put a base implementation here. Will need to
+	expand to cover the AVSwitch case.
+	(Switch.eaterSetActive, Switch.eaterSetInactive): Debitrotten.
+	Fold in common functionality from subclasses.
+	(Switch.switch_to_for_event.feed_unavailable): Fix up for name
+	changes.
+	(SingleSwitch): Simplify, all code is in base class now.
+
+	* flumotion/component/padmonitor.py (PadMonitor.addWatch)
+	(PadMonitor.addWatch, PadMonitor.setInactive)
+	(PadMonitor.__init__): Manage a list of functions that can be
+	notified when pads go active or inactive instead of just one pair
+	of functions.
+
+	* flumotion/component/eater.py (Eater.addWatch): New API, takes
+	two functions, which will be called with the eater alias as an
+	argument when an eater goes active or inactive, respectively.
+
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py (FireWireStep): 

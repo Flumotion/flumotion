@@ -59,14 +59,17 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         #               "backup": ["audio-backup", "video-backup"]}
         self.logicalFeeds = {}
 
+        # eater alias -> (sink pad, switch element)
+        self.switchPads = {}
+
         # _idealEater is used to determine what the ideal eater at the current
         # time is.
         self._idealEater = "master"
-        # these deferreds will fire when relevant eaters are ready
-        # usually these will be None, but when a scheduled switch
-        # was requested and the eater wasn't ready, it'll fire when ready
-        # so the switch can be made
-        self._eaterReadyDefers = {}
+
+        # Dict of logical feed name to deferred for feeds that we would
+        # like to switch to, but are waiting for eaters to become
+        # active.
+        self._feedReadyDefers = {}
         self._started = False
 
     def addWarning(self, id, format, *args, **kwargs):
@@ -123,7 +126,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             for alias in aliases:
                 assert alias in self.eaters
             self.logicalFeeds[name] = aliases
-            self._eaterReadyDefers[name] = None
 
         return feedcomponent.MultiInputParseLaunchComponent.create_pipeline()
 
@@ -131,9 +133,46 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         raise errors.NotImplementedError('subclasses should implement '
                                          'get_logical_feeds')
 
-    def switch_to(self, logicalFeed):
+    def configure_pipeline(self, pipeline, properties):
+        def getDownstreamElement(e):
+            for pad in e.pads:
+                if pad.get_direction() is gst.PAD_SRC:
+                    peer = pad.get_peer()
+                    return peer, peer.get_parent()
+            raise AssertionError('failed to find the switch')
+
+        switchElements = self.get_switch_elements(pipeline)
+        for alias in self.eaters:
+            e = pipeline.get_by_name(self.eaters[alias].elementName)
+            pad = None
+            while e not in switchElements:
+                pad, e = getDownstreamElement(e)
+            self.switchPads[alias] = pad, e
+
+        for alias in self.eaters:
+            self.eaters[alias].addWatch(self.eaterSetActive,
+                                        self.eaterSetInactive)
+
+        for alias in self.logicalFeeds[self._idealEater]:
+            pad, e = self.switchPads[alias]
+            e.set_property('active-pad', pad)
+        self.uiState.set("active-eater", self._idealEater)
+
+    def get_switch_elements(self, pipeline):
         raise errors.NotImplementedError('subclasses should implement '
-                                         'switch_to')
+                                         'get_switch_elements')
+
+    def switch_to(self, feed):
+        if self.is_active(feed):
+            for alias in self.logicalFeeds[feed]:
+                pad, e = self.switchPads[alias]
+                e.set_property('active-pad', pad)
+            self.uiState.set("active-eater", feed)
+            return True
+        else:
+            self.warning("Could not switch to %s because the %s eater "
+                         "is not active.", feed, feed)
+            return False
 
     def is_active(self, feed):
         all = lambda seq: reduce(int.__mul__, seq, True)
@@ -146,13 +185,22 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # in the watchdogs if the starting state is backup
         self._started = True
 
-    #FIXME: This is bitrotten
-    def eaterSetActive(self, feedId):
-        # need to just set _started to True if False and mood is happy
-        feedcomponent.MultiInputParseLaunchComponent.eaterSetActive(
-            self, feedId)
+    def eaterSetActive(self, eaterAlias):
         if not self._started and moods.get(self.getMood()) == moods.happy:
+            # need to just set _started to True if False and mood is happy
+            # FIXME: why?
             self._started = True
+
+        for feed, aliases in self.logicalFeeds.items():
+            if (eaterAlias in aliases
+                and feed in self._feedReadyDefers
+                and self.is_active(feed)):
+                d = self._feedReadyDefers.pop(feed)
+                d.callback(True)
+                break
+
+    def eaterSetInactive(self, eaterAlias):
+        pass
 
     def switch_to_for_event(self, feed, started):
         """
@@ -172,10 +220,10 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                          "will switch when %s is back")
             self.addWarning("error-scheduling-event", fmt, feed, feed)
 
-            while self._eaterReadyDefers:
-                self._eaterReadyDefers.pop()
+            while self._feedReadyDefers:
+                self._feedReadyDefers.pop()
 
-            self._eaterReadyDefers[feed] = d2 = defer.Deferred()
+            self._feedReadyDefers[feed] = d2 = defer.Deferred()
             d2.addCallback(lambda x: self.switch_to(feed))
 
         if not self.pipeline:
@@ -191,76 +239,15 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 class SingleSwitch(Switch):
     logCategory = "single-switch"
 
-    def init(self):
-        self.switchElement = None
-        # eater name -> name of sink pad on switch element
-        self.switchPads = {}
-
     def get_logical_feeds(self):
         return {'master': ['master'], 'backup': ['backup']}
 
-    def get_pipeline_string(self, properties):
-        pipeline = "switch name=switch ! " \
-            "identity silent=true single-segment=true name=iden "
+    def get_muxer_string(self, properties):
+        return ("switch name=muxer ! "
+                "identity silent=true single-segment=true name=iden ")
 
-        for eaterAlias in self.eaters:
-            pipeline += '@ eater:%s @ ! switch. ' % (eaterAlias,)
-
-        pipeline += 'iden.'
-
-        return pipeline
-
-    def configure_pipeline(self, pipeline, properties):
-        self.switchElement = sw = pipeline.get_by_name("switch")
-        # figure out the pads connected for the eaters
-        padPeers = {} # padName -> peer element name
-        # FIXME: this is bitrotten
-        for sinkPadNumber in range(0, len(self.eaters)):
-            self.debug("sink pad %d %r", sinkPadNumber, 
-                sw.get_pad("sink%d" % sinkPadNumber))
-            self.debug("peer pad %r", sw.get_pad("sink%d" % (
-                sinkPadNumber)).get_peer())
-            padPeers["sink%d" % sinkPadNumber] = sw.get_pad("sink%d" % (
-                sinkPadNumber)).get_peer().get_parent().get_name()
-
-        for eaterAlias in self.eaters:
-            feedId = self.eaters[eaterAlias].feedId
-            for sinkPad in padPeers:
-                if feedId and feedId in padPeers[sinkPad]:
-                    self.switchPads[eaterAlias] = sinkPad
-            if not eaterAlias in self.switchPads:
-                self.warning("could not find sink pad for eater %s",
-                             eaterAlias)
-        # make sure switch has the correct sink pad as active
-        self.debug("Setting switch's active-pad to %s",
-            self.switchPads[self._idealEater])
-        self.switchElement.set_property("active-pad",
-            self.switchPads[self._idealEater])
-        self.uiState.set("active-eater", self._idealEater)
-
-    def switch_to(self, feed):
-        if not self.switchElement:
-            self.warning("switch_to called with eater %s but before pipeline "
-                "configured")
-            return False
-        if self.is_active(feed):
-            self.switchElement.set_property("active-pad",
-                self.switchPads[feed])
-            self.uiState.set("active-eater", feed)
-            return True
-        else:
-            self.warning("Could not switch to %s because the %s eater "
-                "is not active.", feed, feed)
-        return False
-
-    #FIXME: bitrotten
-    def eaterSetActive(self, feedId):
-        Switch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        d = self._eaterReadyDefers[eaterName]
-        if d:
-            d.callback(True)
-        self._eaterReadyDefers[eaterName] = None
+    def get_switch_elements(self, pipeline):
+        return [pipeline.get_by_name('muxer')]
 
 class AVSwitch(Switch):
     logCategory = "av-switch"
@@ -280,6 +267,12 @@ class AVSwitch(Switch):
     def get_logical_feeds(self):
         return {'master': ['video-master', 'audio-master'],
                 'backup': ['video-backup', 'audio-backup']}
+
+    def get_switch_elements(self, pipeline):
+        # these have to be in the same order as the lists in
+        # get_logical_feeds
+        return [pipeline.get_by_name('vswitch'),
+                pipeline.get_by_name('aswitch')]
 
     def do_check(self):
         d = Switch.do_check(self)
@@ -623,17 +616,3 @@ class AVSwitch(Switch):
                 self.eaterSwitchingTo)
             self.eaterSwitchingTo = None
             self._switchLock.release()
-
-    #FIXME: bitrotten
-    def eaterSetActive(self, feedId):
-        Switch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        d = None
-        if "master" in eaterName and self.is_active("master"):
-            d = self._eaterReadyDefers["master"]
-            self._eaterReadyDefers["master"] = None
-        elif "backup" in eaterName and self.is_active("backup"):
-            d = self._eaterReadyDefers["backup"]
-            self._eaterReadyDefers["backup"] = None
-        if d:
-            d.callback(True)

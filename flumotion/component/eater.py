@@ -133,6 +133,10 @@ class Eater:
     def isActive(self):
         return self._padMonitor and self._padMonitor.isActive()
 
+    def addWatch(self, setActive, setInactive):
+        self._padMonitor.addWatch(lambda _: setActive(self.eaterAlias),
+                                  lambda _: setInactive(self.eaterAlias))
+
     def timestampDiscont(self, seconds, timestamp):
         """
         @param seconds:   discont duration in seconds

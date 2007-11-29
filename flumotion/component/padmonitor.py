@@ -39,8 +39,9 @@ class PadMonitor(log.Loggable):
         self._active = False
         self._first = True
 
-        self._doSetActive = setActive
-        self._doSetInactive = setInactive
+        self._doSetActive = []
+        self._doSetInactive = []
+        self.addWatch(setActive, setInactive)
 
         # This dict sillyness is because python's dict operations are atomic
         # w.r.t. the GIL.
@@ -137,13 +138,19 @@ class PadMonitor(log.Loggable):
                     self.name)
                 self.setActive()
 
+    def addWatch(self, setActive, setInactive):
+        self._doSetActive.append(setActive)
+        self._doSetInactive.append(setInactive)
+
     def setInactive(self):
         self._active = False
-        self._doSetInactive(self.name)
+        for setInactive in self._doSetInactive:
+            setInactive(self.name)
 
     def setActive(self):
         self._active = True
-        self._doSetActive(self.name)
+        for setActive in self._doSetActive:
+            setActive(self.name)
 
 class EaterPadMonitor(PadMonitor):
     def __init__(self, pad, name, setActive, setInactive,
