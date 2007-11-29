@@ -338,7 +338,7 @@ class WebcamStep(VideoSourceStep):
 
         self.wizard.block_next(True)
 
-        device = self.combobox_device.get_string()
+        device = self.combobox_device.get_selected()
         msg = messages.Info(T_(
                 N_("Probing webcam, this can take a while...")),
             id='webcam-check')

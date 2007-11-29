@@ -6,6 +6,8 @@
 	(WebcamStep._run_checks): Catch RemoteRunError and make it impossible
 	to select the device when it does not exist.
 	(TestVideoSourceStep, WebcamStep): use ProxyWidgetMapping
+	(WebcamStep._run_checks): get_string->get_selected, forgot to merge this
+	change from my rejected patch, grr.
 
 2007-11-28  Pedro Gracia  <pedro@flumotion.com>
 
