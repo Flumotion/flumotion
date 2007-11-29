@@ -582,8 +582,8 @@ class FireWireStep(VideoSourceStep):
             self._input_heights = [self._dims[1]/i for i in self._factors]
             self._input_widths = [self._dims[0]/i for i in self._factors]
             values = []
-            for height in self._input_heights:
-                values.append('%d pixels' % height)
+            for i, height in enumerate(self._input_heights):
+                values.append(('%d pixels' % height, i))
             self.combobox_scaled_height.prefill(values)
             self._set_sensitive(True)
             self.on_update_output_format()
@@ -647,7 +647,7 @@ class FireWireStep(VideoSourceStep):
         self.label_camera_settings.set_text(text)
 
         # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_active()
+        self._factor_i = self.combobox_scaled_height.get_selected()
         self._is_square = self.checkbutton_square_pixels.get_active()
 
         self._width_correction = None
@@ -834,6 +834,7 @@ class SoundcardStep(AudioSourceStep):
 
 
 class FireWireAudioStep(AudioSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Firewire audio')
     section = _('Production')
     glade_file = 'wizard_firewire.glade'
@@ -905,17 +906,17 @@ class FireWireAudioStep(AudioSourceStep):
         self.wizard.add_msg(msg)
         d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
             id='firewire-check')
+
         def firewireCheckDone(options):
             self.wizard.clear_msg('firewire-check')
             self._dims = (options['width'], options['height'])
             self._par = options['par']
             self._input_heights = [self._dims[1]/i for i in self._factors]
             self._input_widths = [self._dims[0]/i for i in self._factors]
-            store = gtk.ListStore(str)
-            for i in self._input_heights:
-                store.set(store.append(), 0, '%d pixels' % i)
-            self.combobox_scaled_height.set_model(store)
-            self.combobox_scaled_height.set_active(1)
+            values = []
+            for i, height in enumerate(self._input_heights):
+                values.append(('%d pixels' % height, i))
+            self.combobox_scaled_height.prefill(values)
             self._set_sensitive(True)
             self.on_update_output_format()
         d.addCallback(firewireCheckDone)
@@ -977,7 +978,7 @@ class FireWireAudioStep(AudioSourceStep):
         self.label_camera_settings.set_text(text)
 
         # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_active()
+        self._factor_i = self.combobox_scaled_height.get_selected()
         self._is_square = self.checkbutton_square_pixels.get_active()
 
         self._width_correction = None
