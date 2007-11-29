@@ -256,6 +256,11 @@ class AVSwitch(Switch):
     def init(self):
         self.audioSwitchElement = None
         self.videoSwitchElement = None
+        # property name -> caps property name
+        self.vparms = {'video-width': 'width', 'video-height': 'height',
+                       'framerate': 'framerate', 'pixel-aspect-ratio': 'par'}
+        self.aparms = {'audio-channels': 'channels',
+                       'audio-samplerate': 'samplerate'}
         # eater name -> name of sink pad on switch element
         self.switchPads = {}
         self._startTimes = {}
@@ -284,9 +289,8 @@ class AVSwitch(Switch):
 
     def do_check(self):
         propkeys = sets.Set(self.config['properties'].keys())
-        vparms = sets.Set(('video-width', 'video-height', 'video-framerate',
-                           'video-pixel-aspect-ratio'))
-        aparms = sets.Set(('audio-channels', 'audio-samplerate'))
+        vparms = sets.Set(self.vparms.keys())
+        aparms = sets.Set(self.aparms.keys())
 
         for kind, parms in ('Video', vparms), ('Audio', aparms):
             missing = parms - (propkeys & parms)
@@ -297,42 +301,44 @@ class AVSwitch(Switch):
                               missing)
 
     def get_pipeline_string(self, properties):
-        videoForceCapsTemplate = ""
-        audioForceCapsTemplate = ""
-        if properties.get("video-width", None):
-            width = properties["video-width"]
-            height = properties["video-height"]
-            par = properties["video-pixel-aspect-ratio"]
-            framerate = properties["video-framerate"]
-            videoForceCapsTemplate = \
-                "ffmpegcolorspace ! videorate ! videoscale !" \
-                " capsfilter caps=video/x-raw-yuv,width=%d,height=%d," \
-                "framerate=%d/%d,pixel-aspect-ratio=%d/%d," \
-                "format=(fourcc)I420 " \
-                "name=capsfilter-%%(eaterName)s ! " % (width,
-                height, framerate[0], framerate[1], par[0], par[1])
-        if self.config.get("audio-channels", None):
-            channels = self.config["audio-channels"]
-            samplerate = self.config["audio-samplerate"]
-            audioForceCapsTemplate = \
-                "audioconvert ! audioconvert ! capsfilter caps=" \
-                "audio/x-raw-int,channels=%d,samplerate=%d," \
-                "width=16,depth=16,signed=true " \
-                "name=capsfilter-%%(eaterName)s ! " % (
-                channels, samplerate)
-        pipeline = "switch name=vswitch ! " \
-            "identity silent=true single-segment=true name=viden " \
-            "switch name=aswitch ! " \
-            "identity silent=true single-segment=true name=aiden "
-        for eaterAlias in self.eaters:
-            if "video" in eaterAlias:
-                pipeline += '@ eater:%s @ ! %s vswitch. ' % (
-                    eaterAlias, videoForceCapsTemplate)
-            if "audio" in eaterAlias:
-                pipeline += '@ eater:%s @ ! %s aswitch. ' % (
-                    eaterAlias, audioForceCapsTemplate)
+        def i420caps(framerate, par, width, height):
+            return ("video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d,"
+                    ",pixel-aspect-ratio=%d/%d,format=(fourcc)I420"
+                    % (width, height, framerate[0], framerate[1],
+                       par[0], par[1]))
+            
+        def audiocaps(channels, samplerate):
+            return ("audio/x-raw-int,channels=%d,samplerate=%d,width=16,"
+                    "depth=16,signed=true" % (channels, samplerate))
 
-        pipeline += 'viden. ! @feeder:video@ aiden. ! @feeder:audio@'
+        def props2caps(proc, parms, prefix, suffix=' ! '):
+            kw = dict([(parms[prop], properties[prop])
+                       for prop in properties if prop in parms])
+            if kw:
+                return prefix + proc(**kw) + suffix
+            else:
+                return ''
+
+        vforce = props2caps(i420caps, self.vparms,
+                            "ffmpegcolorspace ! videorate ! videoscale "
+                            "! capsfilter caps=")
+        aforce = props2caps(audiocaps, self.aparms,
+                            "audioconvert ! audioconvert ! capsfilter caps=")
+
+        pipeline = ("switch name=vswitch"
+                    " ! identity silent=true single-segment=true"
+                    " ! @feeder:video@ "
+                    "switch name=aswitch"
+                    "! identity silent=true single-segment=true "
+                    "! @feeder:audio@ ")
+        for alias in self.eaters:
+            if "video" in alias:
+                pipeline += '@eater:%s@ ! %s vswitch. ' % (alias, vforce)
+            elif "audio" in alias:
+                pipeline += '@eater:%s@ ! %s aswitch. ' % (alias, aforce)
+            else:
+                raise AssertionError()
+
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):

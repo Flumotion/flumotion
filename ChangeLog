@@ -17,6 +17,10 @@
 	(SingleSwitch): Simplify, all code is in base class now.
 	(AVSwitch.addError): New helper.
 	(AVSwitch.do_check): Simplify with use of sets.
+	(AVSwitch.init): Store the prop name -> caps prop name mapping on
+	the class.
+	(AVSwitch.get_pipeline_string): Reflagellate to be more
+	entertaining.
 
 	* flumotion/component/padmonitor.py (PadMonitor.addWatch)
 	(PadMonitor.addWatch, PadMonitor.setInactive)
