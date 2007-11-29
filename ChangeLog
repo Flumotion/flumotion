@@ -3,6 +3,8 @@
 	* flumotion/wizard/productionsteps.py 
 	(WebcamStep.on_combobox_size_changed): Set the height to the height 
 	of the selected size and not the width!
+	(WebcamStep._run_checks): Catch RemoteRunError and make it impossible
+	to select the device when it does not exist.
 
 2007-11-28  Pedro Gracia  <pedro@flumotion.com>
 

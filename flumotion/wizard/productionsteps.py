@@ -350,14 +350,20 @@ class WebcamStep(VideoSourceStep):
         d = self.run_in_worker('flumotion.worker.checks.video', 'checkWebcam',
                            device, id='webcam-check')
 
-        def errback(failure):
+        def errRemoteRunFailure(failure):
             failure.trap(errors.RemoteRunFailure)
             self.debug('a RemoteRunFailure happened')
+            self._clear()
+
+        def errRemoteRunError(failure):
+            failure.trap(errors.RemoteRunError)
+            self.debug('a RemoteRunError happened')
             self._clear()
 
         def deviceFound(result):
             if not result:
                 self.debug('no device %s' % device)
+                self._clear()
                 return None
 
             deviceName, factoryName, sizes = result
@@ -376,7 +382,8 @@ class WebcamStep(VideoSourceStep):
             self.combobox_size.set_active(0)
 
         d.addCallback(deviceFound)
-        d.addErrback(errback)
+        d.addErrback(errRemoteRunFailure)
+        d.addErrback(errRemoteRunError)
 
     # Callbacks
 
