@@ -30,8 +30,6 @@ T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
 
 class WorkerWizardStep(WizardStep):
-    # optional
-    has_worker = True
 
     def __init__(self, wizard):
         WizardStep.__init__(self, wizard)

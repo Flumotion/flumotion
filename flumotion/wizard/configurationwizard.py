@@ -28,7 +28,7 @@ from twisted.internet import defer
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
-from flumotion.ui.wizard import SectionWizard
+from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard import save
 from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
@@ -56,12 +56,11 @@ def _fraction_from_float(number, denominator):
     return "%d/%d" % (number * denominator, denominator)
 
 
-class WelcomeStep(WorkerWizardStep):
+class WelcomeStep(WizardStep):
     glade_file = 'wizard_welcome.glade'
     name = _('Welcome')
     section = _('Welcome')
     icon = 'wizard.png'
-    has_worker = False
 
     def before_show(self):
         self.textview_message.realize()
@@ -72,12 +71,11 @@ class WelcomeStep(WorkerWizardStep):
         return None
 
 
-class LicenseStep(WorkerWizardStep):
+class LicenseStep(WizardStep):
     name = _("Content License")
     glade_file = "wizard_license.glade"
     section = _('License')
     icon = 'licenses.png'
-    has_worker = False
 
     # WizardStep
 
@@ -93,12 +91,11 @@ class LicenseStep(WorkerWizardStep):
         self.combobox_license.set_sensitive(button.get_active())
 
 
-class SummaryStep(WorkerWizardStep):
+class SummaryStep(WizardStep):
     name = _("Summary")
     section = _("Summary")
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
-    has_worker = False
     last_step = True
 
     # WizardStep
@@ -132,10 +129,10 @@ class ConfigurationWizard(SectionWizard):
 
         self.flow = Flow("default")
 
-        self.worker_list = WorkerList()
-        self.top_vbox.pack_start(self.worker_list, False, False)
-        self.worker_list.connect('worker-selected',
-                                 self.on_combobox_worker_changed)
+        self._worker_list = WorkerList()
+        self.top_vbox.pack_start(self._worker_list, False, False)
+        self._worker_list.connect('worker-selected',
+                                  self.on_combobox_worker_changed)
 
     # SectionWizard
 
@@ -153,23 +150,21 @@ class ConfigurationWizard(SectionWizard):
 
     def run(self, interactive, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
-        self.worker_list.set_worker_heaven_state(workerHeavenState)
+        self._worker_list.set_worker_heaven_state(workerHeavenState)
 
         SectionWizard.run(self, interactive, main)
 
     def before_show_step(self, step):
-        if not isinstance(step, WorkerWizardStep):
-            return
-        if step.has_worker:
-            self.worker_list.show()
-            self.worker_list.notify_selected()
+        if isinstance(step, WorkerWizardStep):
+            self._worker_list.show()
+            self._worker_list.notify_selected()
         else:
-            self.worker_list.hide()
+            self._worker_list.hide()
 
-        self._setup_worker(step, self.worker_list.get_worker())
+        self._setup_worker(step, self._worker_list.get_worker())
 
     def show_next_step(self, step):
-        self._setup_worker(step, self.worker_list.get_worker())
+        self._setup_worker(step, self._worker_list.get_worker())
         SectionWizard.show_next_step(self, step)
 
     # Public API
@@ -377,10 +372,11 @@ class ConfigurationWizard(SectionWizard):
         if worker:
             self.clear_msg('worker-error')
             self._last_worker = worker
-            if self._current_step:
-                self._setup_worker(self._current_step, worker)
-                self.debug('calling %r.worker_changed' % self._current_step)
-                self._current_step.worker_changed()
+            step = self._current_step
+            if step and isinstance(step, WorkerWizardStep):
+                self._setup_worker(step, worker)
+                self.debug('calling %r.worker_changed' % step)
+                step.worker_changed()
         else:
             msg = messages.Error(T_(
                     N_('All workers have logged out.\n'

@@ -1,5 +1,12 @@
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	Only inherit from WorkerWizardStep when necessary and 
+	mark worker_list as private.
+
+2007-11-29  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/basesteps.py (AudioEncoderStep.get_next): 
 	Use ProxyWidgetMapping
 
