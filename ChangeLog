@@ -1,5 +1,9 @@
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py (TVCardStep.errRemoteRunError): 
+	Remove defer_generator_method, add a probing message like the webcam 
+	component, clear the combos when a device is not found.
+
 	* configure.ac: kiwi not found, not kiwi found when kiwi is not found.
 
 	* flumotion/wizard/productionsteps.py 

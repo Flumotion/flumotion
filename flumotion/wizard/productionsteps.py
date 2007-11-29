@@ -457,30 +457,45 @@ class TVCardStep(VideoSourceStep):
 
     def _run_checks(self):
         if self._in_setup:
-            yield None
+            return None
 
         self.wizard.block_next(True)
 
         device = self.combobox_device.get_string()
         assert device
+        msg = messages.Info(T_(
+            N_("Probing TV-card, this can take a while...")),
+                            id='tvcard-check')
+        self.wizard.add_msg(msg)
         d = self.run_in_worker('flumotion.worker.checks.video', 'checkTVCard',
-                           device, id='tvcard-check')
-        yield d
-        try:
-            value = d.value()
-            if not value:
-                yield None
+                               device, id='tvcard-check')
 
-            deviceName, channels, norms = value
+        def errRemoteRunFailure(failure):
+            failure.trap(errors.RemoteRunFailure)
+            self.debug('a RemoteRunFailure happened')
+            self._clear_combos()
+
+        def errRemoteRunError(failure):
+            failure.trap(errors.RemoteRunError)
+            self.debug('a RemoteRunError happened')
+            self._clear_combos()
+
+        def deviceFound(result):
+            if not result:
+                self._clear_combos()
+                return None
+
+            deviceName, channels, norms = result
             self.wizard.clear_msg('tvcard-check')
             self.wizard.block_next(False)
             self.combobox_tvnorm.set_list(norms)
             self.combobox_tvnorm.set_sensitive(True)
             self.combobox_source.set_list(channels)
             self.combobox_source.set_sensitive(True)
-        except errors.RemoteRunFailure, e:
-            pass
-    _run_checks = defer_generator_method(_run_checks)
+
+        d.addCallback(deviceFound)
+        d.addErrback(errRemoteRunFailure)
+        d.addErrback(errRemoteRunError)
 
     # Callbacks
 
