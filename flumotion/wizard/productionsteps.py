@@ -779,9 +779,16 @@ class SoundcardStep(AudioSourceStep):
             return
         self.wizard.block_next(True)
 
-        system = self.combobox_system.get_selected()
         device = self.combobox_device.get_selected()
+        system = self.combobox_system.get_selected()
         channels = self.combobox_channels.get_selected() or 2
+        assert device
+        assert system
+        assert channels
+        msg = messages.Info(T_(
+            N_("Probing soundcard, this can take a while...")),
+                            id='soundcard-check')
+        self.wizard.add_msg(msg)
         d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
                                system.element_name,
                                device,

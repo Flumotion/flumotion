@@ -4,6 +4,9 @@
 	(SoundcardStep, TestSourceStep): Use ProxyWidgetMapping
 	and refactor away most of the enum usages, avoid catching
 	AttributeError it just leads to hard to find bugs.
+	(SoundcardStep._update_inputs): Add a message saying what's
+	going on when probing soundcard
+
 	* flumotion/wizard/enums.py (SoundcardSystem): Remove a couple of 
 	enum abuses.
 
