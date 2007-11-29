@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import sets
 import threading
 import gst
 
@@ -274,59 +275,26 @@ class AVSwitch(Switch):
         return [pipeline.get_by_name('vswitch'),
                 pipeline.get_by_name('aswitch')]
 
-    def do_check(self):
-        d = Switch.do_check(self)
-        def checkConfig(result):
-            self.debug("checking config")
-            props = self.config['properties']
-            videoParams = {}
-            audioParams = {}
-            videoParams["video-width"] = props.get("video-width", None)
-            videoParams["video-height"] = props.get("video-height", None)
-            videoParams["video-framerate"] = props.get("video-framerate", None)
-            videoParams["video-pixel-aspect-ratio"] = props.get(
-                "video-pixel-aspect-ratio", None)
-            audioParams["audio-channels"] = props.get("audio-channels", None)
-            audioParams["audio-samplerate"] = props.get(
-                "audio-samplerate", None)
+    def addError(self, id, format, *args, **kwargs):
+        self.warning(format, *args)
+        m = messages.Message(messages.ERROR, T_(format, *args),
+                             id=id, **kwargs)
+        self.addMessage(m)
+        raise errors.ComponentSetupHandledError()
 
-            nonExistantVideoParams = []
-            existsVideoParam = False
-            allVideoParams = True
-            for p in videoParams:
-                if videoParams[p] == None:
-                    allVideoParams = False
-                    nonExistantVideoParams.append(p)
-                else:
-                    existsVideoParam = True
-            self.debug("exists video param: %d all: %d nonexistant: %r",
-                existsVideoParam, allVideoParams, nonExistantVideoParams)
-            if not allVideoParams and existsVideoParam:
-                # message
-                m = messages.Error(T_(N_(
-                    "Video parameter(s) were specified but not all. "
-                    "Missing parameters are: %r" % nonExistantVideoParams)),
-                    id="video-params-not-specified")
-                self.addMessage(m)
-            nonExistantAudioParams = []
-            existsAudioParam = False
-            allAudioParams = True
-            for p in audioParams:
-                if audioParams[p] == None:
-                    allAudioParams = False
-                    nonExistantAudioParams.append(p)
-                else:
-                    existsAudioParam = True
-            if not allAudioParams and existsAudioParam:
-                # message
-                m = messages.Error(T_(N_(
-                    "Audio parameter(s) were specified but not all. "
-                    "Missing parameters are: %r" % nonExistantAudioParams)),
-                    id="audio-params-not-specified")
-                self.addMessage(m)
-            return result
-        d.addCallback(checkConfig)
-        return d
+    def do_check(self):
+        propkeys = sets.Set(self.config['properties'].keys())
+        vparms = sets.Set(('video-width', 'video-height', 'video-framerate',
+                           'video-pixel-aspect-ratio'))
+        aparms = sets.Set(('audio-channels', 'audio-samplerate'))
+
+        for kind, parms in ('Video', vparms), ('Audio', aparms):
+            missing = parms - (propkeys & parms)
+            if missing and missing != parms:
+                fmt = N_("%s parameter(s) were specified but not all. "
+                         "Missing parameters are: %r")
+                self.addError("video-params-not-specified", fmt, kind,
+                              missing)
 
     def get_pipeline_string(self, properties):
         videoForceCapsTemplate = ""
