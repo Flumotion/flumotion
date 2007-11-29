@@ -413,6 +413,7 @@ class WebcamStep(VideoSourceStep):
 # apps (and flumotion) talk about "TV Norm" and "source",
 # and channel (corresponding to frequency)
 class TVCardStep(VideoSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('TV Card')
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
@@ -426,10 +427,10 @@ class TVCardStep(VideoSourceStep):
 
     def setup(self):
         self._in_setup = True
-        self.combobox_device.set_list(('/dev/video0',
-                                       '/dev/video1',
-                                       '/dev/video2',
-                                       '/dev/video3'))
+        self.combobox_device.prefill(['/dev/video0',
+                                      '/dev/video1',
+                                      '/dev/video2',
+                                      '/dev/video3'])
         self._in_setup = False
 
     def worker_changed(self):
@@ -438,9 +439,9 @@ class TVCardStep(VideoSourceStep):
 
     def get_state(self):
         options = {}
-        options['device'] = self.combobox_device.get_string()
-        options['signal'] = self.combobox_tvnorm.get_string()
-        options['channel'] = self.combobox_source.get_string()
+        options['device'] = self.combobox_device.get_selected()
+        options['signal'] = self.combobox_tvnorm.get_selected()
+        options['channel'] = self.combobox_source.get_selected()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = \
@@ -461,7 +462,7 @@ class TVCardStep(VideoSourceStep):
 
         self.wizard.block_next(True)
 
-        device = self.combobox_device.get_string()
+        device = self.combobox_device.get_selected()
         assert device
         msg = messages.Info(T_(
             N_("Probing TV-card, this can take a while...")),
@@ -488,9 +489,9 @@ class TVCardStep(VideoSourceStep):
             deviceName, channels, norms = result
             self.wizard.clear_msg('tvcard-check')
             self.wizard.block_next(False)
-            self.combobox_tvnorm.set_list(norms)
+            self.combobox_tvnorm.prefill(norms)
             self.combobox_tvnorm.set_sensitive(True)
-            self.combobox_source.set_list(channels)
+            self.combobox_source.prefill(channels)
             self.combobox_source.set_sensitive(True)
 
         d.addCallback(deviceFound)

@@ -3,6 +3,7 @@
 	* flumotion/wizard/productionsteps.py (TVCardStep.errRemoteRunError): 
 	Remove defer_generator_method, add a probing message like the webcam 
 	component, clear the combos when a device is not found.
+	(TVCardStep): use ProxyWidgetMapping
 
 	* configure.ac: kiwi not found, not kiwi found when kiwi is not found.
 
