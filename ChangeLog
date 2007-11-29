@@ -1,5 +1,8 @@
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/basesteps.py (AudioEncoderStep.get_next): 
+	Use ProxyWidgetMapping
+
 	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.before_show_step): 
 	Only do something interesting in workersteps.
 

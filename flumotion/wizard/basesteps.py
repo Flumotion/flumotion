@@ -97,6 +97,7 @@ class AudioEncoderStep(WorkerWizardStep):
 
 
 class OverlayStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Overlay')
     glade_file = 'wizard_overlay.glade'
     section = _('Production')
@@ -114,17 +115,16 @@ class OverlayStep(WorkerWizardStep):
         self._worker_changed()
 
     def get_state(self):
-        options = WorkerWizardStep.get_state(self)
-        if self.checkbutton_show_logo.get_active():
-            options['show-logo'] = True
+        options = {
+            'show-logo': self.checkbutton_show_logo.get_active(),
+            'show-text': self.checkbutton_show_text.get_active(),
+            'can-overlay': self._can_overlay,
+            'width': self._video_producer.width,
+            'height': self._video_producer.height,
+            }
 
         if self.checkbutton_show_text.get_active():
             options['text'] = self.entry_text.get_text()
-
-        options['can-overlay'] = self._can_overlay
-
-        options['width'] = self._video_producer.width
-        options['height'] = self._video_producer.height
 
         return options
 
