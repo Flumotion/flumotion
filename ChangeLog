@@ -1,3 +1,12 @@
+2007-11-29  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py: 
+	(SoundcardStep, TestSourceStep): Use ProxyWidgetMapping
+	and refactor away most of the enum usages, avoid catching
+	AttributeError it just leads to hard to find bugs.
+	* flumotion/wizard/enums.py (SoundcardSystem): Remove a couple of 
+	enum abuses.
+
 2007-11-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/switch.py

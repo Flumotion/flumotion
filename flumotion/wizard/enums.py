@@ -118,50 +118,8 @@ AudioTestSamplerate = enum.EnumClass(
 
 SoundcardSystem = enum.EnumClass(
     'SoundcardSystem',
-    ['OSS', 'Alsa'],
-    element=['osssrc', 'alsasrc'])
-
-SoundcardOSSDevice = enum.EnumClass(
-    'SoundcardOSSDevice',
-    ['/dev/dsp',
-     '/dev/dsp1',
-     '/dev/dsp2'])
-
-SoundcardAlsaDevice = enum.EnumClass(
-    'SoundcardAlsaDevice', ['hw:0',
-                            'hw:1',
-                            'hw:2'])
-
-SoundcardInput = enum.EnumClass(
-    'SoundcardInput',
-    ['Line in',
-     'Microphone',
-     'CD'],
-    [_('Line in'),
-     _('Microphone'),
-     _('CD')])
-
-SoundcardChannels = enum.EnumClass(
-    'SoundcardChannels',
-    ['Stereo', 'Mono'],
-    [_('Stereo'), _('Mono')],
-    intvalue=[2, 1])
-
-SoundcardSamplerate = enum.EnumClass(
-    'SoundcardSamplerate',
-    ['48000',
-     '44100',
-     '32000',
-     '22050',
-     '16000',
-     '11025',
-     '8000'])
-
-SoundcardBitdepth = enum.EnumClass(
-    'SoundcardBitdepth',
-    ['16', '8'],
-    [_('16-bit'),
-     _('8-bit')])
+    ['Alsa', 'OSS'],
+    element_name=['alsasrc', 'osssrc'])
 
 #
 # Encoding format

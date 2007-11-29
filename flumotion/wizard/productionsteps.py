@@ -31,9 +31,7 @@ from flumotion.common.python import sorted
 from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WorkerWizardStep, \
     AudioSourceStep, VideoSourceStep
-from flumotion.wizard.enums import AudioDevice, \
-    SoundcardBitdepth, SoundcardChannels, SoundcardSystem, \
-    SoundcardAlsaDevice, SoundcardOSSDevice, SoundcardSamplerate, \
+from flumotion.wizard.enums import AudioDevice, SoundcardSystem, \
     AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
@@ -664,6 +662,7 @@ class FireWireStep(VideoSourceStep):
 
 
 class TestAudioSourceStep(AudioSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Test Audio Source')
     glade_file = 'wizard_audiotest.glade'
     section = _('Production')
@@ -681,13 +680,32 @@ class TestAudioSourceStep(AudioSourceStep):
     def get_state(self):
         return dict(frequency=int(self.spinbutton_freq.get_value()),
                     volume=float(self.spinbutton_volume.get_value()),
-                    rate=self.combobox_samplerate.get_int())
+                    rate=int(self.combobox_samplerate.get_selected().name))
 
     def get_next(self):
         return None
 
 
+OSS_DEVICES = ["/dev/dsp",
+               "/dev/dsp1",
+               "/dev/dsp2"]
+ALSA_DEVICES = ['hw:0',
+                'hw:1',
+                'hw:2']
+CHANNELS = [(_('Stereo'), 2),
+            (_('Mono'), 1)]
+BITDEPTHS = [(_('16-bit'), 16),
+             (_('8-bit'), 8)]
+SAMPLE_RATES = [48000,
+                44100,
+                32000,
+                22050,
+                16000,
+                11025,
+                8000]
+
 class SoundcardStep(AudioSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Soundcard')
     glade_file = 'wizard_soundcard.glade'
     section = _('Production')
@@ -705,6 +723,9 @@ class SoundcardStep(AudioSourceStep):
         # trigger the callback
         self._block_update = True
         self.combobox_system.set_enum(SoundcardSystem)
+        self.combobox_channels.prefill(CHANNELS)
+        self.combobox_samplerate.prefill([(str(r), r) for r in SAMPLE_RATES])
+        self.combobox_bitdepth.prefill(BITDEPTHS)
         self._block_update = False
 
     def worker_changed(self):
@@ -713,23 +734,13 @@ class SoundcardStep(AudioSourceStep):
         self._update_inputs()
 
     def get_state(self):
-        # FIXME: this can't be called if the soundcard hasn't been probed yet
-        # for example, when going through the testsuite
-        try:
-            channels = self.combobox_channels.get_enum().intvalue
-            element = self.combobox_system.get_enum().element
-            bitdepth = self.combobox_bitdepth.get_string()
-            samplerate = self.combobox_samplerate.get_string()
-            input_track = self.combobox_input.get_string()
-        except AttributeError:
-            # when called without enum setup
-            channels = 0
-            element = "fakesrc"
-            bitdepth = "9"
-            samplerate = "12345"
-            input_track = None
+        channels = self.combobox_channels.get_selected()
+        element = self.combobox_system.get_selected().element_name
+        bitdepth = self.combobox_bitdepth.get_selected()
+        samplerate = self.combobox_samplerate.get_selected()
+        input_track = self.combobox_input.get_selected()
 
-        d = dict(device=self.combobox_device.get_string(),
+        d = dict(device=self.combobox_device.get_selected(),
                  depth=int(bitdepth),
                  rate=int(samplerate),
                  channels=channels)
@@ -747,20 +758,18 @@ class SoundcardStep(AudioSourceStep):
     def _clear_combos(self):
         self.combobox_input.clear()
         self.combobox_input.set_sensitive(False)
-        self.combobox_channels.clear()
         self.combobox_channels.set_sensitive(False)
-        self.combobox_samplerate.clear()
         self.combobox_samplerate.set_sensitive(False)
-        self.combobox_bitdepth.clear()
         self.combobox_bitdepth.set_sensitive(False)
 
     def _update_devices(self):
         self._block_update = True
-        enum = self.combobox_system.get_enum()
+        self.combobox_device.clear()
+        enum = self.combobox_system.get_selected()
         if enum == SoundcardSystem.Alsa:
-            self.combobox_device.set_enum(SoundcardAlsaDevice)
+            self.combobox_device.prefill(ALSA_DEVICES)
         elif enum == SoundcardSystem.OSS:
-            self.combobox_device.set_enum(SoundcardOSSDevice)
+            self.combobox_device.prefill(OSS_DEVICES)
         else:
             raise AssertionError
         self._block_update = False
@@ -770,13 +779,15 @@ class SoundcardStep(AudioSourceStep):
             return
         self.wizard.block_next(True)
 
-        enum = self.combobox_system.get_enum()
-        device = self.combobox_device.get_string()
-        e = self.combobox_channels.get_enum()
-        channels = 2
-        if e: channels = e.intvalue
+        system = self.combobox_system.get_selected()
+        device = self.combobox_device.get_selected()
+        channels = self.combobox_channels.get_selected() or 2
         d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
-                               enum.element, device, channels, id='soundcard-check')
+                               system.element_name,
+                               device,
+                               channels,
+                               id='soundcard-check')
+
         def checkFailed(failure):
             self._clear_combos()
             self.wizard.block_next(True)
@@ -786,20 +797,16 @@ class SoundcardStep(AudioSourceStep):
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
             self._block_update = True
-            self.combobox_channels.set_enum(SoundcardChannels)
             self.combobox_channels.set_sensitive(True)
-            self.combobox_samplerate.set_enum(SoundcardSamplerate)
             self.combobox_samplerate.set_sensitive(True)
-            self.combobox_bitdepth.set_enum(SoundcardBitdepth)
             self.combobox_bitdepth.set_sensitive(True)
+            self.combobox_input.prefill(tracks)
+            self.combobox_input.set_sensitive(bool(tracks))
             self._block_update = False
-
-            self.combobox_input.set_list(tracks)
-            self.combobox_input.set_sensitive(True)
-
 
         d.addCallback(soundcardCheckComplete)
         d.addErrback(checkFailed)
+
         return d
 
     # Callbacks
