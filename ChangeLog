@@ -1,3 +1,8 @@
+2007-11-29  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py (FireWireStep): 
+	Use ProxyWidgetMapping
+
 2007-11-29  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po: 
@@ -9,6 +14,7 @@
 	Remove defer_generator_method, add a probing message like the webcam 
 	component, clear the combos when a device is not found.
 	(TVCardStep): use ProxyWidgetMapping
+	(FireWireStep): Use ProxyWidgetMapping
 
 	* configure.ac: kiwi not found, not kiwi found when kiwi is not found.
 

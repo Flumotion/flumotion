@@ -511,6 +511,7 @@ class TVCardStep(VideoSourceStep):
 
 
 class FireWireStep(VideoSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Firewire')
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
@@ -582,11 +583,10 @@ class FireWireStep(VideoSourceStep):
             self._par = options['par']
             self._input_heights = [self._dims[1]/i for i in self._factors]
             self._input_widths = [self._dims[0]/i for i in self._factors]
-            store = gtk.ListStore(str)
-            for i in self._input_heights:
-                store.set(store.append(), 0, '%d pixels' % i)
-            self.combobox_scaled_height.set_model(store)
-            self.combobox_scaled_height.set_active(1)
+            values = []
+            for height in self._input_heights:
+                values.append('%d pixels' % height)
+            self.combobox_scaled_height.prefill(values)
             self._set_sensitive(True)
             self.on_update_output_format()
         except errors.RemoteRunFailure:
