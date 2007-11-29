@@ -396,7 +396,7 @@ class WebcamStep(VideoSourceStep):
             self.combobox_framerate.set_model(store)
             self.combobox_framerate.set_active(0)
             self.model.width = w
-            self.model.height = w
+            self.model.height = h
 
 
 # note:

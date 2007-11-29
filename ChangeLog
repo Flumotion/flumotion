@@ -1,3 +1,9 @@
+2007-11-29  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py 
+	(WebcamStep.on_combobox_size_changed): Set the height to the height 
+	of the selected size and not the width!
+
 2007-11-28  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/client.py: 
