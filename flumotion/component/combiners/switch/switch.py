@@ -23,7 +23,7 @@ import sets
 import threading
 import gst
 
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 
 from flumotion.common import errors, messages
 from flumotion.common.planet import moods
@@ -33,6 +33,15 @@ from flumotion.component.base import scheduler
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
+
+def withlock(proc, lock):
+    def locking(*args):
+        lock.acquire()
+        try:
+            return proc(*args)
+        finally:
+            lock.release()
+    return locking
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
@@ -63,9 +72,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # eater alias -> (sink pad, switch element)
         self.switchPads = {}
 
-        # _idealEater is used to determine what the ideal eater at the current
-        # time is.
-        self._idealEater = "master"
+        self._switchLock = threading.Lock()
+        self._switchingToFeed = None # with _switchLock
+        self._activeFeed = None
 
         # Dict of logical feed name to deferred for feeds that we would
         # like to switch to, but are waiting for eaters to become
@@ -93,7 +102,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             sched = scheduler.ICalScheduler(open(filename, 'r'))
             sched.subscribe(eventStarted, eventStopped)
             if sched.getCurrentEvents():
-                self._idealEater = "backup"
+                self._switchingToFeed = "backup"
         except ValueError:
             fmt = N_("Error parsing ical file %s, so not scheduling "
                      "any events.")
@@ -122,11 +131,13 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.icalScheduler = self._create_scheduler(icalFileName)
 
     def create_pipeline(self):
-        for name, aliases in self.get_logical_feeds().items():
+        for name, aliases in self.get_logical_feeds():
             assert name not in self.logicalFeeds
             for alias in aliases:
                 assert alias in self.eaters
             self.logicalFeeds[name] = aliases
+            if self._switchingToFeed is None:
+                self._switchingToFeed = name
 
         return feedcomponent.MultiInputParseLaunchComponent.create_pipeline()
 
@@ -154,26 +165,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.eaters[alias].addWatch(self.eaterSetActive,
                                         self.eaterSetInactive)
 
-        for alias in self.logicalFeeds[self._idealEater]:
-            pad, e = self.switchPads[alias]
-            e.set_property('active-pad', pad)
-        self.uiState.set("active-eater", self._idealEater)
+        self.switch_to(self._switchingToFeed, checkActive=False)
 
     def get_switch_elements(self, pipeline):
         raise errors.NotImplementedError('subclasses should implement '
                                          'get_switch_elements')
-
-    def switch_to(self, feed):
-        if self.is_active(feed):
-            for alias in self.logicalFeeds[feed]:
-                pad, e = self.switchPads[alias]
-                e.set_property('active-pad', pad)
-            self.uiState.set("active-eater", feed)
-            return True
-        else:
-            self.warning("Could not switch to %s because the %s eater "
-                         "is not active.", feed, feed)
-            return False
 
     def is_active(self, feed):
         all = lambda seq: reduce(int.__mul__, seq, True)
@@ -232,16 +228,148 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if feed not in self.logicalFeeds:
             self.warning("unknown logical feed: %s", feed)
             return None
-        self._idealEater = feed
         d = defer.maybeDeferred(self.switch_to, feed)
         d.addCallback(switch_to_cb)
+        return d
+
+    # So switching multiple eaters is not that easy.
+    # 
+    # We have to make sure the current segment on both the switch
+    # elements has the same stop value, and the next segment on both to
+    # have the same start value to maintain sync.
+    #
+    # In order to do this:
+    # 1) we need to block all src pads of elements connected
+    #    to the switches' sink pads
+    # 2) we need to set the property "stop-value" on both the
+    #    switches to the highest value of "last-timestamp" on the two
+    #    switches.
+    # 3) the pads should be switched (ie active-pad set) on the two switched
+    # 4) the switch elements should be told to queue buffers coming on their
+    #    active sinkpads by setting the queue-buffers property to TRUE
+    # 5) pad buffer probes should be added to the now active sink pads of the
+    #    switch elements, so that the start value of the enxt new segment can
+    #    be determined
+    # 6) the src pads we blocked in 1) should be unblocked
+    # 7) when both pad probes have fired once, use the lowest timestamp
+    #    received as the start value for the switch elements
+    # 8) set the queue-buffers property on the switch elements to FALSE
+
+    def _prepare_switch(self, feed, checkActive):
+        def setSwitching():
+            if self._switchingToFeed:
+                return False
+            self._switchingToFeed = feed
+        setSwitching = withlock(setSwitching, self._switchLock)
+        
+        if feed == self._activeFeed:
+            self.warning("Feed %s is already active", feed)
+            return False
+        if checkActive and not self.is_active(feed):
+            # setActive/setInactive called from main thread, no chance
+            # for race
+            fmt = N_("Could not switch to %s because at least "
+                     "one of the %s eaters is not active.")
+            self.addWarning('cannot-switch', fmt, feed, feed, priority=40)
+            return False
+        if not setSwitching():
+            self.warning("Switch already in progress")
+            return False
+
+        last_times = []
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            pad.set_blocked_async(True, lambda x, y: None) # (1)
+            last_times.append(e.get_property('last-timestamp'))
+
+        last_time = max(last_times)
+        self.debug('last time = %u', last_time)
+        
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            e.set_property('stop-value', last_time) # (2)
+
+        diff = max(last_times) - min(last_times)
+        if diff > gst.SECOND * 10:
+            fmt = N_("When switching to %s, feed timestamps out of sync"
+                     " by %u")
+            self.addWarning('large-timestamp-difference', fmt, feed,
+                            diff, priority=40)
+
+    def switch_to(self, feed, checkActive=True):
+        if not self._prepare_switch(feed, checkActive):
+            return False
+
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            e.set_property('active-pad', pad) # (3)
+        self.uiState.set("active-eater", feed)
+        self._activeFeed = feed
+
+        return self._finish_switch(feed)
+
+    def _finish_switch(self, feed):
+        def unsetSwitching():
+            assert self._switchingToFeed
+            self._switchingToFeed = None
+        unsetSwitching = withlock(unsetSwitching, self._switchLock)
+
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            e.set_property("queue-buffers", True) # (4)
+
+        self.uiState.set("active-eater", feed)
+
+        def gotStartTimes(startTimes):
+            self.debug("have all start times: %u - %u", min(startTimes),
+                       max(startTimes))
+            for alias in self.logicalFeeds[feed]:
+                pad, e = self.switchPads[alias]
+                e.set_property("start-value", min(startTimes)) # (7)
+                e.set_property("queue-buffers", False) # (8)
+            unsetSwitching()
+            
+        d = self._get_new_start_times(feed) # (4)
+        d.addCallback(gotStartTimes)
+
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            pad.set_blocked_async(False, lambda x, y: None) # (6)
+
+    def _get_new_start_times(self, feed):
+        def buffer_probe(pad, buffer):
+            self.debug("start time buffer probe ts: %u", buffer.timestamp)
+            probe_id = probe_ids.pop(pad, None)
+            if probe_id:
+                pad.remove_buffer_probe(probe_id)
+                times.append(buffer.timestamp)
+                if not probe_ids:
+                    reactor.callFromThread(d.callback, times)
+            else:
+                self.warning("foo!")
+            return True
+        probe_lock = threading.Lock()
+        buffer_probe = withlock(buffer_probe, probe_lock)
+
+        d = defer.Deferred()
+        times = []
+        probe_ids = {}
+
+        self.debug("adding buffer probes here for %s", feed)
+        probe_lock.acquire()
+        for alias in self.logicalFeeds[feed]:
+            pad, e = self.switchPads[alias]
+            probe_ids[pad] = pad.add_buffer_probe(buffer_probe)
+        probe_lock.release()
+
         return d
 
 class SingleSwitch(Switch):
     logCategory = "single-switch"
 
     def get_logical_feeds(self):
-        return {'master': ['master'], 'backup': ['backup']}
+        return [('master', ['master']),
+                ('backup', ['backup'])]
 
     def get_muxer_string(self, properties):
         return ("switch name=muxer ! "
@@ -254,25 +382,15 @@ class AVSwitch(Switch):
     logCategory = "av-switch"
 
     def init(self):
-        self.audioSwitchElement = None
-        self.videoSwitchElement = None
         # property name -> caps property name
         self.vparms = {'video-width': 'width', 'video-height': 'height',
                        'framerate': 'framerate', 'pixel-aspect-ratio': 'par'}
         self.aparms = {'audio-channels': 'channels',
                        'audio-samplerate': 'samplerate'}
-        # eater name -> name of sink pad on switch element
-        self.switchPads = {}
-        self._startTimes = {}
-        self._startTimeProbeIds = {}
-        self._padProbeLock = threading.Lock()
-        self._switchLock = threading.Lock()
-        self.pads_awaiting_block = []
-        self.padsBlockedDefer = None
 
     def get_logical_feeds(self):
-        return {'master': ['video-master', 'audio-master'],
-                'backup': ['video-backup', 'audio-backup']}
+        return [('master', ['video-master', 'audio-master']),
+                ('backup', ['video-backup', 'audio-backup'])]
 
     def get_switch_elements(self, pipeline):
         # these have to be in the same order as the lists in
@@ -340,253 +458,3 @@ class AVSwitch(Switch):
                 raise AssertionError()
 
         return pipeline
-
-    def configure_pipeline(self, pipeline, properties):
-        self.videoSwitchElement = vsw = pipeline.get_by_name("vswitch")
-        self.audioSwitchElement = asw = pipeline.get_by_name("aswitch")
-
-        # figure out how many pads should be connected for the eaters
-        # 1 + number of eaters with eaterName *-backup
-        numVideoPads = 1 + len(self.config["eater"]["video-backup"])
-        numAudioPads = 1 + len(self.config["eater"]["audio-backup"])
-        padPeers = {} # peer element name -> (switchSinkPadName, switchElement)
-        for sinkPadNumber in range(0, numVideoPads):
-            padPeers[vsw.get_pad("sink%d" % (
-                    sinkPadNumber)).get_peer().get_parent().get_name()] = \
-                ("sink%d" % sinkPadNumber, vsw)
-        for sinkPadNumber in range(0, numAudioPads):
-            padPeers[asw.get_pad("sink%d" % (
-                    sinkPadNumber)).get_peer().get_parent().get_name()] = \
-                ("sink%d" % sinkPadNumber, asw)
-
-        # Figure out for each eater what switch sink pad is associated.
-        for eaterAlias in self.eaters:
-            # The eater depayloader is linked to our switch.
-            peer = self.eaters[eaterAlias].depayName
-            if peer in padPeers:
-                self.switchPads[eaterAlias] = padPeers[peer]
-            else:
-                self.warning("could not find sink pad for eater %s",
-                             eaterAlias)
-
-        # make sure switch has the correct sink pad as active
-        self.debug("Setting video switch's active-pad to %s",
-            self.switchPads["video-%s" % self._idealEater])
-        vsw.set_property("active-pad",
-            self.switchPads["video-%s" % self._idealEater])
-        self.debug("Setting audio switch's active-pad to %s",
-            self.switchPads["audio-%s" % self._idealEater])
-        asw.set_property("active-pad",
-            self.switchPads["audio-%s" % self._idealEater])
-        self.uiState.set("active-eater", self._idealEater)
-        self.debug("active-eater set to %s", self._idealEater)
-
-    # So switching audio and video is not that easy
-    # We have to make sure the current segment on both
-    # the audio and video switch element have the same
-    # stop value, and the next segment on both to have
-    # the same start value to maintain sync.
-    # In order to do this:
-    # 1) we need to block all src pads of elements connected
-    #    to the switches' sink pads
-    # 2) we need to set the property "stop-value" on both the
-    #    switches to the highest value of "last-timestamp" on the two
-    #    switches.
-    # 3) the pads should be switched (ie active-pad set) on the two switched
-    # 4) the switch elements should be told to queue buffers coming on their
-    #    active sinkpads by setting the queue-buffers property to TRUE
-    # 5) pad buffer probes should be added to the now active sink pads of the
-    #    switch elements, so that the start value of the enxt new segment can
-    #    be determined
-    # 6) the src pads we blocked in 1) should be unblocked
-    # 7) when both pad probes have fired once, use the lowest timestamp
-    #    received as the start value for the switch elements
-    # 8) set the queue-buffers property on the switch elements to FALSE
-    def switch_to(self, eater):
-        if not (self.videoSwitchElement and self.audioSwitchElement):
-            self.warning("switch_to called with eater %s but before pipeline "
-                "configured")
-            return False
-        if eater not in [ "master", "backup" ]:
-            self.warning("%s is not master or backup", eater)
-            return False
-        if self._switchLock.locked():
-            self.warning("Told to switch to %s while a current switch is going on.", eater)
-            return False
-        # Lock is acquired here and released once buffers are told to queue again
-        self._switchLock.acquire()
-        if self.is_active(eater) and self._startTimes == {} and \
-           self.uiState.get("active-eater") != eater:
-            self._startTimes = {"abc":None}
-            self.padsBlockedDefer = defer.Deferred()
-            self.debug("eaterSwitchingTo switching to %s", eater)
-            self.eaterSwitchingTo = eater
-            self._block_switch_sink_pads(True)
-            return self.padsBlockedDefer
-        else:
-            self._switchLock.release()
-            if self.uiState.get("active-eater") == eater:
-                self.warning("Could not switch to %s because it is already active",
-                    eater)
-            elif self._startTimes == {}:
-                self.warning("Could not switch to %s because at least "
-                    "one of the %s eaters is not active." % (eater, eater))
-                m = messages.Warning(T_(N_(
-                    "Could not switch to %s because at least "
-                    "one of the %s eaters is not active." % (eater, eater))),
-                    id="cannot-switch",
-                    priority=40)
-                self.state.append('messages', m)
-            else:
-                self.warning("Could not switch because startTimes is %r",
-                    self._startTimes)
-                m = messages.Warning(T_(N_(
-                    "Could not switch to %s because "
-                    "startTimes is %r." % (eater, self._startTimes))),
-                    id="cannot-switch",
-                    priority=40)
-                self.state.append('messages', m)
-        return False
-
-    def _set_last_timestamp(self):
-        vswTs = self.videoSwitchElement.get_property("last-timestamp")
-        aswTs = self.audioSwitchElement.get_property("last-timestamp")
-        tsToSet = vswTs
-        if aswTs > vswTs:
-            tsToSet = aswTs
-        self.log("Setting stop-value on video switch to %u",
-            tsToSet)
-        self.log("Setting stop-value on audio switch to %u",
-            tsToSet)
-        self.videoSwitchElement.set_property("stop-value",
-            tsToSet)
-        self.audioSwitchElement.set_property("stop-value",
-            tsToSet)
-        message = None
-        if (aswTs > vswTs) and (aswTs - vswTs > gst.SECOND * 10):
-            message = "When switching to %s the other source's video" \
-                " and audio timestamps differ by %u" % (self.eaterSwitchingTo,
-                aswTs - vswTs)
-        elif (vswTs > aswTs) and (vswTs - aswTs > gst.SECOND * 10):
-            message = "When switching to %s the other source's video" \
-                " and audio timestamps differ by %u" % (self.eaterSwitchingTo,
-                vswTs - aswTs)
-        if message:
-            m = messages.Warning(T_(N_(
-                message)),
-                id="large-timestamp-difference",
-                priority=40)
-            self.state.append('messages', m)
-
-    def _block_cb(self, pad, blocked):
-        self.log("here with pad %r and blocked %d", pad, blocked)
-        if blocked:
-            if not pad in self.pads_awaiting_block:
-                return
-            self.pads_awaiting_block.remove(pad)
-            self.log("Pads awaiting block are: %r", self.pads_awaiting_block)
-
-    def _block_switch_sink_pads(self, block):
-        if block:
-            self.pads_awaiting_block = []
-            for eaterName in self.switchPads:
-                if "audio" in eaterName:
-                    pad = self.audioSwitchElement.get_pad(
-                        self.switchPads[eaterName]).get_peer()
-                else:
-                    pad = self.videoSwitchElement.get_pad(
-                        self.switchPads[eaterName]).get_peer()
-                if pad:
-                    self.pads_awaiting_block.append(pad)
-
-        for eaterName in self.switchPads:
-            if "audio" in eaterName:
-                pad = self.audioSwitchElement.get_pad(
-                    self.switchPads[eaterName]).get_peer()
-            else:
-                pad = self.videoSwitchElement.get_pad(
-                    self.switchPads[eaterName]).get_peer()
-            if pad:
-                self.debug("Pad: %r blocked being set to: %d", pad, block)
-                ret = pad.set_blocked_async(block, self._block_cb)
-                self.debug("Return of pad block is: %d", ret)
-                self.debug("Pad %r is blocked: %d", pad, pad.is_blocked())
-        if block:
-            self.on_pads_blocked()
-
-    def on_pads_blocked(self):
-        eater = self.eaterSwitchingTo
-        if not eater:
-            self.warning("Eaterswitchingto is None, crying time")
-        self.log("Block callback")
-        self._set_last_timestamp()
-        self.videoSwitchElement.set_property("active-pad",
-        self.switchPads["video-%s" % eater])
-        self.audioSwitchElement.set_property("active-pad",
-        self.switchPads["audio-%s" % eater])
-        self.videoSwitchElement.set_property("queue-buffers",
-            True)
-        self.audioSwitchElement.set_property("queue-buffers",
-            True)
-        self.uiState.set("active-eater", eater)
-        self._add_pad_probes_for_start_time(eater)
-        self._block_switch_sink_pads(False)
-        if self.padsBlockedDefer:
-            self.padsBlockedDefer.callback(True)
-        else:
-            self.warning("Our pad block defer is None, inconsistency time to cry")
-        self.padsBlockedDefer = None
-
-    def _add_pad_probes_for_start_time(self, activeEater):
-        self.debug("adding buffer probes here for %s", activeEater)
-        for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
-            if "audio" in eaterName:
-                pad = self.audioSwitchElement.get_pad(
-                    self.switchPads[eaterName])
-            else:
-                pad = self.videoSwitchElement.get_pad(
-                    self.switchPads[eaterName])
-            self._padProbeLock.acquire()
-            self._startTimeProbeIds[eaterName] = pad.add_buffer_probe(
-                self._start_time_buffer_probe, eaterName)
-            self._padProbeLock.release()
-
-    def _start_time_buffer_probe(self, pad, buffer, eaterName):
-        self.debug("start time buffer probe for %s buf ts: %u",
-            eaterName, buffer.timestamp)
-        self._padProbeLock.acquire()
-        if eaterName in self._startTimeProbeIds:
-            self._startTimes[eaterName] = buffer.timestamp
-            pad.remove_buffer_probe(self._startTimeProbeIds[eaterName])
-            del self._startTimeProbeIds[eaterName]
-            self.debug("pad probe for %s", eaterName)
-            self._check_start_times_received()
-        self._padProbeLock.release()
-        return True
-
-    def _check_start_times_received(self):
-        self.debug("here")
-        activeEater = self.uiState.get("active-eater")
-        haveAllStartTimes = True
-        lowestTs = 0
-        for eaterName in ["video-%s" % activeEater, "audio-%s" % activeEater]:
-            haveAllStartTimes = haveAllStartTimes and \
-                (eaterName in self._startTimes)
-            if eaterName in self._startTimes and \
-                (lowestTs == 0 or self._startTimes[eaterName] < lowestTs):
-                lowestTs = self._startTimes[eaterName]
-                self.debug("lowest ts received from buffer probes: %u",
-                    lowestTs)
-
-        if haveAllStartTimes:
-            self.debug("have all start times")
-            self.videoSwitchElement.set_property("start-value", lowestTs)
-            self.audioSwitchElement.set_property("start-value", lowestTs)
-            self._startTimes = {}
-            # we can also turn off the queue-buffers property
-            self.audioSwitchElement.set_property("queue-buffers", False)
-            self.videoSwitchElement.set_property("queue-buffers", False)
-            self.log("eaterSwitchingTo becoming None from %s",
-                self.eaterSwitchingTo)
-            self.eaterSwitchingTo = None
-            self._switchLock.release()

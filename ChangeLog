@@ -1,3 +1,19 @@
+2007-11-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py (withlock): New
+	helper.
+	(Switch.init, Switch._create_scheduler): Change idealEater to
+	_switchingToFeed, protected by the switch lock. The switch lock
+	just protects data, not code.
+	(Switch.create_pipeline, SingleSwitch.get_logical_feeds)
+	(AVSwitch.get_logical_feeds): get_logical_feeds returns a list of
+	tuples now instead of a dict so that it can be in order of
+	preference. Remove some code duplication.
+	(Switch._prepare_switch, Switch.switch_to)
+	(Switch._finish_switch): Rework switching so that it is the same
+	in the single and in the multiple case. Dunno if this is really a
+	good idea though. Untested!
+
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/basesteps.py:
