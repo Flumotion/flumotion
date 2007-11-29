@@ -23,6 +23,7 @@ import gettext
 
 from flumotion.common import messages
 from flumotion.common.messages import N_, ngettext
+from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.wizard import WizardStep
 
 T_ = messages.gettexter('flumotion')
@@ -45,12 +46,15 @@ class WorkerWizardStep(WizardStep):
 
 
 class AudioSourceStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
+    section = _('Production')
     def __init__(self, wizard, model):
         self.model = model
         WorkerWizardStep.__init__(self, wizard)
 
 
 class VideoSourceStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     section = _('Production')
     icon = 'widget_doc.png'
 

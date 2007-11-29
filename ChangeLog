@@ -1,5 +1,10 @@
 2007-11-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/basesteps.py (WorkerWizardStep.run_in_worker): 
+	* flumotion/wizard/productionsteps.py: 
+	Move ProxyWidgetMapping to base classes, remove production section
+	where it is not necessary to specify it.
+	
 	* flumotion/wizard/productionsteps.py: 
 	(SoundcardStep, TestSourceStep): Use ProxyWidgetMapping
 	and refactor away most of the enum usages, avoid catching

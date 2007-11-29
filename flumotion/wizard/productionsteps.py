@@ -218,7 +218,6 @@ class ProductionStep(WorkerWizardStep):
 
 
 class TestVideoSourceStep(VideoSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Test Video Source')
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
@@ -265,7 +264,6 @@ class TestVideoSourceStep(VideoSourceStep):
 
 
 class WebcamStep(VideoSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Webcam')
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
@@ -411,7 +409,6 @@ class WebcamStep(VideoSourceStep):
 # apps (and flumotion) talk about "TV Norm" and "source",
 # and channel (corresponding to frequency)
 class TVCardStep(VideoSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('TV Card')
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
@@ -509,7 +506,6 @@ class TVCardStep(VideoSourceStep):
 
 
 class FireWireStep(VideoSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Firewire')
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
@@ -662,10 +658,8 @@ class FireWireStep(VideoSourceStep):
 
 
 class TestAudioSourceStep(AudioSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Test Audio Source')
     glade_file = 'wizard_audiotest.glade'
-    section = _('Production')
     icon = 'soundcard.png'
 
     # WizardStep
@@ -705,10 +699,8 @@ SAMPLE_RATES = [48000,
                 8000]
 
 class SoundcardStep(AudioSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Soundcard')
     glade_file = 'wizard_soundcard.glade'
-    section = _('Production')
     component_type = 'osssrc'
     icon = 'soundcard.png'
 
@@ -834,12 +826,11 @@ class SoundcardStep(AudioSourceStep):
 
 
 class FireWireAudioStep(AudioSourceStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Firewire audio')
-    section = _('Production')
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
+
     width_corrections = ['none', 'pad', 'stretch']
 
     def __init__(self, wizard, model):
