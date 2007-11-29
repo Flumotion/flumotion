@@ -9,12 +9,12 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-11-28 17:13+0100\n"
-"PO-Revision-Date: 2007-11-28 16:22+0100\n"
+"PO-Revision-Date: 2007-11-29 12:15+0100\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: flumotion/manager/manager.py:392
 #, python-format
@@ -251,6 +251,8 @@ msgid ""
 "An ical file has been specified for scheduling, but the necessary modules "
 "are not installed."
 msgstr ""
+"Un fichero \"ical\" ha sido elegido para la programación, pero los módulos necesarios"
+"no están instalados."
 
 #: flumotion/component/combiners/switch/switch.py:287
 #, python-format
@@ -513,9 +515,8 @@ msgstr "Nivel del canal %d:"
 #: flumotion/wizard/consumptionsteps.py:281
 #: flumotion/wizard/consumptionsteps.py:314
 #: flumotion/wizard/consumptionsteps.py:367 flumotion/wizard/save.py:242
-#, fuzzy
 msgid "Consumption"
-msgstr "_Conección"
+msgstr "_Conexión"
 
 #: flumotion/wizard/consumptionsteps.py:46
 #: flumotion/wizard/consumptionsteps.py:47
@@ -533,99 +534,94 @@ msgstr "_Conección"
 #: flumotion/wizard/conversionsteps.py:136 flumotion/wizard/basesteps.py:128
 #: flumotion/wizard/basesteps.py:129
 msgid "Source"
-msgstr ""
+msgstr "Fuente"
 
 #: flumotion/wizard/consumptionsteps.py:76
 #: flumotion/wizard/consumptionsteps.py:262 flumotion/wizard/save.py:270
 msgid "HTTP Streamer (audio & video)"
-msgstr ""
+msgstr "Flujo de HTTP (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:77
 #: flumotion/wizard/consumptionsteps.py:268 flumotion/wizard/save.py:274
 #: flumotion/wizard/save.py:318
 msgid "HTTP Streamer (audio only)"
-msgstr ""
+msgstr "Flujo de HTTP (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:78
 #: flumotion/wizard/consumptionsteps.py:274 flumotion/wizard/save.py:278
 #: flumotion/wizard/save.py:308
 msgid "HTTP Streamer (video only)"
-msgstr ""
+msgstr "Flujo de HTTP (sólo vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:79
 #: flumotion/wizard/consumptionsteps.py:351 flumotion/wizard/save.py:284
-#, fuzzy
 msgid "Disk (audio & video)"
-msgstr "Audio y Vídeo"
+msgstr "Disco (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:80
 #: flumotion/wizard/consumptionsteps.py:356 flumotion/wizard/save.py:288
 #: flumotion/wizard/save.py:321
-#, fuzzy
 msgid "Disk (audio only)"
-msgstr "Sólo audio"
+msgstr "Disco (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:81
 #: flumotion/wizard/consumptionsteps.py:361 flumotion/wizard/save.py:291
 #: flumotion/wizard/save.py:311
-#, fuzzy
 msgid "Disk (video only)"
-msgstr "Sólo vídeo"
+msgstr "Disco (sólo vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:82
 #: flumotion/wizard/consumptionsteps.py:391 flumotion/wizard/save.py:295
 msgid "Icecast streamer (audio & video)"
-msgstr ""
+msgstr "Flujo Icecast (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:83
 #: flumotion/wizard/consumptionsteps.py:396 flumotion/wizard/save.py:299
 #: flumotion/wizard/save.py:324
 msgid "Icecast streamer (audio only)"
-msgstr ""
+msgstr "Flujo de Icecast (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:84
 #: flumotion/wizard/consumptionsteps.py:401 flumotion/wizard/save.py:303
 #: flumotion/wizard/save.py:314
 msgid "Icecast streamer (video only)"
-msgstr ""
+msgstr "Flujo de Icecast (sólo video)"
 
 #: flumotion/wizard/consumptionsteps.py:263
 msgid "HTTP audio/video"
-msgstr ""
+msgstr "Audio/video HTTP"
 
 #: flumotion/wizard/consumptionsteps.py:269
 msgid "HTTP audio"
-msgstr ""
+msgstr "Audio HTTP"
 
 #: flumotion/wizard/consumptionsteps.py:275
 msgid "HTTP video"
-msgstr ""
+msgstr "Video HTTP"
 
 #: flumotion/wizard/consumptionsteps.py:352
 msgid "Disk audio/video"
-msgstr ""
+msgstr "Audio/video en disco"
 
 #: flumotion/wizard/consumptionsteps.py:357
 msgid "Disk audio"
-msgstr ""
+msgstr "Audio en disco"
 
 #: flumotion/wizard/consumptionsteps.py:362
 msgid "Disk video"
-msgstr ""
+msgstr "Video en disco"
 
 #: flumotion/wizard/consumptionsteps.py:392
 msgid "Icecast audio/video"
-msgstr ""
+msgstr "Audio/vídeo de Icecast"
 
 #: flumotion/wizard/consumptionsteps.py:397
-#, fuzzy
 msgid "Icecast audio"
-msgstr "Fuente de audio de prueba"
+msgstr "Audio de Icecast"
 
 #: flumotion/wizard/consumptionsteps.py:402
-#, fuzzy
 msgid "Icecast video"
-msgstr "Fuente del video de prueba"
+msgstr "Video de Icecast"
 
 #: flumotion/wizard/enums.py:36
 msgid "Test video source"
@@ -661,7 +657,7 @@ msgstr "Compuesto"
 
 #: flumotion/wizard/enums.py:89
 msgid "RCA"
-msgstr ""
+msgstr "RCA"
 
 #: flumotion/wizard/enums.py:99
 msgid "SMPTE Color bars"
@@ -677,11 +673,11 @@ msgstr "Totalmente negro"
 
 #: flumotion/wizard/enums.py:106
 msgid "YUV"
-msgstr ""
+msgstr "YUV"
 
 #: flumotion/wizard/enums.py:106
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: flumotion/wizard/enums.py:140
 msgid "Line in"
@@ -693,7 +689,7 @@ msgstr "Micrófono"
 
 #: flumotion/wizard/enums.py:142
 msgid "CD"
-msgstr ""
+msgstr "CD"
 
 #: flumotion/wizard/enums.py:147
 msgid "Stereo"
@@ -705,19 +701,19 @@ msgstr "Mono"
 
 #: flumotion/wizard/enums.py:163
 msgid "16-bit"
-msgstr ""
+msgstr "16-bit"
 
 #: flumotion/wizard/enums.py:164
 msgid "8-bit"
-msgstr ""
+msgstr "8-bit"
 
 #: flumotion/wizard/enums.py:173
 msgid "Ogg"
-msgstr ""
+msgstr "Ogg"
 
 #: flumotion/wizard/enums.py:173
 msgid "Multipart"
-msgstr ""
+msgstr "Multipart"
 
 #: flumotion/wizard/enums.py:201
 msgid "minute(s)"
@@ -737,19 +733,19 @@ msgstr "semana(s)"
 
 #: flumotion/wizard/enums.py:212
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: flumotion/wizard/enums.py:212
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: flumotion/wizard/enums.py:212
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: flumotion/wizard/enums.py:212
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: flumotion/wizard/enums.py:221
 msgid "Creative Commons"
@@ -762,7 +758,7 @@ msgstr "Comercial"
 #: flumotion/wizard/save.py:131 flumotion/wizard/save.py:206
 #: flumotion/wizard/basesteps.py:96
 msgid "Overlay"
-msgstr ""
+msgstr "Sobreimpresión"
 
 #: flumotion/wizard/save.py:135 flumotion/wizard/save.py:154
 #: flumotion/wizard/save.py:185 flumotion/wizard/save.py:199
@@ -771,16 +767,15 @@ msgstr ""
 #: flumotion/wizard/conversionsteps.py:239
 #: flumotion/wizard/conversionsteps.py:261
 msgid "Encoding"
-msgstr ""
+msgstr "Codificación"
 
 #: flumotion/wizard/save.py:140 flumotion/wizard/configurationwizard.py:76
 msgid "Content License"
-msgstr ""
+msgstr "Licencia del contenido"
 
 #: flumotion/wizard/worker.py:70
-#, fuzzy
 msgid "Worker:"
-msgstr "\"Worker\""
+msgstr "\"Worker\":"
 
 #: flumotion/wizard/productionsteps.py:62
 #: flumotion/wizard/productionsteps.py:647
@@ -788,7 +783,7 @@ msgstr "\"Worker\""
 #: flumotion/wizard/productionsteps.py:802 flumotion/wizard/basesteps.py:54
 #: flumotion/wizard/basesteps.py:98
 msgid "Production"
-msgstr ""
+msgstr "Producción"
 
 #: flumotion/wizard/productionsteps.py:161
 msgid "If you want to stream video"
@@ -799,12 +794,10 @@ msgid "If you want to stream audio"
 msgstr "Si desea un flujo de audio"
 
 #: flumotion/wizard/productionsteps.py:223
-#, fuzzy
 msgid "Test Video Source"
-msgstr "Fuente del video de prueba"
+msgstr "Fuente de video de prueba"
 
 #: flumotion/wizard/productionsteps.py:269
-#, fuzzy
 msgid "Webcam"
 msgstr "Cámara web"
 
@@ -813,14 +806,12 @@ msgid "Probing webcam, this can take a while..."
 msgstr "Probando la \"webcam\". Esto podría llevar un rato..."
 
 #: flumotion/wizard/productionsteps.py:410
-#, fuzzy
 msgid "TV Card"
 msgstr "Tarjeta de TV"
 
 #: flumotion/wizard/productionsteps.py:492
-#, fuzzy
 msgid "Firewire"
-msgstr "Video Firewire"
+msgstr "Firewire"
 
 #: flumotion/wizard/productionsteps.py:544
 #: flumotion/wizard/productionsteps.py:861
@@ -840,76 +831,70 @@ msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d relación de aspecto del pixel)"
 
 #: flumotion/wizard/productionsteps.py:645
-#, fuzzy
 msgid "Test Audio Source"
 msgstr "Fuente de audio de prueba"
 
 #: flumotion/wizard/productionsteps.py:669
-#, fuzzy
 msgid "Soundcard"
 msgstr "Tarjeta de sonido"
 
 #: flumotion/wizard/conversionsteps.py:45
 #: flumotion/wizard/conversionsteps.py:222 flumotion/wizard/basesteps.py:74
 #: flumotion/wizard/basesteps.py:83
-#, fuzzy
 msgid "Conversion"
-msgstr "_Conección"
+msgstr "_Conversión"
 
 #: flumotion/wizard/conversionsteps.py:166
-#, fuzzy
 msgid "Theora encoder"
-msgstr "Recargar _el código"
+msgstr "Codificador de Theora"
 
 #: flumotion/wizard/conversionsteps.py:167
 msgid "Theora"
-msgstr ""
+msgstr "Theora"
 
 #: flumotion/wizard/conversionsteps.py:219
 msgid "Smoke encoder"
-msgstr ""
+msgstr "Codificador Smoke"
 
 #: flumotion/wizard/conversionsteps.py:220
 msgid "Smoke"
-msgstr ""
+msgstr "Smoke"
 
 #: flumotion/wizard/conversionsteps.py:267
 msgid "Vorbis encoder"
-msgstr ""
+msgstr "Codificador Vorbis"
 
 #: flumotion/wizard/conversionsteps.py:268
 msgid "Vorbis"
-msgstr ""
+msgstr "Vorbis"
 
 #: flumotion/wizard/conversionsteps.py:309
 msgid "Speex encoder"
-msgstr ""
+msgstr "Codificador Speex"
 
 #: flumotion/wizard/conversionsteps.py:310
 msgid "Speex"
-msgstr ""
+msgstr "Speex"
 
 #: flumotion/wizard/configurationwizard.py:61
 #: flumotion/wizard/configurationwizard.py:62
 msgid "Welcome"
-msgstr ""
+msgstr "Bienvenido"
 
 #: flumotion/wizard/configurationwizard.py:78
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 #: flumotion/wizard/configurationwizard.py:97
 #: flumotion/wizard/configurationwizard.py:98
 msgid "Summary"
-msgstr ""
+msgstr "Sumario"
 
 #: flumotion/wizard/configurationwizard.py:216
 #: flumotion/wizard/basesteps.py:159
-#, fuzzy, python-format
+#, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "El \"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
-msgstr[1] "El \"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
+msgstr "El \"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
 
 #: flumotion/wizard/configurationwizard.py:221
 msgid ""
@@ -1100,11 +1085,9 @@ msgid "%s can be translated"
 msgstr "%s puede ser transladado"
 
 #: flumotion/test/test_common_messages.py:75
-#, fuzzy, python-format
+#, python-format
 msgid "%s %d has %d thing"
-msgid_plural "%s %d has %d things"
-msgstr[0] "%s %d tiene %d"
-msgstr[1] "%s %d tiene %d"
+msgstr "%s %d tiene %d"
 
 #: flumotion/test/test_common_messages.py:102
 msgid "Something is really wrong. "
@@ -1128,18 +1111,14 @@ msgid "I am a translated string"
 msgstr "Soy una cadena traducida"
 
 #: flumotion/test/test_i18n.py:104 flumotion/test/test_i18n.py:109
-#, fuzzy, python-format
+#, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] "Puedo traducir %d"
-msgstr[1] "Puedo traducir %d"
+msgstr "Puedo traducir %d"
 
 #: flumotion/test/test_i18n.py:107 flumotion/test/test_i18n.py:111
-#, fuzzy, python-format
+#, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] "Traduje %d"
-msgstr[1] "Traduje %d"
+msgstr "Traduje %d"
 
 #: flumotion/admin/admin.py:391
 msgid "Internal error in component."
@@ -1912,7 +1891,7 @@ msgstr "F_recuencia:"
 
 #: data/glade/wizard_shout2.glade:102
 msgid "/demo.ogg"
-msgstr ""
+msgstr "/demo.ogg"
 
 #: data/glade/wizard_shout2.glade:119
 msgid "P_assword:"
@@ -1920,7 +1899,7 @@ msgstr "_Contraseña:"
 
 #: data/glade/wizard_shout2.glade:152
 msgid "hackme"
-msgstr ""
+msgstr "hackme"
 
 #: data/glade/wizard_shout2.glade:169
 msgid "_Hostname:"
@@ -1928,7 +1907,7 @@ msgstr "_Servidor:"
 
 #: data/glade/wizard_shout2.glade:202
 msgid "127.0.0.1"
-msgstr ""
+msgstr "127.0.0.1"
 
 #: data/glade/wizard_shout2.glade:219
 msgid "_Name:"
