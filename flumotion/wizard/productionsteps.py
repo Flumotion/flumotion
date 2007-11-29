@@ -220,6 +220,7 @@ class ProductionStep(WorkerWizardStep):
 
 
 class TestVideoSourceStep(VideoSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Test Video Source')
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
@@ -240,7 +241,7 @@ class TestVideoSourceStep(VideoSourceStep):
         self.wizard.require_elements(self.worker, 'videotestsrc')
 
     def get_state(self):
-        format = self.combobox_format.get_enum()
+        format = self.combobox_format.get_selected()
         options = {}
         if format == VideoTestFormat.YUV:
             options['format'] = 'video/x-raw-yuv'
@@ -249,7 +250,7 @@ class TestVideoSourceStep(VideoSourceStep):
         else:
             raise AssertionError
 
-        options['pattern'] = self.combobox_pattern.get_value()
+        options['pattern'] = self.combobox_pattern.get_selected().value
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = _fraction_from_float(
@@ -266,6 +267,7 @@ class TestVideoSourceStep(VideoSourceStep):
 
 
 class WebcamStep(VideoSourceStep):
+    glade_typedict = ProxyWidgetMapping()
     name = _('Webcam')
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
@@ -282,16 +284,10 @@ class WebcamStep(VideoSourceStep):
 
     def setup(self):
         self._in_setup = True
-        self.combobox_device.set_list(('/dev/video0',
-                                       '/dev/video1',
-                                       '/dev/video2',
-                                       '/dev/video3'))
-        cell = gtk.CellRendererText()
-        self.combobox_size.pack_start(cell, True)
-        self.combobox_size.add_attribute(cell, 'text', 0)
-        cell = gtk.CellRendererText()
-        self.combobox_framerate.pack_start(cell, True)
-        self.combobox_framerate.add_attribute(cell, 'text', 0)
+        self.combobox_device.prefill(['/dev/video0',
+                                      '/dev/video1',
+                                      '/dev/video2',
+                                      '/dev/video3'])
         self._in_setup = False
 
     def worker_changed(self):
@@ -300,25 +296,25 @@ class WebcamStep(VideoSourceStep):
 
     def get_state(self):
         options = {}
-        i = self.combobox_size.get_active_iter()
-        if i:
-            w, h = self.combobox_size.get_model().get(i, 1, 2)
+        size = self.combobox_size.get_selected()
+        if size:
+            w, h = size
         else:
             self.warning('something bad happened: no height/width selected?')
             w, h = 320, 240
-        i = self.combobox_framerate.get_active_iter()
-        if i:
-            d = self.combobox_framerate.get_model().get_value(i, 1)
-            num, denom = d['framerate']
-            mime = d['mime']
-            format = d.get('format', None)
+
+        framerate = self.combobox_framerate.get_selected()
+        if framerate:
+            num, denom = framerate['framerate']
+            mime = framerate['mime']
+            format = framerate.get('format', None)
         else:
             self.warning('something bad happened: no framerate selected?')
             num, denom = 15, 2
             mime = 'video/x-raw-yuv'
             format = None
 
-        options['device'] = self.combobox_device.get_string()
+        options['device'] = self.combobox_device.get_selected()
         options['width'] = w
         options['element-factory'] = self._factoryName
         options['height'] = h
@@ -368,22 +364,35 @@ class WebcamStep(VideoSourceStep):
 
             deviceName, factoryName, sizes = result
             self._factoryName = factoryName
-            self._sizes = sizes
+            self._set_sizes(sizes)
             self.wizard.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
             self.combobox_size.set_sensitive(True)
             self.combobox_framerate.set_sensitive(True)
-            store = gtk.ListStore(str, int, int)
-
-            for w, h in sorted(sizes.keys(), reverse=True):
-                store.append(['%d x %d' % (w,h), w, h])
-            self.combobox_size.set_model(store)
-            self.combobox_size.set_active(0)
 
         d.addCallback(deviceFound)
         d.addErrback(errRemoteRunFailure)
         d.addErrback(errRemoteRunError)
+
+    def _set_sizes(self, sizes):
+        # Set sizes before populating the values, since
+        # it trigger size_changed which depends on this
+        # to be set
+        self._sizes = sizes
+
+        values = []
+        for w, h in sorted(sizes.keys(), reverse=True):
+            values.append(['%d x %d' % (w, h), (w, h)])
+        self.combobox_size.prefill(values)
+
+    def _set_framerates(self, size):
+        values = []
+        for d in self._sizes[size]:
+            num, denom = d['framerate']
+            values.append(('%.2f fps' % (1.0*num/denom), d))
+        self.combobox_framerate.prefill(values)
+        self.model.width, self.model.height = size
 
     # Callbacks
 
@@ -391,19 +400,9 @@ class WebcamStep(VideoSourceStep):
         self._run_checks()
 
     def on_combobox_size_changed(self, combo):
-        # check for custom
-        i = self.combobox_size.get_active_iter()
-        if i:
-            w, h = self.combobox_size.get_model().get(i, 1, 2)
-            store = gtk.ListStore(str, object)
-            for d in self._sizes[(w,h)]:
-                num, denom = d['framerate']
-                store.append(['%.2f fps' % (1.0*num/denom), d])
-            # add custom
-            self.combobox_framerate.set_model(store)
-            self.combobox_framerate.set_active(0)
-            self.model.width = w
-            self.model.height = h
+        size = self.combobox_size.get_selected()
+        if size:
+            self._set_framerates(size)
 
 
 # note:
