@@ -66,7 +66,7 @@ AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])
 
 dnl check for kiwi
-AS_PYTHON_IMPORT(kiwi,,AC_MSG_ERROR([kiwi found or too old]),,
+AS_PYTHON_IMPORT(kiwi,,AC_MSG_ERROR([kiwi not found or too old]),,
     [from flumotion.common import boot; boot.init_kiwi()])
 
 PYTHONPATH=$as_save_PYTHONPATH
