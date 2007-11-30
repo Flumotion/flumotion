@@ -1,5 +1,9 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/fgtk.py:
+	Remove all now unused widgets, add SpinButton to the list
+	of converted widgets.
+
 	* data/glade/wizard_smoke.glade: 
 	* flumotion/wizard/conversionsteps.py (SmokeStep): 
 	Remove get_state() and widget naming prefix.
