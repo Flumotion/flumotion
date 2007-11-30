@@ -1,5 +1,16 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_license.glade:
+	* flumotion/wizard/configurationwizard.py:
+	(LicenseStep): rename widget naming prefix, the name of the widget
+	is the state name
+
+	* flumotion/ui/wizard.py (WizardStep.get_state): 
+	reimplement using proxy widget state.
+
+	* flumotion/ui/fgtk.py (ProxyWidgetMapping): Add
+	radio and entry.
+
 	* flumotion/wizard/conversionsteps.py (JPEGStep.get_state): 
 	_fraction_from_float, fix typo
 
