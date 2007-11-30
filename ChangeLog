@@ -1,6 +1,10 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/wizard/productionsteps.py:
+	* data/glade/wizard_encoding.glade: 
+	* flumotion/wizard/productionstep.py (TVCardStep): 
+	Remove get_state() and widget naming prefix. Rename signals.
+	Add default values to the model
+
 	* flumotion/wizard/save.py:
 	Move fraction denomination from the step to the save logic
 

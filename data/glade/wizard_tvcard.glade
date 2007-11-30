@@ -32,7 +32,7 @@
 	  <property name="column_spacing">6</property>
 
 	  <child>
-	    <widget class="GtkComboBox" id="combobox_source">
+	    <widget class="GtkComboBox" id="source">
 	      <property name="visible">True</property>
 	    </widget>
 	    <packing>
@@ -46,7 +46,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkComboBox" id="combobox_tvnorm">
+	    <widget class="GtkComboBox" id="tvnorm">
 	      <property name="visible">True</property>
 	    </widget>
 	    <packing>
@@ -72,7 +72,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
-	      <property name="mnemonic_widget">spinbutton_width</property>
+	      <property name="mnemonic_widget">width</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -97,7 +97,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
-	      <property name="mnemonic_widget">spinbutton_height</property>
+	      <property name="mnemonic_widget">height</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -110,7 +110,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_width">
+	    <widget class="GtkSpinButton" id="width">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -120,7 +120,7 @@
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
 	      <property name="adjustment">352 0 8192 8 32 8</property>
-	      <signal name="value-changed" handler="on_spinbutton_width_value_changed"/>
+	      <signal name="value-changed" handler="on_width__value_changed"/>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -133,7 +133,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_height">
+	    <widget class="GtkSpinButton" id="height">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -143,7 +143,7 @@
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
 	      <property name="adjustment">288 0 8192 8 32 8</property>
-	      <signal name="value-changed" handler="on_spinbutton_height_value_changed"/>
+	      <signal name="value-changed" handler="on_height__value_changed"/>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -168,7 +168,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
-	      <property name="mnemonic_widget">spinbutton_framerate</property>
+	      <property name="mnemonic_widget">framerate</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -181,7 +181,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_framerate">
+	    <widget class="GtkSpinButton" id="framerate">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -275,9 +275,9 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkComboBox" id="combobox_device">
+	    <widget class="GtkComboBox" id="device">
 	      <property name="visible">True</property>
-	      <signal name="changed" handler="on_combobox_device_changed" last_modification_time="Fri, 22 Oct 2004 14:12:19 GMT"/>
+	      <signal name="changed" handler="on_device__changed" last_modification_time="Fri, 22 Oct 2004 14:12:19 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>

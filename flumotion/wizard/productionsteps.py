@@ -267,6 +267,7 @@ class WebcamStep(VideoSourceStep):
                                       '/dev/video1',
                                       '/dev/video2',
                                       '/dev/video3'])
+
         self._in_setup = False
 
     def worker_changed(self):
@@ -401,37 +402,36 @@ class TVCardStep(VideoSourceStep):
         VideoSourceStep.__init__(self, wizard, model)
         self._in_setup = False
 
+        # FIXME: move to model type definition
+        self.width.data_type = int
+        self.height.data_type = int
+        self.framerate.data_type = float
+
     # WizardStep
 
     def setup(self):
         self._in_setup = True
-        self.combobox_device.prefill(['/dev/video0',
-                                      '/dev/video1',
-                                      '/dev/video2',
-                                      '/dev/video3'])
+        self.device.prefill(['/dev/video0',
+                             '/dev/video1',
+                             '/dev/video2',
+                             '/dev/video3'])
+        # FIXME: Remember to remove the values from the glade file
+        #        when we use proxy widgets
+        self.model.width = 320
+        self.model.height = 240
         self._in_setup = False
 
     def worker_changed(self):
         self._clear_combos()
         self._run_checks()
 
-    def get_state(self):
-        options = {}
-        options['device'] = self.combobox_device.get_selected()
-        options['signal'] = self.combobox_tvnorm.get_selected()
-        options['channel'] = self.combobox_source.get_selected()
-        options['width'] = int(self.spinbutton_width.get_value())
-        options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = self.spinbutton_framerate.get_value()
-        return options
-
     # Private
 
     def _clear_combos(self):
-        self.combobox_tvnorm.clear()
-        self.combobox_tvnorm.set_sensitive(False)
-        self.combobox_source.clear()
-        self.combobox_source.set_sensitive(False)
+        self.tvnorm.clear()
+        self.tvnorm.set_sensitive(False)
+        self.source.clear()
+        self.source.set_sensitive(False)
 
     def _run_checks(self):
         if self._in_setup:
@@ -439,7 +439,7 @@ class TVCardStep(VideoSourceStep):
 
         self.wizard.block_next(True)
 
-        device = self.combobox_device.get_selected()
+        device = self.device.get_selected()
         assert device
         msg = messages.Info(T_(
             N_("Probing TV-card, this can take a while...")),
@@ -466,10 +466,10 @@ class TVCardStep(VideoSourceStep):
             deviceName, channels, norms = result
             self.wizard.clear_msg('tvcard-check')
             self.wizard.block_next(False)
-            self.combobox_tvnorm.prefill(norms)
-            self.combobox_tvnorm.set_sensitive(True)
-            self.combobox_source.prefill(channels)
-            self.combobox_source.set_sensitive(True)
+            self.tvnorm.prefill(norms)
+            self.tvnorm.set_sensitive(True)
+            self.source.prefill(channels)
+            self.source.set_sensitive(True)
 
         d.addCallback(deviceFound)
         d.addErrback(errRemoteRunFailure)
@@ -477,13 +477,13 @@ class TVCardStep(VideoSourceStep):
 
     # Callbacks
 
-    def on_combobox_device_changed(self, combo):
+    def on_device__changed(self, combo):
         self._run_checks()
 
-    def on_spinbutton_height_value_changed(self, spinbutton):
+    def on_height__value_changed(self, spinbutton):
         self.model.height = spinbutton.get_value()
 
-    def on_spinbutton_width_value_changed(self, spinbutton):
+    def on_width__value_changed(self, spinbutton):
         self.model.width = spinbutton.get_value()
 
 
