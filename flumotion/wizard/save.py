@@ -135,11 +135,22 @@ class WizardSaver(log.Loggable):
         return Component('producer-video', source.component_type, worker,
                          properties)
 
-    def getVideoOverlay(self, show_logo):
-        # At this point we already know that we should overlay something
+    def getVideoOverlay(self, video_source):
         step = self.wizard.get_step(_('Overlay'))
         properties = step.get_state()
-        if show_logo:
+
+        has_overlay = (step.can_overlay and
+                       (properties['show-logo'] or
+                        properties['show-text']))
+        if not has_overlay:
+            del properties['text']
+            return
+
+        properties['width'] = video_source.props['width']
+        properties['height'] = video_source.props['height']
+
+        # At this point we already know that we should overlay something
+        if properties['show-logo']:
             properties['fluendo-logo'] = True
             encoding_options = self.wizard.get_step_options(_('Encoding'))
             if (encoding_options['format'] == enums.EncodingFormat.Ogg or
@@ -154,7 +165,6 @@ class WizardSaver(log.Loggable):
         # These were just used to pass capabilities; they shouldn't go into the
         # XML.
         del properties['show-logo']
-        del properties['can-overlay']
 
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
@@ -225,27 +235,19 @@ class WizardSaver(log.Loggable):
                          step.worker)
 
     def handleVideo(self, components):
-        overlay_options = self.wizard.get_step_options(_('Overlay'))
-        has_overlay = (overlay_options['can-overlay'] and
-                       (overlay_options['show-logo'] or
-                        overlay_options['show-text']))
-
         video_source =  self.getVideoSource()
         components.append(video_source)
 
-        video_overlay = None
         video_encoder = self.getVideoEncoder()
+        components.append(video_encoder)
 
-        if has_overlay:
-            video_overlay = self.getVideoOverlay(overlay_options['show-logo'])
-            components.append(video_overlay)
-
-        if video_overlay != None:
+        video_overlay = self.getVideoOverlay(video_source)
+        if video_overlay:
             video_overlay.link(video_source)
             video_encoder.link(video_overlay)
+            components.append(video_overlay)
         else:
             video_encoder.link(video_source)
-        components.append(video_encoder)
         return video_encoder, video_source
 
     def handleAudio(self, components, video_source):

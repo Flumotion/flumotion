@@ -101,26 +101,12 @@ class OverlayStep(WorkerWizardStep):
     def __init__(self, wizard, video_producer):
         WorkerWizardStep.__init__(self, wizard)
         self._video_producer = video_producer
-        self._can_overlay = True
+        self.can_overlay = True
 
     # Wizard Step
 
     def worker_changed(self):
         self._worker_changed()
-
-    def get_state(self):
-        options = {
-            'show-logo': self.checkbutton_show_logo.get_active(),
-            'show-text': self.checkbutton_show_text.get_active(),
-            'can-overlay': self._can_overlay,
-            'width': self._video_producer.width,
-            'height': self._video_producer.height,
-            }
-
-        if self.checkbutton_show_text.get_active():
-            options['text'] = self.entry_text.get_text()
-
-        return options
 
     def get_next(self):
         if self.wizard.get_step_option(_('Source'), 'has-audio'):
@@ -131,7 +117,7 @@ class OverlayStep(WorkerWizardStep):
     # Private API
 
     def _worker_changed(self):
-        self._can_overlay = False
+        self.can_overlay = False
         self.set_sensitive(False)
 
         def importError(error):
@@ -146,10 +132,10 @@ class OverlayStep(WorkerWizardStep):
             message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
             message.id = 'module-PIL'
             self.wizard.add_msg(message)
-            self._can_overlay = False
+            self.can_overlay = False
 
         def checkImport(unused):
-            self._can_overlay = True
+            self.can_overlay = True
             self.set_sensitive(True)
 
         def checkElements(elements):
@@ -174,7 +160,7 @@ class OverlayStep(WorkerWizardStep):
             self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
         d.addCallback(checkElements)
 
-    def on_checkbutton_show_text_toggled(self, button):
-        self.entry_text.set_sensitive(button.get_active())
+    def on_show_text__toggled(self, button):
+        self.text.set_sensitive(button.get_active())
 
 
