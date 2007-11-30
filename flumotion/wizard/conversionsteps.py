@@ -235,14 +235,6 @@ class SmokeStep(VideoEncoderStep):
     def worker_changed(self):
         self.wizard.require_elements(self.worker, 'smokeenc')
 
-    def get_state(self):
-        options = {}
-        options['qmin'] = int(self.spinbutton_qmin.get_value())
-        options['qmax'] = int(self.spinbutton_qmax.get_value())
-        options['threshold'] = int(self.spinbutton_threshold.get_value())
-        options['keyframe'] = int(self.spinbutton_keyframe.get_value())
-        return options
-
     def get_next(self):
         return self.wizard.get_step(_('Encoding')).get_audio_page()
 

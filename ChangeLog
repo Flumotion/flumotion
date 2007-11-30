@@ -1,5 +1,9 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_smoke.glade: 
+	* flumotion/wizard/conversionsteps.py (SmokeStep): 
+	Remove get_state() and widget naming prefix.
+
 	* data/glade/wizard_encoding.glade: 
 	* flumotion/wizard/conversionsteps.py (ConversiontStep): 
 	Remove get_state() and widget naming prefix. Rename signals.
