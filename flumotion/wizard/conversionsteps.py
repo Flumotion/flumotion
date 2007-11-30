@@ -270,7 +270,7 @@ class JPEGStep(VideoEncoderStep):
         options = {}
         options['quality'] = int(self.spinbutton_quality.get_value())
         options['framerate'] = _fraction_from_float(
-            int(self.spinbutton_framerate.get_value(), 2))
+            int(self.spinbutton_framerate.get_value()), 2)
         return options
 
     def get_next(self):

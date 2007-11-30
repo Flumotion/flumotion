@@ -1,7 +1,10 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/conversionsteps.py (JPEGStep.get_state): 
+	_fraction_from_float, fix typo
+
 	* flumotion/ui/wizard.py (WizardStep): use ProxyWidgetMapping here
-	and remove it on all known subclasses
+	and remove it on all known subclasses.
 	* flumotion/wizard/configurationwizard.py
 	(LicenseStep): use ProxyWidgetMapping
 
