@@ -21,6 +21,7 @@
 
 import gettext
 
+from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
     AudioEncoderStep
 from flumotion.wizard.enums import EncodingAudio, EncodingFormat, EncodingVideo
@@ -40,6 +41,7 @@ def _fraction_from_float(number, denominator):
 
 
 class ConversionStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_encoding.glade'
     name = _('Encoding')
     section = _('Conversion')
@@ -55,14 +57,7 @@ class ConversionStep(WorkerWizardStep):
 
     def get_audio_page(self):
         if self.wizard.get_step_option(_('Source'), 'has-audio'):
-            codec = self.combobox_audio.get_enum()
-            if codec == EncodingAudio.Vorbis:
-                step_class = VorbisStep
-            elif codec == EncodingAudio.Speex:
-                step_class = SpeexStep
-            elif codec == EncodingAudio.Mulaw:
-                return None
-            return step_class(self.wizard, self._audio_encoder)
+            return self._get_audio_page()
         return None
 
     # WizardStep
@@ -88,46 +83,65 @@ class ConversionStep(WorkerWizardStep):
 
     def get_next(self):
         if self.wizard.get_step_option(_('Source'), 'has-video'):
-            codec = self.combobox_video.get_enum()
-            if codec == EncodingVideo.Theora:
-                step_class = TheoraStep
-            elif codec == EncodingVideo.Smoke:
-                step_class = SmokeStep
-            elif codec == EncodingVideo.JPEG:
-                step_class = JPEGStep
-            else:
-                raise AssertionError(codec)
-            return step_class(self.wizard, self._video_encoder)
+            return self._get_video_page()
         elif self.wizard.get_step_option(_('Source'), 'has-audio'):
-            return self.get_audio_page()
+            return self._get_audio_page()
         else:
             return None
 
     # Private
 
+    def _get_audio_page(self):
+        audio = self.combobox_audio.get_selected()
+        if audio == EncodingAudio.Vorbis:
+            step_class = VorbisStep
+        elif audio == EncodingAudio.Speex:
+            step_class = SpeexStep
+        elif audio == EncodingAudio.Mulaw:
+            return None
+        return step_class(self.wizard, self._audio_encoder)
+
+    def _get_video_page(self):
+        video = self.combobox_video.get_selected()
+        if video == EncodingVideo.Theora:
+            step_class = TheoraStep
+        elif video == EncodingVideo.Smoke:
+            step_class = SmokeStep
+        elif video == EncodingVideo.JPEG:
+            step_class = JPEGStep
+        else:
+            raise AssertionError(codec)
+
+        return step_class(self.wizard, self._video_encoder)
+
     def _verify(self):
         # XXX: isn't there a better way of doing this, like blocking
         #      the signal
 
-        format = self.combobox_format.get_active()
+        format = self.combobox_format.get_selected()
         if format == EncodingFormat.Ogg:
             self.debug('running Ogg checks')
             def hasOgg(unused):
                 # XXX: Smoke can't be put in ogg. Poke Wim to fix
-                self.combobox_video.set_multi_active(EncodingVideo.Theora)
-                self.combobox_audio.set_multi_active(EncodingAudio.Speex,
-                                                     EncodingAudio.Vorbis)
+                self.combobox_video.set_enum(
+                    EncodingVideo, [EncodingVideo.Theora])
+                self.combobox_audio.set_enum(
+                    EncodingAudio, [EncodingAudio.Speex,
+                                    EncodingAudio.Vorbis])
 
             def hasOggmux(unused):
-                d = self.run_in_worker('flumotion.component.muxers.checks', 'checkOgg')
+                d = self.run_in_worker('flumotion.component.muxers.checks',
+                                       'checkOgg')
                 d.addCallback(hasOgg)
             d = self.wizard.require_elements(self.worker, 'oggmux')
             d.addCallback(hasOggmux)
 
         elif format == EncodingFormat.Multipart:
-            self.combobox_video.set_multi_active(EncodingVideo.Smoke,
-                                                 EncodingVideo.JPEG)
-            self.combobox_audio.set_multi_active(EncodingAudio.Mulaw)
+            self.combobox_video.set_enum(
+                EncodingVideo, [EncodingVideo.Smoke,
+                                EncodingVideo.JPEG])
+            self.combobox_audio.set_enum(
+                EncodingAudio, [EncodingAudio.Mulaw])
 
         has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
         self.combobox_audio.set_property('visible', has_audio)
@@ -137,29 +151,30 @@ class ConversionStep(WorkerWizardStep):
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
 
+    def get_state(self):
+        return {
+            'format': self.combobox_format.get_selected(),
+            'audio': self.combobox_audio.get_selected(),
+            'video': self.combobox_video.get_selected(),
+            }
+
     # Callbacks
 
     def on_combobox_format_changed(self, combo):
-        format = combo.get_active()
-        if format == 0:
-            return
-
-        self._muxer.name = combo.get_active().component_type
+        format = combo.get_selected()
+        if format is not None:
+            self._muxer.name = format.component_type
         self._verify()
 
     def on_combobox_audio_changed(self, combo):
-        audio = combo.get_active()
-        if audio == 0:
-            return
-
-        self._audio_encoder.name = combo.get_active().component_type
+        audio = combo.get_selected()
+        if audio is not None:
+            self._audio_encoder.name = audio.component_type
 
     def on_combobox_video_changed(self, combo):
-        video = combo.get_active()
-        if video == 0:
-            return
-
-        self._video_encoder.name = combo.get_active().component_type
+        video = combo.get_selected()
+        if video is not None:
+            self._video_encoder.name = video.component_type
 
 
 class TheoraStep(VideoEncoderStep):
@@ -189,11 +204,13 @@ class TheoraStep(VideoEncoderStep):
     def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
-            options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
+            options['bitrate'] = int(
+                self.spinbutton_bitrate.get_value()) * 1000
         elif self.radiobutton_quality:
             options['quality'] = int(self.spinbutton_quality.get_value())
 
-        options['keyframe-maxdistance'] = int(self.spinbutton_keyframe_maxdistance.get_value())
+        options['keyframe-maxdistance'] = int(
+            self.spinbutton_keyframe_maxdistance.get_value())
         options['noise-sensitivity'] = \
             max(int(self.spinbutton_noise_sensitivity.get_value()
                     * (32768 / 100.)),
