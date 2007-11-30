@@ -1,8 +1,12 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_source.glade: 
+	* flumotion/wizard/productionsteps.py (ProductionStep): 
+	Remove get_state() and widget naming prefix. Rename signals.
+
 	* data/glade/wizard_license.glade:
 	* flumotion/wizard/configurationwizard.py:
-	(LicenseStep): rename widget naming prefix, the name of the widget
+	(LicenseStep): remove widget naming prefix, the name of the widget
 	is the state name
 
 	* flumotion/ui/wizard.py (WizardStep.get_state): 

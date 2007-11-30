@@ -87,7 +87,7 @@ class ProductionStep(WorkerWizardStep):
         @returns: video step
         @rtype: a L{VideoSourceStep} subclass
         """
-        source = self.combobox_video.get_selected()
+        source = self.video.get_selected()
         if source == VideoDevice.Test:
             step_class = TestVideoSourceStep
         elif source == VideoDevice.Webcam:
@@ -107,14 +107,14 @@ class ProductionStep(WorkerWizardStep):
         @returns: audio step
         @rtype: a L{AudioSourceStep} subclass
         """
-        source = self.combobox_audio.get_selected()
+        source = self.audio.get_selected()
         if source == AudioDevice.Test:
             step_class = TestAudioSourceStep
         elif source == AudioDevice.Soundcard:
             step_class = SoundcardStep
         elif source == AudioDevice.Firewire:
             # Only show firewire audio if we're using firewire video
-            if self.combobox_video.get_active() == VideoDevice.Firewire:
+            if self.video.get_active() == VideoDevice.Firewire:
                 return
             step_class = FireWireAudioStep
         else:
@@ -127,20 +127,12 @@ class ProductionStep(WorkerWizardStep):
         self._verify()
 
     def get_next(self):
-        if self.checkbutton_has_video.get_active():
+        if self.has_video.get_active():
             return self.get_video_step()
-        elif self.checkbutton_has_audio.get_active():
+        elif self.has_audio.get_active():
             return self.get_audio_step()
         else:
             raise AssertionError
-
-    def get_state(self):
-        return {
-            'audio': self.combobox_audio.get_selected(),
-            'video': self.combobox_video.get_selected(),
-            'has-audio': self.checkbutton_has_audio.get_active(),
-            'has-video': self.checkbutton_has_video.get_active(),
-            }
 
     # Private API
 
@@ -150,12 +142,12 @@ class ProductionStep(WorkerWizardStep):
         self._video_producer = VideoProducer()
         self.wizard.flow.addComponent(self._video_producer)
 
-        self.combobox_video.set_enum(VideoDevice)
-        self.combobox_audio.set_enum(AudioDevice)
+        self.video.set_enum(VideoDevice)
+        self.audio.set_enum(AudioDevice)
         tips = gtk.Tooltips()
-        tips.set_tip(self.checkbutton_has_video,
+        tips.set_tip(self.has_video,
                      _('If you want to stream video'))
-        tips.set_tip(self.checkbutton_has_audio,
+        tips.set_tip(self.has_audio,
                      _('If you want to stream audio'))
 
     def _verify(self):
@@ -164,15 +156,15 @@ class ProductionStep(WorkerWizardStep):
         if not hasattr(self.wizard, 'combobox_worker'):
             return
 
-        has_audio = self.checkbutton_has_audio.get_active()
-        has_video = self.checkbutton_has_video.get_active()
+        has_audio = self.has_audio.get_active()
+        has_video = self.has_video.get_active()
         can_continue = False
         can_select_worker = False
         if has_audio or has_video:
             can_continue = True
 
-            video_source = self.combobox_video.get_active()
-            audio_source = self.combobox_audio.get_active()
+            video_source = self.video.get_active()
+            audio_source = self.audio.get_active()
             if (has_audio and audio_source == AudioDevice.Firewire and
                 not (has_video and video_source == VideoDevice.Firewire)):
                 can_select_worker = True
@@ -182,32 +174,32 @@ class ProductionStep(WorkerWizardStep):
 
     # Callbacks
 
-    def on_checkbutton_has_video_toggled(self, button):
-        self.combobox_video.set_sensitive(button.get_active())
+    def on_has_video__toggled(self, button):
+        self.video.set_sensitive(button.get_active())
         if button.get_active():
             self.wizard.flow.addComponent(self._video_producer)
         else:
             self.wizard.flow.removeComponent(self._video_producer)
         self._verify()
 
-    def on_checkbutton_has_audio_toggled(self, button):
-        self.combobox_audio.set_sensitive(button.get_active())
+    def on_has_audio__toggled(self, button):
+        self.audio.set_sensitive(button.get_active())
         if button.get_active():
             self.wizard.flow.addComponent(self._audio_producer)
         else:
             self.wizard.flow.removeComponent(self._audio_producer)
         self._verify()
 
-    def on_combobox_video_changed(self, button):
-        video_source = self.combobox_video.get_active()
+    def on_video__changed(self, button):
+        video_source = self.video.get_active()
         # FIXME!!!
         if type(video_source) == int:
             return
         self._video_producer.name = video_source.component_type
         self._verify()
 
-    def on_combobox_audio_changed(self, button):
-        audio_source = self.combobox_audio.get_active()
+    def on_audio__changed(self, button):
+        audio_source = self.audio.get_active()
         # FIXME!!!
         if type(audio_source) == int:
             return
