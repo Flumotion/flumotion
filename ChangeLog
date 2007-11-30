@@ -1,5 +1,9 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_encoding.glade: 
+	* flumotion/wizard/conversionsteps.py (ConversiontStep): 
+	Remove get_state() and widget naming prefix. Rename signals.
+
 	* data/glade/wizard_shout2.glade: 
 	* flumotion/wizard/consumptionsteps.py (Shout2Step): 
 	Remove get_state() and widget naming prefix. Rename signals.

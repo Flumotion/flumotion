@@ -61,9 +61,9 @@ class ConversionStep(WorkerWizardStep):
     # WizardStep
 
     def before_show(self):
-        self.combobox_format.set_enum(EncodingFormat)
-        self.combobox_audio.set_enum(EncodingAudio)
-        self.combobox_video.set_enum(EncodingVideo)
+        self.format.set_enum(EncodingFormat)
+        self.audio.set_enum(EncodingAudio)
+        self.video.set_enum(EncodingVideo)
 
         flow = self.wizard.flow
         production = self.wizard.get_step(_('Source'))
@@ -90,7 +90,7 @@ class ConversionStep(WorkerWizardStep):
     # Private
 
     def _get_audio_page(self):
-        audio = self.combobox_audio.get_selected()
+        audio = self.audio.get_selected()
         if audio == EncodingAudio.Vorbis:
             step_class = VorbisStep
         elif audio == EncodingAudio.Speex:
@@ -100,7 +100,7 @@ class ConversionStep(WorkerWizardStep):
         return step_class(self.wizard, self._audio_encoder)
 
     def _get_video_page(self):
-        video = self.combobox_video.get_selected()
+        video = self.video.get_selected()
         if video == EncodingVideo.Theora:
             step_class = TheoraStep
         elif video == EncodingVideo.Smoke:
@@ -116,14 +116,14 @@ class ConversionStep(WorkerWizardStep):
         # XXX: isn't there a better way of doing this, like blocking
         #      the signal
 
-        format = self.combobox_format.get_selected()
+        format = self.format.get_selected()
         if format == EncodingFormat.Ogg:
             self.debug('running Ogg checks')
             def hasOgg(unused):
                 # XXX: Smoke can't be put in ogg. Poke Wim to fix
-                self.combobox_video.set_enum(
+                self.video.set_enum(
                     EncodingVideo, [EncodingVideo.Theora])
-                self.combobox_audio.set_enum(
+                self.audio.set_enum(
                     EncodingAudio, [EncodingAudio.Speex,
                                     EncodingAudio.Vorbis])
 
@@ -135,41 +135,34 @@ class ConversionStep(WorkerWizardStep):
             d.addCallback(hasOggmux)
 
         elif format == EncodingFormat.Multipart:
-            self.combobox_video.set_enum(
+            self.video.set_enum(
                 EncodingVideo, [EncodingVideo.Smoke,
                                 EncodingVideo.JPEG])
-            self.combobox_audio.set_enum(
+            self.audio.set_enum(
                 EncodingAudio, [EncodingAudio.Mulaw])
 
         has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
-        self.combobox_audio.set_property('visible', has_audio)
+        self.audio.set_property('visible', has_audio)
         self.label_audio.set_property('visible', has_audio)
 
         has_video = self.wizard.get_step_option(_('Source'), 'has-video')
-        self.combobox_video.set_property('visible', has_video)
+        self.video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
-
-    def get_state(self):
-        return {
-            'format': self.combobox_format.get_selected(),
-            'audio': self.combobox_audio.get_selected(),
-            'video': self.combobox_video.get_selected(),
-            }
 
     # Callbacks
 
-    def on_combobox_format_changed(self, combo):
+    def on_format__changed(self, combo):
         format = combo.get_selected()
         if format is not None:
             self._muxer.name = format.component_type
         self._verify()
 
-    def on_combobox_audio_changed(self, combo):
+    def on_audio__changed(self, combo):
         audio = combo.get_selected()
         if audio is not None:
             self._audio_encoder.name = audio.component_type
 
-    def on_combobox_video_changed(self, combo):
+    def on_video__changed(self, combo):
         video = combo.get_selected()
         if video is not None:
             self._video_encoder.name = video.component_type
