@@ -29,7 +29,7 @@ import gtk.glade
 from flumotion.configure import configure
 from flumotion.common import log, pygobject, messages
 from flumotion.common.pygobject import gsignal
-from flumotion.ui import fgtk
+from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
 T_ = messages.gettexter('flumotion')
@@ -89,7 +89,7 @@ class _WalkableStack(object):
 
 
 class WizardStep(GladeWidget, log.Loggable):
-    glade_typedict = fgtk.WidgetMapping()
+    glade_typedict = ProxyWidgetMapping()
 
     # set by subclasses
     name = None

@@ -21,7 +21,6 @@
 
 import gettext
 
-from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
     AudioEncoderStep
 from flumotion.wizard.enums import EncodingAudio, EncodingFormat, EncodingVideo
@@ -41,7 +40,6 @@ def _fraction_from_float(number, denominator):
 
 
 class ConversionStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_encoding.glade'
     name = _('Encoding')
     section = _('Conversion')
@@ -272,7 +270,7 @@ class JPEGStep(VideoEncoderStep):
         options = {}
         options['quality'] = int(self.spinbutton_quality.get_value())
         options['framerate'] = _fraction_from_float(
-            int(self.spinbutton_framerate.get_value()), 2)
+            int(self.spinbutton_framerate.get_value(), 2))
         return options
 
     def get_next(self):

@@ -90,6 +90,12 @@ class LicenseStep(WizardStep):
     def on_checkbutton_set_license_toggled(self, button):
         self.combobox_license.set_sensitive(button.get_active())
 
+    def get_state(self):
+        return {
+            'set-license': self.checkbutton_set_license.get_active(),
+            'license': self.combobox_license.get_selected(),
+            }
+
 
 class SummaryStep(WizardStep):
     name = _("Summary")

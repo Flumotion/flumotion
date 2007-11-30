@@ -28,7 +28,6 @@ from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_
 from flumotion.common.python import sorted
-from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WorkerWizardStep, \
     AudioSourceStep, VideoSourceStep
 from flumotion.wizard.enums import AudioDevice, SoundcardSystem, \
@@ -53,7 +52,6 @@ def _fraction_from_float(number, denominator):
 
 
 class ProductionStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
 
     glade_file = 'wizard_source.glade'
     name = _('Source')

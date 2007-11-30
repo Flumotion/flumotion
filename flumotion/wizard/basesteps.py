@@ -23,7 +23,6 @@ import gettext
 
 from flumotion.common import messages
 from flumotion.common.messages import N_, ngettext
-from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.wizard import WizardStep
 
 T_ = messages.gettexter('flumotion')
@@ -44,7 +43,6 @@ class WorkerWizardStep(WizardStep):
 
 
 class AudioSourceStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     section = _('Production')
     def __init__(self, wizard, model):
         self.model = model
@@ -52,7 +50,6 @@ class AudioSourceStep(WorkerWizardStep):
 
 
 class VideoSourceStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     section = _('Production')
     icon = 'widget_doc.png'
 
@@ -73,7 +70,6 @@ class VideoSourceStep(WorkerWizardStep):
 
 
 class VideoEncoderStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     section = _('Conversion')
 
     def __init__(self, wizard, model):
@@ -82,7 +78,6 @@ class VideoEncoderStep(WorkerWizardStep):
 
 
 class AudioEncoderStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_audio_encoder.glade'
     section = _('Conversion')
 
@@ -97,7 +92,6 @@ class AudioEncoderStep(WorkerWizardStep):
 
 
 class OverlayStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Overlay')
     glade_file = 'wizard_overlay.glade'
     section = _('Production')

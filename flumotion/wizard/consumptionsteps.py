@@ -23,7 +23,6 @@ import gettext
 
 from flumotion.configure import configure
 from flumotion.common.python import any
-from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
 from flumotion.wizard.enums import RotateSize, RotateTime
 
@@ -32,7 +31,6 @@ X_ = _
 
 
 class ConsumptionStep(WizardStep):
-    glade_typedict = ProxyWidgetMapping()
     name = _('Consumption')
     glade_file = 'wizard_consumption.glade'
     section = _('Consumption')
@@ -215,7 +213,6 @@ class ConsumptionStep(WizardStep):
 
 # XXX: If audio codec is speex, disable java applet option
 class HTTPStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_http.glade'
     section = _('Consumption')
     component_type = 'http-streamer'
@@ -295,7 +292,6 @@ class HTTPVideoStep(HTTPStep):
 
 
 class DiskStep(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_disk.glade'
     section = _('Consumption')
     icon = 'kcmdevices.png'
@@ -384,7 +380,6 @@ class DiskVideoStep(DiskStep):
 
 
 class Shout2Step(WorkerWizardStep):
-    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_shout2.glade'
     section = _('Consumption')
     component_type = 'shout2'
