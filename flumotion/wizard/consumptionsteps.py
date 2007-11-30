@@ -47,15 +47,15 @@ class ConsumptionStep(WizardStep):
         has_both = has_audio and has_video
 
         # Hide all checkbuttons if we don't have both audio and video selected
-        for checkbutton in (self.checkbutton_http_audio_video,
-                            self.checkbutton_http_audio,
-                            self.checkbutton_http_video,
-                            self.checkbutton_disk_audio_video,
-                            self.checkbutton_disk_audio,
-                            self.checkbutton_disk_video,
-                            self.checkbutton_shout2_audio_video,
-                            self.checkbutton_shout2_audio,
-                            self.checkbutton_shout2_video):
+        for checkbutton in (self.http_audio_video,
+                            self.http_audio,
+                            self.http_video,
+                            self.disk_audio_video,
+                            self.disk_audio,
+                            self.disk_video,
+                            self.shout2_audio_video,
+                            self.shout2_audio,
+                            self.shout2_video):
             checkbutton.set_property('visible', has_both)
 
     def get_next(self, step=None):
@@ -87,37 +87,21 @@ class ConsumptionStep(WizardStep):
             step_class = steps[stepname]
             return step_class(self.wizard)
 
-    def get_state(self):
-        return {
-            'disk': self.checkbutton_disk.get_active(),
-            'disk-audio': self.checkbutton_disk_audio.get_active(),
-            'disk-video': self.checkbutton_disk_video.get_active(),
-            'disk-audio-video': self.checkbutton_disk_audio_video.get_active(),
-            'http': self.checkbutton_http.get_active(),
-            'http-audio': self.checkbutton_http_audio.get_active(),
-            'http-video': self.checkbutton_http_video.get_active(),
-            'http-audio-video': self.checkbutton_http_audio_video.get_active(),
-            'shout2': self.checkbutton_shout2.get_active(),
-            'shout2-audio': self.checkbutton_shout2_audio.get_active(),
-            'shout2-video': self.checkbutton_shout2_video.get_active(),
-            'shout2-audio-video': self.checkbutton_shout2_audio_video.get_active(),
-            }
-
     # Private
 
     def _verify(self):
-        disk = self.checkbutton_disk.get_active()
-        disk_audio = self.checkbutton_disk_audio.get_active()
-        disk_video = self.checkbutton_disk_video.get_active()
-        disk_audio_video = self.checkbutton_disk_audio_video.get_active()
-        http = self.checkbutton_http.get_active()
-        http_audio = self.checkbutton_http_audio.get_active()
-        http_video = self.checkbutton_http_video.get_active()
-        http_audio_video = self.checkbutton_http_audio_video.get_active()
-        shout2 = self.checkbutton_shout2.get_active()
-        shout2_audio = self.checkbutton_shout2_audio.get_active()
-        shout2_video = self.checkbutton_shout2_video.get_active()
-        shout2_audio_video = self.checkbutton_shout2_audio_video.get_active()
+        disk = self.disk.get_active()
+        disk_audio = self.disk_audio.get_active()
+        disk_video = self.disk_video.get_active()
+        disk_audio_video = self.disk_audio_video.get_active()
+        http = self.http.get_active()
+        http_audio = self.http_audio.get_active()
+        http_video = self.http_video.get_active()
+        http_audio_video = self.http_audio_video.get_active()
+        shout2 = self.shout2.get_active()
+        shout2_audio = self.shout2_audio.get_active()
+        shout2_video = self.shout2_video.get_active()
+        shout2_audio_video = self.shout2_audio_video.get_active()
 
         block_next = True
         if ((disk and any([disk_audio, disk_video, disk_audio_video])) or
@@ -128,21 +112,21 @@ class ConsumptionStep(WizardStep):
 
     def _get_items(self):
         uielements = []
-        if self.checkbutton_http.get_active():
+        if self.http.get_active():
             uielements.append(('HTTP Streamer',
-                               [self.checkbutton_http_audio,
-                                self.checkbutton_http_video,
-                                self.checkbutton_http_audio_video]))
-        if self.checkbutton_disk.get_active():
+                               [self.http_audio,
+                                self.http_video,
+                                self.http_audio_video]))
+        if self.disk.get_active():
             uielements.append(('Disk',
-                               [self.checkbutton_disk_audio,
-                                self.checkbutton_disk_video,
-                                self.checkbutton_disk_audio_video]))
-        if self.checkbutton_shout2.get_active():
+                               [self.disk_audio,
+                                self.disk_video,
+                                self.disk_audio_video]))
+        if self.shout2.get_active():
             uielements.append(('Icecast streamer',
-                               [self.checkbutton_shout2_audio,
-                                self.checkbutton_shout2_video,
-                                self.checkbutton_shout2_audio_video]))
+                               [self.shout2_audio,
+                                self.shout2_video,
+                                self.shout2_audio_video]))
 
         has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
         has_video = self.wizard.get_step_option(_('Source'), 'has-video')
@@ -183,30 +167,30 @@ class ConsumptionStep(WizardStep):
 
     # Callbacks
 
-    def on_checkbutton_disk_toggled(self, button):
-        value = self.checkbutton_disk.get_active()
-        self.checkbutton_disk_audio_video.set_sensitive(value)
-        self.checkbutton_disk_audio.set_sensitive(value)
-        self.checkbutton_disk_video.set_sensitive(value)
+    def on_disk__toggled(self, button):
+        value = self.disk.get_active()
+        self.disk_audio_video.set_sensitive(value)
+        self.disk_audio.set_sensitive(value)
+        self.disk_video.set_sensitive(value)
 
         self._verify()
 
-    def on_checkbutton_shout2_toggled(self, button):
-        value = self.checkbutton_shout2.get_active()
-        self.checkbutton_shout2_audio_video.set_sensitive(value)
-        self.checkbutton_shout2_audio.set_sensitive(value)
-        self.checkbutton_shout2_video.set_sensitive(value)
+    def on_shout2__toggled(self, button):
+        value = self.shout2.get_active()
+        self.shout2_audio_video.set_sensitive(value)
+        self.shout2_audio.set_sensitive(value)
+        self.shout2_video.set_sensitive(value)
 
         self._verify()
 
-    def on_secondary_checkbutton_toggled(self, button):
+    def on_secondary__toggled(self, button):
         self._verify()
 
-    def on_checkbutton_http_toggled(self, button):
-        value = self.checkbutton_http.get_active()
-        self.checkbutton_http_audio_video.set_sensitive(value)
-        self.checkbutton_http_audio.set_sensitive(value)
-        self.checkbutton_http_video.set_sensitive(value)
+    def on_http__toggled(self, button):
+        value = self.http.get_active()
+        self.http_audio_video.set_sensitive(value)
+        self.http_audio.set_sensitive(value)
+        self.http_video.set_sensitive(value)
 
         self._verify()
 

@@ -23,7 +23,7 @@
       <property name="spacing">6</property>
 
       <child>
-	<widget class="GtkCheckButton" id="checkbutton_http">
+	<widget class="GtkCheckButton" id="http">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">S_tream over HTTP</property>
@@ -32,7 +32,7 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_checkbutton_http_toggled" last_modification_time="Thu, 30 Sep 2004 10:49:24 GMT"/>
+	  <signal name="toggled" handler="on_http__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:24 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -54,7 +54,7 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_http_audio_video">
+		<widget class="GtkCheckButton" id="http_audio_video">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">Audio &amp; Video</property>
@@ -63,7 +63,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -73,7 +73,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_http_audio">
+		<widget class="GtkCheckButton" id="http_audio">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">Audio only</property>
@@ -82,7 +82,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -92,7 +92,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_http_video">
+		<widget class="GtkCheckButton" id="http_video">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">Video only</property>
@@ -101,7 +101,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -125,7 +125,7 @@
       </child>
 
       <child>
-	<widget class="GtkCheckButton" id="checkbutton_disk">
+	<widget class="GtkCheckButton" id="disk">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">S_ave to disk</property>
@@ -134,7 +134,7 @@
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_checkbutton_disk_toggled" last_modification_time="Thu, 30 Sep 2004 10:49:32 GMT"/>
+	  <signal name="toggled" handler="on_disk__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:32 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -156,7 +156,7 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_disk_audio_video">
+		<widget class="GtkCheckButton" id="disk_audio_video">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_focus">True</property>
@@ -166,7 +166,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:21:50 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:50 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -176,7 +176,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_disk_audio">
+		<widget class="GtkCheckButton" id="disk_audio">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_focus">True</property>
@@ -186,7 +186,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:22:06 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:06 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -196,7 +196,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_disk_video">
+		<widget class="GtkCheckButton" id="disk_video">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_focus">True</property>
@@ -206,7 +206,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary_checkbutton_toggled" last_modification_time="Thu, 02 Jun 2005 16:22:16 GMT"/>
+		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:16 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -230,7 +230,7 @@
       </child>
 
       <child>
-	<widget class="GtkCheckButton" id="checkbutton_shout2">
+	<widget class="GtkCheckButton" id="shout2">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">Stream to _Icecast2</property>
@@ -239,7 +239,7 @@
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_checkbutton_shout2_toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+	  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -261,7 +261,7 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_shout2_audio_video">
+		<widget class="GtkCheckButton" id="shout2_audio_video">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_focus">True</property>
@@ -271,7 +271,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_checkbutton_shout2_toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -281,7 +281,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_shout2_audio">
+		<widget class="GtkCheckButton" id="shout2_audio">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="sensitive">False</property>
@@ -291,7 +291,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_checkbutton_shout2_toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -301,7 +301,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_shout2_video">
+		<widget class="GtkCheckButton" id="shout2_video">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="sensitive">False</property>
@@ -311,7 +311,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_checkbutton_shout2_toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
