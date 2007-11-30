@@ -695,10 +695,11 @@ class SoundcardStep(AudioSourceStep):
         # block updates, because populating a shown combobox will of course
         # trigger the callback
         self._block_update = True
-        self.combobox_system.set_enum(SoundcardSystem)
-        self.combobox_channels.prefill(CHANNELS)
-        self.combobox_samplerate.prefill([(str(r), r) for r in SAMPLE_RATES])
-        self.combobox_bitdepth.prefill(BITDEPTHS)
+        self.source_element.prefill(
+            [(enum.nick, enum.element_name) for enum in SoundcardSystem])
+        self.channels.prefill(CHANNELS)
+        self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
+        self.depth.prefill(BITDEPTHS)
         self._block_update = False
 
     def worker_changed(self):
@@ -706,43 +707,26 @@ class SoundcardStep(AudioSourceStep):
         self._update_devices()
         self._update_inputs()
 
-    def get_state(self):
-        channels = self.combobox_channels.get_selected()
-        element = self.combobox_system.get_selected().element_name
-        bitdepth = self.combobox_bitdepth.get_selected()
-        samplerate = self.combobox_samplerate.get_selected()
-        input_track = self.combobox_input.get_selected()
-
-        d = dict(device=self.combobox_device.get_selected(),
-                 depth=int(bitdepth),
-                 rate=int(samplerate),
-                 channels=channels)
-        if input_track:
-            d['input-track'] = input_track
-        # FIXME: can a key with a dash be specified ?
-        d['source-element'] = element
-        return d
-
     def get_next(self):
         return None
 
     # Private
 
     def _clear_combos(self):
-        self.combobox_input.clear()
-        self.combobox_input.set_sensitive(False)
-        self.combobox_channels.set_sensitive(False)
-        self.combobox_samplerate.set_sensitive(False)
-        self.combobox_bitdepth.set_sensitive(False)
+        self.input_track.clear()
+        self.input_track.set_sensitive(False)
+        self.channels.set_sensitive(False)
+        self.rate.set_sensitive(False)
+        self.depth.set_sensitive(False)
 
     def _update_devices(self):
         self._block_update = True
-        self.combobox_device.clear()
-        enum = self.combobox_system.get_selected()
-        if enum == SoundcardSystem.Alsa:
-            self.combobox_device.prefill(ALSA_DEVICES)
-        elif enum == SoundcardSystem.OSS:
-            self.combobox_device.prefill(OSS_DEVICES)
+        self.device.clear()
+        enum = self.source_element.get_selected()
+        if enum == SoundcardSystem.Alsa.element_name:
+            self.device.prefill(ALSA_DEVICES)
+        elif enum == SoundcardSystem.OSS.element_name:
+            self.device.prefill(OSS_DEVICES)
         else:
             raise AssertionError
         self._block_update = False
@@ -752,18 +736,18 @@ class SoundcardStep(AudioSourceStep):
             return
         self.wizard.block_next(True)
 
-        device = self.combobox_device.get_selected()
-        system = self.combobox_system.get_selected()
-        channels = self.combobox_channels.get_selected() or 2
+        device = self.device.get_selected()
+        element_name = self.source_element.get_selected()
+        channels = self.channels.get_selected() or 2
         assert device
-        assert system
+        assert element_name
         assert channels
         msg = messages.Info(T_(
             N_("Probing soundcard, this can take a while...")),
                             id='soundcard-check')
         self.wizard.add_msg(msg)
         d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
-                               system.element_name,
+                               element_name,
                                device,
                                channels,
                                id='soundcard-check')
@@ -777,11 +761,11 @@ class SoundcardStep(AudioSourceStep):
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
             self._block_update = True
-            self.combobox_channels.set_sensitive(True)
-            self.combobox_samplerate.set_sensitive(True)
-            self.combobox_bitdepth.set_sensitive(True)
-            self.combobox_input.prefill(tracks)
-            self.combobox_input.set_sensitive(bool(tracks))
+            self.channels.set_sensitive(True)
+            self.rate.set_sensitive(True)
+            self.depth.set_sensitive(True)
+            self.input_track.prefill(tracks)
+            self.input_track.set_sensitive(bool(tracks))
             self._block_update = False
 
         d.addCallback(soundcardCheckComplete)
@@ -791,15 +775,15 @@ class SoundcardStep(AudioSourceStep):
 
     # Callbacks
 
-    def on_combobox_system_changed(self, combo):
+    def on_source_element__changed(self, combo):
         if not self._block_update:
             self._update_devices()
             self._update_inputs()
 
-    def on_combobox_device_changed(self, combo):
+    def on_device__changed(self, combo):
         self._update_inputs()
 
-    def on_combobox_channels_changed(self, combo):
+    def on_channels__changed(self, combo):
         # FIXME: make it so that the number of channels can be changed
         # and the check gets executed with the new number
         # self.update_inputs()

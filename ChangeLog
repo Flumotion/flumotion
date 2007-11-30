@@ -1,5 +1,10 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_soundcard.glade: 
+	* flumotion/wizard/productionstep.py (SoundCardStep): 
+	Remove get_state() and widget naming prefix. Rename signals.
+	Rename widgets to match their state name, simplify element parts
+
 	* data/glade/wizard_encoding.glade: 
 	* flumotion/wizard/productionstep.py (TVCardStep): 
 	Remove get_state() and widget naming prefix. Rename signals.
