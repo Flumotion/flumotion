@@ -1,5 +1,10 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	(JPEGStep.get_state): 
+	Move over the consumption steps to ProxyWidgetMapping
+
 	* flumotion/wizard/conversionsteps.py (ConversionStep): 
 	Use ProxyWidgetMapping, refactor/simplify video/audio page
 	(ConversionStep._get_video_page): Yay for pychecker

@@ -73,6 +73,7 @@ class VideoSourceStep(WorkerWizardStep):
 
 
 class VideoEncoderStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     section = _('Conversion')
 
     def __init__(self, wizard, model):
@@ -81,6 +82,7 @@ class VideoEncoderStep(WorkerWizardStep):
 
 
 class AudioEncoderStep(WorkerWizardStep):
+    glade_typedict = ProxyWidgetMapping()
     glade_file = 'wizard_audio_encoder.glade'
     section = _('Conversion')
 

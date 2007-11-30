@@ -245,11 +245,11 @@ class SmokeStep(VideoEncoderStep):
         self.wizard.require_elements(self.worker, 'smokeenc')
 
     def get_state(self):
-        options = VideoEncoderStep.get_state(self)
-        options['qmin'] = int(options['qmin'])
-        options['qmax'] = int(options['qmax'])
-        options['threshold'] = int(options['threshold'])
-        options['keyframe'] = int(options['keyframe'])
+        options = {}
+        options['qmin'] = int(self.spinbutton_qmin.get_value())
+        options['qmax'] = int(self.spinbutton_qmax.get_value())
+        options['threshold'] = int(self.spinbutton_threshold.get_value())
+        options['keyframe'] = int(self.spinbutton_keyframe.get_value())
         return options
 
     def get_next(self):
@@ -260,7 +260,7 @@ class JPEGStep(VideoEncoderStep):
     name = 'JPEG encoder'
     sidebar_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
-    section = 'Conversion'
+    section = _('Conversion')
     component_type = 'jpeg'
 
     # WizardStep
@@ -269,9 +269,10 @@ class JPEGStep(VideoEncoderStep):
         self.wizard.require_elements(self.worker, 'jpegenc')
 
     def get_state(self):
-        options = VideoEncoderStep.get_state(self)
-        options['quality'] = int(options['quality'])
-        options['framerate'] = _fraction_from_float(options['framerate'], 2)
+        options = {}
+        options['quality'] = int(self.spinbutton_quality.get_value())
+        options['framerate'] = _fraction_from_float(
+            int(self.spinbutton_framerate.get_value()), 2)
         return options
 
     def get_next(self):
@@ -339,6 +340,6 @@ class SpeexStep(AudioEncoderStep):
         self.wizard.require_elements(self.worker, 'speexenc')
 
     def get_state(self):
-        options = AudioEncoderStep.get_state(self)
+        options = {}
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         return options
