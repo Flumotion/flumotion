@@ -26,7 +26,7 @@
       <property name="column_spacing">6</property>
 
       <child>
-	<widget class="GtkCheckButton" id="checkbutton_set_license">
+	<widget class="GtkCheckButton" id="set_license">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">Specify _license:</property>
@@ -35,7 +35,7 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_checkbutton_set_license_toggled" last_modification_time="Thu, 30 Sep 2004 15:40:53 GMT"/>
+	  <signal name="toggled" handler="on_set_license__toggled" last_modification_time="Thu, 30 Sep 2004 15:40:53 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -48,7 +48,7 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox_license">
+	<widget class="GtkComboBox" id="license">
 	  <property name="visible">True</property>
 	</widget>
 	<packing>

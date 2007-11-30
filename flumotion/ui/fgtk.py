@@ -27,6 +27,8 @@ import gobject
 import gtk
 from kiwi.ui.widgets.checkbutton import ProxyCheckButton
 from kiwi.ui.widgets.combo import ProxyComboBox
+from kiwi.ui.widgets.radiobutton import ProxyRadioButton
+from kiwi.ui.widgets.entry import ProxyEntry
 
 from flumotion.common import enum, pygobject
 
@@ -224,4 +226,6 @@ class ProxyWidgetMapping(WidgetMapping):
     types.update({
         'GtkComboBox': FProxyComboBox,
         'GtkCheckButton': ProxyCheckButton,
+        'GtkEntry': ProxyEntry,
+        'GtkRadioButton': ProxyRadioButton,
         })

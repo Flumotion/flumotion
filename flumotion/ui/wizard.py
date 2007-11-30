@@ -25,6 +25,7 @@ import os
 import gtk
 import gtk.gdk
 import gtk.glade
+from kiwi.interfaces import IProxyWidget
 
 from flumotion.configure import configure
 from flumotion.common import log, pygobject, messages
@@ -118,6 +119,15 @@ class WizardStep(GladeWidget, log.Loggable):
 
     # Public API
 
+    def get_state(self):
+        state = {}
+        for name, widget in self.widgets.items():
+            if not IProxyWidget.providedBy(widget):
+                continue
+            name = name.replace('_', '-')
+            state[name] = widget.read()
+        return state
+
     def iterate_widgets(self):
         # depth-first
         def iterator(w):
@@ -152,26 +162,6 @@ class WizardStep(GladeWidget, log.Loggable):
     def before_show(self):
         """This is called just before we show the widget, everything
         is created and in place"""
-
-    def get_state(self):
-        return self._get_widget_states()
-
-    # Private API
-
-    def _get_widget_states(self):
-        # returns a new dict. is this necessary?
-        state_dict = {}
-        for w in self.iterate_widgets():
-            if hasattr(w, 'get_state') and w != self:
-                # only fgtk widgets implement get_state
-                # every widget that implements get_state automatically becomes
-                # a property
-                # spinbutton_some_property -> some-property
-                name = '-'.join(w.get_name().split('_'))
-                key = name.split('-', 1)[1]
-                state_dict[key] = w.get_state()
-
-        return state_dict
 
 
 class SectionWizard(GladeWindow, log.Loggable):

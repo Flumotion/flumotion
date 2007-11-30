@@ -80,21 +80,15 @@ class LicenseStep(WizardStep):
     # WizardStep
 
     def setup(self):
-        self.combobox_license.set_enum(LicenseType)
+        self.license.set_enum(LicenseType)
 
     def get_next(self):
         return None
 
     # Callbacks
 
-    def on_checkbutton_set_license_toggled(self, button):
-        self.combobox_license.set_sensitive(button.get_active())
-
-    def get_state(self):
-        return {
-            'set-license': self.checkbutton_set_license.get_active(),
-            'license': self.combobox_license.get_selected(),
-            }
+    def on_set_license__toggled(self, button):
+        self.license.set_sensitive(button.get_active())
 
 
 class SummaryStep(WizardStep):
