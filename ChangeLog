@@ -1,5 +1,9 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/save.py:
+	Move fraction denomination from the step to the save logic
+
 	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps): 
 	(WizardStepTest.testStepComponentProperties): Enable these, they are
 	working on my machine

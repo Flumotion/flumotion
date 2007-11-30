@@ -44,12 +44,6 @@ __pychecker__ = 'no-classattr no-argsused'
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
 
-def _fraction_from_float(number, denominator):
-    """
-    Return a string to be used in serializing to XML.
-    """
-    return "%d/%d" % (number * denominator, denominator)
-
 
 class ProductionStep(WorkerWizardStep):
 
@@ -240,8 +234,7 @@ class TestVideoSourceStep(VideoSourceStep):
         options['pattern'] = self.combobox_pattern.get_selected().value
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = _fraction_from_float(
-            self.spinbutton_framerate.get_value(), 10)
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 
     # Callbacks
@@ -429,8 +422,7 @@ class TVCardStep(VideoSourceStep):
         options['channel'] = self.combobox_source.get_selected()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = \
-            _fraction_from_float(self.spinbutton_framerate.get_value(), 10)
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 
     # Private
@@ -530,8 +522,7 @@ class FireWireStep(VideoSourceStep):
         options['scaled-width'] = d['sw']
         options['width'] = d['ow']
         options['is-square'] = self._is_square
-        options['framerate'] = \
-            _fraction_from_float(self.spinbutton_framerate.get_value(), 2)
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 
     # Private
@@ -857,8 +848,7 @@ class FireWireAudioStep(AudioSourceStep):
         options['scaled-width'] = d['sw']
         options['width'] = d['ow']
         options['is-square'] = self._is_square
-        options['framerate'] = \
-            _fraction_from_float(self.spinbutton_framerate.get_value(), 2)
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 
     def get_next(self):

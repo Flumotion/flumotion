@@ -21,7 +21,7 @@
 
 import gettext
 
-from flumotion.common import log, registry
+from flumotion.common import log
 from flumotion.wizard import enums
 from flumotion.configure import configure
 
@@ -29,6 +29,12 @@ from flumotion.configure import configure
 #        use translatable string as constants when saving the
 #        wizard configuration.
 _ = N_ = gettext.gettext
+
+def _fraction_from_float(number, denominator):
+    """
+    Return a string to be used in serializing to XML.
+    """
+    return "%d/%d" % (number * denominator, denominator)
 
 class Component(log.Loggable):
     logCategory = "componentsave"
@@ -118,13 +124,16 @@ class WizardSaver(log.Loggable):
         video_step = self.wizard.get_step(N_(source.step))
 
         if hasattr(video_step, 'worker'):
-            props = video_step.get_state()
+            properties = video_step.get_state()
             worker = video_step.worker
         else:
-            props = {}
+            properties = {}
             worker = self.wizard.get_step(_('Source')).worker
 
-        return Component('producer-video', source.component_type, worker, props)
+        self._set_fraction_property(properties, 'framerate', 10)
+
+        return Component('producer-video', source.component_type, worker,
+                         properties)
 
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
@@ -150,13 +159,23 @@ class WizardSaver(log.Loggable):
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
 
+    def _set_fraction_property(self, properties, property_name, denominator):
+        if not property_name in properties:
+            return
+
+        framerate = _fraction_from_float(int(properties[property_name]),
+                                         denominator)
+        properties[property_name] = framerate
+
     def getVideoEncoder(self):
         options = self.wizard.get_step_options(_('Encoding'))
         encoder = options['video']
         encoder_step = self.wizard.get_step(N_(encoder.step))
+
+        properties = encoder_step.get_state()
         return Component('encoder-video', encoder.component_type,
                          encoder_step.worker,
-                         encoder_step.get_state())
+                         properties)
 
     def getAudioSource(self, video_source):
         options = self.wizard.get_step_options(_('Source'))
@@ -169,17 +188,20 @@ class WizardSaver(log.Loggable):
             options['video'] == enums.VideoDevice.Firewire):
             return video_source
 
-        props = {}
 
         audio_step = self.wizard.get_step(N_(source.step))
 
         if hasattr(audio_step, 'worker'):
-            props = audio_step.get_state()
+            properties = audio_step.get_state()
             worker = audio_step.worker
         else:
+            properties = {}
             worker = self.wizard.get_step(_('Source')).worker
 
-        return Component('producer-audio', source.component_type, worker, props)
+        self._set_fraction_property(properties, 'framerate', 10)
+
+        return Component('producer-audio', source.component_type, worker,
+                         properties)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options(_('Encoding'))
