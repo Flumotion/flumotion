@@ -376,23 +376,6 @@ class Shout2Step(WorkerWizardStep):
     def get_next(self):
         return self.wizard.get_step(_('Consumption')).get_next(self)
 
-    def get_state(self):
-        options = {
-            'short-name': self.entry_short_name.get_text(),
-            'description': self.entry_description.get_text(),
-            'url': self.entry_url.get_text(),
-            'ip': self.entry_ip.get_text(),
-            'mount-point': self.entry_mount_point.get_text(),
-            'password': self.entry_password.get_text(),
-            'port': int(self.spinbutton_port.get_text())
-            }
-
-        for option in options.keys():
-            if options[option] == '':
-                del options[option]
-
-        return options
-
 
 class Shout2BothStep(Shout2Step):
     name = _('Icecast streamer (audio & video)')
