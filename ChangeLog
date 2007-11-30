@@ -2,6 +2,7 @@
 
 	* flumotion/wizard/conversionsteps.py (ConversionStep): 
 	Use ProxyWidgetMapping, refactor/simplify video/audio page
+	(ConversionStep._get_video_page): Yay for pychecker
 
 2007-11-29  Andy Wingo  <wingo@pobox.com>
 

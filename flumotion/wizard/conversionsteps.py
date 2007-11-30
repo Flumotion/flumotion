@@ -110,7 +110,7 @@ class ConversionStep(WorkerWizardStep):
         elif video == EncodingVideo.JPEG:
             step_class = JPEGStep
         else:
-            raise AssertionError(codec)
+            raise AssertionError(video)
 
         return step_class(self.wizard, self._video_encoder)
 
