@@ -57,7 +57,6 @@ class WizardStepTest(testsuite.TestCase):
             if s.get_name() != 'Summary':
                 get_next_ret = s.get_next()
                 self.assert_(not get_next_ret or isinstance(get_next_ret, str))
-    testLoadSteps.skip = 'Andy, maybe your generator work broke this ?'
 
     def testStepWidgets(self):
         widgets = [widget for s in self.steps if s.get_name() != 'Firewire'
@@ -85,7 +84,6 @@ class WizardStepTest(testsuite.TestCase):
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(s.get_component_properties(), dict))
-    testStepComponentProperties.skip = 'Andy, maybe your generator work broke this ?'
 
 
 class TestAdmin(admin.AdminModel):

@@ -1,5 +1,9 @@
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps): 
+	(WizardStepTest.testStepComponentProperties): Enable these, they are
+	working on my machine
+
 	* flumotion/ui/fgtk.py:
 	Remove all now unused widgets, add SpinButton to the list
 	of converted widgets.
