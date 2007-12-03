@@ -1,5 +1,7 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* po/POTFILES.in: Updae path to sidebar.py
+
 	* data/glade/wizard.glade:
 	* flumotion/ui/Makefile.am:
 	* flumotion/wizard/Makefile.am:

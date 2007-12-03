@@ -201,6 +201,7 @@ flumotion/ui/url.py
 flumotion/ui/icons.py
 flumotion/ui/wizard.py
 flumotion/ui/fgtk.py
+flumotion/ui/sidebar.py
 flumotion/ui/trayicon.py
 flumotion/ui/__init__.py
 flumotion/wizard/consumptionsteps.py
@@ -213,7 +214,6 @@ flumotion/wizard/conversionsteps.py
 flumotion/wizard/configurationwizard.py
 flumotion/wizard/__init__.py
 flumotion/wizard/basesteps.py
-flumotion/wizard/sidebar.py
 flumotion/monitor/nagios/util.py
 flumotion/monitor/nagios/main.py
 flumotion/monitor/nagios/__init__.py
