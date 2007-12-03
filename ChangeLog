@@ -1,5 +1,12 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/glade.py:
+	* flumotion/ui/url.py:
+	* flumotion/ui/wizard.py:
+	Remove unused imports and make pyflakes happy.
+
+2007-12-03  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/wizard.py (SectionWizard._jump_to_step): 
 	When jumping to the same step don't do anything to
         avoid unnecessary ui flashes

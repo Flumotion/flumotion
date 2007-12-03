@@ -24,7 +24,7 @@ import os
 import sys
 
 import gtk
-import gtk.glade
+from gtk import glade
 import gobject
 
 from flumotion.configure import configure
@@ -71,7 +71,7 @@ def flumotion_glade_custom_handler(xml, proc, name, *args):
     w.show()
     return w
 # FIXME: what does this do ?
-gtk.glade.set_custom_handler(flumotion_glade_custom_handler)
+glade.set_custom_handler(flumotion_glade_custom_handler)
 
 
 class GladeBacked:
@@ -103,10 +103,10 @@ class GladeBacked:
                 self.__class__
             file_path = os.path.join(self.glade_dir, self.glade_file)
             if self.glade_typedict:
-                wtree = gtk.glade.XML(file_path, typedict=self.glade_typedict)
+                wtree = glade.XML(file_path, typedict=self.glade_typedict)
             else:
                 # pygtk 2.4 doesn't like typedict={} ?
-                wtree = gtk.glade.XML(file_path)
+                wtree = glade.XML(file_path)
         except RuntimeError, e:
             msg = log.getExceptionMessage(e)
             raise RuntimeError('Failed to load file %s from directory %s: %s'

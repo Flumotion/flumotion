@@ -23,8 +23,6 @@
 import os
 
 import gtk
-import gtk.gdk
-import gtk.glade
 from kiwi.interfaces import IProxyWidget
 
 from flumotion.configure import configure

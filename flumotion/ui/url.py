@@ -23,8 +23,6 @@
 import os
 import gtk
 
-from flumotion.common import pygobject
-
 class ClickyURL(gtk.EventBox):
     def __init__(self, url, mime_type='application/ogg'):
         gtk.EventBox.__init__(self)
