@@ -1,5 +1,7 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/wizard.py (WizardStep): Remove unused vmethods.
+
 	* flumotion/wizard/conversionsteps.py (ConversionStep):
 	avoid duplication
 

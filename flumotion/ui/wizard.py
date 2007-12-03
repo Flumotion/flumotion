@@ -128,16 +128,6 @@ class WizardStep(GladeWidget, log.Loggable):
             state[name] = widget.read()
         return state
 
-    def iterate_widgets(self):
-        # depth-first
-        def iterator(w):
-            if isinstance(w, gtk.Container):
-                for c in w.get_children():
-                    for cc in iterator(c):
-                        yield cc
-            yield w
-        return iterator(self)
-
     # Required vmethods
 
     def get_next(self):
@@ -155,9 +145,6 @@ class WizardStep(GladeWidget, log.Loggable):
     def activated(self):
         """Called just before the step is shown, so the step can
         do some logic, eg setup the default state"""
-
-    def deactivated(self):
-        """Called after the user pressed next"""
 
     def before_show(self):
         """This is called just before we show the widget, everything
@@ -345,9 +332,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         m = '<span size="x-large">%s</span>' % escape(step.name)
         self.label_title.set_markup(m)
-
-        if self._current_step:
-            self._current_step.deactivated()
 
         self._current_step = step
 
