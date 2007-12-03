@@ -1,3 +1,12 @@
+2007-12-03  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/common/registry.py:
+	  Provide more useful debug output by using filenames where possible
+	* flumotion/twisted/pb.py:
+	  Log remote calls slightly more correctly.
+	* flumotion/test/test_manager_manager.py:
+	  Fix one of the skipped tests.
+
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/admin.glade:
@@ -23,7 +32,7 @@
 
 	* flumotion/ui/wizard.py (SectionWizard._jump_to_step): 
 	When jumping to the same step don't do anything to
-        avoid unnecessary ui flashes
+	avoid unnecessary ui flashes
 
 	* flumotion/ui/sidebar.py (SidebarSection.__init__): 
 	rename steps to buttons

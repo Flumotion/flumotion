@@ -22,7 +22,7 @@
 import os
 
 from twisted.spread import pb
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.common import log, planet, interfaces, common
@@ -236,7 +236,8 @@ class FakeWorkerMind(FakeMind):
     def remote_getFeedServerPort(self):
         return 7609
 
-    def remote_create(self, avatarId, type, moduleName, methodName, config):
+    def remote_create(self, avatarId, type, moduleName, methodName, nice, 
+            config):
         self.debug('remote_create(%s): logging in component' % avatarId)
         d = self.testcase._loginComponent(self.avatarId,
             avatarId, moduleName, methodName, type, config)
@@ -255,7 +256,10 @@ class FakeWorkerMind(FakeMind):
         return d
 
     def remote_getComponents(self):
-        return []
+        # Fire only asychronously; with an empty list.
+        d = defer.Deferred()
+        reactor.callLater(0, d.callback, [])
+        return d
 
 class FakeComponentMind(FakeMind):
 
@@ -266,7 +270,7 @@ class FakeComponentMind(FakeMind):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
         self.logName = avatarId
-        self.config = None
+        self.config = config
 
         self.info('Creating component mind for %s' % avatarId)
         state = planet.ManagerJobState()
@@ -292,10 +296,16 @@ class FakeComponentMind(FakeMind):
         return None
 
     def remote_provideMasterClock(self, port):
+        # Turn happy; we must do this asynchronously, otherwise the tests
+        # synchronously log out a client where that shouldn't be possible.
+        def turnHappy():
+            self.state.observe_set('mood', moods.happy.value)
+        reactor.callLater(0, turnHappy)
+
         return ("127.0.0.1", port, 0L)
 
     def remote_setMasterClock(self, ip, port, base_time):
-        self.state.observe_set('mood', moods.happy.value)
+        return None
 
     def remote_eatFrom(self, eaterAlias, fullFeedId, host, port):
         # pretend this works
@@ -346,7 +356,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
                                    self._workers)
 
     def _loginComponent(self, workerName, avatarId, type, moduleName,
-        methodName, config):
+            methodName, config):
         # create a component and log it in
         # return the avatar
 
@@ -625,7 +635,6 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         d.addCallback(emptyPlanet)
         d.addCallback(verifyMappersIsZero)
         return d
-    testConfigAfterWorker.skip = 'andy will fix this soon'
 
     def _verifyConfigAndOneWorker(self):
         self.debug('verifying after having loaded config and started worker')
@@ -661,9 +670,11 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
 
         state = m.jobState
         l = MyListener(state)
+        self.debug("Waiting for component producer-video-test to go happy")
         d = l.notifyOnSet(state, 'mood', moods.happy.value)
 
         def verifyMoodIsHappy(result):
+            self.debug("Turned happy")
             self.assertEqual(state.get('mood'), moods.happy.value,
                              "mood of %s is not happy but %r" % (
                 m.state.get('name'), moods.get(state.get('mood'))))

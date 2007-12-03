@@ -684,7 +684,7 @@ class Avatar(pb.Avatar, flog.Loggable):
 
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
-                '%s <-- %s: callRemote(%s', startArgs,
+                '%s <-- %s: callRemote(%s, ', startArgs,
                 '): %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
