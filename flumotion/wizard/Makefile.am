@@ -12,7 +12,6 @@ flumotion_PYTHON = \
 	models.py \
 	productionsteps.py \
 	save.py \
-	sidebar.py \
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)

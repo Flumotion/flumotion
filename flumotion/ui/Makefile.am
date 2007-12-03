@@ -8,6 +8,7 @@ flumotion_PYTHON = 	\
 	fvumeter.py 	\
 	glade.py 	\
 	icons.py 	\
+	sidebar.py 	\
 	trayicon.py 	\
 	url.py		\
 	wizard.py

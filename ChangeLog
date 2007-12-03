@@ -1,5 +1,13 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard.glade:
+	* flumotion/ui/Makefile.am:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/sidebar.py:
+	Move sidebar.py from wizard/ to ui/
+
+2007-12-03  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard.py: Remove a bitrotten test case
 
 	* flumotion/ui/wizard.py:
