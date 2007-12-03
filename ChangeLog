@@ -1,9 +1,13 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/conversionsteps.py (ConversionStep):
+	avoid duplication
+
 	* data/glade/wizard_theora.glade:
 	* data/glade/wizard_vorbis.glade:
 	* flumotion/wizard/conversionsteps.py (VorbisStep)
 	(TheoraStep): move over values to the glade files.
+	(ConversionStep.hasOggmux): 
 
 	* po/sv.po: Update swedish translation
 

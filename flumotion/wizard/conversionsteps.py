@@ -141,13 +141,12 @@ class ConversionStep(WorkerWizardStep):
             self.audio.set_enum(
                 EncodingAudio, [EncodingAudio.Mulaw])
 
-        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
-        self.audio.set_property('visible', has_audio)
-        self.label_audio.set_property('visible', has_audio)
-
-        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
-        self.video.set_property('visible', has_video)
-        self.label_video.set_property('visible', has_video)
+        for option, widgets in [
+            ('has-audio', [self.audio, self.label_audio]),
+            ('has-video', [self.video, self.label_video])]:
+            value = self.wizard.get_step_option(_('Source'), option)
+            for widget in widgets:
+                widget.set_property('visible', value)
 
     # Callbacks
 
