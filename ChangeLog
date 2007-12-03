@@ -1,3 +1,9 @@
+2007-12-03  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_http.glade: Make it a bit prettier by
+	aligning the spinbuttons/entries better and avoid expanding them 
+	so much.
+
 2007-11-30  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_overlay.glade: 
