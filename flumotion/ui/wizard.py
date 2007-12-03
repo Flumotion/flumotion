@@ -352,6 +352,11 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._current_step = step
 
     def _jump_to_step(self, name):
+        step = self.get_step(name)
+        # If we're jumping to the same step don't do anything to
+        # avoid unnecessary ui flashes
+        if step == self._current_step:
+            return
         self._stack.skip_to(lambda x: x.name == name)
         step = self._stack.current()
         self.sidebar.show_step(step.section)
