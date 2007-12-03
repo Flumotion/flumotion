@@ -1,5 +1,10 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_theora.glade:
+	* data/glade/wizard_vorbis.glade:
+	* flumotion/wizard/conversionsteps.py (VorbisStep)
+	(TheoraStep): move over values to the glade files.
+
 	* po/sv.po: Update swedish translation
 
 	* data/glade/wizard_http.glade: Make it a bit prettier by

@@ -177,13 +177,6 @@ class TheoraStep(VideoEncoderStep):
 
     # WizardStep
 
-    def setup(self):
-        # XXX: move to glade file
-        self.spinbutton_bitrate.set_range(0, 4000)
-        self.spinbutton_bitrate.set_value(400)
-        self.spinbutton_quality.set_range(0, 63)
-        self.spinbutton_quality.set_value(16)
-
     def worker_changed(self):
         self.debug('running Theora checks')
         def hasTheora(unused):
@@ -273,12 +266,9 @@ class VorbisStep(AudioEncoderStep):
     # WizardStep
 
     def setup(self):
-        self.spinbutton_bitrate.set_range(6, 250)
-        self.spinbutton_bitrate.set_value(64)
         # By choosing quality as a default, we avoid samplerate/bitrate
         # mismatch
         self.radiobutton_bitrate.set_active(False)
-        self.radiobutton_quality.set_active(True)
 
     def worker_changed(self):
         self.debug('running Vorbis checks')
