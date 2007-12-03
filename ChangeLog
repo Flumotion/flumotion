@@ -1,5 +1,19 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/admin.glade:
+	* data/glade/connection-dialog.glade:
+	* data/glade/greeter-authenticate.glade:
+	* data/glade/greeter-connect_to_existing.glade:
+	* data/glade/greeter-load_connection.glade:
+	* data/glade/wizard.glade:
+	Remove trailing () so we can avoid eval.
+	
+	* flumotion/ui/glade.py (_flumotion_glade_custom_handler): 
+	Rewrite, use namedAny instead of eval.
+	Remove unused methods and mark methods as private.
+
+2007-12-03  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/glade.py:
 	* flumotion/ui/url.py:
 	* flumotion/ui/wizard.py:

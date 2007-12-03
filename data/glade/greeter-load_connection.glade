@@ -27,7 +27,7 @@
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="has_focus">True</property>
-	  <property name="creation_function">flumotion.admin.gtk.connections.Connections()</property>
+	  <property name="creation_function">flumotion.admin.gtk.connections.Connections</property>
 	  <property name="int1">0</property>
 	  <property name="int2">0</property>
 	  <property name="last_modification_time">Tue, 08 Mar 2005 16:34:52 GMT</property>

@@ -19,7 +19,7 @@
   <child>
     <widget class="Custom" id="authenticate">
       <property name="visible">True</property>
-      <property name="creation_function">flumotion.admin.gtk.connections.Authenticate()</property>
+      <property name="creation_function">flumotion.admin.gtk.connections.Authenticate</property>
       <property name="int1">0</property>
       <property name="int2">0</property>
       <property name="last_modification_time">Tue, 08 Mar 2005 17:09:38 GMT</property>

@@ -26,52 +26,37 @@ import sys
 import gtk
 from gtk import glade
 import gobject
+from twisted.python.reflect import namedAny
 
 from flumotion.configure import configure
 from flumotion.common import log, pygobject
 
 
-# FIXME: what does this mean ?
-# proc := module1.module2.moduleN.proc1().maybe_another_proc()
-#  -> eval proc1().maybe_another_proc() in module1.module2.moduleN
-def flumotion_glade_custom_handler(xml, proc, name, *args):
-    def takewhile(proc, l):
-        ret = []
-        while l and proc(l[0]):
-            ret.append(l[0])
-            l.remove(l[0])
-        return ret
+def _unbrokenNamedAny(qual):
+    # ihooks breaks namedAny, so split up by module, attribute
+    module_name, attribute = qual.rsplit(".", 1)
+    module = namedAny(module_name)
+    return getattr(module, attribute, None)
 
-    def parse_proc(proc):
-        parts = proc.split('.')
-        assert len(parts) > 1
-        modparts = takewhile(str.isalnum, parts)
-        assert modparts and parts
-        return '.'.join(modparts), '.'.join(parts)
+def _flumotion_glade_custom_handler(xml, proc, name, *args):
+    widget_class = _unbrokenNamedAny(proc)
+    if widget_class is None:
+        mod, attr = proc.rsplit(".", 1)
+        raise RuntimeError(
+            "There is no widget called %r in module %s" % (
+            attr, mod))
 
-    module, code = parse_proc(proc)
-    try:
-        __import__(module)
-    except Exception, e:
-        msg = log.getExceptionMessage(e)
-        raise RuntimeError('Failed to load module %s: %s' % (module, msg))
+    widget = widget_class()
+    widget.set_name(name)
 
-    try:
-        w = eval(code, sys.modules[module].__dict__)
-    except Exception, e:
-        msg = log.getExceptionMessage(e)
-        raise RuntimeError('Failed call %s in module %s: %s'
-                           % (code, module, msg))
-    w.set_name(name)
-    # using custom widgets seems to bypass all property settings from
-    # the xml, so widgets are created as hidden. this show() call was
-    # added as a convenience, but sometimes it is irritating. end
-    # result, if you want to have an initially-hidden widget, hide it
-    # just after calling GladeBacked.__init__().
-    w.show()
-    return w
-# FIXME: what does this do ?
-glade.set_custom_handler(flumotion_glade_custom_handler)
+    # Normal properties are not parsed for Custom widgets,
+    # showing all non-window ones by default is probably a good idea
+    if not isinstance(widget, gtk.Window):
+        widget.show()
+
+    return widget
+
+glade.set_custom_handler(_flumotion_glade_custom_handler)
 
 
 class GladeBacked:
@@ -200,7 +185,7 @@ class GladeWindow(gobject.GObject, GladeBacked):
         for name, widget in self.widgets.iteritems():
             for prefix, signal in self.interesting_signals:
                 if name.startswith(prefix):
-                    hid = self.connect_signal(name, signal)
+                    hid = self._connect_signal(name, signal)
                     self.__signals[(name, signal)] = hid
 
         # have convenience methods acting on our window
@@ -212,7 +197,7 @@ class GladeWindow(gobject.GObject, GladeBacked):
         self.window.destroy()
         del self.window
 
-    def connect_signal(self, widget_name, signal):
+    def _connect_signal(self, widget_name, signal):
         """
         Connect a conventionally-named signal handler.
 
@@ -233,23 +218,5 @@ class GladeWindow(gobject.GObject, GladeBacked):
                  attr, widget_name, signal)
         proc = lambda *x: getattr(self, attr)()
         return self.widgets[widget_name].connect(signal, proc)
-
-    # somewhat experimental decorator
-    # this is only used by flowtester
-    # FIXME: if this wants to stay a public method, it should be commented
-    # and get an example so non-Andy people understand this code.
-    def with_blocked_signal(self, widget_name, signal):
-        w = self.widgets[widget_name]
-        hid = self.__signals[(widget_name, signal)]
-        def blocker(proc):
-            def blocked(*args, **kwargs):
-                w.handler_block(hid)
-                try:
-                    ret = proc(*args, **kwargs)
-                finally:
-                    w.handler_unblock(hid)
-                return ret
-            return blocked
-        return blocker
 
 pygobject.type_register(GladeWindow)

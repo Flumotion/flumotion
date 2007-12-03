@@ -29,7 +29,7 @@
 	<widget class="Custom" id="sidebar">
 	  <property name="width_request">160</property>
 	  <property name="visible">True</property>
-	  <property name="creation_function">flumotion.ui.sidebar.WizardSidebar()</property>
+	  <property name="creation_function">flumotion.ui.sidebar.WizardSidebar</property>
 	  <property name="int1">0</property>
 	  <property name="int2">0</property>
 	  <property name="last_modification_time">Thu, 21 Apr 2005 17:10:32 GMT</property>
@@ -173,7 +173,7 @@
 		      <child>
 			<widget class="Custom" id="message_area">
 			  <property name="height_request">80</property>
-			  <property name="creation_function">flumotion.admin.gtk.message.MessagesView()</property>
+			  <property name="creation_function">flumotion.admin.gtk.message.MessagesView</property>
 			  <property name="int1">0</property>
 			  <property name="int2">0</property>
 			  <property name="last_modification_time">Wed, 08 Jun 2005 14:37:07 GMT</property>
