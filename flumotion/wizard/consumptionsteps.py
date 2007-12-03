@@ -201,6 +201,10 @@ class HTTPStep(WorkerWizardStep):
     section = _('Consumption')
     component_type = 'http-streamer'
 
+    def __init__(self, wizard):
+        WorkerWizardStep.__init__(self, wizard)
+        self._missing_elements = False
+
     # WizardStep
 
     def setup(self):

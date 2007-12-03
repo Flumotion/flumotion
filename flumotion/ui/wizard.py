@@ -241,7 +241,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
         self._set_step(section)
-        self._current_step = section
 
         if not interactive:
             while self.show_next():
@@ -285,9 +284,9 @@ class SectionWizard(GladeWindow, log.Loggable):
                               next_step.sidebar_name)
         else:
             self.sidebar.show_step(next_step.section)
+
         next_step.visited = True
         self._set_step(next_step)
-        self._current_step = next_step
 
         has_next = not hasattr(next_step, 'last_step')
         self._update_buttons(has_next)
@@ -297,10 +296,8 @@ class SectionWizard(GladeWindow, log.Loggable):
     def _update_buttons(self, has_next):
         # update the forward and next buttons
         # has_next: whether or not there is a next step
-        if self._stack.pos == 0:
-            self.button_prev.set_sensitive(False)
-        else:
-            self.button_prev.set_sensitive(True)
+        can_go_back = self._stack.pos != 0
+        self.button_prev.set_sensitive(can_go_back)
 
         # XXX: Use the current step, not the one on the top of the stack
         if has_next:
@@ -308,6 +305,23 @@ class SectionWizard(GladeWindow, log.Loggable):
         else:
             # use APPLY, just like in gnomemeeting
             self.button_next.set_label(gtk.STOCK_APPLY)
+
+    def _set_step_icon(self, icon):
+        icon_filename = os.path.join(configure.imagedir, 'wizard', icon)
+        assert os.path.exists(icon_filename)
+        self.image_icon.set_from_file(icon_filename)
+
+    def _set_step_title(self, title):
+        self.label_title.set_markup(
+            '<span size="x-large">%s</span>' % escape(title))
+
+    def _pack_step(self, step):
+        # Remove previous step
+        map(self.content_area.remove, self.content_area.get_children())
+        self.message_area.clear()
+
+        # Add current
+        self.content_area.pack_start(step, True, True, 0)
 
     def _finish(self, main=True, completed=True):
         if completed:
@@ -320,20 +334,9 @@ class SectionWizard(GladeWindow, log.Loggable):
                 pass
 
     def _set_step(self, step):
-        # Remove previous step
-        map(self.content_area.remove, self.content_area.get_children())
-        self.message_area.clear()
-
-        # Add current
-        self.content_area.pack_start(step, True, True, 0)
-
-        icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
-        self.image_icon.set_from_file(icon_filename)
-
-        m = '<span size="x-large">%s</span>' % escape(step.name)
-        self.label_title.set_markup(m)
-
-        self._current_step = step
+        self._pack_step(step)
+        self._set_step_icon(step.icon)
+        self._set_step_title(step.name)
 
         self._update_buttons(has_next=True)
         self.block_next(False)
@@ -346,11 +349,22 @@ class SectionWizard(GladeWindow, log.Loggable):
         step.show()
         step.activated()
 
+        self._current_step = step
+
+    def _jump_to_step(self, name):
+        self._stack.skip_to(lambda x: x.name == name)
+        step = self._stack.current()
+        self.sidebar.show_step(step.section)
+        self._current_section = self._get_section_by_name(step.section)
+        self._set_step(step)
+
+    def _show_next_step(self):
+        self.show_next_step(self._current_step)
+
     def _show_previous_step(self):
         step = self._stack.back()
         self._current_section = self._get_section_by_name(step.section)
         self._set_step(step)
-        self._current_step = step
         self._update_buttons(has_next=True)
         self.sidebar.show_step(step.section)
         has_next = not hasattr(step, 'last_step')
@@ -383,15 +397,10 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._show_previous_step()
 
     def on_button_next_clicked(self, button):
-        self.show_next_step(self._current_step)
+        self._show_next_step()
 
     def on_sidebar_step_chosen(self, sidebar, name):
-        self._stack.skip_to(lambda x: x.name == name)
-        step = self._stack.current()
-        self._current_step = step
-        self.sidebar.show_step(step.section)
-        self._current_section = self._get_section_by_name(step.section)
-        self._set_step(step)
+        self._jump_to_step(name)
 
 
 pygobject.type_register(SectionWizard)

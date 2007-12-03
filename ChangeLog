@@ -1,5 +1,14 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard.py: Remove a bitrotten test case
+
+	* flumotion/ui/wizard.py:
+	Refactor and simplify
+
+	* flumotion/wizard/consumptionsteps.py (HTTPStep.__init__): 
+	set _missing_element to none in the constructor, it happens
+	when clicking on the step in the sidebar.
+
 	* flumotion/ui/wizard.py (WizardStep): Remove unused vmethods.
 
 	* flumotion/wizard/conversionsteps.py (ConversionStep):

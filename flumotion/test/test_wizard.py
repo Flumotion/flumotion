@@ -32,7 +32,6 @@ except RuntimeError:
     os._exit(0)
 
 from flumotion.admin import admin
-from flumotion.common import enum
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard import enums
 from flumotion.wizard.configurationwizard import ConfigurationWizard
@@ -57,27 +56,6 @@ class WizardStepTest(testsuite.TestCase):
             if s.get_name() != 'Summary':
                 get_next_ret = s.get_next()
                 self.assert_(not get_next_ret or isinstance(get_next_ret, str))
-
-    def testStepWidgets(self):
-        widgets = [widget for s in self.steps if s.get_name() != 'Firewire'
-                              for widget in s.iterate_widgets()]
-        for widget in widgets:
-            if isinstance(widget, fgtk.FSpinButton):
-                self.assert_(isinstance(widget.get_state(), float))
-            elif isinstance(widget, (fgtk.FRadioButton,
-                                     fgtk.FCheckButton)):
-                self.assert_(isinstance(widget.get_state(), bool))
-            elif isinstance(widget, fgtk.FEntry):
-                self.assert_(isinstance(widget.get_state(), str))
-            elif isinstance(widget, fgtk.FComboBox):
-                state = widget.get_state()
-                if hasattr(widget, 'enum_class'):
-                    self.failUnless(isinstance(state, enum.Enum))
-                else:
-                    # state can be None in the testsuite as well
-                    self.failUnless(not state or isinstance(state, int),
-                        "state %r is not an instance of int on widget %r" % (
-                            state, widget))
 
     def testStepComponentProperties(self):
         for s in self.steps:
