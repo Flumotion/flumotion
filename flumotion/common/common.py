@@ -298,35 +298,6 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
                                   _deletePidFile)
 
 
-def argRepr(args=(), kwargs={}, max=-1):
-    """
-    Return a string representing the given args.
-    """
-    # FIXME: rename function
-    # FIXME: implement max
-
-    # check validity of input
-    assert (type(args) is tuple or
-            type(args) is list)
-    assert type(kwargs) is dict
-
-    s = ''
-    args = list(args)
-
-    if args:
-        args = map(repr, args)
-        s += ', '.join(args)
-
-    if kwargs:
-        r = [(key + '=' + repr(item))
-                for key, item in kwargs.items()]
-
-        if s:
-            s += ', '
-        s += ', '.join(r)
-
-    return s
-
 def ensureDir(dir, description):
     """
     Ensure the given directory exists, creating it if not.

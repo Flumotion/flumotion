@@ -1,3 +1,9 @@
+2007-12-03  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/common.py (argRepr): 
+	* flumotion/test/test_common.py:
+	Kill argRepr and remove tests
+
 2007-12-03  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/registry.py:
