@@ -1,5 +1,8 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/sidebar.py (SidebarSection.__init__): 
+	rename steps to buttons
+
 	* po/POTFILES.in: Updae path to sidebar.py
 
 	* data/glade/wizard.glade:

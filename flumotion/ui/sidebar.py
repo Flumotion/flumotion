@@ -100,7 +100,7 @@ class SidebarSection(gtk.VBox):
         gtk.VBox.__init__(self)
 
         self.set_name(title)
-        self.steps = []
+        self.buttons = []
 
         self.title = SidebarButton(title, 10)
         self.title.show()
@@ -113,19 +113,19 @@ class SidebarSection(gtk.VBox):
 
     def set_active(self, active):
         if active:
-            for w in self.steps:
-                w.show()
+            for button in self.buttons:
+                button.show()
         else:
-            for w in self.steps:
-                w.hide()
+            for button in self.buttons:
+                button.hide()
 
     def push_header(self):
-        assert not self.steps
+        assert not self.buttons
         assert not self.title.sensitive
         self.title.set_sensitive(True)
 
     def pop_header(self):
-        assert not self.steps
+        assert not self.buttons
         assert self.title.sensitive
         self.title.set_sensitive(False)
 
@@ -135,15 +135,14 @@ class SidebarSection(gtk.VBox):
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
-        b = SidebarButton(step_title, 20)
-        b.show()
-        self.pack_start(b, False, False)
-
-        self.steps.append(b)
-        b.connect('clicked', clicked_cb, step_name)
+        button = SidebarButton(step_title, 20)
+        button.connect('clicked', clicked_cb, step_name)
+        self.pack_start(button, False, False)
+        button.show()
+        self.buttons.append(button)
 
     def pop_step(self):
-        b = self.steps.pop()
+        b = self.buttons.pop()
         self.remove(b)
 pygobject.type_register(SidebarSection)
 
@@ -207,7 +206,7 @@ class WizardSidebar(gtk.EventBox):
 
     def pop(self):
         top_section = self._sections[self._top]
-        if top_section.steps:
+        if top_section.buttons:
             top_section.pop_step()
         else:
             top_section.pop_header()
