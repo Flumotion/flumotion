@@ -1,5 +1,7 @@
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
+	* po/sv.po: Update swedish translation
+
 	* data/glade/wizard_http.glade: Make it a bit prettier by
 	aligning the spinbuttons/entries better and avoid expanding them 
 	so much.

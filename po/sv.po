@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-11-28 17:13+0100\n"
-"PO-Revision-Date: 2007-11-28 17:14+0100\n"
+"PO-Revision-Date: 2007-12-03 12:26+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -618,7 +618,7 @@ msgstr "Icecast: bild"
 
 #: flumotion/wizard/enums.py:36
 msgid "Test video source"
-msgstr "Test videokälla"
+msgstr "Testbildskälla"
 
 #: flumotion/wizard/enums.py:37
 msgid "Web camera"
@@ -630,7 +630,7 @@ msgstr "TV-kort"
 
 #: flumotion/wizard/enums.py:39
 msgid "Firewire video"
-msgstr "Firewire-video"
+msgstr "Firewire-bild"
 
 #: flumotion/wizard/enums.py:62
 msgid "Test audio source"
@@ -780,7 +780,7 @@ msgstr "Produktion"
 
 #: flumotion/wizard/productionsteps.py:161
 msgid "If you want to stream video"
-msgstr "Om du vill strömma video"
+msgstr "Om du vill strömma bild"
 
 #: flumotion/wizard/productionsteps.py:163
 msgid "If you want to stream audio"
@@ -788,7 +788,7 @@ msgstr "Om du vill strömma ljud"
 
 #: flumotion/wizard/productionsteps.py:223
 msgid "Test Video Source"
-msgstr "Testvideokälla"
+msgstr "Testbildskälla"
 
 #: flumotion/wizard/productionsteps.py:269
 msgid "Webcam"
@@ -1577,7 +1577,7 @@ msgstr "_Ljud:"
 
 #: data/glade/wizard_source.glade:117 data/glade/wizard_encoding.glade:113
 msgid "_Video:"
-msgstr "_Video:"
+msgstr "_Bild:"
 
 #: data/glade/wizard_tvcard.glade:65 data/glade/videotest.glade:60
 #: data/glade/wizard_testsource.glade:33
@@ -1596,7 +1596,7 @@ msgstr "B_ildruta:"
 
 #: data/glade/wizard_tvcard.glade:208
 msgid "Video _source:"
-msgstr "Video_källa:"
+msgstr "Bild_källa:"
 
 #: data/glade/wizard_tvcard.glade:232
 msgid "TV _norm:"
@@ -1774,7 +1774,7 @@ msgstr "Sample _rate:"
 
 #: data/glade/wizard_soundcard.glade:149
 msgid "Bi_t depth:"
-msgstr "Bittdjup"
+msgstr "_Bitdjup:"
 
 #: data/glade/wizard_soundcard.glade:260
 msgid "Sound _system:"
@@ -1790,7 +1790,7 @@ msgstr "klienter"
 
 #: data/glade/wizard_http.glade:162 data/glade/wizard_shout2.glade:68
 msgid "_Mount point:"
-msgstr "_Monteringspunkt"
+msgstr "_Monteringspunkt:"
 
 #: data/glade/wizard_http.glade:204
 msgid "User limit:"
