@@ -1,6 +1,4 @@
-2007-12-04  Michael Smith,,,  <set EMAIL_ADDRESS environment variable>
-
-	reviewed by: <delete if not using a buddy>
+2007-12-04  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/__init__.py:
 	* flumotion/admin/__init__.py:
@@ -366,6 +364,10 @@
 	* flumotion/worker/main.py:
 	* flumotion/worker/medium.py:
 	* flumotion/worker/worker.py:
+	  For all python code:
+	    - add __version__ = "$Rev$"
+	    - set svn:keywords to substitute $Rev$
+
 
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
