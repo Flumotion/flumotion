@@ -173,9 +173,12 @@ class WizardSaver(log.Loggable):
         if not property_name in properties:
             return
 
-        framerate = _fraction_from_float(int(properties[property_name]),
-                                         denominator)
-        properties[property_name] = framerate
+        value = properties[property_name]
+        try:
+            value = _fraction_from_float(int(value), denominator)
+        except ValueError:
+            pass
+        properties[property_name] = value
 
     def getVideoEncoder(self):
         options = self.wizard.get_step_options(_('Encoding'))

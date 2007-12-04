@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/save.py (WizardSaver._set_fraction_property): Catch
+	ValueError, fixes the webcam step.
+
 	* data/glade/admin-wizard.glade:
 	* data/glade/authenticate.glade:
 	* data/glade/greeter-authenticate.glade:
