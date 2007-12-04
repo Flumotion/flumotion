@@ -31,8 +31,6 @@ import gtk.glade
 from twisted.internet import reactor
 from twisted.internet.defer import maybeDeferred
 from zope.interface import implements
-from xml.dom.ext import PrettyPrint
-from xml.dom.ext.reader.Sax import FromXml
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
@@ -881,8 +879,7 @@ class Window(log.Loggable, gobject.GObject):
 
             if not file_exists:
                 f = open(name, 'w')
-                doc = FromXml(conf_xml.encode("utf-16"))
-                PrettyPrint(doc, f)
+                f.write(conf_xml)
                 f.close()
                 chooser.destroy()
 

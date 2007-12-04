@@ -218,14 +218,12 @@ class Parser(log.Loggable):
             raise self.parserError('failed to parse %s as %s: %s', node,
                                    type, log.getExceptionMessage(e))
 
-
 # this xml generation thingie is from a friday project, woo
-def sxml2unicode(expr):
+def sxml2unicode(expr, indent=0):
     if not isinstance(expr, list):
         return escape(unicode(expr))
     operator = expr[0]
-    args = [sxml2unicode(arg) for arg in expr[1:]]
-    return unicode(operator(args))
+    return unicode(operator(indent, expr[1:]))
 
 def _trans(k):
     table = {'klass': 'class'}
@@ -242,8 +240,16 @@ class SXML:
                               ''.join([' %s=%s' % (_trans(k), quoteattr(v))
                                        for k, v in kw.items()]))
             post = '</%s>' % (_trans(attr),)
-            def render(args):
-                return pre + '\n'.join(args) + post
+            def render(indent, args):
+                ind = ' '*indent
+                if len(args) == 0:
+                    return ind + pre[:-1] + ' />'
+                elif len(args) == 1 and not isinstance(args[0], list):
+                    return ind + pre + sxml2unicode(args[0]) + post
+                else:
+                    return (ind + pre + '\n' + '\n'.join(map(
+                        lambda x: sxml2unicode(x,indent+2), args)) + 
+                        '\n' + ind + post)
             render.__name__ = pre
             return render
         tag.__name__ = attr 
