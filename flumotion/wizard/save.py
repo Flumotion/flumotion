@@ -235,7 +235,7 @@ class WizardSaver(log.Loggable):
                          step.worker)
 
     def handleVideo(self, components):
-        video_source =  self.getVideoSource()
+        video_source = self.getVideoSource()
         components.append(video_source)
 
         video_encoder = self.getVideoEncoder()
@@ -267,26 +267,12 @@ class WizardSaver(log.Loggable):
         has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
         has_video = self.wizard.get_step_option(_('Source'), 'has-video')
 
-        audio_muxer = None
-        if has_audio:
-            audio_muxer = self.getMuxer('audio')
-            components.append(audio_muxer)
-            audio_muxer.link(audio_encoder)
-
-        video_muxer = None
-        if has_video:
-            video_muxer = self.getMuxer('video')
-            components.append(video_muxer)
-            video_muxer.link(video_encoder)
+        audio_muxer = self.getMuxer('audio')
+        video_muxer = self.getMuxer('video')
+        both_muxer = self.getMuxer('audio-video')
 
         steps = []
-        both_muxer = None
         if has_audio and has_video:
-            both_muxer = self.getMuxer('audio-video')
-            components.append(both_muxer)
-            both_muxer.link(video_encoder)
-            both_muxer.link(audio_encoder)
-
             if cons_options['http']:
                 if cons_options['http-audio-video']:
                     steps.append(('http-audio-video',
@@ -358,13 +344,17 @@ class WizardSaver(log.Loggable):
             consumer.link(muxer)
             components.append(consumer)
 
-        # Removed unused ones
-        if audio_muxer and not audio_muxer.eaters:
-            components.remove(audio_muxer)
-        if video_muxer and not video_muxer.eaters:
-            components.remove(video_muxer)
-        if both_muxer and not both_muxer.eaters:
-            components.remove(both_muxer)
+        # Add & link the muxers we will use
+        if audio_muxer and audio_muxer.eaters:
+            components.append(audio_muxer)
+            audio_muxer.link(audio_encoder)
+        if video_muxer and video_muxer.eaters:
+            components.append(video_muxer)
+            video_muxer.link(video_encoder)
+        if both_muxer and both_muxer.eaters:
+            components.append(both_muxer)
+            both_muxer.link(video_encoder)
+            both_muxer.link(audio_encoder)
 
     def getComponents(self):
         source_options = self.wizard.get_step_options(_('Source'))

@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/save.py (WizardSaver.handleConsumers): 
+	Link and add muxers after adding consumers, not before.
+
 	* flumotion/wizard/consumptionsteps.py:
 	Use a separate signal handler for all three widgets, for consistency.
 
