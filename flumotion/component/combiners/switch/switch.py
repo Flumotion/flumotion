@@ -25,11 +25,12 @@ import gst
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import errors, messages
+from flumotion.common import errors, messages, log
 from flumotion.common.planet import moods
 from flumotion.worker.checks import check
 from flumotion.component import feedcomponent
 from flumotion.component.base import scheduler
+from flumotion.component.plugs import base
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -43,12 +44,74 @@ def withlock(proc, lock):
             lock.release()
     return locking
 
+def collect_single_shot_buffer_probe(pads, probe):
+    def buffer_probe(pad, buffer):
+        probe_id = probe_ids.pop(pad, None)
+        if probe_id:
+            pad.remove_buffer_probe(probe_id)
+            ret.append(probe(pad, buffer))
+            if not probe_ids:
+                log.debug('switch', "have all probed values: %r", ret)
+                reactor.callFromThread(d.callback, ret)
+        else:
+            log.warning('switch', "foo!")
+        return True
+    probe_lock = threading.Lock()
+    buffer_probe = withlock(buffer_probe, probe_lock)
+
+    d = defer.Deferred()
+    ret = []
+    probe_ids = {}
+
+    log.debug('switch', "adding buffer probes for %r", pads)
+    probe_lock.acquire()
+    for pad in pads:
+        probe_ids[pad] = pad.add_buffer_probe(buffer_probe)
+    probe_lock.release()
+
+    return d
+
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
         return self.comp.switch_to("master")
 
     def remote_switchToBackup(self):
         return self.comp.switch_to("backup")
+
+    def remote_switchTo(self, logicalFeed):
+        return self.comp.switch_to(logicalFeed)
+
+class ICalSwitchPlug(base.ComponentPlug):
+    def start(self, component):
+        self._sid = None
+        self.sched = None
+        try:
+            def eventStarted(event):
+                self.debug("event started %r", event)
+                component.switch_to("backup")
+            def eventStopped(event):
+                self.debug("event stopped %r", event)
+                component.switch_to("master")
+
+            # if an event starts, semantics are to switch to backup
+            # if an event stops, semantics are to switch to master
+            filename = self.args['properties']['ical-schedule']
+            self.sched = scheduler.ICalScheduler(open(filename, 'r'))
+            self._sid = self.sched.subscribe(eventStarted, eventStopped)
+            if self.sched.getCurrentEvents():
+                component.idealFeed = "backup"
+        except ValueError:
+            fmt = N_("Error parsing ical file %s, so not scheduling "
+                     "any events.")
+            component.addWarning("error-parsing-ical", fmt, filename)
+        except ImportError, e:
+            fmt = N_("An ical file has been specified for scheduling, "
+                     "but the necessary modules are not installed.")
+            component.addWarning("error-parsing-ical", fmt, debug=e.message)
+
+    def stop(self, component):
+        if self.sched:
+            self.sched.unsubscribe(self._sid)
 
 class Switch(feedcomponent.MultiInputParseLaunchComponent):
     logCategory = 'switch'
@@ -57,6 +120,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def init(self):
         self.uiState.addKey("active-eater")
         self.icalScheduler = None
+
+        # foo
+        self._started = False
 
         # This structure maps logical feeds to sets of eaters. For
         # example, "master" and "backup" could be logical feeds, and
@@ -72,15 +138,22 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # eater alias -> (sink pad, switch element)
         self.switchPads = {}
 
-        self._switchLock = threading.Lock()
-        self._switchingToFeed = None # with _switchLock
-        self._activeFeed = None
+        # Two variables form the state of the switch component.
+        #    idealFeed
+        #        The feed that we would like to provide, as chosen by
+        #        the user, either by the UI, an ical file, a pattern
+        #        detection, etc.
+        #    activeFeed
+        #        The feed currently being provided
+        self.idealFeed = None
+        self.activeFeed = None
 
-        # Dict of logical feed name to deferred for feeds that we would
-        # like to switch to, but are waiting for eaters to become
-        # active.
-        self._feedReadyDefers = {}
-        self._started = False
+        # Additionally, the boolean flag _switching indicates that a
+        # switch is in progress.
+        self._switching = False
+
+        # All instance variables may only be accessed from the main
+        # thread.
 
     def addWarning(self, id, format, *args, **kwargs):
         self.warning(format, *args)
@@ -88,32 +161,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                              id=id, **kwargs)
         self.addMessage(m)
 
-    def _create_scheduler(self, filename):
-        try:
-            def eventStarted(event):
-                self.debug("event started %r", event)
-                self.switch_to_for_event("backup", True)
-            def eventStopped(event):
-                self.debug("event stopped %r", event)
-                self.switch_to_for_event("master", False)
+    def clearWarning(self, id):
+        for m in self.state.get('messages')[:]:
+            if m.id == id:
+                self.state.remove('messages', m)
 
-            # if an event starts, semantics are to switch to backup
-            # if an event stops, semantics are to switch to master
-            sched = scheduler.ICalScheduler(open(filename, 'r'))
-            sched.subscribe(eventStarted, eventStopped)
-            if sched.getCurrentEvents():
-                self._switchingToFeed = "backup"
-        except ValueError:
-            fmt = N_("Error parsing ical file %s, so not scheduling "
-                     "any events.")
-            self.addWarning("error-parsing-ical", fmt, filename)
-        except ImportError, e:
-            fmt = N_("An ical file has been specified for scheduling, "
-                     "but the necessary modules are not installed.")
-            self.addWarning("error-parsing-ical", fmt, debug=e.message)
-        else:
-            return sched
-        
     def do_check(self):
         def cb(result):
             for m in result.messages:
@@ -128,7 +180,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def do_setup(self):
         icalFileName = self.config['properties']['ical-schedule']
         if icalFileName:
-            self.icalScheduler = self._create_scheduler(icalFileName)
+            args = {'properties': {'ical-schedule': icalFileName}}
+            self.icalScheduler = ICalSwitchPlug(args)
+            self.icalScheduler.start(self)
 
     def create_pipeline(self):
         for name, aliases in self.get_logical_feeds():
@@ -136,8 +190,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             for alias in aliases:
                 assert alias in self.eaters
             self.logicalFeeds[name] = aliases
-            if self._switchingToFeed is None:
-                self._switchingToFeed = name
+            if self.idealFeed is None:
+                self.idealFeed = name
 
         return feedcomponent.MultiInputParseLaunchComponent.create_pipeline()
 
@@ -165,14 +219,14 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.eaters[alias].addWatch(self.eaterSetActive,
                                         self.eaterSetInactive)
 
-        self.switch_to(self._switchingToFeed, checkActive=False)
+        self.try_switch(checkActive=False)
 
     def get_switch_elements(self, pipeline):
         raise errors.NotImplementedError('subclasses should implement '
                                          'get_switch_elements')
 
     def is_active(self, feed):
-        all = lambda seq: reduce(int.__mul__, seq, True)
+        all = lambda seq: reduce(bool.__and__, seq, True)
         return all([self.eaters[alias].isActive()
                     for alias in self.logicalFeeds[feed]])
 
@@ -188,49 +242,31 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             # FIXME: why?
             self._started = True
 
-        for feed, aliases in self.logicalFeeds.items():
-            if (eaterAlias in aliases
-                and feed in self._feedReadyDefers
-                and self.is_active(feed)):
-                d = self._feedReadyDefers.pop(feed)
-                d.callback(True)
-                break
+        if self.activeFeed != self.idealFeed:
+            self.try_switch()
 
     def eaterSetInactive(self, eaterAlias):
         pass
 
-    def switch_to_for_event(self, feed, started):
+    def switch_to(self, feed):
         """
         @param feed: a logical feed
-        @param started: True if start of event, False if stop
         """
-        def switch_to_cb(success):
-            if not success:
-                feed_unavailable()
-
-        def feed_unavailable():
-            if started:
-                fmt = N_("Event started but could not switch to %s, "
-                         "will switch when %s is back")
-            else:
-                fmt = N_("Event stopped but could not switch to %s, "
-                         "will switch when %s is back")
-            self.addWarning("error-scheduling-event", fmt, feed, feed)
-
-            while self._feedReadyDefers:
-                self._feedReadyDefers.pop()
-
-            self._feedReadyDefers[feed] = d2 = defer.Deferred()
-            d2.addCallback(lambda x: self.switch_to(feed))
-
-        if not self.pipeline:
-            return
         if feed not in self.logicalFeeds:
             self.warning("unknown logical feed: %s", feed)
             return None
-        d = defer.maybeDeferred(self.switch_to, feed)
-        d.addCallback(switch_to_cb)
-        return d
+
+        self.debug('scheduling switch to feed %s', feed)
+        self.idealFeed = feed
+
+        if not self.pipeline:
+            return
+
+        success = self.try_switch()
+        if not success:
+            fmt = N_("Tried to switch to %s, but feed is unavailable. "
+                     "Will retry when the feed is back.")
+            self.addWarning("temporary-switch-problem", fmt, feed)
 
     # So switching multiple eaters is not that easy.
     # 
@@ -255,114 +291,80 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     #    received as the start value for the switch elements
     # 8) set the queue-buffers property on the switch elements to FALSE
 
-    def _prepare_switch(self, feed, checkActive):
-        def setSwitching():
-            if self._switchingToFeed:
+    def try_switch(self, checkActive=True):
+        def set_switching(switching):
+            if switching and self._switching:
+                self.warning("Switch already in progress")
                 return False
-            self._switchingToFeed = feed
-        setSwitching = withlock(setSwitching, self._switchLock)
-        
-        if feed == self._activeFeed:
-            self.warning("Feed %s is already active", feed)
-            return False
-        if checkActive and not self.is_active(feed):
-            # setActive/setInactive called from main thread, no chance
-            # for race
-            fmt = N_("Could not switch to %s because at least "
-                     "one of the %s eaters is not active.")
-            self.addWarning('cannot-switch', fmt, feed, feed, priority=40)
-            return False
-        if not setSwitching():
-            self.warning("Switch already in progress")
-            return False
+            elif not switching and not self._switching:
+                self.warning('something went terribly wrong')
+                # fall thru
+            self._switching = switching
 
-        last_times = []
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            pad.set_blocked_async(True, lambda x, y: None) # (1)
-            last_times.append(e.get_property('last-timestamp'))
+        def set_blocked(blocked):
+            for pad, e in switchPads:
+                pad.set_blocked_async(blocked, lambda x, y: None)
 
-        last_time = max(last_times)
-        self.debug('last time = %u', last_time)
-        
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            e.set_property('stop-value', last_time) # (2)
+        def set_stop_time():
+            times = [e.get_property('last-timestamp')
+                     for pad, e in switchPads]
 
-        diff = max(last_times) - min(last_times)
-        if diff > gst.SECOND * 10:
-            fmt = N_("When switching to %s, feed timestamps out of sync"
-                     " by %u")
-            self.addWarning('large-timestamp-difference', fmt, feed,
-                            diff, priority=40)
+            self.debug('last time = %u', max(times))
+            for pad, e in switchPads:
+                e.set_property('stop-value', max(times))
 
-    def switch_to(self, feed, checkActive=True):
-        if not self._prepare_switch(feed, checkActive):
-            return False
+            diff = max(times) - min(times)
+            if diff > gst.SECOND * 10:
+                fmt = N_("When switching to %s, feed timestamps out of"
+                         " sync by %u")
+                self.addWarning('large-timestamp-difference', fmt, feed,
+                                diff, priority=40)
 
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            e.set_property('active-pad', pad) # (3)
-        self.uiState.set("active-eater", feed)
-        self._activeFeed = feed
+        def set_queueing(queueing, start_time=None):
+            for pad, e in switchPads:
+                if start_time:
+                    e.set_property("start-value", start_time)
+                e.set_property("queue-buffers", queueing)
 
-        return self._finish_switch(feed)
+        def switch():
+            for pad, e in switchPads:
+                e.set_property('active-pad', pad)
+            self.activeFeed = feed
+            self.uiState.set("active-eater", feed)
 
-    def _finish_switch(self, feed):
-        def unsetSwitching():
-            assert self._switchingToFeed
-            self._switchingToFeed = None
-        unsetSwitching = withlock(unsetSwitching, self._switchLock)
+        def get_new_start_times():
+            return collect_single_shot_buffer_probe(
+                [pad for pad, e in switchPads],
+                lambda pad, buffer: buffer.timestamp)
 
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            e.set_property("queue-buffers", True) # (4)
 
-        self.uiState.set("active-eater", feed)
+        feed = self.idealFeed
 
-        def gotStartTimes(startTimes):
-            self.debug("have all start times: %u - %u", min(startTimes),
-                       max(startTimes))
-            for alias in self.logicalFeeds[feed]:
-                pad, e = self.switchPads[alias]
-                e.set_property("start-value", min(startTimes)) # (7)
-                e.set_property("queue-buffers", False) # (8)
-            unsetSwitching()
-            
-        d = self._get_new_start_times(feed) # (4)
-        d.addCallback(gotStartTimes)
-
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            pad.set_blocked_async(False, lambda x, y: None) # (6)
-
-    def _get_new_start_times(self, feed):
-        def buffer_probe(pad, buffer):
-            self.debug("start time buffer probe ts: %u", buffer.timestamp)
-            probe_id = probe_ids.pop(pad, None)
-            if probe_id:
-                pad.remove_buffer_probe(probe_id)
-                times.append(buffer.timestamp)
-                if not probe_ids:
-                    reactor.callFromThread(d.callback, times)
-            else:
-                self.warning("foo!")
+        if feed == self.activeFeed:
+            self.debug("feed %s is already active", feed)
+            self.clearWarning('temporary-switch-problem')
             return True
-        probe_lock = threading.Lock()
-        buffer_probe = withlock(buffer_probe, probe_lock)
 
-        d = defer.Deferred()
-        times = []
-        probe_ids = {}
+        if checkActive and not self.is_active(feed):
+            return False
 
-        self.debug("adding buffer probes here for %s", feed)
-        probe_lock.acquire()
-        for alias in self.logicalFeeds[feed]:
-            pad, e = self.switchPads[alias]
-            probe_ids[pad] = pad.add_buffer_probe(buffer_probe)
-        probe_lock.release()
+        if not set_switching(True):
+            return False
 
-        return d
+        switchPads = [self.switchPads[alias]
+                      for alias in self.logicalFeeds[feed]]
+        set_blocked(True) # (1)
+        set_stop_time() # (2)
+        switch() # (3)
+        set_queueing(True) # (4)
+        d = get_new_start_times() # (5)
+        set_blocked(False) # (6)
+        d.addCallback(lambda times: set_queueing(False, min(times))) # (7, 8)
+        d.addCallback(lambda _: set_switching(False))
+        # in self.idealEater was changed in the meantime, also to clear
+        # the warning message if everything is ok
+        d.addCallback(lambda _: self.try_switch())
+        return True
 
 class SingleSwitch(Switch):
     logCategory = "single-switch"

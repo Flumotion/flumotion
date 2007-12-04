@@ -1,3 +1,25 @@
+2007-12-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(collect_single_shot_buffer_probe): New helper, runs a function on
+	one buffer from all pads, firing a deferred in the main thread
+	when all values are collected.
+	(SwitchMedium.remote_switchTo): New remote method.
+	(ICalSwitchPlug, Switch.do_setup): Factor ICal stuff out into a
+	plug, which currently is not exported as such, but in the future
+	could be.
+	(Switch.init): Rework the state of the switcher, and document it.
+	Going back to the idealEater formulation that Zaheer had. Removed
+	lock, unnecessary as all switch code happens in the main thread.
+	(Switch.clearWarning): New helper.
+	(Switch.is_active): Less evil.
+	(Switch.eaterSetActive): Don't muck with a dict of deferreds; the
+	idea is just to retry switching as necessary.
+	(Switch.switch_to): Rework to set the idealEater and then call
+	try_switch().
+	(Switch.try_switch): Put prepare() and finish() code inside, which
+	I hope is more readable. The diff sucks tho.
+
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_consumption.glade:
