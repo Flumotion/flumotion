@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from gettext import gettext as _
 
 import gtk
@@ -178,5 +180,3 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             if value > 1.0: value = 1.0
             self._hscale.set_range(0.0, 1.0)
         self.volumeSet(value)
-
-__version__ = "$Rev$"

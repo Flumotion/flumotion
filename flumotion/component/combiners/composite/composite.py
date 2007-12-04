@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 class Composite(feedcomponent.MultiInputParseLaunchComponent):
@@ -63,5 +65,3 @@ class Composite(feedcomponent.MultiInputParseLaunchComponent):
                 for k, v in cfg.items():
                     if v is not None:
                         p.set_property(k, v)
-
-__version__ = "$Rev$"

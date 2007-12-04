@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 parsing of registry, which holds component and bundle information
 """
@@ -1421,5 +1423,3 @@ def getRegistry():
         __registry = ComponentRegistry()
 
     return __registry
-
-__version__ = "$Rev$"

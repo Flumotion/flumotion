@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 manager main function
 """
@@ -260,5 +262,3 @@ def main(args):
     reactor.run()
 
     return 0
-
-__version__ = "$Rev$"

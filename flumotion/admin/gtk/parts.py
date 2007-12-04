@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 from gettext import gettext as _
@@ -459,5 +461,3 @@ class ComponentMenu(gtk.Menu):
         self.emit('activated', name)
 
 pygobject.type_register(ComponentMenu)
-
-__version__ = "$Rev$"

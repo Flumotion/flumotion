@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from twisted.copyright import version
 
@@ -26,5 +28,3 @@ if version[0] >= '2':
     from twisted.web.http import *
 else:
     from twisted.protocols.http import *
-
-__version__ = "$Rev$"

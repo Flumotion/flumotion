@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from gettext import gettext as _
 
 import gtk
@@ -85,5 +87,3 @@ class VideoTestAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = VideoTestAdminGtk
-
-__version__ = "$Rev$"

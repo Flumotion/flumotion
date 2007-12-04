@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 code shared between components to implement effects
 """
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from zope.interface import implements
 
 from flumotion.common import errors, log
@@ -83,5 +85,3 @@ class BaseAdminText(log.Loggable):
     # run command, return string with result
     def runCommand(self, command):
         return ""
-
-__version__ = "$Rev$"

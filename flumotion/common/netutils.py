@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Miscellaneous network functions for use in flumotion.
 """
@@ -237,5 +239,3 @@ class RoutingTable(object):
                 yield route
         # Yield the default route
         yield None
-
-__version__ = "$Rev$"

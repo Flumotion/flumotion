@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.twisted import reflect
 from flumotion.common import testsuite
 
@@ -28,5 +30,3 @@ class TestSimple(testsuite.TestCase):
         self.failUnlessIdentical(s, TestSimple)
 
     # XXX: Write a test for the exception, but how?
-
-__version__ = "$Rev$"

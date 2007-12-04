@@ -20,6 +20,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from flumotion.component import feedcomponent
 
@@ -48,5 +50,3 @@ class Shout2Consumer(feedcomponent.ParseLaunchComponent):
 
         element = pipeline.get_by_name('shout2-streamer')
         element.connect('connection-problem', _connection_problem)
-
-__version__ = "$Rev$"

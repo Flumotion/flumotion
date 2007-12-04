@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from math import frexp
 from flumotion.component import feedcomponent
 
@@ -113,5 +115,3 @@ class Volume(feedcomponent.Effect):
             return self.component.getVolume()
         else:
             return 1.0
-
-__version__ = "$Rev$"

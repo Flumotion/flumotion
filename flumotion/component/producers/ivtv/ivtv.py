@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 # this is a producer component for ivtv
@@ -37,5 +39,3 @@ class Ivtv(feedcomponent.ParseLaunchComponent):
                 " ! @feeder:video@ d. ! queue ! audioconvert ! audio/x-raw-int "
                 " ! @feeder:audio@"
                 % (device, deinterlacer, scaling_template))
-
-__version__ = "$Rev$"

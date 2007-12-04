@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdminGtkNode
 
@@ -32,5 +34,3 @@ class WebcamAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = WebcamAdminGtk
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 import gtk
@@ -99,5 +101,3 @@ class ClickyURL(gtk.EventBox):
     def _streamurl_leave(self, widget, event):
         window = widget.window
         window.set_cursor(None)
-
-__version__ = "$Rev$"

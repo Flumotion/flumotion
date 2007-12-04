@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gobject
 
 import urllib2
@@ -256,5 +258,3 @@ def verify(client, data):
 
 pygobject.type_register(HTTPClient)
 pygobject.type_register(HTTPClientStatic)
-
-__version__ = "$Rev$"

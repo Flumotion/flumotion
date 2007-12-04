@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.trial import unittest
 
 import log
@@ -193,5 +195,3 @@ class TestLogSettings(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 # FIXME: moving this down causes errors
 from flumotion.common import log, pygobject
 
@@ -219,5 +221,3 @@ if __name__ == '__main__':
 
     _debug("going into gtk.main")
     gtk.main()
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Enum class implementation
 """
@@ -129,5 +131,3 @@ class EnumUnjellyer(jelly.Unjellyable):
 
 
 jelly.setUnjellyableForClass(qual(Enum), EnumUnjellyer)
-
-__version__ = "$Rev$"

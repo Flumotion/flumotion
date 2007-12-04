@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from twisted.internet import defer
@@ -172,5 +174,3 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
 
     result.succeed(None)
     return defer.succeed(result)
-
-__version__ = "$Rev$"

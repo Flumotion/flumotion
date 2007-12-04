@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 # taken from a twisted example
 # emulates an fd
 class CursesStdIO:
@@ -33,5 +35,3 @@ class CursesStdIO:
         """called when input is ready"""
 
     def logPrefix(self): return 'CursesClient'
-
-__version__ = "$Rev$"

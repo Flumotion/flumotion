@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Common routines to parsing XML.
 
@@ -246,5 +248,3 @@ class SXML:
             return render
         tag.__name__ = attr 
         return tag
-
-__version__ = "$Rev$"

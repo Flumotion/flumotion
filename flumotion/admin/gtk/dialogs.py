@@ -20,6 +20,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from gettext import gettext as _
 import os
 
@@ -236,5 +238,3 @@ class AboutDialog(gtk.Dialog):
         info.set_justify(gtk.JUSTIFY_FILL)
         info.set_line_wrap(True)
         info.show()
-
-__version__ = "$Rev$"

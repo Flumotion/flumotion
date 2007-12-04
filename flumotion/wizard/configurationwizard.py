@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 import sets
 
@@ -385,5 +387,3 @@ class ConfigurationWizard(SectionWizard):
                 id='worker-error')
             self.add_msg(msg)
 
-
-__version__ = "$Rev$"

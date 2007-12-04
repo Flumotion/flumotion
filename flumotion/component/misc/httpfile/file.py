@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import string
 import os
 
@@ -325,5 +327,3 @@ class FileTransfer:
     def stopProducing(self):
         self.file.close()
         self.request = None
-
-__version__ = "$Rev$"

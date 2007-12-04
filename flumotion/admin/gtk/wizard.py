@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 
@@ -287,5 +289,3 @@ class Wizard(GladeWindow):
         return d
 
 pygobject.type_register(Wizard)
-
-__version__ = "$Rev$"

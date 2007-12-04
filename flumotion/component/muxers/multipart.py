@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from flumotion.component import feedcomponent
@@ -26,5 +28,3 @@ from flumotion.component import feedcomponent
 class Multipart(feedcomponent.MultiInputParseLaunchComponent):
     def get_muxer_string(self, properties):
         return 'multipartmux name=muxer'
-
-__version__ = "$Rev$"

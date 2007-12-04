@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 A bouncer that only lets in during an event scheduled with an ical file.
 """
@@ -76,5 +78,3 @@ class IcalBouncer(bouncer.Bouncer):
             return keycard
         self.info("failed in authentication, outside hours")
         return None
-
-__version__ = "$Rev$"

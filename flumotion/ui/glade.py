@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import gtk
 from gtk import glade
@@ -192,5 +194,3 @@ class GladeWindow(GladeBacked):
         del self.window
 
 gobject.type_register(GladeWindow)
-
-__version__ = "$Rev$"

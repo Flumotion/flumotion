@@ -18,6 +18,8 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+__version__ = "$Rev$"
 import string
 from twisted.internet import defer
 
@@ -46,5 +48,3 @@ def checkOgg():
 
     result.succeed(None)
     return defer.succeed(result)
-
-__version__ = "$Rev$"

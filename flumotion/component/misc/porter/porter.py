@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from urllib2 import urlparse
 
 from twisted.internet import protocol, reactor, address, error, defer
@@ -516,5 +518,3 @@ class RTSPPorterProtocol(HTTPPorterProtocol):
 
     def writeNotFoundResponse(self):
         self.transport.write("RTSP/1.0 404 Not Found\r\n\r\nResource unknown")
-
-__version__ = "$Rev$"

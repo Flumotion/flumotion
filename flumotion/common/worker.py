@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Objects related to the state of workers.
 """
@@ -234,5 +236,3 @@ class AdminWorkerState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(ManagerWorkerState, AdminWorkerState)
-
-__version__ = "$Rev$"

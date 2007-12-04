@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 implementation of a PB Server through which other components can request
 to eat from or feed to this worker's components.
@@ -170,5 +172,3 @@ class FeedAvatar(fpb.Avatar):
             t.keepSocketAlive = True
 
         t.loseConnection()
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import log
 
 
@@ -67,5 +69,3 @@ class ManagerPlug(Plug):
     def restart(self, vishnu):
         self.stop(vishnu)
         self.start(vishnu)
-
-__version__ = "$Rev$"

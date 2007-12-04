@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gtk
 
 from flumotion.common import errors, log
@@ -101,5 +103,3 @@ class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         spinbutton.handler_block(spinbutton_change_id)
         spinbutton.set_value(value)
         spinbutton.handler_unblock(spinbutton_change_id)
-
-__version__ = "$Rev$"

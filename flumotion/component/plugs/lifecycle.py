@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from flumotion.component.plugs import base
 
@@ -67,5 +69,3 @@ class ComponentLifecyclePrinter(ComponentLifecycle):
     def stop(self, component):
         print 'Component is stopping'
 
-
-__version__ = "$Rev$"

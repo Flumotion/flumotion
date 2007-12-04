@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import StringIO
 
 from flumotion.common.netutils import ipv4StringToInt, ipv4IntToString
@@ -194,5 +196,3 @@ class TestRoutingTable(testsuite.TestCase):
                                    '192.168.3.1/32 foo\n'
                                    ,
                                    ['foo', 'bar'])
-
-__version__ = "$Rev$"

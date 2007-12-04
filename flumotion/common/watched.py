@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 def _make_watched(type, *mutators):
     class Watched(type):
@@ -51,5 +53,3 @@ def _make_watched(type, *mutators):
 
 WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
                             'sort', 'reverse')
-
-__version__ = "$Rev$"

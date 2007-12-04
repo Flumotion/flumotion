@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 
 from flumotion.configure import configure
@@ -402,5 +404,3 @@ class Shout2VideoStep(Shout2Step):
     sidebar_name = _('Icecast video')
 
 
-
-__version__ = "$Rev$"

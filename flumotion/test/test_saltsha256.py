@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 from twisted.trial import unittest
 from twisted.internet import defer
@@ -100,5 +102,3 @@ class TestSaltSha256USCPCC(testsuite.TestCase):
         return d
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

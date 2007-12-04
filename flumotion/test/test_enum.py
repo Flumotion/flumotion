@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.spread import jelly
 
 from flumotion.common import enum
@@ -126,5 +128,3 @@ class TestEnum(testsuite.TestCase):
         self.assertEquals(jelly.unjelly(jelly.jelly(a.Bar)), a.Bar)
         self.assertNotEquals(jelly.unjelly(jelly.jelly(a.Foo)), a.Bar)
         self.assertNotEquals(jelly.unjelly(jelly.jelly(a.Bar)), a.Foo)
-
-__version__ = "$Rev$"

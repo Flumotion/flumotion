@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 class GDPProducer(feedcomponent.ParseLaunchComponent):
@@ -27,5 +29,3 @@ class GDPProducer(feedcomponent.ParseLaunchComponent):
         port = properties['port']
 
         return 'tcpclientsrc host=%s port=%d ! gdpdepay' % (host, port)
-
-__version__ = "$Rev$"

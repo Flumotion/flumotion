@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import gtk
 
@@ -130,5 +132,3 @@ class DiskerAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = DiskerAdminGtk
-
-__version__ = "$Rev$"

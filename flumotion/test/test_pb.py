@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import crypt
 
 from twisted.cred import portal
@@ -589,5 +591,3 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

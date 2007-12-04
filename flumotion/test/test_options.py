@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 from flumotion.common.options import OptionGroup, OptionParser
 from flumotion.common.log import getLogSettings, setLogSettings
@@ -66,5 +68,3 @@ class TestOptions(testsuite.TestCase):
         self.failUnless(options.test)
         self.failUnless(options.verbose)
         self.assertEqual(rest, ["rest"])
-
-__version__ = "$Rev$"

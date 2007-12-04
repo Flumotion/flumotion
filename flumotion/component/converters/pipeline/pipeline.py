@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 __all__ = ['Converter']
@@ -28,5 +30,3 @@ class Converter(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
         return properties['pipeline']
-
-__version__ = "$Rev$"

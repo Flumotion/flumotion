@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Producer to receive gdp-payloaded data on a unix domain socket
 """
-
-__version__ = "$Rev$"

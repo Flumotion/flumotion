@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 from twisted.trial import unittest
 
@@ -76,5 +78,3 @@ class TestProperty(unittest.TestCase):
         b = gstreamer.element_factory_has_property_value(
             'fakesrc', 'sizetype', 'no-way')
         self.failIf(b)
-
-__version__ = "$Rev$"

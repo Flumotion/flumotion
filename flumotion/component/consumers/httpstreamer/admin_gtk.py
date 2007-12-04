@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import time
 
@@ -222,5 +224,3 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self.nodes['Log'].logMessage(message)
 
 GUIClass = HTTPStreamerAdminGtk
-
-__version__ = "$Rev$"

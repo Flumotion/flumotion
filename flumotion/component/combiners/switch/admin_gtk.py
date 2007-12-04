@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import gtk
 
@@ -74,5 +76,3 @@ class SwitcherAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = SwitcherAdminGtk
-
-__version__ = "$Rev$"

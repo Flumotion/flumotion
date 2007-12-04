@@ -16,6 +16,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 """
 Abstractions for dealing with PB connections.
@@ -98,5 +100,3 @@ def parsePBConnectionInfo(string, username='user', password='test',
         if groups[i]:
             setattr(o, k, f(groups[i]))
     return ret
-
-__version__ = "$Rev$"

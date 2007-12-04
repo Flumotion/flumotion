@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 from xml.dom import minidom, Node
@@ -117,5 +119,3 @@ def parsePBConnectionInfo(managerString, use_ssl=True,
                                  % (managerString, managerString))
     else:
         return info
-
-__version__ = "$Rev$"

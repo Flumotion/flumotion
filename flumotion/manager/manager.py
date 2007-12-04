@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 manager implementation and related classes
 
@@ -1257,5 +1259,3 @@ class Vishnu(log.Loggable):
             return self._componentMappers[object].state
 
         return None
-
-__version__ = "$Rev$"

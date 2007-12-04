@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 worker-side objects to handle worker clients
 """
@@ -351,5 +353,3 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
         if self.mind:
             self._sendFileDescriptor(stdout, "redirectStdout")
             self._sendFileDescriptor(stdout, "redirectStderr")
-
-__version__ = "$Rev$"

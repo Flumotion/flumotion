@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
@@ -182,5 +184,3 @@ class BundleLoader(log.Loggable):
         d = self.getBundles(fileName=fileName)
         d.addCallback(gotBundles)
         return d
-
-__version__ = "$Rev$"

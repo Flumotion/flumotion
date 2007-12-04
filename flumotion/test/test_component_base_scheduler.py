@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from datetime import datetime, timedelta
 
@@ -122,5 +124,3 @@ class SchedulerTest(testsuite.TestCase):
         self.assertEquals(s.getCurrentEvents(), [])
 
         s.unsubscribe(sid)
-
-__version__ = "$Rev$"

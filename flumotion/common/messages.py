@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 support for serializable translatable messages from component/manager to admin
 """
@@ -346,5 +348,3 @@ class Result(pb.Copyable, pb.RemoteCopy):
             self.failed = True
             self.value = None
 pb.setUnjellyableForClass(Result, Result)
-
-__version__ = "$Rev$"

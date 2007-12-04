@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 A bouncer that authenticates based on the IP address of the remote side,
 as seen by the bouncer.
@@ -87,5 +89,3 @@ class IPBouncer(bouncer.Bouncer):
             self.debug('allowed login from ip address %s',
                        keycard.address)
             return keycard
-
-__version__ = "$Rev$"

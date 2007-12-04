@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 model abstraction for administration clients supporting different views
 """
@@ -441,5 +443,3 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def getWorkerHeavenState(self):
         return self._workerHeavenState
-
-__version__ = "$Rev$"

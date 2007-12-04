@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 an htpasswd-backed bouncer with crypt passwords
 """
@@ -80,5 +82,3 @@ class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
             len(lines)))
 
         return defer.succeed(None)
-
-__version__ = "$Rev$"

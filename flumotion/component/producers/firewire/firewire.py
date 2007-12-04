@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 from twisted.internet import defer
 
@@ -173,5 +175,3 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                             id="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
-
-__version__ = "$Rev$"

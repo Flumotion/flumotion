@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 import random
@@ -203,5 +205,3 @@ class RRDMonitor(log.Loggable):
 
             d = admin.componentCallRemote(state, 'getUIState')
             d.addCallbacks(gotUIState, errback)
-
-__version__ = "$Rev$"

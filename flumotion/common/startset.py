@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 a data structure to manage asynchronous avatar starts and shutdowns
 """
@@ -246,5 +248,3 @@ class StartSet(log.Loggable):
             self.shutdownSuccess(avatarId)
         else:
             self.debug('unknown avatar %s logged out', avatarId)
-
-__version__ = "$Rev$"

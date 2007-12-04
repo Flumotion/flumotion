@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Bouncer components perform authentication services for other components.
 """
-
-__version__ = "$Rev$"

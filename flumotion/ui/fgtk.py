@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 I am a collection of extended GTK widgets for use in Flumotion.
 """
@@ -69,5 +71,3 @@ class ProxyWidgetMapping:
             return gobject.type_from_name(name)
 
 
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 from flumotion.component.misc.porter import porter
 
@@ -164,5 +166,3 @@ class TestHTTPPorterProtocolParser(testsuite.TestCase):
 
         result = self.pp.parseLine('GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/')
-
-__version__ = "$Rev$"

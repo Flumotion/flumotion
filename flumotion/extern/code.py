@@ -211,5 +211,3 @@ if __name__=="__main__":
                                                   gtk_version)
 
     interpreter.interact(banner, block=True)
-
-__version__ = "$Rev$"

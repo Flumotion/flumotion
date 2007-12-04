@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 from xml.dom import Node
@@ -203,5 +205,3 @@ class ConfigParser(config.BaseConfigParser):
                                      '<source>')
 
         return res
-
-__version__ = "$Rev$"

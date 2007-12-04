@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 functions based on twisted.python.reflect
 """
@@ -66,5 +68,3 @@ def namedAny(name):
         obj = getattr(obj, n)
 
     return obj
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import random
 
@@ -56,5 +58,3 @@ class ExampleIdentityProvider(IdentityProvider):
         i = RemoteIdentity(random.choice(['larry', 'curly', 'moe']),
                            random.choice(['chicago', 'detroit']))
         return defer.succeed(i)
-
-__version__ = "$Rev$"

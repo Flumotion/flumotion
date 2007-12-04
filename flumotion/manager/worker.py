@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 manager-side objects to handle worker clients
 """
@@ -203,5 +205,3 @@ class WorkerHeaven(base.ManagerHeaven):
         except ValueError:
             self.warning('worker %s was never registered in the heaven',
                          workerName)
-
-__version__ = "$Rev$"

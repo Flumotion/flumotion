@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 
 from twisted.internet import defer, reactor
@@ -148,5 +150,3 @@ class TrivialBouncerTest(testsuite.TestCase):
         d = self.obj.authenticate(k)
         d.addCallback(authenticated)
         return d
-
-__version__ = "$Rev$"

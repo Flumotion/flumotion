@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 from flumotion.common import errors
 
@@ -83,5 +85,3 @@ class AVBasicWatchdog(switch.AVSwitch):
             self.debug("Switching to %s, active eater is %s", self._idealEater,
                 self.uiState.get("active-eater"))
             self.switch_to(self._idealEater)
-
-__version__ = "$Rev$"

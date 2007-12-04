@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from vorbis010 import Vorbis
-
-__version__ = "$Rev$"

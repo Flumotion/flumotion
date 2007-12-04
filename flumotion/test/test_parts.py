@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gtk
 from twisted.spread import jelly
 
@@ -144,5 +146,3 @@ class TestComponentsView(testsuite.TestCase):
         self.asserted = False
         self.view._view.set_cursor('0')
         self.failUnless(self.asserted)
-
-__version__ = "$Rev$"

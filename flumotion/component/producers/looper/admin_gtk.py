@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from gettext import gettext as _
 
 import os
@@ -126,5 +128,3 @@ class LooperAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = LooperAdminGtk
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import tempfile
 
@@ -239,5 +241,3 @@ class TestDirectory(testsuite.TestCase):
                 str(len(expected)))
         fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred
-
-__version__ = "$Rev$"

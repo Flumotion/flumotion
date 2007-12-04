@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 code for porter clients and servers
 """
-
-__version__ = "$Rev$"

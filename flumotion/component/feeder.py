@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import time
 
@@ -216,5 +218,3 @@ class FeederClient:
 
         reactor.callFromThread(self._updateUIStateForDisconnect, fd,
                                when)
-
-__version__ = "$Rev$"

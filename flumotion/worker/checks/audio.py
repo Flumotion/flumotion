@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.worker.checks import check
 from flumotion.common import messages, log
 
@@ -61,5 +63,3 @@ def checkMixerTracks(source_factory, device, channels, id=None):
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
-
-__version__ = "$Rev$"

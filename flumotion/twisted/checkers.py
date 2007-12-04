@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion Twisted credential checkers
 """
@@ -169,5 +171,3 @@ class Sha256Checker(log.Loggable):
             self.debug('user %s refused, not in database' %
                 credentials.username)
             return defer.fail(errors.NotAuthenticatedError())
-
-__version__ = "$Rev$"

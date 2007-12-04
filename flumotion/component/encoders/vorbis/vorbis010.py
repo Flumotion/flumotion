@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import gst
 
@@ -88,5 +90,3 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
             return True
 
         handle = pad.add_buffer_probe(buffer_probe)
-
-__version__ = "$Rev$"

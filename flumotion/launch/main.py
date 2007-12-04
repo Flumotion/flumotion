@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 """
 Flumotion-launch: A gst-launch analog for Flumotion.
@@ -281,5 +283,3 @@ def main(args):
         return 1
     else:
         return 0
-
-__version__ = "$Rev$"

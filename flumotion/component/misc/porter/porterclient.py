@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet.tcp import Port, Connection
 from twisted.internet import reactor, address
@@ -160,5 +162,3 @@ class HTTPPorterClientFactory(PorterClientFactory):
             deferred.addCallback(lambda r,m: self.registerPrefix(m),
                 mount)
         deferred.addCallback(self._fireDeferred)
-
-__version__ = "$Rev$"

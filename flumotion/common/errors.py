@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 serializable Flumotion exceptions
 """
@@ -250,5 +252,3 @@ class GStreamerGstError(GStreamerError):
 
 class MissingElementError(GStreamerError):
     "A needed element is missing"
-
-__version__ = "$Rev$"

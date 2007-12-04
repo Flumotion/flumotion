@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 from twisted.web import server
 
@@ -348,5 +350,3 @@ class TestHTTPRoot(testsuite.TestCase):
         self.assertEquals(r, resource)
         output = r.render(request)
         self.assertEquals(output,  server.NOT_DONE_YET)
-
-__version__ = "$Rev$"

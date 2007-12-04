@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import reactor
 from twisted.python import rebuild
 
@@ -105,5 +107,3 @@ def main(args):
     _runInterface(options)
 
     reactor.run()
-
-__version__ = "$Rev$"

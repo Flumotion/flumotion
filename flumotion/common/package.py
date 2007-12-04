@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 objects and functions used in dealing with packages
 """
@@ -439,5 +441,3 @@ def getPackager():
         __packager = Packager()
 
     return __packager
-
-__version__ = "$Rev$"

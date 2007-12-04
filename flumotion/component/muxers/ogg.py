@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from flumotion.component import feedcomponent
@@ -44,5 +46,3 @@ class Ogg(feedcomponent.MultiInputParseLaunchComponent):
             maxDelay, maxPageDelay)
 
         return muxer
-
-__version__ = "$Rev$"

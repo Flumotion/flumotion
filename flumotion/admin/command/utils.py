@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.twisted.defer import defer_generator
 from flumotion.common import componentui, errors
 
@@ -77,5 +79,3 @@ def get_component_uistate(model, avatarId, component=None, quiet=False):
                 print ('Error: Component %s in flow %s is sleeping'
                        % (avatarId[1], avatarId[0]))
 get_component_uistate = defer_generator(get_component_uistate)
-
-__version__ = "$Rev$"

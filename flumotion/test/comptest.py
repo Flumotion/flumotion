@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import new
 import os
 import sys
@@ -525,5 +527,3 @@ def pipeline_cnv(pipelinestr='identity'):
 
     return ComponentWrapper('pipeline-converter', Converter, name=fs_name,
                             props={'pipeline': pipelinestr})
-
-__version__ = "$Rev$"

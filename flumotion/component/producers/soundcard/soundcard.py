@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gst.interfaces
 
@@ -139,5 +141,3 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         else:
             self.warning("no input track selected, cannot set volume")
         return 1.0
-
-__version__ = "$Rev$"

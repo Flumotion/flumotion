@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Manager-side identities of objects that can request operations from the manager.
 """
@@ -63,5 +65,3 @@ class RemoteIdentity(Identity):
     def __str__(self):
         return '%s@%s' % (self.username or '<unknown user>',
                           self.host or '<unknown host>')
-
-__version__ = "$Rev$"

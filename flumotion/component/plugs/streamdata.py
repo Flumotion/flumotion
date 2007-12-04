@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from flumotion.component.plugs import base
 
@@ -52,5 +54,3 @@ class ExampleStreamDataProvider(StreamDataProvider):
             'description': self.description,
             'url' : self.url
             }
-
-__version__ = "$Rev$"

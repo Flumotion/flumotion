@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import sys
 from flumotion.common.log import safeprintf
@@ -241,5 +243,3 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     except (errors.SystemError, SystemError), e:
         safeprintf(sys.stderr, 'ERROR: %s\n', e)
         sys.exit(1)
-
-__version__ = "$Rev$"

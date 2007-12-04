@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 from twisted.internet import defer
@@ -82,5 +84,3 @@ class ManagerManholePlug(lifecycle.ManagerLifecycle):
             ret = defer.succeed(None)
         self.port = None
         return ret
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import string
 from twisted.internet import defer
 
@@ -69,5 +71,3 @@ def checkTheora():
 
     result.succeed(None)
     return defer.succeed(result)
-
-__version__ = "$Rev$"

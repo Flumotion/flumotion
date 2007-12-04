@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 # Originally part of PiTiVi,
 # Copyright (C) 2005-2007 Edward Hervey <bilboed@bilboed.com>,
@@ -306,5 +308,3 @@ class SingleDecodeBin(gst.Bin):
         self.log("element:%s" % element.get_name())
 
 gobject.type_register(SingleDecodeBin)
-
-__version__ = "$Rev$"

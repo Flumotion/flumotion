@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 A test token bouncer.
 """
@@ -58,5 +60,3 @@ class TokenTestPlug(TokenTestBase, plug.BouncerPlug):
     def __init__(self, args):
         plug.BouncerPlug.__init__(self, args)
         self.haveProperties(args['properties'])
-
-__version__ = "$Rev$"

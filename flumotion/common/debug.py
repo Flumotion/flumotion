@@ -16,6 +16,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 """
 Debugging helper code
@@ -303,5 +305,3 @@ def getVersions():
                 pass
 
     return r
-
-__version__ = "$Rev$"

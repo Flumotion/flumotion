@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 
 from flumotion.worker.checks import check
@@ -119,5 +121,3 @@ def checkTicket349():
 
     result.succeed(None)
     return defer.succeed(result)
-
-__version__ = "$Rev$"

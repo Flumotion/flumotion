@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import sets
 import threading
 import gst
@@ -462,5 +464,3 @@ class AVSwitch(Switch):
                 raise AssertionError()
 
         return pipeline
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 # enum for result of stopped
 (STOPPED_SUCCESS,
  STOPPED_ERROR,
@@ -27,5 +29,3 @@
  STOPPED_READ_ERROR,
  STOPPED_INTERNAL_ERROR,
  STOPPED_LAST) = range(7)
-
-__version__ = "$Rev$"

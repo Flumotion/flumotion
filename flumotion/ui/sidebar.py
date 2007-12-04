@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import gtk
 
@@ -246,5 +248,3 @@ class WizardSidebar(gtk.EventBox):
         self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
 
 pygobject.type_register(WizardSidebar)
-
-__version__ = "$Rev$"

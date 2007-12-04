@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Code related to setup and used as part of the bootstrapping of binaries.
 """
@@ -53,5 +55,3 @@ def setupPackagePath():
         # these aren't meant to be replaced
         package.getPackager().registerPackagePath(path,
             "FLU_PROJECT_PATH_" + path)
-
-__version__ = "$Rev$"

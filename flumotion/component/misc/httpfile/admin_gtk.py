@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import gtk
 
@@ -107,5 +109,3 @@ class HTTPFileAdminGtk(BaseAdminGtk):
         self.nodes['Statistics'].setStats(state)
 
 GUIClass = HTTPFileAdminGtk
-
-__version__ = "$Rev$"

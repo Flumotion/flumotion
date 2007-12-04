@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import gstreamer, messages, errors
 from flumotion.component import feedcomponent
 
@@ -49,5 +51,3 @@ class Repeater(feedcomponent.ParseLaunchComponent):
                     dp = " drop-probability=%f" % drop_probability
 
         return 'identity silent=true %s' % dp
-
-__version__ = "$Rev$"

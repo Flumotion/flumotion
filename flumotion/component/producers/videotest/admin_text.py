@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component.base.admin_text import BaseAdminText
 
 import string
@@ -76,5 +78,3 @@ class VideoTestAdminText(BaseAdminText):
 
 
 UIClass = VideoTestAdminText
-
-__version__ = "$Rev$"

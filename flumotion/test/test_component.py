@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gobject
 from twisted.trial import unittest
 
@@ -135,5 +137,3 @@ class TestParser(testsuite.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

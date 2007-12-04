@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 
 from flumotion.common import log
@@ -394,5 +396,3 @@ class WizardSaver(log.Loggable):
         s += '</planet>\n'
 
         return s
-
-__version__ = "$Rev$"

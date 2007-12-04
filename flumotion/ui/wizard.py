@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 
@@ -410,5 +412,3 @@ class SectionWizard(GladeWindow, log.Loggable):
 
 
 pygobject.type_register(SectionWizard)
-
-__version__ = "$Rev$"

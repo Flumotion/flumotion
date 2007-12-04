@@ -869,5 +869,3 @@ class TwistedLogObserver(Loggable):
 
     def clearIgnores(self):
         self._ignoreErrors = []
-
-__version__ = "$Rev$"

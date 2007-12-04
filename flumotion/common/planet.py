@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Serializable objects from worker through manager to admin for
 planet, flow, job and component.
@@ -372,5 +374,3 @@ class ManagerJobState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(WorkerJobState, ManagerJobState)
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 """
 flumotion.launch.parse: A parsing library for flumotion-launch syntax.
@@ -324,5 +326,3 @@ def parse_args(args):
     components.complete_and_verify_configs()
 
     return components.sorted_configs(linker.get_sort_order())
-
-__version__ = "$Rev$"

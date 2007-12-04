@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Utility functions for Nagios.
 """
@@ -73,5 +75,3 @@ def critical(msg):
 def unknown(msg):
     sys.stdout.write('UNKNOWN: %s\n' % msg)
     reactor.exitStatus = 3
-
-__version__ = "$Rev$"

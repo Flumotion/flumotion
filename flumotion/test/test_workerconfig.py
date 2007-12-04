@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 from flumotion.worker import config
 
@@ -90,5 +92,3 @@ class TestConfig(testsuite.TestCase):
     def testParseAuthenticationError(self):
         s = """<worker><authentication><invalid-name/></authentication></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
-
-__version__ = "$Rev$"

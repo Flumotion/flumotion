@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import sys
 
 from twisted.internet import defer, reactor, gtk2reactor
@@ -463,5 +465,3 @@ class TestCompTestFlow(CompTestTestCase):
         task_d.addCallback(insert_flow_errors)
         d = self.p.run_flow(self.duration, tasks=[task_d])
         return self.failUnlessFailure(d, CustomFlowException)
-
-__version__ = "$Rev$"

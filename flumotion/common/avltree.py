@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 A pure python functional-style self-balancing binary search tree
 implementation, with an object-oriented wrapper. Useful for maintaining
@@ -289,5 +291,3 @@ class AVLTree(object):
 
     def iterreversed(self):
         return iteratereversed(self.tree)
-
-__version__ = "$Rev$"

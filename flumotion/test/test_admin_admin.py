@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 
 from flumotion.admin import admin
@@ -98,5 +100,3 @@ class AdminTest(testsuite.TestCaseWithManager):
         d = a.connectToManager(i, writeConnection=False)
         d.addCallbacks(connected, failure)
         return d
-
-__version__ = "$Rev$"

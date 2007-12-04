@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion interfaces
 """
@@ -135,5 +137,3 @@ class IFeedServerParent(Interface):
         """
         Make the component feed the given feed to the fd.
         """
-
-__version__ = "$Rev$"

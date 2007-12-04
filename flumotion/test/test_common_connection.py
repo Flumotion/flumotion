@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import connection
 from flumotion.common import testsuite
 
@@ -40,5 +42,3 @@ class TestConnection(testsuite.TestCase):
                                username='foo', password='bar')
         self.assertParseEquals('foo@baz:1234', 'foo@baz:1234',
                                password='bar')
-
-__version__ = "$Rev$"

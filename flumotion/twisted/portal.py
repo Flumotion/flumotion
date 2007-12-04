@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 portal-related functionality inspired by twisted.cred.portal
 """
@@ -153,5 +155,3 @@ class BouncerPortal(log.Loggable):
         return d
 
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)
-
-__version__ = "$Rev$"

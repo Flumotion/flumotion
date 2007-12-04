@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 from twisted.spread import pb
 
@@ -81,5 +83,3 @@ class TestWorkerMedium(testsuite.TestCase):
         d.addCallback(connected)
         d.addCallback(disconnected)
         return d
-
-__version__ = "$Rev$"

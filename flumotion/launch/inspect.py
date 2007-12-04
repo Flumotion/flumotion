@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import sys
 
 from flumotion.common import log, common, registry
@@ -219,5 +221,3 @@ def main(args):
         parser.error('Could not process arguments, try "-h" option.')
 
     return 0
-
-__version__ = "$Rev$"

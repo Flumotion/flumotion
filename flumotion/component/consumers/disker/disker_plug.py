@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from flumotion.component.plugs import base
 
@@ -49,5 +51,3 @@ class DiskerPlug(base.ComponentPlug):
         @type  location: str
         """
         pass
-
-__version__ = "$Rev$"

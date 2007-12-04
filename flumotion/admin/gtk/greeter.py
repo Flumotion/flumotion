@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import errno
 
@@ -363,5 +365,3 @@ class ConnectExisting(wizard.Wizard):
 
     def __init__(self):
         wizard.Wizard.__init__(self, 'connect_to_existing')
-
-__version__ = "$Rev$"

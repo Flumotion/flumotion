@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 manager-side objects for components
 
@@ -709,5 +711,3 @@ class ComponentHeaven(base.ManagerHeaven):
                     # make the other component initiate connection
                     connect(otherComp, otherFeedName, myComp, myFeedName,
                             reversedMethod)
-
-__version__ = "$Rev$"

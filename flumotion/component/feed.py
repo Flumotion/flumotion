@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 implementation of a PB Client to interface with feedserver.py
 """
@@ -298,5 +300,3 @@ class FeedMedium(fpb.Referenceable):
         self.debug('firing deferred with feedId %s on fd %d', feedId,
                    fd)
         self._feedToDeferred.callback((feedId, fd))
-
-__version__ = "$Rev$"

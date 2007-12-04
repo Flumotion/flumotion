@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Feed components, participating in the stream
 """
@@ -572,5 +574,3 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             pad.set_blocked_async(False, _block_cb)
 
         signalid = queue.connect("underrun", _underrun_cb)
-
-__version__ = "$Rev$"

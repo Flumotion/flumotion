@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion Twisted credentials
 """
@@ -359,5 +361,3 @@ class HTTPDigestChallenger(log.Loggable):
         m.update(HA2)
 
         return m.digest().encode('hex')
-
-__version__ = "$Rev$"

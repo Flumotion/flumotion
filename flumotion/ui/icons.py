@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 import gtk
@@ -47,5 +49,3 @@ def register_icons():
     gtk.window_set_default_icon_from_file(iconfile)
 
     _register_stock_icons(['wizard', 'play', 'pause', 'about'])
-
-__version__ = "$Rev$"

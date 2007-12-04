@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 worker-side objects for components
 """
@@ -595,5 +597,3 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.set('cpu-percent', CPU)
         self._lastTime = nowTime
         self._lastClock = nowClock
-
-__version__ = "$Rev$"

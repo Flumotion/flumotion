@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 small common functions used by all processes
 """
@@ -920,5 +922,3 @@ def strftime(format, t):
     if percent:
         out.append('%')
     return ''.join(out)
-
-__version__ = "$Rev$"

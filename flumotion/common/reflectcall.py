@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 getting coherent errors when calling procedures in named modules
 """
@@ -119,5 +121,3 @@ def createComponent(moduleName, methodName, config):
     """
     return reflectCallCatching(errors.ComponentCreateError,
                                moduleName, methodName, config)
-
-__version__ = "$Rev$"

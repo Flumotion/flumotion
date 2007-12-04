@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import struct
 import socket
 
@@ -415,5 +417,3 @@ class LogFilter:
             if (realip & f[1]) == f[0]:
                 return True
         return False
-
-__version__ = "$Rev$"

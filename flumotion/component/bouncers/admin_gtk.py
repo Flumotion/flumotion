@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 import gtk
@@ -141,5 +143,3 @@ class HTPasswdCryptAdminGtk(BaseAdminGtk):
         self.nodes['Keycards'].cleanup()
 
 GUIClass = HTPasswdCryptAdminGtk
-
-__version__ = "$Rev$"

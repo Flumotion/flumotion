@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gst.interfaces
 
@@ -115,5 +117,3 @@ class BTTV(feedcomponent.ParseLaunchComponent):
             if c:
                 self.debug("set norm to %s" % norm)
                 element.set_norm(c)
-
-__version__ = "$Rev$"

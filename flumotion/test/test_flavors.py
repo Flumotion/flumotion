@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from zope.interface import implements
@@ -419,5 +421,3 @@ class TestState(testsuite.TestCase):
         self.assertEquals(c.get('adict'), {})
         self.assertRaises(KeyError, c.delitem, 'randomdictkey', 'value')
         self.assertRaises(KeyError, c.delitem, 'adict', 'akey')
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 from twisted.spread import jelly
 
@@ -127,5 +129,3 @@ class WizardSaveTest(testsuite.TestCase):
             print item.name, item.worker
         #print self.wizard.printOut()
     testAudioTestWorkers.skip = 'Andy, maybe your generator work broke this ?'
-
-__version__ = "$Rev$"

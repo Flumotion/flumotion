@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import log
 from flumotion.extern.fdpass import fdpass
 
@@ -183,5 +185,3 @@ class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
 
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
-
-__version__ = "$Rev$"

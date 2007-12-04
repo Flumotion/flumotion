@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from flumotion.common import errors, gstreamer, messages
@@ -107,5 +109,3 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
                     identity = self.get_element('identity')
                     identity.set_property('drop-probability',
                         drop_probability)
-
-__version__ = "$Rev$"

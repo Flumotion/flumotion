@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 '''
 configure-time variables for installed or uninstalled operation
 
@@ -117,5 +119,3 @@ _config['versionTuple'] = _versionStringToTuple(_config['version'])
 for key, value in _config.items():
     dictionary = locals()
     dictionary[key] = value
-
-__version__ = "$Rev$"

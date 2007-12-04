@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gobject
 
 from flumotion.common import testsuite
@@ -72,5 +74,3 @@ class VUTest(testsuite.TestCase):
         gtk.main_iteration()
         window.destroy()
         gtk.main_iteration()
-
-__version__ = "$Rev$"

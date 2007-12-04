@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import time
 
 from flumotion.common import testsuite
@@ -84,5 +86,3 @@ class TestFeeder(testsuite.TestCase):
         self.clientAssertEquals(client, 'bytesReadTotal', brt)
         self.clientAssertEquals(client, 'buffersDroppedTotal', bdt)
         self.clientAssertEquals(client, 'reconnects', reconnects)
-
-__version__ = "$Rev$"

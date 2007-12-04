@@ -1,3 +1,9 @@
+2007-12-04  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/*.py:
+	Move __version__ from the end of the file to
+	the beginning, just after the license header
+
 2007-12-04  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/command/commands.py:

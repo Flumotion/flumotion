@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 from flumotion.common import errors, messages
 
@@ -66,5 +68,3 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
                 elif evt_struct['action'] == 'stop':
                     self.switch_to_for_event("master", False)
         return True
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.trial import unittest
@@ -229,5 +231,3 @@ class TestCaseWithManager(TestCase):
         d = self.vishnu.shutdown()
         d.addCallback(lambda _: self.tport.stopListening())
         return d
-
-__version__ = "$Rev$"

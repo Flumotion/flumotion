@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gobject
 import gtk
 
@@ -141,5 +143,3 @@ class TestErrorDialog(testsuite.TestCase):
         # terrible reason
         gtk.main()
         return d
-
-__version__ = "$Rev$"

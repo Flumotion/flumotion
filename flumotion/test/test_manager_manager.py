@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 from twisted.spread import pb
@@ -725,5 +727,3 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         # verify avatar state
         self.failIf(avatar.jobState)
         self.failIf(avatar.componentState)
-
-__version__ = "$Rev$"

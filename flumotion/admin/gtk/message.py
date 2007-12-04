@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import messages
 from flumotion.configure import configure
 
@@ -188,5 +190,3 @@ class MessagesView(gtk.VBox):
                     self.active_button = self.buttonbox.get_children()[0]
                     self.active_button.set_active(True)
                 return
-
-__version__ = "$Rev$"

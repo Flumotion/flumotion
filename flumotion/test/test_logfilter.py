@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.component.base import http
@@ -51,5 +53,3 @@ class TestLogFilter(testsuite.TestCase):
             "192.168.0.0/33")
         self.assertRaises(errors.ConfigError, filter.addIPFilter,
             "192.168.0.0/30/1")
-
-__version__ = "$Rev$"

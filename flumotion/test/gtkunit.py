@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 from twisted.internet import reactor
@@ -158,5 +160,3 @@ class GtkTestCase(testsuite.TestCase):
         call_inc(name, 'set_active', not is_active)
         if process:
             self.process()
-
-__version__ = "$Rev$"

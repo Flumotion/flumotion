@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 directory = os.path.split(os.path.abspath(__file__))[0]
@@ -96,5 +98,3 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
 if __name__ == '__main__':
     #generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
     generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
-
-__version__ = "$Rev$"

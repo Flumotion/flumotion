@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 
 class TestPublicUI(testsuite.TestCase):
@@ -34,5 +36,3 @@ class TestPublicUI(testsuite.TestCase):
 
         from flumotion.ui import icons
         icons.register_icons()
-
-__version__ = "$Rev$"

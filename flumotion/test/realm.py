@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.cred import portal
 from twisted.spread import pb
 
@@ -77,5 +79,3 @@ class TestRealm(log.Loggable):
         if self._bouncer:
             d.addCallback(lambda _: self._bouncer.stop())
         return d
-
-__version__ = "$Rev$"

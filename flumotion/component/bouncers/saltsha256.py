@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 an bouncer with a username/salt/sha256 data backend
 """
@@ -84,5 +86,3 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
             len(lines)))
 
         return defer.succeed(None)
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 common classes and code to support manager-side objects
 """
@@ -361,5 +363,3 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @rtype:   list of L{ManagerAvatar}
         """
         return self.avatars.values()
-
-__version__ = "$Rev$"

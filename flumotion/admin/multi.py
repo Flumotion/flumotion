@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from twisted.internet import defer
 
@@ -224,5 +226,3 @@ class MultiAdminModel(log.Loggable):
         def do_op(object):
             admin.callRemote('component'+op, object)
         self.for_each_component(object, do_op)
-
-__version__ = "$Rev$"

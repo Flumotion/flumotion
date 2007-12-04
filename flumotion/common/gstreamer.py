@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 GStreamer helper functionality
 """
@@ -189,5 +191,3 @@ class StateChangeMonitor(dict, log.Loggable):
                     d.errback(errors.GStreamerGstError(
                         message.src, gerror, debug))
                 del self[change]
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component.bouncers import component
 from flumotion.test import bouncertest
 
@@ -54,5 +56,3 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
     def setKeycardExpireInterval(self, interval):
         # can be overridden
         self.obj.plug._expirer.timeout = interval
-
-__version__ = "$Rev$"

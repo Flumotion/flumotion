@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import signal
 
@@ -461,5 +463,3 @@ def test(proc):
     # it a nice one
     wrappedtest.timeout = 666
     return wrappedtest
-
-__version__ = "$Rev$"

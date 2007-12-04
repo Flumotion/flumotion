@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion Perspective Broker using keycards
 
@@ -753,5 +755,3 @@ class PingableAvatar(Avatar):
             if self.mind:
                 self.mind.broker.transport.loseConnection()
         self.startPingChecking(_disconnect)
-
-__version__ = "$Rev$"

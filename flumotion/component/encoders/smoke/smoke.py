@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 class Smoke(feedcomponent.ParseLaunchComponent):
@@ -31,5 +33,3 @@ class Smoke(feedcomponent.ParseLaunchComponent):
         for p in ('qmin', 'qmax', 'threshold', 'keyframe'):
             if p in properties:
                 element.set_property(p, properties[p])
-
-__version__ = "$Rev$"

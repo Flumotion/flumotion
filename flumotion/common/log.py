@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion logging
 
@@ -41,5 +43,3 @@ def init():
 setFluDebug = externlog.setDebug
 # for pb unit tests
 _getTheFluLogObserver = externlog._getTheTwistedLogObserver
-
-__version__ = "$Rev$"

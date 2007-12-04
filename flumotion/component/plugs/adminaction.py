@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import time
 
 from twisted.python import reflect
@@ -68,5 +70,3 @@ class AdminActionFileLogger(AdminAction):
                 ((identity, method, args, kwargs))))
         self.file.write(s)
         self.file.flush()
-
-__version__ = "$Rev$"

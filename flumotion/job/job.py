@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 the job-side half of the worker-job connection
 """
@@ -398,5 +400,3 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.debug('shutting down medium')
         self.medium.shutdown()
         self.debug('shut down medium')
-
-__version__ = "$Rev$"

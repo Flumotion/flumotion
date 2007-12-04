@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """model objects used by the wizard steps"""
 
 
@@ -228,5 +230,3 @@ class VideoEncoder(Encoder):
 
     eater_type = VideoProducer
     name_template = "video-encoder"
-
-__version__ = "$Rev$"

@@ -199,5 +199,3 @@ class ProgressBar:
 if __name__ == '__main__':
     term = TerminalController()
     print term.render('${BOLD}${RED}Error:${NORMAL}'), 'paper is ripped'
-
-__version__ = "$Rev$"

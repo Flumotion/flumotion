@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.spread import pb
 from twisted.internet import defer
 
@@ -40,5 +42,3 @@ class AdminComponentUIState(flavors.StateRemoteCache):
 
 pb.setUnjellyableForClass(WorkerComponentUIState, ManagerComponentUIState)
 pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
-
-__version__ = "$Rev$"

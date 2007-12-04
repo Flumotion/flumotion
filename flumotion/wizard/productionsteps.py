@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 import math
 
@@ -946,5 +948,3 @@ class FireWireAudioStep(AudioSourceStep):
         self._update_output_format()
 
 
-
-__version__ = "$Rev$"

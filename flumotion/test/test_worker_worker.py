@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 from flumotion.worker import worker
 
@@ -35,5 +37,3 @@ class FakeOptions:
 class TestBrain(testsuite.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())
-
-__version__ = "$Rev$"

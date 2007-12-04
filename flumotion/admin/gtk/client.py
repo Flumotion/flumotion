@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 import os
 import sys
@@ -1066,5 +1068,3 @@ You can do remote component calls using:
         self._about()
 
 pygobject.type_register(Window)
-
-__version__ = "$Rev$"

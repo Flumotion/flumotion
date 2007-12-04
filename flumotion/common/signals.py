@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import log
 
 class SignalMixin(object):
@@ -65,5 +67,3 @@ class SignalMixin(object):
                     log.warning("signalmixin", "Exception calling "
                                 "signal handler %r: %s", proc,
                                 log.getExceptionMessage(e))
-
-__version__ = "$Rev$"

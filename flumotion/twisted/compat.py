@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion Twisted compatibility assistance
 
@@ -39,5 +41,3 @@ def isInterface(object):
 
 Interface = zi.Interface
 implements = zi.implements
-
-__version__ = "$Rev$"

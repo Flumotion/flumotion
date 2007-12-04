@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 from flumotion.common import log, pygobject
 
@@ -27,5 +29,3 @@ __all__ = ['Preview']
 class Preview(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         return 'decodebin ! ffmpegcolorspace ! xvimagesink qos=false'
-
-__version__ = "$Rev$"

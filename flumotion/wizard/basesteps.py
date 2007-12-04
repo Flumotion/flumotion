@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gettext
 
 from flumotion.common import messages
@@ -164,5 +166,3 @@ class OverlayStep(WorkerWizardStep):
         self.text.set_sensitive(button.get_active())
 
 
-
-__version__ = "$Rev$"

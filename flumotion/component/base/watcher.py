@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 import time
@@ -220,5 +222,3 @@ class FilesWatcher(BaseWatcher):
 
     def getFilesToStat(self):
         return self._files
-
-__version__ = "$Rev$"

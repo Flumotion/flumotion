@@ -18,6 +18,8 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+__version__ = "$Rev$"
 import os
 import time
 import string
@@ -483,5 +485,3 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         for logger in self._loggers:
             self.debug('rotating logger %r' % logger)
             logger.rotate()
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 worker-side objects to handle worker clients
 """
@@ -293,5 +295,3 @@ class WorkerBrain(log.Loggable):
 
     def killJob(self, avatarId, signum):
         self.jobHeaven.killJob(avatarId, signum)
-
-__version__ = "$Rev$"

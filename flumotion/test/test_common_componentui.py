@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import componentui
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
@@ -287,5 +289,3 @@ class TestStateSet(testsuite.TestCase):
             return d
         d.addCallback(workerGetStateCallback)
         return d
-
-__version__ = "$Rev$"

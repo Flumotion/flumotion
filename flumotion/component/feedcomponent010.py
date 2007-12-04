@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gobject
 
@@ -730,5 +732,3 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if not pipeline_playing:
             self.try_start_pipeline()
-
-__version__ = "$Rev$"

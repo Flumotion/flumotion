@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gobject
 
@@ -233,5 +235,3 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.timeoutid = 0
 
         self.nbiterations = 0
-
-__version__ = "$Rev$"

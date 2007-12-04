@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import random
 
 from flumotion.common import avltree
@@ -140,5 +142,3 @@ class TestAVLTree(testsuite.TestCase):
                 print 'while deleting:', v, 'from:', savetree
                 avltree.debug(savetree)
                 raise
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.spread import pb
 
 from flumotion.common import keycards, testsuite, interfaces
@@ -65,5 +67,3 @@ class TestAdminAvatar(testsuite.TestCase):
 
     def testAvatarSet(self):
         self.assertEquals(self.heaven.getAvatars(), [self.avatar])
-
-__version__ = "$Rev$"

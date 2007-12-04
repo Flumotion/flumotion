@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import base64
 import binascii
@@ -146,5 +148,3 @@ def openAnonymousTelnetManhole(namespace, portNum=-1):
     port = reactor.listenTCP(portNum, telnetFactory,
                              interface='localhost')
     return port
-
-__version__ = "$Rev$"

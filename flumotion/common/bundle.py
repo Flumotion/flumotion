@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 bundles of files used to implement caching over the network
 """
@@ -460,5 +462,3 @@ def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
     bundlers_used = [b.name for b in bundler.getSubBundlers()]
     regwriter = registry.RegistrySubsetWriter(onlyBundles=bundlers_used)
     regwriter.dump(open(outreg, 'w'))
-
-__version__ = "$Rev$"

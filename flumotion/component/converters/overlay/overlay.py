@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import tempfile
 
@@ -90,5 +92,3 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         else:
             self.debug("Temporary overlay already gone, " \
                 "did we not start up correctly ?")
-
-__version__ = "$Rev$"

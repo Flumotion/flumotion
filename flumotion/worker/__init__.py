@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 code for workers executing jobs for the manager
 """
-
-__version__ = "$Rev$"

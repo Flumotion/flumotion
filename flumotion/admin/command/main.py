@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import sys
 import re
 
@@ -177,5 +179,3 @@ def main(args):
     d.addErrback(lambda failure: quit())
 
     reactor.run()
-
-__version__ = "$Rev$"

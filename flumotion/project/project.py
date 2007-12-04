@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import sys
 
@@ -55,5 +57,3 @@ def get(project, attribute, default=None):
         raise errors.NoProjectError(moduleName)
     m = sys.modules[moduleName]
     return getattr(m, attribute, default)
-
-__version__ = "$Rev$"

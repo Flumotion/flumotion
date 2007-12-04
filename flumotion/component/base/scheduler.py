@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import time
 from datetime import datetime, timedelta, tzinfo
@@ -408,5 +410,3 @@ class ICalScheduler(Scheduler):
             except Exception:
                 self.warning("could not parse ical event %r", event)
         return events
-
-__version__ = "$Rev$"

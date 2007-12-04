@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 main for flumotion-nagios
 """
@@ -227,5 +229,3 @@ def main(args):
     ret = c.parse(args[1:])
 
     return ret
-
-__version__ = "$Rev$"

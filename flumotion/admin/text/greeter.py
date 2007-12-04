@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 
 from flumotion.admin import connections
@@ -148,5 +150,3 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             else:
                 self.current_input = self.current_input + chr(c)
                 self.display_current_input_line()
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 from flumotion.component import component
 
@@ -106,5 +108,3 @@ class Bouncer(component.BaseComponent):
 
     def keepAlive(self, issuerName, ttl):
         self.plug.keepAlive(issuerName, ttl)
-
-__version__ = "$Rev$"

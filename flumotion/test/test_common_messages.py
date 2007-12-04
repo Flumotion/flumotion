@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.trial import unittest
 from twisted.spread import jelly, pb
 from twisted.internet import reactor, defer
@@ -383,5 +385,3 @@ class PBSerializationTest(testsuite.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

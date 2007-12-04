@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Contains the base class for PB client-side mediums.
 """
@@ -291,5 +293,3 @@ class PingingMedium(BaseMedium):
         self.remote.notifyOnDisconnect(stopPingingCb)
 
         self.startPinging(self._disconnect)
-
-__version__ = "$Rev$"

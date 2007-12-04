@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import locale
 import gettext
 import os
@@ -129,5 +131,3 @@ class TestPluralGettext(TestGettext):
         self.assertEquals(self.edone % 1, "Ik vertaalde 1 ding")
         self.assertEquals(self.edcount, "Ik vertaalde %d dingen")
         self.assertEquals(self.edcount % 5, "Ik vertaalde 5 dingen")
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.text.view import AdminTextView
 from flumotion.twisted import flavors, reflect, pb as fpb
@@ -68,5 +70,3 @@ def connect_to_manager(stdscr, info):
     d.addCallback(connected)
     d.addErrback(refused)
     d.addErrback(failed)
-
-__version__ = "$Rev$"

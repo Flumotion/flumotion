@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import time
 
 import gobject
@@ -788,5 +790,3 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
-
-__version__ = "$Rev$"

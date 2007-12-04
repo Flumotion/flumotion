@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.internet import defer
 from flumotion.worker.checks import check
 
@@ -145,5 +147,3 @@ def checkWebcam(device, id):
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 RTSP - Real Time Streaming Protocol.
 
@@ -501,5 +503,3 @@ class ErrorResource(RTSPResource):
 class NoResource(ErrorResource):
     def __init__(self, message=None):
         ErrorResource.__init__(self, NOT_FOUND, message)
-
-__version__ = "$Rev$"

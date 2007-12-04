@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume import admin_gtk as vadmin_gtk
 
@@ -48,5 +50,3 @@ class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
 
 
 GUIClass = SoundcardAdminGtk
-
-__version__ = "$Rev$"

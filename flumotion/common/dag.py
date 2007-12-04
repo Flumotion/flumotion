@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Directed Acyclic Graph class and functionality
 """
@@ -522,5 +524,3 @@ def topological_sort(items, partial_order):
         graph.addEdge(a, b)
 
     return [v for v, t in graph.sort()]
-
-__version__ = "$Rev$"

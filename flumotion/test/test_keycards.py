@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import testsuite
 
 from twisted.trial import unittest
@@ -108,5 +110,3 @@ class TestKeycardSending(testsuite.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

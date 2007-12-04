@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import time
 
 from twisted.internet import reactor
@@ -181,5 +183,3 @@ class Eater:
             c.get('totalOffsetDiscont', 0) + units)
         uiState.set('totalOffsetDiscont',
             uiState.get('totalOffsetDiscont', 0) + units)
-
-__version__ = "$Rev$"

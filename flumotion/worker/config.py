@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Parsing of configuration files.
 """
@@ -192,5 +194,3 @@ class WorkerConfigXML(log.Loggable):
                 if port not in ports:
                     ports.append(port)
         return (ports, random)
-
-__version__ = "$Rev$"

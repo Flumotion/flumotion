@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import time
 
 from flumotion.common import errors
@@ -85,5 +87,3 @@ class ApacheLogger(Logger):
     def rotate(self):
         self.stop()
         self.start()
-
-__version__ = "$Rev$"

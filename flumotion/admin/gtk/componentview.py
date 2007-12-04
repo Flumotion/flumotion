@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import gobject
 import gtk
@@ -210,5 +212,3 @@ class ComponentView(gtk.VBox, log.Loggable):
             self._set_state(OBJECT_INACTIVE)
 
 gobject.type_register(ComponentView)
-
-__version__ = "$Rev$"

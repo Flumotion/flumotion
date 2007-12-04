@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 A test token bouncer.
 """
@@ -33,5 +35,3 @@ class TokenTestBouncer(tokentest.TokenTestBase, bouncer.Bouncer):
     def do_setup(self):
         self.haveProperties(self.config['properties'])
         return defer.succeed(None)
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 
 import os
 
@@ -224,5 +226,3 @@ class Authenticate(GladeWidget):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}
 pygobject.type_register(Authenticate)
-
-__version__ = "$Rev$"

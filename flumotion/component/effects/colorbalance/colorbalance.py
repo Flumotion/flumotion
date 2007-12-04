@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gst.interfaces
 
@@ -131,5 +133,3 @@ def _percent_to_value(percentage, min, max):
     Convert an percentage value to an integer value between min and max.
     """
     return int(min + percentage / 100.0 * (max - min))
-
-__version__ = "$Rev$"

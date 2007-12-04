@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 This module provides utility functions for Flumotion.
 """
@@ -52,5 +54,3 @@ def reload():
     for name in reinitialize:
         if name in sys.modules:
             reinitialize[name](sys.modules[name])
-
-__version__ = "$Rev$"

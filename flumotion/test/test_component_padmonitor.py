@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from twisted.internet import defer, reactor
@@ -98,5 +100,3 @@ class TestPadMonitor(testsuite.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

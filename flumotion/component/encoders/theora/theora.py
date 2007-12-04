@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 from flumotion.common import messages
 
@@ -86,5 +88,3 @@ class Theora(feedcomponent.ParseLaunchComponent):
                         int(properties[pproperty]/1000))
                 else:
                     element.set_property(eproperty, properties[pproperty])
-
-__version__ = "$Rev$"

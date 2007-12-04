@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 import gobject
@@ -218,5 +220,3 @@ def check1394(id):
     d.addErrback(errbackResult)
 
     return d
-
-__version__ = "$Rev$"

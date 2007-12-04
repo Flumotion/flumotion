@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import random
 
 from twisted.internet import defer, reactor
@@ -257,5 +259,3 @@ class RetryingDeferred(object):
         self.delay = min(self.delay, self.maxDelay)
 
         return self.delay
-
-__version__ = "$Rev$"

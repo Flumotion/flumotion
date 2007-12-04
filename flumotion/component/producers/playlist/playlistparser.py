@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 from gst.extend import discoverer
 
@@ -427,5 +429,3 @@ class PlaylistXMLParser(PlaylistParser):
             return int(calendar.timegm(timestruct) * gst.SECOND)
         except ValueError:
             raise fxml.ParserError("Invalid timestamp %s" % ts)
-
-__version__ = "$Rev$"

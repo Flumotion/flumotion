@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
@@ -54,5 +56,3 @@ class TestInit(testsuite.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-__version__ = "$Rev$"

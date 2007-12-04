@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gobject
 import gtk
 
@@ -74,5 +76,3 @@ class TestPyGObject(testsuite.TestCase):
         self.assertEquals(False, o.get_property('burning'))
         o.emit('hcf', False, 'foogoober')
         self.assertEquals(True, o.get_property('burning'))
-
-__version__ = "$Rev$"

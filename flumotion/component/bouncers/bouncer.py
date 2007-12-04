@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Base class and implementation for bouncer components, who perform
 authentication services for other components.
@@ -392,5 +394,3 @@ class ChallengeResponseBouncer(Bouncer):
         d.addCallback(self._requestAvatarIdCallback, keycard)
         d.addErrback(self._requestAvatarIdErrback, keycard)
         return d
-
-__version__ = "$Rev$"

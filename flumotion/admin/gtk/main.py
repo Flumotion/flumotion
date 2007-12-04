@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import sys
 
@@ -136,5 +138,3 @@ def main(args):
     d.addCallbacks(adminStarted, failure)
 
     reactor.run()
-
-__version__ = "$Rev$"

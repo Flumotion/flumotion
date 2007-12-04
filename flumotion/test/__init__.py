@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 import flumotion.common.setup
@@ -69,5 +71,3 @@ if i > -1:
         'fdpass'))
 
 del boot, flumotion, i, log, useGtk2Reactor
-
-__version__ = "$Rev$"

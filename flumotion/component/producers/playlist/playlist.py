@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 import gobject
 import time
@@ -443,5 +445,3 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self._watchDirectory(self._playlistdirectory)
 
         reactor.callLater(10, self.timeReport)
-
-__version__ = "$Rev$"

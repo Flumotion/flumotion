@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 class Mulaw(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         return 'mulawenc name=encoder'
-
-__version__ = "$Rev$"

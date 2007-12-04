@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import dag
 from flumotion.common import testsuite
 
@@ -291,5 +293,3 @@ class TestPlanet(testsuite.TestCase):
         self.assertEquals(len(list), 2)
         for c in [(ccs, component), (cte, component)]:
             self.failUnless(c in list)
-
-__version__ = "$Rev$"

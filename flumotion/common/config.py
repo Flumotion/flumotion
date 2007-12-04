@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 parsing of configuration files
 """
@@ -1029,5 +1031,3 @@ def exportPlanetXml(p):
                  atmosphere(p.get('atmosphere'))]
                 + [flow(f) for f in p.get('flows')])
     return fxml.sxml2unicode(planet(p))
-
-__version__ = "$Rev$"

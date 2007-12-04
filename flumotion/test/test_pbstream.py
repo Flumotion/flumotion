@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 
 import gst
@@ -322,5 +324,3 @@ class TestClientEater(testsuite.TestCase):
             d.callback(None)
         c.deferred.addCallback(stop)
         return d
-
-__version__ = "$Rev$"

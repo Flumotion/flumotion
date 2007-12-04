@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Base classes for component UI's using GTK+
 """
@@ -999,5 +1001,3 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     def effectCallRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state,
             "effect", self.effectName, methodName, *args, **kwargs)
-
-__version__ = "$Rev$"

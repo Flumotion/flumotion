@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component import feedcomponent
 
 import gst
@@ -39,5 +41,3 @@ class JPEG(feedcomponent.ParseLaunchComponent):
         element = pipeline.get_by_name('encoder')
         if 'quality' in properties:
             element.set_property('quality', properties['quality'])
-
-__version__ = "$Rev$"

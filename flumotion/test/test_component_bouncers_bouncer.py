@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.component.bouncers import bouncer
 from flumotion.test import bouncertest
 
@@ -43,5 +45,3 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
         d = self.obj.stop()
         d.addCallback(lambda _: bouncertest.TrivialBouncerTest.tearDown(self))
         return d
-
-__version__ = "$Rev$"

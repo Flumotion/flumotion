@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import sys
 import tempfile
@@ -355,5 +357,3 @@ class TestRecursively(testsuite.TestCase):
 
         # cleanup
         os.system("rm -r %s" % self.tempdir)
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Server functionality.
 """
@@ -125,5 +127,3 @@ class Server(log.Loggable):
         self._servable.setConnectionInfo(host, port, False)
         return reactor.listenTCP(port, self._servable.getFactory(),
                                  interface=host)
-
-__version__ = "$Rev$"

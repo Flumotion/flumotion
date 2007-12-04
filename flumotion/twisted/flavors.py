@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 Flumotion Twisted-like flavors
 
@@ -410,5 +412,3 @@ class StateRemoteCache(pb.RemoteCache):
         self._cache_invalid = True
 
         self._notifyListeners(5)
-
-__version__ = "$Rev$"

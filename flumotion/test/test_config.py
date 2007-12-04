@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from StringIO import StringIO
 
 from flumotion.common import config, registry, errors
@@ -1244,5 +1246,3 @@ class TestDictDiff(testsuite.TestCase):
              "Value mismatch:\n"
              "    old['foo']: 'bar' = 'baz'\n"
              "    new['foo']: 'bar' = 'qux'")
-
-__version__ = "$Rev$"

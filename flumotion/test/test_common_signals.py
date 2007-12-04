@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.common import signals
 from flumotion.common import testsuite
 
@@ -70,5 +72,3 @@ class TestSignalMixin(testsuite.TestCase):
         sid = o.connect('foo', self.fail)
         o.disconnect(sid)
         o.emit('foo')
-
-__version__ = "$Rev$"

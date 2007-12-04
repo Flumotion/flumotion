@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import gst
 
 from flumotion.component import feedcomponent
@@ -125,5 +127,3 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         element = self.get_element('source')
         element.set_property('wave', wave)
         self.uiState.set('wave', wave)
-
-__version__ = "$Rev$"

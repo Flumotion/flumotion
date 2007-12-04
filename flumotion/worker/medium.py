@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 """
 worker-side objects to handle worker clients
 """
@@ -274,5 +276,3 @@ class WorkerMedium(medium.PingingMedium):
 
     def remote_getVersions(self):
         return debug.getVersions()
-
-__version__ = "$Rev$"

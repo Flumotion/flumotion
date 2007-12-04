@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 import os
 import time
 import tempfile
@@ -287,5 +289,3 @@ class TestInitMixin(testsuite.TestCase):
     def testInitD(self):
         self.assertEquals(InitD().inited, [(InitB, (3, 4), {'x':5, 'y':6}),
                                            (InitD, (3, 4), {'x':5, 'y':6})])
-
-__version__ = "$Rev$"

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from twisted.trial import unittest
 from twisted.internet import reactor, defer
 
@@ -42,5 +44,3 @@ class TestCheckJobHeaven(testsuite.TestCase):
 
     def testInit(self):
         pass
-
-__version__ = "$Rev$"
