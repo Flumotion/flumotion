@@ -32,7 +32,6 @@
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="changed" handler="on_video__changed" last_modification_time="Tue, 19 Oct 2004 13:57:44 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -49,7 +48,6 @@
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="changed" handler="on_audio__changed" last_modification_time="Tue, 19 Oct 2004 13:57:48 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -84,7 +82,6 @@
 	      <property name="active">True</property>
 	      <property name="inconsistent">False</property>
 	      <property name="draw_indicator">True</property>
-	      <signal name="toggled" handler="on_has_audio__toggled" last_modification_time="Thu, 30 Sep 2004 14:09:43 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -121,7 +118,6 @@
 	      <property name="active">True</property>
 	      <property name="inconsistent">False</property>
 	      <property name="draw_indicator">True</property>
-	      <signal name="toggled" handler="on_has_video__toggled" last_modification_time="Thu, 30 Sep 2004 14:09:48 GMT"/>
 	    </widget>
 	  </child>
 	</widget>

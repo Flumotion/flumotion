@@ -32,7 +32,6 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_http__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:24 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -63,7 +62,6 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_audio_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -82,7 +80,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_audio__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -101,7 +98,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -134,7 +130,6 @@
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_disk__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:32 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -166,7 +161,6 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:50 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -186,7 +180,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:06 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -206,7 +199,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:16 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -239,7 +231,6 @@
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -271,7 +262,6 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -291,7 +281,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -311,7 +300,6 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
