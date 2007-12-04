@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/porter/porterclient.py: 
+	Avoid a mutable default function argument.
+
 	* flumotion/wizard/save.py (WizardSaver.handleConsumers): 
 	Link and add muxers after adding consumers, not before.
 
