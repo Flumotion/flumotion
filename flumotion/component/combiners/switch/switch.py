@@ -178,9 +178,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         return d
 
     def do_setup(self):
-        icalFileName = self.config['properties']['ical-schedule']
-        if icalFileName:
-            args = {'properties': {'ical-schedule': icalFileName}}
+        ical = self.config['properties'].get('ical-schedule', None)
+        if ical:
+            args = {'properties': {'ical-schedule': ical}}
             self.icalScheduler = ICalSwitchPlug(args)
             self.icalScheduler.start(self)
 
@@ -193,7 +193,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             if self.idealFeed is None:
                 self.idealFeed = name
 
-        return feedcomponent.MultiInputParseLaunchComponent.create_pipeline()
+        return feedcomponent.MultiInputParseLaunchComponent.create_pipeline(self)
 
     def get_logical_feeds(self):
         raise errors.NotImplementedError('subclasses should implement '
@@ -201,7 +201,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         def getDownstreamElement(e):
-            for pad in e.pads:
+            for pad in e.pads():
                 if pad.get_direction() is gst.PAD_SRC:
                     peer = pad.get_peer()
                     return peer, peer.get_parent()
@@ -300,6 +300,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.warning('something went terribly wrong')
                 # fall thru
             self._switching = switching
+            return True
 
         def set_blocked(blocked):
             for pad, e in switchPads:
@@ -308,17 +309,19 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         def set_stop_time():
             times = [e.get_property('last-timestamp')
                      for pad, e in switchPads]
+            stop_time = max(times)
 
-            self.debug('last time = %u', max(times))
-            for pad, e in switchPads:
-                e.set_property('stop-value', max(times))
+            if stop_time != gst.CLOCK_TIME_NONE:
+                self.debug('stop time = %u', stop_time)
+                for pad, e in switchPads:
+                    e.set_property('stop-value', stop_time)
 
-            diff = max(times) - min(times)
-            if diff > gst.SECOND * 10:
-                fmt = N_("When switching to %s, feed timestamps out of"
-                         " sync by %u")
-                self.addWarning('large-timestamp-difference', fmt, feed,
-                                diff, priority=40)
+                diff = max(times) - min(times)
+                if diff > gst.SECOND * 10:
+                    fmt = N_("When switching to %s, feed timestamps out"
+                             " of sync by %u")
+                    self.addWarning('large-timestamp-difference', fmt,
+                                    feed, diff, priority=40)
 
         def set_queueing(queueing, start_time=None):
             for pad, e in switchPads:
@@ -328,7 +331,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         def switch():
             for pad, e in switchPads:
-                e.set_property('active-pad', pad)
+                e.set_property('active-pad', pad.get_name())
             self.activeFeed = feed
             self.uiState.set("active-eater", feed)
 
@@ -336,7 +339,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             return collect_single_shot_buffer_probe(
                 [pad for pad, e in switchPads],
                 lambda pad, buffer: buffer.timestamp)
-
 
         feed = self.idealFeed
 

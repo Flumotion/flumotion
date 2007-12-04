@@ -1,3 +1,27 @@
+2007-12-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window._component_kill): 
+	* flumotion/admin/gtk/parts.py (ComponentMenu.__init__): Add "kill
+	job" to component right-click menu.
+
+	* flumotion/component/feedcomponent.py
+	(MultiInputParseLaunchComponent.get_pipeline_string): Put the
+	muxer string at the end so that even if there are elements after
+	the muxer element, a default ! @feeder:default@ will work.
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.do_setup, Switch.create_pipeline): Fix some bugaboos.
+	(Switch.configure_pipeline.getDownstreamElement): Element.pads is
+	a function, not an attribute. Ghetto!
+	(Switch.try_switch.set_switching): Return True on success.
+	(Switch.try_switch.set_stop_time): Only update stop-value when it
+	is not CLOCK_TIME_NONE.
+	(Switch.try_switch.switch): Hrm, turns out active-pad is a string
+	property, not an object property. Whoops!
+
+	* flumotion/common/gstreamer.py (verbose_deep_notify_cb): %r
+	instead of %s.
+
 2007-12-04  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/__init__.py:
@@ -367,7 +391,6 @@
 	  For all python code:
 	    - add __version__ = "$Rev$"
 	    - set svn:keywords to substitute $Rev$
-
 
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 

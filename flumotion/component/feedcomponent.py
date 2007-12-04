@@ -533,12 +533,12 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
                 feeds.append(feed)
             eaters = { 'default': [(x, 'default') for x in feeds] }
 
-        pipeline = self.get_muxer_string(properties) + ' '
+        pipeline = ''
         for e in eaters:
             for feed, alias in eaters[e]:
                 pipeline += '@ eater:%s @ ! muxer. ' % alias
 
-        pipeline += 'muxer.'
+        pipeline += self.get_muxer_string(properties) + ' '
 
         return pipeline
 

@@ -65,7 +65,7 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
     if pspec.name == 'caps' and output == 'None':
         return
 
-    component.debug('%s: %s = %s' % (orig.get_path_string(), pspec.name, output))
+    component.debug('%s: %s = %r', orig.get_path_string(), pspec.name, output)
 
 def element_factory_has_property(element_factory, property_name):
     """

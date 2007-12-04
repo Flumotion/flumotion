@@ -444,6 +444,10 @@ class ComponentMenu(gtk.Menu):
         self.append(i)
         self._items['modify'] = i
 
+        i = gtk.MenuItem(_('_Kill job'))
+        self.append(i)
+        self._items['kill'] = i
+
         # connect callback
         for name in self._items.keys():
             i = self._items[name]

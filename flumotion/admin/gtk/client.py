@@ -39,7 +39,7 @@ from flumotion.admin.gtk.parts import getComponentLabel
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
 from flumotion.common import errors, log, planet, pygobject
-from flumotion.common import connection
+from flumotion.common import connection, common
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, pb as fpb
 from flumotion.ui import trayicon
@@ -609,6 +609,13 @@ class Window(log.Loggable, gobject.GObject):
         """
         return self._component_do(state, '', 'Deleting', 'Deleted',
             'deleteComponent')
+
+    def _component_kill(self, state):
+        workerName = state.get('workerRequested')
+        avatarId = common.componentId(state.get('parent').get('name'),
+                                      state.get('name'))
+        self._admin.callRemote('workerCallRemote', workerName, 'killJob',
+                               avatarId)
 
     def _component_do(self, state, action, doing, done,
         remoteMethodPrefix="component"):
