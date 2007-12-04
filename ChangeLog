@@ -5,6 +5,7 @@
 	(GladeBacked.__init__): Port over to use the delegate.
 	(GladeWindow.destroy): Don't inherit from GObject direcetly the Delegate
 	already does that.
+	Remove unused modules.
 
 	* data/glade/connection-dialog.glade: Rename the dialog to window1 too,
 	for consistency

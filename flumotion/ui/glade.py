@@ -20,8 +20,6 @@
 # Headers in this file shall remain intact.
 
 
-import os
-
 import gtk
 from gtk import glade
 import gobject
@@ -31,7 +29,6 @@ from kiwi.ui.delegates import GladeDelegate
 from twisted.python.reflect import namedAny
 
 from flumotion.configure import configure
-from flumotion.common import log, pygobject
 
 # FIXME: Move to kiwi initialization
 environ.add_resource('glade', configure.gladedir)
@@ -153,7 +150,9 @@ class GladeWidget(gtk.VBox, GladeBacked):
         self.add(w)
         self._window.destroy()
         self._window = None
+
 gobject.type_register(GladeWidget)
+
 
 class GladeWindow(GladeBacked):
     """
