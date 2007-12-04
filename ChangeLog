@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/connection-dialog.glade: Rename the dialog to window1 too,
+	for consistency
+
 	* flumotion/wizard/save.py (WizardSaver._set_fraction_property): Catch
 	ValueError, fixes the webcam step.
 
