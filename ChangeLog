@@ -1,3 +1,8 @@
+2007-12-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.do_check): Require new switch to avoid locking badness.
+
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/*.py:

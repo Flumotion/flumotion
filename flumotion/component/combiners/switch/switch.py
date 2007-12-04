@@ -175,7 +175,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             return result.value
 
         self.debug("checking for switch element")
-        d = check.checkPlugin('switch', 'gst-plugins-bad')
+        d = check.checkPlugin('switch', 'gst-plugins-bad', (0, 10, 5, 1))
         d.addCallback(cb)
         return d
 
