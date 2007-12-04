@@ -184,6 +184,9 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         self._current_step = self.get_first_step()
 
+    def __nonzero__(self):
+        return True
+
     def __len__(self):
         return len(self._steps)
 

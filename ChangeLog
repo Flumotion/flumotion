@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/wizard.py (SectionWizard.__nonzero__): 
+	Implement __nonzero__, so if wizard: works as expected.
+	
 	* flumotion/component/misc/porter/porterclient.py: 
 	Avoid a mutable default function argument.
 
