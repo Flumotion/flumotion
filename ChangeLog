@@ -2,6 +2,9 @@
 
 	* flumotion/ui/glade.py (FluLibgladeWidgetTree.get_sizegroups): Add a 
 	kiwi monkey patch for the libglade loader
+	(GladeBacked.__init__): Port over to use the delegate.
+	(GladeWindow.destroy): Don't inherit from GObject direcetly the Delegate
+	already does that.
 
 	* data/glade/connection-dialog.glade: Rename the dialog to window1 too,
 	for consistency
