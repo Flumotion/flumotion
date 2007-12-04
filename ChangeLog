@@ -1,5 +1,11 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/admin-wizard.glade:
+	* data/glade/authenticate.glade:
+	* data/glade/greeter-authenticate.glade:
+	* data/glade/wizard.glade:
+	Call the toplevel names window1, for consistency
+
 	* flumotion/ui/glade.py: Remove unused import.
 	(GladeWindow.__init__): Remove unused signal connection mechanism.
 
