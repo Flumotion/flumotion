@@ -21,7 +21,6 @@
 
 
 import os
-import sys
 
 import gtk
 from gtk import glade
@@ -168,7 +167,6 @@ class GladeWindow(gobject.GObject, GladeBacked):
     @ivar window: the gtk Window
     @type window: gtk.Window
     """
-    interesting_signals = ()
     window = None
 
     def __init__(self, parent=None):
@@ -181,13 +179,6 @@ class GladeWindow(gobject.GObject, GladeBacked):
         if parent:
             self.window.set_transient_for(parent)
 
-        self.__signals = {}
-        for name, widget in self.widgets.iteritems():
-            for prefix, signal in self.interesting_signals:
-                if name.startswith(prefix):
-                    hid = self._connect_signal(name, signal)
-                    self.__signals[(name, signal)] = hid
-
         # have convenience methods acting on our window
         self.show = self.window.show
         self.hide = self.window.hide
@@ -197,26 +188,4 @@ class GladeWindow(gobject.GObject, GladeBacked):
         self.window.destroy()
         del self.window
 
-    def _connect_signal(self, widget_name, signal):
-        """
-        Connect a conventionally-named signal handler.
-
-        For example::
-          connect_signal('window-foo', 'delete-event')
-
-        is equivalent to::
-          proc = self.on_window_foo_delete_event
-          self.widgets['window-foo'].connect('delete-event', proc)
-
-        @param widget_name: the name of the widget
-        @type  widget_name: str
-        @param signal: which gobject signal to connect to
-        @type  signal: str
-        """
-        attr = '_'.join(('on-%s-%s' % (widget_name, signal)).split('-'))
-        self.log('trying to connect self.%s for widget %s::%s',
-                 attr, widget_name, signal)
-        proc = lambda *x: getattr(self, attr)()
-        return self.widgets[widget_name].connect(signal, proc)
-
-pygobject.type_register(GladeWindow)
+gobject.type_register(GladeWindow)

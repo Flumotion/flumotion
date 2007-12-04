@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/glade.py: Remove unused import.
+	(GladeWindow.__init__): Remove unused signal connection mechanism.
+
 	* flumotion/ui/wizard.py (SectionWizard.__nonzero__): 
 	Implement __nonzero__, so if wizard: works as expected.
 	
