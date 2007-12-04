@@ -287,3 +287,5 @@ class TestStateSet(testsuite.TestCase):
             return d
         d.addCallback(workerGetStateCallback)
         return d
+
+__version__ = "$Rev$"

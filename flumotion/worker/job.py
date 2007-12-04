@@ -359,3 +359,5 @@ class CheckJobHeaven(base.BaseJobHeaven):
         d.addCallback(haveJob)
 
         return d
+
+__version__ = "$Rev$"

@@ -419,3 +419,5 @@ class TestState(testsuite.TestCase):
         self.assertEquals(c.get('adict'), {})
         self.assertRaises(KeyError, c.delitem, 'randomdictkey', 'value')
         self.assertRaises(KeyError, c.delitem, 'adict', 'akey')
+
+__version__ = "$Rev$"

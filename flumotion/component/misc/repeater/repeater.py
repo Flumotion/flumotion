@@ -49,3 +49,5 @@ class Repeater(feedcomponent.ParseLaunchComponent):
                     dp = " drop-probability=%f" % drop_probability
 
         return 'identity silent=true %s' % dp
+
+__version__ = "$Rev$"

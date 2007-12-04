@@ -222,3 +222,5 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self.nodes['Log'].logMessage(message)
 
 GUIClass = HTTPStreamerAdminGtk
+
+__version__ = "$Rev$"

@@ -117,3 +117,5 @@ _config['versionTuple'] = _versionStringToTuple(_config['version'])
 for key, value in _config.items():
     dictionary = locals()
     dictionary[key] = value
+
+__version__ = "$Rev$"

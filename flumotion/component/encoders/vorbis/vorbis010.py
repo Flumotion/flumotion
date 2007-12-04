@@ -88,3 +88,5 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
             return True
 
         handle = pad.add_buffer_probe(buffer_probe)
+
+__version__ = "$Rev$"

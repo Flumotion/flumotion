@@ -52,3 +52,5 @@ def reload():
     for name in reinitialize:
         if name in sys.modules:
             reinitialize[name](sys.modules[name])
+
+__version__ = "$Rev$"

@@ -189,3 +189,5 @@ class StateChangeMonitor(dict, log.Loggable):
                     d.errback(errors.GStreamerGstError(
                         message.src, gerror, debug))
                 del self[change]
+
+__version__ = "$Rev$"

@@ -22,3 +22,5 @@
 """
 code executed by components in workers and for components in admin clients
 """
+
+__version__ = "$Rev$"

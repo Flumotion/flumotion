@@ -671,3 +671,5 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             raise errors.RemoteRunError(msg)
         self.log("component: returning result: %r to caller" % result)
         return result
+
+__version__ = "$Rev$"

@@ -28,3 +28,5 @@ class TestSimple(testsuite.TestCase):
         self.failUnlessIdentical(s, TestSimple)
 
     # XXX: Write a test for the exception, but how?
+
+__version__ = "$Rev$"

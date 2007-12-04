@@ -75,3 +75,5 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         cb = colorbalance.Colorbalance('outputColorbalance', source,
             hue, saturation, brightness, contrast, pipeline)
         self.addEffect(cb)
+
+__version__ = "$Rev$"

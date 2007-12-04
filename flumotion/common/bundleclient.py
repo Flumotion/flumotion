@@ -182,3 +182,5 @@ class BundleLoader(log.Loggable):
         d = self.getBundles(fileName=fileName)
         d.addCallback(gotBundles)
         return d
+
+__version__ = "$Rev$"

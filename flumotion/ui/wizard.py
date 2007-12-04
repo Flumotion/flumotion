@@ -410,3 +410,5 @@ class SectionWizard(GladeWindow, log.Loggable):
 
 
 pygobject.type_register(SectionWizard)
+
+__version__ = "$Rev$"

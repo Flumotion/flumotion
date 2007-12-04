@@ -119,3 +119,5 @@ def createComponent(moduleName, methodName, config):
     """
     return reflectCallCatching(errors.ComponentCreateError,
                                moduleName, methodName, config)
+
+__version__ = "$Rev$"

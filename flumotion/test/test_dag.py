@@ -291,3 +291,5 @@ class TestPlanet(testsuite.TestCase):
         self.assertEquals(len(list), 2)
         for c in [(ccs, component), (cte, component)]:
             self.failUnless(c in list)
+
+__version__ = "$Rev$"

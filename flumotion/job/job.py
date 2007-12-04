@@ -398,3 +398,5 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.debug('shutting down medium')
         self.medium.shutdown()
         self.debug('shut down medium')
+
+__version__ = "$Rev$"

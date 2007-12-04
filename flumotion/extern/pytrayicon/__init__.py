@@ -29,3 +29,5 @@ except ImportError:
         # no pytrayicon anywhere
         pass
     ltihooks.uninstall()
+
+__version__ = "$Rev$"

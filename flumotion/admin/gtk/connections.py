@@ -224,3 +224,5 @@ class Authenticate(GladeWidget):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}
 pygobject.type_register(Authenticate)
+
+__version__ = "$Rev$"

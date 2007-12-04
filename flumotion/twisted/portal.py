@@ -153,3 +153,5 @@ class BouncerPortal(log.Loggable):
         return d
 
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)
+
+__version__ = "$Rev$"

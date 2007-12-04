@@ -203,3 +203,5 @@ class ConfigParser(config.BaseConfigParser):
                                      '<source>')
 
         return res
+
+__version__ = "$Rev$"

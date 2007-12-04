@@ -394,3 +394,5 @@ class WizardSaver(log.Loggable):
         s += '</planet>\n'
 
         return s
+
+__version__ = "$Rev$"

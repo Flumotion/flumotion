@@ -139,3 +139,5 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         else:
             self.warning("no input track selected, cannot set volume")
         return 1.0
+
+__version__ = "$Rev$"

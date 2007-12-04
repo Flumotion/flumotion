@@ -145,3 +145,5 @@ def checkWebcam(device, id):
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
+
+__version__ = "$Rev$"

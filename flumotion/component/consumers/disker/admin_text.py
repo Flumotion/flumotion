@@ -63,3 +63,5 @@ class DiskerAdminText(BaseAdminText):
 
 
 UIClass = DiskerAdminText
+
+__version__ = "$Rev$"

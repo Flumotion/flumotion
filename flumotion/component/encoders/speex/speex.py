@@ -29,3 +29,5 @@ class Speex(feedcomponent.ParseLaunchComponent):
         element = pipeline.get_by_name('encoder')
         if properties.has_key('bitrate'):
             element.set_property('bitrate', properties['bitrate'])
+
+__version__ = "$Rev$"

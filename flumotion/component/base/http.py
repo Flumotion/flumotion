@@ -415,3 +415,5 @@ class LogFilter:
             if (realip & f[1]) == f[0]:
                 return True
         return False
+
+__version__ = "$Rev$"

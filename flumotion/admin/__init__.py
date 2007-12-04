@@ -22,3 +22,5 @@
 """
 client-side code for administration clients
 """
+
+__version__ = "$Rev$"

@@ -85,3 +85,5 @@ class ApacheLogger(Logger):
     def rotate(self):
         self.stop()
         self.start()
+
+__version__ = "$Rev$"

@@ -455,3 +455,5 @@ class ComponentMenu(gtk.Menu):
         self.emit('activated', name)
 
 pygobject.type_register(ComponentMenu)
+
+__version__ = "$Rev$"

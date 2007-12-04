@@ -22,3 +22,5 @@
 """
 common code used by all flumotion processes
 """
+
+__version__ = "$Rev$"

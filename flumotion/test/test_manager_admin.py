@@ -65,3 +65,5 @@ class TestAdminAvatar(testsuite.TestCase):
 
     def testAvatarSet(self):
         self.assertEquals(self.heaven.getAvatars(), [self.avatar])
+
+__version__ = "$Rev$"

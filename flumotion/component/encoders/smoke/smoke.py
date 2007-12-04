@@ -31,3 +31,5 @@ class Smoke(feedcomponent.ParseLaunchComponent):
         for p in ('qmin', 'qmax', 'threshold', 'keyframe'):
             if p in properties:
                 element.set_property(p, properties[p])
+
+__version__ = "$Rev$"

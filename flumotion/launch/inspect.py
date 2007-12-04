@@ -219,3 +219,5 @@ def main(args):
         parser.error('Could not process arguments, try "-h" option.')
 
     return 0
+
+__version__ = "$Rev$"

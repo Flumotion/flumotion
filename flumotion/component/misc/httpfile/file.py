@@ -325,3 +325,5 @@ class FileTransfer:
     def stopProducing(self):
         self.file.close()
         self.request = None
+
+__version__ = "$Rev$"

@@ -47,3 +47,5 @@ def register_icons():
     gtk.window_set_default_icon_from_file(iconfile)
 
     _register_stock_icons(['wizard', 'play', 'pause', 'about'])
+
+__version__ = "$Rev$"

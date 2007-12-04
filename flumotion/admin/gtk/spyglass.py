@@ -219,3 +219,5 @@ if __name__ == '__main__':
 
     _debug("going into gtk.main")
     gtk.main()
+
+__version__ = "$Rev$"

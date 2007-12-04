@@ -140,3 +140,5 @@ class TestAVLTree(testsuite.TestCase):
                 print 'while deleting:', v, 'from:', savetree
                 avltree.debug(savetree)
                 raise
+
+__version__ = "$Rev$"

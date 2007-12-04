@@ -41,3 +41,5 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
         d = defer.maybeDeferred(self.obj.stop, None)
         d.addCallback(lambda _: bouncertest.TrivialBouncerTest.tearDown(self))
         return d
+
+__version__ = "$Rev$"

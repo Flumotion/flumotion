@@ -173,3 +173,5 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                             id="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
+
+__version__ = "$Rev$"

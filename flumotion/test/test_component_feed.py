@@ -395,3 +395,5 @@ class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(gotFeed)
         d.addCallback(checkfds)
         return d
+
+__version__ = "$Rev$"

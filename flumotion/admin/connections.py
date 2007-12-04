@@ -117,3 +117,5 @@ def parsePBConnectionInfo(managerString, use_ssl=True,
                                  % (managerString, managerString))
     else:
         return info
+
+__version__ = "$Rev$"

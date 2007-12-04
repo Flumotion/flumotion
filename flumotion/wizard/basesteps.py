@@ -164,3 +164,5 @@ class OverlayStep(WorkerWizardStep):
         self.text.set_sensitive(button.get_active())
 
 
+
+__version__ = "$Rev$"

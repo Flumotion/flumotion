@@ -32,3 +32,5 @@ class WebcamAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = WebcamAdminGtk
+
+__version__ = "$Rev$"

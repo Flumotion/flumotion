@@ -22,3 +22,5 @@
 """
 Bouncer components perform authentication services for other components.
 """
+
+__version__ = "$Rev$"

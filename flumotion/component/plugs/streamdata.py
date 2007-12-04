@@ -52,3 +52,5 @@ class ExampleStreamDataProvider(StreamDataProvider):
             'description': self.description,
             'url' : self.url
             }
+
+__version__ = "$Rev$"

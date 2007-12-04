@@ -220,3 +220,5 @@ class FilesWatcher(BaseWatcher):
 
     def getFilesToStat(self):
         return self._files
+
+__version__ = "$Rev$"

@@ -229,3 +229,5 @@ class TestCaseWithManager(TestCase):
         d = self.vishnu.shutdown()
         d.addCallback(lambda _: self.tport.stopListening())
         return d
+
+__version__ = "$Rev$"

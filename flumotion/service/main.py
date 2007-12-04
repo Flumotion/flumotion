@@ -90,3 +90,5 @@ def main(args):
 
     sys.stderr.write("No such command '%s'\n" % command)
     return 1
+
+__version__ = "$Rev$"

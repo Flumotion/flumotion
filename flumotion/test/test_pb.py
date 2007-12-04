@@ -589,3 +589,5 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
 
 if __name__ == '__main__':
     unittest.main()
+
+__version__ = "$Rev$"

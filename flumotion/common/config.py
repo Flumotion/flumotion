@@ -1029,3 +1029,5 @@ def exportPlanetXml(p):
                  atmosphere(p.get('atmosphere'))]
                 + [flow(f) for f in p.get('flows')])
     return fxml.sxml2unicode(planet(p))
+
+__version__ = "$Rev$"

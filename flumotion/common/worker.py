@@ -234,3 +234,5 @@ class AdminWorkerState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(ManagerWorkerState, AdminWorkerState)
+
+__version__ = "$Rev$"

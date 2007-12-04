@@ -144,3 +144,5 @@ class TestComponentsView(testsuite.TestCase):
         self.asserted = False
         self.view._view.set_cursor('0')
         self.failUnless(self.asserted)
+
+__version__ = "$Rev$"

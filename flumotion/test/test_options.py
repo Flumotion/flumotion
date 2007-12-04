@@ -66,3 +66,5 @@ class TestOptions(testsuite.TestCase):
         self.failUnless(options.test)
         self.failUnless(options.verbose)
         self.assertEqual(rest, ["rest"])
+
+__version__ = "$Rev$"

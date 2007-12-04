@@ -135,3 +135,5 @@ class IFeedServerParent(Interface):
         """
         Make the component feed the given feed to the fd.
         """
+
+__version__ = "$Rev$"

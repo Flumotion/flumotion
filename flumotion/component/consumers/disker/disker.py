@@ -436,3 +436,5 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                              '%r <-- %r; %r' %
                              (self._marker_prefix, data, err))
         self.change_filename(tmpl)
+
+__version__ = "$Rev$"

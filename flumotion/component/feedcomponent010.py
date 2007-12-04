@@ -730,3 +730,5 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if not pipeline_playing:
             self.try_start_pipeline()
+
+__version__ = "$Rev$"

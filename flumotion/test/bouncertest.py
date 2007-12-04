@@ -148,3 +148,5 @@ class TrivialBouncerTest(testsuite.TestCase):
         d = self.obj.authenticate(k)
         d.addCallback(authenticated)
         return d
+
+__version__ = "$Rev$"

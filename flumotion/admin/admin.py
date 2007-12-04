@@ -441,3 +441,5 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def getWorkerHeavenState(self):
         return self._workerHeavenState
+
+__version__ = "$Rev$"

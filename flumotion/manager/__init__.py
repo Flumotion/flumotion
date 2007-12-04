@@ -22,3 +22,5 @@
 """
 manager-side code
 """
+
+__version__ = "$Rev$"

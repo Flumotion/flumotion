@@ -91,3 +91,5 @@ class AudioTestAdminGtk(admin_gtk.BaseAdminGtk):
                                           title=_("Audio Test"))
         self.nodes['Audio Test'] = audiotest
         return admin_gtk.BaseAdminGtk.setup(self)
+
+__version__ = "$Rev$"

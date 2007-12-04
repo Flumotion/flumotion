@@ -1059,3 +1059,5 @@ You can do remote component calls using:
         self._about()
 
 pygobject.type_register(Window)
+
+__version__ = "$Rev$"

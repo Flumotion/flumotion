@@ -410,3 +410,5 @@ class StateRemoteCache(pb.RemoteCache):
         self._cache_invalid = True
 
         self._notifyListeners(5)
+
+__version__ = "$Rev$"

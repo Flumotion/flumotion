@@ -85,3 +85,5 @@ class VideoTestAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = VideoTestAdminGtk
+
+__version__ = "$Rev$"

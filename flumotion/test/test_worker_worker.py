@@ -35,3 +35,5 @@ class FakeOptions:
 class TestBrain(testsuite.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())
+
+__version__ = "$Rev$"

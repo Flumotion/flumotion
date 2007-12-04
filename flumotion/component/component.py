@@ -592,3 +592,5 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.set('cpu-percent', CPU)
         self._lastTime = nowTime
         self._lastClock = nowClock
+
+__version__ = "$Rev$"

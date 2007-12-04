@@ -460,3 +460,5 @@ def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
     bundlers_used = [b.name for b in bundler.getSubBundlers()]
     regwriter = registry.RegistrySubsetWriter(onlyBundles=bundlers_used)
     regwriter.dump(open(outreg, 'w'))
+
+__version__ = "$Rev$"

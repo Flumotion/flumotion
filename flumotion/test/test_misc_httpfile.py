@@ -239,3 +239,5 @@ class TestDirectory(testsuite.TestCase):
                 str(len(expected)))
         fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred
+
+__version__ = "$Rev$"

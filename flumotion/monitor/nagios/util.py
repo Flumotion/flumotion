@@ -73,3 +73,5 @@ def critical(msg):
 def unknown(msg):
     sys.stdout.write('UNKNOWN: %s\n' % msg)
     reactor.exitStatus = 3
+
+__version__ = "$Rev$"

@@ -106,3 +106,5 @@ class Bouncer(component.BaseComponent):
 
     def keepAlive(self, issuerName, ttl):
         self.plug.keepAlive(issuerName, ttl)
+
+__version__ = "$Rev$"

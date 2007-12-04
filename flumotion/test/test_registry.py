@@ -588,3 +588,5 @@ class TestFindComponents(testsuite.TestCase):
         types = [c.getType() for c in components]
         types.sort()
         self.assertEquals(types, ['first', 'second', 'third']) # alpha order
+
+__version__ = "$Rev$"

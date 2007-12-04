@@ -98,3 +98,5 @@ class AdminTest(testsuite.TestCaseWithManager):
         d = a.connectToManager(i, writeConnection=False)
         d.addCallbacks(connected, failure)
         return d
+
+__version__ = "$Rev$"

@@ -74,3 +74,5 @@ class SwitcherAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = SwitcherAdminGtk
+
+__version__ = "$Rev$"

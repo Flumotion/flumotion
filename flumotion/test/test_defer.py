@@ -220,3 +220,5 @@ class TestRetryingDeferred(testsuite.TestCase):
         d = rd.start()
 
         return d
+
+__version__ = "$Rev$"

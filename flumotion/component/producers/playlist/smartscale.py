@@ -199,3 +199,5 @@ class SmartVideoScale(gst.Bin):
 
 
 gobject.type_register(SmartVideoScale)
+
+__version__ = "$Rev$"

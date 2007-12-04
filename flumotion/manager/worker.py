@@ -203,3 +203,5 @@ class WorkerHeaven(base.ManagerHeaven):
         except ValueError:
             self.warning('worker %s was never registered in the heaven',
                          workerName)
+
+__version__ = "$Rev$"

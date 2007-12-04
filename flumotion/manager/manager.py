@@ -1257,3 +1257,5 @@ class Vishnu(log.Loggable):
             return self._componentMappers[object].state
 
         return None
+
+__version__ = "$Rev$"

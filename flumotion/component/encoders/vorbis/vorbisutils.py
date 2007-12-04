@@ -71,3 +71,5 @@ def get_max_sample_rate(bitrate, channels):
             retval = -1
 
     return retval
+
+__version__ = "$Rev$"

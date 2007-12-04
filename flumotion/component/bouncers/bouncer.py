@@ -392,3 +392,5 @@ class ChallengeResponseBouncer(Bouncer):
         d.addCallback(self._requestAvatarIdCallback, keycard)
         d.addErrback(self._requestAvatarIdErrback, keycard)
         return d
+
+__version__ = "$Rev$"

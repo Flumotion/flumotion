@@ -34,3 +34,5 @@ class TestPublicUI(testsuite.TestCase):
 
         from flumotion.ui import icons
         icons.register_icons()
+
+__version__ = "$Rev$"

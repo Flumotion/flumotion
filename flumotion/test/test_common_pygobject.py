@@ -74,3 +74,5 @@ class TestPyGObject(testsuite.TestCase):
         self.assertEquals(False, o.get_property('burning'))
         o.emit('hcf', False, 'foogoober')
         self.assertEquals(True, o.get_property('burning'))
+
+__version__ = "$Rev$"

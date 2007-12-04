@@ -19,3 +19,5 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+__version__ = "$Rev$"

@@ -572,3 +572,5 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             pad.set_blocked_async(False, _block_cb)
 
         signalid = queue.connect("underrun", _underrun_cb)
+
+__version__ = "$Rev$"

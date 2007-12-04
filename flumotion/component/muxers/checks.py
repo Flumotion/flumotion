@@ -46,3 +46,5 @@ def checkOgg():
 
     result.succeed(None)
     return defer.succeed(result)
+
+__version__ = "$Rev$"

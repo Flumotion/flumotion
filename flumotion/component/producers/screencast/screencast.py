@@ -48,3 +48,5 @@ class Screencast(feedcomponent.ParseLaunchComponent):
                 ' ! video/x-raw-yuv,framerate=(fraction)%s,format=(fourcc)I420'
                 % (src, x_offset, y_offset, width + x_offset, height + y_offset,
                    '%d/%d' % framerate))
+
+__version__ = "$Rev$"

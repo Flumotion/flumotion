@@ -233,3 +233,5 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.timeoutid = 0
 
         self.nbiterations = 0
+
+__version__ = "$Rev$"

@@ -22,3 +22,5 @@
 """
 code shared between components to implement effects
 """
+
+__version__ = "$Rev$"

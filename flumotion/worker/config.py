@@ -192,3 +192,5 @@ class WorkerConfigXML(log.Loggable):
                 if port not in ports:
                     ports.append(port)
         return (ports, random)
+
+__version__ = "$Rev$"

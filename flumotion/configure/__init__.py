@@ -22,3 +22,5 @@
 """
 configure-time information and settings
 """
+
+__version__ = "$Rev$"

@@ -81,3 +81,5 @@ class TestWorkerMedium(testsuite.TestCase):
         d.addCallback(connected)
         d.addCallback(disconnected)
         return d
+
+__version__ = "$Rev$"

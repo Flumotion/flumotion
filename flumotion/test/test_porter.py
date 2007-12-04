@@ -164,3 +164,5 @@ class TestHTTPPorterProtocolParser(testsuite.TestCase):
 
         result = self.pp.parseLine('GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/')
+
+__version__ = "$Rev$"

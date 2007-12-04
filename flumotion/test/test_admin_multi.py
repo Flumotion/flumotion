@@ -102,3 +102,5 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
         d.addCallback(disconnected)
         d.addCallback(reconnected)
         return d
+
+__version__ = "$Rev$"

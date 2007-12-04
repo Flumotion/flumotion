@@ -177,3 +177,5 @@ def main(args):
     d.addErrback(lambda failure: quit())
 
     reactor.run()
+
+__version__ = "$Rev$"

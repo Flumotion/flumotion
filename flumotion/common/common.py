@@ -920,3 +920,5 @@ def strftime(format, t):
     if percent:
         out.append('%')
     return ''.join(out)
+
+__version__ = "$Rev$"

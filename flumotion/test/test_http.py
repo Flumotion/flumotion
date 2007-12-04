@@ -348,3 +348,5 @@ class TestHTTPRoot(testsuite.TestCase):
         self.assertEquals(r, resource)
         output = r.render(request)
         self.assertEquals(output,  server.NOT_DONE_YET)
+
+__version__ = "$Rev$"

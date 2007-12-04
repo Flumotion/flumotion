@@ -51,3 +51,5 @@ def _make_watched(type, *mutators):
 
 WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
                             'sort', 'reverse')
+
+__version__ = "$Rev$"

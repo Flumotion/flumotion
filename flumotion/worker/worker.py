@@ -293,3 +293,5 @@ class WorkerBrain(log.Loggable):
 
     def killJob(self, avatarId, signum):
         self.jobHeaven.killJob(avatarId, signum)
+
+__version__ = "$Rev$"

@@ -141,3 +141,5 @@ class HTPasswdCryptAdminGtk(BaseAdminGtk):
         self.nodes['Keycards'].cleanup()
 
 GUIClass = HTPasswdCryptAdminGtk
+
+__version__ = "$Rev$"

@@ -250,3 +250,5 @@ class GStreamerGstError(GStreamerError):
 
 class MissingElementError(GStreamerError):
     "A needed element is missing"
+
+__version__ = "$Rev$"

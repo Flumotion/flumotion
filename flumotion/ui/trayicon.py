@@ -185,3 +185,5 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
             self._tray_container.set_tooltip(tooltip)
 
 type_register(FluTrayIcon)
+
+__version__ = "$Rev$"

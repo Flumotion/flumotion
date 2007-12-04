@@ -84,3 +84,5 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
             len(lines)))
 
         return defer.succeed(None)
+
+__version__ = "$Rev$"

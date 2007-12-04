@@ -131,3 +131,5 @@ def _percent_to_value(percentage, min, max):
     Convert an percentage value to an integer value between min and max.
     """
     return int(min + percentage / 100.0 * (max - min))
+
+__version__ = "$Rev$"

@@ -44,3 +44,5 @@ class Ogg(feedcomponent.MultiInputParseLaunchComponent):
             maxDelay, maxPageDelay)
 
         return muxer
+
+__version__ = "$Rev$"

@@ -84,3 +84,5 @@ class TestFeeder(testsuite.TestCase):
         self.clientAssertEquals(client, 'bytesReadTotal', brt)
         self.clientAssertEquals(client, 'buffersDroppedTotal', bdt)
         self.clientAssertEquals(client, 'reconnects', reconnects)
+
+__version__ = "$Rev$"

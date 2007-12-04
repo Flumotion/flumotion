@@ -375,3 +375,5 @@ class AdminHeaven(base.ManagerHeaven):
     logCategory = "admin-heaven"
     implements(interfaces.IHeaven)
     avatarClass = AdminAvatar
+
+__version__ = "$Rev$"

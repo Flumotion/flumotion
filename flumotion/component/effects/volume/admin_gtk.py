@@ -178,3 +178,5 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             if value > 1.0: value = 1.0
             self._hscale.set_range(0.0, 1.0)
         self.volumeSet(value)
+
+__version__ = "$Rev$"

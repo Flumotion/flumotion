@@ -98,3 +98,5 @@ def parsePBConnectionInfo(string, username='user', password='test',
         if groups[i]:
             setattr(o, k, f(groups[i]))
     return ret
+
+__version__ = "$Rev$"

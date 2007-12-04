@@ -22,3 +22,5 @@
 """
 Twisted-like base code written for Flumotion
 """
+
+__version__ = "$Rev$"

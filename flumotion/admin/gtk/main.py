@@ -136,3 +136,5 @@ def main(args):
     d.addCallbacks(adminStarted, failure)
 
     reactor.run()
+
+__version__ = "$Rev$"

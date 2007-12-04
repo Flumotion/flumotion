@@ -216,3 +216,5 @@ class FeederClient:
 
         reactor.callFromThread(self._updateUIStateForDisconnect, fd,
                                when)
+
+__version__ = "$Rev$"

@@ -66,3 +66,5 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
                 elif evt_struct['action'] == 'stop':
                     self.switch_to_for_event("master", False)
         return True
+
+__version__ = "$Rev$"

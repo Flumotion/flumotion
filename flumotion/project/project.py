@@ -55,3 +55,5 @@ def get(project, attribute, default=None):
         raise errors.NoProjectError(moduleName)
     m = sys.modules[moduleName]
     return getattr(m, attribute, default)
+
+__version__ = "$Rev$"

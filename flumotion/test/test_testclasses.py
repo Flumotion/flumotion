@@ -215,3 +215,5 @@ class TestTwoPB(testsuite.TestCase):
         d.addCallback(_setName)
         d.addCallback(_setNameCb)
         return d
+
+__version__ = "$Rev$"

@@ -68,3 +68,5 @@ class AdminActionFileLogger(AdminAction):
                 ((identity, method, args, kwargs))))
         self.file.write(s)
         self.file.flush()
+
+__version__ = "$Rev$"

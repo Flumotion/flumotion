@@ -141,3 +141,5 @@ class TestErrorDialog(testsuite.TestCase):
         # terrible reason
         gtk.main()
         return d
+
+__version__ = "$Rev$"

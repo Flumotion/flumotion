@@ -170,3 +170,5 @@ class FeedAvatar(fpb.Avatar):
             t.keepSocketAlive = True
 
         t.loseConnection()
+
+__version__ = "$Rev$"

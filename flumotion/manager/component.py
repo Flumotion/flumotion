@@ -709,3 +709,5 @@ class ComponentHeaven(base.ManagerHeaven):
                     # make the other component initiate connection
                     connect(otherComp, otherFeedName, myComp, myFeedName,
                             reversedMethod)
+
+__version__ = "$Rev$"

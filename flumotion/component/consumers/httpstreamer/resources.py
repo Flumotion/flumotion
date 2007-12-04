@@ -474,3 +474,5 @@ class HTTPRoot(web_resource.Resource, log.Loggable):
         r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
         self.debug("Returning resource %r" % r)
         return r
+
+__version__ = "$Rev$"

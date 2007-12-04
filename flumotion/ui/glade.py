@@ -192,3 +192,5 @@ class GladeWindow(GladeBacked):
         del self.window
 
 gobject.type_register(GladeWindow)
+
+__version__ = "$Rev$"

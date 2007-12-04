@@ -51,3 +51,5 @@ class TestLogFilter(testsuite.TestCase):
             "192.168.0.0/33")
         self.assertRaises(errors.ConfigError, filter.addIPFilter,
             "192.168.0.0/30/1")
+
+__version__ = "$Rev$"

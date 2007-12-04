@@ -585,3 +585,5 @@ user:PSfNpHTkpTx1M
         workers = self.getWorkers()
         for worker in workers:
             print "worker  %s" % worker
+
+__version__ = "$Rev$"

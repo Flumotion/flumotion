@@ -82,3 +82,5 @@ class ManagerManholePlug(lifecycle.ManagerLifecycle):
             ret = defer.succeed(None)
         self.port = None
         return ret
+
+__version__ = "$Rev$"

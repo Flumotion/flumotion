@@ -246,3 +246,5 @@ class WizardSidebar(gtk.EventBox):
         self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
 
 pygobject.type_register(WizardSidebar)
+
+__version__ = "$Rev$"

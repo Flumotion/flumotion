@@ -126,3 +126,5 @@ class LooperAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = LooperAdminGtk
+
+__version__ = "$Rev$"

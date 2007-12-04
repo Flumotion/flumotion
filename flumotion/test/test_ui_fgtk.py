@@ -72,3 +72,5 @@ class VUTest(testsuite.TestCase):
         gtk.main_iteration()
         window.destroy()
         gtk.main_iteration()
+
+__version__ = "$Rev$"

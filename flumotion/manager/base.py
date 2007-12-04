@@ -361,3 +361,5 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @rtype:   list of L{ManagerAvatar}
         """
         return self.avatars.values()
+
+__version__ = "$Rev$"

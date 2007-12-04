@@ -58,3 +58,5 @@ class TokenTestPlug(TokenTestBase, plug.BouncerPlug):
     def __init__(self, args):
         plug.BouncerPlug.__init__(self, args)
         self.haveProperties(args['properties'])
+
+__version__ = "$Rev$"

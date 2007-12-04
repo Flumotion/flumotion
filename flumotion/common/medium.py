@@ -291,3 +291,5 @@ class PingingMedium(BaseMedium):
         self.remote.notifyOnDisconnect(stopPingingCb)
 
         self.startPinging(self._disconnect)
+
+__version__ = "$Rev$"

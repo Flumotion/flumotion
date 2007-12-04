@@ -267,3 +267,5 @@ def main(args):
     reactor.run()
 
     return 0
+
+__version__ = "$Rev$"

@@ -188,3 +188,5 @@ class MessagesView(gtk.VBox):
                     self.active_button = self.buttonbox.get_children()[0]
                     self.active_button.set_active(True)
                 return
+
+__version__ = "$Rev$"

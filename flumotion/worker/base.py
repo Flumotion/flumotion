@@ -351,3 +351,5 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
         if self.mind:
             self._sendFileDescriptor(stdout, "redirectStdout")
             self._sendFileDescriptor(stdout, "redirectStderr")
+
+__version__ = "$Rev$"

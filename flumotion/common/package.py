@@ -439,3 +439,5 @@ def getPackager():
         __packager = Packager()
 
     return __packager
+
+__version__ = "$Rev$"

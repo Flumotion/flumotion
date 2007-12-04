@@ -287,3 +287,5 @@ class Wizard(GladeWindow):
         return d
 
 pygobject.type_register(Wizard)
+
+__version__ = "$Rev$"

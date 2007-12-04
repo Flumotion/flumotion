@@ -194,3 +194,5 @@ class TestRoutingTable(testsuite.TestCase):
                                    '192.168.3.1/32 foo\n'
                                    ,
                                    ['foo', 'bar'])
+
+__version__ = "$Rev$"

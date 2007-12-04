@@ -178,3 +178,5 @@ LicenseType = enum.EnumClass(
     ['CC', 'Commercial'],
     [_('Creative Commons'),
      _('Commercial')])
+
+__version__ = "$Rev$"

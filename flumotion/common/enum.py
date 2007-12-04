@@ -129,3 +129,5 @@ class EnumUnjellyer(jelly.Unjellyable):
 
 
 jelly.setUnjellyableForClass(qual(Enum), EnumUnjellyer)
+
+__version__ = "$Rev$"

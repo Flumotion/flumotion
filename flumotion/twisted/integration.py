@@ -461,3 +461,5 @@ def test(proc):
     # it a nice one
     wrappedtest.timeout = 666
     return wrappedtest
+
+__version__ = "$Rev$"

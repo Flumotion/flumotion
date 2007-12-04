@@ -158,3 +158,5 @@ class GtkTestCase(testsuite.TestCase):
         call_inc(name, 'set_active', not is_active)
         if process:
             self.process()
+
+__version__ = "$Rev$"

@@ -346,3 +346,5 @@ class Result(pb.Copyable, pb.RemoteCopy):
             self.failed = True
             self.value = None
 pb.setUnjellyableForClass(Result, Result)
+
+__version__ = "$Rev$"

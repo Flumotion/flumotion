@@ -119,3 +119,5 @@ class ClientFactory(log.Loggable):
         print "connect error  clients: %d" % self.results[client.STOPPED_CONNECT_ERROR]
         print "read error     clients: %d" % self.results[client.STOPPED_READ_ERROR]
         print "internal error clients: %d" % self.results[client.STOPPED_INTERNAL_ERROR]
+
+__version__ = "$Rev$"

@@ -281,3 +281,5 @@ def main(args):
         return 1
     else:
         return 0
+
+__version__ = "$Rev$"

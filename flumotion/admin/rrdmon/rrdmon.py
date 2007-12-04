@@ -203,3 +203,5 @@ class RRDMonitor(log.Loggable):
 
             d = admin.componentCallRemote(state, 'getUIState')
             d.addCallbacks(gotUIState, errback)
+
+__version__ = "$Rev$"

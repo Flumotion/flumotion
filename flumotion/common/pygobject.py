@@ -179,3 +179,5 @@ def type_register(klass):
         # all subclasses will at least have a __gtype__ from their
         # parent, make sure it corresponds to the exact class
         gobject.type_register(klass)
+
+__version__ = "$Rev$"

@@ -115,3 +115,5 @@ class BTTV(feedcomponent.ParseLaunchComponent):
             if c:
                 self.debug("set norm to %s" % norm)
                 element.set_norm(c)
+
+__version__ = "$Rev$"

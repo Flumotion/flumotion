@@ -83,3 +83,5 @@ class AVBasicWatchdog(switch.AVSwitch):
             self.debug("Switching to %s, active eater is %s", self._idealEater,
                 self.uiState.get("active-eater"))
             self.switch_to(self._idealEater)
+
+__version__ = "$Rev$"

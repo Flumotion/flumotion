@@ -89,3 +89,5 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
         self.log("Starting to listen on UNIX : %s" % self.socketPath)
         reactor.listenUNIX(self.socketPath, self.factory)
         # we will link once we have a valid FD
+
+__version__ = "$Rev$"

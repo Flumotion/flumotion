@@ -77,3 +77,5 @@ def get_component_uistate(model, avatarId, component=None, quiet=False):
                 print ('Error: Component %s in flow %s is sleeping'
                        % (avatarId[1], avatarId[0]))
 get_component_uistate = defer_generator(get_component_uistate)
+
+__version__ = "$Rev$"

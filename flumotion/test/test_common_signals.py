@@ -70,3 +70,5 @@ class TestSignalMixin(testsuite.TestCase):
         sid = o.connect('foo', self.fail)
         o.disconnect(sid)
         o.emit('foo')
+
+__version__ = "$Rev$"

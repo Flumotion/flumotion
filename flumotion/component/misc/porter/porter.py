@@ -516,3 +516,5 @@ class RTSPPorterProtocol(HTTPPorterProtocol):
 
     def writeNotFoundResponse(self):
         self.transport.write("RTSP/1.0 404 Not Found\r\n\r\nResource unknown")
+
+__version__ = "$Rev$"

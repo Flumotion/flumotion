@@ -61,3 +61,5 @@ def checkMixerTracks(source_factory, device, channels, id=None):
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
+
+__version__ = "$Rev$"

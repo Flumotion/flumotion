@@ -246,3 +246,5 @@ class SXML:
             return render
         tag.__name__ = attr 
         return tag
+
+__version__ = "$Rev$"

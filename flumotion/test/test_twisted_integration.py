@@ -212,3 +212,5 @@ class IntegrationTestDecoratorTest(testsuite.TestCase):
         plan.kill(p1)
         plan.kill(p2)
     testParallelStartAndKill = integration.test(testParallelStartAndKill)
+
+__version__ = "$Rev$"

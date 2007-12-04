@@ -49,3 +49,5 @@ class DiskerPlug(base.ComponentPlug):
         @type  location: str
         """
         pass
+
+__version__ = "$Rev$"

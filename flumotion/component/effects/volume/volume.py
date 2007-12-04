@@ -113,3 +113,5 @@ class Volume(feedcomponent.Effect):
             return self.component.getVolume()
         else:
             return 1.0
+
+__version__ = "$Rev$"

@@ -235,3 +235,5 @@ class FVUMeter(gtk.DrawingArea):
 
 gobject.type_register(FVUMeter)
 
+
+__version__ = "$Rev$"

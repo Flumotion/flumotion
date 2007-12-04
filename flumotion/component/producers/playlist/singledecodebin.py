@@ -306,3 +306,5 @@ class SingleDecodeBin(gst.Bin):
         self.log("element:%s" % element.get_name())
 
 gobject.type_register(SingleDecodeBin)
+
+__version__ = "$Rev$"

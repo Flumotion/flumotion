@@ -83,3 +83,5 @@ class WizardTest(testsuite.TestCase):
         refstate = {'passwd': 'baz', 'host': 'foolio', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         self.assertEquals(state, refstate)
+
+__version__ = "$Rev$"

@@ -33,3 +33,5 @@ class TokenTestBouncer(tokentest.TokenTestBase, bouncer.Bouncer):
     def do_setup(self):
         self.haveProperties(self.config['properties'])
         return defer.succeed(None)
+
+__version__ = "$Rev$"

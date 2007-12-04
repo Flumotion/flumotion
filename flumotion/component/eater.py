@@ -181,3 +181,5 @@ class Eater:
             c.get('totalOffsetDiscont', 0) + units)
         uiState.set('totalOffsetDiscont',
             uiState.get('totalOffsetDiscont', 0) + units)
+
+__version__ = "$Rev$"

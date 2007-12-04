@@ -67,3 +67,5 @@ class ComponentLifecyclePrinter(ComponentLifecycle):
     def stop(self, component):
         print 'Component is stopping'
 
+
+__version__ = "$Rev$"

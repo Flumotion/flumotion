@@ -999,3 +999,5 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     def effectCallRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state,
             "effect", self.effectName, methodName, *args, **kwargs)
+
+__version__ = "$Rev$"

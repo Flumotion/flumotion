@@ -63,3 +63,5 @@ class RemoteIdentity(Identity):
     def __str__(self):
         return '%s@%s' % (self.username or '<unknown user>',
                           self.host or '<unknown host>')
+
+__version__ = "$Rev$"

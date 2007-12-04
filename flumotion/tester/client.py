@@ -27,3 +27,5 @@
  STOPPED_READ_ERROR,
  STOPPED_INTERNAL_ERROR,
  STOPPED_LAST) = range(7)
+
+__version__ = "$Rev$"

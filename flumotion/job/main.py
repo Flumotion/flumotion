@@ -88,3 +88,5 @@ def main(args):
     log.info('job', "Stopped job '%s'" % avatarId)
 
     return 0
+
+__version__ = "$Rev$"

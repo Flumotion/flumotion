@@ -66,3 +66,5 @@ def namedAny(name):
         obj = getattr(obj, n)
 
     return obj
+
+__version__ = "$Rev$"

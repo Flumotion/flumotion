@@ -68,3 +68,5 @@ def connect_to_manager(stdscr, info):
     d.addCallback(connected)
     d.addErrback(refused)
     d.addErrback(failed)
+
+__version__ = "$Rev$"

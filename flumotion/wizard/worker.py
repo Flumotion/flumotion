@@ -130,3 +130,5 @@ class WorkerList(gtk.HBox):
         self.emit('worker-selected', self.get_worker())
 
 pygobject.type_register(WorkerList)
+
+__version__ = "$Rev$"

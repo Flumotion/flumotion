@@ -236,3 +236,5 @@ class AboutDialog(gtk.Dialog):
         info.set_justify(gtk.JUSTIFY_FILL)
         info.set_line_wrap(True)
         info.show()
+
+__version__ = "$Rev$"

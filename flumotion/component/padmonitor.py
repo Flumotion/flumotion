@@ -229,3 +229,5 @@ class PadMonitorSet(dict, log.Loggable):
             if not monitor.isActive():
                 return False
         return True
+
+__version__ = "$Rev$"

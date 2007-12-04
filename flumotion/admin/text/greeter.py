@@ -148,3 +148,5 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             else:
                 self.current_input = self.current_input + chr(c)
                 self.display_current_input_line()
+
+__version__ = "$Rev$"

@@ -204,3 +204,5 @@ class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)
+
+__version__ = "$Rev$"

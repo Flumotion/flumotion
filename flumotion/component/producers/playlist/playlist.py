@@ -443,3 +443,5 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self._watchDirectory(self._playlistdirectory)
 
         reactor.callLater(10, self.timeReport)
+
+__version__ = "$Rev$"

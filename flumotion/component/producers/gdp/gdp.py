@@ -27,3 +27,5 @@ class GDPProducer(feedcomponent.ParseLaunchComponent):
         port = properties['port']
 
         return 'tcpclientsrc host=%s port=%d ! gdpdepay' % (host, port)
+
+__version__ = "$Rev$"

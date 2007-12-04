@@ -241,3 +241,5 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     except (errors.SystemError, SystemError), e:
         safeprintf(sys.stderr, 'ERROR: %s\n', e)
         sys.exit(1)
+
+__version__ = "$Rev$"

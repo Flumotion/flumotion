@@ -67,3 +67,5 @@ def uninstall():
     importer.uninstall()
 
 install()
+
+__version__ = "$Rev$"

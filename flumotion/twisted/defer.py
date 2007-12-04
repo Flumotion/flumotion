@@ -257,3 +257,5 @@ class RetryingDeferred(object):
         self.delay = min(self.delay, self.maxDelay)
 
         return self.delay
+
+__version__ = "$Rev$"

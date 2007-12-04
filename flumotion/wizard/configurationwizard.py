@@ -385,3 +385,5 @@ class ConfigurationWizard(SectionWizard):
                 id='worker-error')
             self.add_msg(msg)
 
+
+__version__ = "$Rev$"

@@ -118,3 +118,5 @@ class TestHeaven(testsuite.TestCase):
                                      interfaces.IWorkerMedium)
         d.addCallback(gotAvatar)
         return d
+
+__version__ = "$Rev$"

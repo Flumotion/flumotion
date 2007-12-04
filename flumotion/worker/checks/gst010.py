@@ -218,3 +218,5 @@ def check1394(id):
     d.addErrback(errbackResult)
 
     return d
+
+__version__ = "$Rev$"

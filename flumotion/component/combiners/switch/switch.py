@@ -460,3 +460,5 @@ class AVSwitch(Switch):
                 raise AssertionError()
 
         return pipeline
+
+__version__ = "$Rev$"

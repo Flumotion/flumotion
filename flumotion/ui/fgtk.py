@@ -69,3 +69,5 @@ class ProxyWidgetMapping:
             return gobject.type_from_name(name)
 
 
+
+__version__ = "$Rev$"

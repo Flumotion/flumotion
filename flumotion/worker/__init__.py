@@ -22,3 +22,5 @@
 """
 code for workers executing jobs for the manager
 """
+
+__version__ = "$Rev$"

@@ -946,3 +946,5 @@ class FireWireAudioStep(AudioSourceStep):
         self._update_output_format()
 
 
+
+__version__ = "$Rev$"

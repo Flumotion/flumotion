@@ -146,3 +146,5 @@ def openAnonymousTelnetManhole(namespace, portNum=-1):
     port = reactor.listenTCP(portNum, telnetFactory,
                              interface='localhost')
     return port
+
+__version__ = "$Rev$"

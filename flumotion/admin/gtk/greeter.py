@@ -363,3 +363,5 @@ class ConnectExisting(wizard.Wizard):
 
     def __init__(self):
         wizard.Wizard.__init__(self, 'connect_to_existing')
+
+__version__ = "$Rev$"

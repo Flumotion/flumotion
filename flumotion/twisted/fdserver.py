@@ -183,3 +183,5 @@ class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
 
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
+
+__version__ = "$Rev$"

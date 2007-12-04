@@ -90,3 +90,5 @@ class TestConfig(testsuite.TestCase):
     def testParseAuthenticationError(self):
         s = """<worker><authentication><invalid-name/></authentication></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
+
+__version__ = "$Rev$"

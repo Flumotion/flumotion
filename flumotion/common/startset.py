@@ -246,3 +246,5 @@ class StartSet(log.Loggable):
             self.shutdownSuccess(avatarId)
         else:
             self.debug('unknown avatar %s logged out', avatarId)
+
+__version__ = "$Rev$"

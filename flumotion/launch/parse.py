@@ -324,3 +324,5 @@ def parse_args(args):
     components.complete_and_verify_configs()
 
     return components.sorted_configs(linker.get_sort_order())
+
+__version__ = "$Rev$"

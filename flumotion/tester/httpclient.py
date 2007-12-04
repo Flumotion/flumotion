@@ -256,3 +256,5 @@ def verify(client, data):
 
 pygobject.type_register(HTTPClient)
 pygobject.type_register(HTTPClientStatic)
+
+__version__ = "$Rev$"

@@ -172,3 +172,5 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
 
     result.succeed(None)
     return defer.succeed(result)
+
+__version__ = "$Rev$"

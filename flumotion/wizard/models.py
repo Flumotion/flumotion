@@ -228,3 +228,5 @@ class VideoEncoder(Encoder):
 
     eater_type = VideoProducer
     name_template = "video-encoder"
+
+__version__ = "$Rev$"

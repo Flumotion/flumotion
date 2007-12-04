@@ -160,3 +160,5 @@ class HTTPPorterClientFactory(PorterClientFactory):
             deferred.addCallback(lambda r,m: self.registerPrefix(m),
                 mount)
         deferred.addCallback(self._fireDeferred)
+
+__version__ = "$Rev$"

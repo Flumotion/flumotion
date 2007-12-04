@@ -271,3 +271,5 @@ class WorkerMedium(medium.PingingMedium):
         @type signum: int
         """
         self.brain.killJob(avatarId, signum)
+
+__version__ = "$Rev$"

@@ -402,3 +402,5 @@ class Shout2VideoStep(Shout2Step):
     sidebar_name = _('Icecast video')
 
 
+
+__version__ = "$Rev$"

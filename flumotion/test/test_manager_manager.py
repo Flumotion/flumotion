@@ -725,3 +725,5 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         # verify avatar state
         self.failIf(avatar.jobState)
         self.failIf(avatar.componentState)
+
+__version__ = "$Rev$"

@@ -65,3 +65,5 @@ class SignalMixin(object):
                     log.warning("signalmixin", "Exception calling "
                                 "signal handler %r: %s", proc,
                                 log.getExceptionMessage(e))
+
+__version__ = "$Rev$"

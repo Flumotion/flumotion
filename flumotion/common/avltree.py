@@ -289,3 +289,5 @@ class AVLTree(object):
 
     def iterreversed(self):
         return iteratereversed(self.tree)
+
+__version__ = "$Rev$"

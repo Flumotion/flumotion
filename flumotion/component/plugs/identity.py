@@ -56,3 +56,5 @@ class ExampleIdentityProvider(IdentityProvider):
         i = RemoteIdentity(random.choice(['larry', 'curly', 'moe']),
                            random.choice(['chicago', 'detroit']))
         return defer.succeed(i)
+
+__version__ = "$Rev$"

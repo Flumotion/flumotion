@@ -33,3 +33,5 @@ class CursesStdIO:
         """called when input is ready"""
 
     def logPrefix(self): return 'CursesClient'
+
+__version__ = "$Rev$"

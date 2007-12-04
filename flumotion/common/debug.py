@@ -284,3 +284,5 @@ class AllocMonitor(object):
                               len(directAllocs) == 1 and "object" or "objects")
         for wrap in directAllocs:
             print '  ' + self._wrapperRepr(wrap)
+
+__version__ = "$Rev$"

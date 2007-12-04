@@ -39,3 +39,5 @@ def isInterface(object):
 
 Interface = zi.Interface
 implements = zi.implements
+
+__version__ = "$Rev$"

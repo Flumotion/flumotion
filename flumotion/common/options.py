@@ -127,3 +127,5 @@ def OptionGroup(parser, title, description=None, **kwargs):
     class FOptionGroup(OptionGroup):
         pass
     return FOptionGroup(parser, title, description, **kwargs)
+
+__version__ = "$Rev$"

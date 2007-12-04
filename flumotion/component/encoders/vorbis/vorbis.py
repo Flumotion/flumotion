@@ -22,3 +22,5 @@
 import gst
 
 from vorbis010 import Vorbis
+
+__version__ = "$Rev$"

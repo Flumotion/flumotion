@@ -315,3 +315,5 @@ class SpeexStep(AudioEncoderStep):
         options = {}
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         return options
+
+__version__ = "$Rev$"

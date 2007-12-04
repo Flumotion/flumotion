@@ -127,3 +127,5 @@ class WizardSaveTest(testsuite.TestCase):
             print item.name, item.worker
         #print self.wizard.printOut()
     testAudioTestWorkers.skip = 'Andy, maybe your generator work broke this ?'
+
+__version__ = "$Rev$"

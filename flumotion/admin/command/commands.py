@@ -489,3 +489,5 @@ commands = (('getprop',
              ),
              do_delete)
             )
+
+__version__ = "$Rev$"

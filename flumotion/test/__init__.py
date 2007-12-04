@@ -69,3 +69,5 @@ if i > -1:
         'fdpass'))
 
 del boot, flumotion, i, log, useGtk2Reactor
+
+__version__ = "$Rev$"

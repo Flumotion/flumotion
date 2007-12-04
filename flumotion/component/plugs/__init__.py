@@ -22,3 +22,5 @@
 """
 Base classes for components and their ui's.
 """
+
+__version__ = "$Rev$"

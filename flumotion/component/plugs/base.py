@@ -67,3 +67,5 @@ class ManagerPlug(Plug):
     def restart(self, vishnu):
         self.stop(vishnu)
         self.start(vishnu)
+
+__version__ = "$Rev$"

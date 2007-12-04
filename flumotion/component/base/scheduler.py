@@ -408,3 +408,5 @@ class ICalScheduler(Scheduler):
             except Exception:
                 self.warning("could not parse ical event %r", event)
         return events
+
+__version__ = "$Rev$"

@@ -59,3 +59,5 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
         typefind = pipeline.get_by_name('tf')
         typefind.connect('have-type', have_caps)
+
+__version__ = "$Rev$"

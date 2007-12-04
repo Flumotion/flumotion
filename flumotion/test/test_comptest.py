@@ -463,3 +463,5 @@ class TestCompTestFlow(CompTestTestCase):
         task_d.addCallback(insert_flow_errors)
         d = self.p.run_flow(self.duration, tasks=[task_d])
         return self.failUnlessFailure(d, CustomFlowException)
+
+__version__ = "$Rev$"

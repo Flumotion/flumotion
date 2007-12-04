@@ -105,3 +105,5 @@ def main(args):
     _runInterface(options)
 
     reactor.run()
+
+__version__ = "$Rev$"

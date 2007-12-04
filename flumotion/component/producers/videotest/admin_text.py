@@ -76,3 +76,5 @@ class VideoTestAdminText(BaseAdminText):
 
 
 UIClass = VideoTestAdminText
+
+__version__ = "$Rev$"

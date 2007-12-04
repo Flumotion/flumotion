@@ -40,3 +40,5 @@ class AdminComponentUIState(flavors.StateRemoteCache):
 
 pb.setUnjellyableForClass(WorkerComponentUIState, ManagerComponentUIState)
 pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
+
+__version__ = "$Rev$"

@@ -87,3 +87,5 @@ class IPBouncer(bouncer.Bouncer):
             self.debug('allowed login from ip address %s',
                        keycard.address)
             return keycard
+
+__version__ = "$Rev$"

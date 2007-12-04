@@ -130,3 +130,5 @@ class DiskerAdminGtk(BaseAdminGtk):
         return BaseAdminGtk.setup(self)
 
 GUIClass = DiskerAdminGtk
+
+__version__ = "$Rev$"

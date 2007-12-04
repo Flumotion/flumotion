@@ -31,3 +31,5 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
         return admin_gtk.BaseAdminGtk.setup(self)
 
 GUIClass = BTTVAdminGtk
+
+__version__ = "$Rev$"

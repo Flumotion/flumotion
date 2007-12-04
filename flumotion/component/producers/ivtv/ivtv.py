@@ -37,3 +37,5 @@ class Ivtv(feedcomponent.ParseLaunchComponent):
                 " ! @feeder:video@ d. ! queue ! audioconvert ! audio/x-raw-int "
                 " ! @feeder:audio@"
                 % (device, deinterlacer, scaling_template))
+
+__version__ = "$Rev$"

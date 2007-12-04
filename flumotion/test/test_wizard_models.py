@@ -61,3 +61,5 @@ class TestComponent(testsuite.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+__version__ = "$Rev$"

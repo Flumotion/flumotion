@@ -483,3 +483,5 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         for logger in self._loggers:
             self.debug('rotating logger %r' % logger)
             logger.rotate()
+
+__version__ = "$Rev$"

@@ -322,3 +322,5 @@ class TestClientEater(testsuite.TestCase):
             d.callback(None)
         c.deferred.addCallback(stop)
         return d
+
+__version__ = "$Rev$"

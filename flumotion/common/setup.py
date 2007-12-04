@@ -53,3 +53,5 @@ def setupPackagePath():
         # these aren't meant to be replaced
         package.getPackager().registerPackagePath(path,
             "FLU_PROJECT_PATH_" + path)
+
+__version__ = "$Rev$"

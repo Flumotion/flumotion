@@ -63,3 +63,5 @@ class Composite(feedcomponent.MultiInputParseLaunchComponent):
                 for k, v in cfg.items():
                     if v is not None:
                         p.set_property(k, v)
+
+__version__ = "$Rev$"

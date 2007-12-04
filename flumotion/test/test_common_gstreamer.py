@@ -76,3 +76,5 @@ class TestProperty(unittest.TestCase):
         b = gstreamer.element_factory_has_property_value(
             'fakesrc', 'sizetype', 'no-way')
         self.failIf(b)
+
+__version__ = "$Rev$"

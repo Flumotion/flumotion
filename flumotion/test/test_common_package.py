@@ -355,3 +355,5 @@ class TestRecursively(testsuite.TestCase):
 
         # cleanup
         os.system("rm -r %s" % self.tempdir)
+
+__version__ = "$Rev$"

@@ -41,3 +41,5 @@ def init():
 setFluDebug = externlog.setDebug
 # for pb unit tests
 _getTheFluLogObserver = externlog._getTheTwistedLogObserver
+
+__version__ = "$Rev$"

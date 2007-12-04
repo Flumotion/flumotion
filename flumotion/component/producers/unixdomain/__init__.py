@@ -22,3 +22,5 @@
 """
 Producer to receive gdp-payloaded data on a unix domain socket
 """
+
+__version__ = "$Rev$"

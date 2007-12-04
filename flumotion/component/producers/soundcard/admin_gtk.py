@@ -48,3 +48,5 @@ class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
 
 
 GUIClass = SoundcardAdminGtk
+
+__version__ = "$Rev$"

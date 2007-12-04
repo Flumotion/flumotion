@@ -45,3 +45,5 @@ class WorkerConfigTest(testsuite.TestCase):
 </worker>
 """)
         self.failUnless(conf.randomFeederports)
+
+__version__ = "$Rev$"

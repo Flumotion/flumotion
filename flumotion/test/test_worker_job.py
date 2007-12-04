@@ -42,3 +42,5 @@ class TestCheckJobHeaven(testsuite.TestCase):
 
     def testInit(self):
         pass
+
+__version__ = "$Rev$"

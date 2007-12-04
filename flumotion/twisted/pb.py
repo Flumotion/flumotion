@@ -753,3 +753,5 @@ class PingableAvatar(Avatar):
             if self.mind:
                 self.mind.broker.transport.loseConnection()
         self.startPingChecking(_disconnect)
+
+__version__ = "$Rev$"

@@ -43,3 +43,5 @@ class Rtsp(feedcomponent.ParseLaunchComponent):
                 " @feeder:video@ %s ! @feeder:audio@"
                 % (location, scaling_template, framerate[0],
                    framerate[1], audio_template))
+
+__version__ = "$Rev$"

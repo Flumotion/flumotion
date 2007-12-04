@@ -169,3 +169,5 @@ class Sha256Checker(log.Loggable):
             self.debug('user %s refused, not in database' %
                 credentials.username)
             return defer.fail(errors.NotAuthenticatedError())
+
+__version__ = "$Rev$"

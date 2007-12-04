@@ -1421,3 +1421,5 @@ def getRegistry():
         __registry = ComponentRegistry()
 
     return __registry
+
+__version__ = "$Rev$"

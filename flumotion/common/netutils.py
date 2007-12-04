@@ -237,3 +237,5 @@ class RoutingTable(object):
                 yield route
         # Yield the default route
         yield None
+
+__version__ = "$Rev$"

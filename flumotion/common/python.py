@@ -47,3 +47,5 @@ if sys.version_info[:2] < (2, 5):
         return False
 else:
     any = any
+
+__version__ = "$Rev$"

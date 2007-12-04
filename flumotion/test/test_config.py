@@ -1244,3 +1244,5 @@ class TestDictDiff(testsuite.TestCase):
              "Value mismatch:\n"
              "    old['foo']: 'bar' = 'baz'\n"
              "    new['foo']: 'bar' = 'qux'")
+
+__version__ = "$Rev$"
