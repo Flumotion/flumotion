@@ -1,3 +1,16 @@
+2007-12-04  Johan Dahlin  <johan@gnome.org>
+
+	Revert commit:
+
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_tvcard.glade:
+	Remove signals which are connected automatically by Kiwi.
+
 2007-12-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/switch.py

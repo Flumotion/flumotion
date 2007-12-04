@@ -35,6 +35,7 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
+	  <signal name="toggled" handler="on_set_license__toggled" last_modification_time="Thu, 30 Sep 2004 15:40:53 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
