@@ -673,13 +673,16 @@ class RegistryParser(fxml.Parser):
         return plugs
 
     ## Component registry specific functions
-    def parseRegistryFile(self, file, name=None):
+    def parseRegistryFile(self, file):
         """
         @param file: The file to parse, either as an open file object,
         or as the name of a file to open.
         @type  file: str or file.
         """
-        self.filename = getattr(file, 'name', file)
+        if isinstance(file, basestring):
+            self.filename = file
+        else:
+            self.filename = getattr(file, 'name', '<string>')
         root = self.getRoot(file)
         node = root.documentElement
 
@@ -788,7 +791,10 @@ class RegistryParser(fxml.Parser):
         or as the name of a file to open.
         @type  file: str or file.
         """
-        self.filename = getattr(file, 'name', file)
+        if isinstance(file, basestring):
+            self.filename = file
+        else:
+            self.filename = getattr(file, 'name', '<string>')
         root = self.getRoot(file)
         self._parseRoot(root.documentElement)
         root.unlink()

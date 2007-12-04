@@ -1,3 +1,9 @@
+2007-12-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/registry.py (RegistryParser.parseRegistryFile)
+	(RegistryParser.parseRegistry): Fix code to match intentions, I
+	think.
+
 2007-12-03  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/common.py (argRepr): 
