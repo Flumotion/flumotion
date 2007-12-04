@@ -1,3 +1,18 @@
+2007-12-04  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/command/commands.py:
+	  Add 'workerremoteinvoke' to invoke a pb method, mirroring invoke
+	  for components and managerinvoke.
+	* flumotion/common/debug.py:
+	  Add a getVersions() method that traverses sys.modules, and for all
+	  flumotion modules with __version__ info, packages up that info and
+	  returns it.
+	* flumotion/component/component.py:
+	* flumotion/manager/admin.py:
+	* flumotion/worker/medium.py:
+	  Provide PB method to get versions via debug.getVersions() in components,
+	  managers, workers.
+
 2007-12-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window._component_kill): 

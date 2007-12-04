@@ -281,6 +281,28 @@ def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     quit()
 do_workerinvoke = defer_generator(do_workerinvoke)
 
+def do_workerremoteinvoke(model, quit, workerName, methodName, *args):
+    if args:
+        args = _parse_typed_args(args[0], args[1:])
+        if args is None:
+            quit()
+            yield None
+
+    d = model.callRemote('workerCallRemote', workerName, methodName, *args)
+    yield d
+
+    try:
+        v = d.value()
+        print "Invoke of %s on %s was successful." % (methodName, workerName)
+        print v
+    except errors.NoMethodError:
+        print "No method '%s' on component '%s'" % (methodName, workerName)
+    except Exception, e:
+        raise
+
+    quit()
+do_workerremoteinvoke = defer_generator(do_workerremoteinvoke)
+
 def do_managerinvoke(model, quit, methodName, *args):
     if args:
         args = _parse_typed_args(args[0], args[1:])
@@ -456,12 +478,17 @@ commands = (('getprop',
               ('args', str, None, True)),
              do_invoke),
             ('workerinvoke',
-             'invoke a function on a worker',
+             'invoke an arbitrary function on a worker',
              (('worker-name', str),
               ('module-name', str),
               ('method-name', str),
               ('args', str, None, True)),
              do_workerinvoke),
+            ('workerremoteinvoke',
+             'invoke a remote function on a manager',
+             (('method-name', str),
+              ('args', str, None, True)),
+             do_workerremoteinvoke),
             ('managerinvoke',
              'invoke a function on a manager',
              (('method-name', str),

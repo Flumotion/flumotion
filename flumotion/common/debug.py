@@ -285,4 +285,23 @@ class AllocMonitor(object):
         for wrap in directAllocs:
             print '  ' + self._wrapperRepr(wrap)
 
+def getVersions():
+    """
+    Get versions of all flumotion modules based on svn Rev keyword.
+    """
+    r = {}
+    for modname in sys.modules:
+        mod = sys.modules[modname]
+        if modname.startswith('flumotion.') and hasattr(mod, "__version__"):
+            # Has the form: "$Rev$"
+            try:
+                versionnum = int(mod.__version__[6:-2])
+                r[modname] = versionnum
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+
+    return r
+
 __version__ = "$Rev$"

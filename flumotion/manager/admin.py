@@ -33,7 +33,7 @@ from twisted.python import failure
 from zope.interface import implements
 
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, log, planet, registry
+from flumotion.common import errors, interfaces, log, planet, registry, debug
 
 # make Result and Message proxyable
 from flumotion.common import messages
@@ -361,14 +361,7 @@ class AdminAvatar(base.ManagerAvatar):
         return self.vishnu.deleteComponent(componentState)
 
     def perspective_getVersions(self):
-        import sys
-        r = []
-        for modname in sys.modules:
-            mod = sys.modules[modname]
-            if hasattr(mod, "__version__"):
-                r.append("%s -> %s" % (modname, mod.__version__))
-
-        return r
+        return debug.getVersions()
 
     # Deprecated -- remove me when no one uses me any more
     def perspective_cleanComponents(self):

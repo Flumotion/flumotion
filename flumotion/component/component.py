@@ -34,7 +34,7 @@ from zope.interface import implements
 
 from flumotion.common import interfaces, errors, log, planet, medium
 from flumotion.common import componentui, common, registry, messages
-from flumotion.common import interfaces, reflectcall
+from flumotion.common import interfaces, reflectcall, debug
 
 from flumotion.common.planet import moods
 from flumotion.configure import configure
@@ -242,6 +242,9 @@ class BaseComponentMedium(medium.PingingMedium):
         subclasses. By default, just returns None.
         """
         return None
+
+    def remote_getVersions(self):
+        return debug.getVersions()
 
 class BaseComponent(common.InitMixin, log.Loggable):
     """
