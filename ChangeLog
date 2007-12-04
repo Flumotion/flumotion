@@ -1,3 +1,8 @@
+2007-12-04  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/consumptionsteps.py:
+	Use a separate signal handler for all three widgets, for consistency.
+
 2007-12-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/registry.py (RegistryParser.parseRegistryFile)

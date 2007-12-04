@@ -63,7 +63,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
+		  <signal name="toggled" handler="on_http_audio_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -82,7 +82,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
+		  <signal name="toggled" handler="on_http_audio__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -101,7 +101,7 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
+		  <signal name="toggled" handler="on_http_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>

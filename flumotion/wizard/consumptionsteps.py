@@ -183,7 +183,13 @@ class ConsumptionStep(WizardStep):
 
         self._verify()
 
-    def on_secondary__toggled(self, button):
+    def on_http_audio_video__toggled(self, button):
+        self._verify()
+
+    def on_http_audio__toggled(self, button):
+        self._verify()
+
+    def on_http_video__toggled(self, button):
         self._verify()
 
     def on_http__toggled(self, button):
