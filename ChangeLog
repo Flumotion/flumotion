@@ -1,5 +1,8 @@
 2007-12-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/glade.py (FluLibgladeWidgetTree.get_sizegroups): Add a 
+	kiwi monkey patch for the libglade loader
+
 	* data/glade/connection-dialog.glade: Rename the dialog to window1 too,
 	for consistency
 

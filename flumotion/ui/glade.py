@@ -25,11 +25,16 @@ import os
 import gtk
 from gtk import glade
 import gobject
+from kiwi.environ import environ
+from kiwi.ui import libgladeloader
+from kiwi.ui.delegates import GladeDelegate
 from twisted.python.reflect import namedAny
 
 from flumotion.configure import configure
 from flumotion.common import log, pygobject
 
+# FIXME: Move to kiwi initialization
+environ.add_resource('glade', configure.gladedir)
 
 def _unbrokenNamedAny(qual):
     # ihooks breaks namedAny, so split up by module, attribute
@@ -58,13 +63,38 @@ def _flumotion_glade_custom_handler(xml, proc, name, *args):
 glade.set_custom_handler(_flumotion_glade_custom_handler)
 
 
-class GladeBacked:
+# Kiwi monkey patch, allows us to specify a
+# glade_typedict on the View.
+class FluLibgladeWidgetTree(glade.XML):
+    def __init__(self, view, gladefile, domain=None):
+        self._view = view
+        glade.XML.__init__(self, gladefile, domain,
+                           typedict=view.glade_typedict or {})
+
+        for widget in self.get_widget_prefix(''):
+            setattr(self._view, widget.get_name(), widget)
+
+    def get_widget(self, name):
+        name = name.replace('.', '_')
+        widget = glade.XML.get_widget(self, name)
+        if widget is None:
+            raise AttributeError(
+                  "Widget %s not found in view %s" % (name, self._view))
+        return widget
+
+    def get_widgets(self):
+        return self.get_widget_prefix('')
+
+    def get_sizegroups(self):
+        return []
+libgladeloader.LibgladeWidgetTree = FluLibgladeWidgetTree
+
+
+class GladeBacked(GladeDelegate):
     """
     Base class for objects backed by glade interface definitions.
     The glade file should have exactly one Window.
 
-    @ivar glade_dir:      directory where the glade file is stored
-    @type glade_dir:      str
     @ivar glade_file:     filename of glade file containing the interface
     @type glade_file:     str
     @ivar glade_typedict: GTK widget class name -> replacement widget class
@@ -73,47 +103,22 @@ class GladeBacked:
     @ivar widgets:        widget name -> Widget
     @type widgets:        str -> gtk.Widget
     """
-    glade_dir = configure.gladedir
     glade_file = None
     glade_typedict = None
-    widgets = None
+    toplevel_name = "window1"
 
     _window = None # the gtk.Window of the glade file
 
     def __init__(self):
-        self.widgets = {}
-        try:
-            assert self.glade_file, "%s.glade_file should be set" % \
-                self.__class__
-            file_path = os.path.join(self.glade_dir, self.glade_file)
-            if self.glade_typedict:
-                wtree = glade.XML(file_path, typedict=self.glade_typedict)
-            else:
-                # pygtk 2.4 doesn't like typedict={} ?
-                wtree = glade.XML(file_path)
-        except RuntimeError, e:
-            msg = log.getExceptionMessage(e)
-            raise RuntimeError('Failed to load file %s from directory %s: %s'
-                               % (self.glade_file, self.glade_dir, msg))
+        GladeDelegate.__init__(self, gladefile=self.glade_file)
 
-        for widget in wtree.get_widget_prefix(''):
-            wname = widget.get_name()
-            if isinstance(widget, gtk.Window):
-                assert self._window == None, \
-                    "glade file %s has more than one Window" % self.glade_file
-                self._window = widget
-                continue
-
-            assert not self.widgets.has_key(wname), \
-                "There is already a widget called %s" % wname
-
-            self.widgets[wname] = widget
-
-        assert self._window != None, \
-            "glade file %s has no Window" % self.glade_file
-
-        # connect all signals
+        wtree = self.get_glade_adaptor()
         wtree.signal_autoconnect(self)
+        self.widgets = {}
+        for widget in wtree.get_widgets():
+            self.widgets[widget.get_name()] = widget
+        self._window = self.widgets[self.toplevel_name]
+
 
 class GladeWidget(gtk.VBox, GladeBacked):
     '''
@@ -148,9 +153,9 @@ class GladeWidget(gtk.VBox, GladeBacked):
         self.add(w)
         self._window.destroy()
         self._window = None
-pygobject.type_register(GladeWidget)
+gobject.type_register(GladeWidget)
 
-class GladeWindow(gobject.GObject, GladeBacked):
+class GladeWindow(GladeBacked):
     """
     Base class for dialogs or windows backed by glade interface definitions.
 
@@ -170,7 +175,6 @@ class GladeWindow(gobject.GObject, GladeBacked):
     window = None
 
     def __init__(self, parent=None):
-        gobject.GObject.__init__(self)
         GladeBacked.__init__(self)
 
         # make public
