@@ -27,29 +27,30 @@ import sys
 
 import gobject
 import gtk
-import gtk.glade
+from gtk import glade
 from twisted.internet import reactor
 from twisted.internet.defer import maybeDeferred
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin import connections
-from flumotion.admin.gtk import dialogs, parts
-from flumotion.admin.gtk.parts import getComponentLabel
-from flumotion.admin.gtk import connections as gtkconnections
+from flumotion.admin.connections import get_recent_connections
+from flumotion.admin.gtk import dialogs
+from flumotion.admin.gtk.connections import ConnectionsDialog
+from flumotion.admin.gtk.parts import getComponentLabel, ComponentsView, \
+     AdminStatusbar
 from flumotion.configure import configure
-from flumotion.common import errors, log, planet, pygobject
-from flumotion.common import connection, common
-from flumotion.manager import admin # Register types
-from flumotion.twisted import flavors, pb as fpb
-from flumotion.ui import trayicon
-from flumotion.common.planet import moods
+from flumotion.common import common, errors, log
+from flumotion.common.connection import PBConnectionInfo
+from flumotion.common.messages import gettexter
+from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
-
-from flumotion.common import messages
+from flumotion.manager import admin # Register types
+from flumotion.twisted.flavors import IStateListener
+from flumotion.twisted.pb import Authenticator
+from flumotion.ui.trayicon import FluTrayIcon
 
 _ = gettext.gettext
-T_ = messages.gettexter('flumotion')
+T_ = gettexter('flumotion')
 
 MAIN_UI = """
 <ui>
@@ -116,7 +117,7 @@ class Window(log.Loggable, gobject.GObject):
     Also connects to the manager on the given host and port.
     '''
 
-    implements(flavors.IStateListener)
+    implements(IStateListener)
 
     logCategory = 'adminview'
     gsignal('connected')
@@ -143,7 +144,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def stateSet(self, state, key, value):
         # called by model when state of something changes
-        if not isinstance(state, planet.AdminComponentState):
+        if not isinstance(state, AdminComponentState):
             return
 
         if key == 'message':
@@ -233,7 +234,7 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('creating UI')
         # returns the window
         # called from __init__
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
+        wtree = glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         wtree.signal_autoconnect(self)
 
         widgets = self._widgets
@@ -318,19 +319,19 @@ class Window(log.Loggable, gobject.GObject):
         self._start_all_action = group.get_action("start-all")
         self._clear_all_action = group.get_action("clear-all")
 
-        self._trayicon = trayicon.FluTrayIcon(window)
+        self._trayicon = FluTrayIcon(window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
         self._trayicon.set_tooltip(_('Not connected'))
 
         # the widget containing the component view
         self._component_view = widgets['component_view']
 
-        self.components_view = parts.ComponentsView(widgets['components_view'])
+        self.components_view = ComponentsView(widgets['components_view'])
         self.components_view.connect('selection_changed',
             self._components_view_selection_changed_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
-        self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
+        self.statusbar = AdminStatusbar(widgets['statusbar'])
         self._update_component_actions()
         self.components_view.connect(
             'notify::can-start-any',
@@ -354,7 +355,7 @@ class Window(log.Loggable, gobject.GObject):
             self._open_connection(conn['info'])
 
         ui = ""
-        for conn in connections.get_recent_connections()[:MAX_RECENT_ITEMS]:
+        for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
             name = conn['name']
             ui += '<menuitem action="%s"/>' % name
             action = gtk.Action(name, name, '', '')
@@ -820,7 +821,7 @@ class Window(log.Loggable, gobject.GObject):
         d.show_all()
 
     def _open_recent_connection(self):
-        d = gtkconnections.ConnectionsDialog(self._window)
+        d = ConnectionsDialog(self._window)
 
         def on_have_connection(d, connectionInfo):
             d.destroy()
@@ -830,17 +831,17 @@ class Window(log.Loggable, gobject.GObject):
         d.show()
 
     def _open_existing_connection(self):
-        from flumotion.admin.gtk import greeter
+        from flumotion.admin.gtk.greeter import ConnectExisting
         from flumotion.admin.gtk.wizard import WizardCancelled
-        wiz = greeter.ConnectExisting()
+        wiz = ConnectExisting()
 
         def got_state(state, g):
             g.set_sensitive(False)
-            authenticator = fpb.Authenticator(username=state['user'],
-                                              password=state['passwd'])
-            info = connection.PBConnectionInfo(state['host'], state['port'],
-                                               not state['use_insecure'],
-                                               authenticator)
+            authenticator = Authenticator(username=state['user'],
+                                          password=state['passwd'])
+            info = PBConnectionInfo(state['host'], state['port'],
+                                    not state['use_insecure'],
+                                    authenticator)
             g.destroy()
             self._open_connection(info)
 
@@ -1075,4 +1076,4 @@ You can do remote component calls using:
     def _help_about_cb(self, action):
         self._about()
 
-pygobject.type_register(Window)
+gobject.type_register(Window)
