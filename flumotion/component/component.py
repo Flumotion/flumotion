@@ -303,6 +303,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('cpu-percent')
+        # Time the component was started
+        self.uiState.addKey('start-time')
+        # Current time at last update. 
+        # Provided in order to allow displaying uptime since the remote system
+        # probably doesn't have a synchronised clock with this one.
+        self.uiState.addKey('current-time') 
+        # Virtual memory size in bytes
+        self.uiState.addKey('virtual-size')
 
         self.plugs = {}
 
@@ -311,7 +319,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Start the cpu-usage updating.
         self._lastTime = time.time()
         self._lastClock = time.clock()
-        self._cpuPoller = common.Poller(self._pollCPUAndMemory, 5)
+        self._cpuPoller = common.Poller(self._pollCPU, 5)
+        self._memoryPoller = common.Poller(self._pollMemory, 60)
 
         self._shutdownHook = None
 
@@ -401,6 +410,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         if self._cpuPoller:
             self._cpuPoller.stop()
             self._cpuPoller = None
+        if self._memoryPoller:
+            self._memoryPoller.stop()
+            self._memoryPoller = None
 
         if self._shutdownHook:
             self.debug('_stoppedCallback: firing shutdown hook')
@@ -434,6 +446,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
             return None
 
         self.setMood(moods.waking)
+        self.uiState.set('start-time', time.time())
 
         d = run_setups()
         d.addCallbacks(go_happy, got_error)
@@ -583,7 +596,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
                        'no manager.'
                        % (methodName, args, kwargs))
 
-    def _pollCPUAndMemory(self):
+    def _pollCPU(self):
         # update CPU time stats
         nowTime = time.time()
         nowClock = time.clock()
@@ -591,10 +604,24 @@ class BaseComponent(common.InitMixin, log.Loggable):
         deltaClock = nowClock - self._lastClock
         self._lastTime = nowTime
         self._lastClock = nowClock
-        if deltaClock <= 0:
-            # time.clock() wrapped around, shit happens periodically
-            return
-        CPU = deltaClock/deltaTime
-        self.log('latest CPU use: %r', CPU)
-        self.uiState.set('cpu-percent', CPU)
+        # deltaClock can be < 0 if time.clock() wrapped around
+        if deltaClock >= 0:
+            CPU = deltaClock/deltaTime
+            self.log('latest CPU use: %r', CPU)
+            self.uiState.set('cpu-percent', CPU)
+
+        self.uiState.set('current-time', nowTime)
+
+    def _pollMemory(self):
+        # Figure out our virtual memory size and report that.
+        # I don't know a nicer way to find vsize than groping /proc/
+        handle = open('/proc/%d/stat' % os.getpid()) 
+        line = handle.read() 
+        handle.close()
+        fields = line.split() 
+        # field 1 (comm) could potentially contain spaces and thus split over 
+        # multiple list items, but our processes do not contain spaces 
+        vsize = int(fields[22]) 
+        self.debug('vsize is %d', vsize) 
+        self.uiState.set('virtual-size', vsize)
 

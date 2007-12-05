@@ -1,3 +1,12 @@
+2007-12-05  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Add uiState keys, and code to update them:
+	  	- virtual-size (virtual memory usage in bytes)
+		- start-time
+		- current-time (these two for uptime reporting)
+	  This will all be used by the component tab when it gets added.
+
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/componentview.py (ComponentView): 
