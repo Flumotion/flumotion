@@ -1076,4 +1076,4 @@ You can do remote component calls using:
     def _help_about_cb(self, action):
         self._about()
 
-gobject.type_register(Window)
+gobject.type_register(AdminClientWindow)
