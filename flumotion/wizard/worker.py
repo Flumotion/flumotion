@@ -23,10 +23,10 @@ __version__ = "$Rev$"
 
 import gettext
 
+import gobject
 import gtk
 from zope.interface import implements
 
-from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
 
@@ -58,7 +58,7 @@ class WorkerListStore(gtk.ListStore):
                     self.remove(r.iter)
                     self.emit('changed')
                     return
-pygobject.type_register(WorkerListStore)
+gobject.type_register(WorkerListStore)
 
 class WorkerList(gtk.HBox):
     gsignal('worker-selected', str)
@@ -131,4 +131,4 @@ class WorkerList(gtk.HBox):
     def notify_selected(self):
         self.emit('worker-selected', self.get_worker())
 
-pygobject.type_register(WorkerList)
+gobject.type_register(WorkerList)

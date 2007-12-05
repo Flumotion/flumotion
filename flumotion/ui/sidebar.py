@@ -22,9 +22,9 @@
 __version__ = "$Rev$"
 
 
+import gobject
 import gtk
 
-from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 
 
@@ -92,7 +92,7 @@ class SidebarButton(gtk.Button):
         self.label.set_markup(m)
 
         gtk.Button.set_sensitive(self, sensitive)
-pygobject.type_register(SidebarButton)
+gobject.type_register(SidebarButton)
 
 
 class SidebarSection(gtk.VBox):
@@ -146,7 +146,7 @@ class SidebarSection(gtk.VBox):
     def pop_step(self):
         b = self.buttons.pop()
         self.remove(b)
-pygobject.type_register(SidebarSection)
+gobject.type_register(SidebarSection)
 
 
 class WizardSidebar(gtk.EventBox):
@@ -247,4 +247,4 @@ class WizardSidebar(gtk.EventBox):
         style = self.get_style()
         self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
 
-pygobject.type_register(WizardSidebar)
+gobject.type_register(WizardSidebar)

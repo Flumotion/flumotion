@@ -21,15 +21,14 @@
 
 __version__ = "$Rev$"
 
-import gobject
-
-import urllib2
-import time
-
 import sys
 import socket
+import time
+import urllib2
 
-from flumotion.common import log, pygobject
+import gobject
+
+from flumotion.common import log
 from flumotion.tester import client
 
 class HTTPClient(gobject.GObject, log.Loggable):
@@ -256,5 +255,5 @@ def verify(client, data):
         return False
     return True
 
-pygobject.type_register(HTTPClient)
-pygobject.type_register(HTTPClientStatic)
+gobject.type_register(HTTPClient)
+gobject.type_register(HTTPClientStatic)

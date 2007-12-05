@@ -25,12 +25,11 @@ __version__ = "$Rev$"
 from gettext import gettext as _
 import os
 
-import gtk
 import gobject
+import gtk
 
 from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
-from flumotion.common import pygobject
 
 
 class ProgressDialog(gtk.Dialog):
@@ -190,7 +189,7 @@ class PropertyChangeDialog(gtk.Dialog):
     def update_value_entry(self, value):
         self.value_entry.set_text(str(value))
 
-pygobject.type_register(PropertyChangeDialog)
+gobject.type_register(PropertyChangeDialog)
 
 class AboutDialog(gtk.Dialog):
     def __init__(self, parent=None):

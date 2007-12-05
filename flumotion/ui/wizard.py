@@ -24,11 +24,12 @@ __version__ = "$Rev$"
 
 import os
 
+import gobject
 import gtk
 from kiwi.interfaces import IProxyWidget
 
 from flumotion.configure import configure
-from flumotion.common import log, pygobject, messages
+from flumotion.common import log, messages
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.glade import GladeWidget, GladeWindow
@@ -411,4 +412,4 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._jump_to_step(name)
 
 
-pygobject.type_register(SectionWizard)
+gobject.type_register(SectionWizard)

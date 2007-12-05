@@ -312,8 +312,8 @@ class Model:
         _debug("gst caps of pad now %s" % pad.get_negotiated_caps())
 
 # register our types globally
-pygobject.type_register(View)
-pygobject.type_register(Controller)
+gobject.type_register(View)
+gobject.type_register(Controller)
 
 if __name__ == '__main__':
     exposed_cb_id = -1

@@ -1,5 +1,19 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/test/test_common_pygobject.py:
+	* flumotion/tester/httpclient.py:
+	* flumotion/ui/sidebar.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/worker.py:
+	* tests/videotest.py:
+	We're depending on PyGTK 2.8 now, so use gobject.type_register()
+	directly. It won't print out silly deprecation warnings any longer.
+
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/gtk/message.py (MessagesView.__init__): Add
 	an etched in border around the message view.
 

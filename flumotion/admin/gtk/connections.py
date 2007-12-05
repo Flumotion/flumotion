@@ -24,16 +24,12 @@ __version__ = "$Rev$"
 
 import os
 
-import gtk
-import gtk.glade
 import gobject
-
-from flumotion.ui.glade import GladeWidget, GladeWindow
-from flumotion.configure import configure
-from flumotion.common import pygobject
-from flumotion.common.pygobject import gsignal, gproperty
+import gtk
 
 from flumotion.admin import connections
+from flumotion.common.pygobject import gsignal, gproperty
+from flumotion.ui.glade import GladeWidget, GladeWindow
 
 class Connections(GladeWidget):
     glade_file = 'connections.glade'
@@ -119,7 +115,7 @@ class Connections(GladeWidget):
             return model.get_value(i, self.STATE_COL)
         else:
             return None
-pygobject.type_register(Connections)
+gobject.type_register(Connections)
 
 
 class ConnectionsDialog(GladeWindow):
@@ -143,7 +139,7 @@ class ConnectionsDialog(GladeWindow):
     def on_delete_event(self, dialog, event):
         self.destroy()
 
-pygobject.type_register(ConnectionsDialog)
+gobject.type_register(ConnectionsDialog)
 
 
 class OpenConnection(GladeWidget):
@@ -185,7 +181,7 @@ class OpenConnection(GladeWidget):
         return {'host': self.host_entry.get_text(),
                 'port': int(self.port_entry.get_text()),
                 'use_insecure': not self.ssl_check.get_active()}
-pygobject.type_register(OpenConnection)
+gobject.type_register(OpenConnection)
 
 
 class Authenticate(GladeWidget):
@@ -225,4 +221,4 @@ class Authenticate(GladeWidget):
     def get_state(self):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}
-pygobject.type_register(Authenticate)
+gobject.type_register(Authenticate)

@@ -69,7 +69,7 @@ class TestPyGObject(testsuite.TestCase):
                 self.assert_(isinstance(x, bool))
                 self.assert_(isinstance(y, str))
                 xself.set_property('burning', True)
-        pygobject.type_register(Foo)
+        gobject.type_register(Foo)
 
         o = Foo()
 

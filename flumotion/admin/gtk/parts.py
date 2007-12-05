@@ -27,16 +27,14 @@ from gettext import gettext as _
 
 import gobject
 import gtk
-import gtk.glade
-
 from zope.interface import implements
 
 from flumotion.configure import configure
-from flumotion.common import log, planet, pygobject
-from flumotion.twisted import flavors
+from flumotion.common import log, planet
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
+from flumotion.twisted import flavors
 
 (COL_MOOD,
  COL_NAME,
@@ -398,7 +396,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         self.update_start_stop_props()
 
-pygobject.type_register(ComponentsView)
+gobject.type_register(ComponentsView)
 
 class ComponentMenu(gtk.Menu):
 
@@ -460,4 +458,4 @@ class ComponentMenu(gtk.Menu):
     def _activated_cb(self, item, name):
         self.emit('activated', name)
 
-pygobject.type_register(ComponentMenu)
+gobject.type_register(ComponentMenu)
