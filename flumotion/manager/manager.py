@@ -422,9 +422,18 @@ class Vishnu(log.Loggable):
             name = comp.getName()
 
             comps = dict([(x.get('name'), x)
-                          for x in parentState.get('components') 
-                          if x.get('mood') != moods.sleeping.value])
+                          for x in parentState.get('components')])
+            runningComps = dict([(x.get('name'), x)
+                                  for x in parentState.get('components')
+                                  if x.get('mood') != moods.sleeping.value])
             if name not in comps:
+                # We don't have it at all; allow it
+                return True
+            elif name not in runningComps:
+                # We have it, but it's not running. Allow it after deleting
+                # the old one.
+                oldComp = comps[name]
+                self.deleteComponent(oldComp)
                 return True
 
             # if we get here, the component is already running; warn if

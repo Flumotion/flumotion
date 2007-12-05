@@ -1,3 +1,8 @@
+2007-12-05  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  When overwriting a (non-running) component, delete the old one first.
+
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/looper/admin_gtk.py 
