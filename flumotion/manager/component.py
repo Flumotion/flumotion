@@ -197,8 +197,8 @@ class ComponentAvatar(base.ManagerAvatar):
                                                    'running conf')
                 self.addMessage(messages.WARNING, 'stale-config',
                                 N_("Component logged in with stale "
-                                   "configuration. Consider stopping "
-                                   "this component and restarting "
+                                   "configuration. To fix this, stop "
+                                   "this component and then restart "
                                    "the manager."),
                                 debug=("Updating internal conf from "
                                        "running conf:\n" + diffMsg))

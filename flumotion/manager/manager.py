@@ -422,7 +422,8 @@ class Vishnu(log.Loggable):
             name = comp.getName()
 
             comps = dict([(x.get('name'), x)
-                          for x in parentState.get('components')])
+                          for x in parentState.get('components') 
+                          if x.get('mood') != moods.sleeping.value])
             if name not in comps:
                 return True
 
