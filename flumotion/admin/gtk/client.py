@@ -752,24 +752,28 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._run_wizard()
 
     def _show_connection_lost_dialog(self):
-        def response(dialog, id):
-            if id == gtk.RESPONSE_CANCEL:
+        RESPONSE_REFRESH = 1
+
+        def response(dialog, response_id):
+            if response_id == RESPONSE_REFRESH:
+                self._admin.reconnect()
+            else:
                 # FIXME: notify admin of cancel
+                dialog.stop()
                 dialog.destroy()
                 return
-            elif id == 1:
-                self._admin.reconnect()
 
-        message = _("Lost connection to manager, reconnecting ...")
-        d = gtk.MessageDialog(self._window, gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
-        # FIXME: move this somewhere
-        RESPONSE_REFRESH = 1
-        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
-        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        d.connect("response", response)
-        d.show_all()
-        self._disconnected_dialog = d
+        dialog = dialogs.ProgressDialog(
+            _("Reconnecting ..."),
+            _("Lost connection to manager %s, reconnecting ...")
+            % (self._admin.adminInfoStr(),),
+            self._window)
+
+        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        dialog.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
+        dialog.connect("response", response)
+        dialog.start()
+        self._disconnected_dialog = dialog
 
     def _connection_lost(self):
         self._components = {}

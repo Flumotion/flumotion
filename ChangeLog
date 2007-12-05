@@ -1,5 +1,13 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* po/sv.po: Update swedish translation
+
+	* flumotion/admin/gtk/client.py 
+	(AdminClientWindow._show_connection_lost_dialog):
+	Use ProgressDialog instead of a MessageDialog, fixes #790
+	
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/gtk/client.py 
 	(AdminClientWindow._connection_lost): 
 	Brain-o. Don't call boolean state, just check if it's set.

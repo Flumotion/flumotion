@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-05 13:45+0100\n"
-"PO-Revision-Date: 2007-12-05 14:01+0100\n"
+"POT-Creation-Date: 2007-12-05 18:40+0100\n"
+"PO-Revision-Date: 2007-12-05 18:40+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr ""
 "använder\n"
 "version %s.\n"
 
-#: flumotion/manager/manager.py:451
+#: flumotion/manager/manager.py:460
 #, python-format
 msgid ""
 "Could not load component %r into %r: a component is already running with "
@@ -36,20 +36,20 @@ msgstr ""
 "redan,\n"
 "fast med en annan konfiguration."
 
-#: flumotion/manager/manager.py:524
+#: flumotion/manager/manager.py:533
 msgid "Invalid component configuration."
 msgstr "Ogiltlig komponentkonfiguration."
 
-#: flumotion/manager/manager.py:533
+#: flumotion/manager/manager.py:542
 #, python-format
 msgid "Unknown component in configuration: %s."
 msgstr "Okänd komponent i konfiguration: %s."
 
-#: flumotion/manager/manager.py:538
+#: flumotion/manager/manager.py:547
 msgid "Unknown error while loading configuration."
 msgstr "Okänt fel inträffade när konfigurationen laddades in."
 
-#: flumotion/manager/manager.py:978
+#: flumotion/manager/manager.py:987
 msgid "The component could not be started."
 msgstr "Komponenten kunde inte startas."
 
@@ -403,11 +403,11 @@ msgstr ""
 msgid "Internal Flumotion error."
 msgstr "Internt Flumotion-fel."
 
-#: flumotion/component/component.py:428
+#: flumotion/component/component.py:440
 msgid "Could not setup component."
 msgstr "Kunde inte ställa in komponent."
 
-#: flumotion/component/component.py:553
+#: flumotion/component/component.py:566
 msgid ""
 "Your configuration uses deprecated properties.  Please update your "
 "configuration and correct them.\n"
@@ -415,7 +415,7 @@ msgstr ""
 "Din konfiguration har föråldrade egenskapar. Var god uppgradera din \n"
 "konfiguration och rätta till dom.\n"
 
-#: flumotion/component/component.py:558
+#: flumotion/component/component.py:571
 #, python-format
 msgid "Please rename '%s' to '%s'.\n"
 msgstr "Vad god döp om '%s' till '%s'.\n"
@@ -1457,34 +1457,39 @@ msgstr "Komponenten %s är ledsen"
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administration"
 
-#: flumotion/admin/gtk/client.py:763
-msgid "Lost connection to manager, reconnecting ..."
-msgstr "Förlorande anslutning till föreståndare, återanslutning ..."
+#: flumotion/admin/gtk/client.py:767
+msgid "Reconnecting ..."
+msgstr "Återansluter ..."
 
-#: flumotion/admin/gtk/client.py:787
+#: flumotion/admin/gtk/client.py:768
+#, python-format
+msgid "Lost connection to manager %s, reconnecting ..."
+msgstr "Förlorande anslutning till föreståndare %s, återansluter ..."
+
+#: flumotion/admin/gtk/client.py:791
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Anslutning till föreståndare %s nekades."
 
-#: flumotion/admin/gtk/client.py:789
+#: flumotion/admin/gtk/client.py:793
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Anslutning till %s nekades"
 
-#: flumotion/admin/gtk/client.py:803
+#: flumotion/admin/gtk/client.py:807
 #, python-format
 msgid "Connection to manager on %(conn)s failed (%(reason)s)."
 msgstr "Anslutning till föreståndaren på %(conn)s misslyckdes (%(reason)s)."
 
-#: flumotion/admin/gtk/client.py:857
+#: flumotion/admin/gtk/client.py:861
 msgid "Import Configuration..."
 msgstr "Importera konfiguration..."
 
-#: flumotion/admin/gtk/client.py:874
+#: flumotion/admin/gtk/client.py:878
 msgid "Export Configuration..."
 msgstr "Exportera konfiguration..."
 
-#: flumotion/admin/gtk/client.py:885
+#: flumotion/admin/gtk/client.py:889
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -1492,15 +1497,15 @@ msgstr ""
 "Filen finns redan.\n"
 "Ersätt?"
 
-#: flumotion/admin/gtk/client.py:919
+#: flumotion/admin/gtk/client.py:923
 msgid "Reloading ..."
 msgstr "Laddar om ..."
 
-#: flumotion/admin/gtk/client.py:920
+#: flumotion/admin/gtk/client.py:924
 msgid "Reloading client code"
 msgstr "Laddar om klientkod"
 
-#: flumotion/admin/gtk/client.py:932
+#: flumotion/admin/gtk/client.py:936
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -1509,7 +1514,7 @@ msgstr ""
 "Kunde inte ladda om komponent:\n"
 "%s"
 
-#: flumotion/admin/gtk/client.py:955
+#: flumotion/admin/gtk/client.py:959
 #, python-format
 msgid "Reloading %s code"
 msgstr "Laddar om %s code"
