@@ -1,5 +1,8 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/admin.glade: 
+	Add an etched in shadow border around the components view
+
 	* flumotion/admin/gtk/main.py (failure): 
 	Trap WizardCancelled here.
 	Clear up addCallbacks() confusion.
