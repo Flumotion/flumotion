@@ -2,7 +2,11 @@
 
 	* flumotion/admin/gtk/main.py (failure): 
 	Trap WizardCancelled here.
-
+	Clear up addCallbacks() confusion.
+	Add a fallback exception handler which prints out the error
+	to stderr. Move default greeter creation to inside 
+	startAdminFromGreeter, delay gtk initialization a bit more.
+	
 2007-12-05  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:

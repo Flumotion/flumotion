@@ -27,6 +27,8 @@ import sys
 import gettext
 
 from twisted.internet import reactor, defer
+from twisted.python import log as twistedlog
+
 from flumotion.admin import connections
 from flumotion.admin.admin import AdminModel
 from flumotion.common import log, errors, connection
@@ -34,14 +36,12 @@ from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 from flumotion.common.options import OptionParser
 
-# FIXME: a function with a capital is extremely poor style.
-def Greeter():
-    # We do the import here so gettext has been set up and class strings
-    # from greeter are translated
-    from flumotion.admin.gtk import greeter
-    return greeter.Greeter()
 
-def startAdminFromGreeter(greeter):
+def startAdminFromGreeter(greeter=None):
+    if greeter is None:
+        from flumotion.admin.gtk.greeter import Greeter
+        greeter = Greeter()
+
     # fuck python's lexicals!
     _info = []
 
@@ -53,10 +53,11 @@ def startAdminFromGreeter(greeter):
                                            not state['use_insecure'],
                                            authenticator)
         _info.append(info)
+
         model = AdminModel()
         return model.connectToManager(info)
 
-    def refused(failure):
+    def connectionRefused(failure):
         from flumotion.admin.gtk import dialogs
         failure.trap(errors.ConnectionRefusedError)
         dret = dialogs.connection_refused_message(greeter.state['host'],
@@ -64,7 +65,7 @@ def startAdminFromGreeter(greeter):
         dret.addCallback(lambda _: startAdminFromGreeter(greeter))
         return dret
 
-    def failed(failure):
+    def connectionFailed(failure):
         from flumotion.admin.gtk import dialogs
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
@@ -73,6 +74,11 @@ def startAdminFromGreeter(greeter):
         dret.addCallback(lambda _: startAdminFromGreeter(greeter))
         return dret
 
+    def wizardCancelled(failure):
+        from flumotion.ui.simplewizard import WizardCancelled
+        failure.trap(WizardCancelled)
+        reactor.stop()
+
     def connected(model):
         greeter.destroy()
         return model
@@ -80,8 +86,10 @@ def startAdminFromGreeter(greeter):
     d = greeter.run_async()
     d.addCallback(got_state)
     d.addCallback(connected)
-    d.addErrback(refused)
-    d.addErrback(failed)
+    d.addErrback(connectionFailed)
+    d.addErrback(connectionRefused)
+    d.addErrback(wizardCancelled)
+
     return d
 
 def startAdminFromManagerString(managerString, useSSL):
@@ -118,31 +126,31 @@ def main(args):
         d = startAdminFromManagerString(options.manager,
                                         not options.no_ssl)
     else:
-        d = startAdminFromGreeter(Greeter())
-
-    from flumotion.ui.icons import register_icons
-    register_icons()
-
-    from flumotion.admin.gtk.client import AdminClientWindow
-    win = AdminClientWindow()
+        d = startAdminFromGreeter()
 
     def adminStarted(admin):
+        if admin is None:
+            return
+
+        from flumotion.ui.icons import register_icons
+        register_icons()
+
+        from flumotion.admin.gtk.client import AdminClientWindow
+        win = AdminClientWindow()
+
         win.setAdminModel(admin)
         win.show()
 
-    def cancel(failure):
-        # Cancelled interactively, just quit
-        from flumotion.ui.simplewizard import WizardCancelled
-        failure.trap(WizardCancelled)
-        reactor.stop()
-
-    def failure(failure):
+    def errback(failure):
         message = "".join(failure.value.args)
         log.warning('admin', "Failed to connect: %s",
                     log.getFailureMessage(failure))
         sys.stderr.write("Connection to manager failed: %s\n" % message)
         reactor.stop()
 
-    d.addCallbacks(adminStarted, cancel, failure)
+    d.addCallbacks(adminStarted, errback)
+
+    # Printout unhandled exception to stderr
+    d.addErrback(twistedlog.err)
 
     reactor.run()
