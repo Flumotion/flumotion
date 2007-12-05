@@ -10,8 +10,7 @@ component_PYTHON = \
 	greeter.py \
 	message.py \
 	parts.py \
-	main.py \
-	spyglass.py
+	main.py
 
 all-local:
 	if test -e videotest.pyc; then rm videotest.pyc; fi

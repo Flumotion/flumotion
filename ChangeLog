@@ -1,5 +1,14 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am:
+	* data/glade/spyglass.glade:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/spyglass.py:
+	* po/POTFILES.in:
+	Remove spyglass, it's been bitrotten since 0.10.
+
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_greeter.py:
 	Update imports after moving simplewizard
 

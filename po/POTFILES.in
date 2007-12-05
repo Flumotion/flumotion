@@ -343,7 +343,6 @@ flumotion/admin/gtk/message.py
 flumotion/admin/gtk/greeter.py
 flumotion/admin/gtk/componentview.py
 flumotion/admin/gtk/main.py
-flumotion/admin/gtk/spyglass.py
 flumotion/admin/gtk/parts.py
 flumotion/admin/gtk/dialogs.py
 flumotion/admin/gtk/__init__.py
@@ -388,7 +387,6 @@ data/glade/wizard_http.glade
 data/glade/greeter-initial.glade
 data/glade/wizard_vorbis.glade
 data/glade/wizard_consumption.glade
-data/glade/spyglass.glade
 data/glade/greeter-authenticate.glade
 data/glade/wizard_jpeg.glade
 data/glade/wizard_testsource.glade
