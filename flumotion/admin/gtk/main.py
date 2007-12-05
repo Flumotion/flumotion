@@ -130,6 +130,12 @@ def main(args):
         win.setAdminModel(admin)
         win.show()
 
+    def cancel(failure):
+        # Cancelled interactively, just quit
+        from flumotion.ui.simplewizard import WizardCancelled
+        failure.trap(WizardCancelled)
+        reactor.stop()
+
     def failure(failure):
         message = "".join(failure.value.args)
         log.warning('admin', "Failed to connect: %s",
@@ -137,6 +143,6 @@ def main(args):
         sys.stderr.write("Connection to manager failed: %s\n" % message)
         reactor.stop()
 
-    d.addCallbacks(adminStarted, failure)
+    d.addCallbacks(adminStarted, cancel, failure)
 
     reactor.run()
