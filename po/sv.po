@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-05 13:45+0100\n"
-"PO-Revision-Date: 2007-12-05 13:57+0100\n"
+"PO-Revision-Date: 2007-12-05 14:01+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2054,7 +2054,7 @@ msgstr "00h 00m 00s"
 
 #: flumotion/component/producers/looper/flufileinfo.glade:281
 msgid "<b>File Information</b>"
-msgstr "<b>Fileinformation</b>"
+msgstr "<b>Filinformation</b>"
 
 #: flumotion/component/producers/looper/looper.glade:34
 msgid "Current position:"
