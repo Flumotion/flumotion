@@ -1,5 +1,8 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_greeter.py:
+	Update imports after moving simplewizard
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/greeter.py:
 	* flumotion/admin/gtk/wizard.py:

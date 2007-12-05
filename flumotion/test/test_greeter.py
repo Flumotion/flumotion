@@ -23,8 +23,11 @@ __version__ = "$Rev$"
 
 import gtk
 
-from flumotion.admin.gtk import greeter, wizard
-from flumotion.test.gtkunit import *
+from flumotion.admin.gtk import greeter
+from flumotion.common import testsuite
+from flumotion.test.gtkunit import set_text, assert_not_failed, \
+     assert_call_returns, click, check_text, set_window
+from flumotion.ui.simplewizard import SimpleWizard, WizardStep
 
 
 def prev():
@@ -42,9 +45,9 @@ class WizardTest(testsuite.TestCase):
     def testGreeter(self):
         wiz = greeter.Greeter()
         ass = self.assert_
-        ass(isinstance(wiz, wizard.Wizard))
+        ass(isinstance(wiz, SimpleWizard))
         ass(isinstance(wiz.name, str))
-        ass(isinstance(wiz.page, wizard.WizardStep))
+        ass(isinstance(wiz.page, WizardStep))
         ass(isinstance(wiz.pages, dict))
         ass(isinstance(wiz.page_stack, list))
         ass(isinstance(wiz.state, dict))
