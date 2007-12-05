@@ -25,13 +25,10 @@ import os
 import sys
 
 import gettext
-import gtk.glade
 
 from twisted.internet import reactor, defer
 from flumotion.admin import connections
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.gtk import dialogs
-from flumotion.admin.gtk.client import Window
 from flumotion.common import log, errors, connection
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
@@ -60,6 +57,7 @@ def startAdminFromGreeter(greeter):
         return model.connectToManager(info)
 
     def refused(failure):
+        from flumotion.admin.gtk import dialogs
         failure.trap(errors.ConnectionRefusedError)
         dret = dialogs.connection_refused_message(greeter.state['host'],
                                                   greeter.window)
@@ -67,6 +65,7 @@ def startAdminFromGreeter(greeter):
         return dret
 
     def failed(failure):
+        from flumotion.admin.gtk import dialogs
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         dret = dialogs.connection_failed_message(_info[0], message,
@@ -106,12 +105,14 @@ def main(args):
     log.debug("locale", "Loading locales from %s" % localedir)
     gettext.bindtextdomain('flumotion', localedir)
     gettext.textdomain('flumotion')
-    gtk.glade.bindtextdomain('flumotion', localedir)
-    gtk.glade.textdomain('flumotion')
 
     if len(args) > 1:
         log.error('flumotion-admin',
                   'too many arguments: %r' % (args[1:],))
+
+    import gtk.glade
+    gtk.glade.bindtextdomain('flumotion', localedir)
+    gtk.glade.textdomain('flumotion')
 
     if options.manager:
         d = startAdminFromManagerString(options.manager,
@@ -122,7 +123,8 @@ def main(args):
     from flumotion.ui.icons import register_icons
     register_icons()
 
-    win = Window()
+    from flumotion.admin.gtk.client import AdminClientWindow
+    win = AdminClientWindow()
 
     def adminStarted(admin):
         win.setAdminModel(admin)

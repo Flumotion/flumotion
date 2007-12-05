@@ -1,5 +1,11 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/main.py (main): 
+	Rename Window to AdminClientWindow.
+	Delay ui imports until they're actually used, in an attempt to
+	make --help and command line parsing faster.
+
 	* data/glade/Makefile.am:
 	* data/glade/spyglass.glade:
 	* flumotion/admin/gtk/Makefile.am:
