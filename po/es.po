@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-28 17:13+0100\n"
-"PO-Revision-Date: 2007-11-29 12:15+0100\n"
+"POT-Creation-Date: 2007-11-29 15:56+0100\n"
+"PO-Revision-Date: 2007-12-05 14:54+0100\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -238,7 +238,7 @@ msgstr "Patrón:"
 msgid "Pattern"
 msgstr "Patrón"
 
-#: flumotion/component/combiners/switch/switch.py:82
+#: flumotion/component/combiners/switch/switch.py:98
 #: flumotion/component/consumers/disker/disker.py:348
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
@@ -246,31 +246,31 @@ msgstr ""
 "Error leyendo el fichero ical %s, así que no se puede programar ningún "
 "evento."
 
-#: flumotion/component/combiners/switch/switch.py:86
+#: flumotion/component/combiners/switch/switch.py:102
 msgid ""
 "An ical file has been specified for scheduling, but the necessary modules "
 "are not installed."
 msgstr ""
-"Un fichero \"ical\" ha sido elegido para la programación, pero los módulos necesarios"
-"no están instalados."
+"Un fichero \"ical\" ha sido elegido para la programación, pero los módulos "
+"necesariosno están instalados."
 
-#: flumotion/component/combiners/switch/switch.py:287
+#: flumotion/component/combiners/switch/switch.py:217
 #, python-format
-msgid ""
-"Video parameter(s) were specified but not all. Missing parameters are: %r"
-msgstr ""
-"El/los parámetro/s de video fueron especificados, pero no todos. Los "
+msgid "Event started but could not switch to %s, will switch when %s is back"
+msgstr "Evento iniciado, pero no se he podido cambiar a %s. Se cambiará cuando %s aparezca."
+
+#: flumotion/component/combiners/switch/switch.py:220
+#, python-format
+msgid "Event stopped but could not switch to %s, will switch when %s is back"
+msgstr "Evento parado, pero no se he podido cambiar a %s. Se cambiará cuando %s aparezca."
+
+#: flumotion/component/combiners/switch/switch.py:298
+#, python-format
+msgid "%s parameter(s) were specified but not all. Missing parameters are: %r"
+msgstr "El/los parámetro/s %s fue/ron especificado/s, pero no todos. Los "
 "parámetros pendientes son: %r"
 
-#: flumotion/component/combiners/switch/switch.py:303
-#, python-format
-msgid ""
-"Audio parameter(s) were specified but not all. Missing parameters are: %r"
-msgstr ""
-"El/los parámetro/s de Audio fueron especificados, pero no todos. Los "
-"parámetros pendientes son: %r"
-
-#: flumotion/component/combiners/switch/switch.py:441
+#: flumotion/component/combiners/switch/switch.py:435
 #, python-format
 msgid ""
 "Could not switch to %s because at least one of the %s eaters is not active."
@@ -278,7 +278,7 @@ msgstr ""
 "No puedo pasar a %s debido a que al menos uno de los %s \"eaters\" no está "
 "activo."
 
-#: flumotion/component/combiners/switch/switch.py:450
+#: flumotion/component/combiners/switch/switch.py:444
 #, python-format
 msgid "Could not switch to %s because startTimes is %r."
 msgstr "No puedo pasar a %s debido a que startTimes es %r."
@@ -514,9 +514,10 @@ msgstr "Nivel del canal %d:"
 #: flumotion/wizard/consumptionsteps.py:237
 #: flumotion/wizard/consumptionsteps.py:281
 #: flumotion/wizard/consumptionsteps.py:314
-#: flumotion/wizard/consumptionsteps.py:367 flumotion/wizard/save.py:242
+#: flumotion/wizard/consumptionsteps.py:367
+#: flumotion/wizard/consumptionsteps.py:376 flumotion/wizard/save.py:242
 msgid "Consumption"
-msgstr "_Conexión"
+msgstr "Consumo"
 
 #: flumotion/wizard/consumptionsteps.py:46
 #: flumotion/wizard/consumptionsteps.py:47
@@ -525,65 +526,59 @@ msgstr "_Conexión"
 #: flumotion/wizard/save.py:125 flumotion/wizard/save.py:162
 #: flumotion/wizard/save.py:180 flumotion/wizard/save.py:190
 #: flumotion/wizard/save.py:243 flumotion/wizard/save.py:244
-#: flumotion/wizard/save.py:346 flumotion/wizard/productionsteps.py:61
+#: flumotion/wizard/save.py:346 flumotion/wizard/productionsteps.py:59
 #: flumotion/wizard/conversionsteps.py:57
 #: flumotion/wizard/conversionsteps.py:76
 #: flumotion/wizard/conversionsteps.py:90
 #: flumotion/wizard/conversionsteps.py:101
 #: flumotion/wizard/conversionsteps.py:132
-#: flumotion/wizard/conversionsteps.py:136 flumotion/wizard/basesteps.py:128
-#: flumotion/wizard/basesteps.py:129
+#: flumotion/wizard/conversionsteps.py:136 flumotion/wizard/basesteps.py:132
+#: flumotion/wizard/basesteps.py:133
 msgid "Source"
 msgstr "Fuente"
 
 #: flumotion/wizard/consumptionsteps.py:76
-#: flumotion/wizard/consumptionsteps.py:262 flumotion/wizard/save.py:270
+#: flumotion/wizard/consumptionsteps.py:262
 msgid "HTTP Streamer (audio & video)"
 msgstr "Flujo de HTTP (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:77
-#: flumotion/wizard/consumptionsteps.py:268 flumotion/wizard/save.py:274
-#: flumotion/wizard/save.py:318
+#: flumotion/wizard/consumptionsteps.py:268
 msgid "HTTP Streamer (audio only)"
 msgstr "Flujo de HTTP (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:78
-#: flumotion/wizard/consumptionsteps.py:274 flumotion/wizard/save.py:278
-#: flumotion/wizard/save.py:308
+#: flumotion/wizard/consumptionsteps.py:274
 msgid "HTTP Streamer (video only)"
 msgstr "Flujo de HTTP (sólo vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:79
-#: flumotion/wizard/consumptionsteps.py:351 flumotion/wizard/save.py:284
+#: flumotion/wizard/consumptionsteps.py:351
 msgid "Disk (audio & video)"
 msgstr "Disco (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:80
-#: flumotion/wizard/consumptionsteps.py:356 flumotion/wizard/save.py:288
-#: flumotion/wizard/save.py:321
+#: flumotion/wizard/consumptionsteps.py:356
 msgid "Disk (audio only)"
 msgstr "Disco (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:81
-#: flumotion/wizard/consumptionsteps.py:361 flumotion/wizard/save.py:291
-#: flumotion/wizard/save.py:311
+#: flumotion/wizard/consumptionsteps.py:361
 msgid "Disk (video only)"
 msgstr "Disco (sólo vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:82
-#: flumotion/wizard/consumptionsteps.py:391 flumotion/wizard/save.py:295
+#: flumotion/wizard/consumptionsteps.py:391
 msgid "Icecast streamer (audio & video)"
 msgstr "Flujo Icecast (audio y vídeo)"
 
 #: flumotion/wizard/consumptionsteps.py:83
-#: flumotion/wizard/consumptionsteps.py:396 flumotion/wizard/save.py:299
-#: flumotion/wizard/save.py:324
+#: flumotion/wizard/consumptionsteps.py:396
 msgid "Icecast streamer (audio only)"
 msgstr "Flujo de Icecast (sólo audio)"
 
 #: flumotion/wizard/consumptionsteps.py:84
-#: flumotion/wizard/consumptionsteps.py:401 flumotion/wizard/save.py:303
-#: flumotion/wizard/save.py:314
+#: flumotion/wizard/consumptionsteps.py:401
 msgid "Icecast streamer (video only)"
 msgstr "Flujo de Icecast (sólo video)"
 
@@ -647,7 +642,7 @@ msgstr "Fuente de audio de prueba"
 msgid "Sound card"
 msgstr "Tarjeta de sonido"
 
-#: flumotion/wizard/enums.py:64 flumotion/wizard/productionsteps.py:801
+#: flumotion/wizard/enums.py:64 flumotion/wizard/productionsteps.py:829
 msgid "Firewire audio"
 msgstr "Audio Firewire"
 
@@ -679,84 +674,56 @@ msgstr "YUV"
 msgid "RGB"
 msgstr "RGB"
 
-#: flumotion/wizard/enums.py:140
-msgid "Line in"
-msgstr "Entrada"
-
-#: flumotion/wizard/enums.py:141
-msgid "Microphone"
-msgstr "Micrófono"
-
-#: flumotion/wizard/enums.py:142
-msgid "CD"
-msgstr "CD"
-
-#: flumotion/wizard/enums.py:147
-msgid "Stereo"
-msgstr "Estéreo"
-
-#: flumotion/wizard/enums.py:147
-msgid "Mono"
-msgstr "Mono"
-
-#: flumotion/wizard/enums.py:163
-msgid "16-bit"
-msgstr "16-bit"
-
-#: flumotion/wizard/enums.py:164
-msgid "8-bit"
-msgstr "8-bit"
-
-#: flumotion/wizard/enums.py:173
+#: flumotion/wizard/enums.py:131
 msgid "Ogg"
 msgstr "Ogg"
 
-#: flumotion/wizard/enums.py:173
+#: flumotion/wizard/enums.py:131
 msgid "Multipart"
 msgstr "Multipart"
 
-#: flumotion/wizard/enums.py:201
+#: flumotion/wizard/enums.py:159
 msgid "minute(s)"
 msgstr "Minuto(s)"
 
-#: flumotion/wizard/enums.py:202
+#: flumotion/wizard/enums.py:160
 msgid "hour(s)"
 msgstr "hora(s)"
 
-#: flumotion/wizard/enums.py:203
+#: flumotion/wizard/enums.py:161
 msgid "day(s)"
 msgstr "día(s)"
 
-#: flumotion/wizard/enums.py:204
+#: flumotion/wizard/enums.py:162
 msgid "week(s)"
 msgstr "semana(s)"
 
-#: flumotion/wizard/enums.py:212
+#: flumotion/wizard/enums.py:170
 msgid "kB"
 msgstr "kB"
 
-#: flumotion/wizard/enums.py:212
+#: flumotion/wizard/enums.py:170
 msgid "MB"
 msgstr "MB"
 
-#: flumotion/wizard/enums.py:212
+#: flumotion/wizard/enums.py:170
 msgid "GB"
 msgstr "GB"
 
-#: flumotion/wizard/enums.py:212
+#: flumotion/wizard/enums.py:170
 msgid "TB"
 msgstr "TB"
 
-#: flumotion/wizard/enums.py:221
+#: flumotion/wizard/enums.py:179
 msgid "Creative Commons"
 msgstr "Creative Commons"
 
-#: flumotion/wizard/enums.py:222
+#: flumotion/wizard/enums.py:180
 msgid "Commercial"
 msgstr "Comercial"
 
 #: flumotion/wizard/save.py:131 flumotion/wizard/save.py:206
-#: flumotion/wizard/basesteps.py:96
+#: flumotion/wizard/basesteps.py:100
 msgid "Overlay"
 msgstr "Sobreimpresión"
 
@@ -777,72 +744,93 @@ msgstr "Licencia del contenido"
 msgid "Worker:"
 msgstr "\"Worker\":"
 
-#: flumotion/wizard/productionsteps.py:62
-#: flumotion/wizard/productionsteps.py:647
-#: flumotion/wizard/productionsteps.py:671
-#: flumotion/wizard/productionsteps.py:802 flumotion/wizard/basesteps.py:54
-#: flumotion/wizard/basesteps.py:98
+#: flumotion/wizard/productionsteps.py:60 flumotion/wizard/basesteps.py:50
+#: flumotion/wizard/basesteps.py:58 flumotion/wizard/basesteps.py:102
 msgid "Production"
 msgstr "Producción"
 
-#: flumotion/wizard/productionsteps.py:161
+#: flumotion/wizard/productionsteps.py:159
 msgid "If you want to stream video"
 msgstr "Si desea un flujo de video"
 
-#: flumotion/wizard/productionsteps.py:163
+#: flumotion/wizard/productionsteps.py:161
 msgid "If you want to stream audio"
 msgstr "Si desea un flujo de audio"
 
-#: flumotion/wizard/productionsteps.py:223
+#: flumotion/wizard/productionsteps.py:221
 msgid "Test Video Source"
 msgstr "Fuente de video de prueba"
 
-#: flumotion/wizard/productionsteps.py:269
+#: flumotion/wizard/productionsteps.py:267
 msgid "Webcam"
 msgstr "Cámara web"
 
-#: flumotion/wizard/productionsteps.py:347
+#: flumotion/wizard/productionsteps.py:339
 msgid "Probing webcam, this can take a while..."
 msgstr "Probando la \"webcam\". Esto podría llevar un rato..."
 
-#: flumotion/wizard/productionsteps.py:410
+#: flumotion/wizard/productionsteps.py:412
 msgid "TV Card"
 msgstr "Tarjeta de TV"
 
-#: flumotion/wizard/productionsteps.py:492
+#: flumotion/wizard/productionsteps.py:463
+msgid "Probing TV-card, this can take a while..."
+msgstr "Probando la capturadora de TV. Esto podría llevar un rato..."
+
+#: flumotion/wizard/productionsteps.py:509
 msgid "Firewire"
 msgstr "Firewire"
 
-#: flumotion/wizard/productionsteps.py:544
-#: flumotion/wizard/productionsteps.py:861
+#: flumotion/wizard/productionsteps.py:561
+#: flumotion/wizard/productionsteps.py:889
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d relación de aspecto del pixel"
 
-#: flumotion/wizard/productionsteps.py:550
-#: flumotion/wizard/productionsteps.py:867
+#: flumotion/wizard/productionsteps.py:567
+#: flumotion/wizard/productionsteps.py:895
 msgid "Checking for Firewire device..."
 msgstr "Comprobando el dispositivo Firewire..."
 
-#: flumotion/wizard/productionsteps.py:625
-#: flumotion/wizard/productionsteps.py:939
+#: flumotion/wizard/productionsteps.py:641
+#: flumotion/wizard/productionsteps.py:967
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d relación de aspecto del pixel)"
 
-#: flumotion/wizard/productionsteps.py:645
+#: flumotion/wizard/productionsteps.py:661
 msgid "Test Audio Source"
 msgstr "Fuente de audio de prueba"
 
-#: flumotion/wizard/productionsteps.py:669
+#: flumotion/wizard/productionsteps.py:689
+msgid "Stereo"
+msgstr "Estéreo"
+
+#: flumotion/wizard/productionsteps.py:690
+msgid "Mono"
+msgstr "Mono"
+
+#: flumotion/wizard/productionsteps.py:691
+msgid "16-bit"
+msgstr "16-bit"
+
+#: flumotion/wizard/productionsteps.py:692
+msgid "8-bit"
+msgstr "8-bit"
+
+#: flumotion/wizard/productionsteps.py:702
 msgid "Soundcard"
 msgstr "Tarjeta de sonido"
 
+#: flumotion/wizard/productionsteps.py:781
+msgid "Probing soundcard, this can take a while..."
+msgstr "Probando la tarjeta de sonido. Esto podría llevar un rato..."
+
 #: flumotion/wizard/conversionsteps.py:45
-#: flumotion/wizard/conversionsteps.py:222 flumotion/wizard/basesteps.py:74
-#: flumotion/wizard/basesteps.py:83
+#: flumotion/wizard/conversionsteps.py:222 flumotion/wizard/basesteps.py:78
+#: flumotion/wizard/basesteps.py:87
 msgid "Conversion"
-msgstr "_Conversión"
+msgstr "Conversión"
 
 #: flumotion/wizard/conversionsteps.py:166
 msgid "Theora encoder"
@@ -891,10 +879,10 @@ msgid "Summary"
 msgstr "Sumario"
 
 #: flumotion/wizard/configurationwizard.py:216
-#: flumotion/wizard/basesteps.py:159
+#: flumotion/wizard/basesteps.py:163
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgstr "El \"Worker\" '%s' no tiene el elemento de GStremaer '%s'."
+msgstr "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
 
 #: flumotion/wizard/configurationwizard.py:221
 msgid ""
@@ -918,13 +906,13 @@ msgstr ""
 "No será capaz de avanzar más usando este \"worker\"."
 
 #: flumotion/wizard/configurationwizard.py:272
-#: flumotion/wizard/basesteps.py:142
+#: flumotion/wizard/basesteps.py:146
 #, python-format
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "El \"Worker\" '%s' no puede importar el módulo '%s'."
 
 #: flumotion/wizard/configurationwizard.py:275
-#: flumotion/wizard/basesteps.py:144
+#: flumotion/wizard/basesteps.py:148
 #, python-format
 msgid ""
 "\n"
@@ -934,7 +922,7 @@ msgstr ""
 "Este módulo es parte de '%s'."
 
 #: flumotion/wizard/configurationwizard.py:278
-#: flumotion/wizard/basesteps.py:146
+#: flumotion/wizard/basesteps.py:150
 #, python-format
 msgid ""
 "\n"
@@ -957,7 +945,7 @@ msgstr ""
 "Asegúrese que la red de su Flumotion está funcionando adecuadamente e "
 "inténtelo de nuevo."
 
-#: flumotion/wizard/basesteps.py:148 flumotion/wizard/basesteps.py:164
+#: flumotion/wizard/basesteps.py:152 flumotion/wizard/basesteps.py:168
 msgid ""
 "\n"
 "\n"
@@ -1342,156 +1330,156 @@ msgstr ""
 msgid "Authors"
 msgstr "Autores"
 
-#: flumotion/admin/gtk/client.py:246
+#: flumotion/admin/gtk/client.py:248
 msgid "_Connection"
-msgstr "_Conección"
+msgstr "_Conexión"
 
-#: flumotion/admin/gtk/client.py:247
+#: flumotion/admin/gtk/client.py:249
 msgid "_Open Recent Connection..."
 msgstr "_Abrir la conexión reciente..."
 
-#: flumotion/admin/gtk/client.py:249
+#: flumotion/admin/gtk/client.py:251
 msgid "Open _Existing Connection..."
 msgstr "Abrir la conexión actual..."
 
-#: flumotion/admin/gtk/client.py:251
+#: flumotion/admin/gtk/client.py:253
 msgid "_Import Configuration..."
 msgstr "_Importar la configuración...."
 
-#: flumotion/admin/gtk/client.py:253
+#: flumotion/admin/gtk/client.py:255
 msgid "_Export Configuration..."
 msgstr "_Exportar la configuración..."
 
-#: flumotion/admin/gtk/client.py:255
+#: flumotion/admin/gtk/client.py:257
 msgid "_Quit"
 msgstr "_Salir"
 
-#: flumotion/admin/gtk/client.py:259
+#: flumotion/admin/gtk/client.py:261
 msgid "_Manage"
 msgstr "_Administrar"
 
-#: flumotion/admin/gtk/client.py:260
+#: flumotion/admin/gtk/client.py:262
 msgid "_S_tart Component"
 msgstr "_Iniciar el componente"
 
-#: flumotion/admin/gtk/client.py:262
+#: flumotion/admin/gtk/client.py:264
 msgid "St_op Component"
 msgstr "Pa_rar el componente"
 
-#: flumotion/admin/gtk/client.py:264
+#: flumotion/admin/gtk/client.py:266
 msgid "_Delete Component"
 msgstr "_Eliminar el componente"
 
-#: flumotion/admin/gtk/client.py:266
+#: flumotion/admin/gtk/client.py:268
 msgid "Start _All"
 msgstr "Arrancar _Todos"
 
-#: flumotion/admin/gtk/client.py:268
+#: flumotion/admin/gtk/client.py:270
 msgid "Stop A_ll"
 msgstr "Parar To_dos"
 
-#: flumotion/admin/gtk/client.py:270
+#: flumotion/admin/gtk/client.py:272
 msgid "_Clear All"
 msgstr "_Despejar Todos"
 
-#: flumotion/admin/gtk/client.py:272
+#: flumotion/admin/gtk/client.py:274
 msgid "Run _Wizard"
 msgstr "Lanzar el _Asistente"
 
-#: flumotion/admin/gtk/client.py:276
+#: flumotion/admin/gtk/client.py:278
 msgid "_Debug"
 msgstr "_Depuración"
 
-#: flumotion/admin/gtk/client.py:277
+#: flumotion/admin/gtk/client.py:279
 msgid "Reload _Manager"
 msgstr "Recargar el \"_Manager\" "
 
-#: flumotion/admin/gtk/client.py:279
+#: flumotion/admin/gtk/client.py:281
 msgid "Reload _Admin"
 msgstr "Recargar el Admin"
 
-#: flumotion/admin/gtk/client.py:281
+#: flumotion/admin/gtk/client.py:283
 msgid "Reload A_ll"
 msgstr "Recargar_Todos"
 
-#: flumotion/admin/gtk/client.py:283
+#: flumotion/admin/gtk/client.py:285
 msgid "Start _Shell"
 msgstr "Lanzar una consola"
 
-#: flumotion/admin/gtk/client.py:287
+#: flumotion/admin/gtk/client.py:289
 msgid "_Help"
 msgstr "_Ayuda"
 
-#: flumotion/admin/gtk/client.py:288
+#: flumotion/admin/gtk/client.py:290
 msgid "_About"
 msgstr "_Acerca de"
 
-#: flumotion/admin/gtk/client.py:320
+#: flumotion/admin/gtk/client.py:322
 msgid "Not connected"
 msgstr "No conectado"
 
-#: flumotion/admin/gtk/client.py:391
+#: flumotion/admin/gtk/client.py:393
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "El asistente no puede funcionar porque no hay \"workers\" identificados."
 
-#: flumotion/admin/gtk/client.py:407
+#: flumotion/admin/gtk/client.py:409
 #, python-format
 msgid "Connecting to %(host)s:%(port)s"
 msgstr "Conectando a %(host)s:%(port)s"
 
-#: flumotion/admin/gtk/client.py:577
+#: flumotion/admin/gtk/client.py:579
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Recargando el código del componente para %s"
 
-#: flumotion/admin/gtk/client.py:619
+#: flumotion/admin/gtk/client.py:621
 msgid "No component selected."
 msgstr "Ningún componente seleccionado."
 
-#: flumotion/admin/gtk/client.py:637
+#: flumotion/admin/gtk/client.py:639
 #, python-format
 msgid "Failed to %(action)s component %(name)s"
 msgstr "Falló la %(action)s al componente %(name)s"
 
-#: flumotion/admin/gtk/client.py:701
+#: flumotion/admin/gtk/client.py:703
 #, python-format
 msgid "Component %s is sad"
 msgstr "El componente %s está triste"
 
-#: flumotion/admin/gtk/client.py:721
+#: flumotion/admin/gtk/client.py:723
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administración de Flumotion"
 
-#: flumotion/admin/gtk/client.py:753
+#: flumotion/admin/gtk/client.py:755
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Conexión perdida con el  \"manager\", volviendo a conectar ..."
 
-#: flumotion/admin/gtk/client.py:766
+#: flumotion/admin/gtk/client.py:768
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "La conexión al \"manager\" en %s fue rechazada."
 
-#: flumotion/admin/gtk/client.py:768
+#: flumotion/admin/gtk/client.py:770
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "La conexión con %s fue rechazada"
 
-#: flumotion/admin/gtk/client.py:782
+#: flumotion/admin/gtk/client.py:784
 #, python-format
 msgid "Connection to manager on %(conn)s failed (%(reason)s)."
 msgstr "La conexión con el \"manager\" en %(conn)s falló (%(reason)s)."
 
-#: flumotion/admin/gtk/client.py:836
+#: flumotion/admin/gtk/client.py:838
 msgid "Import Configuration..."
 msgstr "Importar la configuración..."
 
-#: flumotion/admin/gtk/client.py:853
+#: flumotion/admin/gtk/client.py:855
 msgid "Export Configuration..."
 msgstr "Exportar la configuración..."
 
-#: flumotion/admin/gtk/client.py:864
+#: flumotion/admin/gtk/client.py:866
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -1499,15 +1487,15 @@ msgstr ""
 "El archivo ya existe.\n"
 "¿Desea sobreescribirlo?"
 
-#: flumotion/admin/gtk/client.py:898
+#: flumotion/admin/gtk/client.py:901
 msgid "Reloading ..."
 msgstr "Recargando..."
 
-#: flumotion/admin/gtk/client.py:899
+#: flumotion/admin/gtk/client.py:902
 msgid "Reloading client code"
 msgstr "Recargando el código del cliente"
 
-#: flumotion/admin/gtk/client.py:911
+#: flumotion/admin/gtk/client.py:914
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -1516,7 +1504,7 @@ msgstr ""
 "No he podido recargar el componente:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:934
+#: flumotion/admin/gtk/client.py:937
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recargando el código del %s"
@@ -1972,6 +1960,21 @@ msgstr "nada"
 #: data/glade/wizard_firewire.glade:594
 msgid "<b>Output format</b>"
 msgstr "<b>Formato de salida</b>"
+
+#~ msgid ""
+#~ "Audio parameter(s) were specified but not all. Missing parameters are: %r"
+#~ msgstr ""
+#~ "El/los parámetro/s de Audio fueron especificados, pero no todos. Los "
+#~ "parámetros pendientes son: %r"
+
+#~ msgid "Line in"
+#~ msgstr "Entrada"
+
+#~ msgid "Microphone"
+#~ msgstr "Micrófono"
+
+#~ msgid "CD"
+#~ msgstr "CD"
 
 #, fuzzy
 #~ msgid "%s (audio & video)"
