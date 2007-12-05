@@ -83,7 +83,7 @@ class MessagesView(gtk.VBox):
         self.pack_start(s, False, False, 6)
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        sw.set_shadow_type(gtk.SHADOW_NONE)
+        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.pack_start(sw, True, True, 0)
 
         # text view shows the messages, plus debug information

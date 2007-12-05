@@ -1,5 +1,8 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/message.py (MessagesView.__init__): Add
+	an etched in border around the message view.
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/main.py (main): 
 	Rename Window to AdminClientWindow.
