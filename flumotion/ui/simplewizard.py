@@ -24,15 +24,12 @@ __version__ = "$Rev$"
 
 import os
 
-import sys
-
 import gobject
 import gtk
-import gtk.glade
 
 from flumotion.configure import configure
 
-from flumotion.common import pygobject, log
+from flumotion.common import log
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -117,9 +114,9 @@ class WizardStep(GladeWidget, log.Loggable):
         # vmethod
         pass
 
-class Wizard(GladeWindow):
+class SimpleWizard(GladeWindow):
     """
-    A generic wizard.
+    A simple generic wizard.
 
     This wizard runs its own GObject main loop.
     The wizard is run with the run() method.
@@ -288,4 +285,4 @@ class Wizard(GladeWindow):
         i = self.connect('finished', finished)
         return d
 
-pygobject.type_register(Wizard)
+gobject.type_register(SimpleWizard)

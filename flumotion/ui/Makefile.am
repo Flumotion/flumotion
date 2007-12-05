@@ -9,6 +9,7 @@ flumotion_PYTHON = 	\
 	glade.py 	\
 	icons.py 	\
 	sidebar.py 	\
+	simplewizard.py \
 	trayicon.py 	\
 	url.py		\
 	wizard.py

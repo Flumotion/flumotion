@@ -11,8 +11,7 @@ component_PYTHON = \
 	message.py \
 	parts.py \
 	main.py \
-	spyglass.py \
-	wizard.py
+	spyglass.py
 
 all-local:
 	if test -e videotest.pyc; then rm videotest.pyc; fi

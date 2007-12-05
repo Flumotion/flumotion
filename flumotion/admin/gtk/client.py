@@ -832,7 +832,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def _open_existing_connection(self):
         from flumotion.admin.gtk.greeter import ConnectExisting
-        from flumotion.admin.gtk.wizard import WizardCancelled
+        from flumotion.ui.simplewizard import WizardCancelled
         wiz = ConnectExisting()
 
         def got_state(state, g):

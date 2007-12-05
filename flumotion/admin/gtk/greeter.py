@@ -32,7 +32,7 @@ from twisted.internet import reactor, protocol, defer, error
 
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
-from flumotion.admin.gtk import wizard
+from flumotion.ui.simplewizard import WizardStep, SimpleWizard
 
 
 
@@ -46,7 +46,7 @@ from flumotion.admin.gtk import wizard
 
 # Page classes (see wizard.py for details)
 
-class Initial(wizard.WizardStep):
+class Initial(WizardStep):
     name = 'initial'
     title = _('Connect to Flumotion manager')
     text = _('Flumotion Admin needs to connect to a Flumotion manager.\n') + \
@@ -71,7 +71,7 @@ class Initial(wizard.WizardStep):
                 getattr(self, available_pages[0]).set_active(True)
 
 
-class ConnectToExisting(wizard.WizardStep):
+class ConnectToExisting(WizardStep):
     name = 'connect_to_existing'
     title = _('Host information')
     text = _('Please enter the address where the manager is running.')
@@ -95,7 +95,7 @@ class ConnectToExisting(wizard.WizardStep):
         return 'authenticate'
 
 
-class Authenticate(wizard.WizardStep):
+class Authenticate(WizardStep):
     name = 'authenticate'
     title = _('Authentication')
     text = _('Please select among the following authentication methods.')
@@ -122,7 +122,7 @@ class Authenticate(wizard.WizardStep):
         return '*finished*'
 
 
-class LoadConnection(wizard.WizardStep):
+class LoadConnection(WizardStep):
     name = 'load_connection'
     title = _('Recent connections')
     text = _('Please choose a connection from the box below.')
@@ -161,7 +161,7 @@ class GreeterProcessProtocol(protocol.ProcessProtocol):
         else:
             self.deferred.callback(failure)
 
-class StartNew(wizard.WizardStep):
+class StartNew(WizardStep):
     name = 'start_new'
     title = _('Start a new manager and worker')
     text = _("""This will start a new manager and worker for you.
@@ -300,7 +300,7 @@ This mode is only useful for testing Flumotion.
         gobject.source_remove(self._timeout_id)
         self.emit('finished', result)
 
-class StartNewError(wizard.WizardStep):
+class StartNewError(WizardStep):
     name = 'start_new_error'
     title = _('Failed to start')
     text = ""
@@ -320,7 +320,7 @@ class StartNewError(wizard.WizardStep):
 %s""") % (state['command'], result))
 
 
-class StartNewSuccess(wizard.WizardStep):
+class StartNewSuccess(WizardStep):
     name = 'start_new_success'
     title = _('Started manager and worker')
     start_worker_check = None
@@ -350,18 +350,18 @@ You can shut down the manager and worker later with the following command:
     def on_next(self, state):
         return '*finished*'
 
-class Greeter(wizard.Wizard):
+class Greeter(SimpleWizard):
     name = 'greeter'
     steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
         StartNew, StartNewError, StartNewSuccess]
 
     def __init__(self):
-        wizard.Wizard.__init__(self, 'initial')
+        SimpleWizard.__init__(self, 'initial')
 
 # This is used by the gtk admin to connect to an existing manager
-class ConnectExisting(wizard.Wizard):
+class ConnectExisting(SimpleWizard):
     name = 'greeter'
     steps = [ConnectToExisting, Authenticate]
 
     def __init__(self):
-        wizard.Wizard.__init__(self, 'connect_to_existing')
+        SimpleWizard.__init__(self, 'connect_to_existing')

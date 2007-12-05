@@ -1,3 +1,12 @@
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/ui/simplewizard.py:
+	Rename wizard to simplewizard to avoid confusion with the sectionwizard
+	and move it to flumotion/ui.
+
 2007-12-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/switch.py
