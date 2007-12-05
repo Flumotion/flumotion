@@ -1,3 +1,9 @@
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py 
+	(AdminClientWindow._connection_lost): 
+	Brain-o. Don't call boolean state, just check if it's set.
+
 2007-12-05  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/component.py:

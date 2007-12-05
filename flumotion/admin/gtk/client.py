@@ -779,7 +779,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._planetState.removeListener(self)
             self._planetState = None
 
-        if not self._interactive_shutdown():
+        if not self._interactive_shutdown:
             self._show_connection_lost_dialog()
 
     def _connection_refused(self):
