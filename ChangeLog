@@ -1,5 +1,8 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/looper/admin_gtk.py 
+	(FileInfo.set_audio): Call set_text instead of set_markup.
+
 	* flumotion/ui/glade.py:
 	Monkey patch _open_glade and remove LibgladeWidgeTree monkey patch.
 	Which allows you to specify a path instead of a resource string.

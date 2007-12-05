@@ -55,10 +55,10 @@ class FileInfo(GladeWidget):
         self.timelabel.set_text(time_to_string(duration))
 
     def set_audio(self, audio):
-        self.audiolabel.set_text(audio or "<i>No audio</i>")
+        self.audiolabel.set_markup(audio or "<i>No audio</i>")
 
     def set_video(self, video):
-        self.videolabel.set_text(video or "<i>No video</i>")
+        self.videolabel.set_markup(video or "<i>No video</i>")
 
 class LooperNode(BaseAdminGtkNode):
     logCategory = 'looper'
