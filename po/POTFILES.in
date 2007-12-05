@@ -395,3 +395,15 @@ data/glade/wizard_disk.glade
 data/glade/wizard_audiotest.glade
 data/glade/wizard_shout2.glade
 data/glade/wizard_firewire.glade
+flumotion/component/producers/audiotest/audiotest.glade
+flumotion/component/producers/bttv/colorbalance.glade
+flumotion/component/producers/looper/flufileinfo.glade
+flumotion/component/producers/looper/looper.glade
+flumotion/component/misc/httpfile/httpfile.glade
+flumotion/component/consumers/disker/disker.glade
+flumotion/component/consumers/httpstreamer/http.glade
+flumotion/component/bouncers/bouncer.glade
+flumotion/component/base/feeders.glade
+flumotion/component/base/eaters.glade
+flumotion/component/effects/colorbalance/colorbalance.glade
+flumotion/component/effects/volume/volume.glade

@@ -1,3 +1,9 @@
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
+	* po/POTFILES.in: Add more glade files
+
+	* po/sv.po: Update swedish translation
+
 2007-12-05  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
