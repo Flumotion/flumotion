@@ -116,6 +116,9 @@ class OverlayStep(WorkerWizardStep):
 
         return None
 
+    def setup(self):
+        self.text.set_text(_("Fluendo"))
+
     # Private API
 
     def _worker_changed(self):
