@@ -21,12 +21,13 @@
 
 __version__ = "$Rev$"
 
+import os
 
 import gtk
 from gtk import glade
 import gobject
 from kiwi.environ import environ
-from kiwi.ui import libgladeloader
+from kiwi.ui import views
 from kiwi.ui.delegates import GladeDelegate
 from twisted.python.reflect import namedAny
 
@@ -86,8 +87,20 @@ class FluLibgladeWidgetTree(glade.XML):
 
     def get_sizegroups(self):
         return []
-libgladeloader.LibgladeWidgetTree = FluLibgladeWidgetTree
 
+def _open_glade(view, gladefile, domain):
+    if not gladefile:
+        raise ValueError("A gladefile wasn't provided.")
+    elif not isinstance(gladefile, basestring):
+        raise TypeError(
+              "gladefile should be a string, found %s" % type(gladefile))
+
+    if not '/' in gladefile:
+        filename = os.path.splitext(os.path.basename(gladefile))[0]
+        gladefile = environ.find_resource("glade", filename + '.glade')
+    return FluLibgladeWidgetTree(view, gladefile, domain)
+
+views._open_glade = _open_glade
 
 class GladeBacked(GladeDelegate):
     """
