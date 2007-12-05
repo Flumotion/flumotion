@@ -1,3 +1,10 @@
+2007-12-05  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  When time.clock() wraps around, make sure we've already updated the
+	  measurements, so that the next polling interval will give us a useful
+	  answer.
+
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/admin.glade: 

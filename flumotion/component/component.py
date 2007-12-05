@@ -311,7 +311,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Start the cpu-usage updating.
         self._lastTime = time.time()
         self._lastClock = time.clock()
-        self._cpuPoller = common.Poller(self._pollCPU, 5)
+        self._cpuPoller = common.Poller(self._pollCPUAndMemory, 5)
 
         self._shutdownHook = None
 
@@ -583,17 +583,18 @@ class BaseComponent(common.InitMixin, log.Loggable):
                        'no manager.'
                        % (methodName, args, kwargs))
 
-    def _pollCPU(self):
+    def _pollCPUAndMemory(self):
         # update CPU time stats
         nowTime = time.time()
         nowClock = time.clock()
         deltaTime = nowTime - self._lastTime
         deltaClock = nowClock - self._lastClock
+        self._lastTime = nowTime
+        self._lastClock = nowClock
         if deltaClock <= 0:
             # time.clock() wrapped around, shit happens periodically
             return
         CPU = deltaClock/deltaTime
         self.log('latest CPU use: %r', CPU)
         self.uiState.set('cpu-percent', CPU)
-        self._lastTime = nowTime
-        self._lastClock = nowClock
+
