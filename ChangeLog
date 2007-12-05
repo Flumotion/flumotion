@@ -1,3 +1,15 @@
+2007-12-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.configure_pipeline): More debug.
+	(Switch.try_switch.set_switching): More debug.
+	(Switch.try_switch.set_blocked): Block and unblock all pads.
+	(AVSwitch.get_pipeline_string): Fix pipeline.
+
+	* conf/managers/default/flows/switch-simple.xml: 
+	* conf/managers/default/flows/switch-av.xml: Add switch example
+	configs.
+
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:

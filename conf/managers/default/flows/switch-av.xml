@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <component name="video-source-1" type="videotest-producer" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+    <component name="audio-source-1" project="flumotion" type="audiotest-producer" worker="localhost">
+      <property name="frequency">220</property>
+      <property name="rate">8000</property>
+      <property name="volume">1.0</property>
+    </component>
+
+   <component name="video-source-2" type="videotest-producer" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">1</property>
+      <property name="width">320</property>
+    </component>
+    <component name="audio-source-2" project="flumotion" type="audiotest-producer" worker="localhost">
+      <property name="frequency">280</property>
+      <property name="rate">8000</property>
+      <property name="volume">1.0</property>
+    </component>
+
+    <component name="switch" type="av-switch-combiner" worker="localhost">
+      <eater name="video-master">
+        <feed>video-source-1</feed>
+      </eater>
+      <eater name="audio-master">
+        <feed>audio-source-1</feed>
+      </eater>
+      <eater name="video-backup">
+        <feed>video-source-2</feed>
+      </eater>
+      <eater name="audio-backup">
+        <feed>audio-source-2</feed>
+      </eater>
+    </component>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <eater name="default">
+        <feed>switch:video</feed>
+      </eater>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="audio-encoder" project="flumotion" type="vorbis-encoder" worker="localhost">
+      <source>switch:audio</source>
+      <property name="quality">0.5</property>
+    </component>
+    <component name="muxer" type="ogg-muxer" worker="localhost">
+      <eater name="default">
+        <feed>video-encoder</feed>
+        <feed>audio-encoder</feed>
+      </eater>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <eater name="default">
+        <feed>muxer</feed>
+      </eater>
+      <!-- properties -->
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
+      <property name="port">8800</property>
+    </component>
+  </flow>
+</planet>

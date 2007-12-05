@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <component name="video-source-1" type="videotest-producer" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+    <component name="video-source-2" type="videotest-producer" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">1</property>
+      <property name="width">320</property>
+    </component>
+    <component name="switch" type="single-switch-combiner" worker="localhost">
+      <eater name="master">
+        <feed>video-source-1</feed>
+      </eater>
+      <eater name="backup">
+        <feed>video-source-2</feed>
+      </eater>
+    </component>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <eater name="default">
+        <feed>switch</feed>
+      </eater>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="muxer-video" type="ogg-muxer" worker="localhost">
+      <eater name="default">
+        <feed>video-encoder</feed>
+      </eater>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <eater name="default">
+        <feed>muxer-video</feed>
+      </eater>
+      <!-- properties -->
+      <property name="burst-on-connect">True</property>
+      <property name="mount-point">/</property>
+      <property name="port">8800</property>
+    </component>
+  </flow>
+</planet>

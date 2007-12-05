@@ -215,6 +215,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             pad = None
             while e not in switchElements:
                 pad, e = getDownstreamElement(e)
+            self.debug('eater %s maps to pad %s', alias, pad)
             self.switchPads[alias] = pad, e
 
         for alias in self.eaters:
@@ -274,7 +275,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     # 
     # We have to make sure the current segment on both the switch
     # elements has the same stop value, and the next segment on both to
-    # have the same start value to maintain sync.
+    # have the same start value to maintain sync. This case is different
+    # from the one in playbin/streamselector where all the streams are
+    # in the same segment.
     #
     # In order to do this:
     # 1) we need to block all src pads of elements connected
@@ -295,17 +298,26 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     def try_switch(self, checkActive=True):
         def set_switching(switching):
-            if switching and self._switching:
-                self.warning("Switch already in progress")
-                return False
-            elif not switching and not self._switching:
-                self.warning('something went terribly wrong')
-                # fall thru
-            self._switching = switching
-            return True
+            if switching:
+                if self._switching:
+                    self.warning("Switch already in progress")
+                    return False
+                else:
+                    self.debug('starting switch to %s', self.idealFeed)
+                    self._switching = True
+                    return True
+            else:
+                if self._switching:
+                    self.debug('switch to %s complete', self.activeFeed)
+                    self._switching = False
+                    return True
+                else:
+                    self.warning('something went terribly wrong')
+                    return False
 
         def set_blocked(blocked):
-            for pad, e in switchPads:
+            # block/unblock all pads, not just of new feed
+            for pad, e in self.switchPads.values():
                 pad.set_blocked_async(blocked, lambda x, y: None)
 
         def set_stop_time():
@@ -453,8 +465,8 @@ class AVSwitch(Switch):
                     " ! identity silent=true single-segment=true"
                     " ! @feeder:video@ "
                     "switch name=aswitch"
-                    "! identity silent=true single-segment=true "
-                    "! @feeder:audio@ ")
+                    " ! identity silent=true single-segment=true"
+                    " ! @feeder:audio@ ")
         for alias in self.eaters:
             if "video" in alias:
                 pipeline += '@eater:%s@ ! %s vswitch. ' % (alias, vforce)
