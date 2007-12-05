@@ -1,5 +1,9 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py (Window): 
+	Do not show the connection lost dialog when shutting
+	down the application normally.
+
 	* flumotion/wizard/basesteps.py (OverlayStep.setup): Set
 	the default text here to workaround ProxyEntry bug.
 

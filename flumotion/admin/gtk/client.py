@@ -134,6 +134,7 @@ class Window(log.Loggable, gobject.GObject):
         self._widgets = {}
         self._window = None
         self._recent_menu_uid = None
+        self._interactive_shutdown = False
 
         self._create_ui()
         self._append_recent_connections()
@@ -362,6 +363,12 @@ class Window(log.Loggable, gobject.GObject):
 
         self._recent_menu_uid = self._uimgr.add_ui_from_string(
             RECENT_UI_TEMPLATE % ui)
+
+    def _quit(self):
+        """Quitting the application in a controlled manner"""
+        self._interactive_shutdown = True
+        self._close()
+        self._interactive_shutdown = False
 
     def _close(self, *args):
         reactor.stop()
@@ -743,14 +750,7 @@ class Window(log.Loggable, gobject.GObject):
             self.show()
             self._run_wizard()
 
-    def _connection_lost(self):
-        self._components = {}
-        self._update_components()
-        self._clear_messages()
-        if self._planetState:
-            self._planetState.removeListener(self)
-            self._planetState = None
-
+    def _show_connection_lost_dialog(self):
         def response(dialog, id):
             if id == gtk.RESPONSE_CANCEL:
                 # FIXME: notify admin of cancel
@@ -769,6 +769,17 @@ class Window(log.Loggable, gobject.GObject):
         d.connect("response", response)
         d.show_all()
         self._disconnected_dialog = d
+
+    def _connection_lost(self):
+        self._components = {}
+        self._update_components()
+        self._clear_messages()
+        if self._planetState:
+            self._planetState.removeListener(self)
+            self._planetState = None
+
+        if not self._interactive_shutdown():
+            self._show_connection_lost_dialog()
 
     def _connection_refused(self):
         def refused_later():
@@ -995,10 +1006,10 @@ You can do remote component calls using:
     ### ui callbacks
 
     def _window_delete_event_cb(self, window, event):
-        self._close()
+        self._quit()
 
     def _trayicon_quit_cb(self, trayicon):
-        self._close()
+        self._quit()
 
     def _components_view_selection_changed_cb(self, view, state):
         self._component_selection_changed(state)
@@ -1024,7 +1035,7 @@ You can do remote component calls using:
         self._export_configuration()
 
     def _connection_quit_cb(self, action):
-        self._close()
+        self._quit()
 
     def _manage_start_component_cb(self, action):
         self._component_start(None)
