@@ -1,3 +1,9 @@
+2007-12-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py (ComponentView): 
+	Mark attributes and methods as private, 
+	(NodeBook.render): Simplify and refactor label creation.
+
 2007-12-05  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/component.py:

@@ -43,32 +43,39 @@ class NodeBook(gtk.Notebook):
         self.show()
 
     def _setup_pages(self):
+        def render(widget, table):
+            # dumb dumb dumb dumb
+            old_parent = widget.get_parent()
+            if old_parent:
+                old_parent.remove(widget)
+            map(table.remove, table.get_children())
+            table.add(widget)
+            widget.show()
+
         for name, node in self.nodes.items():
             table = gtk.Table(1,1)
             table.show()
             table.add(gtk.Label('Loading UI for %s...' % name))
-            title = node.title
-            if not title:
-                # FIXME: we have no way of showing an error message ?
-                # This should be added so users can file bugs.
-                self.warning("Component node %s does not have a "
-                    "translateable title. Please file a bug." % name)
-
-                # fall back for now
-                title = name
-
-            label = gtk.Label(title)
+            label = self._get_title_label(node, name)
             label.show()
             self.append_page(table, label)
 
-            def got_widget(w, name, table, node):
-                # dumb dumb dumb dumb
-                if w.get_parent():
-                    w.get_parent().remove(w)
-                map(table.remove, table.get_children())
-                table.add(w)
-                w.show()
-            node.render().addCallback(got_widget, name, table, node)
+            d = node.render()
+            d.addCallback(render, table)
+
+    def _get_title_label(self, node, name):
+        title = node.title
+        if not title:
+            # FIXME: we have no way of showing an error message ?
+            # This should be added so users can file bugs.
+            self.warning("Component node %s does not have a "
+                "translateable title. Please file a bug." % name)
+
+            # fall back for now
+            title = name
+
+        return gtk.Label(title)
+
 
 (OBJECT_UNSET,
  OBJECT_INACTIVE,
@@ -80,11 +87,19 @@ class ComponentView(gtk.VBox, log.Loggable):
     def __init__(self):
         gtk.VBox.__init__(self)
         self.widget_constructor = None
-        self.widget = None
-        self.object = None
+        self._widget = None
+        self._object_state = None
         self._state = OBJECT_UNSET
         self._callStamp = 0
         self.set_single_admin(None)
+
+    # Public API
+
+    def show_object(self, state):
+        self._set_state(OBJECT_UNSET)
+        if state:
+            self._object_state = state
+            self._set_state(OBJECT_INACTIVE)
 
     def set_single_admin(self, admin):
         self.admin = admin
@@ -93,7 +108,17 @@ class ComponentView(gtk.VBox, log.Loggable):
         # override me to do e.g. multi.get_admin_for_object
         return self.admin
 
-    def get_widget_constructor(self, state):
+    # Private
+
+    def _pack_widget(self, widget):
+        assert self._widget == None
+        self._widget = widget
+        self._widget.show()
+        self.pack_start(self._widget, True, True)
+
+        return self._widget
+
+    def _get_widget_constructor(self, state):
         def not_component_state():
             return gtk.Label('')
 
@@ -131,7 +156,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         d.addErrback(sleeping_component)
         return d
 
-    def object_unset_to_inactive(self):
+    def _object_unset_to_inactive(self):
         def invalidate(_):
             self._set_state(OBJECT_UNSET)
         def set(state, key, value):
@@ -142,73 +167,66 @@ class ComponentView(gtk.VBox, log.Loggable):
                 else:
                     self._set_state(OBJECT_INACTIVE)
 
-        assert self.object is not None
-        self.object.addListener(self, invalidate=invalidate,
-                                set=set)
-        if self.object.hasKey('mood'):
-            set(self.object, 'mood', self.object.get('mood'))
+        assert self._object_state is not None
+        self._object_state.addListener(
+            self, invalidate=invalidate, set=set)
+        if self._object_state.hasKey('mood'):
+            set(self._object_state, 'mood', self._object_state.get('mood'))
 
-    def object_inactive_to_active(self):
+    def _object_inactive_to_active(self):
         def got_widget_constructor(proc, callStamp):
             if callStamp != self._callStamp:
-                # in the time that get_widget_constructor was running,
+                # in the time that _get_widget_constructor was running,
                 # perhaps the user selected another object; only update
                 # the ui if that did not happen
                 self.debug('ignoring widget constructor %r, state %d, '
                            'callstamps %d/%d', proc, self._state,
                            callStamp, self._callStamp)
                 return
-            assert self.widget == None
-            self.widget = proc()
-            self.widget.show()
-            self.pack_start(self.widget, True, True)
-            return self.widget
+            widget = proc()
+            return self._pack_widget(widget)
 
         self._callStamp += 1
         callStamp = self._callStamp
-        d = self.get_widget_constructor(self.object)
+        d = self._get_widget_constructor(self._object_state)
         d.addCallback(got_widget_constructor, callStamp)
 
-    def object_active_to_inactive(self):
+    def _object_active_to_inactive(self):
         # prevent got_widget_constructor from adding the widget above
         self._callStamp += 1
-        if self.widget:
-            self.remove(self.widget)
-            # widget maybe a gtk.Label or a NodeBook
-            if hasattr(self.widget, 'admingtk'):
-                if self.widget.admingtk:
-                    # needed for compatibility with managers with old code
-                    if hasattr(self.widget.admingtk, 'cleanup'):
-                        self.widget.admingtk.cleanup()
-                    del self.widget.admingtk
-            self.widget = None
+        if not self._widget:
+            return
 
-    def object_inactive_to_unset(self):
-        self.object.removeListener(self)
-        self.object = None
+        self.remove(self._widget)
+        # widget maybe a gtk.Label or a NodeBook
+        if hasattr(self._widget, 'admingtk'):
+            if self._widget.admingtk:
+                # needed for compatibility with managers with old code
+                if hasattr(self._widget.admingtk, 'cleanup'):
+                    self._widget.admingtk.cleanup()
+                del self._widget.admingtk
+        self._widget = None
+
+    def _object_inactive_to_unset(self):
+        self._object_state.removeListener(self)
+        self._object_state = None
 
     def _set_state(self, state):
-        uptable = [self.object_unset_to_inactive,
-                   self.object_inactive_to_active]
-        downtable = [self.object_inactive_to_unset,
-                     self.object_active_to_inactive]
+        uptable = [self._object_unset_to_inactive,
+                   self._object_inactive_to_active]
+        downtable = [self._object_inactive_to_unset,
+                     self._object_active_to_inactive]
         if self._state < state:
             while self._state < state:
-                self.log('object %r state change: %d++', self.object,
+                self.log('object %r state change: %d++', self._object_state,
                          self._state)
                 self._state += 1
                 uptable[self._state - 1]()
         else:
             while self._state > state:
-                self.log('object %r state change: %d--', self.object,
+                self.log('object %r state change: %d--', self._object_state,
                          self._state)
                 self._state -= 1
                 downtable[self._state]()
-
-    def show_object(self, state):
-        self._set_state(OBJECT_UNSET)
-        if state:
-            self.object = state
-            self._set_state(OBJECT_INACTIVE)
 
 gobject.type_register(ComponentView)
