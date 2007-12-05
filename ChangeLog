@@ -1,5 +1,10 @@
 2007-12-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py 
+	(ConfigurationWizard.destroy): set self._admin to None instead of 
+	deleting it, the gc will collect the old instance.
+	Avoids a race when shutting down the wizard with pending worker jobs.
+
 	* flumotion/admin/gtk/connections.py:
 	* flumotion/admin/gtk/dialogs.py:
 	* flumotion/admin/gtk/parts.py:

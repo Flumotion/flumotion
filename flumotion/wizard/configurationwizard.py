@@ -147,7 +147,7 @@ class ConfigurationWizard(SectionWizard):
 
     def destroy(self):
         SectionWizard.destroy(self)
-        del self._admin
+        self._admin = None
         del self._save
 
     def run(self, interactive, workerHeavenState, main=True):
