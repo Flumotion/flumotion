@@ -25,9 +25,6 @@ from gettext import gettext as _
 
 import gtk
 
-from twisted.internet import defer
-
-from flumotion.common import errors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 from flumotion.ui import fgtk
 from flumotion.wizard import enums
@@ -41,7 +38,7 @@ class PatternNode(BaseAdminGtkNode):
         label = gtk.Label(_("Pattern:"))
         self.widget.attach(label, 0, 1, 0, 1, 0, 0, 6, 6)
         label.show()
-        self.combobox_pattern = fgtk.FComboBox()
+        self.combobox_pattern = fgtk.FProxyComboBox()
         self.combobox_pattern.set_enum(enums.VideoTestPattern)
         self.pattern_changed_id = self.combobox_pattern.connect('changed',
             self.cb_pattern_changed)
@@ -62,7 +59,7 @@ class PatternNode(BaseAdminGtkNode):
                 failure.type, failure.getErrorMessage()))
             return None
 
-        pattern = combobox.get_value()
+        pattern = combobox.get_active()
         d = self.callRemote("setPattern", pattern)
         d.addErrback(_setPatternErrback)
 
