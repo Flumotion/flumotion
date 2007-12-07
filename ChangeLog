@@ -1,3 +1,10 @@
+2007-12-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/encoders/theora/theora.py 
+	(Theora.checkCallback): inline defered callback
+	(Theora.configure_pipeline): avoid duplication and
+	improve readability.
+
 2007-12-06  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/videotest/admin_gtk.py:

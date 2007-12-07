@@ -34,15 +34,15 @@ class Theora(feedcomponent.ParseLaunchComponent):
     def do_check(self):
         self.debug('running Theora check')
         from flumotion.worker.checks import encoder
-        d = encoder.checkTheora()
 
-        d.addCallback(self._checkCallback)
+        def checkCallback(result):
+            for m in result.messages:
+                self.addMessage(m)
+
+        d = encoder.checkTheora()
+        d.addCallback(checkCallback)
 
         return d
-
-    def _checkCallback(self, result):
-        for m in result.messages:
-            self.addMessage(m)
 
     def get_pipeline_string(self, properties):
         return "ffmpegcolorspace ! theoraenc name=encoder"
@@ -75,16 +75,20 @@ class Theora(feedcomponent.ParseLaunchComponent):
                 properties['bitrate'] *= 1000
 
         for p in props:
-            pproperty = isinstance(p, tuple) and p[0] or p
-            eproperty = isinstance(p, tuple) and p[1] or p
+            if isinstance(p, tuple):
+                pproperty, eproperty = p
+            else:
+                pproperty = eproperty = p
 
-            if pproperty in properties:
-                self.debug('Setting GStreamer property %s to %r' % (
-                    eproperty, properties[pproperty]))
-                # FIXME: GStreamer 0.10 has bitrate in kbps, inconsistent
-                # with all other elements, so fix it up
-                if pproperty == 'bitrate':
-                    element.set_property(eproperty,
-                        int(properties[pproperty]/1000))
-                else:
-                    element.set_property(eproperty, properties[pproperty])
+            if not pproperty in properties:
+                continue
+
+            value = properties[pproperty]
+            self.debug('Setting GStreamer property %s to %r' % (
+                eproperty, value))
+
+            # FIXME: GStreamer 0.10 has bitrate in kbps, inconsistent
+            # with all other elements, so fix it up
+            if pproperty == 'bitrate':
+                value = int(value/1000)
+            element.set_property(eproperty, value)
