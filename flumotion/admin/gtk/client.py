@@ -373,6 +373,10 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _close(self, *args):
         reactor.stop()
+        # This is probably a bug in the gtk2reactor, the documentation
+        # states that it should not be called after shutting down the reactor,
+        # however it is necessary to avoid stray events to be fired later on.
+        reactor.iterate()
 
     def _dump_config(self, configation):
         import pprint

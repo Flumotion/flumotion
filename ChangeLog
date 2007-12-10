@@ -1,3 +1,10 @@
+2007-12-10  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py (AdminClientWindow._close): Call
+	reactor.iterate after shutting down the reactor to make sure that
+	the progress dialog is not flashing when shutting down the admin
+	client in a normal way.
+
 2007-12-07  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/encoders/theora/theora.py 
