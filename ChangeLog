@@ -1,3 +1,8 @@
+2007-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Log when we set the maximum fd # because of a python 2.4.3 bug.
+
 2007-12-10  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow._close): Call
