@@ -1,3 +1,9 @@
+2007-12-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/options.py: Unconditionally disable GOption, since
+	it doesn't work to launch a manager + worker yet.
+	(GOptionOptionParserClass): Fix import.
+
 2007-12-17  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/switch.py

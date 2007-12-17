@@ -27,6 +27,10 @@ __version__ = "$Rev$"
 from flumotion.common import common
 from flumotion.common import log
 
+# Disable optionparser, it needs more upstream
+# changes to work properly
+from flumotion.common import boot
+boot.USE_GOPTION_PARSER = False
 
 def OptparseOptionParserClass():
     from optparse import OptionParser as BaseOP
@@ -43,9 +47,9 @@ def OptparseOptionGroupClass():
             BaseOG.__init__(self, parser, title, description,
                             **kwargs)
     return OptionGroup
-    
+
 def GOptionOptionParserClass(use_gst):
-    from goption.option import OptionParser as BaseOP
+    from gobject.option import OptionParser as BaseOP
     class OptionParser(BaseOP):
         def __init__(self, usage, description, domain):
             self.domain = domain
@@ -69,7 +73,7 @@ def GOptionOptionGroupClass():
             BaseOG.__init__(self, title, description,
                             option_list=[], **kwargs)
     return OptionGroup
-    
+
 def OptionParser(usage="", description="", domain=""):
     """I have two responsibilities:
     - provide a generic interface to OptionParser on top of the optparse
@@ -99,7 +103,7 @@ def OptionParser(usage="", description="", domain=""):
                             action="store_true", dest="version",
                             default=False,
                             help="show version information")
-    
+
         def parse_args(self, args):
             options, args = OptionParser.parse_args(self, args)
 
