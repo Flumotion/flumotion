@@ -1,5 +1,8 @@
 2007-12-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/simplewizard.py (SimpleWizard.on_finished): 
+	Workaround gtk+ bug #56070
+
 	* flumotion/component/consumers/httpstreamer/resources.py (HTTPStreamingResource.getMaxAllowedClients): 
 	Fix indentation.
 

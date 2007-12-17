@@ -234,6 +234,10 @@ class SimpleWizard(GladeWindow):
                     self.set_page(next_page)
             self._finished_id = self.page.connect('finished', on_finished)
         else:
+            # work around a gtk+ bug #56070
+            button.hide()
+            button.show()
+
             button.set_sensitive(True)
             self.page_stack.append(self.page)
             self.set_page(next_page)
