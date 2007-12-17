@@ -1,3 +1,13 @@
+2007-12-17  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.try_switch): Drastically simplify, requiring the new
+	switch from gst-plugins-bad.
+
+	* conf/managers/default/flows/switch-av.xml: Change to have two
+	flows that will actually have the same caps. Different caps will
+	bork most all encoders.
+
 2007-12-17  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion.spec.in:
@@ -8,7 +18,8 @@
 	* flumotion/ui/simplewizard.py (SimpleWizard.on_finished): 
 	Workaround gtk+ bug #56070
 
-	* flumotion/component/consumers/httpstreamer/resources.py (HTTPStreamingResource.getMaxAllowedClients): 
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.getMaxAllowedClients):
 	Fix indentation.
 
 2007-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>

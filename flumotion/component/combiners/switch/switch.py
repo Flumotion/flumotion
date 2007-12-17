@@ -275,85 +275,19 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     # 
     # We have to make sure the current segment on both the switch
     # elements has the same stop value, and the next segment on both to
-    # have the same start value to maintain sync. This case is different
-    # from the one in playbin/streamselector where all the streams are
-    # in the same segment.
+    # have the same start value to maintain sync.
     #
     # In order to do this:
-    # 1) we need to block all src pads of elements connected
-    #    to the switches' sink pads
-    # 2) we need to set the property "stop-value" on both the
-    #    switches to the highest value of "last-timestamp" on the two
-    #    switches.
-    # 3) the pads should be switched (ie active-pad set) on the two switched
-    # 4) the switch elements should be told to queue buffers coming on their
-    #    active sinkpads by setting the queue-buffers property to TRUE
-    # 5) pad buffer probes should be added to the now active sink pads of the
-    #    switch elements, so that the start value of the enxt new segment can
-    #    be determined
-    # 6) the src pads we blocked in 1) should be unblocked
-    # 7) when both pad probes have fired once, use the lowest timestamp
-    #    received as the start value for the switch elements
-    # 8) set the queue-buffers property on the switch elements to FALSE
+    # 1) we need to block the switch from processing more data
+    # 2) we need to query the last_stop on all stream segments of the
+    #    previously active stream, and take the maximum to set as the
+    #    stop_time of the old segments
+    # 3) we need to query the last_stop on all stream segments of the
+    #    new stream, and take the minimum to set as the start_time of
+    #    the new segments
+    # 4) tell the switches to switch, with the stop_time and start_time
 
     def try_switch(self, checkActive=True):
-        def set_switching(switching):
-            if switching:
-                if self._switching:
-                    self.warning("Switch already in progress")
-                    return False
-                else:
-                    self.debug('starting switch to %s', self.idealFeed)
-                    self._switching = True
-                    return True
-            else:
-                if self._switching:
-                    self.debug('switch to %s complete', self.activeFeed)
-                    self._switching = False
-                    return True
-                else:
-                    self.warning('something went terribly wrong')
-                    return False
-
-        def set_blocked(blocked):
-            # block/unblock all pads, not just of new feed
-            for pad, e in self.switchPads.values():
-                pad.set_blocked_async(blocked, lambda x, y: None)
-
-        def set_stop_time():
-            times = [e.get_property('last-timestamp')
-                     for pad, e in switchPads]
-            stop_time = max(times)
-
-            if stop_time != gst.CLOCK_TIME_NONE:
-                self.debug('stop time = %u', stop_time)
-                for pad, e in switchPads:
-                    e.set_property('stop-value', stop_time)
-
-                diff = max(times) - min(times)
-                if diff > gst.SECOND * 10:
-                    fmt = N_("When switching to %s, feed timestamps out"
-                             " of sync by %u")
-                    self.addWarning('large-timestamp-difference', fmt,
-                                    feed, diff, priority=40)
-
-        def set_queueing(queueing, start_time=None):
-            for pad, e in switchPads:
-                if start_time:
-                    e.set_property("start-value", start_time)
-                e.set_property("queue-buffers", queueing)
-
-        def switch():
-            for pad, e in switchPads:
-                e.set_property('active-pad', pad.get_name())
-            self.activeFeed = feed
-            self.uiState.set("active-eater", feed)
-
-        def get_new_start_times():
-            return collect_single_shot_buffer_probe(
-                [pad for pad, e in switchPads],
-                lambda pad, buffer: buffer.timestamp)
-
         feed = self.idealFeed
 
         if feed == self.activeFeed:
@@ -364,22 +298,44 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if checkActive and not self.is_active(feed):
             return False
 
-        if not set_switching(True):
-            return False
+        # (pad, switch)
+        pairs = [self.switchPads[alias]
+                 for alias in self.logicalFeeds[feed]]
 
-        switchPads = [self.switchPads[alias]
-                      for alias in self.logicalFeeds[feed]]
-        set_blocked(True) # (1)
-        set_stop_time() # (2)
-        switch() # (3)
-        set_queueing(True) # (4)
-        d = get_new_start_times() # (5)
-        set_blocked(False) # (6)
-        d.addCallback(lambda times: set_queueing(False, min(times))) # (7, 8)
-        d.addCallback(lambda _: set_switching(False))
-        # in self.idealEater was changed in the meantime, also to clear
-        # the warning message if everything is ok
-        d.addCallback(lambda _: self.try_switch())
+        stop_times = [e.emit('block') for p, e in pairs]
+        start_times = [p.get_property('last-stop-time') for p, e in pairs]
+        
+        # FIXME: I don't know what to do if we get a GST_CLOCK_TIME_NONE
+        # for one of the stop_times. E.g. if we get audio data but no
+        # video data. The two options would be (1) to open and close
+        # e.g. a video segment of equal extent to the audio segment, or
+        # to (2) not open and close a video segment, relying on the
+        # future segment setting things right. (1) would certainly be
+        # correct, but (2) might be fine also.
+
+        stop_time = max(stop_times)
+        self.debug('stop time = %s', gst.TIME_ARGS(stop_time))
+
+        if stop_time != gst.CLOCK_TIME_NONE:
+            diff = float(max(stop_times) - min(stop_times))
+            if diff > gst.SECOND * 10:
+                fmt = N_("When switching to %s, feed timestamps out"
+                         " of sync by %us")
+                self.addWarning('large-timestamp-difference', fmt,
+                                feed, diff / gst.SECOND, priority=40)
+
+        # FIXME: I don't know what to do if we get a GST_CLOCK_TIME_NONE
+        # in the start_times. For now I am punting on this one. Yick.
+
+        start_time = min(start_times)
+        self.debug('start time = %s', gst.TIME_ARGS(start_time))
+
+        self.debug('switching from %r to %r', self.activeFeed, feed)
+        for p, e in pairs:
+            e.emit('switch', p.get_name(), stop_time, start_time)
+
+        self.activeFeed = feed
+        self.uiState.set("active-eater", feed)
         return True
 
 class SingleSwitch(Switch):

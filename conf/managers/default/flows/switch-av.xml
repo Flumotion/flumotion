@@ -1,46 +1,28 @@
 <?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="video-source-1" type="videotest-producer" worker="localhost">
+    <component name="looper1" type="loop-producer" worker="localhost">
       <!-- properties -->
-      <property name="format">video/x-raw-yuv</property>
-      <property name="framerate">50/10</property>
-      <property name="height">240</property>
-      <property name="pattern">0</property>
-      <property name="width">320</property>
-    </component>
-    <component name="audio-source-1" project="flumotion" type="audiotest-producer" worker="localhost">
-      <property name="frequency">220</property>
-      <property name="rate">8000</property>
-      <property name="volume">1.0</property>
+      <property name="location">/home/wingo/media/vilanova_presentation.ogg</property>
     </component>
 
-   <component name="video-source-2" type="videotest-producer" worker="localhost">
+    <component name="looper2" type="loop-producer" worker="localhost">
       <!-- properties -->
-      <property name="format">video/x-raw-yuv</property>
-      <property name="framerate">50/10</property>
-      <property name="height">240</property>
-      <property name="pattern">1</property>
-      <property name="width">320</property>
-    </component>
-    <component name="audio-source-2" project="flumotion" type="audiotest-producer" worker="localhost">
-      <property name="frequency">280</property>
-      <property name="rate">8000</property>
-      <property name="volume">1.0</property>
+      <property name="location">/home/wingo/media/vilanova_presentation.ogg</property>
     </component>
 
     <component name="switch" type="av-switch-combiner" worker="localhost">
       <eater name="video-master">
-        <feed>video-source-1</feed>
+        <feed>looper1:video</feed>
       </eater>
       <eater name="audio-master">
-        <feed>audio-source-1</feed>
+        <feed>looper1:audio</feed>
       </eater>
       <eater name="video-backup">
-        <feed>video-source-2</feed>
+        <feed>looper2:video</feed>
       </eater>
       <eater name="audio-backup">
-        <feed>audio-source-2</feed>
+        <feed>looper2:audio</feed>
       </eater>
     </component>
     <component name="video-encoder" type="theora-encoder" worker="localhost">
@@ -60,7 +42,7 @@
         <feed>audio-encoder</feed>
       </eater>
     </component>
-    <component name="http-video" type="http-streamer" worker="localhost">
+    <component name="http" type="http-streamer" worker="localhost">
       <eater name="default">
         <feed>muxer</feed>
       </eater>
