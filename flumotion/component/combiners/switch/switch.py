@@ -22,7 +22,6 @@
 __version__ = "$Rev$"
 
 import sets
-import threading
 import gst
 
 from twisted.internet import defer, reactor
@@ -36,42 +35,6 @@ from flumotion.component.plugs import base
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
-
-def withlock(proc, lock):
-    def locking(*args):
-        lock.acquire()
-        try:
-            return proc(*args)
-        finally:
-            lock.release()
-    return locking
-
-def collect_single_shot_buffer_probe(pads, probe):
-    def buffer_probe(pad, buffer):
-        probe_id = probe_ids.pop(pad, None)
-        if probe_id:
-            pad.remove_buffer_probe(probe_id)
-            ret.append(probe(pad, buffer))
-            if not probe_ids:
-                log.debug('switch', "have all probed values: %r", ret)
-                reactor.callFromThread(d.callback, ret)
-        else:
-            log.warning('switch', "foo!")
-        return True
-    probe_lock = threading.Lock()
-    buffer_probe = withlock(buffer_probe, probe_lock)
-
-    d = defer.Deferred()
-    ret = []
-    probe_ids = {}
-
-    log.debug('switch', "adding buffer probes for %r", pads)
-    probe_lock.acquire()
-    for pad in pads:
-        probe_ids[pad] = pad.add_buffer_probe(buffer_probe)
-    probe_lock.release()
-
-    return d
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):
