@@ -272,8 +272,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             # Bug in python 2.4.3, see http://sourceforge.net/tracker/index.php?func=detail&aid=1494314&group_id=5470&atid=105470
             if version[:3] == (2, 4, 3) and \
                 not hasattr(socket, "has_2_4_3_patch"):
-                    self.warning(
-                        'Setting hardmax to 1024 due to python 2.4.3 bug')
+                self.warning(
+                    'Setting hardmax to 1024 due to python 2.4.3 bug')
                 hardmax = 1024
 
             if neededfds > softmax:
