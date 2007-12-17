@@ -1,3 +1,8 @@
+2007-12-17  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion.spec.in:
+	Fixes the build dependency declaration for kiwi.
+
 2007-12-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/ui/simplewizard.py (SimpleWizard.on_finished): 

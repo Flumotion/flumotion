@@ -40,7 +40,7 @@ BuildRequires:	python-twisted-web
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel
-Requires:	python-kiwi >= %{kiwi_minver}
+BuildRequires:	python-kiwi >= %{kiwi_minver}
 
 # docs
 BuildRequires:	epydoc
