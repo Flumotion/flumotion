@@ -3,6 +3,9 @@
 	* flumotion/component/combiners/switch/switch.py
 	(Switch.try_switch): Drastically simplify, requiring the new
 	switch from gst-plugins-bad.
+	(withlock, collect_single_shot_buffer_probe): Throw our treasures
+	into the deep, to one day be found by an unwitting aqualunged
+	diver.
 
 	* conf/managers/default/flows/switch-av.xml: Change to have two
 	flows that will actually have the same caps. Different caps will
