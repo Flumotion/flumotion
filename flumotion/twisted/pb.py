@@ -589,6 +589,11 @@ class Avatar(pb.Avatar, flog.Loggable):
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args)
         kwargs = broker.unserialize(kwargs)
+        return self.perspectiveMessageReceivedUnserialised(broker, message, 
+            args, kwargs)
+
+    def perspectiveMessageReceivedUnserialised(self, broker, message, 
+            args, kwargs):
         method = getattr(self, "perspective_%s" % message, None)
         if method is None:
             raise pb.NoSuchMethod("No such method: perspective_%s" % (message,))
