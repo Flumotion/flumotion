@@ -1,7 +1,18 @@
+2007-12-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py (BaseComponent._pollMemory): Be
+	less verbose.
+
+	* flumotion/component/combiners/switch/switch.py (Switch.init):
+	Remove some unneeded variables.
+	(Switch.try_switch): Change to reflect changes in the gst switch
+	element.
+
 2007-12-18  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/authenticate.glade: 
-	* flumotion/admin/gtk/connections.py (Authenticate.on_passwd_entry_activate): 
+	* flumotion/admin/gtk/connections.py
+	(Authenticate.on_passwd_entry_activate):
 	Go to the next step of the wizard when pressing enter in the password
 	entry.
 
@@ -16,7 +27,8 @@
 
 2007-12-18  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/test_common_signals.py (TestSignalMixin.testDisconnectByFunc): 
+	* flumotion/test/test_common_signals.py
+	(TestSignalMixin.testDisconnectByFunc): 
 	Add new function, to avoid having to save all signal ids
 
 	* flumotion/common/signals.py (SignalMixin.disconnect_by_func): 

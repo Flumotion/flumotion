@@ -622,6 +622,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # field 1 (comm) could potentially contain spaces and thus split over 
         # multiple list items, but our processes do not contain spaces 
         vsize = int(fields[22]) 
-        self.debug('vsize is %d', vsize) 
+        self.log('vsize is %d', vsize) 
         self.uiState.set('virtual-size', vsize)
 

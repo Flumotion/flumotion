@@ -113,13 +113,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.idealFeed = None
         self.activeFeed = None
 
-        # Additionally, the boolean flag _switching indicates that a
-        # switch is in progress.
-        self._switching = False
-
-        # All instance variables may only be accessed from the main
-        # thread.
-
     def addWarning(self, id, format, *args, **kwargs):
         self.warning(format, *args)
         m = messages.Message(messages.WARNING, T_(format, *args),
@@ -266,7 +259,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                  for alias in self.logicalFeeds[feed]]
 
         stop_times = [e.emit('block') for p, e in pairs]
-        start_times = [p.get_property('last-stop-time') for p, e in pairs]
+        start_times = [p.get_property('running-time') for p, e in pairs]
         
         # FIXME: I don't know what to do if we get a GST_CLOCK_TIME_NONE
         # for one of the stop_times. E.g. if we get audio data but no
@@ -277,6 +270,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # correct, but (2) might be fine also.
 
         stop_time = max(stop_times)
+        self.debug('stop time = %d', stop_time)
         self.debug('stop time = %s', gst.TIME_ARGS(stop_time))
 
         if stop_time != gst.CLOCK_TIME_NONE:
