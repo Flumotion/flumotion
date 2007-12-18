@@ -72,3 +72,10 @@ class TestSignalMixin(testsuite.TestCase):
         sid = o.connect('foo', self.fail)
         o.disconnect(sid)
         o.emit('foo')
+
+    def testDisconnectByFunc(self):
+        o = TestObject()
+
+        o.connect('foo', self.fail)
+        o.disconnect_by_func(self.fail)
+        o.emit('foo')

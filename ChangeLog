@@ -1,3 +1,15 @@
+2007-12-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_common_signals.py (TestSignalMixin.testDisconnectByFunc): 
+	Add new function, to avoid having to save all signal ids
+
+	* flumotion/common/signals.py (SignalMixin.disconnect_by_func): 
+	Add tests for disconnect_by_func
+	
+	* flumotion/admin/gtk/client.py (AdminClientWindow._clear_admin): 
+	Simplify reactor shutdown, do the right thing<tm> by disconnecting
+	all admin callbacks before shutting down
+
 2007-12-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/options.py: Unconditionally disable GOption, since

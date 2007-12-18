@@ -135,7 +135,6 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         self._widgets = {}
         self._window = None
         self._recent_menu_uid = None
-        self._interactive_shutdown = False
 
         self._create_ui()
         self._append_recent_connections()
@@ -218,7 +217,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         # window gets created after model connects initially, so check
         # here
         if self._admin.isConnected():
-            self._admin_connected_cb(model)
+            self._connection_opened(model)
 
         self._admin.connect('connected', self._admin_connected_cb)
         self._admin.connect('disconnected', self._admin_disconnected_cb)
@@ -367,16 +366,11 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _quit(self):
         """Quitting the application in a controlled manner"""
-        self._interactive_shutdown = True
+        self._clear_admin()
         self._close()
-        self._interactive_shutdown = False
 
     def _close(self, *args):
         reactor.stop()
-        # This is probably a bug in the gtk2reactor, the documentation
-        # states that it should not be called after shutting down the reactor,
-        # however it is necessary to avoid stray events to be fired later on.
-        reactor.iterate()
 
     def _dump_config(self, configation):
         import pprint
@@ -412,6 +406,17 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
         self._wizard = wizard
         self._wizard.connect('destroy', nullwizard)
+
+    def _clear_admin(self):
+        if not self._admin:
+            return
+
+        self._admin.disconnect_by_func(self._admin_connected_cb)
+        self._admin.disconnect_by_func(self._admin_disconnected_cb)
+        self._admin.disconnect_by_func(self._admin_connection_refused_cb)
+        self._admin.disconnect_by_func(self._admin_connection_failed_cb)
+        self._admin.disconnect_by_func(self._admin_update_cb)
+        self._admin = None
 
     def _open_connection(self, connectionInfo):
         i = connectionInfo
@@ -787,8 +792,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._planetState.removeListener(self)
             self._planetState = None
 
-        if not self._interactive_shutdown:
-            self._show_connection_lost_dialog()
+        self._show_connection_lost_dialog()
 
     def _connection_refused(self):
         def refused_later():

@@ -53,6 +53,19 @@ class SignalMixin(object):
 
         del self.__signalConnections[signalId]
 
+    def disconnect_by_func(self, func):
+        self.__ensureSignals()
+
+        for signalId, conn in self.__signalConnections.items():
+            name, proc, args, kwargs = conn
+            if proc == func:
+                break
+        else:
+            raise ValueError(
+                'No signal connected to function: %r' % (func,))
+
+        del self.__signalConnections[signalId]
+
     def emit(self, signalName, *args):
         self.__ensureSignals()
         if signalName not in self.__signals__:
