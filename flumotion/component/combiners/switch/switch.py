@@ -97,6 +97,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         #               "backup": ["audio-backup", "video-backup"]}
         # logical feed name -> [eater alias]
         self.logicalFeeds = {}
+        # logical feed names in order of preference
+        self.feedsByPriority = []
 
         # eater alias -> (sink pad, switch element)
         self.switchPads = {}
@@ -148,6 +150,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.logicalFeeds[name] = aliases
             if self.idealFeed is None:
                 self.idealFeed = name
+            self.feedsByPriority.append(name)
 
         return feedcomponent.MultiInputParseLaunchComponent.create_pipeline(self)
 
@@ -213,6 +216,22 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     def feedSetInactive(self, feed):
         self.debug('feed %r is now inactive', feed)
+
+    # this function is used by the watchdogs
+    def auto_switch(self):
+        allFeeds = self.feedsByPriority[:]
+        feed = None
+        while allFeeds:
+            feed = allFeeds.pop(0)
+            if self.is_active(feed):
+                self.debug('autoswitch selects feed %r', feed)
+                self.switch_to(feed)
+                break
+        if feed is None:
+            feed = self.feedsByPriority.get(0, None)
+            self.debug('no feeds active during autoswitch, choosing %r',
+                       feed)
+        self.switch_to(feed)
 
     def switch_to(self, feed):
         """

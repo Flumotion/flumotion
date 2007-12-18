@@ -1,5 +1,17 @@
 2007-12-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/combiners/switch/basicwatchdog.py
+	(SingleBasicWatchdog.feedSetInactive)
+	(SingleBasicWatchdog.feedSetActive)
+	(AVBasicWatchdog.feedSetInactive, AVBasicWatchdog.feedSetActive):
+	Use auto_switch().
+
+	* flumotion/component/combiners/switch/switch.py (Switch.init):
+	(Switch.create_pipeline): Don't throw away the priority ordering
+	of get_logical_feeds() in the feedsByPriority list.
+	(Switch.auto_switch): New function, automatically selects the
+	highest-priority active feed. Should be used in the watchdogs.
+
 	* flumotion/component/combiners/switch/switch.py (Switch.init):
 	Remove self._started state variable -- subclasses should hack this
 	in if needed.

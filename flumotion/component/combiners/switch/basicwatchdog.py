@@ -31,57 +31,21 @@ from flumotion.component.combiners.switch import switch
 class SingleBasicWatchdog(switch.SingleSwitch):
     logCategory = "comb-single-basic-watchdog"
 
-    def eaterSetInactive(self, feedId):
-        switch.SingleSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        oppositeEater = "backup"
-        if self._idealEater == "backup":
-            oppositeEater = "master"
-        if self._idealEater in eaterName and self.is_active(oppositeEater) and \
-           self.uiState.get("active-eater") == self._idealEater and \
-           self._started:
-            self.debug("Switching to %s, active eater is %s", oppositeEater,
-                self.uiState.get("active-eater"))
-            self.switch_to(oppositeEater)
+    def feedSetInactive(self, feed):
+        switch.SingleSwitch.feedSetInactive(self, feed)
+        self.auto_switch()
 
-    def eaterSetActive(self, feedId):
-        switch.SingleSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        oppositeEater = "backup"
-        if self._idealEater == "backup":
-            oppositeEater = "master"
-        if self._idealEater in eaterName and self.is_active(self._idealEater) \
-           and self.uiState.get("active-eater") == oppositeEater and \
-           self._started:
-            self.debug("Switching to %s, active eater is %s", self._idealEater,
-                self.uiState.get("active-eater"))
-            self.switch_to(self._idealEater)
+    def feedSetActive(self, feed):
+        switch.SingleSwitch.feedSetActive(self, feed)
+        self.auto_switch()
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"
 
-    def eaterSetInactive(self, feedId):
-        switch.AVSwitch.eaterSetInactive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        oppositeEater = "backup"
-        if self._idealEater == "backup":
-            oppositeEater = "master"
-        if self._idealEater in eaterName and self.is_active(oppositeEater) and \
-           self.uiState.get("active-eater") == self._idealEater and \
-           self._started:
-            self.debug("Switching to %s, active eater is %s", oppositeEater,
-                self.uiState.get("active-eater"))
-            self.switch_to(oppositeEater)
+    def feedSetInactive(self, feed):
+        switch.AVSwitch.feedSetInactive(self, feed)
+        self.auto_switch()
 
-    def eaterSetActive(self, feedId):
-        switch.AVSwitch.eaterSetActive(self, feedId)
-        eaterName = self.get_eater_name_for_feed_id(feedId)
-        oppositeEater = "backup"
-        if self._idealEater == "backup":
-            oppositeEater = "master"
-        if self._idealEater in eaterName and self.is_active(self._idealEater) \
-           and self.uiState.get("active-eater") == oppositeEater and \
-           self._started:
-            self.debug("Switching to %s, active eater is %s", self._idealEater,
-                self.uiState.get("active-eater"))
-            self.switch_to(self._idealEater)
+    def feedSetActive(self, feed):
+        switch.AVSwitch.feedSetActive(self, feed)
+        self.auto_switch()
