@@ -203,6 +203,10 @@ class Authenticate(GladeWidget):
                                 lambda *x: self.passwd_entry.grab_focus())
         self.connect('grab-focus', self.on_grab_focus)
 
+    def on_passwd_entry_activate(self, entry):
+        toplevel = self.get_toplevel()
+        toplevel.wizard.next()
+
     def on_grab_focus(self, *args):
         self.user_entry.grab_focus()
 
