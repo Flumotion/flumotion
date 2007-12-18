@@ -86,9 +86,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.uiState.addKey("active-eater")
         self.icalScheduler = None
 
-        # foo
-        self._started = False
-
         # This structure maps logical feeds to sets of eaters. For
         # example, "master" and "backup" could be logical feeds, and
         # would be the keys in this dict, mapping to lists of eater
@@ -98,6 +95,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # 
         # For example, {"master": ["audio-master", "video-master"],
         #               "backup": ["audio-backup", "video-backup"]}
+        # logical feed name -> [eater alias]
         self.logicalFeeds = {}
 
         # eater alias -> (sink pad, switch element)
@@ -174,11 +172,30 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.debug('eater %s maps to pad %s', alias, pad)
             self.switchPads[alias] = pad, e
 
-        for alias in self.eaters:
-            self.eaters[alias].addWatch(self.eaterSetActive,
-                                        self.eaterSetInactive)
+        self.install_logical_feed_watches()
 
-        self.try_switch(checkActive=False)
+        self.do_switch()
+
+    def install_logical_feed_watches(self):
+        def eaterSetActive(eaterAlias):
+            for feed, aliases in self.logicalFeeds.items():
+                if eaterAlias in aliases:
+                    if feed not in activeFeeds:
+                        activeFeeds.append(feed)
+                        self.feedSetActive(feed)
+                    return
+
+        def eaterSetInactive(eaterAlias):
+            for feed, aliases in self.logicalFeeds.items():
+                if eaterAlias in aliases:
+                    if feed in activeFeeds:
+                        activeFeeds.remove(feed)
+                        self.feedSetInactive(feed)
+                    return
+
+        activeFeeds = []
+        for alias in self.eaters:
+            self.eaters[alias].addWatch(eaterSetActive, eaterSetInactive)
 
     def get_switch_elements(self, pipeline):
         raise errors.NotImplementedError('subclasses should implement '
@@ -189,23 +206,13 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         return all([self.eaters[alias].isActive()
                     for alias in self.logicalFeeds[feed]])
 
-    def do_pipeline_playing(self):
-        feedcomponent.MultiInputParseLaunchComponent.do_pipeline_playing(self)
-        # needed to stop the flapping between master and backup on startup
-        # in the watchdogs if the starting state is backup
-        self._started = True
+    def feedSetActive(self, feed):
+        self.debug('feed %r is now active', feed)
+        if feed == self.idealFeed:
+            self.do_switch()
 
-    def eaterSetActive(self, eaterAlias):
-        if not self._started and moods.get(self.getMood()) == moods.happy:
-            # need to just set _started to True if False and mood is happy
-            # FIXME: why?
-            self._started = True
-
-        if self.activeFeed != self.idealFeed:
-            self.try_switch()
-
-    def eaterSetInactive(self, eaterAlias):
-        pass
+    def feedSetInactive(self, feed):
+        self.debug('feed %r is now inactive', feed)
 
     def switch_to(self, feed):
         """
@@ -221,38 +228,27 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         if not self.pipeline:
             return
 
-        success = self.try_switch()
-        if not success:
+        if self.is_active(feed):
+            self.do_switch()
+        else:
             fmt = N_("Tried to switch to %s, but feed is unavailable. "
                      "Will retry when the feed is back.")
             self.addWarning("temporary-switch-problem", fmt, feed)
 
-    # So switching multiple eaters is not that easy.
-    # 
-    # We have to make sure the current segment on both the switch
-    # elements has the same stop value, and the next segment on both to
-    # have the same start value to maintain sync.
-    #
-    # In order to do this:
-    # 1) we need to block the switch from processing more data
-    # 2) we need to query the last_stop on all stream segments of the
-    #    previously active stream, and take the maximum to set as the
-    #    stop_time of the old segments
-    # 3) we need to query the last_stop on all stream segments of the
-    #    new stream, and take the minimum to set as the start_time of
-    #    the new segments
-    # 4) tell the switches to switch, with the stop_time and start_time
+    # Switching multiple eaters is easy. The only trick is that we have
+    # to close the previous segment at the same running time, on both
+    # switch elements, and open the new segment at the same running
+    # time. The block()/switch() signal API on switch elements lets us
+    # do this. See the docs for switch's `block' and `switch' signals
+    # for more information.
 
-    def try_switch(self, checkActive=True):
+    def do_switch(self):
         feed = self.idealFeed
 
+        self.clearWarning('temporary-switch-problem')
         if feed == self.activeFeed:
-            self.debug("feed %s is already active", feed)
-            self.clearWarning('temporary-switch-problem')
-            return True
-
-        if checkActive and not self.is_active(feed):
-            return False
+            self.debug("already streaming from feed %r", feed)
+            return
 
         # (pad, switch)
         pairs = [self.switchPads[alias]
@@ -261,14 +257,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         stop_times = [e.emit('block') for p, e in pairs]
         start_times = [p.get_property('running-time') for p, e in pairs]
         
-        # FIXME: I don't know what to do if we get a GST_CLOCK_TIME_NONE
-        # for one of the stop_times. E.g. if we get audio data but no
-        # video data. The two options would be (1) to open and close
-        # e.g. a video segment of equal extent to the audio segment, or
-        # to (2) not open and close a video segment, relying on the
-        # future segment setting things right. (1) would certainly be
-        # correct, but (2) might be fine also.
-
         stop_time = max(stop_times)
         self.debug('stop time = %d', stop_time)
         self.debug('stop time = %s', gst.TIME_ARGS(stop_time))
@@ -281,9 +269,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.addWarning('large-timestamp-difference', fmt,
                                 feed, diff / gst.SECOND, priority=40)
 
-        # FIXME: I don't know what to do if we get a GST_CLOCK_TIME_NONE
-        # in the start_times. For now I am punting on this one. Yick.
-
         start_time = min(start_times)
         self.debug('start time = %s', gst.TIME_ARGS(start_time))
 
@@ -293,7 +278,6 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         self.activeFeed = feed
         self.uiState.set("active-eater", feed)
-        return True
 
 class SingleSwitch(Switch):
     logCategory = "single-switch"

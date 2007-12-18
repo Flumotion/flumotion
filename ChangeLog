@@ -1,5 +1,17 @@
 2007-12-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/combiners/switch/switch.py (Switch.init):
+	Remove self._started state variable -- subclasses should hack this
+	in if needed.
+	(Switch.configure_pipeline, Switch.install_logical_feed_watches)
+	(Switch.feedSetActive, Switch.feedSetInactive): Rework to provide
+	an activation api in terms of logical feeds instead of eaters, for
+	simpler client code.
+	(Switch.do_switch): Rename from try_switch(). Always succeed. The
+	caller is responsible for ensuring that the feed is active, if
+	necessary. Remove some comments fixed by improvements to the
+	switch gstreamer element.
+
 	* flumotion/component/component.py (BaseComponent._pollMemory): Be
 	less verbose.
 
