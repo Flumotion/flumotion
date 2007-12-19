@@ -23,98 +23,84 @@ __version__ = "$Rev$"
 
 
 import os
+import gettext
 
 import gobject
 import gtk
-
+from kiwi.ui.objectlist import ObjectList, Column
 from flumotion.admin import connections
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
+_ = gettext.gettext
+
+def format_timestamp(stamp):
+    return stamp.strftime('%x')
+
 class Connections(GladeWidget):
     glade_file = 'connections.glade'
 
-    (STR_COL,
-     FILE_COL,
-     STATE_COL) = range(3)
-
-    model = None
-    gsignal('has-selection', bool)
+    gsignal('have-connection', bool)
     gsignal('connection-activated', object)
-
-    treeview_connections = None
 
     def __init__(self):
         GladeWidget.__init__(self)
-        v = self.treeview_connections
 
-        c = gtk.TreeViewColumn('Host', gtk.CellRendererText(),
-                               text=self.STR_COL)
-        v.append_column(c)
+        columns = [Column("host", title=_("Hostname")),
+                   Column("timestamp", title=_("Last used"),
+                          sorted=True,
+                          order=gtk.SORT_DESCENDING,
+                          format_func=format_timestamp),
+                   ]
+        self._connections = ObjectList(
+            columns,
+            objects=connections.get_recent_connections(),
+            mode=gtk.SELECTION_SINGLE)
+        self._connections.connect(
+            'row-activated',
+            self._on_objectlist_row_activated)
+        self._connections.connect(
+            'selection-changed',
+            self._on_objectlist_selection_changed)
+        self._connections.set_size_request(-1, 160)
+        self.page.pack_start(self._connections)
+        self.page.reorder_child(self._connections, 0)
+        if len(self._connections):
+            self._connections.select(self._connections[0])
+        self._connections.show()
 
-        self._populate_liststore()
-        v.set_model(self.model)
+    def _clear_all(self):
+        for conn in self._connections:
+            os.unlink(conn.filename)
+        self._connections.clear()
 
-        # Bizarre. This doesn't work at all.
-        #self.scrolledwindow1.set_property('can-focus', False)
+    def _clear(self, conn):
+        self._connections.remove(conn)
+        os.unlink(conn.filename)
 
-        self.connect('grab-focus', self.on_grab_focus)
-
-        s = self.treeview_connections.get_selection()
-        s.set_mode(gtk.SELECTION_SINGLE)
-        if self.model.get_iter_first():
-            s.select_path((0,))
-            self.emit('has-selection', True)
-        else:
-            self.emit('has-selection', False)
-
-    def _populate_liststore(self):
-        self.model = gtk.ListStore(str, str, object)
-        for x in connections.get_recent_connections():
-            i = self.model.append()
-            self.model.set(i, self.STR_COL, x['name'], self.FILE_COL, x['file'],
-                           self.STATE_COL, x['info'])
-
-    def _clear_iter(self, i):
-        os.unlink(self.model.get_value(i, self.FILE_COL))
-        self.model.remove(i)
-
-    def on_grab_focus(self, *args):
-        v = self.treeview_connections
-        model, i = v.get_selection().get_selected()
-        if model:
-            v.scroll_to_cell(model[i].path, None, True, 0.5, 0)
-            v.grab_focus()
-        return True
-
-    def on_clear_all(self, *args):
-        m = self.model
-        i = m.get_iter_first()
-        while i:
-            self._clear_iter(i)
-            i = m.get_iter_first()
-        self.emit('has-selection', False)
-
-    def on_clear(self, *args):
-        s = self.treeview_connections.get_selection()
-        model, i = s.get_selected()
-        if i:
-            self._clear_iter(i)
-            if model.get_iter_first():
-                s.select_path((0,))
-            else:
-                self.emit('has-selection', False)
-
-    def on_row_activated(self, *args):
-        self.emit('connection-activated', self.get_selected())
+    # Public API
 
     def get_selected(self):
-        s = self.treeview_connections.get_selection()
-        model, i = s.get_selected()
-        if i:
-            return model.get_value(i, self.STATE_COL)
-        else:
-            return None
+        return self._connections.get_selected()
+
+    def update(self, connection):
+        os.utime(connection.filename, None)
+
+    # Callbacks
+
+    def on_button_clear_clicked(self, button):
+        conn = self._connections.get_selected()
+        self._clear(conn)
+
+    def on_button_clear_all_clicked(self, button):
+        self._clear_all()
+
+    def _on_objectlist_row_activated(self, connections, connection):
+        self.emit('connection-activated', connection)
+
+    def _on_objectlist_selection_changed(self, connections, connection):
+        self.emit('have-connection', bool(connection))
+
 gobject.type_register(Connections)
 
 

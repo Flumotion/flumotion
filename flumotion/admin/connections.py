@@ -22,12 +22,26 @@
 __version__ = "$Rev$"
 
 
+import datetime
 import os
 from xml.dom import minidom, Node
 
 from flumotion.configure import configure
 from flumotion.common import connection, errors, log
 from flumotion.twisted import pb as fpb
+
+
+class RecentConnection(object):
+    def __init__(self, host, filename, info):
+        self.host = host
+        self.filename = filename
+        self.info = info
+        self.timestamp = datetime.datetime.fromtimestamp(
+            os.stat(filename).st_ctime)
+
+    def update_timestamp(self):
+        os.utime(self.filename, None)
+
 
 def get_recent_connections():
     def parse_connection(f):
@@ -58,9 +72,9 @@ def get_recent_connections():
         for f in [x[1] for x in files]:
             try:
                 state = parse_connection(f)
-                ret.append({'name': str(state),
-                            'file': f,
-                            'info': state})
+                ret.append(RecentConnection(str(state),
+                                            filename=f,
+                                            info=state))
             except Exception, e:
                 log.warning('connections', 'Error parsing %s: %r', f, e)
         return ret
@@ -77,7 +91,7 @@ def parsePBConnectionInfo(managerString, use_ssl=True,
     recent = get_recent_connections()
     if not managerString:
         if recent:
-            return recent[0]['info']
+            return recent[0].info
         else:
             raise errors.OptionError('No string given and no recent '
                                      'connections to use')
@@ -101,14 +115,14 @@ def parsePBConnectionInfo(managerString, use_ssl=True,
 
     if not info.authenticator.username:
         for c in recent:
-            recent = c['info']
+            recent = c.info
             if compatible(info, recent):
                 info.authenticator.username = recent.authenticator.username
                 info.authenticator.password = recent.authenticator.password
                 break
     elif not info.authenticator.password:
         for c in recent:
-            recent = c['info']
+            recent = c.info
             if compatible(info, recent):
                 info.authenticator.password = recent.authenticator.password
                 break

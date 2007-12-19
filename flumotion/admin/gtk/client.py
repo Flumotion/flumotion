@@ -351,11 +351,11 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._uimgr.ensure_update()
 
         def recent_activate(action, conn):
-            self._open_connection(conn['info'])
+            self._open_connection(conn.info)
 
         ui = ""
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
-            name = conn['name']
+            name = conn.host
             ui += '<menuitem action="%s"/>' % name
             action = gtk.Action(name, name, '', '')
             action.connect('activate', recent_activate, conn)
@@ -419,7 +419,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         self._admin = None
 
     def _open_connection(self, connectionInfo):
-        i = connectionInfo
+        i = connectionInfo.info
         model = AdminModel()
         d = model.connectToManager(i)
 
@@ -838,6 +838,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         def on_have_connection(d, connectionInfo):
             d.destroy()
             self._open_connection(connectionInfo)
+            connectionInfo.update_timestamp()
 
         d.connect('have-connection', on_have_connection)
         d.show()

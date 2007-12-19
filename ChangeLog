@@ -1,5 +1,24 @@
 2007-12-19  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/connections.glade:
+	* flumotion/admin/gtk/connections.py (Connections): 
+	Reuse using ObjectList. Add a new column and sorting
+
+	* flumotion/admin/connections.py (RecentConnection): New class, 
+	use this instead of a dictionary to represent a recently
+	used connection
+
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/text/greeter.py:
+	Update callsites
+
+	* flumotion/admin/gtk/client.py:
+	Update the timestamp after successfully connecting to a manager
+
+	Fixes #810
+
+2007-12-19  Johan Dahlin  <johan@gnome.org>
+
 	* misc/pycheckerrc (blacklist): Add kiwi and kiwi.ui
 
 2007-12-19  Michael Smith <msmith@fluendo.com>

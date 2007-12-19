@@ -139,8 +139,10 @@ class LoadConnection(WizardStep):
         self.button_next.emit('clicked')
 
     def on_next(self, state):
-        info = self.connections.get_selected()
-        for k, v in (('host', info.host), ('port', info.port),
+        connection = self.connections.get_selected()
+        info = connection.info
+        for k, v in (('host', info.host),
+                     ('port', info.port),
                      ('use_insecure', not info.use_ssl),
                      ('user', info.authenticator.username),
                      ('passwd', info.authenticator.password)):

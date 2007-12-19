@@ -58,9 +58,9 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         for c in self.connections:
             self.debug("cury: %d", cury)
             if cury - 3 == self.current_connection:
-                self.stdscr.addstr(cury, 10, c['name'], curses.A_REVERSE)
+                self.stdscr.addstr(cury, 10, c.name, curses.A_REVERSE)
             else:
-                self.stdscr.addstr(cury, 10, c['name'])
+                self.stdscr.addstr(cury, 10, c.name)
             if cury + 10 > maxyx[0]:
                 break
             cury = cury + 1
@@ -110,7 +110,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     # ok a recent connection has been selected
                     curses.curs_set(1)
                     c = self.connections[self.current_connection]
-                    info = c['info']
+                    info = c.info
                     reactor.removeReader(self)
                     connection.connect_to_manager(self.stdscr, info)
         else:
