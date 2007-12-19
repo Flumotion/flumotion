@@ -746,8 +746,6 @@ class Vishnu(log.Loggable):
         def stopLost():
             def gotComponents(comps):
                 return avatarId in comps
-            def gotError(failure):
-                sdfa
             def gotJobRunning(running):
                 if running:
                     self.warning('asked to stop lost component %r, but '
@@ -764,7 +762,7 @@ class Vishnu(log.Loggable):
             if workerName and self.workerHeaven.hasAvatar(workerName):
                 self.debug('checking if component has job process running')
                 d = self.workerHeaven.getAvatar(workerName).getComponents()
-                d.addCallbacks(gotComponents, gotError)
+                d.addCallback(gotComponents)
                 d.addCallback(gotJobRunning)
                 return d
             else:
@@ -787,16 +785,8 @@ class Vishnu(log.Loggable):
         def cleanupAndDisconnectComponent(result):
             return componentAvatar.disconnect()
 
-        def setSleeping(result):
-            if componentState.get('mood') == moods.sad.value:
-                self.debug('clearing sad mood after having stopped component')
-                componentState.setMood(moods.sleeping.value)
-
-            return result
-
         d = componentAvatar.stop()
         d.addCallback(cleanupAndDisconnectComponent)
-        d.addCallback(setSleeping)
 
         return d
         

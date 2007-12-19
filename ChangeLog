@@ -1,5 +1,11 @@
 2007-12-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py
+	(Vishnu._componentStopNoAvatar.stopLost)
+	(Vishnu._componentStopWithAvatar): 
+	* flumotion/common/planet.py
+	(ManagerComponentState.clearJobState): Fix #793.
+
 	* flumotion/component/combiners/switch/switch.py
 	(Switch.do_check): Check for a sufficiently new switch.
 

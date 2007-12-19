@@ -312,20 +312,19 @@ class ManagerComponentState(flavors.StateCacheable):
         self._jobState.removeListener(self)
         self._jobState = None
 
-        # Clearing a job state means that a component logged out. If we
-        # were sad, leave the mood as it is. Otherwise if shut down due
-        # to an explicit manager request, go to sleeping. Otherwise, go
-        # to lost, because it got disconnected for an unknown reason
-        # (probably network related)
-        if self.get('mood') != moods.sad.value:
-            if shutdownRequested:
-                log.debug('componentstate', "Shutdown was requested, %s"
-                          " now sleeping", self.get('name'))
-                self.setMood(moods.sleeping.value)
-            else:
-                log.debug('componentstate', "Shutdown was NOT requested,"
-                          " %s now lost", self.get('name'))
-                self.setMood(moods.lost.value)
+        # Clearing a job state means that a component logged out. If the
+        # component logs out due to an explicit manager request, go to
+        # sleeping. Otherwise if the component is sad, leave the mood as
+        # it is, or otherwise go to lost, because it got disconnected
+        # for an unknown reason (probably network related).
+        if shutdownRequested:
+            log.debug('componentstate', "Shutdown was requested, %s"
+                      " now sleeping", self.get('name'))
+            self.setMood(moods.sleeping.value)
+        elif self.get('mood') != moods.sad.value:
+            log.debug('componentstate', "Shutdown was NOT requested,"
+                      " %s now lost", self.get('name'))
+            self.setMood(moods.lost.value)
 
 class AdminComponentState(flavors.StateRemoteCache):
     """
