@@ -1,3 +1,7 @@
+2007-12-19  Johan Dahlin  <johan@gnome.org>
+
+	* misc/pycheckerrc (blacklist): Add kiwi and kiwi.ui
+
 2007-12-19  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/command/commands.py:
