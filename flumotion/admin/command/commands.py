@@ -195,6 +195,10 @@ def _parse_typed_args(spec, args):
                 return dict(accum)
             elif argtype == '{':
                 accum.append(_do_parse_typed_args(spec, args))
+            elif argtype == ']':
+                return accum
+            elif argtype == '[':
+                accum.append(_do_parse_typed_args(spec, args))
             elif argtype not in parsers:
                 raise ParseException('Unknown argument type: %r'
                                      % argtype)

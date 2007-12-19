@@ -1,3 +1,8 @@
+2007-12-19  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/command/commands.py:
+	  Allow lists in flumotion-command invoke arguments.
+
 2007-12-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py
