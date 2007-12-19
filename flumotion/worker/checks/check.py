@@ -145,15 +145,27 @@ def checkElements(elementNames):
     log.debug('check', 'checkElements: returning elements names %r', ret)
     return ret
 
-def checkPlugin(pluginName, packageName, minimumVersion=None):
+def checkPlugin(pluginName, packageName, minimumVersion=None,
+                featureName=None, featureCheck=None):
     """
     Check if the given plug-in is available.
     Return a result with an error if it is not, or not new enough.
 
+    @param pluginName: name of the plugin to check
+    @param packageName: name of the package to tell the user to install
+    if the check fails
+    @param minimumVersion: minimum version of the plugin, as a tuple.
+    Optional.
+    @param featureName: name of a specific feature to check for in the
+    plugin. Optional. Overrides the minimum version check, if given.
+    @param featureCheck: function to call on the found feature, which
+    should return a boolean representing whether the feature is good or
+    not. Optional, and only makes sense if you specify featureName.
     @rtype: L{messages.Result}
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version(pluginName)
+
     if not version:
         m = messages.Error(T_(
             N_("This host is missing the '%s' GStreamer plug-in.\n"),
@@ -161,16 +173,28 @@ def checkPlugin(pluginName, packageName, minimumVersion=None):
         m.add(T_(N_(
             "Please install '%s'.\n"), packageName))
         result.add(m)
-    else:
-        if version < minimumVersion:
+    elif featureName:
+        r = gst.registry_get_default()
+        features = r.get_feature_list_by_plugin(pluginName)
+        byname = dict([(f.get_name(), f) for f in features])
+        if (featureName not in byname
+            or (featureCheck and not featureCheck(byname[featureName]))):
             m = messages.Error(T_(
-                N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
-                   ".".join([str(x) for x in version]), pluginName),
+                N_("Your '%s' GStreamer plug-in is too old.\n"), pluginName),
                 id = 'plugin-%s-check' % pluginName)
             m.add(T_(N_(
-                "Please upgrade '%s' to version %s."), packageName,
-                   ".".join([str(x) for x in minimumVersion])))
+                "Please upgrade '%s' to version %s or development packages."),
+                packageName, ".".join([str(x) for x in minimumVersion])))
             result.add(m)
+    elif version < minimumVersion:
+        m = messages.Error(T_(
+            N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
+               ".".join([str(x) for x in version]), pluginName),
+            id = 'plugin-%s-check' % pluginName)
+        m.add(T_(N_(
+            "Please upgrade '%s' to version %s."), packageName,
+               ".".join([str(x) for x in minimumVersion])))
+        result.add(m)
 
     result.succeed(None)
     return defer.succeed(result)

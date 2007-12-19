@@ -23,6 +23,7 @@ __version__ = "$Rev$"
 
 import sets
 import gst
+import gobject
 
 from twisted.internet import defer, reactor
 
@@ -125,13 +126,19 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.state.remove('messages', m)
 
     def do_check(self):
+        def checkSignal(fact):
+            fact = fact.load()
+            signals = gobject.signal_list_names(fact.get_element_type())
+            return 'block' in signals
+
         def cb(result):
             for m in result.messages:
                 self.addMessage(m)
             return result.value
 
         self.debug("checking for switch element")
-        d = check.checkPlugin('switch', 'gst-plugins-bad', (0, 10, 5, 1))
+        d = check.checkPlugin('switch', 'gst-plugins-bad', (0, 10, 5, 2),
+                              'switch', checkSignal)
         d.addCallback(cb)
         return d
 

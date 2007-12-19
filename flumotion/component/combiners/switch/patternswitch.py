@@ -63,8 +63,8 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
             evt_struct = event.get_structure()
             if evt_struct.get_name() == 'FluStreamMark':
                 if evt_struct['action'] == 'start':
-                    self.switch_to_for_event("backup", True)
+                    self.switch_to("backup")
 
                 elif evt_struct['action'] == 'stop':
-                    self.switch_to_for_event("master", False)
+                    self.switch_to("master")
         return True

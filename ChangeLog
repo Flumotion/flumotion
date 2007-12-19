@@ -1,3 +1,15 @@
+2007-12-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/combiners/switch/switch.py
+	(Switch.do_check): Check for a sufficiently new switch.
+
+	* flumotion/worker/checks/check.py (checkPlugin): Add crack to
+	allow user-defined checks to be run on particular plugin features.
+
+	* flumotion/component/combiners/switch/patternswitch.py
+	(PatternEventSwitcher._markers_event_probe): Minor fixes; this one
+	is still bitrotten. Not an AP tho.
+
 2007-12-18  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py
