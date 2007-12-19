@@ -26,6 +26,7 @@ import gobject
 import gtk
 
 from flumotion.common import planet, errors, common, log
+from flumotion.common import componentui # ensure unjellier registered
 
 
 class NodeBook(gtk.Notebook):

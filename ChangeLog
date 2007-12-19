@@ -1,3 +1,8 @@
+2007-12-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/componentview.py: Make sure unjelliers
+	for the componentui are registered.
+
 2007-12-19  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/connections.glade:
