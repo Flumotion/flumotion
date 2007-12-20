@@ -927,7 +927,6 @@ class RegistryDirectory(log.Loggable):
                 self.debug("Failed to stat file %s, need to rescan", f)
                 return True
 
-        assert self._files, "Path %s does not have registry files" % self._path
         for f in self._files:
             if _rebuildNeeded(f):
                 return True
