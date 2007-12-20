@@ -1,5 +1,11 @@
 2007-12-20  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/effects/volume/admin_gtk.py (VolumeAdminGtkNode.volumeSet): 
+        Ensure that the scale has an adjustment.
+        This is not a proper solution to a problem that can be when switching 
+	components, but it avoids an unexpected segfault in set_value which expects
+        range->adjustment to be non-NULL
+
 	* flumotion/common/registry.py (RegistryDirectory._rebuildNeeded): 
 	Remove bogus assert, so FLU_PROJECT_PATH can be set to a directory
 	without registry files. Makes it possible to have a unified environment
@@ -28,7 +34,7 @@
 	Update the timestamp after successfully connecting to a manager
 
 	Fixes #810
-
+	
 2007-12-19  Johan Dahlin  <johan@gnome.org>
 
 	* misc/pycheckerrc (blacklist): Add kiwi and kiwi.ui

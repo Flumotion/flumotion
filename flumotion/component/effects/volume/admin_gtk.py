@@ -139,6 +139,14 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     # when volume has been set by another admin client
     def volumeSet(self, volume):
         self._hscale.handler_block(self._scale_changed_id)
+
+        # Ensure that the scale has an adjustment.
+        # This is not a proper solution to a problem that
+        # can be when switching components, but it avoids an
+        # unexpected segfault in set_value which expects
+        # range->adjustment to be non-NULL
+        self._hscale.get_adjustment()
+
         self._hscale.set_value(volume)
         self.debug("volume: %f", volume)
         dB = "- inf"
