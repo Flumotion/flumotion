@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/twisted
 
 flumotion_PYTHON = \
@@ -10,7 +10,6 @@ flumotion_PYTHON = \
 	defer.py \
 	fdserver.py \
 	flavors.py \
-	http.py \
 	integration.py \
 	pb.py \
 	portal.py \

@@ -31,13 +31,11 @@ import sys
 import re
 import types
 
-
-from twisted.web import server, resource, util
-from twisted.internet import reactor, defer
+from twisted.web import http
+from twisted.web import server, resource
+from twisted.internet import defer
 
 from twisted.python import log, failure, reflect
-
-from flumotion.twisted import http
 
 try:
     from twisted.protocols._c_urlarg import unquote

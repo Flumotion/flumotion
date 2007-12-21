@@ -1,5 +1,14 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/rtsp.py:
+	* po/POTFILES.in:
+
+	Remove flumotion.twisted.http and import twisted.web.http directly,
+	since we're requiring twisted 2.0 anyway.
+
+2007-12-21  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/*: Make pyflakes clean
 
 	* flumotion/component/encoders/encodingprofile.py (Int.__init__): 

@@ -43,7 +43,6 @@ flumotion/common/avltree.py
 flumotion/common/gstreamer.py
 flumotion/common/python.py
 flumotion/common/connection.py
-flumotion/twisted/http.py
 flumotion/twisted/integration.py
 flumotion/twisted/flavors.py
 flumotion/twisted/credentials.py
