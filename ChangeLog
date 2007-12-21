@@ -1,5 +1,10 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/admin/main.py (__version__): 
+	* flumotion/admin/command/main.py (__version__): 
+	* flumotion/admin/text/main.py (__version__): 
+	Remove pyflakes hacks, since it breaks pychecker
+
 	* flumotion/twisted/Makefile.am:
 	* flumotion/twisted/rtsp.py:
 	* po/POTFILES.in:

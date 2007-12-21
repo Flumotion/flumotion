@@ -35,8 +35,6 @@ from flumotion.common import messages
 from flumotion.admin.command.commands import commands
 from flumotion.common.options import OptionParser
 
-messages # pyflakes
-
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')
     sys.exit(1)

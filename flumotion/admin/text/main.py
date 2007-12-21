@@ -30,8 +30,6 @@ from flumotion.admin.text.greeter import AdminTextGreeter
 from flumotion.common import messages # make Message proxyable
 from flumotion.common.options import OptionParser
 
-messages # pyflakes
-
 def cleanup_curses(stdscr):
     curses.nocbreak()
     stdscr.keypad(0)

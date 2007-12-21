@@ -36,8 +36,6 @@ from flumotion.common.messages import N_
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
-planet, worker # pyflakes
-
 T_ = messages.gettexter('flumotion')
 
 
