@@ -1,5 +1,8 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/text/view.py:
+	Make sure it works again after some things got moved around
+
 	* flumotion/admin/connections.py (RecentConnection.__init__): 
 	set the name attribute which is used by the text client
 

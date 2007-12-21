@@ -226,7 +226,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             lexicalVariableHack.append(res)
             self.debug("entry for %r of type %s is in file %s and method %s",
                        componentState, type, fileName, methodName)
-            return self.bundleLoader.getBundles(fileName=fileName)
+            return self.admin.bundleLoader.getBundles(fileName=fileName)
 
         def gotBundles(res):
             name, bundlePath = res[-1]
@@ -253,7 +253,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             if key == 'mood':
                 # this is needed so UIs load if they change to happy
                 # get bundle for component
-                d = self.admin.getEntry(state, 'admin/text')
+                d = self.getEntry(state, 'admin/text')
                 d.addCallback(self.gotEntryCallback, state.get('name'))
                 d.addErrback(self.gotEntryNoBundleErrback, state.get('name'))
                 d.addErrback(self.gotEntrySleepingComponentErrback)
@@ -269,7 +269,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             component.addListener(self, compStateSet)
 
             # get bundle for component
-            d = self.admin.getEntry(component, 'admin/text')
+            d = self.getEntry(component, 'admin/text')
             d.addCallback(self.gotEntryCallback, name)
             d.addErrback(self.gotEntryNoBundleErrback, name)
             d.addErrback(self.gotEntrySleepingComponentErrback)
