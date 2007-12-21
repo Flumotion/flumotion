@@ -31,21 +31,41 @@ __all__ = ['register_icons']
 
 def _register_stock_icons(names):
     ifact = gtk.IconFactory()
-    sizes = {gtk.ICON_SIZE_MENU:16, gtk.ICON_SIZE_SMALL_TOOLBAR:24}
-    for name in names:
+    for stock_name, filenames in names:
         iset = gtk.IconSet()
-        for size, px in sizes.items():
+        for filename in filenames:
             isource = gtk.IconSource()
-            f = os.path.join(configure.imagedir, '%dx%d' % (px,px),
-                             name + '.png')
+            f = os.path.join(configure.imagedir, filename)
             isource.set_filename(f)
-            isource.set_size(size)
+            if filename.startswith('16x16'):
+                size = gtk.ICON_SIZE_MENU
+            elif filename.startswith('24x24'):
+                size = gtk.ICON_SIZE_SMALL_TOOLBAR
+            else:
+                size = None
+            if size:
+                isource.set_size(size)
             iset.add_source(isource)
-        ifact.add('flumotion-' + name, iset)
+        ifact.add(stock_name, iset)
     ifact.add_default()
 
 def register_icons():
     iconfile = os.path.join(configure.imagedir, 'fluendo.png')
     gtk.window_set_default_icon_from_file(iconfile)
 
-    _register_stock_icons(['wizard', 'play', 'pause', 'about'])
+    _register_stock_icons([
+        ('flumotion-wizard', ['16x16/wizard.png',
+                              '24x24/wizard.png']),
+        ('flumotion-play', ['16x16/play.png',
+                              '24x24/play.png']),
+        ('flumotion-pause', ['16x16/pause.png',
+                              '24x24/pause.png']),
+        ('flumotion-about', ['16x16/about.png',
+                              '24x24/about.png']),
+        ('flumotion-mood-happy', ['mood-happy.png']),
+        ('flumotion-mood-hungry', ['mood-hungry.png']),
+        ('flumotion-mood-lost', ['mood-lost.png']),
+        ('flumotion-mood-sad', ['mood-sad.png']),
+        ('flumotion-mood-sleeping', ['mood-sleeping.png']),
+        ('flumotion-mood-waking', ['mood-waking.png']),
+        ])
