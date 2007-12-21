@@ -31,11 +31,11 @@ from flumotion.admin import connections
 from flumotion.common import log, errors
 # make Message proxyable
 from flumotion.common import messages
-from flumotion.configure import configure
-from flumotion.twisted import pb as fpb
 
 from flumotion.admin.command.commands import commands
 from flumotion.common.options import OptionParser
+
+messages # pyflakes
 
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')

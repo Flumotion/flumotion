@@ -26,7 +26,7 @@ import sys
 
 import gettext
 
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.python import log as twistedlog
 
 from flumotion.admin import connections

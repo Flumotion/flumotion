@@ -29,17 +29,17 @@ from twisted.internet import error, defer, reactor
 from zope.interface import implements
 
 from flumotion.common import common, errors, interfaces, log
-from flumotion.common import keycards, planet, medium, package
-from flumotion.common import messages, signals, connection
+from flumotion.common import medium
+from flumotion.common import messages, signals
+from flumotion.common import planet, worker # register jelly
+from flumotion.common.messages import N_
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
-# these two imports are for their side effects of jelly type
-# registration
-from flumotion.common import planet, worker
+planet, worker # pyflakes
 
-from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
+
 
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     perspectiveInterface = interfaces.IAdminMedium

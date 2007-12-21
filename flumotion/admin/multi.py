@@ -24,8 +24,7 @@ __version__ = "$Rev$"
 
 from twisted.internet import defer
 
-from flumotion.twisted import pb as fpb
-from flumotion.common import log, planet, connection, errors, startset
+from flumotion.common import log, planet, errors, startset
 from flumotion.admin import admin
 
 
@@ -115,12 +114,12 @@ class MultiAdminModel(log.Loggable):
                                      self._managerDisconnected))
             self._reconnectHandlerIds[admin.managerId] = admin, ids
 
-        planet = admin.planet
+        adminplanet = admin.planet
         self.info('Connected to manager %s (planet %s)',
-                  admin.managerId, planet.get('name'))
+                  admin.managerId, adminplanet.get('name'))
         assert admin.managerId not in self.admins
         self.admins[admin.managerId] = admin
-        self.emit('addPlanet', admin, planet)
+        self.emit('addPlanet', admin, adminplanet)
 
     def _managerDisconnected(self, admin):
         if admin.managerId in self.admins:

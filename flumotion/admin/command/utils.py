@@ -22,7 +22,7 @@
 __version__ = "$Rev$"
 
 from flumotion.twisted.defer import defer_generator
-from flumotion.common import componentui, errors
+from flumotion.common import errors
 
 def avatarId(string):
     split = string.split('/')

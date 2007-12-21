@@ -21,24 +21,16 @@
 
 __version__ = "$Rev$"
 
+import curses
+
 from twisted.internet import reactor
-from twisted.python import rebuild
-
-from flumotion.common import log, errors, worker, planet, common
-from flumotion.common.options import OptionGroup, OptionParser
-
-# make Message proxyable
-from flumotion.common import messages
-
-from flumotion.configure import configure
-from flumotion.twisted import flavors, reflect
-
-#from flumotion.admin import connections
 
 from flumotion.admin.text import connection
 from flumotion.admin.text.greeter import AdminTextGreeter
+from flumotion.common import messages # make Message proxyable
+from flumotion.common.options import OptionParser
 
-import curses
+messages # pyflakes
 
 def cleanup_curses(stdscr):
     curses.nocbreak()

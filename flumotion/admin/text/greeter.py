@@ -25,7 +25,7 @@ __version__ = "$Rev$"
 
 from flumotion.admin import connections
 from flumotion.common import log, connection as fconnection
-from flumotion.twisted import flavors, reflect, pb as fpb
+from flumotion.twisted import flavors, pb as fpb
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
 

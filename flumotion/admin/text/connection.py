@@ -25,7 +25,6 @@ import curses
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.text.view import AdminTextView
-from flumotion.twisted import flavors, reflect, pb as fpb
 from flumotion.common import errors
 
 from twisted.internet import reactor

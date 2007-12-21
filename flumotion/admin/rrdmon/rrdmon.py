@@ -28,8 +28,6 @@ import rrdtool
 import datetime
 import time
 
-from dateutil import rrule
-
 from flumotion.admin import multi
 from flumotion.common import log, common
 from flumotion.component.base import scheduler
@@ -37,6 +35,7 @@ from flumotion.component.base import scheduler
 # register the unjellyable
 from flumotion.common import componentui
 
+componentui # pyflakes
 
 """RRD resource poller daemon for Flumotion.
 

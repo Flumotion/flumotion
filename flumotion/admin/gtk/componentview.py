@@ -28,6 +28,7 @@ import gtk
 from flumotion.common import planet, errors, common, log
 from flumotion.common import componentui # ensure unjellier registered
 
+componentui # pyflakes
 
 class NodeBook(gtk.Notebook):
     def __init__(self, admingtk):

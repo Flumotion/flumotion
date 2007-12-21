@@ -27,10 +27,8 @@ import sys
 from twisted.internet import reactor
 
 from flumotion.configure import configure
-from flumotion.common import log, keycards, common, errors
-from flumotion.common import connection
+from flumotion.common import log, common
 from flumotion.admin.rrdmon import rrdmon, config
-from flumotion.twisted import pb
 from flumotion.common.options import OptionGroup, OptionParser
 
 # more standard helper functions necessary...

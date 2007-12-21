@@ -49,6 +49,8 @@ from flumotion.twisted.flavors import IStateListener
 from flumotion.twisted.pb import Authenticator
 from flumotion.ui.trayicon import FluTrayIcon
 
+admin # pyflakes
+
 _ = gettext.gettext
 T_ = gettexter('flumotion')
 
@@ -974,6 +976,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
     def _start_shell(self):
         if sys.version_info >= (2, 4):
             from flumotion.extern import code
+            code # pyflakes
         else:
             import code
 

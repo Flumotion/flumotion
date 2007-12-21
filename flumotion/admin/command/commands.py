@@ -23,13 +23,11 @@ __version__ = "$Rev$"
 import os
 
 from twisted.internet import defer
-from zope.interface import implements
 
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
 from flumotion.common import errors, log, componentui, common
-from flumotion.twisted import flavors
 
 __all__ = ['commands']
 

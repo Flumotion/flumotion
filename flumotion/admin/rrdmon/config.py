@@ -23,9 +23,6 @@ __version__ = "$Rev$"
 
 import os
 
-from xml.dom import Node
-
-from flumotion.configure import configure
 from flumotion.common import common, config, connection
 from flumotion.common.errors import ConfigError
 
