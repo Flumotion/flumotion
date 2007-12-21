@@ -1,5 +1,8 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/encoders/encodingprofile.py (Int.__init__): 
+	Don't use **kwargs to make pychecker happy
+
 	* flumotion/ui/icons.py (register_icons): Refactor the icon registration
 	to be generic and explicit. Register stock icons for all moods, to be
 	used by the admin client.

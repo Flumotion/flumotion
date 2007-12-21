@@ -57,8 +57,8 @@ class Int(Property):
     """
     I am an integer property
     """
-    def __init__(self, name, nick, default, minimum, maximum, **kwargs):
-        Property.__init__(self, name, nick, default, datatype=int, **kwargs)
+    def __init__(self, name, nick, default, minimum, maximum):
+        Property.__init__(self, name, nick, default, datatype=int)
         self.minimum = minimum
         self.maximum = maximum
 
