@@ -1,5 +1,8 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/simplewizard.py (SimpleWizard.__init__): Forgot to 
+	commit which should have been a part of the fix for rev 6014
+
 	* flumotion/component/encoders/*: 
 
 	Add encoding profiles and encoding wizard plugins, 

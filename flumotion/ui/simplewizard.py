@@ -152,6 +152,10 @@ class SimpleWizard(GladeWindow):
         assert self.name
         assert self.steps
 
+        # HACK warning, it would be better to pass in the wizard
+        # to each step
+        self.window1.wizard = self
+
         # instantiate steps
         for cls in self.steps:
             page = cls(self, self.name + '-')
@@ -211,6 +215,9 @@ class SimpleWizard(GladeWindow):
     def on_delete_event(self, *window):
         self.state = None
         self.emit('finished')
+
+    def next(self):
+        self.on_next(self.widgets['button_next'])
 
     def on_next(self, button):
         button.set_sensitive(False)
