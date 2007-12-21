@@ -33,6 +33,7 @@ from flumotion.twisted import pb as fpb
 
 class RecentConnection(object):
     def __init__(self, host, filename, info):
+        self.name = str(info)
         self.host = host
         self.filename = filename
         self.info = info

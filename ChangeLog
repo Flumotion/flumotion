@@ -1,3 +1,14 @@
+2007-12-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/connections.py (RecentConnection.__init__): 
+	set the name attribute which is used by the text client
+
+	* flumotion/admin/text/greeter.py (AdminTextGreeter.connectionLost): 
+	Implement a stub here, it might be called if an error happens very early on
+
+	* flumotion/admin/text/connection.py (connected): 
+	Add some tracebacks helper, to print clean tracebacks instead of curses mangled ones	
+
 2007-12-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/effects/volume/admin_gtk.py (VolumeAdminGtkNode.volumeSet): 

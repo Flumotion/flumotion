@@ -21,6 +21,8 @@
 
 __version__ = "$Rev$"
 
+import curses
+
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.text.view import AdminTextView
 from flumotion.twisted import flavors, reflect, pb as fpb
@@ -45,9 +47,19 @@ def connect_to_manager(stdscr, info):
         stdscr.clrtobot()
         stdscr.refresh()
 
-        view = AdminTextView(model, stdscr)
-        reactor.addReader(view)
-        view.show()
+        try:
+            view = AdminTextView(model, stdscr)
+            reactor.addReader(view)
+            view.show()
+        except Exception, e:
+            # Set everything back to normal
+            stdscr.keypad(0)
+            curses.echo()
+            curses.nocbreak()
+            curses.endwin()
+            # And print the the traceback
+            import traceback
+            traceback.print_exc()
 
     def refused(failure):
         failure.trap(errors.ConnectionRefusedError)

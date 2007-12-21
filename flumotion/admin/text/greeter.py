@@ -84,6 +84,9 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.stdscr.clrtobot()
         self.stdscr.refresh()
 
+    def connectionLost(self, failure):
+        pass
+
     def doRead(self):
         c= self.stdscr.getch()
         if self.state == 0:
