@@ -51,7 +51,7 @@ def connect_to_manager(stdscr, info):
             view = AdminTextView(model, stdscr)
             reactor.addReader(view)
             view.show()
-        except Exception, e:
+        except Exception:
             # Set everything back to normal
             stdscr.keypad(0)
             curses.echo()
