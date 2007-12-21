@@ -14,6 +14,8 @@
       <entries>
         <entry type="component" location="vorbis.py"
                function="Vorbis"/>
+        <entry type="wizard" location="vorbis_wizard.py"
+               function="VorbisWizardPlugin" />
       </entries>
     </component>
  
@@ -45,6 +47,20 @@
                 <filename location="vorbis.py" />
                 <filename location="vorbisutils.py" />
                 <filename location="vorbis010.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="vorbis-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="vorbis-base" />
+            <dependency name="encoding-wizard" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vorbis">
+                <filename location="vorbis_wizard.py" />
             </directory>
         </directories>
     </bundle>

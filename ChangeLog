@@ -1,5 +1,12 @@
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/encoders/*: 
+
+	Add encoding profiles and encoding wizard plugins, 
+	part of bug 812.
+	
+2007-12-21  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/text/connection.py (connected): Remove e,
 	should make pychecker happy.
 

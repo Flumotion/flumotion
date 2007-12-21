@@ -9,6 +9,8 @@
       <feeder name="default" />
       <entries>
         <entry type="component" location="speex.py" function="Speex" />
+        <entry type="wizard" location="speex_wizard.py"
+               function="SpeexWizardPlugin" />
       </entries>
       <properties>
         <property name="bitrate" type="int"
@@ -41,6 +43,20 @@
         <directories>
             <directory name="flumotion/component/encoders/speex">
                 <filename location="speex.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="speex-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="speex-base" />
+            <dependency name="encoding-wizard" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/speex">
+                <filename location="speex_wizard.py" />
             </directory>
         </directories>
     </bundle>

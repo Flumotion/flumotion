@@ -10,6 +10,8 @@
       <entries>
         <entry type="component" location="smoke.py"
                function="Smoke" />
+        <entry type="wizard" location="smoke_wizard.py"
+               function="SmokeWizardPlugin" />
       </entries>
       <properties>
         <property name="qmin" type="int"
@@ -48,6 +50,20 @@
         <directories>
             <directory name="flumotion/component/encoders/smoke">
                 <filename location="smoke.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="smoke-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="smoke-base" />
+            <dependency name="encoding-wizard" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/smoke">
+                <filename location="smoke_wizard.py" />
             </directory>
         </directories>
     </bundle>

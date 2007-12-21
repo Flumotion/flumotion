@@ -3,11 +3,16 @@ include $(top_srcdir)/common/python.mk
 componentdir = $(libdir)/flumotion/python/flumotion/component/encoders
 component_PYTHON = \
 	__init__.py
+component_DATA = \
+	base.xml \
+	encodingprofile.py \
+	encodingwizardplugin.py
 
 jpegdir = $(componentdir)/jpeg
 jpeg_PYTHON = \
 	jpeg/__init__.py \
 	jpeg/jpeg.py
+	jpeg/jpeg_wizard.py
 jpeg_DATA = \
 	jpeg/jpeg.xml
 
@@ -22,6 +27,7 @@ smokedir = $(componentdir)/smoke
 smoke_PYTHON = \
 	smoke/__init__.py \
 	smoke/smoke.py
+	smoke/smoke_wizard.py
 smoke_DATA = \
 	smoke/smoke.xml
 
@@ -29,6 +35,7 @@ speexdir = $(componentdir)/speex
 speex_PYTHON = \
 	speex/__init__.py \
 	speex/speex.py
+	speex/speex_wizard.py
 speex_DATA = \
 	speex/speex.xml
 
@@ -36,6 +43,7 @@ theoradir = $(componentdir)/theora
 theora_PYTHON = \
 	theora/__init__.py \
 	theora/theora.py
+	theora/theora_wizard.py
 theora_DATA = \
 	theora/theora.xml
 
@@ -45,6 +53,7 @@ vorbis_PYTHON = \
 	vorbis/vorbis.py \
 	vorbis/vorbisutils.py \
 	vorbis/vorbis010.py
+	vorbis/vorbis_wizard.py \
 vorbis_DATA = \
 	vorbis/vorbis.xml
 

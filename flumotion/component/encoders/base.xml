@@ -1,0 +1,15 @@
+<registry>
+  <bundles>
+    <bundle name="encoding-wizard">
+      <dependencies>
+        <dependency name="flumotion" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/encoders">
+          <filename location="encodingprofile.py" />
+          <filename location="encodingwizardplugin.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry> 

@@ -10,6 +10,8 @@
       <entries>
         <entry type="component" location="jpeg.py"
                function="JPEG" />
+        <entry type="wizard" location="jpeg_wizard.py"
+               function="JPEGWizardPlugin" />
       </entries>
       <properties>
         <property name="quality" type="int"
@@ -44,6 +46,21 @@
         <directories>
             <directory name="flumotion/component/encoders/jpeg">
                 <filename location="jpeg.py" />
+            </directory>
+        </directories>
+
+    </bundle>
+
+    <bundle name="jpeg-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="jpeg-base" />
+            <dependency name="encoding-wizard" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/jpeg">
+                <filename location="jpeg_wizard.py" />
             </directory>
         </directories>
     </bundle>
