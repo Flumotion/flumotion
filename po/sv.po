@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-05 18:40+0100\n"
-"PO-Revision-Date: 2007-12-05 18:40+0100\n"
+"PO-Revision-Date: 2007-12-24 10:13+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1362,7 +1362,7 @@ msgstr "_Avsluta"
 
 #: flumotion/admin/gtk/client.py:263
 msgid "_Manage"
-msgstr "_Hantera"
+msgstr "Ha_ntera"
 
 #: flumotion/admin/gtk/client.py:264
 msgid "_S_tart Component"

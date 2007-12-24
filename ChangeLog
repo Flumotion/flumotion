@@ -1,3 +1,7 @@
+2007-12-24  Johan Dahlin  <johan@gnome.org>
+
+	* po/sv.po: Avoid mnemonic conflict for menubar items
+
 2007-12-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/admin/main.py (__version__): 
