@@ -176,7 +176,7 @@ def _parse_typed_args(spec, args):
             contents = f.read()
             f.close()
             return contents
-        except:
+        except OSError:
             raise ParseException("Failed to read file %s" % (filename,))
 
     def _do_parse_typed_args(spec, args):
@@ -256,8 +256,6 @@ def do_invoke(model, quit, avatarId, methodName, *args):
         print "No method '%s' on component '%s'" % (methodName, avatarId)
     except errors.SleepingComponentError:
         print "Component %s not running." % avatarId[1]
-    except Exception, e:
-        raise
 
     quit()
 do_invoke = defer_generator(do_invoke)
@@ -279,8 +277,6 @@ def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
         print v
     except errors.NoMethodError:
         print "No method '%s' on component '%s'" % (methodName, workerName)
-    except Exception, e:
-        raise
 
     quit()
 do_workerinvoke = defer_generator(do_workerinvoke)
@@ -301,8 +297,6 @@ def do_workerremoteinvoke(model, quit, workerName, methodName, *args):
         print v
     except errors.NoMethodError:
         print "No method '%s' on component '%s'" % (methodName, workerName)
-    except Exception, e:
-        raise
 
     quit()
 do_workerremoteinvoke = defer_generator(do_workerremoteinvoke)
@@ -323,8 +317,6 @@ def do_managerinvoke(model, quit, methodName, *args):
         print v
     except errors.NoMethodError:
         print "No method '%s' on manager" % (methodName,)
-    except Exception, e:
-        raise
 
     quit()
 do_managerinvoke = defer_generator(do_managerinvoke)

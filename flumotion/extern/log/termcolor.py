@@ -91,16 +91,20 @@ class TerminalController:
         assumed to be a dumb terminal (i.e., have no capabilities).
         """
         # Curses isn't available on all platforms
-        try: import curses
-        except: return
+        try:
+            import curses
+        except ImportError:
+            return
 
         # If the stream isn't a tty, then assume it has no capabilities.
         if not term_stream.isatty(): return
 
         # Check the terminal type.  If we fail, then assume that the
         # terminal has no capabilities.
-        try: curses.setupterm()
-        except: return
+        try:
+            curses.setupterm()
+        except:
+            return
 
         # Look up numeric capabilities.
         self.COLS = curses.tigetnum('cols')

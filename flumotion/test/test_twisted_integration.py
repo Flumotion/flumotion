@@ -42,7 +42,7 @@ def _call_in_reactor(proc):
         return d
     try:
         test.__name__ = proc.__name__
-    except Exception:
+    except TypeError:
         # can only set procedure names in python >= 2.4
         pass
     return test

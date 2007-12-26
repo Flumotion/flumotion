@@ -310,7 +310,7 @@ class Porter(component.BaseComponent, log.Loggable):
             # creates Transports that we know how to pass FDs over.
             try:
                 os.unlink(self._socketPath)
-            except:
+            except OSError:
                 pass
 
             self._socketlistener = reactor.listenWith(
@@ -330,7 +330,7 @@ class Porter(component.BaseComponent, log.Loggable):
         try:
             proto = reflect.namedAny(self._porterProtocol)
             self.debug("Created proto %r" % proto)
-        except:
+        except (ImportError, AttributeError):
             self.warning("Failed to import protocol '%s', defaulting to HTTP" %
                 self._porterProtocol)
             proto = HTTPPorterProtocol

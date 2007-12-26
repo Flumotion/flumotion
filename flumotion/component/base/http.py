@@ -401,7 +401,7 @@ class LogFilter:
         mask = ~((1 << (32 - prefixlen)) - 1)
         try:
             net = struct.unpack(">I", socket.inet_pton(socket.AF_INET, net))[0]
-        except:
+        except socket.error:
             raise errors.ConfigError("Failed to parse network address %s" % net)
         net = net & mask # just in case
 

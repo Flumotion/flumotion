@@ -176,7 +176,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         f = pb.PBServerFactory(p)
         try:
             os.unlink(self._socketPath)
-        except:
+        except OSError:
             pass
 
         # Rather than a listenUNIX(), we use listenWith so that we can specify

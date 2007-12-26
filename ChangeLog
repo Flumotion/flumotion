@@ -1,5 +1,8 @@
 2007-12-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/*.py: Some simple low-hanging fruit cases of except: 
+	removed, part of bug #791
+
 	* flumotion/ui/wizard.py (_WalkableStack.skip_to): Cleanup, use
 	enumerate instead of range+len+getitem.
 

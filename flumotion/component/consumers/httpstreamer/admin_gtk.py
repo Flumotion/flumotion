@@ -42,7 +42,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         try:
             __import__('gnomevfs')
             self._hasgnomevfs = True
-        except:
+        except ImportError:
             pass
 
     def error_dialog(self, message):

@@ -456,7 +456,7 @@ def test(proc):
         return plan.execute()
     try:
         wrappedtest.__name__ = testName
-    except Exception:
+    except TypeError:
         # can only set procedure names in python >= 2.4
         pass
     # trial seems to require a timeout, at least in twisted 2.4, so give

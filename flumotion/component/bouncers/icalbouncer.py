@@ -40,7 +40,7 @@ try:
     from icalendar import Calendar
     from dateutil import rrule
     HAS_ICAL = True
-except:
+except ImportError:
     HAS_ICAL = False
 
 class IcalBouncer(bouncer.Bouncer):

@@ -91,7 +91,7 @@ def guess_public_hostname():
 
     try:
         return socket.gethostbyaddr(ip)[0]
-    except:
+    except socket.error:
         return ip
 
 def ipv4StringToInt(s):

@@ -308,10 +308,11 @@ def ensureDir(dir, description):
     if not os.path.exists(dir):
         try:
             os.makedirs(dir)
-        except:
+        except OSError, e:
             from flumotion.common import errors
-            raise errors.SystemError, "could not create %s directory %s" % (
-                description, dir)
+            raise errors.SystemError(
+                "could not create %s directory %s: %s" % (
+                description, dir, str(e)))
 
 def getPidPath(type, name=None):
     """

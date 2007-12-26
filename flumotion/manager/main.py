@@ -180,19 +180,17 @@ def main(args):
     if not options.certificate and options.transport == 'ssl':
         options.certificate = 'default.pem'
     if not options.name:
-        try:
-            # if the file is in a directory under a 'managers' directory,
-            # use the parent directory name
-            head, filename = os.path.split(os.path.abspath(planetFile))
-            head, name = os.path.split(head)
-            head, managers = os.path.split(head)
-            if managers != 'managers':
-                raise
-            options.name = name
-            log.debug('manager', 'Setting name to %s based on path' % name)
-        except:
+        # if the file is in a directory under a 'managers' directory,
+        # use the parent directory name
+        head, filename = os.path.split(os.path.abspath(planetFile))
+        head, name = os.path.split(head)
+        head, managers = os.path.split(head)
+        if managers != 'managers':
             options.name = 'unnamed'
             log.debug('manager', 'Setting name to unnamed')
+        else:
+            options.name = name
+            log.debug('manager', 'Setting name to %s based on path' % name)
 
     # check for wrong options/arguments
     if not options.transport in ['ssl', 'tcp']:
