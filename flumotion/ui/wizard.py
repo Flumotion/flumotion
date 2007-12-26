@@ -72,8 +72,8 @@ class _WalkableStack(object):
         return self.l[self.pos]
 
     def skip_to(self, key):
-        for i in range(0, len(self.l)):
-            if key(self.l[i]):
+        for i, item in enumerate(self.l):
+            if key(item):
                 self.pos = i
                 return
         raise AssertionError()
