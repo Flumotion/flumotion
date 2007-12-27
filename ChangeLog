@@ -1,5 +1,8 @@
 2007-12-27  Johan Dahlin  <johan@gnome.org>
 
+	* po/POTFILES.in:
+	Rename the tests here too.
+	
 	* flumotion/common/Makefile.am:
 	* flumotion/common/config.py:
 	* flumotion/common/registry.py:
