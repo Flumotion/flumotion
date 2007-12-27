@@ -27,7 +27,7 @@ A bouncer that only lets in during an event scheduled with an ical file.
 
 from twisted.internet import defer
 
-from flumotion.common import keycards, config
+from flumotion.common import keycards, errors
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardGeneric
 from datetime import datetime
@@ -52,7 +52,7 @@ class IcalBouncer(bouncer.Bouncer):
     def do_setup(self):
         if not HAS_ICAL:
             return defer.fail(
-                config.ConfigError(
+                errors.ConfigError(
                     "Please install icalendar and dateutil modules"))
         props = self.config['properties']
         self._icsfile = props['file']

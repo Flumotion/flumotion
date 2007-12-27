@@ -35,7 +35,7 @@ from twisted.cred import credentials
 from zope.interface import implements
 
 from flumotion.component import feedcomponent
-from flumotion.common import bundle, common, gstreamer, errors, pygobject
+from flumotion.common import common, gstreamer, errors, pygobject
 from flumotion.common import messages, netutils, log, interfaces
 
 from flumotion.twisted import fdserver

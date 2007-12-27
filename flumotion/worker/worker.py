@@ -33,7 +33,7 @@ from twisted.spread import pb
 from twisted.internet import error
 from zope.interface import implements
 
-from flumotion.common import errors, interfaces, log, bundleclient
+from flumotion.common import errors, interfaces, log
 from flumotion.common import common, medium, messages, worker
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import pb as fpb

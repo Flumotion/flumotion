@@ -42,7 +42,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 from zope.interface import implements
 
-from flumotion.common import bundle, config, errors, interfaces, log, registry
+from flumotion.common import config, errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.planet import moods

@@ -40,7 +40,7 @@ from twisted.python import failure
 from twisted.spread import pb
 from zope.interface import implements
 
-from flumotion.common import config, errors, interfaces, log, registry, keycards
+from flumotion.common import errors, interfaces, log, keycards
 from flumotion.common import medium, package
 from flumotion.common.reflectcall import createComponent, reflectCallCatching
 from flumotion.component import component

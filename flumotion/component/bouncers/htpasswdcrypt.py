@@ -31,7 +31,7 @@ import random
 from twisted.python import components
 from twisted.internet import defer
 
-from flumotion.common import interfaces, keycards, log, config
+from flumotion.common import interfaces, keycards, log, errors
 from flumotion.component import component
 from flumotion.component.bouncers import bouncer
 from flumotion.twisted import credentials, checkers
@@ -59,14 +59,14 @@ class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
             data = props['data']
             self.debug('using in-line data for passwords')
         else:
-            return defer.fail(config.ConfigError(
+            return defer.fail(errors.ConfigError(
                 'HTPasswdCrypt needs either a <data> or <filename> entry'))
         # FIXME: generalize to a start method, possibly linked to mood
         if filename:
             try:
                 lines = open(filename).readlines()
             except IOError, e:
-                return defer.fail(config.ConfigError(str(e)))
+                return defer.fail(errors.ConfigError(str(e)))
         else:
             lines = data.split("\n")
 

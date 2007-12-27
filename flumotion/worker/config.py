@@ -29,7 +29,7 @@ import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common import log, config, common
+from flumotion.common import log, common
 
 class ConfigError(Exception):
     pass

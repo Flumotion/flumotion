@@ -1,3 +1,19 @@
+2007-12-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	  Don't import common.config, directly import errors and use ConfigError
+	  from there.
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/config.py:
+	* flumotion/worker/worker.py:
+	  Remove unused imports.
+
 2007-12-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/*.py: Some simple low-hanging fruit cases of except: 

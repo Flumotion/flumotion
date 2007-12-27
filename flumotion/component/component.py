@@ -35,7 +35,7 @@ from twisted.python import reflect
 from zope.interface import implements
 
 from flumotion.common import interfaces, errors, log, planet, medium
-from flumotion.common import componentui, common, registry, messages
+from flumotion.common import componentui, common, messages
 from flumotion.common import interfaces, reflectcall, debug
 
 from flumotion.common.planet import moods

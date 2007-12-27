@@ -29,7 +29,7 @@ from twisted.internet import defer
 
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
-from flumotion.common import config, worker, common
+from flumotion.common import worker, common
 
 class WorkerAvatar(base.ManagerAvatar):
     """
