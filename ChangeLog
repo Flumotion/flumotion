@@ -1,5 +1,8 @@
 2007-12-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/rrdmon/config.py (ConfigParser): use fxml.Parser
+	instead of common.BaseConfigParser
+
 	* flumotion/common/bundle.py (MergedBundler.getSubBundlers): Move
 	makeBundleFromLoadedModules from bundle to registry
 

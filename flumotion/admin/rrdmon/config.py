@@ -23,8 +23,9 @@ __version__ = "$Rev$"
 
 import os
 
-from flumotion.common import common, config, connection
+from flumotion.common import common, connection
 from flumotion.common.errors import ConfigError
+from flumotion.common.fxml import Parser
 
 
 """
@@ -86,7 +87,7 @@ their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.
 """
 
 
-class ConfigParser(config.BaseConfigParser):
+class ConfigParser(Parser):
     """
     RRD monitor configuration file parser.
 
@@ -94,6 +95,7 @@ class ConfigParser(config.BaseConfigParser):
     __init__. Parse into a dict of properly-typed options by calling
     parse() on the parser.
     """
+    parserError = ConfigError
     logCategory = 'rrdmon-config'
 
     def __init__(self, file):
@@ -101,7 +103,7 @@ class ConfigParser(config.BaseConfigParser):
         @param file: The path to the config file to parse, or a file object
         @type  file: str or file
         """
-        config.BaseConfigParser.__init__(self, file)
+        self.doc = self.getRoot(file)
 
     def _parseArchive(self, node):
         def strparser(parser):
@@ -125,7 +127,7 @@ class ConfigParser(config.BaseConfigParser):
 
         for k, required, parser, default in basicOptions:
             if required and k not in res:
-                raise config.ConfigError('missing required node %s' % k)
+                raise ConfigError('missing required node %s' % k)
         return res
 
     def _parseSource(self, node):
@@ -139,7 +141,7 @@ class ConfigParser(config.BaseConfigParser):
             return setter
         def filename(v):
             if v[0] != os.sep:
-                raise config.ConfigError('rrdfile paths should be absolute')
+                raise ConfigError('rrdfile paths should be absolute')
             return str(v)
 
         name, = self.parseAttributes(node, ('name',))
@@ -167,9 +169,9 @@ class ConfigParser(config.BaseConfigParser):
 
         for k, required, parser, default in basicOptions:
             if required and k not in res:
-                raise config.ConfigError('missing required node %s' % k)
+                raise ConfigError('missing required node %s' % k)
         if not res['archives']:
-            raise config.ConfigError('must specify at least one '
+            raise ConfigError('must specify at least one '
                                      '<archive> per <source>')
 
         return res
@@ -177,6 +179,7 @@ class ConfigParser(config.BaseConfigParser):
     def parse(self):
         # <rrdmon>
         #   <propName>propValue</propName>
+
         root = self.doc.documentElement
         if not root.nodeName == 'rrdmon':
             raise ConfigError("unexpected root node: %s" % root.nodeName)
@@ -198,7 +201,6 @@ class ConfigParser(config.BaseConfigParser):
         self.parseFromTable(root, table)
 
         if not res['sources']:
-            raise config.ConfigError('must specify at least one '
-                                     '<source>')
+            raise ConfigError('must specify at least one <source>')
 
         return res
