@@ -129,5 +129,4 @@ class EncodingWizardPlugin(object):
         for the step.
         Component and Gstreamer Element checks are usually done here.
         @param worker: the current worker
-        @rtype worker:
         """

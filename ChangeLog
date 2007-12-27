@@ -1,5 +1,12 @@
 2007-12-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/encoders/encodingwizardplugin.py:
+	* flumotion/configure/configure.py:
+	* flumotion/manager/manager.py:
+	Fix a couple of docstrings.
+
+2007-12-27  Johan Dahlin  <johan@gnome.org>
+
 	* po/POTFILES.in:
 	Rename the tests here too.
 	

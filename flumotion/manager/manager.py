@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 manager implementation and related classes
 
@@ -33,6 +31,7 @@ API Stability: semi-stable
 """
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
+__version__ = "$Rev$"
 
 import os
 

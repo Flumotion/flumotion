@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 '''
 configure-time variables for installed or uninstalled operation
 
@@ -38,7 +36,7 @@ different configdir, logdir and rundir.
 @type isinstalled: boolean
 
 @var  cachedir:      directory where cached code is stored
-@type cachedir:      string
+@type cachedir:      stringed
 @var  configdir:     directory where configuration files are stored
 @type configdir:     string
 @var  daemondir:     directory where daemonized programs should run
@@ -76,6 +74,8 @@ different configdir, logdir and rundir.
 @var  versionTuple: Flumotion version number
 @type versionTuple: 4-tuple of integers
 '''
+
+__version__ = "$Rev$"
 
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
