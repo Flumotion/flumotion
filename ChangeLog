@@ -1,3 +1,34 @@
+2007-12-27  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/Makefile.am:
+	* flumotion/common/config.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/testsuite.py:
+	* flumotion/launch/inspect.py:
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/config.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/registry.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/comptest.py:
+	* flumotion/test/test_component_init.py:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_manager_config.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_manager_registry.py:
+	* flumotion/test/test_registry.py:
+	* po/POTFILES.in:
+
+	Move flumotion/common/{config.py,registry.py} into
+	flumotion/manager.py. Rename tests too and update
+	imports and POTFILES.
+	
 2007-12-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_manager_manager.py:

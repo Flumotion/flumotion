@@ -24,7 +24,8 @@ __version__ = "$Rev$"
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
-from flumotion.common import registry, log, reflectcall
+from flumotion.common import log, reflectcall
+from flumotion.manager import registry
 
 
 class TestInit(testsuite.TestCase):

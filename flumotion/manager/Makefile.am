@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/manager
 
 flumotion_PYTHON =	\
@@ -7,8 +7,10 @@ flumotion_PYTHON =	\
 	admin.py	\
 	base.py		\
 	component.py	\
+	config.py 	\
 	main.py		\
 	manager.py	\
+	registry.py 	\
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)

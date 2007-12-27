@@ -32,6 +32,7 @@ from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.common.planet import moods
 from flumotion.manager import component, manager
+from flumotion.manager import registry
 from flumotion.twisted import flavors
 
 
@@ -324,7 +325,6 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
 
     def setUp(self):
         # load and verify registry
-        from flumotion.common import registry
         reg = registry.getRegistry()
 
         self.vishnu = manager.Vishnu('test', unsafeTracebacks=1)

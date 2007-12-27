@@ -37,7 +37,8 @@ from zope.interface import implements
 
 from flumotion.configure import configure
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, keycards, log, config, planet
+from flumotion.manager import config
+from flumotion.common import errors, interfaces, keycards, log, planet
 from flumotion.common import messages, common
 from flumotion.twisted import flavors
 from flumotion.common.planet import moods

@@ -66,9 +66,10 @@ import sys
 from twisted.python import reflect
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common, registry, errors, messages
-from flumotion.twisted import flavors
+from flumotion.common import log, common, errors, messages
 from flumotion.common.options import OptionParser
+from flumotion.manager import registry
+from flumotion.twisted import flavors
 
 from flumotion.launch import parse
 

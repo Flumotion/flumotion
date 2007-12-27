@@ -179,8 +179,8 @@ class TestPB(log.Loggable):
 class TestCaseWithManager(TestCase):
     def setUp(self):
         from flumotion.twisted import pb
-        from flumotion.common import config, server, connection
-        from flumotion.manager import manager
+        from flumotion.common import server, connection
+        from flumotion.manager import config, manager
         from StringIO import StringIO
 
         managerConf = """
