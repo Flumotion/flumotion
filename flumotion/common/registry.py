@@ -29,13 +29,13 @@ import os
 import sets
 import stat
 import errno
+import sys
 from StringIO import StringIO
 
-from xml.dom import minidom, Node
-from xml.parsers import expat
 from xml.sax import saxutils
 
-from flumotion.common import common, log, package, bundle, errors, fxml
+from flumotion.common import common, log, errors, fxml
+from flumotion.common.bundle import BundlerBasket, MergedBundler
 from flumotion.configure import configure
 
 # Re-enable when reading the registry cache is lighter-weight, or we
@@ -1229,7 +1229,7 @@ class ComponentRegistry(log.Loggable):
         @rtype: L{flumotion.common.bundle.BundlerBasket}
         """
         def load():
-            ret = bundle.BundlerBasket()
+            ret = BundlerBasket()
             for b in self.getBundles():
                 bundleName = b.getName()
                 self.debug('Adding bundle %s' % bundleName)
@@ -1408,6 +1408,93 @@ class RegistrySubsetWriter(RegistryWriter):
         regwriter.dump(fd)
 
 __registry = None
+
+
+def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
+    """
+    Make a bundle from a subset of all loaded modules, also writing out
+    a registry file that can apply to that subset of the global
+    registry. Suitable for use as a FLU_ATEXIT handler.
+
+    @param outfile: The path to which a zip file will be written.
+    @type  outfile: str
+    @param outreg: The path to which a registry file will be written.
+    @type  outreg: str
+    @param prefixes: A list of prefixes to which to limit the export. If
+    not given, package up all modules. For example, "flumotion" would
+    limit the output to modules that start with "flumotion".
+    @type  prefixes: list of str
+    """
+    from twisted.python import reflect
+
+    def getUsedModules(prefixes):
+        ret = {}
+        for modname in sys.modules:
+            if prefixes and not filter(modname.startswith, prefixes):
+                continue
+            try:
+                module = reflect.namedModule(modname)
+                if hasattr(module, '__file__'):
+                    ret[modname] = module
+                else:
+                    log.info('makebundle', 'Module %s has no file', module)
+            except ImportError:
+                log.info('makebundle', 'Could not import %s', modname)
+        return ret
+
+    def calculateModuleBundleMap():
+        allbundles = getRegistry().getBundles()
+        ret = {}
+        for bundle in allbundles:
+            for directory in bundle.getDirectories():
+                for file in directory.getFiles():
+                    path = os.path.join(directory.getName(), file.getLocation())
+                    parts = path.split(os.path.sep)
+                    if parts[-1].startswith('__init__.py'):
+                        parts.pop()
+                    elif parts[-1].endswith('.py'):
+                        parts[-1] = parts[-1][:-3]
+                    else:
+                        # not a bundled module
+                        continue
+                    modname = '.'.join(parts)
+                    ret[modname] = bundle
+        return ret
+
+    def makeMergedBundler(modules, modulebundlemap):
+        ret = MergedBundler()
+        basket = getRegistry().makeBundlerBasket()
+        for modname in modules:
+            modfilename = modules[modname].__file__
+            if modname in modulebundlemap:
+                bundleName = modulebundlemap[modname].getName()
+                for depBundleName in basket.getDependencies(bundleName):
+                    ret.addBundler(basket.getBundlerByName(depBundleName))
+            else:
+                if modfilename.endswith('.pyc'):
+                    modfilename = modfilename[:-1]
+                if os.path.isdir(modfilename):
+                    with_init = os.path.join(modfilename, '__init__.py')
+                    if os.path.exists(with_init):
+                        modfilename = with_init
+                nparts = len(modname.split('.'))
+                if '__init__' in modfilename:
+                    nparts += 1
+                relpath = os.path.join(*modfilename.split(os.path.sep)[-nparts:])
+                ret.add(modfilename, relpath)
+        return ret
+
+    modules = getUsedModules(prefixes)
+    modulebundlemap = calculateModuleBundleMap()
+    bundler = makeMergedBundler(modules, modulebundlemap)
+
+    print 'Writing bundle to', outfile
+    open(outfile, 'w').write(bundler.bundle().getZip())
+
+    print 'Writing registry to', outreg
+    bundlers_used = [b.name for b in bundler.getSubBundlers()]
+    regwriter = RegistrySubsetWriter(onlyBundles=bundlers_used)
+    regwriter.dump(open(outreg, 'w'))
 
 def getRegistry():
     """

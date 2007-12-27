@@ -1,14 +1,17 @@
+2007-12-27  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/bundle.py (MergedBundler.getSubBundlers): Move
+	makeBundleFromLoadedModules from bundle to registry
+
+	* flumotion/admin/text/view.py (AdminTextView.doRead): Remove
+	a particularly evil try/except.
+
 2007-12-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/multi.py:
 	  Remove private copy of WatchedDict, use one in common.
 	* flumotion/common/watched.py:
 	  Make a WatchedDict here too.
-
-2007-12-27  Johan Dahlin  <johan@gnome.org>
-
-	* flumotion/admin/text/view.py (AdminTextView.doRead): Remove
-	a particularly evil try/except.
 
 2007-12-27  Michael Smith <msmith@fluendo.com>
 
