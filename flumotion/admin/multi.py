@@ -24,7 +24,7 @@ __version__ = "$Rev$"
 
 from twisted.internet import defer
 
-from flumotion.common import log, planet, errors, startset
+from flumotion.common import log, planet, errors, startset, watched
 from flumotion.admin import admin
 
 
@@ -34,48 +34,12 @@ def get_admin_for_object(object):
     else:
         return object.admin
 
-# this is looking for a home.
-def _make_watched(type, *mutators):
-    class Watched(type):
-        def __init__(self):
-            type.__init__(self)
-            self.watch_id = 0
-            self.watch_procs = {} # id -> proc
-
-        def watch(self, proc):
-            self.watch_id += 1
-            self.watch_procs[self.watch_id] = proc
-            return self.watch_id
-
-        def unwatch(self, id):
-            del self.watch_procs[id]
-
-        def notify_changed(self):
-            for proc in self.watch_procs.values():
-                proc(self)
-
-    def mutate(method):
-        def do_mutate(self, *args, **kwargs):
-            method(self, *args, **kwargs)
-            self.notify_changed()
-        setattr(Watched, method.__name__, do_mutate)
-    for i in mutators:
-        mutate(getattr(type, i))
-
-    return Watched
-
-WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
-                            'sort', 'reverse')
-WatchedDict = _make_watched(dict, '__setitem__', '__delitem__', 'pop',
-                            'popitem', 'update')
-
-
 class MultiAdminModel(log.Loggable):
     logCategory = 'multiadmin'
 
     def __init__(self):
         # public
-        self.admins = WatchedDict() # {managerId: AdminModel}
+        self.admins = watched.WatchedDict() # {managerId: AdminModel}
         # private
         self.listeners = []
         self._reconnectHandlerIds = {} # managerId => [disconnect, id..]

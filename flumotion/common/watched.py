@@ -21,7 +21,6 @@
 
 __version__ = "$Rev$"
 
-
 def _make_watched(type, *mutators):
     class Watched(type):
         def __init__(self):
@@ -53,3 +52,6 @@ def _make_watched(type, *mutators):
 
 WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
                             'sort', 'reverse')
+WatchedDict = _make_watched(dict, '__setitem__', '__delitem__', 'pop',
+                            'popitem', 'update')
+
