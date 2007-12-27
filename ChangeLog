@@ -1,3 +1,8 @@
+2007-12-27  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/text/view.py (AdminTextView.doRead): Remove
+	a particularly evil try/except.
+
 2007-12-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/bouncers/htpasswdcrypt.py:

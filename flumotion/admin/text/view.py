@@ -558,82 +558,78 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     # act as keyboard input
     def doRead(self):
         """ Input is ready! """
-        try:
-            c = self.stdscr.getch() # read a character
+        c = self.stdscr.getch() # read a character
 
-            if c == curses.KEY_BACKSPACE or c == 127:
-                self.inputText = self.inputText[:-1]
-            elif c == curses.KEY_STAB or c == 9:
-                available_commands = self.get_available_completions(self.inputText)
-                if len(available_commands) == 1:
-                    input_split = self.inputText.split()
-                    if len(input_split) > 1:
-                        if not self.inputText.endswith(' '):
-                            input_split.pop()
-                        self.inputText = ' '.join(input_split) + ' ' + available_commands[0]
-                    else:
-                        self.inputText = available_commands[0]
+        if c == curses.KEY_BACKSPACE or c == 127:
+            self.inputText = self.inputText[:-1]
+        elif c == curses.KEY_STAB or c == 9:
+            available_commands = self.get_available_completions(self.inputText)
+            if len(available_commands) == 1:
+                input_split = self.inputText.split()
+                if len(input_split) > 1:
+                    if not self.inputText.endswith(' '):
+                        input_split.pop()
+                    self.inputText = ' '.join(input_split) + ' ' + available_commands[0]
+                else:
+                    self.inputText = available_commands[0]
 
-            elif c == curses.KEY_ENTER or c == 10:
-                # run command
-                self.run_command(self.inputText)
-                # re-display status
-                self.display_status()
-                # clear the prompt line
-                self.stdscr.move(self.lasty+1,0)
-                self.stdscr.clrtoeol()
-                self.stdscr.addstr(self.lasty+1,0,'Prompt: ')
-                self.stdscr.refresh()
-                if len(self.nextcommands) > 0:
-                    self.lastcommands = self.lastcommands + self.nextcommands
-                    self.nextcommands = []
-                self.lastcommands.append(self.inputText)
-                self.inputText = ''
-                self.command_result = ''
-            elif c == curses.KEY_UP:
-                lastcommand = ""
-                if len(self.lastcommands) > 0:
-                    lastcommand = self.lastcommands.pop()
-                if self.inputText != "":
-                    self.nextcommands.append(self.inputText)
-                self.inputText = lastcommand
-            elif c == curses.KEY_DOWN:
-                nextcommand = ""
-                if len(self.nextcommands) > 0:
-                    nextcommand = self.nextcommands.pop()
-                if self.inputText != "":
-                    self.lastcommands.append(self.inputText)
-                self.inputText = nextcommand
-            elif c == curses.KEY_PPAGE: # page up
-                if self._first_onscreen_component > 0:
-                    self._first_onscreen_component = \
-                        self._first_onscreen_component - 1
-                    self.show()
-            elif c == curses.KEY_NPAGE: # page down
-                if self._first_onscreen_component < len(self._components) - \
-                        self.max_components_per_page:
-                    self._first_onscreen_component = \
-                        self._first_onscreen_component + 1
-                    self.show()
-
-            else:
-                # too long
-                if len(self.inputText) == self.cols-2: return
-                # add to input text
-                if c<=256:
-                    self.inputText = self.inputText + chr(c)
-
-            # redisplay status
+        elif c == curses.KEY_ENTER or c == 10:
+            # run command
+            self.run_command(self.inputText)
+            # re-display status
             self.display_status()
-
+            # clear the prompt line
             self.stdscr.move(self.lasty+1,0)
             self.stdscr.clrtoeol()
-
-            self.stdscr.addstr(self.lasty+1, 0,
-                           'Prompt: %s' % self.inputText)
+            self.stdscr.addstr(self.lasty+1,0,'Prompt: ')
             self.stdscr.refresh()
-        except Exception, e:
-            print e
+            if len(self.nextcommands) > 0:
+                self.lastcommands = self.lastcommands + self.nextcommands
+                self.nextcommands = []
+            self.lastcommands.append(self.inputText)
+            self.inputText = ''
+            self.command_result = ''
+        elif c == curses.KEY_UP:
+            lastcommand = ""
+            if len(self.lastcommands) > 0:
+                lastcommand = self.lastcommands.pop()
+            if self.inputText != "":
+                self.nextcommands.append(self.inputText)
+            self.inputText = lastcommand
+        elif c == curses.KEY_DOWN:
+            nextcommand = ""
+            if len(self.nextcommands) > 0:
+                nextcommand = self.nextcommands.pop()
+            if self.inputText != "":
+                self.lastcommands.append(self.inputText)
+            self.inputText = nextcommand
+        elif c == curses.KEY_PPAGE: # page up
+            if self._first_onscreen_component > 0:
+                self._first_onscreen_component = \
+                    self._first_onscreen_component - 1
+                self.show()
+        elif c == curses.KEY_NPAGE: # page down
+            if self._first_onscreen_component < len(self._components) - \
+                    self.max_components_per_page:
+                self._first_onscreen_component = \
+                    self._first_onscreen_component + 1
+                self.show()
+
+        else:
+            # too long
+            if len(self.inputText) == self.cols-2: return
+            # add to input text
+            if c<=256:
+                self.inputText = self.inputText + chr(c)
+
+        # redisplay status
+        self.display_status()
+
+        self.stdscr.move(self.lasty+1,0)
+        self.stdscr.clrtoeol()
+
+        self.stdscr.addstr(self.lasty+1, 0, 'Prompt: %s' % self.inputText)
+        self.stdscr.refresh()
 
 
     # remote calls
