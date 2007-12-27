@@ -1,3 +1,10 @@
+2007-12-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_wizard.py:
+	  Our testsuite should no longer print messages to Andy, as he's unlikely
+	  to do anything about them.
+
 2007-12-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/rrdmon/config.py (ConfigParser): use fxml.Parser

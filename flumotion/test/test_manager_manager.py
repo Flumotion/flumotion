@@ -570,7 +570,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         d.addCallback(gotWorker)
         d.addCallback(confChecked)
         return d
-    testConfigBeforeWorker.skip = 'andy will fix this soon'
+    testConfigBeforeWorker.skip = 'andy will definitely not fix this soon'
 
     def testConfigAfterWorker(self):
         # test a config with three components being loaded after the worker

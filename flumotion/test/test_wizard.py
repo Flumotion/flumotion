@@ -107,7 +107,7 @@ class WizardSaveTest(testsuite.TestCase):
 
         self.failUnlessEqual(config['audio-encoder'].getFeeders(), ['video-source:audio'])
         self.failUnlessEqual(config['video-overlay'].getFeeders(), ['video-source:video'])
-    testFirewireAudioAndVideo.skip = 'Andy, maybe your generator work broke this ?'
+    testFirewireAudioAndVideo.skip = 'Maybe Andy\'s generator work broke this ?'
 
     def testAudioTestWorkers(self):
         source = self.wizard['Source']
@@ -128,4 +128,4 @@ class WizardSaveTest(testsuite.TestCase):
         for item in config.values():
             print item.name, item.worker
         #print self.wizard.printOut()
-    testAudioTestWorkers.skip = 'Andy, maybe your generator work broke this ?'
+    testAudioTestWorkers.skip = 'Maybe Andy\'s generator work broke this ?'
