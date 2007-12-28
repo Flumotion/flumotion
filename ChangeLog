@@ -1,3 +1,30 @@
+2007-12-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/Makefile.am:
+	* flumotion/admin/config.py:
+	  Split out admin config parser from common/config.py
+	* flumotion/common/config.py:
+	  Split out admin and manager config parsers into seperate files, keep
+	  only the generic bits here.
+	* flumotion/common/testsuite.py:
+	* flumotion/launch/parse.py:
+	  Use manager.config
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/config.py:
+	  Split out manager/flow config parsers into here.
+	  Fixed some debug messages.
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/component.py:
+	  Adapted for new imports.
+	* flumotion/test/Makefile.am:
+	  Added test_admin_config.py
+	* flumotion/test/test_admin_config.py:
+	  Moved these tests from test_config.py
+	* flumotion/test/test_config.py:
+	  Changes for file/import movements, move admin config tests into another
+	  file.
+
 2007-12-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/encoders/encodingwizardplugin.py:

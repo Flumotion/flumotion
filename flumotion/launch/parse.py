@@ -30,7 +30,8 @@ flumotion.launch.parse: A parsing library for flumotion-launch syntax.
 import copy
 import sys
 
-from flumotion.common import log, config, common, dag, registry
+from flumotion.common import log, common, dag, registry
+from flumotion.manager import config
 
 __all__ = ['parse_args']
 

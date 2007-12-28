@@ -7,6 +7,7 @@ flumotion_PYTHON =	\
 	admin.py	\
 	base.py		\
 	component.py	\
+	config.py   \
 	main.py		\
 	manager.py	\
 	worker.py

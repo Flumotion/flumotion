@@ -41,12 +41,12 @@ from twisted.spread import pb
 from twisted.cred import portal
 from zope.interface import implements
 
-from flumotion.common import config, errors, interfaces, log, registry
+from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
-from flumotion.manager import admin, component, worker, base
+from flumotion.manager import admin, component, worker, base, config
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 
@@ -524,7 +524,7 @@ class Vishnu(log.Loggable):
             mid += '-%s' % file
         try:
             self.clearMessage(mid)
-            conf = config.FlumotionConfigXML(file)
+            conf = config.PlanetConfigParser(file)
             conf.parse()
             return self._loadComponentConfiguration(conf, identity)
         except errors.ConfigError, e:

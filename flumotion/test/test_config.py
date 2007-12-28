@@ -23,8 +23,9 @@ __version__ = "$Rev$"
 
 from StringIO import StringIO
 
-from flumotion.common import config, registry, errors
+from flumotion.common import registry, errors
 from flumotion.common import testsuite
+from flumotion.manager import config
 
 regchunk = """
 <registry>
@@ -119,7 +120,7 @@ regchunk = """
 reg = registry.getRegistry()
 reg.addFromString(regchunk)
 
-def ConfigXML(string, parser=config.FlumotionConfigXML):
+def ConfigXML(string, parser=config.PlanetConfigParser):
     f = StringIO(string)
     conf = parser(f)
     f.close()
@@ -149,7 +150,7 @@ class TestFunctions(testsuite.TestCase):
                      {'default': [('foo:bar', 'default'),
                                   ('baz', 'alias')]})
         assertRaises('test-component-with-multiple-eater',
-                     [], config.ConfigError)
+                     [], errors.ConfigError)
         assertEaters('test-component-with-multiple-eater',
                      [(None, 'foo:bar')],
                      {'default': [('foo:bar', 'default')]})
@@ -161,10 +162,10 @@ class TestConfig(testsuite.TestCase):
 
     def testParseWrongConfig(self):
         conf = ConfigXML('<somethingorother/>')
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseWrongSyntax(self):
-        self.assertRaises(config.ConfigError,
+        self.assertRaises(errors.ConfigError,
             ConfigXML, 'planet/>')
 
     def testParseComponentNoWorker(self):
@@ -175,7 +176,7 @@ class TestConfig(testsuite.TestCase):
                  <component name="component-name" type="test-component"/>
                </atmosphere>
              </planet>""")
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
         conf = ConfigXML(
              """
              <planet>
@@ -184,7 +185,7 @@ class TestConfig(testsuite.TestCase):
                             worker=""/>
                </atmosphere>
              </planet>""")
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseAtmosphere(self):
         conf = ConfigXML(
@@ -214,7 +215,7 @@ class TestConfig(testsuite.TestCase):
              </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseComponent(self):
         conf = ConfigXML(
@@ -382,9 +383,9 @@ class TestConfig(testsuite.TestCase):
         xml = '<planet><bad-node/></planet>'
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
-        self.assertRaises(config.ConfigError, ManagerConfigXML, xml)
+        self.assertRaises(errors.ConfigError, ManagerConfigXML, xml)
 
     def testParseComponentError(self):
         xml = """<planet>
@@ -403,7 +404,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet>
               <flow name="default">
@@ -412,7 +413,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
         # Specify a source for a component with no eaters
         xml = """<planet>
@@ -424,7 +425,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseFlowError(self):
         xml = """<planet>
@@ -434,7 +435,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet>
               <flow name="manager">
@@ -443,7 +444,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet>
               <flow name="atmosphere">
@@ -452,7 +453,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet>
               <flow name="wrongcomponentnode">
@@ -461,7 +462,7 @@ class TestConfig(testsuite.TestCase):
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
 
     def testParseManagerError(self):
@@ -471,14 +472,14 @@ class TestConfig(testsuite.TestCase):
             </manager></planet>"""
         conf = ManagerConfigXML(xml)
         self.failUnless(conf)
-        self.assertRaises(config.ConfigError, conf.parseBouncerAndPlugs)
+        self.assertRaises(errors.ConfigError, conf.parseBouncerAndPlugs)
 
         xml = """<planet>
                <manager name="aname">
                  <port>notanint</port>
                </manager>
              </planet>"""
-        self.assertRaises(config.ConfigError,
+        self.assertRaises(errors.ConfigError,
             ManagerConfigXML, xml)
 
         xml = """<planet>
@@ -486,7 +487,7 @@ class TestConfig(testsuite.TestCase):
                  <transport>notatransport</transport>
                </manager>
              </planet>"""
-        self.assertRaises(config.ConfigError,
+        self.assertRaises(errors.ConfigError,
             ManagerConfigXML, xml)
 
         xml = """<planet>
@@ -494,7 +495,7 @@ class TestConfig(testsuite.TestCase):
                  <notanode/>
                </manager>
              </planet>"""
-        self.assertRaises(config.ConfigError,
+        self.assertRaises(errors.ConfigError,
             ManagerConfigXML, xml)
 
     def testParseProperties(self):
@@ -810,7 +811,7 @@ class TestConfig(testsuite.TestCase):
              </planet>""")
         self.failIf(planet.flows)
 
-        self.assertRaises(config.ConfigError, planet.parse)
+        self.assertRaises(errors.ConfigError, planet.parse)
 
     def testGetComponentEntries(self):
         conf = ConfigXML(
@@ -868,7 +869,7 @@ class TestConfig(testsuite.TestCase):
               </flow>
             </planet>
             """)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseComponentsWithSource(self):
         conf = ConfigXML(
@@ -942,7 +943,7 @@ class TestConfig(testsuite.TestCase):
               </flow>
             </planet>
             """)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testParseComponentsWithMultipleEater(self):
         conf = ConfigXML(
@@ -1047,12 +1048,12 @@ class TestConfig(testsuite.TestCase):
              </planet>
              """
         conf = ConfigXML(xml)
-        self.assertRaises(config.ConfigError, conf.parse)
+        self.assertRaises(errors.ConfigError, conf.parse)
 
     def testVirtualFeeds(self):
         def assertFail(s):
             conf = ConfigXML(s)
-            self.assertRaises(config.ConfigError, conf.parse)
+            self.assertRaises(errors.ConfigError, conf.parse)
         def assertPass(s, feeds):
             conf = ConfigXML(s)
             conf.parse()
@@ -1109,57 +1110,6 @@ class TestConfig(testsuite.TestCase):
              </planet>
              """, {'valid:name': 'default'})
         
-
-def AdminConfig(sockets, string):
-    f = StringIO(string)
-    conf = config.AdminConfigParser(sockets, f)
-    f.close()
-    return conf
-
-class AdminConfigTest(testsuite.TestCase):
-    def testMinimal(self):
-        doc = ('<admin>'
-               '<plugs>'
-               '</plugs>'
-               '</admin>')
-        parser = AdminConfig((), doc)
-        self.failUnless(parser.plugs == {}, 'expected empty plugset')
-
-    def testMinimal2(self):
-        doc = ('<admin>'
-               '<plugs>'
-               '</plugs>'
-               '</admin>')
-        parser = AdminConfig((), doc)
-        self.failUnless(parser.plugs == {}, 'expected empty plugset')
-
-    def testMinimal3(self):
-        doc = ('<admin>'
-               '<plugs>'
-               '</plugs>'
-               '</admin>')
-        parser = AdminConfig(('foo.bar',), doc)
-        self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
-
-    def testUnknownPlug(self):
-        doc = ('<admin>'
-               '<plugs>'
-               '<plug type="plugdoesnotexist" socket="foo.bar">'
-               '</plug>'
-               '</plugs>'
-               '</admin>')
-        self.assertRaises(errors.UnknownPlugError,
-                          lambda: AdminConfig(('foo.bar',), doc))
-
-    def testUnknownSocket(self):
-        doc = ('<admin>'
-               '<plugs>'
-               '<plug type="frobulator" socket="baz">'
-               '</plug>'
-               '</plugs>'
-               '</admin>')
-        self.assertRaises(config.ConfigError,
-                          lambda: AdminConfig(('foo.bar',), doc))
 
 class TestDictDiff(testsuite.TestCase):
     def assertOND(self, d1, d2, old, new, diff):

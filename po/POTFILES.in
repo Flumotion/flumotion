@@ -1,4 +1,5 @@
 flumotion/manager/admin.py
+flumotion/manager/config.py
 flumotion/manager/worker.py
 flumotion/manager/main.py
 flumotion/manager/base.py
@@ -297,6 +298,7 @@ flumotion/test/test_admin_admin.py
 flumotion/test/test_common_avltree.py
 flumotion/test/test_component_playlist.py
 flumotion/test/test_config.py
+flumotion/test/test_admin_config.py
 flumotion/test/test_saltsha256.py
 flumotion/test/test_ui_fgtk.py
 flumotion/test/test_wizard.py
@@ -328,6 +330,7 @@ flumotion/test/comptest.py
 flumotion/test/test_admin_multi.py
 flumotion/test/test_htpasswdcrypt.py
 flumotion/admin/multi.py
+flumotion/admin/config.py
 flumotion/admin/connections.py
 flumotion/admin/admin.py
 flumotion/admin/text/admin_text.py
