@@ -1,5 +1,14 @@
 2007-12-28  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  Raise an exception rather than silently returning if we fail to stop a
+	  lost component when the worker says it's still running.
+	  Don't disconnect avatar explicitly when stopping a running component;
+	  it'll be disconnected when the shutdown completes. Add a FIXME here.
+	  Remove some dead code in unregisterComponent. Remove a stale FIXME.
+
+2007-12-28  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/admin/gtk/dialogs.py:
 	  Replace "Seek your satisfaction via existing routes" with a more helpful
 	  message.

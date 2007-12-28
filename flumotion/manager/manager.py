@@ -751,11 +751,15 @@ class Vishnu(log.Loggable):
                                  'it is still running', avatarId)
                     # FIXME: put a message on the state to suggest a
                     # kill?
+                    msg = "Cannot stop lost component which is still running."
+                    raise errors.ComponentMoodError(msg)
                 else:
                     self.debug('component %r seems to be really lost, '
                                'setting to sleeping')
                     componentState.setMood(moods.sleeping.value)
                     componentState.set('moodPending', None)
+                    return None
+
             self.debug('asked to stop a lost component without avatar')
             workerName = componentState.get('workerRequested')
             if workerName and self.workerHeaven.hasAvatar(workerName):
@@ -781,11 +785,9 @@ class Vishnu(log.Loggable):
         return stoppers.get(mood, stopUnknown)()
 
     def _componentStopWithAvatar(self, componentState, componentAvatar):
-        def cleanupAndDisconnectComponent(result):
-            return componentAvatar.disconnect()
-
+        # FIXME: This deferred is just the remote call; there's no actual   
+        # deferred for completion of shutdown.
         d = componentAvatar.stop()
-        d.addCallback(cleanupAndDisconnectComponent)
 
         return d
         
@@ -1025,11 +1027,6 @@ class Vishnu(log.Loggable):
         self.debug('unregisterComponent(%r): cleaning up state' %
             componentAvatar)
 
-        if componentAvatar not in self._componentMappers:
-            self.warning("Component logging out that was incompletely logged "
-                " in, ignoring")
-            return
-
         m = self._componentMappers[componentAvatar]
 
         # unmap jobstate
@@ -1136,8 +1133,6 @@ class Vishnu(log.Loggable):
         self.debug('need to stop %d components: %r' % (
             len(components), components))
 
-        # FIXME: we should shut components down in the correct order (according
-        # to the dependency graph); this uses an undefined ordering.
         for c in components:
             avatar = self._componentMappers[c].avatar
             # If this has logged out, but isn't sleeping (so is sad or lost),
