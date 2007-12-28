@@ -307,12 +307,12 @@ class DiskStep(WorkerWizardStep):
         if not self.checkbutton_rotate.get_active():
             options['rotate-type'] = 'none'
         else:
-            if self.radiobutton_has_time:
+            if self.radiobutton_has_time.get_active():
                 options['rotate-type'] = 'time'
                 time_value = self.combobox_time_list.get_selected()
                 options['time'] = long(
                     self.spinbutton_time.get_value() * time_value.unit)
-            elif self.radiobutton_has_size:
+            elif self.radiobutton_has_size.get_active():
                 options['rotate-type'] = 'size'
                 size_value = self.combobox_size_list.get_selected()
                 options['size'] = long(
@@ -329,12 +329,12 @@ class DiskStep(WorkerWizardStep):
     # Private
 
     def _update_radio(self):
-        if self.radiobutton_has_size:
+        if self.radiobutton_has_size.get_active():
             self.spinbutton_size.set_sensitive(True)
             self.combobox_size_list.set_sensitive(True)
             self.spinbutton_time.set_sensitive(False)
             self.combobox_time_list.set_sensitive(False)
-        elif self.radiobutton_has_time:
+        elif self.radiobutton_has_time.get_active():
             self.spinbutton_time.set_sensitive(True)
             self.combobox_time_list.set_sensitive(True)
             self.spinbutton_size.set_sensitive(False)
@@ -342,8 +342,10 @@ class DiskStep(WorkerWizardStep):
 
     # Callbacks
 
-    def on_radiobutton_rotate_toggled(self, button):
-        # This is bound to both radiobutton_has_size and radiobutton_has_time
+    def on_radiobutton_has_time_toggled(self, radio):
+        self._update_radio()
+
+    def on_radiobutton_has_size_toggled(self, radio):
         self._update_radio()
 
     def on_checkbutton_rotate_toggled(self, button):

@@ -1,3 +1,13 @@
+2007-12-28  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_disk.glade:
+	* flumotion/wizard/consumptionsteps.py 
+	(DiskStep.on_checkbutton_rotate_toggled)
+	(DiskStep._update_radio): Avoid relying on __nonzero__ which is gone.
+	(DiskStep.on_radiobutton_has_time_toggled)
+	(DiskStep.on_radiobutton_has_size_toggled): 
+	Use a separate method callback for each widget.
+
 2007-12-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:

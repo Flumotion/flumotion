@@ -82,7 +82,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_radiobutton_rotate_toggled" last_modification_time="Thu, 30 Sep 2004 14:54:10 GMT"/>
+		  <signal name="toggled" handler="on_radiobutton_has_time_toggled" last_modification_time="Thu, 30 Sep 2004 14:54:10 GMT"/>
 		</widget>
 		<packing>
 		  <property name="left_attach">0</property>
@@ -106,7 +106,7 @@
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
 		  <property name="group">radiobutton_has_time</property>
-		  <signal name="toggled" handler="on_radiobutton_has_time_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:57 GMT"/>
+		  <signal name="toggled" handler="on_radiobutton_has_size_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:57 GMT"/>
 		</widget>
 		<packing>
 		  <property name="left_attach">0</property>
