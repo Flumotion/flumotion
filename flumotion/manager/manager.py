@@ -41,13 +41,12 @@ from twisted.spread import pb
 from twisted.cred import portal
 from zope.interface import implements
 
-from flumotion.common import errors, interfaces, log
+from flumotion.common import config, errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
-from flumotion.manager import admin, component, worker, base, registry
-from flumotion.manager import config
+from flumotion.manager import admin, component, worker, base
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 

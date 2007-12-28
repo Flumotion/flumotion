@@ -30,12 +30,11 @@ import sys
 
 from twisted.internet import reactor, error
 
-from flumotion.common import log, common, errors, setup
+from flumotion.manager import manager
+from flumotion.common import log, config, common, errors, setup
 from flumotion.configure import configure
 from flumotion.common import server
 from flumotion.common.options import OptionGroup, OptionParser
-from flumotion.manager import config
-from flumotion.manager import manager
 
 defaultSSLPort = configure.defaultSSLManagerPort
 defaultTCPPort = configure.defaultTCPManagerPort

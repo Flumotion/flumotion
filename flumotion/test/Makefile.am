@@ -43,6 +43,7 @@ EXTRA_DIST = 					\
 	test_component_playlist.py		\
 	test_component.py			\
 	test_comptest.py			\
+	test_config.py				\
 	test_configure.py			\
 	test_credentials.py			\
 	test_dag.py				\
@@ -57,9 +58,7 @@ EXTRA_DIST = 					\
 	test_keycards.py			\
 	test_logfilter.py			\
 	test_manager_admin.py			\
-	test_manager_config.py			\
 	test_manager_manager.py			\
-	test_manager_registry.py		\
 	test_manager_worker.py			\
 	test_misc_httpfile.py			\
 	test_options.py				\
@@ -69,6 +68,7 @@ EXTRA_DIST = 					\
 	test_porter.py				\
 	test_public_ui_api.py			\
 	test_reflect.py				\
+	test_registry.py			\
 	test_saltsha256.py			\
 	test_testclasses.py			\
 	test_twisted_integration.py		\

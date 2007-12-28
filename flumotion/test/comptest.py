@@ -37,10 +37,9 @@ except AssertionError:
 from twisted.python import failure
 from twisted.internet import reactor, defer, interfaces
 
-from flumotion.common import log, common
+from flumotion.common import registry, log, common
 from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
-from flumotion.manager import registry
 from flumotion.twisted import flavors
 
 __all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',

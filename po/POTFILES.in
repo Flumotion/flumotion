@@ -5,8 +5,6 @@ flumotion/manager/base.py
 flumotion/manager/manager.py
 flumotion/manager/component.py
 flumotion/manager/__init__.py
-flumotion/manager/registry.py
-flumotion/manager/config.py
 flumotion/common/pygobject.py
 flumotion/common/options.py
 flumotion/common/reflectcall.py
@@ -15,6 +13,7 @@ flumotion/common/fxml.py
 flumotion/common/errors.py
 flumotion/common/enum.py
 flumotion/common/boot.py
+flumotion/common/registry.py
 flumotion/common/planet.py
 flumotion/common/bundleclient.py
 flumotion/common/identity.py
@@ -39,6 +38,7 @@ flumotion/common/manhole.py
 flumotion/common/keycards.py
 flumotion/common/medium.py
 flumotion/common/setup.py
+flumotion/common/config.py
 flumotion/common/avltree.py
 flumotion/common/gstreamer.py
 flumotion/common/python.py
@@ -271,7 +271,7 @@ flumotion/test/bouncertest.py
 flumotion/test/test_public_ui_api.py
 flumotion/test/test_component_bouncers_bouncer.py
 flumotion/test/test_component_httpserver.py
-flumotion/test/test_manager_registry.py
+flumotion/test/test_registry.py
 flumotion/test/test_component_init.py
 flumotion/test/test_component.py
 flumotion/test/test_testclasses.py
@@ -296,7 +296,7 @@ flumotion/test/test_manager_worker.py
 flumotion/test/test_admin_admin.py
 flumotion/test/test_common_avltree.py
 flumotion/test/test_component_playlist.py
-flumotion/test/test_manager_config.py
+flumotion/test/test_config.py
 flumotion/test/test_saltsha256.py
 flumotion/test/test_ui_fgtk.py
 flumotion/test/test_wizard.py

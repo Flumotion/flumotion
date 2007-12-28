@@ -34,9 +34,8 @@ from twisted.spread import pb
 from twisted.python import failure
 from zope.interface import implements
 
-from flumotion.common import errors, interfaces, log, planet, debug
 from flumotion.manager import base
-from flumotion.manager import registry
+from flumotion.common import errors, interfaces, log, planet, registry, debug
 
 # make Result and Message proxyable
 from flumotion.common import messages
@@ -325,16 +324,16 @@ class AdminAvatar(base.ManagerAvatar):
                                if None, no label will be set.
         @type  componentLabel: str or None
         @param properties:     List of property name-value pairs.
-                               See L{flumotion.manager.config.buildPropertyDict}
+                               See L{flumotion.common.config.buildPropertyDict}
         @type  properties:     [(str, object)]
         @param workerName:     the name of the worker where the added
                                component should run.
         @type  workerName:     str
         @param plugs:          List of plugs, as type-propertyList pairs.
-                               See {flumotion.manager.config.buildPlugsSet}.
+                               See {flumotion.common.config.buildPlugsSet}.
         @type  plugs:          [(str, [(str, object)])]
         @param eaters:         List of (eater name, feed ID) pairs.
-                               See L{flumotion.manager.config.buildEatersDict}
+                               See L{flumotion.common.config.buildEatersDict}
         @type  eaters:         [(str, str)]
         @param isClockMaster:  True if the component to be added must be
                                a clock master. Passing False here means
@@ -343,7 +342,7 @@ class AdminAvatar(base.ManagerAvatar):
                                for this flow.
         @type  isClockMaster:  bool
         @param virtualFeeds:   List of (virtual feed, feeder name) pairs.
-                               See L{flumotion.manager.config.buildVirtualFeeds}
+                               See L{flumotion.common.config.buildVirtualFeeds}
         @type  virtualFeeds:   [(str, str)]
         """
         return self.vishnu.loadComponent(self.remoteIdentity, componentType,

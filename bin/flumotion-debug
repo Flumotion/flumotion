@@ -6,7 +6,7 @@ import sys
 import code
 
 # Variable templates
-LIBDIR = '/opt/flumotion/lib'
+LIBDIR = '/opt/flumotion//lib'
 PROGRAM_PATH = 'flumotion.manager.main.main'
 
 # setup the project root
@@ -50,7 +50,7 @@ def main(args):
     parser = OptionParser()
     parser.add_option('-c', '--command',
                      action="store", type="string", dest="command",
-                     help="Program passed in as string (terminates option list)")
+                     help="ogram passed in as string (terminates option list)")
     options, args = parser.parse_args(args)
 
     ns = globals().copy()

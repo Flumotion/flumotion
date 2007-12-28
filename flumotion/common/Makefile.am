@@ -11,6 +11,7 @@ flumotion_PYTHON = \
 	connection.py \
 	common.py \
 	componentui.py \
+	config.py \
 	dag.py \
 	debug.py \
 	enum.py \
@@ -31,6 +32,7 @@ flumotion_PYTHON = \
 	pygobject.py \
 	python.py \
 	reflectcall.py \
+	registry.py \
 	reload.py \
 	server.py \
 	setup.py \

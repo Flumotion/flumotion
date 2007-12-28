@@ -23,9 +23,8 @@ __version__ = "$Rev$"
 
 import sys
 
-from flumotion.common import log, common
+from flumotion.common import log, common, registry
 from flumotion.common.options import OptionParser
-from flumotion.manager import registry
 
 
 def printMultiline(indent, data):

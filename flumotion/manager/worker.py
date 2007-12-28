@@ -27,11 +27,9 @@ manager-side objects to handle worker clients
 
 from twisted.internet import defer
 
-from flumotion.common import errors, interfaces, log
-from flumotion.common import worker, common
 from flumotion.manager import base
-from flumotion.manager import registry
-
+from flumotion.common import errors, interfaces, log, registry
+from flumotion.common import worker, common
 
 class WorkerAvatar(base.ManagerAvatar):
     """

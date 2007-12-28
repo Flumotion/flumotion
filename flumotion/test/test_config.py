@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name:flumotion.test.test_manager_config -*-
+# -*- Mode: Python; test-case-name:flumotion.test.test_config -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -23,10 +23,8 @@ __version__ = "$Rev$"
 
 from StringIO import StringIO
 
-from flumotion.common import errors
+from flumotion.common import config, registry, errors
 from flumotion.common import testsuite
-from flumotion.manager import config
-from flumotion.manager import registry
 
 regchunk = """
 <registry>
