@@ -1,5 +1,13 @@
 2007-12-28  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/manager/component.py:
+	  When stopping explicitly, create a deferred. Fire it once shutdown is
+	  complete. Return it from remote stop method.
+	  Allows restart to work non-racily (it mostly worked in the normal admin
+	  anyway, because the normal admin uses stop then start, not restart).
+
+2007-12-28  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/manager/manager.py:
 	  Raise an exception rather than silently returning if we fail to stop a
 	  lost component when the worker says it's still running.

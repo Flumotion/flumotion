@@ -74,6 +74,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self.clocking = clocking
 
         self._shutdown_requested = False
+        self._shutdownDeferred = None
 
         self.vishnu.registerComponent(self)
         # calllater to allow the component a chance to receive its
@@ -128,6 +129,10 @@ class ComponentAvatar(base.ManagerAvatar):
         self.jobState = None
 
         self.heaven.componentDetached(self)
+
+        if self._shutdownDeferred:
+            reactor.callLater(0, self._shutdownDeferred.callback, True)
+            self._shutdownDeferred = None
 
         base.ManagerAvatar.onShutdown(self)
 
@@ -384,7 +389,11 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Tell the remote component to shut down.
         """
-        return self.mindCallRemote('stop')
+        self._shutdownDeferred = defer.Deferred()
+
+        self.mindCallRemote('stop')
+
+        return self._shutdownDeferred
 
     def setClocking(self, host, port, base_time):
         # setMood on error?
