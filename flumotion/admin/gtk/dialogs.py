@@ -126,7 +126,8 @@ def connection_failed_message(info, debug, parent=None):
 
 def already_connected_message(info, parent=None):
     d = ErrorDialog('Already connected to %s' % info, parent, True,
-                    "Seek your satisfaction via existing routes.")
+                    "You cannot connect twice to the same manager. Try "
+                    "disconnecting first.")
     return d.run()
 
 class PropertyChangeDialog(gtk.Dialog):
