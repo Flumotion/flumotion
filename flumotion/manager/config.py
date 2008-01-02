@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev: 6049 $"
+__version__ = "$Rev$"
 
 """
 parsing of manager configuration files

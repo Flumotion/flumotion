@@ -1,3 +1,17 @@
+2008-01-02  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/config.py:
+	* flumotion/component/encoders/encodingprofile.py:
+	* flumotion/component/encoders/encodingwizardplugin.py:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/manager/config.py:
+	* flumotion/test/test_admin_config.py:
+	  Set svn:keywords on newly added files.
+
 2008-01-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/client.py:

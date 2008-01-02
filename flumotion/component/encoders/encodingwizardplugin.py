@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev: 5969 $"
+__version__ = "$Rev$"
 
 from flumotion.component.encoders.encodingprofile import Profile
 
