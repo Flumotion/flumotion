@@ -16,6 +16,7 @@ EXTRA_DIST = 					\
 	bouncertest.py				\
 	test_admin_admin.py			\
 	test_admin_config.py			\
+	test_admin_connections.py		\
 	test_admin_multi.py			\
 	test_bundle.py				\
 	test_checkers.py			\

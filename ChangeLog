@@ -1,3 +1,11 @@
+2008-01-02  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_admin_connections.py: Add a test.
+
+	* flumotion/admin/connections.py (RecentConnection.parse_connection): 
+	Refactor try/except clause
+
 2008-01-02  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/config.py:

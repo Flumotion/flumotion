@@ -66,22 +66,23 @@ def get_recent_connections():
         files = [os.path.join(configure.registrydir, f) for f in files]
         files = [(os.stat(f).st_mtime, f) for f in files
                                           if f.endswith('.connection')]
-        files.sort()
-        files.reverse()
-
-        ret = []
-        for f in [x[1] for x in files]:
-            try:
-                state = parse_connection(f)
-                ret.append(RecentConnection(str(state),
-                                            filename=f,
-                                            info=state))
-            except Exception, e:
-                log.warning('connections', 'Error parsing %s: %r', f, e)
-        return ret
     except OSError, e:
         log.warning('connections', 'Error: %s: %s', e.strerror, e.filename)
         return []
+
+    files.sort()
+    files.reverse()
+
+    ret = []
+    for f in [x[1] for x in files]:
+        try:
+            state = parse_connection(f)
+            ret.append(RecentConnection(str(state),
+                                        filename=f,
+                                        info=state))
+        except Exception, e:
+            log.warning('connections', 'Error parsing %s: %r', f, e)
+    return ret
 
 def parsePBConnectionInfo(managerString, use_ssl=True,
                           defaultPort=configure.defaultSSLManagerPort):
