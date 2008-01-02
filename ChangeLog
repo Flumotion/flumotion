@@ -1,3 +1,8 @@
+2008-01-02  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/client.py:
+	Fix recent connections shown on connections menu.
+
 2007-12-28  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_disk.glade:

@@ -353,7 +353,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._uimgr.ensure_update()
 
         def recent_activate(action, conn):
-            self._open_connection(conn.info)
+            self._open_connection(conn)
 
         ui = ""
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
