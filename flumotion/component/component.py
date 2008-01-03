@@ -87,10 +87,16 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         def loginCallback(reference):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
-            self._previously_connected = True
 
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
+
+        def loginFailedDisconnect(failure):
+            # We _always_ disconnect. Then, we may log a more specific failure 
+            # message at a higher warning level.
+            self.debug('Login failed, reason: %s, disconnecting', failure)
+            self.disconnect()
+            return failure
 
         def accessDeniedErrback(failure):
             failure.trap(errors.NotAuthenticatedError)
@@ -109,6 +115,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
             self.warning('Login failed, reason: %s' % failure)
 
         d.addCallback(loginCallback)
+        d.addErrback(loginFailedDisconnect)
         d.addErrback(accessDeniedErrback)
         d.addErrback(connectionRefusedErrback)
         d.addErrback(alreadyLoggedInErrback)

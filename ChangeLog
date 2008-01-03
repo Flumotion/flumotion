@@ -1,3 +1,10 @@
+2008-01-03  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  If login of a component fails for _any_ reason, ensure that we
+	  disconnect immediately, so that the ReconnectingClientFactory can
+	  schedule a reconnect attempt later.
+
 2008-01-02  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/Makefile.am:
