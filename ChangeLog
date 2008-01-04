@@ -1,5 +1,10 @@
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py: Avoid importing a few more modules,
+	import the classes directly instead
+	
+2008-01-04  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/gtk/client.py (AdminClientWindow.refused_later): 
 	Send in the window instead of the instance, fixes #818
 	(AdminClientWindow._fatal_error): Add a new method to show an error

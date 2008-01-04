@@ -34,13 +34,18 @@ from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.connections import get_recent_connections
-from flumotion.admin.gtk import dialogs
+from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
+     ProgressDialog, PropertyChangeDialog, connection_failed_message, \
+     connection_refused_message
 from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.parts import getComponentLabel, ComponentsView, \
      AdminStatusbar
 from flumotion.configure import configure
-from flumotion.common import common, errors, log
+from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
+from flumotion.common.errors import ConnectionRefusedError, PropertyError, \
+     ReloadSyntaxError
+from flumotion.common.log import Loggable
 from flumotion.common.messages import gettexter
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
@@ -113,7 +118,7 @@ RECENT_UI_TEMPLATE = '''<ui>
 MAX_RECENT_ITEMS = 4
 
 
-class AdminClientWindow(log.Loggable, gobject.GObject):
+class AdminClientWindow(Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
@@ -383,8 +388,8 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         self.debug('Configuration=%s' % fd.read())
 
     def _error(self, message):
-        d = dialogs.ErrorDialog(message, self._window,
-                                close_on_response=True)
+        d = ErrorDialog(message, self._window,
+                        close_on_response=True)
         d.show_all()
 
     def _fatal_error(self, message, tray=None):
@@ -392,7 +397,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._trayicon.set_tooltip(tray)
 
         self.info(message)
-        d = dialogs.ErrorDialog(message, self._window)
+        d = ErrorDialog(message, self._window)
         d.show_all()
         d.connect('response', self._close)
 
@@ -450,12 +455,10 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._append_recent_connections()
 
         def refused(failure):
-            if failure.check(errors.ConnectionRefusedError):
-                d = dialogs.connection_refused_message(i.host,
-                                                       self._window)
+            if failure.check(ConnectionRefusedError):
+                d = connection_refused_message(i.host, self._window)
             else:
-                d = dialogs.connection_failed_message(i, str(failure),
-                                                      self._window)
+                d = connection_failed_message(i, str(failure), self._window)
             d.addCallback(lambda _: self._window.set_sensitive(True))
 
         d.addCallbacks(connected, refused)
@@ -567,7 +570,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _component_modify(self, state):
         def propertyErrback(failure):
-            failure.trap(errors.PropertyError)
+            failure.trap(PropertyError)
             self._error("%s." % failure.getErrorMessage())
             return None
 
@@ -584,7 +587,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             cb.addErrback(propertyErrback)
 
         name = state.get('name')
-        d = dialogs.PropertyChangeDialog(name, self._window)
+        d = PropertyChangeDialog(name, self._window)
         d.connect('get', dialog_get_cb, state)
         d.connect('set', dialog_set_cb, state)
         d.run()
@@ -608,7 +611,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
     def _component_reload(self, state):
         name = getComponentLabel(state)
 
-        dialog = dialogs.ProgressDialog("Reloading",
+        dialog = ProgressDialog("Reloading",
             _("Reloading component code for %s") % name, self._window)
         d = self._admin.callRemote('reloadComponent', state)
         d.addCallback(lambda result, dlg: dlg.destroy(), dialog)
@@ -645,8 +648,8 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _component_kill(self, state):
         workerName = state.get('workerRequested')
-        avatarId = common.componentId(state.get('parent').get('name'),
-                                      state.get('name'))
+        avatarId = componentId(state.get('parent').get('name'),
+                               state.get('name'))
         self._admin.callRemote('workerCallRemote', workerName, 'killJob',
                                avatarId)
 
@@ -788,7 +791,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
                 dialog.destroy()
                 return
 
-        dialog = dialogs.ProgressDialog(
+        dialog = ProgressDialog(
             _("Reconnecting ..."),
             _("Lost connection to manager %s, reconnecting ...")
             % (self._admin.adminInfoStr(),),
@@ -817,9 +820,9 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
                 self._admin.connectionInfoStr()),
                 _("Connection to %s was refused") % self._admin.adminInfoStr())
 
-        log.debug('adminclient', "handling connection-refused")
+        self.debug("handling connection-refused")
         reactor.callLater(0, refused_later)
-        log.debug('adminclient', "handled connection-refused")
+        self.debug("handled connection-refused")
 
     def _connection_failed(self, reason):
         def failed_later():
@@ -828,9 +831,9 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
                 self._admin.connectionInfoStr(), reason),
                 _("Connection to %s failed") % self._admin.adminInfoStr())
 
-        log.debug('adminclient', "handling connection-failed")
+        self.debug("handling connection-failed")
         reactor.callLater(0, failed_later)
-        log.debug('adminclient', "handled connection-failed")
+        self.debug("handled connection-failed")
 
     def _open_recent_connection(self):
         d = ConnectionsDialog(self._window)
@@ -929,7 +932,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         self.info('Reloaded admin code')
 
     def _reload_all(self):
-        dialog = dialogs.ProgressDialog(_("Reloading ..."),
+        dialog = ProgressDialog(_("Reloading ..."),
             _("Reloading client code"), self._window)
 
         # FIXME: move all of the reloads over to this dialog
@@ -938,7 +941,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             dialog.destroy()
 
         def _syntaxErrback(failure):
-            failure.trap(errors.ReloadSyntaxError)
+            failure.trap(ReloadSyntaxError)
             dialog.stop()
             dialog.destroy()
             self._error(
@@ -997,7 +1000,7 @@ You can do remote component calls using:
         code.interact(local=vars, banner=message)
 
     def _about(self):
-        about = dialogs.AboutDialog(self._window)
+        about = AboutDialog(self._window)
         about.run()
         about.destroy()
 
