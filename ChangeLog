@@ -1,5 +1,7 @@
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/: Audit and mark more strings as translatable
+
 	* flumotion/admin/gtk/client.py (AdminClientWindow._open_connection): 
 	Accept a PBConnectionInfo
 	(AdminClientWindow.on_have_connection): Send in PBConnectionInfo here.

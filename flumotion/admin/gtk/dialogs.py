@@ -125,18 +125,18 @@ class PropertyChangeDialog(gtk.Dialog):
     RESPONSE_FETCH = 0
 
     def __init__(self, name, parent):
-        title = "Change element property on '%s'" % name
+        title = _("Change element property on '%s'") % name
         gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.connect('response', self.response_cb)
-        self._close = self.add_button('Close', gtk.RESPONSE_CLOSE)
-        self._set = self.add_button('Set', gtk.RESPONSE_APPLY)
-        self._fetch = self.add_button('Fetch current', self.RESPONSE_FETCH)
+        self._close = self.add_button(_('Close'), gtk.RESPONSE_CLOSE)
+        self._set = self.add_button(_('Set'), gtk.RESPONSE_APPLY)
+        self._fetch = self.add_button(_('Fetch current'), self.RESPONSE_FETCH)
 
         hbox = gtk.HBox()
         hbox.show()
 
-        label = gtk.Label('Element')
+        label = gtk.Label(_('Element'))
         label.show()
         hbox.pack_start(label, False, False)
         self.element_combo = gtk.ComboBox()
@@ -144,14 +144,14 @@ class PropertyChangeDialog(gtk.Dialog):
         self.element_entry.show()
         hbox.pack_start(self.element_entry, False, False)
 
-        label = gtk.Label('Property')
+        label = gtk.Label(_('Property'))
         label.show()
         hbox.pack_start(label, False, False)
         self.property_entry = gtk.Entry()
         self.property_entry.show()
         hbox.pack_start(self.property_entry, False, False)
 
-        label = gtk.Label('Value')
+        label = gtk.Label(_('Value'))
         label.show()
         hbox.pack_start(label, False, False)
         self.value_entry = gtk.Entry()

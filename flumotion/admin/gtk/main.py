@@ -145,7 +145,7 @@ def main(args):
         message = "".join(failure.value.args)
         log.warning('admin', "Failed to connect: %s",
                     log.getFailureMessage(failure))
-        sys.stderr.write("Connection to manager failed: %s\n" % message)
+        sys.stderr.write(_("Connection to manager failed: %s\n") % message)
         reactor.stop()
 
     d.addCallbacks(adminStarted, errback)

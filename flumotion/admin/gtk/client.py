@@ -200,11 +200,13 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
     def whsAppend(self, state, key, value):
         if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged in.' % value)
+            self.statusbar.set(
+                'main', _('Worker %s logged in.') % value)
 
     def whsRemove(self, state, key, value):
         if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged out.' % value)
+            self.statusbar.set(
+                'main', _('Worker %s logged out.') % value)
 
     def show(self):
         self._window.show()
@@ -667,7 +669,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         if not name:
             return None
 
-        mid = self.statusbar.push('main', "%s component %s" % (doing, name))
+        mid = self.statusbar.push('main',
+                                  _("%s component %s") % (doing, name))
         d = self._admin.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):

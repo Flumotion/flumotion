@@ -57,7 +57,7 @@ class NodeBook(gtk.Notebook):
         for name, node in self.nodes.items():
             table = gtk.Table(1,1)
             table.show()
-            table.add(gtk.Label('Loading UI for %s...' % name))
+            table.add(gtk.Label(_('Loading UI for %s...') % name))
             label = self._get_title_label(node, name)
             label.show()
             self.append_page(table, label)
@@ -144,7 +144,7 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         def sleeping_component(failure):
             failure.trap(errors.SleepingComponentError)
-            return lambda: gtk.Label('Component %s is still sleeping' %
+            return lambda: gtk.Label(_('Component %s is still sleeping') %
                                      state.get('name'))
 
         admin = self.get_admin_for_object(state)

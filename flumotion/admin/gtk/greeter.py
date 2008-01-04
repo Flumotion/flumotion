@@ -237,7 +237,7 @@ This mode is only useful for testing Flumotion.
             env['PATH'] = os.pathsep.join(paths)
             process = reactor.spawnProcess(protocol, args[0], args, env=env)
             def error(failure, failMessage):
-                self.label_starting.set_text('Failed to %s' % description)
+                self.label_starting.set_text(_('Failed to %s') % description)
                 # error should trigger going to next page with an overview
                 state.update({
                     'command': ' '.join(args),
