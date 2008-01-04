@@ -439,14 +439,13 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin.disconnect_by_func(self._admin_update_cb)
         self._admin = None
 
-    def _open_connection(self, connectionInfo):
-        i = connectionInfo.info
+    def _open_connection(self, info):
         model = AdminModel()
-        d = model.connectToManager(i)
+        d = model.connectToManager(info)
 
         self._trayicon.set_tooltip(_("Connecting to %(host)s:%(port)s") % {
-            'host': i.host,
-            'port': i.port,
+            'host': info.host,
+            'port': info.port,
         })
 
         def connected(model):
@@ -456,9 +455,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         def refused(failure):
             if failure.check(ConnectionRefusedError):
-                d = connection_refused_message(i.host, self._window)
+                d = connection_refused_message(info.host, self._window)
             else:
-                d = connection_failed_message(i, str(failure), self._window)
+                d = connection_failed_message(info, str(failure), self._window)
             d.addCallback(lambda _: self._window.set_sensitive(True))
 
         d.addCallbacks(connected, refused)
@@ -840,7 +839,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         def on_have_connection(d, connectionInfo):
             d.destroy()
-            self._open_connection(connectionInfo)
+            self._open_connection(connectionInfo.info)
             connectionInfo.update_timestamp()
 
         d.connect('have-connection', on_have_connection)

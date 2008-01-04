@@ -1,5 +1,10 @@
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py (AdminClientWindow._open_connection): 
+	Accept a PBConnectionInfo
+	(AdminClientWindow.on_have_connection): Send in PBConnectionInfo here.
+	Fixes #817
+
 	* flumotion/admin/gtk/dialogs.py (connection_refused_message): Mark
 	a few more strings as translatable, reorder classes and functions.
 
