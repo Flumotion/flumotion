@@ -1,3 +1,8 @@
+2008-01-04  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py (AdminClientWindow.refused_later): 
+	Send in the window instead of the instance, fixes #818
+
 2008-01-03  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/component.py:

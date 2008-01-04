@@ -803,7 +803,7 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
             self._trayicon.set_tooltip(_("Connection to %s was refused") %
                 self._admin.adminInfoStr())
             self.info(message)
-            d = dialogs.ErrorDialog(message, self)
+            d = dialogs.ErrorDialog(message, self._window)
             d.show_all()
             d.connect('response', self._close)
 
