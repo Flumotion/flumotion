@@ -1,7 +1,10 @@
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/dialogs.py (connection_refused_message): Mark
+	a few more strings as translatable, reorder classes and functions.
+
 	* flumotion/admin/gtk/client.py: Avoid importing a few more modules,
-	import the classes directly instead
+	import the attributes directly instead
 	
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 

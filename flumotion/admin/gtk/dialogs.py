@@ -20,9 +20,7 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-from gettext import gettext as _
+import gettext
 import os
 
 import gobject
@@ -30,6 +28,9 @@ import gtk
 
 from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
+
+_ = gettext.gettext
+__version__ = "$Rev$"
 
 
 class ProgressDialog(gtk.Dialog):
@@ -77,6 +78,7 @@ class ProgressDialog(gtk.Dialog):
     def _destroy_cb(self, widget):
         self.stop()
 
+
 class ErrorDialog(gtk.MessageDialog):
     def __init__(self, message, parent=None, close_on_response=True,
                  secondary_text=None):
@@ -111,24 +113,6 @@ class ErrorDialog(gtk.MessageDialog):
         self.show()
         return deferred
 
-def connection_refused_message(host, parent=None):
-    d = ErrorDialog('Connection refused', parent, True,
-                    '"%s" refused your connection.\n'
-                    'Check your user name and password and try again.'
-                    % host)
-    return d.run()
-
-def connection_failed_message(info, debug, parent=None):
-    message = (_("Connection to manager on %s failed (%s).")
-               % (str(info), debug))
-    d = ErrorDialog('Connection failed', parent, True, message)
-    return d.run()
-
-def already_connected_message(info, parent=None):
-    d = ErrorDialog('Already connected to %s' % info, parent, True,
-                    "You cannot connect twice to the same manager. Try "
-                    "disconnecting first.")
-    return d.run()
 
 class PropertyChangeDialog(gtk.Dialog):
     """
@@ -192,6 +176,7 @@ class PropertyChangeDialog(gtk.Dialog):
 
 gobject.type_register(PropertyChangeDialog)
 
+
 class AboutDialog(gtk.Dialog):
     def __init__(self, parent=None):
         gtk.Dialog.__init__(self, _('About Flumotion'), parent,
@@ -238,3 +223,24 @@ class AboutDialog(gtk.Dialog):
         info.set_justify(gtk.JUSTIFY_FILL)
         info.set_line_wrap(True)
         info.show()
+
+
+def connection_refused_message(host, parent=None):
+    d = ErrorDialog(_('Connection refused'), parent, True,
+                    _('"%s" refused your connection.\n'
+                      'Check your user name and password and try again.')
+                    % (host,))
+    return d.run()
+
+def connection_failed_message(info, debug, parent=None):
+    message = (_("Connection to manager on %s failed (%s).")
+               % (str(info), debug))
+    d = ErrorDialog('Connection failed', parent, True, message)
+    return d.run()
+
+def already_connected_message(info, parent=None):
+    d = ErrorDialog(_('Already connected to %s') % (info,), parent, True,
+                    _("You cannot connect twice to the same manager. Try "
+                      "disconnecting first."))
+    return d.run()
+
