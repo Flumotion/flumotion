@@ -2,6 +2,10 @@
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow.refused_later): 
 	Send in the window instead of the instance, fixes #818
+	(AdminClientWindow._fatal_error): Add a new method to show an error
+	which is fatal.
+	(AdminClientWindow._connection_refused)
+	(AdminClientWindow._connection_failed): Refactor to use _fatal_error.
 
 2008-01-03  Michael Smith <msmith@fluendo.com>
 

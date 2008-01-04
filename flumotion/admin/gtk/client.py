@@ -382,6 +382,20 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
         fd.seek(0)
         self.debug('Configuration=%s' % fd.read())
 
+    def _error(self, message):
+        d = dialogs.ErrorDialog(message, self._window,
+                                close_on_response=True)
+        d.show_all()
+
+    def _fatal_error(self, message, tray=None):
+        if tray:
+            self._trayicon.set_tooltip(tray)
+
+        self.info(message)
+        d = dialogs.ErrorDialog(message, self._window)
+        d.show_all()
+        d.connect('response', self._close)
+
     def _run_wizard(self):
         if self._wizard:
             self._wizard.present()
@@ -798,14 +812,10 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _connection_refused(self):
         def refused_later():
-            message = _("Connection to manager on %s was refused.") % \
-                self._admin.connectionInfoStr()
-            self._trayicon.set_tooltip(_("Connection to %s was refused") %
-                self._admin.adminInfoStr())
-            self.info(message)
-            d = dialogs.ErrorDialog(message, self._window)
-            d.show_all()
-            d.connect('response', self._close)
+            self._fatal_error(
+                _("Connection to manager on %s was refused.") % (
+                self._admin.connectionInfoStr()),
+                _("Connection to %s was refused") % self._admin.adminInfoStr())
 
         log.debug('adminclient', "handling connection-refused")
         reactor.callLater(0, refused_later)
@@ -813,26 +823,14 @@ class AdminClientWindow(log.Loggable, gobject.GObject):
 
     def _connection_failed(self, reason):
         def failed_later():
-            message = (
-                _("Connection to manager on %(conn)s failed (%(reason)s).") % {
-                    'conn': self._admin.connectionInfoStr(),
-                    'reason': reason,
-                })
-            self._trayicon.set_tooltip("Connection to %s failed" %
-                self._admin.adminInfoStr())
-            self.info(message)
-            d = dialogs.ErrorDialog(message, self._window)
-            d.show_all()
-            d.connect('response', self._close)
+            self._fatal_error(
+                _("Connection to manager on %s failed (%s).") % (
+                self._admin.connectionInfoStr(), reason),
+                _("Connection to %s failed") % self._admin.adminInfoStr())
 
         log.debug('adminclient', "handling connection-failed")
         reactor.callLater(0, failed_later)
         log.debug('adminclient', "handled connection-failed")
-
-    def _error(self, message):
-        d = dialogs.ErrorDialog(message, self._window,
-                                close_on_response=True)
-        d.show_all()
 
     def _open_recent_connection(self):
         d = ConnectionsDialog(self._window)
