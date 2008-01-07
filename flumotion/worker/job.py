@@ -32,7 +32,7 @@ import sys
 from twisted.internet import defer, reactor
 
 from flumotion.common import errors, log
-from flumotion.common import common, messages
+from flumotion.common import messages
 
 N_ = messages.N_
 T_ = messages.gettexter('flumotion')
@@ -260,7 +260,6 @@ class CheckJobAvatar(base.BaseJobAvatar):
 
     def perspective_cleanShutdown(self):
         self.debug("job is stopping")
-        pass
 
 
 class CheckJobHeaven(base.BaseJobHeaven):
@@ -320,7 +319,7 @@ class CheckJobHeaven(base.BaseJobHeaven):
                                           methodName, *args, **kwargs)
 
             def timeout(sig):
-                self.killJobByPid(process.pid, sig)
+                self.killJobByPid(job.pid, sig)
 
             def haveResult(res):
                 if not termtimeout.active():

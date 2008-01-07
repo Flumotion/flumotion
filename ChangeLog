@@ -1,3 +1,8 @@
+2008-01-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker/job.py (CheckJobHeaven.timeout): job.pid, not
+	process.pid. Remove unused import too.
+
 2008-01-07  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/admin/gtk/main.py:
