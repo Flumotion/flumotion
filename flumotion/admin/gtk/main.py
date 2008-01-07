@@ -36,6 +36,7 @@ from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 from flumotion.common.options import OptionParser
 
+_ = gettext.gettext
 
 def startAdminFromGreeter(greeter=None):
     if greeter is None:
