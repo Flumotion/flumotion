@@ -1,3 +1,8 @@
+2008-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/admin.py:
+	  Raise SleepingComponentError with the proper argument, the state.
+
 2008-01-04  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/: Audit and mark more strings as translatable

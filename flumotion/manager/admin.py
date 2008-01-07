@@ -145,7 +145,7 @@ class AdminAvatar(base.ManagerAvatar):
         if not avatar:
             self.warning('No avatar for %s, cannot call remote' %
                 componentState.get('name'))
-            raise errors.SleepingComponentError()
+            raise errors.SleepingComponentError(componentState)
 
         # XXX: Maybe we need to have a prefix, so we can limit what an
         # admin interface can call on a component
@@ -201,7 +201,7 @@ class AdminAvatar(base.ManagerAvatar):
             if not m.avatar:
                 self.debug('component %s not logged in yet, no entry',
                            componentName)
-                raise errors.SleepingComponentError(componentName)
+                raise errors.SleepingComponentError(componentState)
             componentType = m.avatar.getType()
 
         self.debug('getting entry of type %s for component type %s',
