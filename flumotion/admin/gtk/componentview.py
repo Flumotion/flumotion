@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
+import gettext
 
 import gobject
 import gtk
@@ -28,7 +27,11 @@ import gtk
 from flumotion.common import planet, errors, common, log
 from flumotion.common import componentui # ensure unjellier registered
 
+__version__ = "$Rev$"
+_ = gettext.gettext
+
 componentui # pyflakes
+
 
 class NodeBook(gtk.Notebook):
     def __init__(self, admingtk):

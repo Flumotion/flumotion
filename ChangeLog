@@ -1,3 +1,8 @@
+2008-01-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py:
+	Import gettext and set _
+
 2008-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/admin.py:
