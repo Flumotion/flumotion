@@ -7,6 +7,7 @@ flumotion_PYTHON = 	\
 	fgtk.py 	\
 	fvumeter.py 	\
 	glade.py 	\
+	kiwipatches.py 	\
 	icons.py 	\
 	sidebar.py 	\
 	simplewizard.py \

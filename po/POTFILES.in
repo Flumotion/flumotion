@@ -205,6 +205,7 @@ flumotion/ui/sidebar.py
 flumotion/ui/trayicon.py
 flumotion/ui/__init__.py
 flumotion/ui/simplewizard.py
+flumotion/ui/kiwipatches.py
 flumotion/wizard/consumptionsteps.py
 flumotion/wizard/enums.py
 flumotion/wizard/save.py

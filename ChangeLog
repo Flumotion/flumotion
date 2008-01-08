@@ -1,5 +1,16 @@
 2008-01-08  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/glade.py:
+	* flumotion/ui/kiwipatches.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	Refactor kiwi monkey patches to a separate file.
+	Add a monkey patch to workaround a bug fixed in kiwi 1.9.15.
+
+2008-01-08  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_testsource.glade:
 	* data/glade/wizard_tvcard.glade:

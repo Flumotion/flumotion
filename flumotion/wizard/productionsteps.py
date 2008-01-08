@@ -236,10 +236,6 @@ class TestVideoSourceStep(VideoSourceStep):
         self.format.data_type = str
         self.framerate.data_type = float
 
-        self.add_proxy(self.model.properties,
-                       ['pattern', 'width', 'height',
-                        'framerate', 'format'])
-
         self.pattern.prefill([
             (_('SMPTE Color bars'), 0),
             (_('Random (television snow)'), 1),
@@ -247,6 +243,13 @@ class TestVideoSourceStep(VideoSourceStep):
         self.format.prefill([
             (_('YUV'), 'video/x-raw-yuv'),
             (_('RGB'), 'video/x-raw-rgb')])
+
+        self.model.properties.pattern = 0
+        self.model.properties.format = 'video/x-raw-yuv'
+
+        self.add_proxy(self.model.properties,
+                       ['pattern', 'width', 'height',
+                        'framerate', 'format'])
 
     def before_show(self):
         self.wizard.require_elements(self.worker, 'videotestsrc')
@@ -506,13 +509,16 @@ class TestAudioSourceStep(AudioSourceStep):
         self.rate.data_type = str
         self.volume.data_type = float
 
-        self.add_proxy(self.model.properties,
-                       ['frequency', 'volume', 'rate'])
-
         self.rate.prefill(['8000',
                            '16000',
                            '32000',
                            '44100'])
+
+        self.model.properties.rate = '44100'
+
+        self.add_proxy(self.model.properties,
+                       ['frequency', 'volume', 'rate'])
+
         self.rate.set_sensitive(True)
 
     def worker_changed(self):

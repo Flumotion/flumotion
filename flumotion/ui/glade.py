@@ -21,20 +21,20 @@
 
 __version__ = "$Rev$"
 
-import os
-
 import gtk
 from gtk import glade
 import gobject
 from kiwi.environ import environ
-from kiwi.ui import views
 from kiwi.ui.delegates import GladeDelegate
 from twisted.python.reflect import namedAny
 
 from flumotion.configure import configure
+from flumotion.ui.kiwipatches import install_patches
 
 # FIXME: Move to kiwi initialization
 environ.add_resource('glade', configure.gladedir)
+
+install_patches()
 
 def _unbrokenNamedAny(qual):
     # ihooks breaks namedAny, so split up by module, attribute
@@ -63,44 +63,8 @@ def _flumotion_glade_custom_handler(xml, proc, name, *args):
 glade.set_custom_handler(_flumotion_glade_custom_handler)
 
 
-# Kiwi monkey patch, allows us to specify a
-# glade_typedict on the View.
-class FluLibgladeWidgetTree(glade.XML):
-    def __init__(self, view, gladefile, domain=None):
-        self._view = view
-        glade.XML.__init__(self, gladefile, domain,
-                           typedict=view.glade_typedict or {})
 
-        for widget in self.get_widget_prefix(''):
-            setattr(self._view, widget.get_name(), widget)
 
-    def get_widget(self, name):
-        name = name.replace('.', '_')
-        widget = glade.XML.get_widget(self, name)
-        if widget is None:
-            raise AttributeError(
-                  "Widget %s not found in view %s" % (name, self._view))
-        return widget
-
-    def get_widgets(self):
-        return self.get_widget_prefix('')
-
-    def get_sizegroups(self):
-        return []
-
-def _open_glade(view, gladefile, domain):
-    if not gladefile:
-        raise ValueError("A gladefile wasn't provided.")
-    elif not isinstance(gladefile, basestring):
-        raise TypeError(
-              "gladefile should be a string, found %s" % type(gladefile))
-
-    if not '/' in gladefile:
-        filename = os.path.splitext(os.path.basename(gladefile))[0]
-        gladefile = environ.find_resource("glade", filename + '.glade')
-    return FluLibgladeWidgetTree(view, gladefile, domain)
-
-views._open_glade = _open_glade
 
 class GladeBacked(GladeDelegate):
     """
