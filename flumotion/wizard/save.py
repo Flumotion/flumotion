@@ -45,7 +45,7 @@ class Component(log.Loggable):
         self.debug('Creating component %s (%s) worker=%r' % (
             name, type, worker))
         self.name = name
-        self.type = type
+        self.component_type = type
         self.props = properties
         self.worker = worker
         self.eaters = []
@@ -67,7 +67,7 @@ class Component(log.Loggable):
     def getFeeders(self):
         s = []
         for source in self.feeders:
-            if source.type == 'firewire-producer':
+            if source.component_type == 'firewire-producer':
                 if self.name in ('encoder-video', 'overlay-video'):
                     feed = 'video'
                 else:
@@ -88,7 +88,7 @@ class Component(log.Loggable):
         # and "version" should be taken from the relevant project
         s = '    <component name="%s" type="%s" ' \
             'project="flumotion" version="%s"%s>\n' % (
-            self.name, self.type, configure.version, extra)
+            self.name, self.component_type, configure.version, extra)
         whoIsFeedingUs = self.getFeeders()
         if len(whoIsFeedingUs) > 0:
             s += '      <eater name="default">\n'
@@ -104,13 +104,14 @@ class Component(log.Loggable):
             #import code; code.interact(local=locals())
             for name in property_names:
                 value = self.props[name]
+                name = name.replace('_', '-')
                 s += '      <property name="%s">%s</property>\n' % (name, value)
 
         s += "    </component>\n"
         return s
 
     def printTree(self, indent=1):
-        print indent * '*', self.name, self.type, \
+        print indent * '*', self.name, self.component_type, \
               tuple([f.name for f in self.feeders]) or ''
         for eater in self.eaters:
             eater.printTree(indent+1)
@@ -120,21 +121,35 @@ class WizardSaver(log.Loggable):
     def __init__(self, wizard):
         self.wizard = wizard
 
-    def getVideoSource(self):
-        options = self.wizard.get_step_options(_('Source'))
-        source = options['video']
-        video_step = self.wizard.get_step(N_(source.step))
-
-        if hasattr(video_step, 'worker'):
-            properties = video_step.get_state()
-            worker = video_step.worker
-        else:
-            properties = {}
-            worker = self.wizard.get_step(_('Source')).worker
-
+    def _getVideoSource(self):
+        source_step = self.wizard.get_step(_('Source'))
+        video_producer = source_step.get_video_producer()
+        properties = video_producer.getProperties()
         self._set_fraction_property(properties, 'framerate', 10)
 
-        return Component('producer-video', source.component_type, worker,
+        return Component('producer-video',
+                         video_producer.component_type,
+                         video_producer.getWorker(),
+                         properties)
+
+    def _getAudioSource(self, video_source):
+        source_step = self.wizard.get_step(_('Source'))
+        audio_producer = source_step.get_audio_producer()
+
+        # If we selected firewire and have selected video
+        # and the selected video is Firewire,
+        #   return the source
+        if (audio_producer.component_type == 'firewire-producer' and
+            video_source and
+            video_source.component_type == 'firewire-producer'):
+            return video_source
+
+        properties = audio_producer.getProperties()
+        self._set_fraction_property(properties, 'framerate', 10)
+
+        return Component('producer-audio',
+                         audio_producer.component_type,
+                         audio_producer.worker,
                          properties)
 
     def getVideoOverlay(self, video_source):
@@ -192,32 +207,6 @@ class WizardSaver(log.Loggable):
                          encoder_step.worker,
                          properties)
 
-    def getAudioSource(self, video_source):
-        options = self.wizard.get_step_options(_('Source'))
-        source = options['audio']
-
-        # If we selected firewire and have selected video
-        # and the selected video is Firewire,
-        #   return the source
-        if (source == enums.AudioDevice.Firewire and video_source and
-            options['video'] == enums.VideoDevice.Firewire):
-            return video_source
-
-
-        audio_step = self.wizard.get_step(N_(source.step))
-
-        if hasattr(audio_step, 'worker'):
-            properties = audio_step.get_state()
-            worker = audio_step.worker
-        else:
-            properties = {}
-            worker = self.wizard.get_step(_('Source')).worker
-
-        self._set_fraction_property(properties, 'framerate', 10)
-
-        return Component('producer-audio', source.component_type, worker,
-                         properties)
-
     def getAudioEncoder(self):
         options = self.wizard.get_step_options(_('Encoding'))
         encoder = options['audio']
@@ -240,7 +229,7 @@ class WizardSaver(log.Loggable):
                          step.worker)
 
     def handleVideo(self, components):
-        video_source = self.getVideoSource()
+        video_source = self._getVideoSource()
         components.append(video_source)
 
         video_encoder = self.getVideoEncoder()
@@ -256,7 +245,7 @@ class WizardSaver(log.Loggable):
         return video_encoder, video_source
 
     def handleAudio(self, components, video_source):
-        audio_source = self.getAudioSource(video_source)
+        audio_source = self._getAudioSource(video_source)
         # In case of firewire component, which can already be there
         if not audio_source in components:
             components.append(audio_source)

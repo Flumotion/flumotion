@@ -29,53 +29,6 @@ from gettext import gettext as _
 from flumotion.common import enum
 
 #
-# Sources
-#
-
-VideoDevice = enum.EnumClass(
-    'VideoDevice',
-    ['Test', 'Webcam', 'TVCard', 'Firewire'],
-    [_('Test video source'),
-     _('Web camera'),
-     _('TV card'),
-     _('Firewire video'),
-     ],
-    step=['Test Video Source',
-          'Webcam',
-          'TV Card',
-          'Firewire'
-          ],
-    component_type=[
-        'videotest-producer',
-        'webcam-producer',
-        'tvcard-producer',
-        'firewire-producer'
-        ],
-    element_names=[
-        ['videotestsrc'],
-        ['v4lsrc'],
-        ['v4lsrc'],
-        ['dvdec', 'gst1394src'],
-        ])
-
-AudioDevice = enum.EnumClass(
-    'AudioDevice',
-    ['Test', 'Soundcard', 'Firewire'],
-    [_('Test audio source'),
-     _('Sound card'),
-     _('Firewire audio'),
-     ],
-    step=['Test Audio Source',
-          'Soundcard',
-          'Firewire audio',
-          ],
-    component_type=[
-        'audiotest-producer',
-        'soundcard-producer',
-        'firewire-producer'
-        ])
-
-#
 # TVCard
 #
 
@@ -101,18 +54,6 @@ VideoTestPattern = enum.EnumClass(
     [_('SMPTE Color bars'),
      _('Random (television snow)'),
      _('Totally black')])
-
-VideoTestFormat = enum.EnumClass(
-    'VideoTestFormat',
-    ['YUV', 'RGB'],
-    [_('YUV'), _('RGB')])
-
-AudioTestSamplerate = enum.EnumClass(
-    'AudioTestSamplerate',
-    ['8000',
-     '16000',
-     '32000',
-     '44100'])
 
 #
 # Sound card

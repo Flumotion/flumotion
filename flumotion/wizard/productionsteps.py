@@ -25,15 +25,13 @@ import gettext
 import math
 
 import gtk
-from flumotion.twisted.defer import defer_generator_method
 
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import WorkerWizardStep, \
     AudioSourceStep, VideoSourceStep
-from flumotion.wizard.enums import AudioDevice, SoundcardSystem, \
-    AudioTestSamplerate, VideoDevice, VideoTestFormat, VideoTestPattern
+from flumotion.wizard.enums import SoundcardSystem
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
 T_ = messages.gettexter('flumotion')
@@ -83,18 +81,7 @@ class ProductionStep(WorkerWizardStep):
         @returns: video step
         @rtype: a L{VideoSourceStep} subclass
         """
-        source = self.video.get_selected()
-        if source == VideoDevice.Test:
-            step_class = TestVideoSourceStep
-        elif source == VideoDevice.Webcam:
-            step_class = WebcamStep
-        elif source == VideoDevice.TVCard:
-            step_class = TVCardStep
-        elif source == VideoDevice.Firewire:
-            step_class = FireWireStep
-        else:
-            raise AssertionError(source)
-
+        step_class = self._get_video_step_class()
         return step_class(self.wizard, self._video_producer)
 
     def get_audio_step(self):
@@ -103,18 +90,7 @@ class ProductionStep(WorkerWizardStep):
         @returns: audio step
         @rtype: a L{AudioSourceStep} subclass
         """
-        source = self.audio.get_selected()
-        if source == AudioDevice.Test:
-            step_class = TestAudioSourceStep
-        elif source == AudioDevice.Soundcard:
-            step_class = SoundcardStep
-        elif source == AudioDevice.Firewire:
-            # Only show firewire audio if we're using firewire video
-            if self.video.get_active() == VideoDevice.Firewire:
-                return
-            step_class = FireWireAudioStep
-        else:
-            raise AssertionError(source)
+        step_class = self._get_audio_step_class()
         return step_class(self.wizard, self._audio_producer)
 
     # WizardStep
@@ -130,7 +106,42 @@ class ProductionStep(WorkerWizardStep):
         else:
             raise AssertionError
 
+    def worker_changed(self):
+        if not isinstance(self._get_audio_step_class(), WorkerWizardStep):
+            self._audio_producer.worker = self.worker
+        if not isinstance(self._get_video_step_class(), WorkerWizardStep):
+            self._video_producer.worker = self.worker
+
     # Private API
+
+    def _get_audio_step_class(self):
+        source = self.audio.get_selected()
+        if source == 'audiotest-producer':
+            step_class = TestAudioSourceStep
+        elif source == 'soundcard-producer':
+            step_class = SoundcardStep
+        elif source == 'firewire-producer':
+            # Only show firewire audio if we're using firewire video
+            if self.video.get_active() == 'firewire-producer':
+                return
+            step_class = FireWireAudioStep
+        else:
+            raise AssertionError(source)
+        return step_class
+
+    def _get_video_step_class(self):
+        source = self.video.get_selected()
+        if source == 'videotest-producer':
+            step_class = TestVideoSourceStep
+        elif source == 'webcam-producer':
+            step_class = WebcamStep
+        elif source == 'tvcard-producer':
+            step_class = TVCardStep
+        elif source == 'firewire-producer':
+            step_class = FireWireStep
+        else:
+            raise AssertionError(source)
+        return step_class
 
     def _setup(self):
         self._audio_producer = AudioProducer()
@@ -138,13 +149,29 @@ class ProductionStep(WorkerWizardStep):
         self._video_producer = VideoProducer()
         self.wizard.flow.addComponent(self._video_producer)
 
-        self.video.set_enum(VideoDevice)
-        self.audio.set_enum(AudioDevice)
+        self.audio.data_type = object
+        self.video.data_type = object
+        self.audio.model_attribute = 'component_type'
+        self.video.model_attribute = 'component_type'
         tips = gtk.Tooltips()
         tips.set_tip(self.has_video,
                      _('If you want to stream video'))
         tips.set_tip(self.has_audio,
                      _('If you want to stream audio'))
+
+        self.add_proxy(self._audio_producer, ['audio'])
+        self.add_proxy(self._video_producer, ['video'])
+
+        self.video.prefill([
+            (_('Test video source'), 'videotest-producer'),
+            (_('Web camera'), 'webcam-producer'),
+            (_('TV card'), 'tvcard-producer'),
+            (_('Firewire video'), 'firewire-producer')])
+        self.audio.prefill([
+            (_('Test audio source'), 'audiotest-producer'),
+            (_('Sound card'), 'soundcard-producer'),
+            (_('Firewire audio'), 'firewire-producer'),
+            ])
 
     def _verify(self):
         # FIXME: We should wait for the first worker to connect before
@@ -161,8 +188,8 @@ class ProductionStep(WorkerWizardStep):
 
             video_source = self.video.get_active()
             audio_source = self.audio.get_active()
-            if (has_audio and audio_source == AudioDevice.Firewire and
-                not (has_video and video_source == VideoDevice.Firewire)):
+            if (has_audio and audio_source == 'firewire-producer' and
+                not (has_video and video_source == 'firewire-producer')):
                 can_select_worker = True
         self.wizard.block_next(not can_continue)
 
@@ -187,19 +214,9 @@ class ProductionStep(WorkerWizardStep):
         self._verify()
 
     def on_video__changed(self, button):
-        video_source = self.video.get_active()
-        # FIXME!!!
-        if type(video_source) == int:
-            return
-        self._video_producer.name = video_source.component_type
         self._verify()
 
     def on_audio__changed(self, button):
-        audio_source = self.audio.get_active()
-        # FIXME!!!
-        if type(audio_source) == int:
-            return
-        self._audio_producer.name = audio_source.component_type
         self._verify()
 
 
@@ -209,43 +226,30 @@ class TestVideoSourceStep(VideoSourceStep):
     component_type = 'videotestsrc'
     icon = 'testsource.png'
 
+    def __init__(self, wizard, model):
+        VideoSourceStep.__init__(self, wizard, model)
+
     # WizardStep
 
     def setup(self):
-        self.combobox_pattern.set_enum(VideoTestPattern)
-        self.combobox_format.set_enum(VideoTestFormat)
+        self.pattern.data_type = int
+        self.format.data_type = str
+        self.framerate.data_type = float
 
-        # FIXME: Remember to remove the values from the glade file
-        #        when we use proxy widgets
-        self.model.width = 320
-        self.model.height = 240
+        self.add_proxy(self.model.properties,
+                       ['pattern', 'width', 'height',
+                        'framerate', 'format'])
+
+        self.pattern.prefill([
+            (_('SMPTE Color bars'), 0),
+            (_('Random (television snow)'), 1),
+            (_('Totally black'), 2)])
+        self.format.prefill([
+            (_('YUV'), 'video/x-raw-yuv'),
+            (_('RGB'), 'video/x-raw-rgb')])
 
     def before_show(self):
         self.wizard.require_elements(self.worker, 'videotestsrc')
-
-    def get_state(self):
-        format = self.combobox_format.get_selected()
-        options = {}
-        if format == VideoTestFormat.YUV:
-            options['format'] = 'video/x-raw-yuv'
-        elif format == VideoTestFormat.RGB:
-            options['format'] = 'video/x-raw-rgb'
-        else:
-            raise AssertionError
-
-        options['pattern'] = self.combobox_pattern.get_selected().value
-        options['width'] = int(self.spinbutton_width.get_value())
-        options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = self.spinbutton_framerate.get_value()
-        return options
-
-    # Callbacks
-
-    def on_spinbutton_height_value_changed(self, spinbutton):
-        self.model.height = spinbutton.get_value()
-
-    def on_spinbutton_width_value_changed(self, spinbutton):
-        self.model.width = spinbutton.get_value()
 
 
 class WebcamStep(VideoSourceStep):
@@ -259,16 +263,20 @@ class WebcamStep(VideoSourceStep):
         self._in_setup = False
         # _sizes is probed, not set from the UI
         self._sizes = None
-        self._factoryName = None
 
     # WizardStep
 
     def setup(self):
         self._in_setup = True
-        self.combobox_device.prefill(['/dev/video0',
-                                      '/dev/video1',
-                                      '/dev/video2',
-                                      '/dev/video3'])
+        self.device.data_type = str
+        self.framerate.data_type = object
+
+        self.device.prefill(['/dev/video0',
+                             '/dev/video1',
+                             '/dev/video2',
+                             '/dev/video3'])
+
+        self.add_proxy(self.model.properties,['device'])
 
         self._in_setup = False
 
@@ -276,41 +284,11 @@ class WebcamStep(VideoSourceStep):
         self._clear()
         self._run_checks()
 
-    def get_state(self):
-        options = {}
-        size = self.combobox_size.get_selected()
-        if size:
-            w, h = size
-        else:
-            self.warning('something bad happened: no height/width selected?')
-            w, h = 320, 240
-
-        framerate = self.combobox_framerate.get_selected()
-        if framerate:
-            num, denom = framerate['framerate']
-            mime = framerate['mime']
-            format = framerate.get('format', None)
-        else:
-            self.warning('something bad happened: no framerate selected?')
-            num, denom = 15, 2
-            mime = 'video/x-raw-yuv'
-            format = None
-
-        options['device'] = self.combobox_device.get_selected()
-        options['width'] = w
-        options['element-factory'] = self._factoryName
-        options['height'] = h
-        options['framerate'] = '%d/%d' % (num, denom)
-        options['mime'] = mime
-        if format:
-            options['format'] = format
-        return options
-
     # Private
 
     def _clear(self):
-        self.combobox_size.set_sensitive(False)
-        self.combobox_framerate.set_sensitive(False)
+        self.size.set_sensitive(False)
+        self.framerate.set_sensitive(False)
         self.label_name.set_label("")
         self.wizard.block_next(True)
 
@@ -320,7 +298,7 @@ class WebcamStep(VideoSourceStep):
 
         self.wizard.block_next(True)
 
-        device = self.combobox_device.get_selected()
+        device = self.device.get_selected()
         msg = messages.Info(T_(
                 N_("Probing webcam, this can take a while...")),
             id='webcam-check')
@@ -345,19 +323,19 @@ class WebcamStep(VideoSourceStep):
                 return None
 
             deviceName, factoryName, sizes = result
-            self._factoryName = factoryName
-            self._set_sizes(sizes)
+            self.model.properties.element_factory = factoryName
+            self._populate_sizes(sizes)
             self.wizard.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
-            self.combobox_size.set_sensitive(True)
-            self.combobox_framerate.set_sensitive(True)
+            self.size.set_sensitive(True)
+            self.framerate.set_sensitive(True)
 
         d.addCallback(deviceFound)
         d.addErrback(errRemoteRunFailure)
         d.addErrback(errRemoteRunError)
 
-    def _set_sizes(self, sizes):
+    def _populate_sizes(self, sizes):
         # Set sizes before populating the values, since
         # it trigger size_changed which depends on this
         # to be set
@@ -366,25 +344,57 @@ class WebcamStep(VideoSourceStep):
         values = []
         for w, h in sorted(sizes.keys(), reverse=True):
             values.append(['%d x %d' % (w, h), (w, h)])
-        self.combobox_size.prefill(values)
+        self.size.prefill(values)
 
-    def _set_framerates(self, size):
+    def _populate_framerates(self, size):
         values = []
         for d in self._sizes[size]:
             num, denom = d['framerate']
             values.append(('%.2f fps' % (1.0*num/denom), d))
-        self.combobox_framerate.prefill(values)
-        self.model.width, self.model.height = size
+        self.framerate.prefill(values)
+
+    def _update_size(self):
+        size = self.size.get_selected()
+        if size:
+            self._populate_framerates(size)
+            width, height = size
+        else:
+            self.warning('something bad happened: no height/width selected?')
+            width, height = 320, 240
+
+        self.model.properties.width = width
+        self.model.properties.height = height
+
+    def _update_framerate(self):
+        if self._in_setup:
+            return None
+
+        framerate = self.framerate.get_selected()
+        if framerate:
+            num, denom = framerate['framerate']
+            mime = framerate['mime']
+            format = framerate.get('format', None)
+        else:
+            self.warning('something bad happened: no framerate selected?')
+            num, denom = 15, 2
+            mime = 'video/x-raw-yuv'
+            format = None
+
+        self.model.properties.mime = mime
+        self.model.properties.framerate = '%d/%d' % (num, denom)
+        if format:
+            self.model.properties.format = format
 
     # Callbacks
 
-    def on_combobox_device_changed(self, combo):
+    def on_device_changed(self, combo):
         self._run_checks()
 
-    def on_combobox_size_changed(self, combo):
-        size = self.combobox_size.get_selected()
-        if size:
-            self._set_framerates(size)
+    def on_size_changed(self, combo):
+        self._update_size()
+
+    def on_framerate_changed(self, combo):
+        self._update_framerate()
 
 
 # note:
@@ -404,23 +414,25 @@ class TVCardStep(VideoSourceStep):
         VideoSourceStep.__init__(self, wizard, model)
         self._in_setup = False
 
-        # FIXME: move to model type definition
-        self.width.data_type = int
-        self.height.data_type = int
-        self.framerate.data_type = float
-
     # WizardStep
 
     def setup(self):
         self._in_setup = True
+
+        self.device.data_type = str
+        self.width.data_type = int
+        self.height.data_type = int
+        self.framerate.data_type = float
+
         self.device.prefill(['/dev/video0',
                              '/dev/video1',
                              '/dev/video2',
                              '/dev/video3'])
-        # FIXME: Remember to remove the values from the glade file
-        #        when we use proxy widgets
-        self.model.width = 320
-        self.model.height = 240
+
+        self.add_proxy(self.model.properties,
+                       ['device', 'height', 'width',
+                        'framerate'])
+
         self._in_setup = False
 
     def worker_changed(self):
@@ -482,163 +494,6 @@ class TVCardStep(VideoSourceStep):
     def on_device__changed(self, combo):
         self._run_checks()
 
-    def on_height__value_changed(self, spinbutton):
-        self.model.height = spinbutton.get_value()
-
-    def on_width__value_changed(self, spinbutton):
-        self.model.width = spinbutton.get_value()
-
-
-class FireWireStep(VideoSourceStep):
-    name = _('Firewire')
-    glade_file = 'wizard_firewire.glade'
-    component_type = 'firewire'
-    icon = 'firewire.png'
-    width_corrections = ['none', 'pad', 'stretch']
-
-    def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
-
-        # options detected from the device:
-        self._dims = None
-        self._factors = [1, 2, 3, 4, 6, 8]
-        self._input_heights = None
-        self._input_widths = None
-        self._par = None
-
-        # these are instance state variables:
-        self._is_square = None
-        self._factor_i = None             # index into self.factors
-        self._width_correction = None     # currently chosen item from
-                                          # width_corrections
-
-    # WizardStep
-
-    def worker_changed(self):
-        self._run_checks()
-
-    def get_state(self):
-        options = {} # VideoSourceStep.get_state(self)
-        d = self._get_width_height()
-        options['height'] = d['oh']
-        options['scaled-width'] = d['sw']
-        options['width'] = d['ow']
-        options['is-square'] = self._is_square
-        options['framerate'] = self.spinbutton_framerate.get_value()
-        return options
-
-    # Private
-
-    def _set_sensitive(self, is_sensitive):
-        self.vbox_controls.set_sensitive(is_sensitive)
-        self.wizard.block_next(not is_sensitive)
-
-    def _update_output_format(self):
-        d = self._get_width_height()
-        self.model.width = d['ow']
-        self.model.height = d['oh']
-        num, den = 1, 1
-        if not self._is_square:
-            num, den = self._par[0], self._par[1]
-
-        msg = _('%dx%d, %d/%d pixel aspect ratio') % (
-                   d['ow'], d['oh'], num, den)
-        self.label_output_format.set_markup(msg)
-
-    def _run_checks(self):
-        self._set_sensitive(False)
-        msg = messages.Info(T_(N_('Checking for Firewire device...')),
-            id='firewire-check')
-        self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
-            id='firewire-check')
-        yield d
-        try:
-            options = d.value()
-            self.wizard.clear_msg('firewire-check')
-            self._dims = (options['width'], options['height'])
-            self._par = options['par']
-            self._input_heights = [self._dims[1]/i for i in self._factors]
-            self._input_widths = [self._dims[0]/i for i in self._factors]
-            values = []
-            for i, height in enumerate(self._input_heights):
-                values.append(('%d pixels' % height, i))
-            self.combobox_scaled_height.prefill(values)
-            self._set_sensitive(True)
-            self.on_update_output_format()
-        except errors.RemoteRunFailure:
-            pass
-    _run_checks = defer_generator_method(_run_checks)
-
-    def _get_width_height(self):
-        # returns dict with sw, sh, ow, oh
-        # which are scaled width and height, and output width and height
-        sh = self._input_heights[self._factor_i]
-        sw = self._input_widths[self._factor_i]
-        par = 1. * self._par[0] / self._par[1]
-
-        if self._is_square:
-            sw = int(math.ceil(sw * par))
-            # for GStreamer element sanity, make sw an even number
-            # FIXME: check if this can now be removed
-            # sw = sw + (2 - (sw % 2)) % 2
-
-        # if scaled width (after squaring) is not multiple of 8, present
-        # width correction
-        self.frame_width_correction.set_sensitive(sw % 8 != 0)
-
-        # actual output
-        ow = sw
-        oh = sh
-        if self._width_correction == 'pad':
-            ow = sw + (8 - (sw % 8)) % 8
-        elif self._width_correction == 'stretch':
-            ow = sw + (8 - (sw % 8)) % 8
-            sw = ow
-
-        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
-
-    # Callbacks
-
-    def on_update_output_format(self, *args):
-        # update label_camera_settings
-        standard = 'Unknown'
-        aspect = 'Unknown'
-        h = self._dims[1]
-        if h == 576:
-            standard = 'PAL'
-        elif h == 480:
-            standard = 'NTSC'
-        else:
-            self.warning('Unknown capture standard for height %d' % h)
-
-        nom = self._par[0]
-        den = self._par[1]
-        if nom == 59 or nom == 10:
-            aspect = '4:3'
-        elif nom == 118 or nom == 40:
-            aspect = '16:9'
-        else:
-            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
-
-        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
-            nom, den)
-        self.label_camera_settings.set_text(text)
-
-        # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_selected()
-        self._is_square = self.checkbutton_square_pixels.get_active()
-
-        self._width_correction = None
-        for i in FireWireStep.width_corrections:
-            if getattr(self,'radiobutton_width_'+i).get_active():
-                self._width_correction = i
-                break
-        assert self._width_correction
-
-        self._update_output_format()
-
-
 
 class TestAudioSourceStep(AudioSourceStep):
     name = _('Test Audio Source')
@@ -647,17 +502,21 @@ class TestAudioSourceStep(AudioSourceStep):
 
     # WizardStep
 
-    def before_show(self):
-        self.combobox_samplerate.set_enum(AudioTestSamplerate)
-        self.combobox_samplerate.set_sensitive(True)
+    def setup(self):
+        self.rate.data_type = str
+        self.volume.data_type = float
+
+        self.add_proxy(self.model.properties,
+                       ['frequency', 'volume', 'rate'])
+
+        self.rate.prefill(['8000',
+                           '16000',
+                           '32000',
+                           '44100'])
+        self.rate.set_sensitive(True)
 
     def worker_changed(self):
         self.wizard.require_elements(self.worker, 'audiotestsrc')
-
-    def get_state(self):
-        return dict(frequency=int(self.spinbutton_freq.get_value()),
-                    volume=float(self.spinbutton_volume.get_value()),
-                    rate=int(self.combobox_samplerate.get_selected().name))
 
     def get_next(self):
         return None
@@ -697,6 +556,21 @@ class SoundcardStep(AudioSourceStep):
         # block updates, because populating a shown combobox will of course
         # trigger the callback
         self._block_update = True
+        self.input_track.data_type = str
+        self.channels.data_type = int
+        self.rate.data_type = int
+        self.depth.data_type = int
+        self.device.data_type = str
+        self.source_element.data_type = str
+
+        self.add_proxy(self.model.properties,
+                       ['input_track',
+                        'channels',
+                        'rate',
+                        'depth',
+                        'device',
+                        'source_element'])
+
         self.source_element.prefill(
             [(enum.nick, enum.element_name) for enum in SoundcardSystem])
         self.channels.prefill(CHANNELS)
@@ -792,17 +666,13 @@ class SoundcardStep(AudioSourceStep):
         pass
 
 
-class FireWireAudioStep(AudioSourceStep):
-    name = _('Firewire audio')
+class _FireWireCommon:
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
-
     width_corrections = ['none', 'pad', 'stretch']
 
-    def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
-
+    def __init__(self):
         # options detected from the device:
         self._dims = None
         self._factors = [1, 2, 3, 4, 6, 8]
@@ -811,36 +681,17 @@ class FireWireAudioStep(AudioSourceStep):
         self._par = None
 
         # these are instance state variables:
-        self._is_square = None
         self._factor_i = None             # index into self.factors
         self._width_correction = None     # currently chosen item from
                                           # width_corrections
+        self.model.properties.is_square = False
 
     # WizardStep
-
-    def setup(self):
-        self.frame_scaling.hide()
-        self.frame_width_correction.hide()
-        self.frame_capture.hide()
-        self.frame_output_format.hide()
 
     def worker_changed(self):
         self._run_checks()
 
-    def get_state(self):
-        options = {} # VideoSourceStep.get_state(self)
-        d = self._get_width_height()
-        options['height'] = d['oh']
-        options['scaled-width'] = d['sw']
-        options['width'] = d['ow']
-        options['is-square'] = self._is_square
-        options['framerate'] = self.spinbutton_framerate.get_value()
-        return options
-
-    def get_next(self):
-        return None
-
-    # Private API
+    # Private
 
     def _set_sensitive(self, is_sensitive):
         self.vbox_controls.set_sensitive(is_sensitive)
@@ -848,13 +699,47 @@ class FireWireAudioStep(AudioSourceStep):
 
     def _update_output_format(self):
         d = self._get_width_height()
+        self.model.properties.is_square = (
+            self.checkbutton_square_pixels.get_active())
+        self.model.properties.width = d['ow']
+        self.model.properties.height = d['oh']
+        self.model.properties.scaled_width = d['sw']
+        self.model.properties.framerate = self.spinbutton_framerate.get_value()
         num, den = 1, 1
-        if not self._is_square:
+        if not self.model.properties.is_square:
             num, den = self._par[0], self._par[1]
 
         msg = _('%dx%d, %d/%d pixel aspect ratio') % (
                    d['ow'], d['oh'], num, den)
         self.label_output_format.set_markup(msg)
+
+    def _get_width_height(self):
+        # returns dict with sw, sh, ow, oh
+        # which are scaled width and height, and output width and height
+        sh = self._input_heights[self._factor_i]
+        sw = self._input_widths[self._factor_i]
+        par = 1. * self._par[0] / self._par[1]
+
+        if self.model.properties.is_square:
+            sw = int(math.ceil(sw * par))
+            # for GStreamer element sanity, make sw an even number
+            # FIXME: check if this can now be removed
+            # sw = sw + (2 - (sw % 2)) % 2
+
+        # if scaled width (after squaring) is not multiple of 8, present
+        # width correction
+        self.frame_width_correction.set_sensitive(sw % 8 != 0)
+
+        # actual output
+        ow = sw
+        oh = sh
+        if self._width_correction == 'pad':
+            ow = sw + (8 - (sw % 8)) % 8
+        elif self._width_correction == 'stretch':
+            ow = sw + (8 - (sw % 8)) % 8
+            sw = ow
+
+        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     def _run_checks(self):
         self._set_sensitive(False)
@@ -876,36 +761,12 @@ class FireWireAudioStep(AudioSourceStep):
             self.combobox_scaled_height.prefill(values)
             self._set_sensitive(True)
             self.on_update_output_format()
+
+        def trapRemote(failure):
+            failure.trap(errors.RemoteRunError)
         d.addCallback(firewireCheckDone)
+        d.addErrback(trapRemote)
         return d
-
-    def _get_width_height(self):
-        # returns dict with sw, sh, ow, oh
-        # which are scaled width and height, and output width and height
-        sh = self._input_heights[self._factor_i]
-        sw = self._input_widths[self._factor_i]
-        par = 1. * self._par[0] / self._par[1]
-
-        if self._is_square:
-            sw = int(math.ceil(sw * par))
-            # for GStreamer element sanity, make sw an even number
-            # FIXME: check if this can now be removed
-            # sw = sw + (2 - (sw % 2)) % 2
-
-        # if scaled width (after squaring) is not multiple of 8, present
-        # width correction
-        self.frame_width_correction.set_sensitive(sw % 8 != 0)
-
-        # actual output
-        ow = sw
-        oh = sh
-        if self._width_correction == 'pad':
-            ow = sw + (8 - (sw % 8)) % 8
-        elif self._width_correction == 'stretch':
-            ow = sw + (8 - (sw % 8)) % 8
-            sw = ow
-
-        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     # Callbacks
 
@@ -936,10 +797,9 @@ class FireWireAudioStep(AudioSourceStep):
 
         # factor is a double
         self._factor_i = self.combobox_scaled_height.get_selected()
-        self._is_square = self.checkbutton_square_pixels.get_active()
 
         self._width_correction = None
-        for i in FireWireAudioStep.width_corrections:
+        for i in type(self).width_corrections:
             if getattr(self,'radiobutton_width_'+i).get_active():
                 self._width_correction = i
                 break
@@ -948,3 +808,27 @@ class FireWireAudioStep(AudioSourceStep):
         self._update_output_format()
 
 
+class FireWireStep(_FireWireCommon, VideoSourceStep):
+    name = _('Firewire')
+    def __init__(self, wizard, model):
+        VideoSourceStep.__init__(self, wizard, model)
+        _FireWireCommon.__init__(self)
+
+
+class FireWireAudioStep(_FireWireCommon, AudioSourceStep):
+    name = _('Firewire audio')
+
+    def __init__(self, wizard, model):
+        AudioSourceStep.__init__(self, wizard, model)
+        _FireWireCommon.__init__(self)
+
+    # WizardStep
+
+    def setup(self):
+        self.frame_scaling.hide()
+        self.frame_width_correction.hide()
+        self.frame_capture.hide()
+        self.frame_output_format.hide()
+
+    def get_next(self):
+        return None

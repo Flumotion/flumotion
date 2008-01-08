@@ -35,7 +35,6 @@ except RuntimeError:
 
 from flumotion.admin import admin
 from flumotion.ui.wizard import WizardStep
-from flumotion.wizard import enums
 from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 class WizardStepTest(testsuite.TestCase):
@@ -93,8 +92,8 @@ class WizardSaveTest(testsuite.TestCase):
 
     def testFirewireAudioAndVideo(self):
         source = self.wizard['Source']
-        source.combobox_video.set_active(enums.VideoDevice.Firewire)
-        source.combobox_audio.set_active(enums.AudioDevice.Firewire)
+        source.combobox_video.set_active('firewire-producer')
+        source.combobox_audio.set_active('firewire-producer')
 
         self.wizard['Firewire'].run_checks()
         self.wizard.run(False, self.workerHeavenState, True)
@@ -111,8 +110,8 @@ class WizardSaveTest(testsuite.TestCase):
 
     def testAudioTestWorkers(self):
         source = self.wizard['Source']
-        source.combobox_video.set_active(enums.VideoDevice.Webcam)
-        source.combobox_audio.set_active(enums.AudioDevice.Test)
+        source.combobox_video.set_active('webcam-producer')
+        source.combobox_audio.set_active('audiotest-producer')
 
         self.wizard.run(False, ['first', 'second'], True)
 

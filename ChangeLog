@@ -1,5 +1,22 @@
 2008-01-08  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_webcam.glade:
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/save.py:
+
+	Use proxies for all production steps so we can get rid
+	of get_state(). Remove most of the enum usage in the production
+	step at the same time. Merge firewire audio/video steps to a common
+	step to avoid duplication.
+
+2008-01-08  Johan Dahlin  <johan@gnome.org>
+
 	* po/sv.po: Update swedish translation
 
 2008-01-07  Johan Dahlin  <johan@gnome.org>

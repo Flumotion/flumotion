@@ -32,6 +32,26 @@ class ComponentValidationError(ComponentError):
     pass
 
 
+class Properties(dict):
+    """
+    I am a special dictionary which you also can treat as an instance.
+    Setting and getting an attribute works.
+    This is suitable for using in a kiwi proxy.
+    >>> p = Properties()
+    >>> p.attr = 'value'
+    >>> p
+    {'attr': 'value'}
+    """
+    def __setattr__(self, attr, value):
+        self[attr] = value
+
+    def __getattr__(self, attr):
+        try:
+            return self[attr]
+        except KeyError:
+            raise AttributeError(attr)
+
+
 class Flow(object):
     """I am a container which contains a number of components
     """
@@ -118,15 +138,22 @@ class Component(object):
     name_template = "component"
 
     def __init__(self):
-        self.name = None
+        self.component_type = None
         self.worker = None
         self.feeders = []
         self.eaters = []
+        self.properties = Properties()
 
     def validate(self):
         if not self.worker:
             raise ComponentValidationError(
                 "component %s must have a worker set" % (self.name,))
+
+    def getWorker(self):
+        return self.worker
+
+    def getProperties(self):
+        return self.properties
 
 
 class Producer(Component):

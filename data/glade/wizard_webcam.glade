@@ -56,11 +56,11 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox_device">
+	<widget class="GtkComboBox" id="device">
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="changed" handler="on_combobox_device_changed" last_modification_time="Fri, 05 Nov 2004 10:42:45 GMT"/>
+	  <signal name="changed" handler="on_device_changed" last_modification_time="Fri, 05 Nov 2004 10:42:45 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -185,11 +185,11 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox_size">
+	<widget class="GtkComboBox" id="size">
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
-	  <signal name="changed" handler="on_combobox_size_changed" last_modification_time="Wed, 30 May 2007 17:15:11 GMT"/>
+	  <signal name="changed" handler="on_size_changed" last_modification_time="Wed, 30 May 2007 17:15:11 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -202,10 +202,11 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox_framerate">
+	<widget class="GtkComboBox" id="framerate">
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
+	  <signal name="changed" handler="on_framerate_changed" last_modification_time="Fri, 05 Nov 2004 10:42:45 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
