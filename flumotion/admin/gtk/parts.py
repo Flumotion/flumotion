@@ -44,6 +44,14 @@ from flumotion.twisted import flavors
  COL_MOOD_VALUE, # to sort COL_MOOD
  COL_CPU) = range(7)
 
+MOODS_INFO = {
+    moods.sad: _('Sad'),
+    moods.happy: _('Happy'),
+    moods.sleeping: _('Sleeping'),
+    moods.waking: _('Waking'),
+    moods.hungry: _('Hungry'),
+    }
+
 def getComponentLabel(state):
     config = state.get('config')
     return config and config.get('label', config['name'])
@@ -156,6 +164,15 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self.__gobject_init__()
 
         self._view = tree_widget
+
+        if gtk.gtk_version >= (2, 12, 0):
+            self._view.props.has_tooltip = True
+            self._view.connect("query-tooltip",
+                               self._tree_view_query_tooltip_cb)
+            def selection_changed_cb(selection):
+                self._view.trigger_tooltip_query()
+            self._view.get_selection().connect('changed', selection_changed_cb)
+
         self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int, str)
 
         self._view.connect('cursor-changed', self._view_cursor_changed_cb)
@@ -210,6 +227,30 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 configure.imagedir, 'mood-%s.png' % name))
 
         return pixbufs
+
+    def _tooltips_get_context(self, treeview, keyboard_tip, x, y):
+        if keyboard_tip:
+            path = treeview.get_cursor()
+            if not path:
+                return
+        else:
+            x, y = treeview.convert_widget_to_bin_window_coords(x, y)
+            path =  treeview.get_path_at_pos(x, y)
+            if not path:
+                return
+
+        return path
+
+    def _tree_view_query_tooltip_cb(self, treeview, x, y, keyboard_tip, tooltip):
+        path = self._tooltips_get_context(treeview, keyboard_tip, x, y)
+        if path is None:
+            return
+
+        mood = self._model[path[0]][COL_MOOD_VALUE]
+        tooltip.set_markup("<b>%s</b>" % _("Component is %s") % (
+            MOODS_INFO[moods.get(mood)]))
+
+        return True
 
     def _view_cursor_changed_cb(self, *args):
         # name needs to exist before being used in the child functions

@@ -1,5 +1,9 @@
 2008-01-08  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/parts.py:
+	Enable tooltips for moods, conditionally for Gtk 2.12 or higher.
+	Fixes #820
+
 	* flumotion/ui/kiwipatches.py:
 	(old_proxy_entry_init): Attempt to fix pychecker
 
