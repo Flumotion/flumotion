@@ -24,7 +24,6 @@ import os
 from gtk import glade
 from kiwi.environ import environ
 from kiwi.__version__ import version as kiwi_version
-from kiwi.utils import PropertyMeta, PropertyObject
 from kiwi.ui import views
 from kiwi.ui.widgets.entry import ProxyEntry
 
@@ -70,7 +69,7 @@ def _open_glade(view, gladefile, domain):
 
 # Fixing bug #3259, fixed in kiwi 1.99.15
 # Yes I ******HATE***** pychecker
-old_proxy_entry_init = getattr(ProxyEntry, ProxyEntry.__init__.__name__)
+old_proxy_entry_init = ProxyEntry.__dict__['__init__']
 def proxy_entry_init(*args, **kwargs):
     try:
         old_proxy_entry_init(*args, **kwargs)
