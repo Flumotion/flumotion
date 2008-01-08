@@ -69,8 +69,8 @@ def _open_glade(view, gladefile, domain):
     return FluLibgladeWidgetTree(view, gladefile, domain)
 
 # Fixing bug #3259, fixed in kiwi 1.99.15
-
-old_proxy_entry_init = ProxyEntry.__init__
+# Yes I ******HATE***** pychecker
+old_proxy_entry_init = getattr(ProxyEntry, ProxyEntry.__init__.__name__)
 def proxy_entry_init(*args, **kwargs):
     try:
         old_proxy_entry_init(*args, **kwargs)
