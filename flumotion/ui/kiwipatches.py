@@ -71,9 +71,9 @@ def _open_glade(view, gladefile, domain):
 # Fixing bug #3259, fixed in kiwi 1.99.15
 
 old_proxy_entry_init = ProxyEntry.__init__
-def proxy_entry_init(slf, data_type=None, *args, **kwargs):
+def proxy_entry_init(*args, **kwargs):
     try:
-        old_proxy_entry_init(slf, *args, **kwargs)
+        old_proxy_entry_init(*args, **kwargs)
     except TypeError:
         pass
 

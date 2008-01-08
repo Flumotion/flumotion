@@ -1,5 +1,8 @@
 2008-01-08  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/kiwipatches.py:
+	(old_proxy_entry_init): Attempt to fix pychecker
+
 	* flumotion/ui/Makefile.am:
 	* flumotion/ui/glade.py:
 	* flumotion/ui/kiwipatches.py:
