@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-05 18:40+0100\n"
-"PO-Revision-Date: 2007-12-24 10:13+0100\n"
+"PO-Revision-Date: 2008-01-08 08:50+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -783,7 +783,7 @@ msgstr "%dx%d, %d/%d pixelaspektratio"
 #: flumotion/wizard/productionsteps.py:550
 #: flumotion/wizard/productionsteps.py:861
 msgid "Checking for Firewire device..."
-msgstr "Söker efter Firewire-enheter..."
+msgstr "Söker efter Firewire-enhet..."
 
 #: flumotion/wizard/productionsteps.py:624
 #: flumotion/wizard/productionsteps.py:933
@@ -967,8 +967,7 @@ msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
 msgstr ""
-"Kunde inte hitta eller öppna Firewire-enheter. Kontrollera enhetsnoden och "
-"dess\n"
+"Kunde inte hitta eller öppna Firewire-enheten. Kontrollera enhetsnoden och dess\n"
 "rättigheter."
 
 #: flumotion/worker/checks/gst010.py:203
@@ -978,13 +977,11 @@ msgstr "Inga Firewire-enheter funna"
 #: flumotion/worker/checks/gst010.py:206
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
-msgstr ""
-"Kunde inte öppna Firewire-enheter för läsande. Kontroller rättigheterna på\n"
-"enheten"
+msgstr "Kunde inte läsa från Firewire-enhet. Kontrollera enhetens rättigheter."
 
 #: flumotion/worker/checks/gst010.py:213
 msgid "Could not probe Firewire device."
-msgstr "Kunde inte starta sökningen efter Firewire enheter."
+msgstr "Kunde inte starta sökningen efter Firewire-enhet."
 
 #: flumotion/worker/checks/encoder.py:45 flumotion/worker/checks/encoder.py:66
 msgid "Synchronization between audio and video may not be correct.\n"
@@ -994,23 +991,22 @@ msgstr "Synkronizering mellan ljud och bild kan vara felaktig.\n"
 #, python-format
 msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
-msgstr ""
-"Kunde inte öppna enheten '%s' för läsning. Kontrollera enhetens rättigheter."
+msgstr "Kunde inte öppna enhet '%s' för läsning. Kontrollera enhetens rättigheter."
 
 #: flumotion/worker/checks/check.py:51
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
-msgstr "Kunde inte öppna enheten '%s'. Kontrollera enhetens rättigheter."
+msgstr "Kunde inte öppna enhet '%s'. Kontrollera enhetens rättigheter."
 
 #: flumotion/worker/checks/check.py:54
 #, python-format
 msgid "Device '%s' is already in use."
-msgstr "Enheten '%s' används redan."
+msgstr "Enhet '%s' används redan."
 
 #: flumotion/worker/checks/check.py:57
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
-msgstr "Enheten '%s' accepterade inte de begärda inställningarna."
+msgstr "Enhet '%s' accepterade inte de begärda inställningarna."
 
 #: flumotion/worker/checks/check.py:99
 #, python-format
