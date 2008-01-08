@@ -1,6 +1,9 @@
 2008-01-08  Johan Dahlin  <johan@gnome.org>
 
+	* Makefile.am (PYCHECKER_BLACKLIST): Put kiwipatches here.
+
 	* flumotion/ui/kiwipatches.py (_open_glade): Another pychecker workaround
+	(proxy_entry_init): 
 
 	* flumotion/admin/gtk/parts.py:
 	Enable tooltips for moods, conditionally for Gtk 2.12 or higher.

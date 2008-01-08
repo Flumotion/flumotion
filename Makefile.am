@@ -50,8 +50,7 @@ PYCHECKER_WHITELIST = \
 
 PYCHECKER_BLACKLIST = \
             flumotion/common/gstreamer.py	\
-            flumotion/twisted/gtk2reactor.py	\
-            flumotion/admin/gtk/spyglass.py
+            flumotion/ui/kiwipatches.py
 
 COVERAGE_MODULES = flumotion
 
