@@ -134,7 +134,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
 
         def got_entry_point((filename, procname)):
-            # getEntryByType for admin/gtk returns a factory function
+            # getEntry for admin/gtk returns a factory function
             # for creating
             # flumotion.component.base.admin_gtk.BaseAdminGtk
             # subclass instances
@@ -154,7 +154,8 @@ class ComponentView(gtk.VBox, log.Loggable):
         if not isinstance(state, planet.AdminComponentState):
             return not_component_state
 
-        d = admin.callRemote('getEntryByType', state, 'admin/gtk')
+        componentType = state.get('type')
+        d = admin.callRemote('getEntry', componentType, 'admin/gtk')
         d.addErrback(no_bundle)
         d.addCallback(got_entry_point)
         d.addCallback(got_factory)

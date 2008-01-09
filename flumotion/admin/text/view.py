@@ -231,7 +231,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             fileName, methodName = lexicalVariableHack[0]
             return (bundlePath, fileName, methodName)
 
-        d = self.admin.callRemote('getEntryByType', componentState, type)
+        d = self.admin.callRemote('getEntry',
+                                  componentState.get('type'), type)
         d.addCallback(gotEntry)
         d.addCallback(gotBundles)
         return d

@@ -1,5 +1,18 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/admin.py (AdminAvatar.perspective_getEntryByType): 
+	Remove, in favor of getEntry.
+	* flumotion/manager/admin.py (AdminAvatar.perspective_getEntry): 
+	A new simpler version of getEntryByType which takes a component type
+	string instead of a component state. Also rename type to componentType
+	to avoid clashing with the builtin 'type' and remove unused imports.
+	As discussed in bug #812
+
+	* flumotion/admin/text/view.py (AdminTextView.gotBundles): 
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView.sleeping_component): 
+	Update callsites
+	
 	* flumotion/ui/wizard.py:
 	(SectionWizard.on_button_next_clicked): Sort out confusion,
 	do not define _show_next_step twice. Pychecker actually caught

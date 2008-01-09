@@ -29,8 +29,7 @@ import re
 import os
 from StringIO import StringIO
 
-from twisted.internet import reactor, defer
-from twisted.spread import pb
+from twisted.internet import reactor
 from twisted.python import failure
 from zope.interface import implements
 
@@ -187,35 +186,30 @@ class AdminAvatar(base.ManagerAvatar):
             return failure.Failure(errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e)))
 
-    def perspective_getEntryByType(self, componentState=None, type=None,
-                                   componentType=None):
+    def perspective_getEntry(self, componentType, entryType):
         """
         Get the entry point for a piece of bundled code by the type.
-
-        Returns: a (filename, methodName) tuple, or raises a Failure
+        @param componentType: the component
+        @type componentType: a string
+        @param entryType: location of the entry point
+        @type entryType: a string
+        Returns: a (filename, methodName) tuple, or raises::
+          - NoBundleError if the entry location does not exist
         """
-        if componentType is None:
-            assert componentState is not None
-            m = self.vishnu.getComponentMapper(componentState)
-            componentName = componentState.get('name')
-            if not m.avatar:
-                self.debug('component %s not logged in yet, no entry',
-                           componentName)
-                raise errors.SleepingComponentError(componentState)
-            componentType = m.avatar.getType()
+        assert componentType is not None
 
         self.debug('getting entry of type %s for component type %s',
-                   type, componentType)
+                   entryType, componentType)
         try:
             componentRegistryEntry = registry.getRegistry().getComponent(
                 componentType)
             # FIXME: add logic here for default entry points and functions
-            entry = componentRegistryEntry.getEntryByType(type)
+            entry = componentRegistryEntry.getEntryByType(entryType)
         except KeyError:
             self.warning("Could not find bundle for %s(%s)" % (
-                componentType, type))
+                componentType, entryType))
             raise errors.NoBundleError("entry type %s in component type %s" %
-                (type, componentType))
+                (entryType, componentType))
 
         filename = os.path.join(componentRegistryEntry.base, entry.location)
         self.debug('entry point is in file path %s and function %s' % (
