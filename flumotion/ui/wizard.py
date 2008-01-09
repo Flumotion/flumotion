@@ -134,8 +134,11 @@ class WizardStep(GladeWidget, log.Loggable):
 
     def get_next(self):
         """Called when the user presses next in the wizard.
-        @returns: name of next step or next_step instance
-        @rtype:  string or an L{WizardStep} instance
+        @returns: name of next step
+        @rtype: L{WizardStep} instance, deferred or None.
+          The deferred must return a WizardStep instance.
+          None means that the next section should be fetched or if there are
+          no more sections, to finish the wizard.
         """
         raise NotImplementedError
 

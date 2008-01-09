@@ -1,6 +1,8 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/ui/wizard.py (SectionWizard.run): 
+	* flumotion/ui/wizard.py (SectionWizard.run)
+	(WizardStep.get_next): Improve documentation
+
 	* flumotion/wizard/configurationwizard.py:
 	Rename show_next_step to prepare_next_step.
 	Split it into two parts, add support for returning a deferred
