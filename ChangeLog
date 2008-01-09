@@ -1,5 +1,7 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* po/sv.po: Update swedish translation
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard_webcam.glade:
 	* flumotion/component/producers/webcam/Makefile.am:
