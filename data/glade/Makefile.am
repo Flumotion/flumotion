@@ -29,7 +29,6 @@ glade_DATA = \
 	wizard_source.glade		\
 	wizard_summary.glade		\
 	wizard_theora.glade		\
-	wizard_tvcard.glade		\
 	wizard_welcome.glade		\
 	wizard_vorbis.glade
 
