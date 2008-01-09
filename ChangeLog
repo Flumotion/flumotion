@@ -1,5 +1,10 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/wizard.py:
+	(SectionWizard.on_button_next_clicked): Sort out confusion,
+	do not define _show_next_step twice. Pychecker actually caught
+	a real bug, must be a first!
+
 	* flumotion/ui/wizard.py (SectionWizard.run)
 	(WizardStep.get_next): Improve documentation
 

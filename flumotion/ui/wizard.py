@@ -380,9 +380,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._current_section = self._get_section_by_name(step.section)
         self._set_step(step)
 
-    def _show_next_step(self):
-        self.prepare_next_step(self._current_step)
-
     def _show_previous_step(self):
         step = self._stack.back()
         self._current_section = self._get_section_by_name(step.section)
@@ -419,7 +416,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._show_previous_step()
 
     def on_button_next_clicked(self, button):
-        self._show_next_step()
+        self.prepare_next_step(self._current_step)
 
     def on_sidebar_step_chosen(self, sidebar, name):
         self._jump_to_step(name)
