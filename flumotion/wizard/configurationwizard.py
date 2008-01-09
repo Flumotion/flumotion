@@ -165,9 +165,9 @@ class ConfigurationWizard(SectionWizard):
 
         self._setup_worker(step, self._worker_list.get_worker())
 
-    def show_next_step(self, step):
+    def prepare_next_step(self, step):
         self._setup_worker(step, self._worker_list.get_worker())
-        SectionWizard.show_next_step(self, step)
+        SectionWizard.prepare_next_step(self, step)
 
     # Public API
 

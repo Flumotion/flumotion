@@ -27,6 +27,7 @@ import os
 import gobject
 import gtk
 from kiwi.interfaces import IProxyWidget
+from twisted.internet.defer import Deferred
 
 from flumotion.configure import configure
 from flumotion.common import log, messages
@@ -262,10 +263,16 @@ class SectionWizard(GladeWindow, log.Loggable):
         except KeyboardInterrupt:
             pass
 
-    def show_next_step(self, step):
+    def prepare_next_step(self, step):
         next = step.get_next()
         if isinstance(next, WizardStep):
             next_step = next
+        elif isinstance(next, Deferred):
+            d = next
+            def get_step(step):
+                self._show_next_step(step)
+            d.addCallback(get_step)
+            return
         elif next is None:
             if self._current_section + 1 == len(self.sections):
                 self._finish(completed=True)
@@ -276,24 +283,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         else:
             raise AssertionError(next)
 
-        self._steps[next_step.name] = next_step
-
-        while not self._stack.push(next_step):
-            s = self._stack.pop()
-            s.visited = False
-            self.sidebar.pop()
-
-        if not next_step.visited:
-            self.sidebar.push(next_step.section, next_step.name,
-                              next_step.sidebar_name)
-        else:
-            self.sidebar.show_step(next_step.section)
-
-        next_step.visited = True
-        self._set_step(next_step)
-
-        has_next = not hasattr(next_step, 'last_step')
-        self._update_buttons(has_next)
+        self._show_next_step(next_step)
 
     # Private
 
@@ -337,6 +327,26 @@ class SectionWizard(GladeWindow, log.Loggable):
             except RuntimeError:
                 pass
 
+    def _show_next_step(self, step):
+        self._steps[step.name] = step
+
+        while not self._stack.push(step):
+            s = self._stack.pop()
+            s.visited = False
+            self.sidebar.pop()
+
+        if not step.visited:
+            self.sidebar.push(step.section, step.name,
+                              step.sidebar_name)
+        else:
+            self.sidebar.show_step(step.section)
+
+        step.visited = True
+        self._set_step(step)
+
+        has_next = not hasattr(step, 'last_step')
+        self._update_buttons(has_next)
+
     def _set_step(self, step):
         self._pack_step(step)
         self._set_step_icon(step.icon)
@@ -368,7 +378,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._set_step(step)
 
     def _show_next_step(self):
-        self.show_next_step(self._current_step)
+        self.prepare_next_step(self._current_step)
 
     def _show_previous_step(self):
         step = self._stack.back()
