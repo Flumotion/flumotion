@@ -1,6 +1,17 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/Makefile.am:
+	* data/glade/wizard_webcam.glade:
+	* flumotion/component/producers/webcam/Makefile.am:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	Move the webcam step + glade file out to a separate bundle
+
+2008-01-09  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
 	* data/glade/wizard_soundcard.glade:
 	* flumotion/component/producers/soundcard/Makefile.am:
 	* flumotion/component/producers/soundcard/soundcard.xml:

@@ -14,6 +14,8 @@
                function="Webcam" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
+        <entry type="wizard" location="webcam_wizard.py"
+               function="WebcamWizardPlugin" />
       </entries>
 
       <properties>
@@ -81,6 +83,20 @@ capture element, defaults to 'v4lsrc'" />
         <directories>
             <directory name="flumotion/component/producers/webcam">
                 <filename location="webcam.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="webcam-wizard">
+        <dependencies>
+            <dependency name="webcam-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/webcam">
+                <filename location="webcam-wizard.glade" />
+                <filename location="webcam_wizard.py" />
             </directory>
         </directories>
     </bundle>

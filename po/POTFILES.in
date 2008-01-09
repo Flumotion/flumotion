@@ -97,6 +97,7 @@ flumotion/component/producers/playlist/__init__.py
 flumotion/component/producers/webcam/webcam.py
 flumotion/component/producers/webcam/__init__.py
 flumotion/component/producers/webcam/admin_gtk.py
+flumotion/component/producers/webcam/webcam-wizard.glade
 flumotion/component/producers/icecast/icecast.py
 flumotion/component/producers/icecast/__init__.py
 flumotion/component/producers/screencast/screencast.py
@@ -373,7 +374,6 @@ data/glade/wizard_tvcard.glade
 data/glade/wizard_theora.glade
 data/glade/videotest.glade
 data/glade/connections.glade
-data/glade/wizard_webcam.glade
 data/glade/admin.glade
 data/glade/admin-wizard.glade
 data/glade/wizard_overlay.glade
@@ -405,6 +405,7 @@ flumotion/component/producers/looper/flufileinfo.glade
 flumotion/component/producers/looper/looper.glade
 flumotion/component/producers/soundcard/soundcard-wizard.glade
 flumotion/component/producers/videotest/videotest-wizard.glade
+flumotion/component/producers/webcam/webcam-wizard.glade
 flumotion/component/misc/httpfile/httpfile.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/httpstreamer/http.glade

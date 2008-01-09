@@ -30,7 +30,6 @@ glade_DATA = \
 	wizard_summary.glade		\
 	wizard_theora.glade		\
 	wizard_tvcard.glade		\
-	wizard_webcam.glade		\
 	wizard_welcome.glade		\
 	wizard_vorbis.glade
 
