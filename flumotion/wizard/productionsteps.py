@@ -25,8 +25,10 @@ import gettext
 import math
 
 import gtk
+from twisted.internet.defer import Deferred
 
 from flumotion.common import errors, messages
+from flumotion.common.errors import NoBundleError
 from flumotion.common.messages import N_
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import WorkerWizardStep, \
@@ -82,6 +84,9 @@ class ProductionStep(WorkerWizardStep):
         @rtype: a L{VideoSourceStep} subclass
         """
         step_class = self._get_video_step_class()
+        if isinstance(step_class, Deferred):
+            return self._load_step(step_class, self._video_producer)
+
         return step_class(self.wizard, self._video_producer)
 
     def get_audio_step(self):
@@ -91,6 +96,9 @@ class ProductionStep(WorkerWizardStep):
         @rtype: a L{AudioSourceStep} subclass
         """
         step_class = self._get_audio_step_class()
+        if isinstance(step_class, Deferred):
+            return self._load_step(step_class, self._audio_producer)
+
         return step_class(self.wizard, self._audio_producer)
 
     # WizardStep
@@ -107,18 +115,18 @@ class ProductionStep(WorkerWizardStep):
             raise AssertionError
 
     def worker_changed(self):
-        if not isinstance(self._get_audio_step_class(), WorkerWizardStep):
-            self._audio_producer.worker = self.worker
-        if not isinstance(self._get_video_step_class(), WorkerWizardStep):
-            self._video_producer.worker = self.worker
+        if self.audio.get_selected() not in ['audiotest-producer']:
+            if not isinstance(self._get_audio_step_class(), WorkerWizardStep):
+                self._audio_producer.worker = self.worker
+        if self.video.get_selected() not in ['videotest-producer']:
+            if not isinstance(self._get_video_step_class(), WorkerWizardStep):
+                self._video_producer.worker = self.worker
 
     # Private API
 
     def _get_audio_step_class(self):
         source = self.audio.get_selected()
-        if source == 'audiotest-producer':
-            step_class = TestAudioSourceStep
-        elif source == 'soundcard-producer':
+        if source == 'soundcard-producer':
             step_class = SoundcardStep
         elif source == 'firewire-producer':
             # Only show firewire audio if we're using firewire video
@@ -126,21 +134,19 @@ class ProductionStep(WorkerWizardStep):
                 return
             step_class = FireWireAudioStep
         else:
-            raise AssertionError(source)
+            step_class = self._load_plugin(source)
         return step_class
 
     def _get_video_step_class(self):
         source = self.video.get_selected()
-        if source == 'videotest-producer':
-            step_class = TestVideoSourceStep
-        elif source == 'webcam-producer':
+        if source == 'webcam-producer':
             step_class = WebcamStep
         elif source == 'tvcard-producer':
             step_class = TVCardStep
         elif source == 'firewire-producer':
             step_class = FireWireStep
         else:
-            raise AssertionError(source)
+            step_class = self._load_plugin(source)
         return step_class
 
     def _setup(self):
@@ -151,8 +157,11 @@ class ProductionStep(WorkerWizardStep):
 
         self.audio.data_type = object
         self.video.data_type = object
+        # We want to save the audio/video attributes as
+        # component_type in the respective models
         self.audio.model_attribute = 'component_type'
         self.video.model_attribute = 'component_type'
+
         tips = gtk.Tooltips()
         tips.set_tip(self.has_video,
                      _('If you want to stream video'))
@@ -172,6 +181,30 @@ class ProductionStep(WorkerWizardStep):
             (_('Sound card'), 'soundcard-producer'),
             (_('Firewire audio'), 'firewire-producer'),
             ])
+
+    def _load_plugin(self, component_type):
+        def got_factory(factory):
+            plugin = factory(self.wizard)
+            return plugin.get_production_step()
+
+        def noBundle(failure):
+            failure.trap(NoBundleError)
+
+        d = self.wizard.get_wizard_entry(component_type)
+        d.addCallback(got_factory)
+        d.addErrback(noBundle)
+
+        return d
+
+    def _load_step(self, d, producer):
+        def get_step_class(step_class):
+            step = step_class(self.wizard, producer)
+            if isinstance(step, WorkerWizardStep):
+                step.worker = self.worker
+                step.worker_changed()
+            return step
+        d.addCallback(get_step_class)
+        return d
 
     def _verify(self):
         # FIXME: We should wait for the first worker to connect before
@@ -220,39 +253,6 @@ class ProductionStep(WorkerWizardStep):
         self._verify()
 
 
-class TestVideoSourceStep(VideoSourceStep):
-    name = _('Test Video Source')
-    glade_file = 'wizard_testsource.glade'
-    component_type = 'videotestsrc'
-    icon = 'testsource.png'
-
-    def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
-
-    # WizardStep
-
-    def setup(self):
-        self.pattern.data_type = int
-        self.format.data_type = str
-        self.framerate.data_type = float
-
-        self.pattern.prefill([
-            (_('SMPTE Color bars'), 0),
-            (_('Random (television snow)'), 1),
-            (_('Totally black'), 2)])
-        self.format.prefill([
-            (_('YUV'), 'video/x-raw-yuv'),
-            (_('RGB'), 'video/x-raw-rgb')])
-
-        self.model.properties.pattern = 0
-        self.model.properties.format = 'video/x-raw-yuv'
-
-        self.add_proxy(self.model.properties,
-                       ['pattern', 'width', 'height',
-                        'framerate', 'format'])
-
-    def before_show(self):
-        self.wizard.require_elements(self.worker, 'videotestsrc')
 
 
 class WebcamStep(VideoSourceStep):
@@ -498,34 +498,6 @@ class TVCardStep(VideoSourceStep):
         self._run_checks()
 
 
-class TestAudioSourceStep(AudioSourceStep):
-    name = _('Test Audio Source')
-    glade_file = 'wizard_audiotest.glade'
-    icon = 'soundcard.png'
-
-    # WizardStep
-
-    def setup(self):
-        self.rate.data_type = str
-        self.volume.data_type = float
-
-        self.rate.prefill(['8000',
-                           '16000',
-                           '32000',
-                           '44100'])
-
-        self.model.properties.rate = '44100'
-
-        self.add_proxy(self.model.properties,
-                       ['frequency', 'volume', 'rate'])
-
-        self.rate.set_sensitive(True)
-
-    def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'audiotestsrc')
-
-    def get_next(self):
-        return None
 
 
 OSS_DEVICES = ["/dev/dsp",

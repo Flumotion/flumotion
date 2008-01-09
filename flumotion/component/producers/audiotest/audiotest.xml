@@ -13,6 +13,8 @@
                function="AudioTest" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="AudioTestAdminGtk" />
+        <entry type="wizard" location="audiotest_wizard.py"
+               function="AudioTestWizardPlugin" />
       </entries>
 
       <!-- priority to this clock so that when testing, clock choice is
@@ -73,6 +75,20 @@
           <filename location="audiotest.glade" />
         </directory>
       </directories>
+    </bundle>
+
+    <bundle name="audiotest-wizard">
+        <dependencies>
+            <dependency name="audiotest-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/audiotest">
+                <filename location="audiotest-wizard.glade" />
+                <filename location="audiotest_wizard.py" />
+            </directory>
+        </directories>
     </bundle>
 
   </bundles>

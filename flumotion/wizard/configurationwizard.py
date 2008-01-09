@@ -28,6 +28,7 @@ import gtk
 from twisted.internet import defer
 
 from flumotion.common import errors, messages
+from flumotion.common.common import pathToModuleName
 from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
@@ -346,6 +347,26 @@ class ConfigurationWizard(SectionWizard):
 
         d.addErrback(errback)
         d.addCallback(callback)
+        return d
+
+    def get_wizard_entry(self, component_type):
+        """
+        Fetches a wizard bundle from a specific kind of component
+        @param component_type: the component type to get the wizard entry
+          bundle from.
+        @returns: a deferred returning either::
+          - factory of the component
+          - noBundle error: if the component lacks a wizard bundle
+        """
+        def got_entry_point((filename, procname)):
+            modname = pathToModuleName(filename)
+            d = self._admin.getBundledFunction(modname, procname)
+            self.clear_msg('wizard-bundle')
+            return d
+
+        self.clear_msg('wizard-bundle')
+        d = self._admin.callRemote('getEntry', component_type, 'wizard')
+        d.addCallback(got_entry_point)
         return d
 
     # Private

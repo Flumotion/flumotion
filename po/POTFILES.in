@@ -68,6 +68,7 @@ flumotion/component/plugs/manhole.py
 flumotion/component/producers/audiotest/audiotest.py
 flumotion/component/producers/audiotest/__init__.py
 flumotion/component/producers/audiotest/admin_gtk.py
+flumotion/component/producers/audiotest/audiotest_wizard.py
 flumotion/component/producers/soundcard/soundcard.py
 flumotion/component/producers/soundcard/__init__.py
 flumotion/component/producers/soundcard/admin_gtk.py
@@ -108,6 +109,7 @@ flumotion/component/producers/videotest/admin_text.py
 flumotion/component/producers/videotest/videotest.py
 flumotion/component/producers/videotest/__init__.py
 flumotion/component/producers/videotest/admin_gtk.py
+flumotion/component/producers/videotest/videotest_wizard.py
 flumotion/component/combiners/composite/composite.py
 flumotion/component/combiners/composite/__init__.py
 flumotion/component/combiners/switch/basicwatchdog.py
@@ -392,16 +394,16 @@ data/glade/wizard_vorbis.glade
 data/glade/wizard_consumption.glade
 data/glade/greeter-authenticate.glade
 data/glade/wizard_jpeg.glade
-data/glade/wizard_testsource.glade
 data/glade/greeter-connect_to_existing.glade
 data/glade/wizard_disk.glade
-data/glade/wizard_audiotest.glade
 data/glade/wizard_shout2.glade
 data/glade/wizard_firewire.glade
 flumotion/component/producers/audiotest/audiotest.glade
+flumotion/component/producers/audiotest/audiotest-wizard.glade
 flumotion/component/producers/bttv/colorbalance.glade
 flumotion/component/producers/looper/flufileinfo.glade
 flumotion/component/producers/looper/looper.glade
+flumotion/component/producers/videotest/videotest-wizard.glade
 flumotion/component/misc/httpfile/httpfile.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/httpstreamer/http.glade

@@ -16,6 +16,8 @@
                function="GUIClass" />
         <entry type="admin/text" location="admin_text.py"
                function="UIClass" />
+        <entry type="wizard" location="videotest_wizard.py"
+               function="VideoTestWizardPlugin" />
       </entries>
 
       <properties>
@@ -89,6 +91,20 @@
         </directories>
     </bundle>
 
-  </bundles>
+    <bundle name="videotest-wizard">
+        <dependencies>
+            <dependency name="videotest-producer-base" />
+            <dependency name="component" />
+        </dependencies>
 
+        <directories>
+            <directory name="flumotion/component/producers/videotest">
+                <filename location="videotest-wizard.glade" />
+                <filename location="videotest_wizard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+  
 </registry> 

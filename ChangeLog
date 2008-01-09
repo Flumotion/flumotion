@@ -1,5 +1,26 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_testsource.glade:
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/audiotest/audiotest-wizard.glade:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/videotest/Makefile.am:
+	* flumotion/component/producers/videotest/videotest-wizard.glade:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+
+	Make the productionstep of the wizard pluggable. Move the
+	audiotest and videotest steps to the component and put them in
+	separate bundles.
+	Add a new method to the configuration wizard to fetch a wizard bundle.
+
+2008-01-09  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/manager/admin.py (AdminAvatar.perspective_getEntryByType): 
 	Remove, in favor of getEntry.
 	* flumotion/manager/admin.py (AdminAvatar.perspective_getEntry): 
