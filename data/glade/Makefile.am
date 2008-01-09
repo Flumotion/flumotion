@@ -14,7 +14,6 @@ glade_DATA = \
 	open-connection.glade		\
 	videotest.glade			\
 	wizard.glade 			\
-	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\
 	wizard_consumption.glade	\
 	wizard_disk.glade		\
@@ -30,7 +29,6 @@ glade_DATA = \
 	wizard_soundcard.glade		\
 	wizard_source.glade		\
 	wizard_summary.glade		\
-	wizard_testsource.glade		\
 	wizard_theora.glade		\
 	wizard_tvcard.glade		\
 	wizard_webcam.glade		\

@@ -1,5 +1,7 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am (glade_DATA): Remove old glade files here.
+
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_testsource.glade:
 	* flumotion/component/producers/audiotest/Makefile.am:
