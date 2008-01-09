@@ -1,5 +1,16 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am:
+	* data/glade/wizard_soundcard.glade:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	Move the soundcard step + glade file out to a separate bundle
+
+2008-01-09  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/Makefile.am (glade_DATA): Remove old glade files here.
 
 	* data/glade/wizard_audiotest.glade:

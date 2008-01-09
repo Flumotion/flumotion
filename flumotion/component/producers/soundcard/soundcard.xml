@@ -14,6 +14,8 @@
                function="Soundcard"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
+        <entry type="wizard" location="soundcard_wizard.py"
+               function="SoundcardWizardPlugin" />
       </entries>
       <properties>
         <property name="source-element" type="string"
@@ -73,5 +75,20 @@
             </directory>
         </directories>
      </bundle>
+
+    <bundle name="soundcard-wizard">
+        <dependencies>
+            <dependency name="soundcard-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/soundcard">
+                <filename location="soundcard-wizard.glade" />
+                <filename location="soundcard_wizard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
 </registry> 

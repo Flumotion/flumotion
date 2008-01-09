@@ -33,7 +33,6 @@ from flumotion.common.messages import N_
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import WorkerWizardStep, \
     AudioSourceStep, VideoSourceStep
-from flumotion.wizard.enums import SoundcardSystem
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
 T_ = messages.gettexter('flumotion')
@@ -115,7 +114,8 @@ class ProductionStep(WorkerWizardStep):
             raise AssertionError
 
     def worker_changed(self):
-        if self.audio.get_selected() not in ['audiotest-producer']:
+        if self.audio.get_selected() not in ['audiotest-producer',
+                                             'soundcard-producer']:
             if not isinstance(self._get_audio_step_class(), WorkerWizardStep):
                 self._audio_producer.worker = self.worker
         if self.video.get_selected() not in ['videotest-producer']:
@@ -126,9 +126,7 @@ class ProductionStep(WorkerWizardStep):
 
     def _get_audio_step_class(self):
         source = self.audio.get_selected()
-        if source == 'soundcard-producer':
-            step_class = SoundcardStep
-        elif source == 'firewire-producer':
+        if source == 'firewire-producer':
             # Only show firewire audio if we're using firewire video
             if self.video.get_active() == 'firewire-producer':
                 return
@@ -496,152 +494,6 @@ class TVCardStep(VideoSourceStep):
 
     def on_device__changed(self, combo):
         self._run_checks()
-
-
-
-
-OSS_DEVICES = ["/dev/dsp",
-               "/dev/dsp1",
-               "/dev/dsp2"]
-ALSA_DEVICES = ['hw:0',
-                'hw:1',
-                'hw:2']
-CHANNELS = [(_('Stereo'), 2),
-            (_('Mono'), 1)]
-BITDEPTHS = [(_('16-bit'), 16),
-             (_('8-bit'), 8)]
-SAMPLE_RATES = [48000,
-                44100,
-                32000,
-                22050,
-                16000,
-                11025,
-                8000]
-
-class SoundcardStep(AudioSourceStep):
-    name = _('Soundcard')
-    glade_file = 'wizard_soundcard.glade'
-    component_type = 'osssrc'
-    icon = 'soundcard.png'
-
-    def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
-        self._block_update = False
-
-    # WizardStep
-
-    def setup(self):
-        # block updates, because populating a shown combobox will of course
-        # trigger the callback
-        self._block_update = True
-        self.input_track.data_type = str
-        self.channels.data_type = int
-        self.rate.data_type = int
-        self.depth.data_type = int
-        self.device.data_type = str
-        self.source_element.data_type = str
-
-        self.add_proxy(self.model.properties,
-                       ['input_track',
-                        'channels',
-                        'rate',
-                        'depth',
-                        'device',
-                        'source_element'])
-
-        self.source_element.prefill(
-            [(enum.nick, enum.element_name) for enum in SoundcardSystem])
-        self.channels.prefill(CHANNELS)
-        self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
-        self.depth.prefill(BITDEPTHS)
-        self._block_update = False
-
-    def worker_changed(self):
-        self._clear_combos()
-        self._update_devices()
-        self._update_inputs()
-
-    def get_next(self):
-        return None
-
-    # Private
-
-    def _clear_combos(self):
-        self.input_track.clear()
-        self.input_track.set_sensitive(False)
-        self.channels.set_sensitive(False)
-        self.rate.set_sensitive(False)
-        self.depth.set_sensitive(False)
-
-    def _update_devices(self):
-        self._block_update = True
-        self.device.clear()
-        enum = self.source_element.get_selected()
-        if enum == SoundcardSystem.Alsa.element_name:
-            self.device.prefill(ALSA_DEVICES)
-        elif enum == SoundcardSystem.OSS.element_name:
-            self.device.prefill(OSS_DEVICES)
-        else:
-            raise AssertionError
-        self._block_update = False
-
-    def _update_inputs(self):
-        if self._block_update:
-            return
-        self.wizard.block_next(True)
-
-        device = self.device.get_selected()
-        element_name = self.source_element.get_selected()
-        channels = self.channels.get_selected() or 2
-        assert device
-        assert element_name
-        assert channels
-        msg = messages.Info(T_(
-            N_("Probing soundcard, this can take a while...")),
-                            id='soundcard-check')
-        self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.audio', 'checkMixerTracks',
-                               element_name,
-                               device,
-                               channels,
-                               id='soundcard-check')
-
-        def checkFailed(failure):
-            self._clear_combos()
-            self.wizard.block_next(True)
-
-        def soundcardCheckComplete((deviceName, tracks)):
-            self.wizard.clear_msg('soundcard-check')
-            self.wizard.block_next(False)
-            self.label_devicename.set_label(deviceName)
-            self._block_update = True
-            self.channels.set_sensitive(True)
-            self.rate.set_sensitive(True)
-            self.depth.set_sensitive(True)
-            self.input_track.prefill(tracks)
-            self.input_track.set_sensitive(bool(tracks))
-            self._block_update = False
-
-        d.addCallback(soundcardCheckComplete)
-        d.addErrback(checkFailed)
-
-        return d
-
-    # Callbacks
-
-    def on_source_element__changed(self, combo):
-        if not self._block_update:
-            self._update_devices()
-            self._update_inputs()
-
-    def on_device__changed(self, combo):
-        self._update_inputs()
-
-    def on_channels__changed(self, combo):
-        # FIXME: make it so that the number of channels can be changed
-        # and the check gets executed with the new number
-        # self.update_inputs()
-        pass
 
 
 class _FireWireCommon:

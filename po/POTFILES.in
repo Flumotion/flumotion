@@ -72,6 +72,7 @@ flumotion/component/producers/audiotest/audiotest_wizard.py
 flumotion/component/producers/soundcard/soundcard.py
 flumotion/component/producers/soundcard/__init__.py
 flumotion/component/producers/soundcard/admin_gtk.py
+flumotion/component/producers/soundcard/soundcard_wizard.py
 flumotion/component/producers/bttv/bttv.py
 flumotion/component/producers/bttv/__init__.py
 flumotion/component/producers/bttv/admin_gtk.py
@@ -387,7 +388,6 @@ data/glade/greeter-start_new_success.glade
 data/glade/connection-dialog.glade
 data/glade/greeter-start_new_error.glade
 data/glade/wizard_summary.glade
-data/glade/wizard_soundcard.glade
 data/glade/wizard_http.glade
 data/glade/greeter-initial.glade
 data/glade/wizard_vorbis.glade
@@ -403,6 +403,7 @@ flumotion/component/producers/audiotest/audiotest-wizard.glade
 flumotion/component/producers/bttv/colorbalance.glade
 flumotion/component/producers/looper/flufileinfo.glade
 flumotion/component/producers/looper/looper.glade
+flumotion/component/producers/soundcard/soundcard-wizard.glade
 flumotion/component/producers/videotest/videotest-wizard.glade
 flumotion/component/misc/httpfile/httpfile.glade
 flumotion/component/consumers/disker/disker.glade

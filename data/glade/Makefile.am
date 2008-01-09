@@ -26,7 +26,6 @@ glade_DATA = \
 	wizard_overview.glade		\
 	wizard_shout2.glade		\
 	wizard_smoke.glade		\
-	wizard_soundcard.glade		\
 	wizard_source.glade		\
 	wizard_summary.glade		\
 	wizard_theora.glade		\
