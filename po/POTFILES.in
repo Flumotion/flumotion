@@ -76,7 +76,7 @@ flumotion/component/producers/soundcard/soundcard_wizard.py
 flumotion/component/producers/bttv/bttv.py
 flumotion/component/producers/bttv/__init__.py
 flumotion/component/producers/bttv/admin_gtk.py
-flumotion/component/producers/bttv/bttv-wizard.py
+flumotion/component/producers/bttv/bttv_wizard.py
 flumotion/component/producers/firewire/firewire.py
 flumotion/component/producers/firewire/__init__.py
 flumotion/component/producers/firewire/admin_gtk.py

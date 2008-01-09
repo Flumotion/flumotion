@@ -1,5 +1,8 @@
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
+	* po/POTFILES.in:
+	Fix a typo
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard_tvcard.glade:
 	* flumotion/component/producers/bttv/Makefile.am:
