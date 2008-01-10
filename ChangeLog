@@ -1,3 +1,21 @@
+2008-01-10  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard_firewire.glade:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	Move the firewire step + glade file out to a separate bundle.
+	Change the API slightly to handle components which provides
+	both an audio and video producer and update callsites.
+
 2008-01-09  Johan Dahlin  <johan@gnome.org>
 
 	* po/POTFILES.in:

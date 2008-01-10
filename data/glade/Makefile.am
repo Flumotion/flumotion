@@ -18,7 +18,6 @@ glade_DATA = \
 	wizard_consumption.glade	\
 	wizard_disk.glade		\
 	wizard_encoding.glade		\
-	wizard_firewire.glade		\
 	wizard_http.glade		\
 	wizard_jpeg.glade		\
 	wizard_license.glade		\

@@ -80,6 +80,7 @@ flumotion/component/producers/bttv/bttv_wizard.py
 flumotion/component/producers/firewire/firewire.py
 flumotion/component/producers/firewire/__init__.py
 flumotion/component/producers/firewire/admin_gtk.py
+flumotion/component/producers/firewire/firewire_wizard.py
 flumotion/component/producers/gdp/gdp.py
 flumotion/component/producers/gdp/__init__.py
 flumotion/component/producers/rtsp/rtsp.py
@@ -397,11 +398,11 @@ data/glade/wizard_jpeg.glade
 data/glade/greeter-connect_to_existing.glade
 data/glade/wizard_disk.glade
 data/glade/wizard_shout2.glade
-data/glade/wizard_firewire.glade
 flumotion/component/producers/audiotest/audiotest.glade
 flumotion/component/producers/audiotest/audiotest-wizard.glade
 flumotion/component/producers/bttv/bttv-wizard.glade
 flumotion/component/producers/bttv/colorbalance.glade
+flumotion/component/producers/firewire/firewire-wizard.glade
 flumotion/component/producers/looper/flufileinfo.glade
 flumotion/component/producers/looper/looper.glade
 flumotion/component/producers/soundcard/soundcard-wizard.glade

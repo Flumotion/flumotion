@@ -1,8 +1,15 @@
 include $(top_srcdir)/common/python.mk
 
-component_PYTHON = __init__.py firewire.py admin_gtk.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/firewire
-component_DATA = firewire.xml
+component_DATA = 		\
+	firewire.xml		\
+	firewire-wizard.glade
+
+component_PYTHON = 		\
+	__init__.py 		\
+	admin_gtk.py		\
+	firewire.py		\
+	firewire_wizard.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

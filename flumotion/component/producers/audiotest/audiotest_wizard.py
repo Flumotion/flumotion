@@ -64,6 +64,6 @@ class AudioTestWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
 
-    def get_production_step(self):
+    def get_production_step(self, type):
         return TestAudioSourceStep
 

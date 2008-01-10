@@ -19,30 +19,22 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
-import math
 
 import gtk
 from twisted.internet.defer import Deferred
 
-from flumotion.common import errors, messages
+from flumotion.common import messages
 from flumotion.common.errors import NoBundleError
-from flumotion.common.messages import N_
-from flumotion.wizard.basesteps import WorkerWizardStep, \
-    AudioSourceStep, VideoSourceStep
 from flumotion.wizard.models import AudioProducer, VideoProducer
+from flumotion.wizard.basesteps import WorkerWizardStep
 
-T_ = messages.gettexter('flumotion')
-_ = gettext.gettext
-
+__version__ = "$Rev$"
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
-
-# the denominator arg for all calls of this function was sniffed from
-# the glade file's spinbutton adjustment
+T_ = messages.gettexter('flumotion')
+_ = gettext.gettext
 
 
 class ProductionStep(WorkerWizardStep):
@@ -79,25 +71,17 @@ class ProductionStep(WorkerWizardStep):
         """Return the video step to be shown, given the currently
         selected values in this step
         @returns: video step
-        @rtype: a L{VideoSourceStep} subclass
+        @rtype: a deferred returning a L{VideoSourceStep} instance
         """
-        step_class = self._get_video_step_class()
-        if isinstance(step_class, Deferred):
-            return self._load_step(step_class, self._video_producer)
-
-        return step_class(self.wizard, self._video_producer)
+        return self._load_step(self.video, self._video_producer, 'video')
 
     def get_audio_step(self):
         """Return the audio step to be shown, given the currently
         selected values in this step
         @returns: audio step
-        @rtype: a L{AudioSourceStep} subclass
+        @rtype: a deferred returning an L{AudioSourceStep} instance
         """
-        step_class = self._get_audio_step_class()
-        if isinstance(step_class, Deferred):
-            return self._load_step(step_class, self._audio_producer)
-
-        return step_class(self.wizard, self._audio_producer)
+        return self._load_step(self.audio, self._audio_producer, 'audio')
 
     # WizardStep
 
@@ -112,37 +96,7 @@ class ProductionStep(WorkerWizardStep):
         else:
             raise AssertionError
 
-    def worker_changed(self):
-        if self.audio.get_selected() not in ['audiotest-producer',
-                                             'soundcard-producer']:
-            if not isinstance(self._get_audio_step_class(), WorkerWizardStep):
-                self._audio_producer.worker = self.worker
-        if self.video.get_selected() not in ['videotest-producer',
-                                             'webcam-producer',
-                                             'tvcard-producer']:
-            if not isinstance(self._get_video_step_class(), WorkerWizardStep):
-                self._video_producer.worker = self.worker
-
     # Private API
-
-    def _get_audio_step_class(self):
-        source = self.audio.get_selected()
-        if source == 'firewire-producer':
-            # Only show firewire audio if we're using firewire video
-            if self.video.get_active() == 'firewire-producer':
-                return
-            step_class = FireWireAudioStep
-        else:
-            step_class = self._load_plugin(source)
-        return step_class
-
-    def _get_video_step_class(self):
-        source = self.video.get_selected()
-        if source == 'firewire-producer':
-            step_class = FireWireStep
-        else:
-            step_class = self._load_plugin(source)
-        return step_class
 
     def _setup(self):
         self._audio_producer = AudioProducer()
@@ -177,10 +131,9 @@ class ProductionStep(WorkerWizardStep):
             (_('Firewire audio'), 'firewire-producer'),
             ])
 
-    def _load_plugin(self, component_type):
+    def _load_plugin(self, component_type, type):
         def got_factory(factory):
-            plugin = factory(self.wizard)
-            return plugin.get_production_step()
+            return factory(self.wizard)
 
         def noBundle(failure):
             failure.trap(NoBundleError)
@@ -191,14 +144,18 @@ class ProductionStep(WorkerWizardStep):
 
         return d
 
-    def _load_step(self, d, producer):
-        def get_step_class(step_class):
+    def _load_step(self, combo, producer, type):
+        def plugin_loaded(plugin):
+            step_class = plugin.get_production_step(type)
             step = step_class(self.wizard, producer)
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
                 step.worker_changed()
             return step
-        d.addCallback(get_step_class)
+
+        d = self._load_plugin(combo.get_selected(), type)
+        d.addCallback(plugin_loaded)
+
         return d
 
     def _verify(self):
@@ -246,171 +203,3 @@ class ProductionStep(WorkerWizardStep):
 
     def on_audio__changed(self, button):
         self._verify()
-
-
-class _FireWireCommon:
-    glade_file = 'wizard_firewire.glade'
-    component_type = 'firewire'
-    icon = 'firewire.png'
-    width_corrections = ['none', 'pad', 'stretch']
-
-    def __init__(self):
-        # options detected from the device:
-        self._dims = None
-        self._factors = [1, 2, 3, 4, 6, 8]
-        self._input_heights = None
-        self._input_widths = None
-        self._par = None
-
-        # these are instance state variables:
-        self._factor_i = None             # index into self.factors
-        self._width_correction = None     # currently chosen item from
-                                          # width_corrections
-        self.model.properties.is_square = False
-
-    # WizardStep
-
-    def worker_changed(self):
-        self._run_checks()
-
-    # Private
-
-    def _set_sensitive(self, is_sensitive):
-        self.vbox_controls.set_sensitive(is_sensitive)
-        self.wizard.block_next(not is_sensitive)
-
-    def _update_output_format(self):
-        d = self._get_width_height()
-        self.model.properties.is_square = (
-            self.checkbutton_square_pixels.get_active())
-        self.model.properties.width = d['ow']
-        self.model.properties.height = d['oh']
-        self.model.properties.scaled_width = d['sw']
-        self.model.properties.framerate = self.spinbutton_framerate.get_value()
-        num, den = 1, 1
-        if not self.model.properties.is_square:
-            num, den = self._par[0], self._par[1]
-
-        msg = _('%dx%d, %d/%d pixel aspect ratio') % (
-                   d['ow'], d['oh'], num, den)
-        self.label_output_format.set_markup(msg)
-
-    def _get_width_height(self):
-        # returns dict with sw, sh, ow, oh
-        # which are scaled width and height, and output width and height
-        sh = self._input_heights[self._factor_i]
-        sw = self._input_widths[self._factor_i]
-        par = 1. * self._par[0] / self._par[1]
-
-        if self.model.properties.is_square:
-            sw = int(math.ceil(sw * par))
-            # for GStreamer element sanity, make sw an even number
-            # FIXME: check if this can now be removed
-            # sw = sw + (2 - (sw % 2)) % 2
-
-        # if scaled width (after squaring) is not multiple of 8, present
-        # width correction
-        self.frame_width_correction.set_sensitive(sw % 8 != 0)
-
-        # actual output
-        ow = sw
-        oh = sh
-        if self._width_correction == 'pad':
-            ow = sw + (8 - (sw % 8)) % 8
-        elif self._width_correction == 'stretch':
-            ow = sw + (8 - (sw % 8)) % 8
-            sw = ow
-
-        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
-
-    def _run_checks(self):
-        self._set_sensitive(False)
-        msg = messages.Info(T_(N_('Checking for Firewire device...')),
-            id='firewire-check')
-        self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
-            id='firewire-check')
-
-        def firewireCheckDone(options):
-            self.wizard.clear_msg('firewire-check')
-            self._dims = (options['width'], options['height'])
-            self._par = options['par']
-            self._input_heights = [self._dims[1]/i for i in self._factors]
-            self._input_widths = [self._dims[0]/i for i in self._factors]
-            values = []
-            for i, height in enumerate(self._input_heights):
-                values.append(('%d pixels' % height, i))
-            self.combobox_scaled_height.prefill(values)
-            self._set_sensitive(True)
-            self.on_update_output_format()
-
-        def trapRemote(failure):
-            failure.trap(errors.RemoteRunError)
-        d.addCallback(firewireCheckDone)
-        d.addErrback(trapRemote)
-        return d
-
-    # Callbacks
-
-    def on_update_output_format(self, *args):
-        # update label_camera_settings
-        standard = 'Unknown'
-        aspect = 'Unknown'
-        h = self._dims[1]
-        if h == 576:
-            standard = 'PAL'
-        elif h == 480:
-            standard = 'NTSC'
-        else:
-            self.warning('Unknown capture standard for height %d' % h)
-
-        nom = self._par[0]
-        den = self._par[1]
-        if nom == 59 or nom == 10:
-            aspect = '4:3'
-        elif nom == 118 or nom == 40:
-            aspect = '16:9'
-        else:
-            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
-
-        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
-            nom, den)
-        self.label_camera_settings.set_text(text)
-
-        # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_selected()
-
-        self._width_correction = None
-        for i in type(self).width_corrections:
-            if getattr(self,'radiobutton_width_'+i).get_active():
-                self._width_correction = i
-                break
-        assert self._width_correction
-
-        self._update_output_format()
-
-
-class FireWireStep(_FireWireCommon, VideoSourceStep):
-    name = _('Firewire')
-    def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
-        _FireWireCommon.__init__(self)
-
-
-class FireWireAudioStep(_FireWireCommon, AudioSourceStep):
-    name = _('Firewire audio')
-
-    def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
-        _FireWireCommon.__init__(self)
-
-    # WizardStep
-
-    def setup(self):
-        self.frame_scaling.hide()
-        self.frame_width_correction.hide()
-        self.frame_capture.hide()
-        self.frame_output_format.hide()
-
-    def get_next(self):
-        return None
