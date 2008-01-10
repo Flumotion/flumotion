@@ -17,6 +17,9 @@
                function="AudioTestWizardPlugin" />
       </entries>
 
+      <wizard type="audio-producer" _description="Test audio source" 
+              feeder="default" />
+
       <!-- priority to this clock so that when testing, clock choice is
            deterministic -->
       <synchronization required="yes" clock-priority="110" />

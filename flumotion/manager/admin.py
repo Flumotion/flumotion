@@ -368,6 +368,46 @@ class AdminAvatar(base.ManagerAvatar):
         return self.vishnu.emptyPlanet()
 
 
+    def perspective_getWizardEntries(self, types=None, provides=None,
+                                     accepts=None):
+        """
+        Fetches the wizard entries which matches the parameters sent in
+
+        @param types: list of component types to fetch, is usually
+          something like ['video-producer'] or ['audio-encoder']
+        @type  types: list of strings
+        @param provides: formats provided, eg ['jpeg', 'speex']
+        @type  provides: list of strings
+        @param accepts: formats accepted, eg ['theora']
+        @type  accepts: list of strings
+        @returns: tuple: (component_type, description, feeder, name)
+        """
+        retval = []
+
+        for component in registry.getRegistry().getComponents():
+            for wizard in component.wizards:
+                if types is not None:
+                    if wizard.type not in types:
+                        continue
+                if provides is not None:
+                    for format in wizard.provides:
+                        if format.media_type in provides:
+                            break
+                    else:
+                        continue
+                if accepts is not None:
+                    for format in wizard.accepts:
+                        if format.media_type in accepts:
+                            break
+                    else:
+                        continue
+                retval.append((wizard.type,
+                               wizard.description,
+                               wizard.feeder,
+                               component.type))
+        return retval
+
+
 class AdminHeaven(base.ManagerHeaven):
     """
     I interface between the Manager and administrative clients.

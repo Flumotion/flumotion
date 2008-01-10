@@ -1,5 +1,28 @@
 2008-01-10  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* Makefile.am:
+	* autogen.sh:
+	* flumotion/admin/admin.py:
+	* flumotion/common/registry.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/manager/admin.py:
+	* po/POTFILES.in:
+	Add a new registry entry <wizard>, which specifies how
+	a page should appear in the wizard.
+	Annotate all old production plugins.
+	Add a new method for fetching wizard entries and use it in the 
+	wizard, removing the old hard coded list of components.
+	Add intltool support, add the xml files to POTFILES.in
+
+2008-01-10  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard_firewire.glade:
 	* flumotion/component/producers/audiotest/audiotest_wizard.py:

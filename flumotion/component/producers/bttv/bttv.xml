@@ -16,6 +16,9 @@
                function="BTTVWizardPlugin" />
       </entries>
       
+      <wizard type="video-producer" _description="TV card" 
+              feeder="default" />
+
       <synchronization required="yes" />
 
       <properties>

@@ -34,7 +34,7 @@ __version__ = "$Rev$"
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 T_ = messages.gettexter('flumotion')
-_ = gettext.gettext
+N_ = _ = gettext.gettext
 
 
 class ProductionStep(WorkerWizardStep):
@@ -120,16 +120,17 @@ class ProductionStep(WorkerWizardStep):
         self.add_proxy(self._audio_producer, ['audio'])
         self.add_proxy(self._video_producer, ['video'])
 
-        self.video.prefill([
-            (_('Test video source'), 'videotest-producer'),
-            (_('Web camera'), 'webcam-producer'),
-            (_('TV card'), 'tvcard-producer'),
-            (_('Firewire video'), 'firewire-producer')])
-        self.audio.prefill([
-            (_('Test audio source'), 'audiotest-producer'),
-            (_('Sound card'), 'soundcard-producer'),
-            (_('Firewire audio'), 'firewire-producer'),
-            ])
+        def got_entries(entries, combo):
+            data = []
+            for type, desc, feed, component_type in entries:
+                data.append((N_(desc), component_type))
+            combo.prefill(data)
+
+        for ctype, combo in [('video-producer', self.video),
+                             ('audio-producer', self.audio)]:
+            d = self.wizard._admin.getWizardEntries(
+                wizard_types=[ctype])
+            d.addCallback(got_entries, combo)
 
     def _load_plugin(self, component_type, type):
         def got_factory(factory):

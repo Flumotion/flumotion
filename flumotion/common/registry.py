@@ -53,12 +53,12 @@ class RegistryEntryComponent:
     """
     # RegistryEntryComponent has a constructor with a lot of arguments,
     # but that's ok here. Allow it through pychecker.
-    __pychecker__ = 'maxargs=14'
+    __pychecker__ = 'maxargs=15'
 
     def __init__(self, filename, type,
                  source, description, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority,
-                 sockets):
+                 sockets, wizards):
         """
         @param filename:   name of the XML file this component is parsed from
         @type  filename:   str
@@ -68,6 +68,8 @@ class RegistryEntryComponent:
         @type  entries:    dict of str -> L{RegistryEntryEntry}
         @param sockets:    list of sockets supported by the element
         @type  sockets:    list of str
+        @param wizards:    list of wizard entries
+        @type  wizards:    list of L{RegistryEntryWizard}
         """
         self.filename = filename
         self.type = type
@@ -85,6 +87,7 @@ class RegistryEntryComponent:
         self.needs_sync = needs_sync
         self.clock_priority = clock_priority
         self.sockets = sockets
+        self.wizards = wizards
 
     def getProperties(self):
         """
@@ -370,6 +373,29 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
 
+class RegistryEntryWizard:
+    "This class represents a <wizard> entry in the registry"
+    def __init__(self, type, description, feeder, eater, accepts, provides):
+        self.type = type
+        self.description = description
+        self.feeder = feeder
+        self.eater = eater
+        self.accepts = accepts
+        self.provides = provides
+
+    def __repr__(self):
+        return '<wizard type=%s, feeder=%s>' % (self.type, self.feeder)
+
+
+class RegistryWizardFormat:
+    """
+    This class represents an <accept-format> or <provide-format>
+    entry in the registry
+    """
+    def __init__(self, media_type):
+        self.media_type = media_type
+
+
 class RegistryParser(fxml.Parser):
     """
     Registry parser
@@ -436,6 +462,7 @@ class RegistryParser(fxml.Parser):
         #   <entries>
         #   <synchronization>
         #   <sockets>
+        #   <wizard>
         # </component>
 
         type, baseDir, description = self.parseAttributes(node,
@@ -449,6 +476,7 @@ class RegistryParser(fxml.Parser):
         synchronization = fxml.Box((False, 100))
         sockets = []
         properties = {}
+        wizards = []
 
         # Merge in options for inherit
         #if node.hasAttribute('inherit'):
@@ -467,8 +495,8 @@ class RegistryParser(fxml.Parser):
             'synchronization': (self._parseSynchronization,
                                 synchronization.set),
             'sockets':         (self._parseSockets, sockets.extend),
+            'wizard':          (self._parseWizard, wizards.append),
         }
-
         self.parseFromTable(node, parsers)
 
         source = source.unbox()
@@ -479,7 +507,7 @@ class RegistryParser(fxml.Parser):
                                       properties, files,
                                       entries, eaters, feeders,
                                       needs_sync, clock_priority,
-                                      sockets)
+                                      sockets, wizards)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -860,6 +888,40 @@ class RegistryParser(fxml.Parser):
         filename, = self.parseAttributes(node, ('filename',))
         return RegistryDirectory(filename)
 
+    def _parseWizard(self, node):
+        # <wizard type="..." _description=" " feeder="..." eater="..."]/>
+        #
+        # NOTE: We are using _description with the leading underscore for
+        #       the case of intltool, it is not possible for it to pickup
+        #       translated attributes otherwise. Ideally we would use another
+        #       tool so we can avoid underscores in our xml schema.
+        attrs = self.parseAttributes(node,
+                                     ('type', '_description'),
+                                     ('feeder', 'eater'))
+        type, description, feeder, eater = attrs
+
+        accepts = []
+        provides = []
+        self.parseFromTable(
+            node,
+            { 'accept-format': (self._parseAcceptFormat,
+                                lambda n: accepts.append(n)),
+              'provide-format': (self._parseProvideFormat,
+                                 lambda n: provides.append(n)),
+            })
+
+        return RegistryEntryWizard(type, description, feeder, eater, accepts, provides)
+
+    def _parseAcceptFormat(self, node):
+        # <accept-format media-type="..."/>
+        media_type, = self.parseAttributes(node, ('media-type',))
+        return RegistryWizardFormat(media_type)
+
+    def _parseProvideFormat(self, node):
+        # <provide-format media-type="..."/>
+        media_type, = self.parseAttributes(node, ('media-type',))
+        return RegistryWizardFormat(media_type)
+
 
 # FIXME: filename -> path
 class RegistryDirectory(log.Loggable):
@@ -1029,6 +1091,19 @@ class RegistryWriter(log.Loggable):
             w(6, '<properties>')
             _dump_proplist(8, component.getProperties())
             w(6, '</properties>')
+
+            for wizard in component.wizards:
+                w(6, '<wizard type="%s" _description="%s" feeder="%s">' % (
+                        wizard.type,
+                        e(wizard.description),
+                        wizard.feeder))
+                for accept in wizard.accepts:
+                    w(8, '<accept-format media-type="%s"/>' % (
+                            accept.media_type))
+                for provide in wizard.provides:
+                    w(8, '<provide-format media-type="%s"/>' % (
+                            provide.media_type))
+                w(6, '</wizard>')
 
             files = component.getFiles()
             if files:

@@ -17,6 +17,8 @@
         <entry type="wizard" location="soundcard_wizard.py"
                function="SoundcardWizardPlugin" />
       </entries>
+      <wizard type="audio-producer" _description="Sound card" 
+              feeder="default" />
       <properties>
         <property name="source-element" type="string"
                   description="The GStreamer element factory to use as source" />

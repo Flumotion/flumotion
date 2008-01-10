@@ -9,6 +9,9 @@
 
       <synchronization required="yes" />
 
+      <wizard type="video-producer" _description="Web camera" 
+              feeder="default" />
+
       <entries>
         <entry type="component" location="webcam.py"
                function="Webcam" />
