@@ -1,5 +1,8 @@
 2008-01-10  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_registry.py (TestComponentEntry.setUp): 
+	Update the tests
+
 	* configure.ac:
 	* Makefile.am:
 	* autogen.sh:

@@ -514,12 +514,12 @@ class TestComponentEntry(testsuite.TestCase):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
         self.entry = rec('filename', 'type', 'source', 'description', 'base',
-                         ['prop'], [self.file], {}, [], [], False, 100, [])
+                         ['prop'], [self.file], {}, [], [], False, 100, [], [])
         self.empty_entry = rec('filename', 'type', 'source', 'description', 'base',
-                               ['prop'], [], {}, [], [], True, 130, [])
+                               ['prop'], [], {}, [], [], True, 130, [], [])
         self.multiple_entry = rec('filename', 'type', 'source', 'description', 'base', ['prop'],
                                   [self.file, self.file], {}, [], [],
-                                  False, 100, [])
+                                  False, 100, [], [])
 
     def testThings(self):
         self.assertEquals(self.entry.getType(), 'type')
