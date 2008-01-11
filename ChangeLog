@@ -1,3 +1,9 @@
+2008-01-11  Johan Dahlin  <johan@gnome.org>
+
+	* common/common.mk (locale-uninstalled): Set itlocaledir too, intltool
+	uses this rule to install .mo files instead of datadir which normal
+	gettext uses
+
 2008-01-10  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_registry.py (TestComponentEntry.setUp): 

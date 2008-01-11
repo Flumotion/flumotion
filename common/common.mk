@@ -44,7 +44,7 @@ sloc:
 locale-uninstalled:
 	if test -d po; then \
 	cd po; \
-	make datadir=../$(top_builddir) install; \
+	make datadir=../$(top_builddir) itlocaledir=../$(top_builddir)/locale install; \
 	fi
 
 locale-uninstalled-clean:
