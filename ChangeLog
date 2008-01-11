@@ -1,5 +1,10 @@
 2008-01-11  Johan Dahlin  <johan@gnome.org>
 
+	* common/common.mk (locale-uninstalled): Workaround intltool bug 
+	and inline the whole target to copy the .gmo files.
+
+2008-01-11  Johan Dahlin  <johan@gnome.org>
+
 	* common/common.mk (locale-uninstalled): Set itlocaledir too, intltool
 	uses this rule to install .mo files instead of datadir which normal
 	gettext uses
