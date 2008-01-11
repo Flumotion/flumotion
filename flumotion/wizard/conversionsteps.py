@@ -56,7 +56,7 @@ class ConversionStep(WorkerWizardStep):
     # Public API
 
     def get_audio_page(self):
-        if self.wizard.get_step_option(_('Source'), 'has-audio'):
+        if self.wizard.get_step_option('Source', 'has-audio'):
             return self._get_audio_page()
         return None
 
@@ -82,9 +82,9 @@ class ConversionStep(WorkerWizardStep):
         self._verify()
 
     def get_next(self):
-        if self.wizard.get_step_option(_('Source'), 'has-video'):
+        if self.wizard.get_step_option('Source', 'has-video'):
             return self._get_video_page()
-        elif self.wizard.get_step_option(_('Source'), 'has-audio'):
+        elif self.wizard.get_step_option('Source', 'has-audio'):
             return self._get_audio_page()
         else:
             return None
@@ -146,7 +146,7 @@ class ConversionStep(WorkerWizardStep):
         for option, widgets in [
             ('has-audio', [self.audio, self.label_audio]),
             ('has-video', [self.video, self.label_video])]:
-            value = self.wizard.get_step_option(_('Source'), option)
+            value = self.wizard.get_step_option('Source', option)
             for widget in widgets:
                 widget.set_property('visible', value)
 

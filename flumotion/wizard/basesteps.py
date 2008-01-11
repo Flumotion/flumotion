@@ -111,8 +111,8 @@ class OverlayStep(WorkerWizardStep):
         self._worker_changed()
 
     def get_next(self):
-        if self.wizard.get_step_option(_('Source'), 'has-audio'):
-            return self.wizard.get_step(_('Source')).get_audio_step()
+        if self.wizard.get_step_option('Source', 'has-audio'):
+            return self.wizard.get_step('Source').get_audio_step()
 
         return None
 

@@ -200,7 +200,7 @@ class WizardSaver(log.Loggable):
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
-        encoder_step = self.wizard.get_step(N_(encoder.step))
+        encoder_step = self.wizard.get_step(encoder.step)
 
         properties = encoder_step.get_state()
         return Component('encoder-video', encoder.component_type,
@@ -257,9 +257,9 @@ class WizardSaver(log.Loggable):
         return audio_encoder
 
     def handleConsumers(self, components, audio_encoder, video_encoder):
-        cons_options = self.wizard.get_step_options(_('Consumption'))
-        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
-        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
+        cons_options = self.wizard.get_step_options('Consumption')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
 
         audio_muxer = self.getMuxer('audio')
         video_muxer = self.getMuxer('video')
@@ -332,7 +332,7 @@ class WizardSaver(log.Loggable):
         for name, comp_type, step_name, muxer in steps:
             if not cons_options.has_key(name):
                 continue
-            step = self.wizard.get_step(N_(step_name))
+            step = self.wizard.get_step(step_name)
             consumer = Component(name, comp_type, step.worker,
                                  step.get_state())
             consumer.link(muxer)
@@ -351,7 +351,7 @@ class WizardSaver(log.Loggable):
             both_muxer.link(audio_encoder)
 
     def getComponents(self):
-        source_options = self.wizard.get_step_options(_('Source'))
+        source_options = self.wizard.get_step_options('Source')
         has_video = source_options['has-video']
         has_audio = source_options['has-audio']
 

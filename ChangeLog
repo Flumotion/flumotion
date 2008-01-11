@@ -1,11 +1,18 @@
-2008-01-11  Johan Dahlin,,,  <jdahlin@plasttroll>
+2008-01-11  Johan Dahlin  <johan@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/save.py:
+	Get remove of a few (double) translations, left-overs from
+	previous commit.
+
+2008-01-11  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	* flumotion/ui/wizard.py:
 	* flumotion/wizard/consumptionsteps.py:
 	* flumotion/wizard/save.py:
+	Get rid of stupid _() to get_step() & friends.
 
 2008-01-11  Johan Dahlin  <johan@gnome.org>
 
