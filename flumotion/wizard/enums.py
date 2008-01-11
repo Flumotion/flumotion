@@ -29,22 +29,6 @@ from gettext import gettext as _
 from flumotion.common import enum
 
 #
-# TVCard
-#
-
-TVCardDevice = enum.EnumClass(
-    'TVCardDevice',
-    ['/dev/video0',
-     '/dev/video1',
-     '/dev/video2'])
-
-TVCardSignal = enum.EnumClass(
-    'TVCardSignal',
-    ['Composite', 'RCA'],
-    [_('Composite'), _('RCA')])
-
-
-#
 # Videotestsrc, order is important here, since it maps to
 #               GstVideotestsrcPattern
 #

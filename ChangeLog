@@ -1,5 +1,8 @@
 2008-01-11  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/enums.py (EncodingVideo): Remove two
+	unused enums
+
 	* common/common.mk (locale-uninstalled): Workaround intltool bug 
 	and inline the whole target to copy the .gmo files.
 
