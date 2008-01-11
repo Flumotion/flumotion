@@ -48,7 +48,7 @@ pb.PBClientFactory.login = login
 pb.PBClientFactory.getRootObject = getRootObject
 pb.PBClientFactory.getPerspective = getPerspective
 
-from twisted.internet.default import PosixReactorBase
+from twisted.internet.posixbase import PosixReactorBase
 
 def listenUDP(self, port, protocol, interface='', maxPacketSize=8192):
     """Connects a given DatagramProtocol to the given numeric UDP port.
