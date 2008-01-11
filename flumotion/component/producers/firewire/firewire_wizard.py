@@ -209,7 +209,7 @@ class FireWireWizardPlugin(object):
     def get_production_step(self, type):
         if type == 'audio':
             # Only show firewire audio if we're using firewire video
-            source_step = self.wizard.get_step(_('Source'))
+            source_step = self.wizard.get_step('Source')
             if source_step.video.get_active() == 'firewire-producer':
                 return
             return FireWireAudioStep

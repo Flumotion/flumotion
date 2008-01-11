@@ -44,8 +44,8 @@ class ConsumptionStep(WizardStep):
         pass
 
     def activated(self):
-        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
-        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
         has_both = has_audio and has_video
 
         # Hide all checkbuttons if we don't have both audio and video selected
@@ -130,8 +130,8 @@ class ConsumptionStep(WizardStep):
                                 self.shout2_video,
                                 self.shout2_audio_video]))
 
-        has_audio = self.wizard.get_step_option(_('Source'), 'has-audio')
-        has_video = self.wizard.get_step_option(_('Source'), 'has-video')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
 
         items = []
         for name, (audio, video, audio_video) in uielements:
@@ -245,7 +245,7 @@ class HTTPStep(WorkerWizardStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step(_('Consumption')).get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
     # Private
 
@@ -324,7 +324,7 @@ class DiskStep(WorkerWizardStep):
         return options
 
     def get_next(self):
-        return self.wizard.get_step(_('Consumption')).get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
     # Private
 
@@ -388,7 +388,7 @@ class Shout2Step(WorkerWizardStep):
         self.wizard.check_elements(self.worker, 'shout2send')
 
     def get_next(self):
-        return self.wizard.get_step(_('Consumption')).get_next(self)
+        return self.wizard.get_step('Consumption').get_next(self)
 
 
 class Shout2BothStep(Shout2Step):

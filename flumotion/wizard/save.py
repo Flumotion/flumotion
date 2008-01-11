@@ -122,7 +122,7 @@ class WizardSaver(log.Loggable):
         self.wizard = wizard
 
     def _getVideoSource(self):
-        source_step = self.wizard.get_step(_('Source'))
+        source_step = self.wizard.get_step('Source')
         video_producer = source_step.get_video_producer()
         properties = video_producer.getProperties()
         self._set_fraction_property(properties, 'framerate', 10)
@@ -133,7 +133,7 @@ class WizardSaver(log.Loggable):
                          properties)
 
     def _getAudioSource(self, video_source):
-        source_step = self.wizard.get_step(_('Source'))
+        source_step = self.wizard.get_step('Source')
         audio_producer = source_step.get_audio_producer()
 
         # If we selected firewire and have selected video
@@ -153,7 +153,7 @@ class WizardSaver(log.Loggable):
                          properties)
 
     def getVideoOverlay(self, video_source):
-        step = self.wizard.get_step(_('Overlay'))
+        step = self.wizard.get_step('Overlay')
         properties = step.get_state()
 
         has_overlay = (step.can_overlay and
@@ -169,12 +169,12 @@ class WizardSaver(log.Loggable):
         # At this point we already know that we should overlay something
         if properties['show-logo']:
             properties['fluendo-logo'] = True
-            encoding_options = self.wizard.get_step_options(_('Encoding'))
+            encoding_options = self.wizard.get_step_options('Encoding')
             if (encoding_options['format'] == enums.EncodingFormat.Ogg or
                 encoding_options['video'] == enums.EncodingVideo.Theora):
                 properties['xiph-logo'] = True
 
-            license_options = self.wizard.get_step_options(_('Content License'))
+            license_options = self.wizard.get_step_options('Content License')
             if (license_options['set-license']
                 and license_options['license'] == enums.LicenseType.CC):
                 properties['cc-logo'] = True
@@ -198,7 +198,7 @@ class WizardSaver(log.Loggable):
         properties[property_name] = value
 
     def getVideoEncoder(self):
-        options = self.wizard.get_step_options(_('Encoding'))
+        options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
         encoder_step = self.wizard.get_step(N_(encoder.step))
 
@@ -208,22 +208,22 @@ class WizardSaver(log.Loggable):
                          properties)
 
     def getAudioEncoder(self):
-        options = self.wizard.get_step_options(_('Encoding'))
+        options = self.wizard.get_step_options('Encoding')
         encoder = options['audio']
 
         if encoder == enums.EncodingAudio.Mulaw:
             props = {}
-            worker = self.wizard.get_step(_('Source')).worker
+            worker = self.wizard.get_step('Source').worker
         else:
-            encoder_step = self.wizard.get_step(N_(encoder.step))
+            encoder_step = self.wizard.get_step(encoder.step)
             props = encoder_step.get_state()
             worker = encoder_step.worker
 
         return Component('encoder-audio', encoder.component_type, worker, props)
 
     def getMuxer(self, name):
-        options = self.wizard.get_step_options(_('Encoding'))
-        step = self.wizard.get_step(_('Encoding'))
+        options = self.wizard.get_step_options('Encoding')
+        step = self.wizard.get_step('Encoding')
         muxer = options['format']
         return Component('muxer-' + name, muxer.component_type,
                          step.worker)

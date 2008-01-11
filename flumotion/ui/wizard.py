@@ -19,10 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
+import gettext
 
 import gobject
 import gtk
@@ -35,11 +33,13 @@ from flumotion.common.pygobject import gsignal
 from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
+__version__ = "$Rev$"
+__pychecker__ = 'no-classattr no-argsused'
 T_ = messages.gettexter('flumotion')
+N_ = gettext.gettext
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
-__pychecker__ = 'no-classattr no-argsused'
 
 def escape(text):
     return text.replace('&', '&amp;')
@@ -212,6 +212,9 @@ class SectionWizard(GladeWindow, log.Loggable):
         @type stepname: str
         @returns: a L{WizardStep} instance or raises KeyError
         """
+        # Title and name of the page is the same, so we have to lookup
+        # The translated version for now
+        stepname = N_(stepname)
         for step in self._steps.values():
             if step.get_name() == stepname:
                 return step
