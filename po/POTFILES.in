@@ -100,6 +100,7 @@ flumotion/component/producers/webcam/webcam.py
 flumotion/component/producers/webcam/__init__.py
 flumotion/component/producers/webcam/admin_gtk.py
 flumotion/component/producers/webcam/webcam-wizard.glade
+flumotion/component/producers/webcam/webcam_wizard.py
 flumotion/component/producers/icecast/icecast.py
 flumotion/component/producers/icecast/__init__.py
 flumotion/component/producers/screencast/screencast.py
@@ -151,6 +152,7 @@ flumotion/component/encoders/vorbis/__init__.py
 flumotion/component/encoders/mulaw/__init__.py
 flumotion/component/encoders/mulaw/mulaw.py
 flumotion/component/encoders/__init__.py
+flumotion/component/encoders/encodingwizardplugin.py
 flumotion/component/consumers/disker/admin_text.py
 flumotion/component/consumers/disker/disker_plug.py
 flumotion/component/consumers/disker/disker.py
@@ -260,6 +262,7 @@ flumotion/configure/installed.py
 flumotion/configure/__init__.py
 flumotion/extern/pytrayicon/ltihooks.py
 flumotion/extern/pytrayicon/__init__.py
+flumotion/extern/pytrayicon/eggtrayicon.c
 flumotion/extern/code.py
 flumotion/extern/fdpass/__init__.py
 flumotion/extern/__init__.py

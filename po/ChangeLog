@@ -1,0 +1,7 @@
+2008-01-11  Johan Dahlin  <johan@gnome.org>
+
+	* POTFILES.in: Add missing files which intltool now warns us about.
+
+2008-01-11  Johan Dahlin  <johan@gnome.org>
+
+	* ChangeLog: add new separate changelog, since intltool requires it
