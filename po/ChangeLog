@@ -1,5 +1,7 @@
 2008-01-11  Johan Dahlin  <johan@gnome.org>
 
+	* sv.po: Update swedish translation.
+
 	* POTFILES.in: Add missing files which intltool now warns us about.
 
 2008-01-11  Johan Dahlin  <johan@gnome.org>

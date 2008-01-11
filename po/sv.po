@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-01-09 16:27+0100\n"
-"PO-Revision-Date: 2008-01-09 16:31+0100\n"
+"PO-Revision-Date: 2008-01-11 18:25+0100\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2040,7 +2040,7 @@ msgstr ""
 
 #: data/glade/wizard_firewire.glade:220
 msgid "<b>Scaling</b>"
-msgstr ""
+msgstr "<b>Scalning</b>"
 
 #: data/glade/wizard_firewire.glade:297
 msgid "_No width correction"
