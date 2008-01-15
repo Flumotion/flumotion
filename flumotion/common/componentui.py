@@ -46,5 +46,4 @@ pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
 class WizardEntryState(pb.RemoteCopy):
     pass
 
-pb.setUnjellyableForClass(registry.RegistryEntryWizard,
-                          ReceiverWizardEntryState)
+pb.setUnjellyableForClass(registry.RegistryEntryWizard, WizardEntryState)

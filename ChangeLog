@@ -1,6 +1,8 @@
 2008-01-15  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/common/componentui.py:
+	* flumotion/common/componentui.py: 
+	Update the name here too, to avoid breaking the build
+
 	* flumotion/common/registry.py:
 	* flumotion/manager/admin.py:
 	* flumotion/wizard/productionsteps.py:
