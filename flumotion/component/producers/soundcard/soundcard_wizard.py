@@ -73,6 +73,21 @@ class SoundcardStep(AudioSourceStep):
         self.device.data_type = str
         self.source_element.data_type = str
 
+        self.input_track.prefill([''])
+        self.channels.prefill(CHANNELS)
+        self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
+        self.depth.prefill(BITDEPTHS)
+        self.device.prefill([''])
+        self.source_element.prefill(
+            [(enum.nick, enum.element_name) for enum in SoundcardSystem])
+
+        self.model.properties.input_track = ''
+        self.model.properties.channels = 2
+        self.model.properties.rate = 8000
+        self.model.properties.depth = 8
+        self.model.properties.device = ''
+        self.model.properties.source_element = 'alsasrc'
+
         self.add_proxy(self.model.properties,
                        ['input_track',
                         'channels',
@@ -81,11 +96,6 @@ class SoundcardStep(AudioSourceStep):
                         'device',
                         'source_element'])
 
-        self.source_element.prefill(
-            [(enum.nick, enum.element_name) for enum in SoundcardSystem])
-        self.channels.prefill(CHANNELS)
-        self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
-        self.depth.prefill(BITDEPTHS)
         self._block_update = False
 
     def worker_changed(self):

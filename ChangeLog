@@ -1,3 +1,8 @@
+2008-01-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/producers/soundcard/soundcard_wizard.py
+	(SoundcardStep.setup): Make sure that it works using kiwi 1.9.14
+
 2008-01-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* autogen.sh:
