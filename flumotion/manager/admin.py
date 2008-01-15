@@ -31,6 +31,7 @@ from StringIO import StringIO
 
 from twisted.internet import reactor
 from twisted.python import failure
+from twisted.spread import pb
 from zope.interface import implements
 
 from flumotion.manager import base
@@ -42,6 +43,7 @@ from flumotion.common import messages
 # make ComponentState proxyable
 from flumotion.twisted import flavors
 from flumotion.common import componentui
+
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
 class AdminAvatar(base.ManagerAvatar):
@@ -380,7 +382,7 @@ class AdminAvatar(base.ManagerAvatar):
         @type  provides: list of strings
         @param accepts: formats accepted, eg ['theora']
         @type  accepts: list of strings
-        @returns: tuple: (component_type, description, feeder, name)
+        @returns: L[componentui.WizardEntryState}
         """
         retval = []
 
@@ -401,10 +403,7 @@ class AdminAvatar(base.ManagerAvatar):
                             break
                     else:
                         continue
-                retval.append((wizard.type,
-                               wizard.description,
-                               wizard.feeder,
-                               component.type))
+                retval.append(wizard)
         return retval
 
 

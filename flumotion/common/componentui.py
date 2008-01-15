@@ -22,10 +22,9 @@
 __version__ = "$Rev$"
 
 from twisted.spread import pb
-from twisted.internet import defer
 
 from flumotion.twisted import flavors
-from flumotion.common import enum
+from flumotion.common import registry
 
 # state of a component used for UI purposes
 class WorkerComponentUIState(flavors.StateCacheable):
@@ -42,3 +41,10 @@ class AdminComponentUIState(flavors.StateRemoteCache):
 
 pb.setUnjellyableForClass(WorkerComponentUIState, ManagerComponentUIState)
 pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
+
+
+class WizardEntryState(pb.RemoteCopy):
+    pass
+
+pb.setUnjellyableForClass(registry.RegistryEntryWizard,
+                          ReceiverWizardEntryState)

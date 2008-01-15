@@ -1,5 +1,15 @@
 2008-01-15  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/componentui.py:
+	* flumotion/common/registry.py:
+	* flumotion/manager/admin.py:
+	* flumotion/wizard/productionsteps.py:
+	Make RegistryWizardEntry Copyable.
+	Return a list of WizardEntryState in getWizardEntries, update
+	documentation and callsite.
+
+2008-01-15  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/soundcard/soundcard_wizard.py
 	(SoundcardStep.setup): Make sure that it works using kiwi 1.9.14
 

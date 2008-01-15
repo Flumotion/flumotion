@@ -29,6 +29,9 @@ from flumotion.common.errors import NoBundleError
 from flumotion.wizard.models import AudioProducer, VideoProducer
 from flumotion.wizard.basesteps import WorkerWizardStep
 
+# Register components
+from flumotion.common import componentui
+
 __version__ = "$Rev$"
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -122,8 +125,8 @@ class ProductionStep(WorkerWizardStep):
 
         def got_entries(entries, combo):
             data = []
-            for type, desc, feed, component_type in entries:
-                data.append((N_(desc), component_type))
+            for entry in entries:
+                data.append((N_(entry.description), entry.component_type))
             combo.prefill(data)
 
         for ctype, combo in [('video-producer', self.video),

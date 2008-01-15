@@ -33,6 +33,7 @@ import sys
 from StringIO import StringIO
 
 from xml.sax import saxutils
+from twisted.spread import pb
 
 from flumotion.common import common, log, errors, fxml
 from flumotion.common.bundle import BundlerBasket, MergedBundler
@@ -373,9 +374,11 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
 
-class RegistryEntryWizard:
+class RegistryEntryWizard(pb.Copyable):
     "This class represents a <wizard> entry in the registry"
-    def __init__(self, type, description, feeder, eater, accepts, provides):
+    def __init__(self, component_type, type, description, feeder,
+                 eater, accepts, provides):
+        self.component_type = component_type
         self.type = type
         self.description = description
         self.feeder = feeder
@@ -910,7 +913,10 @@ class RegistryParser(fxml.Parser):
                                  lambda n: provides.append(n)),
             })
 
-        return RegistryEntryWizard(type, description, feeder, eater, accepts, provides)
+        component_type = node.parentNode.getAttribute('type')
+
+        return RegistryEntryWizard(component_type, type, description,
+                                   feeder, eater, accepts, provides)
 
     def _parseAcceptFormat(self, node):
         # <accept-format media-type="..."/>
