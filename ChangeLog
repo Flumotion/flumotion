@@ -1,5 +1,11 @@
 2008-01-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* autogen.sh:
+	  Fail if there is no intltoolize (I have no idea why it wasn't
+	  made to fail in the first place)
+
+2008-01-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/Makefile.am:
 	* common/intltool.m4:
 	  Add macro for people who don't have intltool installed.
