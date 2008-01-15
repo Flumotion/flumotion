@@ -1,3 +1,9 @@
+2008-01-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/Makefile.am:
+	* common/intltool.m4:
+	  Add macro for people who don't have intltool installed.
+
 2008-01-11  Johan Dahlin  <johan@gnome.org>
 
 	* common/gendoc.py: Import from posixbase, to avoid a deprecation
