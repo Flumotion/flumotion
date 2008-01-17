@@ -155,7 +155,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             return not_component_state
 
         componentType = state.get('type')
-        d = admin.callRemote('getEntry', componentType, 'admin/gtk')
+        d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
         d.addErrback(no_bundle)
         d.addCallback(got_entry_point)
         d.addCallback(got_factory)

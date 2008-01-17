@@ -1,3 +1,11 @@
+2008-01-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/manager/admin.py:
+	* flumotion/wizard/configurationwizard.py:
+	Rename getEntry back to getEntryByType, reverses part of [6081]
+
 2008-01-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/componentui.py: 

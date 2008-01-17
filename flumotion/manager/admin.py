@@ -188,7 +188,7 @@ class AdminAvatar(base.ManagerAvatar):
             return failure.Failure(errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e)))
 
-    def perspective_getEntry(self, componentType, entryType):
+    def perspective_getEntryByType(self, componentType, entryType):
         """
         Get the entry point for a piece of bundled code by the type.
         @param componentType: the component

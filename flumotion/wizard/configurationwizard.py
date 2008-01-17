@@ -365,7 +365,7 @@ class ConfigurationWizard(SectionWizard):
             return d
 
         self.clear_msg('wizard-bundle')
-        d = self._admin.callRemote('getEntry', component_type, 'wizard')
+        d = self._admin.callRemote('getEntryByType', component_type, 'wizard')
         d.addCallback(got_entry_point)
         return d
 
