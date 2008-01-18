@@ -360,7 +360,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             self._uimgr.ensure_update()
 
         def recent_activate(action, conn):
-            self._open_connection(conn)
+            self._open_connection(conn.info)
 
         ui = ""
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
@@ -442,6 +442,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin = None
 
     def _open_connection(self, info):
+        assert isinstance(info, PBConnectionInfo)
+
         model = AdminModel()
         d = model.connectToManager(info)
 

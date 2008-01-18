@@ -1,5 +1,11 @@
 2008-01-18  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py (AdminClientWindow._open_connection): 
+	Add an assert, to make sure we always send in a PBConnectionInfo 
+	instance.
+	(AdminClientWindow.recent_activate): Send in conn.info.
+	Fixes #835
+
 	* flumotion/admin/gtk/parts.py (ComponentsView.__init__): 
 	Check for PyGTK 2.12.1 or higher, to avoid a crash in PyGTK bug #479012
 
