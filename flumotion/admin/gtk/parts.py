@@ -165,7 +165,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         self._view = tree_widget
 
-        if gtk.gtk_version >= (2, 12, 0):
+        # PyGTK bug #479012 was fixed in 2.12.1 and prevents this from crashing
+        if gtk.pygtk_version >= (2, 12, 1):
             self._view.props.has_tooltip = True
             self._view.connect("query-tooltip",
                                self._tree_view_query_tooltip_cb)
