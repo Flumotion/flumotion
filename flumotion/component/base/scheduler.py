@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component_base_scheduler -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -65,10 +65,6 @@ class LocalTimezone(tzinfo):
 LOCAL = LocalTimezone()
 
 
-def now(tz=LOCAL):
-    return datetime.now(tz)
-
-
 class Event(log.Loggable):
     """
     I am an event. I have a start and stop time and a "content" that can
@@ -76,6 +72,13 @@ class Event(log.Loggable):
     """
 
     def __init__(self, start, end, content, recur=None, now=None):
+        """
+        @type start:   L{datetime}
+        @type end:     L{datetime}
+        @type content: object
+        @type recur:   datetime.timedelta or str
+        @type now:     L{datetime}
+        """
         self.debug('new event, content=%r, start=%r, end=%r', content,
                    start, end)
 

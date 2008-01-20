@@ -1,3 +1,11 @@
+2008-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/scheduler.py:
+	* flumotion/test/test_component_base_scheduler.py:
+	  Add test-case-name lines.
+	  Move public now() to test suite, which is its only consumer.
+	  Document API some more.
+
 2008-01-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow._open_connection): 

@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component_base_scheduler -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -30,9 +30,13 @@ from flumotion.common import testsuite
 from flumotion.component.base import scheduler
 
 
+def _now(tz=scheduler.LOCAL):
+    return datetime.now(tz)
+
+
 class EventTest(testsuite.TestCase):
     def testSimple(self):
-        now = scheduler.now()
+        now = _now()
         start = now - timedelta(hours=1)
         end = now + timedelta(minutes=1)
         e = scheduler.Event(start, end, 'foo')
@@ -42,7 +46,7 @@ class EventTest(testsuite.TestCase):
         self.assertEquals(e.recur, None)
 
     def testUpdateRecurring(self):
-        now = scheduler.now()
+        now = _now()
         now = now.replace(microsecond=0) # recurring adjustments lose precision
         start = now - timedelta(hours=1)
         end = now - timedelta(minutes=1)
@@ -68,7 +72,7 @@ class EventTest(testsuite.TestCase):
         self.assertEquals(e.recur, recur)
 
     def testComparison(self):
-        now = scheduler.now()
+        now = _now()
         hour = timedelta(hours=1)
 
         self.failUnless(scheduler.Event(now, now+hour, 'foo') <
@@ -94,7 +98,7 @@ class SchedulerTest(testsuite.TestCase):
         scheduler.Scheduler()
 
     def testSimple(self):
-        now = scheduler.now()
+        now = _now()
         start = now - timedelta(hours=1)
         end = now + timedelta(minutes=1)
 
