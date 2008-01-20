@@ -92,6 +92,21 @@ class EventTest(testsuite.TestCase):
         self.assertEquals(event.start.tzinfo, scheduler.LOCAL)
         self.assertEquals(event.start, now.replace(tzinfo=scheduler.LOCAL))
 
+    def testRecurringOnce(self):
+        """
+        Google Calendar iCal files can have a recurring event with an
+        UNTIL that causes the event to not go past now.
+        This should work.
+        """
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, scheduler.LOCAL)
+        end = datetime(2007, 12, 22, 18, 0, 0, 0, scheduler.LOCAL)
+        now = end + timedelta(days=1)
+
+        rrule = "FREQ=DAILY;UNTIL=20071223T080000Z;WKST=MO"
+        event = scheduler.Event(start, end, 'content', rrule, now=now)
+
+        self.assertEquals(event.start, start)
+        self.assertEquals(event.end, end)
 
 class SchedulerTest(testsuite.TestCase):
     def testInstantiate(self):

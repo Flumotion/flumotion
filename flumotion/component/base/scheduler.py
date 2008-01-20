@@ -108,11 +108,20 @@ class Event(log.Loggable):
                 endRecurRule = rrule.rrulestr(recur, dtstart=end)
                 startRecurRule = rrule.rrulestr(recur, dtstart=start)
 
+            # we adjust start and end time of a recurring event such that
+            # our idea of when it ends is after "right now", if possible
             if end < now:
-                end = endRecurRule.after(now)
-                start = startRecurRule.before(end)
-                self.debug("adjusting start and end times to %r, %r",
-                           start, end)
+                e = endRecurRule.after(now)
+                # we only get a new end if the recurring event goes on beyond
+                # now
+                if e:
+                    end = e
+                    start = startRecurRule.before(end)
+                    self.debug("adjusted start and end times to %r, %r",
+                        start, end)
+                else:
+                    self.debug("end %r < now %r, but no further instances" % (
+                        end, now))
 
         if not start.tzinfo:
             self.info('event starting at %r does not have timezone '
