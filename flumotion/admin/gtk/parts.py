@@ -50,6 +50,7 @@ MOODS_INFO = {
     moods.sleeping: _('Sleeping'),
     moods.waking: _('Waking'),
     moods.hungry: _('Hungry'),
+    moods.lost: _('Lost')
     }
 
 def getComponentLabel(state):

@@ -1,3 +1,8 @@
+2008-01-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/parts.py:
+	Fix KeyError when hovering on a lost component.
+
 2008-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_component_base_scheduler.py:
