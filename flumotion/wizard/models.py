@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -21,15 +21,9 @@
 
 """model objects used by the wizard steps"""
 
+from flumotion.common.errors import ComponentError, ComponentValidationError
+
 __version__ = "$Rev$"
-
-
-class ComponentError(Exception):
-    pass
-
-
-class ComponentValidationError(ComponentError):
-    pass
 
 
 class Properties(dict):

@@ -227,6 +227,9 @@ class ComponentStartHandledError(ComponentStartError, HandledException):
 class UnknownComponentError(ComponentError):
     "A given component or component type does not exist"
 
+class ComponentValidationError(ComponentError):
+    "The configuration for the component is not valid"
+
 class UnknownPlugError(pb.Error):
     "A given plug type does not exist"
 

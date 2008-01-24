@@ -1,5 +1,15 @@
 2008-01-24  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/errors.py:
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/wizard/models.py:
+	Use ComponentError from flumotion.common.errors
+	Move ComponentValidationError to flumotion.common.errors, add
+	a docstring.
+	Add license headers to test.
+
+2008-01-24  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/models.py (Properties):
 	Implement __repr__ to help debugging saying that we really are
 	a Properties object and not a dictionary.
