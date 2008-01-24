@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_wizard -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_wizard_models -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -19,9 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """model objects used by the wizard steps"""
+
+__version__ = "$Rev$"
 
 
 class ComponentError(Exception):
@@ -40,16 +40,38 @@ class Properties(dict):
     >>> p = Properties()
     >>> p.attr = 'value'
     >>> p
-    {'attr': 'value'}
+    <Properties {'attr': 'value'}>
+
+    Note that you cannot insert the attributes which has the same name
+    as dictionary methods, such as 'keys', 'values', 'items', 'update'.
     """
     def __setattr__(self, attr, value):
+        if attr in dict.__dict__:
+            raise AttributeError(
+                "Cannot set property %r, it's a dictionary attribute"
+                % (attr,))
         self[attr] = value
+
+    def __setitem__(self, attr, value):
+        if attr in dict.__dict__:
+            raise AttributeError(
+                "Cannot set property %r, it's a dictionary attribute"
+                % (attr,))
+        dict.__setitem__(self, attr, value)
 
     def __getattr__(self, attr):
         try:
             return self[attr]
         except KeyError:
-            raise AttributeError(attr)
+            raise AttributeError(
+                "%r object has no attribute %r" % (
+                self, attr))
+
+    def __delattr__(self, attr):
+        del self[attr]
+
+    def __repr__(self):
+        return '<Properties %r>' % (dict.__repr__(self),)
 
 
 class Flow(object):

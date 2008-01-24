@@ -1,7 +1,8 @@
 import unittest
 
 from flumotion.common import testsuite
-from flumotion.wizard.models import Flow, Component, ComponentError
+from flumotion.wizard.models import Flow, Component, ComponentError, \
+     Properties
 
 class TestFlow(testsuite.TestCase):
     def setUp(self):
@@ -58,6 +59,57 @@ class TestFlow(testsuite.TestCase):
 class TestComponent(testsuite.TestCase):
     def setUp(self):
         self.component = Component()
+
+class TestProperties(testsuite.TestCase):
+    def setUp(self):
+        self.props = Properties()
+
+    def testInsertItem(self):
+        self.props['foo'] = 10
+
+        self.failUnless(self.props)
+
+        self.failUnless(hasattr(self.props, 'foo'))
+        self.assertEquals(self.props.foo, 10)
+
+        self.failUnless('foo' in self.props)
+        self.assertEquals(self.props['foo'], 10)
+
+    def testInsertAttribute(self):
+        self.props.foo = 10
+
+        self.failUnless(self.props)
+
+        self.failUnless(hasattr(self.props, 'foo'))
+        self.assertEquals(self.props.foo, 10)
+
+        self.failUnless('foo' in self.props)
+        self.assertEquals(self.props['foo'], 10)
+
+    def testDeleteItem(self):
+        self.props.foo = 10
+
+        del self.props['foo']
+
+        self.failIf(hasattr(self.props, 'foo'))
+        self.failIf('foo' in self.props)
+
+    def testDeleteAttribute(self):
+        self.props.foo = 10
+
+        del self.props.foo
+
+        self.failIf(hasattr(self.props, 'foo'))
+        self.failIf('foo' in self.props)
+
+    def testInsertInvalid(self):
+        self.assertRaises(AttributeError,
+                          self.props.__setattr__, 'update', 10)
+        self.failIf(self.props)
+
+        self.assertRaises(AttributeError,
+                          self.props.__setitem__, 'update', 10)
+        self.failIf(self.props)
 
 if __name__ == "__main__":
     unittest.main()

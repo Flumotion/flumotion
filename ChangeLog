@@ -1,5 +1,16 @@
 2008-01-24  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/models.py (Properties):
+	Implement __repr__ to help debugging saying that we really are
+	a Properties object and not a dictionary.
+	Do not allow properties to be set which clashes with dict methods.
+	Improve documentation a bit
+
+	* flumotion/test/test_wizard_models.py:
+	Add tests
+	
+2008-01-24  Johan Dahlin  <johan@gnome.org>
+
 	Make all dialogs modal, so we can't click on the parent's while they
 	are open.
 
