@@ -1,3 +1,9 @@
+2008-01-24  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/ui/glade.py (GladeWindow.__init__): Make the
+	window modal too, so you can't click on the main window when
+	running the configurationwizard.
+
 2008-01-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/parts.py:

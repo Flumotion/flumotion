@@ -160,6 +160,7 @@ class GladeWindow(GladeBacked):
 
         if parent:
             self.window.set_transient_for(parent)
+            self.window.set_modal(True)
 
         # have convenience methods acting on our window
         self.show = self.window.show
