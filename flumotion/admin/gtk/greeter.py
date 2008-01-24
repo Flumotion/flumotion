@@ -357,13 +357,14 @@ class Greeter(SimpleWizard):
     steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
         StartNew, StartNewError, StartNewSuccess]
 
-    def __init__(self):
-        SimpleWizard.__init__(self, 'initial')
+    def __init__(self, parent=None):
+        SimpleWizard.__init__(self, 'initial', parent=parent)
 
 # This is used by the gtk admin to connect to an existing manager
 class ConnectExisting(SimpleWizard):
     name = 'greeter'
     steps = [ConnectToExisting, Authenticate]
 
-    def __init__(self):
-        SimpleWizard.__init__(self, 'connect_to_existing')
+    def __init__(self, parent=None):
+        SimpleWizard.__init__(self, 'connect_to_existing',
+                              parent=parent)

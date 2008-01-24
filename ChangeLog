@@ -1,5 +1,17 @@
 2008-01-24  Johan Dahlin  <johan@gnome.org>
 
+	Make all dialogs modal, so we can't click on the parent's while they
+	are open.
+
+	* flumotion/admin/gtk/client.py:
+	Send in parents and make file chooser dialogs modal.
+	* flumotion/admin/gtk/greeter.py:
+	Add parent arguments and chain up
+	* flumotion/ui/simplewizard.py (SimpleWizard): add a parent
+	constructor argument and document it. Pass it on to GladeWindow.
+
+2008-01-24  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/glade.py (GladeWindow.__init__): Make the
 	window modal too, so you can't click on the main window when
 	running the configurationwizard.

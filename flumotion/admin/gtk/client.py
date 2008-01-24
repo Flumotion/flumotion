@@ -840,7 +840,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self.debug("handled connection-failed")
 
     def _open_recent_connection(self):
-        d = ConnectionsDialog(self._window)
+        d = ConnectionsDialog(parent=self._window)
 
         def on_have_connection(d, connectionInfo):
             d.destroy()
@@ -853,7 +853,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def _open_existing_connection(self):
         from flumotion.admin.gtk.greeter import ConnectExisting
         from flumotion.ui.simplewizard import WizardCancelled
-        wiz = ConnectExisting()
+        wiz = ConnectExisting(parent=self._window)
 
         def got_state(state, g):
             g.set_sensitive(False)
@@ -878,6 +878,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
 
         def response(d, response):
@@ -895,6 +896,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
 
         def get_configuration(conf_xml, name, chooser):

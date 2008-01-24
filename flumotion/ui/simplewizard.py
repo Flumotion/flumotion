@@ -136,12 +136,14 @@ class SimpleWizard(GladeWindow):
 
     gsignal('finished')
 
-    def __init__(self, initial_page):
+    def __init__(self, initial_page, parent=None):
         """
-        @type  initial_page: str
         @param initial_page: name of the WizardStep to start on
+        @type  initial_page: str
+        @param parent: parent window
+        @type  window: gtk.Window subclass or None
         """
-        GladeWindow.__init__(self)
+        GladeWindow.__init__(self, parent=parent)
 
         self.page = None
         self.page_stack = []
