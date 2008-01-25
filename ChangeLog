@@ -1,3 +1,7 @@
+2008-01-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_wizard_models.py: We're back from the future
+
 2008-01-24  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/__init__.py:
