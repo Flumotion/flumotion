@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import crypt
 
 from twisted.cred import portal
@@ -36,6 +34,7 @@ from flumotion.component.bouncers import htpasswdcrypt, saltsha256
 from flumotion.twisted import checkers, pb
 from flumotion.twisted import portal as fportal
 
+__version__ = "$Rev$"
 
 htpasswdcryptConf = {
     'name':  'testbouncer',

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 import tempfile
@@ -31,6 +29,9 @@ from flumotion.common import testsuite
 # for our simulation of failIfRaises
 import twisted.python.util
 from twisted.trial.unittest import FailTest
+
+__version__ = "$Rev$"
+
 
 class TestPackagePath(testsuite.TestCase):
     def setUp(self):

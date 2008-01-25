@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Feed components, participating in the stream
 """
@@ -45,7 +43,10 @@ from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """

@@ -19,14 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from twisted.spread import pb
 
 from flumotion.common import log, interfaces
 from flumotion.common import testsuite
 from flumotion.manager import worker
+
+__version__ = "$Rev$"
 
 
 class FakeTransport:

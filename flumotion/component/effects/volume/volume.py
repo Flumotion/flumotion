@@ -19,10 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from math import frexp
 from flumotion.component import feedcomponent
+
+__version__ = "$Rev$"
+
 
 class Volume(feedcomponent.Effect):
     """

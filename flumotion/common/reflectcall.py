@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 getting coherent errors when calling procedures in named modules
 """
@@ -28,6 +26,8 @@ getting coherent errors when calling procedures in named modules
 from twisted.python import reflect
 
 from flumotion.common import errors, log
+
+__version__ = "$Rev$"
 
 
 def reflectCall(moduleName, methodName, *args, **kwargs):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 import gobject
@@ -30,6 +28,7 @@ from zope.interface import implements
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
 
+__version__ = "$Rev$"
 _ = gettext.gettext
 
 

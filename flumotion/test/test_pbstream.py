@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 import gst
@@ -31,6 +29,8 @@ from twisted.cred import checkers, portal
 
 from flumotion.common import log
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 # this example sets up a PB connection from client to server,

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 
 from flumotion.common import gstreamer
@@ -28,6 +26,9 @@ from flumotion.common import gstreamer
 from flumotion.component import feedcomponent
 
 from flumotion.component.effects.colorbalance import colorbalance
+
+__version__ = "$Rev$"
+
 
 class Webcam(feedcomponent.ParseLaunchComponent):
 

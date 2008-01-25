@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Serializable objects from worker through manager to admin for
 planet, flow, job and component.
@@ -32,6 +30,9 @@ from zope.interface import implements
 
 from flumotion.twisted import flavors
 from flumotion.common import enum, log
+
+__version__ = "$Rev$"
+
 
 class ManagerPlanetState(flavors.StateCacheable):
     """

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 objects and functions used in dealing with packages
 """
@@ -32,6 +30,9 @@ import glob
 
 from flumotion.common import log, common
 from twisted.python import rebuild, reflect
+
+__version__ = "$Rev$"
+
 
 class PackageHooks(ihooks.Hooks):
     """

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 functions based on twisted.python.reflect
 """
@@ -32,6 +30,9 @@ from twisted.internet import protocol
 from twisted.python import log, reflect
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
+
+__version__ = "$Rev$"
+
 
 ### stolen from twisted.python.reflect and changed
 ### the version in Twisted 1.3.0 checks length of backtrace as metric for

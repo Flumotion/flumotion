@@ -19,13 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 """
 flumotion.launch.parse: A parsing library for flumotion-launch syntax.
 """
-
 
 import copy
 import sys
@@ -34,6 +30,7 @@ from flumotion.common import log, common, dag, registry
 from flumotion.manager import config
 
 __all__ = ['parse_args']
+__version__ = "$Rev$"
 
 
 def err(x):

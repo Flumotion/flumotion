@@ -19,11 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 
 import gst
+
+__version__ = "$Rev$"
+
 
 class JPEG(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):

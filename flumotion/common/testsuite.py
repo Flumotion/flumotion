@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.trial import unittest
 
 from flumotion.common import log
 from flumotion.configure import configure
+
+__version__ = "$Rev$"
+
 
 class TestCase(unittest.TestCase):
 

@@ -19,11 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 
 from flumotion.component import feedcomponent
+
+__version__ = "$Rev$"
+
 
 class Multipart(feedcomponent.MultiInputParseLaunchComponent):
     def get_muxer_string(self, properties):

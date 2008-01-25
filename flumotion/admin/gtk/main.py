@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 
@@ -36,7 +34,9 @@ from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 from flumotion.common.options import OptionParser
 
+__version__ = "$Rev$"
 _ = gettext.gettext
+
 
 def startAdminFromGreeter(greeter=None):
     if greeter is None:

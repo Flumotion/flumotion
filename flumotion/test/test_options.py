@@ -19,11 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 from flumotion.common.options import OptionGroup, OptionParser
 from flumotion.common.log import getLogSettings, setLogSettings
+
+__version__ = "$Rev$"
 
 
 class TestOptions(testsuite.TestCase):

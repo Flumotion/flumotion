@@ -19,14 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 I contain a set of enums used in UI's for Flumotion.
 """
 
 from gettext import gettext as _
 from flumotion.common import enum
+
+__version__ = "$Rev$"
 
 #
 # Videotestsrc, order is important here, since it maps to

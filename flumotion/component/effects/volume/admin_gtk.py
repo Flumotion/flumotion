@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from gettext import gettext as _
 
 import gtk
@@ -31,6 +29,9 @@ import math
 from flumotion.ui import glade
 from flumotion.ui.fvumeter import FVUMeter
 from flumotion.component.base import admin_gtk
+
+__version__ = "$Rev$"
+
 
 def clamp(x, min, max):
     if x < min:

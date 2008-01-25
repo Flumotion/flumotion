@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Parsing of configuration files.
 """
@@ -30,6 +28,9 @@ from xml.dom import minidom, Node
 from xml.parsers import expat
 
 from flumotion.common import log, common
+
+__version__ = "$Rev$"
+
 
 class ConfigError(Exception):
     pass

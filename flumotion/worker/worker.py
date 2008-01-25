@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 worker-side objects to handle worker clients
 """
@@ -40,6 +38,9 @@ from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
 from flumotion.configure import configure
 from flumotion.worker import medium, job, feedserver
+
+__version__ = "$Rev$"
+
 
 class ProxyBouncer(log.Loggable):
     logCategory = "proxybouncer"

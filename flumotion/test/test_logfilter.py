@@ -19,11 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.component.base import http
+
+__version__ = "$Rev$"
 
 
 class TestLogFilter(testsuite.TestCase):

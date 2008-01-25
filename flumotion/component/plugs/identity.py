@@ -19,15 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import random
 
 from flumotion.twisted import defer
 
 from flumotion.common.identity import RemoteIdentity
 from flumotion.component.plugs import base
+
+__version__ = "$Rev$"
 
 
 class IdentityProvider(base.ManagerPlug):

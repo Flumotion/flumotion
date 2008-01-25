@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 from flumotion.component.misc.porter import porter
+
+__version__ = "$Rev$"
 
 
 class FakeTransport:

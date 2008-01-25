@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import sys
 
 from twisted.internet import defer, reactor, gtk2reactor
@@ -33,6 +31,9 @@ from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.test import comptest
 from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
      ComponentUnitTestMixin, pipeline_src, pipeline_cnv
+
+
+__version__ = "$Rev$"
 
 
 class CompTestTestCase(log.Loggable, testsuite.TestCase,

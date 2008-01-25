@@ -19,14 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.common import messages
 from flumotion.common.messages import N_, ngettext
 from flumotion.ui.wizard import WizardStep
 
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
 

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Miscellaneous network functions for use in flumotion.
 """
@@ -32,6 +30,9 @@ import array
 import re
 
 from flumotion.common import avltree
+
+__version__ = "$Rev$"
+
 
 # Thanks to Paul Cannon, see
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439093

@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 
 from flumotion.common import package, errors
 
 import flumotion.project
+
+__version__ = "$Rev$"
+
 
 def list():
     """

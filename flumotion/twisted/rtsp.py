@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 RTSP - Real Time Streaming Protocol.
 
@@ -43,6 +41,8 @@ except ImportError:
     from urllib import unquote
 
 from flumotion.common import log as flog
+
+__version__ = "$Rev$"
 
 SERVER_PROTOCOL = "RTSP/1.0"
 # I can be overridden to add the version

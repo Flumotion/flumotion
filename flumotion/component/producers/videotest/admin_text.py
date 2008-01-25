@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component.base.admin_text import BaseAdminText
 
 import string
 
 from twisted.internet import defer
+
+__version__ = "$Rev$"
+
 
 class VideoTestAdminText(BaseAdminText):
     commands = [ 'setpattern', 'getpattern' ]

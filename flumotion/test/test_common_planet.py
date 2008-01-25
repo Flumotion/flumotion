@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 from twisted.spread import jelly
 from zope.interface import implements
@@ -29,6 +27,8 @@ from flumotion.common import testsuite
 from flumotion.common import planet
 from flumotion.common.planet import moods
 from flumotion.twisted import flavors
+
+__version__ = "$Rev$"
 
 
 class ManagerComponentStateTest(testsuite.TestCase):

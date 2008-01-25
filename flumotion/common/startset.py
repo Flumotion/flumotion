@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 a data structure to manage asynchronous avatar starts and shutdowns
 """
@@ -28,6 +26,8 @@ a data structure to manage asynchronous avatar starts and shutdowns
 from twisted.internet import defer
 
 from flumotion.common import log
+
+__version__ = "$Rev$"
 
 
 # This class was factored out of the worker's jobheaven, so sometimes

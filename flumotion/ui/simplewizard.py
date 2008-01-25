@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
 
 import gobject
@@ -32,6 +29,8 @@ from flumotion.configure import configure
 from flumotion.common import log
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.glade import GladeWidget, GladeWindow
+
+__version__ = "$Rev$"
 
 
 # This file implements a generic wizard framework suitable for processes with

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 parsing of manager configuration files
 """
@@ -34,6 +32,9 @@ from twisted.python import reflect
 from flumotion.common import log, errors, common, registry, fxml
 from flumotion.common import config as fluconfig
 from flumotion.configure import configure
+
+__version__ = "$Rev$"
+
 
 def _ignore(*args):
     pass

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 This module provides utility functions for Flumotion.
 """
@@ -28,6 +26,9 @@ This module provides utility functions for Flumotion.
 import sys
 from twisted.python.rebuild import rebuild
 from flumotion.common import log
+
+__version__ = "$Rev$"
+
 
 def reload():
     """Properly reload all flumotion-related modules currently loaded."""

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import curses
 
 from flumotion.admin.admin import AdminModel
@@ -28,6 +26,9 @@ from flumotion.admin.text.view import AdminTextView
 from flumotion.common import errors
 
 from twisted.internet import reactor
+
+__version__ = "$Rev$"
+
 
 def connect_to_manager(stdscr, info):
     stdscr.addstr(0,0,"Connecting to %s" %

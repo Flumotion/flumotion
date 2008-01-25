@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 import gst.interfaces
 
@@ -31,6 +29,8 @@ from flumotion.component.effects.colorbalance import colorbalance
 
 # FIXME: rename to TVCard
 __all__ = ['BTTV']
+__version__ = "$Rev$"
+
 
 def arg_filtered(proc, *args):
     def ret(*_args):

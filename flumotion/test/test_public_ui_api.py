@@ -19,9 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import testsuite
+
 __version__ = "$Rev$"
 
-from flumotion.common import testsuite
 
 class TestPublicUI(testsuite.TestCase):
     def testPublicUIAPI(self):

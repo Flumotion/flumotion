@@ -16,13 +16,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 """
 Debugging helper code
 """
-
 
 import gc
 import sys
@@ -32,9 +28,10 @@ import types
 
 from twisted.python.reflect import filenameToModuleName
 
-
+__version__ = "$Rev$"
 _tracing = 0
 _indent = ''
+
 
 def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
                 write=None):

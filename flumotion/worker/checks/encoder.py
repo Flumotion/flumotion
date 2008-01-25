@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import string
 from twisted.internet import defer
 
@@ -28,7 +26,10 @@ from flumotion.worker.checks import check
 from flumotion.common import gstreamer, messages
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 def checkVorbis():
     """

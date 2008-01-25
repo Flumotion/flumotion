@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 from flumotion.common import errors
 
 from flumotion.component.combiners.switch import switch
+
+__version__ = "$Rev$"
+
 
 # These basic watchdog components switch to backup
 # when the master eater(s) have gone hungry

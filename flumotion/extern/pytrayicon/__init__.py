@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 try:
     from flumotion.extern.pytrayicon.pytrayicon import *
 except ImportError:
@@ -31,3 +29,5 @@ except ImportError:
         # no pytrayicon anywhere
         pass
     ltihooks.uninstall()
+
+__version__ = "$Rev$"

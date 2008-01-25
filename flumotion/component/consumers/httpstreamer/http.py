@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 
 import gobject
@@ -49,10 +47,10 @@ from flumotion.component.consumers.httpstreamer import resources
 from flumotion.component.base import http
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
-
+__version__ = "$Rev$"
+T_ = messages.gettexter('flumotion')
 
 STATS_POLL_INTERVAL = 10
 

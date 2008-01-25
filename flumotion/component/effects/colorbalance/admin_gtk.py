@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gtk
 
 from flumotion.common import errors, log
 
 from flumotion.component.base import admin_gtk
+
+__version__ = "$Rev$"
+
 
 class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'colorbalance'

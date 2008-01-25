@@ -19,11 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 
 import log
+
+__version__ = "$Rev$"
+
 
 class LogTester(log.Loggable):
     logCategory = 'testlog'

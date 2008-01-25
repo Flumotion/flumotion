@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
 from flumotion.common import registry, log, reflectcall
+
+__version__ = "$Rev$"
 
 
 class TestInit(testsuite.TestCase):

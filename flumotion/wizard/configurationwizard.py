@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 import sets
 
@@ -41,13 +39,14 @@ from flumotion.wizard.models import Flow
 from flumotion.wizard.productionsteps import ProductionStep
 from flumotion.wizard.worker import WorkerList
 
+# pychecker doesn't like the auto-generated widget attrs
+# or the extra args we name in callbacks
+__pychecker__ = 'no-classattr no-argsused'
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
 
 
-# pychecker doesn't like the auto-generated widget attrs
-# or the extra args we name in callbacks
-__pychecker__ = 'no-classattr no-argsused'
 
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment

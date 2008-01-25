@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.twisted.defer import defer_generator
 from flumotion.common import errors
+
+__version__ = "$Rev$"
 
 def avatarId(string):
     split = string.split('/')

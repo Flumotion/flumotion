@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 
 from twisted.trial import unittest
 
 from flumotion.twisted import credentials
+
+__version__ = "$Rev$"
 
 # use some shorter names
 CredCrypt = credentials.UsernameCryptPasswordCrypt

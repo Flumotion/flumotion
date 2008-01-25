@@ -21,6 +21,7 @@
 
 __version__ = "$Rev$"
 
+
 # taken from a twisted example
 # emulates an fd
 class CursesStdIO:

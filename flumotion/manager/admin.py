@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 manager-side objects to handle administrative clients
 """
@@ -43,6 +41,8 @@ from flumotion.common import messages
 # make ComponentState proxyable
 from flumotion.twisted import flavors
 from flumotion.common import componentui
+
+__version__ = "$Rev$"
 
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?

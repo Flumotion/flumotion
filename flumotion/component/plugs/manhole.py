@@ -19,15 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
 from twisted.internet import defer
 
 from flumotion.component.plugs import base, lifecycle
 from flumotion.common.manhole import openSSHManhole
 from flumotion.common.manhole import openAnonymousTelnetManhole
+
+__version__ = "$Rev$"
 
 
 class ManagerManholePlug(lifecycle.ManagerLifecycle):

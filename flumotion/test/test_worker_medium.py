@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from twisted.spread import pb
 
@@ -28,6 +26,8 @@ from flumotion.common import testsuite
 from flumotion.test import realm
 from flumotion.twisted import pb as fpb
 from flumotion.worker import medium
+
+__version__ = "$Rev$"
 
 
 class TestWorkerAvatar(fpb.PingableAvatar):

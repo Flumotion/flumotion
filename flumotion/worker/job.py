@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 worker-side objects to handle worker clients
 """
@@ -33,11 +31,11 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import errors, log
 from flumotion.common import messages
+from flumotion.worker import base
 
+__version__ = "$Rev$"
 N_ = messages.N_
 T_ = messages.gettexter('flumotion')
-
-from flumotion.worker import base
 
 
 class ComponentJobAvatar(base.BaseJobAvatar):

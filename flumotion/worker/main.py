@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 
@@ -32,6 +30,9 @@ from flumotion.common import connection
 from flumotion.worker import worker, config
 from flumotion.twisted import pb
 from flumotion.common.options import OptionGroup, OptionParser
+
+__version__ = "$Rev$"
+
 
 def _createParser():
     parser = OptionParser(domain="flumotion-worker")

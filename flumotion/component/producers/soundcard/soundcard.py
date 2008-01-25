@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 import gst.interfaces
 
@@ -30,7 +28,10 @@ from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
 from flumotion.common import messages
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class Soundcard(feedcomponent.ParseLaunchComponent):
     def do_check(self):

@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 
 from twisted.internet import defer, reactor
 
 from flumotion.common import keycards
+
+__version__ = "$Rev$"
 
 
 class FakeMedium:

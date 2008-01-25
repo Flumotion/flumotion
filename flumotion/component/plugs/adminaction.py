@@ -19,14 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 
 from twisted.python import reflect
 
 from flumotion.common import errors, log, common
 from flumotion.component.plugs import base
+
+__version__ = "$Rev$"
 
 
 class AdminAction(base.ManagerPlug):

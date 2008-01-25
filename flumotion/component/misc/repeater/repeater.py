@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import gstreamer, messages, errors
 from flumotion.component import feedcomponent
 
 from flumotion.common.messages import N_
+
 T_ = messages.gettexter('flumotion')
+__version__ = "$Rev$"
+
 
 class Repeater(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):

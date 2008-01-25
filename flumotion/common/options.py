@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """Command-line options
 """
 
@@ -30,6 +28,9 @@ from flumotion.common import log
 # Disable optionparser, it needs more upstream
 # changes to work properly
 from flumotion.common import boot
+
+__version__ = "$Rev$"
+
 boot.USE_GOPTION_PARSER = False
 
 def OptparseOptionParserClass():

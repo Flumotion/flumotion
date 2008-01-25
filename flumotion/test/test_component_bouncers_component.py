@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component.bouncers import component
 from flumotion.test import bouncertest
+
+__version__ = "$Rev$"
 
 
 class FakeBouncerMedium(bouncertest.FakeMedium, component.BouncerMedium):

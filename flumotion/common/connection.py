@@ -16,9 +16,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 """
 Abstractions for dealing with PB connections.
 """
@@ -29,6 +26,9 @@ from twisted.spread import pb
 
 from flumotion.common import common
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
+
 
 class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
     """

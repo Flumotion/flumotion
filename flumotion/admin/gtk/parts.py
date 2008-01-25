@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 from gettext import gettext as _
@@ -36,6 +34,7 @@ from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
 from flumotion.twisted import flavors
 
+__version__ = "$Rev$"
 (COL_MOOD,
  COL_NAME,
  COL_WORKER,

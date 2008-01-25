@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.worker.checks import check
 from flumotion.common import messages, log
 
 import gst
 
 from gst010 import do_element_check
+
+__version__ = "$Rev$"
+
 
 def checkMixerTracks(source_factory, device, channels, id=None):
     """

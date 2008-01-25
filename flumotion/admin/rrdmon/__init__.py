@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
+"""
+"""
 
-"""
-"""
+__version__ = "$Rev$"

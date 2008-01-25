@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import struct
 import socket
 
@@ -36,6 +34,8 @@ from flumotion.twisted.credentials import cryptChallenge
 from flumotion.common import common, log, keycards
 
 #__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
+__version__ = "$Rev$"
+
 
 HTTP_SERVER_NAME = 'FlumotionHTTPServer'
 HTTP_SERVER_VERSION = configure.version

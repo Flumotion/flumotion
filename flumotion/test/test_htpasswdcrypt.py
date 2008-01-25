@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 from twisted.trial import unittest
 from twisted.internet import defer
@@ -28,6 +26,7 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import htpasswdcrypt
 
+__version__ = "$Rev$"
 bouncerconf = {'name': 'testbouncer',
                'plugs': {},
                'properties': {'data': "user:qi1Lftt0GZC0o"}}

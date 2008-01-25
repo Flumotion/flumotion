@@ -19,10 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdminGtkNode
+
+__version__ = "$Rev$"
+
 
 class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from urllib2 import urlparse
 
 from twisted.internet import protocol, reactor, address, error, defer
@@ -38,7 +36,10 @@ from flumotion.component.component import moods
 import socket, string, os, random
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class PorterAvatar(pb.Avatar, log.Loggable):
     """

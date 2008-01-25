@@ -19,8 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Base classes for components and their UIs.
 """
+
+__version__ = "$Rev$"
+

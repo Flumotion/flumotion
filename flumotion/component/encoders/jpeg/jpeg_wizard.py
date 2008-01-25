@@ -19,15 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.component.encoders.encodingprofile import Profile, Int
 from flumotion.component.encoders.encodingwizardplugin import \
      EncodingWizardPlugin
 
+__version__ = "$Rev$"
 _ = gettext.gettext
+
 
 def _fraction_from_float(number, denominator):
     """

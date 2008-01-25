@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import random
 
 from flumotion.common import avltree
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 class TestAVLTree(testsuite.TestCase):

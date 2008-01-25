@@ -19,9 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.component import feedcomponent
+
 __version__ = "$Rev$"
 
-from flumotion.component import feedcomponent
 
 class GDPProducer(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):

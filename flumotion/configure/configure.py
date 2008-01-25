@@ -75,8 +75,6 @@ different configdir, logdir and rundir.
 @type versionTuple: 4-tuple of integers
 '''
 
-__version__ = "$Rev$"
-
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
 #       really know what you're doing
@@ -84,6 +82,8 @@ __version__ = "$Rev$"
 # FIXME: document all the module variables
 
 import os
+
+__version__ = "$Rev$"
 
 # where am I on the disk ?
 __thisdir = os.path.dirname(os.path.abspath(__file__))

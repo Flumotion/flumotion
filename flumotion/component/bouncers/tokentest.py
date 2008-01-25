@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 A test token bouncer.
 """
@@ -28,6 +26,9 @@ A test token bouncer.
 from flumotion.common import keycards, log
 from flumotion.component.bouncers import plug
 from flumotion.common.keycards import KeycardToken
+
+__version__ = "$Rev$"
+
 
 class TokenTestBase(log.Loggable):
 

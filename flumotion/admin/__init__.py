@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 client-side code for administration clients
 """
+
+__version__ = "$Rev$"

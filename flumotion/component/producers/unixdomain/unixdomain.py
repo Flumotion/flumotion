@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import gst
 
@@ -28,6 +26,9 @@ from flumotion.component import feedcomponent
 from flumotion.common import log, messages, errors
 from twisted.internet.protocol import ServerFactory, Protocol
 from twisted.internet import defer, reactor
+
+__version__ = "$Rev$"
+
 
 # Fake Protocol
 class DumbProtocol(Protocol):

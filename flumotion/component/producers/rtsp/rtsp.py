@@ -18,9 +18,10 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.component import feedcomponent
+
 __version__ = "$Rev$"
 
-from flumotion.component import feedcomponent
 
 # this is a producer component for rtsp sources eg axis network cameras
 class Rtsp(feedcomponent.ParseLaunchComponent):

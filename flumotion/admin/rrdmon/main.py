@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 
@@ -30,6 +28,8 @@ from flumotion.configure import configure
 from flumotion.common import log, common
 from flumotion.admin.rrdmon import rrdmon, config
 from flumotion.common.options import OptionGroup, OptionParser
+
+__version__ = "$Rev$"
 
 # more standard helper functions necessary...
 def _createParser():

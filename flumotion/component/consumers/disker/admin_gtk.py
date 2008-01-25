@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import gtk
 
 from flumotion.common import errors
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+
+__version__ = "$Rev$"
+
 
 class FilenameNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'consumers',

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 import gtk
@@ -28,6 +26,8 @@ import gtk
 from flumotion.configure import configure
 
 __all__ = ['register_icons']
+__version__ = "$Rev$"
+
 
 def _register_stock_icons(names):
     ifact = gtk.IconFactory()

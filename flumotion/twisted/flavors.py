@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion Twisted-like flavors
 
@@ -31,6 +29,8 @@ from twisted.internet import defer
 from twisted.spread import pb
 from zope.interface import Interface
 from flumotion.common import log
+
+__version__ = "$Rev$"
 
 
 ### Generice Cacheable/RemoteCache for state objects

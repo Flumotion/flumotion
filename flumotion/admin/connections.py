@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import datetime
 import os
 from xml.dom import minidom, Node
@@ -29,6 +26,8 @@ from xml.dom import minidom, Node
 from flumotion.configure import configure
 from flumotion.common import connection, errors, log
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
 
 
 class RecentConnection(object):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet.tcp import Port, Connection
 from twisted.internet import reactor, address
@@ -31,6 +29,9 @@ from flumotion.twisted import defer, fdserver
 from flumotion.twisted import pb as fpb
 
 import socket
+
+__version__ = "$Rev$"
+
 
 # Very similar to tcp.Server, but we need to call things in a different order
 class FDPorterServer(Connection):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion tray icon widget.
 """
@@ -37,6 +35,9 @@ from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, type_register
 from flumotion.configure import configure
 from flumotion.twisted import flavors
+
+__version__ = "$Rev$"
+
 
 class FluTrayIcon(log.Loggable, gobject.GObject):
     """

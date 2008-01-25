@@ -19,9 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import log
+
+__version__ = "$Rev$"
 
 
 class Plug(log.Loggable):

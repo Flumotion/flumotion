@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gobject
 
 from flumotion.common import testsuite
@@ -32,7 +30,10 @@ except RuntimeError:
     import os
     os._exit(0)
 
+__version__ = "$Rev$"
+
 INTERVAL = 100 # in ms
+
 
 class VUTest(testsuite.TestCase):
     def testScale(self):

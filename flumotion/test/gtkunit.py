@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 from twisted.internet import reactor
@@ -32,6 +30,7 @@ try:
 except RuntimeError:
     os._exit(0)
 
+__version__ = "$Rev$"
 _INTERVAL = 1 # in ms
 if os.environ.has_key('FLU_INTERVAL'):
     _INTERVAL = int(os.environ['FLU_INTERVAL'])

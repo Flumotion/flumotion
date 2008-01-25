@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import random
 
 from twisted.internet import defer, reactor
@@ -28,6 +26,9 @@ from twisted.python import reflect
 
 # FIXME: this is for HandledException - maybe it should move here instead ?
 from flumotion.common import errors
+
+__version__ = "$Rev$"
+
 
 # See flumotion.test.test_defer for examples
 def defer_generator(proc):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 an bouncer with a username/salt/sha256 data backend
 """
@@ -37,6 +35,8 @@ from flumotion.component.bouncers import bouncer
 from flumotion.twisted import credentials, checkers
 
 __all__ = ['SaltSha256']
+__version__ = "$Rev$"
+
 
 class SaltSha256(bouncer.ChallengeResponseBouncer):
     """

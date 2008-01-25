@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Enum class implementation
 """
@@ -28,7 +26,9 @@ Enum class implementation
 from twisted.python.reflect import qual
 from twisted.spread import jelly
 
+__version__ = "$Rev$"
 _enumClassRegistry = {}
+
 
 class EnumMetaClass(type):
     # pychecker likes this attribute to be there since we use it in this class

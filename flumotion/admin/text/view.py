@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gobject
 import os
 import string
@@ -35,6 +33,9 @@ from flumotion.twisted import flavors, reflect
 from flumotion.common.planet import moods
 
 from flumotion.admin.text import misc_curses
+
+__version__ = "$Rev$"
+
 
 class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 

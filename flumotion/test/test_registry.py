@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import StringIO
 import os
 import warnings
@@ -29,6 +27,8 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 from flumotion.common import testsuite
 from flumotion.common import registry, fxml, common
+
+__version__ = "$Rev$"
 
 
 class TestRegistry(testsuite.TestCase):

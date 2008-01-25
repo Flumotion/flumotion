@@ -19,20 +19,22 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 from twisted.internet import reactor, defer
 
 from flumotion.common import testsuite
 from flumotion.worker import worker
 
+__version__ = "$Rev$"
+
+
 class FakeOptions:
     def __init__(self):
         self.name = 'fakeworker'
         self.feederports = []
         self.randomFeederports = False
-    
+
+
 class TestCheckJobHeaven(testsuite.TestCase):
     def setUp(self):
         self.brain = worker.WorkerBrain(FakeOptions())

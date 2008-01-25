@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import gst
 
 from flumotion.component import feedcomponent
 from vorbisutils import get_max_sample_rate, get_preferred_sample_rate
+
+__version__ = "$Rev$"
+
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
     checkTimestamp = True

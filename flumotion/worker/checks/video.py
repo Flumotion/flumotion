@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from flumotion.worker.checks import check
 
 import gst
 
 from gst010 import *
+
+__version__ = "$Rev$"
+
 
 def checkTVCard(device, id='check-tvcard'):
     """

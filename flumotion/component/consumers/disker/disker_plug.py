@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.component.plugs import base
+
 __version__ = "$Rev$"
 
-
-from flumotion.component.plugs import base
 
 
 class DiskerPlug(base.ComponentPlug):

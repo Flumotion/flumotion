@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 PyGTK helper functions
 """
@@ -31,6 +29,9 @@ from flumotion.common import errors
 import sys
 
 import gobject
+
+__version__ = "$Rev$"
+
 
 def gobject_set_property(object, property, value):
     """

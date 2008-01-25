@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 A pure python functional-style self-balancing binary search tree
 implementation, with an object-oriented wrapper. Useful for maintaining
 sorted sets, traversing sets in order, and closest-match lookups.
 """
+
+__version__ = "$Rev$"
 
 
 def node(l, v, r, b):

@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 
 from flumotion.common import errors
 from flumotion.component.plugs import base
+
+__version__ = "$Rev$"
 
 
 class Logger(base.ComponentPlug):

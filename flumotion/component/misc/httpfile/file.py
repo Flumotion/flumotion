@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import string
 import os
 
@@ -37,6 +35,9 @@ from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
 from flumotion.twisted import fdserver
+
+__version__ = "$Rev$"
+
 
 # add our own mime types to the ones parsed from /etc/mime.types
 def loadMimeTypes():

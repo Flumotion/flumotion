@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion Twisted credential checkers
 """
@@ -32,6 +30,9 @@ from zope.interface import implements
 
 from flumotion.common import log, errors
 from flumotion.twisted import credentials
+
+__version__ = "$Rev$"
+
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it

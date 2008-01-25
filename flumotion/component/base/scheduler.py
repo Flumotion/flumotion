@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import time
 from datetime import datetime, timedelta, tzinfo
 
@@ -29,6 +26,8 @@ from twisted.internet import reactor
 
 from flumotion.common import log, avltree
 from flumotion.component.base import watcher
+
+__version__ = "$Rev$"
 
 
 # A class capturing the platform's idea of local time, from the

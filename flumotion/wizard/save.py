@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.common import log
 from flumotion.wizard import enums
 from flumotion.configure import configure
+
+__version__ = "$Rev$"
 
 # FIXME: This is absolutely /horrible/, we should not
 #        use translatable string as constants when saving the

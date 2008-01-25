@@ -19,10 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
+__version__ = "$Rev$"
 _ = gettext.gettext
 
 

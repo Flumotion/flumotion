@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Utility functions for Nagios.
 """
@@ -31,6 +29,9 @@ from twisted.internet import reactor
 
 from flumotion.common import common, log
 from flumotion.extern.command import command
+
+__version__ = "$Rev$"
+
 
 class LogCommand(command.Command, log.Loggable):
     def __init__(self, parentCommand=None, **kwargs):

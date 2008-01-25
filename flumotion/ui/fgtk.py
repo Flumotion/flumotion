@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 I am a collection of extended GTK widgets for use in Flumotion.
 """
@@ -31,6 +29,9 @@ from kiwi.ui.widgets.combo import ProxyComboBox
 from kiwi.ui.widgets.entry import ProxyEntry
 from kiwi.ui.widgets.radiobutton import ProxyRadioButton
 from kiwi.ui.widgets.spinbutton import ProxySpinButton
+
+__version__ = "$Rev$"
+
 
 class FProxyComboBox(ProxyComboBox):
     def set_enum(self, enum_class, value_filter=()):

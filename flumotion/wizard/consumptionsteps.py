@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.configure import configure
@@ -28,6 +26,7 @@ from flumotion.common.python import any
 from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
 from flumotion.wizard.enums import RotateSize, RotateTime
 
+__version__ = "$Rev$"
 _ = gettext.gettext
 X_ = _
 

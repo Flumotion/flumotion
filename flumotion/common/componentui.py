@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
 from flumotion.common import registry
+
+__version__ = "$Rev$"
+
 
 # state of a component used for UI purposes
 class WorkerComponentUIState(flavors.StateCacheable):

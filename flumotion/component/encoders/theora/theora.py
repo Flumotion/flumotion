@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 from flumotion.common import messages
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class Theora(feedcomponent.ParseLaunchComponent):
     checkTimestamp = True

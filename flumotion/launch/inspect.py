@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import sys
 
 from flumotion.common import log, common, registry
 from flumotion.common.options import OptionParser
+
+__version__ = "$Rev$"
 
 
 def printMultiline(indent, data):

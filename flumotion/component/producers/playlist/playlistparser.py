@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 from gst.extend import discoverer
 
@@ -33,6 +31,9 @@ from xml.dom import Node
 from twisted.internet import reactor
 
 from flumotion.common import log, fxml
+
+__version__ = "$Rev$"
+
 
 class PlaylistItem(object, log.Loggable):
     def __init__(self, id, timestamp, uri, offset, duration):

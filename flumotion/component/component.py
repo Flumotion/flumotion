@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 worker-side objects for components
 """
@@ -44,6 +42,8 @@ from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):

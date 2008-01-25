@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import tempfile
 
@@ -30,6 +28,8 @@ from twisted.web import server, http
 from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import file
 from flumotion.test import test_http
+
+__version__ = "$Rev$"
 
 
 # FIXME: maybe merge into test_http's fake request ?

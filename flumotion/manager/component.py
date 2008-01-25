@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 manager-side objects for components
 
@@ -43,7 +41,10 @@ from flumotion.twisted import flavors
 from flumotion.common.planet import moods
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class ComponentAvatar(base.ManagerAvatar):
     """

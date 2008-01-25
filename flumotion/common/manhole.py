@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import base64
 import binascii
@@ -37,6 +35,8 @@ from twisted.python import failure
 from zope import interface
 
 from flumotion.common import log
+
+__version__ = "$Rev$"
 
 
 # This class is from twisted.conch.checkers, copyright 2001-2007 Paul

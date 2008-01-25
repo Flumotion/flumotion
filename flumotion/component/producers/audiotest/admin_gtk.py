@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from gettext import gettext as _
 
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume import admin_gtk as vadmin_gtk
+
+__version__ = "$Rev$"
+
 
 class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
     logCategory = 'audiotest'

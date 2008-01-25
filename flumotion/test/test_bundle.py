@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
@@ -32,6 +30,9 @@ import StringIO
 import zipfile
 import md5
 import time
+
+__version__ = "$Rev$"
+
 
 class TestBundler(testsuite.TestCase):
     # everything we need to set up the test environment

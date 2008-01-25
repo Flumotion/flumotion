@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from zope.interface import implements
 
 from flumotion.common import log
 from flumotion.twisted import flavors
+
+__version__ = "$Rev$"
+
 
 class BaseAdminText(log.Loggable):
     """

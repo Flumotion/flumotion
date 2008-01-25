@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Directed Acyclic Graph class and functionality
 """
 from flumotion.common import log
+
+__version__ = "$Rev$"
+
 
 class CycleError(Exception):
     """

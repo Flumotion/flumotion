@@ -19,10 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.twisted import reflect
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
+
 
 class TestSimple(testsuite.TestCase):
     def testSimple(self):

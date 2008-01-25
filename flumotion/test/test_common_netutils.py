@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import StringIO
 
 from flumotion.common.netutils import ipv4StringToInt, ipv4IntToString
 from flumotion.common.netutils import RoutingTable
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 class TestIpv4Parse(testsuite.TestCase):

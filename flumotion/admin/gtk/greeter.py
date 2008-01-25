@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import errno
 
@@ -34,6 +32,7 @@ from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
 from flumotion.ui.simplewizard import WizardStep, SimpleWizard
 
+__version__ = "$Rev$"
 
 
 # A wizard run when the user first starts flumotion.

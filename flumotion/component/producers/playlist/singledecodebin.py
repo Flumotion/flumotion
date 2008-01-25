@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 # Originally part of PiTiVi,
 # Copyright (C) 2005-2007 Edward Hervey <bilboed@bilboed.com>,
 # Relicensed under the above dual license with his permission.
@@ -32,6 +29,9 @@ Single-stream queue-less decodebin
 
 import gobject
 import gst
+
+__version__ = "$Rev$"
+
 
 def is_raw(caps):
     """ returns True if the caps are RAW """

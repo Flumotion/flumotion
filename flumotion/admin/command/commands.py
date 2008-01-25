@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
 import os
 
 from twisted.internet import defer
@@ -30,6 +29,8 @@ from flumotion.common.planet import moods
 from flumotion.common import errors, log, componentui, common
 
 __all__ = ['commands']
+__version__ = "$Rev$"
+
 
 # copied from flumotion/twisted/integration.py
 class CommandNotFoundException(Exception):

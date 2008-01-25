@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
@@ -35,6 +33,8 @@ from flumotion.common import bundle, common, errors, log, package
 from flumotion.configure import configure
 
 __all__ = ['BundleLoader']
+__version__ = "$Rev$"
+
 
 class BundleLoader(log.Loggable):
     """

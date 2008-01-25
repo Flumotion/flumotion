@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 import os
 import sys
@@ -56,6 +54,7 @@ from flumotion.ui.trayicon import FluTrayIcon
 
 admin # pyflakes
 
+__version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter('flumotion')
 

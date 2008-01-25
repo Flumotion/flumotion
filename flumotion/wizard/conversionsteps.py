@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
@@ -28,6 +26,7 @@ from flumotion.wizard.basesteps import WorkerWizardStep, VideoEncoderStep, \
 from flumotion.wizard.enums import EncodingAudio, EncodingFormat, EncodingVideo
 from flumotion.wizard.models import AudioEncoder, VideoEncoder, Muxer
 
+__version__ = "$Rev$"
 _ = gettext.gettext
 
 

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import tempfile
 
@@ -31,6 +29,8 @@ from twisted.web import client, error
 from flumotion.common import log
 from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import httpfile
+
+__version__ = "$Rev$"
 
 
 class MountTest(log.Loggable, testsuite.TestCase):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 portal-related functionality inspired by twisted.cred.portal
 """
@@ -33,6 +31,9 @@ from twisted.python.components import registerAdapter
 
 from flumotion.common import keycards, log, interfaces, errors
 from flumotion.twisted.pb import _FPortalRoot
+
+__version__ = "$Rev$"
+
 
 class BouncerPortal(log.Loggable):
     """

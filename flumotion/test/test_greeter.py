@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gtk
 
 from flumotion.admin.gtk import greeter
@@ -28,6 +26,8 @@ from flumotion.common import testsuite
 from flumotion.test.gtkunit import set_text, assert_not_failed, \
      assert_call_returns, click, check_text, set_window
 from flumotion.ui.simplewizard import SimpleWizard, WizardStep
+
+__version__ = "$Rev$"
 
 
 def prev():

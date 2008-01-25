@@ -19,11 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Code related to setup and used as part of the bootstrapping of binaries.
 """
+
+__version__ = "$Rev$"
+
+
 def setup():
     """
     Set up the logging system.

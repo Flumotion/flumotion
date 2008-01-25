@@ -19,12 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import sys
 from flumotion.common.log import safeprintf
 
+__version__ = "$Rev$"
 # Keep in sync with configure.ac
 PYGTK_REQ = (2, 8, 4)
 KIWI_REQ = (1, 9, 13)

@@ -19,14 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 parsing of admin configuration files
 """
 
 from flumotion.common import errors
 from flumotion.common import config as fluconfig
+
+__version__ = "$Rev$"
+
 
 class AdminConfigParser(fluconfig.BaseConfigParser):
     """

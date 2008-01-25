@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import tempfile
 
@@ -32,6 +30,7 @@ from flumotion.common import log, messages
 from flumotion.component import feedcomponent
 from flumotion.component.converters.overlay import genimg
 
+__version__ = "$Rev$"
 N_ = messages.N_
 T_ = messages.gettexter('flumotion')
 

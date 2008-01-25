@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 support for serializable translatable messages from component/manager to admin
 """
@@ -31,6 +29,7 @@ import gettext
 from flumotion.common import log
 from twisted.spread import pb
 
+__version__ = "$Rev$"
 (ERROR,
  WARNING,
  INFO) = range(1, 4)

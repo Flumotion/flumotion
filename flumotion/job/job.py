@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 the job-side half of the worker-job connection
 """
@@ -48,6 +46,9 @@ from flumotion.component import component
 from flumotion.twisted import fdserver
 from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
+
+__version__ = "$Rev$"
+
 
 class JobMedium(medium.BaseMedium):
     """

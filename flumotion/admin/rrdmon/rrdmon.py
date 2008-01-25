@@ -19,24 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
-import os
-import random
-import rrdtool
-import datetime
-import time
-
-from flumotion.admin import multi
-from flumotion.common import log, common
-from flumotion.component.base import scheduler
-
-# register the unjellyable
-from flumotion.common import componentui
-
-componentui # pyflakes
-
 """RRD resource poller daemon for Flumotion.
 
 Makes periodic observations on components' UI states, recording them to
@@ -56,6 +38,22 @@ See L{flumotion.admin.rrdmon.config} for information on how to configure
 the RRD resource poller.
 """
 
+import os
+import random
+import rrdtool
+import datetime
+import time
+
+from flumotion.admin import multi
+from flumotion.common import log, common
+from flumotion.component.base import scheduler
+
+# register the unjellyable
+from flumotion.common import componentui
+
+componentui # pyflakes
+
+__version__ = "$Rev$"
 
 def sourceGetFileName(source):
     return source['rrd-file']

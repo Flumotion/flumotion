@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 import gtk
@@ -31,11 +29,13 @@ from flumotion.common import errors, componentui
 from flumotion.twisted import flavors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
+__version__ = "$Rev$"
 (
   COLUMN_ID,
   COLUMN_USER,
   COLUMN_ADDRESS,
 ) = range(3)
+
 
 class KeycardsNode(BaseAdminGtkNode):
     def render(self):

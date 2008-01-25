@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Common routines to parsing XML.
 
@@ -36,6 +34,8 @@ from xml.parsers import expat
 from xml.sax.saxutils import escape, quoteattr
 
 from flumotion.common import log, common
+
+__version__ = "$Rev$"
 
 
 class Box:

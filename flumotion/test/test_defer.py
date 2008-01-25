@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer, reactor
 
 from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator, RetryingDeferred
+
+__version__ = "$Rev$"
 
 
 class TestDefer(testsuite.TestCase):

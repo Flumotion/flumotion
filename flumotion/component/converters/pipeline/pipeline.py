@@ -19,11 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 
 __all__ = ['Converter']
+__version__ = "$Rev$"
+
 
 class Converter(feedcomponent.ParseLaunchComponent):
     logCategory = 'conv-pipe'

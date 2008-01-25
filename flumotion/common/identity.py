@@ -19,11 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Manager-side identities of objects that can request operations from the manager.
 """
+
+__version__ = "$Rev$"
+
 
 class Identity:
     """

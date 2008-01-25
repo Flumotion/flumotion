@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import signals
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 class TestObject(signals.SignalMixin):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 A bouncer that only lets in during an event scheduled with an ical file.
 """
@@ -34,6 +32,8 @@ from datetime import datetime
 from flumotion.component.base import scheduler
 
 __all__ = ['IcalBouncer']
+__version__ = "$Rev$"
+
 
 try:
     # icalendar and dateutil modules needed for ical parsing

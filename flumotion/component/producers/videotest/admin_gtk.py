@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from gettext import gettext as _
 
 import gtk
@@ -28,6 +26,9 @@ import gtk
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 from flumotion.ui import fgtk
 from flumotion.wizard import enums
+
+__version__ = "$Rev$"
+
 
 class PatternNode(BaseAdminGtkNode):
     uiStateHandlers = None

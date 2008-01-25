@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 from flumotion.common import errors, messages
 
@@ -28,7 +26,10 @@ from flumotion.component.combiners.switch import basicwatchdog
 import gst
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
     logCategory = "comb-av-pattern-switcher"

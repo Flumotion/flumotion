@@ -19,10 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
-
 from flumotion.admin import connections
 from flumotion.common import log, connection as fconnection
 from flumotion.twisted import flavors, pb as fpb
@@ -33,6 +29,9 @@ from twisted.internet import reactor
 from zope.interface import implements
 import gobject
 import curses
+
+__version__ = "$Rev$"
+
 
 class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     implements(flavors.IStateListener)

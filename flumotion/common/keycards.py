@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 serializable keycards used for authentication inside Flumotion
 """
@@ -32,11 +30,12 @@ from zope.interface import implements
 from flumotion.twisted import credentials
 from flumotion.common import common
 
+__version__ = "$Rev$"
+_statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 # state enum values
 (REFUSED,
  REQUESTING,
  AUTHENTICATED) = range(3)
-_statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
     """

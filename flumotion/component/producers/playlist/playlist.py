@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 import gobject
 import time
@@ -37,7 +35,9 @@ import smartscale
 import singledecodebin
 import playlistparser
 
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 def _tsToString(ts):
     """

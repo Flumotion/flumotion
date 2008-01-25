@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion interfaces
 """
 
 from zope.interface import Interface
+
+__version__ = "$Rev$"
+
 
 # See also flumotion.medium.BaseMedium.
 class IMedium(Interface):

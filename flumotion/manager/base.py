@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 common classes and code to support manager-side objects
 """
@@ -31,6 +29,9 @@ from twisted.python import failure, reflect
 
 from flumotion.common import errors, interfaces, log, common
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
+
 
 class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     """

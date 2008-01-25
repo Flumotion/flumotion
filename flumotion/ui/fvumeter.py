@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-#
-
 import gobject
 import gtk
 from gtk import gdk
+
+__version__ = "$Rev$"
+
 
 # this VUMeter respects IEC standard
 # BS 6840-18:1996/IEC-268-18

@@ -19,9 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component.encoders.encodingprofile import Profile
+
+__version__ = "$Rev$"
 
 
 class EncodingWizardPlugin(object):

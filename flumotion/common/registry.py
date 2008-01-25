@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 parsing of registry, which holds component and bundle information
 """
@@ -39,11 +37,12 @@ from flumotion.common import common, log, errors, fxml
 from flumotion.common.bundle import BundlerBasket, MergedBundler
 from flumotion.configure import configure
 
+__all__ = ['ComponentRegistry', 'registry']
+__version__ = "$Rev$"
 # Re-enable when reading the registry cache is lighter-weight, or we
 # decide that it's a good idea, or something. See #799.
 READ_CACHE = False
 
-__all__ = ['ComponentRegistry', 'registry']
 
 def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]

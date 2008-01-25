@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import errno
 import os
 
@@ -34,6 +32,8 @@ from flumotion.component import feed
 from flumotion.component.bouncers import htpasswdcrypt
 from flumotion.twisted import pb as fpb
 from flumotion.worker import feedserver
+
+__version__ = "$Rev$"
 
 
 class FakeWorkerBrain(log.Loggable):

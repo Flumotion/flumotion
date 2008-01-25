@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from StringIO import StringIO
 
 from flumotion.common import registry, errors
 from flumotion.common import testsuite
 from flumotion.manager import config
+
+__version__ = "$Rev$"
 
 regchunk = """
 <registry>

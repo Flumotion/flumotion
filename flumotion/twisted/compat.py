@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion Twisted compatibility assistance
 
@@ -29,6 +27,9 @@ provide any backwards compatibility.
 """
 
 import zope.interface as zi
+
+__version__ = "$Rev$"
+
 
 def implementsInterface(object, interface):
     return interface.providedBy(object)

@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component import feedcomponent
 from flumotion.common import log, pygobject
 
 __all__ = ['Preview']
+__version__ = "$Rev$"
+
 
 class Preview(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):

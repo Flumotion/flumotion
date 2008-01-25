@@ -19,8 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Twisted-like base code written for Flumotion
 """
+
+__version__ = "$Rev$"
+

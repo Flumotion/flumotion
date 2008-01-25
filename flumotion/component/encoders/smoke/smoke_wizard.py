@@ -19,15 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gettext
 
 from flumotion.component.encoders.encodingprofile import Profile, Int
 from flumotion.component.encoders.encodingwizardplugin import \
      EncodingWizardPlugin
 
+__version__ = "$Rev$"
 _ = gettext.gettext
+
 
 class SmokeWizardPlugin(EncodingWizardPlugin):
     def get_profile_presets(self):

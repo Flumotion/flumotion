@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 
 from twisted.internet import reactor
 
 from flumotion.common import componentui
+
+__version__ = "$Rev$"
 
 
 class Eater:

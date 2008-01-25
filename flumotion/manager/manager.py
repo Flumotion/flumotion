@@ -30,9 +30,6 @@ API Stability: semi-stable
 @type LOCAL_IDENTITY: L{LocalIdentity}
 """
 
-__all__ = ['ManagerServerFactory', 'Vishnu']
-__version__ = "$Rev$"
-
 import os
 
 from twisted.internet import reactor, defer
@@ -51,9 +48,12 @@ from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
 
+__all__ = ['ManagerServerFactory', 'Vishnu']
+__version__ = "$Rev$"
+T_ = messages.gettexter('flumotion')
 LOCAL_IDENTITY = LocalIdentity('manager')
+
 
 def _find(list, value, proc=lambda x: x):
     return list[[proc(x) for x in list].index(value)]

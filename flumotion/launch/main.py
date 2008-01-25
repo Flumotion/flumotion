@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 """
 Flumotion-launch: A gst-launch analog for Flumotion.
 
@@ -74,6 +71,7 @@ from flumotion.launch import parse
 
 from gettext import gettext as _
 
+__version__ = "$Rev$"
 _headings = {
     messages.ERROR:   _('Error'),
     messages.WARNING: _('Warning'),

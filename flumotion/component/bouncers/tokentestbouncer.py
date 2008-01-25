@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 A test token bouncer.
 """
@@ -30,6 +28,8 @@ from twisted.internet import defer
 from flumotion.component.bouncers import bouncer, tokentest
 
 __all__ = ['TokenTestBouncer']
+__version__ = "$Rev$"
+
 
 class TokenTestBouncer(tokentest.TokenTestBase, bouncer.Bouncer):
     def do_setup(self):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 
 from twisted.trial import unittest
@@ -28,6 +26,9 @@ from twisted.trial import unittest
 from flumotion.twisted import credentials
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
+
+__version__ = "$Rev$"
+
 
 class TestKeycardUACPP(testsuite.TestCase):
     def testInit(self):

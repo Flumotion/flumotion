@@ -19,12 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 
 from flumotion.component.bouncers import plug
 from flumotion.test import bouncertest
+
+__version__ = "$Rev$"
 
 
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import log
 from flumotion.extern.fdpass import fdpass
 
@@ -31,6 +29,9 @@ import errno
 import os
 import socket
 import struct
+
+__version__ = "$Rev$"
+
 
 # Heavily based on
 # http://twistedmatrix.com/trac/browser/sandbox/exarkun/copyover/server.py

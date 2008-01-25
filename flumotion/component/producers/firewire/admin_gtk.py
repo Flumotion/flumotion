@@ -19,10 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
+
+__version__ = "$Rev$"
+
 
 class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):

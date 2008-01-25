@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 from twisted.spread import jelly, pb
 from twisted.internet import reactor, defer
@@ -38,8 +36,10 @@ from flumotion.twisted.defer import defer_generator_method
 # markers
 from flumotion.common.messages import N_, ngettext
 
+__version__ = "$Rev$"
 # translatablers
 T_ = messages.gettexter('flumotion')
+
 
 class SerializeTest(testsuite.TestCase):
     def testSerialize(self):

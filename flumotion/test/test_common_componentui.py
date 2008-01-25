@@ -19,11 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import componentui
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
+
+__version__ = "$Rev$"
 
 
 class FakeObject: pass

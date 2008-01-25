@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import messages
 from flumotion.configure import configure
 
@@ -29,6 +27,8 @@ from gettext import gettext as _
 import os
 import time
 import gtk
+
+__version__ = "$Rev$"
 
 _stock_icons = {messages.ERROR: gtk.STOCK_DIALOG_ERROR,
                 messages.WARNING: gtk.STOCK_DIALOG_WARNING,

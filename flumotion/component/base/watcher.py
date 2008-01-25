@@ -19,15 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
 import time
 
 from twisted.internet import reactor
 
 from flumotion.common import log
+
+__version__ = "$Rev$"
+
 
 class BaseWatcher(log.Loggable):
     """I watch for file changes.

@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from twisted.spread import pb
 
 from flumotion.common import log
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 # an object that subclasses from both Cacheable and RemoteCache

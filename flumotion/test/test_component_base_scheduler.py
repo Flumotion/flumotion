@@ -19,15 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 from datetime import datetime, timedelta
 
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
 from flumotion.component.base import scheduler
+
+__version__ = "$Rev$"
 
 
 def _now(tz=scheduler.LOCAL):

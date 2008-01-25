@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 
 from twisted.internet import defer
@@ -28,6 +26,8 @@ from twisted.internet import defer
 from flumotion.admin import multi
 from flumotion.common import connection
 from flumotion.twisted import pb
+
+__version__ = "$Rev$"
 
 
 class MultiAdminTest(testsuite.TestCaseWithManager):

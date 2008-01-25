@@ -19,9 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
+
+__version__ = "$Rev$"
 
 directory = os.path.split(os.path.abspath(__file__))[0]
 fontpath = os.path.join(directory, 'Vera.ttf')

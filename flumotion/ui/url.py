@@ -19,11 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
 import gtk
+
+__version__ = "$Rev$"
+
 
 class ClickyURL(gtk.EventBox):
     def __init__(self, url, mime_type='application/ogg'):

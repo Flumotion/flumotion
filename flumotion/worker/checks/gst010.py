@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 import gobject
@@ -35,7 +33,10 @@ from flumotion.twisted import defer as fdefer
 from flumotion.worker.checks import check
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class BusResolution(fdefer.Resolution):
     pipeline = None

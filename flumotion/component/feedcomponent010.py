@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 import gobject
 
@@ -39,6 +37,8 @@ from flumotion.component.eater import Eater
 from flumotion.common.planet import moods
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
 

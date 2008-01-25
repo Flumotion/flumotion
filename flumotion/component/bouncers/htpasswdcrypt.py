@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 an htpasswd-backed bouncer with crypt passwords
 """
@@ -37,6 +35,8 @@ from flumotion.component.bouncers import bouncer
 from flumotion.twisted import credentials, checkers
 
 __all__ = ['HTPasswdCrypt']
+__version__ = "$Rev$"
+
 
 class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
 

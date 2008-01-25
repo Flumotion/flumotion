@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import sets
 import gst
 import gobject
@@ -35,7 +33,10 @@ from flumotion.component.base import scheduler
 from flumotion.component.plugs import base
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchToMaster(self):

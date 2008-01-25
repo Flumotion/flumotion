@@ -19,10 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import connection
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
+
 
 class TestConnection(testsuite.TestCase):
     def assertParseEquals(self, _in, out, **kwargs):

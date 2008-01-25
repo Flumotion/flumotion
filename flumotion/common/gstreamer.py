@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 GStreamer helper functionality
 """
@@ -31,6 +29,9 @@ from flumotion.common import errors, log
 
 import gobject
 import gst
+
+__version__ = "$Rev$"
+
 
 def caps_repr(caps):
     """

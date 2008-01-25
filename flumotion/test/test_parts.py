@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gtk
 from twisted.spread import jelly
 
@@ -28,6 +26,8 @@ from flumotion.admin.gtk import parts
 from flumotion.common import planet
 from flumotion.common import testsuite
 from flumotion.common.planet import moods
+
+__version__ = "$Rev$"
 
 
 class TestAdminStatusbar(testsuite.TestCase):

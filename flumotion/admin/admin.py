@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 model abstraction for administration clients supporting different views
 """
@@ -36,6 +34,7 @@ from flumotion.common.messages import N_
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
 

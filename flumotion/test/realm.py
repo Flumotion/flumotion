@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.cred import portal
 from twisted.spread import pb
 
@@ -29,6 +27,9 @@ from flumotion.twisted import portal as fportal
 from flumotion.common import server, connection, log
 from flumotion.configure import configure
 from flumotion.component.bouncers import htpasswdcrypt
+
+__version__ = "$Rev$"
+
 
 class TestRealm(log.Loggable):
     __implements__ = (portal.IRealm, server.IServable)

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 implementation of a PB Server through which other components can request
 to eat from or feed to this worker's components.
@@ -36,6 +34,9 @@ from flumotion.common import log, common, interfaces
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
+
 
 class FeedServer(log.Loggable):
     """

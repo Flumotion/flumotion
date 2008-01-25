@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 from twisted.spread import pb
@@ -33,6 +31,8 @@ from flumotion.common import testsuite
 from flumotion.common.planet import moods
 from flumotion.manager import component, manager
 from flumotion.twisted import flavors
+
+__version__ = "$Rev$"
 
 
 class MyListener(log.Loggable):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion Twisted credentials
 """
@@ -33,6 +31,9 @@ import random
 from flumotion.common import log
 from twisted.cred import credentials
 from zope.interface import implements
+
+__version__ = "$Rev$"
+
 
 class Username:
     """

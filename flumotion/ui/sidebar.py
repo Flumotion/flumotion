@@ -19,16 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import gobject
 import gtk
 
 from flumotion.common.pygobject import gsignal
 
-
 __all__ = ['WizardSidebar']
+__version__ = "$Rev$"
 
 
 class SidebarButton(gtk.Button):

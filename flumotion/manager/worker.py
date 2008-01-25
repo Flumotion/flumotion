@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 manager-side objects to handle worker clients
 """
@@ -30,6 +28,9 @@ from twisted.internet import defer
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import worker, common
+
+__version__ = "$Rev$"
+
 
 class WorkerAvatar(base.ManagerAvatar):
     """

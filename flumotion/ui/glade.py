@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gtk
 from gtk import glade
 import gobject
@@ -30,6 +28,8 @@ from twisted.python.reflect import namedAny
 
 from flumotion.configure import configure
 from flumotion.ui.kiwipatches import install_patches
+
+__version__ = "$Rev$"
 
 # FIXME: Move to kiwi initialization
 environ.add_resource('glade', configure.gladedir)

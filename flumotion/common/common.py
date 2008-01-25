@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 small common functions used by all processes
 """
@@ -40,6 +38,9 @@ from flumotion.common import log
 #       don't add any extra flumotion imports unless you
 #       really know what you're doing.
 from flumotion.configure import configure
+
+__version__ = "$Rev$"
+
 
 def formatStorage(units, precision=2):
     """

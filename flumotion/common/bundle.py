@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 bundles of files used to implement caching over the network
 """
@@ -35,6 +33,8 @@ import StringIO
 from flumotion.common import errors, dag
 
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
+__version__ = "$Rev$"
+
 
 class BundledFile:
     """

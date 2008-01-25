@@ -19,8 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 common code used by all flumotion processes
 """
+
+__version__ = "$Rev$"

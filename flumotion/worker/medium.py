@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 worker-side objects to handle worker clients
 """
@@ -35,9 +33,11 @@ from flumotion.common import errors, interfaces, log, debug
 from flumotion.common import medium
 from flumotion.twisted import pb as fpb
 
+__version__ = "$Rev$"
 JOB_SHUTDOWN_TIMEOUT = 5
-
 factoryClass = fpb.ReconnectingFPBClientFactory
+
+
 class WorkerClientFactory(factoryClass):
     """
     I am a client factory for the worker to log in to the manager.

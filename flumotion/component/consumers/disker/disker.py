@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import errno
 import os
 import time
@@ -41,9 +39,11 @@ from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
 
 __all__ = ['Disker']
+__version__ = "$Rev$"
+T_ = messages.gettexter('flumotion')
+
 
 
 """

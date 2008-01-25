@@ -19,15 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import locale
+
 import gettext
 import os
 
 from flumotion.common import testsuite
 from flumotion.configure import configure
 
+__version__ = "$Rev$"
 
 # marking/translating for singulars
 _ = gettext.gettext

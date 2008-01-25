@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Base classes for parsing of flumotion configuration files
 """
@@ -37,6 +35,9 @@ from flumotion.common import log, errors, common, registry, fxml
 from flumotion.configure import configure
 
 from errors import ConfigError
+
+__version__ = "$Rev$"
+
 
 def parsePropertyValue(propName, type, value):
     # XXX: We might end up calling float(), which breaks

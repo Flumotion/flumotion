@@ -19,8 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 configure-time information and settings
 """
+
+__version__ = "$Rev$"
+

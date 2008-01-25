@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import sys
 import socket
 import time
@@ -30,6 +28,9 @@ import gobject
 
 from flumotion.common import log
 from flumotion.tester import client
+
+__version__ = "$Rev$"
+
 
 class HTTPClient(gobject.GObject, log.Loggable):
     """

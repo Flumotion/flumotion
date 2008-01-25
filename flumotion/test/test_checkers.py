@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 from twisted.trial import unittest
 
@@ -30,9 +28,12 @@ from twisted.cred import credentials as tcredentials
 from flumotion.twisted import credentials, checkers
 from flumotion.common import errors
 
+__version__ = "$Rev$"
+
 # Use some shorter names
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredCrypt = credentials.UsernameCryptPasswordCrypt
+
 
 class TestFlexibleWithPassword(testsuite.TestCase):
     def setUp(self):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import time
 
@@ -29,6 +27,9 @@ import gtk
 from gettext import gettext as _
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+
+__version__ = "$Rev$"
+
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'consumers',

@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 import os
 import gettext
 
@@ -32,7 +29,9 @@ from flumotion.admin import connections
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
+__version__ = "$Rev$"
 _ = gettext.gettext
+
 
 def format_timestamp(stamp):
     return stamp.strftime('%x')

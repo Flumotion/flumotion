@@ -19,9 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import log
+
 __version__ = "$Rev$"
 
-from flumotion.common import log
 
 class SignalMixin(object):
     __signals__ = ()

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 implementation of a PB Client to interface with feedserver.py
 """
@@ -34,6 +32,8 @@ from zope.interface import implements
 
 from flumotion.common import log, common, interfaces
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
 
 
 # copied from fdserver.py so that it can be bundled

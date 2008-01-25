@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 main for flumotion-nagios
 """
@@ -31,6 +29,9 @@ from flumotion.common import common, errors, planet, log
 from flumotion.admin import connections, admin
 
 from flumotion.monitor.nagios import util
+
+__version__ = "$Rev$"
+
 
 class Mood(util.LogCommand):
     description = "Check the mood of a component."

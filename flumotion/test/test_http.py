@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from twisted.web import server
 
@@ -35,6 +33,9 @@ import fcntl
 import os
 
 from twisted.web import http
+
+__version__ = "$Rev$"
+
 
 class PipeTransport:
     def __init__(self):

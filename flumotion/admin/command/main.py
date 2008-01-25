@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import sys
 import re
 
@@ -34,6 +32,8 @@ from flumotion.common import messages
 
 from flumotion.admin.command.commands import commands
 from flumotion.common.options import OptionParser
+
+__version__ = "$Rev$"
 
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')

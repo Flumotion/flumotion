@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 from twisted.internet import reactor
@@ -30,6 +28,9 @@ from flumotion.common import log, keycards, common, errors
 from flumotion.job import job
 from flumotion.twisted import credentials, fdserver
 from flumotion.common.options import OptionParser
+
+__version__ = "$Rev$"
+
 
 def main(args):
     parser = OptionParser(domain="flumotion-job")

@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
 import os
 import time
 import string
@@ -41,7 +40,10 @@ from flumotion.twisted import fdserver
 from flumotion.component.misc.httpfile import file
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class CancellableRequest(server.Request):
 

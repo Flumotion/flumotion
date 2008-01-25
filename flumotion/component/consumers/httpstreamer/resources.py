@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 import socket
 import time
@@ -48,6 +46,7 @@ from flumotion.common import common, log, keycards
 from flumotion.component.base import http as httpbase
 
 __all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
+__version__ = "$Rev$"
 
 HTTP_NAME = 'FlumotionHTTPServer'
 HTTP_VERSION = configure.version

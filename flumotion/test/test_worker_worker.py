@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from flumotion.common import testsuite
 from flumotion.worker import worker
+
+__version__ = "$Rev$"
 
 
 class FakeOptions:

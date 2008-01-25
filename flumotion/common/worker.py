@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Objects related to the state of workers.
 """
@@ -35,7 +33,10 @@ from flumotion.twisted import flavors
 from flumotion.common import log, errors, messages
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class ProcessProtocol(protocol.ProcessProtocol):
     def __init__(self, loggable, avatarId, processType, where):

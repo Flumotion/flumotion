@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.spread import pb
 
 from flumotion.common import keycards, testsuite, interfaces
 from flumotion.manager import admin, manager
+
+__version__ = "$Rev$"
+
 
 class FakeTransport:
     def getPeer(self):

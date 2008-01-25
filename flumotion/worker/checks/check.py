@@ -19,15 +19,16 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 
 from twisted.internet import defer
 from flumotion.common import errors, log, messages, gstreamer
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 def handleGStreamerDeviceError(failure, device):
     """

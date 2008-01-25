@@ -19,13 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-
 from twisted.internet import defer
 
 from flumotion.common import log, planet, errors, startset, watched
 from flumotion.admin import admin
+
+__version__ = "$Rev$"
 
 
 def get_admin_for_object(object):

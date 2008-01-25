@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 manager main function
 """
@@ -36,6 +34,7 @@ from flumotion.configure import configure
 from flumotion.common import server
 from flumotion.common.options import OptionGroup, OptionParser
 
+__version__ = "$Rev$"
 defaultSSLPort = configure.defaultSSLManagerPort
 defaultTCPPort = configure.defaultTCPManagerPort
 

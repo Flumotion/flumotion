@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Base classes for component UI's using GTK+
 """
@@ -39,9 +37,12 @@ from flumotion.common import errors, log, common, messages
 from flumotion.twisted import flavors
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
 
 from gettext import gettext as _
+
+__version__ = "$Rev$"
+T_ = messages.gettexter('flumotion')
+
 
 class BaseAdminGtk(log.Loggable):
     """

@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 serializable Flumotion exceptions
 """
 
 from twisted.spread import pb
+
+__version__ = "$Rev$"
+
 
 class CancelledError(Exception):
     "An operation was cancelled"

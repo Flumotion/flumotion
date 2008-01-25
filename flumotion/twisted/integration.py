@@ -19,15 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-import os
-import signal
-
-from twisted.python import failure
-from twisted.internet import reactor, protocol, defer
-from flumotion.common import log as flog
-
 """
 Framework for writing automated integration tests.
 
@@ -84,6 +75,16 @@ subsequent commands will be named as echo-1, echo-2, and the like. Upon
 successful completion of the test case, the log directory will be
 deleted.
 """
+
+import os
+import signal
+
+from twisted.python import failure
+from twisted.internet import reactor, protocol, defer
+from flumotion.common import log as flog
+
+__version__ = "$Rev$"
+
 
 # Twisted's reactor.iterate() is defined like this:
 #

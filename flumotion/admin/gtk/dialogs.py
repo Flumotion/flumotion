@@ -29,8 +29,8 @@ import gtk
 from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
 
-_ = gettext.gettext
 __version__ = "$Rev$"
+_ = gettext.gettext
 
 
 class ProgressDialog(gtk.Dialog):

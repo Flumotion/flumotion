@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 A bouncer that authenticates based on the IP address of the remote side,
 as seen by the bouncer.
@@ -32,10 +30,11 @@ from flumotion.common import keycards, messages, errors, log, netutils
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardUACPP
 
+__all__ = ['IPBouncer']
+__version__ = "$Rev$"
 N_ = messages.N_
 T_ = messages.gettexter('flumotion')
 
-__all__ = ['IPBouncer']
 
 class IPBouncer(bouncer.Bouncer):
 

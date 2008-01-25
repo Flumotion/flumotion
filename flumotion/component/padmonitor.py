@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 
 import time
@@ -28,6 +26,8 @@ import time
 from twisted.internet import reactor, defer
 
 from flumotion.common import log, common
+
+__version__ = "$Rev$"
 
 
 class PadMonitor(log.Loggable):

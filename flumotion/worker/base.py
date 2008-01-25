@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 worker-side objects to handle worker clients
 """
@@ -38,6 +36,8 @@ from flumotion.common import errors, log
 from flumotion.common import common, worker, startset
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import pb as fpb
+
+__version__ = "$Rev$"
 
 JOB_SHUTDOWN_TIMEOUT = 5
 

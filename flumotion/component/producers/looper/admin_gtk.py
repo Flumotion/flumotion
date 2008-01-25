@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from gettext import gettext as _
 
 import os
@@ -32,6 +30,9 @@ from flumotion.common import errors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 from flumotion.ui.glade import GladeWidget
+
+__version__ = "$Rev$"
+
 
 def time_to_string(value):
     sec = value / gst.SECOND

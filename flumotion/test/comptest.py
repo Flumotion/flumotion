@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import new
 import os
 import sys
@@ -44,6 +42,7 @@ from flumotion.twisted import flavors
 
 __all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
            'pipeline_cnv']
+__version__ = "$Rev$"
 
 
 class ComponentTestException(Exception):

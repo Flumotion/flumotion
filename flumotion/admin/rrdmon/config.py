@@ -19,14 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
-import os
-
-from flumotion.common import common, connection
-from flumotion.common.errors import ConfigError
-from flumotion.common.fxml import Parser
-
 
 """
 RRD monitor configuration
@@ -85,6 +77,14 @@ their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.
 
 </rrdmon>
 """
+
+import os
+
+from flumotion.common import common, connection
+from flumotion.common.errors import ConfigError
+from flumotion.common.fxml import Parser
+
+__version__ = "$Rev$"
 
 
 class ConfigParser(Parser):

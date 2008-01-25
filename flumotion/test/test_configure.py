@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.trial import unittest
 
 from flumotion.configure import configure
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
+
 
 class TestConfig(testsuite.TestCase):
     def testVariables(self):

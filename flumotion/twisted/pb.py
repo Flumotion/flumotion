@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion Perspective Broker using keycards
 
@@ -43,6 +41,10 @@ from flumotion.common import keycards, interfaces, common, errors
 from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials
+
+__version__ = "$Rev$"
+
+
 # TODO:
 #   merge FMCF back into twisted
 

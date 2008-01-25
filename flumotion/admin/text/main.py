@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import curses
 
 from twisted.internet import reactor
@@ -29,6 +27,9 @@ from flumotion.admin.text import connection
 from flumotion.admin.text.greeter import AdminTextGreeter
 from flumotion.common import messages # make Message proxyable
 from flumotion.common.options import OptionParser
+
+__version__ = "$Rev$"
+
 
 def cleanup_curses(stdscr):
     curses.nocbreak()

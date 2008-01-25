@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Server functionality.
 """
@@ -31,6 +29,8 @@ from twisted.internet import reactor
 from zope.interface import Interface
 
 from flumotion.common import log
+
+__version__ = "$Rev$"
 
 
 class _ServerContextFactory(log.Loggable):

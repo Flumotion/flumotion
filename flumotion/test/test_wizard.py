@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from twisted.internet import defer
 from twisted.spread import jelly
 
@@ -36,6 +34,9 @@ except RuntimeError:
 from flumotion.admin import admin
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard.configurationwizard import ConfigurationWizard
+
+__version__ = "$Rev$"
+
 
 class WizardStepTest(testsuite.TestCase):
     def setUpClass(self):

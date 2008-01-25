@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Flumotion logging
 
@@ -34,6 +32,9 @@ Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 
 from flumotion.extern.log import log as externlog
 from flumotion.extern.log.log import *
+
+__version__ = "$Rev$"
+
 
 def init():
     externlog.init('FLU_DEBUG')

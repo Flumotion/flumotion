@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gobject
 import gtk
 
@@ -28,6 +26,9 @@ from flumotion.common import testsuite
 from flumotion.common import errors, pygobject
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
+
+__version__ = "$Rev$"
+
 
 class SetProperty(testsuite.TestCase):
     def testButton(self):

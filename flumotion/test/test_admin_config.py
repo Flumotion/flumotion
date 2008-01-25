@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 from StringIO import StringIO
 
 from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.admin import config
+
+__version__ = "$Rev$"
+
 
 def AdminConfig(sockets, string):
     f = StringIO(string)

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import gst
 
 from flumotion.component import feedcomponent
@@ -28,7 +26,10 @@ from flumotion.common import errors, gstreamer, messages
 from flumotion.component.effects.volume import volume
 
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 class AudioTestMedium(feedcomponent.FeedComponentMedium):
     def remote_setFrequency(self, frequency):

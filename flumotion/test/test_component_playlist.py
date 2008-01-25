@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 import tempfile
 
@@ -29,6 +27,8 @@ from twisted.trial import unittest
 from flumotion.component.producers.playlist import playlistparser
 from flumotion.common import fxml
 from flumotion.common import testsuite
+
+__version__ = "$Rev$"
 
 
 class FakeProducer(object):

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import time
 import random
 
@@ -30,6 +28,9 @@ from flumotion.tester import httpclient
 from flumotion.common import log
 
 from flumotion.tester import client
+
+__version__ = "$Rev$"
+
 
 class ClientFactory(log.Loggable):
 

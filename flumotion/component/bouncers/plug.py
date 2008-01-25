@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 Base class and implementation for bouncer components, who perform
 authentication services for other components.
@@ -97,6 +95,8 @@ from flumotion.component.plugs import base as pbase
 from flumotion.twisted import credentials
 
 __all__ = ['BouncerPlug']
+__version__ = "$Rev$"
+
 
 class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
     """

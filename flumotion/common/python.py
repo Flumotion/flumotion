@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 """
 forward compatibility with future python versions
 """
@@ -28,6 +26,8 @@ forward compatibility with future python versions
 import sys
 
 __pychecker__ = 'no-shadowbuiltin'
+__version__ = "$Rev$"
+
 
 # sorted() was introduced in 2.4
 if sys.version_info[:2] < (2, 4):

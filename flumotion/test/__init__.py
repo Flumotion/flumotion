@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
-
 import os
 
 import flumotion.common.setup
@@ -28,6 +26,9 @@ import flumotion.common.setup
 flumotion.common.setup.setup()
 
 from flumotion.common import log
+
+__version__ = "$Rev$"
+
 
 def useGtk2Reactor():
     var = 'FLU_TEST_GTK2_REACTOR'
