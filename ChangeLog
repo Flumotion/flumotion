@@ -1,5 +1,9 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	* autogen.sh: Run libtoolize first, and aclocal after
+	intltoolisize, run autopoint --force, mimics the behavior
+	of gnome-autogen.sh and avoids autopoints complaints.
+
 	* flumotion/wizard/productionsteps.py (ProductionStep.got_entries): 
 	Put the videotest-producer and audiotest-producer as the first
 	entries. Fixes #840
