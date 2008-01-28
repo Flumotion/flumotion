@@ -1,3 +1,11 @@
+2008-01-28  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/test_http.py
+	(TestHTTPStreamingResource.deferAssertUnauthorized):
+	Make sure the tests actually check that the authentication
+	deferred is errbacked with NotAuthenticatedError on authentication
+	failure.
+
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
 	Make encoding and muxers pluggable in the wizard, fixes #822.

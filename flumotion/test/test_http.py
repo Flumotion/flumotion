@@ -24,7 +24,7 @@ from twisted.web import server
 
 from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.consumers.httpstreamer import resources
-from flumotion.common import keycards, log
+from flumotion.common import keycards, log, errors
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
 
@@ -144,8 +144,13 @@ class TestHTTPStreamingResource(testsuite.TestCase):
                 'error': http.RESPONSES[error_code]}
             self.assertEquals(request.data, expected)
 
+            # don't swallow failures!
+            return res
+
         d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
+        # make sure we get the authentication exception, too
+        d = self.assertFailure(d, errors.NotAuthenticatedError)
         return d
 
     def deferAssertAuthorized(self, httpauth, request):
