@@ -20,10 +20,10 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
-from flumotion.component.encoders.encodingprofile import Profile, Int
-from flumotion.component.encoders.encodingwizardplugin import \
-     EncodingWizardPlugin
+from flumotion.wizard.basesteps import VideoEncoderStep
+from flumotion.wizard.models import VideoEncoder
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -36,34 +36,50 @@ def _fraction_from_float(number, denominator):
     return "%d/%d" % (number * denominator, denominator)
 
 
-class Framerate(Int):
-    def save(self, value):
-        # save as fraction
-        return _fraction_from_float(value, 2)
+class JPEGVideoEncoder(VideoEncoder):
+    component_type = 'jpeg-encoder'
+
+    def __init__(self):
+        super(JPEGVideoEncoder, self).__init__()
+
+        self.properties.framerate = 5.0
+        self.properties.quality = 84
+
+    def getProperties(self):
+        properties = super(JPEGVideoEncoder, self).getProperties()
+        properties['framerate'] = _fraction_from_float(properties['framerate'], 2)
+        return properties
 
 
-class JPEGWizardPlugin(EncodingWizardPlugin):
-    def get_profile_presets(self):
-        return [(_("0 (largest)"), 0, False),
-                (_("20"), 20, False),
-                (_("40"), 40, False),
-                (_("60"), 60, False),
-                (_("85 (default)"), 85, True),
-                (_("95"), 95, False),
-                (_("100 (smallest)"), 100, False)]
+class JPEGStep(VideoEncoderStep):
+    name = 'JPEG encoder'
+    sidebar_name = 'JPEG'
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'jpeg-wizard.glade')
+    section = _('Conversion')
+    component_type = 'jpeg'
 
-    def create_profile(self, name, quality, isdefault):
-        properties = dict(quality=quality)
+    # WizardStep
 
-        return Profile(name, isdefault, properties)
+    def setup(self):
+        self.framerate.data_type = float
+        self.quality.data_type = int
 
-    def get_custom_properties(self):
-        return [
-            Int("quality",_("Quality"),
-                85, 0, 100),
-            Framerate("framerate",_("Framerate"),
-                      5, 0.01, 100),
-            ]
+        self.add_proxy(self.model.properties,
+                       ['framerate', 'quality'])
 
-    def worker_changed(self, worker):
+    def worker_changed(self):
+        self.model.worker = self.worker
         self.wizard.require_elements(self.worker, 'jpegenc')
+
+    def get_next(self):
+        return self.wizard.get_step('Encoding').get_audio_page()
+
+
+class JPEGWizardPlugin(object):
+    def __init__(self, wizard):
+        self.wizard = wizard
+        self.model = JPEGVideoEncoder()
+
+    def get_conversion_step(self):
+        return JPEGStep(self.wizard, self.model)

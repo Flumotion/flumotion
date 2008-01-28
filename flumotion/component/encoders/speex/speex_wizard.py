@@ -21,23 +21,53 @@
 
 import gettext
 
-from flumotion.component.encoders.encodingprofile import Int
-from flumotion.component.encoders.encodingwizardplugin import \
-     EncodingWizardPlugin
+from flumotion.wizard.basesteps import AudioEncoderStep
+from flumotion.wizard.models import AudioEncoder
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
-class SpeexWizardPlugin(EncodingWizardPlugin):
-    def get_profile_presets(self):
-        return [(_("11? (default)"), 11, True),
-                ]
 
-    def get_custom_properties(self):
-        return [
-            Int("bitrate", _("Bitrate"),
-                11, 3, 30),
-            ]
+class SpeexAudioEncoder(AudioEncoder):
+    component_type = 'speex-encoder'
 
-    def worker_changed(self, worker):
-        self.wizard.require_elements(worker, 'speexenc2')
+    def __init__(self):
+        super(SpeexAudioEncoder, self).__init__()
+
+        self.properties.bitrate = 11
+
+    def getProperties(self):
+        properties = super(SpeexAudioEncoder, self).getProperties()
+        properties['bitrate'] *= 1000
+        return properties
+
+
+class SpeexStep(AudioEncoderStep):
+    name = _('Speex encoder')
+    sidebar_name = _('Speex')
+    component_type = 'speex'
+    icon = 'xiphfish.png'
+
+    # WizardStep
+
+    def setup(self):
+        # Should be 2150 instead of 3 -> 3000
+        self.bitrate.set_range(3, 30)
+        self.bitrate.set_value(11)
+
+        self.bitrate.data_type = int
+
+        self.add_proxy(self.model.properties, ['bitrate'])
+
+    def worker_changed(self):
+        self.model.worker = self.worker
+        self.wizard.require_elements(self.worker, 'speexenc')
+
+
+class SpeexWizardPlugin(object):
+    def __init__(self, wizard):
+        self.wizard = wizard
+        self.model = SpeexAudioEncoder()
+
+    def get_conversion_step(self):
+        return SpeexStep(self.wizard, self.model)

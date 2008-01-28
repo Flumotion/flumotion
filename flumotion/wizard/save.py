@@ -25,12 +25,11 @@ from flumotion.common import log
 from flumotion.wizard import enums
 from flumotion.configure import configure
 
-__version__ = "$Rev$"
-
 # FIXME: This is absolutely /horrible/, we should not
 #        use translatable string as constants when saving the
 #        wizard configuration.
 _ = N_ = gettext.gettext
+__version__ = "$Rev$"
 
 def _fraction_from_float(number, denominator):
     """
@@ -41,11 +40,11 @@ def _fraction_from_float(number, denominator):
 class Component(log.Loggable):
     logCategory = "componentsave"
 
-    def __init__(self, name, type, worker, properties={}):
+    def __init__(self, name, component_type, worker, properties={}):
         self.debug('Creating component %s (%s) worker=%r' % (
             name, type, worker))
         self.name = name
-        self.component_type = type
+        self.component_type = component_type
         self.props = properties
         self.worker = worker
         self.eaters = []
@@ -104,7 +103,6 @@ class Component(log.Loggable):
             #import code; code.interact(local=locals())
             for name in property_names:
                 value = self.props[name]
-                name = name.replace('_', '-')
                 s += '      <property name="%s">%s</property>\n' % (name, value)
 
         s += "    </component>\n"
@@ -120,6 +118,17 @@ class WizardSaver(log.Loggable):
     logCategory = 'wizard-saver'
     def __init__(self, wizard):
         self.wizard = wizard
+
+    def _set_fraction_property(self, properties, property_name, denominator):
+        if not property_name in properties:
+            return
+
+        value = properties[property_name]
+        try:
+            value = _fraction_from_float(int(value), denominator)
+        except ValueError:
+            pass
+        properties[property_name] = value
 
     def _getVideoSource(self):
         source_step = self.wizard.get_step('Source')
@@ -152,6 +161,30 @@ class WizardSaver(log.Loggable):
                          audio_producer.worker,
                          properties)
 
+    def _getVideoEncoder(self):
+        encoding_step = self.wizard.get_step('Encoding')
+        video_encoder = encoding_step.get_video_encoder()
+
+        return Component('encoder-video',
+                         video_encoder.component_type,
+                         video_encoder.getWorker(),
+                         video_encoder.getProperties())
+
+    def _getAudioEncoder(self):
+        encoding_step = self.wizard.get_step('Encoding')
+        audio_encoder = encoding_step.get_audio_encoder()
+
+        return Component('encoder-audio',
+                         audio_encoder.component_type,
+                         audio_encoder.getWorker(),
+                         audio_encoder.getProperties())
+
+    def _getMuxer(self, name):
+        encoding_step = self.wizard.get_step('Encoding')
+        return Component('muxer-' + name,
+                         encoding_step.get_muxer_type(),
+                         encoding_step.worker)
+
     def getVideoOverlay(self, video_source):
         step = self.wizard.get_step('Overlay')
         properties = step.get_state()
@@ -169,9 +202,8 @@ class WizardSaver(log.Loggable):
         # At this point we already know that we should overlay something
         if properties['show-logo']:
             properties['fluendo-logo'] = True
-            encoding_options = self.wizard.get_step_options('Encoding')
-            if (encoding_options['format'] == enums.EncodingFormat.Ogg or
-                encoding_options['video'] == enums.EncodingVideo.Theora):
+            encoding_step = self.wizard.get_step('Encoding')
+            if encoding_step.get_muxer_type() == 'ogg-muxer':
                 properties['xiph-logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
@@ -186,53 +218,11 @@ class WizardSaver(log.Loggable):
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
 
-    def _set_fraction_property(self, properties, property_name, denominator):
-        if not property_name in properties:
-            return
-
-        value = properties[property_name]
-        try:
-            value = _fraction_from_float(int(value), denominator)
-        except ValueError:
-            pass
-        properties[property_name] = value
-
-    def getVideoEncoder(self):
-        options = self.wizard.get_step_options('Encoding')
-        encoder = options['video']
-        encoder_step = self.wizard.get_step(encoder.step)
-
-        properties = encoder_step.get_state()
-        return Component('encoder-video', encoder.component_type,
-                         encoder_step.worker,
-                         properties)
-
-    def getAudioEncoder(self):
-        options = self.wizard.get_step_options('Encoding')
-        encoder = options['audio']
-
-        if encoder == enums.EncodingAudio.Mulaw:
-            props = {}
-            worker = self.wizard.get_step('Source').worker
-        else:
-            encoder_step = self.wizard.get_step(encoder.step)
-            props = encoder_step.get_state()
-            worker = encoder_step.worker
-
-        return Component('encoder-audio', encoder.component_type, worker, props)
-
-    def getMuxer(self, name):
-        options = self.wizard.get_step_options('Encoding')
-        step = self.wizard.get_step('Encoding')
-        muxer = options['format']
-        return Component('muxer-' + name, muxer.component_type,
-                         step.worker)
-
     def handleVideo(self, components):
         video_source = self._getVideoSource()
         components.append(video_source)
 
-        video_encoder = self.getVideoEncoder()
+        video_encoder = self._getVideoEncoder()
         components.append(video_encoder)
 
         video_overlay = self.getVideoOverlay(video_source)
@@ -250,7 +240,7 @@ class WizardSaver(log.Loggable):
         if not audio_source in components:
             components.append(audio_source)
 
-        audio_encoder = self.getAudioEncoder()
+        audio_encoder = self._getAudioEncoder()
         components.append(audio_encoder)
         audio_encoder.link(audio_source)
 
@@ -261,9 +251,9 @@ class WizardSaver(log.Loggable):
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
         has_video = self.wizard.get_step_option('Source', 'has-video')
 
-        audio_muxer = self.getMuxer('audio')
-        video_muxer = self.getMuxer('video')
-        both_muxer = self.getMuxer('audio-video')
+        audio_muxer = self._getMuxer('audio')
+        video_muxer = self._getMuxer('video')
+        both_muxer = self._getMuxer('audio-video')
 
         steps = []
         if has_audio and has_video:

@@ -12,6 +12,10 @@
         <entry type="wizard" location="speex_wizard.py"
                function="SpeexWizardPlugin" />
       </entries>
+      <wizard _description="Speex" type="audio-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="speex"/>
+      </wizard>
       <properties>
         <property name="bitrate" type="int"
                   description="Encoding bitrate (in bits per second)" />
@@ -51,7 +55,6 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="speex-base" />
-            <dependency name="encoding-wizard" />
         </dependencies>
 
         <directories>

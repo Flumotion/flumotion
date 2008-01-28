@@ -19,17 +19,13 @@ glade_DATA = \
 	wizard_disk.glade		\
 	wizard_encoding.glade		\
 	wizard_http.glade		\
-	wizard_jpeg.glade		\
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_overview.glade		\
 	wizard_shout2.glade		\
-	wizard_smoke.glade		\
 	wizard_source.glade		\
 	wizard_summary.glade		\
-	wizard_theora.glade		\
-	wizard_welcome.glade		\
-	wizard_vorbis.glade
+	wizard_welcome.glade
 
 gladedir = $(pkgdatadir)/glade
 

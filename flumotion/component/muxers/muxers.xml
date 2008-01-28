@@ -10,6 +10,12 @@
         <entry type="component" location="ogg.py"
                function="Ogg"/>
       </entries>
+      <wizard _description="Ogg" type="muxer" 
+              feeder="default" eater="default">
+        <accept-format media-type="theora"/>
+        <accept-format media-type="speex"/>
+        <accept-format media-type="vorbis"/>
+      </wizard>
     </component>
   
     <component type="multipart-muxer" base="flumotion/component/muxers"
@@ -21,6 +27,12 @@
         <entry type="component" location="multipart.py"
                function="Multipart"/>
       </entries>
+      <wizard _description="Multipart" type="muxer" 
+              feeder="default" eater="default">
+        <accept-format media-type="jpeg"/>
+        <accept-format media-type="mulaw"/>
+        <accept-format media-type="smoke"/>
+      </wizard>
     </component>
   
   </components>

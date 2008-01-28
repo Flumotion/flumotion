@@ -199,6 +199,7 @@ class ProductionStep(WorkerWizardStep):
             self.wizard.flow.addComponent(self._video_producer)
         else:
             self.wizard.flow.removeComponent(self._video_producer)
+            self._video_producer.component_type = None
         self._verify()
 
     def on_has_audio__toggled(self, button):
@@ -207,6 +208,7 @@ class ProductionStep(WorkerWizardStep):
             self.wizard.flow.addComponent(self._audio_producer)
         else:
             self.wizard.flow.removeComponent(self._audio_producer)
+            self._audio_producer.component_type = None
         self._verify()
 
     def on_video__changed(self, button):

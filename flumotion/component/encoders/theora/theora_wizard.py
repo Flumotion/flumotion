@@ -20,66 +20,95 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
-from flumotion.component.encoders.encodingprofile import Profile, Int
-from flumotion.component.encoders.encodingwizardplugin import \
-     EncodingWizardPlugin
+from flumotion.wizard.basesteps import VideoEncoderStep
+from flumotion.wizard.models import VideoEncoder
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class Bitrate(Int):
-    def save(self, value):
-        # kbps -> bps
-        return value * 1000
+class TheoraVideoEncoder(VideoEncoder):
+    component_type = 'theora-encoder'
+    def __init__(self):
+        super(TheoraVideoEncoder, self).__init__()
+        self.has_quality = True
+        self.has_bitrate = False
+
+        self.properties.noise_sensitivity = 0
+        self.properties.keyframe_maxdistance = 64
+        self.properties.bitrate = 400
+        self.properties.quality = 16
+        self.properties.sharpness = 0
+
+    def getProperties(self):
+        properties = super(TheoraVideoEncoder, self).getProperties()
+        if self.has_bitrate:
+            del properties['quality']
+            properties['bitrate'] *= 1000
+        elif self.has_quality:
+            del properties['bitrate']
+        else:
+            raise AssertionError
+
+        properties['noise-sensitivity'] = max(
+            int(properties['noise-sensitivity'] * (32768 / 100.)),  1)
+
+        return properties
 
 
-class NoiseSensitivty(Int):
-    def save(self, value):
-        # percentage -> [0..32768]
-        return int(value * (32768 / 100.0))
+class TheoraStep(VideoEncoderStep):
+    name = _('Theora encoder')
+    sidebar_name = _('Theora')
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'theora-wizard.glade')
+    component_type = 'theora'
+    icon = 'xiphfish.png'
 
+    # WizardStep
 
-class TheoraWizardPlugin(EncodingWizardPlugin):
-    def get_profile_presets(self):
-        return [(_("64 kbps (worst)"), 64, False),
-                (_("100 kbps"), 100, False),
-                (_("200 kbps"), 200, False),
-                (_("400 kbps (default)"), 400, True),
-                (_("700 kbps"), 700, False),
-                (_("900 kbps"), 900, False),
-                (_("1200 kbps (best)"), 1200, False)]
+    def setup(self):
+        self.bitrate.data_type = int
+        self.quality.data_type = int
+        self.noise_sensitivity.data_type = int
+        self.keyframe_maxdistance.data_type = int
+        self.sharpness.data_type = int
+        self.has_quality.data_type = bool
+        self.has_bitrate.data_type = bool
 
-    def create_profile(self, name, bitrate, isdefault):
-        properties = dict(bitrate=bitrate,
-                          keyframe_maxdistance=64,
-                          noise_sensitivity=0,
-                          sharpness=0)
+        self.add_proxy(self.model,
+                       ['has_quality', 'has_bitrate'])
+        self.add_proxy(self.model.properties,
+                       ['bitrate', 'quality', 'keyframe_maxdistance',
+                        'noise_sensitivity', 'sharpness'])
 
-        return Profile(name, isdefault, properties)
+    def get_next(self):
+        return self.wizard.get_step('Encoding').get_audio_page()
 
-    def get_custom_properties(self):
-        return [
-            Bitrate("bitrate", _("Bitrate"),
-                    400, 0, 4000),
-            #Int("quality",_("Quality"),
-            #    16, 0, 63),
-            Int("keyframe_maxdistance",_("Keyframe max distance"),
-                64, 1, 32768),
-            NoiseSensitivty("noise_sensitivity", _("Noise sensitivity"),
-                            0, 0, 100),
-            Int("sharpness", _("Sharpness"),
-                0, 0, 2),
-            ]
-
-    def worker_changed(self, worker):
-        self.wizard.debug('running Theora checks')
+    def worker_changed(self):
+        self.model.worker = self.worker
 
         def hasTheora(unused):
             self.wizard.run_in_worker(
-                worker, 'flumotion.worker.checks.encoder', 'checkTheora')
+                self.worker, 'flumotion.worker.checks.encoder', 'checkTheora')
 
-        d = self.wizard.require_elements(worker, 'theoraenc')
+        self.wizard.debug('running Theora checks')
+        d = self.wizard.require_elements(self.worker, 'theoraenc')
         d.addCallback(hasTheora)
 
+    # Callbacks
+
+    def on_radiobutton_toggled(self, button):
+        # This is bound to both radiobutton_bitrate and radiobutton_quality
+        self.bitrate.set_sensitive(self.has_bitrate.get_active())
+        self.quality.set_sensitive(self.has_quality.get_active())
+
+
+class TheoraWizardPlugin(object):
+    def __init__(self, wizard):
+        self.wizard = wizard
+        self.model = TheoraVideoEncoder()
+
+    def get_conversion_step(self):
+        return TheoraStep(self.wizard, self.model)

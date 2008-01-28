@@ -389,7 +389,7 @@ class RegistryEntryWizard(pb.Copyable):
         return '<wizard type=%s, feeder=%s>' % (self.type, self.feeder)
 
 
-class RegistryWizardFormat:
+class RegistryEntryWizardFormat(pb.Copyable):
     """
     This class represents an <accept-format> or <provide-format>
     entry in the registry
@@ -920,12 +920,12 @@ class RegistryParser(fxml.Parser):
     def _parseAcceptFormat(self, node):
         # <accept-format media-type="..."/>
         media_type, = self.parseAttributes(node, ('media-type',))
-        return RegistryWizardFormat(media_type)
+        return RegistryEntryWizardFormat(media_type)
 
     def _parseProvideFormat(self, node):
         # <provide-format media-type="..."/>
         media_type, = self.parseAttributes(node, ('media-type',))
-        return RegistryWizardFormat(media_type)
+        return RegistryEntryWizardFormat(media_type)
 
 
 # FIXME: filename -> path

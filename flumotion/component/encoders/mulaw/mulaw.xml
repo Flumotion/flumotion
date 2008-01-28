@@ -11,6 +11,10 @@
         <entry type="component" location="mulaw.py"
                function="Mulaw"/>
       </entries>
+      <wizard _description="Mulaw" type="audio-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="mulaw"/>
+      </wizard>
     </component>
  
   </components>

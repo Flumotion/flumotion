@@ -14,6 +14,11 @@
                function="TheoraWizardPlugin" />
       </entries>
 
+      <wizard _description="Theora" type="video-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="theora"/>
+      </wizard>
+
       <properties>
         <property name="bitrate" type="int"
                   description="Bitrate to encode at (in bps)" />
@@ -66,11 +71,24 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="theora-base" />
-            <dependency name="encoding-wizard" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/encoders/theora">
+                <filename location="theora_wizard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="theora-wizard">
+        <dependencies>
+            <dependency name="theora-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/theora">
+                <filename location="theora-wizard.glade" />
                 <filename location="theora_wizard.py" />
             </directory>
         </directories>

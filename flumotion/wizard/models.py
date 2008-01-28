@@ -148,13 +148,15 @@ class Component(object):
     @cvar feeder_type: restrict the feeders which can be linked with this
       component to this type
     @cvar name_template: template used to define the name of this component
+    @cvar component_type: the type of the component, such as ogg-muxer,
+      this is not mandatory in the class, can also be set in the instance.
     """
     eater_type = None
     feeder_type = None
+    component_type = None
     name_template = "component"
 
     def __init__(self):
-        self.component_type = None
         self.worker = None
         self.feeders = []
         self.eaters = []
@@ -169,7 +171,10 @@ class Component(object):
         return self.worker
 
     def getProperties(self):
-        return self.properties
+        props = {}
+        for key, value in self.properties.iteritems():
+            props[key.replace('_', '-')] = value
+        return props
 
 
 class Producer(Component):

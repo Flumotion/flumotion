@@ -17,6 +17,10 @@
         <entry type="wizard" location="vorbis_wizard.py"
                function="VorbisWizardPlugin" />
       </entries>
+      <wizard _description="Vorbis" type="audio-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="vorbis"/>
+      </wizard>
     </component>
  
   </components>
@@ -55,11 +59,24 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="vorbis-base" />
-            <dependency name="encoding-wizard" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/encoders/vorbis">
+                <filename location="vorbis_wizard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="vorbis-wizard">
+        <dependencies>
+            <dependency name="vorbis-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vorbis">
+                <filename location="vorbis-wizard.glade" />
                 <filename location="vorbis_wizard.py" />
             </directory>
         </directories>

@@ -45,6 +45,24 @@ pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
 
 
 class WizardEntryState(pb.RemoteCopy):
-    pass
+    def getAcceptedMediaTypes(self):
+        """
+        Fetches a list of media types this components accepts.
+        @returns: a list of strings
+        """
+        return [format.media_type for format in self.accepts]
+
+    def getProvidedMediaTypes(self):
+        """
+        Fetches a list of media types this components provides.
+        @returns: a list of strings
+        """
+        return [format.media_type for format in self.provides]
 
 pb.setUnjellyableForClass(registry.RegistryEntryWizard, WizardEntryState)
+
+class WizardEntryFormatState(pb.RemoteCopy):
+    pass
+
+pb.setUnjellyableForClass(registry.RegistryEntryWizardFormat,
+                          WizardEntryFormatState)

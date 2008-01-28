@@ -1,12 +1,8 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 componentdir = $(libdir)/flumotion/python/flumotion/component/encoders
 component_PYTHON = \
 	__init__.py
-component_DATA = \
-	base.xml \
-	encodingprofile.py \
-	encodingwizardplugin.py
 
 jpegdir = $(componentdir)/jpeg
 jpeg_PYTHON = \
@@ -14,7 +10,8 @@ jpeg_PYTHON = \
 	jpeg/jpeg.py
 	jpeg/jpeg_wizard.py
 jpeg_DATA = \
-	jpeg/jpeg.xml
+	jpeg/jpeg.xml \
+	jpeg/jpeg-wizard.glade
 
 mulawdir = $(componentdir)/mulaw
 mulaw_PYTHON = \
@@ -26,10 +23,11 @@ mulaw_DATA = \
 smokedir = $(componentdir)/smoke
 smoke_PYTHON = \
 	smoke/__init__.py \
-	smoke/smoke.py
+	smoke/smoke.py \
 	smoke/smoke_wizard.py
 smoke_DATA = \
-	smoke/smoke.xml
+	smoke/smoke.xml \
+	smoke/smoke-wizard.glade
 
 speexdir = $(componentdir)/speex
 speex_PYTHON = \
@@ -45,7 +43,8 @@ theora_PYTHON = \
 	theora/theora.py
 	theora/theora_wizard.py
 theora_DATA = \
-	theora/theora.xml
+	theora/theora.xml \
+	theora/theora-wizard.glade
 
 vorbisdir = $(componentdir)/vorbis
 vorbis_PYTHON = \
@@ -53,9 +52,10 @@ vorbis_PYTHON = \
 	vorbis/vorbis.py \
 	vorbis/vorbisutils.py \
 	vorbis/vorbis010.py
-	vorbis/vorbis_wizard.py \
+	vorbis/vorbis_wizard.py
 vorbis_DATA = \
-	vorbis/vorbis.xml
+	vorbis/vorbis.xml \
+	vorbis/vorbis-wizard.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo */*.pyc */*.pyo

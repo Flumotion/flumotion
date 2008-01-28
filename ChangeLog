@@ -1,5 +1,74 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	Make encoding and muxers pluggable in the wizard, fixes #822.
+
+	* flumotion/ui/wizard.py:
+	Make it possible for defered steps to return None, which means go to 
+	the next step in the section. This is used by the mulaw step.
+
+	* flumotion/common/componentui.py:
+	* flumotion/common/registry.py:
+	Make sure that we can send the whole wizard entry class, including the
+	formats over the fire. This is necessary to be able to do proper type
+	finding. Add methods to the WizardEntryState to simplify this.
+
+	* flumotion/component/encoders/base.xml:
+	* flumotion/component/encoders/encodingprofile.py:
+	* flumotion/component/encoders/encodingwizardplugin.py:
+	Remove encodingprofile and encoding wizard plugin. They are unused,
+	since we're still using the normal wizard steps. Remove the 
+	encoding-wizard bundle.
+
+	* data/glade/Makefile.am:
+	* flumotion/component/encoders/Makefile.am:
+	* data/glade/wizard_audio_encoder.glade:
+	* flumotion/component/encoders/jpeg/jpeg-wizard.glade:
+	* flumotion/component/encoders/jpeg/jpeg.xml:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/smoke/smoke.xml:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora-wizard.glade:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis-wizard.glade:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/muxers/muxers.xml:
+
+	Move over all glade files from the data directory, and put them
+	into the encoder bundles.
+	Remove encoding profiles. Use kiwi proxy for all properties.
+	Create subclasses for the models.
+	Add <wizard> tags for missing components.
+
+	* data/glade/wizard_encoding.glade:
+	Rename format to muxer.
+	
+	* flumotion/wizard/productionsteps.py:
+	Reset the component type in the producers when disabling audio or video 
+	
+	* flumotion/wizard/enums.py:
+	Remove EncodingFormat, EncodingVideo, EncodingAudio
+
+	* flumotion/wizard/models.py:
+	Make component_type a class variable, so we can define it in a subclass
+	Replace _ with - here in getProperties() instead of in save.py
+
+	* flumotion/wizard/save.py:
+	Adopt getAudioEncoder/getVideoEncoder to use the models.
+
+	* flumotion/wizard/conversionsteps.py:
+	Rewrite to be pluggable, add new method for fetching audio and video
+	encoders. Move steps into plugins.
+	
+	* po/POTFILES.in:
+	Update for renamed and new files
+
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
 	* autogen.sh: Run libtoolize first, and aclocal after
 	intltoolisize, run autopoint --force, mimics the behavior
 	of gnome-autogen.sh and avoids autopoints complaints.

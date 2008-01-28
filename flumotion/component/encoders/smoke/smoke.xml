@@ -13,6 +13,10 @@
         <entry type="wizard" location="smoke_wizard.py"
                function="SmokeWizardPlugin" />
       </entries>
+      <wizard _description="Smoke" type="video-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="smoke"/>
+      </wizard>
       <properties>
         <property name="qmin" type="int"
                   description="Minimum JPEG quality (0-100 %, default 10 %)" />
@@ -58,11 +62,24 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="smoke-base" />
-            <dependency name="encoding-wizard" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/encoders/smoke">
+                <filename location="smoke_wizard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="smoke-wizard">
+        <dependencies>
+            <dependency name="smoke-base" />
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/smoke">
+                <filename location="smoke-wizard.glade" />
                 <filename location="smoke_wizard.py" />
             </directory>
         </directories>

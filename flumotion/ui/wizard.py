@@ -269,6 +269,15 @@ class SectionWizard(GladeWindow, log.Loggable):
         except KeyboardInterrupt:
             pass
 
+    def _get_next_step(self):
+        if self._current_section + 1 == len(self.sections):
+            self._finish(completed=True)
+            return
+
+        self._current_section += 1
+        next_step_class = self.sections[self._current_section]
+        return next_step_class(self)
+
     def prepare_next_step(self, step):
         next = step.get_next()
         if isinstance(next, WizardStep):
@@ -276,16 +285,17 @@ class SectionWizard(GladeWindow, log.Loggable):
         elif isinstance(next, Deferred):
             d = next
             def get_step(step):
+                if step is None:
+                    step = self._get_next_step()
+                if step is None:
+                    return
                 self._show_next_step(step)
             d.addCallback(get_step)
             return
         elif next is None:
-            if self._current_section + 1 == len(self.sections):
-                self._finish(completed=True)
+            next_step = self._get_next_step()
+            if next_step is None:
                 return
-            self._current_section += 1
-            next_step_class = self.sections[self._current_section]
-            next_step = next_step_class(self)
         else:
             raise AssertionError(next)
 

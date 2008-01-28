@@ -56,7 +56,7 @@
       </child>
 
       <child>
-	<widget class="GtkSpinButton" id="spinbutton_bitrate">
+	<widget class="GtkSpinButton" id="bitrate">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="climb_rate">1</property>
@@ -78,7 +78,7 @@
       </child>
 
       <child>
-	<widget class="GtkSpinButton" id="spinbutton_quality">
+	<widget class="GtkSpinButton" id="quality">
 	  <property name="visible">True</property>
 	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>
@@ -101,7 +101,7 @@
       </child>
 
       <child>
-	<widget class="GtkRadioButton" id="radiobutton_bitrate">
+	<widget class="GtkRadioButton" id="has_bitrate">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">Bit _rate:</property>
@@ -124,7 +124,7 @@
       </child>
 
       <child>
-	<widget class="GtkRadioButton" id="radiobutton_quality">
+	<widget class="GtkRadioButton" id="has_quality">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">_Quality:</property>
@@ -134,7 +134,7 @@
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <property name="group">radiobutton_bitrate</property>
+	  <property name="group">has_bitrate</property>
 	  <signal name="toggled" handler="on_radiobutton_toggled" last_modification_time="Thu, 30 Sep 2004 09:39:24 GMT"/>
 	</widget>
 	<packing>
@@ -165,7 +165,7 @@
 	      <property name="column_spacing">6</property>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton_keyframe_maxdistance">
+		<widget class="GtkSpinButton" id="keyframe_maxdistance">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
@@ -215,7 +215,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton_noise_sensitivity">
+		<widget class="GtkSpinButton" id="noise_sensitivity">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
@@ -265,7 +265,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton_sharpness">
+		<widget class="GtkSpinButton" id="sharpness">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
@@ -299,7 +299,7 @@
 		  <property name="yalign">0.5</property>
 		  <property name="xpad">0</property>
 		  <property name="ypad">0</property>
-		  <property name="mnemonic_widget">spinbutton_keyframe_maxdistance</property>
+		  <property name="mnemonic_widget">keyframe_maxdistance</property>
 		  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>
@@ -329,7 +329,7 @@
 		  <property name="yalign">0.5</property>
 		  <property name="xpad">0</property>
 		  <property name="ypad">0</property>
-		  <property name="mnemonic_widget">spinbutton_noise_sensitivity</property>
+		  <property name="mnemonic_widget">noise_sensitivity</property>
 		  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>
@@ -359,7 +359,7 @@
 		  <property name="yalign">0.5</property>
 		  <property name="xpad">0</property>
 		  <property name="ypad">0</property>
-		  <property name="mnemonic_widget">spinbutton_sharpness</property>
+		  <property name="mnemonic_widget">sharpness</property>
 		  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>

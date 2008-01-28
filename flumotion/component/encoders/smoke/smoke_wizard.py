@@ -20,42 +20,42 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
-from flumotion.component.encoders.encodingprofile import Profile, Int
-from flumotion.component.encoders.encodingwizardplugin import \
-     EncodingWizardPlugin
+from flumotion.wizard.basesteps import VideoEncoderStep
+from flumotion.wizard.models import VideoEncoder
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class SmokeWizardPlugin(EncodingWizardPlugin):
-    def get_profile_presets(self):
-        return [(_("Default"), None, True)]
+class SmokeVideoEncoder(VideoEncoder):
+    component_type = 'smoke-encoder'
 
-    def create_profile(self, name, unused, isdefault):
-        properties = dict(qmin=10,
-                          qmax=85,
-                          threshold=300,
-                          keyframe=20)
 
-        return Profile(name, isdefault, properties)
+class SmokeStep(VideoEncoderStep):
+    name = _('Smoke encoder')
+    sidebar_name = _('Smoke')
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'smoke-wizard.glade')
+    section = _('Conversion')
+    component_type = 'smoke'
 
-    def get_custom_properties(self):
-        return [
-            Int("qmin", _("Minimum JPEG quality"),
-                10, 0, 100),
-            Int("qmax",_("Maximum JPEG quality"),
-                85, 0, 100),
-            Int("threshold", _("Motion estimation"),
-                300, 0, 1000000000),
-            Int("keyframe",_("Keyframe interval"),
-                20, 0, 100000),
-        ]
+    # WizardStep
 
-    def worker_changed(self, worker):
+    def worker_changed(self):
+        self.model.worker = self.worker
         self.wizard.require_elements(self.worker, 'smokeenc')
 
-    def get_custom_property_columns(self):
-        return 1
+    def get_next(self):
+        return self.wizard.get_step('Encoding').get_audio_page()
+
+
+class SmokeWizardPlugin(object):
+    def __init__(self, wizard):
+        self.wizard = wizard
+        self.model = SmokeVideoEncoder()
+
+    def get_conversion_step(self):
+        return SmokeStep(self.wizard, self.model)
 

@@ -20,43 +20,82 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
-from flumotion.component.encoders.encodingprofile import Int
-from flumotion.component.encoders.encodingwizardplugin import \
-     EncodingWizardPlugin
+from flumotion.wizard.basesteps import AudioEncoderStep
+from flumotion.wizard.models import AudioEncoder
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
-class Bitrate(Int):
-    def save(self, value):
-        # kbps -> bps
-        return value * 1000
+
+class VorbisAudioEncoder(AudioEncoder):
+    component_type = 'vorbis-encoder'
+    def __init__(self):
+        super(VorbisAudioEncoder, self).__init__()
+        self.has_quality = True
+        self.has_bitrate = False
+
+        self.properties.bitrate = 64
+        self.properties.quality = 0.5
+
+    def getProperties(self):
+        properties = super(VorbisAudioEncoder, self).getProperties()
+        if self.has_bitrate:
+            del properties['quality']
+            properties['bitrate'] *= 1000
+        elif self.has_quality:
+            del properties['bitrate']
+        else:
+            raise AssertionError
+
+        return properties
 
 
-class VorbisWizardPlugin(EncodingWizardPlugin):
-    def get_profile_presets(self):
-        return [(_("24 kbps (worst)"), 32, False),
-                (_("32 kbps"), 32, False),
-                (_("48 kbps"), 48, False),
-                (_("64 kbps (default)"), 64, True),
-                (_("96 kbps"), 96, False),
-                (_("128 kbps"), 128, False),
-                (_("144 kbps"), 144, False),
-                (_("192 kbps (best)"), 192, False),
-                ]
+class VorbisStep(AudioEncoderStep):
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'vorbis-wizard.glade')
+    name = _('Vorbis encoder')
+    sidebar_name = _('Vorbis')
+    component_type = 'vorbis'
+    icon = 'xiphfish.png'
 
-    def get_custom_properties(self):
-        return [
-            Bitrate("bitrate", _("Bitrate"),
-                64, 6, 250),
-            ]
+    # WizardStep
 
-    def worker_changed(self, worker):
-        self.wizard.debug('running Vorbis checks')
+    def setup(self):
+        self.has_bitrate.data_type = bool
+        self.has_quality.data_type = bool
+        self.bitrate.data_type = int
+        self.quality.data_type = float
+
+        self.add_proxy(self.model,
+                       ['has_quality', 'has_bitrate'])
+        self.add_proxy(self.model.properties,
+                       ['bitrate', 'quality'])
+
+    def worker_changed(self):
+        self.model.worker = self.worker
+
         def hasVorbis(unused):
             self.wizard.run_in_worker(
-                worker, 'flumotion.worker.checks.encoder', 'checkVorbis')
+                self.worker, 'flumotion.worker.checks.encoder', 'checkVorbis')
 
-        d = self.wizard.require_elements(worker, 'vorbisenc')
+        self.wizard.debug('running Vorbis checks')
+        d = self.wizard.require_elements(self.worker, 'vorbisenc')
         d.addCallback(hasVorbis)
+
+    # Callbacks
+
+    def on_radiobutton_toggled(self, button):
+        # This is bound to both radiobutton_bitrate and radiobutton_quality
+        self.bitrate.set_sensitive(self.has_bitrate.get_active())
+        self.quality.set_sensitive(self.has_quality.get_active())
+
+
+class VorbisWizardPlugin(object):
+    def __init__(self, wizard):
+        self.wizard = wizard
+        self.model = VorbisAudioEncoder()
+
+    def get_conversion_step(self):
+        return VorbisStep(self.wizard, self.model)

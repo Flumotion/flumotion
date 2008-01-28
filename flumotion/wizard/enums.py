@@ -49,34 +49,6 @@ SoundcardSystem = enum.EnumClass(
     element_name=['alsasrc', 'osssrc'])
 
 #
-# Encoding format
-#
-
-EncodingFormat = enum.EnumClass(
-    'EncodingFormat',
-    ['Ogg', 'Multipart'],
-    [_('Ogg'), _('Multipart')],
-    component_type=('ogg-muxer',
-                    'multipart-muxer'))
-
-EncodingVideo = enum.EnumClass(
-    'EncodingVideo',
-    ['Theora', 'Smoke', 'JPEG'],
-    step=['Theora encoder', 'Smoke encoder',
-          'JPEG encoder'],
-    component_type=['theora-encoder',
-                    'smoke-encoder',
-                    'jpeg-encoder'])
-EncodingAudio = enum.EnumClass(
-    'EncodingAudio',
-    ['Vorbis', 'Speex', 'Mulaw'],
-    step=['Vorbis encoder', 'Speex encoder',
-          'Mulaw encoder'],
-    component_type=['vorbis-encoder',
-                    'speex-encoder',
-                    'mulaw-encoder'])
-
-#
 # Disk writer
 #
 

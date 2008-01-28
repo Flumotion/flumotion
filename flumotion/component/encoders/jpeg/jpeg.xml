@@ -19,6 +19,10 @@
         <property name="framerate" type="fraction"
                   description="Framerate to encode at" />
       </properties>
+      <wizard _description="JPEG" type="video-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="jpeg"/>
+      </wizard>
     </component>
  
   </components>
@@ -55,11 +59,11 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="jpeg-base" />
-            <dependency name="encoding-wizard" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/encoders/jpeg">
+                <filename location="jpeg-wizard.glade" />
                 <filename location="jpeg_wizard.py" />
             </directory>
         </directories>
