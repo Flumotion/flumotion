@@ -1,3 +1,8 @@
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
+	* common/common.mk (locale-uninstalled): We're already inside
+	the po dir
+
 2008-01-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard_models.py: We're back from the future

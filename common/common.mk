@@ -59,7 +59,7 @@ locale-uninstalled:
 	mkdir -p $(top_builddir)/locale; \
 	cd po; \
 	make; \
-	for file in $$(ls $(srcdir)/po/*.gmo); do \
+	for file in $$(ls $(srcdir)/*.gmo); do \
 	  lang=`echo $$file|cut -d/ -f3|cut -d. -f1`; \
 	  dir=../$(top_builddir)/locale/$$lang/LC_MESSAGES; \
 	  mkdir -p $$dir; \
