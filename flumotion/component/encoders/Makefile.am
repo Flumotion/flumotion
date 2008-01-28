@@ -7,7 +7,7 @@ component_PYTHON = \
 jpegdir = $(componentdir)/jpeg
 jpeg_PYTHON = \
 	jpeg/__init__.py \
-	jpeg/jpeg.py
+	jpeg/jpeg.py \
 	jpeg/jpeg_wizard.py
 jpeg_DATA = \
 	jpeg/jpeg.xml \
@@ -32,7 +32,7 @@ smoke_DATA = \
 speexdir = $(componentdir)/speex
 speex_PYTHON = \
 	speex/__init__.py \
-	speex/speex.py
+	speex/speex.py \
 	speex/speex_wizard.py
 speex_DATA = \
 	speex/speex.xml
@@ -40,7 +40,7 @@ speex_DATA = \
 theoradir = $(componentdir)/theora
 theora_PYTHON = \
 	theora/__init__.py \
-	theora/theora.py
+	theora/theora.py \
 	theora/theora_wizard.py
 theora_DATA = \
 	theora/theora.xml \
@@ -51,7 +51,7 @@ vorbis_PYTHON = \
 	vorbis/__init__.py \
 	vorbis/vorbis.py \
 	vorbis/vorbisutils.py \
-	vorbis/vorbis010.py
+	vorbis/vorbis010.py \
 	vorbis/vorbis_wizard.py
 vorbis_DATA = \
 	vorbis/vorbis.xml \

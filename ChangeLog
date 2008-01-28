@@ -1,3 +1,8 @@
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/encoders/Makefile.am:
+	Add a few missing \
+
 2008-01-28  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/test_http.py
