@@ -1,5 +1,11 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* doc/Makefile.am:
+	Add a --disable-docs option, fixes #838
+
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
 	* common/common.mk (locale-uninstalled): Rewrite and simplify 
 	most of the rule
 

@@ -109,9 +109,23 @@ fi
 
 AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
 
-dnl check for epydoc
-AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
+dnl check for documentation
+AC_ARG_ENABLE(docs,
+              [AC_HELP_STRING([--enable-docs],
+                              [create flumotion documentation [default=yes]])],,
+              [enable_docs=yes])
+
+if test "x$enable_docs" = "xyes"; then
+    AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
+    if test "x$EPYDOC" = "xno"; then
+      enable_docs=no
+    fi
+else
+    EPYDOC=no
+fi
+
 AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
+AM_CONDITIONAL(BUILD_DOCS, test "x$enable_docs" = "xyes")
 
 dnl check for pychecker
 AC_CHECK_PROG(PYCHECKER, pychecker, yes, no)
@@ -250,6 +264,11 @@ tests/integration/Makefile
 flumotion.spec
 po/Makefile.in
 )
+
+echo
+echo "Building documentation: $enable_docs"
+echo
+echo "Now type \"make\" to build flumotion"
 
 dnl echo
 dnl echo "configure: *** Flumotion has been configured with support for the"
