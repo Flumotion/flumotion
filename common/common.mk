@@ -60,7 +60,7 @@ locale-uninstalled:
 	cd po; \
 	make; \
 	for file in $$(ls $(srcdir)/*.gmo); do \
-	  lang=`echo $$file|cut -d/ -f3|cut -d. -f1`; \
+	  lang=`basename $$file .gmo`; \
 	  dir=../$(top_builddir)/locale/$$lang/LC_MESSAGES; \
 	  mkdir -p $$dir; \
 	  if test -r $$lang.gmo; then \

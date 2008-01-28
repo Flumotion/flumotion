@@ -2,6 +2,7 @@
 
 	* common/common.mk (locale-uninstalled): We're already inside
 	the po dir
+	(locale-uninstalled): Use basename instead of cut.
 
 2008-01-25  Johan Dahlin  <johan@gnome.org>
 
