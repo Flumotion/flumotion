@@ -1,5 +1,9 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py (ProductionStep.got_entries): 
+	Put the videotest-producer and audiotest-producer as the first
+	entries. Fixes #840
+
 	* configure.ac:
 	* doc/Makefile.am:
 	Add a --disable-docs option, fixes #838

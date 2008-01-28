@@ -123,17 +123,24 @@ class ProductionStep(WorkerWizardStep):
         self.add_proxy(self._audio_producer, ['audio'])
         self.add_proxy(self._video_producer, ['video'])
 
-        def got_entries(entries, combo):
+        def got_entries(entries, combo, default_type):
             data = []
+            default = None
             for entry in entries:
+                if entry.component_type == default_type:
+                    default = entry
+                    continue
                 data.append((N_(entry.description), entry.component_type))
+            assert default
+            data.insert(0, (N_(default.description), default.component_type))
             combo.prefill(data)
 
-        for ctype, combo in [('video-producer', self.video),
-                             ('audio-producer', self.audio)]:
+        for ctype, combo, default_type in [
+            ('video-producer', self.video, 'videotest-producer'),
+            ('audio-producer', self.audio, 'audiotest-producer')]:
             d = self.wizard._admin.getWizardEntries(
                 wizard_types=[ctype])
-            d.addCallback(got_entries, combo)
+            d.addCallback(got_entries, combo, default_type)
 
     def _load_plugin(self, component_type, type):
         def got_factory(factory):
