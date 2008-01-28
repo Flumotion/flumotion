@@ -1,5 +1,10 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	* common/common.mk (locale-uninstalled): Rewrite and simplify 
+	most of the rule
+
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
 	* common/common.mk (locale-uninstalled): We're already inside
 	the po dir
 	(locale-uninstalled): Use basename instead of cut.

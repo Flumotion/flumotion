@@ -55,24 +55,16 @@ locale-uninstalled-1:
 # 	fi
 
 locale-uninstalled:
-	if test -d po; then \
-	mkdir -p $(top_builddir)/locale; \
-	cd po; \
-	make; \
-	for file in $$(ls $(srcdir)/*.gmo); do \
+	podir=$(top_builddir)/po; \
+	localedir=$(top_builddir)/locale; \
+        make -C $$podir; \
+	for file in $$(ls $$podir/*.gmo); do \
 	  lang=`basename $$file .gmo`; \
-	  dir=../$(top_builddir)/locale/$$lang/LC_MESSAGES; \
+	  dir=$$localedir/$$lang/LC_MESSAGES; \
 	  mkdir -p $$dir; \
-	  if test -r $$lang.gmo; then \
-	    install $$lang.gmo $$dir/$(GETTEXT_PACKAGE).mo; \
-	    echo "installing $$lang.gmo as $$dir/$(GETTEXT_PACKAGE).mo"; \
-	  else \
-	    install $(srcdir)/$$lang.gmo $$dir/$(GETTEXT_PACKAGE).mo; \
-	    echo "installing $(srcdir)/$$lang.gmo as" \
-		 "$$dir/$(GETTEXT_PACKAGE).mo"; \
-	  fi; \
-	done; \
-	fi
+          echo "installing $$podir/$$lang.gmo as $$dir/$(GETTEXT_PACKAGE).mo"; \
+	  install $$podir/$$lang.gmo $$dir/$(GETTEXT_PACKAGE).mo; \
+	done;
 
 locale-uninstalled-clean:
 	@-rm -rf _trial_temp
