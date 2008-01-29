@@ -3,7 +3,7 @@ set -x
 
 libtoolize --force || exit 1
 autopoint --force || exit 1
-intltoolize --copy --force --automake || exit 1
+cp -f common/intltool-Makefile.in.in po/Makefile.in.in
 aclocal -I m4 -I common || exit 1
 # autoheader || exit 1
 autoconf || exit 1

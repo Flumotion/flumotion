@@ -1,5 +1,16 @@
 2008-01-28  Johan Dahlin  <johan@gnome.org>
 
+	* autogen.sh:
+	* common/intltool-Makefile.in.in:
+	* intltool-extract.in:
+	* intltool-merge.in:
+	* intltool-update.in:
+
+	Include intltool 0.37.0 files instead of depending on
+	the system version.
+
+2008-01-28  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/encoders/Makefile.am:
 	Add a few missing \
 
