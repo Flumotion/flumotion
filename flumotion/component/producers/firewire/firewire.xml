@@ -34,6 +34,8 @@
                   description="Whether to scale to a 1:1 pixel aspect ratio" />
         <property name="framerate" type="fraction"
                   description="The framerate (in fps) "/>
+        <property name="guid" type="string"
+                  description="The GUID of the device (a hexadecimal like 0xhhhhhhhhhhhhhhhh)" />
       </properties>
     </component>
   </components>

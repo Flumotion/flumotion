@@ -51,6 +51,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, props):
         width = props.get('width', 240)
         height = props.get('height', int(576 * width/720.)) # assuming PAL :-/
+        guid = props.get('guid', None)
 
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
@@ -97,7 +98,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
-        template = ('dv1394src'
+        template = ('dv1394src %(guid)s'
                     '    ! tee name=t'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
@@ -116,6 +117,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     % dict(df=drop_factor, ih=interlaced_height,
                            sq=square_pipe, pp=pad_pipe,
                            sw=scaled_width, h=height,
+                           guid=(guid and ('guid=%s' % guid) or ''),
                            fr=('%d/%d' % (framerate[0], framerate[1]))))
 
         return template
