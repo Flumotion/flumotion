@@ -97,5 +97,5 @@ class VorbisWizardPlugin(object):
         self.wizard = wizard
         self.model = VorbisAudioEncoder()
 
-    def get_conversion_step(self):
+    def getConversionStep(self):
         return VorbisStep(self.wizard, self.model)

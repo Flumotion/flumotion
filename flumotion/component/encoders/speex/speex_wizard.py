@@ -69,5 +69,5 @@ class SpeexWizardPlugin(object):
         self.wizard = wizard
         self.model = SpeexAudioEncoder()
 
-    def get_conversion_step(self):
+    def getConversionStep(self):
         return SpeexStep(self.wizard, self.model)

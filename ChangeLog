@@ -1,5 +1,16 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/wizard/conversionsteps.py:
+
+	Rename get_conversion_step to getConversionStep
+
+2008-01-30  Johan Dahlin  <johan@gnome.org>
+
 	* configure.ac: Pointless change to trigger a new autogen.
 	* common/intltool-Makefile.in.in:
 	(check): Remove maintainer hack and checks

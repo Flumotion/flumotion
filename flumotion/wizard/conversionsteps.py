@@ -167,7 +167,7 @@ class ConversionStep(WorkerWizardStep):
             if plugin is None:
                 self._create_dummy_model(entry)
                 return None
-            step = plugin.get_conversion_step()
+            step = plugin.getConversionStep()
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
                 step.worker_changed()

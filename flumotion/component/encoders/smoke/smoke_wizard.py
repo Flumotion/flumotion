@@ -56,6 +56,6 @@ class SmokeWizardPlugin(object):
         self.wizard = wizard
         self.model = SmokeVideoEncoder()
 
-    def get_conversion_step(self):
+    def getConversionStep(self):
         return SmokeStep(self.wizard, self.model)
 

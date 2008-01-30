@@ -110,5 +110,5 @@ class TheoraWizardPlugin(object):
         self.wizard = wizard
         self.model = TheoraVideoEncoder()
 
-    def get_conversion_step(self):
+    def getConversionStep(self):
         return TheoraStep(self.wizard, self.model)

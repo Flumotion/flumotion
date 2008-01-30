@@ -81,5 +81,5 @@ class JPEGWizardPlugin(object):
         self.wizard = wizard
         self.model = JPEGVideoEncoder()
 
-    def get_conversion_step(self):
+    def getConversionStep(self):
         return JPEGStep(self.wizard, self.model)
