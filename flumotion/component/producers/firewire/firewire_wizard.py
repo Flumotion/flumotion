@@ -28,6 +28,7 @@ from flumotion.common.messages import N_, gettexter
 from flumotion.wizard.basesteps import AudioSourceStep, VideoSourceStep
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
+__pychecker__ = 'no-returnvalues'
 __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter('flumotion')

@@ -1,5 +1,8 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	(__pychecker__): Do not check return values
+
 	* flumotion/component/producers/audiotest/audiotest_wizard.py:
 	* flumotion/component/producers/bttv/bttv_wizard.py:
 	* flumotion/component/producers/firewire/firewire_wizard.py:
