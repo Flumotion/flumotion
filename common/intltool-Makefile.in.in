@@ -141,6 +141,8 @@ uninstall:
 	  rm -f $(DESTDIR)$(itlocaledir)/$$lang/LC_MESSAGES/$(GETTEXT_PACKAGE).mo.m; \
 	done
 
+check: all
+
 check-DISABLED: all $(GETTEXT_PACKAGE).pot
 	rm -fr missing notexist
 	srcdir=$(srcdir) $(INTLTOOL_UPDATE) -m

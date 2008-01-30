@@ -1,5 +1,11 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac: Pointless change to trigger a new autogen.
+	* common/intltool-Makefile.in.in:
+	(check): Add back check which does nothing
+
+2008-01-30  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	(__pychecker__): Do not check return values
 
