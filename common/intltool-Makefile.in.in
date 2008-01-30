@@ -142,7 +142,7 @@ uninstall:
 	done
 
 check: all $(GETTEXT_PACKAGE).pot
-	rm -f missing notexist
+	rm -fr missing notexist $(top_builddir)/rpm
 	srcdir=$(srcdir) $(INTLTOOL_UPDATE) -m
 	if [ -r missing -o -r notexist ]; then \
 	  exit 1; \

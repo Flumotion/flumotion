@@ -2,6 +2,8 @@
 
 	* common/intltool-Makefile.in.in (itlocaledir): 
 	Don't depend on DATADIRNAME, just hardcode to $(prefix)/share
+	(check): Clean up rpm directory before checking for files missing
+	in POTFILES.in
 
 2008-01-29  Arek Korbik  <arkadini@gmail.com>
 
