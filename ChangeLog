@@ -1,5 +1,9 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac: Pointless change to trigger a new autogen.
+	* common/intltool-Makefile.in.in:
+	(check): Remove maintainer hack and checks
+
 	* common/intltool-Makefile.in.in (itlocaledir): 
 	Don't depend on DATADIRNAME, just hardcode to $(prefix)/share
 	(check): Clean up rpm directory before checking for files missing
