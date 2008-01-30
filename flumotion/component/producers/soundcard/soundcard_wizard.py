@@ -22,14 +22,14 @@
 import gettext
 import os
 
-from flumotion.wizard.enums import SoundcardSystem
-from flumotion.common.messages import N_
-from flumotion.common import messages
+from flumotion.common.messages import N_, gettexter, Info
 from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.enums import SoundcardSystem
+from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = messages.gettexter('flumotion')
+T_ = gettexter('flumotion')
 
 OSS_DEVICES = ["/dev/dsp",
                "/dev/dsp1",
@@ -48,6 +48,20 @@ SAMPLE_RATES = [48000,
                 16000,
                 11025,
                 8000]
+
+class SoundcardProducer(AudioProducer):
+    component_type = 'soundcard-producer'
+
+    def __init__(self):
+        super(SoundcardProducer, self).__init__()
+
+        self.properties.input_track = ''
+        self.properties.channels = 2
+        self.properties.rate = 8000
+        self.properties.depth = 8
+        self.properties.device = ''
+        self.properties.source_element = 'alsasrc'
+
 
 class SoundcardStep(AudioSourceStep):
     name = _('Soundcard')
@@ -80,13 +94,6 @@ class SoundcardStep(AudioSourceStep):
         self.device.prefill([''])
         self.source_element.prefill(
             [(enum.nick, enum.element_name) for enum in SoundcardSystem])
-
-        self.model.properties.input_track = ''
-        self.model.properties.channels = 2
-        self.model.properties.rate = 8000
-        self.model.properties.depth = 8
-        self.model.properties.device = ''
-        self.model.properties.source_element = 'alsasrc'
 
         self.add_proxy(self.model.properties,
                        ['input_track',
@@ -139,7 +146,7 @@ class SoundcardStep(AudioSourceStep):
         assert device
         assert element_name
         assert channels
-        msg = messages.Info(T_(
+        msg = Info(T_(
             N_("Probing soundcard, this can take a while...")),
                             id='soundcard-check')
         self.wizard.add_msg(msg)
@@ -188,7 +195,8 @@ class SoundcardStep(AudioSourceStep):
 class SoundcardWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
+        self.model = SoundcardProducer()
 
-    def get_production_step(self, type):
-        return SoundcardStep
+    def getProductionStep(self, type):
+        return SoundcardStep(self.wizard, self.model)
 

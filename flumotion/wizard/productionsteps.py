@@ -22,11 +22,8 @@
 import gettext
 
 import gtk
-from twisted.internet.defer import Deferred
 
-from flumotion.common import messages
 from flumotion.common.errors import NoBundleError
-from flumotion.wizard.models import AudioProducer, VideoProducer
 from flumotion.wizard.basesteps import WorkerWizardStep
 
 # Register components
@@ -36,7 +33,6 @@ __version__ = "$Rev$"
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
-T_ = messages.gettexter('flumotion')
 N_ = _ = gettext.gettext
 
 
@@ -76,7 +72,13 @@ class ProductionStep(WorkerWizardStep):
         @returns: video step
         @rtype: a deferred returning a L{VideoSourceStep} instance
         """
-        return self._load_step(self.video, self._video_producer, 'video')
+        def step_loaded(step):
+            if step is not None:
+                self._video_producer = step.model
+            return step
+        d = self._load_step(self.video, 'video')
+        d.addCallback(step_loaded)
+        return d
 
     def get_audio_step(self):
         """Return the audio step to be shown, given the currently
@@ -84,7 +86,13 @@ class ProductionStep(WorkerWizardStep):
         @returns: audio step
         @rtype: a deferred returning an L{AudioSourceStep} instance
         """
-        return self._load_step(self.audio, self._audio_producer, 'audio')
+        def step_loaded(step):
+            if step is not None:
+                self._audio_producer = step.model
+            return step
+        d = self._load_step(self.audio, 'audio')
+        d.addCallback(step_loaded)
+        return d
 
     # WizardStep
 
@@ -102,11 +110,6 @@ class ProductionStep(WorkerWizardStep):
     # Private API
 
     def _setup(self):
-        self._audio_producer = AudioProducer()
-        self.wizard.flow.addComponent(self._audio_producer)
-        self._video_producer = VideoProducer()
-        self.wizard.flow.addComponent(self._video_producer)
-
         self.audio.data_type = object
         self.video.data_type = object
         # We want to save the audio/video attributes as
@@ -119,9 +122,6 @@ class ProductionStep(WorkerWizardStep):
                      _('If you want to stream video'))
         tips.set_tip(self.has_audio,
                      _('If you want to stream audio'))
-
-        self.add_proxy(self._audio_producer, ['audio'])
-        self.add_proxy(self._video_producer, ['video'])
 
         def got_entries(entries, combo, default_type):
             data = []
@@ -155,10 +155,9 @@ class ProductionStep(WorkerWizardStep):
 
         return d
 
-    def _load_step(self, combo, producer, type):
+    def _load_step(self, combo, type):
         def plugin_loaded(plugin):
-            step_class = plugin.get_production_step(type)
-            step = step_class(self.wizard, producer)
+            step = plugin.getProductionStep(type)
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
                 step.worker_changed()

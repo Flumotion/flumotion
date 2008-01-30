@@ -23,9 +23,20 @@ import gettext
 import os
 
 from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+
+class TestVideoProducer(VideoProducer):
+    component_type = 'videotest-producer'
+
+    def __init__(self):
+        super(TestVideoProducer, self).__init__()
+
+        self.properties.pattern = 0
+        self.properties.format = 'video/x-raw-yuv'
 
 
 class TestVideoSourceStep(VideoSourceStep):
@@ -50,9 +61,6 @@ class TestVideoSourceStep(VideoSourceStep):
             (_('YUV'), 'video/x-raw-yuv'),
             (_('RGB'), 'video/x-raw-rgb')])
 
-        self.model.properties.pattern = 0
-        self.model.properties.format = 'video/x-raw-yuv'
-
         self.add_proxy(self.model.properties,
                        ['pattern', 'width', 'height',
                         'framerate', 'format'])
@@ -67,7 +75,8 @@ class TestVideoSourceStep(VideoSourceStep):
 class VideoTestWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
+        self.model = TestVideoProducer()
 
-    def get_production_step(self, type):
-        return TestVideoSourceStep
+    def getProductionStep(self, type):
+        return TestVideoSourceStep(self.wizard, self.model)
 

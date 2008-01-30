@@ -26,10 +26,20 @@ from flumotion.common import errors
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter('flumotion')
+
+
+class WebcamProducer(VideoProducer):
+    component_type = 'webcam-producer'
+
+    def __init__(self):
+        super(WebcamProducer, self).__init__()
+
+        self.properties.device = '/dev/video0'
 
 
 class WebcamStep(VideoSourceStep):
@@ -56,8 +66,6 @@ class WebcamStep(VideoSourceStep):
                              '/dev/video1',
                              '/dev/video2',
                              '/dev/video3'])
-
-        self.model.properties.device = '/dev/video0'
 
         self.add_proxy(self.model.properties,['device'])
 
@@ -184,7 +192,8 @@ class WebcamStep(VideoSourceStep):
 class WebcamWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
+        self.model = WebcamProducer()
 
-    def get_production_step(self, type):
-        return WebcamStep
+    def getProductionStep(self, type):
+        return WebcamStep(self.wizard, self.model)
 

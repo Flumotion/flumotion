@@ -23,9 +23,18 @@ import gettext
 import os
 
 from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+class TestAudioProducer(AudioProducer):
+    component_type = 'audiotest-producer'
+
+    def __init__(self):
+        super(TestAudioProducer, self).__init__()
+
+        self.properties.rate = '44100'
 
 
 class TestAudioSourceStep(AudioSourceStep):
@@ -45,8 +54,6 @@ class TestAudioSourceStep(AudioSourceStep):
                            '32000',
                            '44100'])
 
-        self.model.properties.rate = '44100'
-
         self.add_proxy(self.model.properties,
                        ['frequency', 'volume', 'rate'])
 
@@ -63,7 +70,7 @@ class TestAudioSourceStep(AudioSourceStep):
 class AudioTestWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
+        self.model = TestAudioProducer()
 
-    def get_production_step(self, type):
-        return TestAudioSourceStep
-
+    def getProductionStep(self, type):
+        return TestAudioSourceStep(self.wizard, self.model)

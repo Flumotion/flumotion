@@ -34,10 +34,21 @@ import os
 from flumotion.common import errors
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter('flumotion')
+
+
+class TVCardProducer(VideoProducer):
+    component_type = 'tvcard-producer'
+
+    def __init__(self):
+        super(TVCardProducer, self).__init__()
+
+        self.properties.device = '/dev/video0'
+
 
 class TVCardStep(VideoSourceStep):
     name = _('TV Card')
@@ -64,8 +75,6 @@ class TVCardStep(VideoSourceStep):
                              '/dev/video1',
                              '/dev/video2',
                              '/dev/video3'])
-
-        self.model.properties.device = '/dev/video0'
 
         self.add_proxy(self.model.properties,
                        ['device', 'height', 'width',
@@ -137,7 +146,8 @@ class TVCardStep(VideoSourceStep):
 class BTTVWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
+        self.model = TVCardProducer()
 
-    def get_production_step(self, type):
-        return TVCardStep
+    def getProductionStep(self, type):
+        return TVCardStep(self.wizard, self.model)
 

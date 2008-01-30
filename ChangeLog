@@ -1,5 +1,19 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/wizard/productionsteps.py:
+
+	Rename get_production_step to getProductionStep.
+	Make the api similar to the conversion api by creating the models
+	in the steps themselves instead of just point to a class.
+
+2008-01-30  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
 	* flumotion/component/encoders/smoke/smoke_wizard.py:
 	* flumotion/component/encoders/speex/speex_wizard.py:
