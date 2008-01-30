@@ -1,0 +1,136 @@
+This documents explains how to create a pluggable wizard plugin
+
+
+Production plugin
+-----------------
+Creating a production step consists of 3 steps.
+
+* Marking the plugin as a production plugin
+
+To mark a plugin, you need to add a <wizard> tag as a child the <component>
+in the registry file of the plugin.
+
+Attributes:
+type: the kind of plugin,"audio-producer" or "video-producer".
+_description: the description of the plugin. This will be shown in the
+              user interface and is transltable
+feeder: name of feeder provides this producer stream.
+
+Example:
+
+  <wizard type="audio-producer" _description="Test audio source" 
+          feeder="default" />
+
+* Adding the wizard step
+
+A new <entry> tag needs to be added to the child of <entries>.
+The type attribute must contain "wizard".
+
+Example:
+
+  <entry type="wizard" location="audiotest_wizard.py"
+         function="AudioTestWizardPlugin" />
+
+* Writing the Step
+
+Create a new file called XXX_wizard.py, for example audiotest_wizard.py.
+
+You need to define the following classes:
+ * plugin: the entry point
+ * step: part of the wizard which can configure the component
+ * model: An AudioProducer (or VideoProducer) subclass
+
+The plugin is the entry point, which takes a wizard instance.
+You will also create the model here, which you pass in to the step
+The getProductionStep method takes one argument, which is the type of the
+production component.
+
+class AudioTestWizardPlugin(object):
+    def __init__(self, wizard):
+       self.wizard = wizard
+       self.model = TestAudioProducer()
+
+    def getProductionStep(self, type):
+       return TestAudioSourceStep(self.wizard, self.model)
+
+The model part is pretty easy, it needs to subclass AudioProducer and
+define the component_type class attribute:
+
+class TestAudioProducer(AudioProducer)
+    component_type = 'audiotest-producer'
+
+The step is slightly more complicated.
+You need inherit from AudioSourceStep or VideoSourceStep.
+glade_file needs to point to an absolute filename.
+The icon is optional.
+
+class TestAudioSourceStep(AudioSourceStep):
+    name = _('Test Audio Source')
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'audiotest-wizard.glade')
+
+    # WizardStep
+
+    def setup(self):
+    	...
+
+        self.add_proxy(self.model.properties, [...])
+
+Additionally a worker_changed method is needed which updates the worker
+attribute on the model.
+Optionally you can check for the presence of an element here.
+
+    def worker_changed(self):
+        self.model.worker = self.worker
+        self.wizard.require_elements(self.worker, 'audiotestsrc')
+
+
+Conversion plugin
+-----------------
+TODO
+
+
+Consumption plugin
+------------------
+TODO
+
+
+HTTP plugin
+-----------
+TODO
+
+
+Bundle
+------
+
+You will also need to distribute the plugin. Using a glade file is
+highly recommended for a production plugin.
+
+Example:
+
+  <bundle name="audiotest-wizard">
+      <dependencies>
+          <dependency name="audiotest-base" />
+          <dependency name="component" />
+      </dependencies>
+
+      <directories>
+          <directory name="flumotion/component/producers/audiotest">
+              <filename location="audiotest-wizard.glade" />
+              <filename location="audiotest_wizard.py" />
+          </directory>
+      </directories>
+  </bundle>
+
+If you add a plugin to outside of flumotion, do not forget that the
+bundle attribute "project" needs to be added.
+
+Distributing
+------------
+
+Added python sources files should go into component_PYTHON and
+Added glade files should go into to component_DATA.
+
+All files which contains translatable strings should also be added to
+po/POTFILES.in.
+

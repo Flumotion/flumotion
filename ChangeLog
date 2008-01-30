@@ -1,5 +1,8 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* doc/random/wizard-plugin: Add an initial draft of 
+	describing how to create a wizard-plugin.
+
 	* configure.ac: Pointless change to trigger a new autogen.
 	* common/intltool-Makefile.in.in:
 	(check): Add back check which does nothing
