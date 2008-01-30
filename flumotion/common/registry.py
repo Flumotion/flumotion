@@ -43,6 +43,13 @@ __version__ = "$Rev$"
 # decide that it's a good idea, or something. See #799.
 READ_CACHE = False
 
+_VALID_WIZARD_ENTRY_TYPES = [
+    'audio-producer',
+    'video-producer',
+    'muxer',
+    'audio-encoder',
+    'video-encoder',
+    ]
 
 def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
@@ -791,7 +798,7 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         return directories
-
+    
     def _parseBundleDirectoryFilename(self, node, name):
         attrs = self.parseAttributes(node, ('location',), ('relative',))
         location, relative = attrs
@@ -913,6 +920,20 @@ class RegistryParser(fxml.Parser):
             })
 
         component_type = node.parentNode.getAttribute('type')
+
+        if not type in _VALID_WIZARD_ENTRY_TYPES:
+            raise fxml.ParserError(
+                "<wizard>'s type attribute is %s must be one of %s" % (
+                component_type,
+                ', '.join(_VALID_WIZARD_ENTRY_TYPES)))
+        if type in ['muxer'] and not accepts:
+            raise fxml.ParserError(
+                ('<wizard type="%s"> requires at least one accepted '
+                 'media-type.') % (component_type,))
+        if type.endswith('-encoder') and not provides:
+            raise fxml.ParserError(
+                ('<wizard type="%s"> requires at least one provided '
+                 'media-type.') % (component_type,))
 
         return RegistryEntryWizard(component_type, type, description,
                                    feeder, eater, accepts, provides)

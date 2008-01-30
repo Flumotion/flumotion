@@ -1,5 +1,8 @@
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/registry.py (RegistryParser._parseWizard): 
+	Verify that the wizard entries are somewhat correct.
+
 	* doc/random/wizard-plugin: Add an initial draft of 
 	describing how to create a wizard-plugin.
 
