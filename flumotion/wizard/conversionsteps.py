@@ -102,16 +102,14 @@ class ConversionStep(WorkerWizardStep):
 
         production = self.wizard.get_step('Source')
         audio_producer = production.get_audio_producer()
-        # FIXME: this is a "do we have an audio stream" check,
-        #        which could be clearer, same below for video.
-        if audio_producer.component_type:
+        if audio_producer:
             data.append(('audio-encoder', self.audio))
         else:
             self.audio.hide()
             self.label_audio.hide()
 
         video_producer = production.get_video_producer()
-        if video_producer.component_type:
+        if video_producer:
             data.append(('video-encoder', self.video))
         else:
             self.video.hide()

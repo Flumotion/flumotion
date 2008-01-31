@@ -57,14 +57,16 @@ class ProductionStep(WorkerWizardStep):
         @returns: producer or None
         @rtype: L{flumotion.wizard.models.AudioProducer}
         """
-        return self._audio_producer
+        if self.has_audio.get_active():
+            return self._audio_producer
 
     def get_video_producer(self):
         """Returns the selected video producer or None
         @returns: producer or None
         @rtype: L{flumotion.wizard.models.VideoProducer}
         """
-        return self._video_producer
+        if self.has_video.get_active():
+            return self._video_producer
 
     def get_video_step(self):
         """Return the video step to be shown, given the currently
@@ -194,20 +196,10 @@ class ProductionStep(WorkerWizardStep):
 
     def on_has_video__toggled(self, button):
         self.video.set_sensitive(button.get_active())
-        if button.get_active():
-            self.wizard.flow.addComponent(self._video_producer)
-        else:
-            self.wizard.flow.removeComponent(self._video_producer)
-            self._video_producer.component_type = None
         self._verify()
 
     def on_has_audio__toggled(self, button):
         self.audio.set_sensitive(button.get_active())
-        if button.get_active():
-            self.wizard.flow.addComponent(self._audio_producer)
-        else:
-            self.wizard.flow.removeComponent(self._audio_producer)
-            self._audio_producer.component_type = None
         self._verify()
 
     def on_video__changed(self, button):

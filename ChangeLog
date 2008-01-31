@@ -1,5 +1,11 @@
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py (ProductionStep): 
+	* flumotion/wizard/conversionsteps.py (ConversionStep): 
+	Fix production_step.get_audio/video_producer() to actually
+	return None if there's no component selected.
+	Update callsites.
+
 	* flumotion/wizard/consumptionsteps.py (HTTPStep): 
 	Clean up the internal blocking api
 
