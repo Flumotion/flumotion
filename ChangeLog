@@ -3,6 +3,7 @@
 	* flumotion/component/misc/httpfile/httpfile.py
 	(HTTPFileStreamer.updatePorterDetails): Refactor and clean up updatePorterDetails.
 	Bump copyright and pep8ify.
+	(HTTPFileStreamer._updatePath): comment and style changes
 
 	* flumotion/ui/wizard.py (SectionWizard._set_step): Set the step earlier
 	since the worker-changed signal is triggered before the end of this

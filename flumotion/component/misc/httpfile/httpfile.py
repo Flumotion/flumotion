@@ -357,10 +357,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # If we've changed paths, we must do some extra work.
         if path == self._porterPath:
             return
-
         self._porterPath = path
-        self._pbclient.stopTrying() # Stop trying to connect with the
-        # old connector.
+
+        # Stop trying to connect with the old connector.
+        self._pbclient.stopTrying()
+
         self._pbclient.resetDelay()
         reactor.connectWith(fdserver.FDConnector, self._porterPath,
                             self._pbclient, 10, checkPID=False)
