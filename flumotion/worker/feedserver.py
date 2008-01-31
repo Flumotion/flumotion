@@ -28,6 +28,7 @@ from twisted.internet import reactor, defer, main
 from twisted.python import components, failure, reflect
 from twisted.spread import pb
 from twisted.cred import portal
+from zope.interface import implements
 
 from flumotion.configure import configure
 from flumotion.common import log, common, interfaces
@@ -43,7 +44,7 @@ class FeedServer(log.Loggable):
     I am the feed server. PHEAR
     """
 
-    __implements__ = portal.IRealm
+    implements(portal.IRealm)
 
     logCategory = 'dispatcher'
 

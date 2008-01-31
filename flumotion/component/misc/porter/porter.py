@@ -25,6 +25,7 @@ from twisted.internet import protocol, reactor, address, error, defer
 
 from twisted.spread import pb
 from twisted.cred import portal
+from zope.interface import implements
 
 from flumotion.common import medium, log, messages
 from flumotion.twisted import credentials, fdserver, checkers
@@ -81,7 +82,7 @@ class PorterRealm(log.Loggable):
     A Realm within the Porter that creates Avatars for streamers logging into
     the porter.
     """
-    __implements__ = portal.IRealm
+    implements(portal.IRealm)
 
     def __init__(self, porter):
         """

@@ -26,6 +26,7 @@ from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.cred import credentials
 from twisted.cred import checkers, portal
+from zope.interface import implements
 
 from flumotion.common import log
 from flumotion.common import testsuite
@@ -187,7 +188,8 @@ class Server(log.Loggable):
 
 class Dispatcher(log.Loggable):
     logCategory = "dispatcher"
-    __implements__ = portal.IRealm
+    implements(portal.IRealm)
+
     def __init__(self, server):
         self.debug("creating dispatcher")
         self.server = server

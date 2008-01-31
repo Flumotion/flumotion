@@ -21,6 +21,7 @@
 
 from twisted.cred import portal
 from twisted.spread import pb
+from zope.interface import implements
 
 from flumotion.twisted import pb as fpb
 from flumotion.twisted import portal as fportal
@@ -32,7 +33,7 @@ __version__ = "$Rev$"
 
 
 class TestRealm(log.Loggable):
-    __implements__ = (portal.IRealm, server.IServable)
+    implements(portal.IRealm, server.IServable)
     logCategory = 'fakerealm'
 
     bouncerconf = {'name': 'testbouncer',

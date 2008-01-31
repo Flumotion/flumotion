@@ -1,5 +1,13 @@
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/test/realm.py:
+	* flumotion/test/test_pbstream.py:
+	* flumotion/worker/feedserver.py:
+	Get rid of most __implements__ in favor of implements()
+
+2008-01-31  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/productionsteps.py (ProductionStep): 
 	* flumotion/wizard/conversionsteps.py (ConversionStep): 
 	Fix production_step.get_audio/video_producer() to actually
