@@ -364,6 +364,8 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._update_buttons(has_next)
 
     def _set_step(self, step):
+        self._current_step = step
+
         self._pack_step(step)
         self._set_step_icon(step.icon)
         self._set_step_title(step.name)
@@ -378,8 +380,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.debug('showing step %r' % step)
         step.show()
         step.activated()
-
-        self._current_step = step
 
     def _jump_to_step(self, name):
         step = self.get_step(name)
