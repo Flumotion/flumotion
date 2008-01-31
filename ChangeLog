@@ -1,5 +1,13 @@
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	Move http_wizard over to the httpstreamer directory.
+	Not yet pluggable, just separated.
+
+2008-01-31  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/misc/porter/porter.py:
 	* flumotion/test/realm.py:
 	* flumotion/test/test_pbstream.py:

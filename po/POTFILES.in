@@ -168,6 +168,7 @@ flumotion/component/consumers/httpstreamer/resources.py
 flumotion/component/consumers/httpstreamer/http.py
 flumotion/component/consumers/httpstreamer/__init__.py
 flumotion/component/consumers/httpstreamer/admin_gtk.py
+flumotion/component/consumers/httpstreamer/http_wizard.py
 flumotion/component/consumers/shout2/shout2.py
 flumotion/component/consumers/shout2/__init__.py
 flumotion/component/consumers/__init__.py
