@@ -1,3 +1,8 @@
+2008-01-31  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/consumptionsteps.py (HTTPStep): 
+	Clean up the internal blocking api
+
 2008-01-30  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/registry.py (RegistryParser._parseWizard): 

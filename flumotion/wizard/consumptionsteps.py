@@ -209,8 +209,8 @@ class HTTPStep(WorkerWizardStep):
     component_type = 'http-streamer'
 
     def __init__(self, wizard):
+        self._blocked = False
         WorkerWizardStep.__init__(self, wizard)
-        self._missing_elements = False
 
     # WizardStep
 
@@ -218,15 +218,11 @@ class HTTPStep(WorkerWizardStep):
         self.spinbutton_port.set_value(self.port)
 
     def activated(self):
+        self._check_elements()
         self._verify()
 
     def worker_changed(self):
-        def got_missing(missing):
-            self._missing_elements = bool(missing)
-            self._verify()
-        self._missing_elements = True
-        d = self.wizard.require_elements(self.worker, 'multifdsink')
-        d.addCallback(got_missing)
+        self._check_elements()
 
     def get_state(self):
         options = {
@@ -248,13 +244,32 @@ class HTTPStep(WorkerWizardStep):
 
     # Private
 
+    def _check_elements(self):
+        def got_missing(missing):
+            blocked = bool(missing)
+            self._block_next(blocked)
+
+        self._block_next(True)
+
+        d = self.wizard.require_elements(self.worker, 'multifdsink')
+        d.addCallback(got_missing)
+
     def _verify(self):
         self.spinbutton_client_limit.set_sensitive(
             self.checkbutton_client_limit.get_active())
         self.spinbutton_bandwidth_limit.set_sensitive(
             self.checkbutton_bandwidth_limit.get_active())
-        self.wizard.block_next(self._missing_elements or
-                               self.entry_mount_point.get_text() == '')
+        self._update_blocked()
+
+    def _block_next(self, blocked):
+        if self._blocked == blocked:
+            return
+        self._blocked = blocked
+        self.wizard.block_next(blocked)
+
+    def _update_blocked(self):
+        self.wizard.block_next(
+            self._blocked or self.entry_mount_point.get_text() == '')
 
     # Callbacks
 
