@@ -1,5 +1,9 @@
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer.updatePorterDetails): Refactor and clean up updatePorterDetails.
+	Bump copyright and pep8ify.
+
 	* flumotion/ui/wizard.py (SectionWizard._set_step): Set the step earlier
 	since the worker-changed signal is triggered before the end of this
 	method, which will end up using the worker from the wrong step.

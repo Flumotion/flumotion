@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -20,8 +20,8 @@
 # Headers in this file shall remain intact.
 
 import os
-import time
 import string
+import time
 
 from twisted.web import resource, static, server, http
 from twisted.web import error as weberror
@@ -29,17 +29,14 @@ from twisted.internet import defer, reactor, error
 from twisted.cred import credentials
 from zope.interface import implements
 
-from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils, interfaces
-from flumotion.component.component import moods
-from flumotion.component.misc.porter import porterclient
-from flumotion.component.base import http as httpbase
-
-from flumotion.twisted import fdserver
-
-from flumotion.component.misc.httpfile import file
-
 from flumotion.common.messages import N_
+from flumotion.component import component
+from flumotion.component.base import http as httpbase
+from flumotion.component.component import moods
+from flumotion.component.misc.httpfile import file
+from flumotion.component.misc.porter import porterclient
+from flumotion.twisted import fdserver
 
 __version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
@@ -85,6 +82,7 @@ class CancellableRequest(server.Request):
                 time.time() - self._start_time, fd)
             self._completed = True
 
+
 class Site(server.Site):
     requestFactory = CancellableRequest
 
@@ -92,6 +90,7 @@ class Site(server.Site):
         server.Site.__init__(self, resource)
 
         self.component = component
+
 
 class HTTPFileMedium(component.BaseComponentMedium):
     def __init__(self, comp):
@@ -132,6 +131,7 @@ class HTTPFileMedium(component.BaseComponentMedium):
 
     def remote_rotateLog(self):
         return self.comp.rotateLog()
+
 
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     implements(interfaces.IStreamingComponent)
@@ -336,27 +336,34 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         If we're currently connected, this won't disconnect - it'll just change
         the information so that next time we try and connect we'll use the
         new ones
+        @param path: new path
+        @param username: new username
+        @param password: new password
         """
-        if self.type == 'slave':
-            self._porterUsername = username
-            self._porterPassword = password
-
-            creds = credentials.UsernamePassword(self._porterUsername,
-                self._porterPassword)
-            self._pbclient.startLogin(creds, self.medium)
-
-            # If we've changed paths, we must do some extra work.
-            if path != self._porterPath:
-                self._porterPath = path
-                self._pbclient.stopTrying() # Stop trying to connect with the
-                                            # old connector.
-                self._pbclient.resetDelay()
-                reactor.connectWith(
-                    fdserver.FDConnector, self._porterPath,
-                    self._pbclient, 10, checkPID=False)
-        else:
+        if self.type != 'slave':
             raise errors.WrongStateError(
                 "Can't specify porter details in master mode")
+
+        self._porterUsername = username
+        self._porterPassword = password
+
+        creds = credentials.UsernamePassword(self._porterUsername,
+                                             self._porterPassword)
+        self._pbclient.startLogin(creds, self.medium)
+
+        self._updatePath(path)
+
+    def _updatePath(self, path):
+        # If we've changed paths, we must do some extra work.
+        if path == self._porterPath:
+            return
+
+        self._porterPath = path
+        self._pbclient.stopTrying() # Stop trying to connect with the
+        # old connector.
+        self._pbclient.resetDelay()
+        reactor.connectWith(fdserver.FDConnector, self._porterPath,
+                            self._pbclient, 10, checkPID=False)
 
     def _timeoutRequests(self):
         now = time.time()
@@ -409,7 +416,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
         self.httpauth.cleanupAuth(fd)
         headers = request.getAllHeaders()
-        
+
         ip = request.getClientIP()
         if not self._logfilter or not self._logfilter.isInRange(ip):
             args = {'ip': ip,
