@@ -610,8 +610,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         def set(k, v):
             if self.uiState.get(k) != v:
                 self.uiState.set(k, v)
+
+        def update_ui_state_later():
+            self._updateUI_DC = None
+            self.update_ui_state()
+
         now = time.time()
-        self._updateUI_DC = None
 
         # If we haven't updated too recently, do it immediately.
         if now - self._lastUpdate >= UI_UPDATE_THROTTLE_PERIOD:
@@ -627,7 +631,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             # Otherwise, schedule doing this in a few seconds (unless an update
             # was already scheduled)
             self._updateUI_DC = reactor.callLater(UI_UPDATE_THROTTLE_PERIOD,
-                self.update_ui_state)
+                                                  update_ui_state_later)
 
     def _client_added_handler(self, sink, fd):
         self.log('[fd %5d] client_added_handler', fd)

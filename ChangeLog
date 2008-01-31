@@ -1,3 +1,10 @@
+2008-01-31  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.update_ui_state):
+	Don't erase delayed call id if the method wasn't called by the
+	reactor from a timeout - fixes memory leak introduced in r5661.
+
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/httpfile/httpfile.py
