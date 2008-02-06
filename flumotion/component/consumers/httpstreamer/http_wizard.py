@@ -19,6 +19,22 @@
 
 # Headers in this file shall remain intact.
 
+"""HTTP wizard integration
+
+This provides a step which you can chose:
+- http port
+- bandwidth/client limit
+- mount point (eg, the url it will be accessed as)
+- burst on connect
+- cortado java applet
+
+A component of type 'http-streamer' will always be created.
+In addition, if you include the java applet, a 'porter' and
+'http-server' will be included to share the port between the streamer
+and the server and to serve an html file plus the java applet itself.
+On the http-server the applet will be provided with help of a plug.
+"""
+
 import gettext
 import random
 
@@ -43,6 +59,9 @@ def _generateRandomString(numchars):
 
 
 class HTTPPorter(Component):
+    """I am a model representing the configuration file for a
+    HTTP porter component.
+    """
     component_type = 'porter'
     def __init__(self, streamer):
         super(HTTPPorter, self).__init__(worker=streamer.worker)
@@ -61,7 +80,8 @@ class HTTPPorter(Component):
 
 
 class HTTPStreamer(Consumer):
-    """
+    """I am a model representing the configuration file for a
+    HTTP streamer component.
     @ivar has_client_limit: If a client limit was set
     @ivar has_bandwidth_limit: If a bandwidth limit was set
     @ivar has_cortado: If we should embed cortado
@@ -112,6 +132,9 @@ class HTTPStreamer(Consumer):
 
 
 class CortadoPlug(Plug):
+    """I am a model representing the configuration file for a
+    Cortado HTTP streaming plug.
+    """
     plug_type = "cortado-plug"
     socket = "flumotion.component.misc.cortado.cortado.CortadoPlug"
     def __init__(self, server, streamer, audio_producer, video_producer):
@@ -159,9 +182,10 @@ class CortadoPlug(Plug):
 
 
 class CortadoHTTPServer(Component):
-    """
-    This is a component which serves cortado on /cortado/index.html
-    It shares the port of a http-streamer through a porter.
+    """I am a model representing the configuration file for a
+    HTTP server component which will be used to serve a cortado
+    java applet.
+    Most of the interesting logic here is actually in a plug.
     """
     component_type = 'http-server'
     def __init__(self, streamer, audio_producer, video_producer):
@@ -198,6 +222,9 @@ class CortadoHTTPServer(Component):
 
 
 class HTTPStep(WorkerWizardStep):
+    """I am a step of the configuration wizard which allows you
+    to configure a stream to be served over HTTP.
+    """
     glade_file = 'wizard_http.glade'
     section = _('Consumption')
     component_type = 'http-streamer'

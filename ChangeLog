@@ -1,5 +1,8 @@
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	improve documentation
+
 	* data/Makefile.am (templatedir): Install .html files 
 	to pkgdatadir, not datadir.
 	* flumotion.spec.in (user): Include all .html files
