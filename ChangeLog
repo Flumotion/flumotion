@@ -1,5 +1,8 @@
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/cortado/Makefile.am (cortado_DATA): Attempt to
+	fix distcheck
+
 	* configure.ac:
 	* flumotion/component/misc/cortado/cortado_location.py.in:
 	* README:
@@ -25,6 +28,8 @@
 
 	Add support for streaming to cortado widgets in the admin wizard.
 
+	Fixes #824
+	
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
 	(HTTPFileStreamer._createRootResourceForPath): Remove factory variable
