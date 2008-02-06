@@ -25,6 +25,8 @@ from twisted.web.resource import Resource
 from twisted.web.static import Data, File
 
 from flumotion.common import log
+from flumotion.common.errors import ComponentStartError
+from flumotion.component.misc.httpfile.httpfile import HTTPFileStreamer
 from flumotion.component.misc.cortado.cortado_location import CORTADO_FILENAME
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.configure import configure
@@ -38,10 +40,9 @@ def _htmlbool(value):
 
 
 class CortadoDirectoryResource(Resource):
-    """
-    I generate the directory used to serve a cortado applet
+    """I generate the directory used to serve a cortado applet
     It contains::
-    - index.html - html file
+    - a html file, usually called index.html.
     - cortado.jar - cortado java applet
     """
 
@@ -101,21 +102,23 @@ class CortadoDirectoryResource(Resource):
             return self._index_content
         return Resource.getChildWithDefault(self, pathEl, request)
 
-    def render(self, request):
-        return self._index_content
-
 
 class CortadoPlug(ComponentPlug):
-    def __init__(self, args):
-        ComponentPlug.__init__(self, args)
-        self._properties = args['properties']
-
-    # ComponentPlug
-
+    """I am a component plug for a http-server which plugs in a
+    http resource containing a cortado java applaet.
+    """
     def start(self, component):
+        """
+        @type component: L{HTTPFileStreamer}
+        """
+        if not isinstance(component, HTTPFileStreamer):
+            raise ComponentStartError(
+                "A CortadoPlug %s must be plugged into a "
+                " HTTPStreamer component, not a %s" % (
+                self, component.__class__.__name__))
         log.debug('cortado', 'Attaching to %r' % (component,))
         resource = CortadoDirectoryResource(component.getMountPoint(),
-                                            self._properties)
+                                            self.args['properties'])
         component.setRootResource(resource)
 
 
