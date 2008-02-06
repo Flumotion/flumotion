@@ -25,10 +25,13 @@ import tempfile
 from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import client, error
+from twisted.web.resource import Resource
+from twisted.web.static import Data
 
 from flumotion.common import log
 from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import httpfile
+from flumotion.component.plugs.base import ComponentPlug
 
 __version__ = "$Rev$"
 
@@ -156,6 +159,62 @@ class MountTest(log.Loggable, testsuite.TestCase):
         d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/D')))
         d.addErrback(lambda f: f.trap(error.Error))
         return d
+
+class _Resource(Resource):
+    def __init__(self):
+        Resource.__init__(self)
+        self.putChild('foobar', Data("baz", "text/html"))
+
+
+class SimpleTestPlug(ComponentPlug):
+    def start(self, component):
+        component.setRootResource(_Resource())
+
+
+class PlugTest(testsuite.TestCase):
+    def tearDown(self):
+        if self.component:
+            self.component.stop()
+
+    def _makeComponent(self, properties, plugs):
+        # start the component with the given properties
+        config = {
+            'feed': [],
+            'name': 'http-server',
+            'parent': 'default',
+            'avatarId': '/default/http-server',
+            'clock-master': None,
+            'type': 'http-server',
+            'plugs': plugs,
+            'properties': properties,
+        }
+        self.component = httpfile.HTTPFileStreamer(config)
+
+    def _getURL(self, path):
+        # path should start with /
+        return 'http://localhost:%d%s' % (self.component.port, path)
+
+    def _localPlug(self, plugname):
+        return {
+            'flumotion.component.plugs.lifecycle.ComponentLifecycle':
+            [{ 'module-name': 'flumotion.test.test_component_httpserver',
+              'function-name': plugname,
+              }]
+            }
+
+    def testSetRootResource(self):
+        properties = {
+            u'mount-point': '/mount',
+            u'port': 0,
+        }
+
+        plugs = self._localPlug('SimpleTestPlug')
+        self._makeComponent(properties, plugs)
+
+        d = client.getPage(self._getURL('/mount/foobar'))
+        d.addCallback(lambda r: self.assertEquals(r, 'baz'))
+        return d
+
 
 if __name__ == '__main__':
     unittest.main()

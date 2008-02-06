@@ -19,7 +19,7 @@
          <!-- Warning: mount_point of / is broken -->
         <property name="mount-point" type="string"
 		  description="The mount point the stream can be accessed on" />
-        <property name="path" type="string" required="true"
+        <property name="path" type="string"
           description="The base path to map to the mount-point" />
 
         <property name="type" type="string"

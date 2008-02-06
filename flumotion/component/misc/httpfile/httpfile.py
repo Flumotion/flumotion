@@ -23,8 +23,8 @@ import os
 import string
 import time
 
-from twisted.web import resource, static, server, http
-from twisted.web import error as weberror
+from twisted.web import server, http
+from twisted.web.resource import Resource
 from twisted.internet import defer, reactor, error
 from twisted.cred import credentials
 from zope.interface import implements
@@ -162,6 +162,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._timeoutRequestsCallLater = None
 
         self._pendingDisconnects = {}
+        self._rootResource = None
 
         # FIXME: maybe we want to allow the configuration to specify
         # additional mime -> File class mapping ?
@@ -191,8 +192,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
             path = props.get('path', None)
             if path is None:
-                msg = "missing required property 'path'"
-                return defer.fail(errors.ConfigError(msg))
+                return
             if os.path.isfile(path):
                 self._singleFile = True
             elif os.path.isdir(path):
@@ -241,31 +241,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     def do_setup(self):
         self.have_properties(self.config['properties'])
-        self.debug('Starting with mount point "%s"' % self.mountPoint)
-        factory = file.MimedFileFactory(self.httpauth,
-            mimeToResource=self._mimeToResource)
-        if self.mountPoint == '/':
-            self.debug('mount point / - create File resource as root')
-            # directly create a File resource for the path
-            root = factory.create(self.filePath)
-        else:
-            # split path on / and add iteratively twisted.web resources
-            # Asking for '' or '/' will retrieve the root Resource's '' child,
-            # so the split on / returning a first list value '' is correct
-            self.debug('mount point %s - creating root Resource and children',
-                self.mountPoint)
-            root = resource.Resource()
-            children = string.split(self.mountPoint[1:], '/')
-            parent = root
-            for child in children[:-1]:
-                res = resource.Resource()
-                self.debug("Putting Resource at %s", child)
-                parent.putChild(child, res)
-                parent = res
-            fileResource = factory.create(self.filePath)
-            self.debug("Putting resource %r at %r", fileResource, children[-1])
-            parent.putChild(children[-1], fileResource)
 
+        root = self._rootResource
+        if root is None:
+            root = self._getDefaultRootResource()
+        site = Site(root, self)
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
@@ -274,10 +254,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             # Streamer is slaved to a porter.
             if self._singleFile:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    Site(root, self), [self.mountPoint], d)
+                    site, [self.mountPoint], d)
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    Site(root, self), [], d,
+                    site, [], d,
                     prefixes=[self.mountPoint])
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
@@ -294,7 +274,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 # we could be listening on port 0, in which case we need
                 # to figure out the actual port we listen on
                 self._twistedPort = reactor.listenTCP(self.port,
-                    Site(root, self), interface=iface)
+                    site, interface=iface)
                 self.port = self._twistedPort.getHost().port
                 self.debug('Listening on port %d' % self.port)
             except error.CannotListenError:
@@ -380,6 +360,32 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
+
+    def _getDefaultRootResource(self):
+        self.debug('Starting with mount point "%s"' % self.mountPoint)
+        factory = file.MimedFileFactory(self.httpauth,
+            mimeToResource=self._mimeToResource)
+
+        root = factory.create(self.filePath)
+        if self.mountPoint != '/':
+            root = self._createRootResourceForPath(self.mountPoint[1:], root)
+
+        return root
+
+    def _createRootResourceForPath(self, path, fileResource):
+        root = Resource()
+        children = string.split(path[1:], '/')
+        parent = root
+        for child in children[:-1]:
+            resource = Resource()
+            self.debug("Putting Resource at %s", child)
+            parent.putChild(child, resource)
+            parent = resource
+        factory = file.MimedFileFactory(self.httpauth,
+            mimeToResource=self._mimeToResource)
+        self.debug("Putting resource %r at %r", fileResource, children[-1])
+        parent.putChild(children[-1], fileResource)
+        return root
 
     def remove_client(self, fd):
         """
@@ -495,3 +501,22 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         for logger in self._loggers:
             self.debug('rotating logger %r' % logger)
             logger.rotate()
+
+    def setRootResource(self, resource):
+        """Attaches a root resource to this component. The root resource is the
+        once which will be used when accessing the mount point.
+        This is normally called from a plugs start() method.
+        @param resource: root resource
+        @type resource: L{twisted.web.resource.Resource}
+        """
+        rootResource = self._createRootResourceForPath(
+            self.getMountPoint(), resource)
+
+        self._rootResource = rootResource
+
+    def getMountPoint(self):
+        """Get the mount point of this component
+        @returns: the mount point
+        """
+        # This is called early, before do_setup()
+        return self.config['properties'].get('mount-point')
