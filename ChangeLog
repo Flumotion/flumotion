@@ -1,5 +1,9 @@
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
+	* data/Makefile.am (templatedir): Install .html files 
+	to pkgdatadir, not datadir.
+	* flumotion.spec.in (user): Include all .html files
+
 	* flumotion/component/misc/cortado/Makefile.am (cortado_DATA): Attempt to
 	fix distcheck
 	(cortado_PYTHON): Add cortado_location.py to cortado_PYTHON

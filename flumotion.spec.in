@@ -252,6 +252,7 @@ fi
 %{_datadir}/flumotion/image
 %{_datadir}/flumotion/make-dummy-cert
 %{_datadir}/flumotion/*.xsl
+%{_datadir}/flumotion/*.html
 %{_datadir}/hal/fdi/policy/20thirdparty/91-flumotion-device-policy.fdi
 
 %attr(750,root,flumotion) %{_sysconfdir}/flumotion
