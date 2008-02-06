@@ -2,6 +2,7 @@
 
 	* flumotion/component/misc/cortado/Makefile.am (cortado_DATA): Attempt to
 	fix distcheck
+	(cortado_PYTHON): Add cortado_location.py to cortado_PYTHON
 
 	* configure.ac:
 	* flumotion/component/misc/cortado/cortado_location.py.in:
