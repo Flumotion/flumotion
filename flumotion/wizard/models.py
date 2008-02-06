@@ -156,11 +156,12 @@ class Component(object):
     component_type = None
     name_template = "component"
 
-    def __init__(self):
-        self.worker = None
+    def __init__(self, worker=None):
+        self.worker = worker
         self.feeders = []
         self.eaters = []
         self.properties = Properties()
+        self.plugs = []
 
     def validate(self):
         if not self.worker:
@@ -169,6 +170,34 @@ class Component(object):
 
     def getWorker(self):
         return self.worker
+
+    def getProperties(self):
+        props = {}
+        for key, value in self.properties.iteritems():
+            props[key.replace('_', '-')] = value
+        return props
+
+    def getPlugs(self):
+        return self.plugs
+
+    def addPlug(self, plug):
+        """
+        Add a plug to the component
+        @param plug: the plug
+        @type plug: L{Plug}
+        """
+        self.plugs.append(plug)
+
+
+class Plug(object):
+    """I am a Plug.
+    A plug has a name which identifies it and must be unique
+    within a flow.
+    @cvar plug_type: the type of the plug, such as cortado,
+      this is not mandatory in the class, can also be set in the instance.
+    """
+    def __init__(self):
+        self.properties = Properties()
 
     def getProperties(self):
         props = {}

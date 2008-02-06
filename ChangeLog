@@ -1,5 +1,32 @@
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* flumotion/component/misc/cortado/cortado_location.py.in:
+	* README:
+
+	Add an optional cortado dependency, store the location and
+	update README.
+	
+	* data/Makefile.am:
+	* data/cortado-template.html:
+	* flumotion/component/misc/Makefile.am:
+	* flumotion/component/misc/cortado/Makefile.am:
+	* flumotion/component/misc/cortado/__init__.py:
+	* flumotion/component/misc/cortado/cortado.py:
+	* flumotion/component/misc/cortado/cortado.xml:
+
+	Create a CortadoPlug which can be plugged into a http streaming
+	component.
+	
+	* data/glade/wizard_http.glade:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/save.py:
+
+	Add support for streaming to cortado widgets in the admin wizard.
+
+2008-02-06  Johan Dahlin  <johan@gnome.org>
+
 	(HTTPFileStreamer._createRootResourceForPath): Remove factory variable
 	to silence pychecker.
 

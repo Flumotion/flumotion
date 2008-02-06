@@ -1,0 +1,29 @@
+<html>
+  <body>
+    <object id="cortado" classid="clsid:08B0E5C0-4FCB-11CF-AAA5-00401C608501"
+            width="%(width)d" height="%(height)d" align="baseline">
+    <param name="code" value="com.fluendo.player.Cortado.class"/>
+    <param name="codebase" value="%(codebase)s"/>
+    <param name="archive" value="cortado.jar?_=2"/>
+    <param name="url" value="%(stream-url)s"/>
+    <param name="audio" value="%(has-audio)s"/>
+    <param name="video" value="%(has-video)s"/>
+    <param name="bufferSize" value="%(buffer-size)s"/>
+    <param name="framerate" value="%(framerate)d"/>
+    <param name="keepaspect" value="true"/>
+    <param name="local" value="false"/>
+    <comment>
+      <embed type="application/x-java-applet"
+             code="com.fluendo.player.Cortado.class"
+             codebase="%(codebase)s"
+             archive="cortado.jar?_=2" url="%(stream-url)s"
+             audio="%(has-audio)s" video="%(has-video)s"
+             width="%(width)d" height="%(height)d"
+             bufferSize="%(buffer-size)s" framerate="%(framerate)d"
+             keepaspect="true" local="false" align="baseline">
+        <noembed>You need to install Java to view this media file.</noembed>
+      </embed>
+    </comment>
+    </object>
+  </body>
+</html>

@@ -21,7 +21,7 @@
   <child>
     <widget class="GtkTable" id="table2">
       <property name="visible">True</property>
-      <property name="n_rows">5</property>
+      <property name="n_rows">6</property>
       <property name="n_columns">3</property>
       <property name="homogeneous">False</property>
       <property name="row_spacing">6</property>
@@ -40,7 +40,7 @@
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
-	  <property name="mnemonic_widget">spinbutton_port</property>
+	  <property name="mnemonic_widget">port</property>
 	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 	  <property name="width_chars">-1</property>
 	  <property name="single_line_mode">False</property>
@@ -125,7 +125,7 @@
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
-	  <property name="mnemonic_widget">entry_mount_point</property>
+	  <property name="mnemonic_widget">mount_point</property>
 	  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 	  <property name="width_chars">-1</property>
 	  <property name="single_line_mode">False</property>
@@ -154,7 +154,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkCheckButton" id="checkbutton_client_limit">
+	    <widget class="GtkCheckButton" id="has_client_limit">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">User limit:</property>
@@ -164,7 +164,7 @@
 	      <property name="active">True</property>
 	      <property name="inconsistent">False</property>
 	      <property name="draw_indicator">True</property>
-	      <signal name="toggled" handler="on_checkbutton_client_limit_toggled" last_modification_time="Tue, 12 Jun 2007 14:56:59 GMT"/>
+	      <signal name="toggled" handler="on_has_client_limit_toggled" last_modification_time="Tue, 12 Jun 2007 14:56:59 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -191,7 +191,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkCheckButton" id="checkbutton_bandwidth_limit">
+	    <widget class="GtkCheckButton" id="has_bandwidth_limit">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">Bandwidth limit:</property>
@@ -201,7 +201,7 @@
 	      <property name="active">False</property>
 	      <property name="inconsistent">False</property>
 	      <property name="draw_indicator">True</property>
-	      <signal name="toggled" handler="on_checkbutton_bandwidth_limit_toggled" last_modification_time="Tue, 12 Jun 2007 14:57:04 GMT"/>
+	      <signal name="toggled" handler="on_has_bandwidth_limit_toggled" last_modification_time="Tue, 12 Jun 2007 14:57:04 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -228,7 +228,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkCheckButton" id="checkbutton_burst_on_connect">
+	    <widget class="GtkCheckButton" id="burst_on_connect">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">Bu_rst on connect</property>
@@ -264,7 +264,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_port">
+	    <widget class="GtkSpinButton" id="port">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -300,7 +300,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_client_limit">
+	    <widget class="GtkSpinButton" id="client_limit">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -336,7 +336,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton_bandwidth_limit">
+	    <widget class="GtkSpinButton" id="bandwidth_limit">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -372,7 +372,7 @@
 	  <property name="right_padding">0</property>
 
 	  <child>
-	    <widget class="GtkEntry" id="entry_mount_point">
+	    <widget class="GtkEntry" id="mount_point">
 	      <property name="width_request">100</property>
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
@@ -383,7 +383,7 @@
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
-	      <signal name="changed" handler="on_entry_mount_point_changed" last_modification_time="Sun, 05 Jun 2005 16:45:39 GMT"/>
+	      <signal name="changed" handler="on_mount_point_changed" last_modification_time="Sun, 05 Jun 2005 16:45:39 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -394,6 +394,27 @@
 	  <property name="bottom_attach">2</property>
 	  <property name="x_options">fill</property>
 	  <property name="y_options">fill</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkCheckButton" id="has_cortado">
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">Embed Java applet</property>
+	  <property name="use_underline">True</property>
+	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
+	  <property name="active">False</property>
+	  <property name="inconsistent">False</property>
+	  <property name="draw_indicator">True</property>
+	</widget>
+	<packing>
+	  <property name="left_attach">0</property>
+	  <property name="right_attach">1</property>
+	  <property name="top_attach">5</property>
+	  <property name="bottom_attach">6</property>
+	  <property name="x_options">fill</property>
+	  <property name="y_options"></property>
 	</packing>
       </child>
     </widget>

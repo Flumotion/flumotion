@@ -158,6 +158,26 @@ sys.exit(0)
 TWISTED_MODULE([twisted.names])
 TWISTED_MODULE([twisted.web])
 
+dnl Cortado
+AC_SUBST(CORTADO_FILENAME)
+AC_ARG_WITH(cortado_prefix,
+           AC_HELP_STRING(--with-cortado-prefix=<dir>, where cortado can be found))
+
+AC_MSG_CHECKING(for cortado)
+RESULT="no"
+CORTADO_FILENAME=""
+for dir in $with_cortado_prefix /usr/local /usr; do
+    for version in 0.2.2 0.2.1 0.2.0; do
+	filename=$dir/share/cortado/cortado-ovt-stripped-$version.1.jar
+        if test -e "$filename"; then
+	     RESULT="found"
+             CORTADO_FILENAME="$filename"
+ 	     break 2;
+        fi
+    done
+done
+AC_MSG_RESULT($RESULT)
+
 AC_CONFIG_FILES([env], [chmod +x env])
 AC_CONFIG_FILES([bin/flumotion], [chmod +x bin/flumotion])
 AC_CONFIG_FILES([bin/flumotion-admin], [chmod +x bin/flumotion-admin])
@@ -211,6 +231,8 @@ flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/misc/Makefile
+flumotion/component/misc/cortado/Makefile
+flumotion/component/misc/cortado/cortado_location.py
 flumotion/component/misc/httpfile/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile

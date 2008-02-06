@@ -48,6 +48,10 @@ And if you want to build documentation:
 
 epydoc
 
+And if you want support for java applets:
+
+cortado
+
 ISSUES
 ------
 

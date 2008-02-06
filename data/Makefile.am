@@ -16,5 +16,13 @@ script_DATA = make-dummy-cert
 halpolicydir = $(datadir)/hal/fdi/policy/20thirdparty
 halpolicy_DATA = 91-flumotion-device-policy.fdi
 
+templatedir = $(datadir)
+template_DATA = cortado-template.html
+
 EXTRA_DIST = \
-        $(desktop_in_files) $(pixmap_DATA) $(xsl_DATA) $(script_DATA) $(halpolicy_DATA)
+        $(desktop_in_files) \
+	$(pixmap_DATA) \
+	$(xsl_DATA) \
+	$(script_DATA) \
+	$(halpolicy_DATA) \
+	$(template_DATA)

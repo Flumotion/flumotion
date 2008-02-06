@@ -1,0 +1,44 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.plugs.lifecycle.ComponentLifecycle"
+          type="cortado-plug">
+      <entry location="flumotion/component/misc/cortado/cortado.py"
+             function="CortadoPlug" />
+      <properties>
+        <property name="width" type="int" required="true"  
+                  description="width of the cortado applet" />
+        <property name="height" type="int" required="true" 
+                  description="height of the cortado applet" />
+        <property name="html-template" type="string" 
+                  description="HTML template to use to serve the cortado applet" />
+        <property name="index" type="string" 
+                  description="The name of the index file, default is index.html" />
+        <property name="has-audio" type="bool" required="true"  
+                  description="If audio should be streamed" />
+        <property name="has-video" type="bool" required="true"  
+                  description="If video should be streamed" />
+        <property name="stream-url" type="string" required="true"  
+                  description="url to the stream we're displaying" />
+        <property name="codebase" type="string" required="true"  
+                  description="baserl used to fetch the cortado applet code" />
+        <property name="buffer-size" type="int" required="true"  
+                  description="size of the buffer in cortado applet" />
+        <property name="framerate" type="float" required="true"  
+                  description="framerate used in the cortado applet" />
+      </properties>
+    </plug>
+  </plugs>
+  <bundles>
+    <bundle name="cortado-plug">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/cortado">
+          <filename location="__init__.py" />
+          <filename location="cortado.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>

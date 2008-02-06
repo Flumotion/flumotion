@@ -40,12 +40,17 @@ def _fraction_from_float(number, denominator):
 class Component(log.Loggable):
     logCategory = "componentsave"
 
-    def __init__(self, name, component_type, worker, properties={}):
+    def __init__(self, name, component_type, worker, properties=None, plugs=None):
         self.debug('Creating component %s (%s) worker=%r' % (
             name, type, worker))
         self.name = name
         self.component_type = component_type
+        if not properties:
+            properties = {}
         self.props = properties
+        if not plugs:
+            plugs = []
+        self.plugs = plugs
         self.worker = worker
         self.eaters = []
         self.feeders = []
@@ -105,6 +110,21 @@ class Component(log.Loggable):
                 value = self.props[name]
                 s += '      <property name="%s">%s</property>\n' % (name, value)
 
+        if self.plugs:
+            s += "\n"
+            s += '      <plugs>\n'
+            for plug in self.plugs:
+                s += '      <plug socket="%s" type="%s">\n' % (plug.socket,
+                                                               plug.plug_type)
+                plugprops = plug.getProperties()
+                property_names = plugprops.keys()
+                property_names.sort()
+                for name in property_names:
+                    value = plugprops[name]
+                    s += '        <property name="%s">%s</property>\n' % (
+                        name, value)
+                s += "      </plug>\n"
+            s += '      </plugs>\n'
         s += "    </component>\n"
         return s
 
@@ -118,6 +138,8 @@ class WizardSaver(log.Loggable):
     logCategory = 'wizard-saver'
     def __init__(self, wizard):
         self.wizard = wizard
+        self._flow_components = []
+        self._atmosphere_components = []
 
     def _set_fraction_property(self, properties, property_name, denominator):
         if not property_name in properties:
@@ -185,6 +207,30 @@ class WizardSaver(log.Loggable):
                          encoding_step.get_muxer_type(),
                          encoding_step.worker)
 
+    def _handleHTTPConsumer(self, name, step):
+        server = step.getServerConsumer()
+        if server is not None:
+            server = Component('server1',
+                               server.component_type,
+                               server.getWorker(),
+                               server.getProperties(),
+                               server.getPlugs())
+            self._flow_components.append(server)
+
+        porter = step.getPorter()
+        if porter is not None:
+            porter = Component('porter1',
+                               porter.component_type,
+                               porter.getWorker(),
+                               porter.getProperties())
+            self._atmosphere_components.append(porter)
+
+        streamer = step.getStreamerConsumer()
+        return Component(name,
+                         streamer.component_type,
+                         streamer.getWorker(),
+                         streamer.getProperties())
+
     def getVideoOverlay(self, video_source):
         step = self.wizard.get_step('Overlay')
         properties = step.get_state()
@@ -218,35 +264,35 @@ class WizardSaver(log.Loggable):
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
 
-    def handleVideo(self, components):
+    def handleVideo(self):
         video_source = self._getVideoSource()
-        components.append(video_source)
+        self._flow_components.append(video_source)
 
         video_encoder = self._getVideoEncoder()
-        components.append(video_encoder)
+        self._flow_components.append(video_encoder)
 
         video_overlay = self.getVideoOverlay(video_source)
         if video_overlay:
             video_overlay.link(video_source)
             video_encoder.link(video_overlay)
-            components.append(video_overlay)
+            self._flow_components.append(video_overlay)
         else:
             video_encoder.link(video_source)
         return video_encoder, video_source
 
-    def handleAudio(self, components, video_source):
+    def handleAudio(self, video_source):
         audio_source = self._getAudioSource(video_source)
         # In case of firewire component, which can already be there
-        if not audio_source in components:
-            components.append(audio_source)
+        if not audio_source in self._flow_components:
+            self._flow_components.append(audio_source)
 
         audio_encoder = self._getAudioEncoder()
-        components.append(audio_encoder)
+        self._flow_components.append(audio_encoder)
         audio_encoder.link(audio_source)
 
         return audio_encoder
 
-    def handleConsumers(self, components, audio_encoder, video_encoder):
+    def handleConsumers(self, audio_encoder, video_encoder):
         cons_options = self.wizard.get_step_options('Consumption')
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
         has_video = self.wizard.get_step_option('Source', 'has-video')
@@ -323,55 +369,65 @@ class WizardSaver(log.Loggable):
             if not cons_options.has_key(name):
                 continue
             step = self.wizard.get_step(step_name)
-            consumer = Component(name, comp_type, step.worker,
-                                 step.get_state())
+            if comp_type == 'http-streamer':
+                consumer = self._handleHTTPConsumer(name, step)
+            else:
+                consumer = Component(
+                    name, comp_type,
+                    step.worker, step.get_state())
+
             consumer.link(muxer)
-            components.append(consumer)
+            self._flow_components.append(consumer)
 
         # Add & link the muxers we will use
         if audio_muxer and audio_muxer.eaters:
-            components.append(audio_muxer)
+            self._flow_components.append(audio_muxer)
             audio_muxer.link(audio_encoder)
         if video_muxer and video_muxer.eaters:
-            components.append(video_muxer)
+            self._flow_components.append(video_muxer)
             video_muxer.link(video_encoder)
         if both_muxer and both_muxer.eaters:
-            components.append(both_muxer)
+            self._flow_components.append(both_muxer)
             both_muxer.link(video_encoder)
             both_muxer.link(audio_encoder)
 
-    def getComponents(self):
+    def _fetchComponentsFromWizardSteps(self):
         source_options = self.wizard.get_step_options('Source')
         has_video = source_options['has-video']
         has_audio = source_options['has-audio']
 
-        components = []
-
         video_encoder = None
         video_source = None
         if has_video:
-            video_encoder, video_source = self.handleVideo(components)
+            video_encoder, video_source = self.handleVideo()
 
         # Must do audio after video, in case of a firewire audio component
         # is selected together with a firewire video component
         audio_encoder = None
         if has_audio:
-            audio_encoder = self.handleAudio(components, video_source)
+            audio_encoder = self.handleAudio(video_source)
 
-        self.handleConsumers(components, audio_encoder, video_encoder)
-
-        return components
+        self.handleConsumers(audio_encoder, video_encoder)
 
     def getXML(self):
         # FIXME: allow for naming flows !
-        components = self.getComponents()
-        self.debug('Got %d components' % len(components))
+        self._fetchComponentsFromWizardSteps()
+        flowname = self.wizard.flowName
 
         s = '<planet>\n'
-        s += '  <flow name="%s">\n' % self.wizard.flowName
-        for component in components:
-            s += component.toXML() + "\n"
-        s += '  </flow>\n'
+
+        if self._atmosphere_components:
+            s += '  <atmosphere>\n'
+            for component in self._atmosphere_components:
+                s += component.toXML() + "\n"
+            s += '  </atmosphere>\n'
+
+        if self._flow_components:
+            s += '  <flow name="%s">\n' % flowname
+            for component in self._flow_components:
+                s += component.toXML() + "\n"
+            s += '  </flow>\n'
+
         s += '</planet>\n'
 
         return s
