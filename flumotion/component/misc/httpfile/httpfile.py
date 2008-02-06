@@ -381,8 +381,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.debug("Putting Resource at %s", child)
             parent.putChild(child, resource)
             parent = resource
-        factory = file.MimedFileFactory(self.httpauth,
-            mimeToResource=self._mimeToResource)
         self.debug("Putting resource %r at %r", fileResource, children[-1])
         parent.putChild(children[-1], fileResource)
         return root
