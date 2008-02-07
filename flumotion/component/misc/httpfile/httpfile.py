@@ -367,7 +367,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
     def _getDefaultRootResource(self):
-        if filePath is None:
+        if self.filePath is None:
             return None
 
         self.debug('Starting with mount point "%s"' % self.mountPoint)

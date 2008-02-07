@@ -1,5 +1,10 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/httpfile/httpfile.py: 
+	Raise an exception if the path property isn't set or if the
+	setRootResource is not called.
+	Fix the build by accessing self.filePath instead of just filePath.
+
 	* data/glade/Makefile.am (glade_DATA): Remove wizard_disk.glade 
 	from here.
 
