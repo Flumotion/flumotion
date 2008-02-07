@@ -1,5 +1,14 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am:
+	* data/glade/wizard_http.glade:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* po/POTFILES.in:
+	Move (and rename) wizard_http.glade to the httpstreamer directory.
+
+2008-02-07  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/consumers/shout2/Makefile.am:
 	(component_PYTHON): Add shout2_wizard.py
 

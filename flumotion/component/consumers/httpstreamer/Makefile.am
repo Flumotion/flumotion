@@ -8,7 +8,7 @@ component_PYTHON = \
 	http_wizard.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
-component_DATA = http.xml http.glade
+component_DATA = http.xml http.glade http-wizard.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

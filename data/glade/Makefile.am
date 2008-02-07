@@ -17,7 +17,6 @@ glade_DATA = \
 	wizard_audio_encoder.glade	\
 	wizard_consumption.glade	\
 	wizard_encoding.glade		\
-	wizard_http.glade		\
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_overview.glade		\

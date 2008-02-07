@@ -396,7 +396,6 @@ data/glade/greeter-start_new_success.glade
 data/glade/connection-dialog.glade
 data/glade/greeter-start_new_error.glade
 data/glade/wizard_summary.glade
-data/glade/wizard_http.glade
 data/glade/greeter-initial.glade
 data/glade/wizard_consumption.glade
 data/glade/greeter-authenticate.glade
@@ -432,6 +431,7 @@ flumotion/component/misc/httpfile/httpfile.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/disker/disker-wizard.glade
 flumotion/component/consumers/httpstreamer/http.glade
+flumotion/component/consumers/httpstreamer/http-wizard.glade
 flumotion/component/consumers/shout2/shout2-wizard.glade
 flumotion/component/bouncers/bouncer.glade
 flumotion/component/base/feeders.glade

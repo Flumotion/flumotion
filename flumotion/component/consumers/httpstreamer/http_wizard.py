@@ -36,6 +36,7 @@ On the http-server the applet will be provided with help of a plug.
 """
 
 import gettext
+import os
 import random
 
 from flumotion.configure import configure
@@ -225,7 +226,8 @@ class HTTPStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
-    glade_file = 'wizard_http.glade'
+    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'http-wizard.glade')
     section = _('Consumption')
     component_type = 'http-streamer'
 
