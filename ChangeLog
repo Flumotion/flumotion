@@ -1,5 +1,8 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/shout2/Makefile.am:
+	(component_PYTHON): Add shout2_wizard.py
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard_shout2.glade:
 	* flumotion/component/consumers/shout2/Makefile.am:
