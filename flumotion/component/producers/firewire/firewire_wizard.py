@@ -72,8 +72,8 @@ class _FireWireCommon:
 
     # WizardStep
 
-    def worker_changed(self):
-        self.model.worker = self.worker
+    def worker_changed(self, worker):
+        self.model.worker = worker
         self._run_checks()
 
     # Private

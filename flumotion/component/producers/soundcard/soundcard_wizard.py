@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -110,8 +110,8 @@ class SoundcardStep(AudioSourceStep):
 
         self._block_update = False
 
-    def worker_changed(self):
-        self.model.worker = self.worker
+    def worker_changed(self, worker):
+        self.model.worker = worker
         self._clear_combos()
         self._update_devices()
         self._update_inputs()

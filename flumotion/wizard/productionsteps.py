@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -162,7 +162,7 @@ class ProductionStep(WorkerWizardStep):
             step = plugin.getProductionStep(type)
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
-                step.worker_changed()
+                step.worker_changed(self.worker)
             return step
 
         d = self._load_plugin(combo.get_selected(), type)

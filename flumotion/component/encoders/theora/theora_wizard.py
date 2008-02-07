@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -86,16 +86,16 @@ class TheoraStep(VideoEncoderStep):
     def get_next(self):
         return self.wizard.get_step('Encoding').get_audio_page()
 
-    def worker_changed(self):
-        self.model.worker = self.worker
+    def worker_changed(self, worker):
+        self.model.worker = worker
 
-        def hasTheora(unused):
+        def hasTheora(unused, worker):
             self.wizard.run_in_worker(
-                self.worker, 'flumotion.worker.checks.encoder', 'checkTheora')
+                worker, 'flumotion.worker.checks.encoder', 'checkTheora')
 
         self.wizard.debug('running Theora checks')
-        d = self.wizard.require_elements(self.worker, 'theoraenc')
-        d.addCallback(hasTheora)
+        d = self.wizard.require_elements(worker, 'theoraenc')
+        d.addCallback(hasTheora, worker)
 
     # Callbacks
 

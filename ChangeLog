@@ -1,5 +1,27 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+
+	Change worker_changed to take a worker argument to simplify the
+	callsites slightly.
+
+2008-02-07  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/configurationwizard.py:
 	Call block_next before requiring an element and block_next when
 	we're done.

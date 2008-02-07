@@ -82,8 +82,8 @@ class TVCardStep(VideoSourceStep):
 
         self._in_setup = False
 
-    def worker_changed(self):
-        self.model.worker = self.worker
+    def worker_changed(self, worker):
+        self.model.worker = worker
         self._clear_combos()
         self._run_checks()
 

@@ -65,9 +65,9 @@ class TestVideoSourceStep(VideoSourceStep):
                        ['pattern', 'width', 'height',
                         'framerate', 'format'])
 
-    def worker_changed(self):
-        self.model.worker = self.worker
-        self.wizard.require_elements(self.worker, 'videotestsrc')
+    def worker_changed(self, worker):
+        self.model.worker = worker
+        self.wizard.require_elements(worker, 'videotestsrc')
 
 
 class VideoTestWizardPlugin(object):

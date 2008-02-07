@@ -297,8 +297,8 @@ class HTTPStep(WorkerWizardStep):
         self._check_elements()
         self._verify()
 
-    def worker_changed(self):
-        self.model.worker = self.worker
+    def worker_changed(self, worker):
+        self.model.worker = worker
         self._check_elements()
 
     def get_next(self):

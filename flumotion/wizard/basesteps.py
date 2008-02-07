@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -35,8 +35,11 @@ class WorkerWizardStep(WizardStep):
         WizardStep.__init__(self, wizard)
         self.worker = None
 
-    def worker_changed(self):
-        pass
+    def worker_changed(self, worker):
+        """This is called when a worker changed.
+        Can be overridden in a subclass
+        @param worker: the new worker
+        """
 
     def run_in_worker(self, module, function, *args, **kwargs):
         return self.wizard.run_in_worker(self.worker, module, function,
@@ -106,8 +109,8 @@ class OverlayStep(WorkerWizardStep):
 
     # Wizard Step
 
-    def worker_changed(self):
-        self._worker_changed()
+    def worker_changed(self, worker):
+        self._worker_changed(worker)
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-audio'):
@@ -121,7 +124,7 @@ class OverlayStep(WorkerWizardStep):
 
     # Private API
 
-    def _worker_changed(self):
+    def _worker_changed(self, worker):
         self.can_overlay = False
         self.set_sensitive(False)
 
@@ -162,7 +165,7 @@ class OverlayStep(WorkerWizardStep):
 
         # first check elements
         d = self.wizard.check_elements(
-            self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
+            worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
         d.addCallback(checkElements)
 
     def on_show_text__toggled(self, button):

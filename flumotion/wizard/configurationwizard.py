@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -399,7 +399,7 @@ class ConfigurationWizard(SectionWizard):
             if step and isinstance(step, WorkerWizardStep):
                 self._setup_worker(step, worker)
                 self.debug('calling %r.worker_changed' % step)
-                step.worker_changed()
+                step.worker_changed(worker)
         else:
             msg = messages.Error(T_(
                     N_('All workers have logged out.\n'
