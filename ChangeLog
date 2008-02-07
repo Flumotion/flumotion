@@ -1,5 +1,8 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am (glade_DATA): Remove wizard_disk.glade 
+	from here.
+
 	* data/glade/wizard_disk.glade:
 	* flumotion/component/consumers/disker/Makefile.am:
 	* flumotion/component/consumers/disker/disker_wizard.py:
