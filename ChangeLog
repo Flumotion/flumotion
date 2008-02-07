@@ -1,5 +1,9 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/videotest/videotest_wizard.py
+	(TestVideoSourceStep.worker_changed): 
+	Move the element check to worker_changed
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard_http.glade:
 	* flumotion/component/consumers/httpstreamer/Makefile.am:
