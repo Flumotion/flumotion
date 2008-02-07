@@ -5,7 +5,7 @@
 	* flumotion/component/consumers/shout2/Makefile.am:
 	* flumotion/component/consumers/shout2/shout2_wizard.py:
 	* flumotion/wizard/consumptionsteps.py:
-	Move the shoutcast component out of consumptionsteps.py
+	Move the shout2 component out of consumptionsteps.py
 
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
