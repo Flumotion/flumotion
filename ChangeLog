@@ -1,5 +1,10 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py:
+	(ProductionStep.plugin_loaded): 
+	First part of unifying the way plugins are fetched
+	in production/converstion
+
 	* flumotion/component/consumers/httpstreamer/http_wizard.py:
 	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
 	* flumotion/component/encoders/smoke/smoke_wizard.py:

@@ -158,15 +158,16 @@ class ProductionStep(WorkerWizardStep):
         return d
 
     def _load_step(self, combo, type):
-        def plugin_loaded(plugin):
+        def plugin_loaded(plugin, entry):
             step = plugin.getProductionStep(type)
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
                 step.worker_changed(self.worker)
             return step
 
-        d = self._load_plugin(combo.get_selected(), type)
-        d.addCallback(plugin_loaded)
+        entry = combo.get_selected()
+        d = self._load_plugin(entry, type)
+        d.addCallback(plugin_loaded, entry)
 
         return d
 
