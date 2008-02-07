@@ -1,5 +1,9 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py:
+	Call block_next before requiring an element and block_next when
+	we're done.
+
 	* flumotion/component/producers/videotest/videotest_wizard.py
 	(TestVideoSourceStep.worker_changed): 
 	Move the element check to worker_changed

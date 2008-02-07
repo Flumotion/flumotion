@@ -222,11 +222,12 @@ class ConfigurationWizard(SectionWizard):
                     "provide these elements and restart the worker.")))
                 message.add(T_(N_("\n\n"
                     "You will not be able to go forward using this worker.")))
-                self.block_next(True)
                 message.id = 'element' + '-'.join(elementNames)
                 self.add_msg(message)
+            self.block_next(False)
             return elements
 
+        self.block_next(True)
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)
 
