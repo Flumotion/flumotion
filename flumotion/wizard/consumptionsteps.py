@@ -26,7 +26,9 @@ from flumotion.component.consumers.httpstreamer.http_wizard import \
      HTTPBothStep, HTTPAudioStep, HTTPVideoStep
 from flumotion.component.consumers.disker.disker_wizard import \
      DiskBothStep, DiskAudioStep, DiskVideoStep
-from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
+from flumotion.component.consumers.shout2.shout2_wizard import \
+     Shout2BothStep, Shout2AudioStep, Shout2VideoStep
+from flumotion.wizard.basesteps import WizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -202,34 +204,5 @@ class ConsumptionStep(WizardStep):
         self.http_video.set_sensitive(value)
 
         self._verify()
-
-
-class Shout2Step(WorkerWizardStep):
-    glade_file = 'wizard_shout2.glade'
-    section = _('Consumption')
-    component_type = 'shout2'
-
-    # WizardStep
-
-    def before_show(self):
-        self.wizard.check_elements(self.worker, 'shout2send')
-
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
-
-
-class Shout2BothStep(Shout2Step):
-    name = _('Icecast streamer (audio & video)')
-    sidebar_name = _('Icecast audio/video')
-
-
-class Shout2AudioStep(Shout2Step):
-    name = _('Icecast streamer (audio only)')
-    sidebar_name = _('Icecast audio')
-
-
-class Shout2VideoStep(Shout2Step):
-    name = _('Icecast streamer (video only)')
-    sidebar_name = _('Icecast video')
 
 

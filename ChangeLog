@@ -1,5 +1,14 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/Makefile.am:
+	* data/glade/wizard_shout2.glade:
+	* flumotion/component/consumers/shout2/Makefile.am:
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	Move the shoutcast component out of consumptionsteps.py
+
+2008-02-07  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/misc/httpfile/httpfile.py: 
 	Raise an exception if the path property isn't set or if the
 	setRootResource is not called.

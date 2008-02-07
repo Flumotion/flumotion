@@ -21,7 +21,6 @@ glade_DATA = \
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_overview.glade		\
-	wizard_shout2.glade		\
 	wizard_source.glade		\
 	wizard_summary.glade		\
 	wizard_welcome.glade

@@ -5,7 +5,7 @@ component_PYTHON = \
 	shout2.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/shout2
-component_DATA = shout2.xml
+component_DATA = shout2.xml shout2-wizard.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo
