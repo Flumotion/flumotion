@@ -1,3 +1,13 @@
+2008-02-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/enums.py:
+
+	Move out enums which are only used once of wizard/enums.py into
+	their respective callsites.
+
 2008-02-06  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/cortado/cortado.py:

@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -29,48 +29,9 @@ from flumotion.common import enum
 __version__ = "$Rev$"
 
 #
-# Videotestsrc, order is important here, since it maps to
-#               GstVideotestsrcPattern
-#
-VideoTestPattern = enum.EnumClass(
-    'VideoTestPattern',
-    ['Bars', 'Snow', 'Black'],
-    [_('SMPTE Color bars'),
-     _('Random (television snow)'),
-     _('Totally black')])
-
-#
-# Sound card
-#
-
-SoundcardSystem = enum.EnumClass(
-    'SoundcardSystem',
-    ['Alsa', 'OSS'],
-    element_name=['alsasrc', 'osssrc'])
-
-#
 # Disk writer
 #
 
-RotateTime = enum.EnumClass(
-    'RotateTime',
-    ['Minutes', 'Hours', 'Days', 'Weeks'],
-    [_('minute(s)'),
-     _('hour(s)'),
-     _('day(s)'),
-     _('week(s)')],
-    unit=(60,
-          60*60,
-          60*60*24,
-          60*60*25*7))
-RotateSize = enum.EnumClass(
-    'RotateSize',
-    ['kB', 'MB', 'GB', 'TB'],
-    [_('kB'), _('MB'), _('GB'), _('TB')],
-    unit=(1 << 10L,
-          1 << 20L,
-          1 << 30L,
-          1 << 40L))
 
 LicenseType = enum.EnumClass(
     'LicenseType',

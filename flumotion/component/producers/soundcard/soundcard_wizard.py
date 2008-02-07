@@ -22,9 +22,9 @@
 import gettext
 import os
 
+from flumotion.common import enum
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.wizard.basesteps import AudioSourceStep
-from flumotion.wizard.enums import SoundcardSystem
 from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
@@ -48,6 +48,11 @@ SAMPLE_RATES = [48000,
                 16000,
                 11025,
                 8000]
+SoundcardSystem = enum.EnumClass(
+    'SoundcardSystem',
+    ['Alsa', 'OSS'],
+    element_name=['alsasrc', 'osssrc'])
+
 
 class SoundcardProducer(AudioProducer):
     component_type = 'soundcard-producer'

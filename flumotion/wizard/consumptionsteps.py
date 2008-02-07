@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -21,15 +21,36 @@
 
 import gettext
 
+from flumotion.common import enum
 from flumotion.common.python import any
 from flumotion.component.consumers.httpstreamer.http_wizard import \
      HTTPBothStep, HTTPAudioStep, HTTPVideoStep
 from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
-from flumotion.wizard.enums import RotateSize, RotateTime
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 X_ = _
+
+
+RotateTime = enum.EnumClass(
+    'RotateTime',
+    ['Minutes', 'Hours', 'Days', 'Weeks'],
+    [_('minute(s)'),
+     _('hour(s)'),
+     _('day(s)'),
+     _('week(s)')],
+    unit=(60,
+          60*60,
+          60*60*24,
+          60*60*25*7))
+RotateSize = enum.EnumClass(
+    'RotateSize',
+    ['kB', 'MB', 'GB', 'TB'],
+    [_('kB'), _('MB'), _('GB'), _('TB')],
+    unit=(1 << 10L,
+          1 << 20L,
+          1 << 30L,
+          1 << 40L))
 
 
 class ConsumptionStep(WizardStep):

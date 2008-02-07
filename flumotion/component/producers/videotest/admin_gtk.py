@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -23,11 +23,19 @@ from gettext import gettext as _
 
 import gtk
 
+from flumotion.common import enum
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 from flumotion.ui import fgtk
-from flumotion.wizard import enums
 
 __version__ = "$Rev$"
+
+
+VideoTestPattern = enum.EnumClass(
+    'VideoTestPattern',
+    ['Bars', 'Snow', 'Black'],
+    [_('SMPTE Color bars'),
+     _('Random (television snow)'),
+     _('Totally black')])
 
 
 class PatternNode(BaseAdminGtkNode):
@@ -40,7 +48,7 @@ class PatternNode(BaseAdminGtkNode):
         self.widget.attach(label, 0, 1, 0, 1, 0, 0, 6, 6)
         label.show()
         self.combobox_pattern = fgtk.FProxyComboBox()
-        self.combobox_pattern.set_enum(enums.VideoTestPattern)
+        self.combobox_pattern.set_enum(VideoTestPattern)
         self.pattern_changed_id = self.combobox_pattern.connect('changed',
             self.cb_pattern_changed)
         self.widget.attach(self.combobox_pattern, 1, 2, 0, 1, 0, 0, 6, 6)
