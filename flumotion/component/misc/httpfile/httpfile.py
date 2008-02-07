@@ -245,6 +245,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         root = self._rootResource
         if root is None:
             root = self._getDefaultRootResource()
+
+        if root is None:
+            raise errors.WrongStateError(
+                "a resource or path property must be set")
+
         site = Site(root, self)
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
@@ -362,6 +367,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
     def _getDefaultRootResource(self):
+        if filePath is None:
+            return None
+
         self.debug('Starting with mount point "%s"' % self.mountPoint)
         factory = file.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource)

@@ -162,6 +162,7 @@ flumotion/component/consumers/disker/disker_plug.py
 flumotion/component/consumers/disker/disker.py
 flumotion/component/consumers/disker/__init__.py
 flumotion/component/consumers/disker/admin_gtk.py
+flumotion/component/consumers/disker/disker_wizard.py
 flumotion/component/consumers/preview/preview.py
 flumotion/component/consumers/preview/__init__.py
 flumotion/component/consumers/httpstreamer/resources.py
@@ -400,7 +401,6 @@ data/glade/greeter-initial.glade
 data/glade/wizard_consumption.glade
 data/glade/greeter-authenticate.glade
 data/glade/greeter-connect_to_existing.glade
-data/glade/wizard_disk.glade
 data/glade/wizard_shout2.glade
 flumotion/component/encoders/jpeg/jpeg-wizard.glade
 flumotion/component/encoders/jpeg/jpeg.xml
@@ -431,6 +431,7 @@ flumotion/component/producers/webcam/webcam-wizard.glade
 flumotion/component/producers/webcam/webcam.xml
 flumotion/component/misc/httpfile/httpfile.glade
 flumotion/component/consumers/disker/disker.glade
+flumotion/component/consumers/disker/disker-wizard.glade
 flumotion/component/consumers/httpstreamer/http.glade
 flumotion/component/bouncers/bouncer.glade
 flumotion/component/base/feeders.glade

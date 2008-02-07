@@ -21,36 +21,16 @@
 
 import gettext
 
-from flumotion.common import enum
 from flumotion.common.python import any
 from flumotion.component.consumers.httpstreamer.http_wizard import \
      HTTPBothStep, HTTPAudioStep, HTTPVideoStep
+from flumotion.component.consumers.disker.disker_wizard import \
+     DiskBothStep, DiskAudioStep, DiskVideoStep
 from flumotion.wizard.basesteps import WizardStep, WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 X_ = _
-
-
-RotateTime = enum.EnumClass(
-    'RotateTime',
-    ['Minutes', 'Hours', 'Days', 'Weeks'],
-    [_('minute(s)'),
-     _('hour(s)'),
-     _('day(s)'),
-     _('week(s)')],
-    unit=(60,
-          60*60,
-          60*60*24,
-          60*60*25*7))
-RotateSize = enum.EnumClass(
-    'RotateSize',
-    ['kB', 'MB', 'GB', 'TB'],
-    [_('kB'), _('MB'), _('GB'), _('TB')],
-    unit=(1 << 10L,
-          1 << 20L,
-          1 << 30L,
-          1 << 40L))
 
 
 class ConsumptionStep(WizardStep):
@@ -222,96 +202,6 @@ class ConsumptionStep(WizardStep):
         self.http_video.set_sensitive(value)
 
         self._verify()
-
-
-class DiskStep(WorkerWizardStep):
-    glade_file = 'wizard_disk.glade'
-    section = _('Consumption')
-    icon = 'kcmdevices.png'
-
-    # WizardStep
-
-    def setup(self):
-        self.combobox_time_list.set_enum(RotateTime)
-        self.combobox_size_list.set_enum(RotateSize)
-        self.radiobutton_has_time.set_active(True)
-        self.spinbutton_time.set_value(12)
-        self.combobox_time_list.select(RotateTime.Hours)
-        self.checkbutton_record_at_startup.set_active(True)
-
-    def get_state(self):
-        options = {}
-        if not self.checkbutton_rotate.get_active():
-            options['rotate-type'] = 'none'
-        else:
-            if self.radiobutton_has_time.get_active():
-                options['rotate-type'] = 'time'
-                time_value = self.combobox_time_list.get_selected()
-                options['time'] = long(
-                    self.spinbutton_time.get_value() * time_value.unit)
-            elif self.radiobutton_has_size.get_active():
-                options['rotate-type'] = 'size'
-                size_value = self.combobox_size_list.get_selected()
-                options['size'] = long(
-                    self.spinbutton_size.get_value() * size_value.unit)
-
-        options['directory'] = self.entry_location.get_text()
-        options['start-recording'] = \
-            self.checkbutton_record_at_startup.get_active()
-        return options
-
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
-
-    # Private
-
-    def _update_radio(self):
-        if self.radiobutton_has_size.get_active():
-            self.spinbutton_size.set_sensitive(True)
-            self.combobox_size_list.set_sensitive(True)
-            self.spinbutton_time.set_sensitive(False)
-            self.combobox_time_list.set_sensitive(False)
-        elif self.radiobutton_has_time.get_active():
-            self.spinbutton_time.set_sensitive(True)
-            self.combobox_time_list.set_sensitive(True)
-            self.spinbutton_size.set_sensitive(False)
-            self.combobox_size_list.set_sensitive(False)
-
-    # Callbacks
-
-    def on_radiobutton_has_time_toggled(self, radio):
-        self._update_radio()
-
-    def on_radiobutton_has_size_toggled(self, radio):
-        self._update_radio()
-
-    def on_checkbutton_rotate_toggled(self, button):
-        if self.checkbutton_rotate.get_active():
-            self.radiobutton_has_size.set_sensitive(True)
-            self.radiobutton_has_time.set_sensitive(True)
-            self._update_radio()
-        else:
-            self.radiobutton_has_size.set_sensitive(False)
-            self.spinbutton_size.set_sensitive(False)
-            self.combobox_size_list.set_sensitive(False)
-            self.radiobutton_has_time.set_sensitive(False)
-            self.spinbutton_time.set_sensitive(False)
-            self.combobox_time_list.set_sensitive(False)
-
-
-class DiskBothStep(DiskStep):
-    name = _('Disk (audio & video)')
-    sidebar_name = _('Disk audio/video')
-
-
-class DiskAudioStep(DiskStep):
-    name = _('Disk (audio only)')
-    sidebar_name = _('Disk audio')
-
-
-class DiskVideoStep(DiskStep):
-    name = _('Disk (video only)')
-    sidebar_name = _('Disk video')
 
 
 class Shout2Step(WorkerWizardStep):

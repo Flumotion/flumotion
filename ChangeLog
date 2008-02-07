@@ -1,5 +1,16 @@
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_disk.glade:
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/wizard/consumptionsteps.py:
+
+	Move disk steps out of wizard/consumptionsteps.py and the
+	disker glade file into the component directory.
+
+2008-02-07  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/soundcard/soundcard_wizard.py:
 	* flumotion/component/producers/videotest/admin_gtk.py:
 	* flumotion/wizard/consumptionsteps.py:
