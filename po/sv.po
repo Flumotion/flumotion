@@ -1729,13 +1729,15 @@ msgid "_Audio:"
 msgstr "_Ljud:"
 
 #: data/glade/wizard_source.glade:117 data/glade/wizard_encoding.glade:113
+# B conflicts with _Back
 msgid "_Video:"
-msgstr "_Bild:"
+msgstr "B_ild:"
 
+# _B conflicts with back
 #: data/glade/wizard_tvcard.glade:65 data/glade/videotest.glade:60
 #: flumotion/component/producers/videotest/videotest-wizard.glade:33
 msgid "_Width:"
-msgstr "_Bredd:"
+msgstr "B_redd:"
 
 #: data/glade/wizard_tvcard.glade:90 data/glade/videotest.glade:85
 #: flumotion/component/producers/videotest/videotest-wizard.glade:62
