@@ -441,14 +441,16 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self.setMood(moods.happy)
 
         def got_error(failure):
+            txt = log.getFailureMessage(failure)
+            self.debug('got_error: %s', txt)
             if not failure.check(errors.ComponentSetupHandledError):
-                txt = log.getFailureMessage(failure)
                 self.warning('Setup failed: %s', txt)
                 m = messages.Error(T_(N_("Could not setup component.")),
                                    debug=txt,
                                    id="component-setup-%s" % self.name)
                 # will call setMood(moods.sad)
                 self.addMessage(m)
+
             # swallow
             return None
 
