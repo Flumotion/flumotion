@@ -317,11 +317,12 @@ class ParseLaunchComponent(FeedComponent):
         try:
             unparsed = self.get_pipeline_string(self.config['properties'])
         except errors.MissingElementError, e:
+            self.warning('Missing %s element' % e.args[0])
             m = messages.Error(T_(N_(
                 "The worker does not have the '%s' element installed.\n"
                 "Please install the necessary plug-in and restart "
                 "the component.\n"), e.args[0]))
-            self.state.append('messages', m)
+            self.addMessage(m)
             raise errors.ComponentSetupHandledError(e)
 
         self.pipeline_string = self.parse_pipeline(unparsed)
@@ -333,7 +334,7 @@ class ParseLaunchComponent(FeedComponent):
             m = messages.Error(T_(N_(
                 "GStreamer error: could not parse component pipeline.")),
                 debug=e.message)
-            self.state.append('messages', m)
+            self.addMessage(m)
             raise errors.PipelineParseError(e.message)
 
         return pipeline
