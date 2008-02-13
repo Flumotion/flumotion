@@ -1,3 +1,9 @@
+2008-02-13  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	Block next while fetching the next page.
+
 2008-02-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:

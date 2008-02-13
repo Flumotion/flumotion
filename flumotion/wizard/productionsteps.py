@@ -77,7 +77,9 @@ class ProductionStep(WorkerWizardStep):
         def step_loaded(step):
             if step is not None:
                 self._video_producer = step.model
+            self.wizard.block_next(False)
             return step
+        self.wizard.block_next(True)
         d = self._load_step(self.video, 'video')
         d.addCallback(step_loaded)
         return d
@@ -91,7 +93,9 @@ class ProductionStep(WorkerWizardStep):
         def step_loaded(step):
             if step is not None:
                 self._audio_producer = step.model
+            self.wizard.block_next(False)
             return step
+        self.wizard.block_next(True)
         d = self._load_step(self.audio, 'audio')
         d.addCallback(step_loaded)
         return d
