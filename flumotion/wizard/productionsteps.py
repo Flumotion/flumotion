@@ -44,11 +44,9 @@ class ProductionStep(WorkerWizardStep):
     icon = 'source.png'
 
     def __init__(self, wizard):
-        WorkerWizardStep.__init__(self, wizard)
         self._audio_producer = None
         self._video_producer = None
-        # FIXME: Why isn't setup() called for WorkerWizardSteps?
-        self._setup()
+        WorkerWizardStep.__init__(self, wizard)
 
     # Public API
 
@@ -102,8 +100,20 @@ class ProductionStep(WorkerWizardStep):
 
     # WizardStep
 
+    def setup(self):
+        self.audio.data_type = object
+        self.video.data_type = object
+        # We want to save the audio/video attributes as
+        # component_type in the respective models
+        self.audio.model_attribute = 'component_type'
+        self.video.model_attribute = 'component_type'
+
+        tips = gtk.Tooltips()
+        tips.set_tip(self.has_video, _('If you want to stream video'))
+        tips.set_tip(self.has_audio, _('If you want to stream audio'))
+
     def activated(self):
-        self._verify()
+        self._populate_combos()
 
     def get_next(self):
         if self.has_video.get_active():
@@ -115,20 +125,7 @@ class ProductionStep(WorkerWizardStep):
 
     # Private API
 
-    def _setup(self):
-        self.audio.data_type = object
-        self.video.data_type = object
-        # We want to save the audio/video attributes as
-        # component_type in the respective models
-        self.audio.model_attribute = 'component_type'
-        self.video.model_attribute = 'component_type'
-
-        tips = gtk.Tooltips()
-        tips.set_tip(self.has_video,
-                     _('If you want to stream video'))
-        tips.set_tip(self.has_audio,
-                     _('If you want to stream audio'))
-
+    def _populate_combos(self):
         def got_entries(entries, combo, default_type):
             data = []
             default = None
@@ -147,6 +144,10 @@ class ProductionStep(WorkerWizardStep):
             d = self.wizard._admin.getWizardEntries(
                 wizard_types=[ctype])
             d.addCallback(got_entries, combo, default_type)
+            combo.prefill([('...', None)])
+
+        self.wizard.block_next(True)
+        d.addCallback(lambda x: self.wizard.block_next(False))
 
     def _load_plugin(self, component_type, type):
         def got_factory(factory):
