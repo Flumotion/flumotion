@@ -1,5 +1,8 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): Remove, 
+	all videosource steps uses separate model classes now.
+
 	* flumotion/ui/wizard.py (WizardStep): Remove unused method before_show.
 
 	* flumotion/wizard/configurationwizard.py (LicenseStep)

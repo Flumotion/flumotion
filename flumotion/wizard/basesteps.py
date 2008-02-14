@@ -66,12 +66,6 @@ class VideoSourceStep(WorkerWizardStep):
     def get_next(self):
         return OverlayStep(self.wizard, self.model)
 
-    def get_state(self):
-        options = WorkerWizardStep.get_state(self)
-        options['width'] = int(options['width'])
-        options['height'] = int(options['height'])
-        return options
-
 
 class VideoEncoderStep(WorkerWizardStep):
     section = _('Conversion')
