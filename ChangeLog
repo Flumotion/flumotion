@@ -1,12 +1,12 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
-	Display tooltips when hoovering over menuenters and toolbuttons.
+	Display tooltips when hoovering over menu entries and tool buttons.
 	Add tooltips for all actions. Fixes #827
-	
+
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): Remove, 
+	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): Remove,
 	all videosource steps uses separate model classes now.
 
 	* flumotion/ui/wizard.py (WizardStep): Remove unused method before_show.
