@@ -45,11 +45,9 @@ class ConversionStep(WorkerWizardStep):
     section = _('Conversion')
 
     def __init__(self, wizard):
-        WorkerWizardStep.__init__(self, wizard)
         self._audio_encoder = None
         self._video_encoder = None
-        self._prepare_flow()
-        self._setup()
+        WorkerWizardStep.__init__(self, wizard)
 
     # Public API
 
@@ -83,21 +81,11 @@ class ConversionStep(WorkerWizardStep):
 
     # WizardStep
 
-    def get_next(self):
-        if self.wizard.get_step_option('Source', 'has-video'):
-            return self._get_video_page()
-        elif self.wizard.get_step_option('Source', 'has-audio'):
-            return self._get_audio_page()
-        else:
-            return None
-
-    # Private
-
-    def _prepare_flow(self):
+    def setup(self):
         self._muxer = Muxer()
         self.wizard.flow.addComponent(self._muxer)
 
-    def _setup(self):
+    def activated(self):
         data = [('muxer', self.muxer)]
 
         production = self.wizard.get_step('Source')
@@ -116,6 +104,16 @@ class ConversionStep(WorkerWizardStep):
             self.label_video.hide()
 
         self._populate_combos(data)
+
+    def get_next(self):
+        if self.wizard.get_step_option('Source', 'has-video'):
+            return self._get_video_page()
+        elif self.wizard.get_step_option('Source', 'has-audio'):
+            return self._get_audio_page()
+        else:
+            return None
+
+    # Private
 
     def _populate_combos(self, combos, provides=None):
         for ctype, combo in combos:

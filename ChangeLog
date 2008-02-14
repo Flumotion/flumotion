@@ -1,5 +1,8 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/conversionsteps.py: Use setup/activated instead of
+	calling private methods from the wizard.
+
 	* flumotion/component/consumers/shout2/shout2_wizard.py (Shout2Step.worker_changed): Check
 	elements in worker_changed instead of before_show.
 
