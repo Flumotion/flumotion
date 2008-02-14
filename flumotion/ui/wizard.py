@@ -143,6 +143,7 @@ class WizardStep(GladeWidget, log.Loggable):
         raise NotImplementedError
 
     # Optional vmethods
+
     def setup(self):
         """This is called after the step is constructed, to be able to
         do some initalization time logic in the steps."""
@@ -150,10 +151,6 @@ class WizardStep(GladeWidget, log.Loggable):
     def activated(self):
         """Called just before the step is shown, so the step can
         do some logic, eg setup the default state"""
-
-    def before_show(self):
-        """This is called just before we show the widget, everything
-        is created and in place"""
 
 
 class SectionWizard(GladeWindow, log.Loggable):
@@ -374,8 +371,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.block_next(False)
 
         self.before_show_step(step)
-
-        step.before_show()
 
         self.debug('showing step %r' % step)
         step.show()

@@ -1,7 +1,9 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/wizard.py (WizardStep): Remove unused method before_show.
+
 	* flumotion/wizard/configurationwizard.py (LicenseStep)
-	(WelcomeStep): Disable changing of the style. Juse use the default background color
+	(WelcomeStep): Disable changing of the style. Juse use the default background color.
 
 	* flumotion/wizard/conversionsteps.py: Use setup/activated instead of
 	calling private methods from the wizard.
