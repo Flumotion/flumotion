@@ -36,8 +36,8 @@ class Shout2Step(WorkerWizardStep):
 
     # WizardStep
 
-    def before_show(self):
-        self.wizard.check_elements(self.worker, 'shout2send')
+    def worker_changed(self, worker):
+        self.wizard.check_elements(worker, 'shout2send')
 
     def get_next(self):
         return self.wizard.get_step('Consumption').get_next(self)

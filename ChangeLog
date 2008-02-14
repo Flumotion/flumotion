@@ -1,5 +1,8 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/shout2/shout2_wizard.py (Shout2Step.worker_changed): Check
+	elements in worker_changed instead of before_show.
+
 	* flumotion/wizard/conversionsteps.py (ConversionStep._populate_combos): 
 	Put ... in the combos while querying the manager and block the next button meanwhile.
 	Disable the combos sensitivy while querying.
