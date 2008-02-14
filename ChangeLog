@@ -1,7 +1,7 @@
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
-	Display tooltips when hoovering over menu entries and tool buttons.
+	Display tooltips when hovering over menu entries and tool buttons.
 	Add tooltips for all actions. Fixes #827
 
 2008-02-14  Johan Dahlin  <johan@gnome.org>
