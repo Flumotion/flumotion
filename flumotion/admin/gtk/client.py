@@ -120,7 +120,7 @@ MAX_RECENT_ITEMS = 4
 class AdminClientWindow(Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
-    Also connects to the manager on the given host and port.
+o    Also connects to the manager on the given host and port.
     '''
 
     implements(IStateListener)
@@ -256,50 +256,71 @@ class AdminClientWindow(Loggable, gobject.GObject):
             # Connection
             ('connection', None, _("_Connection")),
             ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'), None,
-             None, self._connection_open_recent_cb),
+             _('Connect to a recently used connection'),
+             self._connection_open_recent_cb),
             ('open-existing', None, _('Open _Existing Connection...'), None,
-             None, self._connection_open_existing_cb),
+             _('Connect to an previously used connection'),
+             self._connection_open_existing_cb),
             ('import-config', None, _('_Import Configuration...'), None,
-             None, self._connection_import_configuration_cb),
+             _('Import configuration from a file'),
+             self._connection_import_configuration_cb),
             ('export-config', None, _('_Export Configuration...'), None,
-             None, self._connection_export_configuration_cb),
+             _('Export current configuration to a file'),
+             self._connection_export_configuration_cb),
             ('quit', gtk.STOCK_QUIT, _('_Quit'), None,
-             None, self._connection_quit_cb),
+             _('Quit the application and disconnect from the manager'),
+             self._connection_quit_cb),
 
             # Manage
             ('manage', None, _('_Manage')),
             ('start-component', 'flumotion-play', _('_S_tart Component'), None,
-             None, self._manage_start_component_cb),
+             _('Start the selected component'),
+             self._manage_start_component_cb),
             ('stop-component', 'flumotion-pause', _('St_op Component'), None,
-             None, self._manage_stop_component_cb),
+             _('Stop the selected component'),
+             self._manage_stop_component_cb),
             ('delete-component', gtk.STOCK_DELETE, _('_Delete Component'), None,
-             None, self._manage_delete_component_cb),
+             _('Delete the selected component'),
+             self._manage_delete_component_cb),
             ('start-all', None, _('Start _All'), None,
-             None, self._manage_start_all_cb),
+             _('Start all components'),
+             self._manage_start_all_cb),
             ('stop-all', None, _('Stop A_ll'), None,
-             None, self._manage_stop_all_cb),
+             _('Stop all components'),
+             self._manage_stop_all_cb),
             ('clear-all', gtk.STOCK_CLEAR, _('_Clear All'), None,
-             None, self._manage_clear_all_cb),
+             _('Remove all components'),
+             self._manage_clear_all_cb),
             ('run-wizard', 'flumotion-wizard', _('Run _Wizard'), None,
-             None, self._manage_run_wizard_cb),
+             _('Run the configuration wizard'),
+             self._manage_run_wizard_cb),
 
             # Debug
             ('debug', None, _('_Debug')),
             ('reload-manager', gtk.STOCK_REFRESH, _('Reload _Manager'), None,
-             None, self._debug_reload_manager_cb),
+             _('Reload the code used by the manager'),
+             self._debug_reload_manager_cb),
             ('reload-admin', gtk.STOCK_REFRESH, _('Reload _Admin'), None,
-             None, self._debug_reload_admin_cb),
+             _('Reload the code used by the admin client'),
+             self._debug_reload_admin_cb),
             ('reload-all', gtk.STOCK_REFRESH, _('Reload A_ll'), None,
-             None, self._debug_reload_all_cb),
+             _('Reload the code used by the admin client, manager and workers'),
+             self._debug_reload_all_cb),
             ('start-shell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
-             None, self._debug_start_shell_cb),
+             _('Start an interactive debugging shell'),
+             self._debug_start_shell_cb),
 
             # Help
             ('help', None, _('_Help')),
             ('about', gtk.STOCK_ABOUT, _('_About'), None,
-             None, self._help_about_cb),
+             _('Displays an about dialog'),
+             self._help_about_cb),
             ]
         uimgr = gtk.UIManager()
+        uimgr.connect('connect-proxy',
+                      self._on_uimanager__connect_proxy)
+        uimgr.connect('disconnect-proxy',
+                      self._on_uimanager__disconnect_proxy)
         group = gtk.ActionGroup('actions')
         group.add_actions(actions)
         uimgr.insert_action_group(group, 0)
@@ -353,6 +374,45 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         return window
 
+    def _on_uimanager__connect_proxy(self, uimgr, action, widget):
+        tooltip = action.get_property('tooltip')
+        if not tooltip:
+            return
+
+        if isinstance(widget, gtk.MenuItem):
+            cid = widget.connect('select', self._on_menu_item__select,
+                                 tooltip)
+            cid2 = widget.connect('deselect', self._on_menu_item__deselect)
+            widget.set_data('pygtk-app::proxy-signal-ids', (cid, cid2))
+        elif isinstance(widget, gtk.ToolButton):
+            cid = widget.child.connect('enter', self._on_tool_button__enter,
+                                       tooltip)
+            cid2 = widget.child.connect('leave', self._on_tool_button__leave)
+            widget.set_data('pygtk-app::proxy-signal-ids', (cid, cid2))
+
+    def _on_uimanager__disconnect_proxy(self, uimgr, action, widget):
+        cids = widget.get_data('pygtk-app::proxy-signal-ids')
+        if not cids:
+            return
+
+        if isinstance(widget, gtk.ToolButton):
+            widget = widget.child
+
+        for name, cid in cids:
+            widget.disconnect(cid)
+
+    def _on_menu_item__select(self, menuitem, tooltip):
+        self.statusbar.push('main', tooltip)
+
+    def _on_menu_item__deselect(self, menuitem):
+        self.statusbar.pop('main')
+
+    def _on_tool_button__enter(self, toolbutton, tooltip):
+        self.statusbar.push('main', tooltip)
+
+    def _on_tool_button__leave(self, toolbutton):
+        self.statusbar.pop('main')
+
     def _append_recent_connections(self):
         if self._recent_menu_uid:
             self._uimgr.remove_ui(self._recent_menu_uid)
@@ -365,7 +425,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
             name = conn.host
             ui += '<menuitem action="%s"/>' % name
-            action = gtk.Action(name, name, '', '')
+            action = gtk.Action(name, name,
+                                _('Connect to the manager on %s') % conn.host,
+                                '')
             action.connect('activate', recent_activate, conn)
             self._actiongroup.add_action(action)
 
