@@ -1,3 +1,11 @@
+2008-02-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/conversionsteps.py (ConversionStep._populate_combos): 
+	Put ... in the combos while querying the manager and block the next button meanwhile.
+	Disable the combos sensitivy while querying.
+	* flumotion/wizard/productionsteps.py (ProductionStep._populate_combos): 
+	Disable the combos sensitivy while querying.
+
 2008-02-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py (ProductionStep.__init__): 

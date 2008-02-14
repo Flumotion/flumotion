@@ -137,6 +137,7 @@ class ProductionStep(WorkerWizardStep):
             assert default
             data.insert(0, (N_(default.description), default.component_type))
             combo.prefill(data)
+            combo.set_sensitive(True)
 
         for ctype, combo, default_type in [
             ('video-producer', self.video, 'videotest-producer'),
@@ -145,6 +146,7 @@ class ProductionStep(WorkerWizardStep):
                 wizard_types=[ctype])
             d.addCallback(got_entries, combo, default_type)
             combo.prefill([('...', None)])
+            combo.set_sensitive(False)
 
         self.wizard.block_next(True)
         d.addCallback(lambda x: self.wizard.block_next(False))

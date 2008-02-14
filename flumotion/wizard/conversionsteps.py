@@ -123,12 +123,17 @@ class ConversionStep(WorkerWizardStep):
                 wizard_types=[ctype],
                 provides=provides)
             d.addCallback(self._add_entries, ctype, combo)
+            combo.prefill([('...', None)])
+            combo.set_sensitive(False)
+        self.wizard.block_next(True)
+        d.addCallback(lambda x: self.wizard.block_next(False))
 
     def _add_entries(self, entries, ctype, combo):
         data = []
         for entry in entries:
             data.append((N_(entry.description), entry))
         combo.prefill(data)
+        combo.set_sensitive(True)
 
     def _create_dummy_model(self, entry):
         if entry.type == 'audio-encoder':
@@ -200,6 +205,9 @@ class ConversionStep(WorkerWizardStep):
 
     def _muxer_changed(self):
         muxer_entry = self.muxer.get_selected()
+        # '...' used while waiting for the query to be done
+        if muxer_entry is None:
+            return
         self._populate_combos([('audio-encoder', self.audio),
                                ('video-encoder', self.video)],
                               provides=muxer_entry.getAcceptedMediaTypes())
