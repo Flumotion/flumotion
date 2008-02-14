@@ -64,11 +64,6 @@ class WelcomeStep(WizardStep):
     section = _('Welcome')
     icon = 'wizard.png'
 
-    def before_show(self):
-        self.textview_message.realize()
-        normal_bg = self.textview_message.get_style().bg[gtk.STATE_NORMAL]
-        self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
-
     def get_next(self):
         return None
 
@@ -101,11 +96,6 @@ class SummaryStep(WizardStep):
     last_step = True
 
     # WizardStep
-
-    def before_show(self):
-        self.textview_message.realize()
-        normal_bg = self.textview_message.get_style().bg[gtk.STATE_NORMAL]
-        self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
 
     def get_next(self):
         return None
