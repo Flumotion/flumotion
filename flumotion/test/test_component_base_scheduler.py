@@ -88,6 +88,7 @@ class EventTest(testsuite.TestCase):
         self.assertEquals(now.tzinfo, None)
 
         event = scheduler.Event(now, now+hour, 'foo')
+
         self.assertEquals(event.start.tzinfo, scheduler.LOCAL)
         self.assertEquals(event.start, now.replace(tzinfo=scheduler.LOCAL))
 
@@ -102,7 +103,11 @@ class EventTest(testsuite.TestCase):
         now = end + timedelta(days=1)
 
         rrule = "FREQ=DAILY;UNTIL=20071223T080000Z;WKST=MO"
-        event = scheduler.Event(start, end, 'content', rrule, now=now)
+        try:
+            event = scheduler.Event(start, end, 'content', rrule, now=now)
+        except ImportError:
+            raise unittest.SkipTest("don't have dateutil python "
+                                    "package installed")
 
         self.assertEquals(event.start, start)
         self.assertEquals(event.end, end)

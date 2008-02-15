@@ -1,3 +1,8 @@
+2008-02-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_component_base_scheduler.py (EventTest.testRecurringOnce): Check
+	if dateutil is installed before running this test
+
 2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/wizard/configurationwizard.py:
