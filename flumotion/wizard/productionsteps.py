@@ -24,7 +24,7 @@ import gettext
 import gtk
 
 from flumotion.common.errors import NoBundleError
-from flumotion.wizard.basesteps import WorkerWizardStep
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 # Register components
 from flumotion.common import componentui

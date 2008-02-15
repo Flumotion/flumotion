@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.ui.wizard import WizardStep
+
 __version__ = "$Rev: 6225 $"
 
 

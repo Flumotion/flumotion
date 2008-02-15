@@ -1,3 +1,8 @@
+2008-02-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionstep.py: Forgot to save this file.
+	* flumotion/wizard/workerstep.py: Import WizardStep too.
+
 2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/component/consumers/disker/disker_wizard.py:
