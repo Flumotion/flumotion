@@ -230,6 +230,8 @@ flumotion/wizard/conversionsteps.py
 flumotion/wizard/configurationwizard.py
 flumotion/wizard/__init__.py
 flumotion/wizard/basesteps.py
+flumotion/wizard/overlaystep.py
+flumotion/wizard/workerstep.py
 flumotion/monitor/nagios/util.py
 flumotion/monitor/nagios/main.py
 flumotion/monitor/nagios/__init__.py

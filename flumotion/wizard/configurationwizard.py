@@ -31,7 +31,6 @@ from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard import save
-from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.enums import LicenseType

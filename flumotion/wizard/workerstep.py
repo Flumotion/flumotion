@@ -19,42 +19,23 @@
 
 # Headers in this file shall remain intact.
 
-import gettext
-import os
-
-from flumotion.wizard.workerstep import WorkerWizardStep
-
-__version__ = "$Rev$"
-_ = gettext.gettext
+__version__ = "$Rev: 6225 $"
 
 
-class Shout2Step(WorkerWizardStep):
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'shout2-wizard.glade')
-    section = _('Consumption')
-    component_type = 'shout2'
+class WorkerWizardStep(WizardStep):
 
-    # WizardStep
+    def __init__(self, wizard):
+        WizardStep.__init__(self, wizard)
+        self.worker = None
 
     def worker_changed(self, worker):
-        self.wizard.check_elements(worker, 'shout2send')
+        """This is called when a worker changed.
+        Can be overridden in a subclass
+        @param worker: the new worker
+        """
 
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
-
-
-class Shout2BothStep(Shout2Step):
-    name = _('Icecast streamer (audio & video)')
-    sidebar_name = _('Icecast audio/video')
-
-
-class Shout2AudioStep(Shout2Step):
-    name = _('Icecast streamer (audio only)')
-    sidebar_name = _('Icecast audio')
-
-
-class Shout2VideoStep(Shout2Step):
-    name = _('Icecast streamer (video only)')
-    sidebar_name = _('Icecast video')
+    def run_in_worker(self, module, function, *args, **kwargs):
+        return self.wizard.run_in_worker(self.worker, module, function,
+                                         *args, **kwargs)
 
 

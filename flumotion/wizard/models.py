@@ -292,6 +292,20 @@ class VideoProducer(Producer):
     """
     name_template = "video-producer"
 
+    def getWidth(self):
+        """Get the width of the video producer
+        @returns: the width
+        @rtype: integer
+        """
+        return self.properties.width
+
+    def getHeight(self):
+        """Get the height of the video producer
+        @returns: the height
+        @rtype: integer
+        """
+        return self.properties.height
+
 
 class AudioEncoder(Encoder):
     """I am a component which encodes audio

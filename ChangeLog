@@ -1,3 +1,21 @@
+2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/workerstep.py:
+	* po/POTFILES.in:
+	Rewrite overlay wizard step to use a model+proxy.
+	Move overlay and worker step out of basesteps.
+	Update import callsites.
+
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:

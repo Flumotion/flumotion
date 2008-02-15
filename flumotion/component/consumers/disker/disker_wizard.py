@@ -23,7 +23,7 @@ import gettext
 import os
 
 from flumotion.common.enum import EnumClass
-from flumotion.wizard.basesteps import WorkerWizardStep
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

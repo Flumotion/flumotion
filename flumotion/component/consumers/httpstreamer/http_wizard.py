@@ -41,8 +41,8 @@ import random
 
 from flumotion.configure import configure
 from flumotion.component.misc.cortado.cortado_location import CORTADO_FILENAME
-from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.models import Component, Consumer, Plug
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

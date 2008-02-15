@@ -22,7 +22,7 @@
 import gettext
 
 from flumotion.common import log
-from flumotion.wizard import enums
+from flumotion.wizard.enums import LicenseType
 from flumotion.configure import configure
 
 # FIXME: This is absolutely /horrible/, we should not
@@ -231,38 +231,29 @@ class WizardSaver(log.Loggable):
                          streamer.getWorker(),
                          streamer.getProperties())
 
-    def getVideoOverlay(self, video_source):
+    def _getVideoOverlay(self):
         step = self.wizard.get_step('Overlay')
-        properties = step.get_state()
-
-        has_overlay = (step.can_overlay and
-                       (properties['show-logo'] or
-                        properties['show-text']))
-        if not has_overlay:
-            del properties['text']
-            return
-
-        properties['width'] = video_source.props['width']
-        properties['height'] = video_source.props['height']
+        overlay = step.getOverlay()
+        if not overlay:
+            return None
+        properties = overlay.getProperties()
 
         # At this point we already know that we should overlay something
-        if properties['show-logo']:
+        if overlay.show_logo:
             properties['fluendo-logo'] = True
             encoding_step = self.wizard.get_step('Encoding')
             if encoding_step.get_muxer_type() == 'ogg-muxer':
                 properties['xiph-logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
-            if (license_options['set-license']
-                and license_options['license'] == enums.LicenseType.CC):
+            if (license_options['set-license'] and
+                license_options['license'] == LicenseType.CC):
                 properties['cc-logo'] = True
 
-        # These were just used to pass capabilities; they shouldn't go into the
-        # XML.
-        del properties['show-logo']
-
-        return Component('overlay-video', 'overlay-converter',
-                         step.worker, properties)
+        return Component('overlay-video',
+                         overlay.component_type,
+                         overlay.getWorker(),
+                         properties)
 
     def handleVideo(self):
         video_source = self._getVideoSource()
@@ -271,7 +262,7 @@ class WizardSaver(log.Loggable):
         video_encoder = self._getVideoEncoder()
         self._flow_components.append(video_encoder)
 
-        video_overlay = self.getVideoOverlay(video_source)
+        video_overlay = self._getVideoOverlay()
         if video_overlay:
             video_overlay.link(video_source)
             video_encoder.link(video_overlay)

@@ -22,8 +22,8 @@
 import gettext
 
 from flumotion.common.errors import NoBundleError
-from flumotion.wizard.basesteps import WorkerWizardStep
 from flumotion.wizard.models import AudioEncoder, VideoEncoder, Muxer
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
