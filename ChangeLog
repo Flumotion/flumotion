@@ -1,3 +1,9 @@
+2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	Fix a few more imports
+
 2008-02-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionstep.py: Forgot to save this file.

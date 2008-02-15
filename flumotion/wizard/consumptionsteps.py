@@ -28,7 +28,7 @@ from flumotion.component.consumers.disker.disker_wizard import \
      DiskBothStep, DiskAudioStep, DiskVideoStep
 from flumotion.component.consumers.shout2.shout2_wizard import \
      Shout2BothStep, Shout2AudioStep, Shout2VideoStep
-from flumotion.wizard.basesteps import WizardStep
+from flumotion.ui.wizard import WizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

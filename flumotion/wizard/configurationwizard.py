@@ -22,7 +22,6 @@
 import gettext
 import sets
 
-import gtk
 from twisted.internet import defer
 
 from flumotion.common import errors, messages
@@ -37,6 +36,7 @@ from flumotion.wizard.enums import LicenseType
 from flumotion.wizard.models import Flow
 from flumotion.wizard.productionsteps import ProductionStep
 from flumotion.wizard.worker import WorkerList
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
