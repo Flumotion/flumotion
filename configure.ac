@@ -159,24 +159,11 @@ TWISTED_MODULE([twisted.names])
 TWISTED_MODULE([twisted.web])
 
 dnl Cortado
-AC_SUBST(CORTADO_FILENAME)
 AC_ARG_WITH(cortado_prefix,
            AC_HELP_STRING(--with-cortado-prefix=<dir>, where cortado can be found))
 
-AC_MSG_CHECKING(for cortado)
-RESULT="no"
-CORTADO_FILENAME=""
-for dir in $with_cortado_prefix /usr/local /usr; do
-    for version in 0.2.2 0.2.1 0.2.0; do
-	filename=$dir/share/cortado/cortado-ovt-stripped-$version.1.jar
-        if test -e "$filename"; then
-	     RESULT="found"
-             CORTADO_FILENAME="$filename"
- 	     break 2;
-        fi
-    done
-done
-AC_MSG_RESULT($RESULT)
+CORTADO_PREFIX="$with_cortado_prefix"
+AC_SUBST(CORTADO_PREFIX)
 
 AC_CONFIG_FILES([env], [chmod +x env])
 AC_CONFIG_FILES([bin/flumotion], [chmod +x bin/flumotion])

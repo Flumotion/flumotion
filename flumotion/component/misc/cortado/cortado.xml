@@ -2,8 +2,24 @@
   <plugs>
     <plug socket="flumotion.component.plugs.lifecycle.ComponentLifecycle"
           type="cortado-plug">
-      <entry location="flumotion/component/misc/cortado/cortado.py"
-             function="CortadoPlug" />
+      <entries>
+        <entry type="default"
+               location="flumotion/component/misc/cortado/cortado.py"
+               function="CortadoPlug" />
+        <entry type="wizard"
+               location="flumotion/component/misc/cortado/cortado_wizard.py"
+               function="CortadoWizardPlugin" />
+      </entries>
+      <wizard _description="Stream to Java" type="http-consumer" 
+              feeder="default" eater="default">
+        <accept-format media-type="muxer:ogg"/>
+        <accept-format media-type="muxer:multipart"/>
+        <accept-format media-type="audio:vorbis"/>
+        <accept-format media-type="audio:mulaw"/>
+        <accept-format media-type="video:theora"/>
+        <accept-format media-type="video:jpeg"/>
+        <accept-format media-type="video:smoke"/>
+      </wizard>
       <properties>
         <property name="width" type="int" required="true"  
                   description="width of the cortado applet" />
@@ -37,6 +53,7 @@
         <directory name="flumotion/component/misc/cortado">
           <filename location="__init__.py" />
           <filename location="cortado.py" />
+          <filename location="cortado_wizard.py" />
         </directory>
       </directories>
     </bundle>

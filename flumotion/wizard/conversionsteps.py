@@ -79,6 +79,32 @@ class ConversionStep(WorkerWizardStep):
         entry = self.muxer.get_selected()
         return entry.component_type
 
+    def get_muxer_format(self):
+        """Returns the format of the muxer, such as "ogg".
+        @returns: the muxer format
+        @rtype: string
+        """
+        entry = self.muxer.get_selected()
+        return entry.getProvidedMediaTypes()[0]
+
+    def get_audio_format(self):
+        """Returns the format of the audio encoder, such as "vorbis"
+        @returns: the audio format
+        @rtype: string
+        """
+        if self._audio_encoder:
+            entry = self.audio.get_selected()
+            return entry.getProvidedMediaTypes()[0]
+
+    def get_video_format(self):
+        """Returns the format of the video encoder, such as "theora"
+        @returns: the video format
+        @rtype: string
+        """
+        if self._video_encoder:
+            entry = self.video.get_selected()
+            return entry.getProvidedMediaTypes()[0]
+
     # WizardStep
 
     def setup(self):

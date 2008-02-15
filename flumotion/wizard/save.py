@@ -208,25 +208,23 @@ class WizardSaver(log.Loggable):
                          encoding_step.worker)
 
     def _handleHTTPConsumer(self, name, step):
-        server = step.getServerConsumer()
-        if server is not None:
-            server = Component('server1',
+        for server in step.getServerConsumers():
+            server = Component('http-server-%s' % (name,),
                                server.component_type,
                                server.getWorker(),
                                server.getProperties(),
                                server.getPlugs())
             self._flow_components.append(server)
 
-        porter = step.getPorter()
-        if porter is not None:
-            porter = Component('porter1',
+        for porter in step.getPorters():
+            porter = Component('porter-%s' % (name,),
                                porter.component_type,
                                porter.getWorker(),
                                porter.getProperties())
             self._atmosphere_components.append(porter)
 
         streamer = step.getStreamerConsumer()
-        return Component(name,
+        return Component('http-%s' % (name,),
                          streamer.component_type,
                          streamer.getWorker(),
                          streamer.getProperties())
@@ -361,7 +359,7 @@ class WizardSaver(log.Loggable):
                 continue
             step = self.wizard.get_step(step_name)
             if comp_type == 'http-streamer':
-                consumer = self._handleHTTPConsumer(name, step)
+                consumer = self._handleHTTPConsumer(name[5:], step)
             else:
                 consumer = Component(
                     name, comp_type,

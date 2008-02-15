@@ -19,21 +19,16 @@
 
 # Headers in this file shall remain intact.
 
-import os
+from flumotion.common.messages import Result
+from flumotion.component.misc.cortado.cortado_location import getCortadoFilename
 
-CORTADO_PREFIX = "@CORTADO_PREFIX@"
+__version__ = "$Rev$"
 
-def getCortadoFilename():
-    directories = ['/usr/local', '/usr']
-    prefix = CORTADO_PREFIX[:]
-    if prefix:
-        if prefix.endswith('/'):
-            prefix = prefix[1:]
-        directories.insert(0, CORTADO_PREFIX)
-    for directory in directories:
-        for version in ['0.2.2', '0.2.1', '0.2.0']:
-            name = os.path.join(directory, 'share', 'cortado',
-                                'cortado-ovt-stripped-%s.1.jar' % (version,))
-            if os.path.exists(name):
-                return name
-    return None
+def checkCortado():
+    """Check for cortado applet.
+    @returns: a result containing the filename to the jar or None if it cannot be found
+    @rtype: L{flumotion.common.messages.Result}
+    """
+    result = Result()
+    result.succeed(getCortadoFilename())
+    return result

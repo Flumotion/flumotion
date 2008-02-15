@@ -1,4 +1,27 @@
-2008-02-15  Johan Dahlin  <jdahlin@gnome.org>
+2008-02-15  Johan Dahlin  <johan@gnome.org>
+
+	* configure.ac:
+	* flumotion/component/consumers/httpstreamer/http-wizard.glade:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/component/misc/cortado/Makefile.am:
+	* flumotion/component/misc/cortado/cortado.py:
+	* flumotion/component/misc/cortado/cortado.xml:
+	* flumotion/component/misc/cortado/cortado_location.py.in:
+	* flumotion/component/misc/cortado/cortado_wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/save.py:
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/cortado.py
+	Make the http consumption step pluggable.
+	Make the cortado presence detectable in runtime instead of at 
+	configure time.
+	Migrate the cortado step to be a pluggable plug.
+	Fixes #823
+
+2008-02-15  Johan Dahlin  <johan@gnome.org>
 
 	reviewed by: Mike
 

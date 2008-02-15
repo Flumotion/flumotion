@@ -358,6 +358,27 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(got_entry_point)
         return d
 
+    def get_wizard_plug_entry(self, plug_type):
+        """
+        Fetches a wizard bundle from a specific kind of plug
+        @param plug_type: the plug type to get the wizard entry
+          bundle from.
+        @returns: a deferred returning either::
+          - factory of the plug
+          - noBundle error: if the plug lacks a wizard bundle
+        """
+        def got_entry_point((filename, procname)):
+            modname = pathToModuleName(filename)
+            d = self._admin.getBundledFunction(modname, procname)
+            self.clear_msg('wizard-bundle')
+            return d
+
+        self.clear_msg('wizard-bundle')
+        d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
+        d.addCallback(got_entry_point)
+        return d
+
+
     # Private
 
     def _setup_worker(self, step, worker):

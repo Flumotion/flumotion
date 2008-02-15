@@ -8,6 +8,7 @@
           <filename location="video.py" />
 	  <filename location="audio.py" />
           <filename location="gst010.py" />
+          <filename location="cortado.py" />
         </directory>
       </directories>
     </bundle>

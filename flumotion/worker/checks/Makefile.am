@@ -9,6 +9,7 @@ flumotion_PYTHON = \
 	video.py	\
 	gst010.py	\
 	audio.py	\
+	cortado.py	\
 	package.xml
 
 TAGS_FILES = $(flumotion_PYTHON)

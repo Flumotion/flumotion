@@ -321,3 +321,38 @@ class VideoEncoder(Encoder):
 
     eater_type = VideoProducer
     name_template = "video-encoder"
+
+
+class HTTPServer(Component):
+    component_type = 'http-server'
+
+    def __init__(self, worker, mount_point):
+        """
+        @param mount_point:
+        @type  mount_point:
+        """
+        super(HTTPServer, self).__init__(worker=worker)
+
+        self.properties.mount_point = mount_point
+
+
+class HTTPPlug(Plug):
+    def __init__(self, server, streamer, audio_producer, video_producer):
+        """
+        @param server: server
+        @type  server: L{HTTPServer} subclass
+        @param streamer: streamer
+        @type  streamer: L{HTTPStreamer}
+        @param audio_producer: audio producer
+        @type  audio_producer: L{flumotion.wizard.models.AudioProducer}
+          subclass or None
+        @param video_producer: video producer
+        @type  video_producer: L{flumotion.wizard.models.VideoProducer}
+          subclass or None
+        """
+        super(HTTPPlug, self).__init__()
+        self.server = server
+        self.streamer = streamer
+        self.audio_producer = audio_producer
+        self.video_producer = video_producer
+

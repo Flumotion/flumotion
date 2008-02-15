@@ -39,24 +39,27 @@ import gettext
 import os
 import random
 
+import gobject
+from kiwi.utils import gsignal
+import gtk
+
 from flumotion.configure import configure
-from flumotion.component.misc.cortado.cortado_location import CORTADO_FILENAME
-from flumotion.wizard.models import Component, Consumer, Plug
+from flumotion.wizard.models import Component, Consumer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-X_ = _
+N_ = _
 
 def _generateRandomString(numchars):
     """Generate a random US-ASCII string of length numchars
     """
-    str = ""
+    s = ""
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    for _ in range(numchars):
-        str += chars[random.randint(0, len(chars)-1)]
+    for unused in range(numchars):
+        s += chars[random.randint(0, len(chars)-1)]
 
-    return str
+    return s
 
 
 class HTTPPorter(Component):
@@ -96,7 +99,8 @@ class HTTPStreamer(Consumer):
         self.has_client_limit = True
         self.has_bandwidth_limit = False
         self.has_cortado = False
-        self.socket_path = '/tmp/flu-xxx.socket'
+        self.has_plugins = False
+        self.socket_path = 'flu-%s.socket' % (_generateRandomString(6),)
         self.porter_username = _generateRandomString(12)
         self.porter_password = _generateRandomString(12)
 
@@ -122,7 +126,7 @@ class HTTPStreamer(Consumer):
         if not self.has_client_limit:
             del properties['client-limit']
 
-        if self.has_cortado:
+        if self.has_plugins:
             properties['porter-socket-path'] = self.socket_path
             properties['porter-username'] = self.porter_username
             properties['porter-password'] = self.porter_password
@@ -132,102 +136,111 @@ class HTTPStreamer(Consumer):
         return properties
 
 
-class CortadoPlug(Plug):
-    """I am a model representing the configuration file for a
-    Cortado HTTP streaming plug.
+class PlugPluginLine(gtk.VBox):
+    """I am a line in the plug plugin area representing a single plugin.
+    Rendered, I am visible as a checkbutton containing a label with the
+    description of the plugin.
+    Signals::
+      - enable-changed: emitted when I am enabled/disabled
+    @ivar plugin: plugin instance
     """
-    plug_type = "cortado-plug"
-    socket = "flumotion.component.misc.cortado.cortado.CortadoPlug"
-    def __init__(self, server, streamer, audio_producer, video_producer):
+    gsignal('enable-changed')
+    def __init__(self, plugin, description):
         """
-        @param server: server
-        @type  server: L{CortadoHTTPServer}
-        @param streamer: streamer
-        @type  streamer: L{HTTPStreamer}
-        @param audio_producer: audio producer
-        @type  audio_producer: L{flumotion.wizard.models.AudioProducer} subclass or None
-        @param video_producer: video producer
-        @type  video_producer: L{flumotion.wizard.models.VideoProducer} subclass or None
+        @param plugin: plugin instance
+        @param description: description of the plugin
         """
-        super(CortadoPlug, self).__init__()
-        self.server = server
-        self.streamer = streamer
-        self.audio_producer = audio_producer
-        self.video_producer = video_producer
+        gtk.VBox.__init__(self)
+        self.plugin = plugin
+        self.checkbutton = gtk.CheckButton(description)
+        self.checkbutton.connect('toggled',
+                                 self._on_checkbutton__toggled)
+        self.pack_start(self.checkbutton)
+        self.checkbutton.show()
 
-    # Component
+    def isEnabled(self):
+        """Find out if the plugin is going to be enabled or not
+        @returns: enabled
+        @rtype: bool
+        """
+        return self.checkbutton.get_active()
 
-    def getProperties(self):
-        p = super(CortadoPlug, self).getProperties()
-
-        p['codebase'] = self.server.getCodebase()
-        p['stream-url'] = self.streamer.getURL()
-        p['has-video'] = self.video_producer is not None
-        p['has-audio'] = self.audio_producer is not None
-
-        if self.video_producer:
-            width = self.video_producer.properties.width
-            height = self.video_producer.properties.height
-            framerate = self.video_producer.properties.framerate
-        else:
-            width = 320
-            height = 240
-            framerate = 1
-
-        p['width'] = width
-        p['height'] = height
-        p['framerate'] = framerate
-        p['buffer-size'] = 40
-
-        return p
+    def _on_checkbutton__toggled(self, checkbutton):
+        self.emit('enable-changed')
+gobject.type_register(PlugPluginLine)
 
 
-class CortadoHTTPServer(Component):
-    """I am a model representing the configuration file for a
-    HTTP server component which will be used to serve a cortado
-    java applet.
-    Most of the interesting logic here is actually in a plug.
+class PlugPluginArea(gtk.VBox):
+    """I am plugin area representing all available plugins. I keep track
+    of the plugins and their internal state. You can ask me to add new plugins
+    or get the internal models of the plugins.
     """
-    component_type = 'http-server'
-    def __init__(self, streamer, audio_producer, video_producer):
-        """
-        @param streamer: streamer
-        @type  streamer: L{HTTPStreamer}
-        @param audio_producer: audio producer
-        @type  audio_producer: L{flumotion.wizard.models.AudioProducer}
-           subclass or None
-        @param video_producer: video producer
-        @type  video_producer: L{flumotion.wizard.models.VideoProducer}
-           subclass or None
-        """
+    def __init__(self, streamer):
         self.streamer = streamer
+        gtk.VBox.__init__(self, spacing=6)
+        self._lines = []
 
-        super(CortadoHTTPServer, self).__init__(worker=streamer.worker)
+    # Public
 
-        self.properties.mount_point = "/cortado"
-        self.properties.porter_socket_path = streamer.socket_path
-        self.properties.porter_username = streamer.porter_username
-        self.properties.porter_password = streamer.porter_password
-        self.properties.type = 'slave'
-
-        plug = CortadoPlug(self, streamer, audio_producer, video_producer)
-        self.addPlug(plug)
-
-    def getCodebase(self):
-        """Returns the base of directory of the applet
-        @returns: directory
+    def addPlug(self, plugin, description):
+        """Add a plug, eg a checkbutton with a description such as
+        'Cortado Java applet'.
+        @param plugin: plugin instance
+        @param description: label description
         """
-        return 'http://%s:%d%s/' % (self.worker,
-                                    self.streamer.properties.port,
-                                    self.properties.mount_point)
+        line = PlugPluginLine(plugin, description)
+        line.connect('enable-changed', self._on_plugline__enable_changed)
+        self._lines.append(line)
+        self.pack_start(line, False, False)
+        line.show()
+
+    def getPorters(self):
+        """Fetch a list of porters which are going to be used by all
+        available plugins.
+        @returns: porters
+        @rtype: a sequence of L{HTTPPorters}
+        """
+        for unused in self._getEnabledPlugins():
+            yield HTTPPorter(self.streamer)
+
+    def getServerConsumers(self, audio_producer, video_producer):
+        """Fetch a list of server consumers which are going to be used by all
+        available plugins.
+        @returns: consumers
+        @rtype: a sequence of L{HTTPServer} subclasses
+        """
+        for plugin in self._getEnabledPlugins():
+            yield plugin.getConsumer(self.streamer, audio_producer,
+                                     video_producer)
+
+    # Private
+
+    def _hasEnabledPlugins(self):
+        for line in self._lines:
+            if line.isEnabled():
+                return True
+        return False
+
+    def _getEnabledPlugins(self):
+        for line in self._lines:
+            if line.isEnabled():
+                yield line.plugin
+
+    # Callbacks
+
+    def _on_plugline__enable_changed(self, line):
+        self.streamer.has_plugins = self._hasEnabledPlugins()
 
 
 class HTTPStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'http-wizard.glade')
+    glade_file = os.path.join(
+        os.path.dirname(
+        os.path.abspath(__file__)),
+        'http-wizard.glade')
+
     section = _('Consumption')
     component_type = 'http-streamer'
 
@@ -242,28 +255,21 @@ class HTTPStep(WorkerWizardStep):
         """
         return self.model
 
-    def getServerConsumer(self):
+    def getServerConsumers(self):
         """Returns the http-server consumer model or None
         if there will only a stream served.
         @returns: the server consumer or None
         """
-        if not self.model.has_cortado:
-            return None
-
         source_step = self.wizard.get_step('Source')
+        return self.plugarea.getServerConsumers(
+           source_step.get_audio_producer(),
+           source_step.get_video_producer())
 
-        return CortadoHTTPServer(self.model,
-                                 source_step.get_audio_producer(),
-                                 source_step.get_video_producer())
-
-    def getPorter(self):
+    def getPorters(self):
         """Returns the porter model or None if there will only a stream served.
         @returns: the porter or None
         """
-        if not self.model.has_cortado:
-            return None
-
-        return HTTPPorter(self.model)
+        return self.plugarea.getPorters()
 
     # WizardStep
 
@@ -275,14 +281,15 @@ class HTTPStep(WorkerWizardStep):
 
         self.port.set_value(self.default_port)
 
-        if self._canEmbedCortado():
-            self.model.has_cortado = True
-            self.has_cortado.show()
+        self.plugarea = PlugPluginArea(self.model)
+        self.main_vbox.pack_start(self.plugarea, False, False)
+        self.plugarea.show()
+
+        self._populate_plugins()
 
         self.add_proxy(self.model,
                        ['has_client_limit',
-                        'has_bandwidth_limit',
-                        'has_cortado'])
+                        'has_bandwidth_limit'])
 
         self.add_proxy(self.model.properties,
                        ['port',
@@ -306,31 +313,54 @@ class HTTPStep(WorkerWizardStep):
 
     # Private
 
-    def _canEmbedCortado(self):
-        # Empty string means that it couldn't be found by configure
-        if not CORTADO_FILENAME:
-            return False
+    def _populate_plugins(self):
+        def got_entries(entries):
+            for entry in entries:
+                def response(factory, entry):
+                    plugin = factory(self.wizard)
+                    if hasattr(plugin, 'worker_changed'):
+                        d = plugin.worker_changed(self.worker)
+                        def cb(found, plugin, entry):
+                            if found:
+                                self._addPlug(plugin, entry)
+                        d.addCallback(cb, plugin, entry)
+                    else:
+                        self._addPlug(plugin, entry)
+                d = self.wizard.get_wizard_plug_entry(entry.component_type)
+                d.addCallback(response, entry)
+
+        d = self.wizard._admin.getWizardEntries(
+            wizard_types=['http-consumer'])
+        d.addCallback(got_entries)
+
+    def _addPlug(self, plugin, entry):
+        # This function filters out entries which are
+        # not matching the accepted media types of the entry
+        muxerTypes = []
+        audioTypes = []
+        videoTypes = []
+        for mediaType in entry.getAcceptedMediaTypes():
+            kind, name = mediaType.split(':', 1)
+            if kind == 'muxer':
+                muxerTypes.append(name)
+            elif kind == 'video':
+                videoTypes.append(name)
+            elif kind == 'audio':
+                audioTypes.append(name)
+            else:
+                raise AssertionError
 
         encoding_step = self.wizard.get_step('Encoding')
-        if encoding_step.get_muxer_type() not in [
-            'ogg-muxer',
-            'multipart-muxer']:
-            return False
+        if encoding_step.get_muxer_format() not in muxerTypes:
+            return
 
-        audio_encoder = encoding_step.get_audio_encoder()
-        if audio_encoder and audio_encoder.component_type not in [
-            'vorbis-encoder',
-            'mulaw-encoder']:
-            return False
+        audio_format = encoding_step.get_audio_format()
+        video_format = encoding_step.get_video_format()
+        if ((audio_format and audio_format not in audioTypes) or
+            (video_format and video_format not in videoTypes)):
+            return
 
-        video_encoder = encoding_step.get_video_encoder()
-        if video_encoder and video_encoder.component_type not in [
-            'theora-encoder',
-            'jpeg-encoder',
-            'smoke-encoder']:
-            return False
-
-        return True
+        self.plugarea.addPlug(plugin, N_(entry.description))
 
     def _check_elements(self):
         def got_missing(missing):

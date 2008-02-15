@@ -27,7 +27,7 @@ from twisted.web.static import Data, File
 from flumotion.common import log
 from flumotion.common.errors import ComponentStartError
 from flumotion.component.misc.httpfile.httpfile import HTTPFileStreamer
-from flumotion.component.misc.cortado.cortado_location import CORTADO_FILENAME
+from flumotion.component.misc.cortado.cortado_location import getCortadoFilename
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.configure import configure
 
@@ -46,7 +46,7 @@ class CortadoDirectoryResource(Resource):
     - cortado.jar - cortado java applet
     """
 
-    def __init__(self, mount_point, properties):
+    def __init__(self, mount_point, properties, filename):
         Resource.__init__(self)
 
         index_name = properties.get('index', 'index.html')
@@ -60,12 +60,13 @@ class CortadoDirectoryResource(Resource):
         self._properties = properties
         self._index_content = self._get_index_content()
         self._index_name = index_name
-
+        self._cortado_filename = filename
         self._addChildren()
 
     def _addChildren(self):
         self.putChild("cortado.jar",
-                      File(CORTADO_FILENAME, 'application/x-java-archive'))
+                      File(self._cortado_filename,
+                           'application/x-java-archive'))
 
         self.putChild(self._index_name,
                       self._index_content)
@@ -105,7 +106,7 @@ class CortadoDirectoryResource(Resource):
 
 class CortadoPlug(ComponentPlug):
     """I am a component plug for a http-server which plugs in a
-    http resource containing a cortado java applaet.
+    http resource containing a cortado java applet.
     """
     def start(self, component):
         """
@@ -116,9 +117,14 @@ class CortadoPlug(ComponentPlug):
                 "A CortadoPlug %s must be plugged into a "
                 " HTTPStreamer component, not a %s" % (
                 self, component.__class__.__name__))
+        filename = getCortadoFilename()
+        if not filename:
+            raise ComponentStartError(
+                "Could not find cortado jar file")
         log.debug('cortado', 'Attaching to %r' % (component,))
         resource = CortadoDirectoryResource(component.getMountPoint(),
-                                            self.args['properties'])
+                                            self.args['properties'],
+                                            filename)
         component.setRootResource(resource)
 
 
@@ -137,7 +143,7 @@ def test():
                   'stream-url' : '/stream.ogg',
                   'buffer-size': 40,
                   'framerate' : 1}
-    root = CortadoDirectoryResource('/', properties)
+    root = CortadoDirectoryResource('/', properties, getCortadoFilename())
     site = Site(root)
 
     reactor.listenTCP(8080, site)

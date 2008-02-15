@@ -5,7 +5,8 @@ cortadodir = $(libdir)/flumotion/python/flumotion/component/misc/cortado
 cortado_PYTHON = 		\
 	__init__.py 		\
 	cortado.py 		\
-	cortado_location.py 
+	cortado_location.py 	\
+	cortado_wizard.py 
 
 cortado_DATA = cortado.xml
 
