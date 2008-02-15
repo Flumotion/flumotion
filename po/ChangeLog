@@ -1,3 +1,7 @@
+2008-02-15  Johan Dahlin  <johan@gnome.org>
+
+	* pt_BR.po: The gtk+ translation for next in the wizard is 'Frente'.
+
 2008-02-07  Johan Dahlin  <johan@gnome.org>
 
 	* POTFILES.in: Update
