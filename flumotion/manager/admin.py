@@ -190,7 +190,7 @@ class AdminAvatar(base.ManagerAvatar):
 
     def perspective_getEntryByType(self, componentType, entryType):
         """
-        Get the entry point for a piece of bundled code by the type.
+        Get the entry point for a piece of bundled code in a component by type.
         @param componentType: the component
         @type componentType: a string
         @param entryType: location of the entry point
@@ -202,6 +202,7 @@ class AdminAvatar(base.ManagerAvatar):
 
         self.debug('getting entry of type %s for component type %s',
                    entryType, componentType)
+
         try:
             componentRegistryEntry = registry.getRegistry().getComponent(
                 componentType)
@@ -217,6 +218,34 @@ class AdminAvatar(base.ManagerAvatar):
         self.debug('entry point is in file path %s and function %s' % (
             filename, entry.function))
         return (filename, entry.function)
+
+    def perspective_getPlugEntry(self, plugType, entryType):
+        """
+        Get the entry point for a piece of bundled code in a plug by type.
+        @param plugType: the plug
+        @type plugType: a string
+        @param entryType: location of the entry point
+        @type entryType: a string
+        Returns: a (filename, methodName) tuple, or raises::
+          - NoBundleError if the entry location does not exist
+        """
+        assert plugType is not None
+
+        self.debug('getting entry of type %s for plug type %s',
+                   entryType, plugType)
+
+        try:
+            plugRegistryEntry = registry.getRegistry().getPlug(plugType)
+            entry = plugRegistryEntry.getEntryByType(entryType)
+        except KeyError:
+            self.warning("Could not find bundle for %s(%s)" % (
+                plugType, entryType))
+            raise errors.NoBundleError("entry type %s in plug type %s" %
+                                       (entryType, plugType))
+
+        self.debug('entry point is in file path %s and function %s' % (
+           entry.location, entry.function))
+        return (entry.location, entry.function)
 
     def perspective_reloadManager(self):
         """
@@ -384,10 +413,8 @@ class AdminAvatar(base.ManagerAvatar):
         @type  accepts: list of strings
         @returns: L[componentui.WizardEntryState}
         """
-        retval = []
-
-        for component in registry.getRegistry().getComponents():
-            for wizard in component.wizards:
+        def extract(wizards):
+            for wizard in wizards:
                 if types is not None:
                     if wizard.type not in types:
                         continue
@@ -403,7 +430,16 @@ class AdminAvatar(base.ManagerAvatar):
                             break
                     else:
                         continue
-                retval.append(wizard)
+                yield wizard
+
+        retval = []
+        r = registry.getRegistry()
+        for component in r.getComponents():
+            retval += extract(component.wizards)
+        for plug in r.getPlugs():
+            retval += extract(plug.wizards)
+        del r
+
         return retval
 
 

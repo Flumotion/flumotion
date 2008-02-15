@@ -92,7 +92,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def loginFailedDisconnect(failure):
-            # We _always_ disconnect. Then, we may log a more specific failure 
+            # We _always_ disconnect. Then, we may log a more specific failure
             # message at a higher warning level.
             self.debug('Login failed, reason: %s, disconnecting', failure)
             self.disconnect()
@@ -278,7 +278,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         Instead, they should implement init(), which will be called
         by this implementation automatically.
 
-        See L{flumotion.common.common.InitMixin} for more details.
+        L{flumotion.common.common.InitMixin} for more details.
         """
         self.debug("initializing %r with config %r", type(self), config)
         self.config = config
@@ -312,10 +312,10 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.addKey('cpu-percent')
         # Time the component was started
         self.uiState.addKey('start-time')
-        # Current time at last update. 
+        # Current time at last update.
         # Provided in order to allow displaying uptime since the remote system
         # probably doesn't have a synchronised clock with this one.
-        self.uiState.addKey('current-time') 
+        self.uiState.addKey('current-time')
         # Virtual memory size in bytes
         self.uiState.addKey('virtual-size')
 
@@ -384,8 +384,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         for socket, plugs in self.config['plugs'].items():
             self.plugs[socket] = []
             for plug in plugs:
-                instance = reflectcall.reflectCall(plug['module-name'],
-                                                   plug['function-name'],
+                entry = plug['entries']['default']
+                instance = reflectcall.reflectCall(entry['module-name'],
+                                                   entry['function-name'],
                                                    plug)
                 self.plugs[socket].append(instance)
                 self.debug('Starting plug %r on socket %s',
@@ -624,13 +625,13 @@ class BaseComponent(common.InitMixin, log.Loggable):
     def _pollMemory(self):
         # Figure out our virtual memory size and report that.
         # I don't know a nicer way to find vsize than groping /proc/
-        handle = open('/proc/%d/stat' % os.getpid()) 
-        line = handle.read() 
+        handle = open('/proc/%d/stat' % os.getpid())
+        line = handle.read()
         handle.close()
-        fields = line.split() 
-        # field 1 (comm) could potentially contain spaces and thus split over 
-        # multiple list items, but our processes do not contain spaces 
-        vsize = int(fields[22]) 
-        self.log('vsize is %d', vsize) 
+        fields = line.split()
+        # field 1 (comm) could potentially contain spaces and thus split over
+        # multiple list items, but our processes do not contain spaces
+        vsize = int(fields[22])
+        self.log('vsize is %d', vsize)
         self.uiState.set('virtual-size', vsize)
 

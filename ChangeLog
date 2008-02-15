@@ -1,3 +1,30 @@
+2008-02-15  Johan Dahlin  <jdahlin@gnome.org>
+
+	reviewed by: Mike
+
+	* flumotion/common/config.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/component.py:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/manager/admin.py:
+	* flumotion/test/test_component_bouncers_component.py:
+	* flumotion/test/test_component_httpserver.py:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_registry.py:
+	* flumotion/worker/worker.py:
+
+	In preparation for bug 823.
+	Registry changes:
+	* Allow multiple <entry>'s for a <plug>.
+	* Allow <wizard> to be placed in <plugs> in the registry
+	* Improve validation of format media types.
+	Admin PB API:
+	* Add getPlugEntry, which can be used to fetch an entry point in a plug
+	* Update getWizardEntries to also return entries for plugs, not just
+	  components
+	Update worker, config, component modules, muxer xml and tests to take
+	into account these changes.
+
 2008-02-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_component_base_scheduler.py (EventTest.testRecurringOnce): Check

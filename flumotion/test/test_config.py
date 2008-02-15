@@ -357,8 +357,9 @@ class TestConfig(testsuite.TestCase):
                            [{'type':'test-adminaction',
                              'socket':
                              'flumotion.component.plugs.adminaction.AdminAction',
-                             'module-name': 'qux.baz',
-                             'function-name': 'Quxulator',
+                             'entries': {'default':
+                                         {'function-name': 'Quxulator',
+                                          'module-name': 'qux.baz'}},
                              'properties': {'foo': 'bar'}}],
                            'flumotion.component.plugs.lifecycle.ManagerLifecycle':
                            [],
@@ -691,8 +692,8 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'frobulator',
-                           'function-name': 'Frobulator',
-                           'module-name': 'bar.baz',
+                           'entries': {'default':{'function-name': 'Frobulator',
+                                                  'module-name': 'bar.baz'}},
                            'properties': {'rate': (3, 4)}})
 
     def testParsePlugsWithCompoundProperties(self):
@@ -729,8 +730,8 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'compoundulator',
-                           'module-name': 'xom.baz',
-                           'function-name': 'Xombulator',
+                           'entries': {'default': {'function-name': 'Xombulator',
+                                                   'module-name': 'xom.baz'}},
                            'properties': {'cp1': [{'one': 'a string'},
                                                   {'one': 'a second string'}],
                                           'cp2': {'two': 2},
@@ -1059,7 +1060,7 @@ class TestConfig(testsuite.TestCase):
             conf.parse()
             cons = conf.getComponentEntries()['/default/component-name'].getConfigDict()
             self.assertEquals(cons['virtual-feeds'], feeds)
-            
+
         assertFail("""
              <planet>
                <flow name="default">
@@ -1109,7 +1110,7 @@ class TestConfig(testsuite.TestCase):
                </flow>
              </planet>
              """, {'valid:name': 'default'})
-        
+
 
 class TestDictDiff(testsuite.TestCase):
     def assertOND(self, d1, d2, old, new, diff):

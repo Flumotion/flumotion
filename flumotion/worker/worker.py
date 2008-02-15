@@ -251,7 +251,8 @@ class WorkerBrain(log.Loggable):
             moduleNames = [moduleName]
             for plugs in conf.get('plugs', {}).values():
                 for plug in plugs:
-                    moduleNames.append(plug['module-name'])
+                    for entry in plug.get('entries', {}).values():
+                        moduleNames.append(entry['module-name'])
             self.debug('setting up bundles for %r', moduleNames)
             return self.medium.bundleLoader.getBundles(moduleName=moduleNames)
 

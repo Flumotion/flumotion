@@ -278,7 +278,9 @@ class TestRegistry(testsuite.TestCase):
   </components>
   <plugs>
     <plug type="baz" socket="frogger">
-      <entry location="loc" function="main"/>
+      <entries>
+        <entry type="default" location="loc" function="main"/>
+      </entries>
       <properties>
         <property name="qux" type="string" description="a quxy property"/>
       </properties>
@@ -321,7 +323,9 @@ class TestRegistry(testsuite.TestCase):
   <plugs>
 
     <plug type="baz" socket="frogger">
-      <entry location="loc" function="main"/>
+      <entries>
+        <entry type="default" location="loc" function="main"/>
+      </entries>
       <properties>
         <property name="qux" type="string"
                   description="a quxy property"
@@ -472,7 +476,9 @@ class TestRegistry(testsuite.TestCase):
   <plugs>
 
     <plug type="baz" socket="frogger">
-      <entry location="loc" function="main"/>
+      <entries>
+        <entry type="default" location="loc" function="main"/>
+      </entries>
       <properties>
         <property name="qux" type="string"
                   description="a quxy property"

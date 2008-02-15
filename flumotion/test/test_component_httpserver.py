@@ -197,9 +197,9 @@ class PlugTest(testsuite.TestCase):
     def _localPlug(self, plugname):
         return {
             'flumotion.component.plugs.lifecycle.ComponentLifecycle':
-            [{ 'module-name': 'flumotion.test.test_component_httpserver',
+            [{'entries': {'default':{ 'module-name': 'flumotion.test.test_component_httpserver',
               'function-name': plugname,
-              }]
+              }}}]
             }
 
     def testSetRootResource(self):

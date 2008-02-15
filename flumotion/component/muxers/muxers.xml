@@ -15,6 +15,7 @@
         <accept-format media-type="theora"/>
         <accept-format media-type="speex"/>
         <accept-format media-type="vorbis"/>
+        <provide-format media-type="ogg"/>
       </wizard>
     </component>
   
@@ -32,6 +33,7 @@
         <accept-format media-type="jpeg"/>
         <accept-format media-type="mulaw"/>
         <accept-format media-type="smoke"/>
+        <provide-format media-type="multipart"/>
       </wizard>
     </component>
   

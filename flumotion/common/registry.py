@@ -43,12 +43,16 @@ __version__ = "$Rev$"
 # decide that it's a good idea, or something. See #799.
 READ_CACHE = False
 
-_VALID_WIZARD_ENTRY_TYPES = [
+_VALID_WIZARD_COMPONENT_TYPES = [
     'audio-producer',
     'video-producer',
     'muxer',
     'audio-encoder',
     'video-encoder',
+    ]
+
+_VALID_WIZARD_PLUG_TYPES = [
+    'http-consumer',
     ]
 
 def _getMTime(file):
@@ -166,7 +170,7 @@ class RegistryEntryPlug:
     I represent a <plug> entry in the registry
     """
 
-    def __init__(self, filename, type, socket, entry, properties):
+    def __init__(self, filename, type, socket, entries, properties, wizards):
         """
         @param filename:   name of the XML file this plug is parsed from
         @type  filename:   str
@@ -175,16 +179,19 @@ class RegistryEntryPlug:
         @param socket:     the fully qualified class name of the socket this
                            plug can be plugged in to
         @type  socket:     str
-        @param entry:      entry point for instantiating the plug
-        @type  entry:      L{RegistryEntryEntry}
+        @param entries:    entry pointes for instantiating the plug
+        @type  entries:    list of L{RegistryEntryEntry}
         @param properties: properties of the plug
         @type  properties: dict of str -> L{RegistryEntryProperty}
+        @param wizards:    list of wizard entries
+        @type  wizards:    list of L{RegistryEntryWizard}
         """
         self.filename = filename
         self.type = type
         self.socket = socket
-        self.entry = entry
+        self.entries = entries
         self.properties = properties
+        self.wizards = wizards
 
     def getProperties(self):
         """
@@ -200,8 +207,19 @@ class RegistryEntryPlug:
         """
         return name in self.properties.keys()
 
+    def getEntryByType(self, type):
+        """
+        Get the entry point for the given type of entry.
+
+        @type type: string
+        """
+        return self.entries[type]
+
     def getEntry(self):
-        return self.entry
+        return self.entries['default']
+
+    def getEntries(self):
+        return self.entries.values()
 
     def getType(self):
         return self.type
@@ -504,7 +522,7 @@ class RegistryParser(fxml.Parser):
             'synchronization': (self._parseSynchronization,
                                 synchronization.set),
             'sockets':         (self._parseSockets, sockets.extend),
-            'wizard':          (self._parseWizard, wizards.append),
+            'wizard':          (self._parseComponentWizard, wizards.append),
         }
         self.parseFromTable(node, parsers)
 
@@ -666,34 +684,64 @@ class RegistryParser(fxml.Parser):
         return required, clock_priority
 
     def _parsePlugEntry(self, node):
-        # <entry location="" function=""/>
-        # returns: RegistryEntryEntry
+        attrs = self.parseAttributes(node, ('location', 'function'), ('type',))
+        location, function, type = attrs
+        if not type:
+            type = 'default'
+        return RegistryEntryEntry(type, location, function)
 
-        attrs = self.parseAttributes(node, ('location', 'function'))
-        location, function = attrs
-        return RegistryEntryEntry('plug', location, function)
+    def _parseDefaultPlugEntry(self, node):
+        return {'default': self._parsePlugEntry(node)}
+
+    def _parsePlugEntries(self, node):
+        # <entries>
+        #   <entry>
+        # </entries>
+        # returns: dict of type -> entry
+
+        entries = {}
+        def addEntry(entry):
+            if entry.getType() in entries:
+                raise fxml.ParserError("entry %s already specified"
+                                       % entry.getType())
+            entries[entry.getType()] = entry
+
+        parsers = {'entry': (self._parsePlugEntry, addEntry)}
+
+        self.parseFromTable(node, parsers)
+
+        return entries
 
     def _parsePlug(self, node):
         # <plug socket="..." type="...">
+        #   <entries>
         #   <entry>
         #   <properties>
+        #   <wizard>
         # </plug>
 
         type, socket = self.parseAttributes(node, ('type', 'socket'))
 
-        entry = fxml.Box(None)
+        entries = {}
         properties = {}
+        wizards = []
 
-        parsers = {'entry': (self._parsePlugEntry, entry.set),
-                   'properties': (self._parseProperties, properties.update)}
+        parsers = {
+            'entries':    (self._parsePlugEntries, entries.update),
+            # backwards compatibility
+            'entry':      (self._parseDefaultPlugEntry, entries.update),
+            'properties': (self._parseProperties, properties.update),
+            'wizard':     (self._parsePlugWizard, wizards.append),
+            }
 
         self.parseFromTable(node, parsers)
 
-        if not entry.unbox():
-            raise fxml.ParserError("<plug> %s needs an <entry>" % type)
+        if not 'default' in entries:
+            raise fxml.ParserError("<plug> %s needs a default <entry>" % type)
 
         return RegistryEntryPlug(self.filename, type,
-                                 socket, entry.unbox(), properties)
+                                 socket, entries, properties,
+                                 wizards)
 
     def _parsePlugs(self, node):
         # <plugs>
@@ -798,7 +846,7 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         return directories
-    
+
     def _parseBundleDirectoryFilename(self, node, name):
         attrs = self.parseAttributes(node, ('location',), ('relative',))
         location, relative = attrs
@@ -897,7 +945,13 @@ class RegistryParser(fxml.Parser):
         filename, = self.parseAttributes(node, ('filename',))
         return RegistryDirectory(filename)
 
-    def _parseWizard(self, node):
+    def _parseComponentWizard(self, node):
+        return self._parseWizard(node, _VALID_WIZARD_COMPONENT_TYPES)
+
+    def _parsePlugWizard(self, node):
+        return self._parseWizard(node, _VALID_WIZARD_PLUG_TYPES)
+
+    def _parseWizard(self, node, validTypes):
         # <wizard type="..." _description=" " feeder="..." eater="..."]/>
         #
         # NOTE: We are using _description with the leading underscore for
@@ -911,31 +965,49 @@ class RegistryParser(fxml.Parser):
 
         accepts = []
         provides = []
-        self.parseFromTable(
-            node,
-            { 'accept-format': (self._parseAcceptFormat,
-                                lambda n: accepts.append(n)),
-              'provide-format': (self._parseProvideFormat,
-                                 lambda n: provides.append(n)),
-            })
+        parsers = {
+            'accept-format': (self._parseAcceptFormat,
+                              lambda n: accepts.append(n)),
+            'provide-format': (self._parseProvideFormat,
+                               lambda n: provides.append(n)),
+            }
+        self.parseFromTable(node, parsers)
 
-        component_type = node.parentNode.getAttribute('type')
+        parent_type = node.parentNode.getAttribute('type')
 
-        if not type in _VALID_WIZARD_ENTRY_TYPES:
+        if not type in validTypes:
             raise fxml.ParserError(
                 "<wizard>'s type attribute is %s must be one of %s" % (
-                component_type,
-                ', '.join(_VALID_WIZARD_ENTRY_TYPES)))
-        if type in ['muxer'] and not accepts:
-            raise fxml.ParserError(
-                ('<wizard type="%s"> requires at least one accepted '
-                 'media-type.') % (component_type,))
-        if type.endswith('-encoder') and not provides:
-            raise fxml.ParserError(
-                ('<wizard type="%s"> requires at least one provided '
-                 'media-type.') % (component_type,))
+                parent_type,
+                ', '.join(validTypes)))
 
-        return RegistryEntryWizard(component_type, type, description,
+        isProducer = type.endswith('-producer')
+        isEncoder = type.endswith('-encoder')
+        isMuxer = (type == 'muxer')
+        isConsumer = type.endswith('-consumer')
+
+        err = None
+        # Producers and Encoders cannot have provided
+        if accepts and (isProducer or isEncoder):
+            err = ('<wizard type="%s"> does not allow an accepted '
+                   'media-type.') % (parent_type,)
+        # Encoders, Muxers and Consumers must have an accepted
+        elif not accepts and (isMuxer or isConsumer):
+            err = ('<wizard type="%s"> requires at least one accepted '
+                   'media-type.') % (parent_type,)
+        # Producers and Consumers cannot have provided
+        elif provides and (isProducer or isConsumer):
+            err = ('<wizard type="%s"> does not allow a provided '
+                   'media-type.') % (parent_type,)
+        # Producers, Encoders and Muxers must have exactly one provided
+        if len(provides) != 1 and (isEncoder or isMuxer):
+            err = ('<wizard type="%s"> requires exactly one provided '
+                   'media-type.') % (parent_type,)
+
+        if err:
+            raise fxml.ParserError(err)
+
+        return RegistryEntryWizard(parent_type, type, description,
                                    feeder, eater, accepts, provides)
 
     def _parseAcceptFormat(self, node):
@@ -1084,6 +1156,18 @@ class RegistryWriter(log.Loggable):
             _dump_proplist(i + ioff, cprop.getProperties())
             w(i, ('</compound-property>'))
 
+        def _dump_entries(i, entries):
+            if not entries:
+                return
+
+            w(i, '<entries>')
+            for entry in entries:
+                w(i+2, '<entry type="%s" location="%s" function="%s"/>' % (
+                    entry.getType(),
+                    entry.getLocation(),
+                    entry.getFunction()))
+            w(i, '</entries>')
+
         w(0, '<registry>')
         w(0, '')
 
@@ -1140,15 +1224,8 @@ class RegistryWriter(log.Loggable):
                         file.getType()))
                 w(6, '</files>')
 
-            entries = component.getEntries()
-            if entries:
-                w(6, '<entries>')
-                for entry in entries:
-                    w(8, '<entry type="%s" location="%s" function="%s"/>' % (
-                        entry.getType(),
-                        entry.getLocation(),
-                        entry.getFunction()))
-                w(6, '</entries>')
+            _dump_entries(6, component.getEntries())
+
             w(4, '</component>')
             w(0, '')
 
@@ -1162,9 +1239,7 @@ class RegistryWriter(log.Loggable):
             w(4, '<plug type="%s" socket="%s">'
               % (plug.getType(), plug.getSocket()))
 
-            entry = plug.getEntry()
-            w(6, ('<entry location="%s" function="%s"/>'
-                  % (entry.getLocation(), entry.getFunction())))
+            _dump_entries(6, plug.getEntries())
 
             w(6, '<properties>')
             _dump_proplist(8, plug.getProperties())

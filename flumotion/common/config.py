@@ -26,13 +26,8 @@ Base classes for parsing of flumotion configuration files
 import os
 import locale
 import sys
-from xml.dom import minidom, Node
-from xml.parsers import expat
 
-from twisted.python import reflect
-
-from flumotion.common import log, errors, common, registry, fxml
-from flumotion.configure import configure
+from flumotion.common import log, common, registry, fxml
 
 from errors import ConfigError
 
@@ -181,9 +176,18 @@ class ConfigEntryPlug(log.Loggable):
                                             defs.getProperties())
         self.config = {'type': self.type,
                        'socket': self.socket,
-                       'module-name': defs.entry.getModuleName(),
-                       'function-name': defs.entry.getFunction(),
+                       'entries' : self._parseEntries(defs),
                        'properties': self.properties}
+
+    def _parseEntries(self, entries):
+        d = {}
+        for entry in entries.getEntries():
+            d[entry.getType()] = {
+                'module-name': entry.getModuleName(),
+                'function-name': entry.getFunction(),
+                }
+        return d
+
 
 class BaseConfigParser(fxml.Parser):
     parserError = ConfigError
