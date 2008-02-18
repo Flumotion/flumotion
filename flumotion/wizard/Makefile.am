@@ -6,6 +6,7 @@ flumotion_PYTHON = 		\
 	__init__.py 		\
 	basesteps.py 		\
 	configurationwizard.py 	\
+	configurationwriter.py 	\
 	consumptionsteps.py 	\
 	conversionsteps.py 	\
 	enums.py 		\

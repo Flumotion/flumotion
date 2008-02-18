@@ -1,5 +1,16 @@
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/save.py:
+	Move configuration writer out to a separate module.
+	Separate common parts to another class and subclass it in the configuration writer.
+	Use a generic API for all xml generation.
+
+2008-02-18  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_registry.py (TestRegistry._compareRegistryAfterDump): Use
 	testsuite.diffStrings here.
 

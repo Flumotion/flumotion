@@ -20,151 +20,13 @@
 # Headers in this file shall remain intact.
 
 import gettext
-from cStringIO import StringIO
 
 from flumotion.common import log
 from flumotion.wizard.enums import LicenseType
-from flumotion.configure import configure
+from flumotion.wizard.configurationwriter import ConfigurationWriter
 
-# FIXME: This is absolutely /horrible/, we should not
-#        use translatable string as constants when saving the
-#        wizard configuration.
-_ = N_ = gettext.gettext
+_ = gettext.gettext
 __version__ = "$Rev$"
-
-
-class XMLWriter(object):
-    """I am responsible for writing the state of a flow created by the wizard
-    into XML.
-    I will try my best write pretty XML which can be editable by humans at a
-    later point.
-    """
-    def __init__(self, flowName, flowComponents, atmosphereComponents):
-        """
-        @param flowName: name of the flow
-        @param flowComponents: components to be included in the flow
-        @param atmosphereComponents: components to be included in the atmosphere
-        """
-        self._flowName = flowName
-        self._flowComponents = flowComponents
-        self._atmosphereComponents = atmosphereComponents
-        self._data = StringIO()
-        self._tagStack = []
-        self._indent = 0
-        self._writePlanet()
-
-    # Public API
-
-    def getXML(self):
-        """Fetches the xml written by the writer
-        @returns: the xml
-        @rtype: string
-        """
-        return self._data.getvalue()
-
-    # Private
-
-    def _writeLine(self, line=''):
-        """Write a line to the xml.
-        This method honors the current indentation.
-        """
-        self._data.write('%s%s\n' % (' ' * self._indent, line))
-
-    def _pushTag(self, tagName, attributes=None):
-        """Open a new tag::
-          - writes the tag and the attributes
-          - increase the indentation for subsequent calls
-        @param tagName: name of the tag to write
-        @type tagName: string
-        @param attributes: attributes to write
-        @type attributes: list of 2 sizes tuples; (name, value)
-        """
-        attrValue = ''
-        if attributes:
-            for attr, value in attributes:
-                attrValue += ' %s="%s"' % (attr, value)
-        self._writeLine('<%s%s>' % (tagName, attrValue))
-        self._tagStack.append(tagName)
-        self._indent += 2
-
-    def _popTag(self):
-        """Closes the previously opened tag and decreases the indentation
-        @returns: name of the closed tag
-        """
-        self._indent -= 2
-        tagName = self._tagStack.pop()
-        self._writeLine('</%s>' % (tagName,))
-        return tagName
-
-    def _writePlanet(self):
-        self._pushTag('planet')
-        if self._atmosphereComponents:
-            self._writeAtmosphere(self._atmosphereComponents)
-        if self._flowComponents:
-            self._writeFlow(self._flowName, self._flowComponents)
-        self._popTag()
-
-    def _writeAtmosphere(self, components):
-        self._pushTag('atmosphere')
-        self._writeComponents(components)
-        self._popTag()
-
-    def _writeFlow(self, flowName, components):
-        self._pushTag('flow', [('name', flowName)])
-        self._writeComponents(components)
-        self._popTag()
-
-    def _writeComponents(self, components):
-        for component in components:
-            self._writeComponent(component)
-
-    def _writeComponent(self, component):
-        # FIXME: when the wizard can be split among projects, "project"
-        # and "version" should be taken from the relevant project
-        attrs = [('name', component.name),
-                 ('type', component.component_type),
-                 ('project', 'flumotion'),
-                 ('worker', component.worker),
-                 ('version', configure.version)]
-        self._pushTag('component', attrs)
-        whoIsFeedingUs = component.getFeeders()
-        if whoIsFeedingUs:
-            self._writeEaters(whoIsFeedingUs)
-        if component.props:
-            self._writeProperties(component.props)
-        if component.plugs:
-            self._writeComponentPlugs(component.plugs)
-        self._popTag()
-
-    def _writeEaters(self, eaters):
-        self._pushTag('eater', [('name', "default")])
-        for sourceName in eaters:
-            self._writeLine('<feed>%s</feed>' % sourceName)
-        self._popTag()
-
-    def _writeProperties(self, properties):
-        self._writeLine()
-        property_names = properties.keys()
-        property_names.sort()
-        for name in property_names:
-            value = properties[name]
-            self._writeLine('<property name="%s">%s</property>' % (name, value))
-
-    def _writeComponentPlugs(self, plugs):
-        self._writeLine()
-        self._pushTag('plugs')
-        for plug in plugs:
-            self._writeComponentPlug(plug)
-        self._popTag()
-
-    def _writeComponentPlug(self, plug):
-        attrs = [('socket', plug.socket),
-                 ('type', plug.plug_type)]
-        self._pushTag('plug', attrs)
-        plugprops = plug.getProperties()
-        if plugprops:
-            self._writeProperties(plugprops)
-        self._popTag()
 
 
 class Component(log.Loggable):
@@ -486,8 +348,7 @@ class WizardSaver(log.Loggable):
 
     def getXML(self):
         self._fetchComponentsFromWizardSteps()
-        writer = XMLWriter(self.wizard.flowName,
-                           self._flow_components,
-                           self._atmosphere_components)
-
+        writer = ConfigurationWriter(self.wizard.flowName,
+                                     self._flow_components,
+                                     self._atmosphere_components)
         return writer.getXML()

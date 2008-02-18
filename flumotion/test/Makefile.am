@@ -77,6 +77,7 @@ EXTRA_DIST = 					\
 	test_ui_fgtk.py				\
 	test_wizard_models.py			\
 	test_wizard.py				\
+	test_wizard_save.py			\
 	test_worker_config.py			\
 	test_workerconfig.py			\
 	test_worker_job.py			\

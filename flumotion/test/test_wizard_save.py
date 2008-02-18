@@ -25,14 +25,15 @@ import unittest
 
 from flumotion.common import testsuite
 from flumotion.wizard.models import Flow, Plug
-from flumotion.wizard.save import XMLWriter, Component
+from flumotion.wizard.save import Component
+from flumotion.wizard.configurationwriter import ConfigurationWriter
 
 __version__ = "$Rev: 6126 $"
 
 
 class TestXMLWriter(testsuite.TestCase):
     def testEmpty(self):
-        writer = XMLWriter('', [], [])
+        writer = ConfigurationWriter('', [], [])
         testsuite.diffStrings(
             ("<planet>\n"
              "</planet>\n"),
@@ -40,7 +41,7 @@ class TestXMLWriter(testsuite.TestCase):
 
     def testFlowComponent(self):
         c = Component('name', 'streamer', 'worker')
-        writer = XMLWriter('flow', [c], [])
+        writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
             ('<planet>\n'
              '  <flow name="flow">\n'
@@ -53,7 +54,7 @@ class TestXMLWriter(testsuite.TestCase):
 
     def testAtmosphereComponent(self):
         c = Component('name', 'streamer', 'worker', {'foo': 'bar'})
-        writer = XMLWriter('', [], [c])
+        writer = ConfigurationWriter('', [], [c])
         testsuite.diffStrings(
             ('<planet>\n'
              '  <atmosphere>\n'
@@ -73,7 +74,7 @@ class TestXMLWriter(testsuite.TestCase):
         plug.plug_type = 'plug-type'
         plug.properties.foo = 'bar'
         c.plugs.append(plug)
-        writer = XMLWriter('flow', [c], [])
+        writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
             ('<planet>\n'
              '  <flow name="flow">\n'
@@ -96,7 +97,7 @@ class TestXMLWriter(testsuite.TestCase):
         c2 = Component('name', 'second', 'worker')
         c1.link(c2)
 
-        writer = XMLWriter('flow', [c1, c2], [])
+        writer = ConfigurationWriter('flow', [c1, c2], [])
         testsuite.diffStrings(
             ('<planet>\n'
              '  <flow name="flow">\n'
