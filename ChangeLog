@@ -1,3 +1,8 @@
+2008-02-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_registry.py (TestRegistry._compareRegistryAfterDump): Use
+	testsuite.diffStrings here.
+
 2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/common/testsuite.py:

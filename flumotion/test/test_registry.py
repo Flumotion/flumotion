@@ -246,7 +246,7 @@ class TestRegistry(testsuite.TestCase):
         xml = """<registry><components><foo></foo></components></registry>"""
         self.assertRaises(fxml.ParserError, reg.addFromString, xml)
 
-    def _compareRegistryAfterDump(self, orig, expected):
+    def _compareRegistryAfterDump(self, orig, expected, name=''):
         reg = registry.ComponentRegistry()
         reg.clean()
         reg.addFromString(orig)
@@ -255,13 +255,7 @@ class TestRegistry(testsuite.TestCase):
         s.seek(0, 0)
         data = s.read()
 
-        datalines = data.splitlines()
-        targetlines = expected.splitlines()
-        self.assertEquals(len(targetlines), len(datalines))
-        for i, (d, t) in enumerate(zip(datalines, targetlines)):
-            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
-                i + 1, d, t))
-
+        testsuite.diffStrings(data, expected, desc=name)
 
     # addFromString does not parse <directory> toplevel entries since they
     # should not be in partial registry files
@@ -353,7 +347,7 @@ class TestRegistry(testsuite.TestCase):
   </bundles>
 </registry>
 """
-        self._compareRegistryAfterDump(xml, target)
+        self._compareRegistryAfterDump(xml, target, 'testDump')
 
     def testDumpWithEscapedPropertyDescription(self):
         xml = """
@@ -399,7 +393,8 @@ class TestRegistry(testsuite.TestCase):
   </bundles>
 </registry>
 """
-        self._compareRegistryAfterDump(xml, target)
+        self._compareRegistryAfterDump(xml, target,
+                                       'testDumpWithEscapedPropertyDescription')
 
     def testDumpWithCompoundProperties(self):
         xml = """
@@ -513,7 +508,8 @@ class TestRegistry(testsuite.TestCase):
   </bundles>
 </registry>
 """
-        self._compareRegistryAfterDump(xml, target)
+        self._compareRegistryAfterDump(xml, target,
+                                       'testDumpWithCompoundProperties')
 
 class TestComponentEntry(testsuite.TestCase):
     def setUp(self):
