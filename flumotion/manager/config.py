@@ -739,29 +739,30 @@ def exportPlanetXml(p):
     def component(c, isFeedComponent):
         concat = lambda lists: reduce(list.__add__, lists, [])
         C = c.get('config')
-        return ([X.component(name=c.get('name'),
-                             type=c.get('type'),
-                             label=C.get('label', c.get('name')),
-                             worker=c.get('workerRequested'),
-                             project=C['project'],
-                             version=common.versionTupleToString(C['version']))]
-                + [[X.eater(name=name)]
+        values = [X.component(name=c.get('name'),
+                              type=c.get('type'),
+                              label=C.get('label', c.get('name')),
+                              worker=c.get('workerRequested'),
+                              project=C['project'],
+                              version=common.versionTupleToString(C['version']))]
+        values += [[X.eater(name=name)]
                    + [[X.feed(alias=alias), feedId]
                       for feedId, alias in feeders]
                    for name, feeders in  C['eater'].items()]
-                + [[X.property(name=name), serialise(value)]
+        values += [[X.property(name=name), serialise(value)]
                    for name, value in C['properties'].items()]
-                + (isFeedComponent and [[X.clock_master(),
-                    C['clock-master'] == C['avatarId'] and 'true' or 'false']] 
-                   or [])
-                + [[X.plugs()]
-                   + concat([[[X.plug(socket=socket, type=plug['type'])]
-                              + [[X.property(name=name), value]
-                                 for name, value in plug['properties'].items()]
-                              for plug in plugs]
-                             for socket, plugs in C['plugs'].items()])]
-                + [[X.virtual_feed(name=name, real=real)]
-                   for name, real in C['virtual-feeds'].items()])
+        if isFeedComponent:
+            values += [[X.clock_master(),
+                        C['clock-master'] == C['avatarId'] and 'true' or 'false']]
+        values +=  [[X.plugs()]
+                    + concat([[[X.plug(socket=socket, type=plug['type'])]
+                               + [[X.property(name=name), value]
+                                  for name, value in plug['properties'].items()]
+                               for plug in plugs]
+                              for socket, plugs in C['plugs'].items()])]
+        values += [[X.virtual_feed(name=name, real=real)]
+                   for name, real in C['virtual-feeds'].items()]
+        return values
 
     def flow(f):
         return ([X.flow(name=f.get('name'))]

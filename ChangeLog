@@ -1,3 +1,9 @@
+2008-02-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/manager/config.py (exportPlanetXml.component): Break up into
+	pieces which allows a simple if statement instead of crazy and/or conditionals.
+	Fixes a pychecker bug and makes the code easier to understand.
+
 2008-02-18  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/config.py:
@@ -5,6 +11,9 @@
 	  for atmosphere components, since those aren't valid in the XML.
 
 2008-02-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/misc/cortado/cortado_location.py.in (getCortadoFilename): 
+	Check the location ubuntu/debian installs cortado.
 
 	* flumotion/wizard/configurationwriter.py:
 	(XMLWriter._collectAttributes): 
