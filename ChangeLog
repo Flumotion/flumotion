@@ -1,3 +1,9 @@
+2008-02-18  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/config.py:
+	  When exporting a planet config, ensure that we don't add clock-master
+	  for atmosphere components, since those aren't valid in the XML.
+
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/configurationwriter.py:

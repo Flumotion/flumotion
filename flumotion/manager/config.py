@@ -736,7 +736,7 @@ def exportPlanetXml(p):
             return "%d/%d" % propVal
         return propVal
 
-    def component(c):
+    def component(c, isFeedComponent):
         concat = lambda lists: reduce(list.__add__, lists, [])
         C = c.get('config')
         return ([X.component(name=c.get('name'),
@@ -751,8 +751,9 @@ def exportPlanetXml(p):
                    for name, feeders in  C['eater'].items()]
                 + [[X.property(name=name), serialise(value)]
                    for name, value in C['properties'].items()]
-                + [[X.clock_master(),
-                    C['clock-master'] == C['avatarId'] and 'true' or 'false']]
+                + (isFeedComponent and [[X.clock_master(),
+                    C['clock-master'] == C['avatarId'] and 'true' or 'false']] 
+                   or [])
                 + [[X.plugs()]
                    + concat([[[X.plug(socket=socket, type=plug['type'])]
                               + [[X.property(name=name), value]
@@ -764,11 +765,11 @@ def exportPlanetXml(p):
 
     def flow(f):
         return ([X.flow(name=f.get('name'))]
-                 + [component(c) for c in f.get('components')])
+                 + [component(c, True) for c in f.get('components')])
 
     def atmosphere(a):
         return ([X.atmosphere()]
-                + [component(c) for c in a.get('components')])
+                + [component(c, False) for c in a.get('components')])
 
     def planet(p):
         return ([X.planet(name=p.get('name')),
