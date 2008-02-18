@@ -1,5 +1,15 @@
 2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
 
+	* flumotion/common/testsuite.py:
+	New api diffStrings which helps when comparing large strings
+
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/save.py:
+	Decouple xml saving from fetching state from the wizard.
+	Write proper tests
+
+2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
+
 	* flumotion/test/test_wizard_models.py:
 	* flumotion/wizard/models.py:
 	Map underscore to dashes for attribute accesses.
