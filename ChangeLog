@@ -1,5 +1,8 @@
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/cortado/cortado_location.py.in (getCortadoFilename): 
+	Check for cortado.jar in /usr/share/cortado, where debian/ubuntu installs it.
+
 	* flumotion/manager/config.py (exportPlanetXml.component): Break up into
 	pieces which allows a simple if statement instead of crazy and/or conditionals.
 	Fixes a pychecker bug and makes the code easier to understand.

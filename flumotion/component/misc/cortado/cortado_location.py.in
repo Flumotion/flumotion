@@ -31,6 +31,11 @@ def getCortadoFilename():
             prefix = prefix[1:]
         directories.insert(0, CORTADO_PREFIX)
     for directory in directories:
+        # Debian/Ubuntu
+        name = os.path.join(directory, 'share', 'cortado', 'cortado-ovt.jar')
+        if os.path.exists(name):
+            return name
+        # ant install_applet
         for version in ['0.2.2', '0.2.1', '0.2.0']:
             name = os.path.join(directory, 'share', 'cortado',
                                 'cortado-ovt-stripped-%s.1.jar' % (version,))
