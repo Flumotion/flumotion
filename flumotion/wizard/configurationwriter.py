@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 from cStringIO import StringIO
+from xml.sax.saxutils import quoteattr
 
 from flumotion.configure import configure
 
@@ -38,7 +39,7 @@ class XMLWriter(object):
         attrValue = ''
         if attributes:
             for attr, value in attributes:
-                attrValue += ' %s="%s"' % (attr, value)
+                attrValue += ' %s=%s' % (attr, quoteattr(value))
         return attrValue
 
     def _openTag(self, tagName, attributes=None):

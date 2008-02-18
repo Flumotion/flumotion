@@ -1,5 +1,9 @@
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwriter.py:
+	(XMLWriter._collectAttributes): 
+	Quote the attribute values properly
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/Makefile.am:
