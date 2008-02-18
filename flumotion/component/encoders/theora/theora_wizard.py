@@ -45,15 +45,15 @@ class TheoraVideoEncoder(VideoEncoder):
     def getProperties(self):
         properties = super(TheoraVideoEncoder, self).getProperties()
         if self.has_bitrate:
-            del properties['quality']
-            properties['bitrate'] *= 1000
+            del properties.quality
+            properties.bitrate *= 1000
         elif self.has_quality:
-            del properties['bitrate']
+            del properties.bitrate
         else:
             raise AssertionError
 
-        properties['noise-sensitivity'] = max(
-            int(properties['noise-sensitivity'] * (32768 / 100.)),  1)
+        properties.noise_sensitivity = max(
+            int(properties.noise_sensitivity * (32768 / 100.)),  1)
 
         return properties
 

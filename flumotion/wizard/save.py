@@ -238,15 +238,15 @@ class WizardSaver(log.Loggable):
 
         # At this point we already know that we should overlay something
         if overlay.show_logo:
-            properties['fluendo-logo'] = True
+            properties.fluendo_logo = True
             encoding_step = self.wizard.get_step('Encoding')
             if encoding_step.get_muxer_type() == 'ogg-muxer':
-                properties['xiph-logo'] = True
+                properties.xiph_logo = True
 
             license_options = self.wizard.get_step_options('Content License')
             if (license_options['set-license'] and
                 license_options['license'] == LicenseType.CC):
-                properties['cc-logo'] = True
+                properties.cc_logo = True
 
         return Component('overlay-video',
                          overlay.component_type,

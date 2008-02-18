@@ -42,10 +42,10 @@ class VorbisAudioEncoder(AudioEncoder):
     def getProperties(self):
         properties = super(VorbisAudioEncoder, self).getProperties()
         if self.has_bitrate:
-            del properties['quality']
-            properties['bitrate'] *= 1000
+            del properties.quality
+            properties.bitrate *= 1000
         elif self.has_quality:
-            del properties['bitrate']
+            del properties.bitrate
         else:
             raise AssertionError
 

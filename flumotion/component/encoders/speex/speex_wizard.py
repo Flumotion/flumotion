@@ -38,7 +38,7 @@ class SpeexAudioEncoder(AudioEncoder):
 
     def getProperties(self):
         properties = super(SpeexAudioEncoder, self).getProperties()
-        properties['bitrate'] *= 1000
+        properties.bitrate *= 1000
         return properties
 
 

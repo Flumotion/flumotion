@@ -1,3 +1,20 @@
+2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/wizard/models.py:
+	Map underscore to dashes for attribute accesses.
+	This simplifies the getProperties() implementations as a side effect.
+
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/misc/cortado/cortado_wizard.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/save.py:
+	We can use attributes instead of the uglier dictionary interface now.
+
 2008-02-15  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac:

@@ -55,10 +55,10 @@ class Overlay(Component):
         p = super(Overlay, self).getProperties()
 
         if not self.show_text:
-            del p['text']
+            del p.text
 
-        p['width'] = self._video_producer.getWidth()
-        p['height'] = self._video_producer.getHeight()
+        p.width = self._video_producer.getWidth()
+        p.height = self._video_producer.getHeight()
 
         return p
 

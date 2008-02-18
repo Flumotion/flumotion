@@ -79,7 +79,7 @@ class HTTPPorter(Component):
     def getProperties(self):
         properties = super(HTTPPorter, self).getProperties()
         # FIXME: kiwi should do this.
-        properties['port'] = int(properties['port'])
+        properties.port = int(properties.port)
         return properties
 
 
@@ -118,20 +118,20 @@ class HTTPStreamer(Consumer):
     def getProperties(self):
         properties = super(HTTPStreamer, self).getProperties()
         if self.has_bandwidth_limit:
-            properties['bandwidth-limit'] = int(
-                properties['bandwidth-limit'] * 1e6)
+            properties.bandwidth_limit = int(
+                properties.bandwidth_limit * 1e6)
         else:
-            del properties['bandwidth-limit']
+            del properties.bandwidth_limit
 
         if not self.has_client_limit:
-            del properties['client-limit']
+            del properties.client_limit
 
         if self.has_plugins:
-            properties['porter-socket-path'] = self.socket_path
-            properties['porter-username'] = self.porter_username
-            properties['porter-password'] = self.porter_password
-            properties['type'] = 'slave'
-            del properties['port']
+            properties.porter_socket_path = self.socket_path
+            properties.porter_username = self.porter_username
+            properties.porter_password = self.porter_password
+            properties.type = 'slave'
+            del properties.port
 
         return properties
 

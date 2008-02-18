@@ -27,8 +27,7 @@ __version__ = "$Rev$"
 
 
 class Properties(dict):
-    """
-    I am a special dictionary which you also can treat as an instance.
+    """I am a special dictionary which you also can treat as an instance.
     Setting and getting an attribute works.
     This is suitable for using in a kiwi proxy.
     >>> p = Properties()
@@ -38,14 +37,13 @@ class Properties(dict):
 
     Note that you cannot insert the attributes which has the same name
     as dictionary methods, such as 'keys', 'values', 'items', 'update'.
-    """
-    def __setattr__(self, attr, value):
-        if attr in dict.__dict__:
-            raise AttributeError(
-                "Cannot set property %r, it's a dictionary attribute"
-                % (attr,))
-        self[attr] = value
 
+    Underscores are converted to dashes when setting attributes, eg:
+
+    >>> p.this_is_outrageous = True
+    >>> p
+    <Properties {'this-is-outrageous': True}>
+    """
     def __setitem__(self, attr, value):
         if attr in dict.__dict__:
             raise AttributeError(
@@ -53,7 +51,11 @@ class Properties(dict):
                 % (attr,))
         dict.__setitem__(self, attr, value)
 
+    def __setattr__(self, attr, value):
+        self[attr.replace('_', '-')] = value
+
     def __getattr__(self, attr):
+        attr = attr.replace('_', '-')
         try:
             return self[attr]
         except KeyError:
@@ -62,7 +64,7 @@ class Properties(dict):
                 self, attr))
 
     def __delattr__(self, attr):
-        del self[attr]
+        del self[attr.replace('_', '-')]
 
     def __repr__(self):
         return '<Properties %r>' % (dict.__repr__(self),)
@@ -172,10 +174,7 @@ class Component(object):
         return self.worker
 
     def getProperties(self):
-        props = {}
-        for key, value in self.properties.iteritems():
-            props[key.replace('_', '-')] = value
-        return props
+        return self.properties
 
     def getPlugs(self):
         return self.plugs
@@ -200,10 +199,7 @@ class Plug(object):
         self.properties = Properties()
 
     def getProperties(self):
-        props = {}
-        for key, value in self.properties.iteritems():
-            props[key.replace('_', '-')] = value
-        return props
+        return self.properties
 
 
 class Producer(Component):

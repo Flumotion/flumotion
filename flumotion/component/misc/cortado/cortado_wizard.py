@@ -39,10 +39,10 @@ class CortadoHTTPPlug(HTTPPlug):
     def getProperties(self):
         p = super(CortadoHTTPPlug, self).getProperties()
 
-        p['codebase'] = self.server.getCodebase()
-        p['stream-url'] = self.streamer.getURL()
-        p['has-video'] = self.video_producer is not None
-        p['has-audio'] = self.audio_producer is not None
+        p.codebase = self.server.getCodebase()
+        p.stream_url = self.streamer.getURL()
+        p.has_video = self.video_producer is not None
+        p.has_audio = self.audio_producer is not None
 
         if self.video_producer:
             width = self.video_producer.properties.width
@@ -53,10 +53,10 @@ class CortadoHTTPPlug(HTTPPlug):
             height = 240
             framerate = 1
 
-        p['width'] = width
-        p['height'] = height
-        p['framerate'] = framerate
-        p['buffer-size'] = 40
+        p.width = width
+        p.height = height
+        p.framerate = framerate
+        p.buffer_size = 40
 
         return p
 

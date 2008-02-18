@@ -47,7 +47,7 @@ class JPEGVideoEncoder(VideoEncoder):
 
     def getProperties(self):
         properties = super(JPEGVideoEncoder, self).getProperties()
-        properties['framerate'] = _fraction_from_float(properties['framerate'], 2)
+        properties.framerate = _fraction_from_float(properties.framerate, 2)
         return properties
 
 

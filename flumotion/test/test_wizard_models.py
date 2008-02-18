@@ -88,7 +88,7 @@ class TestProperties(testsuite.TestCase):
     def setUp(self):
         self.props = Properties()
 
-    def testInsertItem(self):
+    def testSetItem(self):
         self.props['foo'] = 10
 
         self.failUnless(self.props)
@@ -99,7 +99,19 @@ class TestProperties(testsuite.TestCase):
         self.failUnless('foo' in self.props)
         self.assertEquals(self.props['foo'], 10)
 
-    def testInsertAttribute(self):
+    def testSetItemUnderscore(self):
+        self.props['foo-bar'] = 10
+
+        self.failUnless(self.props)
+
+        self.failUnless(hasattr(self.props, 'foo_bar'))
+        self.assertEquals(self.props.foo_bar, 10)
+
+        self.failUnless('foo-bar' in self.props)
+        self.failIf('foo_bar' in self.props)
+        self.assertEquals(self.props['foo-bar'], 10)
+
+    def testSetAttribute(self):
         self.props.foo = 10
 
         self.failUnless(self.props)
@@ -110,6 +122,18 @@ class TestProperties(testsuite.TestCase):
         self.failUnless('foo' in self.props)
         self.assertEquals(self.props['foo'], 10)
 
+    def testSetAttributeUnderscore(self):
+        self.props.foo_bar = 10
+
+        self.failUnless(self.props)
+
+        self.failUnless(hasattr(self.props, 'foo_bar'))
+        self.assertEquals(self.props.foo_bar, 10)
+
+        self.failUnless('foo-bar' in self.props)
+        self.failIf('foo_bar' in self.props)
+        self.assertEquals(self.props['foo-bar'], 10)
+
     def testDeleteItem(self):
         self.props.foo = 10
 
@@ -117,6 +141,14 @@ class TestProperties(testsuite.TestCase):
 
         self.failIf(hasattr(self.props, 'foo'))
         self.failIf('foo' in self.props)
+
+    def testDeleteItemUnderscore(self):
+        self.props.foo_bar = 10
+
+        del self.props['foo-bar']
+
+        self.failIf(hasattr(self.props, 'foo_bar'))
+        self.failIf('foo-bar' in self.props)
 
     def testDeleteAttribute(self):
         self.props.foo = 10
@@ -126,7 +158,14 @@ class TestProperties(testsuite.TestCase):
         self.failIf(hasattr(self.props, 'foo'))
         self.failIf('foo' in self.props)
 
-    def testInsertInvalid(self):
+    def testDeleteAttributeUnderscore(self):
+        self.props.foo_bar = 10
+        del self.props.foo_bar
+
+        self.failIf(hasattr(self.props, 'foo_bar'))
+        self.failIf('foo-bar' in self.props)
+
+    def testSetInvalid(self):
         self.assertRaises(AttributeError,
                           self.props.__setattr__, 'update', 10)
         self.failIf(self.props)
