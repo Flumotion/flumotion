@@ -1,5 +1,13 @@
 2008-02-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/greeter.py (Initial.setup):
+    	Fix a long-standing annoying bug: always keep a radio button focus on the
+    	first greeter page and make pressing enter go to the next step.
+    	Also refactor the initial step a bit, so it's actually understandable.
+
+	* flumotion/ui/wizard.py (SectionWizard.get_steps): Add a new API to get all the
+	available steps
+
 	* flumotion/worker/checks/cortado.py (checkCortado): Add debugging to the cortado 
 	check
 

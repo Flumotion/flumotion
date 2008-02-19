@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""Wizard run when the user first starts flumotion.
+"""
 import os
 import errno
 
@@ -35,39 +37,49 @@ from flumotion.ui.simplewizard import WizardStep, SimpleWizard
 __version__ = "$Rev$"
 
 
-# A wizard run when the user first starts flumotion.
-
-
-# personal note: these things duplicate to a large extent the code in
-# flumotion.wizard.steps. A bit irritating to find that out after
-# hacking on it for a bit.
-
-
-# Page classes (see wizard.py for details)
-
 class Initial(WizardStep):
     name = 'initial'
     title = _('Connect to Flumotion manager')
-    text = _('Flumotion Admin needs to connect to a Flumotion manager.\n') + \
-           _('Choose an option from the list and click "Forward" to begin.')
+    text = (_('Flumotion Admin needs to connect to a Flumotion manager.\n') +
+            _('Choose an option from the list and click "Forward" to begin.'))
     connect_to_existing = None
-    next_pages = ['load_connection', 'connect_to_existing', 'start_new']
+    next_pages = ['load_connection',
+                  'connect_to_existing',
+                  'start_new']
+
+    def __init__(self, wizard, parent):
+        super(Initial, self).__init__(wizard, parent)
+
+        for radio in self.load_connection.get_group():
+            radio.connect('activate', self._on_radio__activiate)
 
     def on_next(self, state):
-        radio_buttons = self.connect_to_existing.get_group()
-
-        for i in range(len(radio_buttons)):
-            if radio_buttons[i].get_active():
-                return radio_buttons[i].get_name()
+        for radio in self.connect_to_existing.get_group():
+            if radio.get_active():
+                return radio.get_name()
         raise AssertionError
+
+    def _on_radio__activiate(self, radio):
+        self.button_next.clicked()
 
     def setup(self, state, available_pages):
         # the group of radio buttons is named after the first check button
-        radio_buttons = self.load_connection.get_group()
-        for w in radio_buttons:
-            w.set_sensitive(w.get_name() in available_pages)
-            if w.get_active() and not w.get_property('sensitive'):
-                getattr(self, available_pages[0]).set_active(True)
+        for radio in self.load_connection.get_group():
+            isAvailable = radio.get_name() in available_pages
+            radio.set_sensitive(isAvailable)
+
+            if radio.get_active()and not radio.props.sensitive:
+                firstRadio = getattr(self, available_pages[0])
+                firstRadio.set_active(True)
+
+        # Find which radio button should be focused:
+        for radioName in available_pages:
+            radio = getattr(self, radioName)
+            if radio.get_active():
+                break
+        else:
+            raise AssertionError("no button to focus")
+        radio.grab_focus()
 
 
 class ConnectToExisting(WizardStep):
@@ -151,6 +163,7 @@ class LoadConnection(WizardStep):
     def setup(self, state, available_pages):
         self.connections.grab_focus()
 
+
 class GreeterProcessProtocol(protocol.ProcessProtocol):
     def __init__(self):
         # no parent init
@@ -161,6 +174,7 @@ class GreeterProcessProtocol(protocol.ProcessProtocol):
             self.deferred.callback(None)
         else:
             self.deferred.callback(failure)
+
 
 class StartNew(WizardStep):
     name = 'start_new'
@@ -301,6 +315,7 @@ This mode is only useful for testing Flumotion.
         gobject.source_remove(self._timeout_id)
         self.emit('finished', result)
 
+
 class StartNewError(WizardStep):
     name = 'start_new_error'
     title = _('Failed to start')
@@ -351,6 +366,7 @@ You can shut down the manager and worker later with the following command:
     def on_next(self, state):
         return '*finished*'
 
+
 class Greeter(SimpleWizard):
     name = 'greeter'
     steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
@@ -358,6 +374,7 @@ class Greeter(SimpleWizard):
 
     def __init__(self, parent=None):
         SimpleWizard.__init__(self, 'initial', parent=parent)
+
 
 # This is used by the gtk admin to connect to an existing manager
 class ConnectExisting(SimpleWizard):
