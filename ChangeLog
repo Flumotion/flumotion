@@ -1,28 +1,38 @@
+2008-02-19  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/Makefile.am:
+	* flumotion/component/misc/httpfile/ratecontrol.py:
+	  Add rate control code; not committing the bits to hook it into
+	  http-server yet. First working version; still needs lots of cleanup.
+
 2008-02-19  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/worker/checks/cortado.py (checkCortado): Oops, forgot pychecker again.
-	msg instead of filename
+	* flumotion/worker/checks/cortado.py (checkCortado): Oops, forgot 
+	  pychecker again. msg instead of filename
 
 	* flumotion/admin/gtk/greeter.py (Initial.setup):
-    	Fix a long-standing annoying bug: always keep a radio button focus on the
-    	first greeter page and make pressing enter go to the next step.
-    	Also refactor the initial step a bit, so it's actually understandable.
+	  Fix a long-standing annoying bug: always keep a radio button focus on the
+	  first greeter page and make pressing enter go to the next step.
+	  Also refactor the initial step a bit, so it's actually understandable.
 
-	* flumotion/worker/checks/cortado.py (checkCortado): Add debugging to the cortado 
-	check
+	* flumotion/worker/checks/cortado.py (checkCortado): Add debugging to the 
+	  cortado check
 
 	* flumotion/admin/gtk/componentview.py
-	(ComponentView._get_widget_constructor): Add component view wire compatibility
-	with platform-3.
+	(ComponentView._get_widget_constructor): Add component view wire 
+	  compatibility with platform-3.
 
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/component/misc/cortado/cortado_location.py.in (getCortadoFilename): 
-	Check for cortado.jar in /usr/share/cortado, where debian/ubuntu installs it.
+	* flumotion/component/misc/cortado/cortado_location.py.in 
+	(getCortadoFilename): 
+	  Check for cortado.jar in /usr/share/cortado, where debian/ubuntu installs
+	  it.
 
-	* flumotion/manager/config.py (exportPlanetXml.component): Break up into
-	pieces which allows a simple if statement instead of crazy and/or conditionals.
-	Fixes a pychecker bug and makes the code easier to understand.
+	* flumotion/manager/config.py (exportPlanetXml.component): 
+	  Break up into pieces which allows a simple if statement instead of crazy 
+	  and/or conditionals. Fixes a pychecker bug and makes the code easier to 
+	  understand.
 
 2008-02-18  Michael Smith <msmith@fluendo.com>
 
@@ -32,26 +42,28 @@
 
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/component/misc/cortado/cortado_location.py.in (getCortadoFilename): 
-	Check the location ubuntu/debian installs cortado.
+	* flumotion/component/misc/cortado/cortado_location.py.in 
+	(getCortadoFilename): 
+	  Check the location ubuntu/debian installs cortado.
 
 	* flumotion/wizard/configurationwriter.py:
 	(XMLWriter._collectAttributes): 
-	Quote the attribute values properly
+	  Quote the attribute values properly
 
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/Makefile.am:
 	* flumotion/wizard/configurationwriter.py:
 	* flumotion/wizard/save.py:
-	Move configuration writer out to a separate module.
-	Separate common parts to another class and subclass it in the configuration writer.
-	Use a generic API for all xml generation.
+	  Move configuration writer out to a separate module.
+	  Separate common parts to another class and subclass it in the 
+	  configuration writer.
+	  Use a generic API for all xml generation.
 
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/test_registry.py (TestRegistry._compareRegistryAfterDump): Use
-	testsuite.diffStrings here.
+	* flumotion/test/test_registry.py (TestRegistry._compareRegistryAfterDump):
+	  Use testsuite.diffStrings here.
 
 2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
 
@@ -132,8 +144,9 @@
 
 2008-02-15  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/test_component_base_scheduler.py (EventTest.testRecurringOnce): Check
-	if dateutil is installed before running this test
+	* flumotion/test/test_component_base_scheduler.py 
+	(EventTest.testRecurringOnce): 
+	  Check if dateutil is installed before running this test
 
 2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
 
@@ -172,31 +185,35 @@
 
 2008-02-14  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): Remove,
-	all videosource steps uses separate model classes now.
+	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): 
+	  Remove, all videosource steps uses separate model classes now.
 
-	* flumotion/ui/wizard.py (WizardStep): Remove unused method before_show.
+	* flumotion/ui/wizard.py (WizardStep): 
+	  Remove unused method before_show.
 
 	* flumotion/wizard/configurationwizard.py (LicenseStep)
-	(WelcomeStep): Disable changing of the style. Juse use the default background color.
+	(WelcomeStep): 
+	  Disable changing of the style. Juse use the default background color.
 
-	* flumotion/wizard/conversionsteps.py: Use setup/activated instead of
-	calling private methods from the wizard.
+	* flumotion/wizard/conversionsteps.py: 
+	  Use setup/activated instead of calling private methods from the wizard.
 
-	* flumotion/component/consumers/shout2/shout2_wizard.py (Shout2Step.worker_changed): Check
-	elements in worker_changed instead of before_show.
+	* flumotion/component/consumers/shout2/shout2_wizard.py 
+	(Shout2Step.worker_changed): 
+	  Check elements in worker_changed instead of before_show.
 
 	* flumotion/wizard/conversionsteps.py (ConversionStep._populate_combos): 
-	Put ... in the combos while querying the manager and block the next button meanwhile.
-	Disable the combos sensitivy while querying.
+	  Put ... in the combos while querying the manager and block the next 
+	  button meanwhile.	Disable the combos sensitivy while querying.
 	* flumotion/wizard/productionsteps.py (ProductionStep._populate_combos): 
-	Disable the combos sensitivy while querying.
+	  Disable the combos sensitivy while querying.
 
 2008-02-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py (ProductionStep.__init__): 
 	Get rid of a FIXME; remove _setup() and split it into setup/activated logic.
-	Put ... in the combos while querying the manager and block the next button meanwhile.
+	Put ... in the combos while querying the manager and block the next button 
+	meanwhile.
 
 2008-02-13  Johan Dahlin  <jdahlin@async.com.br>
 
@@ -369,8 +386,8 @@
 2008-01-31  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/httpfile/httpfile.py
-	(HTTPFileStreamer.updatePorterDetails): Refactor and clean up updatePorterDetails.
-	Bump copyright and pep8ify.
+	(HTTPFileStreamer.updatePorterDetails): 
+	  Refactor and clean up updatePorterDetails.  Bump copyright and pep8ify.
 	(HTTPFileStreamer._updatePath): comment and style changes
 
 	* flumotion/ui/wizard.py (SectionWizard._set_step): Set the step earlier
@@ -1465,16 +1482,17 @@
 
 2007-12-20  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/component/effects/volume/admin_gtk.py (VolumeAdminGtkNode.volumeSet): 
-        Ensure that the scale has an adjustment.
-        This is not a proper solution to a problem that can be when switching 
-	components, but it avoids an unexpected segfault in set_value which expects
-        range->adjustment to be non-NULL
+	* flumotion/component/effects/volume/admin_gtk.py 
+	(VolumeAdminGtkNode.volumeSet): 
+	  Ensure that the scale has an adjustment.
+	  This is not a proper solution to a problem that can be when switching 
+	  components, but it avoids an unexpected segfault in set_value which 
+	  expects range->adjustment to be non-NULL
 
 	* flumotion/common/registry.py (RegistryDirectory._rebuildNeeded): 
-	Remove bogus assert, so FLU_PROJECT_PATH can be set to a directory
-	without registry files. Makes it possible to have a unified environment
-	for running both manager and fgc.
+	  Remove bogus assert, so FLU_PROJECT_PATH can be set to a directory
+	  without registry files. Makes it possible to have a unified environment
+	  for running both manager and fgc.
 
 2007-12-19  Andy Wingo  <wingo@pobox.com>
 
