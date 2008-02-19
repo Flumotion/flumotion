@@ -1,5 +1,8 @@
 2008-02-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/worker/checks/cortado.py (checkCortado): Add debugging to the cortado 
+	check
+
 	* flumotion/admin/gtk/componentview.py
 	(ComponentView._get_widget_constructor): Add component view wire compatibility
 	with platform-3.

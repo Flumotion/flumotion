@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import log
 from flumotion.common.messages import Result
 from flumotion.component.misc.cortado.cortado_location import getCortadoFilename
 
@@ -29,6 +30,15 @@ def checkCortado():
     @returns: a result containing the filename to the jar or None if it cannot be found
     @rtype: L{flumotion.common.messages.Result}
     """
+    log.debug('cortadocheck', 'Checking...')
+    filename = getCortadoFilename()
+    if not filename:
+        msg = 'not found'
+    else:
+        msg = filename
+
+    log.debug('cortadocheck', 'filename - %s' % (filename,))
     result = Result()
-    result.succeed(getCortadoFilename())
+    result.succeed(filename)
+    log.debug('cortadocheck', 'done, returning')
     return result
