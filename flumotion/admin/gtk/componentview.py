@@ -133,6 +133,17 @@ class ComponentView(gtk.VBox, log.Loggable):
                 'No specific GTK admin for this component, using default')
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
 
+        def old_version(failure):
+            # This is compatibility with platform-3
+            # FIXME: It would be better to do this using strict
+            #        version checking of the manager
+
+            # File ".../flumotion/manager/admin.py", line 278, in perspective_getEntryByType
+            # exceptions.AttributeError: 'str' object has no attribute 'get'
+            failure.trap(AttributeError)
+
+            return admin.callRemote('getEntryByType', state, 'admin/gtk')
+
         def got_entry_point((filename, procname)):
             # getEntry for admin/gtk returns a factory function
             # for creating
@@ -156,6 +167,7 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         componentType = state.get('type')
         d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
+        d.addErrback(old_version)
         d.addErrback(no_bundle)
         d.addCallback(got_entry_point)
         d.addCallback(got_factory)

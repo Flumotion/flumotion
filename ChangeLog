@@ -1,3 +1,9 @@
+2008-02-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView._get_widget_constructor): Add component view wire compatibility
+	with platform-3.
+
 2008-02-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/cortado/cortado_location.py.in (getCortadoFilename): 
