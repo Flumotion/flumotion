@@ -172,6 +172,10 @@ class ConfigurationWriter(XMLWriter):
         property_names.sort()
         for name in property_names:
             value = properties[name]
+            # Fractions, perhaps we should do type introspection here?
+            if isinstance(value, tuple):
+                assert len(value) == 2
+                value = '%d/%d' % value
             self.writeTagWithData('property', value,
                                   attributes=[('name', name)])
 
