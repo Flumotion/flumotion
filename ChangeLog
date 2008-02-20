@@ -5,6 +5,8 @@
 	since twisted 1.0.0.
 	(PlugTest.testSetRootResource): Disable all tests on old twisted for now
 	(PlugTest.setUp): Set component to None, in case it never gets set later.
+	(MountTest.testFileMountEmpty): Re-enable all tests except the one which does not run
+	locally on twisted 2.0.1/2.2.0.
 
 	* flumotion/test/test_component_httpserver.py 
 	(MountTest.testDirMountEmpty, MountTest.properties): 
