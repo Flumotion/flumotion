@@ -22,7 +22,7 @@
 import os
 import tempfile
 
-from twisted import version
+from twisted.copyright import version
 from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import client, error
@@ -34,7 +34,7 @@ from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import httpfile
 from flumotion.component.plugs.base import ComponentPlug
 
-usingOldTwisted = (version.major, version.minor, version.micro) < (2, 5, 0)
+usingOldTwisted = tuple(map(int, version.split('.'))) < (2, 5, 0)
 
 __version__ = "$Rev$"
 
