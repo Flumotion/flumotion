@@ -1,3 +1,12 @@
+2008-02-20  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_component_httpserver.py (MountTest): 
+	Chain deferred by using DeferredList with fireOnOneErroback enabled, half of
+	the tests before this change were actually failing.
+	* flumotion/component/misc/httpfile/httpfile.py
+	(HTTPFileStreamer._getDefaultRootResource): Do not strip the leading character,
+	it will be done later in _createRootResourceForPath().
+
 2008-02-19  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/Makefile.am:

@@ -80,12 +80,14 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
         d = client.getPage(self.getURL('/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
-        d.addCallback(lambda r: client.getPage(self.getURL('/B/C')))
-        d.addCallback(lambda r: self.assertEquals(r, 'test file C'))
+
+        d2 = client.getPage(self.getURL('/B/C'))
+        d2.addCallback(lambda r: self.assertEquals(r, 'test file C'))
+
         # getting a non-existing resource should give web.error.Error
-        d.addCallback(lambda r: client.getPage(self.getURL('/B/D')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        return d
+        d3 = client.getPage(self.getURL('/B/D'))
+        d3.addErrback(lambda f: f.trap(error.Error))
+        return defer.DeferredList([d, d2, d3], fireOnOneErrback=True)
 
     def testDirMountRoot(self):
         properties = {
@@ -97,12 +99,15 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
         d = client.getPage(self.getURL('/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
-        d.addCallback(lambda r: client.getPage(self.getURL('/B/C')))
-        d.addCallback(lambda r: self.assertEquals(r, 'test file C'))
+
+        d2 = client.getPage(self.getURL('/B/C'))
+        d2.addCallback(lambda r: self.assertEquals(r, 'test file C'))
+
         # getting a non-existing resource should give web.error.Error
-        d.addCallback(lambda r: client.getPage(self.getURL('/B/D')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        return d
+        d3 = client.getPage(self.getURL('/B/D'))
+        d3.addErrback(lambda f: f.trap(error.Error))
+
+        return defer.DeferredList([d, d2, d3], fireOnOneErrback=True)
 
     def testDirMountOnDemand(self):
         properties = {
@@ -114,14 +119,15 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
         d = client.getPage(self.getURL('/ondemand/A'))
         d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
-        d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/C')))
-        d.addCallback(lambda r: self.assertEquals(r, 'test file C'))
+        d2 = client.getPage(self.getURL('/ondemand/B/C'))
+        d2.addCallback(lambda r: self.assertEquals(r, 'test file C'))
         # getting a non-existing resource should give web.error.Error
-        d.addCallback(lambda r: client.getPage(self.getURL('/A')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/D')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        return d
+        d3 = client.getPage(self.getURL('/A'))
+        d3.addErrback(lambda f: f.trap(error.Error))
+        d4 = client.getPage(self.getURL('/ondemand/B/D'))
+        d4.addErrback(lambda f: f.trap(error.Error))
+
+        return defer.DeferredList([d, d2, d3, d4], fireOnOneErrback=True)
 
     def testFileMountEmpty(self):
         properties = {
@@ -131,17 +137,17 @@ class MountTest(log.Loggable, testsuite.TestCase):
         }
         self.makeComponent(properties)
 
-        d = defer.Deferred()
-        # FIXME: what if just the server URL is requested ?
-        #d.addCallback(lambda r: client.getPage(self.getURL('')))
-        #d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
-        d.addCallback(lambda r: client.getPage(self.getURL('/')))
-        d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
+        d1 = client.getPage(self.getURL('/'))
+        d1.addCallback(lambda r: self.assertEquals(r, 'test file A'))
+
         # getting a non-existing resource should give web.error.Error
-        d.addCallback(lambda r: client.getPage(self.getURL('/B/D')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        d.callback(None)
-        return d
+        d2 = client.getPage(self.getURL('/B/D'))
+        d2.addErrback(lambda f: f.trap(error.Error))
+
+        d3 = client.getPage(self.getURL(''))
+        d3.addCallback(lambda r: self.assertEquals(r, 'test file A'))
+
+        return defer.DeferredList([d1, d2, d3], fireOnOneErrback=True)
 
     def testFileMountOnDemand(self):
         properties = {
@@ -151,14 +157,15 @@ class MountTest(log.Loggable, testsuite.TestCase):
         }
         self.makeComponent(properties)
 
-        d = client.getPage(self.getURL('/ondemand'))
-        d.addCallback(lambda r: self.assertEquals(r, 'test file A'))
+        d1 = client.getPage(self.getURL('/ondemand'))
+        d1.addCallback(lambda r: self.assertEquals(r, 'test file A'))
         # getting a non-existing resource should give web.error.Error
-        d.addCallback(lambda r: client.getPage(self.getURL('/A')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        d.addCallback(lambda r: client.getPage(self.getURL('/ondemand/B/D')))
-        d.addErrback(lambda f: f.trap(error.Error))
-        return d
+        d2 = client.getPage(self.getURL('/A'))
+        d2.addErrback(lambda f: f.trap(error.Error))
+        d3 = client.getPage(self.getURL('/ondemand/B/D'))
+        d3.addErrback(lambda f: f.trap(error.Error))
+        return defer.DeferredList([d1, d2, d3], fireOnOneErrback=True)
+
 
 class _Resource(Resource):
     def __init__(self):

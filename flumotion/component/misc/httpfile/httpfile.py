@@ -376,7 +376,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         root = factory.create(self.filePath)
         if self.mountPoint != '/':
-            root = self._createRootResourceForPath(self.mountPoint[1:], root)
+            root = self._createRootResourceForPath(self.mountPoint, root)
 
         return root
 
