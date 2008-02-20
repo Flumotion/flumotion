@@ -117,7 +117,7 @@ def buildEatersDict(eatersList, eaterDefs):
         if eater is None:
             if not eaterDefs:
                 raise errors.ConfigError(
-                    "Feed %r cannot be connected, component has no eaters" % 
+                    "Feed %r cannot be connected, component has no eaters" %
                     (feedId,))
             # cope with old <source> entries
             eater = eaterDefs[0].getName()
@@ -505,7 +505,7 @@ class PlanetConfigParser(FlumotionConfigParser):
         # </planet>
         root = self.doc.documentElement
         if root.nodeName != 'planet':
-            raise errors.ConfigError("unexpected root node': %s" % 
+            raise errors.ConfigError("unexpected root node': %s" %
                 (root.nodeName,))
 
         parsers = {'atmosphere': (self._parseAtmosphere,
@@ -517,7 +517,7 @@ class PlanetConfigParser(FlumotionConfigParser):
         self.doc.unlink()
         self.doc = None
 
-        
+
     def _parseAtmosphere(self, node):
         # <atmosphere>
         #   <component>
@@ -637,7 +637,7 @@ class ManagerConfigParser(FlumotionConfigParser):
     def _parseParameters(self):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
-            raise errors.ConfigError("unexpected root node': %s" % 
+            raise errors.ConfigError("unexpected root node': %s" %
                 (root.nodeName,))
 
         parsers = {'atmosphere': (_ignore, _ignore),
@@ -693,7 +693,7 @@ class ManagerConfigParser(FlumotionConfigParser):
             self.bouncer = val
         def parseplugs(node):
             return fluconfig.buildPlugsSet(self.parsePlugs(node),
-                                 self.MANAGER_SOCKETS)
+                                           self.MANAGER_SOCKETS)
         def gotplugs(newplugs):
             for socket in self.plugs:
                 self.plugs[socket].extend(newplugs[socket])
@@ -715,7 +715,7 @@ class ManagerConfigParser(FlumotionConfigParser):
         # </planet>
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
-            raise errors.ConfigError("unexpected root node': %s" % 
+            raise errors.ConfigError("unexpected root node': %s" %
                 (root.nodeName,))
 
         parsers = {'atmosphere': (_ignore, _ignore),

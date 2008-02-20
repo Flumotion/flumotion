@@ -1,3 +1,12 @@
+2008-02-20  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/test/test_manager_config.py:
+	* flumotion/manager/config.py:
+	Add a new test file
+	
+	* flumotion/test/Makefile.am:
+	Reindent and remove trailing whitespace
+
 2008-02-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_component_httpserver.py 

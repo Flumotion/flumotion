@@ -60,6 +60,7 @@ EXTRA_DIST = 					\
 	test_keycards.py			\
 	test_logfilter.py			\
 	test_manager_admin.py			\
+	test_manager_config.py			\
 	test_manager_manager.py			\
 	test_manager_worker.py			\
 	test_misc_httpfile.py			\
