@@ -22,6 +22,7 @@
 import os
 import tempfile
 
+from twisted import version
 from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import client, error
@@ -33,8 +34,9 @@ from flumotion.common import testsuite
 from flumotion.component.misc.httpfile import httpfile
 from flumotion.component.plugs.base import ComponentPlug
 
-__version__ = "$Rev$"
+usingOldTwisted = (version.major, version.minor, version.micro) < (2, 5, 0)
 
+__version__ = "$Rev$"
 
 class MountTest(log.Loggable, testsuite.TestCase):
     def setUp(self):
@@ -71,6 +73,11 @@ class MountTest(log.Loggable, testsuite.TestCase):
         return 'http://localhost:%d%s' % (self.component.port, path)
 
     def testDirMountEmpty(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest("""
+File "twisted/web/http.py", line 836, in getClientIP
+    if isinstance(self.client, address.IPv4Address):
+exceptions.AttributeError: CancellableRequest instance has no attribute 'client'""")
         properties = {
             u'mount-point': '',
             u'path': self.path,
@@ -110,6 +117,12 @@ class MountTest(log.Loggable, testsuite.TestCase):
         return defer.DeferredList([d, d2, d3], fireOnOneErrback=True)
 
     def testDirMountOnDemand(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest("""
+File "twisted/web/http.py", line 836, in getClientIP
+    if isinstance(self.client, address.IPv4Address):
+exceptions.AttributeError: CancellableRequest instance has no attribute 'client'""")
+
         properties = {
             u'mount-point': '/ondemand',
             u'path': self.path,
