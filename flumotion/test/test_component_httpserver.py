@@ -195,6 +195,9 @@ class SimpleTestPlug(ComponentPlug):
 
 
 class PlugTest(testsuite.TestCase):
+    def setUp(self):
+        self.component = None
+
     def tearDown(self):
         if self.component:
             self.component.stop()
