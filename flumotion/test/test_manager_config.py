@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -23,8 +23,8 @@ from cStringIO import StringIO
 
 from flumotion.common import testsuite
 from flumotion.common.errors import ConfigError
-from flumotion.manager.config import ManagerConfigParser, ConfigEntryManager, \
-     ConfigEntryComponent
+from flumotion.manager.config import ConfigEntryComponent, ConfigEntryManager, \
+     ManagerConfigParser, PlanetConfigParser
 
 __version__ = "$Rev$"
 
@@ -34,12 +34,12 @@ def flatten(seq):
         rv.extend(item)
     return rv
 
-def build(child, extra=''):
-    return StringIO('<planet><manager%s>%s</manager></planet>' % (
-        extra, child))
 
+class TestManagerConfigParser(testsuite.TestCase):
+    def _buildManager(self, child, extra=''):
+        xml = '<planet><manager%s>%s</manager></planet>' % (extra, child)
+        return StringIO(xml)
 
-class TestConfigParser(testsuite.TestCase):
     def testParseEmpty(self):
         f = StringIO("")
         self.assertRaises(ConfigError, ManagerConfigParser, f)
@@ -50,12 +50,12 @@ class TestConfigParser(testsuite.TestCase):
         self.failIf(parser.manager)
 
     def testParseManager(self):
-        f = build("""<host>mhost</host>
-                     <port>999</port>
-                     <transport>tcp</transport>
-                     <certificate>manager.cert</certificate>
-                     <debug>true</debug>""",
-                  extra=' name="mname"')
+        f = self._buildManager("""<host>mhost</host>
+                           <port>999</port>
+                           <transport>tcp</transport>
+                           <certificate>manager.cert</certificate>
+                           <debug>true</debug>""",
+                        extra=' name="mname"')
         parser = ManagerConfigParser(f)
         self.failUnless(parser.manager)
         manager = parser.manager
@@ -68,36 +68,36 @@ class TestConfigParser(testsuite.TestCase):
         self.assertEquals(manager.fludebug, 'true')
 
     def testParseManagerInvalid(self):
-        f = build('<transport>foo</transport>')
+        f = self._buildManager('<transport>foo</transport>')
         self.assertRaises(ConfigError, ManagerConfigParser, f)
-        f = build('<xxx/>')
+        f = self._buildManager('<xxx/>')
         self.assertRaises(ConfigError, ManagerConfigParser, f)
-        f = build('<host>xxx</host><host>xxx</host>')
+        f = self._buildManager('<host>xxx</host><host>xxx</host>')
         self.assertRaises(ConfigError, ManagerConfigParser, f)
-        f = build('<host><xxx/></host>')
+        f = self._buildManager('<host><xxx/></host>')
         self.assertRaises(ConfigError, ManagerConfigParser, f)
 
     def testParseBouncerComponent(self):
-        f = build("""<component name="foobar" type="bouncer"/>""")
-        parser = ManagerConfigParser(f)
-        self.failIf(parser.bouncer)
-        parser.parseBouncerAndPlugs()
-        self.failUnless(parser.bouncer)
-        self.failUnless(isinstance(parser.bouncer, ConfigEntryComponent))
-        self.assertEquals(parser.bouncer.type, 'bouncer')
-        self.assertEquals(parser.bouncer.name, 'foobar')
+        f = self._buildManager("""<component name="foobar" type="bouncer"/>""")
+        config = ManagerConfigParser(f)
+        self.failIf(config.bouncer)
+        config.parseBouncerAndPlugs()
+        self.failUnless(config.bouncer)
+        self.failUnless(isinstance(config.bouncer, ConfigEntryComponent))
+        self.assertEquals(config.bouncer.type, 'bouncer')
+        self.assertEquals(config.bouncer.name, 'foobar')
 
     def testParsePlugs(self):
-        f = build("""<plugs>
+        f = self._buildManager("""<plugs>
                        <plug socket="flumotion.component.plugs.adminaction.AdminAction"
                              type="adminactionfilelogger">
                          <property name="logfile">/dev/stdout</property>
                        </plug>
                      </plugs>""")
-        parser = ManagerConfigParser(f)
-        self.failIf(flatten(parser.plugs.values()))
-        parser.parseBouncerAndPlugs()
-        values = flatten(parser.plugs.values())
+        config = ManagerConfigParser(f)
+        self.failIf(flatten(config.plugs.values()))
+        config.parseBouncerAndPlugs()
+        values = flatten(config.plugs.values())
         self.failUnless(values)
         first = values[0]
         self.failUnless(isinstance(first, dict))
@@ -107,3 +107,106 @@ class TestConfigParser(testsuite.TestCase):
         properties = first['properties']
         self.failUnless('logfile' in properties)
         self.assertEquals(properties['logfile'], '/dev/stdout')
+
+
+class TestPlanetConfigParser(testsuite.TestCase):
+    def _buildPlanet(self, child, extra=''):
+        xml = '<planet%s>%s</planet>' % (extra, child)
+        return StringIO(xml)
+
+    def _buildAtmosphere(self, child, extra=''):
+        return self._buildPlanet('<atmosphere%s>%s</atmosphere>' % (
+            extra, child))
+
+    def _buildFlow(self, child, name='flow'):
+        return self._buildPlanet('<flow name="%s">%s</flow>' % (
+            name, child))
+
+    def testParseInvalid(self):
+        f = StringIO("<xxx/>")
+        config = PlanetConfigParser(f)
+        self.assertRaises(ConfigError, config.parse)
+
+    def testParseSimple(self):
+        f = self._buildPlanet('')
+        config = PlanetConfigParser(f)
+        config.parse()
+        self.failIf(config.flows)
+        self.failIf(config.path)
+        self.failIf(config.atmosphere.components)
+
+    def testParseAtmosphereEmpty(self):
+        f = self._buildAtmosphere('')
+        config = PlanetConfigParser(f)
+        config.parse()
+        self.failIf(config.atmosphere.components)
+
+    def testParseAtmosphereWithComponent(self):
+        f = self._buildAtmosphere(
+            '<component name="cname" type="http-server" worker="worker"/>')
+        config = PlanetConfigParser(f)
+        config.parse()
+        components = config.atmosphere.components
+        self.failUnless(components)
+        self.failUnless('cname' in components)
+        component = components.pop('cname')
+        self.failUnless(component)
+        self.failUnless(isinstance(component, ConfigEntryComponent))
+        self.assertEquals(component.worker, 'worker')
+        self.assertEquals(component.type, 'http-server')
+        self.assertEquals(component.config['avatarId'], '/atmosphere/cname')
+        self.failIf(flatten(component.config['plugs'].values()))
+
+    def testParseAtmosphereInvalid(self):
+        f = self._buildAtmosphere(
+            '<component name="cname" type="http-server" worker="worker">'
+            '  <clock-master>true</clock-master>'
+            '</component>')
+        config = PlanetConfigParser(f)
+        self.assertRaises(ConfigError, config.parse)
+
+    def testParseFlow(self):
+        f = self._buildFlow(
+            '<component name="audio" type="audiotest-producer" worker="worker">'
+            '  <clock-master>true</clock-master>'
+            '</component>'
+            '<component name="video" type="videotest-producer" worker="worker">'
+            '</component>'
+            )
+        config = PlanetConfigParser(f)
+        config.parse()
+        self.failUnless(config.flows)
+        self.assertEquals(len(config.flows), 1)
+        components = config.flows[0].components
+        self.failUnless(components)
+        self.failUnless('video' in components)
+        component = components.pop('audio')
+        self.assertEquals(component.type, 'audiotest-producer')
+        self.assertEquals(component.config['clock-master'], '/flow/audio')
+        component = components.pop('video')
+        self.assertEquals(component.type, 'videotest-producer')
+        self.assertEquals(component.config['clock-master'], '/flow/audio')
+        self.failIf(components)
+
+    def testParseFlowInvalid(self):
+        # missing name
+        f = self._buildPlanet('<flow/>')
+        config = PlanetConfigParser(f)
+        self.assertRaises(ConfigError, config.parse)
+
+        # invalid name
+        for name in ['atmosphere', 'manager']:
+            f = self._buildFlow('', name=name)
+            config = PlanetConfigParser(f)
+            self.assertRaises(ConfigError, config.parse)
+
+        # multiple clock master
+        f = self._buildFlow(
+            '<component name="one" type="http-server" worker="worker">'
+            '  <clock-master>true</clock-master>'
+            '</component>'
+            '<component name="two" type="http-server" worker="worker">'
+            '  <clock-master>true</clock-master>'
+            '</component>')
+        config = PlanetConfigParser(f)
+        self.assertRaises(ConfigError, config.parse)

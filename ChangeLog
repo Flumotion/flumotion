@@ -1,3 +1,9 @@
+2008-02-20  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_manager_config.py (TestPlanetConfigParser): 
+	Add a couple of new planet tests, clean up manager config ones to be 
+	consistent
+
 2008-02-20  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/test/test_manager_config.py:
