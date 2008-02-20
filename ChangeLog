@@ -3,7 +3,8 @@
 	* flumotion/test/test_component_httpserver.py 
 	Version test twisted using twisted.copyright.version, available 
 	since twisted 1.0.0.
-	
+	(PlugTest.testSetRootResource): Disable all tests on old twisted for now
+
 	* flumotion/test/test_component_httpserver.py 
 	(MountTest.testDirMountEmpty, MountTest.properties): 
 	Disable on pre twisted 2.5.0, to make buildbots happy.

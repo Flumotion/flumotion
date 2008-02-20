@@ -35,7 +35,10 @@ from flumotion.component.misc.httpfile import httpfile
 from flumotion.component.plugs.base import ComponentPlug
 
 usingOldTwisted = tuple(map(int, version.split('.'))) < (2, 5, 0)
-
+OLD_ERROR = """
+File "twisted/web/http.py", line 836, in getClientIP
+    if isinstance(self.client, address.IPv4Address):
+exceptions.AttributeError: CancellableRequest instance has no attribute 'client'"""
 __version__ = "$Rev$"
 
 class MountTest(log.Loggable, testsuite.TestCase):
@@ -74,10 +77,7 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
     def testDirMountEmpty(self):
         if usingOldTwisted:
-            raise unittest.SkipTest("""
-File "twisted/web/http.py", line 836, in getClientIP
-    if isinstance(self.client, address.IPv4Address):
-exceptions.AttributeError: CancellableRequest instance has no attribute 'client'""")
+            raise unittest.SkipTest(OLD_ERROR)
         properties = {
             u'mount-point': '',
             u'path': self.path,
@@ -97,6 +97,8 @@ exceptions.AttributeError: CancellableRequest instance has no attribute 'client'
         return defer.DeferredList([d, d2, d3], fireOnOneErrback=True)
 
     def testDirMountRoot(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest(OLD_ERROR)
         properties = {
             u'mount-point': '/',
             u'path': self.path,
@@ -118,10 +120,7 @@ exceptions.AttributeError: CancellableRequest instance has no attribute 'client'
 
     def testDirMountOnDemand(self):
         if usingOldTwisted:
-            raise unittest.SkipTest("""
-File "twisted/web/http.py", line 836, in getClientIP
-    if isinstance(self.client, address.IPv4Address):
-exceptions.AttributeError: CancellableRequest instance has no attribute 'client'""")
+            raise unittest.SkipTest(OLD_ERROR)
 
         properties = {
             u'mount-point': '/ondemand',
@@ -143,6 +142,8 @@ exceptions.AttributeError: CancellableRequest instance has no attribute 'client'
         return defer.DeferredList([d, d2, d3, d4], fireOnOneErrback=True)
 
     def testFileMountEmpty(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest(OLD_ERROR)
         properties = {
             u'mount-point': '',
             u'path': os.path.join(self.path, 'A'),
@@ -163,6 +164,8 @@ exceptions.AttributeError: CancellableRequest instance has no attribute 'client'
         return defer.DeferredList([d1, d2, d3], fireOnOneErrback=True)
 
     def testFileMountOnDemand(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest(OLD_ERROR)
         properties = {
             u'mount-point': '/ondemand',
             u'path': os.path.join(self.path, 'A'),
@@ -223,6 +226,8 @@ class PlugTest(testsuite.TestCase):
             }
 
     def testSetRootResource(self):
+        if usingOldTwisted:
+            raise unittest.SkipTest(OLD_ERROR)
         properties = {
             u'mount-point': '/mount',
             u'port': 0,
