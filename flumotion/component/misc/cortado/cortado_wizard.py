@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""XXX
+"""Wizard plugin for the cortado http plug
 """
 
 from flumotion.wizard.models import HTTPServer, HTTPPlug
