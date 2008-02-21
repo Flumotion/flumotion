@@ -44,14 +44,16 @@ class CortadoHTTPPlug(HTTPPlug):
         p.has_video = self.video_producer is not None
         p.has_audio = self.audio_producer is not None
 
+        width = 320
+        height = 240
+        framerate = 1
         if self.video_producer:
             width = self.video_producer.properties.width
             height = self.video_producer.properties.height
             framerate = self.video_producer.properties.framerate
-        else:
-            width = 320
-            height = 240
-            framerate = 1
+            if '/' in framerate:
+                nom, denom = framerate.split('/')
+                framerate = int(float(nom)/float(denom))
 
         p.width = width
         p.height = height

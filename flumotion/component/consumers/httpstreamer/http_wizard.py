@@ -131,7 +131,6 @@ class HTTPStreamer(Consumer):
             properties.porter_username = self.porter_username
             properties.porter_password = self.porter_password
             properties.type = 'slave'
-            del properties.port
 
         return properties
 
@@ -230,7 +229,6 @@ class PlugPluginArea(gtk.VBox):
 
     def _on_plugline__enable_changed(self, line):
         self.streamer.has_plugins = self._hasEnabledPlugins()
-
 
 class HTTPStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you

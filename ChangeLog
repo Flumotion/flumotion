@@ -1,3 +1,14 @@
+2008-02-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/misc/cortado/cortado_wizard.py
+	(CortadoHTTPPlug.getProperties): the streamers framerate property
+	is a fraction, convert it to an integer here which is what cortado
+	expects.
+
+	* flumotion/component/consumers/httpstreamer/http_wizard.py
+	(HTTPStreamer.getProperties): Do not delete the ports property, it's
+	used by the plugs.
+
 2008-02-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/configurationwriter.py (ConfigurationWriter): 
