@@ -1,6 +1,6 @@
 2008-02-20  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/wizard/configurationwriter.py (ConfigurationWriter._writeProperties): 
+	* flumotion/wizard/configurationwriter.py (ConfigurationWriter): 
 	Handle fractions, write x/y instead of (x, y).
 
 	* flumotion/test/test_manager_config.py (TestPlanetConfigParser): 
