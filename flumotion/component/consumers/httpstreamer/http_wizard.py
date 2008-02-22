@@ -131,6 +131,7 @@ class HTTPStreamer(Consumer):
             properties.porter_username = self.porter_username
             properties.porter_password = self.porter_password
             properties.type = 'slave'
+            del properties.port
 
         return properties
 
@@ -154,6 +155,7 @@ class PlugPluginLine(gtk.VBox):
         self.checkbutton = gtk.CheckButton(description)
         self.checkbutton.connect('toggled',
                                  self._on_checkbutton__toggled)
+        self.checkbutton.set_active(True)
         self.pack_start(self.checkbutton)
         self.checkbutton.show()
 
@@ -192,6 +194,7 @@ class PlugPluginArea(gtk.VBox):
         self._lines.append(line)
         self.pack_start(line, False, False)
         line.show()
+        self._updateStreamer()
 
     def getPorters(self):
         """Fetch a list of porters which are going to be used by all
@@ -225,10 +228,13 @@ class PlugPluginArea(gtk.VBox):
             if line.isEnabled():
                 yield line.plugin
 
+    def _updateStreamer(self):
+        self.streamer.has_plugins = self._hasEnabledPlugins()
+
     # Callbacks
 
     def _on_plugline__enable_changed(self, line):
-        self.streamer.has_plugins = self._hasEnabledPlugins()
+        self._updateStreamer()
 
 class HTTPStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you

@@ -1,5 +1,14 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	Enable all http consumer plugins by default and
+	fix a bug in the plugin code to make that possible.
+	* flumotion/component/misc/cortado/cortado_wizard.py:
+	Check the type of the framerate property before attempting to
+	parse it as a fraction.
+
+2008-02-22  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	PEP-8ify imports and docstrings
 	Remove unused imports

@@ -51,7 +51,8 @@ class CortadoHTTPPlug(HTTPPlug):
             width = self.video_producer.properties.width
             height = self.video_producer.properties.height
             framerate = self.video_producer.properties.framerate
-            if '/' in framerate:
+            # FIXME: Why do we get floats and strings randomly?
+            if type(framerate) == str and '/' in framerate:
                 nom, denom = framerate.split('/')
                 framerate = int(float(nom)/float(denom))
 
