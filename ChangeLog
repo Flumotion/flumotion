@@ -1,5 +1,8 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/ui/linkwidget.py: Do not import gobject
+	* Makefile.am (PYCHECKER_BLACKLIST): Blacklist linkwidget.py
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	* flumotion/component/consumers/httpstreamer/http.glade:
 	* flumotion/ui/Makefile.am:

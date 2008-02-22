@@ -21,7 +21,6 @@
 
 """A widget which can used open a link"""
 
-import gobject
 import gtk
 
 __version__ = "$Rev$"
