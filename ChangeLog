@@ -1,5 +1,10 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/models.py (Plug.getProperties): Make a copy
+	of the properties dict when saving, so we can freely delete properties
+	we don't want to save without messing up the internal state of
+	the component models.
+
 	* flumotion/component/misc/cortado/cortado.py:
 	Use endswith instead of [-1]
 	

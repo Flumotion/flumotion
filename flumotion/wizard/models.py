@@ -174,7 +174,7 @@ class Component(object):
         return self.worker
 
     def getProperties(self):
-        return self.properties
+        return Properties(self.properties)
 
     def getPlugs(self):
         return self.plugs
@@ -199,7 +199,7 @@ class Plug(object):
         self.properties = Properties()
 
     def getProperties(self):
-        return self.properties
+        return Properties(self.properties)
 
 
 class Producer(Component):
