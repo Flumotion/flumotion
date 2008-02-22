@@ -34,6 +34,7 @@ from flumotion.common.messages import N_
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
+from flumotion.component.plugs import base as plugbase
 from flumotion.component.misc.httpfile import file
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
@@ -41,7 +42,11 @@ from flumotion.twisted import fdserver
 __version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
+class RateController(plugbase.ComponentPlug):
 
+    def createProducerConsumerProxy(self, consumer, request):
+        pass
+   
 class CancellableRequest(server.Request):
 
     def __init__(self, channel, queued):
@@ -146,6 +151,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.type = None
         self.port = None
         self.hostname = None
+        self._rateControlPlug = None
         self._loggers = []
         self._logfilter = None
         self.httpauth = None
@@ -238,6 +244,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             for f in props['ip-filter']:
                 filter.addIPFilter(f)
             self._logfilter = filter
+
+        socket = 'flumotion.component.misc.httpfile.httpfile.RateController'
+        if socket in self.plugs:
+            # Rate controller factory plug; only one supported.
+            self._rateControlPlug = self.plugs[socket][-1]
 
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
@@ -375,7 +386,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         self.debug('Starting with mount point "%s"' % self.mountPoint)
         factory = file.MimedFileFactory(self.httpauth,
-            mimeToResource=self._mimeToResource)
+            mimeToResource=self._mimeToResource,
+            rateController=self._rateControlPlug)
 
         root = factory.create(self.filePath)
         if self.mountPoint != '/':

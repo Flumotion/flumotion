@@ -33,6 +33,7 @@ from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
+from flumotion.component.misc.httpfile import ratecontrol
 from flumotion.component.base import http as httpbase
 from flumotion.twisted import fdserver
 
@@ -53,14 +54,17 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
     childNotFound = weberror.NoResource("File not found.")
 
-    def __init__(self, path, httpauth, mimeToResource=None):
+    def __init__(self, path, httpauth, mimeToResource=None, 
+            rateController=None):
         resource.Resource.__init__(self)
         filepath.FilePath.__init__(self, path)
 
         self._httpauth = httpauth
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
-        self._factory = MimedFileFactory(httpauth, self._mimeToResource)
+        self._rateController = rateController
+        self._factory = MimedFileFactory(httpauth, self._mimeToResource, 
+            rateController)
 
     def getChild(self, path, request):
         self.log('getChild: self %r, path %r', self, path)
@@ -220,7 +224,21 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         if request.method == 'HEAD':
             return ''
 
-        request._transfer = FileTransfer(f, last + 1, request)
+        if self._rateController:
+            self.log("Creating RateControl object using plug %r", 
+                self._rateController)
+            # What do we want to pass to this? The consumer we proxy to,
+            # perhaps the request object too? This object? The file itself?
+
+            # We probably want the filename part of the request URL - the bit 
+            # after the mount-point. e.g. in /customer1/videos/video1.ogg, we 
+            # probably want to provide /videos/video1.ogg to this..
+            consumer = self._rateController.createProducerConsumerProxy(
+                request, request)
+        else:
+            consumer = request
+        transfer = FileTransfer(f, last + 1, consumer)
+        request._transfer = transfer
 
         return server.NOT_DONE_YET
 
@@ -243,9 +261,10 @@ class MimedFileFactory(log.Loggable):
     contentTypes = loadMimeTypes()
     defaultType = "application/octet-stream"
 
-    def __init__(self, httpauth, mimeToResource=None):
+    def __init__(self, httpauth, mimeToResource=None, rateController=None):
         self._httpauth = httpauth
         self._mimeToResource = mimeToResource or {}
+        self._rateController = rateController
 
     def create(self, path):
         """
@@ -258,7 +277,8 @@ class MimedFileFactory(log.Loggable):
         mimeType = self.contentTypes.get(ext, self.defaultType)
         klazz = self._mimeToResource.get(mimeType, File)
         self.debug("mimetype %s, class %r" % (mimeType, klazz))
-        return klazz(path, self._httpauth, mimeToResource=self._mimeToResource)
+        return klazz(path, self._httpauth, mimeToResource=self._mimeToResource,
+            rateController=self._rateController)
 
 class FLVFile(File):
     """
@@ -292,7 +312,7 @@ class FLVFile(File):
         if first == 0 and start:
             request.write(self.header)
 
-class FileTransfer:
+class FileTransfer(log.Loggable):
     """
     A class to represent the transfer of a file over the network.
     """
@@ -304,7 +324,9 @@ class FileTransfer:
         self.request = request
         self.written = self.file.tell()
         self.bytesWritten = 0
+        self.debug("Calling registerProducer on %r", request)
         request.registerProducer(self, 0)
+        self.debug("Called registerProducer on %r", request)
 
     def resumeProducing(self):
         if not self.request:

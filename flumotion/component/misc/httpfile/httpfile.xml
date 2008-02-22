@@ -10,11 +10,14 @@
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
       </entries>
+
       <sockets>
         <socket type="flumotion.component.plugs.loggers.Logger"/>
         <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
+        <socket type="flumotion.component.misc.httpfile.httpfile.RateController"/>
       </sockets>
+
       <properties>
          <!-- Warning: mount_point of / is broken -->
         <property name="mount-point" type="string"
