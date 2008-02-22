@@ -22,7 +22,7 @@
 from twisted.trial import unittest
 
 from flumotion.common import testsuite
-from flumotion.component.consumers.httpstreamer import http
+from flumotion.component.consumers.httpstreamer import httpstreamer
 
 __version__ = "$Rev$"
 
@@ -53,7 +53,7 @@ class TestOldProperties(testsuite.TestCase):
             'type': 'http-streamer',
             'properties': properties
         }
-        self.component = http.MultifdSinkStreamer(config)
+        self.component = httpstreamer.MultifdSinkStreamer(config)
 
     def tearDown(self):
         return self.component.stop()

@@ -37,7 +37,7 @@ __version__ = "$Rev$"
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'consumers',
-                              'httpstreamer', 'http.glade')
+                              'httpstreamer', 'httpstreamer.glade')
 
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)

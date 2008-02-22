@@ -22,7 +22,7 @@
 import gettext
 
 from flumotion.common.python import any
-from flumotion.component.consumers.httpstreamer.http_wizard import \
+from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
      HTTPBothStep, HTTPAudioStep, HTTPVideoStep
 from flumotion.component.consumers.disker.disker_wizard import \
      DiskBothStep, DiskAudioStep, DiskVideoStep

@@ -166,10 +166,10 @@ flumotion/component/consumers/disker/disker_wizard.py
 flumotion/component/consumers/preview/preview.py
 flumotion/component/consumers/preview/__init__.py
 flumotion/component/consumers/httpstreamer/resources.py
-flumotion/component/consumers/httpstreamer/http.py
+flumotion/component/consumers/httpstreamer/httpstreamer.py
 flumotion/component/consumers/httpstreamer/__init__.py
 flumotion/component/consumers/httpstreamer/admin_gtk.py
-flumotion/component/consumers/httpstreamer/http_wizard.py
+flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
 flumotion/component/consumers/shout2/shout2.py
 flumotion/component/consumers/shout2/__init__.py
 flumotion/component/consumers/__init__.py
@@ -300,7 +300,6 @@ flumotion/test/test_common_package.py
 flumotion/test/test_bundle.py
 flumotion/test/test_common_connection.py
 flumotion/test/test_worker_worker.py
-flumotion/test/test_misc_httpfile.py
 flumotion/test/test_dialogs.py
 flumotion/test/test_configure.py
 flumotion/test/test_reflect.py
@@ -432,8 +431,8 @@ flumotion/component/producers/webcam/webcam.xml
 flumotion/component/misc/httpserver/httpserver.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/disker/disker-wizard.glade
-flumotion/component/consumers/httpstreamer/http.glade
-flumotion/component/consumers/httpstreamer/http-wizard.glade
+flumotion/component/consumers/httpstreamer/httpstreamer.glade
+flumotion/component/consumers/httpstreamer/httpstreamer-wizard.glade
 flumotion/component/consumers/shout2/shout2-wizard.glade
 flumotion/component/bouncers/bouncer.glade
 flumotion/component/base/feeders.glade

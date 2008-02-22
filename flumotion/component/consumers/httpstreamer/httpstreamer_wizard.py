@@ -243,7 +243,7 @@ class HTTPStep(WorkerWizardStep):
     glade_file = os.path.join(
         os.path.dirname(
         os.path.abspath(__file__)),
-        'http-wizard.glade')
+        'httpstreamer-wizard.glade')
 
     section = _('Consumption')
     component_type = 'http-streamer'

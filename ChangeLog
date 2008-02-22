@@ -1,5 +1,22 @@
 2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
 
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http-wizard.glade:
+	* flumotion/component/consumers/httpstreamer/http.glade:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/consumers/httpstreamer/http_wizard.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/test/test_component_httpstreamer.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* po/POTFILES.in:
+
+	Rename httpstreamer/http* to httpstreamer/httpstreamer.
+
+2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
+
 	* configure.ac:
 	* flumotion/component/misc/Makefile.am:
 	* flumotion/component/misc/httpfile/Makefile.am:

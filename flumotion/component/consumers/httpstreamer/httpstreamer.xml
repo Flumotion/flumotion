@@ -4,13 +4,13 @@
                base="flumotion/component/consumers/httpstreamer"
                description="A consumers that streams over HTTP.">
 <!-- old way of specifying component source -->
-      <source location="flumotion.component.consumers.httpstreamer.http" />
+      <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
 
       <eater name="default" />
 
       <!-- entry points for distributable code bundles -->
       <entries>
-        <entry type="component" location="http.py"
+        <entry type="component" location="httpstreamer.py"
                function="MultifdSinkStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
@@ -114,7 +114,7 @@
 
       <directories>
         <directory name="flumotion/component/consumers/httpstreamer">
-          <filename location="http.glade" />
+          <filename location="httpstreamer.glade" />
           <filename location="admin_gtk.py" />
         </directory>
       </directories>
@@ -130,7 +130,7 @@
 
         <directories>
             <directory name="flumotion/component/consumers/httpstreamer">
-                <filename location="http.py" />
+                <filename location="httpstreamer.py" />
                 <filename location="resources.py" />
             </directory>
         </directories>
