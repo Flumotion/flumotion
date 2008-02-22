@@ -123,10 +123,10 @@ flumotion/component/combiners/switch/switch.py
 flumotion/component/combiners/switch/__init__.py
 flumotion/component/combiners/switch/admin_gtk.py
 flumotion/component/combiners/__init__.py
-flumotion/component/misc/httpfile/file.py
-flumotion/component/misc/httpfile/httpfile.py
-flumotion/component/misc/httpfile/__init__.py
-flumotion/component/misc/httpfile/admin_gtk.py
+flumotion/component/misc/httpserver/file.py
+flumotion/component/misc/httpserver/httpserver.py
+flumotion/component/misc/httpserver/__init__.py
+flumotion/component/misc/httpserver/admin_gtk.py
 flumotion/component/misc/porter/porterclient.py
 flumotion/component/misc/porter/porter.py
 flumotion/component/misc/porter/__init__.py
@@ -429,7 +429,7 @@ flumotion/component/producers/videotest/videotest-wizard.glade
 flumotion/component/producers/videotest/videotest.xml
 flumotion/component/producers/webcam/webcam-wizard.glade
 flumotion/component/producers/webcam/webcam.xml
-flumotion/component/misc/httpfile/httpfile.glade
+flumotion/component/misc/httpserver/httpserver.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/disker/disker-wizard.glade
 flumotion/component/consumers/httpstreamer/http.glade

@@ -34,7 +34,7 @@ from flumotion.common.messages import N_
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
-from flumotion.component.misc.httpfile import file
+from flumotion.component.misc.httpserver import file
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
@@ -239,8 +239,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 filter.addIPFilter(f)
             self._logfilter = filter
 
-        socket = 'flumotion.component.misc.httpfile.httpfile.RateController'
-        if socket in self.plugs:
+        socket = 'flumotion.component.misc.httpserver.ratecontroller.RateController'
+        plugs = self.plugs.get(socket, [])
+        if plugs:
+            assert len(plugs) <= 1
             # Rate controller factory plug; only one supported.
             self._rateControlPlug = self.plugs[socket][-1]
 

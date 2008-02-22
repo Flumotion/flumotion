@@ -220,7 +220,7 @@ flumotion/component/converters/overlay/Makefile
 flumotion/component/misc/Makefile
 flumotion/component/misc/cortado/Makefile
 flumotion/component/misc/cortado/cortado_location.py
-flumotion/component/misc/httpfile/Makefile
+flumotion/component/misc/httpserver/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile

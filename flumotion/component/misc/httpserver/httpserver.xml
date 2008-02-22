@@ -1,10 +1,10 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.misc.httpfile.httpfile.RateController" 
+    <plug socket="flumotion.component.misc.httpserver.httpserver.RateController" 
           type="fixed-rate-plug">
       <entries>
         <entry type="default"
-               location="flumotion/component/misc/httpfile/ratecontrol.py"
+               location="flumotion/component/misc/httpserver/ratecontrol.py"
                function="FixedRatePlug" />
       </entries>
    
@@ -18,10 +18,10 @@
 
   <components>
   
-    <component type="http-server" base="flumotion/component/misc/httpfile">
-      <source location="flumotion.component.misc.httpfile.httpfile" />
+    <component type="http-server" base="flumotion/component/misc/httpserver">
+      <source location="flumotion.component.misc.httpserver.httpserver" />
       <entries>
-        <entry type="component" location="httpfile.py"
+        <entry type="component" location="httpserver.py"
                function="HTTPFileStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
@@ -31,7 +31,7 @@
         <socket type="flumotion.component.plugs.loggers.Logger"/>
         <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
-        <socket type="flumotion.component.misc.httpfile.httpfile.RateController"/>
+        <socket type="flumotion.component.misc.httpserver.httpserver.RateController"/>
       </sockets>
 
       <properties>
@@ -83,11 +83,11 @@
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/misc/httpfile">
+            <directory name="flumotion/component/misc/httpserver">
                 <filename location="__init__.py" />
             </directory>
         </directories>
-    </bundle>
+   </bundle>
 
     <bundle name="http-server-component">
         <dependencies>
@@ -97,8 +97,8 @@
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/misc/httpfile">
-                <filename location="httpfile.py" />
+            <directory name="flumotion/component/misc/httpserver">
+                <filename location="httpserver.py" />
                 <filename location="file.py" />
             </directory>
         </directories>
@@ -110,19 +110,20 @@
             <dependency name="http-server-base" />
         </dependencies>
         <directories>
-            <directory name="flumotion/component/misc/httpfile">
+            <directory name="flumotion/component/misc/httpserver">
                 <filename location="admin_gtk.py" />
-                <filename location="httpfile.glade" />
+                <filename location="httpserver.glade" />
             </directory>
         </directories>
     </bundle>
 
     <bundle name="fixed-rate-plug">
       <dependencies>
+        <dependency name="http-server-component" />
         <dependency name="base-plugs" />
       </dependencies>
       <directories>
-        <directory name="flumotion/component/misc/httpfile">
+        <directory name="flumotion/component/misc/httpserver">
           <filename location="ratecontrol.py" />
         </directory>
       </directories>

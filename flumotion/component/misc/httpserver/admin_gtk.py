@@ -37,7 +37,7 @@ _ = gettext.gettext
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'misc',
-                              'httpfile', 'httpfile.glade')
+                              'httpserver', 'httpserver.glade')
 
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)

@@ -63,7 +63,6 @@ EXTRA_DIST = 					\
 	test_manager_config.py			\
 	test_manager_manager.py			\
 	test_manager_worker.py			\
-	test_misc_httpfile.py			\
 	test_options.py				\
 	test_parts.py				\
 	test_pb.py				\

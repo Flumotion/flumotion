@@ -26,7 +26,7 @@ from twisted.web.static import Data, File
 
 from flumotion.common import log
 from flumotion.common.errors import ComponentStartError
-from flumotion.component.misc.httpfile.httpfile import HTTPFileStreamer
+from flumotion.component.misc.httpserver.httpserver import HTTPFileStreamer
 from flumotion.component.misc.cortado.cortado_location import getCortadoFilename
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.configure import configure

@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_misc_httpfile -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_misc_httpserver -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -33,7 +33,7 @@ from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
-from flumotion.component.misc.httpfile import ratecontrol
+from flumotion.component.misc.httpserver import ratecontrol
 from flumotion.component.base import http as httpbase
 from flumotion.twisted import fdserver
 
@@ -54,7 +54,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
     childNotFound = weberror.NoResource("File not found.")
 
-    def __init__(self, path, httpauth, mimeToResource=None, 
+    def __init__(self, path, httpauth, mimeToResource=None,
             rateController=None):
         resource.Resource.__init__(self)
         filepath.FilePath.__init__(self, path)
@@ -63,7 +63,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
-        self._factory = MimedFileFactory(httpauth, self._mimeToResource, 
+        self._factory = MimedFileFactory(httpauth, self._mimeToResource,
             rateController)
 
     def getChild(self, path, request):
@@ -225,13 +225,13 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             return ''
 
         if self._rateController:
-            self.log("Creating RateControl object using plug %r", 
+            self.log("Creating RateControl object using plug %r",
                 self._rateController)
             # What do we want to pass to this? The consumer we proxy to,
             # perhaps the request object too? This object? The file itself?
 
-            # We probably want the filename part of the request URL - the bit 
-            # after the mount-point. e.g. in /customer1/videos/video1.ogg, we 
+            # We probably want the filename part of the request URL - the bit
+            # after the mount-point. e.g. in /customer1/videos/video1.ogg, we
             # probably want to provide /videos/video1.ogg to this..
             consumer = self._rateController.createProducerConsumerProxy(
                 request, request)

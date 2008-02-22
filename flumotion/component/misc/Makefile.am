@@ -11,7 +11,7 @@ clean-local:
 
 SUBDIRS = \
 	cortado \
-	httpfile \
+	httpserver \
 	porter \
 	repeater
 
