@@ -316,20 +316,19 @@ class FileTransfer(log.Loggable):
     """
     A class to represent the transfer of a file over the network.
     """
-    request = None
+    consumer = None
 
-    def __init__(self, file, size, request):
+    def __init__(self, file, size, consumer):
         self.file = file
         self.size = size
-        self.request = request
+        self.consumer = consumer
         self.written = self.file.tell()
         self.bytesWritten = 0
-        self.debug("Calling registerProducer on %r", request)
-        request.registerProducer(self, 0)
-        self.debug("Called registerProducer on %r", request)
+        self.debug("Calling registerProducer on %r", consumer)
+        consumer.registerProducer(self, 0)
 
     def resumeProducing(self):
-        if not self.request:
+        if not self.consumer:
             return
         data = self.file.read(min(abstract.FileDescriptor.bufferSize,
             self.size - self.written))
@@ -338,15 +337,16 @@ class FileTransfer(log.Loggable):
             self.bytesWritten += len(data)
             # this .write will spin the reactor, calling .doWrite and then
             # .resumeProducing again, so be prepared for a re-entrant call
-            self.request.write(data)
-        if self.request and self.file.tell() == self.size:
-            self.request.unregisterProducer()
-            self.request.finish()
-            self.request = None
+            self.consumer.write(data)
+        if self.consumer and self.file.tell() == self.size:
+            self.consumer.unregisterProducer()
+            self.consumer.finish()
+            self.consumer = None
 
     def pauseProducing(self):
         pass
 
     def stopProducing(self):
         self.file.close()
-        self.request = None
+        self.consumer = None
+

@@ -1,6 +1,20 @@
 2008-02-22  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/file.py:
+	  Rename 'request' to 'consumer' in FileTransfer: it has always been used
+	  as a generic consumer here; now in practice it's not a request object if
+	  we use the rate control plug.
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Move RateController plug interface class to ratecontrol.py
+	* flumotion/component/misc/httpfile/ratecontrol.py:
+	  Add a concrete implementation of RateController: FixedRatePlug, which
+	  serves all files at the same (fixed; in the config file) speed.
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	  Add new plug and bundle for it. 
+
+2008-02-22  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/file.py:
 	* flumotion/component/misc/httpfile/httpfile.py:
 	* flumotion/component/misc/httpfile/httpfile.xml:
 	  Add a plug interface for httpfile to put a producer/consumer proxy

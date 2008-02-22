@@ -1,4 +1,20 @@
 <registry>
+  <plugs>
+    <plug socket="flumotion.component.misc.httpfile.httpfile.RateController" 
+          type="fixed-rate-plug">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/misc/httpfile/ratecontrol.py"
+               function="FixedRatePlug" />
+      </entries>
+   
+      <properties>
+        <property name="rate" required="true" type="int" description="The average rate to send all files at, in bits per second" />
+        <property name="max-level" type="int" description="The maximum amount of data to send at full rate at any given moment, in bits" /> <!-- TODO: Describe this better -->
+        <property name="initial-level" type="int" description="The initial amount of data that can be sent at full speed, in bits" />
+      </properties>
+    </plug>
+  </plugs>
 
   <components>
   
@@ -100,6 +116,18 @@
             </directory>
         </directories>
     </bundle>
+
+    <bundle name="fixed-rate-plug">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/httpfile">
+          <filename location="ratecontrol.py" />
+        </directory>
+      </directories>
+    </bundle>
+
 
   </bundles>
 

@@ -34,7 +34,6 @@ from flumotion.common.messages import N_
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
-from flumotion.component.plugs import base as plugbase
 from flumotion.component.misc.httpfile import file
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
@@ -42,11 +41,6 @@ from flumotion.twisted import fdserver
 __version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
-class RateController(plugbase.ComponentPlug):
-
-    def createProducerConsumerProxy(self, consumer, request):
-        pass
-   
 class CancellableRequest(server.Request):
 
     def __init__(self, channel, queued):

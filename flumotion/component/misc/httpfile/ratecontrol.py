@@ -27,20 +27,40 @@ from flumotion.common import log
 
 from twisted.internet import reactor
 
-"""
-Use a token bucket to proxy between a producer (e.g. FileTransfer) and a 
-consumer (TCP protocol, etc.), doing rate control.
+from flumotion.component.plugs import base as plugbase
 
-The bucket has a rate and a maximum level, so a small burst can be permitted.
-The initial level can be set to a non-zero value, this is useful to implement
-burst-on-connect behaviour.
+class RateController(plugbase.ComponentPlug):
 
-TODO: This almost certainly only works with producers that work like 
-FileTransfer - i.e. they produce data directly in resumeProducing, and ignore
-pauseProducing. This is sufficient for our needs right now.
-"""
+    def createProducerConsumerProxy(self, consumer, request):
+        pass
+   
+
+class FixedRatePlug(RateController):
+
+    def __init__(self, args):
+        props = args['properties']
+        self._rateBytesPerSec = int(props.get('rate', 128000) / 8)
+        self._maxLevel = int(props.get('max-level', 
+            self._rateBytesPerSec * 8 * 10) / 8)
+        self._initialLevel = int(props.get('initial-level', 0) / 8)
+        
+    def createProducerConsumerProxy(self, consumer, request):
+        return TokenBucketConsumer(consumer, self._maxLevel, 
+            self._rateBytesPerSec, self._initialLevel)
 
 class TokenBucketConsumer(log.Loggable):
+    """
+    Use a token bucket to proxy between a producer (e.g. FileTransfer) and a 
+    consumer (TCP protocol, etc.), doing rate control.
+
+    The bucket has a rate and a maximum level, so a small burst can be 
+    permitted.  The initial level can be set to a non-zero value, this is 
+    useful to implement burst-on-connect behaviour.
+
+    TODO: This almost certainly only works with producers that work like 
+    FileTransfer - i.e. they produce data directly in resumeProducing, and 
+    ignore pauseProducing. This is sufficient for our needs right now.
+    """
 
     _dripInterval = 0.2 # If we need to wait for more bits in our bucket, wait 
                         # at least this long, to avoid overly frequent small 
@@ -64,7 +84,7 @@ class TokenBucketConsumer(log.Loggable):
 
         self.consumer.registerProducer(self, 0)
 
-        self.info("Created TokenBucket with rate %d, initial level %d, "
+        self.info("Created TokenBucketConsumer with rate %d, initial level %d, "
             "maximum level %d", fillRate, fillLevel, maxLevel)
 
     def _dripAndTryWrite(self):
@@ -103,7 +123,7 @@ class TokenBucketConsumer(log.Loggable):
             # interval), wait... this is what actually performs the data
             # throttling.
             if not self._dripDC:
-                self._dripDC = reactor.callLater(self._dripInternal, 
+                self._dripDC = reactor.callLater(self._dripInterval, 
                     self._dripAndTryWrite)
         else:
             # No buffer remaining; ask for more data or finish
@@ -120,7 +140,6 @@ class TokenBucketConsumer(log.Loggable):
         pass
 
     def resumeProducing(self):
-        #self.debug("resumeProducing called")
         self._tryWrite()
         
         if not self._buffer and self.producer:
@@ -138,6 +157,7 @@ class TokenBucketConsumer(log.Loggable):
         self._finishing = True
 
     def registerProducer(self, producer, streaming):
+        self.debug("Producer registered: %r", producer)
         self.producer = producer
 
         self.resumeProducing()
