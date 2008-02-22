@@ -4,10 +4,10 @@
           type="cortado-plug">
       <entries>
         <entry type="default"
-               location="flumotion/component/misc/cortado/cortado.py"
+               location="flumotion/component/plugs/cortado/cortado.py"
                function="CortadoPlug" />
         <entry type="wizard"
-               location="flumotion/component/misc/cortado/cortado_wizard.py"
+               location="flumotion/component/plugs/cortado/cortado_wizard.py"
                function="CortadoWizardPlugin" />
       </entries>
       <wizard _description="Stream to Java" type="http-consumer" 
@@ -50,7 +50,7 @@
         <dependency name="base-plugs" />
       </dependencies>
       <directories>
-        <directory name="flumotion/component/misc/cortado">
+        <directory name="flumotion/component/plugs/cortado">
           <filename location="__init__.py" />
           <filename location="cortado.py" />
           <filename location="cortado_wizard.py" />

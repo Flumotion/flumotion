@@ -1,5 +1,22 @@
 2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
 
+	* configure.ac:
+	* flumotion/component/misc/Makefile.am:
+	* flumotion/component/misc/cortado/Makefile.am:
+	* flumotion/component/misc/cortado/__init__.py:
+	* flumotion/component/misc/cortado/cortado.py:
+	* flumotion/component/misc/cortado/cortado.xml:
+	* flumotion/component/misc/cortado/cortado_location.py.in:
+	* flumotion/component/misc/cortado/cortado_wizard.py:
+	* flumotion/component/plugs/Makefile.am:
+	* flumotion/component/plugs/cortado/Makefile.am:
+	* flumotion/component/plugs/cortado/cortado.py:
+	* flumotion/component/plugs/cortado/cortado_wizard.py:
+
+	Move the cortado plug from misc/ to plugs/
+
+2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
+
 	* flumotion/component/consumers/httpstreamer/Makefile.am:
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	* flumotion/component/consumers/httpstreamer/http-wizard.glade:

@@ -10,7 +10,6 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
-	cortado \
 	httpserver \
 	porter \
 	repeater

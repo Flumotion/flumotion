@@ -21,7 +21,7 @@
 
 from flumotion.common import log
 from flumotion.common.messages import Result
-from flumotion.component.misc.cortado.cortado_location import getCortadoFilename
+from flumotion.component.plugs.cortado.cortado_location import getCortadoFilename
 
 __version__ = "$Rev$"
 

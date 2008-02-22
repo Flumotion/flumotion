@@ -218,13 +218,13 @@ flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/misc/Makefile
-flumotion/component/misc/cortado/Makefile
-flumotion/component/misc/cortado/cortado_location.py
 flumotion/component/misc/httpserver/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/plugs/Makefile
+flumotion/component/plugs/cortado/Makefile
+flumotion/component/plugs/cortado/cortado_location.py
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile

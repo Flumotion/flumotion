@@ -32,7 +32,7 @@ class CortadoHTTPPlug(HTTPPlug):
     Cortado HTTP streaming plug.
     """
     plug_type = "cortado-plug"
-    socket = "flumotion.component.misc.cortado.cortado.CortadoPlug"
+    socket = "flumotion.component.plugs.cortado.cortado.CortadoPlug"
 
     # Component
 

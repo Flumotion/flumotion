@@ -1,5 +1,7 @@
 include $(top_srcdir)/common/python.mk
 
+SUBDIRS = cortado
+
 component_PYTHON = \
 	__init__.py \
 	adminaction.py \

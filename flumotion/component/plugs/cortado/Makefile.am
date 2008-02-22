@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-cortadodir = $(libdir)/flumotion/python/flumotion/component/misc/cortado
+cortadodir = $(libdir)/flumotion/python/flumotion/component/plugs/cortado
 
 cortado_PYTHON = 		\
 	__init__.py 		\
