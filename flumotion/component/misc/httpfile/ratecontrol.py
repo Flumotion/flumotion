@@ -31,41 +31,48 @@ from twisted.internet import reactor
 Use a token bucket to proxy between a producer (e.g. FileTransfer) and a 
 consumer (TCP protocol, etc.), doing rate control.
 
-Consumer calls resumeProducing() on us. In reaction, if the TB has sufficient
-bits in it, we call resumeProducing() on our producer parent, and then write() 
-that to our consumer. 
+The bucket has a rate and a maximum level, so a small burst can be permitted.
+The initial level can be set to a non-zero value, this is useful to implement
+burst-on-connect behaviour.
 
-Otherwise, we call pauseProducing() on the producer, and unregisterProducer()
-on the consumer. Then we schedule a DelayedCall that will refill our bucket,
-and then resume production...
-
+TODO: This almost certainly only works with producers that work like 
+FileTransfer - i.e. they produce data directly in resumeProducing, and ignore
+pauseProducing. This is sufficient for our needs right now.
 """
 
-class TokenBucket(log.Loggable):
+class TokenBucketConsumer(log.Loggable):
 
-    _dripMinimum = 0.2 # If we need to wait for more bits in our bucket, wait 
-                       # at least this long, to avoid overly frequent small 
-                       # writes
+    _dripInterval = 0.2 # If we need to wait for more bits in our bucket, wait 
+                        # at least this long, to avoid overly frequent small 
+                        # writes
 
     def __init__(self, consumer, maxLevel, fillRate, fillLevel=0):
         self.maxLevel = maxLevel # in bytes
         self.fillRate = fillRate # in bytes per second
         self.fillLevel = fillLevel # in bytes
 
-        self._buffer = ""
-        self._finishing = False
+        self._buffer = "" # TODO: Maybe this should be a list of buffers, or
+                          # of (buffer, offset) tuples, so we can avoid copies?
+        self._finishing = False # If true, we'll stop once the current buffer
+                                # has been sent.
+
         self._lastDrip = time.time()
         self._dripDC = None
 
-#        self.producer = producer
         self.producer = None # we get this in registerProducer.
         self.consumer = consumer
 
         self.consumer.registerProducer(self, 0)
 
-#        self.info("Created TokenBucket with rate %d", fillRate)
+        self.info("Created TokenBucket with rate %d, initial level %d, "
+            "maximum level %d", fillRate, fillLevel, maxLevel)
 
     def _dripAndTryWrite(self):
+        """
+        Re-fill our token bucket based on how long it has been since we last
+        refilled it.
+        Then attempt to write some data.
+        """
         self._dripDC = None
 
         now = time.time()
@@ -73,15 +80,16 @@ class TokenBucket(log.Loggable):
         self._lastDrip = now
 
         bytes = self.fillRate * elapsed
- #       self.debug("dripping %d bytes (to max %d) into bucket: %f * %f", bytes, self.maxLevel, self.fillRate, elapsed)
+        # Note that this does introduce rounding errors - not particularly
+        # important if the drip interval is reasonably high, though. These will
+        # cause the actual rate to be lower than the nominal rate.
         self.fillLevel = int(min(self.fillLevel + bytes, self.maxLevel))
 
         self._tryWrite()
 
     def _tryWrite(self):
-  #      self.debug("Trying to write %d bytes, bucket has %d bytes", len(self._buffer), self.fillLevel)
-
         if self.fillLevel > 0 and len(self._buffer) > 0:
+            # If we're permitted to write at the moment, do so.
             buf = self._buffer[:self.fillLevel]
             bytes = len(buf)
 
@@ -91,24 +99,17 @@ class TokenBucket(log.Loggable):
             self.fillLevel -= bytes
 
         if len(self._buffer) > 0:
-
-            #required = len(self._buffer) - self.fillLevel
-            #time = required/fillRate
-            # Round up to multiple of dripMinimum
-            #time = math.ceil(time/self._dripMinimum) * self._dripMinimum
-
-            #reactor.callLater(time, self._dripAndTryWrite)
-   #         self.debug("Wrote all we could, fillLevel now %d, buffer not empty (%d", self.fillLevel, len(self._buffer))
+            # If we have data (and we're not already waiting for our next drip
+            # interval), wait... this is what actually performs the data
+            # throttling.
             if not self._dripDC:
-   #             self.debug("Writing more in %d s", self._dripMinimum)
-                self._dripDC = reactor.callLater(self._dripMinimum, self._dripAndTryWrite)
-   #         else:
-   #             self.debug("drip already pending")
-        elif self._finishing:
-            self.consumer.finish()
+                self._dripDC = reactor.callLater(self._dripInternal, 
+                    self._dripAndTryWrite)
         else:
-        #    self.debug("No buffer left, asking %r to resume producing...", self.producer)
-            if self.producer:
+            # No buffer remaining; ask for more data or finish
+            if self._finishing:
+                self.consumer.finish()
+            elif self.producer:
                 self.producer.resumeProducing()
 
     def stopProducing(self):
@@ -123,30 +124,25 @@ class TokenBucket(log.Loggable):
         self._tryWrite()
         
         if not self._buffer and self.producer:
-            #self.debug("Telling producer to produce more")
             self.producer.resumeProducing()
 
     def write(self, data):
-        #self.debug("Received %d bytes, appending to buffer and trying to write", len(data))
         self._buffer += data
 
         self._tryWrite()
 
         if self._buffer and not self.fillLevel and self.producer:
-            #self.debug("Have data but no bytes in bucket; pausing producing")
             self.producer.pauseProducing()
 
     def finish(self):
         self._finishing = True
 
     def registerProducer(self, producer, streaming):
-        #self.debug("Producer %r registered", producer)
         self.producer = producer
 
         self.resumeProducing()
 
     def unregisterProducer(self):
-        #self.debug("Producer %r unregistered", self.producer)
         if self.producer is not None:
             self.producer = None
 
