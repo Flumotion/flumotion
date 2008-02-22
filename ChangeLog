@@ -23,6 +23,10 @@
 
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/connections.py (Connections.grab_focus): 
+	Select and grab the focus of the treeview here instead of the
+	constructor which is called too early.
+
 	* flumotion/test/test_component_httpserver.py
 	(PlugTest.testSetRootResourceMultiple): Add a new (disabled) test which
 	shows that you cannot add two plugs to the same httpfile.

@@ -64,8 +64,6 @@ class Connections(GladeWidget):
         self._connections.set_size_request(-1, 160)
         self.page.pack_start(self._connections)
         self.page.reorder_child(self._connections, 0)
-        if len(self._connections):
-            self._connections.select(self._connections[0])
         self._connections.show()
 
     def _clear_all(self):
@@ -78,6 +76,11 @@ class Connections(GladeWidget):
         os.unlink(conn.filename)
 
     # Public API
+
+    def grab_focus(self):
+        if self._connections:
+            self._connections.select(self._connections[0])
+        self._connections.grab_focus()
 
     def get_selected(self):
         return self._connections.get_selected()
