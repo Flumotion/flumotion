@@ -1,3 +1,8 @@
+2008-02-22  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	Only check one time for failure type :)
+
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/httpfile/admin_gtk.py: 

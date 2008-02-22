@@ -279,8 +279,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         if failure.check(error.DNSLookupError):
             message = ("Could not look up host '%s'."
                        % self.connectionInfo.host)
-        elif (failure.check(error.ConnectionRefusedError)
-              or failure.check(error.ConnectionRefusedError)):
+        elif failure.check(error.ConnectionRefusedError):
             message = ("Could not connect to host '%s' on port %d."
                        % (self.connectionInfo.host,
                           self.connectionInfo.port))
