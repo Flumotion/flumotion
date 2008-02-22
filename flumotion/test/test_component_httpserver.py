@@ -173,15 +173,21 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
 
 class _Resource(Resource):
-    def __init__(self):
+    def __init__(self, path):
         Resource.__init__(self)
-        self.putChild('foobar', Data("baz", "text/html"))
+        self.putChild(path, Data("baz", "text/html"))
 
 
 class SimpleTestPlug(ComponentPlug):
     def start(self, component):
-        component.setRootResource(_Resource())
+        component.setRootResource(_Resource(path='foobar'))
 
+
+class SimpleTestPlug2(ComponentPlug):
+    def start(self, component):
+        component.setRootResource(_Resource(path='noogie'))
+
+PLUGTYPE = 'flumotion.component.plugs.lifecycle.ComponentLifecycle'
 
 class PlugTest(testsuite.TestCase):
     def setUp(self):
@@ -211,7 +217,7 @@ class PlugTest(testsuite.TestCase):
 
     def _localPlug(self, plugname):
         return {
-            'flumotion.component.plugs.lifecycle.ComponentLifecycle':
+            PLUGTYPE:
             [{'entries': {'default':{ 'module-name': 'flumotion.test.test_component_httpserver',
               'function-name': plugname,
               }}}]
@@ -230,6 +236,25 @@ class PlugTest(testsuite.TestCase):
         d.addCallback(lambda r: self.assertEquals(r, 'baz'))
         return d
 
+    def testSetRootResourceMultiple(self):
+        properties = {
+            u'mount-point': '/mount',
+            u'port': 0,
+        }
+
+        plugs = self._localPlug('SimpleTestPlug')
+        plugs2 = self._localPlug('SimpleTestPlug2')
+        plugs[PLUGTYPE].extend(plugs2[PLUGTYPE])
+        self._makeComponent(properties, plugs)
+
+        d1 = client.getPage(self._getURL('/mount/foobar'))
+        d1.addCallback(lambda r: self.assertEquals(r, 'baz'))
+
+        d2 = client.getPage(self._getURL('/mount/noogie'))
+        d2.addCallback(lambda r: self.assertEquals(r, 'baz'))
+
+        return defer.DeferredList([d1, d2], fireOnOneErrback=True)
+    testSetRootResourceMultiple.skip = "This is a bug in the httpfile api"
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,9 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_component_httpserver.py
+	(PlugTest.testSetRootResourceMultiple): Add a new (disabled) test which
+	shows that you cannot add two plugs to the same httpfile.
+
 	* flumotion/component/consumers/httpstreamer/http_wizard.py:
 	Enable all http consumer plugins by default and
 	fix a bug in the plugin code to make that possible.
