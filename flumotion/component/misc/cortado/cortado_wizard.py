@@ -91,6 +91,7 @@ class CortadoHTTPServer(HTTPServer):
         self.properties.porter_socket_path = streamer.socket_path
         self.properties.porter_username = streamer.porter_username
         self.properties.porter_password = streamer.porter_password
+        self.properties.port = streamer.properties.port
         self.properties.type = 'slave'
 
         plug = CortadoHTTPPlug(self, streamer, audio_producer, video_producer)
@@ -100,9 +101,9 @@ class CortadoHTTPServer(HTTPServer):
         """Returns the base of directory of the applet
         @returns: directory
         """
-        return 'http://%s:%d%s/' % (self.worker,
-                                    self.streamer.properties.port,
-                                    self.properties.mount_point)
+        return 'http://%s:%d%s' % (self.worker,
+                                   self.properties.port,
+                                   self.properties.mount_point)
 
 
 class CortadoWizardPlugin(object):
@@ -120,4 +121,4 @@ class CortadoWizardPlugin(object):
 
     def getConsumer(self, streamer, audio_producer, video_producer):
         return CortadoHTTPServer(streamer, audio_producer,
-                                 video_producer, "/cortado")
+                                 video_producer, "/cortado/")

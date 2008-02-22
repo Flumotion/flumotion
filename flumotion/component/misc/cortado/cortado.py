@@ -52,7 +52,7 @@ class CortadoDirectoryResource(Resource):
         index_name = properties.get('index', 'index.html')
 
         root = mount_point
-        if root[-1] != "/":
+        if not root.endswith("/"):
             root += "/"
         if index_name != 'index.html':
             root = None

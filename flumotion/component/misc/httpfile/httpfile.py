@@ -173,6 +173,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # store number of connected clients
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
+        self.uiState.addKey('stream-url', None)
 
     def do_check(self):
         props = self.config['properties']
@@ -228,7 +229,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.plugs.get('flumotion.component.plugs.loggers.Logger', [])
 
         self.httpauth = httpbase.HTTPAuthentication(self)
-
         if 'bouncer' in props:
             self.httpauth.setBouncerName(props['bouncer'])
         if 'issuer-class' in props:
@@ -238,6 +238,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             for f in props['ip-filter']:
                 filter.addIPFilter(f)
             self._logfilter = filter
+
+        # Update uiState
+        self.uiState.set('stream-url', self.getUrl())
 
     def do_setup(self):
         self.have_properties(self.config['properties'])
@@ -381,6 +384,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return root
 
     def _createRootResourceForPath(self, path, fileResource):
+        if path.endswith('/'):
+            path = path[:-1]
+
         root = Resource()
         children = string.split(path[1:], '/')
         parent = root

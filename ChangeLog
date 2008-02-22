@@ -1,5 +1,20 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/misc/cortado/cortado.py:
+	Use endswith instead of [-1]
+	
+	* flumotion/component/misc/cortado/cortado_wizard.py:
+	Export /cortado/, so clicking on the link works.
+	
+	* flumotion/component/misc/httpfile/admin_gtk.py:
+	* flumotion/component/misc/httpfile/httpfile.glade:
+	Use the new linkwidget to display the stream url.
+	
+	* flumotion/component/misc/httpfile/httpfile.py:
+	Export the stream-url handler. Handle trailing / in resource names.
+
+2008-02-22  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/linkwidget.py: Do not import gobject
 	* Makefile.am (PYCHECKER_BLACKLIST): Blacklist linkwidget.py
 

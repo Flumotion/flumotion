@@ -19,14 +19,20 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import os
 
-from gettext import gettext as _
+try:
+    import gnomevfs
+except ImportError:
+    gnomevfs = None
 
 from flumotion.common import common
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.ui.linkwidget import LinkWidget
 
 __version__ = "$Rev$"
+_ = gettext.gettext
 
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
@@ -39,6 +45,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self._statistics = None
         self._stats = None
         self._labels = {}
+        self._link = None
 
     # BaseAdminGtkNode
 
@@ -46,8 +53,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self._labels = {}
         self._statistics = self.wtree.get_widget('statistics-widget')
         self.widget = self._statistics
-        for type in ('bytes-transferred', 'connected-clients'):
-            self._registerLabel(type)
+        for labelType in ['bytes-transferred', 'connected-clients']:
+            self._registerLabel(labelType)
 
         self._updateLabels({
             'bytes-transferred': 0,
@@ -95,6 +102,13 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
                     text = common.formatStorage(int(text)) + _('Byte')
                 self._labels[name].set_text(str(text))
 
+        uri = state.get('stream-url')
+        if uri is not None:
+            if not self._link:
+                self._link = self._createLinkWidget(uri)
+            else:
+                self._link.set_uri(uri)
+
     def _registerLabel(self, name):
         #widgetname = name.replace('-', '_')
         # FIXME: make object member directly
@@ -104,6 +118,22 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             return
 
         self._labels[name] = widget
+
+    def _createLinkWidget(self, uri):
+        link = LinkWidget(uri)
+        link.set_callback(self._on_link_show_url)
+        link.show_all()
+        holder = self.wtree.get_widget('link-holder')
+        holder.add(link)
+        return link
+
+    # Callbacks
+
+    def _on_link_show_url(self, url):
+        # text/html is wrong here, but how can we find out the real mime type?
+        app_to_run = gnomevfs.mime_get_default_application('text/html')
+        if app_to_run:
+            os.system('%s "%s" &' % (app_to_run[2], url))
 
 
 class HTTPFileAdminGtk(BaseAdminGtk):
