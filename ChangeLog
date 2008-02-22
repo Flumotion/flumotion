@@ -1,3 +1,9 @@
+2008-02-22  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/misc/httpfile/admin_gtk.py: 
+	Clean up, make a few methods private and organize methods by type.
+	Make all internal attributes private and avoid hasattr.	
+
 2008-02-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/misc/cortado/cortado_wizard.py
