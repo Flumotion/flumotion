@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,40 +19,55 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import os
 import time
 
-import gtk
-
-from gettext import gettext as _
+try:
+    import gnomevfs
+except ImportError:
+    gnomevfs = None
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.ui.linkwidget import LinkWidget
 
+_ = gettext.gettext
 __version__ = "$Rev$"
 
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'consumers',
-        'httpstreamer', 'http.glade')
+                              'httpstreamer', 'http.glade')
 
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)
-        self.shown = False
+        self._statistics = None
+        self._shown = False
         self._stats = None
-        self._hasgnomevfs = False
-        try:
-            __import__('gnomevfs')
-            self._hasgnomevfs = True
-        except ImportError:
-            pass
+        self._link = None
+        self._labels = {}
 
-    def error_dialog(self, message):
-        # FIXME: dialogize
-        print 'ERROR:', message
+    # BaseAdminGtkNode
 
-    def cb_getMimeType(self, mime, label):
-        label.set_text(_('Mime type:') + " %s" % mime)
-        label.show()
+    def haveWidgetTree(self):
+        self._labels = {}
+        self._statistics = self.wtree.get_widget('statistics-widget')
+        self.widget = self._statistics
+
+        for type in ['uptime', 'mime', 'current-bitrate', 'bitrate',
+                     'totalbytes']:
+            self._registerLabel('stream-' + type)
+        for type in ['current', 'average', 'max', 'peak', 'peak-time']:
+            self._registerLabel('clients-' + type)
+        for type in ['bitrate', 'totalbytes']:
+            self._registerLabel('consumption-' + type)
+
+        if self._stats:
+            self._shown = True
+            self._updateLabels(self._stats)
+            self._statistics.show_all()
+
+        return self._statistics
 
     def setStats(self, stats):
         # Set _stats regardless of if condition
@@ -60,149 +75,66 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         # not set if widget tree was gotten before
         # ui state
         self._stats = stats
-        if not hasattr(self, 'statistics'):
-            # widget tree not created yet
+        if not self._statistics:
             return
 
-        self.updateLabels(stats)
+        self._updateLabels(stats)
 
-        if not self.shown:
+        if not self._shown:
             # widget tree created but not yet shown
-            self.shown = True
-            self.statistics.show_all()
+            self._shown = True
+            self._statistics.show_all()
 
-    def registerLabel(self, name):
-        #widgetname = name.replace('-', '_')
-        #FIXME: make object member directly
+    # Private
+
+    def _registerLabel(self, name):
+        # widgetname = name.replace('-', '_')
+        # FIXME: make object member directly
         widget = self.wtree.get_widget('label-' + name)
-        if widget:
-            self.labels[name] = widget
-        else:
+        if not widget:
             print "FIXME: no widget %s" % name
-
-    def hideLabels(self):
-        for name in self.labels.keys():
-            self.labels[name].hide()
-
-    def updateLabels(self, state):
-        if not hasattr(self, 'labels'):
             return
 
+        self._labels[name] = widget
+
+    def _updateLabels(self, state):
         # changed in 0.1.9.1 to be int so we can localize time
         peakTime = state.get('clients-peak-time')
         if not isinstance(peakTime, str):
             peakTime = time.strftime("%c", time.localtime(peakTime))
 
-        self.labels['clients-peak-time'].set_text(peakTime)
+        self._labels['clients-peak-time'].set_text(peakTime)
 
-        for name in self.labels.keys():
+        for name in self._labels:
             if name == 'clients-peak-time':
                 continue
             text = state.get(name)
-            if text == None:
+            if text is None:
                 text = ''
-            # set http url with nice pango markup if gnomevfs present
-            # if not it should be black...so ppl dont click on it
-            if name == 'stream-url' and self._hasgnomevfs:
-                text = '<span foreground="blue">%s</span>' % text
-                self.labels[name].set_markup(text)
-            else:
-                self.labels[name].set_text(text)
 
-    def haveWidgetTree(self):
-        self.labels = {}
-        self.statistics = self.wtree.get_widget('statistics-widget')
-        self.widget = self.statistics
-        for type in ('uptime', 'mime', 'current-bitrate', 'bitrate',
-                'totalbytes', 'url'):
-            self.registerLabel('stream-' + type)
-        for type in ('current', 'average', 'max', 'peak', 'peak-time'):
-            self.registerLabel('clients-' + type)
-        for type in ('bitrate', 'totalbytes'):
-            self.registerLabel('consumption-' + type)
+            self._labels[name].set_text(text)
 
-        if self._stats:
-            self.shown = True
-            self.updateLabels(self._stats)
-            self.statistics.show_all()
+        uri = state.get('stream-url')
+        if not self._link:
+            self._link = self._createLinkWidget(uri)
 
-        # add signal handler for Stream URL only if we have gnomevfs
-        # also signal handler to notify when mouse has gone over label
-        # so cursor changes
-        # add popup menu to let you open url or copy link location
+        self._link.set_uri(uri)
 
-        if self._hasgnomevfs:
-            streamurl_widget_eventbox = self.wtree.get_widget(
-                'eventbox-stream-url')
-            streamurl_widget_eventbox.set_visible_window(False)
-            streamurl_widget_eventbox.connect('button-press-event',
-                self._streamurl_clicked)
-            streamurl_widget_eventbox.connect('enter-notify-event',
-                self._streamurl_enter)
-            streamurl_widget_eventbox.connect('leave-notify-event',
-                self._streamurl_leave)
-            self._streamurl_popupmenu = gtk.Menu()
-            item = gtk.ImageMenuItem('_Open Link')
-            image = gtk.Image()
-            image.set_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU)
-            item.set_image(image)
-            item.show()
-            item.connect('activate', self._streamurl_openlink,
-                streamurl_widget_eventbox)
-            self._streamurl_popupmenu.add(item)
-            item = gtk.ImageMenuItem('Copy _Link Address')
-            image = gtk.Image()
-            image.set_from_stock(gtk.STOCK_COPY, gtk.ICON_SIZE_MENU)
-            item.set_image(image)
-            item.show()
-            item.connect('activate', self._streamurl_copylink,
-                streamurl_widget_eventbox)
-            self._streamurl_popupmenu.add(item)
+    def _createLinkWidget(self, uri):
+        link = LinkWidget(uri)
+        link.set_callback(self._on_link_show_url)
+        link.show_all()
+        holder = self.wtree.get_widget('link-holder')
+        holder.add(link)
+        return link
 
-        return self.statistics
+    # Callbacks
 
-    # signal handler for button press on stream url
-    def _streamurl_clicked(self, widget, event):
-        # check if left click
-        if event.button == 1:
-            url = widget.get_children()[0].get_text()
-            import gnomevfs
-            if self._stats:
-                app_to_run = gnomevfs.mime_get_default_application(
-                    self._stats.get('stream-mime'))
-                if app_to_run:
-                    os.system("%s %s &" % (app_to_run[2],url))
-        elif event.button == 3:
-            self._streamurl_popupmenu.popup(None, None, None, event.button,
-                event.time)
-        
-    # signal handler for open link menu item activation
-    # eventbox is the eventbox that contains the label the url is in
-    def _streamurl_openlink(self, widget, eventbox):
-        url = eventbox.get_children()[0].get_text()
-        import gnomevfs
-        if self._stats:
-            app_to_run = gnomevfs.mime_get_default_application(
-                self._stats.get('stream-mime'))
-            if app_to_run:
-                os.system("%s %s &" % (app_to_run[2],url))
-
-    # signal handler for copy link menu item activation
-    # eventbox is the eventbox that contains the label the url is in
-    def _streamurl_copylink(self, widget, eventbox):
-        url = eventbox.get_children()[0].get_text()
-        clipboard = gtk.Clipboard()
-        clipboard.set_text(url)
-
-    # motion event handles
-    def _streamurl_enter(self, widget, event):
-        cursor = gtk.gdk.Cursor(widget.get_display(), gtk.gdk.HAND2)
-        window = widget.window
-        window.set_cursor(cursor)
-
-    def _streamurl_leave(self, widget, event):
-        window = widget.window
-        window.set_cursor(None)
+    def _on_link_show_url(self, url):
+        app_to_run = gnomevfs.mime_get_default_application(
+            self._stats.get('stream-mime'))
+        if app_to_run:
+            os.system('%s "%s" &' % (app_to_run[2], url))
 
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):

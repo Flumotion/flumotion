@@ -1,3 +1,14 @@
+2008-02-22  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.glade:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/linkwidget.py:
+
+	Clean up the http streamers admin interface, refactor the
+	link widget to a separate file and add support for gtk.LinkButton
+	present in gtk+ 2.10.
+	
 2008-02-22  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/admin/admin.py:
