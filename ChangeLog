@@ -1,3 +1,8 @@
+2008-02-22  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	The Deferred returned by connectToManager was never fired on success. 
+
 2008-02-22  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/ratecontrol.py:

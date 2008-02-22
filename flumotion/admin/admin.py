@@ -306,6 +306,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
             self.debug('Connected to manager and retrieved all state')
             self.connected = True
             self.emit('connected')
+            if self._deferredConnect:
+                self._deferredConnect.callback(whs)
             
         def writeConnection():
             i = self.connectionInfo
