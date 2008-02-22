@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -21,41 +21,29 @@
 
 import time
 
-import gobject
 import gst
-
-# socket needed to get hostname
-import socket
-
+from twisted.cred import credentials
 from twisted.internet import reactor, error, defer
 from twisted.web import server
-from twisted.cred import credentials
 from zope.interface import implements
 
-from flumotion.component import feedcomponent
-from flumotion.common import common, gstreamer, errors, pygobject
-from flumotion.common import messages, netutils, log, interfaces
-
-from flumotion.twisted import fdserver
-from flumotion.component.misc.porter import porterclient
-
-# proxy import
-from flumotion.component.component import moods
-from flumotion.common.pygobject import gsignal
-
-from flumotion.component.consumers.httpstreamer import resources
-from flumotion.component.base import http
-
+from flumotion.common import common, gstreamer, errors
+from flumotion.common import messages, netutils, interfaces
 from flumotion.common.messages import N_
+from flumotion.component import feedcomponent
+from flumotion.component.base import http
+from flumotion.component.component import moods
+from flumotion.component.consumers.httpstreamer import resources
+from flumotion.component.misc.porter import porterclient
+from flumotion.twisted import fdserver
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
-
 STATS_POLL_INTERVAL = 10
-
-UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two 
+UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
                                 # seconds
+
 
 # FIXME: generalize this class and move it out here ?
 class Stats:
@@ -206,6 +194,7 @@ class Stats:
         set('consumption-bitrate-raw', bitspeed)
         set('consumption-totalbytes-raw', bytes_sent)
 
+
 class HTTPMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         """
@@ -250,6 +239,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
     def remote_updatePorterDetails(self, path, username, password):
         return self.comp.updatePorterDetails(path, username, password)
+
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -560,8 +550,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 }
 
     def getLoadData(self):
-        """
-        Return a tuple (deltaadded, deltaremoved, bytes_transferred,
+        """Return a tuple (deltaadded, deltaremoved, bytes_transferred,
         current_clients, current_load) of our current bandwidth and user values.
         The deltas are estimates of how much bitrate is added, removed
         due to client connections, disconnections, per second.
@@ -590,8 +579,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.emit('remove', fd)
 
     def remove_all_clients(self):
-        """
-        Remove all the clients.
+        """Remove all the clients.
 
         Returns a deferred fired once all clients have been removed.
         """
@@ -601,8 +589,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             return self.resource.removeAllClients()
 
     def update_ui_state(self):
-        """
-        Update the uiState object.
+        """Update the uiState object.
         Such updates (through this function) are throttled to a maximum rate,
         to avoid saturating admin clients with traffic when many clients are
         connecting/disconnecting.
@@ -704,9 +691,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):
-        """
-        Provide a new set of porter login information, for when we're in slave
-        mode and the porter changes.
+        """Provide a new set of porter login information, for when we're
+        in slave mode and the porter changes.
         If we're currently connected, this won't disconnect - it'll just change
         the information so that next time we try and connect we'll use the
         new ones

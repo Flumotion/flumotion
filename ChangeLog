@@ -1,5 +1,9 @@
 2008-02-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	PEP-8ify imports and docstrings
+	Remove unused imports
+	
 	* flumotion/wizard/models.py (Plug.getProperties): Make a copy
 	of the properties dict when saving, so we can freely delete properties
 	we don't want to save without messing up the internal state of
