@@ -1,5 +1,9 @@
 2008-02-25  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Do not unconditionally append the result of remove_all_clients, it might
+	return None if the components bootstrap failed.
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py: 
 	Use the registry data before trying to instantiate the plugin, avoids
 	importing a plugin which is not supported.

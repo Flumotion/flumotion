@@ -681,13 +681,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self._tport:
             self._tport.stopListening()
 
-        # After we stop listening (so new connections aren't possible), 
+        l = []
+        # After we stop listening (so new connections aren't possible),
         # disconnect (and thus log) all the old ones.
-        l = [self.remove_all_clients()]
+        clients = self.remove_all_clients()
+        if clients:
+            l.append(clients)
 
         if self.type == 'slave' and self._pbclient:
             l.append(self._pbclient.deregisterPath(self.mountPoint))
-
         return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):
