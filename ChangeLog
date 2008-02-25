@@ -1,5 +1,11 @@
 2008-02-25  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/plugs/cortado/cortado_wizard.py:
+	  Remove 'socket' here; no longer needed since the config writer doesn't
+	  use it now.
+
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/common/config.py:
 	  Nothing uses the 'socket' attribute on a plug. So, make it
 	  optional/deprecated.
