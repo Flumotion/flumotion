@@ -70,7 +70,6 @@ class TestXMLWriter(testsuite.TestCase):
     def testComponentWithPlug(self):
         c = Component('name', 'streamer', 'worker')
         plug = Plug()
-        plug.socket = 'PlugSocket'
         plug.plug_type = 'plug-type'
         plug.properties.foo = 'bar'
         c.plugs.append(plug)
