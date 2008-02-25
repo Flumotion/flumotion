@@ -1,3 +1,9 @@
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	Revert r6273. The added code was wrong, as was the commit message it came
+	with.
+
 2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
 
 	* configure.ac:
