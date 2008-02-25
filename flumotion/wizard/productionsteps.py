@@ -142,7 +142,7 @@ class ProductionStep(WorkerWizardStep):
         for ctype, combo, default_type in [
             ('video-producer', self.video, 'videotest-producer'),
             ('audio-producer', self.audio, 'audiotest-producer')]:
-            d = self.wizard._admin.getWizardEntries(
+            d = self.wizard.getWizardEntries(
                 wizard_types=[ctype])
             d.addCallback(got_entries, combo, default_type)
             combo.prefill([('...', None)])

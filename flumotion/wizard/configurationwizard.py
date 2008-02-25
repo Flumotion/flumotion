@@ -339,8 +339,7 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     def get_wizard_entry(self, component_type):
-        """
-        Fetches a wizard bundle from a specific kind of component
+        """Fetches a wizard bundle from a specific kind of component
         @param component_type: the component type to get the wizard entry
           bundle from.
         @returns: a deferred returning either::
@@ -359,8 +358,7 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     def get_wizard_plug_entry(self, plug_type):
-        """
-        Fetches a wizard bundle from a specific kind of plug
+        """Fetches a wizard bundle from a specific kind of plug
         @param plug_type: the plug type to get the wizard entry
           bundle from.
         @returns: a deferred returning either::
@@ -377,6 +375,25 @@ class ConfigurationWizard(SectionWizard):
         d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
         d.addCallback(got_entry_point)
         return d
+
+    def getWizardEntries(self, wizard_types=None, provides=None, accepts=None):
+        """Queries the manager for a list of wizard entry matching the
+        query.
+        @param types: list of component types to fetch, is usually
+          something like ['video-producer'] or ['audio-encoder']
+        @type  types: list of strings
+        @param provides: formats provided, eg ['jpeg', 'speex']
+        @type  provides: list of strings
+        @param accepts: formats accepted, eg ['theora']
+        @type  accepts: list of strings
+        @returns: a deferred returning a list
+                  of L{flumotion.common.componentui.WizardEntryState}
+        """
+        self.debug('querying wizard entries (wizard_types=%r,provides=%r'
+                   ',accepts=%r)'% (wizard_types, provides, accepts))
+        return self._admin.getWizardEntries(wizard_types=wizard_types,
+                                            provides=provides,
+                                            accepts=accepts)
 
 
     # Private

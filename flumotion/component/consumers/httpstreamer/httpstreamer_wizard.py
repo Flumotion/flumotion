@@ -338,13 +338,8 @@ class HTTPStep(WorkerWizardStep):
                 d = self.wizard.get_wizard_plug_entry(entry.component_type)
                 d.addCallback(response, entry)
 
-        d = self.get_wizard_entries(['http-consumer'])
+        d = self.wizard.getWizardEntries(wizard_types=['http-consumer'])
         d.addCallbacks(got_entries)
-
-    def get_wizard_entries(self, wizard_types):
-        log.debug('httpwizard', 'querying wizard entries %r' % (wizard_types,))
-        return self.wizard._admin.getWizardEntries(
-            wizard_types=wizard_types)
 
     def _canAddPlug(self, entry):
         # This function filters out entries which are

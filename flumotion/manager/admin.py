@@ -411,7 +411,7 @@ class AdminAvatar(base.ManagerAvatar):
         @type  provides: list of strings
         @param accepts: formats accepted, eg ['theora']
         @type  accepts: list of strings
-        @returns: L[componentui.WizardEntryState}
+        @returns: L{componentui.WizardEntryState}
         """
         def extract(wizards):
             for wizard in wizards:
