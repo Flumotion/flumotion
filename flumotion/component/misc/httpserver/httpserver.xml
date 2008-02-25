@@ -1,6 +1,6 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.misc.httpserver.httpserver.RateController" 
+    <plug socket="flumotion.component.misc.httpserver.ratecontroller.RateController" 
           type="fixed-rate-plug">
       <entries>
         <entry type="default"
@@ -31,7 +31,7 @@
         <socket type="flumotion.component.plugs.loggers.Logger"/>
         <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
-        <socket type="flumotion.component.misc.httpserver.httpserver.RateController"/>
+        <socket type="flumotion.component.misc.httpserver.ratecontroller.RateController"/>
       </sockets>
 
       <properties>

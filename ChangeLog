@@ -1,5 +1,12 @@
 2008-02-25  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpserver/httpserver.py:
+	  Don't assert for things that aren't programming errors.
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	  Clean up after Johan's renaming; finish it.
+
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/admin/admin.py:
 	Revert r6273. The added code was wrong, as was the commit message it came
 	with.

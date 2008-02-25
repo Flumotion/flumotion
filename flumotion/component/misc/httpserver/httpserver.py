@@ -242,7 +242,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         socket = 'flumotion.component.misc.httpserver.ratecontroller.RateController'
         plugs = self.plugs.get(socket, [])
         if plugs:
-            assert len(plugs) <= 1
             # Rate controller factory plug; only one supported.
             self._rateControlPlug = self.plugs[socket][-1]
 
