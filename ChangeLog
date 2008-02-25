@@ -1,5 +1,10 @@
 2008-02-25  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/test/test_wizard_save.py:
+	  Fix up test now that we're not writing the socket.
+
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/plugs/cortado/cortado_wizard.py:
 	  Remove 'socket' here; no longer needed since the config writer doesn't
 	  use it now.

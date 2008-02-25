@@ -82,7 +82,7 @@ class TestXMLWriter(testsuite.TestCase):
              'project="flumotion" worker="worker" version="0.5.1.1">\n'
              '      \n'
              '      <plugs>\n'
-             '        <plug socket="PlugSocket" type="plug-type">\n'
+             '        <plug type="plug-type">\n'
              '          \n'
              '          <property name="foo">bar</property>\n'
              '        </plug>\n'
