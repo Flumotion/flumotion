@@ -21,13 +21,14 @@
 
 """Wizard run when the user first starts flumotion.
 """
-import os
+
 import errno
+import gettext
+import os
+import socket
+import tempfile
 
 import gobject
-
-from gettext import gettext as _
-
 from twisted.internet import reactor, protocol, defer, error
 
 from flumotion.common.pygobject import gsignal
@@ -35,6 +36,7 @@ from flumotion.configure import configure
 from flumotion.ui.simplewizard import WizardStep, SimpleWizard
 
 __version__ = "$Rev$"
+_ = gettext.gettext
 
 
 class Initial(WizardStep):
@@ -53,14 +55,7 @@ class Initial(WizardStep):
         for radio in self.load_connection.get_group():
             radio.connect('activate', self._on_radio__activiate)
 
-    def on_next(self, state):
-        for radio in self.connect_to_existing.get_group():
-            if radio.get_active():
-                return radio.get_name()
-        raise AssertionError
-
-    def _on_radio__activiate(self, radio):
-        self.button_next.clicked()
+    # WizardSteps
 
     def setup(self, state, available_pages):
         # the group of radio buttons is named after the first check button
@@ -81,6 +76,17 @@ class Initial(WizardStep):
             raise AssertionError("no button to focus")
         radio.grab_focus()
 
+    # Callbacks
+
+    def on_next(self, state):
+        for radio in self.connect_to_existing.get_group():
+            if radio.get_active():
+                return radio.get_name()
+        raise AssertionError
+
+    def _on_radio__activiate(self, radio):
+        self.button_next.clicked()
+
 
 class ConnectToExisting(WizardStep):
     name = 'connect_to_existing'
@@ -89,6 +95,8 @@ class ConnectToExisting(WizardStep):
     next_pages = ['authenticate']
     open_connection = None
 
+    # WizardSteps
+
     def setup(self, state, available_pages):
         try:
             oc_state = [(k, state[k]) for k in ('host', 'port', 'use_insecure')]
@@ -96,6 +104,8 @@ class ConnectToExisting(WizardStep):
         except KeyError:
             pass
         self.open_connection.grab_focus()
+
+    # Callbacks
 
     def on_can_activate(self, obj, *args):
         self.button_next.set_sensitive(obj.get_property('can-activate'))
@@ -112,8 +122,9 @@ class Authenticate(WizardStep):
     text = _('Please select among the following authentication methods.')
     auth_method_combo = user_entry = passwd_entry = None
     next_pages = []
-
     authenticate = None
+
+    # WizardStep
 
     def setup(self, state, available_pages):
         try:
@@ -123,6 +134,8 @@ class Authenticate(WizardStep):
             self.authenticate.set_state(None)
         self.authenticate.grab_focus()
         self.on_can_activate(self.authenticate)
+
+    # Callbacks
 
     def on_can_activate(self, obj, *args):
         self.button_next.set_sensitive(obj.get_property('can-activate'))
@@ -140,8 +153,15 @@ class LoadConnection(WizardStep):
     connections = None
     next_pages = []
 
+    # WizardStep
+
+    def setup(self, state, available_pages):
+        self.connections.grab_focus()
+
     def is_available(self):
         return self.connections.get_selected()
+
+    # Callbacks
 
     def on_has_selection(self, widget, has_selection):
         self.button_next.set_sensitive(has_selection)
@@ -160,8 +180,6 @@ class LoadConnection(WizardStep):
             state[k] = v
         return '*finished*'
 
-    def setup(self, state, available_pages):
-        self.connections.grab_focus()
 
 
 class GreeterProcessProtocol(protocol.ProcessProtocol):
@@ -191,6 +209,8 @@ This mode is only useful for testing Flumotion.
 
     _timeout_id = None
 
+    # Callbacks
+
     def on_has_selection(self, widget, has_selection):
         self.button_next.set_sensitive(has_selection)
 
@@ -199,7 +219,6 @@ This mode is only useful for testing Flumotion.
         self.progressbar_starting.set_fraction(0.0)
         self.progressbar_starting.show()
         # start a manager first
-        import socket
         port = 7531
         def tryPort(port=0):
             # tries the given port, or a random one, and return None or port
@@ -229,7 +248,6 @@ This mode is only useful for testing Flumotion.
 
         self._timeout_id = gobject.timeout_add(200, pulse)
 
-        import tempfile
         path = tempfile.mkdtemp(suffix='.flumotion')
         confDir = os.path.join(path, 'etc')
         logDir = os.path.join(path, 'var', 'log')
@@ -257,7 +275,7 @@ This mode is only useful for testing Flumotion.
                     'error': failMessage,
                     'failure': failure,
                 })
-                self.finished('start_new_error')
+                self._finished('start_new_error')
                 return failure
             protocol.deferred.addErrback(error, failMessage)
             return protocol.deferred
@@ -300,7 +318,7 @@ This mode is only useful for testing Flumotion.
                 'logDir': logDir,
                 'runDir': runDir,
             })
-            self.finished('start_new_success')
+            self._finished('start_new_success')
 
         d.addCallback(done, state)
 
@@ -308,7 +326,9 @@ This mode is only useful for testing Flumotion.
         d.callback(None)
         return '*signaled*'
 
-    def finished(self, result):
+    # Private
+
+    def _finished(self, result):
         # result: start_new_error or start_new_success
         self.label_starting.hide()
         self.progressbar_starting.hide()
@@ -322,6 +342,8 @@ class StartNewError(WizardStep):
     text = ""
     start_worker_check = None
     next_pages = []
+
+    # WizardStep
 
     def setup(self, state, available_pages):
         self.button_next.set_sensitive(False)
@@ -342,6 +364,8 @@ class StartNewSuccess(WizardStep):
     start_worker_check = None
     text = ''
     next_pages = []
+
+    # WizardStep
 
     def setup(self, state, available_pages):
         executable = os.path.join(configure.sbindir, 'flumotion')

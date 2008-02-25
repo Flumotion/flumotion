@@ -1,5 +1,8 @@
 2008-02-25  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/greeter.py: Reorganize imports, group
+	and annotate the methods of the wizard steps.
+
 	* flumotion/wizard/configurationwizard.py:
 	Add an new API to fetch a wizard entries
 
