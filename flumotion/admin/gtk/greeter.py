@@ -29,6 +29,7 @@ import socket
 import tempfile
 
 import gobject
+import gtk
 from twisted.internet import reactor, protocol, defer, error
 
 from flumotion.common.pygobject import gsignal
@@ -76,13 +77,13 @@ class Initial(WizardStep):
             raise AssertionError("no button to focus")
         radio.grab_focus()
 
-    # Callbacks
-
     def on_next(self, state):
         for radio in self.connect_to_existing.get_group():
             if radio.get_active():
                 return radio.get_name()
         raise AssertionError
+
+    # Callbacks
 
     def _on_radio__activiate(self, radio):
         self.button_next.clicked()
@@ -135,15 +136,15 @@ class Authenticate(WizardStep):
         self.authenticate.grab_focus()
         self.on_can_activate(self.authenticate)
 
-    # Callbacks
-
-    def on_can_activate(self, obj, *args):
-        self.button_next.set_sensitive(obj.get_property('can-activate'))
-
     def on_next(self, state):
         for k, v in self.authenticate.get_state().items():
             state[k] = v
         return '*finished*'
+
+    # Callbacks
+
+    def on_can_activate(self, obj, *args):
+        self.button_next.set_sensitive(obj.get_property('can-activate'))
 
 
 class LoadConnection(WizardStep):
@@ -157,17 +158,7 @@ class LoadConnection(WizardStep):
 
     def setup(self, state, available_pages):
         self.connections.grab_focus()
-
-    def is_available(self):
-        return self.connections.get_selected()
-
-    # Callbacks
-
-    def on_has_selection(self, widget, has_selection):
-        self.button_next.set_sensitive(has_selection)
-
-    def on_connection_activated(self, widget, state):
-        self.button_next.emit('clicked')
+        self.button_next.set_label(gtk.STOCK_CONNECT)
 
     def on_next(self, state):
         connection = self.connections.get_selected()
@@ -180,6 +171,16 @@ class LoadConnection(WizardStep):
             state[k] = v
         return '*finished*'
 
+    def is_available(self):
+        return self.connections.get_selected()
+
+    # Callbacks
+
+    def on_has_selection(self, widget, has_selection):
+        self.button_next.set_sensitive(has_selection)
+
+    def on_connection_activated(self, widget, state):
+        self.button_next.emit('clicked')
 
 
 class GreeterProcessProtocol(protocol.ProcessProtocol):
@@ -209,10 +210,10 @@ This mode is only useful for testing Flumotion.
 
     _timeout_id = None
 
-    # Callbacks
+    # WizardStep
 
-    def on_has_selection(self, widget, has_selection):
-        self.button_next.set_sensitive(has_selection)
+    def setup(self, state, available_pages):
+        self.button_next.grab_focus()
 
     def on_next(self, state):
         self.label_starting.show()
@@ -326,6 +327,11 @@ This mode is only useful for testing Flumotion.
         d.callback(None)
         return '*signaled*'
 
+    # Callbacks
+
+    def on_has_selection(self, widget, has_selection):
+        self.button_next.set_sensitive(has_selection)
+
     # Private
 
     def _finished(self, result):
@@ -368,6 +374,8 @@ class StartNewSuccess(WizardStep):
     # WizardStep
 
     def setup(self, state, available_pages):
+        self.button_prev.set_sensitive(False)
+        self.button_next.set_label(gtk.STOCK_CONNECT)
         executable = os.path.join(configure.sbindir, 'flumotion')
         confDir = state['confDir']
         logDir = state['logDir']
@@ -386,6 +394,7 @@ You can shut down the manager and worker later with the following command:
 
 <i>%s</i>
 """) % (confDir, logDir, stop))
+        self.button_next.grab_focus()
 
     def on_next(self, state):
         return '*finished*'

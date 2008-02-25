@@ -1,5 +1,15 @@
 2008-02-25  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/greeter.py:
+	Reset the stock label of the next button when going back.
+
+	* flumotion/ui/simplewizard.py:
+	on_next is not a callback, so put it in WizardStep section.
+	Change the next button to 'connect' where appropriate.
+	Grab focus, so the enter->enter->enter use case works as expected
+
+2008-02-25  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/gtk/greeter.py: Reorganize imports, group
 	and annotate the methods of the wizard steps.
 

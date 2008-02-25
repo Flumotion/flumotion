@@ -198,6 +198,7 @@ class SimpleWizard(GladeWindow):
 
         w = self.widgets
         page.button_next = w['button_next']
+        page.button_prev = w['button_prev']
 
         available_pages = [p for p in page.next_pages
                                 if self.pages[p].is_available()]
@@ -252,6 +253,7 @@ class SimpleWizard(GladeWindow):
 
     def on_prev(self, button):
         page = self.page_stack.pop()
+        self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         self.set_page(page.name)
 
     def set_sensitive(self, is_sensitive):
