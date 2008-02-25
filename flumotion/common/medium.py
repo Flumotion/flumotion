@@ -253,10 +253,16 @@ class PingingMedium(BaseMedium):
             self._lastPingback = time.time()
             self.log('pinged, pingback at %r' % self._lastPingback)
 
+        def pingFailed(failure):
+            # ignoring the connection failures so they don't end up in
+            # the logs - we'll notice the lack of pingback eventually
+            failure.trap(pb.PBConnectionLost)
+            self.log('ping failed: %s' % log.getFailureMessage(failure))
+
         if self.remote:
             self.log('pinging')
             d = self.callRemoteLogging(log.LOG, 0, 'ping')
-            d.addCallback(pingback)
+            d.addCallbacks(pingback, pingFailed)
         else:
             self.info('tried to ping, but disconnected yo')
 
