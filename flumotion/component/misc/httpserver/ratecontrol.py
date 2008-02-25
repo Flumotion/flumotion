@@ -71,8 +71,9 @@ class TokenBucketConsumer(log.Loggable):
         self.fillRate = fillRate # in bytes per second
         self.fillLevel = fillLevel # in bytes
 
-        self._buffer = "" # TODO: Maybe this should be a list of buffers, or
-                          # of (buffer, offset) tuples, so we can avoid copies?
+        self._buffers = [] # List of (offset, buffer) tuples
+        self._buffersSize = 0
+
         self._finishing = False # If true, we'll stop once the current buffer
                                 # has been sent.
 
@@ -108,17 +109,22 @@ class TokenBucketConsumer(log.Loggable):
         self._tryWrite()
 
     def _tryWrite(self):
-        if self.fillLevel > 0 and len(self._buffer) > 0:
+        while self.fillLevel > 0 and self._buffersSize > 0:
             # If we're permitted to write at the moment, do so.
-            buf = self._buffer[:self.fillLevel]
-            bytes = len(buf)
+            offset, buf = self._buffers[0]
+            sendbuf = buf[offset:offset+self.fillLevel]
+            bytes = len(sendbuf)
 
-            self._buffer = self._buffer[bytes:]
+            if bytes + offset == len(buf):
+                self._buffers.pop(0)
+            else:
+                self._buffers[0] = (offset+bytes, buf)
+            self._buffersSize -= bytes
 
-            self.consumer.write(buf)
+            self.consumer.write(sendbuf)
             self.fillLevel -= bytes
 
-        if len(self._buffer) > 0:
+        if self._buffersSize > 0:
             # If we have data (and we're not already waiting for our next drip
             # interval), wait... this is what actually performs the data
             # throttling.
@@ -142,15 +148,16 @@ class TokenBucketConsumer(log.Loggable):
     def resumeProducing(self):
         self._tryWrite()
 
-        if not self._buffer and self.producer:
+        if not self._buffers and self.producer:
             self.producer.resumeProducing()
 
     def write(self, data):
-        self._buffer += data
+        self._buffers.append((0, data))
+        self._buffersSize += len(data)
 
         self._tryWrite()
 
-        if self._buffer and not self.fillLevel and self.producer:
+        if self._buffers and not self.fillLevel and self.producer:
             self.producer.pauseProducing()
 
     def finish(self):

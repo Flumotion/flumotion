@@ -1,3 +1,10 @@
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	  Rewrite buffer handling to avoid doing so many buffer copies, in an
+	  attempt to make it use less cpu.
+	  Mostly unsuccessful.
+
 2008-02-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
