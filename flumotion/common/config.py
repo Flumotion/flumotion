@@ -228,11 +228,10 @@ class BaseConfigParser(fxml.Parser):
 
         plugs = []
         def parsePlug(node):
-            # <plug socket=... type=...>
+            # <plug type=...>
             #   <property>
-            # FIXME: is it even necessary to have socket specified?
-            # seems not
-            socket, type = self.parseAttributes(node, ('socket', 'type'))
+            # socket is unneeded and deprecated; we don't use it.
+            type, socket = self.parseAttributes(node, ('type',), ('socket',))
             properties = []
             parsers = {'property': (self._parseProperty, properties.append),
                        'compound-property': (self._parseCompoundProperty,

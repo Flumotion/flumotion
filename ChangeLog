@@ -1,5 +1,15 @@
 2008-02-25  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/common/config.py:
+	  Nothing uses the 'socket' attribute on a plug. So, make it
+	  optional/deprecated.
+	* flumotion/manager/config.py:
+	  Don't write the deprecated socket attribute.
+	* flumotion/wizard/configurationwriter.py:
+	  Don't write the deprecated socket attribute.
+
+2008-02-25  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/misc/httpserver/httpserver.py:
 	  Don't assert for things that aren't programming errors.
 	* flumotion/component/misc/httpserver/httpserver.xml:

@@ -755,11 +755,11 @@ def exportPlanetXml(p):
             values += [[X.clock_master(),
                         C['clock-master'] == C['avatarId'] and 'true' or 'false']]
         values +=  [[X.plugs()]
-                    + concat([[[X.plug(socket=socket, type=plug['type'])]
+                    + concat([[[X.plug(type=plug['type'])]
                                + [[X.property(name=name), value]
                                   for name, value in plug['properties'].items()]
                                for plug in plugs]
-                              for socket, plugs in C['plugs'].items()])]
+                              for plugs in C['plugs'].values()])]
         values += [[X.virtual_feed(name=name, real=real)]
                    for name, real in C['virtual-feeds'].items()]
         return values

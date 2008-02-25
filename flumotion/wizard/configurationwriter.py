@@ -189,8 +189,6 @@ class ConfigurationWriter(XMLWriter):
         self.popTag()
 
     def _writeComponentPlug(self, plug):
-        attrs = [('socket', plug.socket),
-                 ('type', plug.plug_type)]
-        self.pushTag('plug', attrs)
+        self.pushTag('plug', [('type', plug.plug_type)])
         self._writeProperties(plug.getProperties())
         self.popTag()
