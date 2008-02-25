@@ -1,3 +1,9 @@
+2008-02-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py: 
+	Use the registry data before trying to instantiate the plugin, avoids
+	importing a plugin which is not supported.
+
 2008-02-25  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/common/medium.py (PingingMedium._ping):

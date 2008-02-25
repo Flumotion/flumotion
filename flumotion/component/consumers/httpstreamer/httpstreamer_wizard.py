@@ -43,6 +43,7 @@ import gobject
 from kiwi.utils import gsignal
 import gtk
 
+from flumotion.common import log
 from flumotion.configure import configure
 from flumotion.wizard.models import Component, Consumer
 from flumotion.wizard.workerstep import WorkerWizardStep
@@ -319,25 +320,33 @@ class HTTPStep(WorkerWizardStep):
 
     def _populate_plugins(self):
         def got_entries(entries):
+            log.debug('httpwizard', 'got %r' % (entries,))
             for entry in entries:
+                if not self._canAddPlug(entry):
+                    continue
                 def response(factory, entry):
                     plugin = factory(self.wizard)
                     if hasattr(plugin, 'worker_changed'):
                         d = plugin.worker_changed(self.worker)
                         def cb(found, plugin, entry):
                             if found:
-                                self._addPlug(plugin, entry)
+                                self._addPlug(
+                                    plugin, N_(entry.description))
                         d.addCallback(cb, plugin, entry)
                     else:
-                        self._addPlug(plugin, entry)
+                        self._addPlug(plugin, N_(entry.description))
                 d = self.wizard.get_wizard_plug_entry(entry.component_type)
                 d.addCallback(response, entry)
 
-        d = self.wizard._admin.getWizardEntries(
-            wizard_types=['http-consumer'])
-        d.addCallback(got_entries)
+        d = self.get_wizard_entries(['http-consumer'])
+        d.addCallbacks(got_entries)
 
-    def _addPlug(self, plugin, entry):
+    def get_wizard_entries(self, wizard_types):
+        log.debug('httpwizard', 'querying wizard entries %r' % (wizard_types,))
+        return self.wizard._admin.getWizardEntries(
+            wizard_types=wizard_types)
+
+    def _canAddPlug(self, entry):
         # This function filters out entries which are
         # not matching the accepted media types of the entry
         muxerTypes = []
@@ -356,15 +365,18 @@ class HTTPStep(WorkerWizardStep):
 
         encoding_step = self.wizard.get_step('Encoding')
         if encoding_step.get_muxer_format() not in muxerTypes:
-            return
+            return False
 
         audio_format = encoding_step.get_audio_format()
         video_format = encoding_step.get_video_format()
         if ((audio_format and audio_format not in audioTypes) or
             (video_format and video_format not in videoTypes)):
-            return
+            return False
 
-        self.plugarea.addPlug(plugin, N_(entry.description))
+        return True
+
+    def _addPlug(self, plugin, description):
+        self.plugarea.addPlug(plugin, description)
 
     def _check_elements(self):
         def got_missing(missing):
