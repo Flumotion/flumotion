@@ -65,7 +65,8 @@
 
 	Rename httpfile to httpserver in the file system hierarchy.
 	Merge test_misc_httpfile into test_component_httpserver.
-	Fix a minor bug in the rate controlling plug part Mike added.
+	Change the socketname to point to a class, check for plug
+	presence by examining the dictionary value, not just the key.
 
 2008-02-22  Michael Smith <msmith@fluendo.com>
 
