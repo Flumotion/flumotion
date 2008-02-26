@@ -108,6 +108,20 @@ class TestRoutingTable(testsuite.TestCase):
         for expected, actual in zip(routes, net.iterHumanReadable()):
             self.assertEquals(expected, actual)
 
+    def testRouteIteration(self):
+        net = RoutingTable()
+
+        net.addSubnet('foo', '192.168.1.0', 24)
+        net.addSubnet('bar', '0.0.0.0', 0)
+
+        # Now, an IP in 'foo' should iterate foo, bar, None.
+        tests = [('192.168.1.1', ['foo', 'bar', None]),
+                 ('203.10.7.20', ['bar', None])]
+
+        for ip, expected in tests:
+            results = [result for result in net.route_iter(ip)]
+            self.assertEquals(expected, results)
+
     def testRoutingPrecedence(self):
         net = RoutingTable()
 

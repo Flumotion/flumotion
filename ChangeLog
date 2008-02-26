@@ -1,3 +1,9 @@
+2008-02-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/test/test_common_netutils.py:
+	  Add a test to check that route iteration correctly goes from
+	  most-specific to least specific.
+
 2008-02-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/greeter.py:
