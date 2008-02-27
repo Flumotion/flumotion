@@ -50,15 +50,9 @@ class Component(log.Loggable):
     def __repr__(self):
         return '<flumotion.wizard.save.Component name="%s">' % self.name
 
-    def addEater(self, component):
-        self.eaters.append(component)
-
-    def addFeeder(self, component):
-        self.feeders.append(component)
-
     def link(self, component):
-        self.addFeeder(component)
-        component.addEater(self)
+        self.feeders.append(component)
+        component.eaters.append(self)
 
     def getProperties(self):
         return self.props
@@ -115,6 +109,7 @@ class WizardSaver(log.Loggable):
         return muxer
 
     def _handleHTTPConsumer(self, name, step):
+        name = name[5:] # strip http, we'll add it manually
         for server in step.getServerConsumers():
             server.name = 'http-server-%s' % (name,)
             self._flow_components.append(server)
@@ -126,6 +121,11 @@ class WizardSaver(log.Loggable):
         streamer = step.getStreamerConsumer()
         streamer.name = 'http-%s' % (name,)
         return streamer
+
+    def _handleDiskerConsumer(self, name, step):
+        disker = step.getDisker()
+        disker.name = name
+        return disker
 
     def _getVideoOverlay(self):
         step = self.wizard.get_step('Overlay')
@@ -255,7 +255,9 @@ class WizardSaver(log.Loggable):
                 continue
             step = self.wizard.get_step(step_name)
             if comp_type == 'http-streamer':
-                consumer = self._handleHTTPConsumer(name[5:], step)
+                consumer = self._handleHTTPConsumer(name, step)
+            elif comp_type == 'disk-consumer':
+                consumer = self._handleDiskerConsumer(name, step)
             else:
                 consumer = Component(
                     name, comp_type,

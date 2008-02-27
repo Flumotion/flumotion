@@ -1,5 +1,12 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/disker/disker-wizard.glade:
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/wizard/save.py:
+	Convert the disker step to use a model and proxy.
+
+2008-02-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	Move old bits specific for the wirefire components from save.py 
 	to here.

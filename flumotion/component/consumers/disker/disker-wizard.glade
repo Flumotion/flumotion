@@ -34,7 +34,7 @@
 	  <property name="column_spacing">6</property>
 
 	  <child>
-	    <widget class="GtkLabel" id="label_location">
+	    <widget class="GtkLabel" id="location_label">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">_Choose location:</property>
 	      <property name="use_underline">True</property>
@@ -46,7 +46,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
-	      <property name="mnemonic_widget">entry_location</property>
+	      <property name="mnemonic_widget">location</property>
 	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 	      <property name="width_chars">-1</property>
 	      <property name="single_line_mode">False</property>
@@ -72,7 +72,7 @@
 	      <property name="column_spacing">7</property>
 
 	      <child>
-		<widget class="GtkRadioButton" id="radiobutton_has_time">
+		<widget class="GtkRadioButton" id="has_time">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes"></property>
@@ -82,7 +82,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_radiobutton_has_time_toggled" last_modification_time="Thu, 30 Sep 2004 14:54:10 GMT"/>
+		  <signal name="toggled" handler="on_has_time_toggled" last_modification_time="Thu, 30 Sep 2004 14:54:10 GMT"/>
 		</widget>
 		<packing>
 		  <property name="left_attach">0</property>
@@ -95,7 +95,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkRadioButton" id="radiobutton_has_size">
+		<widget class="GtkRadioButton" id="has_size">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes"></property>
@@ -105,8 +105,8 @@
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <property name="group">radiobutton_has_time</property>
-		  <signal name="toggled" handler="on_radiobutton_has_size_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:57 GMT"/>
+		  <property name="group">has_time</property>
+		  <signal name="toggled" handler="on_has_size_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:57 GMT"/>
 		</widget>
 		<packing>
 		  <property name="left_attach">0</property>
@@ -119,7 +119,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkComboBox" id="combobox_time_list">
+		<widget class="GtkComboBox" id="time_unit">
 		  <property name="visible">True</property>
 		  <property name="add_tearoffs">False</property>
 		  <property name="focus_on_click">True</property>
@@ -135,7 +135,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton_time">
+		<widget class="GtkSpinButton" id="time">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
@@ -144,7 +144,7 @@
 		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 		  <property name="snap_to_ticks">False</property>
 		  <property name="wrap">False</property>
-		  <property name="adjustment">1 0 100 1 10 10</property>
+		  <property name="adjustment">12 0 100 1 10 10</property>
 		</widget>
 		<packing>
 		  <property name="left_attach">1</property>
@@ -156,7 +156,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton_size">
+		<widget class="GtkSpinButton" id="size">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_focus">True</property>
@@ -178,7 +178,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkComboBox" id="combobox_size_list">
+		<widget class="GtkComboBox" id="size_unit">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="add_tearoffs">False</property>
@@ -205,7 +205,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkEntry" id="entry_location">
+	    <widget class="GtkEntry" id="directory">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="editable">True</property>
@@ -239,7 +239,7 @@
 	      <property name="right_padding">0</property>
 
 	      <child>
-		<widget class="GtkCheckButton" id="checkbutton_rotate">
+		<widget class="GtkCheckButton" id="rotate">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">_Rotate entry every:</property>
@@ -249,7 +249,7 @@
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_checkbutton_rotate_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:47 GMT"/>
+		  <signal name="toggled" handler="on_rotate_toggled" last_modification_time="Thu, 30 Sep 2004 14:42:47 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -264,7 +264,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkCheckButton" id="checkbutton_record_at_startup">
+	    <widget class="GtkCheckButton" id="start_recording">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">Record at startup</property>

@@ -22,31 +22,64 @@
 import gettext
 import os
 
-from flumotion.common.enum import EnumClass
+from flumotion.wizard.models import Consumer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
-RotateTime = EnumClass(
-    'RotateTime',
-    ['Minutes', 'Hours', 'Days', 'Weeks'],
-    [_('minute(s)'),
-     _('hour(s)'),
-     _('day(s)'),
-     _('week(s)')],
-    unit=(60,
-          60*60,
-          60*60*24,
-          60*60*25*7))
-RotateSize = EnumClass(
-    'RotateSize',
-    ['kB', 'MB', 'GB', 'TB'],
-    [_('kB'), _('MB'), _('GB'), _('TB')],
-    unit=(1 << 10L,
-          1 << 20L,
-          1 << 30L,
-          1 << 40L))
+(SIZE_KB,
+ SIZE_MB,
+ SIZE_GB,
+ SIZE_TB) = tuple([1 << (10L*i) for i in range(1, 5)])
+
+TIME_MINUTE = 60
+TIME_HOUR = 60*60
+TIME_DAY = 60*60*24
+TIME_WEEK = 60*60*24*7
+
+
+class Disker(Consumer):
+    """I am a model representing the configuration file for a
+    Disk consumer.
+
+    @ivar has_time: if rotation should be done based on time
+    @ivar has_size: if rotation should be done based on size
+    @ivar time_unit: the selected size unit,
+      size will be multiplied by this value when saved
+    @ivar size_unit: the selected time unit,
+      time will be multiplied by this value when saved
+    """
+    component_type = 'disk-consumer'
+    def __init__(self):
+        super(Disker, self).__init__()
+        self.has_time = False
+        self.has_size = False
+        self.time_unit = TIME_HOUR
+        self.size_unit = SIZE_KB
+        self.time = 12
+        self.size = 10
+        self.properties.directory = ""
+
+    # Component
+
+    def _getRotationType(self):
+        if self.has_time:
+            return 'time'
+        elif self.has_size:
+            return 'size'
+        else:
+            return 'none'
+
+    def getProperties(self):
+        properties = super(Disker, self).getProperties()
+        properties.rotate_type = self._getRotationType()
+        if 'size' in properties:
+            properties.size *= self.size_unit
+        if 'time' in properties:
+            properties.time *= self.time_unit
+
+        return properties
 
 
 class DiskStep(WorkerWizardStep):
@@ -55,36 +88,57 @@ class DiskStep(WorkerWizardStep):
     section = _('Consumption')
     icon = 'kcmdevices.png'
 
+    def __init__(self, wizard):
+        self.model = Disker()
+        WorkerWizardStep.__init__(self, wizard)
+
+    # Public API
+
+    def getDisker(self):
+        return self.model
+
     # WizardStep
 
     def setup(self):
-        self.combobox_time_list.set_enum(RotateTime)
-        self.combobox_size_list.set_enum(RotateSize)
-        self.radiobutton_has_time.set_active(True)
-        self.spinbutton_time.set_value(12)
-        self.combobox_time_list.select(RotateTime.Hours)
-        self.checkbutton_record_at_startup.set_active(True)
+        self.directory.data_type = str
+        self.start_recording.data_type = bool
 
-    def get_state(self):
-        options = {}
-        if not self.checkbutton_rotate.get_active():
-            options['rotate-type'] = 'none'
-        else:
-            if self.radiobutton_has_time.get_active():
-                options['rotate-type'] = 'time'
-                time_value = self.combobox_time_list.get_selected()
-                options['time'] = long(
-                    self.spinbutton_time.get_value() * time_value.unit)
-            elif self.radiobutton_has_size.get_active():
-                options['rotate-type'] = 'size'
-                size_value = self.combobox_size_list.get_selected()
-                options['size'] = long(
-                    self.spinbutton_size.get_value() * size_value.unit)
+        self.has_time.data_type = bool
+        self.time.data_type = int
+        self.time_unit.data_type = int
+        self.time_unit.prefill([
+            (_('minute(s)'), TIME_MINUTE),
+            (_('hour(s)'), TIME_HOUR),
+            (_('day(s)'), TIME_DAY),
+            (_('week(s)'), TIME_WEEK)])
+        self.time_unit.select(TIME_HOUR)
 
-        options['directory'] = self.entry_location.get_text()
-        options['start-recording'] = \
-            self.checkbutton_record_at_startup.get_active()
-        return options
+        self.has_size.data_type = bool
+        self.size.data_type = int
+        self.size_unit.data_type = long
+        self.size_unit.prefill([
+            (_('kB'), SIZE_KB),
+            (_('MB'), SIZE_MB),
+            (_('GB'), SIZE_GB),
+            (_('TB'), SIZE_TB),
+             ])
+
+        self.add_proxy(self.model,
+                       ['rotate',
+                        'has_size',
+                        'has_time',
+                        'size_unit',
+                        'time_unit'])
+
+        self.add_proxy(self.model.properties,
+                       ['size',
+                        'time',
+                        'directory',
+                        'start_recording'])
+
+    def worker_changed(self, worker):
+        self.model.worker = worker
+        self.wizard.require_elements(self.worker, 'multifdsink')
 
     def get_next(self):
         return self.wizard.get_step('Consumption').get_next(self)
@@ -92,37 +146,28 @@ class DiskStep(WorkerWizardStep):
     # Private
 
     def _update_radio(self):
-        if self.radiobutton_has_size.get_active():
-            self.spinbutton_size.set_sensitive(True)
-            self.combobox_size_list.set_sensitive(True)
-            self.spinbutton_time.set_sensitive(False)
-            self.combobox_time_list.set_sensitive(False)
-        elif self.radiobutton_has_time.get_active():
-            self.spinbutton_time.set_sensitive(True)
-            self.combobox_time_list.set_sensitive(True)
-            self.spinbutton_size.set_sensitive(False)
-            self.combobox_size_list.set_sensitive(False)
+        rotate = self.rotate.get_active()
+        self.has_size.set_sensitive(rotate)
+        self.has_time.set_sensitive(rotate)
+
+        has_size = rotate and self.has_size.get_active()
+        self.size.set_sensitive(has_size)
+        self.size_unit.set_sensitive(has_size)
+
+        has_time = rotate and self.has_time.get_active()
+        self.time.set_sensitive(has_time)
+        self.time_unit.set_sensitive(has_time)
 
     # Callbacks
 
-    def on_radiobutton_has_time_toggled(self, radio):
+    def on_has_time_toggled(self, radio):
         self._update_radio()
 
-    def on_radiobutton_has_size_toggled(self, radio):
+    def on_has_size_toggled(self, radio):
         self._update_radio()
 
-    def on_checkbutton_rotate_toggled(self, button):
-        if self.checkbutton_rotate.get_active():
-            self.radiobutton_has_size.set_sensitive(True)
-            self.radiobutton_has_time.set_sensitive(True)
-            self._update_radio()
-        else:
-            self.radiobutton_has_size.set_sensitive(False)
-            self.spinbutton_size.set_sensitive(False)
-            self.combobox_size_list.set_sensitive(False)
-            self.radiobutton_has_time.set_sensitive(False)
-            self.spinbutton_time.set_sensitive(False)
-            self.combobox_time_list.set_sensitive(False)
+    def on_rotate_toggled(self, check):
+        self._update_radio()
 
 
 class DiskBothStep(DiskStep):
