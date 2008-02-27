@@ -1,5 +1,11 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/wizard/save.py:
+	Convert the shout2 step to use a model and proxy.
+
+2008-02-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/consumers/disker/disker-wizard.glade:
 	* flumotion/component/consumers/disker/disker_wizard.py:
 	* flumotion/wizard/save.py:

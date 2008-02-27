@@ -29,39 +29,6 @@ _ = gettext.gettext
 __version__ = "$Rev$"
 
 
-class Component(log.Loggable):
-    logCategory = "componentsave"
-
-    def __init__(self, name, component_type, worker, properties=None, plugs=None):
-        self.debug('Creating component %s (%s) worker=%r' % (
-            name, type, worker))
-        self.name = name
-        self.component_type = component_type
-        if not properties:
-            properties = {}
-        self.props = properties
-        if not plugs:
-            plugs = []
-        self.plugs = plugs
-        self.worker = worker
-        self.eaters = []
-        self.feeders = []
-
-    def __repr__(self):
-        return '<flumotion.wizard.save.Component name="%s">' % self.name
-
-    def link(self, component):
-        self.feeders.append(component)
-        component.eaters.append(self)
-
-    def getProperties(self):
-        return self.props
-
-    def getFeeders(self):
-        for source in self.feeders:
-            yield source.name
-
-
 class WizardSaver(log.Loggable):
     logCategory = 'wizard-saver'
     def __init__(self, wizard):
@@ -126,6 +93,11 @@ class WizardSaver(log.Loggable):
         disker = step.getDisker()
         disker.name = name
         return disker
+
+    def _handleShout2Consumer(self, name, step):
+        shout2 = step.getShout2Model()
+        shout2.name = name
+        return shout2
 
     def _getVideoOverlay(self):
         step = self.wizard.get_step('Overlay')
@@ -259,9 +231,7 @@ class WizardSaver(log.Loggable):
             elif comp_type == 'disk-consumer':
                 consumer = self._handleDiskerConsumer(name, step)
             else:
-                consumer = Component(
-                    name, comp_type,
-                    step.worker, step.get_state())
+                consumer = self._handleShout2Consumer(name, step)
 
             consumer.link(muxer)
             self._flow_components.append(consumer)

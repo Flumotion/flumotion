@@ -22,10 +22,17 @@
 import gettext
 import os
 
+from flumotion.wizard.models import Consumer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+
+class Shout2Consumer(Consumer):
+    component_type = 'shout2-consumer'
+    def __init__(self):
+        super(Shout2Consumer, self).__init__()
 
 
 class Shout2Step(WorkerWizardStep):
@@ -34,7 +41,30 @@ class Shout2Step(WorkerWizardStep):
     section = _('Consumption')
     component_type = 'shout2'
 
+    def __init__(self, wizard):
+        self.model = Shout2Consumer()
+        WorkerWizardStep.__init__(self, wizard)
+
+    # Public API
+
+    def getShout2Model(self):
+        return self.model
+
     # WizardStep
+
+    def setup(self):
+        self.mount_point.data_type = str
+        self.short_name.data_type = str
+        self.description.data_type = str
+        self.url.data_type = str
+        self.port.data_type = int
+
+        self.add_proxy(self.model.properties,
+                       ['mount_point',
+                        'short_name',
+                        'description',
+                        'url',
+                        'port'])
 
     def worker_changed(self, worker):
         self.wizard.check_elements(worker, 'shout2send')
