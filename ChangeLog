@@ -1,3 +1,22 @@
+2008-02-27  Johan Dahlin  <johan@gnome.org>
+
+	reviewed by: <delete if not using a buddy>
+	patch by: <delete if not someone else's patch>
+
+	* data/glade/wizard_summary.glade:
+	* data/glade/wizard_welcome.glade:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/consumers/disker/disker-wizard.glade:
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/videotest/videotest-wizard.glade:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/save.py:
+
 2008-02-27  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/disker/disker.py:
