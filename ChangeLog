@@ -1,5 +1,8 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	Prevent error on component shutdown.
+
 	* flumotion/admin/gtk/client.py: Fix a typo in a docstring
 
 	* data/glade/wizard_summary.glade:

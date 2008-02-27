@@ -121,10 +121,12 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self._link.set_uri(uri)
 
     def _createLinkWidget(self, uri):
+        holder = self.wtree.get_widget('link-holder')
+        if holder is None:
+            return
         link = LinkWidget(uri)
         link.set_callback(self._on_link_show_url)
         link.show_all()
-        holder = self.wtree.get_widget('link-holder')
         holder.add(link)
         return link
 
