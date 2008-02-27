@@ -1,5 +1,9 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/videotest/videotest-wizard.glade: 
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	Make the width/height/framerate entries smaller and right align them
+
 	* flumotion/wizard/conversionsteps.py (ConversionStep.get_muxer): 
 	Add a new method to get the muxer model.
 	(ConversionStep.activated): When going back to this step, do not

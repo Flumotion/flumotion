@@ -22,6 +22,8 @@
 import gettext
 import os
 
+import gtk
+
 from flumotion.wizard.basesteps import VideoSourceStep
 from flumotion.wizard.models import VideoProducer
 
@@ -64,6 +66,11 @@ class TestVideoSourceStep(VideoSourceStep):
         self.add_proxy(self.model.properties,
                        ['pattern', 'width', 'height',
                         'framerate', 'format'])
+
+        sizegroup = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
+        sizegroup.add_widget(self.width)
+        sizegroup.add_widget(self.height)
+        sizegroup.add_widget(self.framerate)
 
     def worker_changed(self, worker):
         self.model.worker = worker
