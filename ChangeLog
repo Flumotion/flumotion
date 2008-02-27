@@ -1,5 +1,12 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/conversionsteps.py (ConversionStep.get_muxer): 
+	Add a new method to get the muxer model.
+	(ConversionStep.activated): When going back to this step, do not
+	reset the options made by the user.
+	(setup): Remove, code in here is unused.
+	(ConversionStep._muxer_changed): Remove dead assignment to self._muxer
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	Prevent error on component shutdown.
 

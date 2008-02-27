@@ -70,6 +70,16 @@ class ConversionStep(WorkerWizardStep):
         """
         return self._audio_encoder
 
+    def get_muxer(self):
+        """Returns the selected muxer or None
+        @returns: muxer or None
+        @rtype: L{flumotion.wizard.models.Muxer}
+        """
+        muxer = Muxer()
+        muxer.worker = self.worker
+        muxer.component_type = self.get_muxer_type()
+        return muxer
+
     def get_muxer_type(self):
         """Returns the component-type, such as "ogg-muxer"
         of the currently selected muxer.
@@ -107,10 +117,6 @@ class ConversionStep(WorkerWizardStep):
 
     # WizardStep
 
-    def setup(self):
-        self._muxer = Muxer()
-        self.wizard.flow.addComponent(self._muxer)
-
     def activated(self):
         data = [('muxer', self.muxer)]
 
@@ -129,7 +135,11 @@ class ConversionStep(WorkerWizardStep):
             self.video.hide()
             self.label_video.hide()
 
-        self._populate_combos(data)
+        # If there is data in the combo already, do not populate it,
+        # Because it means we're pressing "back" in the wizard and the
+        # combo is already populated.
+        if not len(self.video) or not len(self.audio):
+            self._populate_combos(data)
 
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has-video'):
@@ -235,7 +245,6 @@ class ConversionStep(WorkerWizardStep):
         self._populate_combos([('audio-encoder', self.audio),
                                ('video-encoder', self.video)],
                               provides=muxer_entry.getAcceptedMediaTypes())
-        self._muxer = muxer_entry.component_type
 
     # Callbacks
 
