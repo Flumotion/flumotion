@@ -118,9 +118,8 @@ MAX_RECENT_ITEMS = 4
 
 
 class AdminClientWindow(Loggable, gobject.GObject):
-    '''
-    Creates the GtkWindow for the user interface.
-o    Also connects to the manager on the given host and port.
+    '''Creates the GtkWindow for the user interface.
+    Also connects to the manager on the given host and port.
     '''
 
     implements(IStateListener)
