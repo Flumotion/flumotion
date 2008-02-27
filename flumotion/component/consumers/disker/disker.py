@@ -81,11 +81,6 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
     def remote_changeFilename(self, filenameTemplate=None):
         self.comp.change_filename(filenameTemplate)
 
-    def remote_scheduleRecordings(self, ical):
-        if HAS_ICAL:
-            cal = Calendar.from_string(ical)
-            self.addEvents(self.comp.icalScheduler.parseCalendar(cal))
-
     # called when admin ui wants updated state (current filename info)
     def remote_notifyState(self):
         self.comp.update_ui_state()

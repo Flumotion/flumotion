@@ -1,3 +1,18 @@
+2008-02-27  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  Remove a bitrotten remote method; the implementation was obviously
+	  broken, and Zaheer says the semantics are no longer meaningful.
+
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	  Add some comment, tweak the drip interval for lower CPU usage.
+
+	* flumotion/component/producers/playlist/playlist.py:
+	  Fix up for API changes.
+
+	* flumotion/component/producers/unixdomain/unixdomain.py:
+	  Add a TODO to fix this one up for API changes.
+
 2008-02-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/test/test_common_netutils.py:

@@ -40,6 +40,7 @@ class FixedRatePlug(RateController):
     def __init__(self, args):
         props = args['properties']
         self._rateBytesPerSec = int(props.get('rate', 128000) / 8)
+        # Peak level is 10 seconds of data; this is chosen entirely arbitrarily.
         self._maxLevel = int(props.get('max-level',
             self._rateBytesPerSec * 8 * 10) / 8)
         self._initialLevel = int(props.get('initial-level', 0) / 8)
@@ -62,7 +63,12 @@ class TokenBucketConsumer(log.Loggable):
     ignore pauseProducing. This is sufficient for our needs right now.
     """
 
-    _dripInterval = 0.2 # If we need to wait for more bits in our bucket, wait
+    # NOTE: Performance is strongly correlated with this value.
+    # Low values (e.g. 0.2) give a 'smooth' transfer, but very high cpu usage
+    # if you have several hundred clients.
+    # Higher values (e.g. 1.0 or more) give bursty transfer, but nicely lower
+    # cpu usage.
+    _dripInterval = 1.0 # If we need to wait for more bits in our bucket, wait
                         # at least this long, to avoid overly frequent small
                         # writes
 

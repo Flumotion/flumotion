@@ -200,9 +200,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
             srcpad.link(syncidentity.get_pad('sink'))
 
-            feedername = 'feeder:%s:%s' % (self.name, mediatype)
-            chunk = self.FEEDER_TMPL % {'name': feedername}
-            binstr = "bin.("+chunk+" )"
+            feederchunk = self.get_feeder_template(mediatype)
+            binstr = "bin.("+feederchunk+" )"
             self.debug("Parse for media composition is %s", binstr)
 
             bin = gst.parse_launch(binstr)

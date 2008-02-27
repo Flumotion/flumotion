@@ -71,6 +71,7 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
         # create pipeline
 
         # call self.link()
+        # TODO: This is bitrotten; update for API?
         self.link()
 
     def get_pipeline_string(self, properties):
@@ -82,7 +83,7 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
         self.socketPath = props.get('path')
         self.factory = UnixDomainDumbFactory(self)
 
-        # We need to set the pipeline to READY so the multifdsink gets start'ed
+        # We need to set the pipeline to READY so the multifdsink gets started
         self.pipeline.set_state(gst.STATE_READY)
 
         # remove the existing socket
