@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -60,26 +60,12 @@ class Component(log.Loggable):
         self.addFeeder(component)
         component.addEater(self)
 
+    def getProperties(self):
+        return self.props
+
     def getFeeders(self):
-        s = []
         for source in self.feeders:
-            if source.component_type == 'firewire-producer':
-                if self.name in ('encoder-video', 'overlay-video'):
-                    feed = 'video'
-                else:
-                    feed = 'audio'
-                s.append('%s:%s' % (source.name, feed))
-            else:
-                s.append(source.name)
-
-        return s
-
-
-def _fraction_from_float(number, denominator):
-    """
-    Return a string to be used in serializing to XML.
-    """
-    return "%d/%d" % (number * denominator, denominator)
+            yield source.name
 
 
 class WizardSaver(log.Loggable):
@@ -89,27 +75,11 @@ class WizardSaver(log.Loggable):
         self._flow_components = []
         self._atmosphere_components = []
 
-    def _set_fraction_property(self, properties, property_name, denominator):
-        if not property_name in properties:
-            return
-
-        value = properties[property_name]
-        try:
-            value = _fraction_from_float(int(value), denominator)
-        except ValueError:
-            pass
-        properties[property_name] = value
-
     def _getVideoSource(self):
         source_step = self.wizard.get_step('Source')
         video_producer = source_step.get_video_producer()
-        properties = video_producer.getProperties()
-        self._set_fraction_property(properties, 'framerate', 10)
-
-        return Component('producer-video',
-                         video_producer.component_type,
-                         video_producer.getWorker(),
-                         properties)
+        video_producer.name = 'producer-video'
+        return video_producer
 
     def _getAudioSource(self, video_source):
         source_step = self.wizard.get_step('Source')
@@ -123,59 +93,39 @@ class WizardSaver(log.Loggable):
             video_source.component_type == 'firewire-producer'):
             return video_source
 
-        properties = audio_producer.getProperties()
-        self._set_fraction_property(properties, 'framerate', 10)
-
-        return Component('producer-audio',
-                         audio_producer.component_type,
-                         audio_producer.worker,
-                         properties)
+        audio_producer.name = 'producer-audio'
+        return audio_producer
 
     def _getVideoEncoder(self):
         encoding_step = self.wizard.get_step('Encoding')
         video_encoder = encoding_step.get_video_encoder()
-
-        return Component('encoder-video',
-                         video_encoder.component_type,
-                         video_encoder.getWorker(),
-                         video_encoder.getProperties())
+        video_encoder.name = 'encoder-video'
+        return video_encoder
 
     def _getAudioEncoder(self):
         encoding_step = self.wizard.get_step('Encoding')
         audio_encoder = encoding_step.get_audio_encoder()
-
-        return Component('encoder-audio',
-                         audio_encoder.component_type,
-                         audio_encoder.getWorker(),
-                         audio_encoder.getProperties())
+        audio_encoder.name = 'encoder-audio'
+        return audio_encoder
 
     def _getMuxer(self, name):
         encoding_step = self.wizard.get_step('Encoding')
-        return Component('muxer-' + name,
-                         encoding_step.get_muxer_type(),
-                         encoding_step.worker)
+        muxer = encoding_step.get_muxer()
+        muxer.name = 'muxer-' + name
+        return muxer
 
     def _handleHTTPConsumer(self, name, step):
         for server in step.getServerConsumers():
-            server = Component('http-server-%s' % (name,),
-                               server.component_type,
-                               server.getWorker(),
-                               server.getProperties(),
-                               server.getPlugs())
+            server.name = 'http-server-%s' % (name,)
             self._flow_components.append(server)
 
         for porter in step.getPorters():
-            porter = Component('porter-%s' % (name,),
-                               porter.component_type,
-                               porter.getWorker(),
-                               porter.getProperties())
+            porter.name = 'porter-%s' % (name,)
             self._atmosphere_components.append(porter)
 
         streamer = step.getStreamerConsumer()
-        return Component('http-%s' % (name,),
-                         streamer.component_type,
-                         streamer.getWorker(),
-                         streamer.getProperties())
+        streamer.name = 'http-%s' % (name,)
+        return streamer
 
     def _getVideoOverlay(self):
         step = self.wizard.get_step('Overlay')
@@ -196,10 +146,8 @@ class WizardSaver(log.Loggable):
                 license_options['license'] == LicenseType.CC):
                 properties.cc_logo = True
 
-        return Component('overlay-video',
-                         overlay.component_type,
-                         overlay.getWorker(),
-                         properties)
+        overlay.name = 'overlay-video'
+        return overlay
 
     def handleVideo(self):
         video_source = self._getVideoSource()
@@ -351,4 +299,5 @@ class WizardSaver(log.Loggable):
         writer = ConfigurationWriter(self.wizard.flowName,
                                      self._flow_components,
                                      self._atmosphere_components)
-        return writer.getXML()
+        xml = writer.getXML()
+        return xml

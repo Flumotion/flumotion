@@ -41,6 +41,10 @@ class FireWireAudioProducer(AudioProducer):
 
         self.properties.is_square = False
 
+    def getFeeders(self):
+        for feeder in super(FireWireAudioProducer, self).getFeeders():
+            yield feeder + ':audio'
+
 
 class FireWireVideoProducer(VideoProducer):
     component_type = 'firewire-producer'
@@ -48,6 +52,10 @@ class FireWireVideoProducer(VideoProducer):
         super(FireWireVideoProducer, self).__init__()
 
         self.properties.is_square = False
+
+    def getFeeders(self):
+        for feeder in super(FireWireAudioProducer, self).getFeeders():
+            yield feeder + ':video'
 
 
 class _FireWireCommon:

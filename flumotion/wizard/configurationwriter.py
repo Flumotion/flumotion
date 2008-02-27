@@ -152,11 +152,12 @@ class ConfigurationWriter(XMLWriter):
                  ('version', configure.version)]
         self.pushTag('component', attrs)
         self._writeEaters(component.getFeeders())
-        self._writeProperties(component.props)
+        self._writeProperties(component.getProperties())
         self._writeComponentPlugs(component.plugs)
         self.popTag()
 
     def _writeEaters(self, eaters):
+        eaters = list(eaters)
         if not eaters:
             return
         self.pushTag('eater', [('name', "default")])

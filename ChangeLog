@@ -1,5 +1,24 @@
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	Move old bits specific for the wirefire components from save.py 
+	to here.
+	
+	* flumotion/wizard/configurationwriter.py:
+	eaters is a generator, so use list() around it.
+	Call getProperties() instead of accessing props directly
+
+	* flumotion/wizard/models.py:
+	Add getFeeders() and link() methods and move over fraction logic
+	here, since it only applies to producers.
+	
+	* flumotion/wizard/save.py:
+	Send the components directly instead of using the middle layer component
+	class. Still need to port over disker and shout2 components.
+	Add getProperties and simplify getFeeders()
+
+2008-02-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/videotest/videotest-wizard.glade: 
 	* flumotion/component/producers/videotest/videotest_wizard.py:
 	Make the width/height/framerate entries smaller and right align them

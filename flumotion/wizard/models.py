@@ -152,6 +152,7 @@ class Component(object):
     @cvar name_template: template used to define the name of this component
     @cvar component_type: the type of the component, such as ogg-muxer,
       this is not mandatory in the class, can also be set in the instance.
+    @ivar name: name of the component
     """
     eater_type = None
     feeder_type = None
@@ -159,11 +160,15 @@ class Component(object):
     name_template = "component"
 
     def __init__(self, worker=None):
+        self.name = None
         self.worker = worker
         self.feeders = []
         self.eaters = []
         self.properties = Properties()
         self.plugs = []
+
+    def __repr__(self):
+        return '<flumotion.wizard.models.Component name=%r>' % self.name
 
     def validate(self):
         if not self.worker:
@@ -186,6 +191,25 @@ class Component(object):
         @type plug: L{Plug}
         """
         self.plugs.append(plug)
+
+    def link(self, component):
+        """Link two components together
+        @param component: component to link with
+        @type component: Component
+        """
+        if not isinstance(component, Component):
+            raise TypeError(
+                "component must be a Component, not %r" % (component,))
+
+        self.feeders.append(component)
+        component.eaters.append(self)
+
+    def getFeeders(self):
+        """Get the names of all the feeders for this component
+        @returns: feeder names
+        """
+        for source in self.feeders:
+            yield source.name
 
 
 class Plug(object):
@@ -219,6 +243,18 @@ class Producer(Component):
             raise ComponentValidationError(
                 "producer component %s must have at least one feeder" %
                 (self.name,))
+
+    def getProperties(self):
+        properties = super(Producer, self).getProperties()
+        if 'framerate' in properties:
+            # Convert framerate to fraction
+            try:
+                framerate = int(properties['framerate'])
+            except ValueError:
+                pass
+            else:
+                properties['framerate'] = "%d/%d" % (framerate * 10, 10)
+        return properties
 
 
 class Encoder(Component):
