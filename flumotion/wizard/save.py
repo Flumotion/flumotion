@@ -21,7 +21,6 @@
 
 import gettext
 
-from flumotion.common import log
 from flumotion.wizard.enums import LicenseType
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 
@@ -29,8 +28,7 @@ _ = gettext.gettext
 __version__ = "$Rev$"
 
 
-class WizardSaver(log.Loggable):
-    logCategory = 'wizard-saver'
+class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard
         self._flow_components = []
