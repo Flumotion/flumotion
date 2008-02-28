@@ -1,5 +1,23 @@
 2008-02-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py
+	(ConfigurationWizard.getConsumtionSteps): New method
+
+	* flumotion/ui/wizard.py (SectionWizard.getVisitedSteps): 
+	New method
+
+	* flumotion/wizard/basesteps.py (ConsumerStep): New base class
+	for all consumption steps.
+
+	* flumotion/wizard/save.py (WizardSaver._handleConsumers): 
+	Simplify considerably, with help of the getConsumptionSteps method
+	and ConsumerStep base class.
+
+	* flumotion/component/consumers/disker/disker_wizard.py
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
+	* flumotion/component/consumers/shout2/shout2_wizard.py
+	Update consumption steps to the new api.
+
 	* flumotion/wizard/consumptionsteps.py: Avoid using strings to 
 	construct the steps we want to use, just use class references 
 	instead.

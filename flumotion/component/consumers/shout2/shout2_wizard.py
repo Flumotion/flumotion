@@ -23,7 +23,7 @@ import gettext
 import os
 
 from flumotion.wizard.models import Consumer
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -35,19 +35,17 @@ class Shout2Consumer(Consumer):
         super(Shout2Consumer, self).__init__()
 
 
-class Shout2Step(WorkerWizardStep):
+class Shout2Step(ConsumerStep):
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'shout2-wizard.glade')
-    section = _('Consumption')
-    component_type = 'shout2'
 
     def __init__(self, wizard):
         self.model = Shout2Consumer()
-        WorkerWizardStep.__init__(self, wizard)
+        ConsumerStep.__init__(self, wizard)
 
-    # Public API
+    # ConsumerStep
 
-    def getShout2Model(self):
+    def getConsumerModel(self):
         return self.model
 
     # WizardStep
@@ -69,22 +67,32 @@ class Shout2Step(WorkerWizardStep):
     def worker_changed(self, worker):
         self.wizard.check_elements(worker, 'shout2send')
 
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
-
 
 class Shout2BothStep(Shout2Step):
     name = _('Icecast streamer (audio & video)')
     sidebar_name = _('Icecast audio/video')
+
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio-video'
 
 
 class Shout2AudioStep(Shout2Step):
     name = _('Icecast streamer (audio only)')
     sidebar_name = _('Icecast audio')
 
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio'
+
 
 class Shout2VideoStep(Shout2Step):
     name = _('Icecast streamer (video only)')
     sidebar_name = _('Icecast video')
 
+    # ConsumerStep
 
+    def getConsumerType(self):
+        return 'video'

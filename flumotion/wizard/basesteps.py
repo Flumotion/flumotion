@@ -25,7 +25,6 @@ from flumotion.common import messages
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
 _ = gettext.gettext
 
 
@@ -73,4 +72,17 @@ class AudioEncoderStep(WorkerWizardStep):
         return None
 
 
+class ConsumerStep(WorkerWizardStep):
+    section = _('Consumption')
+
+    def getConsumerModel(self):
+        raise NotImplementedError(self)
+
+    def getComponentType(self):
+        raise NotImplementedError(self)
+
+    # WizardStep
+
+    def get_next(self):
+        return self.wizard.get_step('Consumption').get_next(self)
 

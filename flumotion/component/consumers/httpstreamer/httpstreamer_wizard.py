@@ -46,7 +46,7 @@ import gtk
 from flumotion.common import log
 from flumotion.configure import configure
 from flumotion.wizard.models import Component, Consumer
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -237,7 +237,7 @@ class PlugPluginArea(gtk.VBox):
     def _on_plugline__enable_changed(self, line):
         self._updateStreamer()
 
-class HTTPStep(WorkerWizardStep):
+class HTTPStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
@@ -246,19 +246,10 @@ class HTTPStep(WorkerWizardStep):
         os.path.abspath(__file__)),
         'httpstreamer-wizard.glade')
 
-    section = _('Consumption')
-    component_type = 'http-streamer'
-
     def __init__(self, wizard):
         self._blocked = False
         self.model = HTTPStreamer()
-        WorkerWizardStep.__init__(self, wizard)
-
-    def getStreamerConsumer(self):
-        """Returns the http-streamer consumer model
-        @returns: the streamer consumer
-        """
-        return self.model
+        ConsumerStep.__init__(self, wizard)
 
     def getServerConsumers(self):
         """Returns the http-server consumer model or None
@@ -275,6 +266,14 @@ class HTTPStep(WorkerWizardStep):
         @returns: the porter or None
         """
         return self.plugarea.getPorters()
+
+    # ConsumerStep
+
+    def getConsumerModel(self):
+        return self.model
+
+    def getComponentType(self):
+        return 'http-streamer'
 
     # WizardStep
 
@@ -312,9 +311,6 @@ class HTTPStep(WorkerWizardStep):
     def worker_changed(self, worker):
         self.model.worker = worker
         self._check_elements()
-
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
 
     # Private
 
@@ -418,11 +414,21 @@ class HTTPBothStep(HTTPStep):
     sidebar_name = _('HTTP audio/video')
     default_port = configure.defaultStreamPortRange[0]
 
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio-video'
+
 
 class HTTPAudioStep(HTTPStep):
     name = _('HTTP Streamer (audio only)')
     sidebar_name = _('HTTP audio')
     default_port = configure.defaultStreamPortRange[1]
+
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio'
 
 
 class HTTPVideoStep(HTTPStep):
@@ -430,4 +436,8 @@ class HTTPVideoStep(HTTPStep):
     sidebar_name = _('HTTP video')
     default_port = configure.defaultStreamPortRange[2]
 
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'video'
 

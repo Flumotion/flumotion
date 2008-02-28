@@ -226,6 +226,17 @@ class SectionWizard(GladeWindow, log.Loggable):
         step = self.get_step(stepname)
         return step.get_state()
 
+    def getVisitedSteps(self):
+        """Returns a sequence of steps which has been visited.
+        Visited means that the state of the step should be considered
+        when finishing the wizard.
+        @returns: sequence of visited steps.
+        @rtype: sequence of L{WizardStep}
+        """
+        for step in self._steps.values():
+            if step.visited:
+                yield step
+
     def hide(self):
         self.window.hide()
 

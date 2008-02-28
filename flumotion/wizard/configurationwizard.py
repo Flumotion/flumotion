@@ -30,6 +30,7 @@ from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard import save
+from flumotion.wizard.basesteps import ConsumerStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.enums import LicenseType
@@ -159,6 +160,14 @@ class ConfigurationWizard(SectionWizard):
         SectionWizard.prepare_next_step(self, step)
 
     # Public API
+
+    def getConsumtionSteps(self):
+        """Fetches the consumption steps chosen by the user
+        @returns: consumption steps
+        """
+        for step in self.getVisitedSteps():
+            if isinstance(step, ConsumerStep):
+                yield step
 
     def check_elements(self, workerName, *elementNames):
         """

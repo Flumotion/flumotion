@@ -23,7 +23,7 @@ import gettext
 import os
 
 from flumotion.wizard.models import Consumer
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -82,19 +82,18 @@ class Disker(Consumer):
         return properties
 
 
-class DiskStep(WorkerWizardStep):
+class DiskStep(ConsumerStep):
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'disker-wizard.glade')
-    section = _('Consumption')
     icon = 'kcmdevices.png'
 
     def __init__(self, wizard):
         self.model = Disker()
-        WorkerWizardStep.__init__(self, wizard)
+        ConsumerStep.__init__(self, wizard)
 
-    # Public API
+    # ConsumerStep
 
-    def getDisker(self):
+    def getConsumerModel(self):
         return self.model
 
     # WizardStep
@@ -140,9 +139,6 @@ class DiskStep(WorkerWizardStep):
         self.model.worker = worker
         self.wizard.require_elements(self.worker, 'multifdsink')
 
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
-
     # Private
 
     def _update_radio(self):
@@ -174,15 +170,29 @@ class DiskBothStep(DiskStep):
     name = _('Disk (audio & video)')
     sidebar_name = _('Disk audio/video')
 
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio-video'
+
 
 class DiskAudioStep(DiskStep):
     name = _('Disk (audio only)')
     sidebar_name = _('Disk audio')
+
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'audio'
 
 
 class DiskVideoStep(DiskStep):
     name = _('Disk (video only)')
     sidebar_name = _('Disk video')
 
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return 'video'
 
 
