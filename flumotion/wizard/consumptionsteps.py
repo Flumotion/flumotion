@@ -32,7 +32,6 @@ from flumotion.ui.wizard import WizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-X_ = _
 
 
 class ConsumptionStep(WizardStep):
@@ -42,9 +41,6 @@ class ConsumptionStep(WizardStep):
     icon = 'consumption.png'
 
     # WizardStep
-
-    def setup(self):
-        pass
 
     def activated(self):
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
@@ -64,33 +60,19 @@ class ConsumptionStep(WizardStep):
             checkbutton.set_property('visible', has_both)
 
     def get_next(self, step=None):
-        items = self._get_items()
-        assert items
+        steps = self._get_steps()
+        assert steps
 
-        if step:
-            stepname = step.get_name()
-            if stepname in items and items[-1] != stepname:
-                stepname = items[items.index(stepname)+1]
-            else:
-                stepname = None
+        if step is None:
+            step_class = steps[0]
         else:
-            stepname = items[0]
+            step_class = step.__class__
+            if step_class in steps and steps[-1] != step_class:
+                step_class = steps[steps.index(step_class)+1]
+            else:
+                return
 
-        steps = {
-            _('HTTP Streamer (audio & video)'): HTTPBothStep,
-            _('HTTP Streamer (audio only)'): HTTPAudioStep,
-            _('HTTP Streamer (video only)'): HTTPVideoStep,
-            _('Disk (audio & video)'): DiskBothStep,
-            _('Disk (audio only)'): DiskAudioStep,
-            _('Disk (video only)'): DiskVideoStep,
-            _('Icecast streamer (audio & video)'): Shout2BothStep,
-            _('Icecast streamer (audio only)'): Shout2AudioStep,
-            _('Icecast streamer (video only)'): Shout2VideoStep,
-        }
-
-        if stepname in steps:
-            step_class = steps[stepname]
-            return step_class(self.wizard)
+        return step_class(self.wizard)
 
     # Private
 
@@ -115,29 +97,32 @@ class ConsumptionStep(WizardStep):
             block_next = False
         self.wizard.block_next(block_next)
 
-    def _get_items(self):
+    def _get_steps(self):
         uielements = []
         if self.http.get_active():
-            uielements.append(('HTTP Streamer',
-                               [self.http_audio,
-                                self.http_video,
-                                self.http_audio_video]))
+            uielements.append(
+                ([HTTPAudioStep, HTTPVideoStep, HTTPBothStep],
+                 [self.http_audio,
+                  self.http_video,
+                  self.http_audio_video]))
         if self.disk.get_active():
-            uielements.append(('Disk',
-                               [self.disk_audio,
-                                self.disk_video,
-                                self.disk_audio_video]))
+            uielements.append(
+                ([DiskAudioStep, DiskVideoStep, DiskBothStep],
+                 [self.disk_audio,
+                  self.disk_video,
+                  self.disk_audio_video]))
         if self.shout2.get_active():
-            uielements.append(('Icecast streamer',
-                               [self.shout2_audio,
-                                self.shout2_video,
-                                self.shout2_audio_video]))
+            uielements.append(
+                ([Shout2AudioStep, Shout2VideoStep, Shout2BothStep],
+                 [self.shout2_audio,
+                  self.shout2_video,
+                  self.shout2_audio_video]))
 
         has_audio = self.wizard.get_step_option('Source', 'has-audio')
         has_video = self.wizard.get_step_option('Source', 'has-video')
 
-        items = []
-        for name, (audio, video, audio_video) in uielements:
+        retval = []
+        for steps, (audio, video, audio_video) in uielements:
             # Audio & Video, all checkbuttons are visible and
             # changeable by the user
             if has_audio and has_video:
@@ -159,16 +144,15 @@ class ConsumptionStep(WizardStep):
             else:
                 raise AssertionError
 
-            # These strings here should be translated but not marked
-            # for translation
+            audio_step, video_step, audio_video_step = steps
             if enable_audio_video:
-                items.append(X_("%s (audio & video)" % (name,)))
+                retval.append(audio_video_step)
             if enable_audio:
-                items.append(X_("%s (audio only)" % (name,)))
+                retval.append(audio_step)
             if enable_video:
-                items.append(X_("%s (video only)" % (name,)))
+                retval.append(video_step)
 
-        return items
+        return retval
 
     # Callbacks
 
