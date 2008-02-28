@@ -1,3 +1,9 @@
+2008-02-27  Johan Dahlin  <johan@gnome.org> 
+	
+	* flumotion/test/test_wizard_save.py:
+	Use the new Component class instead of the old one in save.py which
+	is removed.
+
 2008-02-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/save.py:

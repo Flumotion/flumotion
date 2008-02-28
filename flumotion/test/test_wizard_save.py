@@ -24,8 +24,7 @@ import os
 import unittest
 
 from flumotion.common import testsuite
-from flumotion.wizard.models import Flow, Plug
-from flumotion.wizard.save import Component
+from flumotion.wizard.models import Component, Flow, Plug
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 
 __version__ = "$Rev: 6126 $"
@@ -40,7 +39,10 @@ class TestXMLWriter(testsuite.TestCase):
             writer.getXML())
 
     def testFlowComponent(self):
-        c = Component('name', 'streamer', 'worker')
+        c = Component()
+        c.name = 'name'
+        c.component_type = 'streamer'
+        c.worker = 'worker'
         writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
             ('<planet>\n'
@@ -53,7 +55,11 @@ class TestXMLWriter(testsuite.TestCase):
             writer.getXML())
 
     def testAtmosphereComponent(self):
-        c = Component('name', 'streamer', 'worker', {'foo': 'bar'})
+        c = Component()
+        c.name = 'name'
+        c.component_type = 'streamer'
+        c.worker = 'worker'
+        c.properties.foo = 'bar'
         writer = ConfigurationWriter('', [], [c])
         testsuite.diffStrings(
             ('<planet>\n'
@@ -68,7 +74,10 @@ class TestXMLWriter(testsuite.TestCase):
             writer.getXML())
 
     def testComponentWithPlug(self):
-        c = Component('name', 'streamer', 'worker')
+        c = Component()
+        c.name = 'name'
+        c.component_type = 'streamer'
+        c.worker = 'worker'
         plug = Plug()
         plug.plug_type = 'plug-type'
         plug.properties.foo = 'bar'
@@ -92,8 +101,14 @@ class TestXMLWriter(testsuite.TestCase):
             writer.getXML())
 
     def testComponentWithFeeders(self):
-        c1 = Component('name', 'first', 'worker')
-        c2 = Component('name', 'second', 'worker')
+        c1 = Component()
+        c1.name = 'name'
+        c1.component_type = 'first'
+        c1.worker = 'worker'
+        c2 = Component()
+        c2.name = 'name'
+        c2.component_type = 'second'
+        c2.worker = 'worker'
         c1.link(c2)
 
         writer = ConfigurationWriter('flow', [c1, c2], [])
