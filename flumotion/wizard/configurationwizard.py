@@ -29,13 +29,13 @@ from flumotion.common.common import pathToModuleName
 from flumotion.common.messages import N_, ngettext
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
-from flumotion.wizard import save
 from flumotion.wizard.basesteps import ConsumerStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.enums import LicenseType
 from flumotion.wizard.models import Flow
 from flumotion.wizard.productionsteps import ProductionStep
+from flumotion.wizard.save import WizardSaver
 from flumotion.wizard.worker import WorkerList
 from flumotion.wizard.workerstep import WorkerWizardStep
 
@@ -115,11 +115,11 @@ class ConfigurationWizard(SectionWizard):
     def __init__(self, parent=None, admin=None):
         SectionWizard.__init__(self, parent)
         self._admin = admin
-        self._save = save.WizardSaver(self)
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
 
         self.flow = Flow("default")
+        self._flowName = 'default'
 
         self._worker_list = WorkerList()
         self.top_vbox.pack_start(self._worker_list, False, False)
@@ -132,13 +132,11 @@ class ConfigurationWizard(SectionWizard):
         return WelcomeStep(self)
 
     def completed(self):
-        configuration = self._save.getXML()
-        self.emit('finished', configuration)
+        self._save()
 
     def destroy(self):
         SectionWizard.destroy(self)
         self._admin = None
-        del self._save
 
     def run(self, interactive, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
@@ -423,6 +421,41 @@ class ConfigurationWizard(SectionWizard):
             if current_text == text:
                 self.combobox_worker.set_active_iter(row.iter)
                 break
+
+    def _save(self):
+        save = WizardSaver()
+        save.setFlowName(self._flowName)
+
+        source_step = self.get_step('Source')
+        save.setAudioProducer(source_step.get_audio_producer())
+        save.setVideoProducer(source_step.get_video_producer())
+
+        overlay_step = self.get_step('Overlay')
+        save.setVideoOverlay(overlay_step.getOverlay())
+
+        encoding_step = self.get_step('Encoding')
+        save.setAudioEncoder(encoding_step.get_audio_encoder())
+        save.setVideoEncoder(encoding_step.get_video_encoder())
+        save.setMuxer(encoding_step.get_muxer_type(), encoding_step.worker)
+
+        for step in self.getConsumtionSteps():
+            consumerType = step.getConsumerType()
+            save.addConsumer(step.getConsumerModel(), consumerType)
+
+            for server in step.getServerConsumers():
+                save.addServerConsumer(server, consumerType)
+
+            for porter in step.getPorters():
+                save.addPorter(porter, consumerType)
+
+        license_options = self.get_step_options('Content License')
+        if (license_options['set-license'] and
+            license_options['license'] == LicenseType.CC):
+            save.setUseCCLicense(True)
+
+        configuration = save.getXML()
+        self.emit('finished', configuration)
+        del save
 
     # Callbacks
 

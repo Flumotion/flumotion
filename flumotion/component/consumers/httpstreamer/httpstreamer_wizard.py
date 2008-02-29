@@ -251,22 +251,6 @@ class HTTPStep(ConsumerStep):
         self.model = HTTPStreamer()
         ConsumerStep.__init__(self, wizard)
 
-    def getServerConsumers(self):
-        """Returns the http-server consumer model or None
-        if there will only a stream served.
-        @returns: the server consumer or None
-        """
-        source_step = self.wizard.get_step('Source')
-        return self.plugarea.getServerConsumers(
-           source_step.get_audio_producer(),
-           source_step.get_video_producer())
-
-    def getPorters(self):
-        """Returns the porter model or None if there will only a stream served.
-        @returns: the porter or None
-        """
-        return self.plugarea.getPorters()
-
     # ConsumerStep
 
     def getConsumerModel(self):
@@ -274,6 +258,15 @@ class HTTPStep(ConsumerStep):
 
     def getComponentType(self):
         return 'http-streamer'
+
+    def getServerConsumers(self):
+        source_step = self.wizard.get_step('Source')
+        return self.plugarea.getServerConsumers(
+           source_step.get_audio_producer(),
+           source_step.get_video_producer())
+
+    def getPorters(self):
+        return self.plugarea.getPorters()
 
     # WizardStep
 

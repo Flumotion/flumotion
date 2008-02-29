@@ -81,6 +81,19 @@ class ConsumerStep(WorkerWizardStep):
     def getComponentType(self):
         raise NotImplementedError(self)
 
+    def getServerConsumers(self):
+        """Returns the http-server consumer model or None
+        if there will only a stream served.
+        @returns: the server consumer or None
+        """
+        return []
+
+    def getPorters(self):
+        """Returns the porter model or None if there will only a stream served.
+        @returns: the porter or None
+        """
+        return []
+
     # WizardStep
 
     def get_next(self):

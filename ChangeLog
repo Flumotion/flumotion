@@ -1,3 +1,21 @@
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/ui/wizard.py:
+	Remove flowName here, it should only be set in a subclass
+
+	* flumotion/wizard/conversionsteps.py:
+	Remove get_muxer, we're not using it any longer.
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/wizard/basesteps.py:
+	Move getServerConsumers and getPorters to the base class
+
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/save.py:
+	Separate the component building from extraction of step state, 
+	so the save logic can be reused by other interfaces. 
+	This completes the wizard MVC separation!
+
 2008-02-29  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/converters/overlay/overlay.py:

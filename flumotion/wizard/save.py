@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_wizard -*-
+4# -*- Mode: Python; test-case-name: flumotion.test.test_wizard -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -21,175 +21,243 @@
 
 import gettext
 
-from flumotion.wizard.enums import LicenseType
 from flumotion.wizard.configurationwriter import ConfigurationWriter
+from flumotion.wizard.models import Muxer, AudioProducer, VideoProducer, \
+     AudioEncoder, VideoEncoder
 
 _ = gettext.gettext
 __version__ = "$Rev$"
 
 
 class WizardSaver:
-    def __init__(self, wizard):
-        self.wizard = wizard
-        self._flow_components = []
-        self._atmosphere_components = []
+    def __init__(self):
+        self._flowComponents = []
+        self._atmosphereComponents = []
         self._muxers = {}
+        self._flowName = None
+        self._audioProducer = None
+        self._videoProducer = None
+        self._audioEncoder = None
+        self._videoEncoder = None
+        self._videoOverlay = None
+        self._useCCLicense = False
+        self._muxerType = None
+        self._muxerWorker = None
 
-    def _getVideoSource(self):
-        source_step = self.wizard.get_step('Source')
-        video_producer = source_step.get_video_producer()
-        video_producer.name = 'producer-video'
-        return video_producer
+    # Public API
 
-    def _getAudioSource(self, video_source):
-        source_step = self.wizard.get_step('Source')
-        audio_producer = source_step.get_audio_producer()
+    def setFlowName(self, flowName):
+        """Sets the name of the flow we're saving.
+        @param flowName:
+        @type flowName: string
+        """
+        self._flowName = flowName
 
-        if (video_source and
-            video_source.component_type == audio_producer.component_type):
-            return video_source
+    def setAudioProducer(self, audioProducer):
+        """Attach a audio producer for this flow
+        @param audioProducer: audio producer
+        @type audioProducer: L{AudioProducer} subclass or None
+        """
+        if (audioProducer is not None and
+            not isinstance(audioProducer, AudioProducer)):
+            raise TypeError(
+                "audioProducer must be a AudioProducer subclass, not %r" % (
+                audioProducer,))
+        self._audioProducer = audioProducer
 
-        audio_producer.name = 'producer-audio'
-        return audio_producer
+    def setVideoProducer(self, videoProducer):
+        """Attach a video producer for this flow
+        @param videoProducer: video producer
+        @type videoProducer: L{VideoProducer} subclass or None
+        """
+        if (videoProducer is not None and
+            not isinstance(videoProducer, VideoProducer)):
+            raise TypeError(
+                "videoProducer must be a VideoProducer subclass, not %r" % (
+                videoProducer,))
+        self._videoProducer = videoProducer
 
-    def _getVideoEncoder(self):
-        encoding_step = self.wizard.get_step('Encoding')
-        video_encoder = encoding_step.get_video_encoder()
-        video_encoder.name = 'encoder-video'
-        return video_encoder
+    def setVideoOverlay(self, videoOverlay):
+        self._videoOverlay = videoOverlay
 
-    def _getAudioEncoder(self):
-        encoding_step = self.wizard.get_step('Encoding')
-        audio_encoder = encoding_step.get_audio_encoder()
-        audio_encoder.name = 'encoder-audio'
-        return audio_encoder
+    def setAudioEncoder(self, audioEncoder):
+        """Attach a audio encoder for this flow
+        @param audioEncoder: audio encoder
+        @type audioEncoder: L{AudioEncoder} subclass or None
+        """
+        if (audioEncoder is not None and
+            not isinstance(audioEncoder, AudioEncoder)):
+            raise TypeError(
+                "audioEncoder must be a AudioEncoder subclass, not %r" % (
+                audioEncoder,))
+        self._audioEncoder = audioEncoder
+
+    def setVideoEncoder(self, videoEncoder):
+        """Attach a video encoder for this flow
+        @param videoEncoder: video encoder
+        @type videoEncoder: L{VideoEncoder} subclass or None
+        """
+        if (videoEncoder is not None and
+            not isinstance(videoEncoder, VideoEncoder)):
+            raise TypeError(
+                "videoEncoder must be a VideoEncoder subclass, not %r" % (
+                videoEncoder,))
+        self._videoEncoder = videoEncoder
+
+    def setMuxer(self, muxerType, muxerWorker):
+        """Adds the necessary state to be able to create a muxer
+        for this flow.
+        @param muxerType:
+        @type muxerType: string
+        @param muxerWorker: name of the worker
+        @type muxerWorker: string
+        """
+        self._muxerType = muxerType
+        self._muxerWorker = muxerWorker
+
+    def addServerConsumer(self, server, consumerType):
+        """Add a server consumer. Currently limited a to http-server
+        server consumers
+        @param server: server consumer
+        @type server:
+        @param consumerType: the type of the consumer, one of
+          audio/video/audio-video
+        @type consumerType: string
+        """
+        # FIXME: Do not hard code to http-server here
+        server.name = 'http-server-%s' % (consumerType,)
+        self._flowComponents.append(server)
+
+    def addPorter(self, porter, consumerType):
+        """Add a porter
+        @param porter: porter
+        @type porter:
+        @param consumerType: the type of the consumer, one of
+          audio/video/audio-video
+        @type consumerType: string
+        """
+        porter.name = 'porter-%s' % (consumerType,)
+        self._atmosphereComponents.append(porter)
+
+    def addConsumer(self, consumer, consumerType):
+        """Add a consumer
+        @param consumer: consumer
+        @type consumer:
+        @param consumerType: the type of the consumer, one of
+          audio/video/audio-video
+        @type consumerType: string
+        """
+        if consumer.component_type == 'http-streamer':
+            prefix = 'http'
+        elif consumer.component_type == 'disk-consumer':
+            prefix = 'disk'
+        elif consumer.component_type == 'shout2':
+            prefix = 'shout2'
+
+        # [disk,http,shout2]-[audio,video,audio-video]
+        consumer.name = prefix + '-' + consumerType
+
+        consumer.link(self._getMuxer(consumerType))
+        self._flowComponents.append(consumer)
+
+    def setUseCCLicense(self, useCCLicense):
+        """Sets if we should use a Creative Common license on
+        the created flow. This will overlay an image if we do
+        video streaming.
+        @param useCCLicense: if we should use a CC license
+        @type useCCLicense: bool
+        """
+        self._useCCLicense = useCCLicense
+
+    def getXML(self):
+        """Creates an XML configuration of the state set
+        @returns: the xml configuration
+        @rtype: string
+        """
+        self._handleAudio()
+        self._handleVideo()
+        self._handleConsumers()
+        writer = ConfigurationWriter(self._flowName,
+                                     self._flowComponents,
+                                     self._atmosphereComponents)
+        xml = writer.getXML()
+        return xml
+
+    # Private API
 
     def _getMuxer(self, name):
         if name in self._muxers:
             muxer = self._muxers[name]
         else:
-            encoding_step = self.wizard.get_step('Encoding')
-            muxer = encoding_step.get_muxer()
+            muxer = Muxer()
             muxer.name = 'muxer-' + name
+            muxer.component_type = self._muxerType
+            muxer.worker = self._muxerWorker
             self._muxers[name] = muxer
         return muxer
 
-    def _handleHTTPConsumer(self, step):
-        name = step.getConsumerType()
-        for server in step.getServerConsumers():
-            server.name = 'http-server-%s' % (name,)
-            self._flow_components.append(server)
+    def _handleAudio(self):
+        if not self._audioProducer:
+            return
 
-        for porter in step.getPorters():
-            porter.name = 'porter-%s' % (name,)
-            self._atmosphere_components.append(porter)
+        self._audioProducer.name = 'producer-audio'
+        if (self._videoProducer and
+            self._videoProducer.component_type ==
+            self._audioProducer.component_type):
+            self._audioProducer = self._videoProducer
+        else:
+            self._flowComponents.append(self._audioProducer)
 
-    def _handleConsumers(self, audio_encoder, video_encoder):
-        for step in self.wizard.getConsumtionSteps():
-            consumer = step.getConsumerModel()
-            if consumer.component_type == 'http-streamer':
-                prefix = 'http'
-                self._handleHTTPConsumer(step)
-            elif consumer.component_type == 'disk-consumer':
-                prefix = 'disk'
-            elif consumer.component_type == 'shout2':
-                prefix = 'shout2'
-            else:
-                raise AssertionError(consumer.component_type)
+        self._audioEncoder.name = 'encoder-audio'
+        self._flowComponents.append(self._audioEncoder)
 
-            consumerType = step.getConsumerType()
-            # [disk,http,shout2]-[audio,video,audio-video]
-            consumer.name = prefix + '-' + consumerType
+        self._audioEncoder.link(self._audioProducer)
 
-            consumer.link(self._getMuxer(consumerType))
-            self._flow_components.append(consumer)
+    def _handleVideo(self):
+        if not self._videoProducer:
+            return
 
+        self._videoProducer.name = 'video-producer'
+        self._flowComponents.append(self._videoProducer)
+
+        self._videoEncoder.name = 'encoder-video'
+        self._flowComponents.append(self._videoEncoder)
+
+        if self._videoOverlay:
+            self._handleVideoOverlay()
+            self._videoOverlay.link(self._videoProducer)
+            self._videoEncoder.link(self._videoOverlay)
+            self._flowComponents.append(self._videoOverlay)
+        else:
+            self._videoEncoder.link(self._videoProducer)
+
+    def _handleVideoOverlay(self):
+        self._videoOverlay.name = 'overlay-video'
+
+        if not self._videoOverlay.show_logo:
+            return
+
+        self._videoOverlay.properties.fluendo_logo = True
+        if self._muxerType == 'ogg-muxer':
+            self._videoOverlay.properties.xiph_logo = True
+
+        if self._useCCLicense:
+            self._videoOverlay.properties.cc_logo = True
+
+    def _handleConsumers(self):
         # Add & link the muxers we will use
         audio_muxer = self._getMuxer('audio')
         if audio_muxer.eaters:
-            self._flow_components.append(audio_muxer)
-            audio_muxer.link(audio_encoder)
+            self._flowComponents.append(audio_muxer)
+            audio_muxer.link(self._audioEncoder)
+
         video_muxer = self._getMuxer('video')
         if video_muxer.eaters:
-            self._flow_components.append(video_muxer)
-            video_muxer.link(video_encoder)
+            self._flowComponents.append(video_muxer)
+            video_muxer.link(self._videoEncoder)
+
         both_muxer = self._getMuxer('audio-video')
         if both_muxer.eaters:
-            self._flow_components.append(both_muxer)
-            both_muxer.link(video_encoder)
-            both_muxer.link(audio_encoder)
-
-    def _getVideoOverlay(self):
-        step = self.wizard.get_step('Overlay')
-        overlay = step.getOverlay()
-        if not overlay:
-            return None
-
-        # At this point we already know that we should overlay something
-        if overlay.show_logo:
-            overlay.properties.fluendo_logo = True
-            encoding_step = self.wizard.get_step('Encoding')
-            if encoding_step.get_muxer_type() == 'ogg-muxer':
-                overlay.properties.xiph_logo = True
-
-            license_options = self.wizard.get_step_options('Content License')
-            if (license_options['set-license'] and
-                license_options['license'] == LicenseType.CC):
-                overlay.properties.cc_logo = True
-
-        overlay.name = 'overlay-video'
-        return overlay
-
-    def handleVideo(self):
-        video_source = self._getVideoSource()
-        self._flow_components.append(video_source)
-
-        video_encoder = self._getVideoEncoder()
-        self._flow_components.append(video_encoder)
-
-        video_overlay = self._getVideoOverlay()
-        if video_overlay:
-            video_overlay.link(video_source)
-            video_encoder.link(video_overlay)
-            self._flow_components.append(video_overlay)
-        else:
-            video_encoder.link(video_source)
-        return video_encoder, video_source
-
-    def handleAudio(self, video_source):
-        audio_source = self._getAudioSource(video_source)
-        # In case of firewire component, which can already be there
-        if not audio_source in self._flow_components:
-            self._flow_components.append(audio_source)
-
-        audio_encoder = self._getAudioEncoder()
-        self._flow_components.append(audio_encoder)
-        audio_encoder.link(audio_source)
-
-        return audio_encoder
-
-    def _fetchComponentsFromWizardSteps(self):
-        source_options = self.wizard.get_step_options('Source')
-        has_video = source_options['has-video']
-        has_audio = source_options['has-audio']
-
-        video_encoder = None
-        video_source = None
-        if has_video:
-            video_encoder, video_source = self.handleVideo()
-
-        # Must do audio after video, in case of a firewire audio component
-        # is selected together with a firewire video component
-        audio_encoder = None
-        if has_audio:
-            audio_encoder = self.handleAudio(video_source)
-
-        self._handleConsumers(audio_encoder, video_encoder)
-
-    def getXML(self):
-        self._fetchComponentsFromWizardSteps()
-        writer = ConfigurationWriter(self.wizard.flowName,
-                                     self._flow_components,
-                                     self._atmosphere_components)
-        xml = writer.getXML()
-        return xml
+            self._flowComponents.append(both_muxer)
+            both_muxer.link(self._audioEncoder)
+            both_muxer.link(self._videoEncoder)

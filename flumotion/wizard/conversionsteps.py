@@ -70,16 +70,6 @@ class ConversionStep(WorkerWizardStep):
         """
         return self._audio_encoder
 
-    def get_muxer(self):
-        """Returns the selected muxer or None
-        @returns: muxer or None
-        @rtype: L{flumotion.wizard.models.Muxer}
-        """
-        muxer = Muxer()
-        muxer.worker = self.worker
-        muxer.component_type = self.get_muxer_type()
-        return muxer
-
     def get_muxer_type(self):
         """Returns the component-type, such as "ogg-muxer"
         of the currently selected muxer.

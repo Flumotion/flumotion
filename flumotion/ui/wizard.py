@@ -158,8 +158,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     logCategory = 'wizard'
 
-    flowName = 'default'
-
     glade_file = 'wizard.glade'
 
     sections = None
