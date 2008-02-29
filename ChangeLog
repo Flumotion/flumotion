@@ -1,5 +1,11 @@
 2008-02-29  Johan Dahlin  <jdahlin@async.com.br>
 
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/wizard/models.py:
+	Do _ -> - conversion in __contains__ too, add tests.
+
+2008-02-29  Johan Dahlin  <jdahlin@async.com.br>
+
 	* flumotion/wizard/Makefile.am:
 	* flumotion/wizard/configurationwizard.py:
 	* flumotion/wizard/enums.py:

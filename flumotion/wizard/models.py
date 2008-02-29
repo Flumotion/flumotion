@@ -66,6 +66,9 @@ class Properties(dict):
     def __delattr__(self, attr):
         del self[attr.replace('_', '-')]
 
+    def __contains__(self, value):
+        return dict.__contains__(self, value.replace('_', '-'))
+
     def __repr__(self):
         return '<Properties %r>' % (dict.__repr__(self),)
 

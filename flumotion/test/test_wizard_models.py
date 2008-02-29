@@ -55,7 +55,7 @@ class TestProperties(testsuite.TestCase):
         self.assertEquals(self.props.foo_bar, 10)
 
         self.failUnless('foo-bar' in self.props)
-        self.failIf('foo_bar' in self.props)
+        self.failUnless('foo_bar' in self.props)
         self.assertEquals(self.props['foo-bar'], 10)
 
     def testSetAttribute(self):
@@ -78,7 +78,7 @@ class TestProperties(testsuite.TestCase):
         self.assertEquals(self.props.foo_bar, 10)
 
         self.failUnless('foo-bar' in self.props)
-        self.failIf('foo_bar' in self.props)
+        self.failUnless('foo_bar' in self.props)
         self.assertEquals(self.props['foo-bar'], 10)
 
     def testDeleteItem(self):
@@ -120,6 +120,14 @@ class TestProperties(testsuite.TestCase):
         self.assertRaises(AttributeError,
                           self.props.__setitem__, 'update', 10)
         self.failIf(self.props)
+
+    def testContains(self):
+        self.props.foo_bar = 10
+        self.failUnless('foo-bar' in self.props)
+        self.failUnless('foo_bar' in self.props)
+        del self.props.foo_bar
+        self.failIf('foo-bar' in self.props)
+        self.failIf('foo_bar' in self.props)
 
 if __name__ == "__main__":
     unittest.main()
