@@ -52,7 +52,6 @@ class WizardStepTest(testsuite.TestCase):
             self.assert_(hasattr(s, 'name'))
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))
-            self.assert_(isinstance(s.get_state(), dict))
             self.assertEqual(s.name, s.get_name())
 
             if s.get_name() != 'Summary':

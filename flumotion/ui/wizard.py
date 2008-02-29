@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -24,7 +24,6 @@ import gettext
 
 import gobject
 import gtk
-from kiwi.interfaces import IProxyWidget
 from twisted.internet.defer import Deferred
 
 from flumotion.configure import configure
@@ -119,17 +118,6 @@ class WizardStep(GladeWidget, log.Loggable):
     def __repr__(self):
         return '<WizardStep object %r>' % self.name
 
-    # Public API
-
-    def get_state(self):
-        state = {}
-        for name, widget in self.widgets.items():
-            if not IProxyWidget.providedBy(widget):
-                continue
-            name = name.replace('_', '-')
-            state[name] = widget.read()
-        return state
-
     # Required vmethods
 
     def get_next(self):
@@ -215,14 +203,6 @@ class SectionWizard(GladeWindow, log.Loggable):
                 return step
         else:
             raise KeyError(stepname)
-
-    def get_step_option(self, stepname, option):
-        state = self.get_step_options(stepname)
-        return state[option]
-
-    def get_step_options(self, stepname):
-        step = self.get_step(stepname)
-        return step.get_state()
 
     def getVisitedSteps(self):
         """Returns a sequence of steps which has been visited.

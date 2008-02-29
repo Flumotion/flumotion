@@ -1,5 +1,12 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard.py:
+	* flumotion/ui/wizard.py:
+	Remove get_state, get_step_option and get_step_options which are not used any
+	longer. Horray!
+
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.hasAudio) 
 	(ConfigurationWizard.hasVideo): New methods
 	* flumotion/wizard/consumptionsteps.py:
