@@ -207,7 +207,8 @@ class WizardSaver(object):
         # In the case video producer and audio producer is the same
         # component, remove the audio producer and rename the video
         # producer.
-        if (self._videoProducer and
+        if (self._videoProducer is not None and
+            self._audioProducer is not None and
             self._videoProducer.component_type ==
             self._audioProducer.component_type):
             self._flowComponents.remove(self._audioProducer)
