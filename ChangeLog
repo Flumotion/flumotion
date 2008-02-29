@@ -1,5 +1,13 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.glade: 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/misc/httpserver/httpserver.glade: 
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	Tweak the UI by moving the URL out of the toplevel table
+
+2008-02-29  Johan Dahlinsd  <johan@gnome.org>
+
 	* flumotion/test/test_wizard_save.py: Remove unused imports
 
 	* flumotion/wizard/save.py: Remove extra 4 at the top of the file. Grr.

@@ -51,7 +51,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
     def haveWidgetTree(self):
         self._labels = {}
-        self._statistics = self.wtree.get_widget('statistics-widget')
+        self._statistics = self.wtree.get_widget('main_vbox')
         self.widget = self._statistics
         for labelType in ['bytes-transferred', 'connected-clients']:
             self._registerLabel(labelType)
