@@ -133,6 +133,18 @@ class TestXMLWriter(testsuite.TestCase):
 
 
 class TestWizardSave(testsuite.TestCase):
+    def _createAudioEncoder(self):
+        audioEncoder = AudioEncoder()
+        audioEncoder.component_type = 'audio-encoder'
+        audioEncoder.worker = 'audio-encoder-worker'
+        return audioEncoder
+
+    def _createVideoEncoder(self):
+        videoEncoder = VideoEncoder()
+        videoEncoder.component_type = 'video-encoder'
+        videoEncoder.worker = 'video-encoder-worker'
+        return videoEncoder
+
     def testDefaultStream(self):
         save = WizardSaver()
         save.setFlowName('flow')
@@ -152,14 +164,9 @@ class TestWizardSave(testsuite.TestCase):
         overlay.worker = 'overlay-worker'
         save.setVideoOverlay(overlay)
 
-        audioEncoder = AudioEncoder()
-        audioEncoder.component_type = 'audio-encoder'
-        audioEncoder.worker = 'audio-encoder-worker'
-        videoEncoder = VideoEncoder()
-        videoEncoder.component_type = 'video-encoder'
-        videoEncoder.worker = 'video-encoder-worker'
-        save.setAudioEncoder(audioEncoder)
-        save.setVideoEncoder(videoEncoder)
+        save.setAudioEncoder(self._createAudioEncoder())
+        save.setVideoEncoder(self._createVideoEncoder())
+
         save.setMuxer('ogg-muxer', 'muxer-worker')
 
         streamer = HTTPStreamer()
@@ -244,6 +251,51 @@ class TestWizardSave(testsuite.TestCase):
              '      <eater name="default">\n'
              '        <feed>encoder-audio</feed>\n'
              '        <feed>encoder-video</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '  </flow>\n'
+             '</planet>\n'),
+            configuration)
+
+    def testMultiFeedProducer(self):
+        save = WizardSaver()
+        save.setFlowName('flow')
+
+        audioProducer = AudioProducer()
+        audioProducer.component_type = 'both-producer'
+        audioProducer.worker = 'both-producer-worker'
+        save.setAudioProducer(audioProducer)
+
+        videoProducer = VideoProducer()
+        videoProducer.component_type = 'both-producer'
+        videoProducer.worker = 'both-producer-worker'
+        videoProducer.properties.width = 640
+        videoProducer.properties.height = 480
+        save.setVideoProducer(videoProducer)
+
+        save.setAudioEncoder(self._createAudioEncoder())
+        save.setVideoEncoder(self._createVideoEncoder())
+
+        configuration = save.getXML()
+        testsuite.diffStrings(
+            ('<planet>\n'
+             '  <flow name="flow">\n'
+             '    <component name="encoder-audio" type="audio-encoder" '
+             'project="flumotion" worker="audio-encoder-worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-audio</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '    <component name="producer-audio-video" type="both-producer" '
+             'project="flumotion" worker="both-producer-worker" version="0.5.1.1">\n'
+             '      \n'
+             '      <property name="height">480</property>\n'
+             '      <property name="width">640</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-video" type="video-encoder" '
+             'project="flumotion" worker="video-encoder-worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'

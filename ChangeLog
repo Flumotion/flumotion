@@ -1,5 +1,9 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard_save.py:
+	(TestWizardSave.testMultiFeedProducer): Add another test for a multi feed
+	component such as firewire.
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
 	(HTTPStreamer.getProperties): Only delete properties if they were set.
 	* flumotion/wizard/configurationwriter.py:
