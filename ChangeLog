@@ -25,7 +25,7 @@
 	* flumotion/component/misc/httpserver/admin_gtk.py:
 	Tweak the UI by moving the URL out of the toplevel table
 
-2008-02-29  Johan Dahlinsd  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard_save.py: Remove unused imports
 
