@@ -64,7 +64,7 @@
 	  <property name="numeric">False</property>
 	  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	  <property name="snap_to_ticks">False</property>
-	  <property name="sensitive">False</property>
+	  <property name="sensitive">True</property>
 	  <property name="wrap">False</property>
 	  <property name="adjustment">64 6 250 1 10 10</property>
 	</widget>
@@ -81,7 +81,7 @@
       <child>
 	<widget class="GtkSpinButton" id="quality">
 	  <property name="visible">True</property>
-	  <property name="sensitive">True</property>
+	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>
 	  <property name="climb_rate">1</property>
 	  <property name="digits">1</property>

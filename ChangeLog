@@ -1,3 +1,11 @@
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py
+	(VorbisAudioEncoder.__init__): 
+	* flumotion/component/encoders/vorbis/vorbis-wizard.glade: 
+	Make the bitrate selected by default, both in the glade file
+	and in the model.
+
 2008-02-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/configurationwizard.py

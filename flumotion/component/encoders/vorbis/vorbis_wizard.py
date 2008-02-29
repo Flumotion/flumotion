@@ -33,8 +33,8 @@ class VorbisAudioEncoder(AudioEncoder):
     component_type = 'vorbis-encoder'
     def __init__(self):
         super(VorbisAudioEncoder, self).__init__()
-        self.has_quality = True
-        self.has_bitrate = False
+        self.has_bitrate = True
+        self.has_quality = False
 
         self.properties.bitrate = 64
         self.properties.quality = 0.5
