@@ -1,5 +1,15 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.hasAudio) 
+	(ConfigurationWizard.hasVideo): New methods
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/overlaystep.py:
+	Replace get_step_option() for checking if there's audio or video
+	with method calls to wizard.
+
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/save.py (WizardSaver._handleProducers): Check so both
 	audio and video producer exists before comparing their component_type.
 

@@ -52,7 +52,7 @@ class ConversionStep(WorkerWizardStep):
     # Public API
 
     def get_audio_page(self):
-        if self.wizard.get_step_option('Source', 'has-audio'):
+        if self.wizard.hasAudio():
             return self._get_audio_page()
         return None
 
@@ -132,9 +132,9 @@ class ConversionStep(WorkerWizardStep):
             self._populate_combos(data)
 
     def get_next(self):
-        if self.wizard.get_step_option('Source', 'has-video'):
+        if self.wizard.hasVideo():
             return self._get_video_page()
-        elif self.wizard.get_step_option('Source', 'has-audio'):
+        elif self.wizard.hasAudio():
             return self._get_audio_page()
         else:
             return None

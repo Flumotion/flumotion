@@ -168,6 +168,22 @@ class ConfigurationWizard(SectionWizard):
 
     # Public API
 
+    def hasAudio(self):
+        """If the configured feed has a audio stream
+        @return: if we have audio
+        @rtype: bool
+        """
+        source_step = self.get_step('Source')
+        return bool(source_step.get_audio_producer())
+
+    def hasVideo(self):
+        """If the configured feed has a video stream
+        @return: if we have video
+        @rtype: bool
+        """
+        source_step = self.get_step('Source')
+        return bool(source_step.get_video_producer())
+
     def getConsumtionSteps(self):
         """Fetches the consumption steps chosen by the user
         @returns: consumption steps

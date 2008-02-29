@@ -43,8 +43,8 @@ class ConsumptionStep(WizardStep):
     # WizardStep
 
     def activated(self):
-        has_audio = self.wizard.get_step_option('Source', 'has-audio')
-        has_video = self.wizard.get_step_option('Source', 'has-video')
+        has_audio = self.wizard.hasAudio()
+        has_video = self.wizard.hasVideo()
         has_both = has_audio and has_video
 
         # Hide all checkbuttons if we don't have both audio and video selected
@@ -118,8 +118,8 @@ class ConsumptionStep(WizardStep):
                   self.shout2_video,
                   self.shout2_audio_video]))
 
-        has_audio = self.wizard.get_step_option('Source', 'has-audio')
-        has_video = self.wizard.get_step_option('Source', 'has-video')
+        has_audio = self.wizard.hasAudio()
+        has_video = self.wizard.hasVideo()
 
         retval = []
         for steps, (audio, video, audio_video) in uielements:
