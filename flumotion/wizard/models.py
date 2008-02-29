@@ -136,6 +136,18 @@ class Component(object):
         self.feeders.append(component)
         component.eaters.append(self)
 
+    def unlink(self, component):
+        """Unlink two components from each other
+        @param component: component to unlink from
+        @type component: Component
+        """
+        if not isinstance(component, Component):
+            raise TypeError(
+                "component must be a Component, not %r" % (component,))
+
+        self.feeders.remove(component)
+        component.eaters.remove(self)
+
     def getFeeders(self):
         """Get the names of all the feeders for this component
         @returns: feeder names

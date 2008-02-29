@@ -1,5 +1,11 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/save.py (WizardSaver._handleVideoOverlay): 
+	Simplify overlay handling by always linking video and then let the overlay
+	unlink and relink. Rename and reorganize some methods.
+
+	* flumotion/wizard/models.py (Component.unlink): New method
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer.glade: 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	* flumotion/component/misc/httpserver/httpserver.glade: 

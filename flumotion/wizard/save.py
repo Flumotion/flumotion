@@ -29,7 +29,11 @@ _ = gettext.gettext
 __version__ = "$Rev$"
 
 
-class WizardSaver:
+class WizardSaver(object):
+    """I am used to link components together and generate XML for them.
+    To use me, add some components by some of the methods and then call
+    my getXML() method to get the xml configuration.
+    """
     def __init__(self):
         self._flowComponents = []
         self._atmosphereComponents = []
@@ -174,8 +178,7 @@ class WizardSaver:
         @returns: the xml configuration
         @rtype: string
         """
-        self._handleAudio()
-        self._handleVideo()
+        self._handleProducers()
         self._handleConsumers()
         writer = ConfigurationWriter(self._flowName,
                                      self._flowComponents,
@@ -196,24 +199,34 @@ class WizardSaver:
             self._muxers[name] = muxer
         return muxer
 
-    def _handleAudio(self):
+    def _handleProducers(self):
+        self._handleAudioProducer()
+        self._handleVideoProducer()
+        self._handleVideoOverlay()
+
+        # In the case video producer and audio producer is the same
+        # component, remove the audio producer and rename the video
+        # producer.
+        if (self._videoProducer and
+            self._videoProducer.component_type ==
+            self._audioProducer.component_type):
+            self._flowComponents.remove(self._audioProducer)
+            self._audioProducer = self._videoProducer
+            self._audioProducer.name = 'producer-audio-video'
+
+    def _handleAudioProducer(self):
         if not self._audioProducer:
             return
 
         self._audioProducer.name = 'producer-audio'
-        if (self._videoProducer and
-            self._videoProducer.component_type ==
-            self._audioProducer.component_type):
-            self._audioProducer = self._videoProducer
-        else:
-            self._flowComponents.append(self._audioProducer)
+        self._flowComponents.append(self._audioProducer)
 
         self._audioEncoder.name = 'encoder-audio'
         self._flowComponents.append(self._audioEncoder)
 
         self._audioEncoder.link(self._audioProducer)
 
-    def _handleVideo(self):
+    def _handleVideoProducer(self):
         if not self._videoProducer:
             return
 
@@ -223,20 +236,24 @@ class WizardSaver:
         self._videoEncoder.name = 'encoder-video'
         self._flowComponents.append(self._videoEncoder)
 
-        if self._videoOverlay:
-            self._handleVideoOverlay()
-            self._videoOverlay.link(self._videoProducer)
-            self._videoEncoder.link(self._videoOverlay)
-            self._flowComponents.append(self._videoOverlay)
-        else:
-            self._videoEncoder.link(self._videoProducer)
+        self._videoEncoder.link(self._videoProducer)
 
     def _handleVideoOverlay(self):
+        if not self._videoOverlay:
+            return
+
+        self._videoEncoder.unlink(self._videoProducer)
+
+        self._videoOverlay.link(self._videoProducer)
+        self._videoEncoder.link(self._videoOverlay)
+        self._flowComponents.append(self._videoOverlay)
+
         self._videoOverlay.name = 'overlay-video'
 
         if not self._videoOverlay.show_logo:
             return
 
+        # FIXME: This should probably not be done here.
         self._videoOverlay.properties.fluendo_logo = True
         if self._muxerType == 'ogg-muxer':
             self._videoOverlay.properties.xiph_logo = True
