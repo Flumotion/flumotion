@@ -32,7 +32,6 @@ from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard.basesteps import ConsumerStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
-from flumotion.wizard.enums import LicenseType
 from flumotion.wizard.productionsteps import ProductionStep
 from flumotion.wizard.save import WizardSaver
 from flumotion.wizard.worker import WorkerList
@@ -73,10 +72,22 @@ class LicenseStep(WizardStep):
     section = _('License')
     icon = 'licenses.png'
 
+    # Public API
+
+    def getLicenseType(self):
+        """Get the selected license type
+        @returns: the license type or None
+        @rtype: string or None
+        """
+        if self.set_license.get_active():
+            return self.license.get_selected()
+
     # WizardStep
 
     def setup(self):
-        self.license.set_enum(LicenseType)
+        self.license.prefill([
+            (_('Creative Commons'), 'CC'),
+            (_('Commercial'), 'Commercial')])
 
     def get_next(self):
         return None
@@ -446,9 +457,8 @@ class ConfigurationWizard(SectionWizard):
             for porter in step.getPorters():
                 save.addPorter(porter, consumerType)
 
-        license_options = self.get_step_options('Content License')
-        if (license_options['set-license'] and
-            license_options['license'] == LicenseType.CC):
+        license_step = self.get_step('Content License')
+        if license_step.getLicenseType() == 'CC':
             save.setUseCCLicense(True)
 
         configuration = save.getXML()

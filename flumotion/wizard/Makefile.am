@@ -9,7 +9,6 @@ flumotion_PYTHON = 		\
 	configurationwriter.py 	\
 	consumptionsteps.py 	\
 	conversionsteps.py 	\
-	enums.py 		\
 	models.py 		\
 	overlaystep.py 		\
 	productionsteps.py 	\
