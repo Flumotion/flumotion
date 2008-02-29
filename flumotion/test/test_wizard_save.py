@@ -19,12 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import difflib
-import os
 import unittest
 
 from flumotion.common import testsuite
-from flumotion.wizard.models import Component, Flow, Plug
+from flumotion.wizard.models import Component, Plug
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 
 __version__ = "$Rev: 6126 $"

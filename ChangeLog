@@ -1,5 +1,7 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard_save.py: Remove unused imports
+
 	* flumotion/wizard/save.py: Remove extra 4 at the top of the file. Grr.
 
 	* flumotion/test/test_wizard_models.py:
