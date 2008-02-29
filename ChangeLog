@@ -1,5 +1,13 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/models.py:
+	Remove the Flow class and the tests, we never ended up using it, since the
+	state is fetched after the completion of the wizard, not during.
+
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/ui/wizard.py:
 	Remove flowName here, it should only be set in a subclass
 

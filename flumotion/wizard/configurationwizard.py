@@ -33,7 +33,6 @@ from flumotion.wizard.basesteps import ConsumerStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.enums import LicenseType
-from flumotion.wizard.models import Flow
 from flumotion.wizard.productionsteps import ProductionStep
 from flumotion.wizard.save import WizardSaver
 from flumotion.wizard.worker import WorkerList
@@ -118,7 +117,6 @@ class ConfigurationWizard(SectionWizard):
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
 
-        self.flow = Flow("default")
         self._flowName = 'default'
 
         self._worker_list = WorkerList()
