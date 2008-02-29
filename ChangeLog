@@ -1,3 +1,10 @@
+2008-02-29  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/converters/overlay/overlay.py:
+	  Add a warning to the component if we're running with videomixer 0.10.7,
+	  since it has a bug that results in many CRITICALs being printed (one per
+	  frame).
+
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/encoders/vorbis/vorbis_wizard.py
