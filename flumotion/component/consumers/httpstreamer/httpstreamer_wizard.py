@@ -122,10 +122,12 @@ class HTTPStreamer(Consumer):
             properties.bandwidth_limit = int(
                 properties.bandwidth_limit * 1e6)
         else:
-            del properties.bandwidth_limit
+            if 'bandwidth_limit' in properties:
+                del properties.bandwidth_limit
 
         if not self.has_client_limit:
-            del properties.client_limit
+            if 'client_limit' in properties:
+                del properties.client_limit
 
         if self.has_plugins:
             properties.porter_socket_path = self.socket_path

@@ -1,5 +1,14 @@
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
+	(HTTPStreamer.getProperties): Only delete properties if they were set.
+	* flumotion/wizard/configurationwriter.py:
+	Add an assert on None, we want only strings here.
+	* flumotion/test/test_wizard_save.py:
+	Write a test which tests wizard saving class.
+
+2008-02-29  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/save.py (WizardSaver._handleVideoOverlay): 
 	Simplify overlay handling by always linking video and then let the overlay
 	unlink and relink. Rename and reorganize some methods.

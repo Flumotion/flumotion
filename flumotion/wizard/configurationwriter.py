@@ -39,6 +39,7 @@ class XMLWriter(object):
         attrValue = ''
         if attributes:
             for attr, value in attributes:
+                assert value is not None, attr
                 attrValue += ' %s=%s' % (attr, quoteattr(value))
         return attrValue
 
