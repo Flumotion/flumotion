@@ -1,3 +1,14 @@
+2008-03-01  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/worker/checks/encoder.py:
+	* flumotion/worker/checks/gst010.py:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/feedserver.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/medium.py:
+	* flumotion/worker/worker.py:
+	Remove unused imports to make pyflakes happier.
+
 2008-02-29  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard.py:

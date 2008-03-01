@@ -24,15 +24,13 @@ implementation of a PB Server through which other components can request
 to eat from or feed to this worker's components.
 """
 
-from twisted.internet import reactor, defer, main
-from twisted.python import components, failure, reflect
+from twisted.internet import reactor
 from twisted.spread import pb
 from twisted.cred import portal
 from zope.interface import implements
 
-from flumotion.configure import configure
-from flumotion.common import log, common, interfaces
-from flumotion.twisted import checkers, fdserver
+from flumotion.common import log, common
+from flumotion.twisted import fdserver
 from flumotion.twisted import portal as fportal
 from flumotion.twisted import pb as fpb
 

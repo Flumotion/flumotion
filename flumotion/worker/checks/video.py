@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-from twisted.internet import defer
-from flumotion.worker.checks import check
-
 import gst
 
-from gst010 import *
+from twisted.internet import defer
+
+from flumotion.common import gstreamer, log, messages
+from flumotion.worker.checks import check
+from flumotion.worker.checks.gst010 import do_element_check
 
 __version__ = "$Rev$"
 

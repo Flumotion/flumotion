@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,25 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-"""
-worker-side objects to handle worker clients
+"""worker-side objects to handle worker clients
 """
 
 import signal
 
-from twisted.cred import portal
-from twisted.internet import defer, reactor
-from twisted.spread import pb
-from twisted.internet import error
+from twisted.internet import defer, error, reactor
 from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log
-from flumotion.common import common, medium, messages, worker
-from flumotion.twisted import checkers, fdserver
-from flumotion.twisted import pb as fpb
-from flumotion.twisted import defer as fdefer
-from flumotion.configure import configure
 from flumotion.worker import medium, job, feedserver
+from flumotion.twisted.defer import defer_call_later
 
 __version__ = "$Rev$"
 
@@ -202,7 +194,7 @@ class WorkerBrain(log.Loggable):
         if self.feedServer:
             l.append(self.feedServer.shutdown())
         # Don't fire this other than from a callLater
-        return fdefer.defer_call_later(defer.DeferredList(l))
+        return defer_call_later(defer.DeferredList(l))
 
     ### These methods called by feed server
     def feedToFD(self, componentId, feedName, fd, eaterId):

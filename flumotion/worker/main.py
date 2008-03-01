@@ -25,7 +25,7 @@ import sys
 from twisted.internet import reactor
 
 from flumotion.configure import configure
-from flumotion.common import log, keycards, common, errors
+from flumotion.common import log, common, errors
 from flumotion.common import connection
 from flumotion.worker import worker, config
 from flumotion.twisted import pb

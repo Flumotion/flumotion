@@ -29,7 +29,7 @@ from twisted.internet import reactor, error
 from twisted.spread import flavors
 from zope.interface import implements
 
-from flumotion.common import errors, interfaces, log, debug
+from flumotion.common import errors, interfaces, debug
 from flumotion.common import medium
 from flumotion.twisted import pb as fpb
 
