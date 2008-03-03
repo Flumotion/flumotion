@@ -26,14 +26,6 @@
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	set burst-on-connect to False by default, update tests.
 
-2008-03-03  Johan Dahlin  <jdahlin@async.com.br>
-
-	* flumotion/common/bundleclient.py:
-	* flumotion/common/fxml.py:
-	* flumotion/common/medium.py:
-	* flumotion/common/planet.py:
-	Remove unused imports
-
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
