@@ -407,7 +407,7 @@ class Greeter(SimpleWizard):
 
     def __init__(self, parent=None):
         SimpleWizard.__init__(self, 'initial', parent=parent)
-
+        self.window1.set_size_request(-1, 450)
 
 # This is used by the gtk admin to connect to an existing manager
 class ConnectExisting(SimpleWizard):

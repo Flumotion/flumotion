@@ -1,5 +1,10 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/greeter.py (Greeter.__init__): Fix the height of the
+	greeter to avoid re-sizing it later on.
+	Hopefully this will make me clear the list of recent connections by mistakes
+	less times.
+	
 	* flumotion/wizard/productionsteps.py (ProductionStep._verify): Un-bitrot,
 	- wait for all producers to be loaded before trying to figure out if 
 	  something should be prevented
