@@ -192,6 +192,13 @@ class ConfigurationWizard(SectionWizard):
             if isinstance(step, ConsumerStep):
                 yield step
 
+    def canSelectWorker(self, canSelect):
+        """Defines if it's possible to select a worker
+        @param canSelect: if a worker can be selected
+        @type canSelect: bool
+        """
+        self._worker_list.set_sensitive(canSelect)
+
     def check_elements(self, workerName, *elementNames):
         """
         Check if the given list of GStreamer elements exist on the given worker.
@@ -436,14 +443,11 @@ class ConfigurationWizard(SectionWizard):
         step.worker = worker
 
     def _set_worker_from_step(self, step):
-        if not hasattr(step, 'worker'):
+        if not isinstance(step, WorkerWizardStep):
             return
 
-        model = self.combobox_worker.get_model()
-        current_text = step.worker
-        for row in model:
-            text = model.get(row.iter, 0)[0]
-            if current_text == text:
+        for row in self.combobox_worker.get_model():
+            if row[0] == step.worker:
                 self.combobox_worker.set_active_iter(row.iter)
                 break
 

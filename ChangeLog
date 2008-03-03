@@ -1,5 +1,17 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/productionsteps.py (ProductionStep._verify): Un-bitrot,
+	- wait for all producers to be loaded before trying to figure out if 
+	  something should be prevented
+	- use new canSelectWorker() method on parent, instead of relying of 
+	  external poking at internal variables from productionstep
+        (ProductionStep._populate_combos): set an instance variable when we're done,
+	so it can be checked in _verify.
+
+	* flumotion/wizard/configurationwizard.py:
+	Use isinstance instead of hasttr(worker), simplify model selection.
+	(ConfigurationWizard.canSelectWorker): New method
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
 	(HTTPStreamer.getProperties)
 	(HTTPStep.setup): Even if we use a porter, set the port of the streamer so

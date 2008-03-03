@@ -46,6 +46,7 @@ class ProductionStep(WorkerWizardStep):
     def __init__(self, wizard):
         self._audio_producer = None
         self._video_producer = None
+        self._loadedSteps = None
         WorkerWizardStep.__init__(self, wizard)
 
     # Public API
@@ -149,7 +150,10 @@ class ProductionStep(WorkerWizardStep):
             combo.set_sensitive(False)
 
         self.wizard.block_next(True)
-        d.addCallback(lambda x: self.wizard.block_next(False))
+        def done(_):
+            self.wizard.block_next(False)
+            self._loadedSteps = True
+        d.addCallback(done)
 
     def _load_plugin(self, component_type, type):
         def got_factory(factory):
@@ -179,26 +183,24 @@ class ProductionStep(WorkerWizardStep):
         return d
 
     def _verify(self):
-        # FIXME: We should wait for the first worker to connect before
-        #        opening the wizard or so
-        if not hasattr(self.wizard, 'combobox_worker'):
+        if not self._loadedSteps:
             return
 
         has_audio = self.has_audio.get_active()
         has_video = self.has_video.get_active()
         can_continue = False
-        can_select_worker = False
+        can_select_worker = True
         if has_audio or has_video:
             can_continue = True
 
-            video_source = self.video.get_active()
-            audio_source = self.audio.get_active()
+            video_source = self.video.get_selected()
+            audio_source = self.audio.get_selected()
             if (has_audio and audio_source == 'firewire-producer' and
                 not (has_video and video_source == 'firewire-producer')):
-                can_select_worker = True
-        self.wizard.block_next(not can_continue)
+                can_select_worker = False
 
-        self.wizard.combobox_worker.set_sensitive(can_select_worker)
+        self.wizard.block_next(not can_continue)
+        self.wizard.canSelectWorker(can_select_worker)
 
     # Callbacks
 
