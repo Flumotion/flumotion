@@ -1,3 +1,9 @@
+2008-03-03  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+
+	* flumotion/component/bouncers/bouncer.py:
+	Added getEnabled function in bouncer.
+	Fixes #856.
+
 2008-03-01  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/worker/checks/encoder.py:

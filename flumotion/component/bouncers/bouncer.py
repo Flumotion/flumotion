@@ -140,6 +140,9 @@ class BouncerMedium(component.BaseComponentMedium):
     def remote_setEnabled(self, enabled):
         return self.comp.setEnabled(enabled)
 
+    def remote_getEnabled(self):
+        return self.comp.getEnabled()
+
 class Bouncer(component.BaseComponent):
     """
     I am the base class for all bouncers.
@@ -188,6 +191,9 @@ class Bouncer(component.BaseComponent):
             self._expirer.stop()
 
         self.enabled = enabled
+
+    def getEnabled(self):
+        return self.enabled
 
     def do_stop(self):
         self.setEnabled(False)
