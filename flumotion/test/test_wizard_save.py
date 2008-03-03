@@ -133,6 +133,27 @@ class TestXMLWriter(testsuite.TestCase):
 
 
 class TestWizardSave(testsuite.TestCase):
+    def _createAudioProducer(self, component_type='audio-producer',
+                             worker='audio-producer-worker'):
+        audioProducer = AudioProducer()
+        audioProducer.component_type = component_type
+        audioProducer.worker = worker
+        return audioProducer
+
+    def _createVideoProducer(self, component_type='video-producer',
+                             worker='video-producer-worker'):
+        videoProducer = VideoProducer()
+        videoProducer.component_type = component_type
+        videoProducer.worker = worker
+        videoProducer.properties.width = 640
+        videoProducer.properties.height = 480
+        return videoProducer
+
+    def _createVideoOverlay(self, videoProducer):
+        overlay = Overlay(videoProducer)
+        overlay.worker = 'overlay-worker'
+        return overlay
+
     def _createAudioEncoder(self):
         audioEncoder = AudioEncoder()
         audioEncoder.component_type = 'audio-encoder'
@@ -149,21 +170,10 @@ class TestWizardSave(testsuite.TestCase):
         save = WizardSaver()
         save.setFlowName('flow')
 
-        audioProducer = AudioProducer()
-        audioProducer.component_type = 'audio-producer'
-        audioProducer.worker = 'audio-producer-worker'
-        save.setAudioProducer(audioProducer)
-        videoProducer = VideoProducer()
-        videoProducer.component_type = 'video-producer'
-        videoProducer.worker = 'video-producer-worker'
-        videoProducer.properties.width = 640
-        videoProducer.properties.height = 480
+        save.setAudioProducer(self._createAudioProducer())
+        videoProducer = self._createVideoProducer()
         save.setVideoProducer(videoProducer)
-
-        overlay = Overlay(videoProducer)
-        overlay.worker = 'overlay-worker'
-        save.setVideoOverlay(overlay)
-
+        save.setVideoOverlay(self._createVideoOverlay(videoProducer))
         save.setAudioEncoder(self._createAudioEncoder())
         save.setVideoEncoder(self._createVideoEncoder())
 
@@ -262,17 +272,12 @@ class TestWizardSave(testsuite.TestCase):
         save = WizardSaver()
         save.setFlowName('flow')
 
-        audioProducer = AudioProducer()
-        audioProducer.component_type = 'both-producer'
-        audioProducer.worker = 'both-producer-worker'
-        save.setAudioProducer(audioProducer)
-
-        videoProducer = VideoProducer()
-        videoProducer.component_type = 'both-producer'
-        videoProducer.worker = 'both-producer-worker'
-        videoProducer.properties.width = 640
-        videoProducer.properties.height = 480
-        save.setVideoProducer(videoProducer)
+        save.setAudioProducer(self._createAudioProducer(
+            worker='both-producer-worker',
+            component_type='both-producer'))
+        save.setVideoProducer(self._createVideoProducer(
+            component_type='both-producer',
+            worker='both-producer-worker'))
 
         save.setAudioEncoder(self._createAudioEncoder())
         save.setVideoEncoder(self._createVideoEncoder())

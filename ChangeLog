@@ -1,6 +1,11 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream): 
+	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream) :
+	Refactor tests into methods, and reuse by other tests.
+
+2008-03-03  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream) 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	set burst-on-connect to False by default, update tests.
 
