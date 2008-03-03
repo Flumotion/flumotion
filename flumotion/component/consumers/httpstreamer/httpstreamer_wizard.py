@@ -104,7 +104,7 @@ class HTTPStreamer(Consumer):
         self.socket_path = 'flu-%s.socket' % (_generateRandomString(6),)
         self.porter_username = _generateRandomString(12)
         self.porter_password = _generateRandomString(12)
-        self.properties.burst_on_connect = True
+        self.properties.burst_on_connect = False
 
     def getURL(self):
         """Fetch the url to this stream

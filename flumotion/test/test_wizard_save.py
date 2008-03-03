@@ -205,6 +205,7 @@ class TestWizardSave(testsuite.TestCase):
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
              '      \n'
+             '      <property name="burst-on-connect">False</property>\n'
              '      <property name="port">8080</property>\n'
              '    </component>\n'
              '    <component name="http-server-audio-video" type="http-server" '
