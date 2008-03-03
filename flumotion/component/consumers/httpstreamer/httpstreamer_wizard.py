@@ -280,6 +280,7 @@ class HTTPStep(ConsumerStep):
         self.mount_point.data_type = str
         self.burst_on_connect.data_type = bool
 
+        self.model.properties.port = self.default_port
         self.port.set_value(self.default_port)
 
         self.plugarea = PlugPluginArea(self.model)

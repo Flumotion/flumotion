@@ -1,5 +1,9 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(StatisticsAdminGtkNode._updateLabels): set_uri/linkbutton constructor
+	does not accept None, add a workaround for that.
+
 	* flumotion/wizard/configurationwizard.py:
 	Do not add an overlay step if we didn't visit one
 
