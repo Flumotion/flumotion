@@ -408,5 +408,54 @@ class TestWizardSave(testsuite.TestCase):
              '</planet>\n'),
             configuration)
 
+    def testAudioOnlyStream(self):
+        save = WizardSaver()
+        save.setFlowName('flow')
+
+        audioProducer = TestAudioProducer()
+        audioProducer.worker = 'worker'
+        save.setAudioProducer(audioProducer)
+
+        audioEncoder = VorbisAudioEncoder()
+        audioEncoder.worker = 'worker'
+        save.setAudioEncoder(audioEncoder)
+
+        videoProducer = self._createVideoEncoder()
+        self.assertRaises(ValueError, save.setVideoOverlay,
+                          self._createVideoOverlay(videoProducer))
+
+        save.setMuxer('ogg-muxer', 'muxer')
+
+        streamer = self._createHTTPStreamer()
+        streamer.worker = 'worker'
+        save.addConsumer(streamer, 'audio-only')
+
+        configuration = save.getXML()
+        testsuite.diffStrings(
+            ('<planet>\n'
+             '  <flow name="flow">\n'
+             '    <component name="http-audio-only" type="http-streamer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>muxer-audio-only</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="burst-on-connect">False</property>\n'
+             '      <property name="port">8080</property>\n'
+             '    </component>\n'
+             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      \n'
+             '      <property name="rate">44100</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-audio</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="bitrate">64000</property>\n'
+             '    </component>\n'
+             '  </flow>\n'
+             '</planet>\n'),
+            configuration)
+
 if __name__ == '__main__':
     unittest.main()

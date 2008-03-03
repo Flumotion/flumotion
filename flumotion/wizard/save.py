@@ -82,6 +82,10 @@ class WizardSaver(object):
         self._videoProducer = videoProducer
 
     def setVideoOverlay(self, videoOverlay):
+        if not self._videoProducer:
+            raise ValueError(
+                "You can't add a video overlay component without "
+                "first setting a video producer")
         self._videoOverlay = videoOverlay
 
     def setAudioEncoder(self, audioEncoder):

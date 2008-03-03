@@ -1,5 +1,19 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py:
+	Do not add an overlay step if we didn't visit one
+
+	* flumotion/wizard/save.py:
+	Don't allow a video overlay component to be added unless we haven't
+	set a video producer first.
+
+	* flumotion/test/test_wizard_save.py:
+	Add a test for the above
+
+	Should fix #854
+	
+2008-03-03  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testOggStream): 
 	New test for audiotest/videotest/vorbis/theora and ogg
 
