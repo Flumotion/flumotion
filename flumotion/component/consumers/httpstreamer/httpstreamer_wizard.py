@@ -135,7 +135,6 @@ class HTTPStreamer(Consumer):
             properties.porter_username = self.porter_username
             properties.porter_password = self.porter_password
             properties.type = 'slave'
-            del properties.port
 
         return properties
 
@@ -281,7 +280,6 @@ class HTTPStep(ConsumerStep):
         self.burst_on_connect.data_type = bool
 
         self.model.properties.port = self.default_port
-        self.port.set_value(self.default_port)
 
         self.plugarea = PlugPluginArea(self.model)
         self.main_vbox.pack_start(self.plugarea, False, False)

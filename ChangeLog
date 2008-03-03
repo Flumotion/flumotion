@@ -1,5 +1,12 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
+	(HTTPStreamer.getProperties)
+	(HTTPStep.setup): Even if we use a porter, set the port of the streamer so
+	it shows up correctly in the component admin interface.
+	This makes fixes so the right port is shown when we use audio only or video
+	only which has a different default port.
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py
 	(StatisticsAdminGtkNode._updateLabels): set_uri/linkbutton constructor
 	does not accept None, add a workaround for that.
