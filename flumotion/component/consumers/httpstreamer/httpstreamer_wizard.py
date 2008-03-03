@@ -104,6 +104,7 @@ class HTTPStreamer(Consumer):
         self.socket_path = 'flu-%s.socket' % (_generateRandomString(6),)
         self.porter_username = _generateRandomString(12)
         self.porter_password = _generateRandomString(12)
+        self.properties.burst_on_connect = True
 
     def getURL(self):
         """Fetch the url to this stream
@@ -274,9 +275,10 @@ class HTTPStep(ConsumerStep):
 
     def setup(self):
         self.port.data_type = int
-        self.mount_point.data_type = str
         self.client_limit.data_type = int
         self.bandwidth_limit.data_type = float
+        self.mount_point.data_type = str
+        self.burst_on_connect.data_type = bool
 
         self.port.set_value(self.default_port)
 

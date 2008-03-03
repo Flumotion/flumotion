@@ -1,4 +1,9 @@
-2008-03-03  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+2008-03-03  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	Make it work with kiwi 1.9.14, by setting a default value for booleans
+
+2008-03-03  Pedro Gracia  <pgracia@flumotion.com>
 
 	* flumotion/component/bouncers/bouncer.py:
 	Added getEnabled function in bouncer.
