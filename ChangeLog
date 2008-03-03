@@ -1,5 +1,22 @@
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard_save.py (TestWizardSave.testOggStream): 
+	New test for audiotest/videotest/vorbis/theora and ogg
+
+	* flumotion/wizard/save.py (WizardSaver._handleVideoProducer) 
+	(WizardSaver._handleAudioProducer): Raise ValueError exceptions if there
+	are no encoders set
+
+2008-03-03  Johan Dahlin  <jdahlin@async.com.br>
+
+	reviewed by: <delete if not using a buddy>
+	patch by: <delete if not someone else's patch>
+
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/save.py:
+
+2008-03-03  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream) :
 	Refactor tests into methods, and reuse by other tests.
 

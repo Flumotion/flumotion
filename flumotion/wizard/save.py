@@ -222,6 +222,9 @@ class WizardSaver(object):
         self._audioProducer.name = 'producer-audio'
         self._flowComponents.append(self._audioProducer)
 
+        if self._audioEncoder is None:
+            raise ValueError("You need to set an audio encoder")
+
         self._audioEncoder.name = 'encoder-audio'
         self._flowComponents.append(self._audioEncoder)
 
@@ -233,6 +236,9 @@ class WizardSaver(object):
 
         self._videoProducer.name = 'video-producer'
         self._flowComponents.append(self._videoProducer)
+
+        if self._videoEncoder is None:
+            raise ValueError("You need to set a video encoder")
 
         self._videoEncoder.name = 'encoder-video'
         self._flowComponents.append(self._videoEncoder)

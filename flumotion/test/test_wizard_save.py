@@ -24,6 +24,14 @@ import unittest
 from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
      HTTPPorter, HTTPStreamer
+from flumotion.component.encoders.vorbis.vorbis_wizard import \
+     VorbisAudioEncoder
+from flumotion.component.encoders.theora.theora_wizard import \
+     TheoraVideoEncoder
+from flumotion.component.producers.videotest.videotest_wizard import \
+     TestVideoProducer
+from flumotion.component.producers.audiotest.audiotest_wizard import \
+     TestAudioProducer
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 from flumotion.wizard.models import Component, Plug, AudioProducer, \
      VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
@@ -166,6 +174,14 @@ class TestWizardSave(testsuite.TestCase):
         videoEncoder.worker = 'video-encoder-worker'
         return videoEncoder
 
+    def _createHTTPStreamer(self):
+        streamer = HTTPStreamer()
+        streamer.properties.port = 8080
+        streamer.socket_path = 'flu-XXXX.socket'
+        streamer.porter_username = 'username'
+        streamer.porter_password = 'password'
+        return streamer
+
     def testDefaultStream(self):
         save = WizardSaver()
         save.setFlowName('flow')
@@ -177,13 +193,9 @@ class TestWizardSave(testsuite.TestCase):
         save.setAudioEncoder(self._createAudioEncoder())
         save.setVideoEncoder(self._createVideoEncoder())
 
-        save.setMuxer('ogg-muxer', 'muxer-worker')
+        save.setMuxer('default-muxer', 'muxer-worker')
 
-        streamer = HTTPStreamer()
-        streamer.properties.port = 8080
-        streamer.socket_path = 'flu-XXXX.socket'
-        streamer.porter_username = 'username'
-        streamer.porter_password = 'password'
+        streamer = self._createHTTPStreamer()
         streamer.worker = 'streamer-worker'
         save.addConsumer(streamer, 'audio-video')
 
@@ -255,9 +267,8 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="height">480</property>\n'
              '      <property name="text">Fluendo</property>\n'
              '      <property name="width">640</property>\n'
-             '      <property name="xiph-logo">True</property>\n'
              '    </component>\n'
-             '    <component name="muxer-audio-video" type="ogg-muxer" '
+             '    <component name="muxer-audio-video" type="default-muxer" '
              'project="flumotion" worker="muxer-worker" version="0.5.1.1">\n'
              '      <eater name="default">\n'
              '        <feed>encoder-audio</feed>\n'
@@ -302,6 +313,95 @@ class TestWizardSave(testsuite.TestCase):
              'project="flumotion" worker="video-encoder-worker" version="0.5.1.1">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio-video</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '  </flow>\n'
+             '</planet>\n'),
+            configuration)
+
+    def testOggStream(self):
+        save = WizardSaver()
+        save.setFlowName('flow')
+
+        audioProducer = TestAudioProducer()
+        audioProducer.worker = 'worker'
+        save.setAudioProducer(audioProducer)
+        videoProducer = TestVideoProducer()
+        videoProducer.worker = 'worker'
+        videoProducer.properties.width = 320
+        videoProducer.properties.height = 240
+        save.setVideoProducer(videoProducer)
+
+        save.setVideoOverlay(self._createVideoOverlay(videoProducer))
+
+        audioEncoder = VorbisAudioEncoder()
+        audioEncoder.worker = 'worker'
+        save.setAudioEncoder(audioEncoder)
+        videoEncoder = TheoraVideoEncoder()
+        videoEncoder.worker = 'worker'
+        save.setVideoEncoder(videoEncoder)
+
+        save.setMuxer('ogg-muxer', 'muxer-worker')
+
+        streamer = self._createHTTPStreamer()
+        streamer.worker = 'worker'
+        save.addConsumer(streamer, 'audio-video')
+
+        configuration = save.getXML()
+        testsuite.diffStrings(
+            ('<planet>\n'
+             '  <flow name="flow">\n'
+             '    <component name="http-audio-video" type="http-streamer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>muxer-audio-video</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="burst-on-connect">False</property>\n'
+             '      <property name="port">8080</property>\n'
+             '    </component>\n'
+             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      \n'
+             '      <property name="rate">44100</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-audio</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="bitrate">64000</property>\n'
+             '    </component>\n'
+             '    <component name="video-producer" type="videotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      \n'
+             '      <property name="format">video/x-raw-yuv</property>\n'
+             '      <property name="height">240</property>\n'
+             '      <property name="pattern">0</property>\n'
+             '      <property name="width">320</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-video" type="theora-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>overlay-video</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="keyframe-maxdistance">64</property>\n'
+             '      <property name="noise-sensitivity">1</property>\n'
+             '      <property name="quality">16</property>\n'
+             '      <property name="sharpness">0</property>\n'
+             '    </component>\n'
+             '    <component name="overlay-video" type="overlay-converter" project="flumotion" worker="overlay-worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>video-producer</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="fluendo-logo">True</property>\n'
+             '      <property name="height">240</property>\n'
+             '      <property name="text">Fluendo</property>\n'
+             '      <property name="width">320</property>\n'
+             '      <property name="xiph-logo">True</property>\n'
+             '    </component>\n'
+             '    <component name="muxer-audio-video" type="ogg-muxer" project="flumotion" worker="muxer-worker" version="0.5.1.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>encoder-audio</feed>\n'
+             '        <feed>encoder-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'
