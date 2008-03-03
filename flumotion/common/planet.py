@@ -26,10 +26,9 @@ planet, flow, job and component.
 
 from twisted.spread import pb
 from twisted.internet import defer
-from zope.interface import implements
 
-from flumotion.twisted import flavors
 from flumotion.common import enum, log
+from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
 

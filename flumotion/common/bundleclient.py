@@ -27,9 +27,7 @@ bundled code and data
 import os
 import sys
 
-from twisted.internet import error, defer
-
-from flumotion.common import bundle, common, errors, log, package
+from flumotion.common import bundle, errors, log, package
 from flumotion.configure import configure
 
 __all__ = ['BundleLoader']

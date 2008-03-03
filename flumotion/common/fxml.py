@@ -33,7 +33,7 @@ from xml.dom import minidom, Node
 from xml.parsers import expat
 from xml.sax.saxutils import escape, quoteattr
 
-from flumotion.common import log, common
+from flumotion.common import log
 
 __version__ = "$Rev$"
 
