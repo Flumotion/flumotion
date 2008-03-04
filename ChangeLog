@@ -1,3 +1,12 @@
+2008-03-04  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/interfaces.py: General maintainance:
+	- Remove self from arguments
+	- add @param to missing parameters
+	- Add two empty new lines between classes (PEP-8)
+	- Remove initial newline in docstring (PEP-8)
+	- Remove unnecessary pass statements
+
 2008-03-03  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/greeter.py (Greeter.__init__): Fix the height of the
