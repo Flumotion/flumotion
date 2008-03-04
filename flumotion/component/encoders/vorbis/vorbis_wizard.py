@@ -22,7 +22,10 @@
 import gettext
 import os
 
+from zope.interface import implements
+
 from flumotion.wizard.basesteps import AudioEncoderStep
+from flumotion.wizard.interfaces import IEncoderPlugin
 from flumotion.wizard.models import AudioEncoder
 
 __version__ = "$Rev$"
@@ -93,6 +96,7 @@ class VorbisStep(AudioEncoderStep):
 
 
 class VorbisWizardPlugin(object):
+    implements(IEncoderPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = VorbisAudioEncoder()

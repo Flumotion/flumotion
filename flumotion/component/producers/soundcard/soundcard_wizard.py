@@ -22,9 +22,12 @@
 import gettext
 import os
 
+from zope.interface import implements
+
 from flumotion.common import enum
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
@@ -198,6 +201,7 @@ class SoundcardStep(AudioSourceStep):
 
 
 class SoundcardWizardPlugin(object):
+    implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = SoundcardProducer()

@@ -170,6 +170,7 @@ class ProductionStep(WorkerWizardStep):
 
     def _load_step(self, combo, type):
         def plugin_loaded(plugin, entry):
+            # FIXME: verify that factory implements IProductionPlugin
             step = plugin.getProductionStep(type)
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker

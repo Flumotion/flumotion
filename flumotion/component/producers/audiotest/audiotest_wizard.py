@@ -22,11 +22,15 @@
 import gettext
 import os
 
+from zope.interface import implements
+
 from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
 
 class TestAudioProducer(AudioProducer):
     component_type = 'audiotest-producer'
@@ -68,6 +72,7 @@ class TestAudioSourceStep(AudioSourceStep):
 
 
 class AudioTestWizardPlugin(object):
+    implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TestAudioProducer()

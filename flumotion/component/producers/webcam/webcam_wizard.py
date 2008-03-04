@@ -22,10 +22,13 @@
 import gettext
 import os
 
+from zope.interface import implements
+
 from flumotion.common import errors
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
@@ -190,6 +193,7 @@ class WebcamStep(VideoSourceStep):
 
 
 class WebcamWizardPlugin(object):
+    implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = WebcamProducer()

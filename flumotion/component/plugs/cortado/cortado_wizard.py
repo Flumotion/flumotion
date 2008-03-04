@@ -22,6 +22,9 @@
 """Wizard plugin for the cortado http plug
 """
 
+from zope.interface import implements
+
+from flumotion.wizard.interfaces import IHTTPConsumerPlugin
 from flumotion.wizard.models import HTTPServer, HTTPPlug
 
 __version__ = "$Rev$"
@@ -107,6 +110,7 @@ class CortadoHTTPServer(HTTPServer):
 
 
 class CortadoWizardPlugin(object):
+    implements(IHTTPConsumerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
 

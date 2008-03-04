@@ -23,8 +23,10 @@ import gettext
 import os
 
 import gtk
+from zope.interface import implements
 
 from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
@@ -78,6 +80,7 @@ class TestVideoSourceStep(VideoSourceStep):
 
 
 class VideoTestWizardPlugin(object):
+    implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TestVideoProducer()

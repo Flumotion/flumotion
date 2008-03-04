@@ -1,5 +1,33 @@
 2008-03-04  Johan Dahlin  <johan@gnome.org>
 
+   * flumotion/wizard/Makefile.am:
+   * flumotion/wizard/interfaces.py:
+   Add a new file with wizard plugin interfaces:
+   - IProductionPlugin
+   - IEncoderPlugin
+   - IHTTPConsumerPlugin
+
+   * flumotion/component/encoders/jpeg/jpeg_wizard.py:
+   * flumotion/component/encoders/smoke/smoke_wizard.py:
+   * flumotion/component/encoders/speex/speex_wizard.py:
+   * flumotion/component/encoders/theora/theora_wizard.py:
+   * flumotion/component/encoders/vorbis/vorbis_wizard.py:
+   * flumotion/component/plugs/cortado/cortado_wizard.py:
+   * flumotion/component/producers/audiotest/audiotest_wizard.py:
+   * flumotion/component/producers/bttv/bttv_wizard.py:
+   * flumotion/component/producers/firewire/firewire_wizard.py:
+   * flumotion/component/producers/soundcard/soundcard_wizard.py:
+   * flumotion/component/producers/videotest/videotest_wizard.py:
+   * flumotion/component/producers/webcam/webcam_wizard.py:
+   Mark the plugin steps as implementing one of the three added interfaces
+   
+   * flumotion/wizard/conversionsteps.py:
+   * flumotion/wizard/productionsteps.py:
+   * flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+   Add FIXME's so we remember to check the interfaces in the future
+   
+2008-03-04  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/common/interfaces.py: General maintainance:
 	- Remove self from arguments
 	- add @param to missing parameters

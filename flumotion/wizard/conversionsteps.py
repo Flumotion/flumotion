@@ -194,6 +194,7 @@ class ConversionStep(WorkerWizardStep):
             if plugin is None:
                 self._create_dummy_model(entry)
                 return None
+            # FIXME: verify that factory implements IEncoderPlugin
             step = plugin.getConversionStep()
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker

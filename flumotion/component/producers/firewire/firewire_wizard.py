@@ -23,9 +23,12 @@ import gettext
 import os
 import math
 
+from zope.interface import implements
+
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_, gettexter
 from flumotion.wizard.basesteps import AudioSourceStep, VideoSourceStep
+from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
 __pychecker__ = 'no-returnvalues'
@@ -228,6 +231,7 @@ class FireWireAudioStep(_FireWireCommon, AudioSourceStep):
 
 
 class FireWireWizardPlugin(object):
+    implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
         self.audio_model = FireWireAudioProducer()

@@ -317,6 +317,7 @@ class HTTPStep(ConsumerStep):
                 if not self._canAddPlug(entry):
                     continue
                 def response(factory, entry):
+                    # FIXME: verify that factory implements IHTTPConsumerPlugin
                     plugin = factory(self.wizard)
                     if hasattr(plugin, 'worker_changed'):
                         d = plugin.worker_changed(self.worker)
