@@ -442,15 +442,6 @@ class ConfigurationWizard(SectionWizard):
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
 
-    def _set_worker_from_step(self, step):
-        if not isinstance(step, WorkerWizardStep):
-            return
-
-        for row in self.combobox_worker.get_model():
-            if row[0] == step.worker:
-                self.combobox_worker.set_active_iter(row.iter)
-                break
-
     def _save(self):
         save = WizardSaver()
         save.setFlowName(self._flowName)

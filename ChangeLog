@@ -1,5 +1,8 @@
 2008-03-04  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py (_set_worker_from_step): 
+	Remove unused method.
+
 	* flumotion/wizard/Makefile.am:
 	* flumotion/wizard/interfaces.py:
 	Add a new file with wizard plugin interfaces:
