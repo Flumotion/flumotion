@@ -394,7 +394,6 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_getVersions(self):
         return debug.getVersions()
 
-    # Deprecated -- remove me when no one uses me any more
     def perspective_cleanComponents(self):
         return self.vishnu.emptyPlanet()
 
