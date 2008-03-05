@@ -33,7 +33,7 @@ import zope.interface as zi
 __version__ = "$Rev$"
 
 warnings.warn(
-    "This module is deprecated, use zope.interfaces directly instead",
+    "This module is deprecated, use zope.interface directly instead",
     DeprecationWarning)
 
 def implementsInterface(object, interface):

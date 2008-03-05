@@ -1,3 +1,8 @@
+2008-03-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/twisted/compat.py:
+	Fix typo.
+
 2008-03-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/server.py (IServable): Remove self argument from
