@@ -54,6 +54,8 @@ class CancellableRequest(server.Request):
         self._start_time = time.time()
         self._lastTimeWritten = self._start_time
 
+        # we index some things by the fd, so we need to store it so we
+        # can still use it in the connectionLost() handler
         self._fd = self.transport.fileno()
 
         self._component.requestStarted(self)
@@ -72,6 +74,8 @@ class CancellableRequest(server.Request):
         self.requestCompleted(fd)
 
     def connectionLost(self, reason):
+        # this is called _after_ the self.transport.fileno() is not
+        # valid anymore, so we use the stored fd number
         server.Request.connectionLost(self, reason)
         self.requestCompleted(self._fd)
 
