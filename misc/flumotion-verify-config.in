@@ -1,0 +1,60 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2008 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+# This is just a testing script; it doesn't get installed and isn't really
+# intended for particularly wide use.
+
+import os
+import sys
+
+from flumotion.manager import config
+
+# Variable templates 
+LIBDIR = '@LIBDIR@'
+PROGRAM_PATH = 'flumotion.launch.inspect.main'
+
+try:
+    # setup the project root
+    dir = os.path.dirname(os.path.abspath(__file__))
+    if os.path.exists(os.path.join(dir, '..', 'flumotion', '.svn')):
+        root = os.path.split(dir)[0]
+    else:
+        root = os.path.join(LIBDIR, 'flumotion', 'python')
+    sys.path.insert(0, root)
+
+    try:
+        conf = config.ManagerConfigParser(sys.argv[1])
+    except Exception, e:
+        print "Exception parsing %s as manager config: %r" % (sys.argv[1], e)
+        raise
+
+    try:
+        conf = config.PlanetConfigParser(sys.argv[1])
+        conf.parse()
+    except Exception, e:
+        print "Exception parsing %s as planet config: %r" % (sys.argv[1], e)
+        raise
+
+    print "Config \"%s\" validated" % (sys.argv[1],)
+
+except KeyboardInterrupt:
+    print 'Interrupted'

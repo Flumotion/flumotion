@@ -179,6 +179,7 @@ AC_CONFIG_FILES([bin/flumotion-rrdmon], [chmod +x bin/flumotion-rrdmon])
 AC_CONFIG_FILES([bin/flumotion-tester], [chmod +x bin/flumotion-tester])
 AC_CONFIG_FILES([bin/flumotion-worker], [chmod +x bin/flumotion-worker])
 AC_CONFIG_FILES([bin/runtest], [chmod +x bin/runtest])
+AC_CONFIG_FILES([misc/flumotion-verify-config], [chmod +x misc/flumotion-verify-config])
 
 dnl output stuff
 AC_OUTPUT(
