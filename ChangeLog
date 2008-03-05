@@ -1,5 +1,8 @@
 2008-03-05  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/server.py (IServable): Remove self argument from
+	methods.
+
 	* flumotion/twisted/compat.py: Print a warning when imported, so
 	extenal modules depend on it can be migrated.
 

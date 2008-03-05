@@ -59,12 +59,12 @@ class IServable(Interface):
     I am an interface for objects that want to be servable through a
     L{Server}.
     """
-    def getFactory(self):
+    def getFactory():
         """
         @rtype: L{twisted.spread.pb.PBServerFactory}
         """
 
-    def setConnectionInfo(self, host, port, useSSL):
+    def setConnectionInfo(host, port, useSSL):
         """
         @param host:   the host to listen as
         @type  host:   str
