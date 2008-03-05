@@ -26,10 +26,15 @@ All functions in this package are deprecated; do not use them. They no longer
 provide any backwards compatibility.
 """
 
+import warnings
+
 import zope.interface as zi
 
 __version__ = "$Rev$"
 
+warnings.warn(
+    "This module is deprecated, use zope.interfaces directly instead",
+    DeprecationWarning)
 
 def implementsInterface(object, interface):
     return interface.providedBy(object)
