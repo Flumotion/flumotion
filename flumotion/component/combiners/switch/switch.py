@@ -359,7 +359,7 @@ class AVSwitch(Switch):
                 fmt = N_("%s parameter(s) were specified but not all. "
                          "Missing parameters are: %r")
                 self.addError("video-params-not-specified", fmt, kind,
-                              missing)
+                              list(missing))
 
     def get_pipeline_string(self, properties):
         def i420caps(framerate, par, width, height):

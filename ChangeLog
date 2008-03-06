@@ -1,6 +1,12 @@
 2008-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py:
+	Sets are not jellyable, so convert to list otherwise error
+	does not show.
+
+2008-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
 	It actually changed name to input-selector not selector, but
 	the plugin name is selector.
 	Capsfilter was given an extra , between framerate and par.
