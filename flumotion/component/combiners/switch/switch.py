@@ -137,9 +137,9 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.addMessage(m)
             return result.value
 
-        self.debug("checking for switch element")
-        d = check.checkPlugin('selector', 'gst-plugins-bad', (0, 10, 5, 2),
-                              'selector', checkSignal)
+        self.debug("checking for input-selector element")
+        d = check.checkPlugin('selector', 'gst-plugins-bad', 
+            (0, 10, 5, 2), 'input-selector', checkSignal)
         d.addCallback(cb)
         return d
 
@@ -314,7 +314,7 @@ class SingleSwitch(Switch):
                 ('backup', ['backup'])]
 
     def get_muxer_string(self, properties):
-        return ("selector name=muxer ! "
+        return ("input-selector name=muxer ! "
                 "identity silent=true single-segment=true name=iden ")
 
     def get_switch_elements(self, pipeline):
@@ -326,7 +326,8 @@ class AVSwitch(Switch):
     def init(self):
         # property name -> caps property name
         self.vparms = {'video-width': 'width', 'video-height': 'height',
-                       'framerate': 'framerate', 'pixel-aspect-ratio': 'par'}
+                       'video-framerate': 'framerate', 
+                       'video-pixel-aspect-ratio': 'par'}
         self.aparms = {'audio-channels': 'channels',
                        'audio-samplerate': 'samplerate'}
 
@@ -363,7 +364,7 @@ class AVSwitch(Switch):
     def get_pipeline_string(self, properties):
         def i420caps(framerate, par, width, height):
             return ("video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d,"
-                    ",pixel-aspect-ratio=%d/%d,format=(fourcc)I420"
+                    "pixel-aspect-ratio=%d/%d,format=(fourcc)I420"
                     % (width, height, framerate[0], framerate[1],
                        par[0], par[1]))
             
@@ -385,10 +386,10 @@ class AVSwitch(Switch):
         aforce = props2caps(audiocaps, self.aparms,
                             "audioconvert ! audioconvert ! capsfilter caps=")
 
-        pipeline = ("selector name=vswitch"
+        pipeline = ("input-selector name=vswitch"
                     " ! identity silent=true single-segment=true"
                     " ! @feeder:video@ "
-                    "selector name=aswitch"
+                    "input-selector name=aswitch"
                     " ! identity silent=true single-segment=true"
                     " ! @feeder:audio@ ")
         for alias in self.eaters:

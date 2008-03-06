@@ -1,6 +1,15 @@
 2008-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py:
+	It actually changed name to input-selector not selector, but
+	the plugin name is selector.
+	Capsfilter was given an extra , between framerate and par.
+	Properties are video-framerate and video-pixel-aspect-ratio
+	not framerate and pixel-aspect-ratio.
+
+2008-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
 	switch element changed name to selector between 0.10.5 and
 	0.10.6
 
