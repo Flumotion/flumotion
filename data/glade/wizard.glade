@@ -17,6 +17,8 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
+  <property name="urgency_hint">False</property>
   <signal name="delete_event" handler="on_wizard_delete_event" last_modification_time="Tue, 28 Sep 2004 13:32:05 GMT"/>
 
   <child>
@@ -63,7 +65,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label_title">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="no">This should be a huge title</property>
+		      <property name="label">This should be a huge title</property>
 		      <property name="use_underline">True</property>
 		      <property name="use_markup">True</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -73,6 +75,10 @@
 		      <property name="yalign">0.5</property>
 		      <property name="xpad">6</property>
 		      <property name="ypad">6</property>
+		      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+		      <property name="width_chars">-1</property>
+		      <property name="single_line_mode">False</property>
+		      <property name="angle">0</property>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
@@ -206,8 +212,8 @@
 		<widget class="GtkHButtonBox" id="hbuttonbox2">
 		  <property name="border_width">12</property>
 		  <property name="visible">True</property>
-		  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
-		  <property name="spacing">6</property>
+		  <property name="layout_style">GTK_BUTTONBOX_END</property>
+		  <property name="spacing">12</property>
 
 		  <child>
 		    <widget class="GtkButton" id="button_prev">
@@ -216,6 +222,7 @@
 		      <property name="label">gtk-go-back</property>
 		      <property name="use_stock">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
+		      <property name="focus_on_click">True</property>
 		      <signal name="clicked" handler="on_button_prev_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
 		    </widget>
 		  </child>
@@ -229,6 +236,7 @@
 		      <property name="label">gtk-go-forward</property>
 		      <property name="use_stock">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
+		      <property name="focus_on_click">True</property>
 		      <signal name="clicked" handler="on_button_next_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:31 GMT"/>
 		    </widget>
 		  </child>
