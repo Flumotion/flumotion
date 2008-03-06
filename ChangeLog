@@ -1,3 +1,9 @@
+2008-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
+	switch element changed name to selector between 0.10.5 and
+	0.10.6
+
 2008-03-05  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/manager/admin.py (AdminAvatar.perspective_cleanComponents): 

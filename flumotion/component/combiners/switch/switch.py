@@ -138,8 +138,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             return result.value
 
         self.debug("checking for switch element")
-        d = check.checkPlugin('switch', 'gst-plugins-bad', (0, 10, 5, 2),
-                              'switch', checkSignal)
+        d = check.checkPlugin('selector', 'gst-plugins-bad', (0, 10, 5, 2),
+                              'selector', checkSignal)
         d.addCallback(cb)
         return d
 
@@ -314,7 +314,7 @@ class SingleSwitch(Switch):
                 ('backup', ['backup'])]
 
     def get_muxer_string(self, properties):
-        return ("switch name=muxer ! "
+        return ("selector name=muxer ! "
                 "identity silent=true single-segment=true name=iden ")
 
     def get_switch_elements(self, pipeline):
@@ -385,10 +385,10 @@ class AVSwitch(Switch):
         aforce = props2caps(audiocaps, self.aparms,
                             "audioconvert ! audioconvert ! capsfilter caps=")
 
-        pipeline = ("switch name=vswitch"
+        pipeline = ("selector name=vswitch"
                     " ! identity silent=true single-segment=true"
                     " ! @feeder:video@ "
-                    "switch name=aswitch"
+                    "selector name=aswitch"
                     " ! identity silent=true single-segment=true"
                     " ! @feeder:audio@ ")
         for alias in self.eaters:
