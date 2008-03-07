@@ -1,0 +1,5 @@
+#!/bin/sh
+killall -9 flumotion-manager 2> /dev/null
+killall -9 flumotion-worker 2> /dev/null
+killall -9 flumotion-job 2> /dev/null
+rm -fr /tmp/*flumotion*
