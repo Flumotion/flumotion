@@ -233,12 +233,16 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             # We probably want the filename part of the request URL - the bit
             # after the mount-point. e.g. in /customer1/videos/video1.ogg, we
             # probably want to provide /videos/video1.ogg to this..
-            consumer = self._rateController.createProducerConsumerProxy(
+            d = defer.maybeDeferred(
+                self._rateController.createProducerConsumerProxy,
                 request, request)
         else:
-            consumer = request
-        transfer = FileTransfer(f, last + 1, consumer)
-        request._transfer = transfer
+            d = defer.succeed(request)
+
+        def attachProxy(consumer):
+            transfer = FileTransfer(f, last + 1, consumer)
+            request._transfer = transfer
+        d.addCallback(attachProxy)
 
         return server.NOT_DONE_YET
 

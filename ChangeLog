@@ -1,3 +1,10 @@
+2008-03-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpserver/file.py:
+	  Allow createProducerConsumerProxy to return a deferred.
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	  Document this.
+
 2008-03-07  Johan Dahlin  <johan@gnome.org>
 
 	* misc/clean-flumotion: 
