@@ -320,6 +320,7 @@ class HTTPAuthentication(log.Loggable):
         d = self.authenticate(request)
         d.addCallback(self._authenticatedCallback, request)
         d.addErrback(self._authenticatedErrback, request)
+        d.addErrback(self._defaultErrback, request)
 
         return d
 
@@ -354,24 +355,31 @@ class HTTPAuthentication(log.Loggable):
 
     def _authenticatedErrback(self, failure, request):
         failure.trap(errors.UnknownComponentError, errors.NotAuthenticatedError)
-        self._handleUnauthorized(request)
+        self._handleUnauthorized(request, http.UNAUTHORIZED)
         return failure
 
-    def _handleUnauthorized(self, request):
+    def _defaultErrback(self, failure, request):
+        if failure.check(errors.UnknownComponentError, 
+                errors.NotAuthenticatedError) is None:
+            # If something else went wrong, we want to disconnect the client and
+            # give them a 500 Internal Server Error.
+            self._handleUnauthorized(request, http.INTERNAL_SERVER_ERROR)
+        return failure
+
+    def _handleUnauthorized(self, request, code):
         self.debug('client from %s is unauthorized' % (request.getClientIP()))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_SERVER_VERSION)
-        if self._domain:
+        if self._domain and code == http.UNAUTHORIZED:
             request.setHeader('WWW-Authenticate',
                               'Basic realm="%s"' % self._domain)
 
-        error_code = http.UNAUTHORIZED
-        request.setResponseCode(error_code)
+        request.setResponseCode(code)
 
         # we have to write data ourselves,
         # since we already returned NOT_DONE_YET
-        html = ERROR_TEMPLATE % {'code': error_code,
-                                 'error': http.RESPONSES[error_code]}
+        html = ERROR_TEMPLATE % {'code': code,
+                                 'error': http.RESPONSES[code]}
         request.write(html)
         request.finish()
 

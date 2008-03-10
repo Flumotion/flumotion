@@ -1,3 +1,10 @@
+2008-03-10  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/http.py:
+	  Ensure that all authentication errors (no matter what type) result in an
+	  appropriate error code being sent to the user, and the user being
+	  disconnected.
+
 2008-03-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpserver/file.py:
