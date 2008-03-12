@@ -142,7 +142,7 @@ class _FireWireCommon:
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
             id='firewire-check')
         self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.video', 'check1394',
+        d = self.run_in_worker('flumotion.worker.checks.gst010', 'check1394',
             id='firewire-check')
 
         def firewireCheckDone(options):

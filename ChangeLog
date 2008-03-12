@@ -1,3 +1,10 @@
+2008-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	  Run a check that actually exists.  Amazingly, my Fedora 7 with
+	  new firewire stack actually works as is with GStreamer.  But
+	  the device is named /dev/fw0 so the check needs further fixing.
+
 2008-03-10  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/http.py:
