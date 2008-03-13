@@ -129,7 +129,11 @@ class FeedComponent(basecomponent.BaseComponent):
         # no race, messages marshalled asynchronously via the bus
         d = self._change_monitor.add(gst.STATE_CHANGE_PAUSED_TO_PLAYING)
         d.addCallback(lambda x: self.do_pipeline_playing())
-        return d
+
+    def setup_completed(self):
+        # Just log; we override the superclass to not turn happy here.
+        # Instead, we turn happy once the pipeline gets to PLAYING.
+        self.debug("Setup completed")
 
     ### FeedComponent interface for subclasses
     def create_pipeline(self):
@@ -732,3 +736,4 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if not pipeline_playing:
             self.try_start_pipeline()
+

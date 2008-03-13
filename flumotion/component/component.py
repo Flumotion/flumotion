@@ -437,9 +437,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
             setups = common.get_all_methods(self, 'do_setup', False)
             return maybe_deferred_chain(setups, self)
 
-        def go_happy(_):
-            self.debug('setup complete, going happy')
-            self.setMood(moods.happy)
+        def setup_complete(_):
+            self.debug('setup completed')
+            self.setup_completed()
 
         def got_error(failure):
             txt = log.getFailureMessage(failure)
@@ -459,8 +459,12 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.set('start-time', time.time())
 
         d = run_setups()
-        d.addCallbacks(go_happy, got_error)
+        d.addCallbacks(setup_complete, got_error)
         # all status info via messages and the mood
+
+    def setup_completed(self):
+        self.debug('turning happy')
+        self.setMood(moods.happy)
 
     def setShutdownHook(self, shutdownHook):
         """

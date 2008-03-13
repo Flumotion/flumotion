@@ -1,3 +1,17 @@
+2008-03-12  Michael Smith <msmith@fluendo.com>
+
+	* doc/random/component-initialization-protocol:
+	  Update to describe the changes in this commit.
+	* flumotion/component/component.py:
+	  Call an instance method (setup_completed) when the do_setup chain is
+	  completed.
+	  Set mood to happy in base class implementation of this.
+	* flumotion/component/feedcomponent010.py:
+	  Override setup_completed to not set mood to happy (that is done when
+	  the pipeline reaches PLAYING)
+	  Do not wait for pipeline to get to playing in do_setup.
+	  Fixes #862.
+
 2008-03-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:

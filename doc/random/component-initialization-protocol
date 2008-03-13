@@ -100,10 +100,17 @@ do_check(self)
 do_setup(self)
     This method has no requirements. It is implementation-specific.
     After this call, the component should have created all resources and
-    started all processes. Implementations should make sure that a
-    succesful do_setup() eventually sets the mood to happy.
+    started all processes. 
+
+    Once all do_setup() methods have been called (and their returned Deferred
+    fired, if any), setup_complete() will be called.
 
     There is no need to chain up in a do_setup() implementation.
+
+setup_complete(self)
+    This method sets the component mood to happy. Subclasses should override
+    if they wish to have other behaviour.
+    
 
 do_stop(self)
     Implementations should make sure that a succesful stop sets the mood to
@@ -129,6 +136,12 @@ do_setup(self)
 
       FeedComponent.create_pipeline(self)
       FeedComponent.set_pipeline(self, pipeline)
+
+    Once the pipeline reaches PLAYING, the component mood will be set to happy.
+
+setup_complete(self)
+    FeedComponent overrides this method to do nothing; setting the component
+    mood to happy is done in reaction to the pipeline reaching PLAYING instead.
 
 provide_master_clock(self, port)
     Export the component's clock on the given UDP port, which may be
