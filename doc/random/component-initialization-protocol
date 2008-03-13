@@ -103,11 +103,11 @@ do_setup(self)
     started all processes. 
 
     Once all do_setup() methods have been called (and their returned Deferred
-    fired, if any), setup_complete() will be called.
+    fired, if any), setup_completed() will be called.
 
     There is no need to chain up in a do_setup() implementation.
 
-setup_complete(self)
+setup_completed(self)
     This method sets the component mood to happy. Subclasses should override
     if they wish to have other behaviour.
     
@@ -139,7 +139,7 @@ do_setup(self)
 
     Once the pipeline reaches PLAYING, the component mood will be set to happy.
 
-setup_complete(self)
+setup_completed(self)
     FeedComponent overrides this method to do nothing; setting the component
     mood to happy is done in reaction to the pipeline reaching PLAYING instead.
 
