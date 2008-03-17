@@ -123,6 +123,10 @@ class BaseAdminGtk(log.Loggable):
             return d
 
         def addPages(_):
+            # add a generic component node  
+            self.nodes['Component'] = ComponentAdminGtkNode(self.state, 
+                self.admin) 
+
             config = self.state.get('config')
 
             if config['feed']:
@@ -482,6 +486,83 @@ class _StateWatcher(object):
                     self.onRemove(self.state, k, v)
             self.state.removeListener(self)
             self.state = None
+
+class ComponentAdminGtkNode(BaseAdminGtkNode):
+    glade_file = os.path.join('flumotion', 'component', 'base',
+        'component.glade')
+
+    def __init__(self, state, admin):
+        BaseAdminGtkNode.__init__(self, state, admin, title=_("Component"))
+
+        self._startTime = None
+
+    def haveWidgetTree(self):
+        self.widget = self.wtree.get_widget('component-widget')
+        assert self.widget, "No component-widget in %s" % self.glade_file
+
+        # pid
+        l = self.wtree.get_widget('label-pid')
+        pid = self.state.get('pid')
+        l.set_text(str(pid))
+
+        # Find the labels which we'll update when we get uiState updates.
+        self._label_start_time = self.wtree.get_widget('label-since')
+        self._label_uptime = self.wtree.get_widget('label-uptime')
+        self._label_cpu = self.wtree.get_widget('label-cpu')
+        self._label_vsize = self.wtree.get_widget('label-vsize')
+
+        self.widget.show_all()
+        return self.widget
+
+    def _setStartTime(self, value):
+        self._label_start_time.set_text(
+            time.strftime("%c", time.localtime(value)))
+        self._label_uptime.set_text(common.formatTime(0))
+
+        self._startTime = value
+
+    def _setCurrentTime(self, value):
+        if self._startTime is not None:
+            runtime = value - self._startTime
+
+            self._label_uptime.set_text(common.formatTime(runtime))
+        else:
+            self._label_uptime.set_text(_("not available"))
+ 
+    def _updateCPU(self, cpu):
+        # given float for cpu, update the label
+        self._label_cpu.set_text('%.2f %%' % (cpu * 100.0))
+
+    def _updateVSize(self, vsize):
+        # given int for vsize in bytes, update the label
+        if vsize == 0:
+            self._label_vsize.set_text(_('Unknown'))
+        else:
+            self._label_vsize.set_text('%sB' % common.formatStorage(vsize))
+
+    def setUIState(self, uiState):
+        BaseAdminGtkNode.setUIState(self, uiState)
+
+        # Ick; we don't get these otherwise.
+        for key in uiState.keys():
+            self.stateSet(uiState, key, uiState.get(key))
+        
+    # IStateListener Interface
+    def stateSet(self, object, key, value):
+        if key == 'cpu-percent':
+            self._updateCPU(value)
+        elif key == 'virtual-size':
+            self._updateVSize(value)
+        if key == 'start-time':
+            self._setStartTime(value)
+        elif key == 'current-time':
+            self._setCurrentTime(value)
+
+    def stateAppend(self, object, key, value):
+        pass
+
+    def stateRemove(self, object, key, value):
+        pass
 
 class FeedersAdminGtkNode(BaseAdminGtkNode):
     glade_file = os.path.join('flumotion', 'component', 'base', 'feeders.glade')

@@ -202,6 +202,7 @@ flumotion/component/base/admin_text.py
 flumotion/component/base/watcher.py
 flumotion/component/base/__init__.py
 flumotion/component/base/admin_gtk.py
+flumotion/component/base/component.glade
 flumotion/component/__init__.py
 flumotion/component/effects/colorbalance/colorbalance.py
 flumotion/component/effects/colorbalance/__init__.py

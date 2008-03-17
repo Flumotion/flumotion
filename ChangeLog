@@ -1,3 +1,13 @@
+2008-03-17  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/component.glade:
+	* po/POTFILES.in:
+	  Add a component tab for all components.
+	  Displays uptime, cpu usage, virtual size, etc.
+	  Fixes #806.
+
 2008-03-17  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/connection-dialog.glade:

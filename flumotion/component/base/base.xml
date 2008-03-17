@@ -8,6 +8,7 @@
       <directories>
         <directory name="flumotion/component/base">
           <filename location="admin_gtk.py" />
+          <filename location="component.glade" />
           <filename location="eaters.glade" />
           <filename location="feeders.glade" />
         </directory>
