@@ -1,5 +1,11 @@
 2008-03-17  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/component/base/component.glade:
+	  Change the glade file to remove some unused rows, and to set the label
+	  defaults to N/A, rather than nonsense values.
+
+2008-03-17  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/base/base.xml:
 	* flumotion/component/base/component.glade:
