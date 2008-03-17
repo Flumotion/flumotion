@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -110,9 +110,6 @@ class ConnectionsDialog(GladeWindow):
     glade_file = 'connection-dialog.glade'
 
     gsignal('have-connection', object)
-
-    def on_has_selection(self, widget, has_selection):
-        self.widgets['button_ok'].set_sensitive(has_selection)
 
     def on_connection_activated(self, widget, state):
         self.emit('have-connection', state)

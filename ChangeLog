@@ -1,3 +1,12 @@
+2008-03-17  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/connection-dialog.glade:
+	* data/glade/greeter-load_connection.glade:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/greeter.py:
+	Remove dead selection code, prevents warnings
+	in the test suite and fixes #863
+
 2008-03-13  Michael Smith <msmith@fluendo.com>
 
 	* doc/random/component-initialization-protocol:

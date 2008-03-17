@@ -176,9 +176,6 @@ class LoadConnection(WizardStep):
 
     # Callbacks
 
-    def on_has_selection(self, widget, has_selection):
-        self.button_next.set_sensitive(has_selection)
-
     def on_connection_activated(self, widget, state):
         self.button_next.emit('clicked')
 
@@ -326,11 +323,6 @@ This mode is only useful for testing Flumotion.
         # start chain
         d.callback(None)
         return '*signaled*'
-
-    # Callbacks
-
-    def on_has_selection(self, widget, has_selection):
-        self.button_next.set_sensitive(has_selection)
 
     # Private
 
