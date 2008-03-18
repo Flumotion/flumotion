@@ -123,9 +123,9 @@ class BaseAdminGtk(log.Loggable):
             return d
 
         def addPages(_):
-            # add a generic component node  
-            self.nodes['Component'] = ComponentAdminGtkNode(self.state, 
-                self.admin) 
+            # add a generic component node
+            self.nodes['Component'] = ComponentAdminGtkNode(self.state,
+                self.admin)
 
             config = self.state.get('config')
 
@@ -528,14 +528,14 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self._label_uptime.set_text(common.formatTime(runtime))
         else:
             self._label_uptime.set_text(_("not available"))
- 
+
     def _updateCPU(self, cpu):
         # given float for cpu, update the label
         self._label_cpu.set_text('%.2f %%' % (cpu * 100.0))
 
     def _updateVSize(self, vsize):
         # given int for vsize in bytes, update the label
-        if vsize == 0:
+        if vsize is None:
             self._label_vsize.set_text(_('Unknown'))
         else:
             self._label_vsize.set_text('%sB' % common.formatStorage(vsize))
@@ -546,7 +546,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         # Ick; we don't get these otherwise.
         for key in uiState.keys():
             self.stateSet(uiState, key, uiState.get(key))
-        
+
     # IStateListener Interface
     def stateSet(self, object, key, value):
         if key == 'cpu-percent':
@@ -1046,7 +1046,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             'vbox-timestamp-discont-total')
         self._vbox_offset_discont_total = self.wtree.get_widget(
             'vbox-offset-discont-total')
-        # 
+        #
         # show the tree view always
         self.wtree.get_widget('scrolledwindow').show_all()
 

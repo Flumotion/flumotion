@@ -1,3 +1,9 @@
+2008-03-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/base/admin_gtk.py
+	(ComponentAdminGtkNode._updateVSize): check for None instead of 0,
+	remove trailing whitespace.
+
 2008-03-17  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/component.glade:
