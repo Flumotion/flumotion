@@ -535,7 +535,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
     def _updateVSize(self, vsize):
         # given int for vsize in bytes, update the label
-        if vsize is None:
+        if not vsize:
             self._label_vsize.set_text(_('Unknown'))
         else:
             self._label_vsize.set_text('%sB' % common.formatStorage(vsize))

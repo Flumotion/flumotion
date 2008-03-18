@@ -1,3 +1,8 @@
+2008-03-18  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Check for None and 0.
+
 2008-03-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/base/admin_gtk.py
