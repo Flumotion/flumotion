@@ -20,6 +20,7 @@ import time
 
 from flumotion.configure import configure
 from flumotion.common import common, errors, log
+from flumotion.common.python import makedirs
 
 """
 Servicer object used in service scripts
@@ -302,7 +303,7 @@ class Servicer(log.Loggable):
         if os.path.exists(managerDir):
             raise errors.SystemError, \
                 "Manager directory %s already exists" % managerDir
-        os.makedirs(managerDir)
+        makedirs(managerDir)
 
         planetFile = os.path.join(managerDir, 'planet.xml')
 
@@ -343,7 +344,7 @@ user:PSfNpHTkpTx1M
 
         @returns: whether or not the config was created.
         """
-        os.makedirs(self.workersDir)
+        makedirs(self.workersDir)
         self.info("Creating worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if os.path.exists(workerFile):

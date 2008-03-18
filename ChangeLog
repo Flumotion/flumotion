@@ -1,3 +1,17 @@
+2008-03-18  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/common/python.py (makedirs):
+	For python < 2.5 provide a local copy of python2.5's os.makedirs()
+	that adds checks for EEXIST.
+
+	* flumotion/common/bundle.py (Unbundler.unbundle):
+	* flumotion/common/common.py (ensureDir):
+	* flumotion/common/registry.py (ComponentRegistry.save):
+	* flumotion/manager/admin.py (AdminAvatar._saveFlowFile):
+	* flumotion/service/service.py (Servicer.createManager,
+	  Servicer.createWorker):
+	Use our new local makedirs() function. Fixes #865.
+
 2008-03-18  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py:

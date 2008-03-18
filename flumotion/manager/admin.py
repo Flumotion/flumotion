@@ -25,6 +25,7 @@ manager-side objects to handle administrative clients
 
 import re
 import os
+import errno
 from StringIO import StringIO
 
 from twisted.internet import reactor
@@ -34,6 +35,7 @@ from zope.interface import implements
 
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry, debug
+from flumotion.common.python import makedirs
 
 # make Result and Message proxyable
 from flumotion.common import messages
@@ -282,9 +284,9 @@ class AdminAvatar(base.ManagerAvatar):
         dir = os.path.join(self.vishnu.configDir, "flows")
         self.debug('told to save flow as %s/%s.xml', dir, filename)
         try:
-            os.makedirs(dir, 0770)
+            makedirs(dir, 0770)
         except OSError, e:
-            if e.errno != 17: # 17 == EEXIST
+            if e.errno != errno.EEXIST:
                 raise e
         prev = os.umask(0007)
         output = open(os.path.join(dir, filename + '.xml'), 'a')

@@ -34,6 +34,7 @@ from xml.sax import saxutils
 from twisted.spread import pb
 
 from flumotion.common import common, log, errors, fxml
+from flumotion.common.python import makedirs
 from flumotion.common.bundle import BundlerBasket, MergedBundler
 from flumotion.configure import configure
 
@@ -1495,7 +1496,7 @@ class ComponentRegistry(log.Loggable):
         dir = os.path.split(self.filename)[0]
         if not os.path.exists(dir):
             try:
-                os.makedirs(dir)
+                makedirs(dir)
             except OSError, e:
                 if e.errno == errno.EACCES:
                     self.error('Registry directory %s could not be created !' %

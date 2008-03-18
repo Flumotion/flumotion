@@ -33,6 +33,7 @@ import locale
 from twisted.internet import address
 
 from flumotion.common import log
+from flumotion.common.python import makedirs
 
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
@@ -308,7 +309,7 @@ def ensureDir(dir, description):
     """
     if not os.path.exists(dir):
         try:
-            os.makedirs(dir)
+            makedirs(dir)
         except OSError, e:
             from flumotion.common import errors
             raise errors.SystemError(

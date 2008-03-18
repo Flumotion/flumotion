@@ -31,6 +31,7 @@ import tempfile
 import StringIO
 
 from flumotion.common import errors, dag
+from flumotion.common.python import makedirs
 
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 __version__ = "$Rev$"
@@ -159,7 +160,7 @@ class Unbundler:
             path = os.path.join(dir, filepath)
             parent = os.path.split(path)[0]
             try:
-                os.makedirs(parent)
+                makedirs(parent)
             except OSError, err:
                 # Reraise error unless if it's an already existing
                 if err.errno != errno.EEXIST or not os.path.isdir(parent):

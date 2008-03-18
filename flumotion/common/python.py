@@ -49,3 +49,27 @@ if sys.version_info[:2] < (2, 5):
         return False
 else:
     any = any
+
+# python2.4's os.makedirs() lacks EEXIST checks, so here's almost a
+# literal copy from the python2.5's version of os module
+if sys.version_info[:2] < (2, 5):
+    import os.path as path
+    from os import mkdir, curdir
+    from errno import EEXIST
+
+    def makedirs(name, mode=0777):
+        head, tail = path.split(name)
+        if not tail:
+            head, tail = path.split(head)
+        if head and tail and not path.exists(head):
+            try:
+                makedirs(head, mode)
+            except OSError, e:
+                # be happy if someone already created the path
+                if e.errno != EEXIST:
+                    raise
+            if tail == curdir: # xxx/newdir/. exists if xxx/newdir exists
+                return
+        mkdir(name, mode)
+else:
+    from os import makedirs
