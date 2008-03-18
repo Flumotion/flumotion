@@ -1,5 +1,10 @@
 2008-03-18  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/worker/base.py (JobProcessProtocol.processEnded):
+	Don't blame GStreamer's corrupt registry for any early exit.
+
+2008-03-18  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/common/python.py (makedirs):
 	For python < 2.5 provide a local copy of python2.5's os.makedirs()
 	that adds checks for EEXIST.

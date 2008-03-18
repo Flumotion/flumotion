@@ -116,9 +116,8 @@ class JobProcessProtocol(worker.ProcessProtocol):
                 reason = "received signal %d" % signum
             else:
                 reason = "unknown reason"
-            text = "Component '%s' has exited early (%s).  " \
-                   "This is sometimes triggered by a corrupt " \
-                   "GStreamer registry." % (self.avatarId, reason)
+            text = ("Component '%s' has exited early (%s)." %
+                    (self.avatarId, reason))
             dstarts.createFailed(self.avatarId,
                                  errors.ComponentCreateError(text))
 
