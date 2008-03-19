@@ -301,7 +301,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         self.debug('switching from %r to %r', self.activeFeed, feed)
         for p, e in pairs:
-            e.emit('switch', p.get_name(), stop_time, start_time)
+            e.emit('switch', p, stop_time, start_time)
 
         self.activeFeed = feed
         self.uiState.set("active-eater", feed)

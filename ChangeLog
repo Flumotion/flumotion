@@ -1,3 +1,9 @@
+2008-03-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
+	Emit signal with the pad not the name of the pad, maybe this 
+	will help it work.
+
 2008-03-18  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/worker/base.py (JobProcessProtocol.processEnded):
