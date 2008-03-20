@@ -1,5 +1,15 @@
 2008-03-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/combiners/switch/basicwatchdog.py:
+	Make sure autoswitch() is only run when all sink pads
+	of all switch elements have received data, ie not in
+	middle of startup.
+	* flumotion/component/combiners/switch/switch.py:
+	Set active-pad property on switch elements at start.
+	Add some extra debug.
+
+2008-03-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/combiners/switch/switch.py:
 	Actually make idealFeed respect its definition and only
 	change it when requested to by user or by external influence

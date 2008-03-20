@@ -184,6 +184,16 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.debug('eater %s maps to pad %s', alias, pad)
             self.switchPads[alias] = pad, e
 
+        # set active pad correctly on each of the switch elements
+        # (pad, switch)
+        pairs = [self.switchPads[alias]
+                 for alias in self.logicalFeeds[self.idealFeed]]
+
+        for p, s in pairs:
+            s.set_property('active-pad', p)
+        self.activeFeed = self.idealFeed
+        self.uiState.set("active-eater", self.idealFeed)
+
         self.install_logical_feed_watches()
 
         self.do_switch()
@@ -236,6 +246,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.debug('autoswitch selects feed %r', feed)
                 self.do_switch(feed)
                 break
+            else:
+                self.debug("could not select feed %r because not active", feed)
         if feed is None:
             feed = self.feedsByPriority.get(0, None)
             self.debug('no feeds active during autoswitch, choosing %r',
@@ -313,6 +325,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         self.debug('switching from %r to %r', self.activeFeed, feed)
         for p, e in pairs:
+            self.debug("switching to pad %r", p)
             e.emit('switch', p, stop_time, start_time)
 
         self.activeFeed = feed

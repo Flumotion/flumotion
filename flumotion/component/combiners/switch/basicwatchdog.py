@@ -32,21 +32,66 @@ __version__ = "$Rev$"
 class SingleBasicWatchdog(switch.SingleSwitch):
     logCategory = "comb-single-basic-watchdog"
 
+    def init(self):
+        switch.SingleSwitch.init(self)
+        # startedFine is set to True when all sink pads to all switch elements
+        # have received data
+        self.startedFine = False
+
     def feedSetInactive(self, feed):
         switch.SingleSwitch.feedSetInactive(self, feed)
-        self.auto_switch()
+        if self.startedFine:
+            self.auto_switch()
+        else:
+            if feed in self._started:
+                self._started.remove(feed)
 
     def feedSetActive(self, feed):
         switch.SingleSwitch.feedSetActive(self, feed)
-        self.auto_switch()
+        if self.startedFine:
+            self.auto_switch()
+        else:
+            self._started.append(feed)
+            allStarted = True
+            # check if all feeds started
+            for lf, blah in self.logicalFeeds:
+                if lf not in self._started:
+                    allStarted = False
+                    break
+            if allStarted:
+                self.startedFine = True
+                self._started = []
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"
 
+    def init(self):
+        switch.AVSwitch.init(self)
+        # startedFine is set to True when all sink pads to all switch elements
+        # have received data
+        self.startedFine = False
+        self._started = []
+
     def feedSetInactive(self, feed):
         switch.AVSwitch.feedSetInactive(self, feed)
-        self.auto_switch()
+        if self.startedFine:
+            self.auto_switch()
+        else:
+            if feed in self._started:
+                self._started.remove(feed)
 
     def feedSetActive(self, feed):
         switch.AVSwitch.feedSetActive(self, feed)
-        self.auto_switch()
+        if self.startedFine:
+            self.auto_switch()
+        else:
+            self._started.append(feed)
+            allStarted = True
+            # check if all feeds started
+            for lf, blah in self.logicalFeeds:
+                if lf not in self._started:
+                    allStarted = False
+                    break
+            if allStarted:
+                self.startedFine = True
+                self._started = []
