@@ -1,3 +1,11 @@
+2008-03-20  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Don't pass unset values. Avoids an exception subtracting None from an
+	  integer.
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  Zero is not a good number to divide by.
+
 2008-03-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/switch.py:

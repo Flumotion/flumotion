@@ -545,7 +545,9 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         # Ick; we don't get these otherwise.
         for key in uiState.keys():
-            self.stateSet(uiState, key, uiState.get(key))
+            val = uiState.get(key)
+            if val is not None:
+                self.stateSet(uiState, key, uiState.get(key))
 
     # IStateListener Interface
     def stateSet(self, object, key, value):
