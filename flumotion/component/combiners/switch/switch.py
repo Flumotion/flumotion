@@ -157,6 +157,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 assert alias in self.eaters
             self.logicalFeeds[name] = aliases
             if self.idealFeed is None:
+                self.debug("idealFeed being set to %s", name)
                 self.idealFeed = name
             self.feedsByPriority.append(name)
 
@@ -233,14 +234,16 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             feed = allFeeds.pop(0)
             if self.is_active(feed):
                 self.debug('autoswitch selects feed %r', feed)
-                self.switch_to(feed)
+                self.do_switch(feed)
                 break
         if feed is None:
             feed = self.feedsByPriority.get(0, None)
             self.debug('no feeds active during autoswitch, choosing %r',
                        feed)
-        self.switch_to(feed)
-
+        self.do_switch(feed)
+    
+    # switch_to should only be called when the ideal feed is requested to be
+    # changed, so not by watchdog reasons.
     def switch_to(self, feed):
         """
         @param feed: a logical feed
@@ -251,6 +254,11 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         self.debug('scheduling switch to feed %s', feed)
         self.idealFeed = feed
+        # here we should bump this feed above others in feedsByPriority
+        self.feedsByPriority = [feed]
+        for name, aliases in self.get_logical_feeds():
+            if name != feed:
+                self.feedsByPriority.append(name)
 
         if not self.pipeline:
             return
@@ -269,12 +277,16 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     # do this. See the docs for switch's `block' and `switch' signals
     # for more information.
 
-    def do_switch(self):
-        feed = self.idealFeed
+    def do_switch(self, feed=None):
+        if feed == None:
+            feed = self.idealFeed
 
         self.clearWarning('temporary-switch-problem')
         if feed == self.activeFeed:
             self.debug("already streaming from feed %r", feed)
+            return
+        if feed not in self.logicalFeeds:
+            self.warning("unknown logical feed: %s", feed)
             return
 
         # (pad, switch)

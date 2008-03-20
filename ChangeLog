@@ -1,3 +1,12 @@
+2008-03-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/switch.py:
+	Actually make idealFeed respect its definition and only
+	change it when requested to by user or by external influence
+	such as by ical event or pattern switch. This entails do_switch()
+	allowing switch to feed other than the ideal feed and switch_to()
+	only called when a change to the ideal feed is required.
+
 2008-03-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py:
