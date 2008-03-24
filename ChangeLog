@@ -1,3 +1,11 @@
+2008-03-24  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/admin/gtk/main.py:
+	Add an enable debug option in the admin interface.
+	Reviewed by Zaheer, fixes #825
+
 2008-03-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py:

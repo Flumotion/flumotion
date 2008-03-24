@@ -32,6 +32,7 @@ _ = gettext.gettext
 
 componentui # pyflakes
 
+_DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
 
 class NodeBook(gtk.Notebook):
     def __init__(self, admingtk):
@@ -41,34 +42,62 @@ class NodeBook(gtk.Notebook):
 
         """
         gtk.Notebook.__init__(self)
+        self._debugEnabled = False
+        self._pageWidgets = {}
+
         self.admingtk = admingtk
         admingtk.setup()
         self.nodes = admingtk.getNodes()
-        self._setup_pages()
+        self._appendPages()
         self.show()
 
-    def _setup_pages(self):
-        def render(widget, table):
-            # dumb dumb dumb dumb
-            old_parent = widget.get_parent()
-            if old_parent:
-                old_parent.remove(widget)
-            map(table.remove, table.get_children())
-            table.add(widget)
-            widget.show()
+    def setDebugEnabled(self, enabled):
+        """Set if debug should be enabled.
+        Not all pages are visible unless debugging is set to true
+        @param enable: if debug should be enabled
+        """
+        self._debugEnabled = enabled
 
-        for name, node in self.nodes.items():
-            table = gtk.Table(1,1)
+        for name in _DEBUG_ONLY_PAGES:
+            widget = self._pageWidgets.get(name)
+            if widget is None:
+                continue
+            widget.set_property('visible', enabled)
+
+    def _renderWidget(self, widget, table):
+        # dumb dumb dumb dumb
+        old_parent = widget.get_parent()
+        if old_parent:
+            old_parent.remove(widget)
+        map(table.remove, table.get_children())
+        table.add(widget)
+        widget.show()
+
+    def _addPage(self, name):
+        node = self.nodes.get(name)
+        assert node is not None, name
+
+        table = gtk.Table(1, 1)
+        table.add(gtk.Label(_('Loading UI for %s...') % name))
+        label = self._getTitleLabel(node, name)
+        label.show()
+        self.append_page(table, label)
+
+        d = node.render()
+        d.addCallback(self._renderWidget, table)
+        return table
+
+    def _appendPages(self):
+        for name in self.nodes.keys():
+            table = self._addPage(name)
+            self._pageWidgets[name] = table
+
+            if name in _DEBUG_ONLY_PAGES:
+                if self._debugEnabled:
+                    continue
             table.show()
-            table.add(gtk.Label(_('Loading UI for %s...') % name))
-            label = self._get_title_label(node, name)
-            label.show()
-            self.append_page(table, label)
 
-            d = node.render()
-            d.addCallback(render, table)
-
-    def _get_title_label(self, node, name):
+    def _getTitleLabel(self, node, name):
         title = node.title
         if not title:
             # FIXME: we have no way of showing an error message ?
@@ -96,9 +125,19 @@ class ComponentView(gtk.VBox, log.Loggable):
         self._object_state = None
         self._state = OBJECT_UNSET
         self._callStamp = 0
+        self._debugEnabled = False
+        self._currentNodebook = None
         self.set_single_admin(None)
 
     # Public API
+
+    def getDebugEnabled(self):
+        return self._debugEnabled
+
+    def setDebugEnabled(self, enabled):
+        self._debugEnabled = enabled
+        if self._currentNodebook:
+            self._currentNodebook.setDebugEnabled(enabled)
 
     def show_object(self, state):
         self._set_state(OBJECT_UNSET)
@@ -120,7 +159,8 @@ class ComponentView(gtk.VBox, log.Loggable):
         self._widget = widget
         self._widget.show()
         self.pack_start(self._widget, True, True)
-
+        self._currentNodebook = widget
+        self._currentNodebook.setDebugEnabled(self._debugEnabled)
         return self._widget
 
     def _get_widget_constructor(self, state):

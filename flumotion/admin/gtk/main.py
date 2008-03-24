@@ -139,6 +139,8 @@ def main(args):
         from flumotion.admin.gtk.client import AdminClientWindow
         win = AdminClientWindow()
 
+        if options.verbose or (options.debug and options.debug > 3):
+            win.setDebugEnabled(True)
         win.setAdminModel(admin)
         win.show()
 

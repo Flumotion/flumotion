@@ -83,6 +83,8 @@ MAIN_UI = """
       <menuitem action="run-wizard"/>
     </menu>
     <menu action="debug">
+      <menuitem action="debug-enable"/>
+      <separator name="sep5"/>
       <menuitem action="reload-manager"/>
       <menuitem action="reload-admin"/>
       <menuitem action="reload-all"/>
@@ -94,11 +96,11 @@ MAIN_UI = """
   </menubar>
   <toolbar name="toolbar">
     <toolitem action="open-recent"/>
-    <separator name="sep5"/>
+    <separator name="sep6"/>
     <toolitem action="start-component"/>
     <toolitem action="stop-component"/>
     <toolitem action="delete-component"/>
-    <separator name="sep6"/>
+    <separator name="sep7"/>
     <toolitem action="run-wizard"/>
   </toolbar>
 </ui>
@@ -140,6 +142,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._widgets = {}
         self._window = None
         self._recent_menu_uid = None
+        self._debugEnabled = False
+        self._debugActions = None
+        self._debugEnableAction = None
 
         self._create_ui()
         self._append_recent_connections()
@@ -234,6 +239,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
                            self._admin_connection_failed_cb)
         self._admin.connect('update', self._admin_update_cb)
 
+    def setDebugEnabled(self, enabled):
+        """Set if debug should be enabled for the admin client window
+        @param enable: if debug should be enabled
+        """
+        self._debugEnabled = enabled
+        self._debugActions.set_sensitive(enabled)
+        self._debugEnableAction.set_active(enabled)
+        self._component_view.setDebugEnabled(enabled)
+
     # Private
 
     def _create_ui(self):
@@ -251,7 +265,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
         vbox = widgets['vbox1']
         window.connect('delete-event', self._window_delete_event_cb)
 
-        actions = [
+        uimgr = gtk.UIManager()
+        uimgr.connect('connect-proxy',
+                      self._on_uimanager__connect_proxy)
+        uimgr.connect('disconnect-proxy',
+                      self._on_uimanager__disconnect_proxy)
+
+        # Normal actions
+        group = gtk.ActionGroup('actions')
+        group.add_actions([
             # Connection
             ('connection', None, _("_Connection")),
             ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'), None,
@@ -296,6 +318,25 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
             # Debug
             ('debug', None, _('_Debug')),
+
+            # Help
+            ('help', None, _('_Help')),
+            ('about', gtk.STOCK_ABOUT, _('_About'), None,
+             _('Displays an about dialog'),
+             self._help_about_cb),
+            ])
+        group.add_toggle_actions([
+            ('debug-enable', None, _('Enable _Debugging'), None,
+             _('Enable debugging in the admin interface'),
+             self._debug_enable_cb),
+            ])
+        self._debugEnableAction = group.get_action('debug-enable')
+        uimgr.insert_action_group(group, 0)
+
+        # Debug actions
+        self._debugActions = gtk.ActionGroup('actions')
+        self._debugActions.add_actions([
+            # Debug
             ('reload-manager', gtk.STOCK_REFRESH, _('Reload _Manager'), None,
              _('Reload the code used by the manager'),
              self._debug_reload_manager_cb),
@@ -308,23 +349,13 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('start-shell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
              _('Start an interactive debugging shell'),
              self._debug_start_shell_cb),
+            ])
+        uimgr.insert_action_group(self._debugActions, 0)
+        self._debugActions.set_sensitive(False)
 
-            # Help
-            ('help', None, _('_Help')),
-            ('about', gtk.STOCK_ABOUT, _('_About'), None,
-             _('Displays an about dialog'),
-             self._help_about_cb),
-            ]
-        uimgr = gtk.UIManager()
-        uimgr.connect('connect-proxy',
-                      self._on_uimanager__connect_proxy)
-        uimgr.connect('disconnect-proxy',
-                      self._on_uimanager__disconnect_proxy)
-        group = gtk.ActionGroup('actions')
-        group.add_actions(actions)
-        uimgr.insert_action_group(group, 0)
         uimgr.add_ui_from_string(MAIN_UI)
         window.add_accel_group(uimgr.get_accel_group())
+
         menubar = uimgr.get_widget('/menubar')
         vbox.pack_start(menubar, expand=False)
         vbox.reorder_child(menubar, 0)
@@ -1143,6 +1174,9 @@ You can do remote component calls using:
 
     def _manage_run_wizard_cb(self, action):
         self._run_wizard()
+
+    def _debug_enable_cb(self, action):
+        self.setDebugEnabled(action.get_active())
 
     def _debug_reload_manager_cb(self, action):
         self._reload_manager()
