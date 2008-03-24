@@ -1,0 +1,44 @@
+- Flumotion messages should be able to link to the documentation
+- If yelp is present on the system, and the documentation Docbook/XML is
+  present too, we can use yelp to open the documentation:
+  yelp ghelp:///usr/share/flumotion/manual/xml/manual.xml?section-system-setup
+- If yelp is not present on the system, or the docs are not present, we
+  can use a standard browser to open the documentation URL:
+http://www.flumotion.net/doc/flumotion/manual/html/chapter-configuration.html#section-system-setup
+- The docs on the flumotion website should be versioned, so that the message
+  can link to a correct version of the docs
+- Hence, the message should have the version of Flumotion encoded in it
+  to link to the docs
+- On the local system, we will only have one specific version of the docs.
+  It may not match the version of the manager's documentation.
+- We could bundle documentation and transfer it from the manager, to ensure
+  it is for the right version.
+
+PROPOSAL
+--------
+- A link target:
+  - is uniquely identified by:
+    - the project (from the perspective of the message-generating code)
+    - the project's version
+      (again, the version of the code that generates the message;
+       a 0.4.1 worker running a check from a 0.4.2 manager should tag
+       the link target with 0.4.2)
+    - the "book" name (for example "manual", "faq", ...)
+    - an id (which is the DocBook/XML id inside the book)
+    (- a localization tag, in the future ?)
+  - also contains:
+    a descriptive text
+  - may additionally need the name of the parent chapter/section to assist
+    linking to the online html version
+
+- When the admin needs to show a link as part of the message:
+  - if yelp is available:
+    - if there is local documentation installed for the right version,
+      use yelp ghelp:// to display it locally
+    - if there isn't, try to get a documentation bundle for the project
+      and version from the manager, and display
+  - if yelp is not available, or getting a local copy fails:
+    use a browser to show the link.  The base URL for docs should be
+    identified as part of the project.  Under that link, there should be
+    a set of directories with the versions
+
