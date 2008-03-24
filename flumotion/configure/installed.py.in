@@ -24,18 +24,6 @@ import sys
 from flumotion.common.log import safeprintf
 
 def get():
-    def ensure(path):
-        try:
-            try:
-                os.listdir(path)
-            except:
-                os.makedirs(path)
-        except OSError, e:
-            safeprintf(sys.stderr,
-                       'Error making dir %s: %s\n', e.filename, e.strerror)
-            safeprintf(sys.stderr,
-                       'Things are probably going to break!\n')
-
     if 'FLU_CACHE_DIR' in os.environ:
         cachedir = os.path.realpath(os.environ['FLU_CACHE_DIR'])
         daemondir = cachedir
@@ -48,7 +36,6 @@ def get():
                                 '.flumotion')
         daemondir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
 
-    ensure(cachedir)
     registrydir = cachedir
 
     return {

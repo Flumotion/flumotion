@@ -262,8 +262,10 @@ def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     @type  processName: str
     """
 
-    ensureDir(configure.logdir, "log file")
-    ensureDir(configure.rundir, "run file")
+    ensureDir(configure.logdir, "log dir")
+    ensureDir(configure.rundir, "run dir")
+    ensureDir(configure.cachedir, "cache dir")
+    ensureDir(configure.registrydir, "registry dir")
 
     pid = getPid(processType, processName)
     if pid:

@@ -1,5 +1,14 @@
 2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+
+	  configure.get() should not have side effects like creating
+	  directories.  Fixes #875.
+
+2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	reviewed by: Johan Dahlin
 
 	* flumotion/admin/gtk/message.py:

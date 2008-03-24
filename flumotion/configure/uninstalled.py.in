@@ -59,18 +59,4 @@ def get():
         'version':       '@VERSION@',
     }
 
-    def ensure(path):
-        try:
-            os.listdir(path)
-        except:
-            os.makedirs(path)
-
-    for i in 'cache', 'log', 'registry':
-        try:
-            ensure(ret[i+'dir'])
-        except OSError, e:
-            safeprintf(sys.stderr, 'Error making %s dir %s: %s\n', i,
-                       e.filename, e.strerror)
-            safeprintf(sys.stderr, 'Things are probably going to break!\n')
-
     return ret
