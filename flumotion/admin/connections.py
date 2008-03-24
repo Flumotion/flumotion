@@ -24,7 +24,7 @@ import os
 from xml.dom import minidom, Node
 
 from flumotion.configure import configure
-from flumotion.common import connection, errors, log
+from flumotion.common import connection, errors, log, common
 from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"
@@ -61,6 +61,7 @@ def get_recent_connections():
 
     try:
         # DSU, or as perl folks call it, a Schwartz Transform
+        common.ensureDir(configure.registrydir, "registry dir")
         files = os.listdir(configure.registrydir)
         files = [os.path.join(configure.registrydir, f) for f in files]
         files = [(os.stat(f).st_mtime, f) for f in files

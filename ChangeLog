@@ -1,5 +1,10 @@
 2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/connections.py:
+	  The recent connections code also uses registry dir, so ensure it.
+
+2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/configure/installed.py.in:
 	* flumotion/configure/uninstalled.py.in:
