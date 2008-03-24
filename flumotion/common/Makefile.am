@@ -14,6 +14,7 @@ flumotion_PYTHON = \
 	config.py \
 	dag.py \
 	debug.py \
+	documentation.py \
 	enum.py \
 	errors.py \
 	fxml.py \

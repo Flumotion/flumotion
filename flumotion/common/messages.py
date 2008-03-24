@@ -27,9 +27,11 @@ import time
 import gettext
 
 from flumotion.common import log
+from flumotion.configure import configure
 from twisted.spread import pb
 
 __version__ = "$Rev$"
+
 (ERROR,
  WARNING,
  INFO) = range(1, 4)
@@ -238,14 +240,32 @@ class Translator(log.Loggable):
 class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     """
     I am a message to be shown in a UI.
+
+    Projects should subclass this base class to provide default project
+    and version class attributes.
+
+    @ivar  section: name of the section in which the message is described.
+    @type  section: str
+    @ivar  anchor:  name of the anchor in which the message is described.
+    @type  anchor:  str
+    @ivar  description: the link text to show
+    @type  description: L{flumotion.common.messages.Translatable}
     """
+    project = 'flumotion'
+    version = configure.version
+
+    # these properties allow linking to the documentation
+    section = None
+    anchor = None
+    description = None
 
     compareAttributes = ["level", "translatables", "debug", "id", "priority",
         "timestamp"]
 
     def __init__(self, level, translatable, debug=None, id=None, priority=50,
         timestamp=None):
-        """Create a new message.
+        """
+        Create a new message.
 
         The id identifies this kind of message, and serves two purposes.
 
@@ -292,6 +312,7 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         if not isinstance(translatable, Translatable):
             raise ValueError('%r is not Translatable' % translatable)
         self.translatables.append(translatable)
+
 pb.setUnjellyableForClass(Message, Message)
 
 # these are implemented as factory functions instead of classes because

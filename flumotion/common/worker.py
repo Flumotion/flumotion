@@ -104,6 +104,8 @@ class ProcessProtocol(protocol.ProcessProtocol):
                         "However, no core dump was generated. "
                         "You may need to configure the environment "
                         "if you want to further debug this problem.")))
+                    #message.description = T_(N_(
+                    #    "Learn how to enable core dumps."))
                 else:
                     obj.info("Core dumped.")
                     corepath = os.path.join(os.getcwd(), 'core.%s' % pid)
@@ -115,6 +117,10 @@ class ProcessProtocol(protocol.ProcessProtocol):
                         # FIXME: add an action that runs gdb and produces a
                         # backtrace; or produce it here and attach to the
                         # message as debug info.
+                        message.description = T_(N_(
+                            "Learn how to analyze core dumps."))
+                        message.section = 'chapter-debug'
+                        message.anchor = 'section-os-analyze-core-dumps'
 
         if message:
             obj.debug('sending message to manager/admin')

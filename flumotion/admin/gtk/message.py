@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import messages
+from flumotion.common import messages, documentation, log
 from flumotion.configure import configure
 
 from gettext import gettext as _
@@ -27,6 +27,7 @@ from gettext import gettext as _
 import os
 import time
 import gtk
+import pango
 
 __version__ = "$Rev$"
 
@@ -96,6 +97,9 @@ class MessagesView(gtk.VBox):
         tv.set_cursor_visible(False)
         tv.set_editable(False)
         #tv.set_sensitive(False)
+        # connect signals to act on the hyperlink
+        tv.connect('event-after', self._textview_on_event_after)
+        tv.connect('motion-notify-event', self._textview_on_motion_notify_event)
         sw.add(tv)
 
         self.active_button = None
@@ -142,11 +146,26 @@ class MessagesView(gtk.VBox):
                 text += _("\nPosted on %s.\n") % time.strftime(
                     "%c", time.localtime(m.timestamp))
             if m.debug:
-                text += "\n\n" + _("Debug information:\n") + m.debug
+                text += "\n\n" + _("Debug information:\n") + m.debug + '\n'
             buf.set_text(text)
             self.textview.set_buffer(buf)
             self.label.set_markup('<b>%s</b>' %
                 _headings.get(m.level, _('Message')))
+
+            # if we have help information, add it to the end of the text view
+            # FIXME: it probably looks nicer right after the message and
+            # before the timestamp
+            description = getattr(m, 'description')
+            if description:
+                iter = buf.get_end_iter()
+                # we set the 'link' data field on tags to identify them
+                translated = self._translator.translateTranslatable(description)
+                tag = buf.create_tag(translated)
+                tag.set_property('underline', pango.UNDERLINE_SINGLE)
+                tag.set_property('foreground', 'blue')
+                tag.set_data('link', documentation.getMessageWebLink(m))
+                buf.insert_with_tags_by_name(iter, translated,
+                    tag.get_property('name'))
 
         # FIXME:this clears all messages with the same id as the new one.
         # effectively replacing.  Is this what we want ?
@@ -190,3 +209,50 @@ class MessagesView(gtk.VBox):
                     self.active_button = self.buttonbox.get_children()[0]
                     self.active_button.set_active(True)
                 return
+
+    # when the mouse cursor moves, set the cursor image accordingly
+    def _textview_on_motion_notify_event(self, textview, event):
+        x, y = textview.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
+            int(event.x), int(event.y))
+        tags = textview.get_iter_at_location(x, y).get_tags()
+        # without this call, further motion notify events don't get
+        # triggered
+        textview.window.get_pointer()
+
+        # if any of the tags is a link, show a hand
+        cursor = None
+        for tag in tags:
+            if tag.get_data('link'):
+                cursor = gtk.gdk.Cursor(gtk.gdk.HAND2)
+        textview.get_window(gtk.TEXT_WINDOW_TEXT).set_cursor(cursor)
+        return False
+
+    def _textview_on_event_after(self, textview, event):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return False
+        if event.button != 1:
+            return False
+        buffer = textview.get_buffer()
+
+        # we shouldn't follow a link if the user has selected something
+        bounds = buffer.get_selection_bounds()
+        if bounds:
+            [start, end] = bounds
+            if start.get_offset() != end.get_offset():
+                return False
+
+        x, y = textview.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
+            int(event.x), int(event.y))
+        iter = textview.get_iter_at_location(x, y)
+
+        for tag in iter.get_tags():
+            link = tag.get_data('link')
+            if link:
+                import webbrowser
+                log.debug('messageview', 'opening %s' % link)
+                webbrowser.open(link)
+                break
+
+        return False
+
+

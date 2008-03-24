@@ -1,3 +1,15 @@
+2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	reviewed by: Johan Dahlin
+
+	* flumotion/admin/gtk/message.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/documentation.py:
+	* flumotion/common/messages.py:
+	* flumotion/common/worker.py:
+	  Add a way for messages to link to online documentation.
+	  Fixes #874.
+
 2008-03-24  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
