@@ -8,7 +8,7 @@ component_PYTHON = __init__.py \
 	watcher.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/base
-component_DATA = base.xml feeders.glade eaters.glade
+component_DATA = base.xml feeders.glade eaters.glade component.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -1,3 +1,8 @@
+2008-03-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/Makefile.am:
+	  Actually dist the base component.glade so the admin works again.
+
 2008-03-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py (ProductionStep.plugin_loaded): 
