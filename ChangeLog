@@ -1,3 +1,8 @@
+2008-03-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* doc/random/wizard-plugin:
+	Fix up docs based on start of doing dvb wizard.
+
 2008-03-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/Makefile.am:

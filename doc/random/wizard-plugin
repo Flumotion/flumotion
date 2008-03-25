@@ -7,13 +7,16 @@ Creating a production step consists of 3 steps.
 
 * Marking the plugin as a production plugin
 
-To mark a plugin, you need to add a <wizard> tag as a child the <component>
+To mark a plugin, you need to add a <wizard> tag as a child of the <component>
 in the registry file of the plugin.
 
 Attributes:
-type: the kind of plugin,"audio-producer" or "video-producer".
+type: the kind of plugin,"audio-producer" or "video-producer". You need to have
+      both a video-producer and an audio-producer for a component providing
+      both with the feeder being unique for each of the wizard tags.
 _description: the description of the plugin. This will be shown in the
-              user interface and is transltable
+              user interface and is translatable (the prefix of _ makes
+	      intltool able to pick it up)
 feeder: name of feeder provides this producer stream.
 
 Example:
@@ -43,7 +46,9 @@ You need to define the following classes:
 The plugin is the entry point, which takes a wizard instance.
 You will also create the model here, which you pass in to the step
 The getProductionStep method takes one argument, which is the type of the
-production component.
+production component. This can be used to provide the correct wizard step
+for a component that provides both video and audio. If getProductionStep()
+returns None, then there will be no configuration page shown for that step.
 
 class AudioTestWizardPlugin(object):
     def __init__(self, wizard):
@@ -61,7 +66,8 @@ class TestAudioProducer(AudioProducer)
 
 The step is slightly more complicated.
 You need inherit from AudioSourceStep or VideoSourceStep.
-glade_file needs to point to an absolute filename.
+glade_file needs to point to an absolute filename and the window has to be named
+window1.
 The icon is optional.
 
 class TestAudioSourceStep(AudioSourceStep):
@@ -80,9 +86,9 @@ Additionally a worker_changed method is needed which updates the worker
 attribute on the model.
 Optionally you can check for the presence of an element here.
 
-    def worker_changed(self):
-        self.model.worker = self.worker
-        self.wizard.require_elements(self.worker, 'audiotestsrc')
+    def worker_changed(self, worker):
+        self.model.worker = worker
+        self.wizard.require_elements(worker, 'audiotestsrc')
 
 
 Conversion plugin
