@@ -1,3 +1,9 @@
+2008-03-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py (ProductionStep.plugin_loaded): 
+	Do not call worker_changed an extra time, it's not necessary since
+	the wizard is already calling it for us a bit later.
+
 2008-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/connections.py:
