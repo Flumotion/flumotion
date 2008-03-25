@@ -57,7 +57,7 @@ class FireWireVideoProducer(VideoProducer):
         self.properties.is_square = False
 
     def getFeeders(self):
-        for feeder in super(FireWireAudioProducer, self).getFeeders():
+        for feeder in super(FireWireVideoProducer, self).getFeeders():
             yield feeder + ':video'
 
 

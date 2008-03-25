@@ -5,6 +5,10 @@
 
 2008-03-25  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py
+	(FireWireVideoProducer.getFeeders): chain up to VideoProducer, not
+	AudioProducer
+
 	* flumotion/wizard/productionsteps.py (ProductionStep.plugin_loaded): 
 	Do not call worker_changed an extra time, it's not necessary since
 	the wizard is already calling it for us a bit later.
