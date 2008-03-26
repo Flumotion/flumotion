@@ -1,3 +1,14 @@
+2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Johan Dahlin
+
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/mulaw/mulaw-wizard.glade:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/mulaw/mulaw_wizard.py:
+	* po/POTFILES.in:
+	Create a mulaw wizard. Fixes #194.
+
 2008-03-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

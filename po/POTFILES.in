@@ -156,6 +156,8 @@ flumotion/component/encoders/vorbis/__init__.py
 flumotion/component/encoders/vorbis/vorbis_wizard.py
 flumotion/component/encoders/mulaw/__init__.py
 flumotion/component/encoders/mulaw/mulaw.py
+flumotion/component/encoders/mulaw/mulaw_wizard.py
+flumotion/component/encoders/mulaw/mulaw-wizard.glade
 flumotion/component/encoders/__init__.py
 flumotion/component/consumers/disker/admin_text.py
 flumotion/component/consumers/disker/disker_plug.py

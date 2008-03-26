@@ -16,9 +16,11 @@ jpeg_DATA = \
 mulawdir = $(componentdir)/mulaw
 mulaw_PYTHON = \
 	mulaw/__init__.py \
-	mulaw/mulaw.py
+	mulaw/mulaw.py \
+	mulaw/mulaw_wizard.py
 mulaw_DATA = \
-	mulaw/mulaw.xml
+	mulaw/mulaw.xml \
+	mulaw/mulaw-wizard.glade
 
 smokedir = $(componentdir)/smoke
 smoke_PYTHON = \

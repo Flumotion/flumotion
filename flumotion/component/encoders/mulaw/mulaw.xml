@@ -10,6 +10,8 @@
       <entries>
         <entry type="component" location="mulaw.py"
                function="Mulaw"/>
+        <entry type="wizard" location="mulaw_wizard.py"
+               function="MulawWizardPlugin" />
       </entries>
       <wizard _description="Mulaw" type="audio-encoder" 
               feeder="default" eater="default">
@@ -44,6 +46,18 @@
                 <filename location="mulaw.py" />
             </directory>
         </directories>
+    </bundle>
+
+    <bundle name="mulaw-wizard">
+	<dependencies>
+		<dependency name="mulaw-base" />
+	</dependencies>
+	<directories>
+		<directory name="flumotion/component/encoders/mulaw">
+			<filename location="mulaw-wizard.glade" />
+			<filename location="mulaw_wizard.py" />
+		</directory>
+	</directories>
     </bundle>
 
   </bundles>
