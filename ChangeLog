@@ -1,3 +1,20 @@
+2008-03-26  Pedro Gracia  <pedro@flumotion.com>
+
+	* data/glade/authenticate.glade:
+	* data/glade/open-connection.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_source.glade:
+	* flumotion/component/consumers/disker/disker-wizard.glade:
+	* flumotion/component/consumers/httpstreamer/httpstreamer-wizard.glade:
+	* flumotion/component/consumers/shout2/shout2-wizard.glade:
+	* flumotion/component/encoders/jpeg/jpeg-wizard.glade:
+	* flumotion/component/encoders/smoke/smoke-wizard.glade:
+	* flumotion/component/producers/audiotest/audiotest-wizard.glade:
+	* flumotion/component/producers/soundcard/soundcard-wizard.glade:
+	* flumotion/component/producers/videotest/videotest-wizard.glade:
+	  xalign property in labels and alignments changed to 0.
+	  Fixes #882.
+
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/base/component.glade:

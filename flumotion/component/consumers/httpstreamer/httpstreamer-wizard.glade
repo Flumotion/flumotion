@@ -248,6 +248,7 @@
 		  <child>
 		    <widget class="GtkCheckButton" id="burst_on_connect">
 		      <property name="visible">True</property>
+		      <property name="tooltip" translatable="yes">It gives all data since the last key frame immediately</property>
 		      <property name="can_focus">True</property>
 		      <property name="label" translatable="yes">Bu_rst on connect</property>
 		      <property name="use_underline">True</property>
