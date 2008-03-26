@@ -1,3 +1,8 @@
+2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/configurationwizard.py:
+	  Fix typo in API.
+
 2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	reviewed by: Johan Dahlin

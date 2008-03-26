@@ -184,7 +184,7 @@ class ConfigurationWizard(SectionWizard):
         source_step = self.get_step('Source')
         return bool(source_step.get_video_producer())
 
-    def getConsumtionSteps(self):
+    def getConsumptionSteps(self):
         """Fetches the consumption steps chosen by the user
         @returns: consumption steps
         """
@@ -462,7 +462,7 @@ class ConfigurationWizard(SectionWizard):
         save.setVideoEncoder(encoding_step.get_video_encoder())
         save.setMuxer(encoding_step.get_muxer_type(), encoding_step.worker)
 
-        for step in self.getConsumtionSteps():
+        for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
             save.addConsumer(step.getConsumerModel(), consumerType)
 
