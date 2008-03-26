@@ -60,6 +60,15 @@ class ProductionStep(WorkerWizardStep):
         """
         return self.has_audio.get_active()
 
+    def hasVideo(self):
+        """Returns if video will be used in the stream
+        created by the wizard.
+
+        @returns: if video will be used
+        @rtype:   bool
+        """
+        return self.has_video.get_active()
+
     def get_audio_producer(self):
         """Returns the selected audio producer or None
         @returns: producer or None

@@ -450,11 +450,7 @@ class ConfigurationWizard(SectionWizard):
         save.setAudioProducer(source_step.get_audio_producer())
         save.setVideoProducer(source_step.get_video_producer())
 
-        try:
-            overlay_step = self.get_step('Overlay')
-        except KeyError:
-            pass
-        else:
+        if source_step.hasVideo():
             save.setVideoOverlay(overlay_step.getOverlay())
 
         encoding_step = self.get_step('Encoding')
