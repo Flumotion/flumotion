@@ -45,7 +45,7 @@ class Connections(GladeWidget):
     def __init__(self):
         GladeWidget.__init__(self)
 
-        columns = [Column("host", title=_("Hostname")),
+        columns = [Column("host", title=_("Hostname"), searchable=True),
                    Column("timestamp", title=_("Last used"),
                           sorted=True,
                           order=gtk.SORT_DESCENDING,

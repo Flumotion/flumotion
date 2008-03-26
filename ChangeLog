@@ -20,6 +20,12 @@
 
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/connections.py (Connections.__init__): 
+	Make the recent hostname column in the connection dialog searchable.
+	Fixes #880
+
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/configurationwizard.py
 	(ConfigurationWizard.hasAudio): 
 	Use the hasAudio method on the production step to find out
