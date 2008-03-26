@@ -708,7 +708,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
-            self._pbclient.startLogin(creds, self.medium)
+
+            self._pbclient.startLogin(creds, self._pbclient.medium)
 
             # If we've changed paths, we must do some extra work.
             if path != self._porterPath:
@@ -761,7 +762,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
-            self._pbclient.startLogin(creds, self.medium)
+            self._pbclient.startLogin(creds, self._pbclient.medium)
 
             self.debug("Starting porter login at \"%s\"", self._porterPath)
             # This will eventually cause d to fire

@@ -1,3 +1,10 @@
+2008-03-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	  Pass the correct medium (the porter client medium) to
+	  PorterClientFactory.startLogin().
+	  Fixes #904.
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	reviewed by: Johan Dahlin
