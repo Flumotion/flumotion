@@ -34,7 +34,9 @@ componentui # pyflakes
 
 _DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
 
-class NodeBook(gtk.Notebook):
+class NodeBook(gtk.Notebook, log.Loggable):
+    logCategory = 'nodebook'
+    
     def __init__(self, admingtk):
         """
         @param admingtk: the GTK Admin with its nodes
@@ -103,7 +105,7 @@ class NodeBook(gtk.Notebook):
             # FIXME: we have no way of showing an error message ?
             # This should be added so users can file bugs.
             self.warning("Component node %s does not have a "
-                "translateable title. Please file a bug." % name)
+                         "translatable title. Please file a bug." % name)
 
             # fall back for now
             title = name

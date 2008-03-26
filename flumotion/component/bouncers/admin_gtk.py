@@ -21,6 +21,7 @@
 
 import os
 
+import gettext
 import gtk
 
 from twisted.internet import defer
@@ -29,6 +30,7 @@ from flumotion.common import errors, componentui
 from flumotion.twisted import flavors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
+_ = gettext.gettext
 __version__ = "$Rev$"
 (
   COLUMN_ID,
@@ -135,7 +137,7 @@ class KeycardsNode(BaseAdminGtkNode):
 class HTPasswdCryptAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
-        keycards = KeycardsNode(self.state, self.admin)
+        keycards = KeycardsNode(self.state, self.admin, _("Keycards"))
         self.nodes['Keycards'] = keycards
         return BaseAdminGtk.setup(self)
 
