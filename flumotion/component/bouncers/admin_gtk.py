@@ -92,6 +92,8 @@ class KeycardsNode(BaseAdminGtkNode):
         def remove(object, key, value):
             self._remove(value)
 
+        self._uiState.addListener(self, append=append, remove=remove)
+
     def _expire_clicked(self, button, treeselection):
         (model, pathlist) = treeselection.get_selected_rows()
         ids = []
@@ -129,11 +131,17 @@ class KeycardsNode(BaseAdminGtkNode):
         del self._iters[id]
         self.model.remove(iter)
 
+    def cleanup(self):
+        self._uiState.removeListener(self)
+
 class HTPasswdCryptAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
         keycards = KeycardsNode(self.state, self.admin, _("Keycards"))
         self.nodes['Keycards'] = keycards
         return BaseAdminGtk.setup(self)
+
+    def cleanup(self):
+        self.nodes['Keycards'].cleanup()
 
 GUIClass = HTPasswdCryptAdminGtk
