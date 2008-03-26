@@ -1,3 +1,8 @@
+2008-03-26  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer-wizard.glade
+	  Missing changes to fix #882.
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/models.py:
