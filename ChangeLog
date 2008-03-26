@@ -1,6 +1,10 @@
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/models.py:
+	(Component.__repr__): print the fully qualified name of the class
+	instead of always showing 'Component'	 
+
+	* flumotion/wizard/models.py:
 	Make the AudioProducer inheirt from Producer, not Component.
 
 	* flumotion/wizard/save.py:

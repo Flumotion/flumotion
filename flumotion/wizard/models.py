@@ -103,7 +103,8 @@ class Component(object):
         self.plugs = []
 
     def __repr__(self):
-        return '<flumotion.wizard.models.Component name=%r>' % self.name
+        return '<%s.%s name=%r>' % (self.__class__.__module__,
+                                    self.__class__.__name__, self.name)
 
     def validate(self):
         if not self.worker:
