@@ -51,6 +51,15 @@ class ProductionStep(WorkerWizardStep):
 
     # Public API
 
+    def hasAudio(self):
+        """Returns if audio will be used in the stream
+        created by the wizard.
+
+        @returns: if audio will be used
+        @rtype:   bool
+        """
+        return self.has_audio.get_active()
+
     def get_audio_producer(self):
         """Returns the selected audio producer or None
         @returns: producer or None

@@ -174,7 +174,7 @@ class ConfigurationWizard(SectionWizard):
         @rtype: bool
         """
         source_step = self.get_step('Source')
-        return bool(source_step.get_audio_producer())
+        return source_step.hasAudio()
 
     def hasVideo(self):
         """If the configured feed has a video stream

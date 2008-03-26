@@ -1,5 +1,18 @@
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py
+	(ConfigurationWizard.hasAudio): 
+	Use the hasAudio method on the production step to find out
+	if we will include audio. We can't just get the model, because
+	it's not created yet.
+
+	* flumotion/wizard/productionsteps.py (ProductionStep.hasAudio): 
+	New method.
+
+	Fixes #884
+
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/models.py:
 	(Component.__repr__): print the fully qualified name of the class
 	instead of always showing 'Component'	 
