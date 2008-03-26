@@ -27,7 +27,7 @@ from zope.interface import implements
 
 from flumotion.common import errors, messages
 from flumotion.common.messages import N_, gettexter
-from flumotion.wizard.basesteps import AudioSourceStep, VideoSourceStep
+from flumotion.wizard.basesteps import AudioProducerStep, VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer, VideoProducer
 
@@ -204,18 +204,18 @@ class _FireWireCommon:
         self._update_output_format()
 
 
-class FireWireVideoStep(_FireWireCommon, VideoSourceStep):
+class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
     name = _('Firewire')
     def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
+        VideoProducerStep.__init__(self, wizard, model)
         _FireWireCommon.__init__(self)
 
 
-class FireWireAudioStep(_FireWireCommon, AudioSourceStep):
+class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
     name = _('Firewire audio')
 
     def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
+        AudioProducerStep.__init__(self, wizard, model)
         _FireWireCommon.__init__(self)
 
     # WizardStep
@@ -240,7 +240,7 @@ class FireWireWizardPlugin(object):
     def getProductionStep(self, type):
         if type == 'audio':
             # Only show firewire audio if we're using firewire video
-            source_step = self.wizard.get_step('Source')
+            source_step = self.wizard.get_step('Producer')
             if source_step.video.get_active() == 'firewire-producer':
                 return
             return FireWireAudioStep(self.wizard, self.audio_model)

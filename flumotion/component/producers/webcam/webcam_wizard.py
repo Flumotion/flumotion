@@ -27,7 +27,7 @@ from zope.interface import implements
 from flumotion.common import errors
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.common.python import sorted
-from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.basesteps import VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer
 
@@ -45,7 +45,7 @@ class WebcamProducer(VideoProducer):
         self.properties.device = '/dev/video0'
 
 
-class WebcamStep(VideoSourceStep):
+class WebcamStep(VideoProducerStep):
     name = _('Webcam')
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'webcam-wizard.glade')
@@ -53,7 +53,7 @@ class WebcamStep(VideoSourceStep):
     icon = 'webcam.png'
 
     def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
+        VideoProducerStep.__init__(self, wizard, model)
         self._in_setup = False
         # _sizes is probed, not set from the UI
         self._sizes = None

@@ -28,14 +28,14 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class AudioSourceStep(WorkerWizardStep):
+class AudioProducerStep(WorkerWizardStep):
     section = _('Production')
     def __init__(self, wizard, model):
         self.model = model
         WorkerWizardStep.__init__(self, wizard)
 
 
-class VideoSourceStep(WorkerWizardStep):
+class VideoProducerStep(WorkerWizardStep):
     section = _('Production')
     icon = 'widget_doc.png'
 

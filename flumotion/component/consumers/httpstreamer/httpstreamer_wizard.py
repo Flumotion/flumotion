@@ -264,7 +264,7 @@ class HTTPStep(ConsumerStep):
         return 'http-streamer'
 
     def getServerConsumers(self):
-        source_step = self.wizard.get_step('Source')
+        source_step = self.wizard.get_step('Production')
         return self.plugarea.getServerConsumers(
            source_step.get_audio_producer(),
            source_step.get_video_producer())

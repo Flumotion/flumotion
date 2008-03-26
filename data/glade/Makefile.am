@@ -20,7 +20,7 @@ glade_DATA = \
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_overview.glade		\
-	wizard_source.glade		\
+	wizard_production.glade		\
 	wizard_summary.glade		\
 	wizard_welcome.glade
 

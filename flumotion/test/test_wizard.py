@@ -91,7 +91,7 @@ class WizardSaveTest(testsuite.TestCase):
         self.workerHeavenState = jelly.unjelly(jelly.jelly(s))
 
     def testFirewireAudioAndVideo(self):
-        source = self.wizard['Source']
+        source = self.wizard['Production']
         source.combobox_video.set_active('firewire-producer')
         source.combobox_audio.set_active('firewire-producer')
 
@@ -99,23 +99,25 @@ class WizardSaveTest(testsuite.TestCase):
         self.wizard.run(False, self.workerHeavenState, True)
 
         config = self.wizard.getConfig()
-        self.assert_(config.has_key('video-source'))
-        self.assert_(not config.has_key('audio-source'))
-        videoSource = config['video-source']
-        self.failUnlessEqual(videoSource.type, 'firewire')
+        self.assert_(config.has_key('video-producer'))
+        self.assert_(not config.has_key('audio-producer'))
+        videoProducer = config['video-producer']
+        self.failUnlessEqual(videoProducer.type, 'firewire')
 
-        self.failUnlessEqual(config['audio-encoder'].getFeeders(), ['video-source:audio'])
-        self.failUnlessEqual(config['video-overlay'].getFeeders(), ['video-source:video'])
+        self.failUnlessEqual(config['audio-encoder'].getFeeders(),
+            ['video-producer:audio'])
+        self.failUnlessEqual(config['video-overlay'].getFeeders(),
+            ['video-producer:video'])
     testFirewireAudioAndVideo.skip = 'Maybe Andy\'s generator work broke this ?'
 
     def testAudioTestWorkers(self):
-        source = self.wizard['Source']
+        source = self.wizard['Production']
         source.combobox_video.set_active('webcam-producer')
         source.combobox_audio.set_active('audiotest-producer')
 
         self.wizard.run(False, ['first', 'second'], True)
 
-        self.wizard['Source'].worker = 'second'
+        self.wizard['Production'].worker = 'second'
         self.wizard['Webcam'].worker = 'second'
         self.wizard['Overlay'].worker = 'second'
         self.wizard['Encoding'].worker = 'second'

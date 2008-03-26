@@ -110,7 +110,7 @@ class ConversionStep(WorkerWizardStep):
     def activated(self):
         data = [('muxer', self.muxer)]
 
-        production = self.wizard.get_step('Source')
+        production = self.wizard.get_step('Production')
         audio_producer = production.get_audio_producer()
         if audio_producer:
             data.append(('audio-encoder', self.audio))

@@ -24,7 +24,7 @@ import os
 
 from zope.interface import implements
 
-from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.basesteps import AudioProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer
 
@@ -41,8 +41,8 @@ class TestAudioProducer(AudioProducer):
         self.properties.rate = '44100'
 
 
-class TestAudioSourceStep(AudioSourceStep):
-    name = _('Test Audio Source')
+class TestAudioProducerStep(AudioProducerStep):
+    name = _('Test Audio Producer')
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'audiotest-wizard.glade')
     icon = 'soundcard.png'
@@ -78,4 +78,4 @@ class AudioTestWizardPlugin(object):
         self.model = TestAudioProducer()
 
     def getProductionStep(self, type):
-        return TestAudioSourceStep(self.wizard, self.model)
+        return TestAudioProducerStep(self.wizard, self.model)

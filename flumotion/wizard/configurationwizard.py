@@ -173,7 +173,7 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have audio
         @rtype: bool
         """
-        source_step = self.get_step('Source')
+        source_step = self.get_step('Production')
         return source_step.hasAudio()
 
     def hasVideo(self):
@@ -181,7 +181,7 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have video
         @rtype: bool
         """
-        source_step = self.get_step('Source')
+        source_step = self.get_step('Production')
         return bool(source_step.get_video_producer())
 
     def getConsumptionSteps(self):
@@ -446,7 +446,7 @@ class ConfigurationWizard(SectionWizard):
         save = WizardSaver()
         save.setFlowName(self._flowName)
 
-        source_step = self.get_step('Source')
+        source_step = self.get_step('Production')
         save.setAudioProducer(source_step.get_audio_producer())
         save.setVideoProducer(source_step.get_video_producer())
 

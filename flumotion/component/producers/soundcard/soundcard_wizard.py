@@ -26,7 +26,7 @@ from zope.interface import implements
 
 from flumotion.common import enum
 from flumotion.common.messages import N_, gettexter, Info
-from flumotion.wizard.basesteps import AudioSourceStep
+from flumotion.wizard.basesteps import AudioProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer
 
@@ -71,7 +71,7 @@ class SoundcardProducer(AudioProducer):
         self.properties.source_element = 'alsasrc'
 
 
-class SoundcardStep(AudioSourceStep):
+class SoundcardStep(AudioProducerStep):
     name = _('Soundcard')
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'soundcard-wizard.glade')
@@ -79,7 +79,7 @@ class SoundcardStep(AudioSourceStep):
     icon = 'soundcard.png'
 
     def __init__(self, wizard, model):
-        AudioSourceStep.__init__(self, wizard, model)
+        AudioProducerStep.__init__(self, wizard, model)
         self._block_update = False
 
     # WizardStep

@@ -35,7 +35,7 @@ from zope.interface import implements
 
 from flumotion.common import errors
 from flumotion.common.messages import N_, gettexter, Info
-from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.basesteps import VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer
 
@@ -53,7 +53,7 @@ class TVCardProducer(VideoProducer):
         self.properties.device = '/dev/video0'
 
 
-class TVCardStep(VideoSourceStep):
+class TVCardStep(VideoProducerStep):
     name = _('TV Card')
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'bttv-wizard.glade')
@@ -61,7 +61,7 @@ class TVCardStep(VideoSourceStep):
     icon = 'tv.png'
 
     def __init__(self, wizard, model):
-        VideoSourceStep.__init__(self, wizard, model)
+        VideoProducerStep.__init__(self, wizard, model)
         self._in_setup = False
 
     # WizardStep

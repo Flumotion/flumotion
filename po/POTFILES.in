@@ -382,7 +382,7 @@ flumotion/project/__init__.py
 data/glade/wizard.glade
 data/glade/wizard_welcome.glade
 data/glade/wizard_overview.glade
-data/glade/wizard_source.glade
+data/glade/wizard_production.glade
 data/glade/videotest.glade
 data/glade/connections.glade
 data/glade/admin.glade

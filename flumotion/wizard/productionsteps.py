@@ -38,8 +38,8 @@ N_ = _ = gettext.gettext
 
 class ProductionStep(WorkerWizardStep):
 
-    glade_file = 'wizard_source.glade'
-    name = _('Source')
+    glade_file = 'wizard_production.glade'
+    name = _('Production')
     section = _('Production')
     icon = 'source.png'
 
@@ -80,7 +80,7 @@ class ProductionStep(WorkerWizardStep):
         """Return the video step to be shown, given the currently
         selected values in this step
         @returns: video step
-        @rtype: a deferred returning a L{VideoSourceStep} instance
+        @rtype: a deferred returning a L{basesteps.VideoProducerStep} instance
         """
         def step_loaded(step):
             if step is not None:
@@ -96,7 +96,7 @@ class ProductionStep(WorkerWizardStep):
         """Return the audio step to be shown, given the currently
         selected values in this step
         @returns: audio step
-        @rtype: a deferred returning an L{AudioSourceStep} instance
+        @rtype: a deferred returning a L{basesteps.AudioProducerStep} instance
         """
         def step_loaded(step):
             if step is not None:

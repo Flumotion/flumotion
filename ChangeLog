@@ -1,3 +1,25 @@
+2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_production.glade:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	  Change wrongly named source/Source instances to (p|P)roduc(er|tion).
+	  Fixes #901.
+
 2008-03-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

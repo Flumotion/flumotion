@@ -25,7 +25,7 @@ import os
 import gtk
 from zope.interface import implements
 
-from flumotion.wizard.basesteps import VideoSourceStep
+from flumotion.wizard.basesteps import VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer
 
@@ -43,8 +43,8 @@ class TestVideoProducer(VideoProducer):
         self.properties.format = 'video/x-raw-yuv'
 
 
-class TestVideoSourceStep(VideoSourceStep):
-    name = _('Test Video Source')
+class TestVideoProducerStep(VideoProducerStep):
+    name = _('Test Video Producer')
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'videotest-wizard.glade')
     component_type = 'videotestsrc'
@@ -86,5 +86,5 @@ class VideoTestWizardPlugin(object):
         self.model = TestVideoProducer()
 
     def getProductionStep(self, type):
-        return TestVideoSourceStep(self.wizard, self.model)
+        return TestVideoProducerStep(self.wizard, self.model)
 
