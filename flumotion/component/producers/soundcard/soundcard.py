@@ -50,7 +50,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
         element = properties.get('source-element', 'alsasrc')
-        device = properties.get('device', 'hw:0')
+        self.device = properties.get('device', 'hw:0')
         rate = properties.get('rate', 44100)
         depth = properties.get('depth', 16)
         channels = properties.get('channels', 2)
@@ -65,7 +65,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
             rate, depth, channels)
         pipeline = "%s device=%s name=src ! %s ! " \
             "level name=volumelevel message=true" % (
-            element, device, caps)
+            element, self.device, caps)
         self._srcelement = None
         return pipeline
 
@@ -148,3 +148,24 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         else:
             self.warning("no input track selected, cannot set volume")
         return 1.0
+
+    def make_message_for_gstreamer_error(self, gerror, debug):
+        if gerror.domain == 'gst-resource-error-quark':
+            # before 0.10.14 gst-plugins-base had the error as WRITE by mistake
+            if gerror.code in [
+                gst.RESOURCE_ERROR_OPEN_WRITE,
+                gst.RESOURCE_ERROR_OPEN_READ]:
+                m = messages.Error(T_(N_(
+                    "Could not open sound device '%s'.  "
+                    "Please check permissions on the device."),
+                    self.device), debug=debug)
+                return m
+            if gerror.code == gst.RESOURCE_ERROR_BUSY:
+                m = messages.Error(T_(N_(
+                    "The sound device '%s' is in use by another program.  "
+                    "Please stop the other program and try again."),
+                    self.device))
+                return m
+
+        base = feedcomponent.ParseLaunchComponent
+        return base.make_message_for_gstreamer_error(self, gerror, debug)

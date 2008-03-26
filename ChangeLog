@@ -1,5 +1,13 @@
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  Handle BUSY and OPEN_READ/OPEN_WRITE better so we get a nicer
+	  message.  Fixes #743.
+	* po/nl.po:
+	  Add translation.
+
+2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  Wrap subclass method invoke into something that can catch
 	  programming errors and shows them.
