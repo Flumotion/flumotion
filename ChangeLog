@@ -1,5 +1,11 @@
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/save.py:
+	  Make saving of config with a producer-video use consistent naming.
+
+2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/documentation.py:
 	  Forgot to rename an attribute to .section here too.  Fixes #897.
 

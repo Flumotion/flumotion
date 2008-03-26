@@ -238,7 +238,7 @@ class WizardSaver(object):
         if not self._videoProducer:
             return
 
-        self._videoProducer.name = 'video-producer'
+        self._videoProducer.name = 'producer-video'
         self._flowComponents.append(self._videoProducer)
 
         if self._videoEncoder is None:
