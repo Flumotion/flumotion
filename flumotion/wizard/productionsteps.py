@@ -113,7 +113,6 @@ class ProductionStep(WorkerWizardStep):
         tips.set_tip(self.has_video, _('If you want to stream video'))
         tips.set_tip(self.has_audio, _('If you want to stream audio'))
 
-    def activated(self):
         self._populate_combos()
 
     def get_next(self):

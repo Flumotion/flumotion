@@ -1,3 +1,9 @@
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/productionsteps.py (ProductionStep.setup): 
+	Populate production combos in setup() instead of activate(), to
+	avoid reverting to the default state when going back to this step.
+
 2008-03-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* doc/random/wizard-plugin:
