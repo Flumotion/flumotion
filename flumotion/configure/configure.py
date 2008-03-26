@@ -82,6 +82,7 @@ different configdir, logdir and rundir.
 # FIXME: document all the module variables
 
 import os
+import sys
 
 __version__ = "$Rev$"
 
@@ -108,6 +109,8 @@ _config['processKillWait'] = 5
 
 # default value for component heartbeat interval, in seconds
 _config['heartbeatInterval'] = 5
+
+_config['bindir'] = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))

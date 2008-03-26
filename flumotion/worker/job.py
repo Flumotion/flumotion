@@ -31,6 +31,7 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import errors, log
 from flumotion.common import messages
+from flumotion.configure import configure
 from flumotion.worker import base
 
 __version__ = "$Rev$"
@@ -198,7 +199,7 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         d = self._startSet.createStart(avatarId)
 
         p = base.JobProcessProtocol(self, avatarId, self._startSet)
-        executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
+        executable = os.path.join(configure.bindir, 'flumotion-job')
         if not os.path.exists(executable):
             self.error("Trying to spawn job process, but '%s' does not "
                        "exist", executable)
@@ -288,7 +289,7 @@ class CheckJobHeaven(base.BaseJobHeaven):
         d = self._startSet.createStart(avatarId)
 
         p = base.JobProcessProtocol(self, avatarId, self._startSet)
-        executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
+        executable = os.path.join(configure.bindir, 'flumotion-job')
         argv = [executable, avatarId, self._socketPath]
 
         childFDs = {0: 0, 1: 1, 2: 2}
