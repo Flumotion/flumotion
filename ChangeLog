@@ -1,3 +1,9 @@
+2008-03-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  Delete messages from component state when stopping a sad component.
+	  Fixes #797.
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_wizard_save.py:

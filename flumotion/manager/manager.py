@@ -736,8 +736,11 @@ class Vishnu(log.Loggable):
         # because we changed above to allow stopping even if moodPending
         # is happy
         def stopSad():
-            # FIXME: clear messages?
             self.debug('asked to stop a sad component without avatar')
+            for mid in componentState.get('messages')[:]:
+                self.debug("Deleting message %r", mid)
+                componentState.remove('messages', mid)
+
             componentState.setMood(moods.sleeping.value)
             componentState.set('moodPending', None)
             return defer.succeed(None)
