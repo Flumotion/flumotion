@@ -249,14 +249,6 @@ class AdminAvatar(base.ManagerAvatar):
            entry.location, entry.function))
         return (entry.location, entry.function)
 
-    def perspective_reloadManager(self):
-        """
-        Reload modules in the manager.
-        """
-        self.info('reloading manager code')
-        from flumotion.common.reload import reload as freload
-        freload()
-
     def perspective_getConfiguration(self):
         """
         Get the configuration of the manager as an XML string.

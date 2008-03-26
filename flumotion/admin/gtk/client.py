@@ -85,9 +85,6 @@ MAIN_UI = """
     <menu action="debug">
       <menuitem action="debug-enable"/>
       <separator name="sep5"/>
-      <menuitem action="reload-manager"/>
-      <menuitem action="reload-admin"/>
-      <menuitem action="reload-all"/>
       <menuitem action="start-shell"/>
     </menu>
     <menu action="help">
@@ -337,15 +334,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._debugActions = gtk.ActionGroup('actions')
         self._debugActions.add_actions([
             # Debug
-            ('reload-manager', gtk.STOCK_REFRESH, _('Reload _Manager'), None,
-             _('Reload the code used by the manager'),
-             self._debug_reload_manager_cb),
-            ('reload-admin', gtk.STOCK_REFRESH, _('Reload _Admin'), None,
-             _('Reload the code used by the admin client'),
-             self._debug_reload_admin_cb),
-            ('reload-all', gtk.STOCK_REFRESH, _('Reload A_ll'), None,
-             _('Reload the code used by the admin client, manager and workers'),
-             self._debug_reload_all_cb),
             ('start-shell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
              _('Start an interactive debugging shell'),
              self._debug_start_shell_cb),
@@ -1019,58 +1007,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         d.connect('response', response)
         d.show()
 
-    def _reload_manager(self):
-        return self._admin.callRemote('reloadManager')
-
-    def _reload_admin(self):
-        self.info('Reloading admin code')
-        from flumotion.common.reload import reload as freload
-        freload()
-        self.info('Reloaded admin code')
-
-    def _reload_all(self):
-        dialog = ProgressDialog(_("Reloading ..."),
-            _("Reloading client code"), self._window)
-
-        # FIXME: move all of the reloads over to this dialog
-        def _stopCallback(result):
-            dialog.stop()
-            dialog.destroy()
-
-        def _syntaxErrback(failure):
-            failure.trap(ReloadSyntaxError)
-            dialog.stop()
-            dialog.destroy()
-            self._error(
-                _("Could not reload component:\n%s.") %
-                failure.getErrorMessage())
-            return None
-
-        def _defaultErrback(failure):
-            self.warning('Errback: unhandled failure: %s' %
-                failure.getErrorMessage())
-            return failure
-
-        def _callLater():
-            d = maybeDeferred(self._reload_admin)
-            d.addCallback(lambda _: self._reload_manager())
-            # stack callbacks so that a new one only gets sent after the
-            # previous one has completed
-            for c in self._components.values():
-                # FIXME: race condition if components log in or out.
-                d.addCallback(lambda _, c: self._component_reload(c), c)
-            d.addCallback(_stopCallback)
-            d.addErrback(_syntaxErrback)
-            d.addErrback(_defaultErrback)
-            # FIXME: errback to close the reloading dialog?
-
-        def _reloadCallback(admin, text):
-            dialog.message(_("Reloading %s code") % text)
-
-        self._admin.connect('reloading', _reloadCallback)
-        dialog.start()
-        reactor.callLater(0.2, _callLater)
-
     def _start_shell(self):
         if sys.version_info >= (2, 4):
             from flumotion.extern import code
@@ -1177,15 +1113,6 @@ You can do remote component calls using:
 
     def _debug_enable_cb(self, action):
         self.setDebugEnabled(action.get_active())
-
-    def _debug_reload_manager_cb(self, action):
-        self._reload_manager()
-
-    def _debug_reload_admin_cb(self, action):
-        self._reload_admin()
-
-    def _debug_reload_all_cb(self, action):
-        self._reload_all()
 
     def _debug_start_shell_cb(self, action):
         self._start_shell()

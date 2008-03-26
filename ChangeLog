@@ -1,3 +1,11 @@
+2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Michael Smith
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/admin.py:
+	Remove dangerous debug options. Fixes #893.
+
 2008-03-26  Sebastien Merle  <sebastien@fluendo.com>
 
 	reviewed by: Johan Dahlin
