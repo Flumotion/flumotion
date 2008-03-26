@@ -1,3 +1,9 @@
+2008-03-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/componentview.py:
+	  Don't attempt to display UI for sad components.
+	  Fixes #899.
+
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
 	* data/cortado-template.html: 

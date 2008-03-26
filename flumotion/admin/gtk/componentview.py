@@ -221,8 +221,8 @@ class ComponentView(gtk.VBox, log.Loggable):
             self._set_state(OBJECT_UNSET)
         def set(state, key, value):
             if key == 'mood':
-                if (value != planet.moods.lost.value
-                    and value != planet.moods.sleeping.value):
+                if value not in [planet.moods.lost.value, 
+                        planet.moods.sleeping.value, planet.moods.sad.value]:
                     self._set_state(OBJECT_ACTIVE)
                 else:
                     self._set_state(OBJECT_INACTIVE)
