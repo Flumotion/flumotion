@@ -1,6 +1,10 @@
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard_save.py
+	(TestWizardSave): avoid hard coding the version, otherwise we'll
+	just break when the version number is bumped.
+	
+	* flumotion/test/test_wizard_save.py
 	(TestWizardSave.testDefaultStream):  Add a firewire test.
 
 	* flumotion/wizard/productionsteps.py (ProductionStep.setup): 

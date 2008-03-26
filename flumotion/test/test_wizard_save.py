@@ -22,6 +22,7 @@
 import unittest
 
 from flumotion.common import testsuite
+from flumotion.configure import configure
 from flumotion.component.producers.firewire.firewire_wizard import \
      FireWireVideoProducer, FireWireAudioProducer
 from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
@@ -61,10 +62,10 @@ class TestXMLWriter(testsuite.TestCase):
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name" type="streamer" '
-             'project="flumotion" worker="worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="worker" version="%(version)s">\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             writer.getXML())
 
     def testAtmosphereComponent(self):
@@ -78,12 +79,12 @@ class TestXMLWriter(testsuite.TestCase):
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="name" type="streamer" '
-             'project="flumotion" worker="worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="worker" version="%(version)s">\n'
              '      \n'
              '      <property name="foo">bar</property>\n'
              '    </component>\n'
              '  </atmosphere>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             writer.getXML())
 
     def testComponentWithPlug(self):
@@ -100,7 +101,7 @@ class TestXMLWriter(testsuite.TestCase):
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name" type="streamer" '
-             'project="flumotion" worker="worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="worker" version="%(version)s">\n'
              '      \n'
              '      <plugs>\n'
              '        <plug type="plug-type">\n'
@@ -110,7 +111,7 @@ class TestXMLWriter(testsuite.TestCase):
              '      </plugs>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             writer.getXML())
 
     def testComponentWithFeeders(self):
@@ -129,16 +130,16 @@ class TestXMLWriter(testsuite.TestCase):
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name" type="first" '
-             'project="flumotion" worker="worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>name</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="name" type="second" '
-             'project="flumotion" worker="worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="worker" version="%(version)s">\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             writer.getXML())
 
 
@@ -226,7 +227,7 @@ class TestWizardSave(testsuite.TestCase):
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="porter-audio-video" type="porter" '
-             'project="flumotion" worker="streamer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="password">password</property>\n'
              '      <property name="port">8080</property>\n'
@@ -236,7 +237,7 @@ class TestWizardSave(testsuite.TestCase):
              '  </atmosphere>\n'
              '  <flow name="flow">\n'
              '    <component name="http-audio-video" type="http-streamer" '
-             'project="flumotion" worker="streamer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
@@ -245,33 +246,33 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="port">8080</property>\n'
              '    </component>\n'
              '    <component name="http-server-audio-video" type="http-server" '
-             'project="flumotion" worker="server-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="server-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="mount-point">/mount/</property>\n'
              '    </component>\n'
              '    <component name="producer-audio" type="audio-producer" '
-             'project="flumotion" worker="audio-producer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="audio-producer-worker" version="%(version)s">\n'
              '    </component>\n'
              '    <component name="encoder-audio" type="audio-encoder" '
-             'project="flumotion" worker="audio-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="video-producer" type="video-producer" '
-             'project="flumotion" worker="video-producer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="video-producer-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="height">480</property>\n'
              '      <property name="width">640</property>\n'
              '    </component>\n'
              '    <component name="encoder-video" type="video-encoder" '
-             'project="flumotion" worker="video-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="video-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>overlay-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="overlay-video" type="overlay-converter" '
-             'project="flumotion" worker="overlay-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="overlay-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>video-producer</feed>\n'
              '      </eater>\n'
@@ -283,14 +284,14 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="width">640</property>\n'
              '    </component>\n'
              '    <component name="muxer-audio-video" type="default-muxer" '
-             'project="flumotion" worker="muxer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="muxer-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>encoder-audio</feed>\n'
              '        <feed>encoder-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             configuration)
 
     def testMultiFeedProducer(self):
@@ -312,25 +313,25 @@ class TestWizardSave(testsuite.TestCase):
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="encoder-audio" type="audio-encoder" '
-             'project="flumotion" worker="audio-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="producer-audio-video" type="both-producer" '
-             'project="flumotion" worker="both-producer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="both-producer-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="height">480</property>\n'
              '      <property name="width">640</property>\n'
              '    </component>\n'
              '    <component name="encoder-video" type="video-encoder" '
-             'project="flumotion" worker="video-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="video-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             configuration)
 
     def testOggStream(self):
@@ -365,7 +366,7 @@ class TestWizardSave(testsuite.TestCase):
         testsuite.diffStrings(
             ('<planet>\n'
              '  <flow name="flow">\n'
-             '    <component name="http-audio-video" type="http-streamer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="http-audio-video" type="http-streamer" project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
@@ -373,25 +374,25 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="port">8080</property>\n'
              '    </component>\n'
-             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="%(version)s">\n'
              '      \n'
              '      <property name="rate">44100</property>\n'
              '    </component>\n'
-             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio</feed>\n'
              '      </eater>\n'
              '      \n'
              '      <property name="bitrate">64000</property>\n'
              '    </component>\n'
-             '    <component name="video-producer" type="videotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="video-producer" type="videotest-producer" project="flumotion" worker="worker" version="%(version)s">\n'
              '      \n'
              '      <property name="format">video/x-raw-yuv</property>\n'
              '      <property name="height">240</property>\n'
              '      <property name="pattern">0</property>\n'
              '      <property name="width">320</property>\n'
              '    </component>\n'
-             '    <component name="encoder-video" type="theora-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="encoder-video" type="theora-encoder" project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>overlay-video</feed>\n'
              '      </eater>\n'
@@ -401,7 +402,7 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="quality">16</property>\n'
              '      <property name="sharpness">0</property>\n'
              '    </component>\n'
-             '    <component name="overlay-video" type="overlay-converter" project="flumotion" worker="overlay-worker" version="0.5.1.1">\n'
+             '    <component name="overlay-video" type="overlay-converter" project="flumotion" worker="overlay-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>video-producer</feed>\n'
              '      </eater>\n'
@@ -412,14 +413,14 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="width">320</property>\n'
              '      <property name="xiph-logo">True</property>\n'
              '    </component>\n'
-             '    <component name="muxer-audio-video" type="ogg-muxer" project="flumotion" worker="muxer-worker" version="0.5.1.1">\n'
+             '    <component name="muxer-audio-video" type="ogg-muxer" project="flumotion" worker="muxer-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>encoder-audio</feed>\n'
              '        <feed>encoder-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             configuration)
 
     def testAudioOnlyStream(self):
@@ -448,7 +449,7 @@ class TestWizardSave(testsuite.TestCase):
         testsuite.diffStrings(
             ('<planet>\n'
              '  <flow name="flow">\n'
-             '    <component name="http-audio-only" type="http-streamer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="http-audio-only" type="http-streamer" project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-only</feed>\n'
              '      </eater>\n'
@@ -456,11 +457,11 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="port">8080</property>\n'
              '    </component>\n'
-             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="producer-audio" type="audiotest-producer" project="flumotion" worker="worker" version="%(version)s">\n'
              '      \n'
              '      <property name="rate">44100</property>\n'
              '    </component>\n'
-             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="0.5.1.1">\n'
+             '    <component name="encoder-audio" type="vorbis-encoder" project="flumotion" worker="worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio</feed>\n'
              '      </eater>\n'
@@ -468,7 +469,7 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="bitrate">64000</property>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             configuration)
 
     def testFirewireStreamer(self):
@@ -502,7 +503,7 @@ class TestWizardSave(testsuite.TestCase):
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="porter-audio-video" type="porter" '
-             'project="flumotion" worker="streamer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="password">password</property>\n'
              '      <property name="port">8080</property>\n'
@@ -512,7 +513,7 @@ class TestWizardSave(testsuite.TestCase):
              '  </atmosphere>\n'
              '  <flow name="flow">\n'
              '    <component name="http-audio-video" type="http-streamer" '
-             'project="flumotion" worker="streamer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
@@ -521,32 +522,32 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="port">8080</property>\n'
              '    </component>\n'
              '    <component name="http-server-audio-video" type="http-server" '
-             'project="flumotion" worker="server-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="server-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="mount-point">/mount/</property>\n'
              '    </component>\n'
              '    <component name="encoder-audio" type="audio-encoder" '
-             'project="flumotion" worker="audio-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="producer-audio-video" '
              'type="firewire-producer" project="flumotion" '
-             'worker="firewire-video-producer-worker" version="0.5.1.1">\n'
+             'worker="firewire-video-producer-worker" version="%(version)s">\n'
              '      \n'
              '      <property name="height">480</property>\n'
              '      <property name="is-square">False</property>\n'
              '      <property name="width">640</property>\n'
              '    </component>\n'
              '    <component name="encoder-video" type="video-encoder" '
-             'project="flumotion" worker="video-encoder-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="video-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>overlay-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="overlay-video" type="overlay-converter" '
-             'project="flumotion" worker="overlay-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="overlay-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
@@ -558,14 +559,14 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="width">640</property>\n'
              '    </component>\n'
              '    <component name="muxer-audio-video" type="default-muxer" '
-             'project="flumotion" worker="muxer-worker" version="0.5.1.1">\n'
+             'project="flumotion" worker="muxer-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>encoder-audio</feed>\n'
              '        <feed>encoder-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '  </flow>\n'
-             '</planet>\n'),
+             '</planet>\n' % dict(version=configure.version)),
             configuration)
 
 if __name__ == '__main__':
