@@ -28,7 +28,7 @@ import time
 from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
-from flumotion.common import common, errors, pygobject, messages
+from flumotion.common import common, errors, pygobject, messages, log
 from flumotion.common import gstreamer
 from flumotion.component import feed, padmonitor
 from flumotion.component.feeder import Feeder
@@ -232,7 +232,17 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('element %s error %s %s',
                          src.get_path_string(), gerror, debug)
             self.setMood(moods.sad)
-            m = self.make_message_for_gstreamer_error(gerror, debug)
+
+            # this method can fail if the component has a mistake
+            try:
+                m = self.make_message_for_gstreamer_error(gerror, debug)
+            except Exception, e:
+                msg = log.getExceptionMessage(e)
+                m = messages.Error(T_(N_(
+                    "Programming error in component.")),
+                    debug="Bug in %r.make_message_for_gstreamer_error: %s" % (
+                        self.__class__, msg))
+                
             self.state.append('messages', m)
             self._change_monitor.have_error(self.pipeline.get_state(),
                                             message)
