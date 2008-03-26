@@ -1,3 +1,9 @@
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/base/component.glade:
+	Make all the labels in the newly added statistics tab selectable,
+	as suggested by Mike.
+
 2008-03-26  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/componentview.py:
