@@ -59,7 +59,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self._registerLabel('stream-' + type)
         for type in ['current', 'average', 'max', 'peak', 'peak-time']:
             self._registerLabel('clients-' + type)
-        for type in ['bitrate', 'totalbytes']:
+        for type in ['bitrate', 'bitrate-current', 'totalbytes']:
             self._registerLabel('consumption-' + type)
 
         if self._stats:

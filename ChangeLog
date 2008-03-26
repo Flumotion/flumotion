@@ -1,3 +1,13 @@
+2008-03-26  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.glade:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	  Add a row to the http admin showing the current aggregate client bitrate
+	  usage. Rename 'Bitrate' to 'Average bitrate' to clarify what the other
+	  one is.
+	  Fixes #815.
+
 2008-03-26  Pedro Gracia  <pedro@flumotion.com>
 
 	* data/glade/authenticate.glade:

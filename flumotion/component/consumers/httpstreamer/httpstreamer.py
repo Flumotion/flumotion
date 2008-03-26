@@ -190,6 +190,8 @@ class Stats:
 
         bitspeed = bytes_sent * 8 / uptime
         set('consumption-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('consumption-bitrate-current', 
+            common.formatStorage(currentbitrate * c.getClients()) + 'bit/s')
         set('consumption-totalbytes', common.formatStorage(bytes_sent) + 'Byte')
         set('consumption-bitrate-raw', bitspeed)
         set('consumption-totalbytes-raw', bytes_sent)
@@ -294,6 +296,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                   'stream-bitrate', 'stream-totalbytes', 'clients-current',
                   'clients-max', 'clients-peak', 'clients-peak-time',
                   'clients-average', 'consumption-bitrate',
+                  'consumption-bitrate-current',
                   'consumption-totalbytes', 'stream-bitrate-raw',
                   'stream-totalbytes-raw', 'consumption-bitrate-raw',
                   'consumption-totalbytes-raw', 'stream-url'):
