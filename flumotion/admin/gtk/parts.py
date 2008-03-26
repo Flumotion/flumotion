@@ -206,14 +206,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
         col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
 
-        def type_pid_datafunc(column, cell, model, iter):
-            state = model.get_value(iter, COL_STATE)
-            pid = state.get('pid')
-            cell.set_property('text', pid and str(pid) or '')
-
         t = gtk.CellRendererText()
-        col = gtk.TreeViewColumn('PID', t, text=COL_PID)
-        col.set_cell_data_func(t, type_pid_datafunc)
+        col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID)
         col.set_sort_column_id(COL_PID)
         self._view.append_column(col)
 
@@ -409,6 +403,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
         if mood == moods.sleeping.value:
             markup = "<i>%s</i>" % workerName
         self._model.set(iter, COL_WORKER, markup)
+        pid = componentState.get('pid')
+        self._model.set(iter, COL_PID, (pid and str(pid)) or '')
 
     def stateSet(self, state, key, value):
         if not isinstance(state, planet.AdminComponentState):

@@ -1,3 +1,11 @@
+2008-03-26  Sebastien Merle  <sebastien@fluendo.com>
+
+	reviewed by: Johan Dahlin
+
+	* flumotion/admin/gtk/parts.py:
+	Do not use data function for PID column, it cannot be sorted.
+	Fixes #312.
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/Makefile.am:
