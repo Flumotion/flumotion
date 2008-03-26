@@ -1,3 +1,8 @@
+2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/documentation.py:
+	  Forgot to rename an attribute to .section here too.  Fixes #897.
+
 2008-03-20  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/configure/configure.py:

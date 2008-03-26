@@ -52,6 +52,6 @@ def getMessageWebLink(message, LL=None):
     version = common.versionTupleToString(versionTuple[:3])
     
     url = '%s/%s/%s/html/%s.html#%s' % (
-        docURL, LL, version, message.chapter, message.anchor)
+        docURL, LL, version, message.section, message.anchor)
 
     return url
