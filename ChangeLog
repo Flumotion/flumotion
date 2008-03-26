@@ -1,5 +1,10 @@
 2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	Remove 8 bit option for soundcard completely.
+
+2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	reviewed by: Johan Dahlin
 
 	* flumotion/component/producers/soundcard/soundcard_wizard.py:

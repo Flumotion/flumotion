@@ -42,8 +42,7 @@ ALSA_DEVICES = ['hw:0',
                 'hw:2']
 CHANNELS = [(_('Stereo'), 2),
             (_('Mono'), 1)]
-BITDEPTHS = [(_('16-bit'), 16),
-             (_('8-bit'), 8)]
+BITDEPTHS = [(_('16-bit'), 16)]
 SAMPLE_RATES = [48000,
                 44100,
                 32000,
