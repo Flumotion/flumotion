@@ -392,7 +392,7 @@ class TestWizardSave(testsuite.TestCase):
              '        <feed>overlay-video</feed>\n'
              '      </eater>\n'
              '      \n'
-             '      <property name="keyframe-maxdistance">64</property>\n'
+             '      <property name="keyframe-maxdistance">50</property>\n'
              '      <property name="noise-sensitivity">1</property>\n'
              '      <property name="quality">16</property>\n'
              '      <property name="sharpness">0</property>\n'

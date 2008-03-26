@@ -43,7 +43,7 @@ class TheoraVideoEncoder(VideoEncoder):
         super(TheoraVideoEncoder, self).__init__()
         self.has_quality = True
         self.has_bitrate = False
-        self.framerate = 0.0
+        self.framerate = 25.0
 
         self.properties.noise_sensitivity = 0
         self.properties.keyframe_delta = 2.0
@@ -72,6 +72,9 @@ class TheoraVideoEncoder(VideoEncoder):
         properties.keyframe_maxdistance = int(properties.keyframe_delta *
             self.framerate)
         del properties.keyframe_delta
+
+        self.debug('keyframe_maxdistance: %r',
+            properties.keyframe_maxdistance)
 
         return properties
 

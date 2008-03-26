@@ -21,6 +21,7 @@
 
 """model objects used by the wizard steps"""
 
+from flumotion.common import log
 from flumotion.common.errors import ComponentError, ComponentValidationError
 
 __version__ = "$Rev$"
@@ -73,7 +74,7 @@ class Properties(dict):
         return '<Properties %r>' % (dict.__repr__(self),)
 
 
-class Component(object):
+class Component(object, log.Loggable):
     """I am a Component.
     A component has a name which identifies it and must be unique
     within a flow.
