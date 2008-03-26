@@ -65,8 +65,8 @@ class SoundcardProducer(AudioProducer):
 
         self.properties.input_track = ''
         self.properties.channels = 2
-        self.properties.rate = 8000
-        self.properties.depth = 8
+        self.properties.rate = 44100
+        self.properties.depth = 16
         self.properties.device = ''
         self.properties.source_element = 'alsasrc'
 

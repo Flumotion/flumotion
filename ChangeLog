@@ -1,3 +1,11 @@
+2008-03-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Johan Dahlin
+
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	Use sensible defaults for soundcard producer.
+	Fixes #870.
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/audiotest/audiotest-wizard.glade:
