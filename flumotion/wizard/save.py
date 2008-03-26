@@ -22,7 +22,7 @@
 import gettext
 
 from flumotion.wizard.configurationwriter import ConfigurationWriter
-from flumotion.wizard.models import Muxer, AudioProducer, VideoProducer, \
+from flumotion.wizard.models import Muxer, Producer, \
      AudioEncoder, VideoEncoder
 
 _ = gettext.gettext
@@ -63,9 +63,9 @@ class WizardSaver(object):
         @type audioProducer: L{AudioProducer} subclass or None
         """
         if (audioProducer is not None and
-            not isinstance(audioProducer, AudioProducer)):
+            not isinstance(audioProducer, Producer)):
             raise TypeError(
-                "audioProducer must be a AudioProducer subclass, not %r" % (
+                "audioProducer must be a Producer subclass, not %r" % (
                 audioProducer,))
         self._audioProducer = audioProducer
 
@@ -75,9 +75,9 @@ class WizardSaver(object):
         @type videoProducer: L{VideoProducer} subclass or None
         """
         if (videoProducer is not None and
-            not isinstance(videoProducer, VideoProducer)):
+            not isinstance(videoProducer, Producer)):
             raise TypeError(
-                "videoProducer must be a VideoProducer subclass, not %r" % (
+                "videoProducer must be a Producer subclass, not %r" % (
                 videoProducer,))
         self._videoProducer = videoProducer
 

@@ -260,7 +260,7 @@ class Consumer(Component):
                 (self.name,))
 
 
-class AudioProducer(Component):
+class AudioProducer(Producer):
     """I am a component which produces audio
     """
     name_template = "audio-producer"

@@ -1,5 +1,16 @@
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/models.py:
+	Make the AudioProducer inheirt from Producer, not Component.
+
+	* flumotion/wizard/save.py:
+	Allow video and audio producers to be subclasses of Producer.
+
+	* flumotion/test/test_wizard_save.py:
+	Create one producer and use it for both audio and video
+
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard_save.py
 	(TestWizardSave): avoid hard coding the version, otherwise we'll
 	just break when the version number is bumped.

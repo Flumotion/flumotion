@@ -185,11 +185,6 @@ class TestWizardSave(testsuite.TestCase):
         streamer.porter_password = 'password'
         return streamer
 
-    def _createFirewireAudioProducer(self):
-        audioProducer = FireWireAudioProducer()
-        audioProducer.worker = 'firewire-audio-producer-worker'
-        return audioProducer
-
     def _createFirewireVideoProducer(self):
         videoProducer = FireWireVideoProducer()
         videoProducer.worker = 'firewire-video-producer-worker'
@@ -476,9 +471,8 @@ class TestWizardSave(testsuite.TestCase):
         save = WizardSaver()
         save.setFlowName('flow')
 
-        producer = self._createFirewireAudioProducer()
         videoProducer = self._createFirewireVideoProducer()
-        save.setAudioProducer(producer)
+        save.setAudioProducer(videoProducer)
         save.setVideoProducer(videoProducer)
         save.setVideoOverlay(self._createVideoOverlay(videoProducer))
         save.setAudioEncoder(self._createAudioEncoder())
@@ -529,7 +523,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="encoder-audio" type="audio-encoder" '
              'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
-             '        <feed>producer-audio</feed>\n'
+             '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="producer-audio-video" '
