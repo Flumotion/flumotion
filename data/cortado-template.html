@@ -1,7 +1,33 @@
 <html>
-  <body>
+  <script language="JavaScript">
+    function checkJavaPlugin () {
+      var browsername = navigator.appName;
+      var _have_java = false;
+
+      /* Easy case */
+      if (browsername.indexOf ("Netscape") != -1) {
+        for (i = 0; i < navigator.plugins.length; i++) {
+          for (j = 0; j < navigator.plugins[i].length; j++) {
+            if (navigator.plugins[i][j].type == "application/x-java-applet") {
+              _have_java = true;
+            }
+          }
+        }
+        if (!_have_java) {
+          window.location = "http://www.flumotion.com/java/";
+        }
+      }
+    }
+ 
+    function objectLoadError () {
+      window.location = "http://www.flumotion.com/java/";
+    }
+  </script>
+
+<body onLoad="checkJavaPlugin();">
     <object id="cortado" classid="clsid:08B0E5C0-4FCB-11CF-AAA5-00401C608501"
-            width="%(width)d" height="%(height)d" align="baseline">
+            width="%(width)d" height="%(height)d" align="baseline"
+            onerror="objectLoadError();">
     <param name="code" value="com.fluendo.player.Cortado.class"/>
     <param name="codebase" value="%(codebase)s"/>
     <param name="archive" value="cortado.jar?_=2"/>

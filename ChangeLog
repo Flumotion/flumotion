@@ -1,5 +1,11 @@
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
+	* data/cortado-template.html: 
+	Add a check and redirect to www.flumotion.com/java if java is not installed.
+	Fixes #887
+	
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	Require multifdsink and twisted.web.
 	
