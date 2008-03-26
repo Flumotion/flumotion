@@ -9,6 +9,12 @@
 
 2008-03-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/configurationwizard.py
+	(ConfigurationWizard._save): 
+	Unbreak non-audio streams bug introduced in last commit.
+
+2008-03-26  Johan Dahlin  <johan@gnome.org>
+
 	reviewed by: Zaheer
 
 	* flumotion/wizard/productionsteps.py:

@@ -451,6 +451,7 @@ class ConfigurationWizard(SectionWizard):
         save.setVideoProducer(source_step.get_video_producer())
 
         if source_step.hasVideo():
+            overlay_step = self.get_step('Overlay')
             save.setVideoOverlay(overlay_step.getOverlay())
 
         encoding_step = self.get_step('Encoding')
