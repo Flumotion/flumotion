@@ -33,14 +33,20 @@ _ = gettext.gettext
 
 
 class TheoraVideoEncoder(VideoEncoder):
+    """
+    @ivar framerate: number of frames per second; to be set by view
+    @type framerate: float
+    """
     component_type = 'theora-encoder'
+
     def __init__(self):
         super(TheoraVideoEncoder, self).__init__()
         self.has_quality = True
         self.has_bitrate = False
+        self.framerate = 0.0
 
         self.properties.noise_sensitivity = 0
-        self.properties.keyframe_maxdistance = 64
+        self.properties.keyframe_delta = 2.0
         self.properties.bitrate = 400
         self.properties.quality = 16
         self.properties.sharpness = 0
@@ -57,6 +63,15 @@ class TheoraVideoEncoder(VideoEncoder):
 
         properties.noise_sensitivity = max(
             int(properties.noise_sensitivity * (32768 / 100.)),  1)
+
+        # convert the human-friendly delta to maxdistance 
+        # FIXME: I think the theora-encoder component should not expose
+        # the theora element properties directly, but just have keyframe-delta
+        # directly and calculate GStreamer element properties. But that's a
+        # property change.
+        properties.keyframe_maxdistance = int(properties.keyframe_delta *
+            self.framerate)
+        del properties.keyframe_delta
 
         return properties
 
@@ -75,7 +90,7 @@ class TheoraStep(VideoEncoderStep):
         self.bitrate.data_type = int
         self.quality.data_type = int
         self.noise_sensitivity.data_type = int
-        self.keyframe_maxdistance.data_type = int
+        self.keyframe_delta.data_type = float
         self.sharpness.data_type = int
         self.has_quality.data_type = bool
         self.has_bitrate.data_type = bool
@@ -83,8 +98,19 @@ class TheoraStep(VideoEncoderStep):
         self.add_proxy(self.model,
                        ['has_quality', 'has_bitrate'])
         self.add_proxy(self.model.properties,
-                       ['bitrate', 'quality', 'keyframe_maxdistance',
+                       ['bitrate', 'quality', 'keyframe_delta',
                         'noise_sensitivity', 'sharpness'])
+
+        # we specify keyframe_delta in seconds, but theora expects
+        # a number of frames, so we need the framerate and calculate
+        # we need to go through the Step (which is the view) because models
+        # don't have references to other models
+        producer = self.wizard.get_step('Production').get_video_producer()
+        self.model.framerate = producer.properties['framerate']
+        self.debug('Framerate of video producer: %r' % self.model.framerate)
+        step = 1 / self.model.framerate
+        page = 1.0
+        self.keyframe_delta.set_increments(step, page)
 
     def get_next(self):
         return self.wizard.get_step('Encoding').get_audio_page()

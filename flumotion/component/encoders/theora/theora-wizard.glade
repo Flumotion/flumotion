@@ -165,16 +165,16 @@
 	      <property name="column_spacing">6</property>
 
 	      <child>
-		<widget class="GtkSpinButton" id="keyframe_maxdistance">
+		<widget class="GtkSpinButton" id="keyframe_delta">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
-		  <property name="digits">0</property>
+		  <property name="digits">3</property>
 		  <property name="numeric">False</property>
 		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-		  <property name="snap_to_ticks">False</property>
+		  <property name="snap_to_ticks">True</property>
 		  <property name="wrap">False</property>
-		  <property name="adjustment">64 1 32768 1 1024 1024</property>
+		  <property name="adjustment">2 0 60 0.0399999991059 1 1</property>
 		</widget>
 		<packing>
 		  <property name="left_attach">1</property>
@@ -189,7 +189,7 @@
 	      <child>
 		<widget class="GtkLabel" id="label7">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">frames</property>
+		  <property name="label" translatable="yes">seconds</property>
 		  <property name="use_underline">False</property>
 		  <property name="use_markup">False</property>
 		  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -289,7 +289,7 @@
 	      <child>
 		<widget class="GtkLabel" id="label6">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">_Keyframe frequency:</property>
+		  <property name="label" translatable="yes">Time between _keyframes:</property>
 		  <property name="use_underline">True</property>
 		  <property name="use_markup">False</property>
 		  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -299,7 +299,7 @@
 		  <property name="yalign">0.5</property>
 		  <property name="xpad">0</property>
 		  <property name="ypad">0</property>
-		  <property name="mnemonic_widget">keyframe_maxdistance</property>
+		  <property name="mnemonic_widget">keyframe_delta</property>
 		  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>
