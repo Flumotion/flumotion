@@ -42,15 +42,17 @@ import random
 import gobject
 from kiwi.utils import gsignal
 import gtk
+from twisted.internet import defer
 
-from flumotion.common import log
+from flumotion.common import errors, log
+from flumotion.common.messages import N_, ngettext, gettexter, Warning
 from flumotion.configure import configure
 from flumotion.wizard.models import Component, Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-N_ = _
+T_ = gettexter('flumotion')
 
 def _generateRandomString(numchars):
     """Generate a random US-ASCII string of length numchars
@@ -367,14 +369,47 @@ class HTTPStep(ConsumerStep):
         self.plugarea.addPlug(plugin, description)
 
     def _check_elements(self):
-        def got_missing(missing):
-            blocked = bool(missing)
-            self._block_next(blocked)
-
         self._block_next(True)
 
+        def importError(error):
+            self.info('could not import twisted-web')
+            message = Warning(T_(N_(
+                "Worker '%s' cannot import module '%s'."),
+                self.worker, 'twisted.web'))
+            message.add(T_(N_("\nThis module is part of the '%s'."),
+                           'Twisted Project'))
+            message.add(T_(N_("\nThe project's homepage is %s"),
+                           'http://www.twistedmatrix.com/'))
+            message.id = 'module-twisted-web'
+            self.wizard.add_msg(message)
+
+        def checkElements(elements):
+            if elements:
+                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
+                    "Worker '%s' is missing GStreamer elements '%s'.",
+                    len(elements))
+                message = Warning(
+                    T_(f, self.worker, "', '".join(elements)), id='httpstreamer')
+                self.wizard.add_msg(message)
+                self._block_next(True)
+                return defer.fail(errors.FlumotionError('missing multifdsink element'))
+
+            self.wizard.clear_msg('httpstreamer')
+
+            # now check import
+            d = self.wizard.check_import(self.worker, 'twisted.web')
+            d.addCallback(lambda unused: self._block_next(False))
+            d.addErrback(importError)
+
+            self._block_next(True)
+
+        # first check elements
         d = self.wizard.require_elements(self.worker, 'multifdsink')
-        d.addCallback(got_missing)
+        d.addCallback(checkElements)
+
+        # require_elements calls check_elements which unconditionally
+        # unblocks the next call. Work around that behavior here.
+        d.addErrback(lambda unused: self._block_next(True))
 
     def _verify(self):
         self.client_limit.set_sensitive(
@@ -384,8 +419,6 @@ class HTTPStep(ConsumerStep):
         self._update_blocked()
 
     def _block_next(self, blocked):
-        if self._blocked == blocked:
-            return
         self._blocked = blocked
         self.wizard.block_next(blocked)
 

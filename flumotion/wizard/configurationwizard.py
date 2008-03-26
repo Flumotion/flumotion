@@ -252,7 +252,7 @@ class ConfigurationWizard(SectionWizard):
                     "You will not be able to go forward using this worker.")))
                 message.id = 'element' + '-'.join(elementNames)
                 self.add_msg(message)
-            self.block_next(False)
+            self.block_next(bool(elements))
             return elements
 
         self.block_next(True)
