@@ -22,8 +22,8 @@
 import gettext
 
 from flumotion.wizard.configurationwriter import ConfigurationWriter
-from flumotion.wizard.models import Muxer, Producer, \
-     AudioEncoder, VideoEncoder
+from flumotion.wizard.models import Muxer, AudioProducer, \
+     VideoProducer, AudioEncoder, VideoEncoder
 
 _ = gettext.gettext
 __version__ = "$Rev$"
@@ -63,7 +63,7 @@ class WizardSaver(object):
         @type audioProducer: L{AudioProducer} subclass or None
         """
         if (audioProducer is not None and
-            not isinstance(audioProducer, Producer)):
+            not isinstance(audioProducer, AudioProducer)):
             raise TypeError(
                 "audioProducer must be a Producer subclass, not %r" % (
                 audioProducer,))
@@ -75,7 +75,7 @@ class WizardSaver(object):
         @type videoProducer: L{VideoProducer} subclass or None
         """
         if (videoProducer is not None and
-            not isinstance(videoProducer, Producer)):
+            not isinstance(videoProducer, VideoProducer)):
             raise TypeError(
                 "videoProducer must be a Producer subclass, not %r" % (
                 videoProducer,))
@@ -216,14 +216,16 @@ class WizardSaver(object):
             self._videoProducer.component_type ==
             self._audioProducer.component_type):
             self._flowComponents.remove(self._audioProducer)
-            self._audioProducer = self._videoProducer
             self._audioProducer.name = 'producer-audio-video'
+            self._videoProducer.name = 'producer-audio-video'
+            self._audioProducer = self._videoProducer
 
     def _handleAudioProducer(self):
         if not self._audioProducer:
             return
 
         self._audioProducer.name = 'producer-audio'
+
         self._flowComponents.append(self._audioProducer)
 
         if self._audioEncoder is None:

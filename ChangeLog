@@ -1,5 +1,11 @@
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/wizard/save.py:
+	Make firewire finally work again, this fixes #867
+
+2008-03-27  Johan Dahlin  <johan@gnome.org>
+
 	* misc/clean-flumotion:
 	* scripts/run-local-manager:
 	Add a script to run a local manager, move and rename the clean 

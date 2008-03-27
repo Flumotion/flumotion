@@ -38,21 +38,10 @@ _ = gettext.gettext
 T_ = gettexter('flumotion')
 
 
-class FireWireAudioProducer(AudioProducer):
+class FireWireProducer(AudioProducer, VideoProducer):
     component_type = 'firewire-producer'
     def __init__(self):
-        super(FireWireAudioProducer, self).__init__()
-
-        self.properties.is_square = False
-
-    def getFeederName(self, component):
-        return 'audio'
-
-
-class FireWireVideoProducer(VideoProducer):
-    component_type = 'firewire-producer'
-    def __init__(self):
-        super(FireWireVideoProducer, self).__init__()
+        super(FireWireProducer, self).__init__()
 
         self.properties.is_square = False
 
@@ -238,8 +227,7 @@ class FireWireWizardPlugin(object):
     implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.audio_model = FireWireAudioProducer()
-        self.video_model = FireWireVideoProducer()
+        self.model = FireWireProducer()
 
     def getProductionStep(self, type):
         if type == 'audio':
@@ -247,6 +235,6 @@ class FireWireWizardPlugin(object):
             source_step = self.wizard.get_step('Production')
             if source_step.video.get_active() == 'firewire-producer':
                 return
-            return FireWireAudioStep(self.wizard, self.audio_model)
+            return FireWireAudioStep(self.wizard, self.model)
         elif type == 'video':
-            return FireWireVideoStep(self.wizard, self.video_model)
+            return FireWireVideoStep(self.wizard, self.model)
