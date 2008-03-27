@@ -1,5 +1,8 @@
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/save.py (WizardSaver.setVideoProducer)
+	(WizardSaver.setAudioProducer): Update exception messages.
+
 	* flumotion/test/test_wizard_save.py
 	(TestWizardSave.testFirewireStreamer): 
 	Unbreak the testsuite too.

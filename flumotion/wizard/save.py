@@ -65,7 +65,7 @@ class WizardSaver(object):
         if (audioProducer is not None and
             not isinstance(audioProducer, AudioProducer)):
             raise TypeError(
-                "audioProducer must be a Producer subclass, not %r" % (
+                "audioProducer must be a AudioProducer subclass, not %r" % (
                 audioProducer,))
         self._audioProducer = audioProducer
 
@@ -77,7 +77,7 @@ class WizardSaver(object):
         if (videoProducer is not None and
             not isinstance(videoProducer, VideoProducer)):
             raise TypeError(
-                "videoProducer must be a Producer subclass, not %r" % (
+                "videoProducer must be a VideoProducer subclass, not %r" % (
                 videoProducer,))
         self._videoProducer = videoProducer
 
