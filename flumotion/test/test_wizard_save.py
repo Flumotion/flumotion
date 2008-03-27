@@ -24,7 +24,7 @@ import unittest
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.firewire_wizard import \
-     FireWireVideoProducer
+     FireWireProducer
 from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
      HTTPPorter, HTTPStreamer
 from flumotion.component.encoders.vorbis.vorbis_wizard import \
@@ -185,12 +185,12 @@ class TestWizardSave(testsuite.TestCase):
         streamer.porter_password = 'password'
         return streamer
 
-    def _createFirewireVideoProducer(self):
-        videoProducer = FireWireVideoProducer()
-        videoProducer.worker = 'firewire-video-producer-worker'
-        videoProducer.properties.width = 640
-        videoProducer.properties.height = 480
-        return videoProducer
+    def _createFirewireProducer(self):
+        producer = FireWireProducer()
+        producer.worker = 'firewire-video-producer-worker'
+        producer.properties.width = 640
+        producer.properties.height = 480
+        return producer
 
     def testDefaultStream(self):
         save = WizardSaver()
@@ -471,10 +471,10 @@ class TestWizardSave(testsuite.TestCase):
         save = WizardSaver()
         save.setFlowName('flow')
 
-        videoProducer = self._createFirewireVideoProducer()
-        save.setAudioProducer(videoProducer)
-        save.setVideoProducer(videoProducer)
-        save.setVideoOverlay(self._createVideoOverlay(videoProducer))
+        producer = self._createFirewireProducer()
+        save.setAudioProducer(producer)
+        save.setVideoProducer(producer)
+        save.setVideoOverlay(self._createVideoOverlay(producer))
         save.setAudioEncoder(self._createAudioEncoder())
         save.setVideoEncoder(self._createVideoEncoder())
 

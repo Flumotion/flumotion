@@ -1,5 +1,9 @@
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard_save.py
+	(TestWizardSave.testFirewireStreamer): 
+	Unbreak the testsuite too.
+
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	* flumotion/wizard/save.py:
 	Make firewire finally work again, this fixes #867
