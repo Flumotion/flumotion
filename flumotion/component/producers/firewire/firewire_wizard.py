@@ -29,7 +29,8 @@ from flumotion.common import errors, messages
 from flumotion.common.messages import N_, gettexter
 from flumotion.wizard.basesteps import AudioProducerStep, VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
-from flumotion.wizard.models import AudioProducer, VideoProducer
+from flumotion.wizard.models import AudioProducer, VideoProducer, \
+     AudioEncoder, VideoEncoder, VideoConverter
 
 __pychecker__ = 'no-returnvalues'
 __version__ = "$Rev$"
@@ -44,9 +45,8 @@ class FireWireAudioProducer(AudioProducer):
 
         self.properties.is_square = False
 
-    def getFeeders(self):
-        for feeder in super(FireWireAudioProducer, self).getFeeders():
-            yield feeder + ':audio'
+    def getFeederName(self, component):
+        return 'audio'
 
 
 class FireWireVideoProducer(VideoProducer):
@@ -56,9 +56,13 @@ class FireWireVideoProducer(VideoProducer):
 
         self.properties.is_square = False
 
-    def getFeeders(self):
-        for feeder in super(FireWireVideoProducer, self).getFeeders():
-            yield feeder + ':video'
+    def getFeederName(self, component):
+        if isinstance(component, AudioEncoder):
+            return 'audio'
+        elif isinstance(component, (VideoEncoder, VideoConverter)):
+            return 'video'
+        else:
+            raise AssertionError
 
 
 class _FireWireCommon:
@@ -240,7 +244,7 @@ class FireWireWizardPlugin(object):
     def getProductionStep(self, type):
         if type == 'audio':
             # Only show firewire audio if we're using firewire video
-            source_step = self.wizard.get_step('Producer')
+            source_step = self.wizard.get_step('Production')
             if source_step.video.get_active() == 'firewire-producer':
                 return
             return FireWireAudioStep(self.wizard, self.audio_model)

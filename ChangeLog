@@ -1,5 +1,14 @@
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/overlaystep.py:
+	Generate proper feeder names and fix a typo of the step name
+	Part of #867
+	
+2008-03-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/command/main.py:
 	Print errors on stderr and return an error code when it fails.
 	Fixes #908

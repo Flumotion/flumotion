@@ -157,8 +157,25 @@ class Component(object, log.Loggable):
         """Get the names of all the feeders for this component
         @returns: feeder names
         """
+
+        # Figure out the feeder names to use.
+        # Ask the feeder component which name it wants us to use
         for source in self.feeders:
-            yield source.name
+            feederName = source.getFeederName(self)
+            if feederName is None:
+                feederName = ''
+            else:
+                feederName = ':' + feederName
+
+            yield source.name + feederName
+
+    def getFeederName(self, component):
+        """Get the feeder name a component should use to link to
+        @param component: the component who links to this
+        @type component: L{Component} subclass
+        @returns: feeder name
+        @rtype: string
+        """
 
 
 class Plug(object):
@@ -286,6 +303,13 @@ class VideoProducer(Producer):
         @rtype: integer
         """
         return self.properties.height
+
+
+class VideoConverter(Component):
+    """I am a component which converts video
+    """
+
+    name_template = "video-converter"
 
 
 class AudioEncoder(Encoder):

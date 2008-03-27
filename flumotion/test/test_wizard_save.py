@@ -24,7 +24,7 @@ import unittest
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.firewire_wizard import \
-     FireWireVideoProducer, FireWireAudioProducer
+     FireWireVideoProducer
 from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
      HTTPPorter, HTTPStreamer
 from flumotion.component.encoders.vorbis.vorbis_wizard import \
@@ -523,7 +523,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="encoder-audio" type="audio-encoder" '
              'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
-             '        <feed>producer-audio-video</feed>\n'
+             '        <feed>producer-audio-video:audio</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="producer-audio-video" '
@@ -543,7 +543,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="overlay-video" type="overlay-converter" '
              'project="flumotion" worker="overlay-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
-             '        <feed>producer-audio-video</feed>\n'
+             '        <feed>producer-audio-video:video</feed>\n'
              '      </eater>\n'
              '      \n'
              '      <property name="cc-logo">True</property>\n'

@@ -22,7 +22,7 @@
 import gettext
 
 from flumotion.common.messages import N_, ngettext, gettexter, Warning
-from flumotion.wizard.models import Component
+from flumotion.wizard.models import VideoConverter
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev: 6228 $"
@@ -30,7 +30,7 @@ T_ = gettexter('flumotion')
 _ = gettext.gettext
 
 
-class Overlay(Component):
+class Overlay(VideoConverter):
     component_type = 'overlay-converter'
 
     def __init__(self, video_producer):
