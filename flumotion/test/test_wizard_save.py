@@ -310,7 +310,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="encoder-audio" type="audio-encoder" '
              'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
              '      <eater name="default">\n'
-             '        <feed>producer-audio</feed>\n'
+             '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
              '    </component>\n'
              '    <component name="producer-audio-video" type="both-producer" '
