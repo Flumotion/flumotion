@@ -131,12 +131,13 @@ def setup_reactor(info):
 
     def failed(failure):
         if failure.check(errors.ConnectionRefusedError):
-            print "Manager refused connection. Check your user and password."
+            print >> sys.stderr, \
+                  "Manager refused connection. Check your user and password."
         elif failure.check(errors.ConnectionFailedError):
             message = "".join(failure.value.args)
-            print "Connection to manager failed: %s" % message
+            print >> sys.stderr, "Connection to manager failed: %s" % message
         else:
-            print ("Exception while connecting to manager: %s"
+            print >> sys.stderr, ("Exception while connecting to manager: %s"
                    % log.getFailureMessage(failure))
         return failure
 
@@ -169,11 +170,17 @@ def main(args):
     command = parse_commands(args)
     quit = lambda: reactor.callLater(0, reactor.stop)
 
+    reactor.exitStatus = 0
+
     d = setup_reactor(connection)
 
     d.addCallback(lambda model: command(model, quit))
     # assume that whatever raised the error already printed -- this is a
     # bit geto
-    d.addErrback(lambda failure: quit())
+    def errback(failure):
+        reactor.exitStatus = 1
+        quit()
+    d.addErrback(errback)
 
     reactor.run()
+    return reactor.exitStatus

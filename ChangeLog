@@ -1,3 +1,9 @@
+2008-03-27  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/command/main.py:
+	Print errors on stderr and return an error code when it fails.
+	Fixes #908
+
 2008-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/soundcard/soundcard.py:
