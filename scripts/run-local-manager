@@ -1,0 +1,34 @@
+#!/bin/bash
+NAME=flumotion-test
+flumotion-manager -v -T tcp \
+                  -n $NAME \
+                  conf/managers/default/planet.xml >& /tmp/$NAME.manager.log &
+manager_pid=$!
+
+flumotion-worker -v -T tcp -u user -p test >& /tmp/$NAME.worker.log  &
+worker_pid=$!
+
+MANAGER=user:test@localhost:8654
+
+killed()
+{
+  echo 'Ctrl-C caught'
+  kill -9 $manager_pid $worker_pid
+  exit 1;
+}
+
+trap killed SIGINT SIGTERM
+
+while true; do
+  flumotion-command --no-ssl \
+                    -m user:test@localhost:8642 \
+                    showworkers 2> /dev/null
+  EXITCODE=$?
+  if test "$EXITCODE" = "0"; then
+    echo 'Manager and Worker are ready and waiting.'
+    break
+  fi
+done
+
+wait $manager_pid $worker_pid
+exit 0;

@@ -1,5 +1,12 @@
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
+	* misc/clean-flumotion:
+	* scripts/run-local-manager:
+	Add a script to run a local manager, move and rename the clean 
+	one to misc.
+
+2008-03-27  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/models.py:
