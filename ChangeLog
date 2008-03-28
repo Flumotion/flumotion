@@ -1,3 +1,13 @@
+2008-03-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/component.glade:
+	* flumotion/component/component.py:
+	Add an interface to the components tab to modify the 
+	gstreamer/flumotion logging on the fly.
+	Introduce a new remote method setFluDebug on BaseComponentMedium.
+
 2008-03-28  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/manager/config.py (PlanetConfigParser._parseFlow):

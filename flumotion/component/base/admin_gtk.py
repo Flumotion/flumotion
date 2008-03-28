@@ -34,7 +34,9 @@ from twisted.internet import defer
 from zope.interface import implements
 
 from flumotion.common import errors, log, common, messages
+from flumotion.common.planet import AdminFlowState
 from flumotion.twisted import flavors
+from flumotion.ui.fgtk import ProxyWidgetMapping
 
 from flumotion.common.messages import N_
 
@@ -63,6 +65,7 @@ class BaseAdminGtk(log.Loggable):
         @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         """
+        self._debugEnabled = False
         self.state = state
         self.name = state.get('name')
         self.admin = admin
@@ -72,6 +75,15 @@ class BaseAdminGtk(log.Loggable):
 
         d = admin.componentCallRemote(state, 'getUIState')
         d.addCallback(self.setUIState)
+
+    def setDebugEnabled(self, enabled):
+        """Set if debug should be enabled.
+        Not all pages are visible unless debugging is set to true
+        @param enable: if debug should be enabled
+        """
+        self._debugEnabled = enabled
+        for node in self.getNodes().values():
+            node.setDebugEnabled(enabled)
 
     def cleanup(self):
         if self.uiState:
@@ -199,6 +211,7 @@ class BaseAdminGtkNode(log.Loggable):
         @param title: the (translated) title to show this node with
         @type  title: str
         """
+        self._debugEnabled = False
         self.state = state
         self.admin = admin
         self.statusbar = None
@@ -212,6 +225,13 @@ class BaseAdminGtkNode(log.Loggable):
         ## Absolute path to the glade file.
         ##   e.g. "/home/flu/.flumotion/cache/test/80...df7/flumotion/ui.glade
         self._gladefilepath = None
+
+    def setDebugEnabled(self, enabled):
+        """Set if debug should be enabled.
+        Not all pages are visible unless debugging is set to true
+        @param enable: if debug should be enabled
+        """
+        self._debugEnabled = enabled
 
     def cleanup(self):
         if self.uiState:
@@ -247,7 +267,8 @@ class BaseAdminGtkNode(log.Loggable):
             self._gladefilepath = path
             gtk.glade.textdomain(domain)
 
-            self.wtree = gtk.glade.XML(path)
+            self.wtree = gtk.glade.XML(path,
+                                       typedict=ProxyWidgetMapping())
 
             self.debug("Switching glade text domain back from %s to %s" % (
                 domain, old))
@@ -277,7 +298,8 @@ class BaseAdminGtkNode(log.Loggable):
         """
         if not self._gladefilepath:
             raise IndexError
-        wtree = gtk.glade.XML(self._gladefilepath, name)
+        wtree = gtk.glade.XML(self._gladefilepath, name,
+                              typedict=ProxyWidgetMapping())
         widget = wtree.get_widget(name)
         if not widget:
             self.warning('Could not create widget %s' % name)
@@ -495,10 +517,25 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Component"))
 
         self._startTime = None
+        self._debugging = None
+
+    def setDebugEnabled(self, enabled):
+        BaseAdminGtkNode.setDebugEnabled(self, enabled)
+        if self._debugging:
+            self._debugging.set_property('visible', enabled)
 
     def haveWidgetTree(self):
-        self.widget = self.wtree.get_widget('component-widget')
+        self.widget = self.wtree.get_widget('main-vbox')
         assert self.widget, "No component-widget in %s" % self.glade_file
+        self.gst_mask = self.wtree.get_widget('gst_mask')
+        self.gst_mask.connect('changed', self._on_gst_mask_changed)
+        self.gst_label = self.wtree.get_widget('gst_label')
+        self.flu_mask = self.wtree.get_widget('flu_mask')
+        self.flu_mask.connect('changed', self._on_flu_mask_changed)
+        self.gst_profile = self.wtree.get_widget('gst_profile')
+        self.gst_profile.connect('changed', self._on_gst_profile_changed)
+        self.flu_profile = self.wtree.get_widget('flu_profile')
+        self.flu_profile.connect('changed', self._on_flu_profile_changed)
 
         # pid
         l = self.wtree.get_widget('label-pid')
@@ -511,8 +548,62 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self._label_cpu = self.wtree.get_widget('label-cpu')
         self._label_vsize = self.wtree.get_widget('label-vsize')
 
-        self.widget.show_all()
+        self.widget.show()
+
+        self._prepareDebugging()
+
+        self._debugging = self.wtree.get_widget('debugging')
+        if self._debugEnabled:
+            self._debugging.show()
+
         return self.widget
+
+    def _validateMask(self, mask):
+        if ':' not in mask or mask.count(':') != 1:
+            return False
+        name, level = mask.split(':', 1)
+        try:
+            int(level)
+        except ValueError:
+            return False
+        return True
+
+    def _on_gst_profile_changed(self, combo):
+        profile = combo.get_selected()
+        if profile is not None:
+            gtk.Entry.set_text(self.gst_mask, profile)
+        self.gst_mask.set_sensitive(profile is None)
+
+    def _on_flu_profile_changed(self, combo):
+        profile = combo.get_selected()
+        if profile is not None:
+            gtk.Entry.set_text(self.flu_mask, profile)
+        self.flu_mask.set_sensitive(profile is None)
+
+    def _on_flu_mask_changed(self, entry):
+        debug = entry.get_text()
+        if self._debugEnabled and self._validateMask(debug):
+            self.admin.componentCallRemote(
+                self.state, 'setFluDebug', debug)
+
+    def _on_gst_mask_changed(self, entry):
+        debug = entry.get_text()
+        if self._debugEnabled and self._validateMask(debug):
+            self.admin.componentCallRemote(
+                self.state, 'setGstDebug', debug)
+
+    def _prepareDebugging(self):
+        default = [(_('Nothing'), '*:0'),
+                   (_('Everything'), '*:4'),
+                   (_('Custom'), None)]
+        self.flu_profile.prefill(default)
+
+        if isinstance(self.state.get('parent'), AdminFlowState):
+            self.gst_profile.prefill(default)
+        else:
+            self.gst_profile.hide()
+            self.gst_label.hide()
+            self.gst_mask.hide()
 
     def _setStartTime(self, value):
         self._label_start_time.set_text(

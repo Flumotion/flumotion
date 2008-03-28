@@ -59,7 +59,7 @@ class NodeBook(gtk.Notebook, log.Loggable):
         @param enable: if debug should be enabled
         """
         self._debugEnabled = enabled
-
+        self.admingtk.setDebugEnabled(enabled)
         for name in _DEBUG_ONLY_PAGES:
             widget = self._pageWidgets.get(name)
             if widget is None:

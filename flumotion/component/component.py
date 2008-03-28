@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -254,6 +254,16 @@ class BaseComponentMedium(medium.PingingMedium):
 
     def remote_getVersions(self):
         return debug.getVersions()
+
+    def remote_setFluDebug(self, debug):
+        """
+        Sets the Flumotion debugging levels based on the passed debug string.
+
+        @since: 0.6.0
+        """
+        self.debug('Setting Flumotion debug level to %s' % debug)
+        log.setDebug(debug)
+
 
 class BaseComponent(common.InitMixin, log.Loggable):
     """
