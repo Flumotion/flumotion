@@ -1,5 +1,9 @@
 2008-03-28  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire_wizard.py
+	(_FireWireCommon.trapRemoteError): trap RemoteRunFailure, to avoid
+	printing warnings when firewire does not exist on a worker.
+
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/save.py:
 	http-server components should be in the atmosphere and not the flow.

@@ -151,10 +151,14 @@ class _FireWireCommon:
             self._set_sensitive(True)
             self.on_update_output_format()
 
-        def trapRemote(failure):
+        def trapRemoteFailure(failure):
+            failure.trap(errors.RemoteRunFailure)
+
+        def trapRemoteError(failure):
             failure.trap(errors.RemoteRunError)
         d.addCallback(firewireCheckDone)
-        d.addErrback(trapRemote)
+        d.addErrback(trapRemoteError)
+        d.addErrback(trapRemoteFailure)
         return d
 
     # Callbacks
