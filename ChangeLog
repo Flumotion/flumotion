@@ -3,6 +3,7 @@
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/save.py:
 	http-server components should be in the atmosphere and not the flow.
+	Fixes #901
 
 2008-03-28  Michael Smith <msmith@fluendo.com>
 
