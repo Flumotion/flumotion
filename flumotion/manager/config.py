@@ -555,8 +555,8 @@ class PlanetConfigParser(FlumotionConfigParser):
         # config
         masters = [x for x in components if x.config['clock-master']]
         if len(masters) > 1:
-            raise errors.ConfigError("Multiple clock masters in flow %s: %r"
-                              % (name, masters))
+            raise errors.ConfigError("Multiple clock masters in flow %s: %s"
+                              % (name, ', '.join([m.name for m in masters])))
 
         need_sync = [(x.defs.getClockPriority(), x) for x in components
                      if x.defs.getNeedsSynchronization()]
