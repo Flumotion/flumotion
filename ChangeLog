@@ -1,3 +1,10 @@
+2008-03-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/productionsteps.py:
+	Remove the worker list from the production page.
+	Remove canSelectWorker which is now unused.
+
 2008-03-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/save.py (WizardSaver.setVideoProducer)

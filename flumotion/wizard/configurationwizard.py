@@ -192,13 +192,6 @@ class ConfigurationWizard(SectionWizard):
             if isinstance(step, ConsumerStep):
                 yield step
 
-    def canSelectWorker(self, canSelect):
-        """Defines if it's possible to select a worker
-        @param canSelect: if a worker can be selected
-        @type canSelect: bool
-        """
-        self._worker_list.set_sensitive(canSelect)
-
     def check_elements(self, workerName, *elementNames):
         """
         Check if the given list of GStreamer elements exist on the given worker.

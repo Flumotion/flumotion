@@ -24,7 +24,7 @@ import gettext
 import gtk
 
 from flumotion.common.errors import NoBundleError
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.ui.wizard import WizardStep
 
 # Register components
 from flumotion.common import componentui
@@ -36,7 +36,7 @@ __pychecker__ = 'no-classattr no-argsused'
 N_ = _ = gettext.gettext
 
 
-class ProductionStep(WorkerWizardStep):
+class ProductionStep(WizardStep):
 
     glade_file = 'wizard_production.glade'
     name = _('Production')
@@ -47,7 +47,7 @@ class ProductionStep(WorkerWizardStep):
         self._audio_producer = None
         self._video_producer = None
         self._loadedSteps = None
-        WorkerWizardStep.__init__(self, wizard)
+        WizardStep.__init__(self, wizard)
 
     # Public API
 
@@ -204,18 +204,10 @@ class ProductionStep(WorkerWizardStep):
         has_audio = self.has_audio.get_active()
         has_video = self.has_video.get_active()
         can_continue = False
-        can_select_worker = True
         if has_audio or has_video:
             can_continue = True
 
-            video_source = self.video.get_selected()
-            audio_source = self.audio.get_selected()
-            if (has_audio and audio_source == 'firewire-producer' and
-                not (has_video and video_source == 'firewire-producer')):
-                can_select_worker = False
-
         self.wizard.block_next(not can_continue)
-        self.wizard.canSelectWorker(can_select_worker)
 
     # Callbacks
 
