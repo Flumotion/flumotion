@@ -1,3 +1,8 @@
+2008-03-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/component.glade:
+	  Make the debug header visible, so it's shown if debug is enabled.
+
 2008-03-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/componentview.py:

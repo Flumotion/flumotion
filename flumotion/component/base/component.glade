@@ -375,7 +375,8 @@
 	  <property name="column_spacing">6</property>
 
 	  <child>
-	    <widget class="GtkLabel" id="label39">
+	    <widget class="GtkLabel" id="debug_header">
+	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">&lt;b&gt;Debug Logging&lt;/b&gt;</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">True</property>
