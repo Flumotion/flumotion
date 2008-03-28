@@ -1,3 +1,9 @@
+2008-03-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/save.py:
+	http-server components should be in the atmosphere and not the flow.
+
 2008-03-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/component.glade:

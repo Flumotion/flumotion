@@ -134,7 +134,7 @@ class WizardSaver(object):
         """
         # FIXME: Do not hard code to http-server here
         server.name = 'http-server-%s' % (consumerType,)
-        self._flowComponents.append(server)
+        self._atmosphereComponents.append(server)
 
     def addPorter(self, porter, consumerType):
         """Add a porter
