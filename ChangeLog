@@ -1,3 +1,9 @@
+2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+
+	* flumotion/wizard/worker.py:
+	  Add spacing between worker label and worker combo.
+	  Fixes #883.
+
 2008-03-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py

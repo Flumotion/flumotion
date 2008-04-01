@@ -73,7 +73,7 @@ class WorkerList(gtk.HBox):
         self._label.show()
         self.pack_start(self._label, False, False, 0)
         vb = gtk.VBox()
-        self.pack_start(vb, False, False, 0)
+        self.pack_start(vb, False, False, 10)
         vb.show()
         a = gtk.Alignment(0.5, 0.5)
         a.show()
