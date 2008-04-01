@@ -1,5 +1,10 @@
 2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
 
+	* po/es.po:
+	  Spanish translation up to date.
+
+2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+
 	* flumotion/wizard/worker.py:
 	  Add spacing between worker label and worker combo.
 	  Fixes #883.
