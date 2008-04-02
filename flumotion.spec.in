@@ -49,6 +49,7 @@ BuildRequires:	epydoc
 BuildRequires:  gcc-c++
 
 BuildRequires:	desktop-file-utils
+BuildRequires:	intltool
 
 # since we compile pytrayicon, we're no longer noarch
 # BuildArch:	noarch
@@ -262,6 +263,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Wed Apr 02 2008 Thomas Vander Stichele <thomas at apestaart dot org>
+- Add intltool buildrequires
+
 * Wed Nov 28 2007 Johan Dahlin <johan at gnome dot org>
 - Add kiwi dependency and bump pygtk to 2.8.4
 

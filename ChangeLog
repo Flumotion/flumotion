@@ -1,3 +1,8 @@
+2008-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
+	  Add intltool buildrequires
+
 2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
 
 	* po/es.po:
