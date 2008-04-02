@@ -21,12 +21,12 @@
 	* flumotion.spec.in:
 	  Add intltool buildrequires
 
-2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+2008-04-01  Pedro Gracia  <pgracia@flumotion.com>
 
 	* po/es.po:
 	  Spanish translation up to date.
 
-2008-04-01  Pedro Gracia  <Pedro Gracia <pgracia@flumotion.com>>
+2008-04-01  Pedro Gracia  <pgracia@flumotion.com>
 
 	* flumotion/wizard/worker.py:
 	  Add spacing between worker label and worker combo.
@@ -6837,11 +6837,11 @@
 
 	* flumotion/manager/component.py: removed componentId.
 
-2007-08-09  Pedro Gracia <pedro@flumotion.com>
+2007-08-09  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/manager/component.py: now pass unittest.
 
-2007-08-09  Pedro Gracia <pedro@flumotion.com>
+2007-08-09  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
 	* flumotion/manager/component.py:
@@ -7427,7 +7427,7 @@
 	  (PlaylistProducer._buildAudioPipeline):
 	Force output audio to be 16bit width and depth.
 
-2007-07-23  Pedro Gracia <pedro@flumotion.com>
+2007-07-23  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Reverted changes from ticket #293. It's useful to stop
@@ -7453,7 +7453,7 @@
 	remove redundant/useless tests, fix spelling, replace unclear
 	callbacks.
 
-2007-07-20 Pedro Gracia <pedro@flumotion.com>
+2007-07-20 Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Closed ticket #293
