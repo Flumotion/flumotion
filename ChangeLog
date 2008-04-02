@@ -1,3 +1,8 @@
+2008-04-02  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_production.glade: Add description label
+	and tooltips for the checkboxes
+
 2008-04-02  Johan Dahlin  <jdahlin@async.com.br>
 
 	* flumotion/component/producers/firewire/firewire-wizard.glade:
