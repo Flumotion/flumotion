@@ -87,6 +87,48 @@ class _FireWireCommon:
         self.wizard.block_next(not is_sensitive)
 
     def _update_output_format(self):
+        self._update_label_camera_settings()
+
+        # factor is a double
+        self._factor_i = self.combobox_scaled_height.get_selected()
+
+        self._update_width_correction()
+        self._update_label_output_format()
+
+    def _update_label_camera_settings(self):
+        # update label_camera_settings
+        standard = 'Unknown'
+        aspect = 'Unknown'
+        h = self._dims[1]
+        if h == 576:
+            standard = 'PAL'
+        elif h == 480:
+            standard = 'NTSC'
+        else:
+            self.warning('Unknown capture standard for height %d' % h)
+
+        nom = self._par[0]
+        den = self._par[1]
+        if nom == 59 or nom == 10:
+            aspect = '4:3'
+        elif nom == 118 or nom == 40:
+            aspect = '16:9'
+        else:
+            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
+
+        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
+            nom, den)
+        self.label_camera_settings.set_text(text)
+
+    def _update_width_correction(self):
+        self._width_correction = None
+        for i in type(self).width_corrections:
+            if getattr(self,'radiobutton_width_'+i).get_active():
+                self._width_correction = i
+                break
+        assert self._width_correction
+
+    def _update_label_output_format(self):
         d = self._get_width_height()
         self.model.properties.is_square = (
             self.checkbutton_square_pixels.get_active())
@@ -149,7 +191,7 @@ class _FireWireCommon:
                 values.append(('%d pixels' % height, i))
             self.combobox_scaled_height.prefill(values)
             self._set_sensitive(True)
-            self.on_update_output_format()
+            self._update_output_format()
 
         def trapRemoteFailure(failure):
             failure.trap(errors.RemoteRunFailure)
@@ -163,41 +205,19 @@ class _FireWireCommon:
 
     # Callbacks
 
-    def on_update_output_format(self, *args):
-        # update label_camera_settings
-        standard = 'Unknown'
-        aspect = 'Unknown'
-        h = self._dims[1]
-        if h == 576:
-            standard = 'PAL'
-        elif h == 480:
-            standard = 'NTSC'
-        else:
-            self.warning('Unknown capture standard for height %d' % h)
+    def on_checkbutton_square_pixels_toggled(self, radio):
+        self._update_output_format()
 
-        nom = self._par[0]
-        den = self._par[1]
-        if nom == 59 or nom == 10:
-            aspect = '4:3'
-        elif nom == 118 or nom == 40:
-            aspect = '16:9'
-        else:
-            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
+    def on_combobox_scaled_height_changed(self, combo):
+        self._update_output_format()
 
-        text = _('%s, %s (%d/%d pixel aspect ratio)') % (standard, aspect,
-            nom, den)
-        self.label_camera_settings.set_text(text)
+    def on_radiobutton_width_none_toggled(self, radio):
+        self._update_output_format()
 
-        # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_selected()
+    def on_radiobutton_width_stretch_toggled(self, radio):
+        self._update_output_format()
 
-        self._width_correction = None
-        for i in type(self).width_corrections:
-            if getattr(self,'radiobutton_width_'+i).get_active():
-                self._width_correction = i
-                break
-        assert self._width_correction
-
+    def on_radiobutton_width_pad_toggled(self, radio):
         self._update_output_format()
 
 

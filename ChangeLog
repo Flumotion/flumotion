@@ -1,3 +1,10 @@
+2008-04-02  Johan Dahlin  <jdahlin@async.com.br>
+
+	* flumotion/component/producers/firewire/firewire-wizard.glade:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	Refactor signal handles, make a method private, rename and
+	merge a few others.
+
 2008-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
