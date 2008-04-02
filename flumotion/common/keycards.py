@@ -140,26 +140,28 @@ pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
 
 class KeycardToken(Keycard, credentials.Token):
     """
-    I am a keycard with a token and IP address.
+    I am a keycard with a token and IP address and a path (optional).
     I get authenticated by token and maybe IP address.
     """
     implements(common.mergeImplements(Keycard,credentials.Token))
 
-    def __init__(self, token, address):
+    def __init__(self, token, address, path=None):
         credentials.Token.__init__(self, token)
         Keycard.__init__(self)
         self.address = address
+        self.path = path
 
     def getData(self):
         d = Keycard.getData(self)
         d['token'] = self.token
         d['address'] = self.address
+        d['path'] = self.path
         return d
 
     def __repr__(self):
-        return "<%s token %s @%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.token, self.address,
-            self.requesterId, _statesEnum[self.state])
+        return "<%s token with %s path %s @%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.token, self.path, 
+            self.address, self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 

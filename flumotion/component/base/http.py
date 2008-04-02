@@ -111,7 +111,7 @@ class HTTPTokenIssuer(Issuer):
             token = token[0]
 
         keycard = keycards.KeycardToken(token,
-            request.getClientIP())
+            request.getClientIP(), request.path)
         return keycard
 
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'

@@ -1,3 +1,9 @@
+2008-04-02  Pedro Gracia  <Pedro Gracia <pedro@flumotion.com>>
+
+	* flumotion/common/keycards.py:
+	* flumotion/component/base/http.py:
+	  Added "path" to keycards in order to use a timed bouncer type.
+
 2008-04-02  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_production.glade: Add description label
