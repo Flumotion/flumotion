@@ -1087,7 +1087,7 @@ msgstr "Por favor, instale '%s'.\n"
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr ""
-"La versión '%s' del componente '%s' de GStreamer es demasiado antigüa.\n"
+"La versión del componente '%s' de GStreamer es demasiado antigüa.\n"
 
 #: ../flumotion/worker/checks/check.py:187
 #, python-format
@@ -1723,7 +1723,7 @@ msgstr "Reconectando..."
 #: ../flumotion/admin/gtk/client.py:879
 #, python-format
 msgid "Lost connection to manager %s, reconnecting ..."
-msgstr "Conexión perdida con el \"manager\", volviendo a conectar ..."
+msgstr "Conexión perdida con el manager %s, volviendo a conectar ..."
 
 #: ../flumotion/admin/gtk/client.py:902
 #, python-format

@@ -1,5 +1,10 @@
 2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* po/es.po:
+	  Fix argument count mismatch.
+
+2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/overlaystep.py:
 	  Click Forward, not Next.
 
