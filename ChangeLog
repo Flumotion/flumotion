@@ -1,3 +1,8 @@
+2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/overlaystep.py:
+	  Click Forward, not Next.
+
 2008-04-02  Pedro Gracia  <Pedro Gracia <pedro@flumotion.com>>
 
 	* flumotion/common/keycards.py:

@@ -113,7 +113,7 @@ class OverlayStep(WorkerWizardStep):
                            'Python Imaging Library'))
             message.add(T_(N_("\nThe project's homepage is %s"),
                            'http://www.pythonware.com/products/pil/'))
-            message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
+            message.add(T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
             message.id = 'module-PIL'
             self.wizard.add_msg(message)
             self.model.can_overlay = False
@@ -129,7 +129,7 @@ class OverlayStep(WorkerWizardStep):
                     len(elements))
                 message = Warning(
                     T_(f, self.worker, "', '".join(elements)), id='overlay')
-                message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
+                message.add(T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
                 self.wizard.add_msg(message)
             else:
                 self.wizard.clear_msg('overlay')
