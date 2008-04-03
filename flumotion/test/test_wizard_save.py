@@ -563,5 +563,114 @@ class TestWizardSave(testsuite.TestCase):
              '</planet>\n' % dict(version=configure.version)),
             configuration)
 
+    def testFirewireStreamerDifferentWorkers(self):
+        save = WizardSaver()
+        save.setFlowName('flow')
+
+        audioProducer = self._createFirewireProducer()
+        audioProducer.name = 'audio-producer'
+        audioProducer.worker = 'audio-worker'
+        save.setAudioProducer(audioProducer)
+        videoProducer = self._createFirewireProducer()
+        videoProducer.name = 'video-producer'
+        videoProducer.worker = 'video-worker'
+        save.setVideoProducer(videoProducer)
+        save.setVideoOverlay(self._createVideoOverlay(videoProducer))
+        save.setAudioEncoder(self._createAudioEncoder())
+        save.setVideoEncoder(self._createVideoEncoder())
+
+        save.setMuxer('default-muxer', 'muxer-worker')
+
+        streamer = self._createHTTPStreamer()
+        streamer.worker = 'streamer-worker'
+        save.addConsumer(streamer, 'audio-video')
+
+        server = HTTPServer('server-worker', '/mount/')
+        save.addServerConsumer(server, 'audio-video')
+
+        porter = HTTPPorter(streamer)
+        save.addPorter(porter, 'audio-video')
+
+        save.setUseCCLicense(True)
+
+        configuration = save.getXML()
+        testsuite.diffStrings(
+            ('<planet>\n'
+             '  <atmosphere>\n'
+             '    <component name="http-server-audio-video" type="http-server" '
+             'project="flumotion" worker="server-worker" version="%(version)s">\n'
+             '      \n'
+             '      <property name="mount-point">/mount/</property>\n'
+             '    </component>\n'
+             '    <component name="porter-audio-video" type="porter" '
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
+             '      \n'
+             '      <property name="password">password</property>\n'
+             '      <property name="port">8080</property>\n'
+             '      <property name="socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="username">username</property>\n'
+             '    </component>\n'
+             '  </atmosphere>\n'
+             '  <flow name="flow">\n'
+             '    <component name="http-audio-video" type="http-streamer" '
+             'project="flumotion" worker="streamer-worker" version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>muxer-audio-video</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="burst-on-connect">False</property>\n'
+             '      <property name="port">8080</property>\n'
+             '    </component>\n'
+             '    <component name="producer-audio" '
+             'type="firewire-producer" project="flumotion" '
+             'worker="audio-worker" version="%(version)s">\n'
+             '      \n'
+             '      <property name="height">480</property>\n'
+             '      <property name="is-square">False</property>\n'
+             '      <property name="width">640</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-audio" type="audio-encoder" '
+             'project="flumotion" worker="audio-encoder-worker" version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-audio:audio</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '    <component name="producer-video" '
+             'type="firewire-producer" project="flumotion" '
+             'worker="video-worker" version="%(version)s">\n'
+             '      \n'
+             '      <property name="height">480</property>\n'
+             '      <property name="is-square">False</property>\n'
+             '      <property name="width">640</property>\n'
+             '    </component>\n'
+             '    <component name="encoder-video" type="video-encoder" '
+             'project="flumotion" worker="video-encoder-worker" version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>overlay-video</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '    <component name="overlay-video" type="overlay-converter" '
+             'project="flumotion" worker="overlay-worker" version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>producer-video:video</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="cc-logo">True</property>\n'
+             '      <property name="fluendo-logo">True</property>\n'
+             '      <property name="height">480</property>\n'
+             '      <property name="text">Fluendo</property>\n'
+             '      <property name="width">640</property>\n'
+             '    </component>\n'
+             '    <component name="muxer-audio-video" type="default-muxer" '
+             'project="flumotion" worker="muxer-worker" version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>encoder-audio</feed>\n'
+             '        <feed>encoder-video</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '  </flow>\n'
+             '</planet>\n' % dict(version=configure.version)),
+            configuration)
+
 if __name__ == '__main__':
     unittest.main()

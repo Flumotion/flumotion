@@ -251,7 +251,6 @@ class FireWireWizardPlugin(object):
     implements(IProducerPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.model = FireWireProducer()
 
     def getProductionStep(self, type):
         if type == 'audio':
@@ -259,6 +258,6 @@ class FireWireWizardPlugin(object):
             source_step = self.wizard.get_step('Production')
             if source_step.video.get_active() == 'firewire-producer':
                 return
-            return FireWireAudioStep(self.wizard, self.model)
+            return FireWireAudioStep(self.wizard, FireWireProducer())
         elif type == 'video':
-            return FireWireVideoStep(self.wizard, self.model)
+            return FireWireVideoStep(self.wizard, FireWireProducer())

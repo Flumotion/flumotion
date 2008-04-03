@@ -209,12 +209,14 @@ class WizardSaver(object):
         self._handleVideoOverlay()
 
         # In the case video producer and audio producer is the same
-        # component, remove the audio producer and rename the video
-        # producer.
-        if (self._videoProducer is not None and
-            self._audioProducer is not None and
-            self._videoProducer.component_type ==
-            self._audioProducer.component_type):
+        # component and on the same worker, remove the audio producer and
+        # rename the video producer.
+        video = self._videoProducer
+        audio = self._audioProducer
+        if (video is not None and
+            audio is not None and
+            video.component_type == audio.component_type and
+            video.worker == audio.worker):
             self._flowComponents.remove(self._audioProducer)
             self._audioProducer.name = 'producer-audio-video'
             self._videoProducer.name = 'producer-audio-video'
