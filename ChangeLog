@@ -1,3 +1,10 @@
+2008-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	Reviewed by: Arek
+
+	* flumotion/component/misc/httpserver/file.py:
+	  Log the fd's and transfer ends.  Fixes #919.
+
 2008-04-03  Johan Dahlin  <jdahlin@async.com.br>
 
 	Reviewed by: Arek

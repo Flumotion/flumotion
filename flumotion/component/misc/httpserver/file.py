@@ -88,9 +88,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         return self._factory.create(fpath.path)
 
     def openForReading(self):
-        """Open a file and return it."""
+        """Open a file and return the handle."""
         f = self.open()
-        self.debug("Reading file from FD: %d", f.fileno())
+        self.debug("[fd %5d] opening file %s", f.fileno(), self.path)
         return f
 
     def getFileSize(self):
@@ -98,9 +98,11 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         return self.getsize()
 
     def render(self, request):
-        self.debug('render request %r' % request)
+        self.debug('[fd %5d] render incoming request %r',
+            request.transport.fileno(), request)
         def terminateSimpleRequest(res, request):
             if res != server.NOT_DONE_YET:
+                self.debug('finish request %r' % request)
                 request.finish()
 
         d = self._httpauth.startAuthentication(request)
@@ -323,6 +325,9 @@ class FileTransfer(log.Loggable):
     consumer = None
 
     def __init__(self, file, size, consumer):
+        """
+        @param file: a file handle
+        """
         self.file = file
         self.size = size
         self.consumer = consumer
@@ -343,6 +348,9 @@ class FileTransfer(log.Loggable):
             # .resumeProducing again, so be prepared for a re-entrant call
             self.consumer.write(data)
         if self.consumer and self.file.tell() == self.size:
+            log.debug('request',
+                '[fd %5d] written entire file of %d bytes from fd %d',
+                self.consumer.transport.fileno(), self.size, self.file.fileno())
             self.consumer.unregisterProducer()
             self.consumer.finish()
             self.consumer = None
@@ -351,6 +359,9 @@ class FileTransfer(log.Loggable):
         pass
 
     def stopProducing(self):
+        log.debug('request',
+            '[fd %5d] stop producing from fd %d at %d/%d bytes',
+            self.consumer.transport.fileno(), self.file.fileno(),
+            self.file.tell(), self.size)
         self.file.close()
         self.consumer = None
-
