@@ -104,8 +104,8 @@ class KeycardUACPP(Keycard, UCPP):
         return d
 
     def __repr__(self):
-        return "<%s %s@%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.username, self.address,
+        return "<%s %s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.username, self.address,
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
@@ -132,8 +132,8 @@ class KeycardUACPCC(Keycard, UCPCC):
         return d
 
     def __repr__(self):
-        return "<%s %s@%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.username, self.address,
+        return "<%s %s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.username, self.address,
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
@@ -159,8 +159,8 @@ class KeycardToken(Keycard, credentials.Token):
         return d
 
     def __repr__(self):
-        return "<%s token with %s path %s @%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.token, self.path, 
+        return "<%s %s token %s for path %s @%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.token, self.path, 
             self.address, self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
@@ -184,8 +184,8 @@ class KeycardUASPCC(Keycard, USPCC):
         return d
 
     def __repr__(self):
-        return "<%s %s@%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.username, self.address,
+        return "<%s %s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.username, self.address,
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
@@ -202,8 +202,8 @@ class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
         return d
 
     def __repr__(self):
-        return "<%s %s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.username,
+        return "<%s %s %s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.username,
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)

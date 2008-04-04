@@ -1,5 +1,10 @@
 2008-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/keycards.py:
+	  Put the id in the repr of keycards.
+
+2008-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	Reviewed by: Arek
 
 	* flumotion/component/misc/httpserver/file.py:
