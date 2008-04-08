@@ -1,3 +1,16 @@
+2008-04-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/component.glade:
+	* flumotion/component/base/eaters.glade:
+	* flumotion/component/consumers/disker/disker.glade:
+	* flumotion/component/consumers/httpstreamer/httpstreamer-wizard.glade:
+	* flumotion/component/consumers/shout2/shout2-wizard.glade:
+	* flumotion/component/encoders/theora/theora-wizard.glade:
+	* flumotion/component/producers/looper/flufileinfo.glade:
+	* flumotion/component/producers/looper/looper.glade:
+	  Unmark strings for translation.
+	  Add/fix some tooltips.
+
 2008-04-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/keycards.py:

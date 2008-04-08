@@ -15,6 +15,7 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="urgency_hint">False</property>
 
   <child>
     <widget class="GtkTable" id="filename-widget">
@@ -29,7 +30,7 @@
 	<widget class="GtkLabel" id="label-current">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">/path/to/file</property>
+	  <property name="label">/path/to/file</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>

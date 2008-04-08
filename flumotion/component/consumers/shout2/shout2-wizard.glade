@@ -15,7 +15,6 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
-  <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
 
   <child>
@@ -47,10 +46,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">port</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -76,10 +71,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">mount_point</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -99,7 +90,7 @@
 	      <property name="editable">True</property>
 	      <property name="visibility">True</property>
 	      <property name="max_length">0</property>
-	      <property name="text" translatable="yes">/demo.ogg</property>
+	      <property name="text">/demo.ogg</property>
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
@@ -127,10 +118,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">password</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -149,7 +136,7 @@
 	      <property name="editable">True</property>
 	      <property name="visibility">False</property>
 	      <property name="max_length">0</property>
-	      <property name="text" translatable="yes">hackme</property>
+	      <property name="text">hackme</property>
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
@@ -177,10 +164,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">ip</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -199,7 +182,7 @@
 	      <property name="editable">True</property>
 	      <property name="visibility">True</property>
 	      <property name="max_length">0</property>
-	      <property name="text" translatable="yes">127.0.0.1</property>
+	      <property name="text">127.0.0.1</property>
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
@@ -227,10 +210,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">short_name</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -277,10 +256,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">description</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
@@ -327,10 +302,6 @@
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
 	      <property name="mnemonic_widget">url</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">0</property>
