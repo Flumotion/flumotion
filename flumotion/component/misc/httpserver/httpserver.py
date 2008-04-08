@@ -55,7 +55,8 @@ class CancellableRequest(server.Request):
         self._lastTimeWritten = self._start_time
 
         # we index some things by the fd, so we need to store it so we
-        # can still use it in the connectionLost() handler
+        # can still use it (in the connectionLost() handler and in
+        # finish()) after transport's fd has been closed
         self._fd = self.transport.fileno()
 
         self._component.requestStarted(self)
@@ -67,11 +68,13 @@ class CancellableRequest(server.Request):
         self._lastTimeWritten = time.time()
 
     def finish(self):
+        # it can happen that this method will be called with the
+        # transport's fd already closed (if the connection is lost
+        # early in the request handling)
         server.Request.finish(self)
-        fd = self.transport.fileno()
         # We sent Connection: close, so we must close the connection
         self.transport.loseConnection()
-        self.requestCompleted(fd)
+        self.requestCompleted(self._fd)
 
     def connectionLost(self, reason):
         # this is called _after_ the self.transport.fileno() is not

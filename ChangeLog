@@ -1,3 +1,9 @@
+2008-04-08  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py
+	(CancellableRequest.finish): Use stored fd number, in case the
+	transport's fd was closed early. Fixes #920.
+
 2008-04-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/component.glade:
