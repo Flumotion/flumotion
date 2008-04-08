@@ -1,3 +1,10 @@
+2008-04-08  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_encoding.glade:
+	* flumotion/component/encoders/mulaw/mulaw-wizard.glade:
+	Add a label to the encoding page.
+	Don't expand vertically on the label on the mulaw page
+
 2008-04-08  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/misc/httpserver/httpserver.py
