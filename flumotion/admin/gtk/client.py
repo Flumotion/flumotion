@@ -291,7 +291,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
             # Manage
             ('manage', None, _('_Manage')),
-            ('start-component', 'flumotion-play', _('_S_tart Component'), None,
+            ('start-component', 'flumotion-play', _('_Start Component'), None,
              _('Start the selected component'),
              self._manage_start_component_cb),
             ('stop-component', 'flumotion-pause', _('St_op Component'), None,
