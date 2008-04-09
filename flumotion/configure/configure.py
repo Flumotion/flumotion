@@ -104,7 +104,7 @@ _config['defaultGstPortRange'] = range(8600, 8639 + 1)
 
 # default values for service-related stuff
 # how long to wait before timing out term and kill signals
-_config['processTermWait'] = 5
+_config['processTermWait'] = 10
 _config['processKillWait'] = 5
 
 # default value for component heartbeat interval, in seconds

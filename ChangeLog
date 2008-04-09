@@ -1,5 +1,10 @@
 2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/configure/configure.py:
+	  Give programs more time to react to a TERM before getting KILLed.
+
+2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/nl.po:
 	  Update translation.
 
