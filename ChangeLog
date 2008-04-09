@@ -1,5 +1,11 @@
 2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/manager/admin.py:
+	  Add a message to some asserts.
+
+2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/configure/configure.py:
 	  Give programs more time to react to a TERM before getting KILLed.
 

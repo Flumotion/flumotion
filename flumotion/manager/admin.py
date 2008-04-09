@@ -136,7 +136,8 @@ class AdminAvatar(base.ManagerAvatar):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        assert isinstance(componentState, planet.ManagerComponentState)
+        assert isinstance(componentState, planet.ManagerComponentState), \
+            "%r is not a componentState" % componentState
 
         if methodName == "start":
             self.warning('forwarding "start" to perspective_componentStart')

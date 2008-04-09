@@ -534,8 +534,10 @@ def parseComponentId(componentId):
     @return: tuple of (flowName, componentName)
     """
     list = componentId.split("/")
-    assert len(list) == 3
-    assert list[0] == ''
+    assert len(list) == 3, \
+        "componentId %s should have exactly two components" % componentId
+    assert list[0] == '', \
+        "componentId %s should start with /" % componentId
     return (list[1], list[2])
 
 def feedId(componentName, feedName):
