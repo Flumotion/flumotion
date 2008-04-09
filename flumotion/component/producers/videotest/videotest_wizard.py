@@ -76,7 +76,7 @@ class TestVideoProducerStep(VideoProducerStep):
 
     def worker_changed(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'videotestsrc')
+        self.wizard.require_elements(worker, 'videotestsrc', 'level')
 
 
 class VideoTestWizardPlugin(object):
