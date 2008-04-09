@@ -1,3 +1,8 @@
+2008-04-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-nagios.in:
+	  Don't use GStreamer.  as a side effect, makes -h/--help work.
+
 2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/dialogs.py:
