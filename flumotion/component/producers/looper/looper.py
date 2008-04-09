@@ -121,7 +121,8 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
     def make_message_for_gstreamer_error(self, gerror, debug):
         if gerror.domain == 'gst-resource-error-quark':
-            return messages.Error(T_(N_("Could not open file %r."),
+            return messages.Error(T_(N_(
+                "Could not open file '%s' for reading."),
                                      self.filelocation),
                                   debug='%s\n%s' % (gerror.message, debug),
                                   id=gerror.domain, priority=40)

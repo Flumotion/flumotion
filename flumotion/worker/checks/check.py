@@ -184,7 +184,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
                 N_("Your '%s' GStreamer plug-in is too old.\n"), pluginName),
                 id = 'plugin-%s-check' % pluginName)
             m.add(T_(N_(
-                "Please upgrade '%s' to version %s or development packages."),
+                "Please upgrade '%s' to version %s or higher."),
                 packageName, ".".join([str(x) for x in minimumVersion])))
             result.add(m)
     elif version < minimumVersion:

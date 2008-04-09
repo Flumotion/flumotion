@@ -1,5 +1,12 @@
 2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/worker/checks/check.py:
+	  Fix some translatables.
+
+2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  Fix wrong translation string.
 

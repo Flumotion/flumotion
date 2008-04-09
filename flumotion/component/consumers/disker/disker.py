@@ -225,9 +225,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         except IOError, e:
             self.warning("Failed to open output file %s: %s",
                        self.location, log.getExceptionMessage(e))
-            m = messages.Error(T_(N_("Failed to open output file "
-                                       "%s. Check your permissions."
-                                       % (self.location,))))
+            m = messages.Error(T_(N_(
+                "Failed to open output file '%s' for writing. "
+                "Check permissions on the file."), self.location))
             self.addMessage(m)
             return
         self._plug_recording_started(self.file, self.location)
