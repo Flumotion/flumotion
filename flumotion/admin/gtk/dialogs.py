@@ -201,7 +201,7 @@ class AboutDialog(gtk.Dialog):
         version.show()
 
         text = _('Flumotion is a streaming media server.\n\n'
-            '© 2004, 2005, 2006, 2007 Fluendo S.L.')
+            '© 2004, 2005, 2006, 2007,2008 Fluendo S.L.')
         authors = (
                    'Johan Dahlin',
                    'Arek Korbik',
