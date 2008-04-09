@@ -1,3 +1,10 @@
+2008-04-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/combiners/switch/basicwatchdog.py:
+	Use correct variable when iterating.
+	* flumotion/component/combiners/switch/switch.py:
+	Extra debuging.
+
 2008-04-09  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/videotest/videotest_wizard.py

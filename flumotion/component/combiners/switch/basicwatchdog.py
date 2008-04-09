@@ -54,7 +54,7 @@ class SingleBasicWatchdog(switch.SingleSwitch):
             self._started.append(feed)
             allStarted = True
             # check if all feeds started
-            for lf, blah in self.logicalFeeds:
+            for lf in self.logicalFeeds:
                 if lf not in self._started:
                     allStarted = False
                     break
@@ -88,7 +88,7 @@ class AVBasicWatchdog(switch.AVSwitch):
             self._started.append(feed)
             allStarted = True
             # check if all feeds started
-            for lf, blah in self.logicalFeeds:
+            for lf in self.logicalFeeds:
                 if lf not in self._started:
                     allStarted = False
                     break

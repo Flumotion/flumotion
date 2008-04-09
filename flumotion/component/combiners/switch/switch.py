@@ -180,6 +180,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             e = pipeline.get_by_name(self.eaters[alias].elementName)
             pad = None
             while e not in switchElements:
+                self.log("Element: %s", e.get_name())
                 pad, e = getDownstreamElement(e)
             self.debug('eater %s maps to pad %s', alias, pad)
             self.switchPads[alias] = pad, e
