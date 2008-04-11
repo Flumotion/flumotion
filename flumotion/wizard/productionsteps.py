@@ -94,9 +94,9 @@ class ProductionStep(WizardStep):
         def step_loaded(step):
             if step is not None:
                 self._video_producer = step.model
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             return step
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('video producer step')
         d = self._load_step(self.video, 'video')
         d.addCallback(step_loaded)
         return d
@@ -110,9 +110,9 @@ class ProductionStep(WizardStep):
         def step_loaded(step):
             if step is not None:
                 self._audio_producer = step.model
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             return step
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('audio producer step')
         d = self._load_step(self.audio, 'audio')
         d.addCallback(step_loaded)
         return d
@@ -166,9 +166,9 @@ class ProductionStep(WizardStep):
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
 
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('querying producers')
         def done(_):
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             self._loadedSteps = True
         d.addCallback(done)
 

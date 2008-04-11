@@ -1,3 +1,20 @@
+2008-04-11  Johan Dahlin  <jdahlin@async.com.br>
+
+	Rubber-stamped by Arek
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	Introduce waitForTask/taskFinished methods on the configuration wizard
+	which blocks the interface and prevents you from clicking next.
+	This replaces the old block_next(True/False) calls which were
+	dangerous since they weren't stacked.
+	Fixes #917
+
 2008-04-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-nagios.in:

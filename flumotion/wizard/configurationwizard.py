@@ -22,6 +22,7 @@
 import gettext
 import sets
 
+from gtk import gdk
 from twisted.internet import defer
 
 from flumotion.common import errors, messages
@@ -124,6 +125,8 @@ class ConfigurationWizard(SectionWizard):
 
     def __init__(self, parent=None, admin=None):
         SectionWizard.__init__(self, parent)
+        self._cursorWatch = gdk.Cursor(gdk.WATCH)
+        self._tasks = []
         self._admin = admin
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
@@ -166,7 +169,43 @@ class ConfigurationWizard(SectionWizard):
         self._setup_worker(step, self._worker_list.get_worker())
         SectionWizard.prepare_next_step(self, step)
 
+    def block_next(self, block):
+        # Do not block/unblock if we have tasks running
+        if self._tasks:
+            return
+        SectionWizard.block_next(self, block)
+
     # Public API
+
+    def waitForTask(self, taskName):
+        """Instruct the wizard that we're waiting for a task
+        to be finished. This changes the cursor and prevents
+        the user from continuing moving forward.
+        Each call to this method should have another call
+        to taskFinished() when the task is actually done.
+        @param taskName: name of the name
+        """
+        self.info("waiting for task %s" % (taskName,))
+        if not self._tasks:
+            self.window1.window.set_cursor(self._cursorWatch)
+            self.block_next(True)
+        self._tasks.append(taskName)
+
+    def taskFinished(self, blockNext=False):
+        """Instruct the wizard that a task was finished.
+        @param blockNext: if we should still next when done
+        """
+        taskName = self._tasks.pop()
+        self.info("task %s has now finished" % (taskName,))
+        if not self._tasks:
+            self.window1.window.set_cursor(None)
+            self.block_next(blockNext)
+
+    def pendingTask(self):
+        """Returns true if there are any pending tasks
+        @returns: if there are pending tasks
+        """
+        return bool(self._tasks)
 
     def hasAudio(self):
         """If the configured feed has a audio stream
@@ -208,10 +247,10 @@ class ConfigurationWizard(SectionWizard):
         asked = sets.Set(elementNames)
         def _checkElementsCallback(existing, workerName):
             existing = sets.Set(existing)
-            self.block_next(False)
+            self.taskFinished()
             return tuple(asked.difference(existing))
 
-        self.block_next(True)
+        self.waitForTask('check elements %r' % (elementNames,))
         d = self._admin.checkElements(workerName, elementNames)
         d.addCallback(_checkElementsCallback, workerName)
         return d
@@ -245,10 +284,10 @@ class ConfigurationWizard(SectionWizard):
                     "You will not be able to go forward using this worker.")))
                 message.id = 'element' + '-'.join(elementNames)
                 self.add_msg(message)
-            self.block_next(bool(elements))
+            self.taskFinished(bool(elements))
             return elements
 
-        self.block_next(True)
+        self.waitForTask('require elements %r' % (elementNames,))
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)
 
@@ -300,9 +339,9 @@ class ConfigurationWizard(SectionWizard):
                     "The project's homepage is %s"), projectURL))
             message.add(T_(N_("\n\n"
                 "You will not be able to go forward using this worker.")))
-            self.block_next(True)
             message.id = 'module-%s' % moduleName
             self.add_msg(message)
+            self.taskFinished(True)
 
         d = self.check_import(workerName, moduleName)
         d.addErrback(_checkImportErrback)
@@ -328,8 +367,6 @@ class ConfigurationWizard(SectionWizard):
             self.warning('skipping run_in_worker, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
-        d = admin.workerRun(worker, module, function, *args, **kwargs)
-
         def callback(result):
             self.debug('run_in_worker callbacked a result')
             self.clear_msg(function)
@@ -340,6 +377,7 @@ class ConfigurationWizard(SectionWizard):
                     debug=('function %r returned a non-Result %r'
                            % (function, result)))
                 self.add_msg(msg)
+                self.taskFinished(True)
                 raise errors.RemoteRunError(function, 'Internal error.')
 
             for m in result.messages:
@@ -348,8 +386,10 @@ class ConfigurationWizard(SectionWizard):
 
             if result.failed:
                 self.debug('... that failed')
+                self.taskFinished(True)
                 raise errors.RemoteRunFailure(function, 'Result failed')
             self.debug('... that succeeded')
+            self.taskFinished()
             return result.value
 
         def errback(failure):
@@ -364,8 +404,12 @@ class ConfigurationWizard(SectionWizard):
                 N_("Internal error: could not run check code on worker.")),
                 debug=debug)
             self.add_msg(msg)
+            self.taskFinished(True)
             raise errors.RemoteRunError(function, 'Internal error.')
 
+        self.waitForTask('run in worker: %s.%s(%r, %r)' % (module, function,
+                                                           args, kwargs))
+        d = admin.workerRun(worker, module, function, *args, **kwargs)
         d.addErrback(errback)
         d.addCallback(callback)
         return d
@@ -382,8 +426,10 @@ class ConfigurationWizard(SectionWizard):
             modname = pathToModuleName(filename)
             d = self._admin.getBundledFunction(modname, procname)
             self.clear_msg('wizard-bundle')
+            self.taskFinished()
             return d
 
+        self.waitForTask('get wizard entry %s' % (component_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getEntryByType', component_type, 'wizard')
         d.addCallback(got_entry_point)
@@ -401,8 +447,10 @@ class ConfigurationWizard(SectionWizard):
             modname = pathToModuleName(filename)
             d = self._admin.getBundledFunction(modname, procname)
             self.clear_msg('wizard-bundle')
+            self.taskFinished()
             return d
 
+        self.waitForTask('get wizard plug %s' % (plug_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
         d.addCallback(got_entry_point)

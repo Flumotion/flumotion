@@ -251,7 +251,6 @@ class HTTPStep(ConsumerStep):
         'httpstreamer-wizard.glade')
 
     def __init__(self, wizard):
-        self._blocked = False
         self.model = HTTPStreamer()
         ConsumerStep.__init__(self, wizard)
 
@@ -369,7 +368,7 @@ class HTTPStep(ConsumerStep):
         self.plugarea.addPlug(plugin, description)
 
     def _check_elements(self):
-        self._block_next(True)
+        self.wizard.waitForTask('http streamer check')
 
         def importError(error):
             self.info('could not import twisted-web')
@@ -382,6 +381,7 @@ class HTTPStep(ConsumerStep):
                            'http://www.twistedmatrix.com/'))
             message.id = 'module-twisted-web'
             self.wizard.add_msg(message)
+            self.wizard.taskFinished(True)
 
         def checkElements(elements):
             if elements:
@@ -391,17 +391,15 @@ class HTTPStep(ConsumerStep):
                 message = Warning(
                     T_(f, self.worker, "', '".join(elements)), id='httpstreamer')
                 self.wizard.add_msg(message)
-                self._block_next(True)
+                self.wizard.taskFinished(True)
                 return defer.fail(errors.FlumotionError('missing multifdsink element'))
 
             self.wizard.clear_msg('httpstreamer')
 
             # now check import
             d = self.wizard.check_import(self.worker, 'twisted.web')
-            d.addCallback(lambda unused: self._block_next(False))
+            d.addCallback(lambda unused: self.wizard.taskFinished())
             d.addErrback(importError)
-
-            self._block_next(True)
 
         # first check elements
         d = self.wizard.require_elements(self.worker, 'multifdsink')
@@ -409,7 +407,7 @@ class HTTPStep(ConsumerStep):
 
         # require_elements calls check_elements which unconditionally
         # unblocks the next call. Work around that behavior here.
-        d.addErrback(lambda unused: self._block_next(True))
+        d.addErrback(lambda unused: self.wizard.taskFinished(True))
 
     def _verify(self):
         self.client_limit.set_sensitive(
@@ -418,19 +416,17 @@ class HTTPStep(ConsumerStep):
             self.has_bandwidth_limit.get_active())
         self._update_blocked()
 
-    def _block_next(self, blocked):
-        self._blocked = blocked
-        self.wizard.block_next(blocked)
-
     def _update_blocked(self):
+        # FIXME: This should be updated and only called when all pending
+        #        tasks are done.
         self.wizard.block_next(
-            self._blocked or self.mount_point.get_text() == '')
+            self.wizard.pendingTask() or self.mount_point.get_text() == '')
 
     # Callbacks
 
     def on_mount_point_changed(self, entry):
         self._verify()
-        self._block_next(self.model.has_cortado and entry.get_text() == "/")
+        self.wizard.block_next(self.model.has_cortado and entry.get_text() == "/")
 
     def on_has_client_limit_toggled(self, checkbutton):
         self._verify()

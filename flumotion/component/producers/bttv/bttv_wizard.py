@@ -102,7 +102,7 @@ class TVCardStep(VideoProducerStep):
         if self._in_setup:
             return None
 
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('bttv checks')
 
         device = self.device.get_selected()
         assert device
@@ -117,24 +117,27 @@ class TVCardStep(VideoProducerStep):
             failure.trap(errors.RemoteRunFailure)
             self.debug('a RemoteRunFailure happened')
             self._clear_combos()
+            self.wizard.taskFinished(True)
 
         def errRemoteRunError(failure):
             failure.trap(errors.RemoteRunError)
             self.debug('a RemoteRunError happened')
             self._clear_combos()
+            self.wizard.taskFinished(True)
 
         def deviceFound(result):
             if not result:
                 self._clear_combos()
+                self.wizard.taskFinished(True)
                 return None
 
             deviceName, channels, norms = result
             self.wizard.clear_msg('tvcard-check')
-            self.wizard.block_next(False)
             self.tvnorm.prefill(norms)
             self.tvnorm.set_sensitive(True)
             self.source.prefill(channels)
             self.source.set_sensitive(True)
+            self.wizard.taskFinished()
 
         d.addCallback(deviceFound)
         d.addErrback(errRemoteRunFailure)

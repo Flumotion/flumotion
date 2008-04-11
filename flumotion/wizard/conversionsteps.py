@@ -149,8 +149,8 @@ class ConversionStep(WorkerWizardStep):
             d.addCallback(self._add_entries, ctype, combo)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
-        self.wizard.block_next(True)
-        d.addCallback(lambda x: self.wizard.block_next(False))
+        self.wizard.waitForTask('querying encoders')
+        d.addCallback(lambda x: self.wizard.taskFinished())
 
     def _add_entries(self, entries, ctype, combo):
         data = []
@@ -210,9 +210,9 @@ class ConversionStep(WorkerWizardStep):
         def step_loaded(step):
             if step is not None:
                 self._audio_encoder = step.model
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             return step
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('audio encoder page')
         d = self._load_step(self.audio)
         d.addCallback(step_loaded)
         return d
@@ -221,9 +221,9 @@ class ConversionStep(WorkerWizardStep):
         def step_loaded(step):
             if step is not None:
                 self._video_encoder = step.model
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             return step
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('video encoder page')
         d = self._load_step(self.video)
         d.addCallback(step_loaded)
         return d

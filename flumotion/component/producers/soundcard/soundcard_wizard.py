@@ -145,7 +145,7 @@ class SoundcardStep(AudioProducerStep):
     def _update_inputs(self):
         if self._block_update:
             return
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('soundcard checks')
 
         device = self.device.get_selected()
         element_name = self.source_element.get_selected()
@@ -163,11 +163,11 @@ class SoundcardStep(AudioProducerStep):
 
         def checkFailed(failure):
             self._clear_combos()
-            self.wizard.block_next(True)
+            self.wizard.taskFinished()
 
         def soundcardCheckComplete((deviceName, tracks)):
             self.wizard.clear_msg('soundcard-check')
-            self.wizard.block_next(False)
+            self.wizard.taskFinished(False)
             self.label_devicename.set_label(deviceName)
             self._block_update = True
             self.channels.set_sensitive(True)

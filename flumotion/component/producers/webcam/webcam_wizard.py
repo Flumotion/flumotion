@@ -85,13 +85,13 @@ class WebcamStep(VideoProducerStep):
         self.size.set_sensitive(False)
         self.framerate.set_sensitive(False)
         self.label_name.set_label("")
-        self.wizard.block_next(True)
+        self.wizard.taskFinished(True)
 
     def _run_checks(self):
         if self._in_setup:
             return None
 
-        self.wizard.block_next(True)
+        self.wizard.waitForTask('webcam checks')
 
         device = self.device.get_selected()
         msg = Info(T_(
@@ -122,7 +122,7 @@ class WebcamStep(VideoProducerStep):
             self._populate_sizes(sizes)
             self.wizard.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
-            self.wizard.block_next(False)
+            self.wizard.taskFinished()
             self.size.set_sensitive(True)
             self.framerate.set_sensitive(True)
 
