@@ -1,5 +1,11 @@
 2008-04-11  Johan Dahlin  <jdahlin@async.com.br>
 
+	* flumotion/wizard/overlaystep.py:
+	Do not add a overlay component if we're missing elements/python modules.
+	Fixes #914
+
+2008-04-11  Johan Dahlin  <jdahlin@async.com.br>
+
 	Rubber-stamped by Arek
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:

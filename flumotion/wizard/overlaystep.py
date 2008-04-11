@@ -100,27 +100,35 @@ class OverlayStep(WorkerWizardStep):
 
     # Private API
 
+    def _set_sensitive(self, sensitive):
+        self.show_text.set_sensitive(sensitive)
+        self.show_logo.set_sensitive(sensitive)
+        self.text.set_sensitive(sensitive)
+
     def _check_elements(self):
         self.model.can_overlay = False
-        self.set_sensitive(False)
-
         def importError(error):
             self.info('could not import PIL')
-            message = Warning(T_(N_(
-                "Worker '%s' cannot import module '%s'."),
-                self.worker, 'PIL'))
-            message.add(T_(N_("\nThis module is part of '%s'."),
-                           'Python Imaging Library'))
-            message.add(T_(N_("\nThe project's homepage is %s"),
-                           'http://www.pythonware.com/products/pil/'))
-            message.add(T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
+            message = Warning(
+                T_(N_("Worker '%s' cannot import module '%s'."),
+                   self.worker, 'PIL'))
+            message.add(
+                T_(N_("\nThis module is part of '%s'."),
+                   'Python Imaging Library'))
+            message.add(
+                T_(N_("\nThe project's homepage is %s"),
+                   'http://www.pythonware.com/products/pil/'))
+            message.add(
+                T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
             message.id = 'module-PIL'
             self.wizard.add_msg(message)
-            self.model.can_overlay = False
+            self.wizard.taskFinished()
+            self._set_sensitive(False)
 
         def checkImport(unused):
+            self.wizard.taskFinished()
+            # taskFinished updates sensitivity
             self.model.can_overlay = True
-            self.set_sensitive(True)
 
         def checkElements(elements):
             if elements:
@@ -129,8 +137,12 @@ class OverlayStep(WorkerWizardStep):
                     len(elements))
                 message = Warning(
                     T_(f, self.worker, "', '".join(elements)), id='overlay')
-                message.add(T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
+                message.add(
+                    T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
                 self.wizard.add_msg(message)
+                self.wizard.taskFinished()
+                self._set_sensitive(False)
+                return
             else:
                 self.wizard.clear_msg('overlay')
 
@@ -139,6 +151,7 @@ class OverlayStep(WorkerWizardStep):
             d.addCallback(checkImport)
             d.addErrback(importError)
 
+        self.wizard.waitForTask('overlay')
         # first check elements
         d = self.wizard.check_elements(
             self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
