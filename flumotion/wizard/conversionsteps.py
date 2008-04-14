@@ -153,6 +153,7 @@ class ConversionStep(WorkerWizardStep):
         d.addCallback(lambda x: self.wizard.taskFinished())
 
     def _add_entries(self, entries, ctype, combo):
+        self.debug('adding entries for ctype %s: %r', ctype, entries)
         data = []
         for entry in entries:
             data.append((N_(entry.description), entry))
