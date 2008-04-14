@@ -412,7 +412,8 @@ class RegistryEntryWizard(pb.Copyable):
         self.provides = provides
 
     def __repr__(self):
-        return '<wizard type=%s, feeder=%s>' % (self.type, self.feeder)
+        return '<wizard %s type=%s, feeder=%s>' % (self.component_type,
+            self.type, self.feeder)
 
 
 class RegistryEntryWizardFormat(pb.Copyable):
