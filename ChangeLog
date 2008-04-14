@@ -1,5 +1,13 @@
 2008-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* conf/Makefile.am:
+	* misc/validate-config.py:
+	  Add a script to validate config files.
+	  Run it as part of make check on some sample config files.
+
+2008-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	  In the refactoring, the code that handles errors from do_check
 	  and stops going to setup got lost.  Put it back so that a

@@ -1,3 +1,9 @@
+CONFIG = 						\
+	examples/twores.xml				\
+	examples/default.xml 				\
+	examples/discont.xml 				\
+	examples/ondemand.xml
+
 EXTRA_DIST = 						\
         default.pem					\
 	managers/default/adminactionfilelogger.xml	\
@@ -7,8 +13,7 @@ EXTRA_DIST = 						\
 	managers/default/planet.xml			\
 	managers/default/flows/ogg-test-theora.xml	\
 	workers/default.xml 				\
-	examples/twores.xml				\
-	examples/default.xml 				\
-	examples/discont.xml 				\
-	examples/ondemand.xml
+	$(CONFIG)
 
+check:
+	for f in $(CONFIG); do python $(top_srcdir)/misc/validate-config.py $(srcdir)/$$f; done
