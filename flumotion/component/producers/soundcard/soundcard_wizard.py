@@ -162,6 +162,7 @@ class SoundcardStep(AudioProducerStep):
             element_name, device, channels, id='soundcard-check')
 
         def checkFailed(failure):
+            print 'FIXME: trap', failure
             self._clear_combos()
             self.wizard.taskFinished()
 

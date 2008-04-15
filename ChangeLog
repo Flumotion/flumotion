@@ -6,6 +6,12 @@
 
 2008-04-15  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/soundcard/soundcard_wizard.py
+	(SoundcardStep._update_inputs): 
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py
+	(HTTPStep._check_elements.importError): 
+	Add annoying fixmes to remind us to fix these errbacks
+
 	* flumotion/worker/checks/check.py (do_check): Add this function,
 	missing from #921.
 

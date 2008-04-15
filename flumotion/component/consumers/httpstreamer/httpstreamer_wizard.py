@@ -370,7 +370,8 @@ class HTTPStep(ConsumerStep):
     def _check_elements(self):
         self.wizard.waitForTask('http streamer check')
 
-        def importError(error):
+        def importError(failure):
+            print 'FIXME: trap', failure, 'in httpstreamer_wizard.py'
             self.info('could not import twisted-web')
             message = Warning(T_(N_(
                 "Worker '%s' cannot import module '%s'."),
