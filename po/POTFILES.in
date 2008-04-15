@@ -137,6 +137,9 @@ flumotion/component/muxers/ogg.py
 flumotion/component/muxers/checks.py
 flumotion/component/muxers/__init__.py
 flumotion/component/muxers/multipart.py
+flumotion/component/encoders/dirac/dirac.py
+flumotion/component/encoders/dirac/__init__.py
+flumotion/component/encoders/dirac/dirac_wizard.py
 flumotion/component/encoders/theora/theora.py
 flumotion/component/encoders/theora/__init__.py
 flumotion/component/encoders/theora/theora_wizard.py
@@ -403,6 +406,8 @@ data/glade/greeter-initial.glade
 data/glade/wizard_consumption.glade
 data/glade/greeter-authenticate.glade
 data/glade/greeter-connect_to_existing.glade
+flumotion/component/encoders/dirac/dirac-wizard.glade
+flumotion/component/encoders/dirac/dirac.xml
 flumotion/component/encoders/jpeg/jpeg-wizard.glade
 flumotion/component/encoders/jpeg/jpeg.xml
 flumotion/component/encoders/mulaw/mulaw.xml
