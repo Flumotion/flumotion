@@ -57,6 +57,9 @@ class VideoEncoderStep(WorkerWizardStep):
         self.model = model
         WorkerWizardStep.__init__(self, wizard)
 
+    def get_next(self):
+        return self.wizard.get_step('Encoding').get_audio_page()
+
 
 class AudioEncoderStep(WorkerWizardStep):
     glade_file = 'wizard_audio_encoder.glade'

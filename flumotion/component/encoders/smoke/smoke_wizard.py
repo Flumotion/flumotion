@@ -50,9 +50,6 @@ class SmokeStep(VideoEncoderStep):
         self.model.worker = worker
         self.wizard.require_elements(worker, 'smokeenc')
 
-    def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
-
 
 class SmokeWizardPlugin(object):
     implements(IEncoderPlugin)

@@ -75,9 +75,6 @@ class JPEGStep(VideoEncoderStep):
         self.model.worker = worker
         self.wizard.require_elements(worker, 'jpegenc')
 
-    def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
-
 
 class JPEGWizardPlugin(object):
     implements(IEncoderPlugin)

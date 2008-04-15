@@ -115,9 +115,6 @@ class TheoraStep(VideoEncoderStep):
         page = 1.0
         self.keyframe_delta.set_increments(step, page)
 
-    def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
-
     def worker_changed(self, worker):
         self.model.worker = worker
 

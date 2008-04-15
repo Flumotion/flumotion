@@ -55,9 +55,6 @@ class DiracStep(VideoEncoderStep):
         self.add_proxy(self.model.properties,
                        ['bitrate'])
 
-    def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
-
     def worker_changed(self, worker):
         self.model.worker = worker
 
