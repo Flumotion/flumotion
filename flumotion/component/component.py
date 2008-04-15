@@ -406,18 +406,6 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Call check methods, starting from the base class and working down to
         # subclasses.
         checks = common.get_all_methods(self, 'do_check', False)
-
-        def checkErrorCallback(result):
-            # if the mood is now sad, it means an error was encountered
-            # during check, and we should return a failure here.
-            # since the checks are responsible for adding a message,
-            # this is a handled error.
-            current = self.state.get('mood')
-            if current == moods.sad.value:
-                self.warning('Running checks made the component sad.')
-                raise errors.ComponentSetupHandledError()
-
-        checks.append(checkErrorCallback)
         return maybe_deferred_chain(checks, self)
 
     def do_stop(self):
