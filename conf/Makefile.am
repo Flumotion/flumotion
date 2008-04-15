@@ -16,4 +16,4 @@ EXTRA_DIST = 						\
 	$(CONFIG)
 
 check:
-	for f in $(CONFIG); do $(top_srcdir)/env python $(top_srcdir)/misc/validate-config.py $(srcdir)/$$f; done
+	for f in $(CONFIG); do $(top_builddir)/env python $(top_srcdir)/misc/validate-config.py $(srcdir)/$$f; done
