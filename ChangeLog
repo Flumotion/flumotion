@@ -1,5 +1,10 @@
 2008-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/dirac/dirac.xml:
+	  Add component xml too.
+
+2008-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/Makefile.am:
 	* flumotion/component/encoders/dirac/__init__.py:
 	* flumotion/component/encoders/dirac/dirac-wizard.glade:

@@ -1,0 +1,73 @@
+<registry>
+
+  <components>
+  
+    <component type="dirac-encoder" base="flumotion/component/encoders/dirac"
+               description="Encode a raw video feed using BBC's Dirac codec." >
+      <source location="flumotion.component.encoders.dirac.dirac" />
+      <eater name="default" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="dirac.py"
+               function="Dirac" />
+        <entry type="wizard" location="dirac_wizard.py"
+               function="DiracWizardPlugin" />
+      </entries>
+
+      <wizard _description="Dirac" type="video-encoder" 
+              feeder="default" eater="default">
+        <provide-format media-type="dirac" />
+      </wizard>
+
+      <properties>
+        <property name="bitrate" type="int"
+                  description="Bitrate to encode at (in bps)" />
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="dirac-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/dirac">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="dirac-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="dirac-base" />
+            <dependency name="worker-checks" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/dirac">
+                <filename location="dirac.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+   <bundle name="dirac-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="dirac-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/dirac">
+                <filename location="dirac_wizard.py" />
+                <filename location="dirac-wizard.glade" />
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+
+</registry> 
