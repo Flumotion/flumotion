@@ -55,7 +55,9 @@ def checkMixerTracks(source_factory, device, channels, id=None):
         return (element.get_property('device-name'),
                 [track.label for track in element.list_tracks()])
 
-    pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
+    pipeline = ('%s name=source device=%s ! '
+                'audio/x-raw-int,channels=%d ! fakesink') % (
+        source_factory, device, channels)
     d = do_element_check(pipeline, 'source', get_tracks,
         set_state_deferred = True)
 
