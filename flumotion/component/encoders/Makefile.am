@@ -4,6 +4,16 @@ componentdir = $(libdir)/flumotion/python/flumotion/component/encoders
 component_PYTHON = \
 	__init__.py
 
+diracdir = $(componentdir)/dirac
+dirac_PYTHON = \
+	dirac/__init__.py \
+	dirac/dirac.py \
+	dirac/dirac_wizard.py
+dirac_DATA = \
+	dirac/dirac.xml \
+	dirac/dirac-wizard.glade
+
+
 jpegdir = $(componentdir)/jpeg
 jpeg_PYTHON = \
 	jpeg/__init__.py \
@@ -64,5 +74,5 @@ clean-local:
 
 EXTRA_DIST = \
 	$(component_DATA) \
-	$(jpeg_DATA) $(mulaw_DATA) $(smoke_DATA) \
+	$(dirac_DATA) $(jpeg_DATA) $(mulaw_DATA) $(smoke_DATA) \
 	$(speex_DATA) $(theora_DATA) $(vorbis_DATA)

@@ -12,10 +12,11 @@
       </entries>
       <wizard _description="Ogg" type="muxer" 
               feeder="default" eater="default">
-        <accept-format media-type="theora"/>
-        <accept-format media-type="speex"/>
-        <accept-format media-type="vorbis"/>
-        <provide-format media-type="ogg"/>
+        <accept-format media-type="dirac" />
+        <accept-format media-type="theora" />
+        <accept-format media-type="speex" />
+        <accept-format media-type="vorbis" />
+        <provide-format media-type="ogg" />
       </wizard>
     </component>
   
