@@ -64,15 +64,32 @@ def findComponent(planet, avatarId):
 def ok(msg):
     sys.stdout.write('OK: %s\n' % msg)
     reactor.exitStatus = 0
+    return 0
 
 def warning(msg):
     sys.stdout.write('WARNING: %s\n' % msg)
     reactor.exitStatus = 1
+    return 1
 
 def critical(msg):
     sys.stdout.write('CRITICAL: %s\n' % msg)
     reactor.exitStatus = 2
+    return 2
 
 def unknown(msg):
     sys.stdout.write('UNKNOWN: %s\n' % msg)
     reactor.exitStatus = 3
+    return 3
+
+# equivalent exceptions that allow us to stop deferred flows
+class NagiosException(Exception):
+    pass
+
+class NagiosWarning(NagiosException):
+    pass
+
+class NagiosCritical(NagiosException):
+    pass
+
+class NagiosUnknown(NagiosException):
+    pass

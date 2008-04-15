@@ -1,3 +1,9 @@
+2008-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/util.py:
+	  Return the exit codes as well, for convenience.
+	  Add some exceptions, so we can use errbacks to handle error cases.
+
 2008-04-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/worker/checks/check.py (do_check): Add this function,
