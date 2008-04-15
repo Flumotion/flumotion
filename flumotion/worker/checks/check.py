@@ -199,3 +199,22 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
 
     result.succeed(None)
     return defer.succeed(result)
+
+# FIXME: I would prefer to have this in flumotion/component/base/check.py
+def do_check(obj, callable, *args, **kwargs):
+    """
+    @param obj: an object having a addMessage method
+    @param callable: a callable which returns a deferred method
+      returning a Result.
+    @rtype: L{twisted.internet.defer.Deferred}
+
+    This method can be used in component do_check vmethods.
+    It will add messages from the result to the UI state.
+    """
+    def checkCallback(result):
+        for m in result.messages:
+            obj.addMessage(m)
+
+    d = callable(*args, **kwargs)
+    d.addCallback(checkCallback)
+    return d

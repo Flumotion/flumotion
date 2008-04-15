@@ -1,3 +1,8 @@
+2008-04-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker/checks/check.py (do_check): Add this function,
+	missing from #921.
+
 2008-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/encoders/dirac/dirac.xml:
