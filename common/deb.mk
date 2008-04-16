@@ -1,6 +1,6 @@
 # depends on dpkg-dev
 
-# adebversion = $(shell dpkg-parsechangelog -l$(1)|egrep ^Version|cut -d\  -f2)
+# debversion = $(shell dpkg-parsechangelog -l$(1)|egrep ^Version|cut -d\  -f2)
 # @debversion=$(call debversion,pkg/$*/changelog);
 
 deb-%: dist-gzip pkg/%/rules pkg/%/control pkg/%/changelog
@@ -12,5 +12,5 @@ deb-%: dist-gzip pkg/%/rules pkg/%/control pkg/%/changelog
 	ln -s $$distdir.tar.gz $$pkgorig && \
 	cd $$distdir && \
 	debuild -S && \
-	rm -fr $$distdir && \
+	rm -fr $$distdir $$pkgorig
 
