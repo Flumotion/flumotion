@@ -23,7 +23,7 @@
           <property name="position-left" type="int" />
           <property name="position-top" type="int" />
           <property name="z-order" type="int"
-                    description="Non-negative integer specifying z-order of the input (with 0 meaning the input will be drawn below all others)." />
+                    description="Non-negative integer specifying z-order of the input (with 0 meaning the input will be drawn below all others). Each input has to have a unique z-order value." />
           <property name="alpha" type="float"
                     description="Transparency of the input, with full transparency at 0.0 to full opacity at 1.0." />
         </compound-property>

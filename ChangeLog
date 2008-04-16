@@ -1,3 +1,8 @@
+2008-04-16  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/combiners/composite/composite.xml:
+	Add note that z-order needs to be unique.
+
 2008-04-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/basesteps.py (VideoEncoderStep.get_next): 
