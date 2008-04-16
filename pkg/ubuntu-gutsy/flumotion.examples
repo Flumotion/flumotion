@@ -1,0 +1,4 @@
+conf/examples/*.xml
+conf/managers/default/adminactionfilelogger.xml
+conf/managers/default/managerlifecycleprinter.xml
+conf/managers/default/exampleidentityprovider.xml

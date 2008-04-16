@@ -1,0 +1,42 @@
+flumotion (0.4.2-1) unstable; urgency=low
+
+  * The format of the configuration for managers ("<planet>") changed in
+    versions 0.3.2 and 0.4.1.  The configuration for the default manager will
+    be automatically upgraded *after* the normal dpkg upgrade process and a
+    backup of the previous version will be saved as:
+        /etc/flumotion/managers/default/planet.pre-0.4.1-backup.xml
+
+    If you need to upgrade more configuration files, you should do so manually
+    with the help of the provided XSLT stylesheet; you should run a command
+    such as the following one as root:
+        # su -s /bin/sh flumotion -c \
+            "xsltproc /usr/share/flumotion/upgrade-to-0.4.1.xsl \
+                 /etc/flumotion/managers/default/planet.xml"
+
+ -- Loic Minier <lool@dooz.org>  Sat, 05 May 2007 11:16:49 +0200
+
+flumotion (0.2.2-1) unstable; urgency=low
+
+  Previous flumotion versions used to allow any login/password by default, but
+  this fails by default now.  The default configuration file,
+  /etc/flumotion/managers/default/planet.xml, now adds an account named "user"
+  with password "test" which you may use instead.
+
+ -- Loic Minier <lool@dooz.org>  Sat, 30 Sep 2006 19:44:07 +0200
+
+flumotion (0.2.0-1) unstable; urgency=low
+
+  The XML config format was changed for components.  They should now list
+  each of their properties in a
+  <property name="propname"> section instead of just having
+  <propname></propname>.  Also, the <feed> nodes are gone.
+
+  This must also be done in the manager section where it's using a bouncer
+  component.
+
+  You can upgrade your planet config files using xsltproc and the
+  included stylesheet:
+
+      xsltproc /usr/share/flumotion/upgrade-to-0.2.0.xsl planet.xml > new.xml
+
+ -- Loic Minier <lool@dooz.org>  Mon,  6 Mar 2006 21:34:36 +0100

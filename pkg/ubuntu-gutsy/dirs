@@ -1,0 +1,5 @@
+/etc/flumotion/managers
+/etc/flumotion/workers
+/var/cache/flumotion
+/var/log/flumotion
+/var/run/flumotion

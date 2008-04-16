@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/utils.mk
+include /usr/share/cdbs/1/class/gnome.mk
+
+DEB_CONFIGURE_SCRIPT_ENV += env -u DISPLAY
+
+binary-post-install/flumotion::
+	dh_pycentral -p$(cdbs_curpkg)
+
+DEB_DH_FIXPERMS_ARGS += -X etc/flumotion
+
+clean::
+	rm -f flumotion/configure/configure.pyc
+	rm -f flumotion/configure/__init__.pyc
+
+binary-post-install/flumotion::
+	# install the rtupdate script to handle Python default runtime change
+	install -d debian/flumotion/usr/share/python/runtime.d
+	install debian/flumotion.rtupdate debian/flumotion/usr/share/python/runtime.d
+	# force executable bit on files looking like python scripts
+	egrep -rlZ '^#!(.*)python' debian/flumotion/usr/lib/flumotion | xargs -0 chmod a+x --
+	# force executable bit on the SSL cert script
+	chmod a+x debian/flumotion/usr/share/flumotion/make-dummy-cert
+	# protect configuration file with sensitive information
+	chmod 750 debian/flumotion/etc/flumotion
+	# install the logrotate configuration file; fix executable bit
+	install -d debian/flumotion/etc/logrotate.d
+	install doc/redhat/flumotion.logrotate debian/flumotion/etc/logrotate.d/flumotion
+	chmod a-x debian/flumotion/etc/logrotate.d/flumotion
+

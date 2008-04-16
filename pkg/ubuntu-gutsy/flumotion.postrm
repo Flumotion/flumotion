@@ -1,0 +1,50 @@
+#! /bin/sh
+set -e
+
+#DEBHELPER#
+
+log() {
+    echo "$*" >&2
+}
+
+log_i() {
+    log "I:" "$@"
+}
+
+# $1 is the log; the remaining arguments are file or directories to rm -rf if
+# they exist
+remove() {
+    local msg
+    local msg_written
+    local path
+    msg="$1"
+    shift
+    # whether we wrote $msg already
+    msg_written=no
+
+    while [ $# -gt 0 ]; do
+        path="$1"
+        shift
+        if [ -h "$path" -o -e "$path" ]; then
+            if [ $msg_written = no ]; then
+                msg_written=yes
+                log_i "$msg"
+            fi
+            rm -rf "$path"
+        fi
+    done
+}
+
+case "$1" in
+  purge)
+    remove "Removing default certificate" /etc/flumotion/default.pem
+    remove "Removing symlink (hash) to default certificate" \
+        $(find /etc/flumotion -maxdepth 1 -lname default.pem)
+    remove "Removing registry" rm -rf /var/cache/flumotion
+    remove "Removing logs" rm -rf /var/log/flumotion
+    remove "Removing run directory" /var/run/flumotion
+    # backup of pre-0.4.1 configuration file
+    remove "Removing backup of pre-0.4.1 configuration file" \
+        /etc/flumotion/managers/default/planet.pre-0.4.1-backup.xml
+  ;;
+esac

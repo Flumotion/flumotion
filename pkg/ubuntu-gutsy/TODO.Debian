@@ -1,0 +1,26 @@
+Profiling support
+=================
+There's an "import statprof" in job/main.py (only if FLU_PROFILE is present in
+the environment), no idea which package ships that in Debian (if any), perhaps
+python*-tau.
+
+
+pytrayicon support
+==================
+There's an "import ltihooks" in extern/pytrayicon/__init__.py (only if
+flumotion.extern.pytrayicon.pytrayicon can not be imported).
+
+The systray icon isn't arch:all, and hence isn't shipped yet.
+
+
+Documentation build
+===================
+python2.3-epydoc is probably required to build the documentation.
+
+
+Debconf
+=======
+
+Debconfize the root password / worker configuration, listen address, SSL
+cert stuff...
+

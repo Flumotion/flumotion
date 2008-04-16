@@ -6,6 +6,7 @@ ACLOCAL_AMFLAGS = -I m4 -I common
 include $(srcdir)/common/common.mk
 include $(srcdir)/common/pychecker.mk
 include $(srcdir)/common/rpm.mk
+include $(srcdir)/common/deb.mk
 
 SUBDIRS = . bin conf data flumotion doc common pkgconfig tests po
 

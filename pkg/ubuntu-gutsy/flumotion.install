@@ -1,0 +1,4 @@
+debian/planet.xml /etc/flumotion/managers/default/
+debian/default.xml /etc/flumotion/workers/
+conf/managers /usr/share/doc/flumotion/example-conf/
+conf/workers /usr/share/doc/flumotion/example-conf/

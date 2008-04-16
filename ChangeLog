@@ -1,3 +1,35 @@
+2008-04-16  Johan Dahlin  <jdahlin@async.com.br>
+
+	* Makefile.am:
+	* pkg/ubuntu-gutsy/NEWS:
+	* pkg/ubuntu-gutsy/README.Debian:
+	* pkg/ubuntu-gutsy/TODO.Debian:
+	* pkg/ubuntu-gutsy/changelog:
+	* pkg/ubuntu-gutsy/compat:
+	* pkg/ubuntu-gutsy/control:
+	* pkg/ubuntu-gutsy/copyright:
+	* pkg/ubuntu-gutsy/default.xml:
+	* pkg/ubuntu-gutsy/dirs:
+	* pkg/ubuntu-gutsy/flumotion.docs:
+	* pkg/ubuntu-gutsy/flumotion.examples:
+	* pkg/ubuntu-gutsy/flumotion.init:
+	* pkg/ubuntu-gutsy/flumotion.install:
+	* pkg/ubuntu-gutsy/flumotion.postinst:
+	* pkg/ubuntu-gutsy/flumotion.postrm:
+	* pkg/ubuntu-gutsy/flumotion.rtupdate:
+	* pkg/ubuntu-gutsy/planet.xml:
+	* pkg/ubuntu-gutsy/pycompat:
+	* pkg/ubuntu-gutsy/rules:
+	* pkg/ubuntu-gutsy/watch:
+	Add a package for ubuntu-gutsy
+
+2008-04-16  Johan Dahlin  <jdahlin@async.com.br>
+
+	reviewed by: <delete if not using a buddy>
+	patch by: <delete if not someone else's patch>
+
+	* pkg/ubuntu-gutsy/control:
+
 2008-04-16  Johan Dahlin  <johan@gnome.org>
 
 	* common/deb.mk: Add a makefile for building debian packages.

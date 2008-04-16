@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -e
+
+log() {
+    echo "$*" >&2
+}
+
+log_i() {
+    log "I:" "$@"
+}
+
+if [ "$1" = configure ] && [ "$2" = "" ]; then
+    # Make self-signed certificate
+    if [ ! -f /etc/flumotion/default.pem ]; then
+        /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/flumotion/default.pem
+    fi
+fi
+
+if [ "$1" = configure ]; then
+    if ! getent passwd flumotion > /dev/null; then
+        adduser --system --quiet --home /var/run/flumotion \
+            --shell /usr/sbin/nologin --no-create-home --group \
+            --disabled-password --disabled-login \
+            --gecos "Flumotion Streaming Server" flumotion
+    fi
+    chown flumotion:flumotion /var/cache/flumotion
+    chown flumotion:flumotion /var/run/flumotion
+    chown flumotion:adm /var/log/flumotion
+    if [ -d /etc/flumotion ]; then
+        chown -R flumotion:flumotion /etc/flumotion
+    fi
+fi
+
+if [ "$1" = "configure" ] && dpkg --compare-versions "$2" lt "0.4.2"; then
+    log_i "Saving backup of default manager configuration..."
+    cp -av /etc/flumotion/managers/default/planet.xml \
+        /etc/flumotion/managers/default/planet.pre-0.4.1-backup.xml
+    log_i "Upgrading configuration..."
+    tmpdir=$(mktemp -d -t flumotion.postinst.XXXXXXXXXX)
+    cp -av /etc/flumotion/managers/default/planet.xml \
+        "$tmpdir/planet.post-0.4.1.xml"
+    xsltproc /usr/share/flumotion/upgrade-to-0.4.1.xsl \
+        /etc/flumotion/managers/default/planet.xml \
+        >"$tmpdir/planet.post-0.4.1.xml"
+    mv -fv "$tmpdir/planet.post-0.4.1.xml" \
+        /etc/flumotion/managers/default/planet.xml
+    rm -rfv "$tmpdir"
+fi
+
+#DEBHELPER#
+
+# restart flumotion after the byte-compilation
+if [ -x "/etc/init.d/flumotion" ]; then
+    update-rc.d flumotion defaults >/dev/null
+    if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
+        invoke-rc.d flumotion restart || exit $?
+    else
+        /etc/init.d/flumotion restart || exit $?
+    fi
+fi

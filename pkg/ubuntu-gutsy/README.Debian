@@ -1,0 +1,38 @@
+Debian Flumotion packages
+-------------------------
+
+1. Default configuration
+
+Flumotion comes with an almost empty configuration which disables the default
+password and lets a default manager bound only to localhost with a default
+worker which connects to this manager.  A more complete configuration is
+proposed in /usr/share/doc/flumotion/example-conf, directly taken from the
+upstream configuration.
+
+You should be able to connect to the default manager from localhost, and you
+should be able to follow the wizard to create a test pipeline (login: user,
+password: test).
+
+
+2. Runtime
+
+Flumotion runs as the user "flumotion" by default, but you can run your own
+manager as any user to follow in the upstream README which is a nice
+quickstart.
+
+If you want to stream data coming from your sound card, a video card, a tuner,
+etc., you probably want to add flumotion to the unix group which owns the
+relevant devices.  This can be achieved with adduser as root:
+    # adduser flumotion audio
+    # adduser flumotion video
+    ...
+
+
+3. Control commands
+
+The init script will switch to the user flumotion to run various commands such
+as "flumotion status".  While you can invoke flumotion directly as root, it is
+not recommended as it will create a ~/.flumotion and might break the file
+permissions for data which should be owned by "flumotion".
+
+ -- Loic Minier <lool@dooz.org>  Fri, 15 Dec 2006 13:52:06 +0100
