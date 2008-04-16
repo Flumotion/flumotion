@@ -1,5 +1,7 @@
 2008-04-16  Johan Dahlin  <johan@gnome.org>
 
+	* common/deb.mk: Add a makefile for building debian packages.
+
 	* autogen.sh: Copy and force installation of missing files from automake 
 	and libtool.
 
