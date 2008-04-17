@@ -1,3 +1,10 @@
+flumotion (0.5.1.1-1flu1~hardy3) hardy; urgency=low
+
+  * Depend on cortado and gstreamer0.10-schroedinger
+  * Build-depend on python-rrd
+
+ -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:41:49 -0300
+
 flumotion (0.5.1.1-1flu1~hardy2) hardy; urgency=low
 
   * New orig tarball
