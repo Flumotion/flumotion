@@ -1,32 +1,26 @@
-flumotion (0.5.1.1-1flu1~gutsy4) gutsy; urgency=low
+flumotion (0.5.1.1-1flu1~hardy2) hardy; urgency=low
 
-  * Depend on cortado and build-depends on python-rrd.
+  * New orig tarball
 
- -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:30:39 -0300
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:57:37 -0300
 
-flumotion (0.5.1.1-1flu1~gutsy3) gutsy; urgency=low
+flumotion (0.5.1.1-1flu1~hardy1) hardy; urgency=low
 
-  * Try without an orig tarball, which has to be unique
+  * Change versioning scheme again
 
- -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 19:33:18 -0300
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:46:48 -0300
 
-flumotion (0.5.1.1-1flu1~gutsy2) gutsy; urgency=low
+flumotion (0.5.1.1-0flu1~hardy1) hardy; urgency=low
 
-  * New orig tarball 
+  * Hardy release
 
- -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:57:18 -0300
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:40:02 -0300
 
-flumotion (0.5.1.1-1flu1~gutsy1) gutsy; urgency=low
+flumotion (0.5.1.1-0flu7) hardy; urgency=low
 
-  * Change version scheme again
+  * Hardy release
 
- -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:51:46 -0300
-
-flumotion (0.5.1.1-0flu1~gutsy1) gutsy; urgency=low
-
-  * Change version scheme, include gutsy in the version
-
- -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:45:11 -0300
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:24:36 -0300
 
 flumotion (0.5.1.1-0flu6) gutsy; urgency=low
 

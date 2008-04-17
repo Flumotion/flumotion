@@ -3,14 +3,18 @@
 # debversion = $(shell dpkg-parsechangelog -l$(1)|egrep ^Version|cut -d\  -f2)
 # @debversion=$(call debversion,pkg/$*/changelog);
 
-deb-%: dist-gzip pkg/%/rules pkg/%/control pkg/%/changelog
+deb-%: dist-gzip pkg/%/control pkg/%/changelog
 	distdir=$(PACKAGE)-$(VERSION); \
-	pkgorig=$(PACKAGE)_$(VERSION).orig.tar.gz; \
-	rm -fr $$distdir $$pkgorig $$pkgorig.tmp-nest && \
+	rm -fr $$distdir && \
 	tar xfz $$distdir.tar.gz && \
-	cp -r pkg/$* $$distdir/debian && \
-	ln -s $$distdir.tar.gz $$pkgorig && \
+	mkdir $$distdir/debian && \
+	cp pkg/debian-common/* $$distdir/debian && \
+	cp pkg/$*/* $$distdir/debian && \
 	cd $$distdir && \
-	debuild -S && \
-	rm -fr $$distdir $$pkgorig
+	debuild -S -sa
 
+deb-%-inc:
+	dist=`echo $*|cut -d\- -f2`; \
+	debchange \
+	-c pkg/$*/changelog -i \
+	--distribution $$dist -D $$dist

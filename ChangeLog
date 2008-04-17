@@ -1,3 +1,52 @@
+2008-04-17  Johan Dahlin  <jdahlin@async.com.br>
+
+	* common/deb.mk:
+	* pkg/debian-common/NEWS:
+	* pkg/debian-common/README.Debian:
+	* pkg/debian-common/TODO.Debian:
+	* pkg/debian-common/compat:
+	* pkg/debian-common/control:
+	* pkg/debian-common/copyright:
+	* pkg/debian-common/default.xml:
+	* pkg/debian-common/dirs:
+	* pkg/debian-common/flumotion.docs:
+	* pkg/debian-common/flumotion.examples:
+	* pkg/debian-common/flumotion.init:
+	* pkg/debian-common/flumotion.install:
+	* pkg/debian-common/flumotion.postinst:
+	* pkg/debian-common/flumotion.postrm:
+	* pkg/debian-common/flumotion.rtupdate:
+	* pkg/debian-common/planet.xml:
+	* pkg/debian-common/pycompat:
+	* pkg/debian-common/rules:
+	* pkg/debian-common/watch:
+	* pkg/ubuntu-gutsy/NEWS:
+	* pkg/ubuntu-gutsy/README.Debian:
+	* pkg/ubuntu-gutsy/TODO.Debian:
+	* pkg/ubuntu-gutsy/changelog:
+	* pkg/ubuntu-gutsy/compat:
+	* pkg/ubuntu-gutsy/control:
+	* pkg/ubuntu-gutsy/copyright:
+	* pkg/ubuntu-gutsy/default.xml:
+	* pkg/ubuntu-gutsy/dirs:
+	* pkg/ubuntu-gutsy/flumotion.docs:
+	* pkg/ubuntu-gutsy/flumotion.examples:
+	* pkg/ubuntu-gutsy/flumotion.init:
+	* pkg/ubuntu-gutsy/flumotion.install:
+	* pkg/ubuntu-gutsy/flumotion.postinst:
+	* pkg/ubuntu-gutsy/flumotion.postrm:
+	* pkg/ubuntu-gutsy/flumotion.rtupdate:
+	* pkg/ubuntu-gutsy/planet.xml:
+	* pkg/ubuntu-gutsy/pycompat:
+	* pkg/ubuntu-gutsy/rules:
+	* pkg/ubuntu-gutsy/watch:
+	* pkg/ubuntu-hardy/changelog:
+	* pkg/ubuntu-hardy/control:
+
+	Move most of the files over from ubuntu-gutsy to debian-common.
+	Add a new directory for ubuntu-hardy packages.
+	Change the deb makerules to take this into account.
+
 2008-04-16  Johan Dahlin  <jdahlin@async.com.br>
 
 	* Makefile.am:
