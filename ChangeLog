@@ -1,3 +1,11 @@
+2008-04-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/overlaystep.py (Overlay.getProperties): show-text
+	should be saved as a real property. Fixes #929
+
+	* flumotion/test/test_wizard_save.py (TestWizardSave): 
+	Update tests
+	
 2008-04-18  Johan Dahlin  <johan@flumotion.com>
 
 	reviewed by: Zaheer

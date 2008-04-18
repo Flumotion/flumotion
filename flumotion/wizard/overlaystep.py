@@ -37,8 +37,8 @@ class Overlay(VideoConverter):
         super(Overlay, self).__init__()
         self._video_producer = video_producer
         self.can_overlay = False
-        self.show_text = True
         self.show_logo = True
+        self.properties.show_text = True
         self.properties.text = _("Fluendo")
 
     # Public API
@@ -54,7 +54,7 @@ class Overlay(VideoConverter):
     def getProperties(self):
         p = super(Overlay, self).getProperties()
 
-        if not self.show_text:
+        if not self.properties.show_text:
             del p.text
 
         p.width = self._video_producer.getWidth()
@@ -85,8 +85,8 @@ class OverlayStep(WorkerWizardStep):
     def setup(self):
         self.text.data_type = str
 
-        self.add_proxy(self.model, ['show_logo', 'show_text'])
-        self.add_proxy(self.model.properties, ['text'])
+        self.add_proxy(self.model, ['show_logo'])
+        self.add_proxy(self.model.properties, ['show_text', 'text'])
 
     def worker_changed(self, worker):
         self.model.worker = worker
