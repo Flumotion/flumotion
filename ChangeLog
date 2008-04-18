@@ -1,3 +1,16 @@
+2008-04-18  Johan Dahlin  <johan@flumotion.com>
+
+	reviewed by: Zaheer
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/plugs/cortado/cortado_wizard.py:
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/http.py:
+	* flumotion/worker/checks/package.xml:
+
+	Don't use localhost for the porter, guess the public hostname instead.
+	Fixes #923
+
 2008-04-17  Johan Dahlin  <jdahlin@async.com.br>
 
 	* common/deb.mk:
@@ -71,13 +84,6 @@
 	* pkg/ubuntu-gutsy/rules:
 	* pkg/ubuntu-gutsy/watch:
 	Add a package for ubuntu-gutsy
-
-2008-04-16  Johan Dahlin  <jdahlin@async.com.br>
-
-	reviewed by: <delete if not using a buddy>
-	patch by: <delete if not someone else's patch>
-
-	* pkg/ubuntu-gutsy/control:
 
 2008-04-16  Johan Dahlin  <johan@gnome.org>
 

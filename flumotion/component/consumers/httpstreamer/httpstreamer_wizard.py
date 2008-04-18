@@ -95,6 +95,7 @@ class HTTPStreamer(Consumer):
     @ivar socket_path: Path to the porter socket
     @ivar porter_username: Username for the porter
     @ivar porter_password: Password for the porter
+    @ivar hostname: the hostname this will be streamed on
     """
     component_type = 'http-streamer'
     def __init__(self):
@@ -107,13 +108,14 @@ class HTTPStreamer(Consumer):
         self.porter_username = _generateRandomString(12)
         self.porter_password = _generateRandomString(12)
         self.properties.burst_on_connect = False
+        self.hostname = None
 
     def getURL(self):
         """Fetch the url to this stream
         @returns: the url
         """
         return 'http://%s:%d%s' % (
-            self.properties.get('hostname', self.worker),
+            self.properties.get('hostname', self.hostname),
             self.properties.port,
             self.properties.mount_point)
 
@@ -240,6 +242,7 @@ class PlugPluginArea(gtk.VBox):
 
     def _on_plugline__enable_changed(self, line):
         self._updateStreamer()
+
 
 class HTTPStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
@@ -384,6 +387,16 @@ class HTTPStep(ConsumerStep):
             self.wizard.add_msg(message)
             self.wizard.taskFinished(True)
 
+        def finished(hostname):
+            self.model.hostname = hostname
+            self.wizard.taskFinished()
+
+        def checkWorkerHostname(unused):
+            d = self.wizard.run_in_worker(
+                self.worker, 'flumotion.worker.checks.http',
+                'runHTTPStreamerChecks')
+            d.addCallback(finished)
+
         def checkElements(elements):
             if elements:
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
@@ -399,7 +412,7 @@ class HTTPStep(ConsumerStep):
 
             # now check import
             d = self.wizard.check_import(self.worker, 'twisted.web')
-            d.addCallback(lambda unused: self.wizard.taskFinished())
+            d.addCallback(checkWorkerHostname)
             d.addErrback(importError)
 
         # first check elements

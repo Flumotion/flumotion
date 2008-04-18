@@ -9,6 +9,7 @@
 	  <filename location="audio.py" />
           <filename location="gst010.py" />
           <filename location="cortado.py" />
+          <filename location="http.py" />
         </directory>
       </directories>
     </bundle>
