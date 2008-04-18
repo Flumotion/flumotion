@@ -1,3 +1,9 @@
+flumotion (0.5.1.1-1flu1~gutsy5) gutsy; urgency=low
+
+  * Rebuild with bug #923 fixed
+
+ -- Johan Dahlin <johan@flumotion.com>  Fri, 18 Apr 2008 10:08:00 -0300
+
 flumotion (0.5.1.1-1flu1~gutsy4) gutsy; urgency=low
 
   * Depend on cortado and build-depends on python-rrd.
