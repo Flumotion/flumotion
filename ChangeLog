@@ -1,3 +1,10 @@
+2008-04-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/epydoc.mk:
+	* common/filterdoc.py:
+	  Filter the output when generating epydoc, suppressing output from
+	  modules outside of flumotion, like gobject, gtk, and twisted.
+
 2008-04-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/overlaystep.py (Overlay.getProperties): show-text
