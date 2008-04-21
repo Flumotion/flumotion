@@ -119,9 +119,13 @@ class ManagerAtmosphereState(flavors.StateCacheable):
         """
         Clear out all component entries.
 
-        @returns: a DeferredList that will fire when all notifications are done.
+        @returns: a DeferredList that will fire when all notifications
+                  are done.
         """
-        list = [self.remove('components', c) for c in self.get('components')]
+        # make a copy, so we can iterate safely while modifying
+        components = self.get('components')[:]
+
+        list = [self.remove('components', c) for c in components]
         return defer.DeferredList(list)
 
 class AdminAtmosphereState(flavors.StateRemoteCache):

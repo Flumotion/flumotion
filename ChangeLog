@@ -1,3 +1,9 @@
+2008-04-21  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/common/planet.py (ManagerAtmosphereState.empty):
+	Make a copy of a list before removing from it while iterating.
+	Fixes #931.
+
 2008-04-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/epydoc.mk:
