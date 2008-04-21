@@ -1,3 +1,8 @@
+2008-04-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/plugs/cortado/cortado_location.py.in:
+	Add OpenSuSE location here too.
+
 2008-04-21  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/common/planet.py (ManagerAtmosphereState.empty):

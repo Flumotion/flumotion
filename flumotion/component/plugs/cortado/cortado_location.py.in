@@ -35,6 +35,10 @@ def getCortadoFilename():
         name = os.path.join(directory, 'share', 'cortado', 'cortado-ovt.jar')
         if os.path.exists(name):
             return name
+        # OpenSuSE
+        name = os.path.join(directory, 'share', 'java', 'cortado', 'cortado-ovt.jar')
+        if os.path.exists(name):
+            return name
         # ant install_applet
         for version in ['0.2.2', '0.2.1', '0.2.0']:
             name = os.path.join(directory, 'share', 'cortado',
