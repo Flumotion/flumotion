@@ -15,7 +15,7 @@ html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES)) $(top_srcdir)/c
 all-local-epydoc: html/index.html
 
 check-local-epydoc:
-	@PYTHONPATH=$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py --check $(MODULES)
+	@PYTHONPATH=$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py --check $(MODULES) 2>&1 | $(PYTHON) $(top_srcdir)/common/filterdoc.py
 
 clean-local-epydoc:
 	rm -rf html
