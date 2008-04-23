@@ -1,6 +1,12 @@
 2008-04-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
+	  Store the connector when a connection is being made, so
+	  we can mention it when we fail.
+
+2008-04-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
 	  Tell us what we fail to connect to so we can solve the problem.
 
 2008-04-21  Johan Dahlin  <johan@gnome.org>

@@ -52,6 +52,13 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         self.extraTenacious = extraTenacious
         self.hasBeenConnected = 0
 
+        self._connector = None
+
+    def startedConnecting(self, connector):
+        self._connector = connector
+        return fpb.ReconnectingFPBClientFactory.startedConnecting(
+            self, connector)
+
     def clientConnectionMade(self, broker):
         self.hasBeenConnected = 1
 
@@ -99,7 +106,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         def error(failure):
             if self.extraTenacious:
                 self.debug('connection problem to %s: %s',
-                    connector.getDestination(),
+                    self._connector.getDestination(),
                     log.getFailureMessage(failure))
                 self.debug('we are tenacious, so trying again later')
                 self.disconnect()
@@ -118,8 +125,9 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 self.debug("emitted connection-refused")
             else:
                 self.medium.emit('connection-error', failure)
-                self.warning('connection error: %s',
-                             log.getFailureMessage(failure))
+                self.warning('connection error to %s:: %s',
+                    self._connector.getDestination(),
+                    log.getFailureMessage(failure))
             # swallow error
                 
         d.addCallbacks(success, error)
