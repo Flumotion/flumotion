@@ -98,8 +98,9 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         def error(failure):
             if self.extraTenacious:
-                self.debug('connection problem: %s',
-                           log.getFailureMessage(failure))
+                self.debug('connection problem to %s: %s',
+                    connector.getDestination(),
+                    log.getFailureMessage(failure))
                 self.debug('we are tenacious, so trying again later')
                 self.disconnect()
             elif failure.check(errors.ConnectionFailedError):

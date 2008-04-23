@@ -1,3 +1,8 @@
+2008-04-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  Tell us what we fail to connect to so we can solve the problem.
+
 2008-04-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/plugs/cortado/cortado_location.py.in:
