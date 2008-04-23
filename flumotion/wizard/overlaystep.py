@@ -45,7 +45,7 @@ class Overlay(VideoConverter):
 
     def hasOverlay(self):
         if self.can_overlay:
-            if self.show_logo or self.show_text:
+            if self.show_logo or self.properties.show_text:
                 return True
         return False
 
