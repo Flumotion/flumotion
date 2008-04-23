@@ -13,6 +13,12 @@ log_PYTHON = \
 	log/log.py \
 	log/termcolor.py
 
+commanddir = $(libdir)/flumotion/python/flumotion/extern/command
+
+command_PYTHON = \
+	command/__init__.py \
+	command/command.py
+
 EXTRA_DIST = log/test_log.py
 
 if BUILD_TRAYICON
