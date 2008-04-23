@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	py-compile-destdir 	\
 	common.mk 		\
 	epydoc.mk 		\
+	filterdoc.py 		\
 	gendoc.py 		\
 	locale.mk 		\
 	python.mk 		\
