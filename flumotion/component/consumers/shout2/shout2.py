@@ -38,14 +38,15 @@ class Shout2Consumer(feedcomponent.ParseLaunchComponent):
                    ('short-name', 'streamname'))
         for k, v in elprops:
             if k in properties:
-                pipestr += ' %s=%s' % (v, properties[k])
+                # mind the gap, quote the values
+                pipestr += ' %s="%s"' % (v, properties[k])
 
         return pipestr
 
     def configure_pipeline(self, pipeline, properties):
         def _connection_problem(self, error):
             # apparently error is an int
-            self.warning('Connection problem: %s', error)
+            self.warning('Connection problem: %r', error)
 
         element = pipeline.get_by_name('shout2-streamer')
         element.connect('connection-problem', _connection_problem)
