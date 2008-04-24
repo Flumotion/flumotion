@@ -1,5 +1,8 @@
 2008-04-24  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/save.py (WizardSaver.addConsumer): 
+	it's called shout2-consumer, not shout2.
+
 	* flumotion/ui/kiwipatches.py (_open_glade): Use os.path.sep instead
 	of /.
 

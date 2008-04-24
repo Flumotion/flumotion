@@ -159,8 +159,11 @@ class WizardSaver(object):
             prefix = 'http'
         elif consumer.component_type == 'disk-consumer':
             prefix = 'disk'
-        elif consumer.component_type == 'shout2':
+        elif consumer.component_type == 'shout2-consumer':
             prefix = 'shout2'
+        else:
+            raise AssertionError("unknown component: %s" % (
+                consumer.component_type))
 
         # [disk,http,shout2]-[audio,video,audio-video]
         consumer.name = prefix + '-' + consumerType
