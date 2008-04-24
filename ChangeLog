@@ -1,5 +1,9 @@
 2008-04-24  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/shout2/shout2_wizard.py 
+	(Shout2Consumer.__init__): Make sure that all properties 
+	are saved to the configuration file
+
 	* flumotion/component/consumers/shout2/shout2_wizard.py
 	(Shout2Consumer.__init__): 
 	mount_point is a required property, always set it

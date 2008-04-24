@@ -33,7 +33,12 @@ class Shout2Consumer(Consumer):
     component_type = 'shout2-consumer'
     def __init__(self):
         super(Shout2Consumer, self).__init__()
+        self.properties.ip = '127.0.0.1'
         self.properties.mount_point = '/'
+        self.properties.description = ''
+        self.properties.short_name = ''
+        self.properties.url = 'http://localhost/'
+        self.properties.password = ''
 
 
 class Shout2Step(ConsumerStep):
@@ -52,18 +57,22 @@ class Shout2Step(ConsumerStep):
     # WizardStep
 
     def setup(self):
+        self.ip.data_type = str
+        self.port.data_type = int
         self.mount_point.data_type = str
+        self.password.data_type = str
         self.short_name.data_type = str
         self.description.data_type = str
         self.url.data_type = str
-        self.port.data_type = int
 
         self.add_proxy(self.model.properties,
-                       ['mount_point',
+                       ['ip',
+                        'port',
+                        'mount_point',
                         'short_name',
+                        'password',
                         'description',
-                        'url',
-                        'port'])
+                        'url'])
 
     def worker_changed(self, worker):
         self.model.worker = worker
