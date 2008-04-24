@@ -62,7 +62,7 @@ def _open_glade(view, gladefile, domain):
         raise TypeError(
               "gladefile should be a string, found %s" % type(gladefile))
 
-    if not '/' in gladefile:
+    if not os.path.sep in gladefile:
         filename = os.path.splitext(os.path.basename(gladefile))[0]
         gladefile = environ.find_resource("glade", filename + '.glade')
     return FluLibgladeWidgetTree(view, gladefile, domain)

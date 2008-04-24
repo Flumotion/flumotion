@@ -1,3 +1,8 @@
+2008-04-24  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/ui/kiwipatches.py (_open_glade): Use os.path.sep instead
+	of /.
+
 2008-04-23  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/overlaystep.py:
