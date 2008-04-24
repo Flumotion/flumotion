@@ -98,7 +98,7 @@ class BTTV(feedcomponent.ParseLaunchComponent):
 
         # register state change notify to set channel and norm
         element = pipeline.get_by_name('source')
-        channel = properties['channel']
+        channel = properties.get('channel', None)
         norm = properties['signal']
 
         call_on_state_change(element, gst.STATE_READY, gst.STATE_PAUSED,

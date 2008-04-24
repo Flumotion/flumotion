@@ -1,3 +1,9 @@
+2008-04-24  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/producers/bttv/bttv.py:
+	Workaround the case where no channels are specified,
+	fixes #934
+
 2008-04-24  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/consumers/shout2/shout2.py
