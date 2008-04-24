@@ -29,7 +29,7 @@ components; and one or more admin clients connecting to the manager to control
 it.
  </description>
  <category></category>
- <bug-database rdf:resource="https://core.fluendo.com/flumotion/trac/newticket?component=flumotion" />
+ <bug-database rdf:resource="https://code.fluendo.com/flumotion/trac/newticket?component=flumotion" />
  <screenshots></screenshots>
  <mailing-list rdf:resource="http://lists.fluendo.com/mailman/listinfo/flumotion-devel" />
  <programming-language>python</programming-language>
@@ -38,9 +38,9 @@ it.
 
  <repository>
    <SVNRepository>
-     <anon-root>https://core.fluendo.com/svn/</anon-root>
+     <anon-root>https://code.fluendo.com/flumotion/svn/</anon-root>
      <module>flumotion</module>
-     <browse rdf:resource="https://core.fluendo.com/flumotion/trac/browser" />
+     <browse rdf:resource="https://code.fluendo.com/flumotion/trac/browser" />
    </SVNRepository>
  </repository> 
 
