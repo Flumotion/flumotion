@@ -1,5 +1,10 @@
 2008-04-24  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/consumers/shout2/shout2_wizard.py
+	(Shout2Consumer.__init__): 
+	mount_point is a required property, always set it
+	(Shout2Step.worker_changed): Set the worker name of the model.
+
 	* flumotion/wizard/save.py (WizardSaver.addConsumer): 
 	it's called shout2-consumer, not shout2.
 

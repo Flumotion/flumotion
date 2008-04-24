@@ -33,6 +33,7 @@ class Shout2Consumer(Consumer):
     component_type = 'shout2-consumer'
     def __init__(self):
         super(Shout2Consumer, self).__init__()
+        self.properties.mount_point = '/'
 
 
 class Shout2Step(ConsumerStep):
@@ -65,6 +66,7 @@ class Shout2Step(ConsumerStep):
                         'port'])
 
     def worker_changed(self, worker):
+        self.model.worker = worker
         self.wizard.check_elements(worker, 'shout2send')
 
 
