@@ -37,10 +37,9 @@ class MultiAdminModel(log.Loggable):
     logCategory = 'multiadmin'
 
     def __init__(self):
-        # public
         self.admins = watched.WatchedDict() # {managerId: AdminModel}
-        # private
-        self.listeners = []
+
+        self._listeners = []
         self._reconnectHandlerIds = {} # managerId => [disconnect, id..]
         self._startSet = startset.StartSet(self.admins.has_key,
                                            errors.AlreadyConnectingError,
@@ -50,7 +49,7 @@ class MultiAdminModel(log.Loggable):
     def emit(self, signal_name, *args, **kwargs):
         self.debug('emit %r %r %r' % (signal_name, args, kwargs))
         assert signal_name != 'handler'
-        for c in self.listeners:
+        for c in self._listeners:
             if getattr(c, 'model_handler', None):
                 c.model_handler(c, signal_name, *args, **kwargs)
             elif getattr(c, 'model_%s' % signal_name):
@@ -60,11 +59,11 @@ class MultiAdminModel(log.Loggable):
                 raise NotImplementedError(s)
 
     def addListener(self, obj):
-        assert not obj in self.listeners
-        self.listeners.append(obj)
+        assert not obj in self._listeners
+        self._listeners.append(obj)
 
     def removeListener(self, obj):
-        self.listeners.remove(obj)
+        self._listeners.remove(obj)
 
     def _managerConnected(self, admin):
         if admin.managerId not in self._reconnectHandlerIds:

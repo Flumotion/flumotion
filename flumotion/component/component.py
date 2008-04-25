@@ -126,7 +126,19 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         self.medium.setAuthenticator(authenticator)
         return fpb.ReconnectingFPBClientFactory.startLogin(self, authenticator)
 
-def maybe_deferred_chain(procs, *args, **kwargs):
+def _maybeDeferredChain(procs, *args, **kwargs):
+    """
+    Creates a deferred chain created by chaining calls to the given
+    procedures, each of them made with the given args and kwargs.
+    Only the result of the last procedure is returned; results for the
+    other procedures are discarded.
+
+    Failures triggered during any of the procedure short-circuit execution
+    of the other procedures and should be handled by the errbacks attached
+    to the deferred returned here.
+    
+    @rtype: L{twisted.internet.defer.Deferred}
+    """
     def call_proc(_, p):
         log.debug('', 'calling %r', p)
         return p(*args, **kwargs)
@@ -419,7 +431,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 raise errors.ComponentSetupHandledError()
 
         checks.append(checkErrorCallback)
-        return maybe_deferred_chain(checks, self)
+        return _maybeDeferredChain(checks, self)
 
     def do_stop(self):
         """
@@ -458,7 +470,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         def run_setups():
             setups = common.get_all_methods(self, 'do_setup', False)
-            return maybe_deferred_chain(setups, self)
+            return _maybeDeferredChain(setups, self)
 
         def setup_complete(_):
             self.debug('setup completed')
@@ -509,7 +521,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         # Run stop methods, starting from the subclass, up to this base class.
         stops = common.get_all_methods(self, 'do_stop', True)
-        return maybe_deferred_chain(stops, self)
+        return _maybeDeferredChain(stops, self)
 
     ### BaseComponent public methods
     def getName(self):
