@@ -1,5 +1,11 @@
 2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/signals.py:
+	  Use the right variable.  Actually chain through to the
+	  non-deprecated method.
+
+2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/theora/theora.py:
 	  Use the correctly imported module.
 

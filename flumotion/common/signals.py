@@ -58,6 +58,7 @@ class SignalMixin(object):
     def disconnect_by_func(self, func):
         warnings.warn("Please call disconnectByFunction instead",
             DeprecationWarning, stacklevel=2)
+        self.disconnectByFunction(func)
 
     def disconnectByFunction(self, function):
         self.__ensureSignals()
@@ -68,7 +69,7 @@ class SignalMixin(object):
                 break
         else:
             raise ValueError(
-                'No signal connected to function: %r' % (func,))
+                'No signal connected to function: %r' % (function, ))
 
         del self.__signalConnections[signalId]
 
