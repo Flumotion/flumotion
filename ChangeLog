@@ -1,5 +1,12 @@
 2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/theora/theora.xml:
+	  Remove bundle with same name.
+	  Use the check that was moved to the check module.
+
+2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/monitor/nagios/main.py:
 	  Return the exit code.
 	  Don't traceback on Nagios Exceptions

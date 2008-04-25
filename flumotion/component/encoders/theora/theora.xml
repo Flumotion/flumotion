@@ -16,7 +16,7 @@
 
       <wizard _description="Theora" type="video-encoder" 
               feeder="default" eater="default">
-        <provide-format media-type="theora"/>
+        <provide-format media-type="theora" />
       </wizard>
 
       <properties>
@@ -76,20 +76,7 @@
         <directories>
             <directory name="flumotion/component/encoders/theora">
                 <filename location="theora_wizard.py" />
-            </directory>
-        </directories>
-    </bundle>
-
-    <bundle name="theora-wizard">
-        <dependencies>
-            <dependency name="theora-base" />
-            <dependency name="component" />
-        </dependencies>
-
-        <directories>
-            <directory name="flumotion/component/encoders/theora">
                 <filename location="theora-wizard.glade" />
-                <filename location="theora_wizard.py" />
             </directory>
         </directories>
     </bundle>
