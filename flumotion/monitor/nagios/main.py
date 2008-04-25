@@ -35,6 +35,7 @@ __version__ = "$Rev$"
 
 class Mood(util.LogCommand):
     description = "Check the mood of a component."
+    usage = "mood [mood options] [component id]"
 
     def addOptions(self):
         default = "hungry"
@@ -64,32 +65,28 @@ class Mood(util.LogCommand):
 
     def _callback(self, result):
         d = self.parentCommand.adminModel.callRemote('getPlanetState')
-        def gotMoodCb(result):
-            self.debug('gotMoodCb')
+        def gotPlanetStateCb(result):
+            self.debug('gotPlanetStateCb')
             c = util.findComponent(result, self._component)
             if not c:
-                util.unknown('Could not find component %s' %
+                return util.unknown('Could not find component %s' %
                     self._component)
-                return 3
 
             moodValue = c.get('mood')
             moodName = planet.moods.get(moodValue).name
 
             if moodName in self._critical:
-                util.critical('Component %s is %s' % (self._component,
+                return util.critical('Component %s is %s' % (self._component,
                     moodName))
-                return 2
 
             if moodName in self._warning:
-                util.warning('Component %s is %s' % (self._component,
+                return util.warning('Component %s is %s' % (self._component,
                     moodName))
-                return 1
 
-            util.ok('Component %s is %s' % (self._component,
+            return util.ok('Component %s is %s' % (self._component,
                 moodName))
-            return 0
 
-        d.addCallback(gotMoodCb)
+        d.addCallback(gotPlanetStateCb)
         d.addCallback(lambda e: setattr(reactor, 'exitStatus', e))
         return d
 
@@ -161,6 +158,9 @@ class Nagios(util.LogCommand):
             reactor.callLater(0, reactor.stop)
         def eb(failure):
             self.debug('parse: eb: failure %s' % log.getFailureMessage(failure))
+            # Nagios exceptions have already got their feedback covered
+            if not failure.check(util.NagiosException):
+                util.unknown(log.getFailureMessage(failure))
             reactor.callLater(0, reactor.stop)
         self.managerDeferred.addCallback(cb)
         self.managerDeferred.addErrback(eb)

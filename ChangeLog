@@ -1,5 +1,11 @@
 2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/monitor/nagios/main.py:
+	  Return the exit code.
+	  Don't traceback on Nagios Exceptions
+
+2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/admin/admin.py:
 	* flumotion/common/common.py:
