@@ -1,3 +1,11 @@
+flumotion (0.5.2-1flu1~hardy1) hardy; urgency=low
+
+  * New version
+  * Depend on python-kiwi, create /var/run/flumotion when starting the 
+    script if it doesn't exist
+
+ -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:41:49 -0300
+
 flumotion (0.5.1.1-1flu1~hardy3) hardy; urgency=low
 
   * Depend on cortado and gstreamer0.10-schroedinger

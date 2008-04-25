@@ -36,6 +36,14 @@ SCRIPTNAME="/etc/init.d/$NAME"
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
+check_var_run_dir() {
+    if [ ! -d /var/run/flumotion ]; then
+        mkdir /var/run/flumotion
+        chmod 0755 /var/run/flumotion
+        chown flumotion:flumotion /var/run/flumotion
+    fi
+}
+
 user_do() {
 	# set an umask for log files
 	# unset HOME as otherwise flumotion uses $HOME/.flumotion as its cache
@@ -57,6 +65,7 @@ do_start()
 		return "$?"
 	fi
 
+	check_var_run_dir
 	list="`user_do "$DAEMON status" | cut -f1,2 -d' ' | tr ' ' @`"
 	RETVAL="0"
 	for line in $list; do
