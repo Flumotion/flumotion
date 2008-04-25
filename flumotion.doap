@@ -259,4 +259,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.1.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.5.2</revision>
+   <branch>0.5</branch>
+   <name>Can Tomas</name>
+   <created>2008-04-25</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.2.tar.bz2" />
+  </Version>
+ </release>
 </Project>
