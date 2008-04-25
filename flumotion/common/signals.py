@@ -19,10 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+import warnings
 from flumotion.common import log
 
 __version__ = "$Rev$"
-
 
 class SignalMixin(object):
     __signals__ = ()
@@ -54,12 +54,17 @@ class SignalMixin(object):
 
         del self.__signalConnections[signalId]
 
+    # F0.8
     def disconnect_by_func(self, func):
+        warnings.warn("Please call disconnectByFunction instead",
+            DeprecationWarning, stacklevel=2)
+
+    def disconnectByFunction(self, function):
         self.__ensureSignals()
 
         for signalId, conn in self.__signalConnections.items():
             name, proc, args, kwargs = conn
-            if proc == func:
+            if proc == function:
                 break
         else:
             raise ValueError(

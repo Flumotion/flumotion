@@ -1,6 +1,13 @@
 2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/multi.py:
+	* flumotion/common/signals.py:
+	* flumotion/test/test_common_signals.py:
+	  Fix naming, but using DeprecationWarning
+
+2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/multi.py:
 	* flumotion/component/component.py:
 	  Privatize variables and camelCase.
 
