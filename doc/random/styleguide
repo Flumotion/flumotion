@@ -109,3 +109,13 @@ COMPONENTS
     or misc/
   - under that, they can go in files matching the first part of the type,
     or in a separate subdirectory for the component on its own
+
+DEPRECATING
+-----------
+- all deprecated methods should be marked with a comment tag, so that they
+  can later be removed; for example: # F0.8
+- they should also contain a warnings.warn statement, and call through to
+  the new version; for example:
+	warnings.warn("Please call disconnectByFunction instead",
+            DeprecationWarning, stacklevel=2)
+
