@@ -16,7 +16,8 @@
 * copy the generated text version to the RELEASE file
 * Edit NEWS and add the tickets fixed for this milestone, as well as the
   new features
-* bump nano in configure.ac
+* bump nano in configure.ac to 0
+* update doap file, adding new release
 * edit ChangeLog and add === release 0.1.2 ===
 * commit to SVN
 * make release
@@ -26,5 +27,5 @@
   using bin/data-put
 * fix up ticket list to do and milestone (trac)
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)
-* update doap file, adding new release
 * send out mail, see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README. Example: moap doap -f ~/svn/flumotion-0.4.x/flumotion.doap -v 0.3.2 mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org
+* bump nano in configure.ac to 1 to go back to development
