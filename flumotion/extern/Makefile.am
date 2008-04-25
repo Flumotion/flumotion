@@ -2,9 +2,10 @@ include $(top_srcdir)/common/python.mk
 
 flumotiondir = $(libdir)/flumotion/python/flumotion/extern
 
-flumotion_PYTHON = \
-	__init__.py \
-	code.py
+flumotion_PYTHON = 	\
+	__init__.py 	\
+	code.py		\
+	unixcrypt.py
 
 logdir = $(libdir)/flumotion/python/flumotion/extern/log
 

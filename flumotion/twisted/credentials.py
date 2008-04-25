@@ -23,7 +23,6 @@
 Flumotion Twisted credentials
 """
 
-import crypt
 import md5
 
 import random
@@ -31,6 +30,11 @@ import random
 from flumotion.common import log
 from twisted.cred import credentials
 from zope.interface import implements
+
+try:
+    import crypt
+except ImportError:
+    from flumotion.extern import unixcrypt as crypt
 
 __version__ = "$Rev$"
 
