@@ -375,7 +375,7 @@ class RTSPChannel(http.HTTPChannel):
 class RTSPSite(server.Site):
     """
     I am a ServerFactory that can be used in
-    L{twisted.internet.interfaces.IReactorTCP.listenTCP}
+    L{twisted.internet.interfaces.IReactorTCP}'s .listenTCP
     Create me with an L{RTSPResource} object.
     """
     protocol = RTSPChannel

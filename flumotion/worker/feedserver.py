@@ -98,7 +98,7 @@ class FeedAvatar(fpb.Avatar):
     I am an avatar in a FeedServer for components that log in and request
     to eat from or feed to one of my components.
 
-    My mind is a reference to a L{FeedMedium}
+    My mind is a reference to a L{flumotion.component.feed.FeedMedium}
     """
     logCategory = "feedavatar"
     remoteLogName = "feedmedium"

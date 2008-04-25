@@ -74,7 +74,7 @@ class GladeBacked(GladeDelegate):
     @ivar glade_file:     filename of glade file containing the interface
     @type glade_file:     str
     @ivar glade_typedict: GTK widget class name -> replacement widget class
-                          see L{flumotion.ui.fgtk.WidgetMapping}
+                          see L{flumotion.ui.fgtk.ProxyWidgetMapping}
     @type glade_typedict: dict of str -> class
     @ivar widgets:        widget name -> Widget
     @type widgets:        str -> gtk.Widget

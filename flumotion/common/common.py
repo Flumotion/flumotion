@@ -504,11 +504,12 @@ def addressGetPort(a):
         port = a[2]
     return port
 
+# FIXME: fix epydoc to correctly spell deprecated
 def componentPath(componentName, parentName):
     """
     Create a path string out of the name of a component and its parent.
 
-    @deprecated: Use @componentId instead
+    @depreciated: Use @componentId instead
     """
     return '/%s/%s' % (parentName, componentName)
 
@@ -837,12 +838,11 @@ class Poller(object, log.Loggable):
 
     def __init__(self, proc, timeout, immediately=False, start=True):
         """
-        @param proc: a procedure of no arguments
-        @param timeout: float number of seconds to wait between calls
+        @param proc:        a procedure of no arguments
+        @param timeout:     float number of seconds to wait between calls
         @param immediately: whether to immediately call proc, or to wait
-        until one period has passed
-        @param immediately: whether to start the poller (defaults to
-        True)
+                            until one period has passed
+        @param start:       whether to start the poller (defaults to True)
         """
         from twisted.internet import reactor
         from twisted.internet import defer

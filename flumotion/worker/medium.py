@@ -48,8 +48,8 @@ class WorkerClientFactory(factoryClass):
     def __init__(self, medium, host, port):
         """
         @type medium: L{flumotion.worker.medium.WorkerMedium}
-        @type host: str
-        @type port: int
+        @type host:   str
+        @type port:   int
         """
         self._managerHost = host
         self._managerPort = port
@@ -126,8 +126,10 @@ class WorkerMedium(medium.PingingMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
 
-    @ivar brain: the worker brain
-    @type brain: L{WorkerBrain}
+    @ivar brain:   the worker brain
+    @type brain:   L{worker.WorkerBrain}
+    @ivar factory: the worker client factory
+    @type factory: L{WorkerClientFactory}
     """
 
     logCategory = 'workermedium'
@@ -136,7 +138,7 @@ class WorkerMedium(medium.PingingMedium):
 
     def __init__(self, brain):
         """
-        @type brain: L{WorkerBrain}
+        @type brain: L{worker.WorkerBrain}
         """
         self.brain = brain
         self.factory = None

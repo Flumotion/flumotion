@@ -87,8 +87,9 @@ class FeedMedium(fpb.Referenceable):
 
     @ivar component:   the component this is a feed client for
     @type component:   L{flumotion.component.feedcomponent.FeedComponent}
-    @ivar remote:       a reference to a L{FeedAvatar}
-    @type remote:       L{twisted.spread.pb.RemoteReference}
+    @ivar remote:      a reference to a
+                       L{flumotion.worker.feedserver.FeedAvatar}
+    @type remote:      L{twisted.spread.pb.RemoteReference}
     """
     logCategory = 'feedmedium'
     remoteLogName = 'feedserver'
@@ -112,16 +113,16 @@ class FeedMedium(fpb.Referenceable):
         cancelling an in-progress connection via the stopConnecting()
         method.
 
-        @param host: the remote host name
-        @type host: str
-        @param port: the tcp port on which to connect
-        @param port int
+        @param host:          the remote host name
+        @type  host:          str
+        @param port:          the tcp port on which to connect
+        @param port           int
         @param authenticator: the authenticator, normally provided by
-        the worker
-        @param authenticator: L{flumotion.twisted.pb.Authenticator}
+                              the worker
+        @type  authenticator: L{flumotion.twisted.pb.Authenticator}
 
         @returns: a deferred that will fire with the remote reference,
-        once we have authenticated.
+                  once we have authenticated.
         """
         assert self._factory is None
         self._factory = FeedClientFactory(self)
@@ -137,20 +138,20 @@ class FeedMedium(fpb.Referenceable):
         descriptor or an error. A pending connection attempt can be
         cancelled via stopConnecting().
 
-        @param host: the remote host name
-        @type host: str
-        @param port: the tcp port on which to connect
-        @type port int
+        @param host:          the remote host name
+        @type  host:          str
+        @param port:          the tcp port on which to connect
+        @type  port:          int
         @param authenticator: the authenticator, normally provided by
-        the worker
-        @type authenticator: L{flumotion.twisted.pb.Authenticator}
-        @param fullFeedId: the full feed id (/flow/component:feed)
-        offered by the remote side
-        @type fullFeedId: str
+                              the worker
+        @type  authenticator: L{flumotion.twisted.pb.Authenticator}
+        @param fullFeedId:    the full feed id (/flow/component:feed)
+                              offered by the remote side
+        @type  fullFeedId:    str
 
         @returns: a deferred that, if successful, will fire with a pair
-        (feedId, fd). In an error case it will errback and close the
-        remote connection.
+                  (feedId, fd). In an error case it will errback and close the
+                  remote connection.
         """
         def connected(remote):
             self.setRemoteReference(remote)
@@ -185,20 +186,20 @@ class FeedMedium(fpb.Referenceable):
         descriptor or an error. A pending connection attempt can be
         cancelled via stopConnecting().
 
-        @param host: the remote host name
-        @type host: str
-        @param port: the tcp port on which to connect
-        @type port int
+        @param host:          the remote host name
+        @type  host:          str
+        @param port:          the tcp port on which to connect
+        @type  port:          int
         @param authenticator: the authenticator, normally provided by
-        the worker
-        @type authenticator: L{flumotion.twisted.pb.Authenticator}
-        @param fullFeedId: the full feed id (/flow/component:eaterAlias)
-        to feed to on the remote size
-        @type fullFeedId: str
+                              the worker
+        @type  authenticator: L{flumotion.twisted.pb.Authenticator}
+        @param fullFeedId:    the full feed id (/flow/component:eaterAlias)
+                              to feed to on the remote size
+        @type  fullFeedId:    str
 
         @returns: a deferred that, if successful, will fire with a pair
-        (feedId, fd). In an error case it will errback and close the
-        remote connection.
+                  (feedId, fd). In an error case it will errback and close the
+                  remote connection.
         """
         def connected(remote):
             assert isinstance(remote.broker.transport, _SocketMaybeCloser)

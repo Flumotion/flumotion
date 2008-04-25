@@ -104,7 +104,7 @@ class WizardStep(GladeWidget, log.Loggable):
     def __init__(self, wizard):
         """
         @param wizard: the wizard this step is a part of
-        @type  wizard: L{Wizard}
+        @type  wizard: L{SectionWizard}
         """
         self.visited = False
         self.wizard = wizard

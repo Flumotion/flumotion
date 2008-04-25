@@ -69,13 +69,13 @@ class WorkerBrain(log.Loggable):
     @ivar authenticator:       authenticator worker used to log in to manager
     @type authenticator        L{flumotion.twisted.pb.Authenticator}
     @ivar medium:
-    @type medium:              L{WorkerMedium}
+    @type medium:              L{medium.WorkerMedium}
     @ivar jobHeaven:
-    @type jobHeaven:           L{ComponentJobHeaven}
+    @type jobHeaven:           L{job.ComponentJobHeaven}
     @ivar checkHeaven:
-    @type checkHeaven:         L{CheckJobHeaven}
+    @type checkHeaven:         L{job.CheckJobHeaven}
     @ivar workerClientFactory:
-    @type workerClientFactory: L{WorkerClientFactory}
+    @type workerClientFactory: L{medium.WorkerClientFactory}
     @ivar feedServerPort:      TCP port the Feed Server is listening on
     @type feedServerPort:      int
     """

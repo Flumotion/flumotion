@@ -79,7 +79,9 @@ class BaseAdminGtk(log.Loggable):
     def setDebugEnabled(self, enabled):
         """Set if debug should be enabled.
         Not all pages are visible unless debugging is set to true
-        @param enable: if debug should be enabled
+
+        @param enabled: whether debug should be enabled
+        @type  enabled: bool
         """
         self._debugEnabled = enabled
         for node in self.getNodes().values():
@@ -229,7 +231,9 @@ class BaseAdminGtkNode(log.Loggable):
     def setDebugEnabled(self, enabled):
         """Set if debug should be enabled.
         Not all pages are visible unless debugging is set to true
-        @param enable: if debug should be enabled
+
+        @param enabled: whether debug should be enabled
+        @type  enabled: bool
         """
         self._debugEnabled = enabled
 
@@ -781,10 +785,11 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.treemodel.set(i, 2, w, 3, 'feeder')
         self.treeview.expand_all()
 
+    # FIXME: this docstring is confusing
     def addFeederClient(self, feederState, state):
         """
-        @param state: the component's uiState
-        @param state: the feeder client's uiState
+        @param feederState: the component's uiState
+        @param state:       the feeder client's uiState
         """
 
         printableClientId = self._mungeClientId(state.get('clientId'))

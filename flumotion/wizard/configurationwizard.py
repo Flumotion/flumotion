@@ -456,22 +456,24 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(got_entry_point)
         return d
 
-    def getWizardEntries(self, wizard_types=None, provides=None, accepts=None):
-        """Queries the manager for a list of wizard entry matching the
+    def getWizardEntries(self, wizardTypes=None, provides=None, accepts=None):
+        """Queries the manager for a list of wizard entries matching the
         query.
-        @param types: list of component types to fetch, is usually
-          something like ['video-producer'] or ['audio-encoder']
-        @type  types: list of strings
-        @param provides: formats provided, eg ['jpeg', 'speex']
-        @type  provides: list of strings
-        @param accepts: formats accepted, eg ['theora']
-        @type  accepts: list of strings
+        @param wizardTypes: list of component types to fetch, is usually
+                            something like ['video-producer'] or
+                            ['audio-encoder']
+        @type  wizardTypes: list of str
+        @param provides:    formats provided, eg ['jpeg', 'speex']
+        @type  provides:    list of str
+        @param accepts:     formats accepted, eg ['theora']
+        @type  accepts:     list of str
+
         @returns: a deferred returning a list
                   of L{flumotion.common.componentui.WizardEntryState}
         """
-        self.debug('querying wizard entries (wizard_types=%r,provides=%r'
-                   ',accepts=%r)'% (wizard_types, provides, accepts))
-        return self._admin.getWizardEntries(wizard_types=wizard_types,
+        self.debug('querying wizard entries (wizardTypes=%r,provides=%r'
+                   ',accepts=%r)'% (wizardTypes, provides, accepts))
+        return self._admin.getWizardEntries(wizardTypes=wizardTypes,
                                             provides=provides,
                                             accepts=accepts)
 

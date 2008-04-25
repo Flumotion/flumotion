@@ -29,7 +29,7 @@ L{twisted.trial.unittest.TestCase} class.
 
 Integration tests look like normal test methods, except that they are
 decorated with L{integration.test}, take an extra "plan" argument, and
-do not return anything. For example:
+do not return anything. For example::
 
   from twisted.trial import unittest
   from flumotion.twisted import integration
@@ -65,7 +65,7 @@ having failed.
 Also note that while the test is running, the stdout and stderr of each
 spawned process is redirected into log files in a subdirectory of where
 the test is located. For example, in the previous example, the following
-files will be created:
+files will be created::
 
   $testdir/IntegrationTestExample-$date/testEchoFunctionality/echo.stdout
   $testdir/IntegrationTestExample-$date/testEchoFunctionality/echo.stderr

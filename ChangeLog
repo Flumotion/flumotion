@@ -1,3 +1,22 @@
+2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/reference/Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/common/common.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/feed.py:
+	* flumotion/manager/admin.py:
+	* flumotion/twisted/integration.py:
+	* flumotion/twisted/rtsp.py:
+	* flumotion/ui/glade.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/worker/base.py:
+	* flumotion/worker/feedserver.py:
+	* flumotion/worker/medium.py:
+	* flumotion/worker/worker.py:
+	  Fix a bunch of documentation errors.
+
 2008-04-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/extern/Makefile.am:

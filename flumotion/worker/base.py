@@ -149,7 +149,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
     def __init__(self, brain):
         """
         @param brain:       a reference to the worker brain
-        @type  brain:       L{WorkerBrain}
+        @type  brain:       L{worker.WorkerBrain}
         """
         self.avatars = {} # componentId -> avatar
         self.brain = brain

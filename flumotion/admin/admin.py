@@ -66,7 +66,9 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         """
-        @param reason: L{twisted.spread.pb.failure.Failure}
+        @type  connector: implementation of
+                          L{twisted.internet.interfaces.IConnector}
+        @param reason:    L{twisted.spread.pb.failure.Failure}
         """
         if reason.check(error.DNSLookupError):
             self.debug('DNS lookup error')

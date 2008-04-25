@@ -16,6 +16,7 @@ MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
 	flumotion/project/*.py				\
 	flumotion/service/*.py				\
 	flumotion/twisted/*.py				\
+	flumotion/wizard/*.py				\
 	flumotion/worker/*.py				\
 	flumotion/worker/checks/*.py			\
 	)
