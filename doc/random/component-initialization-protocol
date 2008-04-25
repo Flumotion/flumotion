@@ -86,11 +86,11 @@ do_check(self)
     It can be used to check various requirements, or known bugs in certain
     versions of software.
 
-    If this method adds any error messages to the component state, this
-    will automatically trigger a mood change to sad and raise a
-    ComponentSetupError. If there is a fatal problem that can't be
-    expressed with a message, this method should go to sad and raise
-    ComponentSetupError itself.
+    If this method adds any error messages to the component state,
+    this will automatically trigger a mood change to sad, which will
+    eventually raise a ComponentSetupError before the setup stage. If
+    there is a fatal problem that can't be expressed with a message,
+    this method should go to sad and raise ComponentSetupError itself.
 
     If there is nothing, or only warnings, the method should return a
     result. After this call, a call to setup() will succeed, in theory.

@@ -347,9 +347,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         performs setup.
 
         Messages can be added to the component state's 'messages' list key.
-        Any error messages added will trigger the component going to sad
-        an L{flumotion.common.errors.ComponentSetupError} being raised;
-        do_setup() will not be called.
+        Any error messages added will trigger the component going to sad,
+        with L{flumotion.common.errors.ComponentSetupError} being raised
+        before getting to setup stage; do_setup() will not be called.
 
         In the event of a fatal problem that can't be expressed through an
         error message, this method should raise an exception or return a
@@ -369,8 +369,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         A component implementation can override this method to run any
         checks that it needs to. Typically, a check_properties
         implementation will call the provided addMessage() callback to
-        note warnings or errors. For errors, addMessage() will abort the
-        check process, setting the mood to sad.
+        note warnings or errors. For errors, addMessage() will set
+        component's mood to sad, which will abort the init process
+        before getting to do_setup().
 
         @param properties: The component's properties
         @type properties: dict of string => object
@@ -406,6 +407,18 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Call check methods, starting from the base class and working down to
         # subclasses.
         checks = common.get_all_methods(self, 'do_check', False)
+
+        def checkErrorCallback(result):
+            # if the mood is now sad, it means an error was encountered
+            # during check, and we should return a failure here.
+            # since the checks are responsible for adding a message,
+            # this is a handled error.
+            current = self.state.get('mood')
+            if current == moods.sad.value:
+                self.warning('Running checks made the component sad.')
+                raise errors.ComponentSetupHandledError()
+
+        checks.append(checkErrorCallback)
         return maybe_deferred_chain(checks, self)
 
     def do_stop(self):

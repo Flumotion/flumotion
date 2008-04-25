@@ -1,3 +1,16 @@
+2008-04-25  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/component.py (BaseComponent.do_check,
+	  BaseComponent.check_properties, BaseComponent.do_setup,
+	  checkErrorCallback):
+	Resurect a part of the code that was removed in r5566 (and
+	mostly resurected in r6499): add checking for component's mood
+	before continuing with do_setup(). Update API docstrings.
+	Fixes #924.
+
+	* doc/random/component-initialization-protocol:
+	Make the documentation bits consistent with the implementation.
+
 2008-04-24  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion.doap:
