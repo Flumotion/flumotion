@@ -133,15 +133,16 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         # make the resource authenticate the request, and verify
         # the request is not authorized
         def checkResult(res):
-            error_code = http.UNAUTHORIZED
-            self.assertEquals(request.headers.get('content-type', ''), 'text/html')
+            errorCode = http.UNAUTHORIZED
+            self.assertEquals(request.headers.get('content-type', ''),
+                'text/html')
             self.assertEquals(request.headers.get('server', ''),
                 resources.HTTP_VERSION)
-            self.assertEquals(request.response, error_code)
+            self.assertEquals(request.response, errorCode)
 
             expected = resources.ERROR_TEMPLATE % {
-                'code': error_code,
-                'error': http.RESPONSES[error_code]}
+                'code': errorCode,
+                'error': http.RESPONSES[errorCode]}
             self.assertEquals(request.data, expected)
 
             # don't swallow failures!
