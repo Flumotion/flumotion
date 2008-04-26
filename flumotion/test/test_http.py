@@ -26,7 +26,6 @@ from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.consumers.httpstreamer import resources
 from flumotion.common import keycards, log, errors
 from flumotion.common import testsuite
-from flumotion.twisted.defer import defer_generator_method
 
 # From twisted/test/proto_helpers.py
 import fcntl
@@ -55,6 +54,7 @@ class PipeTransport:
                 break
         return data
 
+# a mockery of twisted.web.http.Request
 class FakeRequest:
     transport = PipeTransport()
     method = 'GET'
@@ -72,6 +72,8 @@ class FakeRequest:
 
         # fake out request.transport.fileno
         self.fdIncoming = 3
+
+        self.path = ''
 
         # copied from test_web.DummyRequest
         self.sitepath = []
@@ -158,7 +160,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         # make the resource authenticate the request, and verify
         # the request is authorized
         def checkResult(res):
-            self.failIfEquals(request.response, http.UNAUTHORIZED)
+            self.failIfEquals(request.response, http.OK)
 
         d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
@@ -223,20 +225,27 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         streamer.caps = True
         self.failUnless(resource.isReady())
 
-        # wrong token
-        request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
-        yield self.deferAssertUnauthorized(httpauth, request)
+        d = defer.Deferred()
 
-        # no token
-        request = FakeRequest(ip='127.0.0.1', args={'notoken': 'LETMEIN'})
-        yield self.deferAssertUnauthorized(httpauth, request)
+        def wrongToken(_):
+            request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
+            return self.deferAssertUnauthorized(httpauth, request)
 
-        # doublewrong token
-        request = FakeRequest(ip='127.0.0.1',
-            args={'token': ['WRONG', 'AGAIN']})
-        yield self.deferAssertUnauthorized(httpauth, request)
-    testRenderHTTPTokenUnauthorized = \
-        defer_generator_method(testRenderHTTPTokenUnauthorized)
+        def noToken(_):
+            request = FakeRequest(ip='127.0.0.1', args={'notoken': 'LETMEIN'})
+            return self.deferAssertUnauthorized(httpauth, request)
+
+        def doubleWrongToken(_):
+            request = FakeRequest(ip='127.0.0.1',
+                args={'token': ['WRONG', 'AGAIN']})
+            return self.deferAssertUnauthorized(httpauth, request)
+
+        d.addCallback(wrongToken)
+        d.addCallback(noToken)
+        d.addCallback(doubleWrongToken)
+
+        d.callback(None)
+        return d
 
     def testRenderHTTPTokenAuthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
@@ -250,16 +259,22 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         streamer.caps = True
         self.failUnless(resource.isReady())
 
-        # right token
-        request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
-        yield self.deferAssertAuthorized(httpauth, request)
+        d = defer.Deferred()
 
-        # right token, twice
-        request = FakeRequest(ip='127.0.0.1',
-            args={'token': ['LETMEIN', 'LETMEIN']})
-        yield self.deferAssertAuthorized(httpauth, request)
-    testRenderHTTPTokenAuthorized = \
-        defer_generator_method(testRenderHTTPTokenAuthorized)
+        def rightToken(_):
+            request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
+            return self.deferAssertAuthorized(httpauth, request)
+
+        def rightTokenTwice(_):
+            request = FakeRequest(ip='127.0.0.1',
+                args={'token': ['LETMEIN', 'LETMEIN']})
+            return self.deferAssertAuthorized(httpauth, request)
+
+        d.addCallback(rightToken)
+        d.addCallback(rightTokenTwice)
+
+        d.callback(None)
+        return d
 
     def testRenderNew(self):
         streamer = FakeStreamer()

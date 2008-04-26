@@ -1,5 +1,12 @@
 2008-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_http.py:
+	  Remove the defer generator to bring out the traceback
+	  that was being papered over as an actual error.
+	  Fix the error by adding a .path to FakeRequest.
+
+2008-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/keycards.py:
 	  Properly document Keycard attributes instead of commenting.
 	  Deprecate inconsistently named HTTPDigestKeycard.
