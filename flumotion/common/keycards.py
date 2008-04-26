@@ -31,7 +31,8 @@ from flumotion.twisted import credentials
 from flumotion.common import common
 
 __version__ = "$Rev$"
-_statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
+
+_statesEnum = ['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 # state enum values
 (REFUSED,
  REQUESTING,
@@ -41,23 +42,47 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     """
     I am the base class for keycards which together with credentials are
     a serializable object used in authentication inside Flumotion.
+
+    @ivar  bouncerName: name of the bouncer to authenticate against; set by
+                        requester
+    @type  bouncerName: str
+    @ivar  requesterId: avatarId of the requester
+    @type  requesterId: str
+    @ivar  avatarId:    avatarId preferred by requester
+    @type  avatarId:    str
+    @ivar  id:          id of keycard decided by bouncer after authenticating
+    @type  id:          object
+    @ivar  duration:    duration for which the keycard is valid, or 0 for
+                        unlimited
+    @type  duration:    int
+    @ivar  domain:      requester can pass a domain id to the bouncer
+    @type  domain:      str
+    @ivar  state:       state the keycard is in
+    @type  state:       int
     """
-    implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, ))
+    implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy)
+        + (tcredentials.ICredentials, ))
+
     def __init__(self):
-        self.bouncerName = None         # set by requester,decides which bouncer
-        self.requesterId = None         # who is requesting auth ?
-        self.avatarId = None            # avatarId prefered by requester
-        self.id = None                  # set by bouncer when authenticated
-        self.duration = 0               # means unlimited
-        self.domain = None              # requester can pass this to bouncer
+        self.bouncerName = None
+        self.requesterId = None
+        self.avatarId = None
+        self.id = None
+        self.duration = 0
+        self.domain = None
         self.state = REQUESTING
 
+    # F0.8
     def setDomain(self, domain):
         """
         Set the domain of the requester on the keycard.
 
         @type domain: string
         """
+        import warnings
+        warnings.warn('Set the domain on the keycard directly.',
+            DeprecationWarning, stacklevel=2)
+
         self.domain = domain
 
     def getData(self):
@@ -190,7 +215,7 @@ class KeycardUASPCC(Keycard, USPCC):
 
 pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
 
-class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
+class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
     def __init__(self, username):
         credentials.HTTPDigestChallenger.__init__(self, username)
         Keycard.__init__(self)
@@ -205,5 +230,15 @@ class HTTPDigestKeycard(Keycard, credentials.HTTPDigestChallenger):
         return "<%s %s %s for requesterId %r in state %s>" % (
             self.__class__.__name__, self.id, self.username,
             self.requesterId, _statesEnum[self.state])
+
+pb.setUnjellyableForClass(KeycardHTTPDigest, KeycardHTTPDigest)
+
+# F0.8
+class HTTPDigestKeycard(KeycardHTTPDigest):
+    def __init__(self, username):
+        import warnings
+        warnings.warn('Use KeycardHTTPDigest instead.', DeprecationWarning,
+            stacklevel=2)
+        KeycardHTTPDigest.__init__(self, username)
 
 pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)

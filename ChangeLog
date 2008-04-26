@@ -1,3 +1,11 @@
+2008-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/keycards.py:
+	  Properly document Keycard attributes instead of commenting.
+	  Deprecate inconsistently named HTTPDigestKeycard.
+	* flumotion/test/test_keycards.py:
+	  Drive up coverage to 100%.
+
 2008-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/signals.py:

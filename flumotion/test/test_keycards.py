@@ -21,7 +21,7 @@
 
 from flumotion.common import testsuite
 
-from twisted.trial import unittest
+from twisted.trial import unittest, util
 
 from flumotion.twisted import credentials
 from flumotion.twisted.defer import defer_generator_method
@@ -30,6 +30,7 @@ from flumotion.common import keycards
 __version__ = "$Rev$"
 
 
+# test all the keycards
 class TestKeycardUACPP(testsuite.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
@@ -41,6 +42,49 @@ class TestKeycardUACPCC(testsuite.TestCase):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
+
+class TestKeycardToken(testsuite.TestCase):
+    def testInit(self):
+        keycard = keycards.KeycardToken('token', '127.0.0.1')
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+        self.failUnless(credentials.IToken.providedBy(keycard))
+
+        d = keycard.getData()
+        self.assertEquals(d['token'], 'token')
+        self.assertEquals(d['address'], '127.0.0.1')
+
+        repr(keycard)
+
+class TestKeycardHTTPDigest(testsuite.TestCase):
+    def testInit(self):
+        keycard = keycards.KeycardHTTPDigest('username')
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+
+        d = keycard.getData()
+        self.assertEquals(d['username'], 'username')
+
+        repr(keycard)
+
+# F0.8
+class TestHTTPDigestKeycard(testsuite.TestCase):
+    def testInit(self):
+        keycard = keycards.HTTPDigestKeycard('username')
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+
+    testInit.suppress = [util.suppress(
+        message='Use KeycardHTTPDigest instead.', category=DeprecationWarning)]
+
+# test the base class repr
+class MyKeycard(keycards.Keycard):
+    pass
+
+class TestMyKeycard(testsuite.TestCase):
+    def testInit(self):
+        keycard = MyKeycard()
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+
+        repr(keycard)
+
 
 # test sending keycards back and forth
 class Admin(testsuite.TestAdmin):
