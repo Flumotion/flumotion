@@ -39,7 +39,7 @@
 	* flumotion/wizard/productionsteps.py:
 	Clean up thomas' "refactoring".
 
-2008-04-28  Johan Dahlin  <johan@gnome.org>
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_common_messages.py:
 	Remove a deferred generator
@@ -165,7 +165,7 @@
 	Quote the properties passed to parse_launch, they may contain
 	spaces. Fix warning logging.
 
-2008-04-24  Johan Dahlin  <johan@gnome.org>
+2008-04-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/shout2/shout2_wizard.py 
 	(Shout2Consumer.__init__): Make sure that all properties 
@@ -198,7 +198,7 @@
 	* flumotion/admin/admin.py:
 	  Tell us what we fail to connect to so we can solve the problem.
 
-2008-04-21  Johan Dahlin  <johan@gnome.org>
+2008-04-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/plugs/cortado/cortado_location.py.in:
 	Add OpenSuSE location here too.
@@ -216,7 +216,7 @@
 	  Filter the output when generating epydoc, suppressing output from
 	  modules outside of flumotion, like gobject, gtk, and twisted.
 
-2008-04-18  Johan Dahlin  <johan@gnome.org>
+2008-04-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/overlaystep.py (Overlay.getProperties): show-text
 	should be saved as a real property. Fixes #929
@@ -237,7 +237,7 @@
 	Don't use localhost for the porter, guess the public hostname instead.
 	Fixes #923
 
-2008-04-17  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-17  Johan Dahlin  <johan@flumotion.com>
 
 	* common/deb.mk:
 	* pkg/debian-common/NEWS:
@@ -286,7 +286,7 @@
 	Add a new directory for ubuntu-hardy packages.
 	Change the deb makerules to take this into account.
 
-2008-04-16  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-16  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
 	* pkg/ubuntu-gutsy/NEWS:
@@ -311,7 +311,7 @@
 	* pkg/ubuntu-gutsy/watch:
 	Add a package for ubuntu-gutsy
 
-2008-04-16  Johan Dahlin  <johan@gnome.org>
+2008-04-16  Johan Dahlin  <johan@flumotion.com>
 
 	* common/deb.mk: Add a makefile for building debian packages.
 
@@ -323,7 +323,7 @@
 	* flumotion/component/combiners/composite/composite.xml:
 	Add note that z-order needs to be unique.
 
-2008-04-15  Johan Dahlin  <johan@gnome.org>
+2008-04-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py (VideoEncoderStep.get_next): 
 	Move the get_next() method from all subclasses of VideoEncoderStep
@@ -335,7 +335,7 @@
 	  Return the exit codes as well, for convenience.
 	  Add some exceptions, so we can use errbacks to handle error cases.
 
-2008-04-15  Johan Dahlin  <johan@gnome.org>
+2008-04-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/soundcard/soundcard_wizard.py
 	(SoundcardStep._update_inputs): 
@@ -369,13 +369,13 @@
 	  Add a script to validate config files.
 	  Run it as part of make check on some sample config files.
 
-2008-04-11  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/overlaystep.py:
 	Do not add a overlay component if we're missing elements/python modules.
 	Fixes #914
 
-2008-04-11  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-11  Johan Dahlin  <johan@flumotion.com>
 
 	Rubber-stamped by Arek
 
@@ -437,13 +437,13 @@
 	* flumotion/component/combiners/switch/switch.py:
 	Extra debuging.
 
-2008-04-09  Johan Dahlin  <johan@gnome.org>
+2008-04-09  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/videotest/videotest_wizard.py
 	(TestVideoProducerStep.worker_changed): Check for the level element,
 	fixes #915
 
-2008-04-08  Johan Dahlin  <johan@gnome.org>
+2008-04-08  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_encoding.glade:
 	* flumotion/component/encoders/mulaw/mulaw-wizard.glade:
@@ -481,7 +481,7 @@
 	* flumotion/component/misc/httpserver/file.py:
 	  Log the fd's and transfer ends.  Fixes #919.
 
-2008-04-03  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-03  Johan Dahlin  <johan@flumotion.com>
 
 	Reviewed by: Arek
 
@@ -507,12 +507,12 @@
 	* flumotion/component/base/http.py:
 	  Added "path" to keycards in order to use a timed bouncer type.
 
-2008-04-02  Johan Dahlin  <johan@gnome.org>
+2008-04-02  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_production.glade: Add description label
 	and tooltips for the checkboxes
 
-2008-04-02  Johan Dahlin  <jdahlin@async.com.br>
+2008-04-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire-wizard.glade:
 	* flumotion/component/producers/firewire/firewire_wizard.py:
@@ -535,7 +535,7 @@
 	  Add spacing between worker label and worker combo.
 	  Fixes #883.
 
-2008-03-28  Johan Dahlin  <johan@gnome.org>
+2008-03-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py
 	(_FireWireCommon.trapRemoteError): trap RemoteRunFailure, to avoid
@@ -551,7 +551,7 @@
 	* flumotion/component/base/component.glade:
 	  Make the debug header visible, so it's shown if debug is enabled.
 
-2008-03-28  Johan Dahlin  <johan@gnome.org>
+2008-03-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py:
 	* flumotion/component/base/admin_gtk.py:
@@ -566,14 +566,14 @@
 	* flumotion/manager/config.py (PlanetConfigParser._parseFlow):
 	Humanize error message.
 
-2008-03-28  Johan Dahlin  <johan@gnome.org>
+2008-03-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py:
 	* flumotion/wizard/productionsteps.py:
 	Remove the worker list from the production page.
 	Remove canSelectWorker which is now unused.
 
-2008-03-27  Johan Dahlin  <johan@gnome.org>
+2008-03-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py (WizardSaver.setVideoProducer)
 	(WizardSaver.setAudioProducer): Update exception messages.
@@ -586,14 +586,14 @@
 	* flumotion/wizard/save.py:
 	Make firewire finally work again, this fixes #867
 
-2008-03-27  Johan Dahlin  <johan@gnome.org>
+2008-03-27  Johan Dahlin  <johan@flumotion.com>
 
 	* misc/clean-flumotion:
 	* scripts/run-local-manager:
 	Add a script to run a local manager, move and rename the clean 
 	one to misc.
 
-2008-03-27  Johan Dahlin  <johan@gnome.org>
+2008-03-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	* flumotion/test/test_wizard_save.py:
@@ -602,7 +602,7 @@
 	Generate proper feeder names and fix a typo of the step name
 	Part of #867
 	
-2008-03-27  Johan Dahlin  <johan@gnome.org>
+2008-03-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/command/main.py:
 	Print errors on stderr and return an error code when it fails.
@@ -636,13 +636,13 @@
 	  Fix test by setting a default delta and checking for it.  Really
 	  fixes #885
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py
 	(ConfigurationWizard._save): 
 	Unbreak non-audio streams bug introduced in last commit.
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	reviewed by: Zaheer
 
@@ -768,7 +768,7 @@
 	  xalign property in labels and alignments changed to 0.
 	  Fixes #882.
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/component.glade:
 	Make all the labels in the newly added statistics tab selectable,
@@ -780,13 +780,13 @@
 	  Don't attempt to display UI for sad components.
 	  Fixes #899.
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* data/cortado-template.html: 
 	Add a check and redirect to www.flumotion.com/java if java is not installed.
 	Fixes #887
 	
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	Require multifdsink and twisted.web.
@@ -845,13 +845,13 @@
 	  Spawn jobs from this directory
 	  Fixes #873.
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/connections.py (Connections.__init__): 
 	Make the recent hostname column in the connection dialog searchable.
 	Fixes #880
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py
 	(ConfigurationWizard.hasAudio): 
@@ -864,7 +864,7 @@
 
 	Fixes #884
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/models.py:
 	(Component.__repr__): print the fully qualified name of the class
@@ -879,7 +879,7 @@
 	* flumotion/test/test_wizard_save.py:
 	Create one producer and use it for both audio and video
 
-2008-03-26  Johan Dahlin  <johan@gnome.org>
+2008-03-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py
 	(TestWizardSave): avoid hard coding the version, otherwise we'll
@@ -902,7 +902,7 @@
 	* flumotion/component/base/Makefile.am:
 	  Actually dist the base component.glade so the admin works again.
 
-2008-03-25  Johan Dahlin  <johan@gnome.org>
+2008-03-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py
 	(FireWireVideoProducer.getFeeders): chain up to VideoProducer, not
@@ -938,7 +938,7 @@
 	  Add a way for messages to link to online documentation.
 	  Fixes #874.
 
-2008-03-24  Johan Dahlin  <johan@gnome.org>
+2008-03-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/componentview.py:
@@ -1003,7 +1003,7 @@
 	* flumotion/component/base/admin_gtk.py:
 	  Check for None and 0.
 
-2008-03-18  Johan Dahlin  <johan@gnome.org>
+2008-03-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/admin_gtk.py
 	(ComponentAdminGtkNode._updateVSize): check for None instead of 0,
@@ -1025,7 +1025,7 @@
 	  Displays uptime, cpu usage, virtual size, etc.
 	  Fixes #806.
 
-2008-03-17  Johan Dahlin  <johan@gnome.org>
+2008-03-17  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/connection-dialog.glade:
 	* data/glade/greeter-load_connection.glade:
@@ -1074,14 +1074,14 @@
 	* flumotion/component/misc/httpserver/ratecontrol.py:
 	  Document this.
 
-2008-03-07  Johan Dahlin  <johan@gnome.org>
+2008-03-07  Johan Dahlin  <johan@flumotion.com>
 
 	* misc/clean-flumotion: 
 	Add a horribly broken, but still pretty useful script to 
 	clean up all flumotion temporary files in /tmp, when 
 	starting from the manager from the wizard.
 	
-2008-03-06  Johan Dahlin  <johan@gnome.org>
+2008-03-06  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin-wizard.glade:
 	* data/glade/wizard.glade:
@@ -1108,7 +1108,7 @@
 	switch element changed name to selector between 0.10.5 and
 	0.10.6
 
-2008-03-05  Johan Dahlin  <johan@gnome.org>
+2008-03-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/manager/admin.py (AdminAvatar.perspective_cleanComponents): 
 	Undeprecate, since there are no alternatives.
@@ -1124,7 +1124,7 @@
 	* flumotion/twisted/compat.py:
 	Fix typo.
 
-2008-03-05  Johan Dahlin  <johan@gnome.org>
+2008-03-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/server.py (IServable): Remove self argument from
 	methods.
@@ -1138,7 +1138,7 @@
 	Comment on the not-necessary-obvious calling context of the
 	connectionLost() handler.
 
-2008-03-04  Johan Dahlin  <johan@gnome.org>
+2008-03-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py (_set_worker_from_step): 
 	Remove unused method.
@@ -1171,7 +1171,7 @@
 
 	Fixes #858
 
-2008-03-04  Johan Dahlin  <johan@gnome.org>
+2008-03-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/interfaces.py: General maintainance:
 	- Remove self from arguments
@@ -1180,7 +1180,7 @@
 	- Remove initial newline in docstring (PEP-8)
 	- Remove unnecessary pass statements
 
-2008-03-03  Johan Dahlin  <johan@gnome.org>
+2008-03-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/greeter.py (Greeter.__init__): Fix the height of the
 	greeter to avoid re-sizing it later on.
@@ -1222,7 +1222,7 @@
 
 	Should fix #854
 	
-2008-03-03  Johan Dahlin  <johan@gnome.org>
+2008-03-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testOggStream): 
 	New test for audiotest/videotest/vorbis/theora and ogg
@@ -1231,18 +1231,18 @@
 	(WizardSaver._handleAudioProducer): Raise ValueError exceptions if there
 	are no encoders set
 
-2008-03-03  Johan Dahlin  <johan@gnome.org>
+2008-03-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream) :
 	Refactor tests into methods, and reuse by other tests.
 
-2008-03-03  Johan Dahlin  <johan@gnome.org>
+2008-03-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testDefaultStream) 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	set burst-on-connect to False by default, update tests.
 
-2008-03-03  Johan Dahlin  <johan@gnome.org>
+2008-03-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	Make it work with kiwi 1.9.14, by setting a default value for booleans
@@ -1253,7 +1253,7 @@
 	Added getEnabled function in bouncer.
 	Fixes #856.
 
-2008-03-01  Johan Dahlin  <jdahlin@async.com.br>
+2008-03-01  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/checks/encoder.py:
 	* flumotion/worker/checks/gst010.py:
@@ -1264,14 +1264,14 @@
 	* flumotion/worker/worker.py:
 	Remove unused imports to make pyflakes happier.
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py:
 	* flumotion/ui/wizard.py:
 	Remove get_state, get_step_option and get_step_options which are not used any
 	longer. Horray!
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.hasAudio) 
 	(ConfigurationWizard.hasVideo): New methods
@@ -1281,18 +1281,18 @@
 	Replace get_step_option() for checking if there's audio or video
 	with method calls to wizard.
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py (WizardSaver._handleProducers): Check so both
 	audio and video producer exists before comparing their component_type.
 
-2008-02-29  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_models.py:
 	* flumotion/wizard/models.py:
 	Do _ -> - conversion in __contains__ too, add tests.
 
-2008-02-29  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/Makefile.am:
 	* flumotion/wizard/configurationwizard.py:
@@ -1301,7 +1301,7 @@
 	Get rid of LicenseType and use prefill directly.
 	Kill flumotion/wizard/enums.py!
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py:
 	(TestWizardSave.testMultiFeedProducer): Add another test for a multi feed
@@ -1314,7 +1314,7 @@
 	* flumotion/test/test_wizard_save.py:
 	Write a test which tests wizard saving class.
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py (WizardSaver._handleVideoOverlay): 
 	Simplify overlay handling by always linking video and then let the overlay
@@ -1328,7 +1328,7 @@
 	* flumotion/component/misc/httpserver/admin_gtk.py:
 	Tweak the UI by moving the URL out of the toplevel table
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py: Remove unused imports
 
@@ -1340,7 +1340,7 @@
 	Remove the Flow class and the tests, we never ended up using it, since the
 	state is fetched after the completion of the wizard, not during.
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/wizard.py:
 	Remove flowName here, it should only be set in a subclass
@@ -1365,7 +1365,7 @@
 	  since it has a bug that results in many CRITICALs being printed (one per
 	  frame).
 
-2008-02-29  Johan Dahlin  <johan@gnome.org>
+2008-02-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/encoders/vorbis/vorbis_wizard.py
 	(VorbisAudioEncoder.__init__): 
@@ -1373,7 +1373,7 @@
 	Make the bitrate selected by default, both in the glade file
 	and in the model.
 
-2008-02-28  Johan Dahlin  <johan@gnome.org>
+2008-02-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py
 	(ConfigurationWizard.getConsumtionSteps): New method
@@ -1397,32 +1397,32 @@
 	construct the steps we want to use, just use class references 
 	instead.
 
-2008-02-27  Johan Dahlin  <johan@gnome.org> 
+2008-02-27  Johan Dahlin  <johan@flumotion.com> 
 	
 	* flumotion/test/test_wizard_save.py:
 	Use the new Component class instead of the old one in save.py which
 	is removed.
 
-2008-02-27  Johan Dahlin  <johan@gnome.org>
+2008-02-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py:
 	Remove Component which is now unused, and disable Loggable in 
 	the WizardSaver is not used.
 	
-2008-02-27  Johan Dahlin  <johan@gnome.org>
+2008-02-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/shout2/shout2_wizard.py:
 	* flumotion/wizard/save.py:
 	Convert the shout2 step to use a model and proxy.
 	
-2008-02-27  Johan Dahlin  <johan@gnome.org>
+2008-02-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/disker/disker-wizard.glade:
 	* flumotion/component/consumers/disker/disker_wizard.py:
 	* flumotion/wizard/save.py:
 	Convert the disker step to use a model and proxy.
 
-2008-02-27  Johan Dahlin  <johan@gnome.org>
+2008-02-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	Move old bits specific for the wirefire components from save.py 
@@ -1441,7 +1441,7 @@
 	class. Still need to port over disker and shout2 components.
 	Add getProperties and simplify getFeeders()
 
-2008-02-27  Johan Dahlin  <johan@gnome.org>
+2008-02-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/videotest/videotest-wizard.glade: 
 	* flumotion/component/producers/videotest/videotest_wizard.py:
@@ -1485,7 +1485,7 @@
 	  Add a test to check that route iteration correctly goes from
 	  most-specific to least specific.
 
-2008-02-25  Johan Dahlin  <johan@gnome.org>
+2008-02-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/greeter.py:
 	Reset the stock label of the next button when going back.
@@ -1495,7 +1495,7 @@
 	Change the next button to 'connect' where appropriate.
 	Grab focus, so the enter->enter->enter use case works as expected
 
-2008-02-25  Johan Dahlin  <johan@gnome.org>
+2008-02-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/greeter.py: Reorganize imports, group
 	and annotate the methods of the wizard steps.
@@ -1518,7 +1518,7 @@
 	  attempt to make it use less cpu.
 	  Mostly unsuccessful.
 
-2008-02-25  Johan Dahlin  <johan@gnome.org>
+2008-02-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
 	Do not unconditionally append the result of remove_all_clients, it might
@@ -1533,7 +1533,7 @@
 	* flumotion/common/medium.py (PingingMedium._ping):
 	Add errback handler for the 'ping' remote call.
 
-2008-02-25  Johan Dahlin  <johan@gnome.org>
+2008-02-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py: remove the now unused socket attribute too.
 
@@ -1571,7 +1571,7 @@
 	Revert r6273. The added code was wrong, as was the commit message it came
 	with.
 
-2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/component/misc/Makefile.am:
@@ -1588,7 +1588,7 @@
 
 	Move the cortado plug from misc/ to plugs/
 
-2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/Makefile.am:
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
@@ -1605,7 +1605,7 @@
 
 	Rename httpstreamer/http* to httpstreamer/httpstreamer.
 
-2008-02-22  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/component/misc/Makefile.am:
@@ -1658,7 +1658,7 @@
 	  between filetransfer and request. This can be used to hook up the rate
 	  control stuff.
 
-2008-02-22  Johan Dahlin  <johan@gnome.org>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/connections.py (Connections.grab_focus): 
 	Select and grab the focus of the treeview here instead of the
@@ -1675,7 +1675,7 @@
 	Check the type of the framerate property before attempting to
 	parse it as a fraction.
 
-2008-02-22  Johan Dahlin  <johan@gnome.org>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
 	PEP-8ify imports and docstrings
@@ -1699,7 +1699,7 @@
 	* flumotion/component/misc/httpfile/httpfile.py:
 	Export the stream-url handler. Handle trailing / in resource names.
 
-2008-02-22  Johan Dahlin  <johan@gnome.org>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/linkwidget.py: Do not import gobject
 	* Makefile.am (PYCHECKER_BLACKLIST): Blacklist linkwidget.py
@@ -1728,13 +1728,13 @@
 	* flumotion/admin/admin.py:
 	Only check one time for failure type :)
 
-2008-02-22  Johan Dahlin  <johan@gnome.org>
+2008-02-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/httpfile/admin_gtk.py: 
 	Clean up, make a few methods private and organize methods by type.
 	Make all internal attributes private and avoid hasattr.	
 
-2008-02-21  Johan Dahlin  <johan@gnome.org>
+2008-02-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/cortado/cortado_wizard.py
 	(CortadoHTTPPlug.getProperties): the streamers framerate property
@@ -1745,7 +1745,7 @@
 	(HTTPStreamer.getProperties): Do not delete the ports property, it's
 	used by the plugs.
 
-2008-02-20  Johan Dahlin  <johan@gnome.org>
+2008-02-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwriter.py (ConfigurationWriter): 
 	Handle fractions, write x/y instead of (x, y).
@@ -1754,7 +1754,7 @@
 	Add a couple of new planet tests, clean up manager config ones to be 
 	consistent
 
-2008-02-20  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_manager_config.py:
 	* flumotion/manager/config.py:
@@ -1763,7 +1763,7 @@
 	* flumotion/test/Makefile.am:
 	Reindent and remove trailing whitespace
 
-2008-02-20  Johan Dahlin  <johan@gnome.org>
+2008-02-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_component_httpserver.py 
 	Version test twisted using twisted.copyright.version, available 
@@ -1792,7 +1792,7 @@
 	  Add rate control code; not committing the bits to hook it into
 	  http-server yet. First working version; still needs lots of cleanup.
 
-2008-02-19  Johan Dahlin  <johan@gnome.org>
+2008-02-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/checks/cortado.py (checkCortado): Oops, forgot 
 	  pychecker again. msg instead of filename
@@ -1809,7 +1809,7 @@
 	(ComponentView._get_widget_constructor): Add component view wire 
 	  compatibility with platform-3.
 
-2008-02-18  Johan Dahlin  <johan@gnome.org>
+2008-02-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/cortado/cortado_location.py.in 
 	(getCortadoFilename): 
@@ -1827,7 +1827,7 @@
 	  When exporting a planet config, ensure that we don't add clock-master
 	  for atmosphere components, since those aren't valid in the XML.
 
-2008-02-18  Johan Dahlin  <johan@gnome.org>
+2008-02-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/cortado/cortado_location.py.in 
 	(getCortadoFilename): 
@@ -1847,12 +1847,12 @@
 	  configuration writer.
 	  Use a generic API for all xml generation.
 
-2008-02-18  Johan Dahlin  <johan@gnome.org>
+2008-02-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_registry.py (TestRegistry._compareRegistryAfterDump):
 	  Use testsuite.diffStrings here.
 
-2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/testsuite.py:
 	New api diffStrings which helps when comparing large strings
@@ -1862,7 +1862,7 @@
 	Decouple xml saving from fetching state from the wizard.
 	Write proper tests
 
-2008-02-18  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_models.py:
 	* flumotion/wizard/models.py:
@@ -1879,7 +1879,7 @@
 	* flumotion/wizard/save.py:
 	We can use attributes instead of the uglier dictionary interface now.
 
-2008-02-15  Johan Dahlin  <johan@gnome.org>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/component/consumers/httpstreamer/http-wizard.glade:
@@ -1902,7 +1902,7 @@
 	Migrate the cortado step to be a pluggable plug.
 	Fixes #823
 
-2008-02-15  Johan Dahlin  <johan@gnome.org>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	reviewed by: Mike
 
@@ -1929,24 +1929,24 @@
 	Update worker, config, component modules, muxer xml and tests to take
 	into account these changes.
 
-2008-02-15  Johan Dahlin  <johan@gnome.org>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_component_base_scheduler.py 
 	(EventTest.testRecurringOnce): 
 	  Check if dateutil is installed before running this test
 
-2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py:
 	* flumotion/wizard/consumptionsteps.py:
 	Fix a few more imports
 
-2008-02-15  Johan Dahlin  <johan@gnome.org>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionstep.py: Forgot to save this file.
 	* flumotion/wizard/workerstep.py: Import WizardStep too.
 
-2008-02-15  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/disker/disker_wizard.py:
 	* flumotion/component/consumers/httpstreamer/http_wizard.py:
@@ -1964,13 +1964,13 @@
 	Move overlay and worker step out of basesteps.
 	Update import callsites.
 
-2008-02-14  Johan Dahlin  <johan@gnome.org>
+2008-02-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Display tooltips when hovering over menu entries and tool buttons.
 	Add tooltips for all actions. Fixes #827
 
-2008-02-14  Johan Dahlin  <johan@gnome.org>
+2008-02-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py (VideoSourceStep.get_state): 
 	  Remove, all videosource steps uses separate model classes now.
@@ -1995,14 +1995,14 @@
 	* flumotion/wizard/productionsteps.py (ProductionStep._populate_combos): 
 	  Disable the combos sensitivy while querying.
 
-2008-02-13  Johan Dahlin  <johan@gnome.org>
+2008-02-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py (ProductionStep.__init__): 
 	Get rid of a FIXME; remove _setup() and split it into setup/activated logic.
 	Put ... in the combos while querying the manager and block the next button 
 	meanwhile.
 
-2008-02-13  Johan Dahlin  <jdahlin@async.com.br>
+2008-02-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/conversionsteps.py:
 	* flumotion/wizard/productionsteps.py:
@@ -2018,7 +2018,7 @@
 	* flumotion/component/component.py:
 	  Make sure we at least debug exceptions, even if they're handled.
 
-2008-02-07  Johan Dahlin  <johan@gnome.org>
+2008-02-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py:
 	(ProductionStep.plugin_loaded): 
@@ -2045,7 +2045,7 @@
 	Change worker_changed to take a worker argument to simplify the
 	callsites slightly.
 
-2008-02-07  Johan Dahlin  <johan@gnome.org>
+2008-02-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/configurationwizard.py:
 	Call block_next before requiring an element and block_next when
@@ -2062,7 +2062,7 @@
 	* po/POTFILES.in:
 	Move (and rename) wizard_http.glade to the httpstreamer directory.
 
-2008-02-07  Johan Dahlin  <johan@gnome.org>
+2008-02-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/consumers/shout2/Makefile.am:
 	(component_PYTHON): Add shout2_wizard.py
@@ -2074,7 +2074,7 @@
 	* flumotion/wizard/consumptionsteps.py:
 	Move the shout2 component out of consumptionsteps.py
 
-2008-02-07  Johan Dahlin  <johan@gnome.org>
+2008-02-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py: 
 	Raise an exception if the path property isn't set or if the
@@ -2093,7 +2093,7 @@
 	Move disk steps out of wizard/consumptionsteps.py and the
 	disker glade file into the component directory.
 
-2008-02-07  Johan Dahlin  <johan@gnome.org>
+2008-02-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/soundcard/soundcard_wizard.py:
 	* flumotion/component/producers/videotest/admin_gtk.py:
@@ -2103,7 +2103,7 @@
 	Move out enums which are only used once of wizard/enums.py into
 	their respective callsites.
 
-2008-02-06  Johan Dahlin  <johan@gnome.org>
+2008-02-06  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/cortado/cortado.py:
 	document and check the component type. remove unused methods.
@@ -2146,7 +2146,7 @@
 
 	Fixes #824
 	
-2008-02-06  Johan Dahlin  <johan@gnome.org>
+2008-02-06  Johan Dahlin  <johan@flumotion.com>
 
 	(HTTPFileStreamer._createRootResourceForPath): Remove factory variable
 	to silence pychecker.
@@ -2170,7 +2170,7 @@
 	Don't erase delayed call id if the method wasn't called by the
 	reactor from a timeout - fixes memory leak introduced in r5661.
 
-2008-01-31  Johan Dahlin  <johan@gnome.org>
+2008-01-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py
 	(HTTPFileStreamer.updatePorterDetails): 
@@ -2187,7 +2187,7 @@
 	Move http_wizard over to the httpstreamer directory.
 	Not yet pluggable, just separated.
 
-2008-01-31  Johan Dahlin  <johan@gnome.org>
+2008-01-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/porter/porter.py:
 	* flumotion/test/realm.py:
@@ -2195,7 +2195,7 @@
 	* flumotion/worker/feedserver.py:
 	Get rid of most __implements__ in favor of implements()
 
-2008-01-31  Johan Dahlin  <johan@gnome.org>
+2008-01-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py (ProductionStep): 
 	* flumotion/wizard/conversionsteps.py (ConversionStep): 
@@ -2206,7 +2206,7 @@
 	* flumotion/wizard/consumptionsteps.py (HTTPStep): 
 	Clean up the internal blocking api
 
-2008-01-30  Johan Dahlin  <johan@gnome.org>
+2008-01-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/registry.py (RegistryParser._parseWizard): 
 	Verify that the wizard entries are somewhat correct.
@@ -2218,7 +2218,7 @@
 	* common/intltool-Makefile.in.in:
 	(check): Add back check which does nothing
 
-2008-01-30  Johan Dahlin  <johan@gnome.org>
+2008-01-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	(__pychecker__): Do not check return values
@@ -2235,7 +2235,7 @@
 	Make the api similar to the conversion api by creating the models
 	in the steps themselves instead of just point to a class.
 
-2008-01-30  Johan Dahlin  <johan@gnome.org>
+2008-01-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
 	* flumotion/component/encoders/smoke/smoke_wizard.py:
@@ -2246,7 +2246,7 @@
 
 	Rename get_conversion_step to getConversionStep
 
-2008-01-30  Johan Dahlin  <johan@gnome.org>
+2008-01-30  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac: Pointless change to trigger a new autogen.
 	* common/intltool-Makefile.in.in:
@@ -2264,7 +2264,7 @@
 	* flumotion/component/producers/firewire/firewire.xml:
 	Add support for selecting device by GUID in the firewire producer.
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	* autogen.sh:
 	* common/intltool-Makefile.in.in:
@@ -2275,7 +2275,7 @@
 	Include intltool 0.37.0 files instead of depending on
 	the system version.
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/encoders/Makefile.am:
 	Add a few missing \
@@ -2288,7 +2288,7 @@
 	deferred is errbacked with NotAuthenticatedError on authentication
 	failure.
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	Make encoding and muxers pluggable in the wizard, fixes #822.
 
@@ -2357,7 +2357,7 @@
 	* po/POTFILES.in:
 	Update for renamed and new files
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	* autogen.sh: Run libtoolize first, and aclocal after
 	intltoolisize, run autopoint --force, mimics the behavior
@@ -2371,22 +2371,22 @@
 	* doc/Makefile.am:
 	Add a --disable-docs option, fixes #838
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	* common/common.mk (locale-uninstalled): Rewrite and simplify 
 	most of the rule
 
-2008-01-28  Johan Dahlin  <johan@gnome.org>
+2008-01-28  Johan Dahlin  <johan@flumotion.com>
 
 	* common/common.mk (locale-uninstalled): We're already inside
 	the po dir
 	(locale-uninstalled): Use basename instead of cut.
 
-2008-01-25  Johan Dahlin  <johan@gnome.org>
+2008-01-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_models.py: We're back from the future
 
-2008-01-24  Johan Dahlin  <johan@gnome.org>
+2008-01-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/__init__.py:
 	* flumotion/admin/admin.py:
@@ -2699,7 +2699,7 @@
 	Move down __version__ from the first part of the module,
 	avoids breaking doc strings. Fixes #836
 
-2008-01-24  Johan Dahlin  <johan@gnome.org>
+2008-01-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/errors.py:
 	* flumotion/test/test_wizard_models.py:
@@ -2709,7 +2709,7 @@
 	a docstring.
 	Add license headers to test.
 
-2008-01-24  Johan Dahlin  <johan@gnome.org>
+2008-01-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/models.py (Properties):
 	Implement __repr__ to help debugging saying that we really are
@@ -2720,7 +2720,7 @@
 	* flumotion/test/test_wizard_models.py:
 	Add tests
 	
-2008-01-24  Johan Dahlin  <johan@gnome.org>
+2008-01-24  Johan Dahlin  <johan@flumotion.com>
 
 	Make all dialogs modal, so we can't click on the parent's while they
 	are open.
@@ -2732,7 +2732,7 @@
 	* flumotion/ui/simplewizard.py (SimpleWizard): add a parent
 	constructor argument and document it. Pass it on to GladeWindow.
 
-2008-01-24  Johan Dahlin  <johan@gnome.org>
+2008-01-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/glade.py (GladeWindow.__init__): Make the
 	window modal too, so you can't click on the main window when
@@ -2759,7 +2759,7 @@
 	  Move public now() to test suite, which is its only consumer.
 	  Document API some more.
 
-2008-01-18  Johan Dahlin  <johan@gnome.org>
+2008-01-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow._open_connection): 
 	Add an assert, to make sure we always send in a PBConnectionInfo 
@@ -2770,7 +2770,7 @@
 	* flumotion/admin/gtk/parts.py (ComponentsView.__init__): 
 	Check for PyGTK 2.12.1 or higher, to avoid a crash in PyGTK bug #479012
 
-2008-01-17  Johan Dahlin  <johan@gnome.org>
+2008-01-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py:
 	* flumotion/admin/text/view.py:
@@ -2778,7 +2778,7 @@
 	* flumotion/wizard/configurationwizard.py:
 	Rename getEntry back to getEntryByType, reverses part of [6081]
 
-2008-01-15  Johan Dahlin  <johan@gnome.org>
+2008-01-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/componentui.py: 
 	Update the name here too, to avoid breaking the build
@@ -2790,7 +2790,7 @@
 	Return a list of WizardEntryState in getWizardEntries, update
 	documentation and callsite.
 
-2008-01-15  Johan Dahlin  <johan@gnome.org>
+2008-01-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/soundcard/soundcard_wizard.py
 	(SoundcardStep.setup): Make sure that it works using kiwi 1.9.14
@@ -2807,12 +2807,12 @@
 	* common/intltool.m4:
 	  Add macro for people who don't have intltool installed.
 
-2008-01-11  Johan Dahlin  <johan@gnome.org>
+2008-01-11  Johan Dahlin  <johan@flumotion.com>
 
 	* common/gendoc.py: Import from posixbase, to avoid a deprecation
 	message when running the testsuite.
 
-2008-01-11  Johan Dahlin  <johan@gnome.org>
+2008-01-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py:
 	* flumotion/wizard/conversionsteps.py:
@@ -2820,7 +2820,7 @@
 	Get remove of a few (double) translations, left-overs from
 	previous commit.
 
-2008-01-11  Johan Dahlin  <johan@gnome.org>
+2008-01-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire_wizard.py:
 	* flumotion/ui/wizard.py:
@@ -2828,7 +2828,7 @@
 	* flumotion/wizard/save.py:
 	Get rid of stupid _() to get_step() & friends.
 
-2008-01-11  Johan Dahlin  <johan@gnome.org>
+2008-01-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/enums.py (EncodingVideo): Remove two
 	unused enums
@@ -2836,13 +2836,13 @@
 	* common/common.mk (locale-uninstalled): Workaround intltool bug 
 	and inline the whole target to copy the .gmo files.
 
-2008-01-11  Johan Dahlin  <johan@gnome.org>
+2008-01-11  Johan Dahlin  <johan@flumotion.com>
 
 	* common/common.mk (locale-uninstalled): Set itlocaledir too, intltool
 	uses this rule to install .mo files instead of datadir which normal
 	gettext uses
 
-2008-01-10  Johan Dahlin  <johan@gnome.org>
+2008-01-10  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_registry.py (TestComponentEntry.setUp): 
 	Update the tests
@@ -2868,7 +2868,7 @@
 	wizard, removing the old hard coded list of components.
 	Add intltool support, add the xml files to POTFILES.in
 
-2008-01-10  Johan Dahlin  <johan@gnome.org>
+2008-01-10  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
 	* data/glade/wizard_firewire.glade:
@@ -2886,7 +2886,7 @@
 	Change the API slightly to handle components which provides
 	both an audio and video producer and update callsites.
 
-2008-01-09  Johan Dahlin  <johan@gnome.org>
+2008-01-09  Johan Dahlin  <johan@flumotion.com>
 
 	* po/POTFILES.in:
 	Fix a typo
@@ -2900,7 +2900,7 @@
 	* po/POTFILES.in:
 	Move the bttv step + glade file out to a separate bundle
 
-2008-01-09  Johan Dahlin  <johan@gnome.org>
+2008-01-09  Johan Dahlin  <johan@flumotion.com>
 
 	* po/sv.po: Update swedish translation
 
@@ -2913,7 +2913,7 @@
 	* po/POTFILES.in:
 	Move the webcam step + glade file out to a separate bundle
 
-2008-01-09  Johan Dahlin  <johan@gnome.org>
+2008-01-09  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
 	* data/glade/wizard_soundcard.glade:
@@ -2924,7 +2924,7 @@
 	* po/POTFILES.in:
 	Move the soundcard step + glade file out to a separate bundle
 
-2008-01-09  Johan Dahlin  <johan@gnome.org>
+2008-01-09  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am (glade_DATA): Remove old glade files here.
 
@@ -2947,7 +2947,7 @@
 	separate bundles.
 	Add a new method to the configuration wizard to fetch a wizard bundle.
 
-2008-01-09  Johan Dahlin  <johan@gnome.org>
+2008-01-09  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/manager/admin.py (AdminAvatar.perspective_getEntryByType): 
 	Remove, in favor of getEntry.
@@ -2975,7 +2975,7 @@
 	Split it into two parts, add support for returning a deferred
 	instead of a wizard step instance.
 
-2008-01-08  Johan Dahlin  <johan@gnome.org>
+2008-01-08  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am (PYCHECKER_BLACKLIST): Put kiwipatches here.
 
@@ -2998,7 +2998,7 @@
 	Refactor kiwi monkey patches to a separate file.
 	Add a monkey patch to workaround a bug fixed in kiwi 1.9.15.
 
-2008-01-08  Johan Dahlin  <johan@gnome.org>
+2008-01-08  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_testsource.glade:
@@ -3015,11 +3015,11 @@
 	step at the same time. Merge firewire audio/video steps to a common
 	step to avoid duplication.
 
-2008-01-08  Johan Dahlin  <johan@gnome.org>
+2008-01-08  Johan Dahlin  <johan@flumotion.com>
 
 	* po/sv.po: Update swedish translation
 
-2008-01-07  Johan Dahlin  <johan@gnome.org>
+2008-01-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/job.py (CheckJobHeaven.timeout): job.pid, not
 	process.pid. Remove unused import too.
@@ -3029,7 +3029,7 @@
 	* flumotion/admin/gtk/main.py:
 	Add missing '_' definition for gettext.
 
-2008-01-07  Johan Dahlin  <johan@gnome.org>
+2008-01-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py:
 	Import gettext and set _
@@ -3039,7 +3039,7 @@
 	* flumotion/manager/admin.py:
 	  Raise SleepingComponentError with the proper argument, the state.
 
-2008-01-04  Johan Dahlin  <johan@gnome.org>
+2008-01-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/: Audit and mark more strings as translatable
 
@@ -3054,7 +3054,7 @@
 	* flumotion/admin/gtk/client.py: Avoid importing a few more modules,
 	import the attributes directly instead
 	
-2008-01-04  Johan Dahlin  <johan@gnome.org>
+2008-01-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow.refused_later): 
 	Send in the window instead of the instance, fixes #818
@@ -3070,7 +3070,7 @@
 	  disconnect immediately, so that the ReconnectingClientFactory can
 	  schedule a reconnect attempt later.
 
-2008-01-02  Johan Dahlin  <johan@gnome.org>
+2008-01-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_admin_connections.py: Add a test.
@@ -3097,7 +3097,7 @@
 	* flumotion/admin/gtk/client.py:
 	Fix recent connections shown on connections menu.
 
-2007-12-28  Johan Dahlin  <johan@gnome.org>
+2007-12-28  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_disk.glade:
 	* flumotion/wizard/consumptionsteps.py 
@@ -3157,7 +3157,7 @@
 	  Changes for file/import movements, move admin config tests into another
 	  file.
 
-2007-12-27  Johan Dahlin  <johan@gnome.org>
+2007-12-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/encoders/encodingwizardplugin.py:
 	* flumotion/configure/configure.py:
@@ -3171,7 +3171,7 @@
 	  Our testsuite should no longer print messages to Andy, as he's unlikely
 	  to do anything about them.
 
-2007-12-27  Johan Dahlin  <johan@gnome.org>
+2007-12-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/rrdmon/config.py (ConfigParser): use fxml.Parser
 	instead of common.BaseConfigParser
@@ -3205,7 +3205,7 @@
 	* flumotion/worker/worker.py:
 	  Remove unused imports.
 
-2007-12-26  Johan Dahlin  <johan@gnome.org>
+2007-12-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/*.py: Some simple low-hanging fruit cases of except: 
 	removed, part of bug #791
@@ -3213,11 +3213,11 @@
 	* flumotion/ui/wizard.py (_WalkableStack.skip_to): Cleanup, use
 	enumerate instead of range+len+getitem.
 
-2007-12-24  Johan Dahlin  <johan@gnome.org>
+2007-12-24  Johan Dahlin  <johan@flumotion.com>
 
 	* po/sv.po: Avoid mnemonic conflict for menubar items
 
-2007-12-21  Johan Dahlin  <johan@gnome.org>
+2007-12-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/admin/main.py (__version__): 
 	* flumotion/admin/command/main.py (__version__): 
@@ -3231,7 +3231,7 @@
 	Remove flumotion.twisted.http and import twisted.web.http directly,
 	since we're requiring twisted 2.0 anyway.
 
-2007-12-21  Johan Dahlin  <johan@gnome.org>
+2007-12-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/*: Make pyflakes clean
 
@@ -3250,7 +3250,7 @@
 	Add encoding profiles and encoding wizard plugins, 
 	part of bug 812.
 	
-2007-12-21  Johan Dahlin  <johan@gnome.org>
+2007-12-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/text/connection.py (connected): Remove e,
 	should make pychecker happy.
@@ -3267,7 +3267,7 @@
 	* flumotion/admin/text/connection.py (connected): 
 	Add some tracebacks helper, to print clean tracebacks instead of curses mangled ones	
 
-2007-12-20  Johan Dahlin  <johan@gnome.org>
+2007-12-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/effects/volume/admin_gtk.py 
 	(VolumeAdminGtkNode.volumeSet): 
@@ -3286,7 +3286,7 @@
 	* flumotion/admin/gtk/componentview.py: Make sure unjelliers
 	for the componentui are registered.
 
-2007-12-19  Johan Dahlin  <johan@gnome.org>
+2007-12-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/connections.glade:
 	* flumotion/admin/gtk/connections.py (Connections): 
@@ -3305,7 +3305,7 @@
 
 	Fixes #810
 	
-2007-12-19  Johan Dahlin  <johan@gnome.org>
+2007-12-19  Johan Dahlin  <johan@flumotion.com>
 
 	* misc/pycheckerrc (blacklist): Add kiwi and kiwi.ui
 
@@ -3366,7 +3366,7 @@
 	(Switch.try_switch): Change to reflect changes in the gst switch
 	element.
 
-2007-12-18  Johan Dahlin  <johan@gnome.org>
+2007-12-18  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/authenticate.glade: 
 	* flumotion/admin/gtk/connections.py
@@ -3383,7 +3383,7 @@
 	* flumotion/twisted/pb.py:
 	  Add perspectiveMessageReceivedUnserialised.
 
-2007-12-18  Johan Dahlin  <johan@gnome.org>
+2007-12-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_common_signals.py
 	(TestSignalMixin.testDisconnectByFunc): 
@@ -3396,7 +3396,7 @@
 	Simplify reactor shutdown, do the right thing<tm> by disconnecting
 	all admin callbacks before shutting down
 
-2007-12-17  Johan Dahlin  <johan@gnome.org>
+2007-12-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/options.py: Unconditionally disable GOption, since
 	it doesn't work to launch a manager + worker yet.
@@ -3420,7 +3420,7 @@
 	* flumotion.spec.in:
 	Fixes the build dependency declaration for kiwi.
 
-2007-12-17  Johan Dahlin  <johan@gnome.org>
+2007-12-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/simplewizard.py (SimpleWizard.on_finished): 
 	Workaround gtk+ bug #56070
@@ -3434,26 +3434,26 @@
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Log when we set the maximum fd # because of a python 2.4.3 bug.
 
-2007-12-10  Johan Dahlin  <johan@gnome.org>
+2007-12-10  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow._close): Call
 	reactor.iterate after shutting down the reactor to make sure that
 	the progress dialog is not flashing when shutting down the admin
 	client in a normal way.
 
-2007-12-07  Johan Dahlin  <johan@gnome.org>
+2007-12-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/encoders/theora/theora.py 
 	(Theora.checkCallback): inline defered callback
 	(Theora.configure_pipeline): avoid duplication and
 	improve readability.
 
-2007-12-06  Johan Dahlin  <johan@gnome.org>
+2007-12-06  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/videotest/admin_gtk.py:
 	Remove unused imports and update to use FCProxyComboBox.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* po/sv.po: Update swedish translation
 
@@ -3461,7 +3461,7 @@
 	(AdminClientWindow._show_connection_lost_dialog):
 	Use ProgressDialog instead of a MessageDialog, fixes #790
 	
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py 
 	(AdminClientWindow._connection_lost): 
@@ -3476,7 +3476,7 @@
 		- current-time (these two for uptime reporting)
 	  This will all be used by the component tab when it gets added.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py (ComponentView): 
 	Mark attributes and methods as private, 
@@ -3489,7 +3489,7 @@
 	  measurements, so that the next polling interval will give us a useful
 	  answer.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin.glade: 
 	Add an etched in shadow border around the components view
@@ -3506,7 +3506,7 @@
 	* po/es.po:
 	More strings translated.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* po/sv.po: Update swedish translation
 
@@ -3519,7 +3519,7 @@
 	* flumotion/manager/manager.py:
 	  When overwriting a (non-running) component, delete the old one first.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/looper/admin_gtk.py 
 	(FileInfo.set_audio): Call set_text instead of set_markup.
@@ -3541,7 +3541,7 @@
 	  Allow overwriting configuration for non-running components, as the code
 	  appears to have intended to do.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/looper/looper.glade: Remove () here
 	too.
@@ -3563,7 +3563,7 @@
 	We're depending on PyGTK 2.8 now, so use gobject.type_register()
 	directly. It won't print out silly deprecation warnings any longer.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/message.py (MessagesView.__init__): Add
 	an etched in border around the message view.
@@ -3581,7 +3581,7 @@
 	* po/POTFILES.in:
 	Remove spyglass, it's been bitrotten since 0.10.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_greeter.py:
 	Update imports after moving simplewizard
@@ -3605,7 +3605,7 @@
 	* conf/managers/default/flows/switch-av.xml: Add switch example
 	configs.
 
-2007-12-05  Johan Dahlin  <johan@gnome.org>
+2007-12-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Clean up imports
@@ -3630,7 +3630,7 @@
 	* flumotion/component/combiners/switch/switch.py
 	(Switch.do_check): Require new switch to avoid locking badness.
 
-2007-12-04  Johan Dahlin  <johan@gnome.org>
+2007-12-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/*.py:
 	Move __version__ from the end of the file to
@@ -4045,7 +4045,7 @@
 	    - add __version__ = "$Rev$"
 	    - set svn:keywords to substitute $Rev$
 
-2007-12-04  Johan Dahlin  <johan@gnome.org>
+2007-12-04  Johan Dahlin  <johan@flumotion.com>
 
 	Revert commit:
 
@@ -4080,7 +4080,7 @@
 	(Switch.try_switch): Put prepare() and finish() code inside, which
 	I hope is more readable. The diff sucks tho.
 
-2007-12-04  Johan Dahlin  <johan@gnome.org>
+2007-12-04  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_consumption.glade:
 	* data/glade/wizard_encoding.glade:
@@ -4091,7 +4091,7 @@
 	* data/glade/wizard_tvcard.glade:
 	Remove signals which are connected automatically by Kiwi.
 
-2007-12-04  Johan Dahlin  <johan@gnome.org>
+2007-12-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/glade.py (FluLibgladeWidgetTree.get_sizegroups): Add a 
 	kiwi monkey patch for the libglade loader
@@ -4133,7 +4133,7 @@
 	(RegistryParser.parseRegistry): Fix code to match intentions, I
 	think.
 
-2007-12-03  Johan Dahlin  <johan@gnome.org>
+2007-12-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/common.py (argRepr): 
 	* flumotion/test/test_common.py:
@@ -4148,7 +4148,7 @@
 	* flumotion/test/test_manager_manager.py:
 	  Fix one of the skipped tests.
 
-2007-12-03  Johan Dahlin  <johan@gnome.org>
+2007-12-03  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin.glade:
 	* data/glade/connection-dialog.glade:
@@ -4162,14 +4162,14 @@
 	Rewrite, use namedAny instead of eval.
 	Remove unused methods and mark methods as private.
 
-2007-12-03  Johan Dahlin  <johan@gnome.org>
+2007-12-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/glade.py:
 	* flumotion/ui/url.py:
 	* flumotion/ui/wizard.py:
 	Remove unused imports and make pyflakes happy.
 
-2007-12-03  Johan Dahlin  <johan@gnome.org>
+2007-12-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/wizard.py (SectionWizard._jump_to_step): 
 	When jumping to the same step don't do anything to
@@ -4186,7 +4186,7 @@
 	* flumotion/wizard/sidebar.py:
 	Move sidebar.py from wizard/ to ui/
 
-2007-12-03  Johan Dahlin  <johan@gnome.org>
+2007-12-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py: Remove a bitrotten test case
 
@@ -4214,7 +4214,7 @@
 	aligning the spinbuttons/entries better and avoid expanding them 
 	so much.
 
-2007-11-30  Johan Dahlin  <johan@gnome.org>
+2007-11-30  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_overlay.glade: 
 	* flumotion/wizard/basesteps.py (OverlayStep): 
@@ -4309,14 +4309,14 @@
 	in the single and in the multiple case. Dunno if this is really a
 	good idea though. Untested!
 
-2007-11-29  Johan Dahlin  <johan@gnome.org>
+2007-11-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py:
 	* flumotion/wizard/configurationwizard.py:
 	Only inherit from WorkerWizardStep when necessary and 
 	mark worker_list as private.
 
-2007-11-29  Johan Dahlin  <johan@gnome.org>
+2007-11-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py (AudioEncoderStep.get_next): 
 	Use ProxyWidgetMapping
@@ -4379,7 +4379,7 @@
 	two functions, which will be called with the eater alias as an
 	argument when an eater goes active or inactive, respectively.
 
-2007-11-29  Johan Dahlin  <johan@gnome.org>
+2007-11-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py (FireWireStep): 
 	Use ProxyWidgetMapping
@@ -4389,7 +4389,7 @@
 	* po/es.po: 
 	Spanish 100% again
 
-2007-11-29  Johan Dahlin  <johan@gnome.org>
+2007-11-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py (TVCardStep.errRemoteRunError): 
 	Remove defer_generator_method, add a probing message like the webcam 
@@ -4413,7 +4413,7 @@
 	* flumotion/admin/gtk/client.py: 
 	Pretty print in XML export - fixes #801
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/basesteps.py:
 	* flumotion/wizard/configurationwizard.py:
@@ -4446,7 +4446,7 @@
 	(Switch.switch_to_for_event, SingleSwitch.switch_to): More
 	flagellation.
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* README:
 	* configure.ac:
@@ -4477,7 +4477,7 @@
 
 	* po/es.po: updated spanish translation again
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/common/boot.py:
@@ -4489,7 +4489,7 @@
 	* README:
 	Document the new requirements
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/fvumeter.py: 
 	* flumotion/ui/fgtk.py:
@@ -4503,7 +4503,7 @@
 
 	Move FVUMeter out of fgtk.py to a separate file, update callsites.
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/fgtk.py (FComboBox._get_column_content): Mark as private
 	(FComboBox.__len__) Remove,
@@ -4531,7 +4531,7 @@
 	* po/sv.po:
 	Update swedish translation
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_audiotest.glade:
 	* data/glade/wizard_disk.glade:
@@ -4554,7 +4554,7 @@
 	  First steps towards making switch work again (it still doesn't work, but
 	  some bits are cleaned up?)
 
-2007-11-28  Johan Dahlin  <johan@gnome.org>
+2007-11-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/productionsteps.py (WebcamStep._run_checks.errback): 
 	Get rid of a defer generator method
@@ -4583,12 +4583,12 @@
 
 	* po/*.po: For some reason svn wants me to commit these.
 
-2007-11-27  Johan Dahlin  <johan@gnome.org>
+2007-11-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Test all reload code and avoid throwing errors
 
-2007-11-27  Johan Dahlin  <johan@gnome.org>
+2007-11-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/admin_gtk.py (FeedersAdminGtkNode.setUIState): 
 	Check if selection is not None, fixes a startup race.
@@ -4626,7 +4626,7 @@
 	  Comment out 'inherit' handling; it's unreachable ('inherit' is not an
 	  optional attribute in the parser) and needs redesigning anyway.
 
-2007-11-26  Johan Dahlin  <johan@gnome.org>
+2007-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* po/LINGUAS: Add swedish here
 
@@ -4665,13 +4665,13 @@
 	* flumotion/worker/worker.py:
 	  Documentation fixes to produce fewer epydoc warnings.
 
-2007-11-26  Johan Dahlin  <johan@gnome.org>
+2007-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py: 
 	* flumotion/admin/gtk/wizard.py:
 	Handle WizardCancelled for the ConnectionDialog
 
-2007-11-26  Johan Dahlin  <johan@gnome.org>
+2007-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/connection-dialog.glade: 
 	* flumotion/admin/gtk/connections.py (ConnectionsDialog): 
@@ -4692,11 +4692,11 @@
 
 	* po/es.po: Spanish translation updated.
 
-2007-11-26  Johan Dahlin  <johan@gnome.org>
+2007-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/greeter.py: Remove unused imports
 
-2007-11-23  Johan Dahlin  <johan@gnome.org>
+2007-11-23  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am (glade_DATA): Add videotest.glade
 	(glade_DATA): add spyglass.glade
@@ -4721,7 +4721,7 @@
 
 	* po/*.po: Update
 
-2007-11-22  Johan Dahlin  <johan@gnome.org>
+2007-11-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/connections.py (Connections.__init__): 
 	use scroll_to_cell instead of set_cursor, to actually go to the select
@@ -4762,7 +4762,7 @@
 	  does, and it's slow and memory-hungry. The bugs we were using this
 	  to detect haven't existed in a couple of years.
 
-2007-11-21  Johan Dahlin  <johan@gnome.org>
+2007-11-21  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_consumption.glade: 
 	Set inconsistent to false for checkbutton_shout2_audio_video
@@ -4787,7 +4787,7 @@
 	startup, and over the long term because normally we only serve a
 	fraction of bundles.
 
-2007-11-21  Johan Dahlin  <johan@gnome.org>
+2007-11-21  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_consumption.glade: Revert the defaults to
 	False for all video only/audio only consumptions.
@@ -4821,7 +4821,7 @@
 	* configure.ac:
 	Initial import of the composite combiner component.
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): Add 
 	configurationwizard.py here
@@ -4837,7 +4837,7 @@
 	* flumotion/common/boot.py (boot, init_option_parser): Detect at
 	boot-time whether or not we should use gobject.option.
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): fix typo
 
@@ -4846,7 +4846,7 @@
 	Make it work on pre python 2.5 by importing
 	our sorted/any re-implementations.
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/test/test_public_ui_api.py:
@@ -4882,7 +4882,7 @@
 	(TestConfig.testParseComponentsWithMultipleSources): Add test for
 	specifying aliases for eaters.
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_public_ui_api.py:
 	Import changed
@@ -4899,7 +4899,7 @@
 	Move flumotion.wizard.wizard.Wizard to 
 	flumotion.ui.wizard.SectionWizard
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard.glade:
 	* flumotion/wizard/steps.py:
@@ -4911,7 +4911,7 @@
 	Split out the specific parts of the first time wizard:
 	workers, admin etc to the subclass
 
-2007-11-20  Johan Dahlin  <johan@gnome.org>
+2007-11-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py: Fix test after the latest
 	wizard changes
@@ -4923,7 +4923,7 @@
 	(Wizard.__init__): Merge in Scenario, mark most attributes
 	and methods as private.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py (Wizard.__init__): 
 	Check before trying to access self.sections and raise
@@ -4938,7 +4938,7 @@
 	- a list of sections to be provieded
 	- the initial step
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py:
 	Update getitem callsites here too.
@@ -4977,7 +4977,7 @@
 	component.
 	(AdminAvatar.perspective_reloadManager): Streamline.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py (Wizard.__getitem__): 
 	Rename to get_step() and update callsits
@@ -4993,7 +4993,7 @@
 	(reload): Remove the ignore hack, it was just that the log system
 	needed reinitialization.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps): 
 	Update WizardStep import
@@ -5010,7 +5010,7 @@
 	(Avatar.perspectiveMessageReceived): Use maybeDeferred to reduce
 	duplicate code paths.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/step.py: svn remove this
 	* flumotion/test/test_public_ui_api.py (TestPublicUI.testPublicUIAPI): 
@@ -5031,7 +5031,7 @@
 	* flumotion/test/test_config.py (TestConfig.testParseEmpty):
 	Remove call to nonexistent function.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/Makefile.am:
 	* flumotion/wizard/save.py:
@@ -5068,13 +5068,13 @@
 	(exportPlanetXml): New function, takes a planet state and makes
 	XML out of it. Nifty, and somewhat evil.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py:
 	Reorganize, group the methods by their type. Remove unused
 	API.
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_tvcard.glade:
 	* flumotion/wizard/steps.py:
@@ -5083,7 +5083,7 @@
 	(FireWireAudioStep): Move down _get_width_height to have a similar
 	order to the firewire video step. *args -> checkbutton
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 	
 	* flumotion/wizard/steps.py: 
 	Store instance variables in the instances instead of in classes, 
@@ -5092,7 +5092,7 @@
 	Add section comments and group the methods by their type.
 	Mark a few more methods as private
 
-2007-11-19  Johan Dahlin  <johan@gnome.org>
+2007-11-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py (ConsumptionStep.activated): improve
 	comment
@@ -5101,7 +5101,7 @@
 	Add comments explaining what's going on here, since it's non-obvious
 	at a first glance.
 
-2007-11-16  Johan Dahlin  <johan@gnome.org>
+2007-11-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/Makefile.am (flumotion_PYTHON): 
 	* flumotion/test/Makefile.am: (EXTRA_DIST): 
@@ -5121,7 +5121,7 @@
 	Make some of the indivudal steps create the upcoming step instead of just
 	returning the name, this allows us to pass the model on to the next step. 
 
-2007-11-16  Johan Dahlin  <johan@gnome.org>
+2007-11-16  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_consumption.glade: Set the audio/video only
 	sub checkbuttons to true by default
@@ -5145,7 +5145,7 @@
 	* data/glade/admin.glade: center the window when displaying it
 	for the first time.
 
-2007-11-15  Johan Dahlin  <johan@gnome.org>
+2007-11-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py (Consumption.activated, 
 	Consumption.get_next): Continue refactoring, avoids plenty
@@ -5174,7 +5174,7 @@
 	* flumotion/test/test_manager_manager.py
 	(FakeComponentMind.__init__): Remove cpu from the jobstate.
 
-2007-11-14  Johan Dahlin  <johan@gnome.org>
+2007-11-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/python.py:
 	Attempt to fix pychecker.
@@ -5193,7 +5193,7 @@
 	(BaseComponent.init, BaseComponent._pollCPU): Move the CPU poller
 	to be a common.Poller.
 
-2007-11-14  Johan Dahlin  <johan@gnome.org>
+2007-11-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py: 
 	* flumotion/common/Makefile.am (flumotion_PYTHON): 
@@ -5276,7 +5276,7 @@
 	which we connected one or more times, but is disconnected now.
 	Case (4) in the comment.
 
-2007-11-14  Johan Dahlin  <johan@gnome.org>
+2007-11-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/Makefile.am (EXTRA_DIST): Add test_public_ui_api.py
 	* flumotion/test/test_public_ui_api.py (TestPublicUI): 
@@ -5292,7 +5292,7 @@
 	are setting the mood to a value equal to the moodPending, clear
 	moodPending. Restores previous behaviour.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/trayicon.py (FluTrayIcon): 
 	* flumotion/admin/gtk/client.py (Window): 
@@ -5323,7 +5323,7 @@
 	(AdminAvatar.getComponentStates, AdminHeaven.avatarsCallRemote)
 	(AdminHeaven.__init__): Remove more unused code.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion-debug: Add a new script which
 	makes it easier to debug a manager. So far only a vishnu
@@ -5391,7 +5391,7 @@
 	(KeycardsNode.propertyChanged): Removed, a vestigial
 	copy-and-pasteo.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/main.py (main): 
 	* flumotion/admin/gtk/client.py (Window.setAdminModel): 
@@ -5446,7 +5446,7 @@
 	  Implement waiting for clients to disconnect and loggers to complete
 	  logging on shutdown, so we log properly on shutdown.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Continue to refactor all the code in the callbacks
@@ -5459,7 +5459,7 @@
 	(ComponentAvatar.onShutdown, ComponentAvatar.onShutdown): Remove
 	some unused code.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/main.py:
@@ -5476,7 +5476,7 @@
 	(FeedMap._recalc): If multiple components supply a feed, prefer
 	the one that has been logged in longer.
 
-2007-11-13  Johan Dahlin  <johan@gnome.org>
+2007-11-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	(Window._admin_connected_cb): Use consistent naming and 
@@ -5488,7 +5488,7 @@
 	Rename the ComponentsView signal has-selection to selection-changed,
 	which better reflects the arguments given.
 
-2007-11-12  Johan Dahlin  <johan@gnome.org>
+2007-11-12  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	Reorder methods, rename to gtk-style namings, mark methods and attributes
@@ -5507,7 +5507,7 @@
 	object when we start to log in. Fixes problem where the porter
 	thinks we logged out.
 
-2007-11-12  Johan Dahlin  <johan@gnome.org>
+2007-11-12  Johan Dahlin  <johan@flumotion.com>
 
 	* common/epydoc.mk (EPYDOC_ARGS): Remove the --ignore-mismatch-parameter
 	argument which is not present in epydoc 3.0, fixes #783
@@ -5565,14 +5565,14 @@
 	  Use maybeDeferred() on logger plug return; move firing disconnect
 	  deferreds to after logging successfully completes.
 
-2007-11-12  Johan Dahlin  <johan@gnome.org>
+2007-11-12  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py (Webcam.run_checks): Reverse the list of
 	resolution so we get the largest one first instead of last.
 	(FireWire.run_checks): Make it work on 2.3. Use a nicer api to append
 	data to the tree model.
 
-2007-11-09  Johan Dahlin  <johan@gnome.org>
+2007-11-09  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_component_playlist.py: assertTrue -> failUnless
 
@@ -5596,7 +5596,7 @@
 	  Remove all clients on stop, don't continue shutdown until removal is
 	  complete.
 
-2007-11-08  Johan Dahlin  <johan@gnome.org>
+2007-11-08  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
 	Unbreak the flumotion-template test.
@@ -5622,7 +5622,7 @@
 	  Put error messages in the message area where they belong, and add
 	  a method for it to do it consistently.
 
-2007-11-07  Johan Dahlin  <johan@gnome.org>
+2007-11-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py (Window.help_about_cb): 
 	* flumotion/admin/gtk/dialogs.py: 
@@ -5684,7 +5684,7 @@
 	(ComponentHeaven._connectEatersAndFeeders): No need to deal with
 	the feeder-not-present case.
 
-2007-11-07  Johan Dahlin  <johan@gnome.org>
+2007-11-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_options.py (TestOptions): Make sure to turn
 	all logging of after running the OptionParser tests.
@@ -5716,7 +5716,7 @@
 	  Import fcntl in global scope as well. There's no reason to do this
 	  locally, and it's somewhat of a hot path (client connection).
 
-2007-11-07  Johan Dahlin  <johan@gnome.org>
+2007-11-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/common.py:
 	* flumotion/common/config.py:
@@ -5868,12 +5868,12 @@
 	* flumotion/manager/manager.py (Vishnu.deleteFlow): Adeu,
 	generator.
 
-2007-11-05  Johan Dahlin  <johan@gnome.org>
+2007-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/job/main.py (main): Remove --version here,
 	it's already added by the common optparse options.
 
-2007-11-05  Johan Dahlin  <johan@gnome.org>
+2007-11-05  Johan Dahlin  <johan@flumotion.com>
 
        * flumotion/admin/command/main.py:
        * flumotion/admin/gtk/main.py:
@@ -5899,7 +5899,7 @@
 	* flumotion/component/base/admin_gtk.py: Exorcise defer_generator
 	from another file.
 
-2007-11-05  Johan Dahlin  <johan@gnome.org>
+2007-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/options.py: Don't assume gobject.pygobject_version
 	is present, fixes build on FC5.
@@ -5924,7 +5924,7 @@
 
 	* flumotion/admin/gtk/componentview.py: Remove unneeded import.
 
-2007-11-05  Johan Dahlin  <johan@gnome.org>
+2007-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/fgtk.py (FVUMeter.do_realize): Fix inconsistent tabbing
 	found by reindent.py
@@ -5936,7 +5936,7 @@
 	* flumotion/common/netutils.py:
 	  Document two methods in the routing table class.
 
-2007-11-05  Johan Dahlin  <johan@gnome.org>
+2007-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* all python files in the tree: run reindent.py, fixes #789
 
@@ -5975,7 +5975,7 @@
 	(TrivialBouncerTest.setKeycardExpireInterval): Use private API to
 	set the expirer timeout. Hacky, but hey.
 
-2007-11-02  Johan Dahlin  <johan@gnome.org>
+2007-11-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/dialogs.py (PropertyChangeDialog): Use show()
 	on all individual items instead of show_all() once.
@@ -5984,7 +5984,7 @@
 	shortcut for changing the volume from C to V, C is already used
 	by the Connection menu in the admin interface.
 
-2007-11-01  Johan Dahlin  <johan@gnome.org>
+2007-11-01  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/authenticate.glade:
 	* data/glade/connections.glade:
@@ -5996,7 +5996,7 @@
 	windows when starting up the admin interface the first time.
 	Fixes #784.
 
-2007-11-01  Johan Dahlin  <johan@gnome.org>
+2007-11-01  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render): 
 	Remove trailing whitespace and prefix all error messages in the render
@@ -27601,7 +27601,7 @@
 	* flumotion/worker/main.py:
 	  Common base class for heaven and avatar.  Fixes #13
 
-2004-11-26  Johan Dahlin  <johan@gnome.org>
+2004-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* doc/random/bundle:
 	* flumotion/common/registry.py:
@@ -27614,13 +27614,13 @@
 	Add a bundle basket in the vishnu that reads all bundles
 	from the registry
 	
-2004-11-26  Johan Dahlin  <johan@gnome.org>
+2004-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/registry.py:
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	* flumotion/manager/manager.py:
 
-2004-11-26  Johan Dahlin  <johan@gnome.org>
+2004-11-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/registry.py:
 	* flumotion/test/test_registry.py:
@@ -27701,7 +27701,7 @@
 	* flumotion.spec.in:
 	  Integrate spec changes from issue 86
 
-2004-11-11  Johan Dahlin  <johan@gnome.org>
+2004-11-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py:
 	Only skip configuration if we use firewire audio
@@ -27846,7 +27846,7 @@
 	  cleanup of wizard code; better error checking, throw up
 	  error dialogs.  Fixes issue #92
 
-2004-11-09  Johan Dahlin  <johan@gnome.org>
+2004-11-09  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac: Check for the gst module before gst.interfaces and
 	set PYTHONPATH based on the directory found in pkg-config.
@@ -27866,7 +27866,7 @@
 	* flumotion/test/test_wizard.py:
 	  skip test for now
 
-2004-11-05  Johan Dahlin  <johan@gnome.org>
+2004-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/errors.py:
 	* flumotion/wizard/steps.py:
@@ -27925,7 +27925,7 @@
 	Fix py-compile to support DESTDIR, so the rpm can tag compiled python
 	code with the final on-disk location
 
-2004-11-05  Johan Dahlin  <johan@gnome.org>
+2004-11-05  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_webcam.glade:
 	* flumotion/wizard/steps.py:
@@ -28002,7 +28002,7 @@
 	* pkgconfig/flumotion.pc.in:
 	  adding .pc files
 
-2004-11-04  Johan Dahlin  <johan@gnome.org>
+2004-11-04  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_soundcard.glade:
 	* flumotion/admin/admin.py:
@@ -28045,7 +28045,7 @@
 	* flumotion/wizard/wizard.py:
 	  make wizard remember last chosen worker.  fixes issue #76
 
-2004-11-03  Johan Dahlin  <johan@gnome.org>
+2004-11-03  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac: Check for gst.interfaces and gtk.glade
 
@@ -28123,7 +28123,7 @@
 	  restructuring and adding code to support decent init scripts
 	  and correct daemon behaviour
 
-2004-11-02  Johan Dahlin  <johan@gnome.org>
+2004-11-02  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
 	* bin/flumotion-manager.in:
@@ -28137,7 +28137,7 @@
 
 	Add support for FLU_REGISTRY_PATH
 	
-2004-10-29  Johan Dahlin  <johan@gnome.org>
+2004-10-29  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_firewire.glade:
 
@@ -28169,13 +28169,13 @@
 	  Don't activate save to disk by default.  If stuff like this
 	  ever needs to be done, do it in the glade file instead.
 
-2004-10-26  Johan Dahlin  <johan@gnome.org>
+2004-10-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire.py:
 
 	proper width and height in here, avoids unnecessary and ugly scaling.
 
-2004-10-26  Johan Dahlin  <johan@gnome.org>
+2004-10-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py:
 	* flumotion/wizard/save.py:
@@ -28184,13 +28184,13 @@
 	Don't output firewire-audio if we have firewire-video
 	Add a test for this too.
 	
-2004-10-26  Johan Dahlin  <johan@gnome.org>
+2004-10-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py:
 
 	Don't add firewire audio component twice.
 
-2004-10-26  Johan Dahlin  <johan@gnome.org>
+2004-10-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py:
 
@@ -28214,7 +28214,7 @@
 	* flumotion/test/test_registry.py:
 	  fix make distcheck.
 
-2004-10-25  Johan Dahlin  <johan@gnome.org>
+2004-10-25  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_firewire.glade:
 	* flumotion/wizard/save.py:
@@ -28222,13 +28222,13 @@
 
 	Add firewire to the wizard and add good defaults.
 	
-2004-10-25  Johan Dahlin  <johan@gnome.org>
+2004-10-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/firewire/firewire.py:
 
 	Add width, height and framerate
 	
-2004-10-25  Johan Dahlin  <johan@gnome.org>
+2004-10-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/steps.py:
 	* flumotion/wizard/wizard.py:
@@ -28252,7 +28252,7 @@
 	* m4/as-python.m4:
 	new upstream version, check for python module
 
-2004-10-25  Johan Dahlin  <johan@gnome.org>
+2004-10-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/admin.py:
 	* flumotion/worker/worker.py: 
@@ -28261,7 +28261,7 @@
 	retrieve the source. This allows us to just send in a function
 	instead of a string.
 
-2004-10-22  Johan Dahlin  <johan@gnome.org>
+2004-10-22  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_tvcard.glade:
 	* flumotion/admin/admin.py:
@@ -28274,21 +28274,21 @@
 	Query the tv-card for information and use it in the wizard.
 	Fixes Issue #55
 	
-2004-10-22  Johan Dahlin  <johan@gnome.org>
+2004-10-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py:
 	Don't use a global instance of the wizard, only save the steps
 	globally. Fixes Ticket #42
 	
 
-2004-10-22  Johan Dahlin  <johan@gnome.org>
+2004-10-22  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
 	* misc/pycheckerrc:
 	Add pychecker target and a configuration file that disables
 	the most retarded checks.
 
-2004-10-22  Johan Dahlin  <johan@gnome.org>
+2004-10-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/worker.py: Make sure that we send a tuple with
 	exactly one item.
@@ -28300,7 +28300,7 @@
 	* flumotion/worker/worker.py:
 	  fix docs
 
-2004-10-21  Johan Dahlin  <johan@gnome.org>
+2004-10-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/main.py:
@@ -28321,7 +28321,7 @@
 	  install a signal handler correctly, tying into twisted's SIGCHLD
 	  handler.  This cleans up zombie workers nicely and closes #41
 
-2004-10-21  Johan Dahlin  <johan@gnome.org>
+2004-10-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/bttv/bttv.py:
 	* flumotion/component/producers/bttv/bttv.xml:
@@ -28330,7 +28330,7 @@
 
 	TV-Card producer should work better now.
 	
-2004-10-21  Johan Dahlin  <johan@gnome.org>
+2004-10-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/admin.py:
 	* flumotion/common/common.py:
@@ -28353,7 +28353,7 @@
 
 	* configure.ac: releasing 0.1.0, "Agua"
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin.glade:
 	Disable Save in the user interface for now
@@ -28366,14 +28366,14 @@
 	  adding README
 	  changing ending
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/common.py:
 	* flumotion/common/config.py:
 	* flumotion/wizard/wizard.py:
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py:
 
@@ -28387,7 +28387,7 @@
 	* flumotion/manager/worker.py:
 	  clean up INFO level messages
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion-admin.in:
 	* bin/flumotion-manager.in:
@@ -28531,7 +28531,7 @@
 	* flumotion/component/producers/firewire/firewire.py:
 	Change the names of the feeds
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/main.py:
@@ -28539,7 +28539,7 @@
 	Add file->open and file->new in interface. Don't load default
 	configuration on startup.
 	
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin.glade:
 	* flumotion/admin/admin.py:
@@ -28550,7 +28550,7 @@
 	Add a clean button in the interface and methods in the medium and
 	avatar.
 	
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py:
 	Generate a runnable firewire configuration
@@ -28571,7 +28571,7 @@
 	* doc/random/header.py:
 	semi-final header
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/save.py: Boolean expression was broken, it's
 	now as it should be.
@@ -28592,7 +28592,7 @@
 
 	More package fixes, service starts up nicely now, yay
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/admin.glade:
 	* data/glade/wizard_source.glade:
@@ -28617,7 +28617,7 @@
 	* flumotion.spec.in:
 	  fix dist
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/component/muxers/ogg.py:
@@ -28633,14 +28633,14 @@
 
 	Remove dv component and add firewire
 	
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/audiotest/audiotest.py:
 	* flumotion/component/producers/audiotest/audiotest.xml:
 
 	Add freq property.
 	
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/image/wizard/Makefile.am:
 	* data/image/wizard/summary.png:
@@ -28648,7 +28648,7 @@
 
 	Add summary icon and fix small regression.
 	
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_workerconfig.py:
@@ -28662,7 +28662,7 @@
 	* flumotion/manager/main.py:
 	Fix typos and copy-and-paste errors.
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	reviewed by: <delete if not using a buddy>
 
@@ -28672,7 +28672,7 @@
 	* flumotion/manager/main.py:
 	* flumotion/wizard/steps.py:
 
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
 	* data/glade/wizard.glade:
@@ -28706,7 +28706,7 @@
 	  import correctly, use tempfile
 	* flumotion/manager/main.py:
 
-2004-10-18  Johan Dahlin  <johan@gnome.org>
+2004-10-18  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_audiotest.glade:
 	* flumotion/admin/admin.py:
@@ -28760,7 +28760,7 @@
 	* flumotion/component/webcam/webcam.xml:
 	  this should do the trick
 
-2004-10-18  Johan Dahlin  <johan@gnome.org>
+2004-10-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/main.py:
 	* flumotion/common/config.py:
@@ -28825,7 +28825,7 @@
 	* flumotion/test/test_manager_admin.py:
 	  adding test
 
-2004-10-18  Johan Dahlin  <johan@gnome.org>
+2004-10-18  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
 	* data/glade/wizard.glade:
@@ -28909,7 +28909,7 @@
 	* flumotion/component/passwd/passwd.xml:
 	  remove two unused components
 
-2004-10-18  Johan Dahlin  <johan@gnome.org>
+2004-10-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/file/file.py:
 	* flumotion/component/http/http.py:
@@ -28924,7 +28924,7 @@
 	Fix speex encoding.
 	Set bitrate property range to sane values.
 
-2004-10-18  Johan Dahlin  <johan@gnome.org>
+2004-10-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/main.py:
 	* flumotion/wizard/save.py:
@@ -28987,7 +28987,7 @@
 	* flumotion/admin/admin.py:
 	  fix Johan's bug
 
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard.py: Fix test breakage
 
@@ -29039,7 +29039,7 @@
 	* flumotion/worker/main.py:
 	  use logdir when daemonizing
 
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/audiotest/audiotest.py (createComponent):
 	Set sync to true for sinesrc, to avoid eating up all CPU.
@@ -29077,7 +29077,7 @@
 	* flumotion/twisted/pb.py:
 	  60% coverage !
 
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_disk.glade:
 	* data/glade/wizard_http.glade:
@@ -29140,7 +29140,7 @@
 	  with other heavens.
 	  Still need to assign a unique id to admin clients.
 
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/http/Makefile.am:
 	* flumotion/component/http/http.py:
@@ -29163,7 +29163,7 @@
 	  component now logs in with same options as the worker it got
 	  started from
 
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/wizard.py: Add very simple unittest for wizard
 	and its steps
@@ -29177,7 +29177,7 @@
 	Make it possible to go back to major steps. Fixes quite a few bugs.
 	Beginning of cleanup for the WizardStep API.
 	
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_overlay.glade:
 	* flumotion/wizard/save.py:
@@ -29237,7 +29237,7 @@
 	* flumotion/manager/component.py:
 	  some debugging
 
-2004-10-16  Johan Dahlin  <johan@gnome.org>
+2004-10-16  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard_audio_encoder.glade:
 	* data/glade/wizard_consumption.glade:
@@ -29288,7 +29288,7 @@
 	* flumotion/twisted/credentials.py:
 	  fix __implements__
 
-2004-10-16  Johan Dahlin  <johan@gnome.org>
+2004-10-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/worker.py: Clean up error
 	handling in worker brain.
@@ -29304,7 +29304,7 @@
 
 	Add an audiotest step (sinesrc)
 	
-2004-10-16  Johan Dahlin  <johan@gnome.org>
+2004-10-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/overlay/Makefile.am:
 	* flumotion/component/overlay/cc_24x24.png:
@@ -29328,7 +29328,7 @@
 	* flumotion/twisted/credentials.py:
 	  add tests and add some keycards
 
-2004-10-16  Johan Dahlin  <johan@gnome.org>
+2004-10-16  Johan Dahlin  <johan@flumotion.com>
 
 	* data/image/wizard/Makefile.am (image_DATA): Add a few more icons
 	for the wizard
@@ -29343,7 +29343,7 @@
 	* flumotion/manager/main.py (_loadConfig): Don't parse the
 	configuration twice.
 
-2004-10-15  Johan Dahlin  <johan@gnome.org>
+2004-10-15  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* data/glade/wizard.glade:
@@ -29364,7 +29364,7 @@
 
 	Wizard work, commit some icons.
 	
-2004-10-15  Johan Dahlin  <johan@gnome.org>
+2004-10-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/: Add a few new unittests.
 
@@ -29394,7 +29394,7 @@
 	* doc/random/header.py:
 	  reworded header after call with the lawyer
 
-2004-10-15  Johan Dahlin  <johan@gnome.org>
+2004-10-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/Makefile.am: Add more unittests
 
@@ -29413,7 +29413,7 @@
 	* flumotion/twisted/reflect.py:
 	  add missing files
 
-2004-10-15  Johan Dahlin  <johan@gnome.org>
+2004-10-15  Johan Dahlin  <johan@flumotion.com>
 
 	* conf/minimal.xml:
 	* conf/videotest-jpeg.xml:
@@ -29529,7 +29529,7 @@
 	  add an avatarId request to pb.client and portal so pb.client
 	  can request a specific avatarId when logging in
 
-2004-10-14  Johan Dahlin  <johan@gnome.org>
+2004-10-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_http.py: Fix rest regressions.
 
@@ -29541,7 +29541,7 @@
 
 	Kill auth, replaced by bouncer.
 	
-2004-10-14  Johan Dahlin  <johan@gnome.org>
+2004-10-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/http/Makefile.am:
@@ -29569,7 +29569,7 @@
 	* flumotion/test/Makefile.am:
 	  fix test
 
-2004-10-14  Johan Dahlin  <johan@gnome.org>
+2004-10-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/videotest/videotest.py:
@@ -29656,7 +29656,7 @@
 	* flumotion/wizard/wizard.py:
 	  put all configure-time stuff in flumotion.configure package
 
-2004-10-13  Johan Dahlin  <johan@gnome.org>
+2004-10-13  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am (test): New target
 
@@ -29715,7 +29715,7 @@
 	* flumotion/worker/worker.py:
 	  implement SSL option (-t on worker and manager)
 
-2004-10-13  Johan Dahlin  <johan@gnome.org>
+2004-10-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/Makefile.am: Add setup.py
 
@@ -29748,7 +29748,7 @@
 	components.
 	We can now actually parse the default output of the wizard.
 	
-2004-10-12  Johan Dahlin  <johan@gnome.org>
+2004-10-12  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac:
 	* flumotion/component/encoders/Makefile.am:
@@ -29761,7 +29761,7 @@
 
 	And audio encoders.
 	
-2004-10-12  Johan Dahlin  <johan@gnome.org>
+2004-10-12  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/Makefile.am:
 	* flumotion/component/encoders/Makefile.am:
@@ -29775,7 +29775,7 @@
 
 	Add video encoders.
 	
-2004-10-12  Johan Dahlin  <johan@gnome.org>
+2004-10-12  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion-admin.in:
 	* flumotion/admin/gtk/client.py:
@@ -29833,7 +29833,7 @@
 	* flumotion/test/test_manager.py:
 	  uniformize, privatize, rewrite, remove, restructure
 
-2004-10-12  Johan Dahlin  <johan@gnome.org>
+2004-10-12  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/http/http.py:
 	Allow grids without a bouncer. Refactor stuff a little bit. Show 
@@ -29876,7 +29876,7 @@
 	* flumotion/test/test_http.py:
 	  make keycards module.  bouncer now works.
 
-2004-10-11  Johan Dahlin  <johan@gnome.org>
+2004-10-11  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
 	* bin/flumotion-admin.in:
@@ -29941,7 +29941,7 @@
 	* flumotion/config/uninstalled.py.in:
 	  add version number
 
-2004-10-07  Johan Dahlin  <johan@gnome.org>
+2004-10-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/http/http.py
 	(HTTPStreamingResource._render): Fix HEAD and PROPFIND for
@@ -29991,7 +29991,7 @@
 	  split out FeedComponent from BaseComponent in preparation for
 	  other types of component
 
-2004-10-05  Johan Dahlin  <johan@gnome.org>
+2004-10-05  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard.glade:
 	* flumotion/test/Makefile.am:
@@ -30139,7 +30139,7 @@
 	* flumotion/worker/worker.py:
 	  rename some objects, restructure main()
 
-2004-09-30  Johan Dahlin  <johan@gnome.org>
+2004-09-30  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
 	* data/glade/wizard.glade:
@@ -30167,7 +30167,7 @@
 	place and pretty functional. No configuration saving yet. Need a
 	little bit more logic aswell.
 
-2004-09-28  Johan Dahlin  <johan@gnome.org>
+2004-09-28  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/wizard.glade:
 	* data/glade/wizard_audiosource.glade:
@@ -30353,7 +30353,7 @@
 	* flumotion/manager/manager.py:
 	  commenting some more, privatize a function
 
-2004-09-17  Johan Dahlin  <johan@gnome.org>
+2004-09-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/config.py:
 	* flumotion/common/registry.py:
@@ -30367,7 +30367,7 @@
 	common/config. Write test suite for test_config and fix a couple
 	of bugs meanwhile.
 	
-2004-09-17  Johan Dahlin  <johan@gnome.org>
+2004-09-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/http/http.py: Implement admin-password,
 	fixes Ticket #10 
@@ -30400,7 +30400,7 @@
 	  provide a decent set of options to influence behaviour of static
 	  http clients
 
-2004-09-16  Johan Dahlin  <johan@gnome.org>
+2004-09-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/config.py: 
 	Add basic support for <workers> and <worker> and worker on component
@@ -30418,7 +30418,7 @@
 	cred.FlexibleCredentials, for which we can turn on/off anonymous
 	access whenever we want.
 	
-2004-09-16  Johan Dahlin  <johan@gnome.org>
+2004-09-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/job.py:
 	* flumotion/worker/report.py:
@@ -30459,7 +30459,7 @@
 	* flumotion/tester/httpclient.py:
 	  add tester classes and application, also needs cleanup
 
-2004-09-15  Johan Dahlin  <johan@gnome.org>
+2004-09-15  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/runtest.in: make it a little bit smarter
 
@@ -30492,7 +30492,7 @@
 	* flumotion/manager/component.py:
 	  make http statistics work.  Needs more cleanup and discussion.
 
-2004-09-15  Johan Dahlin  <johan@gnome.org>
+2004-09-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/worker/job.py:
 	* flumotion/worker/launcher.py:
@@ -30519,7 +30519,7 @@
 	* flumotion/test/test_bundle.py:
 	  rework bundle to also have unbundler
 
-2004-09-14  Johan Dahlin  <johan@gnome.org>
+2004-09-14  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/runtest.in (olddir): script to run tests
 
@@ -30538,7 +30538,7 @@
 	* data/glade/http.glade:
 	  add UI for http component
 
-2004-09-14  Johan Dahlin  <johan@gnome.org>
+2004-09-14  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/: Move testsuite over here and use trial.
 
@@ -30561,7 +30561,7 @@
 	* flumotion/utils/log.py (addLogHandler): Doc fix, add pedantic
 	assertion.
 
-2004-09-13  Johan Dahlin  <johan@gnome.org>
+2004-09-13  Johan Dahlin  <johan@flumotion.com>
 
 	* conf/minmal.xml: add a minimal configuration for testing purposes.
 
@@ -30572,7 +30572,7 @@
 	* testsuite/tests/log.py:
 	  add tests for logging
 
-2004-09-13  Johan Dahlin  <johan@gnome.org>
+2004-09-13  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/bundle.py:
 	* flumotion/component/component.py:
@@ -30612,7 +30612,7 @@
 	* flumotion/manager/admin.py:
 	  change componentmanager to c-heaven
 
-2004-09-10  Johan Dahlin  <johan@gnome.org>
+2004-09-10  Johan Dahlin  <johan@flumotion.com>
 
 	* doc/reference/Makefile.am:
 	* flumotion/common/launcher.py:
@@ -30667,7 +30667,7 @@
 	  abstract tie between model and view further.
 	  add a reload of only one component to speed up debugging.
 
-2004-09-09  Johan Dahlin  <johan@gnome.org>
+2004-09-09  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/Makefile.am:
 	* bin/flumotion-admin.in:
@@ -30782,7 +30782,7 @@
 	* flumotion/manager/registry.py:
 	  change to components.xml
 
-2004-09-08  Johan Dahlin  <johan@gnome.org>
+2004-09-08  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/manager/admin.py (AdminHeaven): 
 	* flumotion/manager/component.py (ComponentHeaven): Implement
@@ -30798,7 +30798,7 @@
 	* testsuite/runtests.py:
 	  first stab at making make distcheck work again
 
-2004-09-08  Johan Dahlin  <johan@gnome.org>
+2004-09-08  Johan Dahlin  <johan@flumotion.com>
 
 	* tests/manager.py: update tests.
 
@@ -30893,7 +30893,7 @@
 	  remove proctitle
 	  add a clean-local rule everywhere for .pyc and .pyo
 
-2004-09-08  Johan Dahlin  <johan@gnome.org>
+2004-09-08  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/manager/launcher.py (Launcher.launch_component): Clean
 	up here aswell, so we have a better idea what needs to be sent
@@ -31104,7 +31104,7 @@
 	* flumotion/utils/__init__.py:
 	  properly stack reload calls one after another
 
-2004-09-07  Johan Dahlin  <johan@gnome.org>
+2004-09-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/components/http/http.py:
 	* flumotion/gui/adminclient.py:
@@ -31120,7 +31120,7 @@
 	* flumotion/utils/log.py:
 	  add timestamp similar to syslog
 
-2004-09-06  Johan Dahlin  <johan@gnome.org>
+2004-09-06  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/components/http/http.py:
 	* flumotion/components/http/http_gui.py:
@@ -31132,7 +31132,7 @@
 
 	Add notifications to administrative interface, improve http view slightly
 
-2004-09-06  Johan Dahlin  <johan@gnome.org>
+2004-09-06  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/launcher.py (Launcher): Enable core dumps by
 	default and cleanup logging.
@@ -31174,7 +31174,7 @@
 	* flumotion/gui/adminclient.py:
 	  properly handle error dialog.
 
-2004-09-03  Johan Dahlin  <johan@gnome.org>
+2004-09-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/components/http/http.py
 	(HTTPStreamingAdminResource.render_stats): Start cleaning up the
@@ -31204,14 +31204,14 @@
 	* flumotion/gui/admininterface.py:
 	  fix callbacks for reload
 
-2004-09-03  Johan Dahlin  <johan@gnome.org>
+2004-09-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/gui/adminclient.py: Add an green icon for playing and
 	a red one otherwise.
 
 	* flumotion/server/controller.py: Make user interface work again
 
-2004-09-02  Johan Dahlin  <johan@gnome.org>
+2004-09-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/gui/admininterface.py (AdminInterface): Use debugging
 	framework instead of prints
@@ -31288,7 +31288,7 @@
 	* flumotion/twisted/errors.py:
 	  add ReloadSyntaxError
 
-2004-09-01  Johan Dahlin  <johan@gnome.org>
+2004-09-01  Johan Dahlin  <johan@flumotion.com>
 
 	* data/registry/basecomponents.xml:
 	* flumotion/components/http/http.py:
@@ -31327,7 +31327,7 @@
 	  better error messages for properties.
 	  allow setting of strings.
 
-2004-08-31  Johan Dahlin  <johan@gnome.org>
+2004-08-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/registry.py (ComponentRegistry): Implement
 	saving and merging
@@ -31352,7 +31352,7 @@
 	  instead of length of backtrace.  Issue filed in twisted as
 	  http://www.twistedmatrix.com/users/roundup.twistd/twisted/issue698
 
-2004-08-31  Johan Dahlin  <johan@gnome.org>
+2004-08-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/interfaces.py (IAdminComponent): Add a new interface
 
@@ -31380,7 +31380,7 @@
 	* flumotion/utils/log.py:
 	  fix functions for debug and log, duh.
 
-2004-08-30  Johan Dahlin  <johan@gnome.org>
+2004-08-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/interfaces.py (IBaseComponent):
 	* flumotion/server/controller.py (Dispatcher.requestAvatar): 
@@ -31407,7 +31407,7 @@
 	* flumotion/server/controller.py:
 	  lots of documenting
 
-2004-08-27  Johan Dahlin  <johan@gnome.org>
+2004-08-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/controller.py (__all__): Don't export private
 	classes.
@@ -31449,7 +31449,7 @@
 	* flumotion/server/launcher.py:
 	  subclass Loggable where-ever
 
-2004-08-18  Johan Dahlin  <johan@gnome.org>
+2004-08-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/components/file.py (FileSinkStreamer.__init__):
 	Implement changing of filename
@@ -31466,7 +31466,7 @@
 	* flumotion/server/component.py:
 	  add all handlers
 
-2004-08-17  Johan Dahlin  <johan@gnome.org>
+2004-08-17  Johan Dahlin  <johan@flumotion.com>
 
 	* tests/test_component_parse.py (PipelineTest.__init__): Call
 	__gobject_init__ to avoid segfault.
@@ -31492,7 +31492,7 @@
 	* misc/flu.modules:
 	  add jhbuild modules file
 
-2004-08-17  Johan Dahlin  <johan@gnome.org>
+2004-08-17  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/component.py (ComponentView): New class with
 	twisted specific interfaces
@@ -31534,7 +31534,7 @@
 	* doc/Makefile.am:
 	  only rebuild docs when source module files change
 
-2004-08-12  Johan Dahlin  <johan@gnome.org>
+2004-08-12  Johan Dahlin  <johan@flumotion.com>
 
 	* tests/test_component_parse.py: import common
 	* tests/test_http.py: New test
@@ -31560,7 +31560,7 @@
 	* flumotion/utils/log.py:
 	  make logging similar to GStreamer's
 
-2004-08-11  Johan Dahlin  <johan@gnome.org>
+2004-08-11  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/config.py (FlumotionConfigXML.parseProperties):
 	Add support for float values
@@ -31646,7 +31646,7 @@
 	* flumotion/admin/spyglass.py:
 	  fix header
 
-2004-08-09  Johan Dahlin  <johan@gnome.org>
+2004-08-09  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion.in: Call threads_init here, to avoid strange crashes.
 
@@ -31657,7 +31657,7 @@
 	* flumotion/Makefile.am:
 	  fix build
 
-2004-08-05  Johan Dahlin  <johan@gnome.org>
+2004-08-05  Johan Dahlin  <johan@flumotion.com>
 
 	* conf/*.conf: Move to conf/historic
 
@@ -31707,7 +31707,7 @@
 	  add to epydoc to please myself.
 	  add test for config to please Johan.
 
-2004-08-03  Johan Dahlin  <johan@gnome.org>
+2004-08-03  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion.in: 
 	* configure.ac (PYGTK_REQ): Require PyGTK 2.3.96
@@ -31727,7 +31727,7 @@
 	* ui/videotest.glade:
 	  adding glade files for UI components
 
-2004-08-02  Johan Dahlin  <johan@gnome.org>
+2004-08-02  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac: Require Python 2.3
 
@@ -31740,7 +31740,7 @@
 
 	* flumotion/components/file.py: Move out file streamer here.
 
-2004-07-30  Johan Dahlin  <johan@gnome.org>
+2004-07-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/config.py: More cleaning up, work in progress
 
@@ -31767,7 +31767,7 @@
 	* conf/videotest-jpeg.xml: xml version of videotest-jpeg.conf,
 	unused so far
 
-2004-07-27  Johan Dahlin  <johan@gnome.org>
+2004-07-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/streamer.py (HTTPStreamingResource.setHeader):
 	Rewrite most part of the HTTP server, handles simple
@@ -31776,13 +31776,13 @@
 
 	* conf/videotest-jpeg.conf: Overlay an image.
 
-2004-07-23  Johan Dahlin  <johan@gnome.org>
+2004-07-23  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/controller.py (Dispatcher.requestAvatar): Clean
 	up, clean up imports as well
 	* flumotion/server/*: Futher logging cleanups
 
-2004-07-22  Johan Dahlin  <johan@gnome.org>
+2004-07-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/component.py (ParseLaunchComponent): Refactor stuff
 
@@ -31794,23 +31794,23 @@
 	* flumotion/server/launcher.py (Launcher.load_config): Clean up
 	* flumotion/server/*: Clean up logging
 
-2004-07-21  Johan Dahlin  <johan@gnome.org>
+2004-07-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/config.py: Move out
 	stuff from launcher.py to here, to prepare for further user interface changes
 
-2004-07-16  Johan Dahlin  <johan@gnome.org>
+2004-07-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/controller.py: Clean up a little bit and add
 	some documentation
 
 	* tests: Add some basic tests for the controller class
 
-2004-06-28  Johan Dahlin  <johan@gnome.org>
+2004-06-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/*: Add support for changing properties
 
-2004-06-27  Johan Dahlin  <johan@gnome.org>
+2004-06-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/launcher.py (main): Add support for setuid to a
 	username and renice.
@@ -31819,7 +31819,7 @@
 
 	* conf/sine-disc.conf (sine): Add nice for testing
 
-2004-06-26  Johan Dahlin  <johan@gnome.org>
+2004-06-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/controller.py (FeedManager.feedReady): Add
 	silly FIXME
@@ -31831,7 +31831,7 @@
 
 	* flumotion/gui/adminclient.py (Window.update): Clean up
 
-2004-06-25  Johan Dahlin  <johan@gnome.org>
+2004-06-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/streamer.py: New streamers and stuff
 
@@ -31844,7 +31844,7 @@
 
 	* data/ui/admin.glade: Remove textview for now
 
-2004-06-24  Johan Dahlin  <johan@gnome.org>
+2004-06-24  Johan Dahlin  <johan@flumotion.com>
 
 	* conf/complex.conf: New configuration, in preparation
 	for guadec.
@@ -31867,7 +31867,7 @@
 	* flumotion/utils/gstutils.py (is_port_free): Don't print socket
 	errors which makes us all very nervous. 
 
-2004-06-22  Johan Dahlin  <johan@gnome.org>
+2004-06-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Log the
 	component name aswell
@@ -31877,7 +31877,7 @@
 	* flumotion/server/*: Cleanup callbacks, always prefix twisted
 	callbacks with cb_.
 	
-2004-06-20  Johan Dahlin  <johan@gnome.org>
+2004-06-20  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Filter out
 	active notifies and empty caps. Thomas will probably kill me for
@@ -31902,7 +31902,7 @@
 
 	* m4/as-python.m4 (else): Add AM_CHECK_PYTHON_HEADERS macro.
 
-2004-06-18  Johan Dahlin  <johan@gnome.org>
+2004-06-18  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/controller.py (Controller.isLocalComponent):
 	Don't call getListenHost, since it needs to be working for
@@ -31918,7 +31918,7 @@
 	run all configuration files quite well so assuming it works for
 	now.
 	
-2004-06-17  Johan Dahlin  <johan@gnome.org>
+2004-06-17  Johan Dahlin  <johan@flumotion.com>
 
 	* bin/flumotion.in (dir): Remove silly require.
 
@@ -31934,14 +31934,14 @@
 
 	* flumotion.spec.in: update
 
-2004-06-15  Johan Dahlin  <johan@gnome.org>
+2004-06-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/server/launcher.py (main): Merge in all command line
 	parsing from other files in here. Improve logging.
 
 	* flumotion/errors.py: Move OptionError here
 
-2004-06-11  Johan Dahlin  <johan@gnome.org>
+2004-06-11  Johan Dahlin  <johan@flumotion.com>
 
 	* configure.ac (PYGTK_REQ): Require 2.0.0.
 	Add gst-python dependency
