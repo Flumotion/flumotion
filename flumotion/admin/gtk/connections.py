@@ -37,7 +37,7 @@ def format_timestamp(stamp):
     return stamp.strftime('%x')
 
 class Connections(GladeWidget):
-    glade_file = 'connections.glade'
+    gladeFile = 'connections.glade'
 
     gsignal('have-connection', bool)
     gsignal('connection-activated', object)
@@ -107,7 +107,7 @@ gobject.type_register(Connections)
 
 
 class ConnectionsDialog(GladeWindow):
-    glade_file = 'connection-dialog.glade'
+    gladeFile = 'connection-dialog.glade'
 
     gsignal('have-connection', object)
 
@@ -128,7 +128,7 @@ gobject.type_register(ConnectionsDialog)
 
 
 class OpenConnection(GladeWidget):
-    glade_file = 'open-connection.glade'
+    gladeFile = 'open-connection.glade'
 
     gproperty(bool, 'can-activate', 'If the state of the widget is complete',
               False)
@@ -170,7 +170,7 @@ gobject.type_register(OpenConnection)
 
 
 class Authenticate(GladeWidget):
-    glade_file = 'authenticate.glade'
+    gladeFile = 'authenticate.glade'
 
     gproperty(bool, 'can-activate', 'If the state of the widget is complete',
               False)

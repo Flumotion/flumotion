@@ -65,7 +65,7 @@ class Overlay(VideoConverter):
 
 class OverlayStep(WorkerWizardStep):
     name = _('Overlay')
-    glade_file = 'wizard_overlay.glade'
+    gladeFile = 'wizard_overlay.glade'
     section = _('Production')
     component_type = 'overlay'
     icon = 'overlay.png'

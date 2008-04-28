@@ -55,7 +55,7 @@ class TVCardProducer(VideoProducer):
 
 class TVCardStep(VideoProducerStep):
     name = _('TV Card')
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'bttv-wizard.glade')
     component_type = 'bttv'
     icon = 'tv.png'

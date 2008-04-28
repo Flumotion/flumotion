@@ -58,7 +58,7 @@ def _fraction_from_float(number, denominator):
 
 
 class WelcomeStep(WizardStep):
-    glade_file = 'wizard_welcome.glade'
+    gladeFile = 'wizard_welcome.glade'
     name = _('Welcome')
     section = _('Welcome')
     icon = 'wizard.png'
@@ -69,7 +69,7 @@ class WelcomeStep(WizardStep):
 
 class LicenseStep(WizardStep):
     name = _("Content License")
-    glade_file = "wizard_license.glade"
+    gladeFile = "wizard_license.glade"
     section = _('License')
     icon = 'licenses.png'
 
@@ -102,9 +102,9 @@ class LicenseStep(WizardStep):
 class SummaryStep(WizardStep):
     name = _("Summary")
     section = _("Summary")
-    glade_file = "wizard_summary.glade"
+    gladeFile = "wizard_summary.glade"
     icon = 'summary.png'
-    last_step = True
+    lastStep = True
 
     # WizardStep
 
@@ -527,7 +527,7 @@ class ConfigurationWizard(SectionWizard):
         if worker:
             self.clear_msg('worker-error')
             self._lastWorker = worker
-            step = self._current_step
+            step = self._currentStep
             if step and isinstance(step, WorkerWizardStep):
                 self._setupWorker(step, worker)
                 self.debug('calling %r.workerChanged' % step)

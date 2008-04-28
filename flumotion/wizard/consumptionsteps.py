@@ -36,7 +36,7 @@ _ = gettext.gettext
 
 class ConsumptionStep(WizardStep):
     name = _('Consumption')
-    glade_file = 'wizard_consumption.glade'
+    gladeFile = 'wizard_consumption.glade'
     section = _('Consumption')
     icon = 'consumption.png'
 

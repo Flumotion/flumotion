@@ -43,7 +43,7 @@ class TestAudioProducer(AudioProducer):
 
 class TestAudioProducerStep(AudioProducerStep):
     name = _('Test Audio Producer')
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'audiotest-wizard.glade')
     icon = 'soundcard.png'
 

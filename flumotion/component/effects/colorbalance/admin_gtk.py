@@ -31,7 +31,7 @@ __version__ = "$Rev$"
 class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'colorbalance'
 
-    glade_file = 'flumotion/component/effects/colorbalance/colorbalance.glade'
+    gladeFile = 'flumotion/component/effects/colorbalance/colorbalance.glade'
 
     # FIXME: the scale and the spinbutton should just be using the same
     # adjustment

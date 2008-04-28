@@ -91,7 +91,7 @@ class _WalkableStack(object):
 
 
 class WizardStep(GladeWidget, log.Loggable):
-    glade_typedict = ProxyWidgetMapping()
+    gladeTypedict = ProxyWidgetMapping()
 
     # set by subclasses
     name = None
@@ -99,7 +99,7 @@ class WizardStep(GladeWidget, log.Loggable):
     icon = 'placeholder.png'
 
     # optional
-    sidebar_name = None
+    sidebarName = None
 
     def __init__(self, wizard):
         """
@@ -111,8 +111,8 @@ class WizardStep(GladeWidget, log.Loggable):
 
         GladeWidget.__init__(self)
         self.set_name(self.name)
-        if not self.sidebar_name:
-            self.sidebar_name = self.name
+        if not self.sidebarName:
+            self.sidebarName = self.name
         self.setup()
 
     def __repr__(self):
@@ -146,7 +146,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     logCategory = 'wizard'
 
-    glade_file = 'wizard.glade'
+    gladeFile = 'wizard.glade'
 
     sections = None
 
@@ -156,10 +156,10 @@ class SectionWizard(GladeWindow, log.Loggable):
                     self, 'sections'))
 
         self._steps = {}
-        self._current_section = 0
+        self._currentSection = 0
         self._stack = _WalkableStack()
-        self._current_step = None
-        self._use_main = True
+        self._currentStep = None
+        self._useMain = True
 
         GladeWindow.__init__(self, parent_window)
         for k, v in self.widgets.items():
@@ -172,7 +172,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
 
-        self._current_step = self.getFirstStep()
+        self._currentStep = self.getFirstStep()
 
     def __nonzero__(self):
         return True
@@ -232,9 +232,9 @@ class SectionWizard(GladeWindow, log.Loggable):
             self.button_next.show()
 
     def run(self, interactive, main=True):
-        self._use_main = main
-        section_class = self.sections[self._current_section]
-        section = section_class(self)
+        self._useMain = main
+        sectionClass = self.sections[self._currentSection]
+        section = sectionClass(self)
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
         self._setStep(section)
@@ -247,7 +247,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.window.present()
         self.window.grab_focus()
 
-        if not self._use_main:
+        if not self._useMain:
             return
 
         try:
@@ -256,18 +256,18 @@ class SectionWizard(GladeWindow, log.Loggable):
             pass
 
     def _getNextStep(self):
-        if self._current_section + 1 == len(self.sections):
+        if self._currentSection + 1 == len(self.sections):
             self._finish(completed=True)
             return
 
-        self._current_section += 1
-        next_step_class = self.sections[self._current_section]
-        return next_step_class(self)
+        self._currentSection += 1
+        nextStepClass = self.sections[self._currentSection]
+        return nextStepClass(self)
 
     def prepareNextStep(self, step):
         next = step.getNext()
         if isinstance(next, WizardStep):
-            next_step = next
+            nextStep = next
         elif isinstance(next, Deferred):
             d = next
             def getStep(step):
@@ -279,24 +279,24 @@ class SectionWizard(GladeWindow, log.Loggable):
             d.addCallback(getStep)
             return
         elif next is None:
-            next_step = self._getNextStep()
-            if next_step is None:
+            nextStep = self._getNextStep()
+            if nextStep is None:
                 return
         else:
             raise AssertionError(next)
 
-        self._showNextStep(next_step)
+        self._showNextStep(nextStep)
 
     # Private
 
-    def _updateButtons(self, has_next):
+    def _updateButtons(self, hasNext):
         # update the forward and next buttons
-        # has_next: whether or not there is a next step
+        # hasNext: whether or not there is a next step
         can_go_back = self._stack.pos != 0
         self.button_prev.set_sensitive(can_go_back)
 
         # XXX: Use the current step, not the one on the top of the stack
-        if has_next:
+        if hasNext:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
             # use APPLY, just like in gnomemeeting
@@ -323,7 +323,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         if completed:
             self.completed()
 
-        if self._use_main:
+        if self._useMain:
             try:
                 gtk.main_quit()
             except RuntimeError:
@@ -339,24 +339,24 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         if not step.visited:
             self.sidebar.push(step.section, step.name,
-                              step.sidebar_name)
+                              step.sidebarName)
         else:
             self.sidebar.show_step(step.section)
 
         step.visited = True
         self._setStep(step)
 
-        has_next = not hasattr(step, 'last_step')
-        self._updateButtons(has_next)
+        hasNext = not hasattr(step, 'lastStep')
+        self._updateButtons(hasNext)
 
     def _setStep(self, step):
-        self._current_step = step
+        self._currentStep = step
 
         self._packStep(step)
         self._setStepIcon(step.icon)
         self._setStepTitle(step.name)
 
-        self._updateButtons(has_next=True)
+        self._updateButtons(hasNext=True)
         self.blockNext(False)
 
         self.beforeShowStep(step)
@@ -369,27 +369,27 @@ class SectionWizard(GladeWindow, log.Loggable):
         step = self.getStep(name)
         # If we're jumping to the same step don't do anything to
         # avoid unnecessary ui flashes
-        if step == self._current_step:
+        if step == self._currentStep:
             return
         self._stack.skipTo(lambda x: x.name == name)
         step = self._stack.current()
         self.sidebar.show_step(step.section)
-        self._current_section = self._getSectionByName(step.section)
+        self._currentSection = self._getSectionByName(step.section)
         self._setStep(step)
 
     def _showPreviousStep(self):
         step = self._stack.back()
-        self._current_section = self._getSectionByName(step.section)
+        self._currentSection = self._getSectionByName(step.section)
         self._setStep(step)
-        self._updateButtons(has_next=True)
+        self._updateButtons(hasNext=True)
         self.sidebar.show_step(step.section)
-        has_next = not hasattr(step, 'last_step')
-        self._updateButtons(has_next)
+        hasNext = not hasattr(step, 'lastStep')
+        self._updateButtons(hasNext)
 
     def _getSectionByName(self, section_name):
-        for section_class in self.sections:
-            if section_class.section == section_name:
-                return self.sections.index(section_class)
+        for sectionClass in self.sections:
+            if sectionClass.section == section_name:
+                return self.sections.index(sectionClass)
 
     # Callbacks
 
@@ -407,13 +407,13 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.emit('destroy')
 
     def on_window_delete_event(self, wizard, event):
-        self._finish(self._use_main, completed=False)
+        self._finish(self._useMain, completed=False)
 
     def on_button_prev_clicked(self, button):
         self._showPreviousStep()
 
     def on_button_next_clicked(self, button):
-        self.prepareNextStep(self._current_step)
+        self.prepareNextStep(self._currentStep)
 
     def on_sidebar_step_chosen(self, sidebar, name):
         self._jumpToStep(name)

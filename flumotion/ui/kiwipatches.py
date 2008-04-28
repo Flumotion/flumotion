@@ -31,12 +31,12 @@ __version__ = "$Rev$"
 
 
 # Kiwi monkey patch, allows us to specify a
-# glade_typedict on the View.
+# gladeTypedict on the View.
 class FluLibgladeWidgetTree(glade.XML):
     def __init__(self, view, gladefile, domain=None):
         self._view = view
         glade.XML.__init__(self, gladefile, domain,
-                           typedict=view.glade_typedict or {})
+                           typedict=view.gladeTypedict or {})
 
         for widget in self.get_widget_prefix(''):
             setattr(self._view, widget.get_name(), widget)

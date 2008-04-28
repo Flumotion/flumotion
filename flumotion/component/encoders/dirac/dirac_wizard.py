@@ -42,8 +42,8 @@ class DiracVideoEncoder(VideoEncoder):
 
 class DiracStep(VideoEncoderStep):
     name = _('Dirac encoder')
-    sidebar_name = _('Dirac')
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    sidebarName = _('Dirac')
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'dirac-wizard.glade')
     component_type = 'dirac'
     icon = 'xiphfish.png'

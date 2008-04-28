@@ -47,7 +47,7 @@ class SpeexAudioEncoder(AudioEncoder):
 
 class SpeexStep(AudioEncoderStep):
     name = _('Speex encoder')
-    sidebar_name = _('Speex')
+    sidebarName = _('Speex')
     component_type = 'speex'
     icon = 'xiphfish.png'
 

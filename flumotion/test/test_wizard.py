@@ -48,7 +48,7 @@ class WizardStepTest(testsuite.TestCase):
             self.assert_(isinstance(s, WizardStep))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'icon'))
-            self.assert_(hasattr(s, 'glade_file'))
+            self.assert_(hasattr(s, 'gladeFile'))
             self.assert_(hasattr(s, 'name'))
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))

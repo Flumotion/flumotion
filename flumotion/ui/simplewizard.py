@@ -96,14 +96,14 @@ class WizardStep(GladeWidget, log.Loggable):
     wizard = None # set by wizard
     logCategory = "wizardstep"
 
-    def __init__(self, wizard, glade_prefix=''):
+    def __init__(self, wizard, gladePrefix=''):
         """
         @type  wizard:       L{Wizard}
-        @type  glade_prefix: str
-        @param glade_prefix: prefix used for glade files for the step
+        @type  gladePrefix: str
+        @param gladePrefix: prefix used for glade files for the step
         """
         self.wizard = wizard
-        self.glade_file = glade_prefix + self.name + '.glade'
+        self.gladeFile = gladePrefix + self.name + '.glade'
         GladeWidget.__init__(self)
 
     def is_available(self):
@@ -131,7 +131,7 @@ class SimpleWizard(GladeWindow):
 
     # private
     # well really, if they're private, why not prefix them with _
-    glade_file = 'admin-wizard.glade'
+    gladeFile = 'admin-wizard.glade'
 
     gsignal('finished')
 

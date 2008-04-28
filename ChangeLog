@@ -1,5 +1,57 @@
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/component/effects/colorbalance/admin_gtk.py:
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/component/encoders/dirac/dirac_wizard.py:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/mulaw/mulaw_wizard.py:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/looper/admin_gtk.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/test/test_wizard.py:
+	* flumotion/ui/glade.py:
+	* flumotion/ui/kiwipatches.py:
+	* flumotion/ui/simplewizard.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	More camelCase renaming:
+	  * _use_main -> _useMain
+	  * current_section -> currentSection
+	  * current_step -> currentStep
+	  * gettext_domain -> gettextDomain
+	  * glade_file -> gladeFile
+	  * glade_typedict -> gladeTypedict
+	  * has_next -> hasNext
+	  * last_step -> lastStep
+	  * next_step -> nextStep
+	  * nexstep_class -> nextStepClass
+	  * section_class -> sectionClass
+	  * sidebar_name -> sidebarName
+
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/xmlwriter.py:
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/configurationwriter.py:

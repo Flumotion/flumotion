@@ -56,7 +56,7 @@ class BaseAdminGtk(log.Loggable):
     """
 
     logCategory = "admingtk"
-    gettext_domain = None
+    gettextDomain = None
 
     def __init__(self, state, admin):
         """
@@ -116,22 +116,22 @@ class BaseAdminGtk(log.Loggable):
         self.debug('BaseAdminGtk.setup()')
 
         def fetchTranslations():
-            if not self.gettext_domain:
+            if not self.gettextDomain:
                 return defer.succeed(None)
 
             def haveBundle(localedatadir):
                 localeDir = os.path.join(localedatadir, 'locale')
                 self.debug("Loading locales for %s from %s" % (
-                    self.gettext_domain, localeDir))
+                    self.gettextDomain, localeDir))
                 # import done here due to defgen scoping issues
                 import gettext
-                gettext.bindtextdomain(self.gettext_domain, localeDir)
-                gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
+                gettext.bindtextdomain(self.gettextDomain, localeDir)
+                gtk.glade.bindtextdomain(self.gettextDomain, localeDir)
 
 
             lang = common.getLL()
             self.debug("loading bundle for %s locales" % lang)
-            bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
+            bundleName = '%s-locale-%s' % (self.gettextDomain, lang)
             d = self.admin.bundleLoader.getBundleByName(bundleName)
             d.addCallbacks(haveBundle, lambda _: None)
             return d
@@ -200,9 +200,9 @@ class BaseAdminGtkNode(log.Loggable):
     implements(flavors.IStateListener)
 
     logCategory = "admingtk"
-    glade_file = None ## Relative path of the glade file.
+    gladeFile = None ## Relative path of the glade file.
                       ##   e.g. "flumotion/ui.glade"
-    gettext_domain = 'flumotion'
+    gettextDomain = 'flumotion'
 
     def __init__(self, state, admin, title=None):
         """
@@ -388,7 +388,7 @@ class BaseAdminGtkNode(log.Loggable):
             return label
 
         def loadGladeFile():
-            if not self.glade_file:
+            if not self.gladeFile:
                 return defer.succeed(None)
 
             def haveWtree(wtree):
@@ -400,19 +400,19 @@ class BaseAdminGtkNode(log.Loggable):
                     return error(log.getExceptionMessage(e))
 
             self.debug('render: loading glade file %s in text domain %s',
-                       self.glade_file, self.gettext_domain)
+                       self.gladeFile, self.gettextDomain)
 
-            d = self.loadGladeFile(self.glade_file, self.gettext_domain)
+            d = self.loadGladeFile(self.gladeFile, self.gettextDomain)
             d.addCallback(haveWtree)
             return d
 
         def loadGladeFileErrback(failure):
             if failure.check(RuntimeError):
                 return error(
-                    'Could not load glade file %s.' % self.glade_file)
+                    'Could not load glade file %s.' % self.gladeFile)
             if failure.check(errors.NoBundleError):
                 return error(
-                    'No bundle found containing %s.' % self.glade_file)
+                    'No bundle found containing %s.' % self.gladeFile)
 
             return failure
 
@@ -514,7 +514,7 @@ class _StateWatcher(object):
             self.state = None
 
 class ComponentAdminGtkNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'base',
+    gladeFile = os.path.join('flumotion', 'component', 'base',
         'component.glade')
 
     def __init__(self, state, admin):
@@ -530,7 +530,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('main-vbox')
-        assert self.widget, "No component-widget in %s" % self.glade_file
+        assert self.widget, "No component-widget in %s" % self.gladeFile
         self.gst_mask = self.wtree.get_widget('gst_mask')
         self.gst_mask.connect('changed', self._on_gst_mask_changed)
         self.gst_label = self.wtree.get_widget('gst_label')
@@ -662,7 +662,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         pass
 
 class FeedersAdminGtkNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'base', 'feeders.glade')
+    gladeFile = os.path.join('flumotion', 'component', 'base', 'feeders.glade')
 
     def __init__(self, state, admin):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Feeders"))
@@ -886,7 +886,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         return self.widget
 
 class EatersAdminGtkNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'base', 'eaters.glade')
+    gladeFile = os.path.join('flumotion', 'component', 'base', 'eaters.glade')
 
     def __init__(self, state, admin):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Eaters"))

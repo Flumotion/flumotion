@@ -40,7 +40,7 @@ def _fraction_from_float(number, denominator):
 
 
 class ConversionStep(WorkerWizardStep):
-    glade_file = 'wizard_encoding.glade'
+    gladeFile = 'wizard_encoding.glade'
     name = _('Encoding')
     section = _('Conversion')
 

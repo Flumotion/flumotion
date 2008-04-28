@@ -42,7 +42,7 @@ class Shout2Consumer(Consumer):
 
 
 class Shout2Step(ConsumerStep):
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'shout2-wizard.glade')
 
     def __init__(self, wizard):
@@ -81,7 +81,7 @@ class Shout2Step(ConsumerStep):
 
 class Shout2BothStep(Shout2Step):
     name = _('Icecast streamer (audio & video)')
-    sidebar_name = _('Icecast audio/video')
+    sidebarName = _('Icecast audio/video')
 
     # ConsumerStep
 
@@ -91,7 +91,7 @@ class Shout2BothStep(Shout2Step):
 
 class Shout2AudioStep(Shout2Step):
     name = _('Icecast streamer (audio only)')
-    sidebar_name = _('Icecast audio')
+    sidebarName = _('Icecast audio')
 
     # ConsumerStep
 
@@ -101,7 +101,7 @@ class Shout2AudioStep(Shout2Step):
 
 class Shout2VideoStep(Shout2Step):
     name = _('Icecast streamer (video only)')
-    sidebar_name = _('Icecast video')
+    sidebarName = _('Icecast video')
 
     # ConsumerStep
 

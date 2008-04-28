@@ -71,22 +71,22 @@ class GladeBacked(GladeDelegate):
     Base class for objects backed by glade interface definitions.
     The glade file should have exactly one Window.
 
-    @ivar glade_file:     filename of glade file containing the interface
-    @type glade_file:     str
-    @ivar glade_typedict: GTK widget class name -> replacement widget class
+    @ivar gladeFile:     filename of glade file containing the interface
+    @type gladeFile:     str
+    @ivar gladeTypedict: GTK widget class name -> replacement widget class
                           see L{flumotion.ui.fgtk.ProxyWidgetMapping}
-    @type glade_typedict: dict of str -> class
+    @type gladeTypedict: dict of str -> class
     @ivar widgets:        widget name -> Widget
     @type widgets:        str -> gtk.Widget
     """
-    glade_file = None
-    glade_typedict = None
+    gladeFile = None
+    gladeTypedict = None
     toplevel_name = "window1"
 
     _window = None # the gtk.Window of the glade file
 
     def __init__(self):
-        GladeDelegate.__init__(self, gladefile=self.glade_file)
+        GladeDelegate.__init__(self, gladefile=self.gladeFile)
 
         wtree = self.get_glade_adaptor()
         wtree.signal_autoconnect(self)
@@ -106,7 +106,7 @@ class GladeWidget(gtk.VBox, GladeBacked):
 
     Example::
       class MyWidget(GladeWidget):
-          glade_file = 'my_glade_file.glade'
+          gladeFile = 'my_gladeFile.glade'
           ...
       gobject.type_register(MyWidget)
 
@@ -139,7 +139,7 @@ class GladeWindow(GladeBacked):
 
     Example::
       class MyWindow(GladeWindow):
-          glade_file = 'my_glade_file.glade'
+          gladeFile = 'my_gladeFile.glade'
           ...
 
     Remember to chain up if you customize __init__(). Also note that GladeWindow

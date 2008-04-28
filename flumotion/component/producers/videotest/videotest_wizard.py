@@ -45,7 +45,7 @@ class TestVideoProducer(VideoProducer):
 
 class TestVideoProducerStep(VideoProducerStep):
     name = _('Test Video Producer')
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'videotest-wizard.glade')
     component_type = 'videotestsrc'
     icon = 'testsource.png'

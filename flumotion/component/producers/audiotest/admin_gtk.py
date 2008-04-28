@@ -29,7 +29,7 @@ __version__ = "$Rev$"
 
 class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
     logCategory = 'audiotest'
-    glade_file = 'flumotion/component/producers/audiotest/audiotest.glade'
+    gladeFile = 'flumotion/component/producers/audiotest/audiotest.glade'
     uiStateHandlers = None
 
     def haveWidgetTree(self):

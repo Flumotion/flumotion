@@ -42,7 +42,7 @@ def clamp(x, min, max):
 
 class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'volume'
-    glade_file = os.path.join('flumotion', 'component', 'effects',
+    gladeFile = os.path.join('flumotion', 'component', 'effects',
                               'volume', 'volume.glade')
 
     uiStateHandlers = None

@@ -248,7 +248,7 @@ class HTTPStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
-    glade_file = os.path.join(
+    gladeFile = os.path.join(
         os.path.dirname(
         os.path.abspath(__file__)),
         'httpstreamer-wizard.glade')
@@ -451,7 +451,7 @@ class HTTPStep(ConsumerStep):
 
 class HTTPBothStep(HTTPStep):
     name = _('HTTP Streamer (audio & video)')
-    sidebar_name = _('HTTP audio/video')
+    sidebarName = _('HTTP audio/video')
     default_port = configure.defaultStreamPortRange[0]
 
     # ConsumerStep
@@ -462,7 +462,7 @@ class HTTPBothStep(HTTPStep):
 
 class HTTPAudioStep(HTTPStep):
     name = _('HTTP Streamer (audio only)')
-    sidebar_name = _('HTTP audio')
+    sidebarName = _('HTTP audio')
     default_port = configure.defaultStreamPortRange[1]
 
     # ConsumerStep
@@ -473,7 +473,7 @@ class HTTPAudioStep(HTTPStep):
 
 class HTTPVideoStep(HTTPStep):
     name = _('HTTP Streamer (video only)')
-    sidebar_name = _('HTTP video')
+    sidebarName = _('HTTP video')
     default_port = configure.defaultStreamPortRange[2]
 
     # ConsumerStep

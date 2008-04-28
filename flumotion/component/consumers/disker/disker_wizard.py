@@ -83,7 +83,7 @@ class Disker(Consumer):
 
 
 class DiskStep(ConsumerStep):
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'disker-wizard.glade')
     icon = 'kcmdevices.png'
 
@@ -168,7 +168,7 @@ class DiskStep(ConsumerStep):
 
 class DiskBothStep(DiskStep):
     name = _('Disk (audio & video)')
-    sidebar_name = _('Disk audio/video')
+    sidebarName = _('Disk audio/video')
 
     # ConsumerStep
 
@@ -178,7 +178,7 @@ class DiskBothStep(DiskStep):
 
 class DiskAudioStep(DiskStep):
     name = _('Disk (audio only)')
-    sidebar_name = _('Disk audio')
+    sidebarName = _('Disk audio')
 
     # ConsumerStep
 
@@ -188,7 +188,7 @@ class DiskAudioStep(DiskStep):
 
 class DiskVideoStep(DiskStep):
     name = _('Disk (video only)')
-    sidebar_name = _('Disk video')
+    sidebarName = _('Disk video')
 
     # ConsumerStep
 

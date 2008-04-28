@@ -44,7 +44,7 @@ def time_to_string(value):
 
 
 class FileInfo(GladeWidget):
-    glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'flufileinfo.glade')
     duration = 0
 
@@ -65,7 +65,7 @@ class LooperNode(BaseAdminGtkNode):
     logCategory = 'looper'
 
     uiStateHandlers = None
-    glade_file = os.path.join('flumotion', 'component', 'producers',
+    gladeFile = os.path.join('flumotion', 'component', 'producers',
                               'looper', 'looper.glade')
 
     def haveWidgetTree(self):

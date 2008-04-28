@@ -30,7 +30,7 @@ __version__ = "$Rev$"
 
 
 class FilenameNode(BaseAdminGtkNode):
-    glade_file = os.path.join('flumotion', 'component', 'consumers',
+    gladeFile = os.path.join('flumotion', 'component', 'consumers',
                               'disker', 'disker.glade')
 
     currentFilenameLabel = None
