@@ -1,3 +1,9 @@
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	Clean up thomas' "refactoring".
+
 2008-04-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_common_messages.py:

@@ -144,7 +144,7 @@ class ConversionStep(WorkerWizardStep):
     def _populate_combos(self, combos, provides=None):
         for ctype, combo in combos:
             d = self.wizard.getWizardEntries(
-                wizard_types=[ctype],
+                wizardTypes=[ctype],
                 provides=provides)
             d.addCallback(self._add_entries, ctype, combo)
             combo.prefill([('...', None)])

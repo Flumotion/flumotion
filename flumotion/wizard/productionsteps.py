@@ -161,7 +161,7 @@ class ProductionStep(WizardStep):
             ('video-producer', self.video, 'videotest-producer'),
             ('audio-producer', self.audio, 'audiotest-producer')]:
             d = self.wizard.getWizardEntries(
-                wizard_types=[ctype])
+                wizardTypes=[ctype])
             d.addCallback(got_entries, combo, default_type)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
