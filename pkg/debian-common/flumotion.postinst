@@ -22,7 +22,8 @@ if [ "$1" = configure ]; then
         adduser --system --quiet --home /var/run/flumotion \
             --shell /usr/sbin/nologin --no-create-home --group \
             --disabled-password --disabled-login \
-            --gecos "Flumotion Streaming Server" flumotion
+            --gecos "Flumotion Streaming Server" 
+            --add_extra_groups "audio" flumotion
     fi
     chown flumotion:flumotion /var/cache/flumotion
     chown flumotion:flumotion /var/run/flumotion
