@@ -448,8 +448,9 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)
 
-    def getWizardEntries(self, wizard_types=None, provides=None, accepts=None):
-        return self.callRemote('getWizardEntries', wizard_types, provides, accepts)
+    def getWizardEntries(self, wizardTypes=None, provides=None, accepts=None):
+        return self.callRemote('getWizardEntries',
+                               wizardTypes, provides, accepts)
 
     def getWorkerHeavenState(self):
         return self._workerHeavenState
