@@ -71,7 +71,7 @@ class _WalkableStack(object):
     def current(self):
         return self.l[self.pos]
 
-    def skip_to(self, key):
+    def skipTo(self, key):
         for i, item in enumerate(self.l):
             if key(item):
                 self.pos = i
@@ -120,7 +120,7 @@ class WizardStep(GladeWidget, log.Loggable):
 
     # Required vmethods
 
-    def get_next(self):
+    def getNext(self):
         """Called when the user presses next in the wizard.
         @returns: name of next step
         @rtype: L{WizardStep} instance, deferred or None.
@@ -172,7 +172,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
 
-        self._current_step = self.get_first_step()
+        self._current_step = self.getFirstStep()
 
     def __nonzero__(self):
         return True
@@ -181,7 +181,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         return len(self._steps)
 
     # Override this in subclass
-    def get_first_step(self):
+    def getFirstStep(self):
         raise NotImplementedError
 
     def completed(self):
@@ -189,7 +189,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     # Public API
 
-    def get_step(self, stepname):
+    def getStep(self, stepname):
         """Fetches a step. KeyError is raised when the step is not found.
         @param stepname: name of the step to fetch
         @type stepname: str
@@ -224,7 +224,7 @@ class SectionWizard(GladeWindow, log.Loggable):
     def add_msg(self, msg):
         self.message_area.add_message(msg)
 
-    def block_next(self, block):
+    def blockNext(self, block):
         self.button_next.set_sensitive(not block)
         # work around a gtk+ bug #56070
         if not block:
@@ -237,7 +237,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         section = section_class(self)
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
-        self._set_step(section)
+        self._setStep(section)
 
         if not interactive:
             while self.show_next():
@@ -255,7 +255,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         except KeyboardInterrupt:
             pass
 
-    def _get_next_step(self):
+    def _getNextStep(self):
         if self._current_section + 1 == len(self.sections):
             self._finish(completed=True)
             return
@@ -264,32 +264,32 @@ class SectionWizard(GladeWindow, log.Loggable):
         next_step_class = self.sections[self._current_section]
         return next_step_class(self)
 
-    def prepare_next_step(self, step):
-        next = step.get_next()
+    def prepareNextStep(self, step):
+        next = step.getNext()
         if isinstance(next, WizardStep):
             next_step = next
         elif isinstance(next, Deferred):
             d = next
-            def get_step(step):
+            def getStep(step):
                 if step is None:
-                    step = self._get_next_step()
+                    step = self._getNextStep()
                 if step is None:
                     return
-                self._show_next_step(step)
-            d.addCallback(get_step)
+                self._showNextStep(step)
+            d.addCallback(getStep)
             return
         elif next is None:
-            next_step = self._get_next_step()
+            next_step = self._getNextStep()
             if next_step is None:
                 return
         else:
             raise AssertionError(next)
 
-        self._show_next_step(next_step)
+        self._showNextStep(next_step)
 
     # Private
 
-    def _update_buttons(self, has_next):
+    def _updateButtons(self, has_next):
         # update the forward and next buttons
         # has_next: whether or not there is a next step
         can_go_back = self._stack.pos != 0
@@ -302,16 +302,16 @@ class SectionWizard(GladeWindow, log.Loggable):
             # use APPLY, just like in gnomemeeting
             self.button_next.set_label(gtk.STOCK_APPLY)
 
-    def _set_step_icon(self, icon):
+    def _setStepIcon(self, icon):
         icon_filename = os.path.join(configure.imagedir, 'wizard', icon)
         assert os.path.exists(icon_filename)
         self.image_icon.set_from_file(icon_filename)
 
-    def _set_step_title(self, title):
+    def _setStepTitle(self, title):
         self.label_title.set_markup(
             '<span size="x-large">%s</span>' % escape(title))
 
-    def _pack_step(self, step):
+    def _packStep(self, step):
         # Remove previous step
         map(self.content_area.remove, self.content_area.get_children())
         self.message_area.clear()
@@ -329,7 +329,7 @@ class SectionWizard(GladeWindow, log.Loggable):
             except RuntimeError:
                 pass
 
-    def _show_next_step(self, step):
+    def _showNextStep(self, step):
         self._steps[step.name] = step
 
         while not self._stack.push(step):
@@ -344,49 +344,49 @@ class SectionWizard(GladeWindow, log.Loggable):
             self.sidebar.show_step(step.section)
 
         step.visited = True
-        self._set_step(step)
+        self._setStep(step)
 
         has_next = not hasattr(step, 'last_step')
-        self._update_buttons(has_next)
+        self._updateButtons(has_next)
 
-    def _set_step(self, step):
+    def _setStep(self, step):
         self._current_step = step
 
-        self._pack_step(step)
-        self._set_step_icon(step.icon)
-        self._set_step_title(step.name)
+        self._packStep(step)
+        self._setStepIcon(step.icon)
+        self._setStepTitle(step.name)
 
-        self._update_buttons(has_next=True)
-        self.block_next(False)
+        self._updateButtons(has_next=True)
+        self.blockNext(False)
 
-        self.before_show_step(step)
+        self.beforeShowStep(step)
 
         self.debug('showing step %r' % step)
         step.show()
         step.activated()
 
-    def _jump_to_step(self, name):
-        step = self.get_step(name)
+    def _jumpToStep(self, name):
+        step = self.getStep(name)
         # If we're jumping to the same step don't do anything to
         # avoid unnecessary ui flashes
         if step == self._current_step:
             return
-        self._stack.skip_to(lambda x: x.name == name)
+        self._stack.skipTo(lambda x: x.name == name)
         step = self._stack.current()
         self.sidebar.show_step(step.section)
-        self._current_section = self._get_section_by_name(step.section)
-        self._set_step(step)
+        self._current_section = self._getSectionByName(step.section)
+        self._setStep(step)
 
-    def _show_previous_step(self):
+    def _showPreviousStep(self):
         step = self._stack.back()
-        self._current_section = self._get_section_by_name(step.section)
-        self._set_step(step)
-        self._update_buttons(has_next=True)
+        self._current_section = self._getSectionByName(step.section)
+        self._setStep(step)
+        self._updateButtons(has_next=True)
         self.sidebar.show_step(step.section)
         has_next = not hasattr(step, 'last_step')
-        self._update_buttons(has_next)
+        self._updateButtons(has_next)
 
-    def _get_section_by_name(self, section_name):
+    def _getSectionByName(self, section_name):
         for section_class in self.sections:
             if section_class.section == section_name:
                 return self.sections.index(section_class)
@@ -410,13 +410,13 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._finish(self._use_main, completed=False)
 
     def on_button_prev_clicked(self, button):
-        self._show_previous_step()
+        self._showPreviousStep()
 
     def on_button_next_clicked(self, button):
-        self.prepare_next_step(self._current_step)
+        self.prepareNextStep(self._current_step)
 
     def on_sidebar_step_chosen(self, sidebar, name):
-        self._jump_to_step(name)
+        self._jumpToStep(name)
 
 
 gobject.type_register(SectionWizard)

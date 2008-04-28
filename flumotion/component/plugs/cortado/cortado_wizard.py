@@ -114,8 +114,8 @@ class CortadoWizardPlugin(object):
     def __init__(self, wizard):
         self.wizard = wizard
 
-    def worker_changed(self, worker):
-        d = self.wizard.run_in_worker(
+    def workerChanged(self, worker):
+        d = self.wizard.runInWorker(
             worker,
             'flumotion.worker.checks.cortado', 'checkCortado')
         def check(found):

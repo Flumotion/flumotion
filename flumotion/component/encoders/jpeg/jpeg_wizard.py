@@ -71,9 +71,9 @@ class JPEGStep(VideoEncoderStep):
         self.add_proxy(self.model.properties,
                        ['framerate', 'quality'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'jpegenc')
+        self.wizard.requireElements(worker, 'jpegenc')
 
 
 class JPEGWizardPlugin(object):

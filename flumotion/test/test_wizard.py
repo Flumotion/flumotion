@@ -55,8 +55,8 @@ class WizardStepTest(testsuite.TestCase):
             self.assertEqual(s.name, s.get_name())
 
             if s.get_name() != 'Summary':
-                get_next_ret = s.get_next()
-                self.assert_(not get_next_ret or isinstance(get_next_ret, str))
+                getNextRet = s.getNext()
+                self.assert_(not getNextRet or isinstance(getNextRet, str))
 
     def testStepComponentProperties(self):
         for s in self.steps:

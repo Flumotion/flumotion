@@ -55,13 +55,13 @@ class DiracStep(VideoEncoderStep):
         self.add_proxy(self.model.properties,
                        ['bitrate'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
 
         self.wizard.debug('running Dirac checks')
         # FIXME: what happens to this deferred ? Does it get fired into the
         # unknown ? Should we wait on it ?
-        self.wizard.require_elements(worker, 'schroenc')
+        self.wizard.requireElements(worker, 'schroenc')
 
 class DiracWizardPlugin(object):
     implements(IEncoderPlugin)

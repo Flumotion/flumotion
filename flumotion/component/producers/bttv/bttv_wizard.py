@@ -85,7 +85,7 @@ class TVCardStep(VideoProducerStep):
 
         self._in_setup = False
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
         self._clear_combos()
         self._run_checks()
@@ -110,7 +110,7 @@ class TVCardStep(VideoProducerStep):
             N_("Probing TV-card, this can take a while...")),
                             id='tvcard-check')
         self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.video', 'checkTVCard',
+        d = self.runInWorker('flumotion.worker.checks.video', 'checkTVCard',
                                device, id='tvcard-check')
 
         def errRemoteRunFailure(failure):

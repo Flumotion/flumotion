@@ -135,9 +135,9 @@ class DiskStep(ConsumerStep):
                         'directory',
                         'start_recording'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(self.worker, 'multifdsink')
+        self.wizard.requireElements(self.worker, 'multifdsink')
 
     # Private
 

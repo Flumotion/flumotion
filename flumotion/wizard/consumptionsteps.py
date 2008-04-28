@@ -59,8 +59,8 @@ class ConsumptionStep(WizardStep):
                             self.shout2_video):
             checkbutton.set_property('visible', has_both)
 
-    def get_next(self, step=None):
-        steps = self._get_steps()
+    def getNext(self, step=None):
+        steps = self._getSteps()
         assert steps
 
         if step is None:
@@ -90,14 +90,14 @@ class ConsumptionStep(WizardStep):
         shout2_video = self.shout2_video.get_active()
         shout2_audio_video = self.shout2_audio_video.get_active()
 
-        block_next = True
+        blockNext = True
         if ((disk and any([disk_audio, disk_video, disk_audio_video])) or
             (http and any([http_audio, http_video, http_audio_video])) or
             (shout2 and any([shout2_audio, shout2_video, shout2_audio_video]))):
-            block_next = False
-        self.wizard.block_next(block_next)
+            blockNext = False
+        self.wizard.blockNext(blockNext)
 
-    def _get_steps(self):
+    def _getSteps(self):
         uielements = []
         if self.http.get_active():
             uielements.append(

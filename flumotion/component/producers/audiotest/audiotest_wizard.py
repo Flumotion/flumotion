@@ -63,11 +63,11 @@ class TestAudioProducerStep(AudioProducerStep):
 
         self.rate.set_sensitive(True)
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'audiotestsrc')
+        self.wizard.requireElements(worker, 'audiotestsrc')
 
-    def get_next(self):
+    def getNext(self):
         return None
 
 

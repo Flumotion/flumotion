@@ -76,15 +76,15 @@ class _FireWireCommon:
 
     # WizardStep
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
         self._run_checks()
 
     # Private
 
-    def _set_sensitive(self, is_sensitive):
+    def _setSensitive(self, is_sensitive):
         self.vbox_controls.set_sensitive(is_sensitive)
-        self.wizard.block_next(not is_sensitive)
+        self.wizard.blockNext(not is_sensitive)
 
     def _update_output_format(self):
         self._update_label_camera_settings()
@@ -173,11 +173,11 @@ class _FireWireCommon:
         return dict(sw=sw,sh=sh,ow=ow,oh=oh)
 
     def _run_checks(self):
-        self._set_sensitive(False)
+        self._setSensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
             id='firewire-check')
         self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.gst010', 'check1394',
+        d = self.runInWorker('flumotion.worker.checks.gst010', 'check1394',
             id='firewire-check')
 
         def firewireCheckDone(options):
@@ -190,7 +190,7 @@ class _FireWireCommon:
             for i, height in enumerate(self._input_heights):
                 values.append(('%d pixels' % height, i))
             self.combobox_scaled_height.prefill(values)
-            self._set_sensitive(True)
+            self._setSensitive(True)
             self._update_output_format()
 
         def trapRemoteFailure(failure):
@@ -243,7 +243,7 @@ class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
         self.frame_capture.hide()
         self.frame_output_format.hide()
 
-    def get_next(self):
+    def getNext(self):
         return None
 
 
@@ -255,7 +255,7 @@ class FireWireWizardPlugin(object):
     def getProductionStep(self, type):
         if type == 'audio':
             # Only show firewire audio if we're using firewire video
-            source_step = self.wizard.get_step('Production')
+            source_step = self.wizard.getStep('Production')
             if source_step.video.get_active() == 'firewire-producer':
                 return
             return FireWireAudioStep(self.wizard, FireWireProducer())

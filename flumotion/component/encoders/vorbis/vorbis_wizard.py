@@ -76,15 +76,15 @@ class VorbisStep(AudioEncoderStep):
         self.add_proxy(self.model.properties,
                        ['bitrate', 'quality'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
 
         def hasVorbis(unused, worker):
-            self.wizard.run_in_worker(
+            self.wizard.runInWorker(
                 worker, 'flumotion.worker.checks.encoder', 'checkVorbis')
 
         self.wizard.debug('running Vorbis checks')
-        d = self.wizard.require_elements(worker, 'vorbisenc')
+        d = self.wizard.requireElements(worker, 'vorbisenc')
         d.addCallback(hasVorbis, worker)
 
     # Callbacks

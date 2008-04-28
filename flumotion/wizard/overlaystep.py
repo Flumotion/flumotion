@@ -35,7 +35,7 @@ class Overlay(VideoConverter):
 
     def __init__(self, video_producer):
         super(Overlay, self).__init__()
-        self._video_producer = video_producer
+        self._videoProducer = video_producer
         self.can_overlay = False
         self.show_logo = True
         self.properties.show_text = True
@@ -57,8 +57,8 @@ class Overlay(VideoConverter):
         if not self.properties.show_text:
             del p.text
 
-        p.width = self._video_producer.getWidth()
-        p.height = self._video_producer.getHeight()
+        p.width = self._videoProducer.getWidth()
+        p.height = self._videoProducer.getHeight()
 
         return p
 
@@ -88,24 +88,24 @@ class OverlayStep(WorkerWizardStep):
         self.add_proxy(self.model, ['show_logo'])
         self.add_proxy(self.model.properties, ['show_text', 'text'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self._check_elements()
+        self._checkElements()
 
-    def get_next(self):
+    def getNext(self):
         if self.wizard.hasAudio():
-            return self.wizard.get_step('Production').get_audio_step()
+            return self.wizard.getStep('Production').getAudioStep()
 
         return None
 
     # Private API
 
-    def _set_sensitive(self, sensitive):
+    def _setSensitive(self, sensitive):
         self.show_text.set_sensitive(sensitive)
         self.show_logo.set_sensitive(sensitive)
         self.text.set_sensitive(sensitive)
 
-    def _check_elements(self):
+    def _checkElements(self):
         self.model.can_overlay = False
         def importError(error):
             self.info('could not import PIL')
@@ -123,7 +123,7 @@ class OverlayStep(WorkerWizardStep):
             message.id = 'module-PIL'
             self.wizard.add_msg(message)
             self.wizard.taskFinished()
-            self._set_sensitive(False)
+            self._setSensitive(False)
 
         def checkImport(unused):
             self.wizard.taskFinished()
@@ -141,19 +141,19 @@ class OverlayStep(WorkerWizardStep):
                     T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished()
-                self._set_sensitive(False)
+                self._setSensitive(False)
                 return
             else:
                 self.wizard.clear_msg('overlay')
 
             # now check import
-            d = self.wizard.check_import(self.worker, 'PIL')
+            d = self.wizard.checkImport(self.worker, 'PIL')
             d.addCallback(checkImport)
             d.addErrback(importError)
 
         self.wizard.waitForTask('overlay')
         # first check elements
-        d = self.wizard.check_elements(
+        d = self.wizard.checkElements(
             self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
         d.addCallback(checkElements)
 

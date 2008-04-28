@@ -63,7 +63,7 @@ class WelcomeStep(WizardStep):
     section = _('Welcome')
     icon = 'wizard.png'
 
-    def get_next(self):
+    def getNext(self):
         return None
 
 
@@ -90,7 +90,7 @@ class LicenseStep(WizardStep):
             (_('Creative Commons'), 'CC'),
             (_('Commercial'), 'Commercial')])
 
-    def get_next(self):
+    def getNext(self):
         return None
 
     # Callbacks
@@ -108,7 +108,7 @@ class SummaryStep(WizardStep):
 
     # WizardStep
 
-    def get_next(self):
+    def getNext(self):
         return None
 
 
@@ -129,18 +129,18 @@ class ConfigurationWizard(SectionWizard):
         self._tasks = []
         self._admin = admin
         self._workerHeavenState = None
-        self._last_worker = 0 # combo id last worker from step to step
+        self._lastWorker = 0 # combo id last worker from step to step
 
         self._flowName = 'default'
 
-        self._worker_list = WorkerList()
-        self.top_vbox.pack_start(self._worker_list, False, False)
-        self._worker_list.connect('worker-selected',
+        self._workerList = WorkerList()
+        self.top_vbox.pack_start(self._workerList, False, False)
+        self._workerList.connect('worker-selected',
                                   self.on_combobox_worker_changed)
 
     # SectionWizard
 
-    def get_first_step(self):
+    def getFirstStep(self):
         return WelcomeStep(self)
 
     def completed(self):
@@ -152,28 +152,28 @@ class ConfigurationWizard(SectionWizard):
 
     def run(self, interactive, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
-        self._worker_list.set_worker_heaven_state(workerHeavenState)
+        self._workerList.setWorkerHeavenState(workerHeavenState)
 
         SectionWizard.run(self, interactive, main)
 
-    def before_show_step(self, step):
+    def beforeShowStep(self, step):
         if isinstance(step, WorkerWizardStep):
-            self._worker_list.show()
-            self._worker_list.notify_selected()
+            self._workerList.show()
+            self._workerList.notifySelected()
         else:
-            self._worker_list.hide()
+            self._workerList.hide()
 
-        self._setup_worker(step, self._worker_list.get_worker())
+        self._setupWorker(step, self._workerList.getWorker())
 
-    def prepare_next_step(self, step):
-        self._setup_worker(step, self._worker_list.get_worker())
-        SectionWizard.prepare_next_step(self, step)
+    def prepareNextStep(self, step):
+        self._setupWorker(step, self._workerList.getWorker())
+        SectionWizard.prepareNextStep(self, step)
 
-    def block_next(self, block):
+    def blockNext(self, block):
         # Do not block/unblock if we have tasks running
         if self._tasks:
             return
-        SectionWizard.block_next(self, block)
+        SectionWizard.blockNext(self, block)
 
     # Public API
 
@@ -188,7 +188,7 @@ class ConfigurationWizard(SectionWizard):
         self.info("waiting for task %s" % (taskName,))
         if not self._tasks:
             self.window1.window.set_cursor(self._cursorWatch)
-            self.block_next(True)
+            self.blockNext(True)
         self._tasks.append(taskName)
 
     def taskFinished(self, blockNext=False):
@@ -199,7 +199,7 @@ class ConfigurationWizard(SectionWizard):
         self.info("task %s has now finished" % (taskName,))
         if not self._tasks:
             self.window1.window.set_cursor(None)
-            self.block_next(blockNext)
+            self.blockNext(blockNext)
 
     def pendingTask(self):
         """Returns true if there are any pending tasks
@@ -212,7 +212,7 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have audio
         @rtype: bool
         """
-        source_step = self.get_step('Production')
+        source_step = self.getStep('Production')
         return source_step.hasAudio()
 
     def hasVideo(self):
@@ -220,8 +220,8 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have video
         @rtype: bool
         """
-        source_step = self.get_step('Production')
-        return bool(source_step.get_video_producer())
+        source_step = self.getStep('Production')
+        return bool(source_step.getVideoProducer())
 
     def getConsumptionSteps(self):
         """Fetches the consumption steps chosen by the user
@@ -231,7 +231,7 @@ class ConfigurationWizard(SectionWizard):
             if isinstance(step, ConsumerStep):
                 yield step
 
-    def check_elements(self, workerName, *elementNames):
+    def checkElements(self, workerName, *elementNames):
         """
         Check if the given list of GStreamer elements exist on the given worker.
 
@@ -255,7 +255,7 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(_checkElementsCallback, workerName)
         return d
 
-    def require_elements(self, workerName, *elementNames):
+    def requireElements(self, workerName, *elementNames):
         """
         Require that the given list of GStreamer elements exists on the
         given worker. If the elements do not exist, an error message is
@@ -269,7 +269,7 @@ class ConfigurationWizard(SectionWizard):
             return
 
         self.debug('requiring elements %r' % (elementNames,))
-        def got_missing_elements(elements, workerName):
+        def gotMissingElements(elements, workerName):
             if elements:
                 self.warning('elements %r do not exist' % (elements,))
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
@@ -288,12 +288,12 @@ class ConfigurationWizard(SectionWizard):
             return elements
 
         self.waitForTask('require elements %r' % (elementNames,))
-        d = self.check_elements(workerName, *elementNames)
-        d.addCallback(got_missing_elements, workerName)
+        d = self.checkElements(workerName, *elementNames)
+        d.addCallback(gotMissingElements, workerName)
 
         return d
 
-    def check_import(self, workerName, moduleName):
+    def checkImport(self, workerName, moduleName):
         """
         Check if the given module can be imported.
 
@@ -309,7 +309,7 @@ class ConfigurationWizard(SectionWizard):
         d = self._admin.checkImport(workerName, moduleName)
         return d
 
-    def require_import(self, workerName, moduleName, projectName=None,
+    def requireImport(self, workerName, moduleName, projectName=None,
                        projectURL=None):
         """
         Require that the given module can be imported on the given worker.
@@ -343,12 +343,12 @@ class ConfigurationWizard(SectionWizard):
             self.add_msg(message)
             self.taskFinished(True)
 
-        d = self.check_import(workerName, moduleName)
+        d = self.checkImport(workerName, moduleName)
         d.addErrback(_checkImportErrback)
         return d
 
     # FIXME: maybe add id here for return messages ?
-    def run_in_worker(self, worker, module, function, *args, **kwargs):
+    def runInWorker(self, worker, module, function, *args, **kwargs):
         """
         Run the given function and arguments on the selected worker.
 
@@ -357,18 +357,18 @@ class ConfigurationWizard(SectionWizard):
         @param function:
         @returns: L{twisted.internet.defer.Deferred}
         """
-        self.debug('run_in_worker(module=%r, function=%r)' % (module, function))
+        self.debug('runInWorker(module=%r, function=%r)' % (module, function))
         admin = self._admin
         if not admin:
-            self.warning('skipping run_in_worker, no admin')
+            self.warning('skipping runInWorker, no admin')
             return defer.fail(errors.FlumotionError('no admin'))
 
         if not worker:
-            self.warning('skipping run_in_worker, no worker')
+            self.warning('skipping runInWorker, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
         def callback(result):
-            self.debug('run_in_worker callbacked a result')
+            self.debug('runInWorker callbacked a result')
             self.clear_msg(function)
 
             if not isinstance(result, messages.Result):
@@ -393,7 +393,7 @@ class ConfigurationWizard(SectionWizard):
             return result.value
 
         def errback(failure):
-            self.debug('run_in_worker errbacked, showing error msg')
+            self.debug('runInWorker errbacked, showing error msg')
             if failure.check(errors.RemoteRunError):
                 debug = failure.value
             else:
@@ -414,7 +414,7 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(callback)
         return d
 
-    def get_wizard_entry(self, component_type):
+    def getWizardEntry(self, component_type):
         """Fetches a wizard bundle from a specific kind of component
         @param component_type: the component type to get the wizard entry
           bundle from.
@@ -422,7 +422,7 @@ class ConfigurationWizard(SectionWizard):
           - factory of the component
           - noBundle error: if the component lacks a wizard bundle
         """
-        def got_entry_point((filename, procname)):
+        def gotEntryPoint((filename, procname)):
             modname = pathToModuleName(filename)
             d = self._admin.getBundledFunction(modname, procname)
             self.clear_msg('wizard-bundle')
@@ -432,10 +432,10 @@ class ConfigurationWizard(SectionWizard):
         self.waitForTask('get wizard entry %s' % (component_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getEntryByType', component_type, 'wizard')
-        d.addCallback(got_entry_point)
+        d.addCallback(gotEntryPoint)
         return d
 
-    def get_wizard_plug_entry(self, plug_type):
+    def _getWizardPlugEntry(self, plug_type):
         """Fetches a wizard bundle from a specific kind of plug
         @param plug_type: the plug type to get the wizard entry
           bundle from.
@@ -443,7 +443,7 @@ class ConfigurationWizard(SectionWizard):
           - factory of the plug
           - noBundle error: if the plug lacks a wizard bundle
         """
-        def got_entry_point((filename, procname)):
+        def gotEntryPoint((filename, procname)):
             modname = pathToModuleName(filename)
             d = self._admin.getBundledFunction(modname, procname)
             self.clear_msg('wizard-bundle')
@@ -453,7 +453,7 @@ class ConfigurationWizard(SectionWizard):
         self.waitForTask('get wizard plug %s' % (plug_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
-        d.addCallback(got_entry_point)
+        d.addCallback(gotEntryPoint)
         return d
 
     def getWizardEntries(self, wizardTypes=None, provides=None, accepts=None):
@@ -480,7 +480,7 @@ class ConfigurationWizard(SectionWizard):
 
     # Private
 
-    def _setup_worker(self, step, worker):
+    def _setupWorker(self, step, worker):
         # get name of active worker
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
@@ -489,18 +489,18 @@ class ConfigurationWizard(SectionWizard):
         save = WizardSaver()
         save.setFlowName(self._flowName)
 
-        source_step = self.get_step('Production')
-        save.setAudioProducer(source_step.get_audio_producer())
-        save.setVideoProducer(source_step.get_video_producer())
+        source_step = self.getStep('Production')
+        save.setAudioProducer(source_step.getAudioProducer())
+        save.setVideoProducer(source_step.getVideoProducer())
 
         if source_step.hasVideo():
-            overlay_step = self.get_step('Overlay')
+            overlay_step = self.getStep('Overlay')
             save.setVideoOverlay(overlay_step.getOverlay())
 
-        encoding_step = self.get_step('Encoding')
-        save.setAudioEncoder(encoding_step.get_audio_encoder())
-        save.setVideoEncoder(encoding_step.get_video_encoder())
-        save.setMuxer(encoding_step.get_muxer_type(), encoding_step.worker)
+        encoding_step = self.getStep('Encoding')
+        save.setAudioEncoder(encoding_step.getAudioEncoder())
+        save.setVideoEncoder(encoding_step.getVideoEncoder())
+        save.setMuxer(encoding_step.getMuxerType(), encoding_step.worker)
 
         for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
@@ -512,7 +512,7 @@ class ConfigurationWizard(SectionWizard):
             for porter in step.getPorters():
                 save.addPorter(porter, consumerType)
 
-        license_step = self.get_step('Content License')
+        license_step = self.getStep('Content License')
         if license_step.getLicenseType() == 'CC':
             save.setUseCCLicense(True)
 
@@ -523,15 +523,15 @@ class ConfigurationWizard(SectionWizard):
     # Callbacks
 
     def on_combobox_worker_changed(self, combobox, worker):
-        self.debug('combobox_worker_changed, worker %r' % worker)
+        self.debug('combobox_workerChanged, worker %r' % worker)
         if worker:
             self.clear_msg('worker-error')
-            self._last_worker = worker
+            self._lastWorker = worker
             step = self._current_step
             if step and isinstance(step, WorkerWizardStep):
-                self._setup_worker(step, worker)
-                self.debug('calling %r.worker_changed' % step)
-                step.worker_changed(worker)
+                self._setupWorker(step, worker)
+                self.debug('calling %r.workerChanged' % step)
+                step.workerChanged(worker)
         else:
             msg = messages.Error(T_(
                     N_('All workers have logged out.\n'

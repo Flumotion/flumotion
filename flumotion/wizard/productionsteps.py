@@ -44,8 +44,8 @@ class ProductionStep(WizardStep):
     icon = 'source.png'
 
     def __init__(self, wizard):
-        self._audio_producer = None
-        self._video_producer = None
+        self._audioProducer = None
+        self._videoProducer = None
         self._loadedSteps = None
         WizardStep.__init__(self, wizard)
 
@@ -69,52 +69,52 @@ class ProductionStep(WizardStep):
         """
         return self.has_video.get_active()
 
-    def get_audio_producer(self):
+    def getAudioProducer(self):
         """Returns the selected audio producer or None
         @returns: producer or None
         @rtype: L{flumotion.wizard.models.AudioProducer}
         """
         if self.has_audio.get_active():
-            return self._audio_producer
+            return self._audioProducer
 
-    def get_video_producer(self):
+    def getVideoProducer(self):
         """Returns the selected video producer or None
         @returns: producer or None
         @rtype: L{flumotion.wizard.models.VideoProducer}
         """
         if self.has_video.get_active():
-            return self._video_producer
+            return self._videoProducer
 
-    def get_video_step(self):
+    def getVideoStep(self):
         """Return the video step to be shown, given the currently
         selected values in this step
         @returns: video step
         @rtype: a deferred returning a L{basesteps.VideoProducerStep} instance
         """
-        def step_loaded(step):
+        def stepLoaded(step):
             if step is not None:
-                self._video_producer = step.model
+                self._videoProducer = step.model
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('video producer step')
-        d = self._load_step(self.video, 'video')
-        d.addCallback(step_loaded)
+        d = self._loadStep(self.video, 'video')
+        d.addCallback(stepLoaded)
         return d
 
-    def get_audio_step(self):
+    def getAudioStep(self):
         """Return the audio step to be shown, given the currently
         selected values in this step
         @returns: audio step
         @rtype: a deferred returning a L{basesteps.AudioProducerStep} instance
         """
-        def step_loaded(step):
+        def stepLoaded(step):
             if step is not None:
-                self._audio_producer = step.model
+                self._audioProducer = step.model
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('audio producer step')
-        d = self._load_step(self.audio, 'audio')
-        d.addCallback(step_loaded)
+        d = self._loadStep(self.audio, 'audio')
+        d.addCallback(stepLoaded)
         return d
 
     # WizardStep
@@ -131,20 +131,20 @@ class ProductionStep(WizardStep):
         tips.set_tip(self.has_video, _('If you want to stream video'))
         tips.set_tip(self.has_audio, _('If you want to stream audio'))
 
-        self._populate_combos()
+        self._populateCombos()
 
-    def get_next(self):
+    def getNext(self):
         if self.has_video.get_active():
-            return self.get_video_step()
+            return self.getVideoStep()
         elif self.has_audio.get_active():
-            return self.get_audio_step()
+            return self.getAudioStep()
         else:
             raise AssertionError
 
     # Private API
 
-    def _populate_combos(self):
-        def got_entries(entries, combo, default_type):
+    def _populateCombos(self):
+        def gotEntries(entries, combo, default_type):
             data = []
             default = None
             for entry in entries:
@@ -162,7 +162,7 @@ class ProductionStep(WizardStep):
             ('audio-producer', self.audio, 'audiotest-producer')]:
             d = self.wizard.getWizardEntries(
                 wizardTypes=[ctype])
-            d.addCallback(got_entries, combo, default_type)
+            d.addCallback(gotEntries, combo, default_type)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
 
@@ -172,28 +172,28 @@ class ProductionStep(WizardStep):
             self._loadedSteps = True
         d.addCallback(done)
 
-    def _load_plugin(self, component_type, type):
-        def got_factory(factory):
+    def _loadPlugin(self, component_type, type):
+        def gotFactory(factory):
             return factory(self.wizard)
 
         def noBundle(failure):
             failure.trap(NoBundleError)
 
-        d = self.wizard.get_wizard_entry(component_type)
-        d.addCallback(got_factory)
+        d = self.wizard.getWizardEntry(component_type)
+        d.addCallback(gotFactory)
         d.addErrback(noBundle)
 
         return d
 
-    def _load_step(self, combo, type):
-        def plugin_loaded(plugin, entry):
+    def _loadStep(self, combo, type):
+        def pluginLoaded(plugin, entry):
             # FIXME: verify that factory implements IProductionPlugin
             step = plugin.getProductionStep(type)
             return step
 
         entry = combo.get_selected()
-        d = self._load_plugin(entry, type)
-        d.addCallback(plugin_loaded, entry)
+        d = self._loadPlugin(entry, type)
+        d.addCallback(pluginLoaded, entry)
 
         return d
 
@@ -207,7 +207,7 @@ class ProductionStep(WizardStep):
         if has_audio or has_video:
             can_continue = True
 
-        self.wizard.block_next(not can_continue)
+        self.wizard.blockNext(not can_continue)
 
     # Callbacks
 

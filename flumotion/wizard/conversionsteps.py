@@ -45,32 +45,32 @@ class ConversionStep(WorkerWizardStep):
     section = _('Conversion')
 
     def __init__(self, wizard):
-        self._audio_encoder = None
-        self._video_encoder = None
+        self._audioEncoder = None
+        self._videoEncoder = None
         WorkerWizardStep.__init__(self, wizard)
 
     # Public API
 
-    def get_audio_page(self):
+    def getAudioPage(self):
         if self.wizard.hasAudio():
-            return self._get_audio_page()
+            return self._getAudioPage()
         return None
 
-    def get_video_encoder(self):
+    def getVideoEncoder(self):
         """Returns the selected video encoder or None
         @returns: encoder or None
         @rtype: L{flumotion.wizard.models.VideoEncoder}
         """
-        return self._video_encoder
+        return self._videoEncoder
 
-    def get_audio_encoder(self):
+    def getAudioEncoder(self):
         """Returns the selected audio encoder or None
         @returns: encoder or None
         @rtype: L{flumotion.wizard.models.AudioEncoder}
         """
-        return self._audio_encoder
+        return self._audioEncoder
 
-    def get_muxer_type(self):
+    def getMuxerType(self):
         """Returns the component-type, such as "ogg-muxer"
         of the currently selected muxer.
         @returns: the muxer
@@ -79,7 +79,7 @@ class ConversionStep(WorkerWizardStep):
         entry = self.muxer.get_selected()
         return entry.component_type
 
-    def get_muxer_format(self):
+    def getMuxerFormat(self):
         """Returns the format of the muxer, such as "ogg".
         @returns: the muxer format
         @rtype: string
@@ -87,21 +87,21 @@ class ConversionStep(WorkerWizardStep):
         entry = self.muxer.get_selected()
         return entry.getProvidedMediaTypes()[0]
 
-    def get_audio_format(self):
+    def getAudioFormat(self):
         """Returns the format of the audio encoder, such as "vorbis"
         @returns: the audio format
         @rtype: string
         """
-        if self._audio_encoder:
+        if self._audioEncoder:
             entry = self.audio.get_selected()
             return entry.getProvidedMediaTypes()[0]
 
-    def get_video_format(self):
+    def getVideoFormat(self):
         """Returns the format of the video encoder, such as "theora"
         @returns: the video format
         @rtype: string
         """
-        if self._video_encoder:
+        if self._videoEncoder:
             entry = self.video.get_selected()
             return entry.getProvidedMediaTypes()[0]
 
@@ -110,15 +110,15 @@ class ConversionStep(WorkerWizardStep):
     def activated(self):
         data = [('muxer', self.muxer)]
 
-        production = self.wizard.get_step('Production')
-        audio_producer = production.get_audio_producer()
+        production = self.wizard.getStep('Production')
+        audio_producer = production.getAudioProducer()
         if audio_producer:
             data.append(('audio-encoder', self.audio))
         else:
             self.audio.hide()
             self.label_audio.hide()
 
-        video_producer = production.get_video_producer()
+        video_producer = production.getVideoProducer()
         if video_producer:
             data.append(('video-encoder', self.video))
         else:
@@ -129,30 +129,30 @@ class ConversionStep(WorkerWizardStep):
         # Because it means we're pressing "back" in the wizard and the
         # combo is already populated.
         if not len(self.video) or not len(self.audio):
-            self._populate_combos(data)
+            self._populateCombos(data)
 
-    def get_next(self):
+    def getNext(self):
         if self.wizard.hasVideo():
-            return self._get_video_page()
+            return self._getVideoPage()
         elif self.wizard.hasAudio():
-            return self._get_audio_page()
+            return self._getAudioPage()
         else:
             return None
 
     # Private
 
-    def _populate_combos(self, combos, provides=None):
+    def _populateCombos(self, combos, provides=None):
         for ctype, combo in combos:
             d = self.wizard.getWizardEntries(
                 wizardTypes=[ctype],
                 provides=provides)
-            d.addCallback(self._add_entries, ctype, combo)
+            d.addCallback(self._addEntries, ctype, combo)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
         self.wizard.waitForTask('querying encoders')
         d.addCallback(lambda x: self.wizard.taskFinished())
 
-    def _add_entries(self, entries, ctype, combo):
+    def _addEntries(self, entries, ctype, combo):
         self.debug('adding entries for ctype %s: %r', ctype, entries)
         data = []
         for entry in entries:
@@ -160,7 +160,7 @@ class ConversionStep(WorkerWizardStep):
         combo.prefill(data)
         combo.set_sensitive(True)
 
-    def _create_dummy_model(self, entry):
+    def _createDummyModel(self, entry):
         if entry.type == 'audio-encoder':
             encoder = AudioEncoder()
         elif entry.type == 'video-encoder':
@@ -172,73 +172,73 @@ class ConversionStep(WorkerWizardStep):
         encoder.worker = self.worker
 
         if entry.type == 'audio-encoder':
-            self._audio_encoder = encoder
+            self._audioEncoder = encoder
         else:
-            self._video_encoder = encoder
+            self._videoEncoder = encoder
 
-    def _load_plugin(self, entry):
-        def got_factory(factory):
+    def _loadPlugin(self, entry):
+        def gotFactory(factory):
             return factory(self.wizard)
 
         def no_bundle(failure):
             failure.trap(NoBundleError)
 
-        d = self.wizard.get_wizard_entry(entry.component_type)
-        d.addCallback(got_factory)
+        d = self.wizard.getWizardEntry(entry.component_type)
+        d.addCallback(gotFactory)
         d.addErrback(no_bundle)
 
         return d
 
-    def _load_step(self, combo):
+    def _loadStep(self, combo):
         entry = combo.get_selected()
-        def plugin_loaded(plugin, entry):
+        def pluginLoaded(plugin, entry):
             if plugin is None:
-                self._create_dummy_model(entry)
+                self._createDummyModel(entry)
                 return None
             # FIXME: verify that factory implements IEncoderPlugin
             step = plugin.getConversionStep()
             if isinstance(step, WorkerWizardStep):
                 step.worker = self.worker
-                step.worker_changed(self.worker)
+                step.workerChanged(self.worker)
             return step
 
-        d = self._load_plugin(entry)
-        d.addCallback(plugin_loaded, entry)
+        d = self._loadPlugin(entry)
+        d.addCallback(pluginLoaded, entry)
 
         return d
 
-    def _get_audio_page(self):
-        def step_loaded(step):
+    def _getAudioPage(self):
+        def stepLoaded(step):
             if step is not None:
-                self._audio_encoder = step.model
+                self._audioEncoder = step.model
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('audio encoder page')
-        d = self._load_step(self.audio)
-        d.addCallback(step_loaded)
+        d = self._loadStep(self.audio)
+        d.addCallback(stepLoaded)
         return d
 
-    def _get_video_page(self):
-        def step_loaded(step):
+    def _getVideoPage(self):
+        def stepLoaded(step):
             if step is not None:
-                self._video_encoder = step.model
+                self._videoEncoder = step.model
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('video encoder page')
-        d = self._load_step(self.video)
-        d.addCallback(step_loaded)
+        d = self._loadStep(self.video)
+        d.addCallback(stepLoaded)
         return d
 
-    def _muxer_changed(self):
+    def _muxerChanged(self):
         muxer_entry = self.muxer.get_selected()
         # '...' used while waiting for the query to be done
         if muxer_entry is None:
             return
-        self._populate_combos([('audio-encoder', self.audio),
+        self._populateCombos([('audio-encoder', self.audio),
                                ('video-encoder', self.video)],
                               provides=muxer_entry.getAcceptedMediaTypes())
 
     # Callbacks
 
     def on_muxer__changed(self, combo):
-        self._muxer_changed()
+        self._muxerChanged()

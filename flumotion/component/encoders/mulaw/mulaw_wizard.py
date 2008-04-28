@@ -46,9 +46,9 @@ class MulawStep(AudioEncoderStep):
 
     # WizardStep
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'mulawenc')
+        self.wizard.requireElements(worker, 'mulawenc')
 
 
 class MulawWizardPlugin(object):

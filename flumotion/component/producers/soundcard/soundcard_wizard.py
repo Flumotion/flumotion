@@ -112,13 +112,13 @@ class SoundcardStep(AudioProducerStep):
 
         self._block_update = False
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
         self._clear_combos()
         self._update_devices()
         self._update_inputs()
 
-    def get_next(self):
+    def getNext(self):
         return None
 
     # Private
@@ -157,7 +157,7 @@ class SoundcardStep(AudioProducerStep):
             N_("Probing soundcard, this can take a while...")),
                             id='soundcard-check')
         self.wizard.add_msg(msg)
-        d = self.run_in_worker(
+        d = self.runInWorker(
             'flumotion.worker.checks.audio', 'checkMixerTracks',
             element_name, device, channels, id='soundcard-check')
 

@@ -46,9 +46,9 @@ class SmokeStep(VideoEncoderStep):
 
     # WizardStep
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'smokeenc')
+        self.wizard.requireElements(worker, 'smokeenc')
 
 
 class SmokeWizardPlugin(object):

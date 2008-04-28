@@ -82,10 +82,10 @@ class WorkerList(gtk.HBox):
         self._combobox.pack_start(cell, True)
         self._combobox.add_attribute(cell, 'text', 0)
 
-        def on_changed(cb):
-            self.emit('worker-selected', self.get_worker())
+        def onChanged(cb):
+            self.emit('worker-selected', self.getWorker())
 
-        self._combobox.connect('changed', on_changed)
+        self._combobox.connect('changed', onChanged)
         self._combobox.show()
         # GTK 2.4
         try:
@@ -95,21 +95,21 @@ class WorkerList(gtk.HBox):
             pass
         a.add(self._combobox)
 
-    def set_worker_heaven_state(self, whs):
+    def setWorkerHeavenState(self, whs):
         self._combobox.set_model(WorkerListStore(whs))
-        self.select_worker(None)
+        self.selectWorker(None)
 
-        def on_model_changed(model):
-            if not self.get_worker():
+        def onModelChanged(model):
+            if not self.getWorker():
                 # need to select a new worker
-                self.select_worker(None) # will emit if worker selected
-                if not self.get_worker():
+                self.selectWorker(None) # will emit if worker selected
+                if not self.getWorker():
                     # no workers present!
                     self.emit('worker-selected', None)
 
-        self._combobox.get_model().connect('changed', on_model_changed)
+        self._combobox.get_model().connect('changed', onModelChanged)
 
-    def select_worker(self, worker):
+    def selectWorker(self, worker):
         # worker == none means select first worker
         for r in self._combobox.get_model():
             if not worker or r.model.get_value(r.iter, 0) == worker:
@@ -120,14 +120,14 @@ class WorkerList(gtk.HBox):
             # FIXME: let's not print, have correct logging
             print 'warning: worker %s not available' % worker
 
-    def get_worker(self):
+    def getWorker(self):
         i = self._combobox.get_active_iter()
         if i:
             return self._combobox.get_model().get_value(i, 0)
 
         return None
 
-    def notify_selected(self):
-        self.emit('worker-selected', self.get_worker())
+    def notifySelected(self):
+        self.emit('worker-selected', self.getWorker())
 
 gobject.type_register(WorkerList)

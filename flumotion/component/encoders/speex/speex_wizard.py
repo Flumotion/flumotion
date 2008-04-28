@@ -62,9 +62,9 @@ class SpeexStep(AudioEncoderStep):
 
         self.add_proxy(self.model.properties, ['bitrate'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'speexenc')
+        self.wizard.requireElements(worker, 'speexenc')
 
 
 class SpeexWizardPlugin(object):

@@ -74,7 +74,7 @@ class WebcamStep(VideoProducerStep):
 
         self._in_setup = False
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
         self._clear()
         self._run_checks()
@@ -98,7 +98,7 @@ class WebcamStep(VideoProducerStep):
                 N_("Probing webcam, this can take a while...")),
             id='webcam-check')
         self.wizard.add_msg(msg)
-        d = self.run_in_worker('flumotion.worker.checks.video', 'checkWebcam',
+        d = self.runInWorker('flumotion.worker.checks.video', 'checkWebcam',
                            device, id='webcam-check')
 
         def errRemoteRunFailure(failure):

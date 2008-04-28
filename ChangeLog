@@ -1,5 +1,38 @@
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/component/encoders/dirac/dirac_wizard.py:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/mulaw/mulaw_wizard.py:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex_wizard.py:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/plugs/cortado/cortado_wizard.py:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/test/test_wizard.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/interfaces.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/worker.py:
+	* flumotion/wizard/workerstep.py:
+	Rename wizard variables, private and public API to use camelCase
+	instead of under_scores.
+
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/admin.py:
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	* flumotion/wizard/conversionsteps.py:

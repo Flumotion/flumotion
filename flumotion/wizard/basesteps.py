@@ -45,7 +45,7 @@ class VideoProducerStep(WorkerWizardStep):
 
     # WizardStep
 
-    def get_next(self):
+    def getNext(self):
         from flumotion.wizard.overlaystep import OverlayStep
         return OverlayStep(self.wizard, self.model)
 
@@ -57,12 +57,12 @@ class VideoEncoderStep(WorkerWizardStep):
         self.model = model
         WorkerWizardStep.__init__(self, wizard)
 
-    def get_next(self):
-        return self.wizard.get_step('Encoding').get_audio_page()
+    def getNext(self):
+        return self.wizard.getStep('Encoding').getAudioPage()
 
 
 class AudioEncoderStep(WorkerWizardStep):
-    glade_file = 'wizard_audio_encoder.glade'
+    glade_file = 'wizard_audioEncoder.glade'
     section = _('Conversion')
 
     def __init__(self, wizard, model):
@@ -71,7 +71,7 @@ class AudioEncoderStep(WorkerWizardStep):
 
     # WizardStep
 
-    def get_next(self):
+    def getNext(self):
         return None
 
 
@@ -99,6 +99,6 @@ class ConsumerStep(WorkerWizardStep):
 
     # WizardStep
 
-    def get_next(self):
-        return self.wizard.get_step('Consumption').get_next(self)
+    def getNext(self):
+        return self.wizard.getStep('Consumption').getNext(self)
 

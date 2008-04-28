@@ -30,14 +30,14 @@ class WorkerWizardStep(WizardStep):
         WizardStep.__init__(self, wizard)
         self.worker = None
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         """This is called when a worker changed.
         Can be overridden in a subclass
         @param worker: the new worker
         """
 
-    def run_in_worker(self, module, function, *args, **kwargs):
-        return self.wizard.run_in_worker(self.worker, module, function,
+    def runInWorker(self, module, function, *args, **kwargs):
+        return self.wizard.runInWorker(self.worker, module, function,
                                          *args, **kwargs)
 
 

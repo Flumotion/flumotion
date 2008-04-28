@@ -266,10 +266,10 @@ class HTTPStep(ConsumerStep):
         return 'http-streamer'
 
     def getServerConsumers(self):
-        source_step = self.wizard.get_step('Production')
+        source_step = self.wizard.getStep('Production')
         return self.plugarea.getServerConsumers(
-           source_step.get_audio_producer(),
-           source_step.get_video_producer())
+           source_step.getAudioProducer(),
+           source_step.getVideoProducer())
 
     def getPorters(self):
         return self.plugarea.getPorters()
@@ -289,7 +289,7 @@ class HTTPStep(ConsumerStep):
         self.main_vbox.pack_start(self.plugarea, False, False)
         self.plugarea.show()
 
-        self._populate_plugins()
+        self._populatePlugins()
 
         self.add_proxy(self.model,
                        ['has_client_limit',
@@ -305,17 +305,17 @@ class HTTPStep(ConsumerStep):
         self.mount_point.set_text("/")
 
     def activated(self):
-        self._check_elements()
+        self._checkElements()
         self._verify()
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self._check_elements()
+        self._checkElements()
 
     # Private
 
-    def _populate_plugins(self):
-        def got_entries(entries):
+    def _populatePlugins(self):
+        def gotEntries(entries):
             log.debug('httpwizard', 'got %r' % (entries,))
             for entry in entries:
                 if not self._canAddPlug(entry):
@@ -323,8 +323,8 @@ class HTTPStep(ConsumerStep):
                 def response(factory, entry):
                     # FIXME: verify that factory implements IHTTPConsumerPlugin
                     plugin = factory(self.wizard)
-                    if hasattr(plugin, 'worker_changed'):
-                        d = plugin.worker_changed(self.worker)
+                    if hasattr(plugin, 'workerChanged'):
+                        d = plugin.workerChanged(self.worker)
                         def cb(found, plugin, entry):
                             if found:
                                 self._addPlug(
@@ -332,11 +332,11 @@ class HTTPStep(ConsumerStep):
                         d.addCallback(cb, plugin, entry)
                     else:
                         self._addPlug(plugin, N_(entry.description))
-                d = self.wizard.get_wizard_plug_entry(entry.component_type)
+                d = self.wizard._getWizardPlugEntry(entry.component_type)
                 d.addCallback(response, entry)
 
         d = self.wizard.getWizardEntries(wizardTypes=['http-consumer'])
-        d.addCallbacks(got_entries)
+        d.addCallbacks(gotEntries)
 
     def _canAddPlug(self, entry):
         # This function filters out entries which are
@@ -355,14 +355,14 @@ class HTTPStep(ConsumerStep):
             else:
                 raise AssertionError
 
-        encoding_step = self.wizard.get_step('Encoding')
-        if encoding_step.get_muxer_format() not in muxerTypes:
+        encoding_step = self.wizard.getStep('Encoding')
+        if encoding_step.getMuxerFormat() not in muxerTypes:
             return False
 
-        audio_format = encoding_step.get_audio_format()
-        video_format = encoding_step.get_video_format()
-        if ((audio_format and audio_format not in audioTypes) or
-            (video_format and video_format not in videoTypes)):
+        audioFormat = encoding_step.getAudioFormat()
+        videoFormat = encoding_step.getVideoFormat()
+        if ((audioFormat and audioFormat not in audioTypes) or
+            (videoFormat and videoFormat not in videoTypes)):
             return False
 
         return True
@@ -370,7 +370,7 @@ class HTTPStep(ConsumerStep):
     def _addPlug(self, plugin, description):
         self.plugarea.addPlug(plugin, description)
 
-    def _check_elements(self):
+    def _checkElements(self):
         self.wizard.waitForTask('http streamer check')
 
         def importError(failure):
@@ -392,7 +392,7 @@ class HTTPStep(ConsumerStep):
             self.wizard.taskFinished()
 
         def checkWorkerHostname(unused):
-            d = self.wizard.run_in_worker(
+            d = self.wizard.runInWorker(
                 self.worker, 'flumotion.worker.checks.http',
                 'runHTTPStreamerChecks')
             d.addCallback(finished)
@@ -411,15 +411,15 @@ class HTTPStep(ConsumerStep):
             self.wizard.clear_msg('httpstreamer')
 
             # now check import
-            d = self.wizard.check_import(self.worker, 'twisted.web')
+            d = self.wizard.checkImport(self.worker, 'twisted.web')
             d.addCallback(checkWorkerHostname)
             d.addErrback(importError)
 
         # first check elements
-        d = self.wizard.require_elements(self.worker, 'multifdsink')
+        d = self.wizard.requireElements(self.worker, 'multifdsink')
         d.addCallback(checkElements)
 
-        # require_elements calls check_elements which unconditionally
+        # requireElements calls checkElements which unconditionally
         # unblocks the next call. Work around that behavior here.
         d.addErrback(lambda unused: self.wizard.taskFinished(True))
 
@@ -433,14 +433,14 @@ class HTTPStep(ConsumerStep):
     def _update_blocked(self):
         # FIXME: This should be updated and only called when all pending
         #        tasks are done.
-        self.wizard.block_next(
+        self.wizard.blockNext(
             self.wizard.pendingTask() or self.mount_point.get_text() == '')
 
     # Callbacks
 
     def on_mount_point_changed(self, entry):
         self._verify()
-        self.wizard.block_next(self.model.has_cortado and entry.get_text() == "/")
+        self.wizard.blockNext(self.model.has_cortado and entry.get_text() == "/")
 
     def on_has_client_limit_toggled(self, checkbutton):
         self._verify()

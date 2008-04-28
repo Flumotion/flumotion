@@ -108,22 +108,22 @@ class TheoraStep(VideoEncoderStep):
         # a number of frames, so we need the framerate and calculate
         # we need to go through the Step (which is the view) because models
         # don't have references to other models
-        producer = self.wizard.get_step('Production').get_video_producer()
+        producer = self.wizard.getStep('Production').getVideoProducer()
         self.model.framerate = producer.properties['framerate']
         self.debug('Framerate of video producer: %r' % self.model.framerate)
         step = 1 / self.model.framerate
         page = 1.0
         self.keyframe_delta.set_increments(step, page)
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
 
         def hasTheora(unused, worker):
-            self.wizard.run_in_worker(
+            self.wizard.runInWorker(
                 worker, 'flumotion.worker.checks.encoder', 'checkTheora')
 
         self.wizard.debug('running Theora checks')
-        d = self.wizard.require_elements(worker, 'theoraenc')
+        d = self.wizard.requireElements(worker, 'theoraenc')
         d.addCallback(hasTheora, worker)
 
     # Callbacks

@@ -86,7 +86,7 @@ class IHTTPConsumerPlugin(Interface):
         """
 
     # FIXME: Rename to workerChanged
-    def worker_changed(worker):
+    def workerChanged(worker):
         """Called when the worker for the step changed.
         @param worker: the worker
         @type worker: L{WorkerComponentUIState}

@@ -74,9 +74,9 @@ class Shout2Step(ConsumerStep):
                         'description',
                         'url'])
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.check_elements(worker, 'shout2send')
+        self.wizard.checkElements(worker, 'shout2send')
 
 
 class Shout2BothStep(Shout2Step):

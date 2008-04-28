@@ -74,9 +74,9 @@ class TestVideoProducerStep(VideoProducerStep):
         sizegroup.add_widget(self.height)
         sizegroup.add_widget(self.framerate)
 
-    def worker_changed(self, worker):
+    def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.require_elements(worker, 'videotestsrc', 'level')
+        self.wizard.requireElements(worker, 'videotestsrc', 'level')
 
 
 class VideoTestWizardPlugin(object):
