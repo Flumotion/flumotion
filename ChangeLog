@@ -1,3 +1,9 @@
+2008-04-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.waitForTask): 
+	prevent a raise from happening when shutting down the wizard, check
+	so the GdkWindow isn't None when setting a cursor.
+
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/connections.py:

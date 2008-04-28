@@ -187,7 +187,8 @@ class ConfigurationWizard(SectionWizard):
         """
         self.info("waiting for task %s" % (taskName,))
         if not self._tasks:
-            self.window1.window.set_cursor(self._cursorWatch)
+            if self.window1.window is not None:
+                self.window1.window.set_cursor(self._cursorWatch)
             self.blockNext(True)
         self._tasks.append(taskName)
 
