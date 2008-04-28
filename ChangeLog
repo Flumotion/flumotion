@@ -1,6 +1,7 @@
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/admin.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	* flumotion/wizard/conversionsteps.py:
 	* flumotion/wizard/productionsteps.py:
 	Clean up thomas' "refactoring".

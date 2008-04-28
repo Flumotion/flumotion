@@ -335,7 +335,7 @@ class HTTPStep(ConsumerStep):
                 d = self.wizard.get_wizard_plug_entry(entry.component_type)
                 d.addCallback(response, entry)
 
-        d = self.wizard.getWizardEntries(wizard_types=['http-consumer'])
+        d = self.wizard.getWizardEntries(wizardTypes=['http-consumer'])
         d.addCallbacks(got_entries)
 
     def _canAddPlug(self, entry):
