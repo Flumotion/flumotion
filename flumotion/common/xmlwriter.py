@@ -30,19 +30,41 @@ class XMLWriter(object):
         self._data = StringIO()
         self._tagStack = []
         self._indent = 0
+        self._indentChar = ' '
+        self._indentUnit = 2
 
     # Private
 
-    def _collectAttributes(self, attributes):
+    def _calcAttrsLength(self, attributes, indent):
+        if indent == -1:
+            return -1
+        attrLength = 0
+        for attr, value in attributes:
+            attrLength += 1 + len(attr) + len(quoteattr(value))
+        return attrLength + indent
+
+    def _collectAttributes(self, attributes, indent=-1):
+        if not attributes:
+            return ''
+
+        if self._calcAttrsLength(attributes, indent) > 79:
+            indentLen = self._indent + indent
+        else:
+            indentLen = 0
+        first = True
         attrValue = ''
-        if attributes:
-            for attr, value in attributes:
-                assert value is not None, attr
-                attrValue += ' %s=%s' % (attr, quoteattr(value))
+        for attr, value in attributes:
+            if indentLen and not first:
+                attrValue += '\n%s' % (self._indentChar * indentLen)
+            assert value is not None, attr
+            attrValue += ' %s=%s' % (attr, quoteattr(value))
+            if first:
+                first = False
         return attrValue
 
     def _openTag(self, tagName, attributes=None):
-        attrs = self._collectAttributes(attributes)
+        attrs = self._collectAttributes(
+            attributes, len(tagName) + 1)
         self.writeLine('<%s%s>' % (tagName, attrs))
 
     def _closeTag(self, tagName):
@@ -61,19 +83,24 @@ class XMLWriter(object):
         """Write a line to the xml.
         This method honors the current indentation.
         """
-        self._data.write('%s%s\n' % (' ' * self._indent, line))
+        self._data.write('%s%s\n' % (self._indentChar * self._indent, line))
 
-    def writeTagWithData(self, tagName, data, attributes=None):
+    def writeTag(self, tagName, attributes=None, data=None):
         """Writes out and closes a tag. Optionally writes data as a child node.
         @param tagName: name of the tag
-        @param data: data or None
         @param attributes: attributes or None
+        @param data: data or None
         """
-        attrs = self._collectAttributes(attributes)
-        if data is None:
-            self.writeLine('<%s%s/>' % (tagName, attrs))
+        if attributes is None:
+            attributes = []
+        prefix = '<%s' % (tagName,)
+        if data is not None:
+            suffix = '>%s</%s>' % (data, tagName)
         else:
-            self.writeLine('<%s%s>%s</%s>' % (tagName, attrs, data, tagName))
+            suffix = '/>'
+        attrs = self._collectAttributes(
+            attributes, len(prefix) + len(suffix))
+        self.writeLine(prefix + attrs + suffix)
 
     def pushTag(self, tagName, attributes=None):
         """Push a tag::
@@ -86,13 +113,13 @@ class XMLWriter(object):
         """
         self._openTag(tagName, attributes)
         self._tagStack.append(tagName)
-        self._indent += 2
+        self._indent += self._indentUnit
 
     def popTag(self):
         """Decreases the indentation and closes the previously opened tag.
         @returns: name of the closed tag
         """
-        self._indent -= 2
+        self._indent -= self._indentUnit
         tagName = self._tagStack.pop()
         self._closeTag(tagName)
         return tagName

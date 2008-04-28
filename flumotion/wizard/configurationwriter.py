@@ -91,7 +91,7 @@ class ConfigurationWriter(XMLWriter):
             return
         self.pushTag('eater', [('name', "default")])
         for sourceName in eaters:
-            self.writeTagWithData('feed', sourceName)
+            self.writeTag('feed', data=sourceName)
         self.popTag()
 
     def _writeProperties(self, properties):
@@ -106,8 +106,7 @@ class ConfigurationWriter(XMLWriter):
             if isinstance(value, tuple):
                 assert len(value) == 2
                 value = '%d/%d' % value
-            self.writeTagWithData('property', value,
-                                  attributes=[('name', name)])
+            self.writeTag('property', [('name', name)], value)
 
     def _writeComponentPlugs(self, plugs):
         if not plugs:

@@ -1,6 +1,15 @@
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/xmlwriter.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/configurationwriter.py:
+	Update xmlwriter from gobject-introspection copy, it
+	can line write attributes properly.
+	Update tests and change callsite slightly.
+
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/common/xmlwriter.py:
 	* flumotion/wizard/configurationwriter.py:
 	Move xmlwriter out of the wizard.
 
