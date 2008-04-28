@@ -1,5 +1,11 @@
 2008-04-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/xmlwriter.py:
+	* flumotion/wizard/configurationwriter.py:
+	Move xmlwriter out of the wizard.
+
+2008-04-28  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/consumers/disker/disker_wizard.py:
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	* flumotion/component/consumers/shout2/shout2_wizard.py:

@@ -41,7 +41,8 @@ flumotion_PYTHON = \
 	startset.py \
 	testsuite.py \
 	watched.py \
-	worker.py
+	worker.py \
+	xmlwriter.py
 
 TAGS_DEPENDENCIES = $(flumotion_PYTHON)
 ETAGS_ARGS = --lang=python $(flumotion_PYTHON)
