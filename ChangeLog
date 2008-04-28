@@ -1,3 +1,8 @@
+2008-04-28  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_common_messages.py:
+	Remove a deferred generator
+
 2008-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_http.py:

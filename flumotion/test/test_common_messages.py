@@ -31,7 +31,6 @@ import gettext
 from flumotion.common import messages, log
 from flumotion.configure import configure
 from flumotion.twisted import flavors
-from flumotion.twisted.defer import defer_generator_method
 
 # markers
 from flumotion.common.messages import N_, ngettext
@@ -199,9 +198,7 @@ class PBSerializationTest(testsuite.TestCase):
         self.runServer()
 
     def tearDown(self):
-        d = self.stopServer()
-        yield d
-    tearDown = defer_generator_method(tearDown)
+        return self.stopServer()
 
     # helper functions to start PB comms
     def runClient(self):
