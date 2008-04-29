@@ -1,3 +1,8 @@
+2008-04-29  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/encoders/theora/theora.py (Theora.do_check):
+	Import the used modules and invoke the check function properly.
+
 2008-04-28  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/configurationwizard.py (ConfigurationWizard.waitForTask): 

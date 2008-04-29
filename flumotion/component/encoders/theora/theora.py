@@ -21,6 +21,7 @@
 
 from flumotion.component import feedcomponent
 from flumotion.common import messages
+from flumotion.worker.checks import check
 
 from flumotion.common.messages import N_
 
@@ -35,7 +36,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
     def do_check(self):
         self.debug('running Theora check')
         from flumotion.worker.checks import encoder
-        return encoder.do_check(encoder.checkTheora)
+        return check.do_check(self, encoder.checkTheora)
 
     def get_pipeline_string(self, properties):
         return "ffmpegcolorspace ! theoraenc name=encoder"
