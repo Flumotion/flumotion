@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -23,14 +23,9 @@
 parsing of manager configuration files
 """
 
-import os
-from xml.dom import minidom, Node
-from xml.parsers import expat
-
-from twisted.python import reflect
-
-from flumotion.common import log, errors, common, registry, fxml
+from flumotion.common import log, errors, common, registry
 from flumotion.common import config as fluconfig
+from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 from flumotion.configure import configure
 
 __version__ = "$Rev$"
@@ -727,54 +722,102 @@ class ManagerConfigParser(FlumotionConfigParser):
         self.doc.unlink()
         self.doc = None
 
-def exportPlanetXml(p):
-    from flumotion.common.fxml import SXML
-    X = SXML()
 
-    def serialise(propVal):
-        if isinstance(propVal, tuple): # fractions are our only tuple type
-            return "%d/%d" % propVal
-        return propVal
+class PlanetXMLWriter(XMLWriter):
+    def __init__(self, planetState):
+        super(PlanetXMLWriter, self).__init__()
+        self._writePlanet(planetState)
 
-    def component(c, isFeedComponent):
-        concat = lambda lists: reduce(list.__add__, lists, [])
-        C = c.get('config')
-        values = [X.component(name=c.get('name'),
-                              type=c.get('type'),
-                              label=C.get('label', c.get('name')),
-                              worker=c.get('workerRequested'),
-                              project=C['project'],
-                              version=common.versionTupleToString(C['version']))]
-        values += [[X.eater(name=name)]
-                   + [[X.feed(alias=alias), feedId]
-                      for feedId, alias in feeders]
-                   for name, feeders in  C['eater'].items()]
-        values += [[X.property(name=name), serialise(value)]
-                   for name, value in C['properties'].items()]
+    def _writePlanet(self, planet):
+        attrs = [('name', planet.get('name'))]
+        self.pushTag('planet', attrs)
+        self._writeAtmosphere(planet.get('atmosphere'))
+        for flow in planet.get('flows'):
+            self._writeFlow(flow)
+        self.popTag()
+
+    def _writeAtmosphere(self, atmosphere):
+        self.pushTag('atmosphere')
+        for component in atmosphere.get('components'):
+            self._writeComponent(component, isFeedComponent=False)
+        self.popTag()
+
+    def _writeFlow(self, flow):
+        attrs = [('name', flow.get('name'))]
+        self.pushTag('flow', attrs)
+
+        # FIXME: When we can depend on Python 2.4, use
+        #        sorted(flow.get('components'),
+        #               cmp=cmpComponentType,
+        #               key=operator.attrgetter('type'))
+        #
+        def componentSort(a, b):
+            return cmpComponentType(a.get('type'), b.get('type'))
+        components = list(flow.get('components'))
+        components.sort(cmp=componentSort)
+        for component in components:
+            self._writeComponent(component)
+        self.popTag()
+
+    def _writeComponent(self, component, isFeedComponent=True):
+        config = component.get('config')
+        attrs = [('name', component.get('name')),
+                 ('type', component.get('type')),
+                 ('label', config.get('label', component.get('name'))),
+                 ('worker', component.get('workerRequested')),
+                 ('project', config['project']),
+                 ('version', common.versionTupleToString(config['version']))]
+        self.pushTag('component', attrs)
+        for name, feeders in config['eater'].items():
+            self._writeEater(name, feeders)
+        self._writeProperties(config['properties'].items())
         if isFeedComponent:
-            values += [[X.clock_master(),
-                        C['clock-master'] == C['avatarId'] and 'true' or 'false']]
-        values +=  [[X.plugs()]
-                    + concat([[[X.plug(type=plug['type'])]
-                               + [[X.property(name=name), value]
-                                  for name, value in plug['properties'].items()]
-                               for plug in plugs]
-                              for plugs in C['plugs'].values()])]
-        values += [[X.virtual_feed(name=name, real=real)]
-                   for name, real in C['virtual-feeds'].items()]
-        return values
+            if config['clock-master'] == config['avatarId']:
+                value = 'true'
+            else:
+                value = 'false'
+            self.writeTag('clock-master', data=value)
+        self._writePlugs(config['plugs'].items())
+        self._writeVirtualFeeds(config['virtual-feeds'].items())
+        self.popTag()
 
-    def flow(f):
-        return ([X.flow(name=f.get('name'))]
-                 + [component(c, True) for c in f.get('components')])
+    def _writeEater(self, name, feeders):
+        attrs = [('name', name)]
+        self.pushTag('eater', attrs)
+        for feedId, alias in feeders:
+            attrs = [('alias', alias)]
+            self.writeTag('feed', attrs, feedId)
+        self.popTag()
 
-    def atmosphere(a):
-        return ([X.atmosphere()]
-                + [component(c, False) for c in a.get('components')])
+    def _writeProperties(self, properties):
+        def serialise(propVal):
+            if isinstance(propVal, tuple): # fractions are our only tuple type
+                return "%d/%d" % propVal
+            return propVal
+        for name, value in properties:
+            attrs = [('name', name)]
+            self.writeTag('property', attrs, serialise(value))
 
-    def planet(p):
-        return ([X.planet(name=p.get('name')),
-                 atmosphere(p.get('atmosphere'))]
-                + [flow(f) for f in p.get('flows')])
-    return fxml.sxml2unicode(planet(p))
+    def _writePlugs(self, plugs):
+        self.pushTag('plugs')
+        for socket, plugs in plugs:
+            for plug in plugs:
+                self._writePlug(plug, socket)
+        self.popTag()
 
+    def _writePlug(self, plug, socket):
+        attrs = [('socket', socket),
+                 ('type', plug['type'])]
+        self.pushTag('plug', attrs)
+        self._writeProperties(plug['properties'].items())
+        self.popTag()
+
+    def _writeVirtualFeeds(self, virtualfeeds):
+        for name, real in virtualfeeds:
+            attrs = [('name', name),
+                     ('real', real)]
+            self.writeTag('virtual-feed', attrs)
+
+def exportPlanetXml(p):
+    pw = PlanetXMLWriter(p)
+    return pw.getXML()

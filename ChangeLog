@@ -1,4 +1,17 @@
 2008-04-30  Johan Dahlin  <johan@flumotion.com>
+	
+	* flumotion/common/fxml.py:
+	* flumotion/common/xmlwriter.py:
+	* flumotion/manager/config.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_xmlwriter.py:
+	* flumotion/wizard/configurationwriter.py:
+	Wrap long lines in the xml output by using xmlwriter when
+	exporting xml from the planet. Sort the components and
+	add a new function for ordering components by type.
+	Fixes #939.
+
+2008-04-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_common_xmlwriter.py:

@@ -22,7 +22,7 @@
 from cStringIO import StringIO
 from xml.sax.saxutils import quoteattr
 
-from flumotion.common.xmlwriter import XMLWriter
+from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 from flumotion.configure import configure
 
 __version__ = "$Rev: 6246 $"
@@ -68,6 +68,16 @@ class ConfigurationWriter(XMLWriter):
         self.popTag()
 
     def _writeComponents(self, components):
+        # FIXME: When we can depend on Python 2.4, use
+        #        sorted(flow.get('components'),
+        #               cmp=cmpComponentType,
+        #               key=operator.attrgetter('component_type'))
+        #
+        def componentSort(a, b):
+            return cmpComponentType(a.component_type,
+                                    b.component_type)
+        components = list(components)
+        components.sort(cmp=componentSort)
         for component in components:
             self._writeComponent(component)
 

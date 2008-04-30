@@ -123,3 +123,28 @@ class XMLWriter(object):
         tagName = self._tagStack.pop()
         self._closeTag(tagName)
         return tagName
+
+
+def cmpComponentType(aType, bType):
+    """Compare two component types the way they should be written in an xml
+    file. Suitable for using as cmp argument to list.sort() or sorted().
+    @param aType: first component type
+    @type aType:
+    @param bType: second component type
+    @type bType:
+    @returns: -1, 0 or 1, see L{__builtin__.cmp}
+    """
+    for suffix in ['-producer',
+                   '-converter',
+                   '-encoder',
+                   '-muxer',
+                   '-streamer']:
+        bHasSuffix = bType.endswith(suffix)
+        if aType.endswith(suffix):
+            if bHasSuffix:
+                return cmp(aType, bType)
+            else:
+                return -1
+        elif bHasSuffix:
+            return 1
+    return cmp(aType, bType)

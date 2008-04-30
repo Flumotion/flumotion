@@ -31,9 +31,8 @@ import sets
 
 from xml.dom import minidom, Node
 from xml.parsers import expat
-from xml.sax.saxutils import escape, quoteattr
 
-from flumotion.common import log, common
+from flumotion.common import log
 
 __version__ = "$Rev$"
 
@@ -217,40 +216,3 @@ class Parser(log.Loggable):
         except Exception, e:
             raise self.parserError('failed to parse %s as %s: %s', node,
                                    type, log.getExceptionMessage(e))
-
-# this xml generation thingie is from a friday project, woo
-def sxml2unicode(expr, indent=0):
-    if not isinstance(expr, list):
-        return escape(unicode(expr))
-    operator = expr[0]
-    return unicode(operator(indent, expr[1:]))
-
-def _trans(k):
-    table = {'klass': 'class'}
-    return '-'.join(table.get(k, k).split('_'))
-
-## element := [tag, expression, expression...]
-## tag := xml.tagname | xml.tagname(attr=val, attr=val...)
-## expression := element | atom
-## atom := any non-list python object, unicode() will be called on it
-class SXML:
-    def __getattr__(self, attr):
-        def tag(**kw):
-            pre = '<%s%s>' % (_trans(attr),
-                              ''.join([' %s=%s' % (_trans(k), quoteattr(v))
-                                       for k, v in kw.items()]))
-            post = '</%s>' % (_trans(attr),)
-            def render(indent, args):
-                ind = ' '*indent
-                if len(args) == 0:
-                    return ind + pre[:-1] + ' />'
-                elif len(args) == 1 and not isinstance(args[0], list):
-                    return ind + pre + sxml2unicode(args[0]) + post
-                else:
-                    return (ind + pre + '\n' + '\n'.join(map(
-                        lambda x: sxml2unicode(x,indent+2), args)) + 
-                        '\n' + ind + post)
-            render.__name__ = pre
-            return render
-        tag.__name__ = attr 
-        return tag

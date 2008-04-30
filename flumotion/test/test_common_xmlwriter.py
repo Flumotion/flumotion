@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common.testsuite import TestCase
-from flumotion.common.xmlwriter import XMLWriter
+from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 
 __version__ = "$Rev$"
 
@@ -89,3 +89,48 @@ class TestXMLWriter(TestCase):
         xw.writeTag('tag2', data='data')
         self.assertEquals(xw.getXML(),
                           '<tag>\n  <tag2>data</tag2>\n')
+
+
+class TestCompareComponentTypes(TestCase):
+    def testEncoderMuxer(self):
+        components = ['ogg-muxer',
+                      'vorbis-encoder',
+                      'theora-encoder']
+        components.sort(cmp=cmpComponentType)
+        self.assertEquals(components,
+                          ['theora-encoder',
+                           'vorbis-encoder',
+                           'ogg-muxer'],
+                          components)
+
+    def testProducerEncoderMuxer(self):
+        components = ['ogg-muxer',
+                      'vorbis-encoder',
+                      'videotest-producer',
+                      'theora-encoder']
+        components.sort(cmp=cmpComponentType)
+        self.assertEquals(components,
+                          ['videotest-producer',
+                           'theora-encoder',
+                           'vorbis-encoder',
+                           'ogg-muxer'],
+                          components)
+
+    def testComplete(self):
+        components = ['ogg-muxer',
+                      'http-streamer',
+                      'overlay-converter',
+                      'vorbis-encoder',
+                      'videotest-producer',
+                      'dirac-encoder',
+                      'audiotest-producer']
+        components.sort(cmp=cmpComponentType)
+        self.assertEquals(components,
+                          ['audiotest-producer',
+                           'videotest-producer',
+                           'overlay-converter',
+                           'dirac-encoder',
+                           'vorbis-encoder',
+                           'ogg-muxer',
+                           'http-streamer'],
+                          components)
