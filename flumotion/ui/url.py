@@ -45,7 +45,7 @@ class ClickyURL(gtk.EventBox):
             text = '<span foreground="blue">%s</span>' % self.url
             label.set_markup(text)
         else:
-            label.set_text(text)
+            label.set_text(self.url)
         label.show()
         self.add(label)
 

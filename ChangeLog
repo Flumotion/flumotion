@@ -1,5 +1,10 @@
 2008-04-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/url.py: Fix typo which broke the case 
+	where gnomevfs is not installed.
+
+2008-04-30  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/fxml.py:
 	* flumotion/common/xmlwriter.py:
 	* flumotion/manager/config.py:
