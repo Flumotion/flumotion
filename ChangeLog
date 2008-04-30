@@ -1,3 +1,9 @@
+2008-04-30  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_xmlwriter.py:
+	Add xmlwriter tests.
+
 2008-04-29  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/encoders/theora/theora.py (Theora.do_check):

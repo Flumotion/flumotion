@@ -31,6 +31,7 @@ EXTRA_DIST = 					\
 	test_common.py				\
 	test_common_pygobject.py		\
 	test_common_signals.py			\
+	test_common_xmlwriter.py		\
 	test_component_base_scheduler.py	\
 	test_component_base_watcher.py		\
 	test_component_bouncers_bouncer.py	\
