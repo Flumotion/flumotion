@@ -252,7 +252,7 @@ class BundlerBasket:
 
         self._graph = dag.DAG()
 
-    def add(self, bundleName, source, destination = None):
+    def add(self, bundleName, source, destination=None):
         """
         Add files to the bundler basket for the given bundle.
 
@@ -343,6 +343,15 @@ class BundlerBasket:
         if self._files.has_key(filename):
             return self._files[filename]
         return None
+
+    def getBundlerNames(self):
+        """
+        Get all bundler names.
+
+        @rtype: list of str
+        @returns: a list of all bundler names in this basket.
+        """
+        return self._bundlers.keys()
 
 class MergedBundler(Bundler):
     """

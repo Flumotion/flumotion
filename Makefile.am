@@ -19,6 +19,7 @@ EXTRA_DIST = \
 	flumotion.doap \
 	misc/pycheckerhelp.py \
 	misc/validate-config.py \
+	misc/validate-registry.py \
 	intltool-extract.in \
 	intltool-merge.in \
 	intltool-update.in

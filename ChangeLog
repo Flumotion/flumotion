@@ -1,3 +1,15 @@
+2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* misc/validate-registry.py:
+	  Add a simple script to validate the registry.
+	* Makefile.am:
+	* common/common.mk:
+	  Run it as part of make check.
+	* flumotion/common/bundle.py:
+	  Add a method to get bundle names ...
+	* flumotion/test/test_bundle.py:
+	  ... and test it.
+
 2008-04-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/url.py: Fix typo which broke the case 

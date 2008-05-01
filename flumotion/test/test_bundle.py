@@ -227,6 +227,8 @@ class TestBundlerBasket(testsuite.TestCase):
         self.failIf(bundler)
         bundler = basket.getBundlerByName("test")
         self.failUnless(bundler)
+        names = basket.getBundlerNames()
+        self.assertEquals(names, ['test'])
 
     def testBundlerBasketFile(self):
         basket = bundle.BundlerBasket()

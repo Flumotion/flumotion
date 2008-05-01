@@ -1,10 +1,13 @@
-check-local: check-local-pychecker
+check-local: check-local-pychecker check-local-registry
 
 test:
 	@make check -C flumotion/test
 
 check-docs:
 	@make check -C doc/reference
+
+check-local-registry: locale-uninstalled
+	@$(PYTHON) $(top_srcdir)/misc/validate-registry.py
 
 coverage:
 	@trial --temp-directory=_trial_coverage --coverage flumotion.test
@@ -55,7 +58,7 @@ locale-uninstalled-1:
 # 	fi
 
 locale-uninstalled:
-	podir=$(top_builddir)/po; \
+	podir=$(top_srcdir)/po; \
 	localedir=$(top_builddir)/locale; \
         make -C $$podir; \
 	for file in $$(ls $$podir/*.gmo); do \
