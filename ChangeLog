@@ -1,5 +1,10 @@
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/common.mk:
+	  Run inside environment so flumotion can be imported.
+
+2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* misc/validate-registry.py:
 	  Add a simple script to validate the registry.
 	* Makefile.am:
