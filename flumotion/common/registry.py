@@ -583,7 +583,7 @@ class RegistryParser(fxml.Parser):
     def _parseProperties(self, node):
         # <properties>
         #   <property>*
-        #   <compound-proerty>*
+        #   <compound-property>*
         # </properties>
 
         properties = {}
