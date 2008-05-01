@@ -1,6 +1,16 @@
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* misc/validate-registry.py:
+	* common/validate-registry.py:
+	  Move from misc to common.
+	* Makefile.am:
+	* common/Makefile.am:
+	* common/common.mk:
+	  Fix up files for the move.
+
+2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* misc/validate-registry.py:
 	  Set up the package path as well.
 
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>

@@ -7,7 +7,7 @@ check-docs:
 	@make check -C doc/reference
 
 check-local-registry: locale-uninstalled
-	@$(top_builddir)/env $(PYTHON) $(top_srcdir)/misc/validate-registry.py
+	$(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
 
 coverage:
 	@trial --temp-directory=_trial_coverage --coverage flumotion.test
