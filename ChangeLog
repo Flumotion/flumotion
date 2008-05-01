@@ -1,5 +1,10 @@
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/project/project.py:
+	  Tell us the reason of an import error when trying to load a project.
+
+2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* misc/validate-registry.py:
 	* common/validate-registry.py:
 	  Move from misc to common.

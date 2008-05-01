@@ -22,7 +22,7 @@
 import os
 import sys
 
-from flumotion.common import package, errors
+from flumotion.common import package, errors, log
 
 import flumotion.project
 
@@ -52,7 +52,9 @@ def get(project, attribute, default=None):
     moduleName = "flumotion.project.%s" % project
     try:
         exec("import %s" % moduleName)
-    except ImportError:
+    except ImportError, e:
+        log.warning('project', 'Could not load project %s: %s',
+            project, log.getExceptionMessage(e))
         raise errors.NoProjectError(moduleName)
     except SyntaxError:
         raise errors.NoProjectError(moduleName)
