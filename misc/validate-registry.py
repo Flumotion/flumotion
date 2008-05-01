@@ -7,6 +7,7 @@ from flumotion.common import registry
 
 from flumotion.common import setup
 setup.setup()
+setup.setupPackagePath()
 
 registry = registry.getRegistry()
 
