@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
 import gobject
 import gtk
@@ -36,7 +37,7 @@ _DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
 
 class NodeBook(gtk.Notebook, log.Loggable):
     logCategory = 'nodebook'
-    
+
     def __init__(self, admingtk):
         """
         @param admingtk: the GTK Admin with its nodes
@@ -187,6 +188,9 @@ class ComponentView(gtk.VBox, log.Loggable):
             return admin.callRemote('getEntryByType', state, 'admin/gtk')
 
         def got_entry_point((filename, procname)):
+            # The manager always returns / as a path separator, replace them with
+            # the separator since the rest of our infrastructure depends on that.
+            filename = filename.replace('/', os.path.sep)
             # getEntry for admin/gtk returns a factory function
             # for creating
             # flumotion.component.base.admin_gtk.BaseAdminGtk
@@ -221,7 +225,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             self._set_state(OBJECT_UNSET)
         def set(state, key, value):
             if key == 'mood':
-                if value not in [planet.moods.lost.value, 
+                if value not in [planet.moods.lost.value,
                         planet.moods.sleeping.value, planet.moods.sad.value]:
                     self._set_state(OBJECT_ACTIVE)
                 else:

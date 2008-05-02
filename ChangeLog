@@ -1,5 +1,11 @@
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView._get_widget_constructor.got_entry_point): 
+	Ditto for componentview.
+
+2008-05-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
 	* flumotion/wizard/configurationwizard.py 
 	(ConfigurationWizard._gotEntryPoint): Move out of 
