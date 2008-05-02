@@ -1,5 +1,13 @@
-2008-05-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+2008-05-02  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/base/admin_gtk.py 
+	(BaseAdminGtkNode.loadGladeFile): 
+	Fixes #942. Manager is assumed to work on / for now, while the 
+	admin client is using os.path.sep and converts back and forth 
+	when talking to the manager.
+
+2008-05-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+ 
 	* common/common.mk:
 	  put FLUMOTION_DIR first on PYTHONPATH.
 
@@ -7,7 +15,7 @@
 
 	* flumotion/admin/gtk/componentview.py
 	(ComponentView._get_widget_constructor.got_entry_point): 
-	Ditto for componentview.
+	Ditto for componentview. Part of #942
 
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
@@ -21,6 +29,7 @@
 	Also replace the path separator given from the manager
 	with os.path.sep, since that is what is expected on the
 	admin client side of the story.
+	Part of #942.
 
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 

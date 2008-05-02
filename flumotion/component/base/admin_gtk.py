@@ -279,6 +279,9 @@ class BaseAdminGtkNode(log.Loggable):
             gtk.glade.textdomain(old)
             return self.wtree
 
+        # The manager is always using / as a path separator, to avoid
+        # confusion, convert os.path.sep -> / here.
+        gladeFile = gladeFile.replace(os.path.sep, '/')
         # FIXME: this does needless roundtrips; should instead be
         # loading from the already-downloaded paths
         self.debug("requesting bundle for glade file %s" % gladeFile)
