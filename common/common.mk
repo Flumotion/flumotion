@@ -58,7 +58,7 @@ locale-uninstalled-1:
 # 	fi
 
 locale-uninstalled:
-	podir=$(top_srcdir)/po; \
+	podir=$(top_builddir)/po; \
 	localedir=$(top_builddir)/locale; \
         make -C $$podir; \
 	for file in $$(ls $$podir/*.gmo); do \
