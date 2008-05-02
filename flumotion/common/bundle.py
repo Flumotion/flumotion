@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_bundle -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_common_bundle -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
