@@ -7,7 +7,7 @@ check-docs:
 	@make check -C doc/reference
 
 check-local-registry:
-	$(top_builddir)/env bash -c "export PYTHONPATH=$(top_srcdir):$(FLUMOTION_DIR)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
+	$(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
 
 coverage:
 	@trial --temp-directory=_trial_coverage --coverage flumotion.test

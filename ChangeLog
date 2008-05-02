@@ -1,3 +1,8 @@
+2008-05-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/common.mk:
+	  put FLUMOTION_DIR first on PYTHONPATH.
+
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py
