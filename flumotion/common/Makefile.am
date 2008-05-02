@@ -26,6 +26,7 @@ flumotion_PYTHON = \
 	manhole.py \
 	medium.py \
 	messages.py \
+	mimetypes.py \
 	netutils.py \
 	options.py \
 	package.py \

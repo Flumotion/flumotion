@@ -21,11 +21,7 @@
 
 import gettext
 import os
-
-try:
-    import gnomevfs
-except ImportError:
-    gnomevfs = None
+import webbrowser
 
 from flumotion.common import common
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
@@ -130,10 +126,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     # Callbacks
 
     def _on_link_show_url(self, url):
-        # text/html is wrong here, but how can we find out the real mime type?
-        app_to_run = gnomevfs.mime_get_default_application('text/html')
-        if app_to_run:
-            os.system('%s "%s" &' % (app_to_run[2], url))
+        webbrowser.open_new(url)
 
 
 class HTTPFileAdminGtk(BaseAdminGtk):

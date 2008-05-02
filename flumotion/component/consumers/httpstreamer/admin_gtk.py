@@ -23,11 +23,7 @@ import gettext
 import os
 import time
 
-try:
-    import gnomevfs
-except ImportError:
-    gnomevfs = None
-
+from flumotion.common.mimetypes import launchApplicationByUrl
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
 
@@ -133,11 +129,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     # Callbacks
 
     def _on_link_show_url(self, url):
-        app_to_run = gnomevfs.mime_get_default_application(
-            self._stats.get('stream-mime'))
-        if app_to_run:
-            os.system('%s "%s" &' % (app_to_run[2], url))
-
+        launchApplicationByUrl(url, self._stats.get('stream-mime'))
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):

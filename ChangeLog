@@ -1,5 +1,17 @@
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/mimetypes.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	Abstract launching an application and move it to f.c.mimetypes and
+	also move conversion of a mime type to a file extension.
+	Use subprocess instead of os.system on linux.
+	Implement support for launching an app on win32.
+
+2008-05-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/Makefile.am:
 	* flumotion/ui/url.py:
 	* po/POTFILES.in:

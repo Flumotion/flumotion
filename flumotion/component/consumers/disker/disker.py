@@ -33,6 +33,7 @@ from twisted.internet import reactor
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
 from flumotion.common import common
+from flumotion.common.mimetypes import mimeTypeToExtention
 
 # proxy import
 from flumotion.component.component import moods
@@ -182,30 +183,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         to time.localtime(). A 9-tuple may be passed instead.
         """
         mime = self.get_mime()
-        if mime == 'application/ogg':
-            ext = 'ogg'
-        elif mime == 'multipart/x-mixed-replace':
-            ext = 'multipart'
-        elif mime == 'audio/mpeg':
-            ext = 'mp3'
-        elif mime == 'video/x-msvideo':
-            ext = 'avi'
-        elif mime == 'video/x-ms-asf':
-            ext = 'asf'
-        elif mime == 'audio/x-flac':
-            ext = 'flac'
-        elif mime == 'audio/x-wav':
-            ext = 'wav'
-        elif mime == 'video/x-matroska':
-            ext = 'mkv'
-        elif mime == 'video/x-dv':
-            ext = 'dv'
-        elif mime == 'video/x-flv':
-            ext = 'flv'
-        elif mime == 'video/mpegts':
-            ext = 'ts'
-        else:
-            ext = 'data'
+        ext = mimeTypeToExtention(mime)
 
         self.stop_recording()
 
