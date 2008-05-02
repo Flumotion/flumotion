@@ -172,6 +172,11 @@ class Unbundler:
             handle = os.fdopen(fd, 'wb')
             handle.write(data)
             handle.close()
+
+            # os.rename is not deleting the target file
+            # if it exists, so remove it before
+            if os.path.exists(path):
+                os.unlink(path)
             os.rename(tempname, path)
         return dir
 

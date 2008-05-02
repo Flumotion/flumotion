@@ -1,4 +1,7 @@
-2008-05-02  Johan Dahlin  <johan@gnome.org>
+2008-05-02  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/common/bundle.py (Unbundler.unbundle): 
+	Remove the target file before renaming.
 
 	* flumotion/component/base/admin_gtk.py 
 	(BaseAdminGtkNode.loadGladeFile): 
