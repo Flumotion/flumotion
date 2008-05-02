@@ -13,7 +13,6 @@ flumotion_PYTHON = 	\
 	sidebar.py 	\
 	simplewizard.py \
 	trayicon.py 	\
-	url.py		\
 	wizard.py
 
 TAGS_FILES = $(flumotion_PYTHON)

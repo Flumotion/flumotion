@@ -1,5 +1,12 @@
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/url.py:
+	* po/POTFILES.in:
+	Remove flumotion.ui.url which is unused.
+
+2008-05-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/bundle.py (Unbundler.unbundle): 
 	Remove the target file before renaming.
 

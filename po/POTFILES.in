@@ -217,7 +217,6 @@ flumotion/component/effects/volume/volume.py
 flumotion/component/effects/volume/__init__.py
 flumotion/component/effects/volume/admin_gtk.py
 flumotion/ui/glade.py
-flumotion/ui/url.py
 flumotion/ui/icons.py
 flumotion/ui/wizard.py
 flumotion/ui/fgtk.py
