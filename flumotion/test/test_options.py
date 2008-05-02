@@ -23,7 +23,7 @@ from flumotion.common import testsuite
 from flumotion.common.options import OptionGroup, OptionParser
 from flumotion.common.log import getLogSettings, setLogSettings
 
-__version__ = "$Rev$"
+
 
 
 class TestOptions(testsuite.TestCase):

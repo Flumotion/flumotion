@@ -24,7 +24,7 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer import httpstreamer
 
-__version__ = "$Rev$"
+
 
 
 class TestOldProperties(testsuite.TestCase):

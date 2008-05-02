@@ -30,7 +30,7 @@ except RuntimeError:
     import os
     os._exit(0)
 
-__version__ = "$Rev$"
+
 
 INTERVAL = 100 # in ms
 

@@ -30,7 +30,7 @@ from flumotion.common import testsuite
 import twisted.python.util
 from twisted.trial.unittest import FailTest
 
-__version__ = "$Rev$"
+
 
 
 class TestPackagePath(testsuite.TestCase):

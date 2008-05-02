@@ -33,7 +33,7 @@ from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
      ComponentUnitTestMixin, pipeline_src, pipeline_cnv
 
 
-__version__ = "$Rev$"
+
 
 
 class CompTestTestCase(log.Loggable, testsuite.TestCase,

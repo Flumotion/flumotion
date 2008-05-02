@@ -27,7 +27,7 @@ from flumotion.common import planet
 from flumotion.common import testsuite
 from flumotion.common.planet import moods
 
-__version__ = "$Rev$"
+
 
 
 class TestAdminStatusbar(testsuite.TestCase):

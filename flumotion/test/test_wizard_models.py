@@ -24,7 +24,7 @@ import unittest
 from flumotion.common import testsuite
 from flumotion.wizard.models import Component, Properties
 
-__version__ = "$Rev$"
+
 
 
 class TestComponent(testsuite.TestCase):

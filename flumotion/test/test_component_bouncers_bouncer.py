@@ -22,7 +22,7 @@
 from flumotion.component.bouncers import bouncer
 from flumotion.test import bouncertest
 
-__version__ = "$Rev$"
+
 
 
 class FakeBouncerMedium(bouncertest.FakeMedium, bouncer.BouncerMedium):

@@ -24,7 +24,7 @@ from flumotion.common import testsuite
 from flumotion.admin.connections import get_recent_connections, \
      RecentConnection
 
-__version__ = "$Rev$"
+
 
 
 class AdminConnectiontionsTest(testsuite.TestCase):

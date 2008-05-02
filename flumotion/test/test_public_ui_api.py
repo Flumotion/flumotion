@@ -21,7 +21,7 @@
 
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestPublicUI(testsuite.TestCase):

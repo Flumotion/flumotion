@@ -32,7 +32,7 @@ from flumotion.common.planet import moods
 from flumotion.manager import component, manager
 from flumotion.twisted import flavors
 
-__version__ = "$Rev$"
+
 
 
 class MyListener(log.Loggable):

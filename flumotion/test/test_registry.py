@@ -28,7 +28,7 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 from flumotion.common import testsuite
 from flumotion.common import registry, fxml, common
 
-__version__ = "$Rev$"
+
 
 
 class TestRegistry(testsuite.TestCase):

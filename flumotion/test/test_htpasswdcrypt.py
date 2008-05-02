@@ -26,7 +26,7 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import htpasswdcrypt
 
-__version__ = "$Rev$"
+
 bouncerconf = {'name': 'testbouncer',
                'plugs': {},
                'properties': {'data': "user:qi1Lftt0GZC0o"}}

@@ -26,7 +26,7 @@ from flumotion.common import connection
 from flumotion.common import testsuite
 from flumotion.twisted import pb
 
-__version__ = "$Rev$"
+
 
 
 class AdminTest(testsuite.TestCaseWithManager):

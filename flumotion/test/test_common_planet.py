@@ -28,7 +28,7 @@ from flumotion.common import planet
 from flumotion.common.planet import moods
 from flumotion.twisted import flavors
 
-__version__ = "$Rev$"
+
 
 
 class ManagerComponentStateTest(testsuite.TestCase):

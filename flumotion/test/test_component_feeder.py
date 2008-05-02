@@ -27,7 +27,7 @@ from twisted.internet import defer, reactor
 
 from flumotion.component import feeder
 
-__version__ = "$Rev$"
+
 
 
 class TestFeeder(testsuite.TestCase):

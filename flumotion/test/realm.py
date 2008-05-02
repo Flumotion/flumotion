@@ -29,7 +29,7 @@ from flumotion.common import server, connection, log
 from flumotion.configure import configure
 from flumotion.component.bouncers import htpasswdcrypt
 
-__version__ = "$Rev$"
+
 
 
 class TestRealm(log.Loggable):

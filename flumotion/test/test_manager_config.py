@@ -26,7 +26,7 @@ from flumotion.common.errors import ConfigError
 from flumotion.manager.config import ConfigEntryComponent, ConfigEntryManager, \
      ManagerConfigParser, PlanetConfigParser
 
-__version__ = "$Rev$"
+
 
 def flatten(seq):
     rv = []

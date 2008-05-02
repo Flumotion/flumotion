@@ -28,7 +28,7 @@ from twisted.cred import credentials as tcredentials
 from flumotion.twisted import credentials, checkers
 from flumotion.common import errors
 
-__version__ = "$Rev$"
+
 
 # Use some shorter names
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext

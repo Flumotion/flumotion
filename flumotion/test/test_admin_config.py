@@ -25,7 +25,7 @@ from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.admin import config
 
-__version__ = "$Rev$"
+
 
 
 def AdminConfig(sockets, string):

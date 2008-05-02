@@ -23,7 +23,7 @@ from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.component.base import http
 
-__version__ = "$Rev$"
+
 
 
 class TestLogFilter(testsuite.TestCase):

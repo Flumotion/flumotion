@@ -24,7 +24,7 @@ from twisted.trial import unittest
 
 from flumotion.common import gstreamer
 
-__version__ = "$Rev$"
+
 
 
 class Factory(unittest.TestCase):

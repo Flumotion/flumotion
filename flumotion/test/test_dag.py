@@ -22,7 +22,7 @@
 from flumotion.common import dag
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestDAG(testsuite.TestCase):

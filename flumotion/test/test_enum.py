@@ -24,7 +24,7 @@ from twisted.spread import jelly
 from flumotion.common import enum
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestEnum(testsuite.TestCase):

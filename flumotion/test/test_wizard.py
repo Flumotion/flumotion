@@ -35,7 +35,7 @@ from flumotion.admin import admin
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard.configurationwizard import ConfigurationWizard
 
-__version__ = "$Rev$"
+
 
 
 class WizardStepTest(testsuite.TestCase):

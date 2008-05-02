@@ -22,7 +22,7 @@
 from flumotion.common import testsuite
 from flumotion.component.base import watcher
 
-__version__ = "$Rev$"
+
 
 
 class WatcherTest(testsuite.TestCase):

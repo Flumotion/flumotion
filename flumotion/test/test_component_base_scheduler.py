@@ -26,7 +26,7 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component.base import scheduler
 
-__version__ = "$Rev$"
+
 
 
 def _now(tz=scheduler.LOCAL):

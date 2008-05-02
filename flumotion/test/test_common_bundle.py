@@ -31,7 +31,7 @@ import zipfile
 import md5
 import time
 
-__version__ = "$Rev$"
+
 
 
 class TestBundler(testsuite.TestCase):

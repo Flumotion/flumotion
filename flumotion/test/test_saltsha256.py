@@ -26,7 +26,7 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import saltsha256
 
-__version__ = "$Rev$"
+
 
 bouncerconf = {
     'name': 'testbouncer',

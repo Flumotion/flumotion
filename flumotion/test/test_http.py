@@ -33,7 +33,7 @@ import os
 
 from twisted.web import http
 
-__version__ = "$Rev$"
+
 
 
 class PipeTransport:

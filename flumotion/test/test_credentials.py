@@ -25,7 +25,7 @@ from twisted.trial import unittest
 
 from flumotion.twisted import credentials
 
-__version__ = "$Rev$"
+
 
 # use some shorter names
 CredCrypt = credentials.UsernameCryptPasswordCrypt

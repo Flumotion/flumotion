@@ -22,7 +22,7 @@
 from flumotion.common import signals
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestObject(signals.SignalMixin):

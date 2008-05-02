@@ -27,7 +27,7 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component import padmonitor
 
-__version__ = "$Rev$"
+
 
 
 class TestPadMonitor(testsuite.TestCase):

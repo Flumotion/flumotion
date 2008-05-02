@@ -26,7 +26,7 @@ from zope.interface import implements
 from flumotion.common import testsuite
 from flumotion.twisted import flavors
 
-__version__ = "$Rev$"
+
 
 
 class TestStateCacheable(flavors.StateCacheable):

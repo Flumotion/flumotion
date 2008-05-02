@@ -25,7 +25,7 @@ from twisted.spread import pb
 from flumotion.common import log
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 # an object that subclasses from both Cacheable and RemoteCache

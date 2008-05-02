@@ -34,7 +34,7 @@ from flumotion.component.misc.httpserver import file, httpserver
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.test import test_http
 
-__version__ = "$Rev$"
+
 
 
 class MountTest(log.Loggable, testsuite.TestCase):

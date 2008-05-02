@@ -27,7 +27,7 @@ from flumotion.test import realm
 from flumotion.twisted import pb as fpb
 from flumotion.worker import medium
 
-__version__ = "$Rev$"
+
 
 
 class TestWorkerAvatar(fpb.PingableAvatar):

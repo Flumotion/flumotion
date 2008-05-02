@@ -27,7 +27,7 @@ from flumotion.twisted import credentials
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
 
-__version__ = "$Rev$"
+
 
 
 # test all the keycards

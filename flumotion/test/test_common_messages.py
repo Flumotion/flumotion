@@ -35,7 +35,7 @@ from flumotion.twisted import flavors
 # markers
 from flumotion.common.messages import N_, ngettext
 
-__version__ = "$Rev$"
+
 # translatablers
 T_ = messages.gettexter('flumotion')
 

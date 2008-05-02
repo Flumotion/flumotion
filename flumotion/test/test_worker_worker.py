@@ -22,7 +22,7 @@
 from flumotion.common import testsuite
 from flumotion.worker import worker
 
-__version__ = "$Rev$"
+
 
 
 class FakeOptions:

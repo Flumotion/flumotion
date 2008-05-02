@@ -42,7 +42,7 @@ from flumotion.twisted import flavors
 
 __all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
            'pipeline_cnv']
-__version__ = "$Rev$"
+
 
 
 class ComponentTestException(Exception):

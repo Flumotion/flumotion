@@ -29,7 +29,7 @@ from zope.interface import implements,Interface
 from flumotion.common import common
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestFormatStorage(testsuite.TestCase):

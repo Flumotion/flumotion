@@ -25,7 +25,7 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import keycards
 
-__version__ = "$Rev$"
+
 
 
 class FakeMedium:

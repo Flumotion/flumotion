@@ -41,7 +41,7 @@ from flumotion.wizard.models import Component, Plug, AudioProducer, \
 from flumotion.wizard.overlaystep import Overlay
 from flumotion.wizard.save import WizardSaver
 
-__version__ = "$Rev: 6126 $"
+
 
 
 class TestXMLWriter(testsuite.TestCase):

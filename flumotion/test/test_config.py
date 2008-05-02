@@ -25,7 +25,7 @@ from flumotion.common import registry, errors
 from flumotion.common import testsuite
 from flumotion.manager import config
 
-__version__ = "$Rev$"
+
 
 regchunk = """
 <registry>

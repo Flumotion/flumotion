@@ -25,7 +25,7 @@ from twisted.internet import reactor, defer
 from flumotion.common import testsuite
 from flumotion.worker import worker
 
-__version__ = "$Rev$"
+
 
 
 class FakeOptions:

@@ -27,7 +27,7 @@ flumotion.common.setup.setup()
 
 from flumotion.common import log
 
-__version__ = "$Rev$"
+
 
 
 def useGtk2Reactor():

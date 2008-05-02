@@ -25,7 +25,7 @@ from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator, RetryingDeferred
 
-__version__ = "$Rev$"
+
 
 
 class TestDefer(testsuite.TestCase):

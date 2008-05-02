@@ -26,7 +26,7 @@ from flumotion.common import log, interfaces
 from flumotion.common import testsuite
 from flumotion.manager import worker
 
-__version__ = "$Rev$"
+
 
 
 class FakeTransport:

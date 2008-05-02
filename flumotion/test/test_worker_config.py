@@ -22,7 +22,7 @@
 from flumotion.common import testsuite
 from flumotion.worker import config
 
-__version__ = "$Rev$"
+
 
 
 class WorkerConfigTest(testsuite.TestCase):

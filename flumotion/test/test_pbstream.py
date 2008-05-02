@@ -31,7 +31,7 @@ from zope.interface import implements
 from flumotion.common import log
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 # this example sets up a PB connection from client to server,

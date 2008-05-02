@@ -28,7 +28,7 @@ from twisted.internet import defer, error, reactor
 from flumotion.common import testsuite
 from flumotion.twisted import integration
 
-__version__ = "$Rev$"
+
 
 
 def _call_in_reactor(proc):

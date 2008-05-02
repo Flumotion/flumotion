@@ -22,7 +22,7 @@
 from flumotion.twisted import reflect
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestSimple(testsuite.TestCase):

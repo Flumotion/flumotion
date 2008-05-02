@@ -25,7 +25,7 @@ import gtk
 from flumotion.admin.gtk import dialogs
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 INTERVAL = 100 # in ms
 

@@ -22,7 +22,7 @@
 from flumotion.common import connection
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class TestConnection(testsuite.TestCase):

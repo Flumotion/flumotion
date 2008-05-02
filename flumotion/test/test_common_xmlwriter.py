@@ -22,7 +22,7 @@
 from flumotion.common.testsuite import TestCase
 from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 
-__version__ = "$Rev$"
+
 
 
 class TestXMLWriter(TestCase):

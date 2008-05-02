@@ -28,7 +28,7 @@ from flumotion.component.producers.playlist import playlistparser
 from flumotion.common import fxml
 from flumotion.common import testsuite
 
-__version__ = "$Rev$"
+
 
 
 class FakeProducer(object):

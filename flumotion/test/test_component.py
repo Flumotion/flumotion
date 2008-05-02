@@ -26,7 +26,7 @@ from flumotion.common import testsuite
 from flumotion.common import errors
 from flumotion.component.feedcomponent import ParseLaunchComponent
 
-__version__ = "$Rev$"
+
 
 
 class PipelineTest(ParseLaunchComponent):
