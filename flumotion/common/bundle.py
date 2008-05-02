@@ -173,7 +173,7 @@ class Unbundler:
             handle.write(data)
             handle.close()
 
-            # os.rename is not deleting the target file
+            # os.rename on Win32 is not deleting the target file
             # if it exists, so remove it before
             if os.path.exists(path):
                 os.unlink(path)
