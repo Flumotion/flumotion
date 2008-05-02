@@ -1,3 +1,16 @@
+2008-05-02  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/wizard/configurationwizard.py 
+	(ConfigurationWizard._gotEntryPoint): Move out of 
+	(ConfigurationWizard.getWizardPlugEntry): this
+	(ConfigurationWizard.getWizardEntry):  and this.
+	Make getWizardPlugEntry public, refactor component/plug callback to a 
+	common path.
+	Also replace the path separator given from the manager
+	with os.path.sep, since that is what is expected on the
+	admin client side of the story.
+
 2008-05-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/common.mk:

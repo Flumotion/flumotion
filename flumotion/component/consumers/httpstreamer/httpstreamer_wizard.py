@@ -332,7 +332,7 @@ class HTTPStep(ConsumerStep):
                         d.addCallback(cb, plugin, entry)
                     else:
                         self._addPlug(plugin, N_(entry.description))
-                d = self.wizard._getWizardPlugEntry(entry.component_type)
+                d = self.wizard.getWizardPlugEntry(entry.component_type)
                 d.addCallback(response, entry)
 
         d = self.wizard.getWizardEntries(wizardTypes=['http-consumer'])

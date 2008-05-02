@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 import sets
 
 from gtk import gdk
@@ -415,6 +416,16 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(callback)
         return d
 
+    def _gotEntryPoint(self, (filename, procname)):
+        # The manager always returns / as a path separator, replace them with
+        # the separator since the rest of our infrastructure depends on that.
+        filename = filename.replace('/', os.path.sep)
+        modname = pathToModuleName(filename)
+        d = self._admin.getBundledFunction(modname, procname)
+        self.clear_msg('wizard-bundle')
+        self.taskFinished()
+        return d
+
     def getWizardEntry(self, component_type):
         """Fetches a wizard bundle from a specific kind of component
         @param component_type: the component type to get the wizard entry
@@ -423,20 +434,13 @@ class ConfigurationWizard(SectionWizard):
           - factory of the component
           - noBundle error: if the component lacks a wizard bundle
         """
-        def gotEntryPoint((filename, procname)):
-            modname = pathToModuleName(filename)
-            d = self._admin.getBundledFunction(modname, procname)
-            self.clear_msg('wizard-bundle')
-            self.taskFinished()
-            return d
-
         self.waitForTask('get wizard entry %s' % (component_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getEntryByType', component_type, 'wizard')
-        d.addCallback(gotEntryPoint)
+        d.addCallback(self._gotEntryPoint)
         return d
 
-    def _getWizardPlugEntry(self, plug_type):
+    def getWizardPlugEntry(self, plug_type):
         """Fetches a wizard bundle from a specific kind of plug
         @param plug_type: the plug type to get the wizard entry
           bundle from.
@@ -444,17 +448,10 @@ class ConfigurationWizard(SectionWizard):
           - factory of the plug
           - noBundle error: if the plug lacks a wizard bundle
         """
-        def gotEntryPoint((filename, procname)):
-            modname = pathToModuleName(filename)
-            d = self._admin.getBundledFunction(modname, procname)
-            self.clear_msg('wizard-bundle')
-            self.taskFinished()
-            return d
-
         self.waitForTask('get wizard plug %s' % (plug_type,))
         self.clear_msg('wizard-bundle')
         d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
-        d.addCallback(gotEntryPoint)
+        d.addCallback(self._gotEntryPoint)
         return d
 
     def getWizardEntries(self, wizardTypes=None, provides=None, accepts=None):
