@@ -3,14 +3,14 @@ include $(top_srcdir)/common/python.mk
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/bttv
 component_DATA = 		\
 	bttv.xml		\
-	bttv-wizard.glade	\
+	wizard.glade	\
 	colorbalance.glade
 
 component_PYTHON = 		\
 	__init__.py		\
 	admin_gtk.py		\
 	bttv.py			\
-	bttv_wizard.py
+	wizard_gtk.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

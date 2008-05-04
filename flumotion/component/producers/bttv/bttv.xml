@@ -12,7 +12,7 @@
                function="BTTV" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
-        <entry type="wizard" location="bttv_wizard.py"
+        <entry type="wizard" location="wizard_gtk.py"
                function="BTTVWizardPlugin" />
       </entries>
       
@@ -91,8 +91,8 @@
 
         <directories>
             <directory name="flumotion/component/producers/bttv">
-                <filename location="bttv-wizard.glade" />
-                <filename location="bttv_wizard.py" />
+                <filename location="wizard.glade" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

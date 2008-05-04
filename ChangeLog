@@ -1,3 +1,50 @@
+2008-05-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/disker_wizard.py:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/httpstreamer_wizard.py:
+	* flumotion/component/consumers/shout2/Makefile.am:
+	* flumotion/component/consumers/shout2/shout2_wizard.py:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/dirac/dirac.xml:
+	* flumotion/component/encoders/dirac/dirac_wizard.py:
+	* flumotion/component/encoders/jpeg/jpeg.xml:
+	* flumotion/component/encoders/jpeg/jpeg_wizard.py:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/mulaw/mulaw_wizard.py:
+	* flumotion/component/encoders/smoke/smoke.xml:
+	* flumotion/component/encoders/smoke/smoke_wizard.py:
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/theora/theora_wizard.py:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/vorbis_wizard.py:
+	* flumotion/component/plugs/cortado/Makefile.am:
+	* flumotion/component/plugs/cortado/cortado.xml:
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/audiotest/audiotest_wizard.py:
+	* flumotion/component/producers/bttv/Makefile.am:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/bttv/bttv_wizard.py:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/firewire/firewire_wizard.py:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/soundcard/soundcard_wizard.py:
+	* flumotion/component/producers/videotest/Makefile.am:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/videotest/videotest_wizard.py:
+	* flumotion/component/producers/webcam/Makefile.am:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/producers/webcam/webcam_wizard.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* po/POTFILES.in:
+	  Mass rename to conform to new naming guidelines.
+
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/Makefile.am:

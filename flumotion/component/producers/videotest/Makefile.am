@@ -5,12 +5,12 @@ component_PYTHON = 		\
 	admin_gtk.py		\
 	admin_text.py		\
 	videotest.py		\
-	videotest_wizard.py
+	wizard_gtk.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/videotest
 component_DATA = \
 	videotest.xml		\
-	videotest-wizard.glade
+	wizard.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo
