@@ -22,7 +22,7 @@ glade_DATA =							\
 	overview-wizard.glade				\
 	production-wizard.glade				\
 	summary-wizard.glade				\
-	wizard_welcome.glade
+	welcome-wizard.glade
 
 gladedir = $(pkgdatadir)/glade
 
