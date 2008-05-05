@@ -64,20 +64,7 @@
         <directories>
             <directory name="flumotion/component/encoders/vorbis">
                 <filename location="wizard_gtk.py" />
-            </directory>
-        </directories>
-    </bundle>
-
-    <bundle name="vorbis-wizard">
-        <dependencies>
-            <dependency name="vorbis-base" />
-            <dependency name="component" />
-        </dependencies>
-
-        <directories>
-            <directory name="flumotion/component/encoders/vorbis">
                 <filename location="wizard.glade" />
-                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

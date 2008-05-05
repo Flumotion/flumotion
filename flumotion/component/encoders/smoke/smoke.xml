@@ -67,20 +67,7 @@
         <directories>
             <directory name="flumotion/component/encoders/smoke">
                 <filename location="wizard_gtk.py" />
-            </directory>
-        </directories>
-    </bundle>
-
-    <bundle name="smoke-wizard">
-        <dependencies>
-            <dependency name="smoke-base" />
-            <dependency name="component" />
-        </dependencies>
-
-        <directories>
-            <directory name="flumotion/component/encoders/smoke">
                 <filename location="wizard.glade" />
-                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>
