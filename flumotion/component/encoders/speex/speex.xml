@@ -9,7 +9,7 @@
       <feeder name="default" />
       <entries>
         <entry type="component" location="speex.py" function="Speex" />
-        <entry type="wizard" location="wizard_gtk.py"
+        <entry type="wizard" location="speex_wizard.py"
                function="SpeexWizardPlugin" />
       </entries>
       <wizard _description="Speex" type="audio-encoder" 
@@ -59,7 +59,7 @@
 
         <directories>
             <directory name="flumotion/component/encoders/speex">
-                <filename location="wizard_gtk.py" />
+                <filename location="speex_wizard.py" />
             </directory>
         </directories>
     </bundle>

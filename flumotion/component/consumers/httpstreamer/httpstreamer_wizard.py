@@ -251,7 +251,7 @@ class HTTPStep(ConsumerStep):
     gladeFile = os.path.join(
         os.path.dirname(
         os.path.abspath(__file__)),
-        'wizard.glade')
+        'httpstreamer-wizard.glade')
 
     def __init__(self, wizard):
         self.model = HTTPStreamer()

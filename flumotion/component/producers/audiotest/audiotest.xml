@@ -13,7 +13,7 @@
                function="AudioTest" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="AudioTestAdminGtk" />
-        <entry type="wizard" location="wizard_gtk.py"
+        <entry type="wizard" location="audiotest_wizard.py"
                function="AudioTestWizardPlugin" />
       </entries>
 
@@ -88,8 +88,8 @@
 
         <directories>
             <directory name="flumotion/component/producers/audiotest">
-                <filename location="wizard.glade" />
-                <filename location="wizard_gtk.py" />
+                <filename location="audiotest-wizard.glade" />
+                <filename location="audiotest_wizard.py" />
             </directory>
         </directories>
     </bundle>

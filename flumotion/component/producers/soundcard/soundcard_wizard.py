@@ -73,7 +73,7 @@ class SoundcardProducer(AudioProducer):
 class SoundcardStep(AudioProducerStep):
     name = _('Soundcard')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'wizard.glade')
+                              'soundcard-wizard.glade')
     component_type = 'osssrc'
     icon = 'soundcard.png'
 

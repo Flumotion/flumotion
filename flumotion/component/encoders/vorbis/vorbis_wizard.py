@@ -57,7 +57,7 @@ class VorbisAudioEncoder(AudioEncoder):
 
 class VorbisStep(AudioEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'wizard.glade')
+                              'vorbis-wizard.glade')
     name = _('Vorbis encoder')
     sidebarName = _('Vorbis')
     component_type = 'vorbis'

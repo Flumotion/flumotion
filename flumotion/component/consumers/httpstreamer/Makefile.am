@@ -5,13 +5,13 @@ component_PYTHON = 		\
 	httpstreamer.py 	\
 	resources.py 		\
 	admin_gtk.py 		\
-	wizard_gtk.py
+	httpstreamer_wizard.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
 component_DATA = 			\
 	httpstreamer.xml 		\
 	httpstreamer.glade 		\
-	wizard.glade
+	httpstreamer-wizard.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -4,13 +4,13 @@ componentdir = $(libdir)/flumotion/python/flumotion/component/producers/webcam
 
 component_DATA = \
 	webcam.xml	\
-	wizard.glade
+	webcam-wizard.glade
 
 component_PYTHON = 	\
 	__init__.py	\
 	admin_gtk.py	\
 	webcam.py	\
-	wizard_gtk.py
+	webcam_wizard.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

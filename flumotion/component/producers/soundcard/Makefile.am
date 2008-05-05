@@ -4,13 +4,13 @@ componentdir = $(libdir)/flumotion/python/flumotion/component/producers/soundcar
 
 component_DATA = 		\
 	soundcard.xml		\
-	wizard.glade
+	soundcard-wizard.glade
 
 component_PYTHON = 		\
 	__init__.py		\
 	admin_gtk.py		\
 	soundcard.py		\
-	wizard_gtk.py
+	soundcard_wizard.py
 
 
 clean-local:

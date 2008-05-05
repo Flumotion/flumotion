@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="dirac.py"
                function="Dirac" />
-        <entry type="wizard" location="wizard_gtk.py"
+        <entry type="wizard" location="dirac_wizard.py"
                function="DiracWizardPlugin" />
       </entries>
 
@@ -63,8 +63,8 @@
 
         <directories>
             <directory name="flumotion/component/encoders/dirac">
-                <filename location="wizard_gtk.py" />
-                <filename location="wizard.glade" />
+                <filename location="dirac_wizard.py" />
+                <filename location="dirac-wizard.glade" />
             </directory>
         </directories>
     </bundle>

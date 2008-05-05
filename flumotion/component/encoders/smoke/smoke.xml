@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="smoke.py"
                function="Smoke" />
-        <entry type="wizard" location="wizard_gtk.py"
+        <entry type="wizard" location="smoke_wizard.py"
                function="SmokeWizardPlugin" />
       </entries>
       <wizard _description="Smoke" type="video-encoder" 
@@ -66,7 +66,7 @@
 
         <directories>
             <directory name="flumotion/component/encoders/smoke">
-                <filename location="wizard_gtk.py" />
+                <filename location="smoke_wizard.py" />
             </directory>
         </directories>
     </bundle>
@@ -79,8 +79,8 @@
 
         <directories>
             <directory name="flumotion/component/encoders/smoke">
-                <filename location="wizard.glade" />
-                <filename location="wizard_gtk.py" />
+                <filename location="smoke-wizard.glade" />
+                <filename location="smoke_wizard.py" />
             </directory>
         </directories>
     </bundle>
