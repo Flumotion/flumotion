@@ -38,7 +38,7 @@ N_ = _ = gettext.gettext
 
 class ProductionStep(WizardStep):
 
-    gladeFile = 'wizard_production.glade'
+    gladeFile = 'production-wizard.glade'
     name = _('Production')
     section = _('Production')
     icon = 'source.png'

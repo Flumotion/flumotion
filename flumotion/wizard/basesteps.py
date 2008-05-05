@@ -62,7 +62,7 @@ class VideoEncoderStep(WorkerWizardStep):
 
 
 class AudioEncoderStep(WorkerWizardStep):
-    gladeFile = 'wizard_audioEncoder.glade'
+    gladeFile = 'audio-encoder-wizard.glade'
     section = _('Conversion')
 
     def __init__(self, wizard, model):

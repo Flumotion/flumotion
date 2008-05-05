@@ -1,3 +1,27 @@
+2008-05-05  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_overview.glade:
+	* data/glade/wizard_production.glade:
+	* data/glade/wizard_summary.glade:
+	* data/glade/wizard_welcome.glade:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/basesteps.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	* po/POTFILES.in:
+	Rename most glade files, wizard_* -> *-wizard and
+	wizard -> section-wizard
+
 2008-05-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/worker.py:

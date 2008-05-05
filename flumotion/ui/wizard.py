@@ -146,7 +146,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     logCategory = 'wizard'
 
-    gladeFile = 'wizard.glade'
+    gladeFile = 'sectionwizard.glade'
 
     sections = None
 
