@@ -111,7 +111,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def removeAllClients(self):
         """
-        Start to remove all the clients connected (this will complete 
+        Start to remove all the clients connected (this will complete
         asynchronously from another thread)
 
         Returns a deferred that will fire once they're all removed.

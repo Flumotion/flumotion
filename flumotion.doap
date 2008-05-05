@@ -42,7 +42,7 @@ it.
      <module>flumotion</module>
      <browse rdf:resource="https://code.fluendo.com/flumotion/trac/browser" />
    </SVNRepository>
- </repository> 
+ </repository>
 
  <maintainer>
   <foaf:Person>

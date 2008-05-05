@@ -148,7 +148,7 @@ then
   mkdir -p %{_sysconfdir}/flumotion/managers/default/flows
   cat > %{_sysconfdir}/flumotion/managers/default/planet.xml <<EOF
 <planet>
- 
+
   <manager>
     <!-- <debug>3</debug> -->
     <host>localhost</host>
@@ -167,7 +167,7 @@ user:PSfNpHTkpTx1M
 ]]></property>
     </component>
   </manager>
- 
+
 </planet>
 EOF
 fi
@@ -179,7 +179,7 @@ then
   mkdir -p %{_sysconfdir}/flumotion/workers
   cat > %{_sysconfdir}/flumotion/workers/default.xml <<EOF
 <worker>
- 
+
   <!-- <debug>3</debug> -->
 
   <manager>
@@ -193,7 +193,7 @@ then
     <username>user</username>
     <password>test</password>
   </authentication>
- 
+
   <!-- <feederports>8600-8639</feederports> -->
 
 </worker>
@@ -310,7 +310,7 @@ fi
 - Integrate changes from issue 86
 
 * Fri Nov 05 2004 Christian Schaller <christian at fluendo com>
-- Add call to chkconfig script in post and preun parts to get our service into 
+- Add call to chkconfig script in post and preun parts to get our service into
   the service list
 
 * Fri Nov 05 2004 Thomas Vander Stichele <thomas at apestaart dot org>

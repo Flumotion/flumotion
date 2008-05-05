@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="jpeg-encoder" base="flumotion/component/encoders/jpeg"
                description="Encodes raw video feed to JPEG frames.">
       <source location="flumotion.component.encoders.jpeg.jpeg" />
@@ -19,12 +19,12 @@
         <property name="framerate" type="fraction"
                   description="Framerate to encode at" />
       </properties>
-      <wizard _description="JPEG" type="video-encoder" 
+      <wizard _description="JPEG" type="video-encoder"
               feeder="default" eater="default">
         <provide-format media-type="jpeg"/>
       </wizard>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -71,4 +71,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

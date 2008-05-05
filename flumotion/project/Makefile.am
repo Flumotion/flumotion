@@ -7,7 +7,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	project.py
 flumotion_DATA = flumotion.locale.xml
- 
+
 clean-local:
 	rm -rf *.pyc *.pyo
 

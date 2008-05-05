@@ -213,7 +213,7 @@ class RoutingTable(object):
     def route(self, ip):
         """
         Return the preferred route for this IP.
-        
+
         @param ip: The IP to use for routing decisions.
         @type  ip: An integer or string representing an IPv4 address
         """
@@ -229,7 +229,7 @@ class RoutingTable(object):
     def route_iter(self, ip):
         """
         Return an iterator yielding routes in order of preference.
-        
+
         @param ip: The IP to use for routing decisions.
         @type  ip: An integer or string representing an IPv4 address
         """

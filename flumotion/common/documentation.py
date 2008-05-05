@@ -50,7 +50,7 @@ def getMessageWebLink(message, LL=None):
     # drop the nano or always link to trunk version
     versionTuple = message.version.split('.')
     version = common.versionTupleToString(versionTuple[:3])
-    
+
     url = '%s/%s/%s/html/%s.html#%s' % (
         docURL, LL, version, message.section, message.anchor)
 

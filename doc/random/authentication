@@ -20,7 +20,7 @@ Credentials(twisted):
   example: the PortalWrapper in PB server does a challenge/response with the
            PB client. When it receives the response, the credentials have
            all the info to be able to have the check... method called, since
-           the challenge/response sent to the client can be replayed with 
+           the challenge/response sent to the client can be replayed with
            the password tried by the credentials checker.
   example: credentials(username, plaintextPassword) is
            already trivially primed for a plaintext-backed credential checker,
@@ -64,7 +64,7 @@ Checker(twisted):
            checkCryptPassword on them; regardless of whether the credentials
            store the plaintext password, the cryptPassword, or even
            some challenge/response
-  
+
 Keycard (flumotion):
 - an extension of the Credentials concept to allow using/transferring it over
   PB connections
@@ -132,7 +132,7 @@ Bouncer(flumotion):
         back to say the requester has removed the client
 
 - requester should tell the bouncer when a given keycardId has been
-  used up, so the bouncer can clean up its state 
+  used up, so the bouncer can clean up its state
 
 Requester:
 - can be:

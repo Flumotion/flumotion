@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="unixdomain-producer"
                base="flumotion/component/producers/unixdomain">
       <source location="flumotion.component.producers.unixdomain.unixdomain" />
@@ -15,7 +15,7 @@
                   description="path to the unix domain socket" />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -47,4 +47,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

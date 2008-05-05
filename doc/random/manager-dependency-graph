@@ -21,9 +21,9 @@ This triggers job creation. When job creation is complete, we can start setting
 up and starting componenents.
 
 Specifics: whenever an action corresponding to a depgraph node is complete, we
-set the node to True through a call to Vishnu._depgraph.setXXXStarted(), for 
-appropriate XXX (e.g. setWorkerStarted). We then follow all edges from this 
-node to its immediate children. For each child node that hasn't already been 
+set the node to True through a call to Vishnu._depgraph.setXXXStarted(), for
+appropriate XXX (e.g. setWorkerStarted). We then follow all edges from this
+node to its immediate children. For each child node that hasn't already been
 set to true, we check whether all its parent nodes are set to true. If so, we
 then start the appropriate action at that node. This will (if things work)
 result in the action completing, the node being set True, and we'll proceed
@@ -35,7 +35,7 @@ Example:
    its children. In this case, this is the three jobs. We start the jobs.
  - Each job in turn logs in. We set the JOB nodes to true.
  - The only thing we can do as a result of this is set up the soundcard-source
-   (it is the clock master, and thus must go first). 
+   (it is the clock master, and thus must go first).
  - When that completes, we set the soundcard-source as a clock master.
  - Then we can start the soundcard source, and setup the other two components
  - When those are both done, we can start the encoder. When that starts, we
@@ -50,7 +50,7 @@ There are two main things that aren't done according to this right now.
    starts jobs in reaction to it. We don't actually follow the depgraph edges
    until the _job_ logs in - at which point we use the depgraph to set up, set
    clock masters, and start components
-2. We don't set components up in parallel. There are depgraph edges between 
+2. We don't set components up in parallel. There are depgraph edges between
    feeder and eater for setup (which probably doesn't make sense), not just for
    start (which does)
 

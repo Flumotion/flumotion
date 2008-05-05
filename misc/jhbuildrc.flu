@@ -1,5 +1,5 @@
-# -*- Mode: python -*- 
-# Flumotion jhbuildrc file 
+# -*- Mode: python -*-
+# Flumotion jhbuildrc file
 # symlink this to or save it as
 # a file called .jhbuildrc.flu.(flavor) in your homedir
 # where flavor is stable.stable, unstable.stable, unstable.unstable

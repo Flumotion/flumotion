@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 pydir = $(libdir)/flumotion/python/flumotion/monitor
 py_PYTHON = \
 	__init__.py

@@ -359,7 +359,7 @@ class HTTPAuthentication(log.Loggable):
         return failure
 
     def _defaultErrback(self, failure, request):
-        if failure.check(errors.UnknownComponentError, 
+        if failure.check(errors.UnknownComponentError,
                 errors.NotAuthenticatedError) is None:
             # If something else went wrong, we want to disconnect the client and
             # give them a 500 Internal Server Error.

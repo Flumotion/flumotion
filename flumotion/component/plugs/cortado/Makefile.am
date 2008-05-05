@@ -6,7 +6,7 @@ cortado_PYTHON = 		\
 	__init__.py 		\
 	cortado.py 		\
 	cortado_location.py 	\
-	wizard_gtk.py 
+	wizard_gtk.py
 
 cortado_DATA = cortado.xml
 

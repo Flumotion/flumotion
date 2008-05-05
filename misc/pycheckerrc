@@ -72,7 +72,7 @@ constant1 = 0
 stringIteration = 1
 
 # check improper use of string.find()
-# This is new in pychecker 0.8.14 which is not installed everywhere 
+# This is new in pychecker 0.8.14 which is not installed everywhere
 #stringFind = 1
 
 # Calling data members as functions

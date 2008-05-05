@@ -4,10 +4,10 @@
 
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
-	* log.py (getLoggingSettings, setLoggingSettings): 
+	* log.py (getLoggingSettings, setLoggingSettings):
 	Add two new functions for setting and restoring the current log
 	settings.
-	
+
 2007-10-31  Andy Wingo  <wingo@pobox.com>
 
 	Patch by: Philippe Normand <philippe fluendo.com>

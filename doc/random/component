@@ -132,7 +132,7 @@ Detailed breakdown of program flow
         - JobMedium.remote_start(name, parent, ...) gets called
         - calls self._runComponent(name, parent, ...)
         - logs in to manager with keycard.avatarId set to the path
-        - in the manager: 
+        - in the manager:
 	  - ComponentAvatar gets created
           - ComponentAvatar.attached() gets called:
             - triggers vishnu.componentAttached, which maps the component
@@ -148,7 +148,7 @@ Detailed breakdown of program flow
               - feeder set gets informed (must be done after setup)
               - components get started if they don't take feeds; otherwise
                 they get depended on feeders, and checked if they can start:wa
-                
+
             - self.vishnu.registerComponent():
             - inform vishnu so it can map
      ManagerJobState <-> ComponentAvatar
@@ -188,7 +188,7 @@ COMPONENTS IN MANAGER
   - calls avatar.start(...), which does a remote call
   - deferred will return when the component has finally started up completely
 
-- ComponentHeaven.componentAttached 
+- ComponentHeaven.componentAttached
   - called when a component logs in, knows avatarId
   - inform vishnu so it can store ComponentAvatar -> avatarId -> state
   - calls a getState to get the JobState

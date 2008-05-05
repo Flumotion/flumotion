@@ -39,7 +39,7 @@
 	<property name="video-width" type="int" required="no" />
 	<property name="video-height" type="int" required="no" />
 	<property name="video-framerate" type="fraction" required="no" />
-	<property name="video-pixel-aspect-ratio" type="fraction" 
+	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no" />
 	<property name="audio-samplerate" type="int" required="no" />
 	<property name="audio-channels" type="int" required="no" />
@@ -83,7 +83,7 @@
 	<property name="video-width" type="int" required="no" />
 	<property name="video-height" type="int" required="no" />
 	<property name="video-framerate" type="fraction" required="no" />
-	<property name="video-pixel-aspect-ratio" type="fraction" 
+	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no" />
 	<property name="audio-samplerate" type="int" required="no" />
 	<property name="audio-channels" type="int" required="no" />
@@ -110,7 +110,7 @@
 	<property name="video-width" type="int" required="no" />
 	<property name="video-height" type="int" required="no" />
 	<property name="video-framerate" type="fraction" required="no" />
-	<property name="video-pixel-aspect-ratio" type="fraction" 
+	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no" />
 	<property name="audio-samplerate" type="int" required="no" />
 	<property name="audio-channels" type="int" required="no" />
@@ -176,7 +176,7 @@
             <dependency name="base-admin-gtk"/>
 	    <dependency name="switch-combiner-base"/>
         </dependencies>
-        
+
         <directories>
             <directory name="flumotion/component/combiners/switch">
                 <filename location="admin_gtk.py"/>
@@ -187,4 +187,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

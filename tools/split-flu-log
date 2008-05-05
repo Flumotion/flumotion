@@ -42,7 +42,7 @@ def split(f, fragment, nfragments, outhead):
     filename = outhead + time.strftime('-%m%d.%H%M%S', date)
     print 'outputting to %s' % filename
     out = open(outhead + time.strftime('-%m%d.%H%M%S', date), 'w')
-    
+
     out.write(line)
     for line in f:
         bytes -= len(line)
@@ -55,7 +55,7 @@ def split(f, fragment, nfragments, outhead):
         if line_date(line):
             break
         out.write(line)
-    
+
     print 'wrote %d bytes' % out.tell()
     out.close()
 
@@ -86,6 +86,6 @@ def main(args):
     else:
         for i in range(options.num_chunks):
             split(log, i, options.num_chunks, outhead)
-    
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

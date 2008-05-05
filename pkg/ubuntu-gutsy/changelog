@@ -18,7 +18,7 @@ flumotion (0.5.1.1-1flu1~gutsy3) gutsy; urgency=low
 
 flumotion (0.5.1.1-1flu1~gutsy2) gutsy; urgency=low
 
-  * New orig tarball 
+  * New orig tarball
 
  -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:57:18 -0300
 
@@ -62,7 +62,7 @@ flumotion (0.5.1.1-0flu3) gutsy; urgency=low
 flumotion (0.5.1.1-0flu2) hardy; urgency=low
 
   * New attempt, run maintainer-clean before and remove leftover patches in
-    the tree before uploading source. 
+    the tree before uploading source.
 
  -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 11:52:26 -0300
 

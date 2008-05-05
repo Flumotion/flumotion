@@ -1,5 +1,5 @@
 <planet>
-  <!-- the manager and the bouncer with user/password test/test 
+  <!-- the manager and the bouncer with user/password test/test
        This bouncer is user to authenticate other components in the
        system, but not client connecting to the stream. -->
   <manager>
@@ -18,33 +18,33 @@ test:PSfNpHTkpTx1M
       <feed>audio</feed>
       <pipeline>
          <!-- read from firewire, decode video, drop every 2 frames -->
-         dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 ! 
+         dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 !
 	   <!-- normalize rate, scale down to get rid of interlace -->
-           videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 ! 
+           videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 !
 	   <!-- scale down some more to correct aspect ratio -->
            videoscale ! video/x-raw-yuv,width=384,height=268,framerate=12.5,format=(fourcc)YUY2 ! @feeder::video@
 	 <!-- audio gets rate corrected -->
-         dec. ! audio/x-raw-int ! audiorate ! 
+         dec. ! audio/x-raw-int ! audiorate !
 	   <!-- downsample audio to encode it at lower bitrate -->
            audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@
       </pipeline>
     </component>
-    
+
     <!-- add an overlay to the raw video stream, make sure to have a png image in
          the directory where you start the server. -->
     <component name="dv-with-overlay" type="converter">
       <source>dv-camera:video</source>
       <pipeline>
 	 <!-- read png -->
-         filesrc location=dv_384x268.png blocksize=100000 ! pngdec ! 
+         filesrc location=dv_384x268.png blocksize=100000 ! pngdec !
 	   <!-- convert RGBA to YUVA and send to videomixer -->
            alphacolor ! videomixer name=mix ! @feeder::video@
 	 <!-- take dv video, color convert and send to video mixer -->
-         @eater:dv-camera:video@ ! video/x-raw-yuv,width=384,height=268,framerate=12.5 ! ffmpegcolorspace ! alpha ! mix. 
+         @eater:dv-camera:video@ ! video/x-raw-yuv,width=384,height=268,framerate=12.5 ! ffmpegcolorspace ! alpha ! mix.
       </pipeline>
       <feed>video</feed>
     </component>
-  
+
     <component name="dv-theora" type="converter">
       <source>dv-with-overlay:video</source>
       <!-- colorspace convert and theora encode at 300kbps -->
@@ -65,7 +65,7 @@ test:PSfNpHTkpTx1M
       <feed>ogg</feed>
       <pipeline>
           <!-- take audio and send to the muxer -->
-          { @eater:dv-vorbis:audio@ } ! queue max-size-buffers=16 ! oggmux name=mux 
+          { @eater:dv-vorbis:audio@ } ! queue max-size-buffers=16 ! oggmux name=mux
           <!-- take video and send to the muxer -->
 	  { @eater:dv-theora:video@ } ! queue max-size-buffers=16 ! mux. mux. ! @feeder::ogg@
       </pipeline>

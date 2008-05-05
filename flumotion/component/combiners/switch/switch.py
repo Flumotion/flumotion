@@ -94,7 +94,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         # aliases corresponding to those feeds. The lengths of those
         # lists is equal to the number of feeders that the element has,
         # which is the number of individual streams in a logical feed.
-        # 
+        #
         # For example, {"master": ["audio-master", "video-master"],
         #               "backup": ["audio-backup", "video-backup"]}
         # logical feed name -> [eater alias]
@@ -138,7 +138,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             return result.value
 
         self.debug("checking for input-selector element")
-        d = check.checkPlugin('selector', 'gst-plugins-bad', 
+        d = check.checkPlugin('selector', 'gst-plugins-bad',
             (0, 10, 5, 2), 'input-selector', checkSignal)
         d.addCallback(cb)
         return d
@@ -254,7 +254,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             self.debug('no feeds active during autoswitch, choosing %r',
                        feed)
         self.do_switch(feed)
-    
+
     # switch_to should only be called when the ideal feed is requested to be
     # changed, so not by watchdog reasons.
     def switch_to(self, feed):
@@ -308,7 +308,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         stop_times = [e.emit('block') for p, e in pairs]
         start_times = [p.get_property('running-time') for p, e in pairs]
-        
+
         stop_time = max(stop_times)
         self.debug('stop time = %d', stop_time)
         self.debug('stop time = %s', gst.TIME_ARGS(stop_time))
@@ -352,7 +352,7 @@ class AVSwitch(Switch):
     def init(self):
         # property name -> caps property name
         self.vparms = {'video-width': 'width', 'video-height': 'height',
-                       'video-framerate': 'framerate', 
+                       'video-framerate': 'framerate',
                        'video-pixel-aspect-ratio': 'par'}
         self.aparms = {'audio-channels': 'channels',
                        'audio-samplerate': 'samplerate'}
@@ -393,7 +393,7 @@ class AVSwitch(Switch):
                     "pixel-aspect-ratio=%d/%d,format=(fourcc)I420"
                     % (width, height, framerate[0], framerate[1],
                        par[0], par[1]))
-            
+
         def audiocaps(channels, samplerate):
             return ("audio/x-raw-int,channels=%d,samplerate=%d,width=16,"
                     "depth=16,signed=true" % (channels, samplerate))

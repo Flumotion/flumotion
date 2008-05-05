@@ -9,7 +9,7 @@ the worker can ensure that ports are assigned correctly.
    flumotion.manager.worker.WorkerHeaven.start()
    -> flumotion.manager.worker.WorkerAvatar.start()
    -> flumotion.worker.worker.WorkerView.remote_start()
-  
+
 - the worker checks how many feeds this component will feed
 - the worker reserves ports for this component
 

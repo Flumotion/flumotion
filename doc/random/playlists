@@ -5,18 +5,18 @@ We parse a simple XML format, consisting of a top-level <playlist> element,
 containing one or more <entry> elements.
 
 Each <entry> has two mandatory and two optional attributes. Normally, we expect
-that the optional attributes won't be used, but they're there for advanced 
+that the optional attributes won't be used, but they're there for advanced
 requirements:
-  filename - the file to use. May be relative, in which case it will be 
+  filename - the file to use. May be relative, in which case it will be
              interpreted relative to some configured location
   time     - the time at which to start playing the file, a UTC timestamp
              in the format YYYY-MM-DDThh:mm:ss.sZ (an ISO 8601 format), see
              below for examples.
-  offset   - optional, defaults to zero. The offset (in seconds, fractional 
+  offset   - optional, defaults to zero. The offset (in seconds, fractional
              seconds permitted) from the start of the media file to begin
              playback at the given time.
-  duration - optional, defaults to the length of the file minus the offset. 
-             The duration, in seconds, of playback from the file. 
+  duration - optional, defaults to the length of the file minus the offset.
+             The duration, in seconds, of playback from the file.
              If duration + offset is greater than the length of the actual file,
              it will be clamped to the actual length - offset.
 
@@ -24,7 +24,7 @@ If times and durations (explicit or implicit) cause any overlap to occur, the
 earlier entry will be truncated to allow the later ones to begin on time.
 
 Whenever any part of the timeline has no scheduled or available data, video
-will be replaced by black, audio by silence. 
+will be replaced by black, audio by silence.
 
 Timestamps:
  ISO 8601 Combined Date/Time Format, UTC.
@@ -39,7 +39,7 @@ Timestamps:
 Sample file (single entry):
 
 <playlist>
-  <entry filename="customer/file/movie.ogg" time="2007-04-19T15:15:20.38Z" 
+  <entry filename="customer/file/movie.ogg" time="2007-04-19T15:15:20.38Z"
          offset="0" duration="120.45"/>
 </playlist>
 

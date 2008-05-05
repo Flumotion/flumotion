@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="gdp-producer" base="flumotion/component/producers/gdp"
                description="Produces a feed from a GStreamer TCP server.">
       <source location="flumotion.component.producers.gdp.gdp" />
@@ -17,7 +17,7 @@
                   description="Port of the GStreamer TCP server." />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -49,4 +49,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

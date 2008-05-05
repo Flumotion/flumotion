@@ -11,7 +11,7 @@ Use cases:
 - manager migration/upgrade:
   - administrator starts admin client to manager A
   - administrator creates a new manager B on another machine for this planet
-  - administrator migrates all components and workers, plus itself, to 
+  - administrator migrates all components and workers, plus itself, to
     manager B
   - administrator shuts down manager A
 

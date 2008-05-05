@@ -14,7 +14,7 @@ interaction between client-side UI parts and worker-side components
   - flumotion.admin.admin:
     the model (self.admin) calls componentCallRemote
   - flumotion.manager.admin:
-    the admin avatar receives this as 
+    the admin avatar receives this as
     perspective_componentCallRemote(componentName, "effect", effectName,
       methodName, ...)
     if the component exists in the componentheaven, the call gets transfered
@@ -30,7 +30,7 @@ interaction between client-side UI parts and worker-side components
     - it calls the method on it with (...)
   - (whatever actual effect):
     - method is called on the effect
-    
+
 - an effect wants to call a method on all UI nodes representing it:
   - a message needs to go from a component to an admin-side view on the
     component
@@ -61,7 +61,7 @@ interaction between client-side UI parts and worker-side components
   - f.m.admin:
     calls avatar.mindCallRemote() for each avatar
   - f.m.admin:
-    each avatar calls 
+    each avatar calls
     self.mindCallRemote('componentCall', componentName,
       "effectPropertyChanged", effectName, propertyName, value)
 

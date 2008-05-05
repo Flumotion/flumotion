@@ -1,11 +1,11 @@
 Using the playlist component
 ----------------------------
 
-- Requires gstreamer core and base cvs, or the upcoming releases (0.10.13 of 
-  both) and gnonlin cvs (or a future 0.10.9). Either that or an extensive 
+- Requires gstreamer core and base cvs, or the upcoming releases (0.10.13 of
+  both) and gnonlin cvs (or a future 0.10.9). Either that or an extensive
   patch set.
 - Playlist files must not be added until after all the files are available
-- Only ogg vorbis/theora files have been tested. Other formats are _not_ 
+- Only ogg vorbis/theora files have been tested. Other formats are _not_
   expected to work fully at this time.
 - If you need other input file types, you should transcode them before use (and
   thus before adding the playlist file)

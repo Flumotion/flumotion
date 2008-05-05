@@ -72,7 +72,7 @@
 		- bundle dependencies
 		- component dependencies
 		and possibly remove feederset
-		
+
 * MEDIUM	allow inspecting and changing debug level on the fly of
 		every process.  This way when a problem arises, before
 		stopping and restarting, we can increase it and retry to
@@ -150,7 +150,7 @@
   - rename components to avatars, and rename functions accordingly
 
 - make an executable script/program that makes all required checks and
-  outputs a report, has a proper zero or non-zero exit status and 
+  outputs a report, has a proper zero or non-zero exit status and
   can't run forever if things are stuck (times out properly)
 
 

@@ -17,7 +17,7 @@
         <entry type="wizard" location="wizard_gtk.py"
                function="SoundcardWizardPlugin" />
       </entries>
-      <wizard type="audio-producer" _description="Sound card" 
+      <wizard type="audio-producer" _description="Sound card"
               feeder="default" />
       <properties>
         <property name="source-element" type="string"
@@ -93,4 +93,4 @@
     </bundle>
 
   </bundles>
-</registry> 
+</registry>

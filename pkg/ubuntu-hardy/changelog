@@ -1,7 +1,7 @@
 flumotion (0.5.2-1flu1~hardy1) hardy; urgency=low
 
   * New version
-  * Depend on python-kiwi, create /var/run/flumotion when starting the 
+  * Depend on python-kiwi, create /var/run/flumotion when starting the
     script if it doesn't exist
 
  -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:41:49 -0300
@@ -65,7 +65,7 @@ flumotion (0.5.1.1-0flu3) gutsy; urgency=low
 flumotion (0.5.1.1-0flu2) hardy; urgency=low
 
   * New attempt, run maintainer-clean before and remove leftover patches in
-    the tree before uploading source. 
+    the tree before uploading source.
 
  -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 11:52:26 -0300
 

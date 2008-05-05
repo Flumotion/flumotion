@@ -1,5 +1,5 @@
 - Red Hat/Fedora service script behaviour:
-  - 
+  -
 
 - service script behaviour:
   - "service flumotion" can manage multiple managers and workers

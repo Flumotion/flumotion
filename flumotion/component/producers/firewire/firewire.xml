@@ -18,9 +18,9 @@
 
       <synchronization required="yes" clock-priority="160" />
 
-      <wizard type="audio-producer" _description="Firewire audio" 
+      <wizard type="audio-producer" _description="Firewire audio"
               feeder="audio" />
-      <wizard type="video-producer" _description="Firewire video" 
+      <wizard type="video-producer" _description="Firewire video"
               feeder="video" />
 
       <properties>
@@ -96,4 +96,4 @@
     </bundle>
 
   </bundles>
-</registry> 
+</registry>

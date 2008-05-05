@@ -50,7 +50,7 @@
     <source>vorbis</source>
     <source>theora</source>
     <pipeline>
-      @ eater:vorbis @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+      @ eater:vorbis @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000
       @ eater:theora @ ! mux. mux.
     </pipeline>
   </component>
@@ -60,7 +60,7 @@
     <source>vorbis-high</source>
     <source>theora</source>
     <pipeline>
-      @ eater:vorbis-high @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+      @ eater:vorbis-high @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000
       @ eater:theora @ ! mux. mux.
     </pipeline>
   </component>
@@ -70,15 +70,15 @@
     <source>video+sine:audio</source>
     <source>video+sine:video</source>
     <pipeline>
-      { @ eater:video+sine:audio @ ! audioscale ! audioconvert ! 
-        audio/x-raw-int,rate=8000,channels=1 ! mulawenc name=aenc } 
-      { @ eater:video+sine:video @ ! smokeenc name=venc } 
-         aenc. ! queue max-size-bytes=1000000 ! multipartmux name=mux venc. ! 
+      { @ eater:video+sine:audio @ ! audioscale ! audioconvert !
+        audio/x-raw-int,rate=8000,channels=1 ! mulawenc name=aenc }
+      { @ eater:video+sine:video @ ! smokeenc name=venc }
+         aenc. ! queue max-size-bytes=1000000 ! multipartmux name=mux venc. !
                  queue max-size-bytes=1000000 ! mux. mux.
     </pipeline>
   </component>
 
-  <component name="http-java" type="http-streamer"> 
+  <component name="http-java" type="http-streamer">
     <source>mulaw+smokey</source>
     <port>8801</port>
   </component>
@@ -96,7 +96,7 @@
   </component>
 
 <!--
-    <component name="http-all" type="http-streamer"> 
+    <component name="http-all" type="http-streamer">
        <port>8800</port>
        <logfile>/tmp/all-clients.log</logfile>
        <sources>

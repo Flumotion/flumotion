@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 componentdir = $(libdir)/flumotion/python/flumotion/component
 component_DATA = component.xml
 component_PYTHON = \

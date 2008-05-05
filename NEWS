@@ -112,7 +112,7 @@ Bugs fixed since 0.5.1:
   * 936 : disabling overlay breaks wizard
 
 Features since 0.4.2:
-    
+
   * Much more robust and efficient protocol between manager and
     component. It is now impossible to get a component in a "stuck"
     state. The manager's code was dramatically simplified,
@@ -180,7 +180,7 @@ Features since 0.4.2:
     more. Admit it, the part about "and more" piqued your curiosity.
 
 Bugs fixed since 0.4.2:
-    
+
   * 22 : [wizard] Smoke settings screen should probably have better name
   * 44 : Don't print in manager when logging in with bad credentials
   * 68 : Wizard click on left summary does not update back/forward buttons
@@ -317,7 +317,7 @@ Features since 0.3.1:
  - Allow setting a maximum duration for http connections
  - Add simple icecast-stream relaying component
  - Add component that takes GDP-payloaded data from a unix socket
- - iCal based bouncer, to specify that clients may only connect during a 
+ - iCal based bouncer, to specify that clients may only connect during a
    specific time of day
  - Restarting a manager while a flow is running now works reliably
  - The disker component can now be remotely controlled to start/stop recording,
@@ -330,14 +330,14 @@ Features since 0.3.1:
 
 Bugs fixed since 0.3.1:
 
-50      when modules get renamed, and you do a new make install, you end up 
+50      when modules get renamed, and you do a new make install, you end up
         with two components of the same name
 88      automatically restart workers on connection trouble
 89      possibility for external (software) sources.
-131     a manager restart with a running worker config causes worker to lose 
+131     a manager restart with a running worker config causes worker to lose
         its old children that get overwritten with new info
 232     go over all component properties in registry and unify naming
-298     Changing to a different connection and failing leaves the UI in a 
+298     Changing to a different connection and failing leaves the UI in a
         grayed-out state
 315     stopping all and starting all makes all components sad
 352     theora encoder uses bitrate in kbit/sec, unlike most other encoders
@@ -347,20 +347,20 @@ Bugs fixed since 0.3.1:
 438     core dump by flumotion-job
 440     flow with an audio-source fails
 441     looper component stays waking forever if file does not exist
-449     workers that have their port range specified as x-x (to use only one 
+449     workers that have their port range specified as x-x (to use only one
         port) make things go wrong
-454     reconnect when upstream components restart causes a bad stream, gdp 
+454     reconnect when upstream components restart causes a bad stream, gdp
         issue
 462     Burst-on-connect by time
-471     empty .connections file breaks the greeter, creating a gtk.Label 
+471     empty .connections file breaks the greeter, creating a gtk.Label
         instead of the custom Connections
 477     we seem to be leaking file descriptors on reconnect
 479     leak in feedserver
-480     after component that is clock master reconnects, it is told to be a 
+480     after component that is clock master reconnects, it is told to be a
         clock master again
 481     merge mike-http-improvements-1
-484     worker does not create job for a sleeping component that has a 
-        moodPending, also moodPending should get reset when stopping a sad or 
+484     worker does not create job for a sleeping component that has a
+        moodPending, also moodPending should get reset when stopping a sad or
         lost component
 485     add ability to stop recording to a disker
 486     disker should allow schedulable recordings
@@ -368,12 +368,12 @@ Bugs fixed since 0.3.1:
 507     feed components should track information of the eaters connected to them
 510     every reconnect causes a new feeder to be added in UI for "plumbing"
 513     The BaseAdminGtkNode don't have setitem and delitem vmethod
-515     The Plumbing GtkNode is alway instantiated and failed when the 
+515     The Plumbing GtkNode is alway instantiated and failed when the
         component is not a FeedComponent
 518     Admin prints tracebacks for non-feed-components
 519     tracebacks in  admin when  stopping a component
 524     disker admin UI bug
-525     When the audiotest component admin interface is loaded it set the 
+525     When the audiotest component admin interface is loaded it set the
         frequency to 1 making it "silent"
 530     admin's open connection, quit, and about menu items appear as gtk-open,
         etc
@@ -449,7 +449,7 @@ Features since 0.1.9:
 
 - (Experimental) support for GStreamer 0.9.x Development series
 - flumotion-inspect to examine installed components
-- flumotion-launch to launch a command-line specified flow in one process 
+- flumotion-launch to launch a command-line specified flow in one process
 - projects allow uninstalled additional Flumotion projects to be used
 - workers now spawn job processes
 - Flumotion can now be translated; Dutch translation added
@@ -572,7 +572,7 @@ Issues fixed since 0.1.2:
 ticket  summary
 71      Final button in wizard should be "Done" instead of "Quit"
 92      Worker hangs/crash on sound device selection
-98      Getting assertion error when selecting bttv card on thread as its gives 
+98      Getting assertion error when selecting bttv card on thread as its gives
 	me soundcard
 101     soundcard producer was broken
 86	[PATCH] Spec file improvements

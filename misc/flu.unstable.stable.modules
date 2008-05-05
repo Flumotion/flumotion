@@ -73,7 +73,7 @@
       <dep package="gtk+" />
     </dependencies>
   </cvsmodule>
- 
+
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
              revision="RELEASE-0_10_4">
     <dependencies>
@@ -83,7 +83,7 @@
     </dependencies>
   </cvsmodule>
 
-  <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
+  <svnmodule id="flumotion" svnroot="svn.fluendo.com"
    module="flumotion/trunk" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />

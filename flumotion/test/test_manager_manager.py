@@ -238,7 +238,7 @@ class FakeWorkerMind(FakeMind):
     def remote_getFeedServerPort(self):
         return 7609
 
-    def remote_create(self, avatarId, type, moduleName, methodName, nice, 
+    def remote_create(self, avatarId, type, moduleName, methodName, nice,
             config):
         self.debug('remote_create(%s): logging in component' % avatarId)
         d = self.testcase._loginComponent(self.avatarId,

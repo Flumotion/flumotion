@@ -136,14 +136,14 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
                         vol = vol + (volumeVals[k] / nchannels)
                     maxVolume = float(track.get_property('max-volume'))
                     self.debug("vol: %f max vol: %f", vol, maxVolume)
-                    
+
                     if maxVolume == 0.0:
                         return 1.0
-            
+
                     v = vol / maxVolume
-            
+
                     self.debug("v: %f", v)
-                    return v
+                    return
             self.warning("could not find track %s", self.inputTrackLabel)
         else:
             self.warning("no input track selected, cannot set volume")

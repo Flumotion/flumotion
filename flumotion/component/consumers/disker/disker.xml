@@ -59,7 +59,7 @@
             <dependency name="base-admin-gtk"/>
 	        <dependency name="disker-base"/>
         </dependencies>
-        
+
         <directories>
             <directory name="flumotion/component/consumers/disker">
                 <filename location="admin_gtk.py"/>
@@ -109,5 +109,5 @@
 
   </bundles>
 
-</registry> 
-  
+</registry>
+

@@ -499,7 +499,7 @@ class dictlist(dict):
         self[key].remove(value)
         if not self[key]:
             del self[key]
-        
+
 class FeedMap(object, log.Loggable):
     logName = 'feed-map'
     def __init__(self):
@@ -537,7 +537,7 @@ class FeedMap(object, log.Loggable):
                 self.debug('chose %s for feed %s',
                            feeder.getFeedId(feedName), feedId)
         return feeder, feedName
-        
+
     def _recalc(self):
         if not self._dirty:
             return
@@ -552,7 +552,7 @@ class FeedMap(object, log.Loggable):
                                (comp, feederName))
             for ffid, pair in comp.getVirtualFeeds().items():
                 self.feeds.add(ffid, pair)
-                
+
         for eater in self.avatars.values():
             for pairs in eater.getEaters().values():
                 for feedId, eName in pairs:

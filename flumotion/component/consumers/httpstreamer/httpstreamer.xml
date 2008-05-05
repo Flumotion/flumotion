@@ -66,14 +66,14 @@
         <property name="description" type="string"
                   description="A description of the stream"/>
 
-        <!-- IP-based filtering for logs; commonly used to filter out 
+        <!-- IP-based filtering for logs; commonly used to filter out
              automated-tester IPs from the logs. Values should be of the form
              network-address/prefix-length, e.g. "192.168.1.0/24" -->
         <property name="ip-filter" type="string" multiple="yes"
                   description="IP network-address/prefix-length to filter out of logs" />
 
         <!-- Burst on connect options. Defaults to off.
-             If just burst-on-connect is specified, this gives a simple 
+             If just burst-on-connect is specified, this gives a simple
              burst-from-latest keyframe (so no effect for audio streams).
 
              Additionally, you MAY specify either (not both) of burst-size,
@@ -137,4 +137,4 @@
     </bundle>
 
   </bundles>
-</registry> 
+</registry>

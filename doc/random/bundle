@@ -1,10 +1,10 @@
 Bundles
 =======
 
-The code from the wizard should move to their respective components, 
-and should be sent as bundles from the manager to the administration interface. 
+The code from the wizard should move to their respective components,
+and should be sent as bundles from the manager to the administration interface.
 The components itself will, through the main wizard object have a reference
-to the administration medium and using that it can easily call remote methods, 
+to the administration medium and using that it can easily call remote methods,
 the main (only?) usage will be running code on a connected worker.
 
 I'd suggest that a bundle is specified in the xml file, for instance:
@@ -16,7 +16,7 @@ I'd suggest that a bundle is specified in the xml file, for instance:
      e.g. admin/gtk.py will be looked for under this base for the GTK
      admin code -->
       <!-- additionally, entry points can be overridden, both path and
-           entry function 
+           entry function
            location is relative to base -->
       <entries>
         <entry type="admin/gtk"
@@ -172,7 +172,7 @@ class BaseMedium:
     # to implement, base it on flumotion.worker.worker.remote_runCode
   def runBundle(bundleName, filename, objectName, *args, **kwargs):
 
-   XXX: Perhaps remote_runCode, currently in worker (move to Base) should 
+   XXX: Perhaps remote_runCode, currently in worker (move to Base) should
         take an additional filename argument, so tracebacks can contain
         the name of the loaded module
         now we're always been run string segments, but in the future we

@@ -185,7 +185,7 @@ class KeycardToken(Keycard, credentials.Token):
 
     def __repr__(self):
         return "<%s %s token %s for path %s @%s for requesterId %r in state %s>" % (
-            self.__class__.__name__, self.id, self.token, self.path, 
+            self.__class__.__name__, self.id, self.token, self.path,
             self.address, self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)

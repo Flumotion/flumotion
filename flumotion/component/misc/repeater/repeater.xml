@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="repeater" base="flumotion/component/misc/repeater">
       <source location="flumotion.component.misc.repeater.repeater"/>
       <eater name="default"/>
@@ -15,7 +15,7 @@
                   description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -47,4 +47,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

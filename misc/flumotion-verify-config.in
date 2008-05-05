@@ -28,7 +28,7 @@ import sys
 
 from flumotion.manager import config
 
-# Variable templates 
+# Variable templates
 LIBDIR = '@LIBDIR@'
 PROGRAM_PATH = 'flumotion.launch.inspect.main'
 

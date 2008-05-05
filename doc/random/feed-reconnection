@@ -56,9 +56,9 @@ LOSING NETWORK CONNECTION
 - flow: same as above
 - worker 2 connects to manager over different interface (e.g. an eth0 alias)
 - interface is brought down
-  - worker avatar times out -> disconnected in manager 
+  - worker avatar times out -> disconnected in manager
   - worker medium times out -> disconnected in worker
-  - component avatar times out -> disconnected in manager 
+  - component avatar times out -> disconnected in manager
   - component medium times out -> disconnected in worker
   - streamer stops receiving data -> turns hungry
   - same for component -> manager marks muxer as lost

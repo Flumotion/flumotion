@@ -11,7 +11,7 @@ WHAT IS NEEDED
   - a list of:
     - "format string", (args tuple), "textdomain"
       or
-    - ("singular format", "plural format", integer), (args tuple), "textdomain" 
+    - ("singular format", "plural format", integer), (args tuple), "textdomain"
 
 DESIGN QUESTIONS and CHOICES
 -----------------------------

@@ -621,7 +621,7 @@ class Vishnu(log.Loggable):
         """
         Load a component into the manager configuration.
 
-        See L{flumotion.manager.admin.AdminAvatar.perspective_loadComponent} 
+        See L{flumotion.manager.admin.AdminAvatar.perspective_loadComponent}
         for a definition of the argument types.
         """
         self.debug('loading %s component %s on %s',
@@ -783,19 +783,19 @@ class Vishnu(log.Loggable):
                    % moods.get(mood))
             self.warning(msg)
             return defer.fail(errors.ComponentMoodError(msg))
-            
+
         mood = componentState.get('mood')
         stoppers = {moods.sad.value: stopSad,
                     moods.lost.value: stopLost}
         return stoppers.get(mood, stopUnknown)()
 
     def _componentStopWithAvatar(self, componentState, componentAvatar):
-        # FIXME: This deferred is just the remote call; there's no actual   
+        # FIXME: This deferred is just the remote call; there's no actual
         # deferred for completion of shutdown.
         d = componentAvatar.stop()
 
         return d
-        
+
     def componentStop(self, componentState):
         """
         Stop the given component.
@@ -894,7 +894,7 @@ class Vishnu(log.Loggable):
 
             self._workerCreateComponents(workerId, allComponents)
         d.addCallback(workerAvatarComponentListReceived)
-        
+
         reactor.callLater(0, self.componentHeaven.feedServerAvailable,
                           workerId)
 

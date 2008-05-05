@@ -10,7 +10,7 @@ It will probably still contain bugs, be difficult to install (since
 you need recent dependencies), and cause you some headaches.
 
 On the other hand, when it works and you are capturing your Firewire camera
-on one machine, encoding to Theora on a second (with an overlay, of course), 
+on one machine, encoding to Theora on a second (with an overlay, of course),
 encoding the audio to Vorbis on a third, muxing to Ogg on a fourth, and then
 streaming both audio and video from a fifth, audio only from a sixth,
 video only from a seventh, and capturing all three streams to disk from
@@ -62,8 +62,8 @@ run into them:
 - When encoding to Vorbis, prefer to use quality instead of absolute bitrate.
   For absolute bitrate, for each sample rate a limited range of bitrates is
   allowed.
-- You may see memory leaks if you use the soundcard or firewire source 
-  components, and you use PyGTK prior to 0.8.5, or gst-python prior to 0.10.3, 
+- You may see memory leaks if you use the soundcard or firewire source
+  components, and you use PyGTK prior to 0.8.5, or gst-python prior to 0.10.3,
   so upgrading to these versions is strongly recommended.
 
 A FIRST TEST
@@ -79,8 +79,8 @@ terminal 2:
   flumotion-worker -v -T tcp -u user -p test
 
 terminal 3:
-  flumotion-admin -v
-  Unselect 'Secure connection via SSL', press Next, then enter "user" and 
+  flumotion-admin -
+  Unselect 'Secure connection via SSL', press Next, then enter "user" and
   "test" in the dialog.
 
   Go through the wizard, chosing defaults.
@@ -90,10 +90,10 @@ terminal 3:
 terminal 4:
   gst-launch playbin uri=http://localhost:8800
 
-  Some systems may not have gst-launch, but only gst-launch-0.8 or 
+  Some systems may not have gst-launch, but only gst-launch-0.8 or
   gst-launch-0.10, in that case you can substitute either of those commands.
 
-  Alternatively, you can use any theora-enabled network player to see the 
+  Alternatively, you can use any theora-enabled network player to see the
   stream.
 
 terminal 5:
@@ -103,7 +103,7 @@ terminal 5:
   all of them will return success at the end of their run!
 
   We use 900 clients rather than a nice round number such as 1000 because, with
-  a standard unix system, you'll usually be limited to slightly under 1000 
+  a standard unix system, you'll usually be limited to slightly under 1000
   clients by default due to limits on open file descriptors (each client
   requires a file descriptor). This limit is changable, but it's simpler to just
   test with slightly fewer clients.

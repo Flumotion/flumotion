@@ -49,7 +49,7 @@
 
       <property name="porter-socket-path">/tmp/portertest1</property>
       <property name="porter-username">me</property>
-      <property name="porter-password">unguessable</property> 
+      <property name="porter-password">unguessable</property>
     </component>
 
     <component type="http-server" name="httpserver" worker="localhost">
@@ -58,7 +58,7 @@
       <property name="type">slave</property>
       <property name="porter-socket-path">/tmp/portertest1</property>
       <property name="porter-username">me</property>
-      <property name="porter-password">unguessable</property> 
+      <property name="porter-password">unguessable</property>
     </component>
   </flow>
 </planet>

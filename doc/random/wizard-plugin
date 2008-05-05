@@ -21,7 +21,7 @@ feeder: name of feeder provides this producer stream.
 
 Example:
 
-  <wizard type="audio-producer" _description="Test audio source" 
+  <wizard type="audio-producer" _description="Test audio source"
           feeder="default" />
 
 * Adding the wizard step

@@ -53,7 +53,7 @@ class AdminConfigParser(fluconfig.BaseConfigParser):
         #   <plugs>
         root = self.doc.documentElement
         if not root.nodeName == 'admin':
-            raise errors.ConfigError("unexpected root node': %s" % 
+            raise errors.ConfigError("unexpected root node': %s" %
                 (root.nodeName,))
 
         def parseplugs(node):

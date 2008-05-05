@@ -136,7 +136,7 @@ def _maybeDeferredChain(procs, *args, **kwargs):
     Failures triggered during any of the procedure short-circuit execution
     of the other procedures and should be handled by the errbacks attached
     to the deferred returned here.
-    
+
     @rtype: L{twisted.internet.defer.Deferred}
     """
     def call_proc(_, p):

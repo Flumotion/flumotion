@@ -20,7 +20,7 @@ rundir=/var/run/flumotion
 logfile=/var/log/flumotion/service.log
 sysconfig=/etc/sysconfig/flumotion
 
-# source configuration 
+# source configuration
 if [ -f $sysconfig ] ; then
         . $sysconfig
 fi

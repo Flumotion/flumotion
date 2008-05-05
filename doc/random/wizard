@@ -21,9 +21,9 @@ visited		If we've been to the step, used by the sidebar
 A step is a wrapper around a glade file with some extra information
 to be able to integrate it to the wizard, it is a class with meta data
 such as icon name, title. It also contains methods which is used by the
-wizard to determine the flow of the configuration. 
+wizard to determine the flow of the configuration.
 The step has complete access to the main wizard object and can, by calling
-different methods to block the next/prev buttons, show a dialog or run a 
+different methods to block the next/prev buttons, show a dialog or run a
 function on a specified worker.
 
 Calls step -> wizard:
@@ -59,7 +59,7 @@ All steps are stored in a stack and are added as the user navigates
 through the wizard. Back simply pops the item and next puts it on the top.
 
 To load the steps, flumotion.wizard.steps is imported and all steps are
-added to the global list _steps. Then each step is added to the wizard, 
+added to the global list _steps. Then each step is added to the wizard,
 setup() is called on the step and if its the initial step its added on top
 of the stack. The rest of the steps are simply stored in a list and they are
 used by the sidebar code for instance.
@@ -70,7 +70,7 @@ So it has options to specify whether it should run its own mainloop to be
 able to reuse a rector when running with twisted for instance.
 
 The sidebar is completely rebuilt in each step, it's basically a vertical
-box with a number of other horizontal boxes. Because we cannot show 
+box with a number of other horizontal boxes. Because we cannot show
 the complete progress, due to the dynamic nature of the wizard we need
 to put group them into different sections.
 Welcome, Production, Conversion, Consumption and License
@@ -84,7 +84,7 @@ WizardSaver
 ===========
 
 Iterates over all steps in the stack and generates a configuration file
-matching the input. It mainly takes care of doing checks between 
+matching the input. It mainly takes care of doing checks between
 different components.
 
 

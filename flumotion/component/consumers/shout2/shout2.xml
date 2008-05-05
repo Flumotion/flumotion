@@ -10,7 +10,7 @@
         <entry type="component" location="shout2.py"
                function="Shout2Consumer"/>
       </entries>
-      
+
       <properties>
 	<property name="ip" type="string" required="no" />
 	<property name="password" type="string" required="no" />
@@ -50,4 +50,4 @@
      </bundle>
   </bundles>
 
-</registry> 
+</registry>

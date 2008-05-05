@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="smoke-encoder" base="flumotion/component/encoders/smoke"
                description="An encoder using JPEG frames and delta frames.">
       <source location="flumotion.component.encoders.smoke.smoke" />
@@ -13,7 +13,7 @@
         <entry type="wizard" location="wizard_gtk.py"
                function="SmokeWizardPlugin" />
       </entries>
-      <wizard _description="Smoke" type="video-encoder" 
+      <wizard _description="Smoke" type="video-encoder"
               feeder="default" eater="default">
         <provide-format media-type="smoke"/>
       </wizard>
@@ -28,7 +28,7 @@
                   description="How often should a keyframe appear (in frames, default 20" />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -74,4 +74,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

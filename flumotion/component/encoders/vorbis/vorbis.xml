@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="vorbis-encoder" base="flumotion/component/encoders/vorbis">
       <source location="flumotion.component.encoders.vorbis.vorbis"/>
       <eater name="default"/>
@@ -17,12 +17,12 @@
         <entry type="wizard" location="wizard_gtk.py"
                function="VorbisWizardPlugin" />
       </entries>
-      <wizard _description="Vorbis" type="audio-encoder" 
+      <wizard _description="Vorbis" type="audio-encoder"
               feeder="default" eater="default">
         <provide-format media-type="vorbis"/>
       </wizard>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -71,4 +71,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

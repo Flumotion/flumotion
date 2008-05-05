@@ -34,7 +34,7 @@ Notes on Firewire
 
   - so wizard has three different kinds of width:
     - input_width:  width the device is giving us; this is in original PAR
-    - scaled_width: this is the width after scaling; either because of 
+    - scaled_width: this is the width after scaling; either because of
                     square pixel conversion, width correction stretching, or
                     both
     - output_width: the actual video width the component will report, which
@@ -57,4 +57,4 @@ Notes on Firewire
   gst-launch -v videotestsrc ! video/x-raw-yuv,width=720,height=576,format=\(fourcc\)YUY2,framerate=25.0,pixel-aspect-ratio=\(fraction\)59/54 !
 
 - TODO: cropping or top/bottom padding to get to 4:3 or 16:9; probably
-  should be done 
+  should be done

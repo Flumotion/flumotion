@@ -38,4 +38,4 @@ Connecting downstream (from feeder to eater):
   The JobMedium receives the message, and calls feedToFD() on the component
 - at this point, the feeder and the eater are both connected, and the eater
   will receive the stream from the feeder
-  
+

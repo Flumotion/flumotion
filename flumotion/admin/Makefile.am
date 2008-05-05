@@ -1,5 +1,5 @@
 include $(top_srcdir)/common/python.mk
-                                                                                
+
 componentdir = $(libdir)/flumotion/python/flumotion/admin
 component_PYTHON = \
 	__init__.py \

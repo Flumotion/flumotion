@@ -15,8 +15,8 @@
         <entry type="wizard" location="wizard_gtk.py"
                function="BTTVWizardPlugin" />
       </entries>
-      
-      <wizard type="video-producer" _description="TV card" 
+
+      <wizard type="video-producer" _description="TV card"
               feeder="default" />
 
       <synchronization required="yes" />
@@ -98,5 +98,5 @@
     </bundle>
 
   </bundles>
-            
-</registry> 
+
+</registry>

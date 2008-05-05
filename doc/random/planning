@@ -16,7 +16,7 @@ Planned features for flumotion and what's needed to implement it
 - automatically serve minimal cortado applet
   - cortado .class files installed as a discoverable package
   - wizard provides option in streamer and checks presence of these files
-  - streamer component provides 
+  - streamer component provides
     - URL for download of cortado jar, which is generated whenever .class files
       change (like bundles), and with only code needed to show the stream
     - URL with .html page linking to the applet and stream, with correct

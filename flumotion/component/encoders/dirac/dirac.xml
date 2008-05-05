@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="dirac-encoder" base="flumotion/component/encoders/dirac"
                description="Encode a raw video feed using BBC's Dirac codec." >
       <source location="flumotion.component.encoders.dirac.dirac" />
@@ -14,7 +14,7 @@
                function="DiracWizardPlugin" />
       </entries>
 
-      <wizard _description="Dirac" type="video-encoder" 
+      <wizard _description="Dirac" type="video-encoder"
               feeder="default" eater="default">
         <provide-format media-type="dirac" />
       </wizard>
@@ -24,7 +24,7 @@
                   description="Bitrate to encode at (in bps)" />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -70,4 +70,4 @@
     </bundle>
   </bundles>
 
-</registry> 
+</registry>

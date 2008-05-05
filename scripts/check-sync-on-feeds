@@ -66,7 +66,7 @@ def gotVideoFeed(res):
         return
     (feedId, fd) = res
     videoFd = fd
-    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" % 
+    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" %
         (fd, feedId))
     haveVideoFeed = True
     if haveAudioFeed:
@@ -79,7 +79,7 @@ def videoEventProbe(pad, event):
             event)
         if not seenNewsegmentVideo:
             seenNewsegmentVideo = True
-            return False 
+            return False
     return True
 
 def audioEventProbe(pad, event):
@@ -123,7 +123,7 @@ def videoBufferProbe(pad, buffer):
         sendNewsegments()
     else:
         lowestTimestamp = buffer.timestamp
-    return False 
+    return False
 
 def audioBufferProbe(pad, buffer):
     global haveVideoBuffer
@@ -170,7 +170,7 @@ def gotAudioFeed(res):
         return
     (feedId, fd) = res
     audioFd = fd
-    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" % 
+    log.debug("check-sync-on-feeds","Got feed on fd %r for feedId %s" %
         (fd, feedId))
     haveAudioFeed = True
     if haveVideoFeed:
@@ -200,7 +200,7 @@ def main(args):
                       action="store", type="string", dest="audioFeedId",
                       help="the full feed id of the audio feed to connect to"
                         ", e.g. /default/audio-source:default")
-    
+
     options, args = parser.parse_args(args)
 
     if options.debug:
@@ -235,14 +235,14 @@ def main(args):
 def getFeed(feedClient, worker, authenticator, feedId, model):
     fsd = model.workerCallRemote(worker.get("name"), "getFeedServerPort")
     def gotFeedServerPort(port):
-        return feedClient.requestFeed(worker.get('host'), port, 
+        return feedClient.requestFeed(worker.get('host'), port,
             authenticator, feedId)
     fsd.addCallback(gotFeedServerPort)
     return fsd
 
 def managerConnected(model, options):
     psd = model.callRemote('getPlanetState')
-    
+
     def gotPlanetState(planet):
         videoAvatarId = utils.avatarId(options.videoFeedId.split(":")[0])
         audioAvatarId = utils.avatarId(options.audioFeedId.split(":")[0])
@@ -265,7 +265,7 @@ def managerConnected(model, options):
                     vclient = feed.FeedMedium(logName="check-sync-on-feeds")
                     aclient = feed.FeedMedium(logName="check-sync-on-feeds")
                     authenticator = model.connectionInfo.authenticator
-                    vd = getFeed(vclient, vworker, authenticator, 
+                    vd = getFeed(vclient, vworker, authenticator,
                         options.videoFeedId, model)
                     ad = getFeed(aclient, aworker, authenticator,
                         options.audioFeedId, model)
@@ -273,5 +273,5 @@ def managerConnected(model, options):
                     ad.addCallback(gotAudioFeed)
         whsd.addCallback(gotWorkerHeavenState)
     psd.addCallback(gotPlanetState)
-   
+
 main(sys.argv)

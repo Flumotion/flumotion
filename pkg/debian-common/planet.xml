@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <planet>
 
-  
+
 <manager name="planet">
     <host>127.0.0.1</host>
 <!--

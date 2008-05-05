@@ -1,36 +1,36 @@
 <planet>
-  
-  <atmosphere>  
+
+  <atmosphere>
     <component name="videotest-producer" type="videotest">
       <feed>default</feed>
       <width>320</width>
       <height>240</height>
       <framerate>5.0</framerate>
     </component>
-  
+
     <component name="png-overlay" type="overlay">
       <feed>default</feed>
       <source>videotest-producer</source>
       <location>/tmp/overlay.png</location>
     </component>
-    
+
     <component name="jpeg+multipart" type="multipartjpeg">
       <feed>default</feed>
       <source>png-overlay</source>
     </component>
-  
+
     <component name="jpeg+multipart-clean" type="multipartjpeg">
       <feed>default</feed>
       <source>videotest-producer</source>
     </component>
-  
+
     <component name="http-video" type="http-streamer">
       <source>jpeg+multipart</source>
       <port>8803</port>
       <logfile>/tmp/videotestsrc_access.log</logfile>
       <maxclients>1</maxclients>
     </component>
-  
+
     <component name="file-video" type="file-dumper">
       <source>jpeg+multipart</source>
       <location>/tmp/log.raw</location>

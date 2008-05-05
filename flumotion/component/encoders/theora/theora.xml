@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="theora-encoder" base="flumotion/component/encoders/theora"
                description="Encode a raw video feed using Xiph's Theora codec." >
       <source location="flumotion.component.encoders.theora.theora" />
@@ -14,7 +14,7 @@
                function="TheoraWizardPlugin" />
       </entries>
 
-      <wizard _description="Theora" type="video-encoder" 
+      <wizard _description="Theora" type="video-encoder"
               feeder="default" eater="default">
         <provide-format media-type="theora" />
       </wizard>
@@ -36,7 +36,7 @@
                   description="Sharpness encoder parameter: 0, 1, or 2"/>
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -83,4 +83,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

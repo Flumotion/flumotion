@@ -14,7 +14,7 @@ image_DATA = 		\
 	webcam.png 	\
 	widget_doc.png	\
 	wizard.png	\
-	xiphfish.png 
+	xiphfish.png
 
 imagedir = $(pkgdatadir)/image/wizard
 

@@ -29,9 +29,9 @@ Daemons
 
 Daemons have specific lifetime requirements.
 
-When a daemon starts up, it will typically have a number of critical tasks to 
-perform that may fail (parsing config files, binding ports, etc.). If it fails 
-doing and of these, it should print out an error message, then exit with a 
+When a daemon starts up, it will typically have a number of critical tasks to
+perform that may fail (parsing config files, binding ports, etc.). If it fails
+doing and of these, it should print out an error message, then exit with a
 non-zero exit code.
 
 After performing everything that can fail in an unrecoverable manner, the daemon
@@ -39,14 +39,14 @@ should daemonize (see flumotion.common.common.daemonize()). Once this function
 has returned, the program is a daemon.
 
 At this point, the daemon should never fail irrecoverably. Anything that might
-fail (such as connecting to a remote service) from here on should be retried, 
-forever, if it fails. 
+fail (such as connecting to a remote service) from here on should be retried,
+forever, if it fails.
 
 The daemon will normally terminate only with an explicit shutdown request (e.g.
 a pb shutdown message), or a signal (usually SIGTERM). On receiving either of
 these, the daemon should clean up and terminate cleanly.
 
-Any codepath that can cause (through other than explicit request as described 
-above) a shutdown of the daemon after daemonization, or permanent 
+Any codepath that can cause (through other than explicit request as described
+above) a shutdown of the daemon after daemonization, or permanent
 (unrecoverable) failure of the daemon, is a bug.
 

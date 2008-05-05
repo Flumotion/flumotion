@@ -133,7 +133,7 @@ audioconvert
 filesrc name=source blocksize=100000
     ! pngdec
     ! alphacolor
-    ! videomixer name=mix 
+    ! videomixer name=mix
     @feeder@ ! ffmpegcolorspace ! mix.
 
 multifdsink

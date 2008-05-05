@@ -52,7 +52,7 @@ PROCEDURE
   - registerPackagePath on all dirs listed in an env var, so other
     (uninstalled, or installed in different prefix) projects' import space
     is added
- 
+
 - when a bundle needs to be registered:
   - unpack the bundle
   - registerPackagePath for the bundle

@@ -242,7 +242,7 @@ class FeedComponent(basecomponent.BaseComponent):
                     "Programming error in component.")),
                     debug="Bug in %r.make_message_for_gstreamer_error: %s" % (
                         self.__class__, msg))
-                
+
             self.state.append('messages', m)
             self._change_monitor.have_error(self.pipeline.get_state(),
                                             message)

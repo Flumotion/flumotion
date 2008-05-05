@@ -36,7 +36,7 @@ TVCard
   width		>> width
   height	>> height
   framerate	>> framerate
-	
+
 Firewire
   -> inherited from VideoSource
   width		>> width
@@ -72,7 +72,7 @@ Overlay
     show text
     text
     show logo
-    
+
 Soundcard
   -> Encoding
 
@@ -98,7 +98,7 @@ Encoding
 
 VideoEncoding (for Theora, Smoke, JPEG)
   -> Use audio algorithm from Encoding
-    
+
 AudioEncoder (for Vorbis, Speex)
   -> Consumption
 
@@ -120,7 +120,7 @@ API Requirements
 
 Properties
 ==========
-  
+
 Some steps have some widgets which maps to component properties
 In most cases, they'll map directly so
 

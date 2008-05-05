@@ -157,7 +157,7 @@ class HistogramAnalyzer(StatsAnalyzer):
             last = last.replace(minute=30)
         self.linehist.append(self.make_bucket())
         self.lasttime = time.mktime(last.timetuple())
-        
+
     def new_bucket(self):
         last = datetime.datetime.fromtimestamp(self.lasttime)
         last += self.BUCKETSIZE
@@ -182,7 +182,7 @@ class HistogramAnalyzer(StatsAnalyzer):
         print 'Time distribution of log lines'
         print
 
-        
+
         maxlines = reduce(max, (b['numlines'] for b in self.linehist), 0)
         starsize = int(maxlines / 40.)
 
@@ -215,7 +215,7 @@ def analyze(f, basic_stats=False, histogram=False, tracebacks=False):
         parsed = parse_line(line)
         for a in analyzers:
             a.linein(parsed)
-        
+
     for a in analyzers:
         a.print_summary()
 
@@ -247,6 +247,6 @@ def main(args):
             basic_stats=options.basic_stats,
             histogram=options.histogram,
             tracebacks=options.tracebacks)
-    
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

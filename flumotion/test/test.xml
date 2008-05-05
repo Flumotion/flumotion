@@ -6,7 +6,7 @@
   videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5/1,format=(fourcc)I420
       </property>
     </component>
-  
+
     <component name="converter-ogg-theora" type="pipeline-converter" worker="worker">
       <eater name="default">
         <feed>producer-video-test</feed>
@@ -15,7 +15,7 @@
   ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
       </property>
     </component>
-  
+
     <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
       <eater name="default">
         <feed>converter-ogg-theora</feed>

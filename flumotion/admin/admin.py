@@ -131,10 +131,10 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                     self._connector.getDestination(),
                     log.getFailureMessage(failure))
             # swallow error
-                
+
         d.addCallbacks(success, error)
         return d
-        
+
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
 class AdminModel(medium.PingingMedium, signals.SignalMixin):
@@ -317,7 +317,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
             self.debug('Connected to manager and retrieved all state')
             self.connected = True
             self.emit('connected')
-            
+
         def writeConnection():
             i = self.connectionInfo
             if not (i.authenticator.username

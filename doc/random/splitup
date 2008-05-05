@@ -10,7 +10,7 @@ There are four kinds of code files:
 - common: code used both by manager "as-is" and bundle-able to others
   (ie keycards, ...)
 
-- everything else: bundle-able code 
+- everything else: bundle-able code
 
 FIXME: maybe shared and bundled can go in the same directory; stuff from
        shared can also be bundled so bundled is not a good name

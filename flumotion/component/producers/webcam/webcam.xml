@@ -9,7 +9,7 @@
 
       <synchronization required="yes" />
 
-      <wizard type="video-producer" _description="Web camera" 
+      <wizard type="video-producer" _description="Web camera"
               feeder="default" />
 
       <entries>
@@ -106,4 +106,4 @@ capture element, defaults to 'v4lsrc'" />
 
    </bundles>
 
-</registry> 
+</registry>

@@ -1,6 +1,6 @@
 <registry>
   <components>
-  
+
     <component type="ogg-muxer" base="flumotion/component/muxers"
                description="Muxes encoded feeds into an Ogg feed.">
       <source location="flumotion.component.muxers.ogg"/>
@@ -10,7 +10,7 @@
         <entry type="component" location="ogg.py"
                function="Ogg"/>
       </entries>
-      <wizard _description="Ogg" type="muxer" 
+      <wizard _description="Ogg" type="muxer"
               feeder="default" eater="default">
         <accept-format media-type="dirac" />
         <accept-format media-type="theora" />
@@ -19,7 +19,7 @@
         <provide-format media-type="ogg" />
       </wizard>
     </component>
-  
+
     <component type="multipart-muxer" base="flumotion/component/muxers"
                description="Muxes encoded feeds into a Multipart feed.">
       <source location="flumotion.component.muxers.multipart"/>
@@ -29,7 +29,7 @@
         <entry type="component" location="multipart.py"
                function="Multipart"/>
       </entries>
-      <wizard _description="Multipart" type="muxer" 
+      <wizard _description="Multipart" type="muxer"
               feeder="default" eater="default">
         <accept-format media-type="jpeg"/>
         <accept-format media-type="mulaw"/>
@@ -37,7 +37,7 @@
         <provide-format media-type="multipart"/>
       </wizard>
     </component>
-  
+
   </components>
 
   <bundles>
@@ -58,4 +58,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

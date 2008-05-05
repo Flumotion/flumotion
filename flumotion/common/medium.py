@@ -218,13 +218,13 @@ class BaseMedium(fpb.Referenceable):
                              module, function, args, kwargs,
                              log.getFailureMessage(failure))
                 return failure
-            
+
             self.debug('calling %s.%s(%r, %r)', module, function, args,
                        kwargs)
             d = defer.maybeDeferred(proc, *args, **kwargs)
             d.addErrback(invocationError)
             return d
-            
+
         d = self.getBundledFunction(module, function)
         d.addCallback(gotFunction)
         return d

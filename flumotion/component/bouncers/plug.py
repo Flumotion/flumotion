@@ -126,7 +126,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         self._expirer = common.Poller(self._expire,
                                       self.KEYCARD_EXPIRE_INTERVAL,
                                       start=False)
-        
+
     def typeAllowed(self, keycard):
         """
         Verify if the keycard is an instance of a Keycard class specified

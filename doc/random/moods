@@ -22,16 +22,16 @@
 
   - SLEEPING: manager "knows" about this component but it is not running on
 	      a worker in a job process
- 
+
 - the "mood" is decided in the manager; for example, a component that is LOST
   could be locked up and doesn't know itself that it is lost !
 - connected admins use a remotecacheable object for the component that has
-  the mood 
+  the mood
 - component lifecycle:
   - manager has configuration which mentions a component -> SLEEPING
   - gets created -> createComponent -> "WAKING"
-  - manager calls "start" -> startComponent -> 
+  - manager calls "start" -> startComponent ->
     component goes to HUNGRY, SAD, or HAPPY
 
   - manager destroys component -> "SLEEPING"
- 
+

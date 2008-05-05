@@ -79,7 +79,7 @@ class Stats:
         dc1 = self.average_client_number
         dt2 = now - self.average_time
         dc2 = self.no_clients
-        self.average_time = now # we can update now that we used self.av
+        self.average_time = now # we can update now that we used self.a
         if dt1 == 0:
             # first measurement
             self.average_client_number = 0
@@ -190,7 +190,7 @@ class Stats:
 
         bitspeed = bytes_sent * 8 / uptime
         set('consumption-bitrate', common.formatStorage(bitspeed) + 'bit/s')
-        set('consumption-bitrate-current', 
+        set('consumption-bitrate-current',
             common.formatStorage(currentbitrate * c.getClients()) + 'bit/s')
         set('consumption-totalbytes', common.formatStorage(bytes_sent) + 'Byte')
         set('consumption-bitrate-raw', bitspeed)

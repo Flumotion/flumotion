@@ -1,7 +1,7 @@
 <registry>
 
   <components>
-  
+
     <component type="speex-encoder" base="flumotion/component/encoders/speex"
                description="Encodes a raw audio feed using the Speex speech codec.">
       <source location="flumotion.component.encoders.speex.speex" />
@@ -12,7 +12,7 @@
         <entry type="wizard" location="wizard_gtk.py"
                function="SpeexWizardPlugin" />
       </entries>
-      <wizard _description="Speex" type="audio-encoder" 
+      <wizard _description="Speex" type="audio-encoder"
               feeder="default" eater="default">
         <provide-format media-type="speex"/>
       </wizard>
@@ -21,7 +21,7 @@
                   description="Encoding bitrate (in bits per second)" />
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -66,4 +66,4 @@
 
   </bundles>
 
-</registry> 
+</registry>

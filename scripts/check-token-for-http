@@ -5,7 +5,7 @@ correct_token=$2
 incorrect_token=$3
 # check with correct token first
 if curl -I --retry 0 $url?token=$correct_token | grep "200 OK"
-then echo; 
+then echo;
 else exit 1;
 fi
 if curl -I --retry 0 $url?token=$incorrect_token | grep "401 Unauthorized"

@@ -9,7 +9,7 @@ flumotion-admin \- streaming media server administration GUI
 .SH SYNOPSIS
 .B flumotion-admin
 [
-.B -v
+.B -
 ]
 [
 .B --debug
@@ -22,12 +22,12 @@ is a GUI application that provides administration capabilities for the flumotion
 streaming server. Using it, you can configure and monitor the streams flumotion
 serves.
 .B flumotion-admin
-connects to a running 
+connects to a running
 .I flumotion-manager
-to control the manager, start and stop components, and display logging and 
+to control the manager, start and stop components, and display logging and
 monitoring information about the running components.
 
-You must start 
+You must start
 .I flumotion-manager
 before you can use
 .B flumotion-admin
@@ -44,7 +44,7 @@ Show the version number.
 Be verbose in console output. This is equivalent to setting the debug level to
 3, and will override any debug specifiers.
 .IP "-dDEBUG, --debug=DEBUG"
-Set the debug configuration to the specified 
+Set the debug configuration to the specified
 .B debug
 string. See the
 .I Debugging
@@ -69,11 +69,11 @@ specify a debug configuration string with the following syntax:
 .B name1:n1,name2:n2,name3:n3
 .RE
 
-In this syntax, the 'name' variables can be replaced with the name of a 
-particular module within flumotion (such as 'admin', 'twisted', etc.). You can 
+In this syntax, the 'name' variables can be replaced with the name of a
+particular module within flumotion (such as 'admin', 'twisted', etc.). You can
 also use '*' to specify all modules. The 'n' variables are numbers from 1 to 5,
-larger numbers corresponding to more verbose output (ERROR, WARN, INFO, DEBUG, 
-and LOG). At level 4, full debugging information is emitted. 
+larger numbers corresponding to more verbose output (ERROR, WARN, INFO, DEBUG,
+and LOG). At level 4, full debugging information is emitted.
 
 You can also use an abbreviated form where you just supply a single number, thisuses that debug level for all modules. Thus the simplest way to enable full
 debug output for all modules is to use '-d 4' on the command line.

@@ -1,13 +1,13 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.misc.httpserver.ratecontroller.RateController" 
+    <plug socket="flumotion.component.misc.httpserver.ratecontroller.RateController"
           type="fixed-rate-plug">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/ratecontrol.py"
                function="FixedRatePlug" />
       </entries>
-   
+
       <properties>
         <property name="rate" required="true" type="int" description="The average rate to send all files at, in bits per second" />
         <property name="max-level" type="int" description="The maximum amount of data to send at full rate at any given moment, in bits" /> <!-- TODO: Describe this better -->
@@ -17,7 +17,7 @@
   </plugs>
 
   <components>
-  
+
     <component type="http-server" base="flumotion/component/misc/httpserver">
       <source location="flumotion.component.misc.httpserver.httpserver" />
       <entries>
@@ -54,10 +54,10 @@
                   description="Name of a bouncer in the atmosphere to authenticate against" />
         <property name="issuer-class" type="string"
                   description="Python class of the Keycard issuer to use" />
-   
+
         <property name="ip-filter" type="string" multiple="yes"
                   description="IP network-address/prefix-length to filter out of logs" />
-		
+
         <!-- If type is 'master' (default) -->
         <property name="port" type="int"
                   description="Port to listen on (if type is 'master')" />
@@ -72,7 +72,7 @@
 
       </properties>
     </component>
- 
+
   </components>
 
   <bundles>
@@ -132,4 +132,4 @@
 
   </bundles>
 
-</registry> 
+</registry>
