@@ -1,3 +1,9 @@
+2008-05-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/worker.py:
+	  Counterintuitively, list.index() triggers a ValueError exception,
+	  so catch that instead.
+
 2008-05-05  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/encoders/smoke/smoke.xml:

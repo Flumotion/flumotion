@@ -160,7 +160,7 @@ class PortSet(log.Loggable):
         for port in ports:
             try:
                 i = self.ports.index(port)
-            except IndexError:
+            except ValueError:
                 self.warning('portset does not include port %d', port)
             else:
                 if self.used[i]:
