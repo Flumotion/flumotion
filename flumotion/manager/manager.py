@@ -193,6 +193,8 @@ class Vishnu(log.Loggable):
     @type componentHeaven: L{component.ComponentHeaven}
     @cvar adminHeaven:     the admin heaven
     @type adminHeaven:     L{admin.AdminHeaven}
+    @cvar configDir:       the configuration directory for this Vishnu's manager
+    @type configDir:       str
     """
 
     implements(server.IServable)

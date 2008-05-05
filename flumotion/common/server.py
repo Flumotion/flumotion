@@ -90,6 +90,10 @@ class Server(log.Loggable):
         Listen as the given host and on the given port using SSL.
         Use the given .pem file, or look for it in the config directory.
 
+        @param pemFile:   File containing the SSL certificate.
+                          If it's a full path, respects the full path.
+                          If not, looks in configDir for this file.
+        @param configDir: directory where .pem file is stored
         @returns: {twisted.internet.interfaces.IListeningPort} on which
         we are listening; call .stopListening() to stop.
         """

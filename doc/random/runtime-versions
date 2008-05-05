@@ -1,0 +1,65 @@
+GENERIC PROBLEM
+---------------
+
+On our running platform, we are often not sure which version of Flumotion
+is running.  This is a problem when doing post-mortems of bugs, when
+deciding if certain processes need to be restarted due to an upgrade, and so
+on.
+
+RELATED PROBLEMS
+----------------
+- stack traces from exceptions show code objects from the actually running
+  code, but text of source code from the current file on disk
+- code could have been patched
+- there is no "one" version of Flumotion running; every process - even on
+  the same machine - can be running a different version of Flumotion as a
+  whole, or even some modules it has imported may be of a different version
+- this means that flumotion.configure.configure.version is not really useful
+  to determine the version
+- API stability requirements because of these facts are not dealt with
+
+PROPOSAL
+--------
+- every flumotion source module gets a few special variables:
+  __Revision__
+  __URL__
+
+- these variables get set from Subversion keyword properties.  As such,
+  Revision only gets updated when there is actually a change to the source code
+  file (ie, Revision shows the last revision in which this file was
+  actually changed)
+
+- add a flumotion method to:
+  - inspect sys.modules
+  - for all modules matching a prefix (e.g. 'flumotion'):
+    - check if these module variables exist
+    - extract branch and revision number for each module, with a regexp,
+      and dealing with the keyword not being expanded yet
+    - collect these in a dict
+
+- this method can be called in any of the processes
+- add remote methods:
+  - to worker and component jobs, to return this dict
+  - proxies of these in the manager, for the admin to call
+  - to the manager, to ask versions on the manager
+
+- a utility function to determine the earliest and latest revision would be
+  useful; together with a script, this would allow us to then see if we
+  are running all modules from the "same" revision number, or if any of
+  the modules has had changes between earliest and latest.
+
+- a bug handler could invoke this script such that this information can
+  be attached to bug reports.
+
+NOTES/QUESTIONS
+---------------
+- code patched in a package can also affect the code; one way to detect this
+  would be to have a __Patched__ module variable, and require patches
+  in production to actually set this variable.  Is there any more automatic
+  thing we could do ?
+
+- How do we get revision info from the cluster admin ? maybe through http
+  interface ?
+
+- This idea ties us to Subversion.  Is that a problem ? What other methods
+  do other version control systems have for tracking this ?

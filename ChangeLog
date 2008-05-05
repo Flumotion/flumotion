@@ -1,3 +1,12 @@
+2008-05-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/runtime-versions:
+	* flumotion/common/server.py:
+	* flumotion/manager/manager.py:
+	  Document more.  Add original document on versioning of .py files
+	  (which shows the URL bit is missing to know whether it's trunk or
+	  not)
+
 2008-05-05  Arek Korbik  <arkadini@gmail.com>
 
 	* po/POTFILES.in:
