@@ -23,13 +23,18 @@ import unittest
 
 from flumotion.common import testsuite
 from flumotion.configure import configure
-from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
-from flumotion.component.consumers.httpstreamer.wizard_gtk import \
+from flumotion.component.producers.firewire.firewire_wizard import \
+     FireWireProducer
+from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
      HTTPPorter, HTTPStreamer
-from flumotion.component.encoders.vorbis.wizard_gtk import VorbisAudioEncoder
-from flumotion.component.encoders.theora.wizard_gtk import TheoraVideoEncoder
-from flumotion.component.producers.videotest.wizard_gtk import TestVideoProducer
-from flumotion.component.producers.audiotest.wizard_gtk import TestAudioProducer
+from flumotion.component.encoders.vorbis.vorbis_wizard import \
+     VorbisAudioEncoder
+from flumotion.component.encoders.theora.theora_wizard import \
+     TheoraVideoEncoder
+from flumotion.component.producers.videotest.videotest_wizard import \
+     TestVideoProducer
+from flumotion.component.producers.audiotest.audiotest_wizard import \
+     TestAudioProducer
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 from flumotion.wizard.models import Component, Plug, AudioProducer, \
      VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
