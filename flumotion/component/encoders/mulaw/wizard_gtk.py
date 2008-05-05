@@ -24,39 +24,39 @@ import os
 
 from zope.interface import implements
 
-from flumotion.wizard.basesteps import VideoEncoderStep
+from flumotion.wizard.basesteps import AudioEncoderStep
 from flumotion.wizard.interfaces import IEncoderPlugin
-from flumotion.wizard.models import VideoEncoder
+from flumotion.wizard.models import AudioEncoder
 
-__version__ = "$Rev$"
+__version__ = "$Rev: 6359 $"
 _ = gettext.gettext
 
 
-class SmokeVideoEncoder(VideoEncoder):
-    component_type = 'smoke-encoder'
+class MulawAudioEncoder(AudioEncoder):
+    component_type = 'mulaw-encoder'
 
 
-class SmokeStep(VideoEncoderStep):
-    name = _('Smoke encoder')
-    sidebarName = _('Smoke')
+class MulawStep(AudioEncoderStep):
+    name = _('Mulaw encoder')
+    sidebarName = _('Mulaw')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'smoke-wizard.glade')
+                              'wizard.glade')
     section = _('Conversion')
-    component_type = 'smoke'
+    component_type = 'mulaw-encoder'
 
     # WizardStep
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.requireElements(worker, 'smokeenc')
+        self.wizard.requireElements(worker, 'mulawenc')
 
 
-class SmokeWizardPlugin(object):
+class MulawWizardPlugin(object):
     implements(IEncoderPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.model = SmokeVideoEncoder()
+        self.model = MulawAudioEncoder()
 
     def getConversionStep(self):
-        return SmokeStep(self.wizard, self.model)
+        return MulawStep(self.wizard, self.model)
 

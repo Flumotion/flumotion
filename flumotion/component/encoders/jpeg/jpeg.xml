@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="jpeg.py"
                function="JPEG" />
-        <entry type="wizard" location="jpeg_wizard.py"
+        <entry type="wizard" location="wizard_gtk.py"
                function="JPEGWizardPlugin" />
       </entries>
       <properties>
@@ -63,8 +63,8 @@
 
         <directories>
             <directory name="flumotion/component/encoders/jpeg">
-                <filename location="jpeg-wizard.glade" />
-                <filename location="jpeg_wizard.py" />
+                <filename location="wizard.glade" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

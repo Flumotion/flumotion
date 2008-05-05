@@ -19,7 +19,7 @@
                function="GUIClass" />
         <entry type="admin/text" location="admin_text.py"
                function="UIClass" />
-        <entry type="wizard" location="videotest_wizard.py"
+        <entry type="wizard" location="wizard_gtk.py"
                function="VideoTestWizardPlugin" />
       </entries>
 
@@ -102,8 +102,8 @@
 
         <directories>
             <directory name="flumotion/component/producers/videotest">
-                <filename location="videotest-wizard.glade" />
-                <filename location="videotest_wizard.py" />
+                <filename location="wizard.glade" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

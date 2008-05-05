@@ -1,3 +1,70 @@
+2008-05-05  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/plugs/cortado/Makefile.am:
+	* flumotion/component/plugs/cortado/cortado.xml:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/component/encoders/dirac/dirac.xml:
+	* flumotion/component/encoders/dirac/wizard.glade:
+	* flumotion/component/encoders/dirac/wizard_gtk.py:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/theora/wizard.glade:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/speex/wizard_gtk.py:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/wizard.glade:
+	* flumotion/component/encoders/vorbis/wizard_gtk.py:
+	* flumotion/component/encoders/jpeg/jpeg.xml:
+	* flumotion/component/encoders/jpeg/wizard.glade:
+	* flumotion/component/encoders/jpeg/wizard_gtk.py:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/mulaw/wizard.glade:
+	* flumotion/component/encoders/mulaw/wizard_gtk.py:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/smoke/wizard.glade:
+	* flumotion/component/encoders/smoke/wizard_gtk.py:
+	* flumotion/component/encoders/smoke/smoke.xml:
+	* flumotion/component/producers/bttv/Makefile.am:
+	* flumotion/component/producers/bttv/wizard.glade:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/wizard.glade:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/webcam/Makefile.am:
+	* flumotion/component/producers/webcam/wizard.glade:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/audiotest/wizard.glade:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/videotest/Makefile.am:
+	* flumotion/component/producers/videotest/wizard.glade:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/firewire/wizard.glade:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/wizard.glade:
+	* flumotion/component/consumers/disker/wizard_gtk.py:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/wizard.glade:
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/consumers/shout2/Makefile.am:
+	* flumotion/component/consumers/shout2/wizard.glade:
+	* flumotion/component/consumers/shout2/wizard_gtk.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* po/POTFILES.in:
+
+	Rename all the *_wizard.py files into wizard_gtk.py, and all
+	the *-wizard.glade files into wizard.glade. Update makefiles and
+	references in a few other files.
+
 2008-05-02  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/Makefile.am:

@@ -43,7 +43,7 @@ class Shout2Consumer(Consumer):
 
 class Shout2Step(ConsumerStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'shout2-wizard.glade')
+                              'wizard.glade')
 
     def __init__(self, wizard):
         self.model = Shout2Consumer()

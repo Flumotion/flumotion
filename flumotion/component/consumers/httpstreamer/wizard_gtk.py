@@ -251,7 +251,7 @@ class HTTPStep(ConsumerStep):
     gladeFile = os.path.join(
         os.path.dirname(
         os.path.abspath(__file__)),
-        'httpstreamer-wizard.glade')
+        'wizard.glade')
 
     def __init__(self, wizard):
         self.model = HTTPStreamer()
@@ -374,7 +374,7 @@ class HTTPStep(ConsumerStep):
         self.wizard.waitForTask('http streamer check')
 
         def importError(failure):
-            print 'FIXME: trap', failure, 'in httpstreamer_wizard.py'
+            print 'FIXME: trap', failure, 'in .../httpstreamer/wizard_gtk.py'
             self.info('could not import twisted-web')
             message = Warning(T_(N_(
                 "Worker '%s' cannot import module '%s'."),

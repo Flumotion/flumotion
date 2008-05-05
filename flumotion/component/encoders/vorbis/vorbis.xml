@@ -14,7 +14,7 @@
       <entries>
         <entry type="component" location="vorbis.py"
                function="Vorbis"/>
-        <entry type="wizard" location="vorbis_wizard.py"
+        <entry type="wizard" location="wizard_gtk.py"
                function="VorbisWizardPlugin" />
       </entries>
       <wizard _description="Vorbis" type="audio-encoder" 
@@ -63,7 +63,7 @@
 
         <directories>
             <directory name="flumotion/component/encoders/vorbis">
-                <filename location="vorbis_wizard.py" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>
@@ -76,8 +76,8 @@
 
         <directories>
             <directory name="flumotion/component/encoders/vorbis">
-                <filename location="vorbis-wizard.glade" />
-                <filename location="vorbis_wizard.py" />
+                <filename location="wizard.glade" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

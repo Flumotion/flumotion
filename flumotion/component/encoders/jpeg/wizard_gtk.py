@@ -24,39 +24,63 @@ import os
 
 from zope.interface import implements
 
-from flumotion.wizard.basesteps import AudioEncoderStep
+from flumotion.wizard.basesteps import VideoEncoderStep
 from flumotion.wizard.interfaces import IEncoderPlugin
-from flumotion.wizard.models import AudioEncoder
+from flumotion.wizard.models import VideoEncoder
 
-__version__ = "$Rev: 6359 $"
+__version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class MulawAudioEncoder(AudioEncoder):
-    component_type = 'mulaw-encoder'
+def _fraction_from_float(number, denominator):
+    """
+    Return a string to be used in serializing to XML.
+    """
+    return "%d/%d" % (number * denominator, denominator)
 
 
-class MulawStep(AudioEncoderStep):
-    name = _('Mulaw encoder')
-    sidebarName = _('Mulaw')
+class JPEGVideoEncoder(VideoEncoder):
+    component_type = 'jpeg-encoder'
+
+    def __init__(self):
+        super(JPEGVideoEncoder, self).__init__()
+
+        self.properties.framerate = 5.0
+        self.properties.quality = 84
+
+    def getProperties(self):
+        properties = super(JPEGVideoEncoder, self).getProperties()
+        properties.framerate = _fraction_from_float(properties.framerate, 2)
+        return properties
+
+
+class JPEGStep(VideoEncoderStep):
+    name = 'JPEG encoder'
+    sidebarName = 'JPEG'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'mulaw-wizard.glade')
+                              'wizard.glade')
     section = _('Conversion')
-    component_type = 'mulaw-encoder'
+    component_type = 'jpeg'
 
     # WizardStep
 
+    def setup(self):
+        self.framerate.data_type = float
+        self.quality.data_type = int
+
+        self.add_proxy(self.model.properties,
+                       ['framerate', 'quality'])
+
     def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.requireElements(worker, 'mulawenc')
+        self.wizard.requireElements(worker, 'jpegenc')
 
 
-class MulawWizardPlugin(object):
+class JPEGWizardPlugin(object):
     implements(IEncoderPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.model = MulawAudioEncoder()
+        self.model = JPEGVideoEncoder()
 
     def getConversionStep(self):
-        return MulawStep(self.wizard, self.model)
-
+        return JPEGStep(self.wizard, self.model)

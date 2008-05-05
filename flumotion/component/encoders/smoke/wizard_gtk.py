@@ -28,46 +28,35 @@ from flumotion.wizard.basesteps import VideoEncoderStep
 from flumotion.wizard.interfaces import IEncoderPlugin
 from flumotion.wizard.models import VideoEncoder
 
-__version__ = "$Rev: 6443 $"
+__version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class DiracVideoEncoder(VideoEncoder):
-    component_type = 'dirac-encoder'
+class SmokeVideoEncoder(VideoEncoder):
+    component_type = 'smoke-encoder'
 
-    def __init__(self):
-        super(DiracVideoEncoder, self).__init__()
 
-        self.properties.bitrate = 400
-
-class DiracStep(VideoEncoderStep):
-    name = _('Dirac encoder')
-    sidebarName = _('Dirac')
+class SmokeStep(VideoEncoderStep):
+    name = _('Smoke encoder')
+    sidebarName = _('Smoke')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'dirac-wizard.glade')
-    component_type = 'dirac'
-    icon = 'xiphfish.png'
+                              'wizard.glade')
+    section = _('Conversion')
+    component_type = 'smoke'
 
     # WizardStep
 
-    def setup(self):
-        self.bitrate.data_type = int
-        self.add_proxy(self.model.properties,
-                       ['bitrate'])
-
     def workerChanged(self, worker):
         self.model.worker = worker
+        self.wizard.requireElements(worker, 'smokeenc')
 
-        self.wizard.debug('running Dirac checks')
-        # FIXME: what happens to this deferred ? Does it get fired into the
-        # unknown ? Should we wait on it ?
-        self.wizard.requireElements(worker, 'schroenc')
 
-class DiracWizardPlugin(object):
+class SmokeWizardPlugin(object):
     implements(IEncoderPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.model = DiracVideoEncoder()
+        self.model = SmokeVideoEncoder()
 
     def getConversionStep(self):
-        return DiracStep(self.wizard, self.model)
+        return SmokeStep(self.wizard, self.model)
+

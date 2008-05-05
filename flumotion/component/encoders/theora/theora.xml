@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="theora.py"
                function="Theora"/>
-        <entry type="wizard" location="theora_wizard.py"
+        <entry type="wizard" location="wizard_gtk.py"
                function="TheoraWizardPlugin" />
       </entries>
 
@@ -75,8 +75,8 @@
 
         <directories>
             <directory name="flumotion/component/encoders/theora">
-                <filename location="theora_wizard.py" />
-                <filename location="theora-wizard.glade" />
+                <filename location="wizard_gtk.py" />
+                <filename location="wizard.glade" />
             </directory>
         </directories>
     </bundle>

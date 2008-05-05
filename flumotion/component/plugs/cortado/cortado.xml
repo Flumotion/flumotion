@@ -7,7 +7,7 @@
                location="flumotion/component/plugs/cortado/cortado.py"
                function="CortadoPlug" />
         <entry type="wizard"
-               location="flumotion/component/plugs/cortado/cortado_wizard.py"
+               location="flumotion/component/plugs/cortado/wizard_gtk.py"
                function="CortadoWizardPlugin" />
       </entries>
       <wizard _description="Stream to Java" type="http-consumer" 
@@ -53,7 +53,7 @@
         <directory name="flumotion/component/plugs/cortado">
           <filename location="__init__.py" />
           <filename location="cortado.py" />
-          <filename location="cortado_wizard.py" />
+          <filename location="wizard_gtk.py" />
         </directory>
       </directories>
     </bundle>

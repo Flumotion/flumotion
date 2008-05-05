@@ -28,59 +28,46 @@ from flumotion.wizard.basesteps import VideoEncoderStep
 from flumotion.wizard.interfaces import IEncoderPlugin
 from flumotion.wizard.models import VideoEncoder
 
-__version__ = "$Rev$"
+__version__ = "$Rev: 6443 $"
 _ = gettext.gettext
 
 
-def _fraction_from_float(number, denominator):
-    """
-    Return a string to be used in serializing to XML.
-    """
-    return "%d/%d" % (number * denominator, denominator)
-
-
-class JPEGVideoEncoder(VideoEncoder):
-    component_type = 'jpeg-encoder'
+class DiracVideoEncoder(VideoEncoder):
+    component_type = 'dirac-encoder'
 
     def __init__(self):
-        super(JPEGVideoEncoder, self).__init__()
+        super(DiracVideoEncoder, self).__init__()
 
-        self.properties.framerate = 5.0
-        self.properties.quality = 84
+        self.properties.bitrate = 400
 
-    def getProperties(self):
-        properties = super(JPEGVideoEncoder, self).getProperties()
-        properties.framerate = _fraction_from_float(properties.framerate, 2)
-        return properties
-
-
-class JPEGStep(VideoEncoderStep):
-    name = 'JPEG encoder'
-    sidebarName = 'JPEG'
+class DiracStep(VideoEncoderStep):
+    name = _('Dirac encoder')
+    sidebarName = _('Dirac')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'jpeg-wizard.glade')
-    section = _('Conversion')
-    component_type = 'jpeg'
+                              'wizard.glade')
+    component_type = 'dirac'
+    icon = 'xiphfish.png'
 
     # WizardStep
 
     def setup(self):
-        self.framerate.data_type = float
-        self.quality.data_type = int
-
+        self.bitrate.data_type = int
         self.add_proxy(self.model.properties,
-                       ['framerate', 'quality'])
+                       ['bitrate'])
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self.wizard.requireElements(worker, 'jpegenc')
 
+        self.wizard.debug('running Dirac checks')
+        # FIXME: what happens to this deferred ? Does it get fired into the
+        # unknown ? Should we wait on it ?
+        self.wizard.requireElements(worker, 'schroenc')
 
-class JPEGWizardPlugin(object):
+class DiracWizardPlugin(object):
     implements(IEncoderPlugin)
     def __init__(self, wizard):
         self.wizard = wizard
-        self.model = JPEGVideoEncoder()
+        self.model = DiracVideoEncoder()
 
     def getConversionStep(self):
-        return JPEGStep(self.wizard, self.model)
+        return DiracStep(self.wizard, self.model)

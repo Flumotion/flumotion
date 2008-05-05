@@ -22,11 +22,11 @@
 import gettext
 
 from flumotion.common.python import any
-from flumotion.component.consumers.httpstreamer.httpstreamer_wizard import \
+from flumotion.component.consumers.httpstreamer.wizard_gtk import \
      HTTPBothStep, HTTPAudioStep, HTTPVideoStep
-from flumotion.component.consumers.disker.disker_wizard import \
+from flumotion.component.consumers.disker.wizard_gtk import \
      DiskBothStep, DiskAudioStep, DiskVideoStep
-from flumotion.component.consumers.shout2.shout2_wizard import \
+from flumotion.component.consumers.shout2.wizard_gtk import \
      Shout2BothStep, Shout2AudioStep, Shout2VideoStep
 from flumotion.ui.wizard import WizardStep
 

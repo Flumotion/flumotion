@@ -83,7 +83,7 @@ class TheoraStep(VideoEncoderStep):
     name = _('Theora encoder')
     sidebarName = _('Theora')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'theora-wizard.glade')
+                              'wizard.glade')
     component_type = 'theora'
     icon = 'xiphfish.png'
 
