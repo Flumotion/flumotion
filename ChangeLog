@@ -1,5 +1,10 @@
 2008-05-05  Arek Korbik  <arkadini@gmail.com>
 
+	* po/POTFILES.in:
+	Update filename: test_bundle.py -> test_common_bundle.py.
+
+2008-05-05  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/component/plugs/cortado/Makefile.am:
 	* flumotion/component/plugs/cortado/cortado.xml:
 	* flumotion/component/plugs/cortado/wizard_gtk.py:

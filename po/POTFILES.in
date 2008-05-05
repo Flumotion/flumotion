@@ -301,7 +301,7 @@ flumotion/test/test_testclasses.py
 flumotion/test/test_component_httpstreamer.py
 flumotion/test/test_dag.py
 flumotion/test/test_common_package.py
-flumotion/test/test_bundle.py
+flumotion/test/test_common_bundle.py
 flumotion/test/test_common_connection.py
 flumotion/test/test_worker_worker.py
 flumotion/test/test_dialogs.py
