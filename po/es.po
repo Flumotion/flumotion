@@ -9,12 +9,12 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2008-05-05 12:13-0300\n"
-"PO-Revision-Date: 2008-04-01 15:38+0200\n"
+"PO-Revision-Date: 2008-05-06 15:45+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: ../flumotion/manager/manager.py:393
 #, python-format
@@ -247,9 +247,9 @@ msgid "Firewire audio"
 msgstr "Audio Firewire"
 
 #: ../flumotion/component/producers/looper/looper.py:125
-#, fuzzy, python-format
+#, python-format
 msgid "Could not open file '%s' for reading."
-msgstr "No se ha podido abrir el fichero %r."
+msgstr "No se ha podido abrir el fichero '%s' para lectura."
 
 #: ../flumotion/component/producers/looper/admin_gtk.py:126
 msgid "Looper"
@@ -466,9 +466,8 @@ msgid "Please upgrade '%s' to version %s."
 msgstr "Por favor, actualize '%s' a la versión %s."
 
 #: ../flumotion/component/encoders/dirac/wizard_gtk.py:44
-#, fuzzy
 msgid "Dirac encoder"
-msgstr "Codificador de Theora"
+msgstr "Codificador Dirac"
 
 #: ../flumotion/component/encoders/dirac/wizard_gtk.py:45
 #: ../flumotion/component/encoders/dirac/dirac.xml.h:1
@@ -558,10 +557,10 @@ msgstr ""
 "la configuración."
 
 #: ../flumotion/component/consumers/disker/disker.py:207
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Failed to open output file '%s' for writing. Check permissions on the file."
-msgstr "No puedo abrir el fichero de salida'%s'. Compruebe sus permisos."
+msgstr "No puedo abrir el fichero de salida'%s' para escritura. Compruebe los permisos sobre el fichero."
 
 #: ../flumotion/component/consumers/disker/disker.py:236
 #, python-format
@@ -676,11 +675,9 @@ msgstr ""
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:402
 #: ../flumotion/wizard/configurationwizard.py:277
 #: ../flumotion/wizard/overlaystep.py:135
-#, fuzzy, python-format
+#, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
-msgstr[1] "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
+msgstr "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:453
 msgid "HTTP Streamer (audio & video)"
@@ -752,7 +749,7 @@ msgstr "Valor inválido para la propiedad %r: %s"
 #. FIXME: have constructor take self instead ?
 #: ../flumotion/component/bouncers/admin_gtk.py:136
 msgid "Keycards"
-msgstr ""
+msgstr "\"Keycards\""
 
 #: ../flumotion/component/converters/overlay/overlay.py:78
 #, python-format
@@ -1009,7 +1006,6 @@ msgstr "Sobreimpresión"
 
 #: ../flumotion/wizard/overlaystep.py:122
 #: ../flumotion/wizard/overlaystep.py:141
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1106,7 +1102,7 @@ msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr "La versión del componente '%s' de GStreamer es demasiado antigüa.\n"
 
 #: ../flumotion/worker/checks/check.py:187
-#, fuzzy, python-format
+#, python-format
 msgid "Please upgrade '%s' to version %s or higher."
 msgstr "Por favor, actualize '%s' a la versión %s o superior."
 
@@ -1159,11 +1155,9 @@ msgstr "%s puede ser transladado"
 
 #. Andy 3 is a droid in the Andy series and doesn't need translating
 #: ../flumotion/test/test_common_messages.py:76
-#, fuzzy, python-format
+#, python-format
 msgid "%s %d has %d thing"
-msgid_plural "%s %d has %d things"
-msgstr[0] "%s %d tiene %d"
-msgstr[1] "%s %d tiene %d"
+msgstr "%s %d tiene %d"
 
 #: ../flumotion/test/test_common_messages.py:103
 msgid "Something is really wrong. "
@@ -1188,19 +1182,15 @@ msgstr "Soy una cadena traducida"
 
 #. use our "fake" ngettext so it gets picked up
 #: ../flumotion/test/test_i18n.py:106 ../flumotion/test/test_i18n.py:111
-#, fuzzy, python-format
+#, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] "Puedo traducir %d"
-msgstr[1] "Puedo traducir %d"
+msgstr "Puedo traducir %d"
 
 #. use the "real" ngettext, from the module, also gets picked up
 #: ../flumotion/test/test_i18n.py:109 ../flumotion/test/test_i18n.py:113
-#, fuzzy, python-format
+#, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] "Traduje %d"
-msgstr[1] "Traduje %d"
+msgstr "Traduje %d"
 
 #: ../flumotion/admin/admin.py:400
 msgid "Internal error in component."
@@ -1499,7 +1489,6 @@ msgid "About Flumotion"
 msgstr "Acerca de Flumotion"
 
 #: ../flumotion/admin/gtk/dialogs.py:203
-#, fuzzy
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -1507,7 +1496,7 @@ msgid ""
 msgstr ""
 "Flumotion es un servidor de \"streaming\" multimedia.\n"
 "\n"
-"© 2004, 2005, 2006, 2007 Fluendo S.L."
+"© 2004, 2005, 2006, 2007, 2008 Fluendo S.L."
 
 #: ../flumotion/admin/gtk/dialogs.py:215
 msgid "Authors"
@@ -1603,9 +1592,8 @@ msgid "_Manage"
 msgstr "_Administrar"
 
 #: ../flumotion/admin/gtk/client.py:294
-#, fuzzy
 msgid "_Start Component"
-msgstr "_Iniciar el componente"
+msgstr "_Iniciar componente"
 
 #: ../flumotion/admin/gtk/client.py:295
 msgid "Start the selected component"
@@ -1799,20 +1787,19 @@ msgstr ""
 "configurar su servidor de \"streaming\"."
 
 #: ../data/glade/wizard_production.glade.h:1
-#, fuzzy
 msgid "Enable this to stream audio"
-msgstr "Si desea un flujo de audio"
+msgstr "Active esto para un flujo de audio"
 
 #: ../data/glade/wizard_production.glade.h:2
-#, fuzzy
 msgid "Enable this to stream video"
-msgstr "Si desea un flujo de video"
+msgstr "Active esto para un flujo de video"
 
 #: ../data/glade/wizard_production.glade.h:3
 msgid ""
 "Please select the sources you want \n"
 "to use in your stream:"
-msgstr ""
+msgstr "Por favor, seleccione las fuente que desee \n"
+"usar en su flujo:"
 
 #: ../data/glade/wizard_production.glade.h:5
 #: ../data/glade/wizard_encoding.glade.h:4
@@ -1912,7 +1899,7 @@ msgstr "_Nombre de usuario"
 msgid ""
 "Please select the format, audio and/or \n"
 "video codecs which will be used in your stream:"
-msgstr ""
+msgstr "Por favor seleccione el formato, o sea, los codecs de audio y video que serán usados en su flujo:"
 
 #: ../data/glade/open-connection.glade.h:1
 msgid "_Host:"
@@ -2056,7 +2043,7 @@ msgstr "Configuraciones avanzadas"
 msgid ""
 "Shorter time between keyframes reduces playback latency at the cost of a "
 "higher bitrate or lower quality."
-msgstr ""
+msgstr "Tiempos entre \"keyframes\" más cortos reducen la latencia de la reproducción al costo de un mayor ratio de bits o una calidad más baja."
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:6
 msgid "Time between _keyframes:"
@@ -2404,7 +2391,7 @@ msgstr "Mbit/s"
 msgid ""
 "Send buffered data to new clients.  This reduces the delay before playback "
 "starts, but increases the latency."
-msgstr ""
+msgstr "Envia datos almacenados a los nuevos clientes. Esto reduce el retraso antes de que la reproducción comience, pero incrementa la latencia."
 
 #: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:5
 msgid "User limit:"
@@ -2441,7 +2428,7 @@ msgstr "_URL:"
 
 #: ../flumotion/component/bouncers/bouncer.glade.h:1
 msgid "_Expire selected keycards"
-msgstr ""
+msgstr "Hace caducar las \"keycards\" seleccionadas"
 
 #: ../flumotion/component/base/feeders.glade.h:1
 #: ../flumotion/component/base/eaters.glade.h:1
@@ -2520,7 +2507,7 @@ msgstr "'Offset' del último"
 
 #: ../flumotion/component/base/eaters.glade.h:14
 msgid "Offsets:"
-msgstr ""
+msgstr "Desplazamientos:"
 
 #: ../flumotion/component/base/eaters.glade.h:15
 msgid "Size of last"
@@ -2536,7 +2523,7 @@ msgstr "'Timestamp' del último"
 
 #: ../flumotion/component/base/eaters.glade.h:19
 msgid "Timestamps:"
-msgstr ""
+msgstr "Marcas de tiempo:"
 
 #: ../flumotion/component/base/eaters.glade.h:20
 msgid "Total duration"
@@ -2682,17 +2669,14 @@ msgstr "_Permitir incrementar el volúmen."
 #~ msgid "CD"
 #~ msgstr "CD"
 
-#, fuzzy
 #~ msgid "%s (audio & video)"
-#~ msgstr "Audio y Vídeo"
+#~ msgstr "%s (audio y vídeo)"
 
-#, fuzzy
 #~ msgid "%s (audio only)"
-#~ msgstr "Sólo audio"
+#~ msgstr "%s (solo audio)"
 
-#, fuzzy
 #~ msgid "%s (video only)"
-#~ msgstr "Sólo vídeo"
+#~ msgstr "%s (solo vídeo)"
 
 #~ msgid ""
 #~ "TV Card\n"
