@@ -145,7 +145,8 @@ class ConfigurationWizard(SectionWizard):
         return WelcomeStep(self)
 
     def completed(self):
-        self._save()
+        save = self._prepareSave()
+        self.emit('finished', save.getXML())
 
     def destroy(self):
         SectionWizard.destroy(self)
@@ -483,22 +484,28 @@ class ConfigurationWizard(SectionWizard):
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
 
-    def _save(self):
+    def _prepareSave(self):
         save = WizardSaver()
         save.setFlowName(self._flowName)
 
-        source_step = self.getStep('Production')
-        save.setAudioProducer(source_step.getAudioProducer())
-        save.setVideoProducer(source_step.getVideoProducer())
+        productionStep = self.getStep('Production')
+        if productionStep.hasOnDemand():
+            ondemandStep = self.getStep('Demand')
+            save.addServerConsumer(
+                ondemandStep.getServerConsumer(), 'ondemand')
+            return save
 
-        if source_step.hasVideo():
-            overlay_step = self.getStep('Overlay')
-            save.setVideoOverlay(overlay_step.getOverlay())
+        save.setAudioProducer(productionStep.getAudioProducer())
+        save.setVideoProducer(productionStep.getVideoProducer())
 
-        encoding_step = self.getStep('Encoding')
-        save.setAudioEncoder(encoding_step.getAudioEncoder())
-        save.setVideoEncoder(encoding_step.getVideoEncoder())
-        save.setMuxer(encoding_step.getMuxerType(), encoding_step.worker)
+        if productionStep.hasVideo():
+            overlayStep = self.getStep('Overlay')
+            save.setVideoOverlay(overlayStep.getOverlay())
+
+        encodingStep = self.getStep('Encoding')
+        save.setAudioEncoder(encodingStep.getAudioEncoder())
+        save.setVideoEncoder(encodingStep.getVideoEncoder())
+        save.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
         for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
@@ -510,13 +517,11 @@ class ConfigurationWizard(SectionWizard):
             for porter in step.getPorters():
                 save.addPorter(porter, consumerType)
 
-        license_step = self.getStep('Content License')
-        if license_step.getLicenseType() == 'CC':
+        licenseStep = self.getStep('Content License')
+        if licenseStep.getLicenseType() == 'CC':
             save.setUseCCLicense(True)
 
-        configuration = save.getXML()
-        self.emit('finished', configuration)
-        del save
+        return save
 
     # Callbacks
 

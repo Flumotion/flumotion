@@ -11,6 +11,7 @@ flumotion_PYTHON = 		\
 	conversionsteps.py 	\
 	interfaces.py 		\
 	models.py 		\
+	ondemandstep.py		\
 	overlaystep.py 		\
 	productionsteps.py 	\
 	save.py 		\

@@ -1,3 +1,14 @@
+2008-05-06  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/ondemand-wizard.glade:
+	* data/glade/production-wizard.glade:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/productionsteps.py:
+	Add ondemand step to the wizard, fixes #932
+
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/service.py:

@@ -25,6 +25,7 @@ import gtk
 
 from flumotion.common.errors import NoBundleError
 from flumotion.ui.wizard import WizardStep
+from flumotion.wizard.ondemandstep import OnDemandStep
 
 # Register components
 from flumotion.common import componentui
@@ -50,6 +51,15 @@ class ProductionStep(WizardStep):
         WizardStep.__init__(self, wizard)
 
     # Public API
+
+    def hasOnDemand(self):
+        """Returns a boolean if on-demand will be used
+        in the stream
+
+        @returns: if on-demand was selected
+        @rtype:   bool
+        """
+        return self.on_demand.get_active()
 
     def hasAudio(self):
         """Returns if audio will be used in the stream
@@ -132,11 +142,14 @@ class ProductionStep(WizardStep):
         tips.set_tip(self.has_audio, _('If you want to stream audio'))
 
         self._populateCombos()
+        self._updateSensitivity()
 
     def getNext(self):
-        if self.has_video.get_active():
+        if self.hasOnDemand():
+            return OnDemandStep(self.wizard)
+        if self.hasVideo():
             return self.getVideoStep()
-        elif self.has_audio.get_active():
+        elif self.hasAudio():
             return self.getAudioStep()
         else:
             raise AssertionError
@@ -209,6 +222,11 @@ class ProductionStep(WizardStep):
 
         self.wizard.blockNext(not can_continue)
 
+    def _updateSensitivity(self):
+        liveStream = self.live_stream.get_active()
+        self.live_vbox.set_sensitive(liveStream)
+        self.demand_label.set_sensitive(not liveStream)
+
     # Callbacks
 
     def on_has_video__toggled(self, button):
@@ -224,3 +242,6 @@ class ProductionStep(WizardStep):
 
     def on_audio__changed(self, button):
         self._verify()
+
+    def on_live_stream_toggled(self, radio):
+        self._updateSensitivity()

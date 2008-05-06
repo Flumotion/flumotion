@@ -265,6 +265,10 @@ class SectionWizard(GladeWindow, log.Loggable):
         return nextStepClass(self)
 
     def prepareNextStep(self, step):
+        if hasattr(step, 'lastStep'):
+            self._finish(completed=True)
+            return
+
         next = step.getNext()
         if isinstance(next, WizardStep):
             nextStep = next
@@ -337,7 +341,8 @@ class SectionWizard(GladeWindow, log.Loggable):
             s.visited = False
             self.sidebar.pop()
 
-        if not step.visited:
+        hasNext = not hasattr(step, 'lastStep')
+        if not step.visited and hasNext:
             self.sidebar.push(step.section, step.name,
                               step.sidebarName)
         else:
@@ -346,7 +351,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         step.visited = True
         self._setStep(step)
 
-        hasNext = not hasattr(step, 'lastStep')
         self._updateButtons(hasNext)
 
     def _setStep(self, step):

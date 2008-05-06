@@ -234,6 +234,7 @@ flumotion/wizard/conversionsteps.py
 flumotion/wizard/configurationwizard.py
 flumotion/wizard/__init__.py
 flumotion/wizard/basesteps.py
+flumotion/wizard/ondemandstep.py
 flumotion/wizard/overlaystep.py
 flumotion/wizard/workerstep.py
 flumotion/monitor/nagios/util.py
@@ -387,9 +388,10 @@ data/glade/audio-encoder-wizard.glade
 data/glade/consumption-wizard.glade
 data/glade/encoding-wizard.glade
 data/glade/license-wizard.glade
+data/glade/ondemand-wizard.glade
+data/glade/overlay-wizard.glade
 data/glade/overview-wizard.glade
 data/glade/production-wizard.glade
-data/glade/overlay-wizard.glade
 data/glade/summary-wizard.glade
 data/glade/welcome-wizard.glade
 data/glade/admin.glade
