@@ -137,22 +137,32 @@ class BaseAdminGtk(log.Loggable):
             return d
 
         def addPages(_):
+            # FIXME: node order should be fixed somehow, so e.g. Component
+            # always comes last, together with eater/feeder ?
+
             # add a generic component node
             self.nodes['Component'] = ComponentAdminGtkNode(self.state,
                 self.admin)
 
             config = self.state.get('config')
 
+            # add feeder node, if component has feeders
             if config['feed']:
                 self.debug("Component has feeders, show Feeders node")
-                self.nodes['Feeders'] = FeedersAdminGtkNode(self.state, self.admin)
+                self.nodes['Feeders'] = FeedersAdminGtkNode(
+                    self.state, self.admin)
 
+            # add eater node, if component has eaters
             if 'eater' in config and config['eater']:
                 self.debug("Component has eaters, show Eaters node")
-                self.nodes['Eaters'] = EatersAdminGtkNode(self.state, self.admin)
+                self.nodes['Eaters'] = EatersAdminGtkNode(
+                    self.state, self.admin)
 
         d = fetchTranslations()
         d.addCallback(addPages)
+
+        # FIXME: why are we not returning the deferred here ? If there is
+        # a good reason, it should be commented here
         return
 
     def getNodes(self):

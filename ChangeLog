@@ -1,3 +1,8 @@
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Commenting and code reformatting.
+
 2008-05-05  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:
