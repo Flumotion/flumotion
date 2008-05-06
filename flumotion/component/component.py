@@ -281,10 +281,21 @@ class BaseComponent(common.InitMixin, log.Loggable):
     """
     I am the base class for all Flumotion components.
 
-    @ivar name:   the name of the component
-    @type name:   string
-    @ivar medium: the component's medium
-    @type medium: L{BaseComponentMedium}
+    @ivar name:    the name of the component
+    @type name:    string
+    @ivar medium:  the component's medium
+    @type medium:  L{BaseComponentMedium}
+    @ivar uiState: state of the component to be shown in a UI.
+                   Contains at least the following keys.
+                    - cpu-percent:  percentage of CPU use in last interval
+                    - start-time:   time when component was started, in epoch
+                                    seconds
+                    - current-time: current time in epoch seconds, as seen on
+                                    component's machine, which might be out of
+                                    sync
+                    - virtual-size: virtual memory size in bytes
+                   Subclasses can add additional keys for their respective UI.
+    @type uiState: L{componentui.WorkerComponentUIState}
 
     @cvar componentMediumClass: the medium class to use for this component
     @type componentMediumClass: child class of L{BaseComponentMedium}
@@ -332,13 +343,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('cpu-percent')
-        # Time the component was started
         self.uiState.addKey('start-time')
-        # Current time at last update.
-        # Provided in order to allow displaying uptime since the remote system
-        # probably doesn't have a synchronised clock with this one.
         self.uiState.addKey('current-time')
-        # Virtual memory size in bytes
         self.uiState.addKey('virtual-size')
 
         self.plugs = {}
