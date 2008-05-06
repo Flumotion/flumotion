@@ -7,6 +7,12 @@ CODE
 The style of all python code should honor the recommendations in the
 Style Guide for Python Code [1] document.
 
+In particular:
+ - no space between the last comma and the closing parenthesis/brace in
+   tuples or lists; examples:
+   (1,)
+   ['a', 'b',]
+
 [1]: http://www.python.org/peps/pep-0008.html
 
 ChangeLog

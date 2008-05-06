@@ -560,13 +560,13 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): %r', (flog.ellipsize(result), ), args, kwargs)
+                '): %r', (flog.ellipsize(result),), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): failure %r', (failure, ), args, kwargs)
+                '): failure %r', (failure,), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 
@@ -617,13 +617,13 @@ class Avatar(pb.Avatar, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): %r', (flog.ellipsize(result), ), args, kwargs)
+                '): %r', (flog.ellipsize(result),), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): failure %r', (failure, ), args, kwargs)
+                '): failure %r', (failure,), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 
@@ -687,14 +687,14 @@ class Avatar(pb.Avatar, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (flog.ellipsize(result), ), args, kwargs)
+                '): %r', (flog.ellipsize(result),), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
 
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (failure, ), args, kwargs)
+                '): %r', (failure,), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 

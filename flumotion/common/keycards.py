@@ -61,7 +61,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     @type  state:       int
     """
     implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy)
-        + (tcredentials.ICredentials, ))
+        + (tcredentials.ICredentials,))
 
     def __init__(self):
         self.bouncerName = None

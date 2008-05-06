@@ -69,7 +69,7 @@ class SignalMixin(object):
                 break
         else:
             raise ValueError(
-                'No signal connected to function: %r' % (function, ))
+                'No signal connected to function: %r' % (function,))
 
         del self.__signalConnections[signalId]
 

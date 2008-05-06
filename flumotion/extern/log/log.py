@@ -98,7 +98,7 @@ def registerCategory(category):
 
         # our glob is unix filename style globbing, so cheat with fnmatch
         # fnmatch.fnmatch didn't work for this, so don't use it
-        if category in fnmatch.filter((category, ), spec):
+        if category in fnmatch.filter((category,), spec):
             # we have a match, so set level based on string or int
             if not value:
                 continue
@@ -237,9 +237,9 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
         debugArgs.extend(items)
     debugArgs.extend(endArgs)
     format = startFormat \
-              + ', '.join(('%s', ) * len(args)) \
+              + ', '.join(('%s',) * len(args)) \
               + (kwargs and ', ' or '') \
-              + ', '.join(('%s=%r', ) * len(kwargs)) \
+              + ', '.join(('%s=%r',) * len(kwargs)) \
               + endFormat
     return format, debugArgs
 

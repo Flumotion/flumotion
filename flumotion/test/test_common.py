@@ -131,10 +131,10 @@ class TestMergeImplements(testsuite.TestCase):
         self.assertEquals(common.mergeImplements(A, B), (I1, I2))
 
     def testFirstWithout(self):
-        self.assertEquals(common.mergeImplements(B, C), (I2, ))
+        self.assertEquals(common.mergeImplements(B, C), (I2,))
 
     def testSecondWithout(self):
-        self.assertEquals(common.mergeImplements(A, C), (I1, ))
+        self.assertEquals(common.mergeImplements(A, C), (I1,))
 
     def testBothWithout(self):
         self.assertEquals(common.mergeImplements(C, C), ( ))
@@ -144,9 +144,9 @@ class TestVersion(testsuite.TestCase):
         self.failUnless(common.version('abinary'))
 
     def test_versionTupleToString(self):
-        self.assertEquals(common.versionTupleToString((1, )), "1")
-        self.assertEquals(common.versionTupleToString((1, 2, )), "1.2")
-        self.assertEquals(common.versionTupleToString((1, 2, 3, )), "1.2.3")
+        self.assertEquals(common.versionTupleToString((1,)), "1")
+        self.assertEquals(common.versionTupleToString((1, 2,)), "1.2")
+        self.assertEquals(common.versionTupleToString((1, 2, 3,)), "1.2.3")
         self.assertEquals(common.versionTupleToString((1, 2, 3, 0,)), "1.2.3")
         self.assertEquals(common.versionTupleToString((1, 2, 3, 1,)), "1.2.3.1")
 

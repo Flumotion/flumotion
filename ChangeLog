@@ -1,5 +1,25 @@
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/styleguide:
+	  Clear up trailing commas in tuples/lists case.
+	* flumotion/common/gstreamer.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/medium.py:
+	* flumotion/common/signals.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/extern/log/log.py:
+	* flumotion/extern/unixcrypt.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_messages.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/rtsp.py:
+	* flumotion/worker/checks/check.py:
+	  fix them up.
+
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	  properly document uiState ivar.
 
