@@ -1,3 +1,10 @@
+2008-05-06  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/conversionsteps.py: 
+	  Added theora and vorbis as default encoders. Fixes #926.
+
 2008-05-06  Pedro Gracia <pedro@flumotion.com>>
 
 	* po/es.po:

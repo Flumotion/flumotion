@@ -29,6 +29,9 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 N_ = _ = gettext.gettext
 
+_PREFERRED_VIDEO_ENCODER = "theora"
+_PREFERRED_AUDIO_ENCODER = "vorbis"
+
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
 
@@ -108,19 +111,19 @@ class ConversionStep(WorkerWizardStep):
     # WizardStep
 
     def activated(self):
-        data = [('muxer', self.muxer)]
+        data = [('muxer', self.muxer, None)]
 
         production = self.wizard.getStep('Production')
         audio_producer = production.getAudioProducer()
         if audio_producer:
-            data.append(('audio-encoder', self.audio))
+            data.append(('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER))
         else:
             self.audio.hide()
             self.label_audio.hide()
 
         video_producer = production.getVideoProducer()
         if video_producer:
-            data.append(('video-encoder', self.video))
+            data.append(('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER))
         else:
             self.video.hide()
             self.label_video.hide()
@@ -142,21 +145,28 @@ class ConversionStep(WorkerWizardStep):
     # Private
 
     def _populateCombos(self, combos, provides=None):
-        for ctype, combo in combos:
+        self.debug("populating combos %r", combos)
+        for ctype, combo, default_type in combos:
             d = self.wizard.getWizardEntries(
                 wizardTypes=[ctype],
                 provides=provides)
-            d.addCallback(self._addEntries, ctype, combo)
+            d.addCallback(self._addEntries, ctype, combo, default_type)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
         self.wizard.waitForTask('querying encoders')
         d.addCallback(lambda x: self.wizard.taskFinished())
 
-    def _addEntries(self, entries, ctype, combo):
-        self.debug('adding entries for ctype %s: %r', ctype, entries)
+    def _addEntries(self, entries, ctype, combo, default_type):
+        self.debug('adding entries for ctype %s: %r with default_type %s', ctype, entries, default_type)
         data = []
         for entry in entries:
-            data.append((N_(entry.description), entry))
+            item = (N_(entry.description), entry)
+            provided_media_types = entry.getProvidedMediaTypes()
+            self.debug("adding entry %r", provided_media_types)
+            if default_type and default_type in provided_media_types:
+                data.insert(0, item)
+            else:
+                data.append(item)
         combo.prefill(data)
         combo.set_sensitive(True)
 
@@ -234,8 +244,8 @@ class ConversionStep(WorkerWizardStep):
         # '...' used while waiting for the query to be done
         if muxer_entry is None:
             return
-        self._populateCombos([('audio-encoder', self.audio),
-                               ('video-encoder', self.video)],
+        self._populateCombos([('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER),
+                               ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER)],
                               provides=muxer_entry.getAcceptedMediaTypes())
 
     # Callbacks
