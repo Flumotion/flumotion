@@ -134,7 +134,7 @@ def main(args):
         sys.stderr.write("ERROR: %s\n" % e.args[0])
         return 1
 
-    configDir = os.path.abspath(os.path.dirname(planetFile))
+    managerConfigDir = os.path.abspath(os.path.dirname(planetFile))
 
     # now copy over stuff from config that is not set yet
     if cfg.manager:
@@ -213,7 +213,7 @@ def main(args):
         log.debug('manager', 'Registered project %s version %s' % (
             p, project.get(p, 'version')))
 
-    vishnu = manager.Vishnu(options.name, configDir=configDir)
+    vishnu = manager.Vishnu(options.name, configDir=managerConfigDir)
     for managerConfigFile in args[1:]:
         vishnu.loadManagerConfigurationXML(managerConfigFile)
 
