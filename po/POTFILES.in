@@ -382,7 +382,7 @@ flumotion/admin/command/__init__.py
 flumotion/admin/__init__.py
 flumotion/project/project.py
 flumotion/project/__init__.py
-data/glade/wizard.glade
+data/glade/sectionwizard.glade
 data/glade/admin-wizard.glade
 data/glade/audio-encoder-wizard.glade
 data/glade/consumption-wizard.glade

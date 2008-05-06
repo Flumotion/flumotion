@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-05-05 12:13-0300\n"
+"POT-Creation-Date: 2008-05-06 14:07-0300\n"
 "PO-Revision-Date: 2008-04-08 03:00+0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../flumotion/manager/manager.py:393
+#: ../flumotion/manager/manager.py:395
 #, python-format
 msgid ""
 "This component is configured for Flumotion version %s, but you are running "
@@ -28,27 +28,27 @@ msgstr ""
 "versie %r.\n"
 "Gelieve de configuratie van de component aan te passen.\n"
 
-#: ../flumotion/manager/manager.py:459
+#: ../flumotion/manager/manager.py:461
 #, python-format
 msgid ""
 "Could not load component %r into %r: a component is already running with "
 "this name, but has a different configuration."
 msgstr ""
 
-#: ../flumotion/manager/manager.py:532
+#: ../flumotion/manager/manager.py:534
 msgid "Invalid component configuration."
 msgstr "Foute componentconfiguratie."
 
-#: ../flumotion/manager/manager.py:541
+#: ../flumotion/manager/manager.py:543
 #, python-format
 msgid "Unknown component in configuration: %s."
 msgstr "Onbekende component in configuratie: %s."
 
-#: ../flumotion/manager/manager.py:546
+#: ../flumotion/manager/manager.py:548
 msgid "Unknown error while loading configuration."
 msgstr "Onbekende fout tijdens het laden van de configuratie."
 
-#: ../flumotion/manager/manager.py:981
+#: ../flumotion/manager/manager.py:983
 msgid "The component could not be started."
 msgstr "De component kon niet gestart worden."
 
@@ -397,9 +397,9 @@ msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
 
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:98
-#: ../flumotion/component/base/admin_gtk.py:710
-#: ../flumotion/component/base/admin_gtk.py:724
-#: ../flumotion/component/base/admin_gtk.py:926
+#: ../flumotion/component/base/admin_gtk.py:720
+#: ../flumotion/component/base/admin_gtk.py:734
+#: ../flumotion/component/base/admin_gtk.py:936
 msgid "Byte"
 msgstr "Byte"
 
@@ -618,13 +618,15 @@ msgid "Unable to set the maximum client limit to %d clients."
 msgstr ""
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:380
-#: ../flumotion/wizard/configurationwizard.py:334
+#: ../flumotion/wizard/configurationwizard.py:335
+#: ../flumotion/wizard/ondemandstep.py:107
 #: ../flumotion/wizard/overlaystep.py:113
 #, python-format
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "Werker '%s' kan module '%s' niet importeren."
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:382
+#: ../flumotion/wizard/ondemandstep.py:109
 #, python-format
 msgid ""
 "\n"
@@ -634,7 +636,8 @@ msgstr ""
 "Deze module maakt deel uit van '%s'."
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:384
-#: ../flumotion/wizard/configurationwizard.py:340
+#: ../flumotion/wizard/configurationwizard.py:341
+#: ../flumotion/wizard/ondemandstep.py:111
 #: ../flumotion/wizard/overlaystep.py:119
 #, python-format
 msgid ""
@@ -645,7 +648,7 @@ msgstr ""
 "De thuispagina van het project is %s"
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:402
-#: ../flumotion/wizard/configurationwizard.py:277
+#: ../flumotion/wizard/configurationwizard.py:278
 #: ../flumotion/wizard/overlaystep.py:135
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
@@ -696,11 +699,11 @@ msgstr ""
 msgid "Internal Flumotion error."
 msgstr "Interne Flumotion-fout."
 
-#: ../flumotion/component/component.py:484
+#: ../flumotion/component/component.py:490
 msgid "Could not setup component."
 msgstr "Kon component niet instellen."
 
-#: ../flumotion/component/component.py:615
+#: ../flumotion/component/component.py:621
 msgid ""
 "Your configuration uses deprecated properties.  Please update your "
 "configuration and correct them.\n"
@@ -708,7 +711,7 @@ msgstr ""
 "Uw configuratie gebruikt verouderde eigenschappen.  Gelieve uw "
 "configuratiete vernieuwen en de eigenschappen te verbeteren.\n"
 
-#: ../flumotion/component/component.py:620
+#: ../flumotion/component/component.py:626
 #, python-format
 msgid "Please rename '%s' to '%s'.\n"
 msgstr "Gelieve '%s' te hernoemen tot '%s'.\n"
@@ -734,12 +737,12 @@ msgid ""
 "may see many errors in the debug output, but it should work correctly anyway."
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:379
+#: ../flumotion/component/base/admin_gtk.py:389
 msgid ""
 "Internal error in component UI.  Please file a bug against the component."
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:384
+#: ../flumotion/component/base/admin_gtk.py:394
 msgid ""
 "Internal error.\n"
 "See component error message\n"
@@ -747,65 +750,65 @@ msgid ""
 msgstr ""
 
 #. name -> gtk.MenuItem
-#: ../flumotion/component/base/admin_gtk.py:524
+#: ../flumotion/component/base/admin_gtk.py:534
 #: ../flumotion/admin/gtk/parts.py:199 ../flumotion/admin/gtk/parts.py:450
 msgid "Component"
 msgstr "Component"
 
-#: ../flumotion/component/base/admin_gtk.py:603
+#: ../flumotion/component/base/admin_gtk.py:613
 msgid "Nothing"
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:604
+#: ../flumotion/component/base/admin_gtk.py:614
 msgid "Everything"
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:605
+#: ../flumotion/component/base/admin_gtk.py:615
 msgid "Custom"
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:628
+#: ../flumotion/component/base/admin_gtk.py:638
 msgid "not available"
 msgstr ""
 
 #. no support for counting dropped buffers
-#: ../flumotion/component/base/admin_gtk.py:637
-#: ../flumotion/component/base/admin_gtk.py:718
-#: ../flumotion/component/base/admin_gtk.py:730
+#: ../flumotion/component/base/admin_gtk.py:647
+#: ../flumotion/component/base/admin_gtk.py:728
+#: ../flumotion/component/base/admin_gtk.py:740
 msgid "Unknown"
 msgstr "Ongekend"
 
-#: ../flumotion/component/base/admin_gtk.py:671
+#: ../flumotion/component/base/admin_gtk.py:681
 msgid "Feeders"
 msgstr "Voeders"
 
-#: ../flumotion/component/base/admin_gtk.py:692
+#: ../flumotion/component/base/admin_gtk.py:702
 #, python-format
 msgid "Feeder <b>%s</b>"
 msgstr "Voeder <b>%s</b>"
 
-#: ../flumotion/component/base/admin_gtk.py:703
+#: ../flumotion/component/base/admin_gtk.py:713
 msgid "<i>select an eater</i>"
 msgstr ""
 
-#: ../flumotion/component/base/admin_gtk.py:706
+#: ../flumotion/component/base/admin_gtk.py:716
 #, python-format
 msgid "<b>%s</b>"
 msgstr "<b>%s</b>"
 
-#: ../flumotion/component/base/admin_gtk.py:895
+#: ../flumotion/component/base/admin_gtk.py:905
 msgid "Eaters"
 msgstr "Eters"
 
-#: ../flumotion/component/base/admin_gtk.py:923
+#: ../flumotion/component/base/admin_gtk.py:933
 #, python-format
 msgid "Eater <b>%s</b>"
 msgstr "Eter <b>%s</b>"
 
-#: ../flumotion/component/base/admin_gtk.py:970
-#: ../flumotion/component/base/admin_gtk.py:975
-#: ../flumotion/component/base/admin_gtk.py:982
-#: ../flumotion/component/base/admin_gtk.py:1012
+#: ../flumotion/component/base/admin_gtk.py:980
+#: ../flumotion/component/base/admin_gtk.py:985
+#: ../flumotion/component/base/admin_gtk.py:992
+#: ../flumotion/component/base/admin_gtk.py:1022
 #, python-format
 msgid "%d units"
 msgstr "%d eenheden"
@@ -870,18 +873,19 @@ msgstr "Consumptie"
 msgid "Worker:"
 msgstr "Worker:"
 
-#: ../flumotion/wizard/productionsteps.py:42
 #: ../flumotion/wizard/productionsteps.py:43
+#: ../flumotion/wizard/productionsteps.py:44
 #: ../flumotion/wizard/basesteps.py:32 ../flumotion/wizard/basesteps.py:39
+#: ../flumotion/wizard/ondemandstep.py:65
 #: ../flumotion/wizard/overlaystep.py:69
 msgid "Production"
 msgstr "Productie"
 
-#: ../flumotion/wizard/productionsteps.py:131
+#: ../flumotion/wizard/productionsteps.py:141
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
 
-#: ../flumotion/wizard/productionsteps.py:132
+#: ../flumotion/wizard/productionsteps.py:142
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
@@ -915,7 +919,7 @@ msgstr ""
 msgid "Summary"
 msgstr "Samenvatting"
 
-#: ../flumotion/wizard/configurationwizard.py:282
+#: ../flumotion/wizard/configurationwizard.py:283
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
@@ -925,8 +929,8 @@ msgstr ""
 "Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
 "en de worker te herstarten."
 
-#: ../flumotion/wizard/configurationwizard.py:285
-#: ../flumotion/wizard/configurationwizard.py:342
+#: ../flumotion/wizard/configurationwizard.py:286
+#: ../flumotion/wizard/configurationwizard.py:343
 msgid ""
 "\n"
 "\n"
@@ -936,7 +940,7 @@ msgstr ""
 "\n"
 "U kan niet verder gaan."
 
-#: ../flumotion/wizard/configurationwizard.py:337
+#: ../flumotion/wizard/configurationwizard.py:338
 #: ../flumotion/wizard/overlaystep.py:116
 #, python-format
 msgid ""
@@ -946,18 +950,27 @@ msgstr ""
 "\n"
 "Deze module maakt deel uit van '%s'."
 
-#: ../flumotion/wizard/configurationwizard.py:378
-#: ../flumotion/wizard/configurationwizard.py:406
+#: ../flumotion/wizard/configurationwizard.py:379
+#: ../flumotion/wizard/configurationwizard.py:407
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
-#: ../flumotion/wizard/configurationwizard.py:535
+#: ../flumotion/wizard/configurationwizard.py:540
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
 "Alle workers zijn afgemeld.\n"
 "Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
+
+#: ../flumotion/wizard/ondemandstep.py:63
+msgid "Demand"
+msgstr ""
+
+#: ../flumotion/wizard/ondemandstep.py:64
+#: ../data/glade/production-wizard.glade.h:4
+msgid "On demand"
+msgstr ""
 
 #: ../flumotion/wizard/overlaystep.py:42
 msgid "Fluendo"
@@ -1745,11 +1758,166 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: ../data/glade/wizard.glade.h:1 ../data/glade/admin-wizard.glade.h:1
+#: ../data/glade/sectionwizard.glade.h:1 ../data/glade/admin-wizard.glade.h:1
 msgid "Flumotion Configuration Wizard"
 msgstr "Flumotion Configuratie Wizard"
 
-#: ../data/glade/wizard_welcome.glade.h:1
+#: ../data/glade/admin-wizard.glade.h:2
+msgid "Name of step"
+msgstr "Naam van stap"
+
+#: ../data/glade/audio-encoder-wizard.glade.h:1
+#: ../flumotion/component/encoders/dirac/wizard.glade.h:1
+#: ../flumotion/component/encoders/theora/wizard.glade.h:4
+#: ../flumotion/component/encoders/vorbis/wizard.glade.h:1
+msgid "Bit _rate:"
+msgstr "Bit_snelheid:"
+
+#: ../data/glade/audio-encoder-wizard.glade.h:2
+#: ../flumotion/component/encoders/dirac/wizard.glade.h:2
+#: ../flumotion/component/encoders/theora/wizard.glade.h:10
+#: ../flumotion/component/encoders/vorbis/wizard.glade.h:3
+msgid "kbit/s"
+msgstr "kbit/s"
+
+#: ../data/glade/consumption-wizard.glade.h:1
+msgid "Audio & Video"
+msgstr "Audio & Video"
+
+#: ../data/glade/consumption-wizard.glade.h:2
+msgid "Audio only"
+msgstr "Enkel audio"
+
+#: ../data/glade/consumption-wizard.glade.h:3
+msgid "S_ave to disk"
+msgstr "O_pslaan op schijf"
+
+#: ../data/glade/consumption-wizard.glade.h:4
+msgid "S_tream over HTTP"
+msgstr "_Streamen over HTTP"
+
+#: ../data/glade/consumption-wizard.glade.h:5
+msgid "Stream to _Icecast2"
+msgstr ""
+
+#: ../data/glade/consumption-wizard.glade.h:6
+msgid "Video only"
+msgstr "Enkel video"
+
+#: ../data/glade/encoding-wizard.glade.h:1 ../data/glade/videotest.glade.h:2
+#: ../flumotion/component/producers/videotest/wizard.glade.h:1
+msgid "F_ormat:"
+msgstr "F_ormaat:"
+
+#: ../data/glade/encoding-wizard.glade.h:2
+msgid ""
+"Please select the format, audio and/or \n"
+"video codecs which will be used in your stream:"
+msgstr ""
+
+#: ../data/glade/encoding-wizard.glade.h:4
+#: ../data/glade/production-wizard.glade.h:8
+msgid "_Audio:"
+msgstr "_Audio:"
+
+#: ../data/glade/encoding-wizard.glade.h:5
+#: ../data/glade/production-wizard.glade.h:9
+msgid "_Video:"
+msgstr "V_ideo:"
+
+#: ../data/glade/license-wizard.glade.h:1
+msgid "Specify _license:"
+msgstr "Kies _licentie:"
+
+#: ../data/glade/ondemand-wizard.glade.h:1
+msgid "/tmp"
+msgstr ""
+
+#: ../data/glade/ondemand-wizard.glade.h:2
+#, fuzzy
+msgid "Directory:"
+msgstr "Theora encoder"
+
+#: ../data/glade/ondemand-wizard.glade.h:3
+msgid ""
+"The base path of the streamer, all urls will be prefixed with this. Defaults "
+"to '/'."
+msgstr ""
+
+#: ../data/glade/ondemand-wizard.glade.h:4
+msgid ""
+"This is the directory which will be exported. All files in this and it's "
+"subdirectories will be accessible over http."
+msgstr ""
+
+#: ../data/glade/ondemand-wizard.glade.h:5
+msgid ""
+"This page allows you to configure\n"
+" your on demand video server:"
+msgstr ""
+
+#: ../data/glade/ondemand-wizard.glade.h:7
+#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:6
+#: ../flumotion/component/consumers/shout2/wizard.glade.h:4
+msgid "_Mount point:"
+msgstr "_Mountpunt:"
+
+#: ../data/glade/ondemand-wizard.glade.h:8
+#: ../data/glade/open-connection.glade.h:2
+#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:7
+#: ../flumotion/component/consumers/shout2/wizard.glade.h:6
+msgid "_Port:"
+msgstr "_Poort:"
+
+#: ../data/glade/overlay-wizard.glade.h:1
+msgid "Show _logos in bottom left corner"
+msgstr "Toon _logos in de linkeronderhoek"
+
+#: ../data/glade/overlay-wizard.glade.h:2
+msgid "Show _text in upper left corner:"
+msgstr "Toon t_ekst in the rechterbovenhoek:"
+
+#: ../data/glade/production-wizard.glade.h:1
+#, fuzzy
+msgid "Enable this to stream audio"
+msgstr "Als je audio wil streamen"
+
+#: ../data/glade/production-wizard.glade.h:2
+#, fuzzy
+msgid "Enable this to stream video"
+msgstr "Als je video wil streamen"
+
+#: ../data/glade/production-wizard.glade.h:3
+msgid "Live stream"
+msgstr ""
+
+#: ../data/glade/production-wizard.glade.h:5
+msgid ""
+"Please select the sources you want \n"
+"to use in your live stream:"
+msgstr ""
+
+#: ../data/glade/production-wizard.glade.h:7
+msgid ""
+"This option allows you to serve a collection of files from disk on demand."
+msgstr ""
+
+#: ../data/glade/summary-wizard.glade.h:1
+#, fuzzy
+msgid ""
+"Congratulations ! You are now ready to use \n"
+"your streaming server.\n"
+"\n"
+"When you press &quot;Apply&quot;, your configuration will be automatically "
+"loaded on your network.  This will take some time."
+msgstr ""
+"Proficiat ! U bent nu klaar om uw \n"
+"streaming server te gebruiken.\n"
+"\n"
+"Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
+"worden op uw netwerk.  Dit zal enige tijd duren."
+
+#: ../data/glade/welcome-wizard.glade.h:1
 msgid ""
 "Welcome to the Flumotion configuration wizard.\n"
 "\n"
@@ -1761,41 +1929,37 @@ msgstr ""
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
 
-#: ../data/glade/wizard_production.glade.h:1
+#: ../data/glade/admin.glade.h:1
+msgid "Flumotion Administration"
+msgstr "Flumotion Administratie"
+
+#: ../data/glade/authenticate.glade.h:1
+msgid "Name and Password"
+msgstr "Naam en Paswoord"
+
+#: ../data/glade/authenticate.glade.h:2
 #, fuzzy
-msgid "Enable this to stream audio"
-msgstr "Als je audio wil streamen"
+msgid "_Method:"
+msgstr "_Drempel:"
 
-#: ../data/glade/wizard_production.glade.h:2
+#: ../data/glade/authenticate.glade.h:3
 #, fuzzy
-msgid "Enable this to stream video"
-msgstr "Als je video wil streamen"
+msgid "_Password:"
+msgstr "_Paswoord"
 
-#: ../data/glade/wizard_production.glade.h:3
-msgid ""
-"Please select the sources you want \n"
-"to use in your stream:"
-msgstr ""
+#: ../data/glade/authenticate.glade.h:4
+#, fuzzy
+msgid "_Username:"
+msgstr "_Gebruikersnaam"
 
-#: ../data/glade/wizard_production.glade.h:5
-#: ../data/glade/wizard_encoding.glade.h:4
-msgid "_Audio:"
-msgstr "_Audio:"
-
-#: ../data/glade/wizard_production.glade.h:6
-#: ../data/glade/wizard_encoding.glade.h:5
-msgid "_Video:"
-msgstr "V_ideo:"
+#: ../data/glade/connections.glade.h:1
+msgid "Clear _All"
+msgstr "Wis _Alles"
 
 #: ../data/glade/videotest.glade.h:1
 #, fuzzy
 msgid "<b>Options</b>"
 msgstr "<b>Cliënten</b>"
-
-#: ../data/glade/videotest.glade.h:2 ../data/glade/wizard_encoding.glade.h:1
-#: ../flumotion/component/producers/videotest/wizard.glade.h:1
-msgid "F_ormat:"
-msgstr "F_ormaat:"
 
 #: ../data/glade/videotest.glade.h:3
 #, fuzzy
@@ -1819,83 +1983,18 @@ msgstr "_Patroon:"
 msgid "_Width:"
 msgstr "_Breedte:"
 
-#: ../data/glade/connections.glade.h:1
-msgid "Clear _All"
-msgstr "Wis _Alles"
-
-#: ../data/glade/admin.glade.h:1
-msgid "Flumotion Administration"
-msgstr "Flumotion Administratie"
-
-#: ../data/glade/admin-wizard.glade.h:2
-msgid "Name of step"
-msgstr "Naam van stap"
-
-#: ../data/glade/wizard_overlay.glade.h:1
-msgid "Show _logos in bottom left corner"
-msgstr "Toon _logos in de linkeronderhoek"
-
-#: ../data/glade/wizard_overlay.glade.h:2
-msgid "Show _text in upper left corner:"
-msgstr "Toon t_ekst in the rechterbovenhoek:"
-
-#: ../data/glade/wizard_audio_encoder.glade.h:1
-#: ../flumotion/component/encoders/dirac/wizard.glade.h:1
-#: ../flumotion/component/encoders/theora/wizard.glade.h:4
-#: ../flumotion/component/encoders/vorbis/wizard.glade.h:1
-msgid "Bit _rate:"
-msgstr "Bit_snelheid:"
-
-#: ../data/glade/wizard_audio_encoder.glade.h:2
-#: ../flumotion/component/encoders/dirac/wizard.glade.h:2
-#: ../flumotion/component/encoders/theora/wizard.glade.h:10
-#: ../flumotion/component/encoders/vorbis/wizard.glade.h:3
-msgid "kbit/s"
-msgstr "kbit/s"
-
-#: ../data/glade/wizard_license.glade.h:1
-msgid "Specify _license:"
-msgstr "Kies _licentie:"
-
-#: ../data/glade/authenticate.glade.h:1
-msgid "Name and Password"
-msgstr "Naam en Paswoord"
-
-#: ../data/glade/authenticate.glade.h:2
-#, fuzzy
-msgid "_Method:"
-msgstr "_Drempel:"
-
-#: ../data/glade/authenticate.glade.h:3
-#, fuzzy
-msgid "_Password:"
-msgstr "_Paswoord"
-
-#: ../data/glade/authenticate.glade.h:4
-#, fuzzy
-msgid "_Username:"
-msgstr "_Gebruikersnaam"
-
-#: ../data/glade/wizard_encoding.glade.h:2
-msgid ""
-"Please select the format, audio and/or \n"
-"video codecs which will be used in your stream:"
-msgstr ""
-
 #: ../data/glade/open-connection.glade.h:1
 #, fuzzy
 msgid "_Host:"
 msgstr "_Gast"
 
-#: ../data/glade/open-connection.glade.h:2
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:7
-#: ../flumotion/component/consumers/shout2/wizard.glade.h:6
-msgid "_Port:"
-msgstr "_Poort:"
-
 #: ../data/glade/open-connection.glade.h:3
 msgid "_Secure connection via SSL"
 msgstr "V_eilige verbinding via SSL"
+
+#: ../data/glade/connection-dialog.glade.h:1
+msgid "Open Connection..."
+msgstr "Verbinding Openen..."
 
 #: ../data/glade/greeter-start_new_success.glade.h:1
 msgid ""
@@ -1906,10 +2005,6 @@ msgid ""
 "You can shut it down later:"
 msgstr ""
 
-#: ../data/glade/connection-dialog.glade.h:1
-msgid "Open Connection..."
-msgstr "Verbinding Openen..."
-
 #: ../data/glade/greeter-start_new_error.glade.h:1
 msgid "But it had a very good reason."
 msgstr ""
@@ -1918,21 +2013,6 @@ msgstr ""
 #, fuzzy
 msgid "The manager could not be created."
 msgstr "De component kon niet gestart worden."
-
-#: ../data/glade/wizard_summary.glade.h:1
-#, fuzzy
-msgid ""
-"Congratulations ! You are now ready to use \n"
-"your streaming server.\n"
-"\n"
-"When you press &quot;Apply&quot;, your configuration will be automatically "
-"loaded on your network.  This will take some time."
-msgstr ""
-"Proficiat ! U bent nu klaar om uw \n"
-"streaming server te gebruiken.\n"
-"\n"
-"Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
-"worden op uw netwerk.  Dit zal enige tijd duren."
 
 #: ../data/glade/greeter-initial.glade.h:1
 msgid "Connect to a _running manager"
@@ -1945,30 +2025,6 @@ msgstr "Start een _nieuwe manager en verbind ermee"
 #: ../data/glade/greeter-initial.glade.h:3
 msgid "_Open recent connection"
 msgstr "_Recente verbinding openen"
-
-#: ../data/glade/wizard_consumption.glade.h:1
-msgid "Audio & Video"
-msgstr "Audio & Video"
-
-#: ../data/glade/wizard_consumption.glade.h:2
-msgid "Audio only"
-msgstr "Enkel audio"
-
-#: ../data/glade/wizard_consumption.glade.h:3
-msgid "S_ave to disk"
-msgstr "O_pslaan op schijf"
-
-#: ../data/glade/wizard_consumption.glade.h:4
-msgid "S_tream over HTTP"
-msgstr "_Streamen over HTTP"
-
-#: ../data/glade/wizard_consumption.glade.h:5
-msgid "Stream to _Icecast2"
-msgstr ""
-
-#: ../data/glade/wizard_consumption.glade.h:6
-msgid "Video only"
-msgstr "Enkel video"
 
 #: ../flumotion/component/encoders/jpeg/wizard.glade.h:1
 #: ../flumotion/component/producers/firewire/wizard.glade.h:6
@@ -2394,11 +2450,6 @@ msgstr ""
 #, fuzzy
 msgid "User limit:"
 msgstr "_Gebruikerslimiet:"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:6
-#: ../flumotion/component/consumers/shout2/wizard.glade.h:4
-msgid "_Mount point:"
-msgstr "_Mountpunt:"
 
 #: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:8
 msgid "clients"
