@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2008-05-06 14:07-0300\n"
-"PO-Revision-Date: 2008-05-05 12:55-0300\n"
+"PO-Revision-Date: 2008-05-06 14:13-0300\n"
 "Last-Translator: Johan Dahlin <johan@gnome.org>\n"
 "Language-Team: Swedish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -997,12 +997,12 @@ msgstr ""
 
 #: ../flumotion/wizard/ondemandstep.py:63
 msgid "Demand"
-msgstr ""
+msgstr "Efterfrågan"
 
 #: ../flumotion/wizard/ondemandstep.py:64
 #: ../data/glade/production-wizard.glade.h:4
 msgid "On demand"
-msgstr ""
+msgstr "Vid efterfrågan"
 
 #: ../flumotion/wizard/overlaystep.py:42
 msgid "Fluendo"
@@ -1855,30 +1855,35 @@ msgstr "Välj _licens:"
 
 #: ../data/glade/ondemand-wizard.glade.h:1
 msgid "/tmp"
-msgstr ""
+msgstr "/tmp"
 
 #: ../data/glade/ondemand-wizard.glade.h:2
-#, fuzzy
 msgid "Directory:"
-msgstr "Dirac-kodare"
+msgstr "Katalog:"
 
 #: ../data/glade/ondemand-wizard.glade.h:3
 msgid ""
 "The base path of the streamer, all urls will be prefixed with this. Defaults "
 "to '/'."
 msgstr ""
+"Bassökvägen till strömaren, alla urlen kommer att ha detta prefix. Standard \n"
+"är '/'."
 
 #: ../data/glade/ondemand-wizard.glade.h:4
 msgid ""
 "This is the directory which will be exported. All files in this and it's "
 "subdirectories will be accessible over http."
 msgstr ""
+"Det här är katalogen som kommer att exporteras. Alla filer i den och dess\n"
+"subkataloger kommer att vara tillgängliga över http."
 
 #: ../data/glade/ondemand-wizard.glade.h:5
 msgid ""
 "This page allows you to configure\n"
 " your on demand video server:"
 msgstr ""
+"Denna sidan låter dig konfigurera\n"
+" din vid-efterfrågan (on demand) videoserver:"
 
 #: ../data/glade/ondemand-wizard.glade.h:7
 #: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:6
@@ -1911,21 +1916,22 @@ msgstr "Om du vill strömma bild"
 
 #: ../data/glade/production-wizard.glade.h:3
 msgid "Live stream"
-msgstr ""
+msgstr "Direktström"
 
 #: ../data/glade/production-wizard.glade.h:5
-#, fuzzy
 msgid ""
 "Please select the sources you want \n"
 "to use in your live stream:"
 msgstr ""
 "Välj källor som du vill använda\n"
-"i din ström:"
+"i din direktström:"
 
 #: ../data/glade/production-wizard.glade.h:7
 msgid ""
 "This option allows you to serve a collection of files from disk on demand."
 msgstr ""
+"Detta alternative låter dig erbjuda en samling med filer från en disk \n"
+"vid efterfrågan (on demand)."
 
 #: ../data/glade/summary-wizard.glade.h:1
 msgid ""
