@@ -333,7 +333,8 @@ user:PSfNpHTkpTx1M
         # create a default.pem file if it doesn't exist yet
         pemFile = os.path.join(configure.configdir, 'default.pem')
         if not os.path.exists(pemFile):
-            os.system("%s %s" % (
+            # files in datadir are usually not executable, so call through sh
+            os.system("sh %s %s" % (
                 os.path.join(configure.datadir, 'make-dummy-cert'), pemFile))
 
         return True

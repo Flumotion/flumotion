@@ -1,5 +1,10 @@
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/service.py:
+	  Invoke cert generation through sh, fix for installed version.
+
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/styleguide:
 	  Clear up trailing commas in tuples/lists case.
 	* flumotion/common/gstreamer.py:
