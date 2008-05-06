@@ -1,3 +1,8 @@
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* log.py:
+	  Provide exception message when a handler fails.
+
 2007-11-07  Johan Dahlin  <johan@gnome.org>
 
 	* log.py: use range() for an enum
