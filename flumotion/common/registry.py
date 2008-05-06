@@ -1439,14 +1439,17 @@ class ComponentRegistry(log.Loggable):
         try:
             return load()
         except Exception, e:
-            self.warning("Bundle problem, rebuilding registry (%s)" % e)
+            self.debug("Could not register bundles the first time: %s" %
+                log.getExceptionMessage(e))
+            self.warning("Bundle problem, rebuilding registry")
             self.verify(force=True)
             try:
                 return load()
             except Exception, e:
                 self.debug("Could not register bundles the second time: %s" %
                     log.getExceptionMessage(e))
-                self.error("Could not not register bundles (%s)" % e)
+                self.error("Could not not register bundles (%s)" %
+                    log.getExceptionMessage(e))
 
     def dump(self, fd):
         """
