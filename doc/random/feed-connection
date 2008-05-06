@@ -1,0 +1,26 @@
+- every worker creates one PB feed server that it listens on
+- manager creates network maps and thus knows:
+  - where the feeders and eaters are, and which need connecting
+  - in which direction the connection should be made
+- for every component being started, its eaters need to be provided with a
+  feed; either the component connects to the remote FeedServer to eat the feed,
+  or the remote component should be told to feed to the local eater through
+  the local FeedServer
+- manager wants to connect feeder F on component A, worker 1
+  with eater E on component B, worker 2,
+  connection going from 2 to 1:
+  - manager tells component B to connect to worker 1 on the given port
+    ComponentAvatar.eat(hostIP, port)
+  - component B makes the connection using the same keycard as used for the
+    manager
+  - worker 1 receives a PB connection, and authenticates the keycard by
+    forwarding it to the manager
+  - if successful, component B callRemote's eat('feederName')
+    after that, it hands the fd to fdsrc
+  - worker 1's remote_eat method:
+    - takes the fd
+    - passes it over the job socket to the right job
+    - removes the fd from pb
+
+  - component B and gives the fd to the feeder's multifdsink
+  - component B tells manager about successful connect
