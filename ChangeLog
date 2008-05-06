@@ -1,5 +1,11 @@
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	* flumotion/project/project.py:
+	  Add some debugging.  Fix up some debugging text.
+
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/gstreamer.py:
 	  Offset balance in the force by adding whitespace.
 

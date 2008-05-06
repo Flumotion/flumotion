@@ -49,6 +49,9 @@ def get(project, attribute, default=None):
     """
     Get an attribute from a project's module.
     """
+    log.debug('project', 'Getting attribute %s from project %s',
+        attribute, project)
+
     moduleName = "flumotion.project.%s" % project
     try:
         exec("import %s" % moduleName)

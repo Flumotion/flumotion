@@ -1417,7 +1417,7 @@ class ComponentRegistry(log.Loggable):
                         try:
                             basedir = b.getBaseDir()
                         except errors.NoProjectError, e:
-                            self.warning("Could not find project %s" % e.args)
+                            self.warning("Could not load project %s" % e.args)
                             raise
                         fullpath = os.path.join(basedir, directory,
                                                 file.getLocation())
@@ -1444,7 +1444,7 @@ class ComponentRegistry(log.Loggable):
             try:
                 return load()
             except Exception, e:
-                self.debug("Could not register bundles twice: %s" %
+                self.debug("Could not register bundles the second time: %s" %
                     log.getExceptionMessage(e))
                 self.error("Could not not register bundles (%s)" % e)
 
@@ -1533,6 +1533,10 @@ class ComponentRegistry(log.Loggable):
         # construct a list of all paths to scan for registry .xml files
         if force or self.rebuildNeeded():
             self.info("Rebuilding registry")
+            if force:
+                self.info("Rebuild of registry is forced")
+            if self.rebuildNeeded():
+                self.info("Rebuild of registry is needed")
             self.clean()
             for path in self._getRegistryPathsFromEnviron():
                 if not self.addRegistryPath(path):
