@@ -9,12 +9,12 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2008-05-06 14:07-0300\n"
-"PO-Revision-Date: 2008-05-06 15:45+0200\n"
+"PO-Revision-Date: 2008-05-06 19:14+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: ../flumotion/manager/manager.py:395
 #, python-format
@@ -680,11 +680,9 @@ msgstr ""
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:402
 #: ../flumotion/wizard/configurationwizard.py:278
 #: ../flumotion/wizard/overlaystep.py:135
-#, fuzzy, python-format
+#, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
-msgstr[1] "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
+msgstr "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
 
 #: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:453
 msgid "HTTP Streamer (audio & video)"
@@ -1006,12 +1004,12 @@ msgstr ""
 
 #: ../flumotion/wizard/ondemandstep.py:63
 msgid "Demand"
-msgstr ""
+msgstr "Demanda"
 
 #: ../flumotion/wizard/ondemandstep.py:64
 #: ../data/glade/production-wizard.glade.h:4
 msgid "On demand"
-msgstr ""
+msgstr "Bajo demanda"
 
 #: ../flumotion/wizard/overlaystep.py:42
 msgid "Fluendo"
@@ -1172,11 +1170,9 @@ msgstr "%s puede ser transladado"
 
 #. Andy 3 is a droid in the Andy series and doesn't need translating
 #: ../flumotion/test/test_common_messages.py:76
-#, fuzzy, python-format
+#, python-format
 msgid "%s %d has %d thing"
-msgid_plural "%s %d has %d things"
-msgstr[0] "%s %d tiene %d"
-msgstr[1] "%s %d tiene %d"
+msgstr "%s %d tiene %d"
 
 #: ../flumotion/test/test_common_messages.py:103
 msgid "Something is really wrong. "
@@ -1201,19 +1197,15 @@ msgstr "Soy una cadena traducida"
 
 #. use our "fake" ngettext so it gets picked up
 #: ../flumotion/test/test_i18n.py:106 ../flumotion/test/test_i18n.py:111
-#, fuzzy, python-format
+#, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] "Puedo traducir %d"
-msgstr[1] "Puedo traducir %d"
+msgstr "Puedo traducir %d"
 
 #. use the "real" ngettext, from the module, also gets picked up
 #: ../flumotion/test/test_i18n.py:109 ../flumotion/test/test_i18n.py:113
-#, fuzzy, python-format
+#, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] "Traduje %d"
-msgstr[1] "Traduje %d"
+msgstr "Traduje %d"
 
 #: ../flumotion/admin/admin.py:400
 msgid "Internal error in component."
@@ -1871,27 +1863,27 @@ msgid "/tmp"
 msgstr ""
 
 #: ../data/glade/ondemand-wizard.glade.h:2
-#, fuzzy
 msgid "Directory:"
-msgstr "Codificador Dirac"
+msgstr "Directorio:"
 
 #: ../data/glade/ondemand-wizard.glade.h:3
 msgid ""
 "The base path of the streamer, all urls will be prefixed with this. Defaults "
 "to '/'."
-msgstr ""
+msgstr "El \"path\" base del flujo, todas las URLs tendrán este prefijo. Por defecto es \"/\""
 
 #: ../data/glade/ondemand-wizard.glade.h:4
 msgid ""
 "This is the directory which will be exported. All files in this and it's "
 "subdirectories will be accessible over http."
-msgstr ""
+msgstr "Este es el directorio que será exportado. Todos los ficheros en contengal y sus subdirectorios será accesibles por http."
 
 #: ../data/glade/ondemand-wizard.glade.h:5
 msgid ""
 "This page allows you to configure\n"
 " your on demand video server:"
-msgstr ""
+msgstr "Este página permite configurar\n"
+"su servidor de video bajo demanda."
 
 #: ../data/glade/ondemand-wizard.glade.h:7
 #: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:6
@@ -1924,21 +1916,20 @@ msgstr "Active esto para un flujo de video"
 
 #: ../data/glade/production-wizard.glade.h:3
 msgid "Live stream"
-msgstr ""
+msgstr "Flujo en vivo"
 
 #: ../data/glade/production-wizard.glade.h:5
-#, fuzzy
 msgid ""
 "Please select the sources you want \n"
 "to use in your live stream:"
 msgstr ""
 "Por favor, seleccione las fuente que desee \n"
-"usar en su flujo:"
+"usar en su flujo en vivo:"
 
 #: ../data/glade/production-wizard.glade.h:7
 msgid ""
 "This option allows you to serve a collection of files from disk on demand."
-msgstr ""
+msgstr "Esta opción permite servir una colección de ficheros desde el disco bajo demanda."
 
 #: ../data/glade/summary-wizard.glade.h:1
 msgid ""
