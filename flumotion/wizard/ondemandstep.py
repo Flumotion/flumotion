@@ -23,7 +23,6 @@
 """
 
 import gettext
-import os
 
 from twisted.internet import defer
 
