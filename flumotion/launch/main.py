@@ -206,7 +206,9 @@ def start_components(wrappers, fds):
 
     for wrapper in wrappers:
         if not wrapper.instantiate():
-            return defer.fail(errors.ComponentStartError)
+            # we don't have a ComponentState, so we cheat and give the
+            # exception a wrapper
+            return defer.fail(errors.ComponentStartError(wrapper))
     d = provide_clock()
     for wrapper in wrappers:
         d.addCallback(do_start, wrapper)

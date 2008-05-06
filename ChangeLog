@@ -1,5 +1,11 @@
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/launch/main.py:
+	  Respect ComponentStartError's prototype by passing it a "fake"
+	  component state it can complain about.
+
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Use getExceptionMessage to convert an exception into a string.
 	  Only show the exception if it's fatal.
