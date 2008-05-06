@@ -1,5 +1,10 @@
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/gstreamer.py:
+	  Offset balance in the force by adding whitespace.
+
+2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	  Commenting and code reformatting.
 
