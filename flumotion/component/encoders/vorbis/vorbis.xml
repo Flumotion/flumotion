@@ -14,7 +14,7 @@
       </properties>
       <entries>
         <entry type="component" location="vorbis.py"
-               function="Vorbis"i />
+               function="Vorbis" />
         <entry type="wizard" location="wizard_gtk.py"
                function="VorbisWizardPlugin" />
       </entries>
