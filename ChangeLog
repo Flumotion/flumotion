@@ -2,15 +2,15 @@
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/wizard/conversionsteps.py: 
+	* flumotion/wizard/conversionsteps.py:
 	  Added theora and vorbis as default encoders. Fixes #926.
 
-2008-05-06  Pedro Gracia <pedro@flumotion.com>>
+2008-05-06  Pedro Gracia <pedro@flumotion.com>
 
 	* po/es.po:
 	New spanish strings translated.
 
-2008-05-06  Pedro Gracia <pedro@flumotion.com>>
+2008-05-06  Pedro Gracia <pedro@flumotion.com>
 
 	* po/es.po:
 	Spanish translation up to date.
