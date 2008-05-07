@@ -1,5 +1,10 @@
 2008-05-07  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	convert private methods and variables to camel case.
+
+2008-05-07  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/producers/bttv/wizard.glade: 
 	* flumotion/component/producers/bttv/wizard_gtk.py:
 	Speculative fix for BTTV: Add channel and signal properties

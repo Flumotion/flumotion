@@ -64,12 +64,12 @@ class TVCardStep(VideoProducerStep):
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
-        self._in_setup = False
+        self._inSetup = False
 
     # WizardStep
 
     def setup(self):
-        self._in_setup = True
+        self._inSetup = True
 
         self.device.data_type = str
         self.width.data_type = int
@@ -87,23 +87,23 @@ class TVCardStep(VideoProducerStep):
                        ['device', 'height', 'width',
                         'framerate', 'signal', 'channel'])
 
-        self._in_setup = False
+        self._inSetup = False
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._clear_combos()
-        self._run_checks()
+        self._clearCombos()
+        self._runChecks()
 
     # Private
 
-    def _clear_combos(self):
+    def _clearCombos(self):
         self.channel.clear()
         self.channel.set_sensitive(False)
         self.signal.clear()
         self.signal.set_sensitive(False)
 
-    def _run_checks(self):
-        if self._in_setup:
+    def _runChecks(self):
+        if self._inSetup:
             return None
 
         self.wizard.waitForTask('bttv checks')
@@ -120,18 +120,18 @@ class TVCardStep(VideoProducerStep):
         def errRemoteRunFailure(failure):
             failure.trap(errors.RemoteRunFailure)
             self.debug('a RemoteRunFailure happened')
-            self._clear_combos()
+            self._clearCombos()
             self.wizard.taskFinished(True)
 
         def errRemoteRunError(failure):
             failure.trap(errors.RemoteRunError)
             self.debug('a RemoteRunError happened')
-            self._clear_combos()
+            self._clearCombos()
             self.wizard.taskFinished(True)
 
         def deviceFound(result):
             if not result:
-                self._clear_combos()
+                self._clearCombos()
                 self.wizard.taskFinished(True)
                 return None
 
@@ -150,7 +150,7 @@ class TVCardStep(VideoProducerStep):
     # Callbacks
 
     def on_device__changed(self, combo):
-        self._run_checks()
+        self._runChecks()
 
 
 class BTTVWizardPlugin(object):
