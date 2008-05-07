@@ -21,8 +21,10 @@
 
 """model objects used by the wizard steps"""
 
+import random
+
 from flumotion.common import log
-from flumotion.common.errors import ComponentError, ComponentValidationError
+from flumotion.common.errors import ComponentValidationError
 
 __version__ = "$Rev$"
 
@@ -265,6 +267,10 @@ class Consumer(Component):
     eater_type = Muxer
     name_template = "consumer"
 
+    def __init__(self, worker=None):
+        Component.__init__(self, worker)
+        self._porter = None
+
     def validate(self):
         super(Component, self).validate()
 
@@ -277,6 +283,12 @@ class Consumer(Component):
             raise ComponentValidationError(
                 "consumer component %s must have at least one feeder" %
                 (self.name,))
+
+    def setPorter(self, porter):
+        self._porter = porter
+
+    def getPorter(self):
+        return self._porter
 
 
 class AudioProducer(Producer):
@@ -361,3 +373,57 @@ class HTTPPlug(Plug):
         self.audio_producer = audio_producer
         self.video_producer = video_producer
 
+
+def _generateRandomString(numchars):
+    """Generate a random US-ASCII string of length numchars
+    """
+    s = ""
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    for unused in range(numchars):
+        s += chars[random.randint(0, len(chars)-1)]
+
+    return s
+
+
+class Porter(Component):
+    """I am a model representing the configuration file for a
+    porter component.
+    """
+    component_type = 'porter'
+    def __init__(self, worker, port, username=None, password=None,
+                 socketPath=None):
+        super(Porter, self).__init__(worker=worker)
+
+        self.properties.port = port
+        if username is None:
+            username = _generateRandomString(12)
+        self.properties.username = username
+
+        if password is None:
+            password = _generateRandomString(12)
+        self.properties.password = password
+
+        if socketPath is None:
+            socketPath = 'flu-%s.socket' % (_generateRandomString(6),)
+        self.properties.socket_path = socketPath
+
+    # Public API
+
+    def getPort(self):
+        return self.properties.port
+
+    def getSocketPath(self):
+        return self.properties.socket_path
+
+    def getUsername(self):
+        return self.properties.username
+
+    def getPassword(self):
+        return self.properties.password
+
+    # Component
+
+    def getProperties(self):
+        properties = super(Porter, self).getProperties()
+        properties.port = int(properties.port)
+        return properties

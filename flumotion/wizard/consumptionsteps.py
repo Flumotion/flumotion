@@ -28,10 +28,22 @@ from flumotion.component.consumers.disker.wizard_gtk import \
      DiskBothStep, DiskAudioStep, DiskVideoStep
 from flumotion.component.consumers.shout2.wizard_gtk import \
      Shout2BothStep, Shout2AudioStep, Shout2VideoStep
+from flumotion.configure import configure
 from flumotion.ui.wizard import WizardStep
+from flumotion.wizard.models import Porter
+from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+
+class HTTPCommon(object):
+    def __init__(self):
+        self.has_client_limit = False
+        self.has_bandwidth_limit = False
+        self.client_limit = 1000
+        self.bandgwidth_limit = 500
+        self.burst_on_connect = False
 
 
 class ConsumptionStep(WizardStep):
@@ -40,8 +52,22 @@ class ConsumptionStep(WizardStep):
     section = _('Consumption')
     icon = 'consumption.png'
 
-    # WizardStep
+    def __init__(self, wizard):
+        self._httpCommon = HTTPCommon()
+        self._httpPorter = Porter(
+            worker=None, port=configure.defaultHTTPStreamPort)
+        WizardStep.__init__(self, wizard)
 
+    # Public
+
+    def getHTTPCommon(self):
+        return self._httpCommon
+    
+    def getHTTPPorter(self):
+        return self._httpPorter
+    
+    # WizardStep
+    
     def activated(self):
         has_audio = self.wizard.hasAudio()
         has_video = self.wizard.hasVideo()
@@ -99,7 +125,9 @@ class ConsumptionStep(WizardStep):
 
     def _getSteps(self):
         uielements = []
+        retval = []
         if self.http.get_active():
+            retval.append(HTTPConsumptionStep)
             uielements.append(
                 ([HTTPAudioStep, HTTPVideoStep, HTTPBothStep],
                  [self.http_audio,
@@ -121,7 +149,6 @@ class ConsumptionStep(WizardStep):
         has_audio = self.wizard.hasAudio()
         has_video = self.wizard.hasVideo()
 
-        retval = []
         for steps, (audio, video, audio_video) in uielements:
             # Audio & Video, all checkbuttons are visible and
             # changeable by the user
@@ -190,3 +217,57 @@ class ConsumptionStep(WizardStep):
         self._verify()
 
 
+class HTTPConsumptionStep(WorkerWizardStep):
+    """I am a step of the configuration wizard which allows you
+    to configure the common http properties of a stream
+    """
+    icon = 'consumption.png'
+    name = _('HTTP')
+    gladeFile = 'http-wizard.glade'
+    section = _('Consumption')
+
+    def __init__(self, wizard):
+        consumptionStep = wizard.getStep('Consumption')
+        self.common = consumptionStep.getHTTPCommon()
+        self.porter = consumptionStep.getHTTPPorter()
+        WorkerWizardStep.__init__(self, wizard)
+
+    # WizardStep
+    
+    def setup(self):
+        self.bandwidth_limit.data_type = float
+        self.burst_on_connect.data_type = bool
+        self.client_limit.data_type = int
+        self.port.data_type = int
+
+        self.add_proxy(self.porter.properties, ['port'])
+        self.add_proxy(self.common, ['has_client_limit',
+                                     'has_bandwidth_limit',
+                                     'client_limit',
+                                     'bandwidth_limit',
+                                     'burst_on_connect'])
+
+    def activated(self):
+        self._verify()
+
+    def getNext(self):
+        return self.wizard.getStep('Consumption').getNext(self)
+
+    def workerChanged(self, worker):
+        self.porter.worker = worker
+
+    # Private
+    
+    def _verify(self):
+        self.client_limit.set_sensitive(
+            self.has_client_limit.get_active())
+        self.bandwidth_limit.set_sensitive(
+            self.has_bandwidth_limit.get_active())
+
+    # Callbacks
+
+    def on_has_client_limit_toggled(self, checkbutton):
+         self._verify()
+
+    def on_has_bandwidth_limit_toggled(self, checkbutton):
+         self._verify()

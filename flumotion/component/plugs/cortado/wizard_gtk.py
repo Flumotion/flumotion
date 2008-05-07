@@ -29,6 +29,19 @@ from flumotion.wizard.models import HTTPServer, HTTPPlug
 
 __version__ = "$Rev$"
 
+# Copied from posixpath.py
+def slashjoin(a, *p):
+    """Join two or more pathname components, inserting '/' as needed"""
+    path = a
+    for b in p:
+        if b.startswith('/'):
+            path = b
+        elif path == '' or path.endswith('/'):
+            path +=  b
+        else:
+            path += '/' + b
+    return path
+
 
 class CortadoHTTPPlug(HTTPPlug):
     """I am a model representing the configuration file for a
@@ -91,10 +104,11 @@ class CortadoHTTPServer(HTTPServer):
         super(CortadoHTTPServer, self).__init__(mount_point=mount_point,
                                                 worker=streamer.worker)
 
-        self.properties.porter_socket_path = streamer.socket_path
-        self.properties.porter_username = streamer.porter_username
-        self.properties.porter_password = streamer.porter_password
-        self.properties.port = streamer.properties.port
+        porter = streamer.getPorter()
+        self.properties.porter_socket_path = porter.getSocketPath()
+        self.properties.porter_username = porter.getUsername()
+        self.properties.porter_password = porter.getPassword()
+        self.properties.port = porter.getPort()
         self.properties.type = 'slave'
 
         plug = CortadoHTTPPlug(self, streamer, audio_producer, video_producer)
@@ -124,5 +138,9 @@ class CortadoWizardPlugin(object):
         return d
 
     def getConsumer(self, streamer, audio_producer, video_producer):
+        mount_point = slashjoin(streamer.properties.mount_point,
+                                "cortado/")
         return CortadoHTTPServer(streamer, audio_producer,
-                                 video_producer, "/cortado/")
+                                 video_producer,
+                                 mount_point)
+    

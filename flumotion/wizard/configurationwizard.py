@@ -507,15 +507,14 @@ class ConfigurationWizard(SectionWizard):
         save.setVideoEncoder(encodingStep.getVideoEncoder())
         save.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
+        consumptionStep = self.getStep('Consumption')
+        save.addPorter(consumptionStep.getHTTPPorter(), 'http')
         for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
             save.addConsumer(step.getConsumerModel(), consumerType)
 
             for server in step.getServerConsumers():
                 save.addServerConsumer(server, consumerType)
-
-            for porter in step.getPorters():
-                save.addPorter(porter, consumerType)
 
         licenseStep = self.getStep('Content License')
         if licenseStep.getLicenseType() == 'CC':

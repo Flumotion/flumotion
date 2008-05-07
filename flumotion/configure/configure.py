@@ -64,8 +64,8 @@ different configdir, logdir and rundir.
 @type defaultTCPManagerPort:  int
 @var  defaultSSLManagerPort:  the default manager port for SSL communication
 @type defaultSSLManagerPort:  int
-@var  defaultStreamPortRange: the default range of external streaming ports
-@type defaultStreamPortRange: list of ints
+@var  defaultHTTPStreamPort:  the default external http streaming port
+@type defaultHTTPStreamPort:  int
 @var  defaultGstPortRange:    the default range of internal GStreamer ports
 @type defaultGstPortRange:    list of ints
 
@@ -99,7 +99,7 @@ else:
 # default values for ports
 _config['defaultTCPManagerPort'] = 8642
 _config['defaultSSLManagerPort'] = 7531
-_config['defaultStreamPortRange'] = range(8800, 8844 + 1)
+_config['defaultHTTPStreamPort'] = 8800
 _config['defaultGstPortRange'] = range(8600, 8639 + 1)
 
 # default values for service-related stuff

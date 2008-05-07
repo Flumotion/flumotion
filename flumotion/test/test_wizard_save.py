@@ -21,17 +21,19 @@
 
 import unittest
 
+from kiwi.python import Settable
+
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
 from flumotion.component.consumers.httpstreamer.wizard_gtk import \
-     HTTPPorter, HTTPStreamer
+     HTTPStreamer
 from flumotion.component.encoders.vorbis.wizard_gtk import VorbisAudioEncoder
 from flumotion.component.encoders.theora.wizard_gtk import TheoraVideoEncoder
 from flumotion.component.producers.videotest.wizard_gtk import TestVideoProducer
 from flumotion.component.producers.audiotest.wizard_gtk import TestAudioProducer
 from flumotion.wizard.configurationwriter import ConfigurationWriter
-from flumotion.wizard.models import Component, Plug, AudioProducer, \
+from flumotion.wizard.models import Component, Plug, Porter, AudioProducer, \
      VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
 from flumotion.wizard.overlaystep import Overlay
 from flumotion.wizard.save import WizardSaver
@@ -187,12 +189,18 @@ class TestWizardSave(testsuite.TestCase):
         videoEncoder.worker = 'video-encoder-worker'
         return videoEncoder
 
+    def _createPorter(self):
+        return Porter('porter-worker',
+                      port=8080,
+                      username='username',
+                      password='password',
+                      socketPath='flu-XXXX.socket')
+
     def _createHTTPStreamer(self):
-        streamer = HTTPStreamer()
-        streamer.properties.port = 8080
-        streamer.socket_path = 'flu-XXXX.socket'
-        streamer.porter_username = 'username'
-        streamer.porter_password = 'password'
+        common = Settable(has_bandwidth_limit=False,
+                          burst_on_connect=False)
+        streamer = HTTPStreamer(common)
+        streamer.worker = 'streamer-worker'
         return streamer
 
     def _createFirewireProducer(self):
@@ -215,15 +223,16 @@ class TestWizardSave(testsuite.TestCase):
 
         save.setMuxer('default-muxer', 'muxer-worker')
 
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
+
         streamer = self._createHTTPStreamer()
-        streamer.worker = 'streamer-worker'
+        streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 
         server = HTTPServer('server-worker', '/mount/')
         save.addServerConsumer(server, 'audio-video')
 
-        porter = HTTPPorter(streamer)
-        save.addPorter(porter, 'audio-video')
 
         save.setUseCCLicense(True)
 
@@ -242,7 +251,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="porter-audio-video"\n'
              '               type="porter"\n'
              '               project="flumotion"\n'
-             '               worker="streamer-worker"\n'
+             '               worker="porter-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
              '      <property name="password">password</property>\n'
@@ -321,7 +330,10 @@ class TestWizardSave(testsuite.TestCase):
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
-             '      <property name="port">8080</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),
@@ -400,13 +412,28 @@ class TestWizardSave(testsuite.TestCase):
 
         save.setMuxer('ogg-muxer', 'muxer-worker')
 
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
         streamer = self._createHTTPStreamer()
-        streamer.worker = 'worker'
+        streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 
         configuration = save.getXML()
         testsuite.diffStrings(
             ('<planet>\n'
+             '  <atmosphere>\n'
+             '    <component name="porter-audio-video"\n'
+             '               type="porter"\n'
+             '               project="flumotion"\n'
+             '               worker="porter-worker"\n'
+             '               version="0.5.2.1">\n'
+             '      \n'
+             '      <property name="password">password</property>\n'
+             '      <property name="port">8080</property>\n'
+             '      <property name="socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="username">username</property>\n'
+             '    </component>\n'
+             '  </atmosphere>\n'
              '  <flow name="flow">\n'
              '    <component name="producer-audio"\n'
              '               type="audiotest-producer"\n'
@@ -481,14 +508,17 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="http-audio-video"\n'
              '               type="http-streamer"\n'
              '               project="flumotion"\n'
-             '               worker="worker"\n'
+             '               worker="streamer-worker"\n'
              '               version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
-             '      <property name="port">8080</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),
@@ -496,6 +526,8 @@ class TestWizardSave(testsuite.TestCase):
 
     def testAudioOnlyStream(self):
         save = WizardSaver()
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
 
         audioProducer = TestAudioProducer()
@@ -513,12 +545,25 @@ class TestWizardSave(testsuite.TestCase):
         save.setMuxer('ogg-muxer', 'muxer')
 
         streamer = self._createHTTPStreamer()
-        streamer.worker = 'worker'
+        streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-only')
 
         configuration = save.getXML()
         testsuite.diffStrings(
             ('<planet>\n'
+             '  <atmosphere>\n'
+             '    <component name="porter-audio-video"\n'
+             '               type="porter"\n'
+             '               project="flumotion"\n'
+             '               worker="porter-worker"\n'
+             '               version="0.5.2.1">\n'
+             '      \n'
+             '      <property name="password">password</property>\n'
+             '      <property name="port">8080</property>\n'
+             '      <property name="socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="username">username</property>\n'
+             '    </component>\n'
+             '  </atmosphere>\n'
              '  <flow name="flow">\n'
              '    <component name="producer-audio"\n'
              '               type="audiotest-producer"\n'
@@ -542,14 +587,17 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="http-audio-only"\n'
              '               type="http-streamer"\n'
              '               project="flumotion"\n'
-             '               worker="worker"\n'
+             '               worker="streamer-worker"\n'
              '               version="%(version)s">\n'
              '      <eater name="default">\n'
              '        <feed>muxer-audio-only</feed>\n'
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
-             '      <property name="port">8080</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),
@@ -557,6 +605,8 @@ class TestWizardSave(testsuite.TestCase):
 
     def testFirewireStreamer(self):
         save = WizardSaver()
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
 
         producer = self._createFirewireProducer()
@@ -569,14 +619,11 @@ class TestWizardSave(testsuite.TestCase):
         save.setMuxer('default-muxer', 'muxer-worker')
 
         streamer = self._createHTTPStreamer()
-        streamer.worker = 'streamer-worker'
+        streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 
         server = HTTPServer('server-worker', '/mount/')
         save.addServerConsumer(server, 'audio-video')
-
-        porter = HTTPPorter(streamer)
-        save.addPorter(porter, 'audio-video')
 
         save.setUseCCLicense(True)
 
@@ -595,7 +642,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="porter-audio-video"\n'
              '               type="porter"\n'
              '               project="flumotion"\n'
-             '               worker="streamer-worker"\n'
+             '               worker="porter-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
              '      <property name="password">password</property>\n'
@@ -669,7 +716,10 @@ class TestWizardSave(testsuite.TestCase):
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
-             '      <property name="port">8080</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),
@@ -677,6 +727,8 @@ class TestWizardSave(testsuite.TestCase):
 
     def testFirewireStreamerDifferentWorkers(self):
         save = WizardSaver()
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
 
         audioProducer = self._createFirewireProducer()
@@ -694,14 +746,11 @@ class TestWizardSave(testsuite.TestCase):
         save.setMuxer('default-muxer', 'muxer-worker')
 
         streamer = self._createHTTPStreamer()
-        streamer.worker = 'streamer-worker'
+        streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 
         server = HTTPServer('server-worker', '/mount/')
         save.addServerConsumer(server, 'audio-video')
-
-        porter = HTTPPorter(streamer)
-        save.addPorter(porter, 'audio-video')
 
         save.setUseCCLicense(True)
 
@@ -720,7 +769,7 @@ class TestWizardSave(testsuite.TestCase):
              '    <component name="porter-audio-video"\n'
              '               type="porter"\n'
              '               project="flumotion"\n'
-             '               worker="streamer-worker"\n'
+             '               worker="porter-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
              '      <property name="password">password</property>\n'
@@ -804,7 +853,10 @@ class TestWizardSave(testsuite.TestCase):
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
-             '      <property name="port">8080</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),

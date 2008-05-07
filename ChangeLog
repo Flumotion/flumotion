@@ -1,5 +1,20 @@
 2008-05-07  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/http-wizard.glade:
+	* flumotion/component/consumers/httpstreamer/wizard.glade:
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/configure/configure.py:
+	* flumotion/test/test_wizard_save.py
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/models.py:
+	Create a new HTTP page with generic http options.
+	Use :8800/audio-video instead of :8802 for audio/video streams etc.
+	Fixes #963
+
+2008-05-07  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/save.py (WizardSaver._handleMuxers): Rename
 	from _handleConsumers
 

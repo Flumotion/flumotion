@@ -37,7 +37,6 @@ On the http-server the applet will be provided with help of a plug.
 
 import gettext
 import os
-import random
 
 import gobject
 from kiwi.utils import gsignal
@@ -46,44 +45,12 @@ from twisted.internet import defer
 
 from flumotion.common import errors, log
 from flumotion.common.messages import N_, ngettext, gettexter, Warning
-from flumotion.configure import configure
-from flumotion.wizard.models import Component, Consumer
+from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter('flumotion')
-
-def _generateRandomString(numchars):
-    """Generate a random US-ASCII string of length numchars
-    """
-    s = ""
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    for unused in range(numchars):
-        s += chars[random.randint(0, len(chars)-1)]
-
-    return s
-
-
-class HTTPPorter(Component):
-    """I am a model representing the configuration file for a
-    HTTP porter component.
-    """
-    component_type = 'porter'
-    def __init__(self, streamer):
-        super(HTTPPorter, self).__init__(worker=streamer.worker)
-        self.properties.socket_path = streamer.socket_path
-        self.properties.port = streamer.properties.port
-        self.properties.username = streamer.porter_username
-        self.properties.password = streamer.porter_password
-
-    # Component
-
-    def getProperties(self):
-        properties = super(HTTPPorter, self).getProperties()
-        # FIXME: kiwi should do this.
-        properties.port = int(properties.port)
-        return properties
 
 
 class HTTPStreamer(Consumer):
@@ -92,23 +59,17 @@ class HTTPStreamer(Consumer):
     @ivar has_client_limit: If a client limit was set
     @ivar has_bandwidth_limit: If a bandwidth limit was set
     @ivar has_cortado: If we should embed cortado
-    @ivar socket_path: Path to the porter socket
-    @ivar porter_username: Username for the porter
-    @ivar porter_password: Password for the porter
     @ivar hostname: the hostname this will be streamed on
     """
     component_type = 'http-streamer'
-    def __init__(self):
+    def __init__(self, common):
         super(HTTPStreamer, self).__init__()
-        self.has_client_limit = True
-        self.has_bandwidth_limit = False
+        self._common = common
         self.has_cortado = False
         self.has_plugins = False
-        self.socket_path = 'flu-%s.socket' % (_generateRandomString(6),)
-        self.porter_username = _generateRandomString(12)
-        self.porter_password = _generateRandomString(12)
-        self.properties.burst_on_connect = False
         self.hostname = None
+
+    # Public
 
     def getURL(self):
         """Fetch the url to this stream
@@ -116,31 +77,29 @@ class HTTPStreamer(Consumer):
         """
         return 'http://%s:%d%s' % (
             self.properties.get('hostname', self.hostname),
-            self.properties.port,
+            self.getPorter().getPort(),
             self.properties.mount_point)
 
     # Component
 
     def getProperties(self):
         properties = super(HTTPStreamer, self).getProperties()
-        if self.has_bandwidth_limit:
+        if self._common.has_bandwidth_limit:
             properties.bandwidth_limit = int(
-                properties.bandwidth_limit * 1e6)
-        else:
-            if 'bandwidth_limit' in properties:
-                del properties.bandwidth_limit
+                self._common.bandwidth_limit * 1e6)
 
-        if not self.has_client_limit:
-            if 'client_limit' in properties:
-                del properties.client_limit
-
-        if self.has_plugins:
-            properties.porter_socket_path = self.socket_path
-            properties.porter_username = self.porter_username
-            properties.porter_password = self.porter_password
-            properties.type = 'slave'
+        porter = self.getPorter()
+        properties.porter_socket_path = porter.getSocketPath()
+        properties.porter_username = porter.getUsername()
+        properties.porter_password = porter.getPassword()
+        properties.type = 'slave'
+        properties.burst_on_connect = self._common.burst_on_connect
 
         return properties
+
+    # Private
+    def _getPort(self):
+        return self._common.port
 
 
 class PlugPluginLine(gtk.VBox):
@@ -203,15 +162,6 @@ class PlugPluginArea(gtk.VBox):
         line.show()
         self._updateStreamer()
 
-    def getPorters(self):
-        """Fetch a list of porters which are going to be used by all
-        available plugins.
-        @returns: porters
-        @rtype: a sequence of L{HTTPPorters}
-        """
-        for unused in self._getEnabledPlugins():
-            yield HTTPPorter(self.streamer)
-
     def getServerConsumers(self, audio_producer, video_producer):
         """Fetch a list of server consumers which are going to be used by all
         available plugins.
@@ -244,7 +194,7 @@ class PlugPluginArea(gtk.VBox):
         self._updateStreamer()
 
 
-class HTTPStep(ConsumerStep):
+class HTTPSpecificStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
@@ -254,7 +204,9 @@ class HTTPStep(ConsumerStep):
         'wizard.glade')
 
     def __init__(self, wizard):
-        self.model = HTTPStreamer()
+        consumptionStep = wizard.getStep('Consumption')
+        self.model = HTTPStreamer(consumptionStep.getHTTPCommon())
+        self.model.setPorter(consumptionStep.getHTTPPorter())
         ConsumerStep.__init__(self, wizard)
 
     # ConsumerStep
@@ -271,19 +223,13 @@ class HTTPStep(ConsumerStep):
            source_step.getAudioProducer(),
            source_step.getVideoProducer())
 
-    def getPorters(self):
-        return self.plugarea.getPorters()
+    def getDefaultMountPath(self):
+        return '/%s/' % (self.getConsumerType(),)
 
     # WizardStep
 
     def setup(self):
-        self.port.data_type = int
-        self.client_limit.data_type = int
-        self.bandwidth_limit.data_type = float
         self.mount_point.data_type = str
-        self.burst_on_connect.data_type = bool
-
-        self.model.properties.port = self.default_port
 
         self.plugarea = PlugPluginArea(self.model)
         self.main_vbox.pack_start(self.plugarea, False, False)
@@ -291,18 +237,8 @@ class HTTPStep(ConsumerStep):
 
         self._populatePlugins()
 
-        self.add_proxy(self.model,
-                       ['has_client_limit',
-                        'has_bandwidth_limit'])
-
-        self.add_proxy(self.model.properties,
-                       ['port',
-                        'client_limit',
-                        'bandwidth_limit',
-                        'mount_point',
-                        'burst_on_connect'])
-
-        self.mount_point.set_text("/")
+        self.model.properties.mount_point = self.getDefaultMountPath()
+        self.add_proxy(self.model.properties, ['mount_point'])
 
     def activated(self):
         self._checkElements()
@@ -424,10 +360,6 @@ class HTTPStep(ConsumerStep):
         d.addErrback(lambda unused: self.wizard.taskFinished(True))
 
     def _verify(self):
-        self.client_limit.set_sensitive(
-            self.has_client_limit.get_active())
-        self.bandwidth_limit.set_sensitive(
-            self.has_bandwidth_limit.get_active())
         self._update_blocked()
 
     def _update_blocked(self):
@@ -440,19 +372,13 @@ class HTTPStep(ConsumerStep):
 
     def on_mount_point_changed(self, entry):
         self._verify()
-        self.wizard.blockNext(self.model.has_cortado and entry.get_text() == "/")
-
-    def on_has_client_limit_toggled(self, checkbutton):
-        self._verify()
-
-    def on_has_bandwidth_limit_toggled(self, checkbutton):
-        self._verify()
+        self.wizard.blockNext(self.model.has_cortado and
+                              entry.get_text() == self.getDefaultMountPath())
 
 
-class HTTPBothStep(HTTPStep):
+class HTTPBothStep(HTTPSpecificStep):
     name = _('HTTP Streamer (audio & video)')
     sidebarName = _('HTTP audio/video')
-    default_port = configure.defaultStreamPortRange[0]
 
     # ConsumerStep
 
@@ -460,10 +386,9 @@ class HTTPBothStep(HTTPStep):
         return 'audio-video'
 
 
-class HTTPAudioStep(HTTPStep):
+class HTTPAudioStep(HTTPSpecificStep):
     name = _('HTTP Streamer (audio only)')
     sidebarName = _('HTTP audio')
-    default_port = configure.defaultStreamPortRange[1]
 
     # ConsumerStep
 
@@ -471,10 +396,9 @@ class HTTPAudioStep(HTTPStep):
         return 'audio'
 
 
-class HTTPVideoStep(HTTPStep):
+class HTTPVideoStep(HTTPSpecificStep):
     name = _('HTTP Streamer (video only)')
     sidebarName = _('HTTP video')
-    default_port = configure.defaultStreamPortRange[2]
 
     # ConsumerStep
 
