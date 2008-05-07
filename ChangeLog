@@ -1,3 +1,8 @@
+2008-05-07  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/save.py (WizardSaver._handleMuxers): Rename
+	from _handleConsumers
+
 2008-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/checks/audio.py:

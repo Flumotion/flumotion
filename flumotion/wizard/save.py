@@ -186,7 +186,7 @@ class WizardSaver(object):
         @rtype: string
         """
         self._handleProducers()
-        self._handleConsumers()
+        self._handleMuxers()
         writer = ConfigurationWriter(self._flowName,
                                      self._flowComponents,
                                      self._atmosphereComponents)
@@ -279,7 +279,7 @@ class WizardSaver(object):
         if self._useCCLicense:
             self._videoOverlay.properties.cc_logo = True
 
-    def _handleConsumers(self):
+    def _handleMuxers(self):
         # Add & link the muxers we will use
         audio_muxer = self._getMuxer('audio')
         if audio_muxer.eaters:
