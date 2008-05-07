@@ -1,3 +1,9 @@
+2008-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	  unify encoder description.
+
 2008-05-06  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>

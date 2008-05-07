@@ -3,23 +3,24 @@
   <components>
 
     <component type="vorbis-encoder" base="flumotion/component/encoders/vorbis">
-      <source location="flumotion.component.encoders.vorbis.vorbis"/>
-      <eater name="default"/>
-      <feeder name="default"/>
+      <source location="flumotion.component.encoders.vorbis.vorbis" />
+      <eater name="default" />
+      <feeder name="default" />
       <properties>
-        <property name="bitrate" type="int"/>
-        <property name="quality" type="float"/>
-        <property name="channels" type="int"/>
+        <property name="bitrate" type="int"
+                  description="Bitrate to encode at (in bps)" />
+        <property name="quality" type="float" />
+        <property name="channels" type="int" />
       </properties>
       <entries>
         <entry type="component" location="vorbis.py"
-               function="Vorbis"/>
+               function="Vorbis"i />
         <entry type="wizard" location="wizard_gtk.py"
                function="VorbisWizardPlugin" />
       </entries>
       <wizard _description="Vorbis" type="audio-encoder"
               feeder="default" eater="default">
-        <provide-format media-type="vorbis"/>
+        <provide-format media-type="vorbis" />
       </wizard>
     </component>
 

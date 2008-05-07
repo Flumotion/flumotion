@@ -14,11 +14,11 @@
       </entries>
       <wizard _description="Speex" type="audio-encoder"
               feeder="default" eater="default">
-        <provide-format media-type="speex"/>
+        <provide-format media-type="speex" />
       </wizard>
       <properties>
         <property name="bitrate" type="int"
-                  description="Encoding bitrate (in bits per second)" />
+                  description="Bitrate to encode at (in bps)" />
       </properties>
     </component>
 
