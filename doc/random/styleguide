@@ -116,6 +116,11 @@ COMPONENTS
   - under that, they can go in files matching the first part of the type,
     or in a separate subdirectory for the component on its own
 
+COMPONENT PROPERTIES
+--------------------
+- bitrate should always be in bps, and have as description
+  Bitrate to encode at (in bps)
+
 DEPRECATING
 -----------
 - all deprecated methods should be marked with a comment tag, so that they
@@ -125,3 +130,6 @@ DEPRECATING
 	warnings.warn("Please call disconnectByFunction instead",
             DeprecationWarning, stacklevel=2)
 
+REGISTRY
+--------
+- xml tags without data should be closed with a space before />
