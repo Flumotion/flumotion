@@ -33,7 +33,7 @@ Depends: ${python:Depends},
 	 cortado,
          gstreamer0.10-plugins-base,
          gstreamer0.10-plugins-good,
-         gstreamer0.10-schroedinger
+         gstreamer0.10-schroedinger,
          python-dateutil,
 	 python-glade2,
          python-gobject,

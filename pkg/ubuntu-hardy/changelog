@@ -1,3 +1,10 @@
+flumotion (0.5.2-1flu1~hardy2) hardy; urgency=low
+
+  * Update to SVN 2008-05-06
+  * Add the flumotion user to audio & video group.
+
+ -- Johan Dahlin <johan@flumotion.com>  Tue, 06 May 2008 15:29:44 -0300
+
 flumotion (0.5.2-1flu1~hardy1) hardy; urgency=low
 
   * New version
