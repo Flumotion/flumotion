@@ -51,6 +51,8 @@ class TVCardProducer(VideoProducer):
         super(TVCardProducer, self).__init__()
 
         self.properties.device = '/dev/video0'
+        self.properties.signal = ''
+        self.properties.channel = ''
 
 
 class TVCardStep(VideoProducerStep):
@@ -73,6 +75,8 @@ class TVCardStep(VideoProducerStep):
         self.width.data_type = int
         self.height.data_type = int
         self.framerate.data_type = float
+        self.channel.data_type = str
+        self.signal.data_type = str
 
         self.device.prefill(['/dev/video0',
                              '/dev/video1',
@@ -81,7 +85,7 @@ class TVCardStep(VideoProducerStep):
 
         self.add_proxy(self.model.properties,
                        ['device', 'height', 'width',
-                        'framerate'])
+                        'framerate', 'signal', 'channel'])
 
         self._in_setup = False
 
@@ -93,10 +97,10 @@ class TVCardStep(VideoProducerStep):
     # Private
 
     def _clear_combos(self):
-        self.tvnorm.clear()
-        self.tvnorm.set_sensitive(False)
-        self.source.clear()
-        self.source.set_sensitive(False)
+        self.channel.clear()
+        self.channel.set_sensitive(False)
+        self.signal.clear()
+        self.signal.set_sensitive(False)
 
     def _run_checks(self):
         if self._in_setup:
@@ -133,10 +137,10 @@ class TVCardStep(VideoProducerStep):
 
             deviceName, channels, norms = result
             self.wizard.clear_msg('tvcard-check')
-            self.tvnorm.prefill(norms)
-            self.tvnorm.set_sensitive(True)
-            self.source.prefill(channels)
-            self.source.set_sensitive(True)
+            self.channel.prefill(norms)
+            self.channel.set_sensitive(True)
+            self.signal.prefill(channels)
+            self.signal.set_sensitive(True)
             self.wizard.taskFinished()
 
         d.addCallback(deviceFound)
