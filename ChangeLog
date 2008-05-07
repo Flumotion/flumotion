@@ -1,3 +1,9 @@
+2008-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
+	  Rename a terribly named method that is internal to the file.
+	  Use it to log creation and addition of translatables to messages.
+
 2008-05-07  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/bttv/wizard_gtk.py:
