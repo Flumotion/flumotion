@@ -1,5 +1,14 @@
 2008-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/audio.py:
+	* flumotion/worker/checks/check.py:
+	  Add handling of RESOURCE_WRITE errors.
+	  Also handle alsasrc bug for gst-plugins-base <= 0.10.14
+	  where it was actually sending RESOURCE_WRITE when it should have
+	  sent RESOURCE_READ.
+
+2008-05-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  Rename a terribly named method that is internal to the file.
 	  Use it to log creation and addition of translatables to messages.

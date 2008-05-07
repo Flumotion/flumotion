@@ -46,10 +46,16 @@ def handleGStreamerDeviceError(failure, device):
         if gerror.domain == "gst-resource-error-quark":
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
                 m = messages.Error(T_(
-                    N_("Could not open device '%s' for reading.  Check permissions on the device."), device))
+                    N_("Could not open device '%s' for reading.  "
+                       "Check permissions on the device."), device))
+            if gerror.code == int(gst.RESOURCE_ERROR_OPEN_WRITE):
+                m = messages.Error(T_(
+                    N_("Could not open device '%s' for writing.  "
+                       "Check permissions on the device."), device))
             elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
                 m = messages.Error(T_(
-                    N_("Could not open device '%s'.  Check permissions on the device."), device))
+                    N_("Could not open device '%s'.  "
+                       "Check permissions on the device."), device))
             elif gerror.code == int(gst.RESOURCE_ERROR_BUSY):
                 m = messages.Error(T_(
                     N_("Device '%s' is already in use."), device))
@@ -61,7 +67,7 @@ def handleGStreamerDeviceError(failure, device):
 
         # fallback GStreamer GstError handling
         if not m:
-            m = messages.Error(T_(N_("Internal GStreamer error.")),
+            m = messages.Error(T_(N_("Internal unhandled GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
                     gerror.message, gerror.domain, gerror.code, debug))
     elif failure.check(errors.GStreamerError):
@@ -89,6 +95,8 @@ def errbackResult(failure, result, id, device):
     """
     I am an errback to add to a do_element_check deferred, after your
     specific one.
+    
+    I handle several generic cases, including some generic GStreamer errors.
     """
     m = None
     if failure.check(errors.GStreamerGstError):

@@ -19,15 +19,17 @@
 
 # Headers in this file shall remain intact.
 
+__version__ = "$Rev$"
+
 from flumotion.worker.checks import check
-from flumotion.common import messages, log
+from flumotion.common import messages, log, errors, gstreamer
 
 import gst
 
 from gst010 import do_element_check
 
-__version__ = "$Rev$"
-
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 def checkMixerTracks(source_factory, device, channels, id=None):
     """
@@ -59,10 +61,38 @@ def checkMixerTracks(source_factory, device, channels, id=None):
                 'audio/x-raw-int,channels=%d ! fakesink') % (
         source_factory, device, channels)
     d = do_element_check(pipeline, 'source', get_tracks,
-        set_state_deferred = True)
+        set_state_deferred=True)
+
+    def errbackAlsaBugResult(failure, result, id, device):
+        # alsasrc in gst-plugins-base <= 0.10.14 was accidentally reporting
+        # GST_RESOURCE_ERROR_WRITE when it could not be opened for reading.
+        if not failure.check(errors.GStreamerGstError):
+            return failure
+        if source_factory != 'alsasrc':
+            return failure
+        version = gstreamer.get_plugin_version('alsasrc')
+        if version > (0, 10, 14):
+            return failure
+
+        source, gerror, debug = failure.value.args
+        log.debug('check',
+            'GStreamer GError: %s (domain %s, code %d, debug %s)' % (
+                gerror.message, gerror.domain, gerror.code, debug))
+
+        if gerror.domain == "gst-resource-error-quark":
+            if gerror.code == int(gst.RESOURCE_ERROR_OPEN_WRITE):
+                m = messages.Error(T_(
+                    N_("Could not open device '%s' for reading.  "
+                       "Check permissions on the device."), device))
+                result.add(m)
+                return result
+
+        return failure
+        
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)
+    d.addErrback(errbackAlsaBugResult, result, id, device)
     d.addErrback(check.errbackResult, result, id, device)
 
     return d
