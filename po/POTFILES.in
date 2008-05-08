@@ -65,6 +65,7 @@ flumotion/component/plugs/lifecycle.py
 flumotion/component/plugs/loggers.py
 flumotion/component/plugs/__init__.py
 flumotion/component/plugs/manhole.py
+flumotion/component/plugs/cortado/cortado.xml
 flumotion/component/producers/audiotest/audiotest.py
 flumotion/component/producers/audiotest/__init__.py
 flumotion/component/producers/audiotest/admin_gtk.py
@@ -177,6 +178,7 @@ flumotion/component/consumers/httpstreamer/admin_gtk.py
 flumotion/component/consumers/httpstreamer/wizard_gtk.py
 flumotion/component/consumers/shout2/shout2.py
 flumotion/component/consumers/shout2/__init__.py
+flumotion/component/consumers/shout2/wizard_gtk.py
 flumotion/component/consumers/__init__.py
 flumotion/component/feed.py
 flumotion/component/feedcomponent010.py
@@ -438,6 +440,7 @@ flumotion/component/producers/videotest/videotest.xml
 flumotion/component/producers/webcam/wizard.glade
 flumotion/component/producers/webcam/webcam.xml
 flumotion/component/misc/httpserver/httpserver.glade
+flumotion/component/misc/httpserver/httpfile.glade
 flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/disker/wizard.glade
 flumotion/component/consumers/httpstreamer/httpstreamer.glade
