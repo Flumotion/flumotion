@@ -57,7 +57,7 @@ SoundcardSystem = enum.EnumClass(
 
 
 class SoundcardProducer(AudioProducer):
-    component_type = 'soundcard-producer'
+    componentType = 'soundcard-producer'
 
     def __init__(self):
         super(SoundcardProducer, self).__init__()
@@ -74,7 +74,7 @@ class SoundcardStep(AudioProducerStep):
     name = _('Soundcard')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'osssrc'
+    componentType = 'osssrc'
     icon = 'soundcard.png'
 
     def __init__(self, wizard, model):

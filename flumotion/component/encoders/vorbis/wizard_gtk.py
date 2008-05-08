@@ -33,7 +33,7 @@ _ = gettext.gettext
 
 
 class VorbisAudioEncoder(AudioEncoder):
-    component_type = 'vorbis-encoder'
+    componentType = 'vorbis-encoder'
     def __init__(self):
         super(VorbisAudioEncoder, self).__init__()
         self.has_bitrate = True
@@ -60,7 +60,7 @@ class VorbisStep(AudioEncoderStep):
                               'wizard.glade')
     name = _('Vorbis encoder')
     sidebarName = _('Vorbis')
-    component_type = 'vorbis'
+    componentType = 'vorbis'
     icon = 'xiphfish.png'
 
     # WizardStep

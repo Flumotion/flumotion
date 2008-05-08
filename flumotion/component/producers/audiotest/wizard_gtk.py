@@ -33,7 +33,7 @@ _ = gettext.gettext
 
 
 class TestAudioProducer(AudioProducer):
-    component_type = 'audiotest-producer'
+    componentType = 'audiotest-producer'
 
     def __init__(self):
         super(TestAudioProducer, self).__init__()

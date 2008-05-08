@@ -133,9 +133,9 @@ class ProductionStep(WizardStep):
         self.audio.data_type = object
         self.video.data_type = object
         # We want to save the audio/video attributes as
-        # component_type in the respective models
-        self.audio.model_attribute = 'component_type'
-        self.video.model_attribute = 'component_type'
+        # componentType in the respective models
+        self.audio.model_attribute = 'componentType'
+        self.video.model_attribute = 'componentType'
 
         tips = gtk.Tooltips()
         tips.set_tip(self.has_video, _('If you want to stream video'))
@@ -161,12 +161,12 @@ class ProductionStep(WizardStep):
             data = []
             default = None
             for entry in entries:
-                if entry.component_type == default_type:
+                if entry.componentType == default_type:
                     default = entry
                     continue
-                data.append((N_(entry.description), entry.component_type))
+                data.append((N_(entry.description), entry.componentType))
             assert default
-            data.insert(0, (N_(default.description), default.component_type))
+            data.insert(0, (N_(default.description), default.componentType))
             combo.prefill(data)
             combo.set_sensitive(True)
 
@@ -185,14 +185,14 @@ class ProductionStep(WizardStep):
             self._loadedSteps = True
         d.addCallback(done)
 
-    def _loadPlugin(self, component_type, type):
+    def _loadPlugin(self, componentType, type):
         def gotFactory(factory):
             return factory(self.wizard)
 
         def noBundle(failure):
             failure.trap(NoBundleError)
 
-        d = self.wizard.getWizardEntry(component_type)
+        d = self.wizard.getWizardEntry(componentType)
         d.addCallback(gotFactory)
         d.addErrback(noBundle)
 

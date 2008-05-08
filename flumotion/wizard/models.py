@@ -83,19 +83,19 @@ class Component(object, log.Loggable):
     A component has a list of feeders and a list of eaters and must
     belong to a worker. The feeder list or the eater list can be empty,
     but not both at the same time.
-    @cvar eater_type: restrict the eaters which can be linked with this
+    @cvar eaterType: restrict the eaters which can be linked with this
       component to this type
-    @cvar feeder_type: restrict the feeders which can be linked with this
+    @cvar feederType: restrict the feeders which can be linked with this
       component to this type
-    @cvar name_template: template used to define the name of this component
-    @cvar component_type: the type of the component, such as ogg-muxer,
+    @cvar nameTemplate: template used to define the name of this component
+    @cvar componentType: the type of the component, such as ogg-muxer,
       this is not mandatory in the class, can also be set in the instance.
     @ivar name: name of the component
     """
-    eater_type = None
-    feeder_type = None
-    component_type = None
-    name_template = "component"
+    eaterType = None
+    feederType = None
+    componentType = None
+    nameTemplate = "component"
 
     def __init__(self, worker=None):
         self.name = None
@@ -108,6 +108,14 @@ class Component(object, log.Loggable):
     def __repr__(self):
         return '<%s.%s name=%r>' % (self.__class__.__module__,
                                     self.__class__.__name__, self.name)
+
+    # Backwards compatibility
+    @property
+    def component_type(self):
+        import warnings
+        warnings.warn('Use %s.componentType' % (self.__class__.__name,),
+                      DeprecationWarning, stacklevel=2)
+        return self.componentType
 
     def validate(self):
         if not self.worker:
@@ -184,7 +192,7 @@ class Plug(object):
     """I am a Plug.
     A plug has a name which identifies it and must be unique
     within a flow.
-    @cvar plug_type: the type of the plug, such as cortado,
+    @cvar plugType: the type of the plug, such as cortado,
       this is not mandatory in the class, can also be set in the instance.
     """
     def __init__(self):
@@ -197,7 +205,7 @@ class Plug(object):
 class Producer(Component):
     """I am a component which produces data.
     """
-    name_template = "producer"
+    nameTemplate = "producer"
 
     def validate(self):
         super(Component, self).validate()
@@ -228,7 +236,7 @@ class Producer(Component):
 class Encoder(Component):
     """I am a component which encodes data
     """
-    name_template = "encoder"
+    nameTemplate = "encoder"
 
     def validate(self):
         super(Component, self).validate()
@@ -247,7 +255,7 @@ class Encoder(Component):
 class Muxer(Component):
     """I am a component which muxes data from different components together.
     """
-    name_template = "muxer"
+    nameTemplate = "muxer"
 
     def validate(self):
         super(Component, self).validate()
@@ -264,8 +272,8 @@ class Muxer(Component):
 
 
 class Consumer(Component):
-    eater_type = Muxer
-    name_template = "consumer"
+    eaterType = Muxer
+    nameTemplate = "consumer"
 
     def __init__(self, worker=None):
         Component.__init__(self, worker)
@@ -294,13 +302,13 @@ class Consumer(Component):
 class AudioProducer(Producer):
     """I am a component which produces audio
     """
-    name_template = "audio-producer"
+    nameTemplate = "audio-producer"
 
 
 class VideoProducer(Producer):
     """I am a component which produces video
     """
-    name_template = "video-producer"
+    nameTemplate = "video-producer"
 
     def getWidth(self):
         """Get the width of the video producer
@@ -321,57 +329,57 @@ class VideoConverter(Component):
     """I am a component which converts video
     """
 
-    name_template = "video-converter"
+    nameTemplate = "video-converter"
 
 
 class AudioEncoder(Encoder):
     """I am a component which encodes audio
     """
 
-    eater_type = AudioProducer
-    name_template = "audio-encoder"
+    eaterType = AudioProducer
+    nameTemplate = "audio-encoder"
 
 
 class VideoEncoder(Encoder):
     """I am a component which encodes video
     """
 
-    eater_type = VideoProducer
-    name_template = "video-encoder"
+    eaterType = VideoProducer
+    nameTemplate = "video-encoder"
 
 
 class HTTPServer(Component):
-    component_type = 'http-server'
+    componentType = 'http-server'
 
-    def __init__(self, worker, mount_point):
+    def __init__(self, worker, mountPoint):
         """
-        @param mount_point:
-        @type  mount_point:
+        @param mountPoint:
+        @type  mountPoint:
         """
         super(HTTPServer, self).__init__(worker=worker)
 
-        self.properties.mount_point = mount_point
+        self.properties.mount_point = mountPoint
 
 
 class HTTPPlug(Plug):
-    def __init__(self, server, streamer, audio_producer, video_producer):
+    def __init__(self, server, streamer, audioProducer, videoProducer):
         """
         @param server: server
         @type  server: L{HTTPServer} subclass
         @param streamer: streamer
         @type  streamer: L{HTTPStreamer}
-        @param audio_producer: audio producer
-        @type  audio_producer: L{flumotion.wizard.models.AudioProducer}
+        @param audioProducer: audio producer
+        @type  audioProducer: L{flumotion.wizard.models.AudioProducer}
           subclass or None
-        @param video_producer: video producer
-        @type  video_producer: L{flumotion.wizard.models.VideoProducer}
+        @param videoProducer: video producer
+        @type  videoProducer: L{flumotion.wizard.models.VideoProducer}
           subclass or None
         """
         super(HTTPPlug, self).__init__()
         self.server = server
         self.streamer = streamer
-        self.audio_producer = audio_producer
-        self.video_producer = video_producer
+        self.audioProducer = audioProducer
+        self.videoProducer = videoProducer
 
 
 def _generateRandomString(numchars):
@@ -389,7 +397,7 @@ class Porter(Component):
     """I am a model representing the configuration file for a
     porter component.
     """
-    component_type = 'porter'
+    componentType = 'porter'
     def __init__(self, worker, port, username=None, password=None,
                  socketPath=None):
         super(Porter, self).__init__(worker=worker)

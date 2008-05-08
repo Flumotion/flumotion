@@ -39,7 +39,7 @@ T_ = gettexter('flumotion')
 
 
 class FireWireProducer(AudioProducer, VideoProducer):
-    component_type = 'firewire-producer'
+    componentType = 'firewire-producer'
     def __init__(self):
         super(FireWireProducer, self).__init__()
 
@@ -57,7 +57,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
 class _FireWireCommon:
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'firewire'
+    componentType = 'firewire'
     icon = 'firewire.png'
     width_corrections = ['none', 'pad', 'stretch']
 

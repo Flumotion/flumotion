@@ -52,7 +52,7 @@ class TestXMLWriter(testsuite.TestCase):
     def testFlowComponent(self):
         c = Component()
         c.name = 'name'
-        c.component_type = 'streamer'
+        c.componentType = 'streamer'
         c.worker = 'worker'
         writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
@@ -71,7 +71,7 @@ class TestXMLWriter(testsuite.TestCase):
     def testAtmosphereComponent(self):
         c = Component()
         c.name = 'name'
-        c.component_type = 'streamer'
+        c.componentType = 'streamer'
         c.worker = 'worker'
         c.properties.foo = 'bar'
         writer = ConfigurationWriter('', [], [c])
@@ -93,10 +93,10 @@ class TestXMLWriter(testsuite.TestCase):
     def testComponentWithPlug(self):
         c = Component()
         c.name = 'name'
-        c.component_type = 'streamer'
+        c.componentType = 'streamer'
         c.worker = 'worker'
         plug = Plug()
-        plug.plug_type = 'plug-type'
+        plug.plugType = 'plug-type'
         plug.properties.foo = 'bar'
         c.plugs.append(plug)
         writer = ConfigurationWriter('flow', [c], [])
@@ -123,11 +123,11 @@ class TestXMLWriter(testsuite.TestCase):
     def testComponentWithFeeders(self):
         c1 = Component()
         c1.name = 'name'
-        c1.component_type = 'first'
+        c1.componentType = 'first'
         c1.worker = 'worker'
         c2 = Component()
         c2.name = 'name'
-        c2.component_type = 'second'
+        c2.componentType = 'second'
         c2.worker = 'worker'
         c1.link(c2)
 
@@ -156,17 +156,17 @@ class TestXMLWriter(testsuite.TestCase):
 
 
 class TestWizardSave(testsuite.TestCase):
-    def _createAudioProducer(self, component_type='audio-producer',
+    def _createAudioProducer(self, componentType='audio-producer',
                              worker='audio-producer-worker'):
         audioProducer = AudioProducer()
-        audioProducer.component_type = component_type
+        audioProducer.componentType = componentType
         audioProducer.worker = worker
         return audioProducer
 
-    def _createVideoProducer(self, component_type='video-producer',
+    def _createVideoProducer(self, componentType='video-producer',
                              worker='video-producer-worker'):
         videoProducer = VideoProducer()
-        videoProducer.component_type = component_type
+        videoProducer.componentType = componentType
         videoProducer.worker = worker
         videoProducer.properties.width = 640
         videoProducer.properties.height = 480
@@ -179,13 +179,13 @@ class TestWizardSave(testsuite.TestCase):
 
     def _createAudioEncoder(self):
         audioEncoder = AudioEncoder()
-        audioEncoder.component_type = 'audio-encoder'
+        audioEncoder.componentType = 'audio-encoder'
         audioEncoder.worker = 'audio-encoder-worker'
         return audioEncoder
 
     def _createVideoEncoder(self):
         videoEncoder = VideoEncoder()
-        videoEncoder.component_type = 'video-encoder'
+        videoEncoder.componentType = 'video-encoder'
         videoEncoder.worker = 'video-encoder-worker'
         return videoEncoder
 
@@ -345,9 +345,9 @@ class TestWizardSave(testsuite.TestCase):
 
         save.setAudioProducer(self._createAudioProducer(
             worker='both-producer-worker',
-            component_type='both-producer'))
+            componentType='both-producer'))
         save.setVideoProducer(self._createVideoProducer(
-            component_type='both-producer',
+            componentType='both-producer',
             worker='both-producer-worker'))
 
         save.setAudioEncoder(self._createAudioEncoder())

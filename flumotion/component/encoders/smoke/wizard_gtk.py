@@ -33,7 +33,7 @@ _ = gettext.gettext
 
 
 class SmokeVideoEncoder(VideoEncoder):
-    component_type = 'smoke-encoder'
+    componentType = 'smoke-encoder'
 
 
 class SmokeStep(VideoEncoderStep):
@@ -42,7 +42,7 @@ class SmokeStep(VideoEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     section = _('Conversion')
-    component_type = 'smoke'
+    componentType = 'smoke'
 
     # WizardStep
 

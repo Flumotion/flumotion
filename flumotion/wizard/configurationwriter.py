@@ -71,11 +71,11 @@ class ConfigurationWriter(XMLWriter):
         # FIXME: When we can depend on Python 2.4, use
         #        sorted(flow.get('components'),
         #               cmp=cmpComponentType,
-        #               key=operator.attrgetter('component_type'))
+        #               key=operator.attrgetter('componentType'))
         #
         def componentSort(a, b):
-            return cmpComponentType(a.component_type,
-                                    b.component_type)
+            return cmpComponentType(a.componentType,
+                                    b.componentType)
         components = list(components)
         components.sort(cmp=componentSort)
         for component in components:
@@ -85,7 +85,7 @@ class ConfigurationWriter(XMLWriter):
         # FIXME: when the wizard can be split among projects, "project"
         # and "version" should be taken from the relevant project
         attrs = [('name', component.name),
-                 ('type', component.component_type),
+                 ('type', component.componentType),
                  ('project', 'flumotion'),
                  ('worker', component.worker),
                  ('version', configure.version)]
@@ -108,9 +108,9 @@ class ConfigurationWriter(XMLWriter):
         if not properties:
             return
         self.writeLine()
-        property_names = properties.keys()
-        property_names.sort()
-        for name in property_names:
+        propertyNames = properties.keys()
+        propertyNames.sort()
+        for name in propertyNames:
             value = properties[name]
             # Fractions, perhaps we should do type introspection here?
             if isinstance(value, tuple):
@@ -128,6 +128,6 @@ class ConfigurationWriter(XMLWriter):
         self.popTag()
 
     def _writeComponentPlug(self, plug):
-        self.pushTag('plug', [('type', plug.plug_type)])
+        self.pushTag('plug', [('type', plug.plugType)])
         self._writeProperties(plug.getProperties())
         self.popTag()

@@ -41,7 +41,7 @@ class OnDemand(HTTPServer):
     """I am a model representing the configuration file for a
     an on demand HTTP server component.
     """
-    component_type = 'http-server'
+    componentType = 'http-server'
     def __init__(self, worker=None):
         super(OnDemand, self).__init__(worker, mount_point='/')
         self.properties.path = '/tmp'

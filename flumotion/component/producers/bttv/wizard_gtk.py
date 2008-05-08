@@ -45,7 +45,7 @@ T_ = gettexter('flumotion')
 
 
 class TVCardProducer(VideoProducer):
-    component_type = 'tvcard-producer'
+    componentType = 'tvcard-producer'
 
     def __init__(self):
         super(TVCardProducer, self).__init__()
@@ -59,7 +59,7 @@ class TVCardStep(VideoProducerStep):
     name = _('TV Card')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'bttv'
+    componentType = 'bttv'
     icon = 'tv.png'
 
     def __init__(self, wizard, model):

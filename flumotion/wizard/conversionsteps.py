@@ -80,7 +80,7 @@ class ConversionStep(WorkerWizardStep):
         @rtype: string
         """
         entry = self.muxer.get_selected()
-        return entry.component_type
+        return entry.componentType
 
     def getMuxerFormat(self):
         """Returns the format of the muxer, such as "ogg".
@@ -178,7 +178,7 @@ class ConversionStep(WorkerWizardStep):
         else:
             raise AssertionError
 
-        encoder.component_type = entry.component_type
+        encoder.componentType = entry.componentType
         encoder.worker = self.worker
 
         if entry.type == 'audio-encoder':
@@ -193,7 +193,7 @@ class ConversionStep(WorkerWizardStep):
         def no_bundle(failure):
             failure.trap(NoBundleError)
 
-        d = self.wizard.getWizardEntry(entry.component_type)
+        d = self.wizard.getWizardEntry(entry.componentType)
         d.addCallback(gotFactory)
         d.addErrback(no_bundle)
 

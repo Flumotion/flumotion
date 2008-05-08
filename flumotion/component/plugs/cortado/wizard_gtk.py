@@ -47,7 +47,7 @@ class CortadoHTTPPlug(HTTPPlug):
     """I am a model representing the configuration file for a
     Cortado HTTP streaming plug.
     """
-    plug_type = "cortado-plug"
+    plugType = "cortado-plug"
 
     # Component
 
@@ -56,16 +56,16 @@ class CortadoHTTPPlug(HTTPPlug):
 
         p.codebase = self.server.getCodebase()
         p.stream_url = self.streamer.getURL()
-        p.has_video = self.video_producer is not None
-        p.has_audio = self.audio_producer is not None
+        p.has_video = self.videoProducer is not None
+        p.has_audio = self.audioProducer is not None
 
         width = 320
         height = 240
         framerate = 1
-        if self.video_producer:
-            width = self.video_producer.properties.width
-            height = self.video_producer.properties.height
-            framerate = self.video_producer.properties.framerate
+        if self.videoProducer:
+            width = self.videoProducer.properties.width
+            height = self.videoProducer.properties.height
+            framerate = self.videoProducer.properties.framerate
             # FIXME: Why do we get floats and strings randomly?
             if type(framerate) == str and '/' in framerate:
                 nom, denom = framerate.split('/')
@@ -85,23 +85,23 @@ class CortadoHTTPServer(HTTPServer):
     java applet.
     Most of the interesting logic here is actually in a plug.
     """
-    component_type = 'http-server'
-    def __init__(self, streamer, audio_producer, video_producer, mount_point):
+    componentType = 'http-server'
+    def __init__(self, streamer, audioProducer, videoProducer, mountPoint):
         """
         @param streamer: streamer
         @type  streamer: L{HTTPStreamer}
-        @param audio_producer: audio producer
-        @type  audio_producer: L{flumotion.wizard.models.AudioProducer}
+        @param audioProducer: audio producer
+        @type  audioProducer: L{flumotion.wizard.models.AudioProducer}
            subclass or None
-        @param video_producer: video producer
-        @type  video_producer: L{flumotion.wizard.models.VideoProducer}
+        @param videoProducer: video producer
+        @type  videoProducer: L{flumotion.wizard.models.VideoProducer}
            subclass or None
-        @param mount_point:
-        @type  mount_point:
+        @param mountPoint:
+        @type  mountPoint:
         """
         self.streamer = streamer
 
-        super(CortadoHTTPServer, self).__init__(mount_point=mount_point,
+        super(CortadoHTTPServer, self).__init__(mountPoint=mountPoint,
                                                 worker=streamer.worker)
 
         porter = streamer.getPorter()
@@ -111,7 +111,7 @@ class CortadoHTTPServer(HTTPServer):
         self.properties.port = porter.getPort()
         self.properties.type = 'slave'
 
-        plug = CortadoHTTPPlug(self, streamer, audio_producer, video_producer)
+        plug = CortadoHTTPPlug(self, streamer, audioProducer, videoProducer)
         self.addPlug(plug)
 
     def getCodebase(self):
@@ -137,10 +137,10 @@ class CortadoWizardPlugin(object):
         d.addCallback(check)
         return d
 
-    def getConsumer(self, streamer, audio_producer, video_producer):
-        mount_point = slashjoin(streamer.properties.mount_point,
-                                "cortado/")
-        return CortadoHTTPServer(streamer, audio_producer,
-                                 video_producer,
-                                 mount_point)
+    def getConsumer(self, streamer, audioProducer, videoProducer):
+        mountPoint = slashjoin(streamer.properties.mount_point,
+                               "cortado/")
+        return CortadoHTTPServer(streamer, audioProducer,
+                                 videoProducer,
+                                 mountPoint)
     

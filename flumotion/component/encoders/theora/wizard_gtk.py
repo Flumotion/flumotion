@@ -37,7 +37,7 @@ class TheoraVideoEncoder(VideoEncoder):
     @ivar framerate: number of frames per second; to be set by view
     @type framerate: float
     """
-    component_type = 'theora-encoder'
+    componentType = 'theora-encoder'
 
     def __init__(self):
         super(TheoraVideoEncoder, self).__init__()
@@ -84,7 +84,7 @@ class TheoraStep(VideoEncoderStep):
     sidebarName = _('Theora')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'theora'
+    componentType = 'theora'
     icon = 'xiphfish.png'
 
     # WizardStep

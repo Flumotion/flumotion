@@ -37,7 +37,7 @@ T_ = gettexter('flumotion')
 
 
 class WebcamProducer(VideoProducer):
-    component_type = 'webcam-producer'
+    componentType = 'webcam-producer'
 
     def __init__(self):
         super(WebcamProducer, self).__init__()
@@ -49,7 +49,7 @@ class WebcamStep(VideoProducerStep):
     name = _('Webcam')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'video4linux'
+    componentType = 'video4linux'
     icon = 'webcam.png'
 
     def __init__(self, wizard, model):

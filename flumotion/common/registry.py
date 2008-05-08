@@ -401,9 +401,9 @@ class RegistryEntryEater:
 
 class RegistryEntryWizard(pb.Copyable):
     "This class represents a <wizard> entry in the registry"
-    def __init__(self, component_type, type, description, feeder,
+    def __init__(self, componentType, type, description, feeder,
                  eater, accepts, provides):
-        self.component_type = component_type
+        self.componentType = componentType
         self.type = type
         self.description = description
         self.feeder = feeder
@@ -412,7 +412,7 @@ class RegistryEntryWizard(pb.Copyable):
         self.provides = provides
 
     def __repr__(self):
-        return '<wizard %s type=%s, feeder=%s>' % (self.component_type,
+        return '<wizard %s type=%s, feeder=%s>' % (self.componentType,
             self.type, self.feeder)
 
 

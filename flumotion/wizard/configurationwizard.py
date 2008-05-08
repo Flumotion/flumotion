@@ -427,31 +427,31 @@ class ConfigurationWizard(SectionWizard):
         self.taskFinished()
         return d
 
-    def getWizardEntry(self, component_type):
+    def getWizardEntry(self, componentType):
         """Fetches a wizard bundle from a specific kind of component
-        @param component_type: the component type to get the wizard entry
+        @param componentType: the component type to get the wizard entry
           bundle from.
         @returns: a deferred returning either::
           - factory of the component
           - noBundle error: if the component lacks a wizard bundle
         """
-        self.waitForTask('get wizard entry %s' % (component_type,))
+        self.waitForTask('get wizard entry %s' % (componentType,))
         self.clear_msg('wizard-bundle')
-        d = self._admin.callRemote('getEntryByType', component_type, 'wizard')
+        d = self._admin.callRemote('getEntryByType', componentType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 
-    def getWizardPlugEntry(self, plug_type):
+    def getWizardPlugEntry(self, plugType):
         """Fetches a wizard bundle from a specific kind of plug
-        @param plug_type: the plug type to get the wizard entry
+        @param plugType: the plug type to get the wizard entry
           bundle from.
         @returns: a deferred returning either::
           - factory of the plug
           - noBundle error: if the plug lacks a wizard bundle
         """
-        self.waitForTask('get wizard plug %s' % (plug_type,))
+        self.waitForTask('get wizard plug %s' % (plugType,))
         self.clear_msg('wizard-bundle')
-        d = self._admin.callRemote('getPlugEntry', plug_type, 'wizard')
+        d = self._admin.callRemote('getPlugEntry', plugType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 

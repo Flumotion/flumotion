@@ -1,3 +1,37 @@
+2008-05-08  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/disker/wizard_gtk.py:
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/consumers/shout2/wizard_gtk.py:
+	* flumotion/component/encoders/dirac/wizard_gtk.py:
+	* flumotion/component/encoders/jpeg/wizard_gtk.py:
+	* flumotion/component/encoders/mulaw/wizard_gtk.py:
+	* flumotion/component/encoders/smoke/wizard_gtk.py:
+	* flumotion/component/encoders/speex/wizard_gtk.py:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/component/encoders/vorbis/wizard_gtk.py:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/save.py:
+	Complete teh underscore_style to camelCase changes for
+	flumotion/wizard/models.py.
+	Also do a complete component_type -> componentType conversion,
+	including backwards compat for external modules.
+
 2008-05-08  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_common_package.py

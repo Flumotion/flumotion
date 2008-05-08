@@ -32,7 +32,7 @@ _ = gettext.gettext
 
 
 class SpeexAudioEncoder(AudioEncoder):
-    component_type = 'speex-encoder'
+    componentType = 'speex-encoder'
 
     def __init__(self):
         super(SpeexAudioEncoder, self).__init__()
@@ -48,7 +48,7 @@ class SpeexAudioEncoder(AudioEncoder):
 class SpeexStep(AudioEncoderStep):
     name = _('Speex encoder')
     sidebarName = _('Speex')
-    component_type = 'speex'
+    componentType = 'speex'
     icon = 'xiphfish.png'
 
     # WizardStep

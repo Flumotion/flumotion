@@ -34,7 +34,7 @@ _ = gettext.gettext
 
 
 class TestVideoProducer(VideoProducer):
-    component_type = 'videotest-producer'
+    componentType = 'videotest-producer'
 
     def __init__(self):
         super(TestVideoProducer, self).__init__()
@@ -47,7 +47,7 @@ class TestVideoProducerStep(VideoProducerStep):
     name = _('Test Video Producer')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'videotestsrc'
+    componentType = 'videotestsrc'
     icon = 'testsource.png'
 
     # WizardStep

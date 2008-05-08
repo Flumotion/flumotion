@@ -31,7 +31,7 @@ _ = gettext.gettext
 
 
 class Overlay(VideoConverter):
-    component_type = 'overlay-converter'
+    componentType = 'overlay-converter'
 
     def __init__(self, video_producer):
         super(Overlay, self).__init__()
@@ -67,7 +67,7 @@ class OverlayStep(WorkerWizardStep):
     name = _('Overlay')
     gladeFile = 'overlay-wizard.glade'
     section = _('Production')
-    component_type = 'overlay'
+    componentType = 'overlay'
     icon = 'overlay.png'
 
     def __init__(self, wizard, video_producer):

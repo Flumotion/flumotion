@@ -155,15 +155,15 @@ class WizardSaver(object):
           audio/video/audio-video
         @type consumerType: string
         """
-        if consumer.component_type == 'http-streamer':
+        if consumer.componentType == 'http-streamer':
             prefix = 'http'
-        elif consumer.component_type == 'disk-consumer':
+        elif consumer.componentType == 'disk-consumer':
             prefix = 'disk'
-        elif consumer.component_type == 'shout2-consumer':
+        elif consumer.componentType == 'shout2-consumer':
             prefix = 'shout2'
         else:
             raise AssertionError("unknown component: %s" % (
-                consumer.component_type))
+                consumer.componentType))
 
         # [disk,http,shout2]-[audio,video,audio-video]
         consumer.name = prefix + '-' + consumerType
@@ -201,7 +201,7 @@ class WizardSaver(object):
         else:
             muxer = Muxer()
             muxer.name = 'muxer-' + name
-            muxer.component_type = self._muxerType
+            muxer.componentType = self._muxerType
             muxer.worker = self._muxerWorker
             self._muxers[name] = muxer
         return muxer
@@ -218,7 +218,7 @@ class WizardSaver(object):
         audio = self._audioProducer
         if (video is not None and
             audio is not None and
-            video.component_type == audio.component_type and
+            video.componentType == audio.componentType and
             video.worker == audio.worker):
             self._flowComponents.remove(self._audioProducer)
             self._audioProducer.name = 'producer-audio-video'

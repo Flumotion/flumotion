@@ -61,7 +61,7 @@ class HTTPStreamer(Consumer):
     @ivar has_cortado: If we should embed cortado
     @ivar hostname: the hostname this will be streamed on
     """
-    component_type = 'http-streamer'
+    componentType = 'http-streamer'
     def __init__(self, common):
         super(HTTPStreamer, self).__init__()
         self._common = common
@@ -268,7 +268,7 @@ class HTTPSpecificStep(ConsumerStep):
                         d.addCallback(cb, plugin, entry)
                     else:
                         self._addPlug(plugin, N_(entry.description))
-                d = self.wizard.getWizardPlugEntry(entry.component_type)
+                d = self.wizard.getWizardPlugEntry(entry.componentType)
                 d.addCallback(response, entry)
 
         d = self.wizard.getWizardEntries(wizardTypes=['http-consumer'])

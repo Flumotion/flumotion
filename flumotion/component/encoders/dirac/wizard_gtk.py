@@ -33,7 +33,7 @@ _ = gettext.gettext
 
 
 class DiracVideoEncoder(VideoEncoder):
-    component_type = 'dirac-encoder'
+    componentType = 'dirac-encoder'
 
     def __init__(self):
         super(DiracVideoEncoder, self).__init__()
@@ -45,7 +45,7 @@ class DiracStep(VideoEncoderStep):
     sidebarName = _('Dirac')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    component_type = 'dirac'
+    componentType = 'dirac'
     icon = 'xiphfish.png'
 
     # WizardStep

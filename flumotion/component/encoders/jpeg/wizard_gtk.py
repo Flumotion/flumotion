@@ -40,7 +40,7 @@ def _fraction_from_float(number, denominator):
 
 
 class JPEGVideoEncoder(VideoEncoder):
-    component_type = 'jpeg-encoder'
+    componentType = 'jpeg-encoder'
 
     def __init__(self):
         super(JPEGVideoEncoder, self).__init__()
@@ -60,7 +60,7 @@ class JPEGStep(VideoEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     section = _('Conversion')
-    component_type = 'jpeg'
+    componentType = 'jpeg'
 
     # WizardStep
 
