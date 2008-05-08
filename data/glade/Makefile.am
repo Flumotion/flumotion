@@ -17,7 +17,9 @@ glade_DATA =					\
 	audio-encoder-wizard.glade		\
 	consumption-wizard.glade		\
 	encoding-wizard.glade			\
+	http-wizard.glade			\
 	license-wizard.glade			\
+	ondemand-wizard.glade			\
 	overlay-wizard.glade			\
 	overview-wizard.glade			\
 	production-wizard.glade			\

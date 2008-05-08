@@ -1,3 +1,8 @@
+2008-05-08  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/Makefile.am (glade_DATA): Add ondemand.glade, so
+	it's included in the dist and thus ubuntu packages.
+
 2008-05-08  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/admin/multi.py (get_admin_for_object):
@@ -45,7 +50,7 @@
 
 2008-05-07  Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/component/producers/bttv/wizard.glade: 
+	* flumotion/component/producers/bttv/wizard.glade:
 	* flumotion/component/producers/bttv/wizard_gtk.py:
 	Speculative fix for BTTV: Add channel and signal properties
 
