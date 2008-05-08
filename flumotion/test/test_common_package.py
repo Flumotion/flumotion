@@ -249,7 +249,10 @@ class TestPackagePath(testsuite.TestCase):
     def testPackagerWithNonePrefix(self):
         # see if import hooks don't mess up non prefix hooks
         packager = package.Packager()
-        from xml.dom.html import HTMLDOMImplementation
+        try:
+            from xml.dom.html import HTMLDOMImplementation
+        except ImportError:
+            return
         HTMLDOMImplementation
         packager.unregister()
 

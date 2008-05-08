@@ -1,7 +1,13 @@
+2008-05-08  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_common_package.py
+	(TestPackagePath.testPackagerWithNonePrefix):
+	Don't require the xml.dom.html module to be installed
+
 2008-05-08  Johan Dahlin  <johan@flumotion.com>
 
-	* data/glade/Makefile.am (glade_DATA): Add ondemand.glade, so
-	it's included in the dist and thus ubuntu packages.
+	* data/glade/Makefile.am (glade_DATA): Add http-wizard.glade and
+	ondemand.glade, so it's included in the dist and thus ubuntu packages.
 
 2008-05-08  Arek Korbik  <arkadini@gmail.com>
 
