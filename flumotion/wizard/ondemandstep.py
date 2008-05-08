@@ -43,7 +43,7 @@ class OnDemand(HTTPServer):
     """
     componentType = 'http-server'
     def __init__(self, worker=None):
-        super(OnDemand, self).__init__(worker, mount_point='/')
+        super(OnDemand, self).__init__(worker, mountPoint='/')
         self.properties.path = '/tmp'
         self.properties.port = 8800
 
