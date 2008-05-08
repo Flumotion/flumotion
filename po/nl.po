@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-05-06 14:07-0300\n"
+"POT-Creation-Date: 2008-05-08 12:32-0300\n"
 "PO-Revision-Date: 2008-04-08 03:00+0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
@@ -117,6 +117,10 @@ msgstr ""
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "GStreamer-fout: kon de component-pijplijn niet verwerken."
 
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:1
+msgid "Stream to Java"
+msgstr ""
+
 #: ../flumotion/component/producers/audiotest/audiotest.py:91
 #: ../flumotion/component/producers/videotest/videotest.py:98
 #: ../flumotion/component/misc/repeater/repeater.py:41
@@ -200,11 +204,11 @@ msgstr "Geluidskaart"
 msgid "Probing soundcard, this can take a while..."
 msgstr "Geluidskaart aan het onderzoeken, dit kan even duren..."
 
-#: ../flumotion/component/producers/bttv/wizard_gtk.py:57
+#: ../flumotion/component/producers/bttv/wizard_gtk.py:59
 msgid "TV Card"
 msgstr "TV-kaart"
 
-#: ../flumotion/component/producers/bttv/wizard_gtk.py:110
+#: ../flumotion/component/producers/bttv/wizard_gtk.py:114
 msgid "Probing TV-card, this can take a while..."
 msgstr "TV-kaart aan het onderzoeken, dit kan even duren..."
 
@@ -407,6 +411,7 @@ msgstr "Byte"
 #: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:137
 #: ../flumotion/component/base/component.glade.h:7
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:5
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:5
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:11
 #: ../flumotion/component/base/feeders.glade.h:12
 #: ../flumotion/component/base/eaters.glade.h:16
@@ -438,7 +443,7 @@ msgstr ""
 #: ../flumotion/component/feedcomponent010.py:381
 #: ../flumotion/worker/checks/encoder.py:47
 #: ../flumotion/worker/checks/encoder.py:68
-#: ../flumotion/worker/checks/check.py:196
+#: ../flumotion/worker/checks/check.py:203
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s."
@@ -480,7 +485,7 @@ msgstr ""
 #: ../flumotion/component/encoders/smoke/wizard_gtk.py:44
 #: ../flumotion/component/encoders/jpeg/wizard_gtk.py:62
 #: ../flumotion/component/encoders/mulaw/wizard_gtk.py:44
-#: ../flumotion/wizard/conversionsteps.py:45
+#: ../flumotion/wizard/conversionsteps.py:48
 #: ../flumotion/wizard/basesteps.py:54 ../flumotion/wizard/basesteps.py:66
 msgid "Conversion"
 msgstr "Conversie"
@@ -607,7 +612,7 @@ msgid "Disk video"
 msgstr "Schijf video"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:340
-#: ../flumotion/worker/checks/check.py:192
+#: ../flumotion/worker/checks/check.py:199
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
 msgstr "Versie %s van de '%s' GStreamer-plug-in is te oud.\n"
@@ -617,7 +622,7 @@ msgstr "Versie %s van de '%s' GStreamer-plug-in is te oud.\n"
 msgid "Unable to set the maximum client limit to %d clients."
 msgstr ""
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:380
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:316
 #: ../flumotion/wizard/configurationwizard.py:335
 #: ../flumotion/wizard/ondemandstep.py:107
 #: ../flumotion/wizard/overlaystep.py:113
@@ -625,7 +630,7 @@ msgstr ""
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "Werker '%s' kan module '%s' niet importeren."
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:382
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:318
 #: ../flumotion/wizard/ondemandstep.py:109
 #, python-format
 msgid ""
@@ -635,7 +640,7 @@ msgstr ""
 "\n"
 "Deze module maakt deel uit van '%s'."
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:384
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:320
 #: ../flumotion/wizard/configurationwizard.py:341
 #: ../flumotion/wizard/ondemandstep.py:111
 #: ../flumotion/wizard/overlaystep.py:119
@@ -647,7 +652,7 @@ msgstr ""
 "\n"
 "De thuispagina van het project is %s"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:402
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:338
 #: ../flumotion/wizard/configurationwizard.py:278
 #: ../flumotion/wizard/overlaystep.py:135
 #, python-format
@@ -656,33 +661,56 @@ msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] "Worker '%s' mist het GStreamer-element '%s'."
 msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:453
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:380
 msgid "HTTP Streamer (audio & video)"
 msgstr "HTTP Streamer (audio & video)"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:454
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:381
 msgid "HTTP audio/video"
 msgstr "HTTP audio/video"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:464
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:390
 msgid "HTTP Streamer (audio only)"
 msgstr "HTTP Streamer (enkel audio)"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:465
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:391
 msgid "HTTP audio"
 msgstr "HTTP audio"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:475
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:400
 msgid "HTTP Streamer (video only)"
 msgstr "HTTP Streamer (enkel video)"
 
-#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:476
+#: ../flumotion/component/consumers/httpstreamer/wizard_gtk.py:401
 msgid "HTTP video"
 msgstr "HTTP video"
 
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:83
+msgid "Icecast streamer (audio & video)"
+msgstr "Icecast Streamer (audio & video)"
+
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:84
+msgid "Icecast audio/video"
+msgstr "Icecast audio/video"
+
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:93
+msgid "Icecast streamer (audio only)"
+msgstr "Icecast Streamer (enkel audio)"
+
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:94
+msgid "Icecast audio"
+msgstr "Icecast audio"
+
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:103
+msgid "Icecast streamer (video only)"
+msgstr "Icecast Streamer (enkel video)"
+
+#: ../flumotion/component/consumers/shout2/wizard_gtk.py:104
+msgid "Icecast video"
+msgstr "Icecast video"
+
 #: ../flumotion/component/feedcomponent010.py:218
-#: ../flumotion/worker/checks/check.py:64
-#: ../flumotion/worker/checks/check.py:68
+#: ../flumotion/worker/checks/check.py:73
 msgid "Internal GStreamer error."
 msgstr "Interne GStreamer-fout."
 
@@ -863,11 +891,16 @@ msgstr ""
 msgid "Channel %d level:"
 msgstr ""
 
-#: ../flumotion/wizard/consumptionsteps.py:38
-#: ../flumotion/wizard/consumptionsteps.py:40
+#: ../flumotion/wizard/consumptionsteps.py:50
+#: ../flumotion/wizard/consumptionsteps.py:52
+#: ../flumotion/wizard/consumptionsteps.py:227
 #: ../flumotion/wizard/basesteps.py:79
 msgid "Consumption"
 msgstr "Consumptie"
+
+#: ../flumotion/wizard/consumptionsteps.py:225
+msgid "HTTP"
+msgstr ""
 
 #: ../flumotion/wizard/worker.py:71
 msgid "Worker:"
@@ -889,7 +922,7 @@ msgstr "Als je video wil streamen"
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
-#: ../flumotion/wizard/conversionsteps.py:44
+#: ../flumotion/wizard/conversionsteps.py:47
 msgid "Encoding"
 msgstr "Encodering"
 
@@ -955,7 +988,7 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
-#: ../flumotion/wizard/configurationwizard.py:540
+#: ../flumotion/wizard/configurationwizard.py:539
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
@@ -1027,7 +1060,8 @@ msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Synchronisatie tussen audio en video kan mogelijks fout zijn.\n"
 
-#: ../flumotion/worker/checks/check.py:49
+#: ../flumotion/worker/checks/audio.py:85
+#: ../flumotion/worker/checks/check.py:48
 #, python-format
 msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
@@ -1036,46 +1070,59 @@ msgstr ""
 "toestel."
 
 #: ../flumotion/worker/checks/check.py:52
+#, fuzzy, python-format
+msgid ""
+"Could not open device '%s' for writing.  Check permissions on the device."
+msgstr ""
+"Kan toestel '%s' niet openen om te lezen.  Verifieer toelatingen op het "
+"toestel."
+
+#: ../flumotion/worker/checks/check.py:56
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr "Kan toestel '%s' niet openen.  Verifieer toelatingen op het toestel."
 
-#: ../flumotion/worker/checks/check.py:55
+#: ../flumotion/worker/checks/check.py:60
 #, python-format
 msgid "Device '%s' is already in use."
 msgstr "Toestel '%s' is al in gebruik."
 
-#: ../flumotion/worker/checks/check.py:58
+#: ../flumotion/worker/checks/check.py:63
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
 msgstr "Toestel '%s' weigerde de gevraagde instellingen."
 
-#: ../flumotion/worker/checks/check.py:100
+#: ../flumotion/worker/checks/check.py:69
+#, fuzzy
+msgid "Internal unhandled GStreamer error."
+msgstr "Interne GStreamer-fout."
+
+#: ../flumotion/worker/checks/check.py:107
 #, python-format
 msgid "Could not probe device '%s'."
 msgstr "Kon toestel '%s' niet onderzoeken."
 
-#: ../flumotion/worker/checks/check.py:118
+#: ../flumotion/worker/checks/check.py:125
 #, python-format
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: ../flumotion/worker/checks/check.py:172
+#: ../flumotion/worker/checks/check.py:179
 #, python-format
 msgid "This host is missing the '%s' GStreamer plug-in.\n"
 msgstr "Deze computer mist de '%s' GStreamer plug-in.\n"
 
-#: ../flumotion/worker/checks/check.py:175
+#: ../flumotion/worker/checks/check.py:182
 #, python-format
 msgid "Please install '%s'.\n"
 msgstr "Gelieve '%s' te installeren.\n"
 
-#: ../flumotion/worker/checks/check.py:184
+#: ../flumotion/worker/checks/check.py:191
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr "De '%s' GStreamer-plug-in is te oud.\n"
 
-#: ../flumotion/worker/checks/check.py:187
+#: ../flumotion/worker/checks/check.py:194
 #, fuzzy, python-format
 msgid "Please upgrade '%s' to version %s or higher."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s of later."
@@ -1829,6 +1876,40 @@ msgstr "V_ideo:"
 msgid "Specify _license:"
 msgstr "Kies _licentie:"
 
+#: ../data/glade/http-wizard.glade.h:1
+#, fuzzy
+msgid "Bandwidth limit:"
+msgstr "B_andbreedtelimiet:"
+
+#: ../data/glade/http-wizard.glade.h:2
+msgid "Bu_rst on connect"
+msgstr "Uitba_rsten bij verbinding"
+
+#: ../data/glade/http-wizard.glade.h:3
+msgid "Mbit/s"
+msgstr "Mbit/s"
+
+#: ../data/glade/http-wizard.glade.h:4
+msgid ""
+"Send buffered data to new clients.  This reduces the delay before playback "
+"starts, but increases the latency."
+msgstr ""
+
+#: ../data/glade/http-wizard.glade.h:5
+#, fuzzy
+msgid "User limit:"
+msgstr "_Gebruikerslimiet:"
+
+#: ../data/glade/http-wizard.glade.h:6 ../data/glade/ondemand-wizard.glade.h:8
+#: ../data/glade/open-connection.glade.h:2
+#: ../flumotion/component/consumers/shout2/wizard.glade.h:6
+msgid "_Port:"
+msgstr "_Poort:"
+
+#: ../data/glade/http-wizard.glade.h:7
+msgid "clients"
+msgstr "cliënten"
+
 #: ../data/glade/ondemand-wizard.glade.h:1
 msgid "/tmp"
 msgstr ""
@@ -1857,17 +1938,10 @@ msgid ""
 msgstr ""
 
 #: ../data/glade/ondemand-wizard.glade.h:7
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:6
+#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:1
 #: ../flumotion/component/consumers/shout2/wizard.glade.h:4
 msgid "_Mount point:"
 msgstr "_Mountpunt:"
-
-#: ../data/glade/ondemand-wizard.glade.h:8
-#: ../data/glade/open-connection.glade.h:2
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:7
-#: ../flumotion/component/consumers/shout2/wizard.glade.h:6
-msgid "_Port:"
-msgstr "_Poort:"
 
 #: ../data/glade/overlay-wizard.glade.h:1
 msgid "Show _logos in bottom left corner"
@@ -2343,10 +2417,12 @@ msgid "Web camera"
 msgstr "Webcam"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:1
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:1
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:2
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:2
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:2
 msgid "<b>Clients</b>"
 msgstr "<b>Cliënten</b>"
@@ -2358,14 +2434,27 @@ msgid "<b>URL</b>"
 msgstr "Eter <b>%s</b>"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:4
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:4
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:8
 msgid "Current:"
 msgstr "Huidig:"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:6
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:6
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:12
 msgid "Total bytes:"
 msgstr "Totaal aantal bytes:"
+
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:3
+#: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:3
+#, fuzzy
+msgid "<b>Stream</b>"
+msgstr "<b>Stream</b>"
+
+#: ../flumotion/component/misc/httpserver/httpfile.glade.h:7
+#, fuzzy
+msgid "URL:"
+msgstr "_URL:"
 
 #: ../flumotion/component/consumers/disker/disker.glade.h:1
 msgid "Current filename:"
@@ -2394,11 +2483,6 @@ msgstr "_Roteer opslag elke"
 msgid "<b>Client consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
-#: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:3
-#, fuzzy
-msgid "<b>Stream</b>"
-msgstr "<b>Stream</b>"
-
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:5
 msgid "Average bitrate:"
 msgstr "Gemiddelde bitsnelheid:"
@@ -2426,34 +2510,6 @@ msgstr "op"
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:15
 msgid "of"
 msgstr "van"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:1
-#, fuzzy
-msgid "Bandwidth limit:"
-msgstr "B_andbreedtelimiet:"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:2
-msgid "Bu_rst on connect"
-msgstr "Uitba_rsten bij verbinding"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:3
-msgid "Mbit/s"
-msgstr "Mbit/s"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:4
-msgid ""
-"Send buffered data to new clients.  This reduces the delay before playback "
-"starts, but increases the latency."
-msgstr ""
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:5
-#, fuzzy
-msgid "User limit:"
-msgstr "_Gebruikerslimiet:"
-
-#: ../flumotion/component/consumers/httpstreamer/wizard.glade.h:8
-msgid "clients"
-msgstr "cliënten"
 
 #: ../flumotion/component/consumers/shout2/wizard.glade.h:1
 msgid "P_assword:"
@@ -2613,24 +2669,6 @@ msgstr "_Sta toe het volume te verhogen"
 
 #~ msgid "Source"
 #~ msgstr "Bron"
-
-#~ msgid "Icecast streamer (audio & video)"
-#~ msgstr "Icecast Streamer (audio & video)"
-
-#~ msgid "Icecast streamer (audio only)"
-#~ msgstr "Icecast Streamer (enkel audio)"
-
-#~ msgid "Icecast streamer (video only)"
-#~ msgstr "Icecast Streamer (enkel video)"
-
-#~ msgid "Icecast audio/video"
-#~ msgstr "Icecast audio/video"
-
-#~ msgid "Icecast audio"
-#~ msgstr "Icecast audio"
-
-#~ msgid "Icecast video"
-#~ msgstr "Icecast video"
 
 #~ msgid "Composite"
 #~ msgstr "Composite"
