@@ -1,3 +1,8 @@
+2008-05-08  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/multi.py (get_admin_for_object):
+	Fix brokennes in r6565 - don't import functions as modules!
+
 2008-05-07  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/http-wizard.glade:

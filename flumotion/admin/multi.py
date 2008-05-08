@@ -28,7 +28,7 @@ __version__ = "$Rev$"
 
 
 def get_admin_for_object(object):
-    import warnings.warn
+    import warnings
     warnings.warn('Use getAdminForObject', DeprecationWarning, stacklevel=2)
     return getAdminForObject(object)
 
