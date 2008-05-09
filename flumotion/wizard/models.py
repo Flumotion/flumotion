@@ -25,6 +25,7 @@ import random
 
 from flumotion.common import log
 from flumotion.common.errors import ComponentValidationError
+from flumotion.common.fraction import fractionFromValue
 
 __version__ = "$Rev$"
 
@@ -309,6 +310,13 @@ class VideoProducer(Producer):
     """I am a component which produces video
     """
     nameTemplate = "video-producer"
+
+    def getFramerate(self):
+        """Get the framerate video producer
+        @returns: the framerate
+        @rtype: fraction: 2 sized tuple of two integers
+        """
+        return fractionFromValue(self.properties.framerate)
 
     def getWidth(self):
         """Get the width of the video producer

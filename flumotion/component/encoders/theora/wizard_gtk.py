@@ -24,6 +24,7 @@ import os
 
 from zope.interface import implements
 
+from flumotion.common.fraction import fractionAsFloat
 from flumotion.wizard.basesteps import VideoEncoderStep
 from flumotion.wizard.interfaces import IEncoderPlugin
 from flumotion.wizard.models import VideoEncoder
@@ -109,7 +110,7 @@ class TheoraStep(VideoEncoderStep):
         # we need to go through the Step (which is the view) because models
         # don't have references to other models
         producer = self.wizard.getStep('Production').getVideoProducer()
-        self.model.framerate = producer.properties['framerate']
+        self.model.framerate = fractionAsFloat(producer.getFramerate())
         self.debug('Framerate of video producer: %r' % self.model.framerate)
         step = 1 / self.model.framerate
         page = 1.0

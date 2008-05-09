@@ -28,11 +28,10 @@ import locale
 import sys
 
 from flumotion.common import log, common, registry, fxml
-
-from errors import ConfigError
+from flumotion.common.errors import ConfigError
+from flumotion.common.fraction import fractionFromValue
 
 __version__ = "$Rev$"
-
 
 def parsePropertyValue(propName, type, value):
     # XXX: We might end up calling float(), which breaks
@@ -47,13 +46,6 @@ def parsePropertyValue(propName, type, value):
             return s
     def strWithoutNewlines(s):
         return tryStr(' '.join([x.strip() for x in s.split('\n')]))
-    def fraction(v):
-        def frac(num, denom=1):
-            return int(num), int(denom)
-        if isinstance(v, basestring):
-            return frac(*v.split('/'))
-        else:
-            return frac(*v)
     def boolean(v):
         if isinstance(v, bool):
             return v
@@ -67,7 +59,7 @@ def parsePropertyValue(propName, type, value):
                 'long': long,
                 'bool': boolean,
                 'float': float,
-                'fraction': fraction}[type](value)
+                'fraction': fractionFromValue}[type](value)
     except KeyError:
         raise ConfigError("unknown type '%s' for property %s"
                           % (type, propName))

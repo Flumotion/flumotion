@@ -23,8 +23,6 @@ from flumotion.common.testsuite import TestCase
 from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 
 
-
-
 class TestXMLWriter(TestCase):
     def testIndent(self):
         xw = XMLWriter()

@@ -25,6 +25,7 @@ import os
 from zope.interface import implements
 
 from flumotion.common import errors
+from flumotion.common.fraction import fractionAsString
 from flumotion.common.messages import N_, gettexter, Info
 from flumotion.common.python import sorted
 from flumotion.wizard.basesteps import VideoProducerStep
@@ -181,7 +182,7 @@ class WebcamStep(VideoProducerStep):
             format = None
 
         self.model.properties.mime = mime
-        self.model.properties.framerate = '%d/%d' % (num, denom)
+        self.model.properties.framerate = fractionAsString((num, denom))
         if format:
             self.model.properties.format = format
 

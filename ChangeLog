@@ -1,5 +1,19 @@
 2008-05-09  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/config.py:
+	* flumotion/common/fraction.py:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/test/test_common_fraction.py:
+	* flumotion/test/test_common_xmlwriter.py:
+	* flumotion/wizard/models.py:
+	Clear up confusion about fractions between webcam step and
+	theora, add functions to convert to and from fractions.
+	Fixes #968
+
+2008-05-09  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/configurationwizard.py:
 	Improve error message from stray taskFinished calls
 
