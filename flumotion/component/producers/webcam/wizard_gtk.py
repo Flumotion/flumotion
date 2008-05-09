@@ -54,14 +54,14 @@ class WebcamStep(VideoProducerStep):
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
-        self._in_setup = False
+        self._inSetup = False
         # _sizes is probed, not set from the UI
         self._sizes = None
 
     # WizardStep
 
     def setup(self):
-        self._in_setup = True
+        self._inSetup = True
         self.device.data_type = str
         self.framerate.data_type = object
 
@@ -72,23 +72,25 @@ class WebcamStep(VideoProducerStep):
 
         self.add_proxy(self.model.properties,['device'])
 
-        self._in_setup = False
+        self._inSetup = False
 
     def workerChanged(self, worker):
         self.model.worker = worker
         self._clear()
-        self._run_checks()
+        self._runChecks()
 
     # Private
 
     def _clear(self):
+        # Clear is called:
+        # - when changing a worker
+        # - after probing a device, if none found
         self.size.set_sensitive(False)
         self.framerate.set_sensitive(False)
         self.label_name.set_label("")
-        self.wizard.taskFinished(True)
 
-    def _run_checks(self):
-        if self._in_setup:
+    def _runChecks(self):
+        if self._inSetup:
             return None
 
         self.wizard.waitForTask('webcam checks')
@@ -105,21 +107,24 @@ class WebcamStep(VideoProducerStep):
             failure.trap(errors.RemoteRunFailure)
             self.debug('a RemoteRunFailure happened')
             self._clear()
+            self.wizard.taskFinished(blockNext=True)
 
         def errRemoteRunError(failure):
             failure.trap(errors.RemoteRunError)
             self.debug('a RemoteRunError happened')
             self._clear()
+            self.wizard.taskFinished(blockNext=True)
 
         def deviceFound(result):
             if not result:
                 self.debug('no device %s' % device)
                 self._clear()
+                self.wizard.taskFinished(blockNext=True)
                 return None
 
             deviceName, factoryName, sizes = result
             self.model.properties.element_factory = factoryName
-            self._populate_sizes(sizes)
+            self._populateSizes(sizes)
             self.wizard.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.taskFinished()
@@ -130,7 +135,7 @@ class WebcamStep(VideoProducerStep):
         d.addErrback(errRemoteRunFailure)
         d.addErrback(errRemoteRunError)
 
-    def _populate_sizes(self, sizes):
+    def _populateSizes(self, sizes):
         # Set sizes before populating the values, since
         # it trigger size_changed which depends on this
         # to be set
@@ -141,17 +146,17 @@ class WebcamStep(VideoProducerStep):
             values.append(['%d x %d' % (w, h), (w, h)])
         self.size.prefill(values)
 
-    def _populate_framerates(self, size):
+    def _populateFramerates(self, size):
         values = []
         for d in self._sizes[size]:
             num, denom = d['framerate']
             values.append(('%.2f fps' % (1.0*num/denom), d))
         self.framerate.prefill(values)
 
-    def _update_size(self):
+    def _updateSize(self):
         size = self.size.get_selected()
         if size:
-            self._populate_framerates(size)
+            self._populateFramerates(size)
             width, height = size
         else:
             self.warning('something bad happened: no height/width selected?')
@@ -160,8 +165,8 @@ class WebcamStep(VideoProducerStep):
         self.model.properties.width = width
         self.model.properties.height = height
 
-    def _update_framerate(self):
-        if self._in_setup:
+    def _updateFramerate(self):
+        if self._inSetup:
             return None
 
         framerate = self.framerate.get_selected()
@@ -183,13 +188,13 @@ class WebcamStep(VideoProducerStep):
     # Callbacks
 
     def on_device_changed(self, combo):
-        self._run_checks()
+        self._runChecks()
 
     def on_size_changed(self, combo):
-        self._update_size()
+        self._updateSize()
 
     def on_framerate_changed(self, combo):
-        self._update_framerate()
+        self._updateFramerate()
 
 
 class WebcamWizardPlugin(object):

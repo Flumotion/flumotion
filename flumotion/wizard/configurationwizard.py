@@ -198,6 +198,10 @@ class ConfigurationWizard(SectionWizard):
         """Instruct the wizard that a task was finished.
         @param blockNext: if we should still next when done
         """
+        if not _tasks:
+            raise AssertionError(
+                "Stray call to taskFinished(), forgot to call waitForTask()?")
+        
         taskName = self._tasks.pop()
         self.info("task %s has now finished" % (taskName,))
         if not self._tasks:

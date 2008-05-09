@@ -1,3 +1,14 @@
+2008-05-09  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/configurationwizard.py:
+	Improve error message from stray taskFinished calls
+
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	Rename to camelCase.
+	Refactor taskFinished call out of _clear. Document when _clear
+	is called.
+	Fixes #967
+
 2008-05-08  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/registry.py:
