@@ -13,6 +13,9 @@ In particular:
    (1,)
    ['a', 'b',]
 
+Other specific code guidelines:
+- don't assert without having a message for the assertion
+
 [1]: http://www.python.org/peps/pep-0008.html
 
 ChangeLog
@@ -71,7 +74,6 @@ example:
 
 NAMING
 ------
-
 - classes should be named with CapitalizedWords
 - methods, functions and attributes should be named in the same style as the
   libraries on the same interface level
@@ -86,6 +88,9 @@ NAMING
   This goes for regular functions and variables too
 - some Twisted-style methods have a special form of (action)_lowerCamelCase;
   e.g. perspective_, remote_, do_
+  this also applies to tests; when testing the method formatTime, it is ok
+  to write a test method called test_formatTime instead of changing it to
+  testFormatTime
 - Twisted coding standard:
   http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
 
