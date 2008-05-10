@@ -216,6 +216,14 @@ class TestProcess(testsuite.TestCase):
             # now that it's gone, it should fail
             self.failIf(common.killPid(ret))
 
+    def test_checkPidRunning(self):
+        # we should be running
+        pid = os.getpid()
+        self.failUnless(common.checkPidRunning(pid))
+
+        # so should init as pid 1, but run as root
+        self.failUnless(common.checkPidRunning(1))
+
 class TestObjRepr(testsuite.TestCase):
     def testMe(self):
         self.assertEquals(common.objRepr(self),

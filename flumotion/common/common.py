@@ -406,10 +406,14 @@ def signalPid(pid, signum):
         os.kill(pid, signum)
         return True
     except OSError, e:
-        if not e.errno == errno.ESRCH:
-        # FIXME: unhandled error, maybe give some better info ?
-            raise
-        return False
+        # see man 2 kill
+        if e.errno == errno.EPERM:
+            # exists but belongs to a different user
+            return True
+        if e.errno == errno.ESRCH:
+            # pid does not exist
+            return False
+        raise
 
 def termPid(pid):
     """
