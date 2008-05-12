@@ -24,13 +24,11 @@
 
 import gettext
 
-from twisted.internet import defer
+import gobject
 
-from flumotion.common import errors
-from flumotion.common.messages import N_, ngettext, gettexter, Warning
+from flumotion.common.messages import N_, gettexter, Warning
 from flumotion.wizard.models import HTTPServer
 from flumotion.wizard.workerstep import WorkerWizardStep
-
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -66,6 +64,7 @@ class OnDemandStep(WorkerWizardStep):
 
     def __init__(self, wizard):
         self.model = OnDemand()
+        self._idleId = -1
         WorkerWizardStep.__init__(self, wizard)
 
     # WizardStep
@@ -84,7 +83,7 @@ class OnDemandStep(WorkerWizardStep):
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._checkElements()
+        self._runChecks()
 
     def getNext(self):
         from flumotion.wizard.configurationwizard import SummaryStep
@@ -97,7 +96,7 @@ class OnDemandStep(WorkerWizardStep):
 
     # Private
 
-    def _checkElements(self):
+    def _runChecks(self):
         self.wizard.waitForTask('ondemand check')
 
         def importError(failure):
@@ -114,12 +113,37 @@ class OnDemandStep(WorkerWizardStep):
             self.wizard.add_msg(message)
             self.wizard.taskFinished(True)
 
-        def finished(unused):
-            self.wizard.taskFinished()
+        def checkPathFinished(pathExists, path):
+            if not pathExists:
+                message = Warning(T_(N_(
+                    "Directory '%s' does not exist, "
+                    "or is not readable on worker '%s'.")
+                                  % (path, self.worker)))
+                message.id = 'demand-directory-check'
+                self.wizard.add_msg(message)
+            else:
+                self.wizard.clear_msg('demand-directory-check')
+
+            self.wizard.taskFinished(blockNext=not pathExists)
+
+        def checkPath(unused):
+            path = self.path.get_text()
+            d = self.runInWorker('flumotion.worker.checks.check',
+                                 'checkDirectory', path)
+            d.addCallback(checkPathFinished, path)
 
         d = self.wizard.checkImport(self.worker, 'twisted.web')
-        d.addCallback(finished)
+        d.addCallback(checkPath)
         d.addErrback(importError)
+
+    def _abortScheduledCheck(self):
+        if self._idleId != -1:
+            gobject.source_remove(self._idleId)
+            self._idleId = -1
+
+    def _scheduleCheck(self):
+        self._abortScheduledCheck()
+        self._idleId = gobject.timeout_add(300, self._runChecks)
 
     def _verify(self):
         self._updateBlocked()
@@ -134,4 +158,7 @@ class OnDemandStep(WorkerWizardStep):
     def on_mount_point_changed(self, entry):
         self._verify()
         self.wizard.blockNext(entry.get_text() == "/")
+
+    def on_path__changed(self, entry):
+        self._scheduleCheck()
 

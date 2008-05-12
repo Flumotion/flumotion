@@ -19,15 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-__version__ = "$Rev$"
+import os
 
 import gst
-
 from twisted.internet import defer
-from flumotion.common import errors, log, messages, gstreamer
 
+from flumotion.common import errors, log, messages, gstreamer
 from flumotion.common.messages import N_
+
+__version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
+
 
 def handleGStreamerDeviceError(failure, device):
     """
@@ -152,6 +154,25 @@ def checkElements(elementNames):
             pass
     log.debug('check', 'checkElements: returning elements names %r', ret)
     return ret
+
+def checkDirectory(pathName):
+    """
+    Check if a path is a directory and that it is readable and
+    executable
+    @param pathName: path to check
+    @type pathName: string
+    @returns: if the path is a directory and readable
+    @rtype: L{messages.Result}
+    """
+
+    result = messages.Result()
+    succeeded = False
+    if (os.path.isdir(pathName) and
+        os.access(pathName, os.R_OK|os.X_OK)):
+        succeeded = True
+
+    result.succeed(succeeded)
+    return result
 
 def checkPlugin(pluginName, packageName, minimumVersion=None,
                 featureName=None, featureCheck=None):

@@ -1,5 +1,15 @@
 2008-05-12  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/ondemand-wizard.glade:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/worker/checks/check.py:
+	Add a worker check to verify that the directory is
+	a directory and readable. Add tooltip and accelerator
+	for the directory entry.
+	Fixes #959
+
+2008-05-12  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/greeter.py:
 	The activate signal is emitted when activation changes, not
 	just when it's true, add a check to make sure that the radio button
