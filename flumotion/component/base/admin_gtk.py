@@ -23,25 +23,24 @@
 Base classes for component UI's using GTK+
 """
 
+import gettext
 import os
 import time
 
 import gtk
 import gtk.glade
-
 from twisted.python import util
 from twisted.internet import defer
 from zope.interface import implements
 
 from flumotion.common import errors, log, common, messages
+from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
+from flumotion.common.messages import N_
 from flumotion.common.planet import AdminFlowState
 from flumotion.twisted import flavors
 from flumotion.ui.fgtk import ProxyWidgetMapping
 
-from flumotion.common.messages import N_
-
-from gettext import gettext as _
-
+_ = gettext.gettext
 __version__ = "$Rev$"
 T_ = messages.gettexter('flumotion')
 
@@ -625,7 +624,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
     def _setStartTime(self, value):
         self._label_start_time.set_text(
             time.strftime("%c", time.localtime(value)))
-        self._label_uptime.set_text(common.formatTime(0))
+        self._label_uptime.set_text(formatTime(0))
 
         self._startTime = value
 
@@ -633,7 +632,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         if self._startTime is not None:
             runtime = value - self._startTime
 
-            self._label_uptime.set_text(common.formatTime(runtime))
+            self._label_uptime.set_text(formatTime(runtime))
         else:
             self._label_uptime.set_text(_("not available"))
 
@@ -646,7 +645,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         if not vsize:
             self._label_vsize.set_text(_('Unknown'))
         else:
-            self._label_vsize.set_text('%sB' % common.formatStorage(vsize))
+            self._label_vsize.set_text('%sB' % formatStorage(vsize))
 
     def setUIState(self, uiState):
         BaseAdminGtkNode.setUIState(self, uiState)
@@ -717,7 +716,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
                                              % (value,))
 
     def setFeederClientBytesReadCurrent(self, state, value):
-        txt = value and (common.formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-current'].set_text(txt)
         self.updateConnectionTime()
         self.updateDisconnectionTime()
@@ -731,7 +730,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.updateDisconnectionTime()
 
     def setFeederClientBytesReadTotal(self, state, value):
-        txt = value and (common.formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-total'].set_text(txt)
 
     def setFeederClientBuffersDroppedTotal(self, state, value):
@@ -745,21 +744,21 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def setFeederClientLastConnect(self, state, value):
         if value:
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._lastConnect = value
             self.updateConnectionTime()
 
     def setFeederClientLastDisconnect(self, state, value):
         if value:
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['disconnected-since'].set_text(text)
             self._lastDisconnect = value
             self.updateDisconnectionTime()
 
     def setFeederClientLastActivity(self, state, value):
         if value:
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['last-activity'].set_text(text)
 
     def setFeederClientFD(self, state, value):
@@ -774,13 +773,13 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
     # FIXME: add a timeout to update this ?
     def updateConnectionTime(self):
         if self._lastConnect:
-            text = common.formatTime(time.time() - self._lastConnect)
+            text = formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
     def updateDisconnectionTime(self):
         if self._lastDisconnect:
-            text = common.formatTime(time.time() - self._lastDisconnect)
+            text = formatTime(time.time() - self._lastDisconnect)
             self.labels['disconnection-time'].set_text(text)
 
     def addFeeder(self, uiState, state):
@@ -933,7 +932,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self.labels['eater-name'].set_markup(_('Eater <b>%s</b>') % value)
 
     def _setEaterBytesReadCurrent(self, state, value):
-        txt = value and (common.formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-current'].set_text(txt)
         self._updateConnectionTime()
         self._updateDisconnectionTime()
@@ -947,24 +946,24 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'timeTimestampDiscont':
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['timestamp-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'lastTimestampDiscont':
-            text = common.formatTime(value, fractional=9)
+            text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-last-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'totalTimestampDiscont':
-            text = common.formatTime(value, fractional=9)
+            text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-total-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'timestampTimestampDiscont':
             if value is None:
                 return
-            text = common.formatTime(value, fractional=9)
+            text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-timestamp-current'].set_text(text)
         # offsets
         elif key == 'countOffsetDiscont':
@@ -972,7 +971,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'timeOffsetDiscont':
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['offset-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_offset_discont_current.show()
@@ -1004,7 +1003,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
     def _setEaterTotalTimestampDiscont(self, state, value):
         if value is None:
             return
-        text = common.formatTime(value, fractional=9)
+        text = formatTime(value, fractional=9)
         self.labels['timestamp-discont-total'].set_text(text)
         if value > 0.0:
             self._vbox_timestamp_discont_total.show()
@@ -1026,7 +1025,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
 
     def _setEaterLastConnect(self, state, value):
         if value:
-            text = common.formatTimeStamp(time.localtime(value))
+            text = formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._table_connected.show()
             self._table_disconnected.hide()
@@ -1048,13 +1047,13 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
     # FIXME: add a timeout to update this ?
     def _updateConnectionTime(self):
         if self._lastConnect:
-            text = common.formatTime(time.time() - self._lastConnect)
+            text = formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
     def _updateDisconnectionTime(self):
         if self._lastDisconnect:
-            text = common.formatTime(time.time() - self._lastDisconnect)
+            text = formatTime(time.time() - self._lastDisconnect)
             self.labels['disconnection-time'].set_text(text)
 
     def addEater(self, uiState, state):

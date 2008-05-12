@@ -23,7 +23,7 @@ import gettext
 import os
 import webbrowser
 
-from flumotion.common import common
+from flumotion.common.format import formatStorage
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
 
@@ -95,7 +95,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             text = state.get(name)
             if text is not None:
                 if name == 'bytes-transferred':
-                    text = common.formatStorage(int(text)) + _('Byte')
+                    text = formatStorage(int(text)) + _('Byte')
                 self._labels[name].set_text(str(text))
 
         uri = state.get('stream-url')

@@ -23,6 +23,7 @@ EXTRA_DIST = 					\
 	test_common_bundle.py			\
 	test_common_componentui.py		\
 	test_common_connection.py		\
+	test_common_format.py			\
 	test_common_gstreamer.py		\
 	test_common_messages.py			\
 	test_common_netutils.py			\

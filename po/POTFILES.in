@@ -65,6 +65,7 @@ flumotion/common/dag.py
 flumotion/common/debug.py
 flumotion/common/enum.py
 flumotion/common/errors.py
+flumotion/common/format.py
 flumotion/common/fxml.py
 flumotion/common/gstreamer.py
 flumotion/common/identity.py

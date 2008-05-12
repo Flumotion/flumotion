@@ -28,7 +28,6 @@ import os
 import sys
 import time
 import signal
-import locale
 
 from twisted.internet import address
 
@@ -43,101 +42,6 @@ from flumotion.configure import configure
 __version__ = "$Rev$"
 
 
-def formatStorage(units, precision=2):
-    """
-    Nicely formats a storage size using SI units.
-    See Wikipedia and other sources for rationale.
-    Prefixes are k, M, G, ...
-    Sizes are powers of 10.
-    Actual result should be suffixed with bit or byte, not b or B.
-
-    @param units:     the unit size to format
-    @type  units:     int or float
-    @param precision: the number of floating point digits to use
-    @type  precision: int
-
-    @rtype: string
-    @returns: value of units, formatted using SI scale and the given precision
-    """
-
-    # XXX: We might end up calling float(), which breaks
-    #      when using LC_NUMERIC when it is not C -- only in python
-    #      2.3 though, no prob in 2.4. See PEP 331
-    if sys.version_info < (2, 4):
-        locale.setlocale(locale.LC_NUMERIC, "C")
-
-    prefixes = ['E', 'P', 'T', 'G', 'M', 'k', '']
-
-    value = float(units)
-    prefix = prefixes.pop()
-    while prefixes and value >= 1000:
-        prefix = prefixes.pop()
-        value /= 1000
-
-    format = "%%.%df %%s" % precision
-    return format % (value, prefix)
-
-def formatTime(seconds, fractional=0):
-    """
-    Nicely format time in a human-readable format.
-    Will chunks weeks, days, hours and minutes.
-
-    @param seconds:    the time in seconds to format.
-    @type  seconds:    int or float
-    @param fractional: how many digits to show for the fractional part.
-    @type  fractional: int
-
-    @rtype: string
-    @returns: a nicely formatted time string.
-    """
-    chunks = []
-
-    week = 60 * 60 * 24 * 7
-    weeks = seconds / week
-    seconds %= week
-
-    day = 60 * 60 * 24
-    days = seconds / day
-    seconds %= day
-
-    hour = 60 * 60
-    hours = seconds / hour
-    seconds %= hour
-
-    minute = 60
-    minutes = seconds / minute
-    seconds %= minute
-
-    if weeks > 1:
-        chunks.append('%d weeks' % weeks)
-    elif weeks == 1:
-        chunks.append('1 week')
-
-    if days > 1:
-        chunks.append('%d days' % days)
-    elif days == 1:
-        chunks.append('1 day')
-
-    chunk = '%02d:%02d' % (hours, minutes)
-    if fractional > 0:
-        chunk += ':%0*.*f' % (fractional + 3, fractional, seconds)
-
-    chunks.append(chunk)
-
-
-    return " ".join(chunks)
-
-def formatTimeStamp(timeOrTuple):
-    """
-    Format a timestamp in a human-readable format.
-
-    @param timeOrTuple: the timestamp to format
-    @type  timeOrTuple: something that time.strftime will accept
-
-    @rtype: string
-    @returns: a nicely formatted timestamp string.
-    """
-    return time.strftime("%Y-%m-%d %H:%M %Z", timeOrTuple)
 
 def version(binary):
     """

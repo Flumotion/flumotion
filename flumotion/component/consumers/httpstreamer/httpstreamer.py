@@ -27,8 +27,9 @@ from twisted.internet import reactor, error, defer
 from twisted.web import server
 from zope.interface import implements
 
-from flumotion.common import common, gstreamer, errors
+from flumotion.common import gstreamer, errors
 from flumotion.common import messages, netutils, interfaces
+from flumotion.common.format import formatStorage, formatTime
 from flumotion.common.messages import N_
 from flumotion.component import feedcomponent
 from flumotion.component.base import http
@@ -172,13 +173,13 @@ class Stats:
 
         set('stream-mime', c.get_mime())
         set('stream-url', c.getUrl())
-        set('stream-uptime', common.formatTime(uptime))
+        set('stream-uptime', formatTime(uptime))
         bitspeed = bytes_received * 8 / uptime
         currentbitrate = self.getCurrentBitrate()
-        set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('stream-bitrate', formatStorage(bitspeed) + 'bit/s')
         set('stream-current-bitrate',
-            common.formatStorage(currentbitrate) + 'bit/s')
-        set('stream-totalbytes', common.formatStorage(bytes_received) + 'Byte')
+            formatStorage(currentbitrate) + 'bit/s')
+        set('stream-totalbytes', formatStorage(bytes_received) + 'Byte')
         set('stream-bitrate-raw', bitspeed)
         set('stream-totalbytes-raw', bytes_received)
 
@@ -189,10 +190,10 @@ class Stats:
         set('clients-average', str(int(c.getAverageClients())))
 
         bitspeed = bytes_sent * 8 / uptime
-        set('consumption-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('consumption-bitrate', formatStorage(bitspeed) + 'bit/s')
         set('consumption-bitrate-current',
-            common.formatStorage(currentbitrate * c.getClients()) + 'bit/s')
-        set('consumption-totalbytes', common.formatStorage(bytes_sent) + 'Byte')
+            formatStorage(currentbitrate * c.getClients()) + 'bit/s')
+        set('consumption-totalbytes', formatStorage(bytes_sent) + 'Byte')
         set('consumption-bitrate-raw', bitspeed)
         set('consumption-totalbytes-raw', bytes_sent)
 

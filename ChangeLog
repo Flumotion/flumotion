@@ -1,5 +1,22 @@
 2008-05-12  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/common/format.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_format.py:
+	Move formattting functions out of flumotion.common.format.
+	Translate formatTime using ngettext.
+	Update callsites to import from flumotion.common.
+	Split tests out to test_common_format.
+	Fixes #938
+
+2008-05-12  Johan Dahlin  <johan@flumotion.com>
+
 	* data/glade/ondemand-wizard.glade:
 	* flumotion/wizard/ondemandstep.py:
 	* flumotion/worker/checks/check.py:

@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -20,100 +20,15 @@
 # Headers in this file shall remain intact.
 
 import os
-import time
 import tempfile
+import time
 
 from twisted.internet import address
-from zope.interface import implements,Interface
+from zope.interface import implements, Interface
 
 from flumotion.common import common
 from flumotion.common import testsuite
 
-
-
-
-class TestFormatStorage(testsuite.TestCase):
-    def testBytes(self):
-        value = 4
-        assert common.formatStorage(value) == "4.00 "
-
-    def testKibibyte(self):
-        value = 1024
-        assert common.formatStorage(value) == "1.02 k"
-        assert common.formatStorage(value, 3) == "1.024 k"
-
-    def testMegabyte(self):
-        value = 1000 * 1000
-        assert common.formatStorage(value) == "1.00 M"
-
-    def testMebibyte(self):
-        value = 1024 * 1024
-        assert common.formatStorage(value) == "1.05 M"
-        assert common.formatStorage(value, 3) == "1.049 M"
-        assert common.formatStorage(value, 4) == "1.0486 M"
-
-    def testGibibyte(self):
-        value = 1024 * 1024 * 1024
-        assert common.formatStorage(value, 4) == "1.0737 G"
-
-    def testTebibyte(self):
-        value = 1024 * 1024 * 1024 * 1024
-        assert common.formatStorage(value, 4) == "1.0995 T"
-
-    def testPebibyte(self):
-        value = 1024 * 1024 * 1024 * 1024 * 1024
-        assert common.formatStorage(value, 4) == "1.1259 P"
-
-    def testExbibyte(self):
-        value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-        assert common.formatStorage(value, 4) == "1.1529 E"
-
-class TestFormatTime(testsuite.TestCase):
-    def testFractionalSecond(self):
-        value = 1.1
-        self.assertEquals(common.formatTime(value, fractional=2),
-            "00:00:01.10")
-
-    def testSecond(self):
-        value = 1
-        assert common.formatTime(value) == "00:00"
-
-    def testMinuteSecond(self):
-        value = 60 + 1
-        assert common.formatTime(value) == "00:01"
-
-    def testHourMinuteSecond(self):
-        value = 60 * 60 + 60 + 2
-        assert common.formatTime(value) == "01:01"
-
-    def testDay(self):
-        value = 60 * 60 * 24
-        assert common.formatTime(value) == "1 day 00:00"
-
-    def testDays(self):
-        value = 60 * 60 * 24 * 2
-        assert common.formatTime(value) == "2 days 00:00"
-
-    def testWeek(self):
-        value = 60 * 60 * 24 * 7
-        assert common.formatTime(value) == "1 week 00:00"
-
-    def testWeeks(self):
-        value = 60 * 60 * 24 * 7 * 2
-        assert common.formatTime(value) == "2 weeks 00:00"
-
-    def testYear(self):
-        value = 60 * 60 * 24 * 365
-        assert common.formatTime(value) == "52 weeks 1 day 00:00"
-
-    def testReallyLong(self):
-        minute = 60
-        hour = minute * 60
-        day = hour * 24
-        week = day * 7
-
-        value = week * 291 + day * 5 + hour * 13 + minute * 5
-        assert common.formatTime(value) == "291 weeks 5 days 13:05"
 
 class I1(Interface): pass
 class I2(Interface): pass
@@ -125,6 +40,7 @@ class B:
     implements(I2)
 
 class C: pass
+
 
 class TestMergeImplements(testsuite.TestCase):
     def testTwoImplements(self):
@@ -139,6 +55,7 @@ class TestMergeImplements(testsuite.TestCase):
     def testBothWithout(self):
         self.assertEquals(common.mergeImplements(C, C), ( ))
 
+
 class TestVersion(testsuite.TestCase):
     def testVersion(self):
         self.failUnless(common.version('abinary'))
@@ -150,9 +67,11 @@ class TestVersion(testsuite.TestCase):
         self.assertEquals(common.versionTupleToString((1, 2, 3, 0,)), "1.2.3")
         self.assertEquals(common.versionTupleToString((1, 2, 3, 1,)), "1.2.3.1")
 
+
 class TestComponentPath(testsuite.TestCase):
     def testPath(self):
         self.assertEqual(common.componentId('Adam', 'Cain'), '/Adam/Cain')
+
 
 class TestEnsureDir(testsuite.TestCase):
     def testNonExisting(self):
@@ -165,6 +84,7 @@ class TestEnsureDir(testsuite.TestCase):
         common.ensureDir(self.tempdir, "a description")
         os.system("rm -r %s" % self.tempdir)
 
+
 class TestPid(testsuite.TestCase):
     def testAll(self):
         pid = common.getPid('test', 'default')
@@ -175,6 +95,7 @@ class TestPid(testsuite.TestCase):
         self.assertEquals(os.getpid(), pid)
         common.deletePidFile('test', 'default')
 
+
 class TestAddress(testsuite.TestCase):
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
@@ -184,6 +105,7 @@ class TestAddress(testsuite.TestCase):
 
     def testGetPort(self):
         self.failUnlessEqual(common.addressGetPort(self.address), '8000')
+
 
 class TestProcess(testsuite.TestCase):
     def testTermPid(self):
@@ -229,6 +151,7 @@ class TestObjRepr(testsuite.TestCase):
         self.assertEquals(common.objRepr(self),
             'flumotion.test.test_common.TestObjRepr')
 
+
 class TestPathToModule(testsuite.TestCase):
     def testPaths(self):
         tests = {
@@ -242,6 +165,7 @@ class TestPathToModule(testsuite.TestCase):
         for (path, module) in tests.items():
             self.assertEquals(common.pathToModuleName(path), module,
                 "path %s did not give end module %s" % (path, module))
+
 
 class TestCompareVersions(testsuite.TestCase):
     def testBadVersion(self):
@@ -269,21 +193,26 @@ class TestCompareVersions(testsuite.TestCase):
         self.assertEquals(common.compareVersions("2.1", "2.0"), 1)
         self.assertEquals(common.compareVersions("1.2.3.4", "1.2.3.3.0"), 1)
 
+
 class InitA(common.InitMixin):
     def __init__(self):
         self.inited = []
         common.InitMixin.__init__(self, 3, 4, x=5, y=6)
 
+
 class InitB(InitA):
     def init(self, *args, **kwargs):
         self.inited.append((InitB, args, kwargs))
 
+
 class InitC(InitB):
     pass
+
 
 class InitD(InitC):
     def init(self, *args, **kwargs):
         self.inited.append((InitD, args, kwargs))
+
 
 class TestInitMixin(testsuite.TestCase):
     def testInitA(self):

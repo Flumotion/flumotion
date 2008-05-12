@@ -18,6 +18,7 @@ flumotion_PYTHON = \
 	enum.py \
 	errors.py \
 	fraction.py \
+	format.py \
 	fxml.py \
 	gstreamer.py \
 	identity.py \
