@@ -1,3 +1,11 @@
+2008-05-12  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/greeter.py:
+	The activate signal is emitted when activation changes, not
+	just when it's true, add a check to make sure that the radio button
+	is active before proceeding.
+	Fixes #958
+
 2008-05-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

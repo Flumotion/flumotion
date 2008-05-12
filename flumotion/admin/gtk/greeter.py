@@ -86,6 +86,8 @@ class Initial(WizardStep):
     # Callbacks
 
     def _on_radio__activiate(self, radio):
+        if not radio.get_active():
+            return
         self.button_next.clicked()
 
 
