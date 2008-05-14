@@ -1,3 +1,12 @@
+2008-05-14  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/production-wizard.glade:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/productionsteps.py:
+	Make sure so that enter on a radio button on the production step
+	page goes to the next page. Add an API to go to the next page.
+	Refactor a production step to be simpler.
+
 2008-05-12  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/Makefile.am:

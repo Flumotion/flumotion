@@ -36,6 +36,7 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
+	  <signal name="activate" handler="on_live_stream_activate" last_modification_time="Tue, 29 Apr 2008 21:16:45 GMT"/>
 	  <signal name="toggled" handler="on_live_stream_toggled" last_modification_time="Tue, 29 Apr 2008 21:16:45 GMT"/>
 	</widget>
 	<packing>
@@ -236,6 +237,7 @@ to use in your live stream:</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
 	  <property name="group">live_stream</property>
+	  <signal name="activate" handler="on_demand_activate"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>

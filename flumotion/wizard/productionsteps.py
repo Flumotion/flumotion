@@ -214,13 +214,8 @@ class ProductionStep(WizardStep):
         if not self._loadedSteps:
             return
 
-        has_audio = self.has_audio.get_active()
-        has_video = self.has_video.get_active()
-        can_continue = False
-        if has_audio or has_video:
-            can_continue = True
-
-        self.wizard.blockNext(not can_continue)
+        canContinue = self.hasAudio() or self.hasVideo()
+        self.wizard.blockNext(not canContinue)
 
     def _updateSensitivity(self):
         liveStream = self.live_stream.get_active()
@@ -245,3 +240,9 @@ class ProductionStep(WizardStep):
 
     def on_live_stream_toggled(self, radio):
         self._updateSensitivity()
+
+    def on_live_stream_activate(self, radio):
+        self.wizard.goNext()
+
+    def on_demand_activate(self, radio):
+        self.wizard.goNext()

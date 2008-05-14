@@ -224,6 +224,12 @@ class SectionWizard(GladeWindow, log.Loggable):
     def add_msg(self, msg):
         self.message_area.add_message(msg)
 
+    def goNext(self):
+        """Show the next step, this is called when
+        the next button is clicked
+        """
+        self.prepareNextStep(self._currentStep)
+
     def blockNext(self, block):
         self.button_next.set_sensitive(not block)
         # work around a gtk+ bug #56070
@@ -417,7 +423,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._showPreviousStep()
 
     def on_button_next_clicked(self, button):
-        self.prepareNextStep(self._currentStep)
+        self.goNext()
 
     def on_sidebar_step_chosen(self, sidebar, name):
         self._jumpToStep(name)
