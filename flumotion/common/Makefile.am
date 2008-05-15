@@ -33,6 +33,7 @@ flumotion_PYTHON = \
 	options.py \
 	package.py \
 	planet.py \
+	process.py \
 	pygobject.py \
 	python.py \
 	reflectcall.py \

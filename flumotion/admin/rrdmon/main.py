@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -24,10 +24,11 @@ import sys
 
 from twisted.internet import reactor
 
-from flumotion.configure import configure
-from flumotion.common import log, common
 from flumotion.admin.rrdmon import rrdmon, config
+from flumotion.common import log
 from flumotion.common.options import OptionGroup, OptionParser
+from flumotion.common.process import startup
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 
@@ -111,7 +112,7 @@ def main(args):
         if not options.daemonizeTo:
             options.daemonizeTo = "/"
 
-    common.startup("rrdmon", name, options.daemonize, options.daemonizeTo)
+    startup("rrdmon", name, options.daemonize, options.daemonizeTo)
 
     log.debug('rrdmon', 'Running Flumotion version %s' %
         configure.version)

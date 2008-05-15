@@ -29,10 +29,11 @@ import sys
 from twisted.internet import reactor, error
 
 from flumotion.manager import manager, config
-from flumotion.common import log, common, errors, setup
-from flumotion.configure import configure
+from flumotion.common import log, errors, setup
 from flumotion.common import server
 from flumotion.common.options import OptionGroup, OptionParser
+from flumotion.common.process import startup
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 defaultSSLPort = configure.defaultSSLManagerPort
@@ -253,8 +254,7 @@ def main(args):
         if not options.daemonizeTo:
             options.daemonizeTo = "/"
 
-    common.startup("manager", name, options.daemonize,
-        options.daemonizeTo)
+    startup("manager", name, options.daemonize, options.daemonizeTo)
 
     reactor.run()
 

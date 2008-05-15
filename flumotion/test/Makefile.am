@@ -19,6 +19,7 @@ EXTRA_DIST = 					\
 	test_admin_connections.py		\
 	test_admin_multi.py			\
 	test_checkers.py			\
+	test_common.py				\
 	test_common_avltree.py			\
 	test_common_bundle.py			\
 	test_common_componentui.py		\
@@ -29,7 +30,7 @@ EXTRA_DIST = 					\
 	test_common_netutils.py			\
 	test_common_package.py			\
 	test_common_planet.py			\
-	test_common.py				\
+	test_common_process.py			\
 	test_common_pygobject.py		\
 	test_common_signals.py			\
 	test_common_xmlwriter.py		\

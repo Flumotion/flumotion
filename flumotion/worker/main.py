@@ -25,11 +25,12 @@ import sys
 from twisted.internet import reactor
 
 from flumotion.configure import configure
-from flumotion.common import log, common, errors
+from flumotion.common import log, errors
 from flumotion.common import connection
+from flumotion.common.options import OptionGroup, OptionParser
+from flumotion.common.process import startup
 from flumotion.worker import worker, config
 from flumotion.twisted import pb
-from flumotion.common.options import OptionGroup, OptionParser
 
 __version__ = "$Rev$"
 
@@ -238,7 +239,7 @@ def main(args):
         if not options.daemonizeTo:
             options.daemonizeTo = "/"
 
-    common.startup("worker", name, options.daemonize, options.daemonizeTo)
+    startup("worker", name, options.daemonize, options.daemonizeTo)
 
     log.debug('worker', 'Running Flumotion version %s' %
         configure.version)

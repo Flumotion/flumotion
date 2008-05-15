@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,17 +14,23 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+"""
+Servicer object used in service scripts
+"""
+
 import os
 import glob
 import time
 
 from flumotion.configure import configure
-from flumotion.common import common, errors, log
+from flumotion.common import errors, log
 from flumotion.common.python import makedirs
+from flumotion.common.process import checkPidRunning, deletePidFile, getPid, \
+     killPid, termPid, waitPidFile
 
-"""
-Servicer object used in service scripts
-"""
+__version__ = "$Rev$"
+
+
 class Servicer(log.Loggable):
     """
     I manage running managers and workers on behalf of a service script.
@@ -194,11 +200,11 @@ class Servicer(log.Loggable):
         self.debug("Status managers %r and workers %r" % (managers, workers))
         for kind, names in [('manager', managers), ('worker', workers)]:
             for name in names:
-                pid = common.getPid(kind, name)
+                pid = getPid(kind, name)
                 if not pid:
                     print "%s %s not running" % (kind, name)
                     continue
-                if common.checkPidRunning(pid):
+                if checkPidRunning(pid):
                     print "%s %s is running with pid %d" % (kind, name, pid)
                 else:
                     print "%s %s dead (stale pid %d)" % (kind, name, pid)
@@ -211,17 +217,17 @@ class Servicer(log.Loggable):
         self.debug("Clean managers %r and workers %r" % (managers, workers))
         for kind, names in [('manager', managers), ('worker', workers)]:
             for name in names:
-                pid = common.getPid(kind, name)
+                pid = getPid(kind, name)
                 if not pid:
                     # may be a file that contains bogus data
                     print "deleting bogus pid file for %s %s" % (kind, name)
-                    common.deletePidFile(kind, name)
+                    deletePidFile(kind, name)
                     continue
-                if not common.checkPidRunning(pid):
+                if not checkPidRunning(pid):
                     self.debug("Cleaning up stale pid %d for %s %s" % (
                         pid, kind, name))
                     print "deleting stale pid file for %s %s" % (kind, name)
-                    common.deletePidFile(kind, name)
+                    deletePidFile(kind, name)
 
     def condrestart(self, args):
         """
@@ -242,10 +248,10 @@ class Servicer(log.Loggable):
 
         for kind, names in [('manager', managers), ('worker', workers)]:
             for name in names:
-                pid = common.getPid(kind, name)
+                pid = getPid(kind, name)
                 if not pid:
                     continue
-                if common.checkPidRunning(pid):
+                if checkPidRunning(pid):
                     if kind == 'manager':
                         if not self.stopManager(name):
                             exitvalue += 1
@@ -406,9 +412,9 @@ user:PSfNpHTkpTx1M
             flowFiles.append(flowFile)
             self.info("Loading flow %s" % flowFile)
 
-        pid = common.getPid('manager', name)
+        pid = getPid('manager', name)
         if pid:
-            if common.checkPidRunning(pid):
+            if checkPidRunning(pid):
                 raise errors.SystemError, \
                     "Manager %s is already running (with pid %d)" % (name, pid)
             else:
@@ -425,7 +431,7 @@ user:PSfNpHTkpTx1M
 
         if retval == 0:
             self.debug("Waiting for pid for manager %s" % name)
-            pid = common.waitPidFile('manager', name)
+            pid = waitPidFile('manager', name)
             if pid:
                 self.info("Started manager %s with pid %d" % (name, pid))
                 return True
@@ -450,9 +456,9 @@ user:PSfNpHTkpTx1M
             raise errors.SystemError, \
                 "Worker file %s does not exist" % workerFile
 
-        pid = common.getPid('worker', name)
+        pid = getPid('worker', name)
         if pid:
-            if common.checkPidRunning(pid):
+            if checkPidRunning(pid):
                 raise errors.SystemError, \
                     "Worker %s is already running (with pid %d)" % (name, pid)
             else:
@@ -471,7 +477,7 @@ user:PSfNpHTkpTx1M
 
         if retval == 0:
             self.debug("Waiting for pid for worker %s" % name)
-            pid = common.waitPidFile('worker', name)
+            pid = waitPidFile('worker', name)
             if pid:
                 self.info("Started worker %s with pid %d" % (name, pid))
                 return True
@@ -501,12 +507,12 @@ user:PSfNpHTkpTx1M
         Stop the given manager if it is running.
         """
         self.info("Stopping manager %s" % name)
-        pid = common.getPid('manager', name)
+        pid = getPid('manager', name)
         if not pid:
             return True
 
         # FIXME: ensure a correct process is running this pid
-        if not common.checkPidRunning(pid):
+        if not checkPidRunning(pid):
             self.info("Manager %s is dead (stale pid %d)" % (name, pid))
             return False
 
@@ -522,13 +528,13 @@ user:PSfNpHTkpTx1M
         Stop the given worker if it is running.
         """
         self.info("Stopping worker %s" % name)
-        pid = common.getPid('worker', name)
+        pid = getPid('worker', name)
         if not pid:
             self.info("worker %s was not running" % name)
             return True
 
         # FIXME: ensure a correct process is running this pid
-        if not common.checkPidRunning(pid):
+        if not checkPidRunning(pid):
             self.info("Worker %s is dead (stale pid %d)" % (name, pid))
             return False
 
@@ -549,17 +555,17 @@ user:PSfNpHTkpTx1M
         killClock = termClock + configure.processKillWait
 
         self.debug('stopping process with pid %d' % pid)
-        if not common.termPid(pid):
+        if not termPid(pid):
             self.warning('No process with pid %d' % pid)
             return False
 
         # wait for the kill
-        while (common.checkPidRunning(pid)):
+        while (checkPidRunning(pid)):
             if time.clock() > termClock:
                 self.warning("Process with pid %d has not responded to TERM " \
                     "for %d seconds, killing" % (pid,
                         configure.processTermWait))
-                common.killPid(pid)
+                killPid(pid)
                 termClock = killClock + 1.0 # so it does not get triggered again
 
             if time.clock() > killClock:

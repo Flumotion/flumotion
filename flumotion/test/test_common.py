@@ -85,17 +85,6 @@ class TestEnsureDir(testsuite.TestCase):
         os.system("rm -r %s" % self.tempdir)
 
 
-class TestPid(testsuite.TestCase):
-    def testAll(self):
-        pid = common.getPid('test', 'default')
-        self.failIf(pid)
-        common.writePidFile('test', 'default')
-        common.waitPidFile('test', 'default')
-        pid = common.getPid('test', 'default')
-        self.assertEquals(os.getpid(), pid)
-        common.deletePidFile('test', 'default')
-
-
 class TestAddress(testsuite.TestCase):
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
@@ -106,45 +95,6 @@ class TestAddress(testsuite.TestCase):
     def testGetPort(self):
         self.failUnlessEqual(common.addressGetPort(self.address), '8000')
 
-
-class TestProcess(testsuite.TestCase):
-    def testTermPid(self):
-        ret = os.fork()
-        if ret == 0:
-            # child
-            time.sleep(4)
-            os._exit(0)
-        else:
-            # parent
-            self.failUnless(common.checkPidRunning(ret))
-            self.failUnless(common.termPid(ret))
-
-            os.waitpid(ret, 0)
-
-            # now that it's gone, it should fail
-            self.failIf(common.checkPidRunning(ret))
-            self.failIf(common.termPid(ret))
-
-    def testKillPid(self):
-        ret = os.fork()
-        if ret == 0:
-            # child
-            common.waitForTerm()
-            os._exit(0)
-        else:
-            # parent
-            self.failUnless(common.killPid(ret))
-            os.waitpid(ret, 0)
-            # now that it's gone, it should fail
-            self.failIf(common.killPid(ret))
-
-    def test_checkPidRunning(self):
-        # we should be running
-        pid = os.getpid()
-        self.failUnless(common.checkPidRunning(pid))
-
-        # so should init as pid 1, but run as root
-        self.failUnless(common.checkPidRunning(1))
 
 class TestObjRepr(testsuite.TestCase):
     def testMe(self):

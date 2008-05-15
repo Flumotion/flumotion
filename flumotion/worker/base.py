@@ -33,7 +33,8 @@ from twisted.spread import pb
 from zope.interface import implements
 
 from flumotion.common import errors, log
-from flumotion.common import common, worker, startset
+from flumotion.common import worker, startset
+from flumotion.common.process import signalPid
 from flumotion.twisted import checkers, fdserver
 from flumotion.twisted import pb as fpb
 
@@ -283,7 +284,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         jobInfo = self._jobInfos[pid]
         self.debug("Sending signal %d to job %s at pid %d", signum,
                    jobInfo.avatarId, jobInfo.pid)
-        common.signalPid(jobInfo.pid, signum)
+        signalPid(jobInfo.pid, signum)
 
     def killJob(self, avatarId, signum):
         for job in self._jobInfos.values():

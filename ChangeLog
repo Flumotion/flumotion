@@ -1,5 +1,23 @@
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/rrdmon/main.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/common/process.py:
+	* flumotion/manager/main.py:
+	* flumotion/service/service.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_process.py:
+	* flumotion/worker/base.py:
+	* flumotion/worker/main.py:
+	Move process related utilites from f.c.common to
+	f.c.process. Mark the untested ones without callsites 
+	in flumotion as private.
+	Update callsites and split the tests too.
+
+2008-05-15  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/common.py (writePidFile): 
 	Refactor to avoid duplication.
 	Set chmod to 644 of created pid files.
