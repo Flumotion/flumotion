@@ -93,19 +93,19 @@ class Mood(util.LogCommand):
 # Because we run a reactor and use deferreds, the flow is slightly different
 # from the usual Command flow.
 
-# Nagios will first create a managerDeferred instance variable, which will
+# Manager will first create a managerDeferred instance variable, which will
 # allow subcommands to hook into the connection and schedule callbacks.
 
-# Nagios will then parse the command line, allowing all subcommands to
+# Manager will then parse the command line, allowing all subcommands to
 # hook into this step with their respective handleOptions/parse/do methods.
 
 # Subcommands are expected to use the ok/warning/critical methods to report
 # a message and set the exit state.
 
-# The Nagios root command will take care of stopping the reactor and returning
+# The Manager root command will take care of stopping the reactor and returning
 # the exit value.
 
-class Nagios(util.LogCommand):
+class Manager(util.LogCommand):
     usage = "%prog %command"
     description = "Run Nagios checks on Flumotion manager."
 
@@ -224,6 +224,23 @@ class Nagios(util.LogCommand):
         if failure.check(errors.ConnectionRefusedError):
             util.critical("Manager refused connection.")
         self.managerDeferred.errback(failure)
+
+class Nagios(util.LogCommand):
+    usage = "%prog %command"
+    description = "Run Flumotion-related Nagios checks."
+
+    subCommandClasses = [Manager, ]
+
+    def addOptions(self):
+        self.parser.add_option('-v', '--version',
+            action="store_true", dest="version",
+            help="show version information")
+
+    def handleOptions(self, options):
+        self.debug('Nagios: handleOptions')
+        if options.version:
+            print common.version("flumotion-nagios")
+            return 0
 
 def main(args):
     c = Nagios()
