@@ -26,7 +26,7 @@ from flumotion.wizard.models import VideoConverter
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev: 6228 $"
-T_ = gettexter('flumotion')
+T_ = gettexter()
 _ = gettext.gettext
 
 

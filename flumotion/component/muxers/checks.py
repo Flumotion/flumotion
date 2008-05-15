@@ -28,7 +28,7 @@ from flumotion.common import gstreamer, messages
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 def checkOgg():

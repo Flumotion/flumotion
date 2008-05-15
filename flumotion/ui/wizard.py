@@ -34,7 +34,7 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 
 __version__ = "$Rev$"
 __pychecker__ = 'no-classattr no-argsused'
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 N_ = gettext.gettext
 
 # pychecker doesn't like the auto-generated widget attrs

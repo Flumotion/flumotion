@@ -29,7 +29,7 @@ import gst
 from gst010 import do_element_check
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 def checkMixerTracks(source_factory, device, channels, id=None):
     """

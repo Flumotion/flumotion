@@ -45,9 +45,9 @@ def ngettext(singular, plural, count): return (singular, plural, count)
 class TestSingularClassbased(testsuite.TestCase):
     def setUp(self):
         localedir = os.path.join(configure.localedatadir, 'locale')
-        mo = gettext.find("flumotion", localedir, ["nl_NL"])
+        mo = gettext.find(configure.PACKAGE, localedir, ["nl_NL"])
         self.failUnless(mo)
-        self.nl = gettext.translation("flumotion", localedir, ["nl_NL"])
+        self.nl = gettext.translation(configure.PACKAGE, localedir, ["nl_NL"])
         self.failUnless(self.nl)
         self.able = N_("I am a translatable string")
         self.ed = self.nl.gettext("I am a translated string")
@@ -65,13 +65,13 @@ class TestSingularClassbased(testsuite.TestCase):
 # helper class for gettext API tests
 class TestGettext(testsuite.TestCase):
     def setUp(self):
-        self.oldlocaledir = gettext.bindtextdomain('flumotion')
+        self.oldlocaledir = gettext.bindtextdomain(configure.PACKAGE)
         self.oldlocale = locale.setlocale(locale.LC_MESSAGES)
 
         # switch to nl
         localedir = os.path.join(configure.localedatadir, 'locale')
-        gettext.bindtextdomain('flumotion', localedir)
-        gettext.textdomain('flumotion')
+        gettext.bindtextdomain(configure.PACKAGE, localedir)
+        gettext.textdomain(configure.PACKAGE)
         # FIXME: for some reason locale.setlocale does not work, only env
         #locale.setlocale(locale.LC_ALL, "nl_NL")
         os.environ['LANG'] = 'nl_NL'
@@ -80,7 +80,7 @@ class TestGettext(testsuite.TestCase):
         os.environ['LANGUAGE'] = 'nl_NL'
 
     def tearDown(self):
-        gettext.bindtextdomain('flumotion', self.oldlocaledir)
+        gettext.bindtextdomain(configure.PACKAGE, self.oldlocaledir)
         locale.setlocale(locale.LC_MESSAGES, self.oldlocale)
 
 class TestSingularGettext(TestGettext):

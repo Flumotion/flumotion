@@ -30,7 +30,7 @@ from flumotion.common import messages
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class Soundcard(feedcomponent.ParseLaunchComponent):

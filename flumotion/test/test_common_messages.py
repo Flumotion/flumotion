@@ -37,7 +37,7 @@ from flumotion.common.messages import N_, ngettext
 
 
 # translatablers
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class SerializeTest(testsuite.TestCase):
@@ -67,7 +67,7 @@ class SerializeTest(testsuite.TestCase):
 class TranslatableTest(testsuite.TestCase):
     def testTranslatable(self):
         t = T_(N_("%s can be translated"), "I")
-        self.assertEquals(t.domain, "flumotion")
+        self.assertEquals(t.domain, configure.PACKAGE)
         self.assertEquals(t.format, "%s can be translated")
         self.assertEquals(t.args, ("I",))
 
@@ -75,7 +75,7 @@ class TranslatableTest(testsuite.TestCase):
         # Andy 3 is a droid in the Andy series and doesn't need translating
         t = T_(ngettext("%s %d has %d thing", "%s %d has %d things", 5),
             "Andy", 3, 5)
-        self.assertEquals(t.domain, "flumotion")
+        self.assertEquals(t.domain, configure.PACKAGE)
         self.assertEquals(t.singular, "%s %d has %d thing")
         self.assertEquals(t.plural, "%s %d has %d things")
         self.assertEquals(t.count, 5)
@@ -84,7 +84,7 @@ class TranslatableTest(testsuite.TestCase):
 
         # now translate to nl_NL
         localedir = os.path.join(configure.localedatadir, 'locale')
-        self.nl = gettext.translation("flumotion", localedir, ["nl_NL"])
+        self.nl = gettext.translation(configure.PACKAGE, localedir, ["nl_NL"])
         self.failUnless(self.nl)
         text = self.nl.ngettext(t.singular, t.plural, t.count) % t.args
         self.assertEquals(text, "Andy 3 heeft 5 dingen")
@@ -95,7 +95,7 @@ class TranslatorTest(testsuite.TestCase):
 
         translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
-        translator.addLocaleDir('flumotion', localedir)
+        translator.addLocaleDir(configure.PACKAGE, localedir)
         text = translator.translateTranslatable(t, lang=["nl_NL"])
         self.assertEquals(text, 'Andy kan vertaald worden')
 
@@ -107,7 +107,7 @@ class TranslatorTest(testsuite.TestCase):
 
         translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
-        translator.addLocaleDir('flumotion', localedir)
+        translator.addLocaleDir(configure.PACKAGE, localedir)
 
         text = translator.translate(mmsg, lang=["nl_NL"])
         self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
@@ -116,7 +116,7 @@ class ResultTest(testsuite.TestCase):
     def setUp(self):
         self.translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
-        self.translator.addLocaleDir('flumotion', localedir)
+        self.translator.addLocaleDir(configure.PACKAGE, localedir)
 
     def testSerializeWithWarning(self):
         wresult = messages.Result()

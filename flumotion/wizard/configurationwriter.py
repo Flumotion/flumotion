@@ -86,7 +86,7 @@ class ConfigurationWriter(XMLWriter):
         # and "version" should be taken from the relevant project
         attrs = [('name', component.name),
                  ('type', component.componentType),
-                 ('project', 'flumotion'),
+                 ('project', configure.PACKAGE),
                  ('worker', component.worker),
                  ('version', configure.version)]
         self.pushTag('component', attrs)

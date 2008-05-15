@@ -32,7 +32,7 @@ from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 OSS_DEVICES = ["/dev/dsp",
                "/dev/dsp1",

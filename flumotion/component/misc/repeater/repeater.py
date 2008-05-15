@@ -24,7 +24,7 @@ from flumotion.component import feedcomponent
 
 from flumotion.common.messages import N_
 
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 __version__ = "$Rev$"
 
 

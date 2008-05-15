@@ -33,7 +33,7 @@ from flumotion.common.keycards import KeycardUACPP
 __all__ = ['IPBouncer']
 __version__ = "$Rev$"
 N_ = messages.N_
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class IPBouncer(bouncer.Bouncer):

@@ -37,12 +37,13 @@ from flumotion.common import errors, log, common, messages
 from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
 from flumotion.common.messages import N_
 from flumotion.common.planet import AdminFlowState
+from flumotion.configure import configure
 from flumotion.twisted import flavors
 from flumotion.ui.fgtk import ProxyWidgetMapping
 
 _ = gettext.gettext
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class BaseAdminGtk(log.Loggable):
@@ -211,7 +212,7 @@ class BaseAdminGtkNode(log.Loggable):
     logCategory = "admingtk"
     gladeFile = None ## Relative path of the glade file.
                       ##   e.g. "flumotion/ui.glade"
-    gettextDomain = 'flumotion'
+    gettextDomain = configure.PACKAGE
 
     def __init__(self, state, admin, title=None):
         """
@@ -263,7 +264,7 @@ class BaseAdminGtkNode(log.Loggable):
                                               *args, **kwargs)
 
     # FIXME: do this automatically if there is a gladeFile class attr set
-    def loadGladeFile(self, gladeFile, domain='flumotion'):
+    def loadGladeFile(self, gladeFile, domain=configure.PACKAGE):
         """
         Returns: a deferred returning the widget tree from the glade file.
         """

@@ -35,7 +35,7 @@ from flumotion.common import log, errors, messages
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class ProcessProtocol(protocol.ProcessProtocol):

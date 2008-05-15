@@ -292,7 +292,7 @@ class ConfigEntryComponent(log.Loggable):
                   'type': self.type,
                   'config-version': CURRENT_VERSION,
                   'avatarId': common.componentId(self.parent, self.name),
-                  'project': project or 'flumotion',
+                  'project': project or configure.PACKAGE,
                   'version': self._buildVersionTuple(version),
                   'clock-master': isClockMaster or None,
                   'feed': self.defs.getFeeders(),

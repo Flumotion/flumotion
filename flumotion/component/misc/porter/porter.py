@@ -39,7 +39,7 @@ import socket, string, os, random
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class PorterAvatar(pb.Avatar, log.Loggable):

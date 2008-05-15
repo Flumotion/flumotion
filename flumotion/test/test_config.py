@@ -23,8 +23,8 @@ from StringIO import StringIO
 
 from flumotion.common import registry, errors
 from flumotion.common import testsuite
+from flumotion.configure import configure
 from flumotion.manager import config
-
 
 
 regchunk = """
@@ -292,7 +292,7 @@ class TestConfig(testsuite.TestCase):
         flow = conf.flows[0]
         self.failUnless(flow.components.has_key('component-name'))
         conf = flow.components['component-name'].getConfigDict()
-        self.assertEquals(conf['project'], 'flumotion', conf['type'])
+        self.assertEquals(conf['project'], configure.PACKAGE, conf['type'])
         self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
 
         # now the same, but without specifying project
@@ -312,7 +312,7 @@ class TestConfig(testsuite.TestCase):
         flow = conf.flows[0]
         self.failUnless(flow.components.has_key('component-name'))
         conf = flow.components['component-name'].getConfigDict()
-        self.assertEquals(conf['project'], 'flumotion', conf['type'])
+        self.assertEquals(conf['project'], configure.PACKAGE, conf['type'])
         self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
 
     def testParseManager(self):

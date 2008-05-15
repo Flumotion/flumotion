@@ -43,7 +43,7 @@ from flumotion.common.messages import N_
 
 __all__ = ['Disker']
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 

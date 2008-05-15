@@ -50,7 +50,7 @@ from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 
 class HTTPStreamer(Consumer):

@@ -34,7 +34,7 @@ from flumotion.wizard.models import VideoProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 
 class WebcamProducer(VideoProducer):

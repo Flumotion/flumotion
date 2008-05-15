@@ -51,7 +51,7 @@ from flumotion.common.messages import N_
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 LOCAL_IDENTITY = LocalIdentity('manager')
 
 

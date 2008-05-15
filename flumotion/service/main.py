@@ -23,7 +23,7 @@ from flumotion.service import service
 from flumotion.common.options import OptionParser
 
 def main(args):
-    parser = OptionParser(domain="flumotion")
+    parser = OptionParser(domain=configure.PACKAGE)
 
     parser.add_option('-l', '--logfile',
                       action="store", dest="logfile",

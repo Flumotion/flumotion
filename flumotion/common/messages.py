@@ -48,7 +48,7 @@ def ngettext(singular, plural, count):
     """
     return (singular, plural, count)
 
-def gettexter(domain):
+def gettexter(domain=configure.PACKAGE):
     """
     Return a function that takes a format string or tuple, and additional
     format args,
@@ -251,7 +251,7 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     @ivar  description: the link text to show
     @type  description: L{flumotion.common.messages.Translatable}
     """
-    project = 'flumotion'
+    project = configure.PACKAGE
     version = configure.version
 
     # these properties allow linking to the documentation

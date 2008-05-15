@@ -37,7 +37,6 @@ from flumotion.configure import configure
 
 __version__ = "$Rev$"
 
-
 def version(binary):
     """
     Print a version block for the flumotion binaries.

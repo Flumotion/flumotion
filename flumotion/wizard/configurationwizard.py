@@ -43,7 +43,7 @@ from flumotion.wizard.workerstep import WorkerWizardStep
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 _ = gettext.gettext
 
 

@@ -33,7 +33,7 @@ from flumotion.twisted import defer as fdefer
 from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class BusResolution(fdefer.Resolution):

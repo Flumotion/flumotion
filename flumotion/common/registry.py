@@ -256,7 +256,7 @@ class RegistryEntryBundle:
         return self.under
 
     def getBaseDir(self):
-        if self.project == 'flumotion':
+        if self.project == configure.PACKAGE:
             return getattr(configure, self.under)
 
         from flumotion.project import project
@@ -807,7 +807,7 @@ class RegistryParser(fxml.Parser):
 
         attrs = self.parseAttributes(node, ('name',), ('project', 'under'))
         name, project, under = attrs
-        project = project or 'flumotion'
+        project = project or configure.PACKAGE
         under = under or 'pythondir'
 
         dependencies = []
@@ -1030,7 +1030,7 @@ class RegistryDirectory(log.Loggable):
     I can be queried for a list of partial registry .xml files underneath
     the given path, under the given prefix.
     """
-    def __init__(self, path, prefix='flumotion'):
+    def __init__(self, path, prefix=configure.PACKAGE):
         self._path = path
         self._prefix = prefix
         scanPath = os.path.join(path, prefix)
@@ -1336,7 +1336,7 @@ class ComponentRegistry(log.Loggable):
         self.addFile(f)
         f.close()
 
-    def addRegistryPath(self, path, prefix='flumotion'):
+    def addRegistryPath(self, path, prefix=configure.PACKAGE):
         """
         Add a registry path to this registry, scanning it for registry
         snippets.

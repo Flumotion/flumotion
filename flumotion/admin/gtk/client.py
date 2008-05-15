@@ -53,7 +53,7 @@ admin # pyflakes
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 MAIN_UI = """
 <ui>

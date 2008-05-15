@@ -40,7 +40,7 @@ from flumotion.twisted import fdserver
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 STATS_POLL_INTERVAL = 10
 UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
                                 # seconds

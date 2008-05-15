@@ -44,7 +44,7 @@ from flumotion.twisted import pb as fpb
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """

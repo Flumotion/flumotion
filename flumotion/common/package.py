@@ -28,8 +28,10 @@ import os
 import sys
 import glob
 
-from flumotion.common import log, common
 from twisted.python import rebuild, reflect
+
+from flumotion.common import log, common
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 
@@ -98,7 +100,7 @@ class Packager(log.Loggable):
 
         return [self._paths[key] for key in self._packages[packageName]]
 
-    def registerPackagePath(self, packagePath, key, prefix='flumotion'):
+    def registerPackagePath(self, packagePath, key, prefix=configure.PACKAGE):
         """
         Register a given path as a path that can be imported from.
         Used to support partition of bundled code or import code from various
@@ -343,7 +345,7 @@ def _listPyFileRecursively(path):
 
     return retval
 
-def _findPackageCandidates(path, prefix='flumotion'):
+def _findPackageCandidates(path, prefix=configure.PACKAGE):
     """
     I take a directory and return a list of candidate python packages
     under that directory that start with the given prefix.
@@ -390,7 +392,7 @@ def _findPackageCandidates(path, prefix='flumotion'):
 
     return bundlePackages
 
-def findEndModuleCandidates(path, prefix='flumotion'):
+def findEndModuleCandidates(path, prefix=configure.PACKAGE):
     """
     I take a directory and return a list of candidate python end modules
     (i.e., non-package modules) for the given module prefix.

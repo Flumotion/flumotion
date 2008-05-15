@@ -24,7 +24,7 @@ from flumotion.worker.checks import check
 from flumotion.common import messages
 
 from flumotion.common.messages import N_
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 class Dirac(feedcomponent.ParseLaunchComponent):
     checkTimestamp = True

@@ -36,7 +36,7 @@ from flumotion.worker import base
 
 __version__ = "$Rev$"
 N_ = messages.N_
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class ComponentJobAvatar(base.BaseJobAvatar):

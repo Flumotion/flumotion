@@ -26,7 +26,7 @@ from flumotion.worker.checks import check
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class Theora(feedcomponent.ParseLaunchComponent):

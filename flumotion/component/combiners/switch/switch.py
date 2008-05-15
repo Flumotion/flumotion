@@ -35,7 +35,7 @@ from flumotion.component.plugs import base
 from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):

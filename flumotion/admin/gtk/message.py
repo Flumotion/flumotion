@@ -112,7 +112,7 @@ class MessagesView(gtk.VBox):
         self._translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
         # FIXME: add locales as messages from domains come in
-        self._translator.addLocaleDir('flumotion', localedir)
+        self._translator.addLocaleDir(configure.PACKAGE, localedir)
 
     def clear(self):
         """

@@ -32,7 +32,7 @@ from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 
 class OnDemand(HTTPServer):

@@ -1,5 +1,66 @@
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/message.py:
+	* flumotion/common/common.py:
+	* flumotion/common/format.py:
+	* flumotion/common/messages.py:
+	* flumotion/common/package.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/worker.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/bouncers/ipbouncer.py:
+	* flumotion/component/combiners/switch/patternswitch.py:
+	* flumotion/component/combiners/switch/switch.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/encoders/dirac/dirac.py:
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/repeater/repeater.py:
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/screencast/screencast.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/config.py:
+	* flumotion/manager/manager.py:
+	* flumotion/service/main.py:
+	* flumotion/test/test_common_messages.py:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_i18n.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/worker/checks/audio.py:
+	* flumotion/worker/checks/check.py:
+	* flumotion/worker/checks/encoder.py:
+	* flumotion/worker/checks/gst010.py:
+	* flumotion/worker/job.py:
+	Use configure.PACKAGE instead of 'flumotion', when referring to:
+	- the gettext domain
+	- the default bundle project
+
+2008-05-15  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/rrdmon/main.py:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/common.py:

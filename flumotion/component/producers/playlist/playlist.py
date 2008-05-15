@@ -36,7 +36,7 @@ import singledecodebin
 import playlistparser
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 def _tsToString(ts):

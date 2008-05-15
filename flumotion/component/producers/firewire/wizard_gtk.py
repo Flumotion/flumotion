@@ -35,7 +35,7 @@ from flumotion.wizard.models import AudioProducer, VideoProducer, \
 __pychecker__ = 'no-returnvalues'
 __version__ = "$Rev$"
 _ = gettext.gettext
-T_ = gettexter('flumotion')
+T_ = gettexter()
 
 
 class FireWireProducer(AudioProducer, VideoProducer):

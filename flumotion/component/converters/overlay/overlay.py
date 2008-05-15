@@ -32,7 +32,7 @@ from flumotion.component.converters.overlay import genimg
 
 __version__ = "$Rev$"
 N_ = messages.N_
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class Overlay(feedcomponent.ParseLaunchComponent):

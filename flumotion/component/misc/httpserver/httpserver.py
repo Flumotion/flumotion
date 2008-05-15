@@ -39,7 +39,7 @@ from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 class CancellableRequest(server.Request):
 

@@ -35,7 +35,7 @@ from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"
-T_ = messages.gettexter('flumotion')
+T_ = messages.gettexter()
 
 
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):

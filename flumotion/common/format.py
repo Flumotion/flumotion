@@ -27,6 +27,8 @@ import locale
 import sys
 import time
 
+from flumotion.configure import configure
+
 _ = gettext.gettext
 __version__ = "$Rev$"
 N_ = lambda m: m
@@ -96,16 +98,16 @@ def formatTime(seconds, fractional=0):
     minute = 60
     minutes = seconds / minute
     seconds %= minute
-    
+
     if weeks >= 1:
         chunks.append(gettext.dngettext(
-            'flumotion',
+            configure.PACKAGE,
             N_('%d week'), N_('%d weeks'), weeks) % weeks)
     if days >= 1:
         chunks.append(gettext.dngettext(
-            'flumotion',
+            configure.PACKAGE,
             N_('%d day'), N_('%d days'), days) % days)
-        
+
     chunk = _('%02d:%02d') % (hours, minutes)
     if fractional > 0:
         chunk += ':%0*.*f' % (fractional + 3, fractional, seconds)
