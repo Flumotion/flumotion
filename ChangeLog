@@ -1,5 +1,12 @@
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/common.py (writePidFile): 
+	Refactor to avoid duplication.
+	Set chmod to 644 of created pid files.
+	Fixes #847
+
+2008-05-15  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/connections.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/dialogs.py:

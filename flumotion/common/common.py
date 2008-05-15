@@ -241,18 +241,16 @@ def writePidFile(type, name=None, file=None):
     @rtype:   str
     @returns: full path to the pid file that was written
     """
-    pid = os.getpid()
-    if not file:
+    if file is None:
         ensureDir(configure.rundir, "rundir")
-        path = getPidPath(type, name)
-        file = open(path, 'w')
-        file.write("%d\n" % pid)
-        file.close()
-        return path
+        filename = getPidPath(type, name)
+        file = open(filename, 'w')
     else:
-        file.write("%d\n" % pid)
-        file.close()
-        return file.name
+        filename = file.name
+    file.write("%d\n" % (os.getpid(),))
+    file.close()
+    os.chmod(filename, 0644)
+    return filename
 
 def _acquirePidFile(type, name=None):
     """
