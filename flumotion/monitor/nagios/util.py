@@ -38,6 +38,11 @@ class LogCommand(command.Command, log.Loggable):
         command.Command.__init__(self, parentCommand, **kwargs)
         self.logCategory = self.name
 
+    # command.Command has a fake debug method, so choose the right one
+    def debug(self, format, *args):
+        kwargs = {}
+        log.Loggable.doLog(self, log.DEBUG, -2, format, *args, **kwargs)
+
 def findComponent(planet, avatarId):
     """
     Finds the component with the given avatarId in the given planet.

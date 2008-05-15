@@ -106,7 +106,7 @@ class Mood(util.LogCommand):
 # the exit value.
 
 class Manager(util.LogCommand):
-    usage = "%prog %command"
+    usage = "manager [-m manager-string] %command"
     description = "Run Nagios checks on Flumotion manager."
 
     managerDeferred = None # deferred that fires upon connection
@@ -115,9 +115,6 @@ class Manager(util.LogCommand):
     subCommandClasses = [Mood, ]
 
     def addOptions(self):
-        self.parser.add_option('-v', '--version',
-            action="store_true", dest="version",
-            help="show version information")
         default = "user:test@localhost:7531"
         self.parser.add_option('-m', '--manager',
             action="store", type="string", dest="manager",
@@ -130,12 +127,6 @@ class Manager(util.LogCommand):
             help="transport protocol to use (tcp/ssl) [default ssl]",
             default="ssl")
 
-    def handleOptions(self, options):
-        self.debug('Nagios: handleOptions')
-        if options.version:
-            print common.version("flumotion-nagios")
-            return 0
-
     def parse(self, argv):
         self.managerDeferred = defer.Deferred()
 
@@ -143,10 +134,14 @@ class Manager(util.LogCommand):
         # chain up to parent first
         # all subcommands will have a chance to chain up to the deferred
         ret = util.LogCommand.parse(self, argv)
+        self.debug('parse: chained up')
 
         if ret:
             self.debug('parse returned %r' % ret)
             return ret
+
+        if self.parser.help_printed or self.parser.usage_printed:
+            return 0
 
         # now connect
         self.debug('parse: connect')

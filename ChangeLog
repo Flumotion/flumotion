@@ -1,6 +1,14 @@
 2008-05-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/main.py:
+	  Use changes to Command class to be able to stop parsing when
+	  usage or help is printed.
+	* flumotion/monitor/nagios/util.py:
+	  override .debug() properly
+
+2008-05-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/main.py:
 	  Put all manager-needing checks under a new command
 	  called manager.
 
