@@ -27,6 +27,8 @@ import gobject
 import gtk
 
 from flumotion.configure import configure
+from flumotion.common.errors import ConnectionFailedError, \
+     ConnectionRefusedError
 from flumotion.common.pygobject import gsignal
 
 __version__ = "$Rev$"
@@ -224,19 +226,22 @@ class AboutDialog(gtk.Dialog):
         info.set_line_wrap(True)
         info.show()
 
+def showConnectionErrorDialog(failure, info, parent=None):
+    if failure.check(ConnectionRefusedError):
+        title = _('Connection refused')
+        message = (
+            _('"%s" refused your connection.\n'
+              'Check your user name and password and try again.')
+            % (info.host,))
+    elif failure.check(ConnectionFailedError):
+        title = _('Connection failed')
+        message = (_("Connection to manager on %s failed (%s).")
+                   % (str(info), str(failure)))
+    else:
+        raise AssertionError(failure)
 
-def connection_refused_message(host, parent=None):
-    d = ErrorDialog(_('Connection refused'), parent, True,
-                    _('"%s" refused your connection.\n'
-                      'Check your user name and password and try again.')
-                    % (host,))
-    return d.run()
-
-def connection_failed_message(info, debug, parent=None):
-    message = (_("Connection to manager on %s failed (%s).")
-               % (str(info), debug))
-    d = ErrorDialog('Connection failed', parent, True, message)
-    return d.run()
+    dialog = ErrorDialog(title, parent, True, message)
+    return dialog.run()
 
 def already_connected_message(info, parent=None):
     d = ErrorDialog(_('Already connected to %s') % (info,), parent, True,

@@ -113,6 +113,7 @@ class WizardStep(GladeWidget, log.Loggable):
         # vmethod
         pass
 
+
 class SimpleWizard(GladeWindow):
     """
     A simple generic wizard.
@@ -265,7 +266,7 @@ class SimpleWizard(GladeWindow):
         or closes the wizard.
         """
         loop = gobject.MainLoop()
-        d = self.run_async()
+        d = self.runAsync()
         def async_done(_):
             loop.quit()
         d.addCallbacks(async_done, async_done)
@@ -275,7 +276,7 @@ class SimpleWizard(GladeWindow):
     def stop(self):
         self.window.destroy()
 
-    def run_async(self):
+    def runAsync(self):
         """
         Show the wizard. Returns a deferred that fires when the user has
         closed the wizard, either via completing the process or has

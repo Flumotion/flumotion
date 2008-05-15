@@ -41,9 +41,16 @@ def check_prev_next(can_prev, can_next):
     assert_sensitive('button_prev', can_prev)
     assert_sensitive('button_next', can_next)
 
+class FakeAdminWindow:
+    def __init__(self):
+        pass
+
+    def getWindow(self):
+        return None
+
 class WizardTest(testsuite.TestCase):
     def testGreeter(self):
-        wiz = greeter.Greeter()
+        wiz = greeter.Greeter(FakeAdminWindow())
         ass = self.assert_
         ass(isinstance(wiz, SimpleWizard))
         ass(isinstance(wiz.name, str))
@@ -81,10 +88,13 @@ class WizardTest(testsuite.TestCase):
         wiz.hide()
         gtk.main_iteration()
         wiz.destroy()
-        # I don't know why it needs so many, but it seems it does to actually
-        # unmap the window
-        for i in range(1, 32): gtk.main_iteration()
 
-        refstate = {'passwd': 'baz', 'host': 'foolio', 'port': 8642,
-                    'use_insecure': True, 'user': 'bar'}
-        self.assertEquals(state, refstate)
+        while gtk.events_pending():
+            gtk.main_iteration()
+
+        self.assertEquals(state.get('passwd'), 'baz')
+        self.assertEquals(state.get('host'), 'foolio')
+        self.assertEquals(state.get('port'), 8642)
+        self.assertEquals(state.get('use_insecure'), True)
+        self.assertEquals(state.get('user'), 'bar')
+        self.failUnless('connectionInfo' in state)

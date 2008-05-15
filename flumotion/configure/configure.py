@@ -112,6 +112,8 @@ _config['heartbeatInterval'] = 5
 
 _config['bindir'] = os.path.dirname(os.path.abspath(sys.argv[0]))
 
+_config['PACKAGE'] = 'flumotion'
+
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))
     if len (t) < 4:

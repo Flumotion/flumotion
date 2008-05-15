@@ -28,75 +28,45 @@ from twisted.internet import reactor
 from twisted.python import log as twistedlog
 
 from flumotion.admin import connections
-from flumotion.admin.admin import AdminModel
-from flumotion.common import log, errors, connection
+from flumotion.common import log, connection
+from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.configure import configure
-from flumotion.twisted import pb as fpb
 from flumotion.common.options import OptionParser
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 
+def _installGettext():
+    import locale
 
-def startAdminFromGreeter(greeter=None):
-    if greeter is None:
-        from flumotion.admin.gtk.greeter import Greeter
-        greeter = Greeter()
+    localedir = os.path.join(configure.localedatadir, 'locale')
+    log.debug("locale", "Loading locales from %s" % localedir)
+    gettext.bindtextdomain(configure.PACKAGE, localedir)
+    gettext.textdomain(configure.PACKAGE)
+    locale.bindtextdomain(configure.PACKAGE, localedir)
+    locale.textdomain(configure.PACKAGE)
 
-    # fuck python's lexicals!
-    _info = []
+def _connectToManager(win, manager, ssl):
+    try:
+        info = connections.parsePBConnectionInfo(manager, ssl)
+    except OptionError, e:
+        raise SystemExit("ERROR: %s" % (e,))
 
-    def got_state(state):
-        greeter.set_sensitive(False)
-        authenticator = fpb.Authenticator(username=state['user'],
-                                          password=state['passwd'])
-        info = connection.PBConnectionInfo(state['host'], state['port'],
-                                           not state['use_insecure'],
-                                           authenticator)
-        _info.append(info)
-
-        model = AdminModel()
-        return model.connectToManager(info)
-
-    def connectionRefused(failure):
-        from flumotion.admin.gtk import dialogs
-        failure.trap(errors.ConnectionRefusedError)
-        dret = dialogs.connection_refused_message(greeter.state['host'],
-                                                  greeter.window)
-        dret.addCallback(lambda _: startAdminFromGreeter(greeter))
-        return dret
-
-    def connectionFailed(failure):
-        from flumotion.admin.gtk import dialogs
-        failure.trap(errors.ConnectionFailedError)
-        message = "".join(failure.value.args)
-        dret = dialogs.connection_failed_message(_info[0], message,
-                                                 greeter.window)
-        dret.addCallback(lambda _: startAdminFromGreeter(greeter))
-        return dret
-
-    def wizardCancelled(failure):
-        from flumotion.ui.simplewizard import WizardCancelled
-        failure.trap(WizardCancelled)
+    d = win.openConnection(info)
+    def errbackConnectionRefused(failure):
+        failure.trap(ConnectionRefusedError)
+        print >> sys.stderr, _(
+            "ERROR: Could not connect to manager:\n"
+            "       The connection to %r was refused.") % (
+            manager,)
         reactor.stop()
 
-    def connected(model):
-        greeter.destroy()
-        return model
-
-    d = greeter.run_async()
-    d.addCallback(got_state)
-    d.addCallback(connected)
-    d.addErrback(connectionFailed)
-    d.addErrback(connectionRefused)
-    d.addErrback(wizardCancelled)
-
+    def errback(failure):
+        print >> sys.stderr, "ERROR: %s" % (failure.value,)
+        reactor.stop()
+    d.addErrback(errbackConnectionRefused)
+    d.addErrback(errback)
     return d
-
-def startAdminFromManagerString(managerString, useSSL):
-    info = connections.parsePBConnectionInfo(managerString, useSSL)
-    model = AdminModel()
-    return model.connectToManager(info)
 
 def main(args):
     parser = OptionParser(domain="flumotion-admin")
@@ -104,56 +74,36 @@ def main(args):
                       action="store", type="string", dest="manager",
                       help="the manager to connect to, e.g. localhost:7531")
     parser.add_option('', '--no-ssl',
-                      action="store_true", dest="no_ssl",
+                      action="store_false", dest="ssl",
                       help="disable encryption when connecting to the manager")
 
     options, args = parser.parse_args(args)
 
-    # set up gettext
-    localedir = os.path.join(configure.localedatadir, 'locale')
-    log.debug("locale", "Loading locales from %s" % localedir)
-    gettext.bindtextdomain('flumotion', localedir)
-    gettext.textdomain('flumotion')
+    _installGettext()
 
     if len(args) > 1:
         log.error('flumotion-admin',
                   'too many arguments: %r' % (args[1:],))
+        return 1
 
-    import gtk.glade
-    gtk.glade.bindtextdomain('flumotion', localedir)
-    gtk.glade.textdomain('flumotion')
+    from flumotion.ui.icons import register_icons
+    register_icons()
+
+    from flumotion.admin.gtk.client import AdminClientWindow
+    win = AdminClientWindow()
+
+    if options.verbose or (options.debug and options.debug > 3):
+        win.setDebugEnabled(True)
 
     if options.manager:
-        d = startAdminFromManagerString(options.manager,
-                                        not options.no_ssl)
+        d = _connectToManager(win, options.manager, options.ssl)
     else:
-        d = startAdminFromGreeter()
-
-    def adminStarted(admin):
-        if admin is None:
-            return
-
-        from flumotion.ui.icons import register_icons
-        register_icons()
-
-        from flumotion.admin.gtk.client import AdminClientWindow
-        win = AdminClientWindow()
-
-        if options.verbose or (options.debug and options.debug > 3):
-            win.setDebugEnabled(True)
-        win.setAdminModel(admin)
-        win.show()
-
-    def errback(failure):
-        message = "".join(failure.value.args)
-        log.warning('admin', "Failed to connect: %s",
-                    log.getFailureMessage(failure))
-        sys.stderr.write(_("Connection to manager failed: %s\n") % message)
-        reactor.stop()
-
-    d.addCallbacks(adminStarted, errback)
+        from flumotion.admin.gtk.greeter import Greeter
+        greeter = Greeter(win)
+        d = greeter.runAsync()
 
     # Printout unhandled exception to stderr
     d.addErrback(twistedlog.err)
 
     reactor.run()
+    return 0

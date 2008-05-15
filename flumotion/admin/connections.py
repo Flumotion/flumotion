@@ -39,7 +39,7 @@ class RecentConnection(object):
         self.timestamp = datetime.datetime.fromtimestamp(
             os.stat(filename).st_ctime)
 
-    def update_timestamp(self):
+    def updateTimestamp(self):
         os.utime(self.filename, None)
 
 

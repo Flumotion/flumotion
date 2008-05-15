@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -26,30 +26,27 @@ import sys
 import gobject
 import gtk
 from gtk import glade
-from twisted.internet import reactor
-from twisted.internet.defer import maybeDeferred
+from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.connections import get_recent_connections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
-     ProgressDialog, PropertyChangeDialog, connection_failed_message, \
-     connection_refused_message
+     ProgressDialog, PropertyChangeDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.parts import getComponentLabel, ComponentsView, \
      AdminStatusbar
 from flumotion.configure import configure
 from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
-from flumotion.common.errors import ConnectionRefusedError, PropertyError, \
-     ReloadSyntaxError
+from flumotion.common.errors import ConnectionRefusedError, \
+     ConnectionFailedError, PropertyError
 from flumotion.common.log import Loggable
 from flumotion.common.messages import gettexter
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
-from flumotion.twisted.pb import Authenticator
 from flumotion.ui.trayicon import FluTrayIcon
 
 admin # pyflakes
@@ -211,31 +208,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def show(self):
         self._window.show()
 
-    def setAdminModel(self, model):
-        'set the model to which we are a view/controller'
-        # it's ok if we've already been connected
-        self.debug('setting model')
-
-        if self._admin:
-            self.debug('Connecting to new model %r' % model)
-            if self._wizard:
-                self._wizard.destroy()
-
-        self._admin = model
-
-        # window gets created after model connects initially, so check
-        # here
-        if self._admin.isConnected():
-            self._connection_opened(model)
-
-        self._admin.connect('connected', self._admin_connected_cb)
-        self._admin.connect('disconnected', self._admin_disconnected_cb)
-        self._admin.connect('connection-refused',
-                           self._admin_connection_refused_cb)
-        self._admin.connect('connection-failed',
-                           self._admin_connection_failed_cb)
-        self._admin.connect('update', self._admin_update_cb)
-
     def setDebugEnabled(self, enabled):
         """Set if debug should be enabled for the admin client window
         @param enable: if debug should be enabled
@@ -244,6 +216,21 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._debugActions.set_sensitive(enabled)
         self._debugEnableAction.set_active(enabled)
         self._component_view.setDebugEnabled(enabled)
+
+    def getWindow(self):
+        """Get the gtk window for the admin interface
+        @returns: window
+        @rtype: gtk.Window
+        """
+        return self._window
+
+    def openConnection(self, info):
+        """Connects to a manager given a connection info
+        @param info: connection info
+        @type info: L{PBConnectionInfo}
+        """
+        assert isinstance(info, PBConnectionInfo), info
+        return self._openConnection(info)
 
     # Private
 
@@ -431,13 +418,77 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def _on_tool_button__leave(self, toolbutton):
         self.statusbar.pop('main')
 
+    def _setAdminModel(self, model):
+        'set the model to which we are a view/controller'
+        # it's ok if we've already been connected
+        self.debug('setting model')
+
+        if self._admin:
+            self.debug('Connecting to new model %r' % model)
+            if self._wizard:
+                self._wizard.destroy()
+
+        self._admin = model
+
+        # window gets created after model connects initially, so check
+        # here
+        if self._admin.isConnected():
+            self._connection_opened(model)
+
+        self._admin.connect('connected', self._admin_connected_cb)
+        self._admin.connect('disconnected', self._admin_disconnected_cb)
+        self._admin.connect('connection-refused',
+                           self._admin_connection_refused_cb)
+        self._admin.connect('connection-failed',
+                           self._admin_connection_failed_cb)
+        self._admin.connect('update', self._admin_update_cb)
+
+    def _openConnection(self, info):
+        self._trayicon.set_tooltip(_("Connecting to %s:%s") % (
+            info.host, info.port))
+
+        def connected(model):
+            self._setAdminModel(model)
+            self._append_recent_connections()
+
+        model = AdminModel()
+        d = model.connectToManager(info)
+        d.addCallback(connected)
+        return d
+
+    def _openConnectionInternal(self, info):
+        d = self._openConnection(info)
+
+        def errorMessageDisplayed(unused):
+            self._window.set_sensitive(True)
+
+        def connected(model):
+            self._window.set_sensitive(True)
+
+        def errbackConnectionRefusedError(failure):
+            failure.trap(ConnectionRefusedError)
+            d = showConnectionErrorDialog(failure, info, parent=self._window)
+            d.addCallback(errorMessageDisplayed)
+
+        def errbackConnectionFailedError(failure):
+            failure.trap(ConnectionFailedError)
+            d = showConnectionErrorDialog(failure, info, parent=self._window)
+            d.addCallback(errorMessageDisplayed)
+            return d
+
+        d.addCallback(connected)
+        d.addErrback(errbackConnectionRefusedError)
+        d.addErrback(errbackConnectionFailedError)
+        self._window.set_sensitive(False)
+        return d
+
     def _append_recent_connections(self):
         if self._recent_menu_uid:
             self._uimgr.remove_ui(self._recent_menu_uid)
             self._uimgr.ensure_update()
 
         def recent_activate(action, conn):
-            self._open_connection(conn.info)
+            self._openConnectionInternal(conn.info)
 
         ui = ""
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
@@ -519,32 +570,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin.disconnect_by_func(self._admin_connection_failed_cb)
         self._admin.disconnect_by_func(self._admin_update_cb)
         self._admin = None
-
-    def _open_connection(self, info):
-        assert isinstance(info, PBConnectionInfo)
-
-        model = AdminModel()
-        d = model.connectToManager(info)
-
-        self._trayicon.set_tooltip(_("Connecting to %(host)s:%(port)s") % {
-            'host': info.host,
-            'port': info.port,
-        })
-
-        def connected(model):
-            self._window.set_sensitive(True)
-            self.setAdminModel(model)
-            self._append_recent_connections()
-
-        def refused(failure):
-            if failure.check(ConnectionRefusedError):
-                d = connection_refused_message(info.host, self._window)
-            else:
-                d = connection_failed_message(info, str(failure), self._window)
-            d.addCallback(lambda _: self._window.set_sensitive(True))
-
-        d.addCallbacks(connected, refused)
-        self._window.set_sensitive(False)
 
     def _update_component_actions(self):
         state = self._current_component_state
@@ -908,23 +933,18 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self.debug("handled connection-refused")
 
     def _connection_failed(self, reason):
-        def failed_later():
-            self._fatal_error(
-                _("Connection to manager on %s failed (%s).") % (
-                self._admin.connectionInfoStr(), reason),
-                _("Connection to %s failed") % self._admin.adminInfoStr())
-
-        self.debug("handling connection-failed")
-        reactor.callLater(0, failed_later)
-        self.debug("handled connection-failed")
+        return self._fatal_error(
+            _("Connection to manager on %s failed (%s).") % (
+            self._admin.connectionInfoStr(), reason),
+            _("Connection to %s failed") % self._admin.adminInfoStr())
 
     def _open_recent_connection(self):
         d = ConnectionsDialog(parent=self._window)
 
         def on_have_connection(d, connectionInfo):
             d.destroy()
-            self._open_connection(connectionInfo.info)
-            connectionInfo.update_timestamp()
+            self._openConnectionInternal(connectionInfo.info)
+            connectionInfo.updateTimestamp()
 
         d.connect('have-connection', on_have_connection)
         d.show()
@@ -936,19 +956,14 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         def got_state(state, g):
             g.set_sensitive(False)
-            authenticator = Authenticator(username=state['user'],
-                                          password=state['passwd'])
-            info = PBConnectionInfo(state['host'], state['port'],
-                                    not state['use_insecure'],
-                                    authenticator)
             g.destroy()
-            self._open_connection(info)
+            self._openConnectionInternal(state['connectionInfo'])
 
         def cancel(failure):
             failure.trap(WizardCancelled)
             wiz.stop()
 
-        d = wiz.run_async()
+        d = wiz.runAsync()
         d.addCallback(got_state, wiz)
         d.addErrback(cancel)
 

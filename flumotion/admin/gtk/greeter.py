@@ -32,9 +32,13 @@ import gobject
 import gtk
 from twisted.internet import reactor, protocol, defer, error
 
+from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
+from flumotion.common.connection import parsePBConnectionInfo
+from flumotion.common.errors import ConnectionFailedError
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
-from flumotion.ui.simplewizard import WizardStep, SimpleWizard
+from flumotion.ui.simplewizard import SimpleWizard, WizardStep, \
+     WizardCancelled
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -141,6 +145,12 @@ class Authenticate(WizardStep):
     def on_next(self, state):
         for k, v in self.authenticate.get_state().items():
             state[k] = v
+        state['connectionInfo'] = parsePBConnectionInfo(
+            state['host'],
+            username=state['user'],
+            password=state['passwd'],
+            port=state['port'],
+            use_ssl=not state['use_insecure'])
         return '*finished*'
 
     # Callbacks
@@ -164,17 +174,9 @@ class LoadConnection(WizardStep):
 
     def on_next(self, state):
         connection = self.connections.get_selected()
-        info = connection.info
-        for k, v in (('host', info.host),
-                     ('port', info.port),
-                     ('use_insecure', not info.use_ssl),
-                     ('user', info.authenticator.username),
-                     ('passwd', info.authenticator.password)):
-            state[k] = v
+        state['connection'] = connection
+        state['connectionInfo'] = connection.info
         return '*finished*'
-
-    def is_available(self):
-        return self.connections.get_selected()
 
     # Callbacks
 
@@ -397,11 +399,52 @@ You can shut down the manager and worker later with the following command:
 class Greeter(SimpleWizard):
     name = 'greeter'
     steps = [Initial, ConnectToExisting, Authenticate, LoadConnection,
-        StartNew, StartNewError, StartNewSuccess]
+             StartNew, StartNewError, StartNewSuccess]
 
-    def __init__(self, parent=None):
-        SimpleWizard.__init__(self, 'initial', parent=parent)
+    def __init__(self, adminWindow):
+        self._adminWindow = adminWindow
+        SimpleWizard.__init__(self, 'initial',
+                              parent=adminWindow.getWindow())
         self.window1.set_size_request(-1, 450)
+
+    # SimpleWizard
+
+    def runAsync(self):
+        d = SimpleWizard.runAsync(self)
+        d.addCallback(self._runAsyncFinished)
+        d.addErrback(self._wizardCancelledErrback)
+        return d
+
+    # Private
+
+    def _runAsyncFinished(self, state):
+        connection = state.get('connection')
+        info = state['connectionInfo']
+
+        def connected(unused):
+            if connection is not None:
+                connection.updateTimestamp()
+
+        def errorMessageDisplayed(unused):
+            return self.runAsync()
+
+        def connectionFailed(failure):
+            failure.trap(ConnectionFailedError)
+            self.hide()
+            d = showConnectionErrorDialog(failure, info,
+                                          parent=self.window)
+            d.addCallback(errorMessageDisplayed)
+            return d
+
+        d = self._adminWindow.openConnection(info)
+        d.addCallbacks(connected, connectionFailed)
+        self.set_sensitive(False)
+        return d
+
+    def _wizardCancelledErrback(self, failure):
+        failure.trap(WizardCancelled)
+        reactor.stop()
+
 
 # This is used by the gtk admin to connect to an existing manager
 class ConnectExisting(SimpleWizard):

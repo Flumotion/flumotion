@@ -1,3 +1,18 @@
+2008-05-15  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/connections.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/configure/configure.py:
+	* flumotion/ui/simplewizard.py:
+	Refactoring connection handling.
+	This avoids a bit of duplication, improves the APIs.
+	Do some underscore->camelcase renaming.
+	gtk/main.py is considerably shorter and easier to understand.
+	Add a PACKAGE variable used by gettext.
+	
 2008-05-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/main.py:
