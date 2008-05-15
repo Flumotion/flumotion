@@ -26,8 +26,6 @@ small common functions used by all processes
 import os
 import time
 
-from twisted.internet import address
-
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
 #       really know what you're doing.
@@ -82,37 +80,6 @@ def ensureDir(dir, description):
                 "could not create %s directory %s: %s" % (
                 description, dir, str(e)))
 
-
-def addressGetHost(a):
-    """
-    Get the host name of an IPv4 address.
-
-    @type a: L{twisted.internet.address.IPv4Address}
-    """
-    if not isinstance(a, address.IPv4Address) and not isinstance(a,
-        address.UNIXAddress):
-        raise TypeError("object %r is not an IPv4Address or UNIXAddress" % a)
-    if isinstance(a, address.UNIXAddress):
-        return 'localhost'
-
-    try:
-        host = a.host
-    except AttributeError:
-        host = a[1]
-    return host
-
-def addressGetPort(a):
-    """
-    Get the port number of an IPv4 address.
-
-    @type a: L{twisted.internet.address.IPv4Address}
-    """
-    assert(isinstance(a, address.IPv4Address))
-    try:
-        port = a.port
-    except AttributeError:
-        port = a[2]
-    return port
 
 # FIXME: fix epydoc to correctly spell deprecated
 def componentPath(componentName, parentName):

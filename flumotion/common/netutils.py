@@ -23,11 +23,13 @@
 Miscellaneous network functions for use in flumotion.
 """
 
-import socket
-import fcntl
-import struct
 import array
+import fcntl
 import re
+import socket
+import struct
+
+from twisted.internet import address
 
 from flumotion.common import avltree
 
@@ -240,3 +242,34 @@ class RoutingTable(object):
                 yield route
         # Yield the default route
         yield None
+
+def addressGetHost(a):
+    """
+    Get the host name of an IPv4 address.
+
+    @type a: L{twisted.internet.address.IPv4Address}
+    """
+    if not isinstance(a, address.IPv4Address) and not isinstance(a,
+        address.UNIXAddress):
+        raise TypeError("object %r is not an IPv4Address or UNIXAddress" % a)
+    if isinstance(a, address.UNIXAddress):
+        return 'localhost'
+
+    try:
+        host = a.host
+    except AttributeError:
+        host = a[1]
+    return host
+
+def addressGetPort(a):
+    """
+    Get the port number of an IPv4 address.
+
+    @type a: L{twisted.internet.address.IPv4Address}
+    """
+    assert(isinstance(a, address.IPv4Address))
+    try:
+        port = a.port
+    except AttributeError:
+        port = a[2]
+    return port

@@ -21,11 +21,12 @@
 
 import StringIO
 
+from twisted.internet import address
+
+from flumotion.common import testsuite
 from flumotion.common.netutils import ipv4StringToInt, ipv4IntToString
 from flumotion.common.netutils import RoutingTable
-from flumotion.common import testsuite
-
-
+from flumotion.common.netutils import addressGetHost, addressGetPort
 
 
 class TestIpv4Parse(testsuite.TestCase):
@@ -210,3 +211,14 @@ class TestRoutingTable(testsuite.TestCase):
                                    '192.168.3.1/32 foo\n'
                                    ,
                                    ['foo', 'bar'])
+
+
+class TestAddress(testsuite.TestCase):
+    def setUp(self):
+        self.address = address.IPv4Address('TCP', 'localhost', '8000')
+
+    def testGetHost(self):
+        self.failUnlessEqual(addressGetHost(self.address), 'localhost')
+
+    def testGetPort(self):
+        self.failUnlessEqual(addressGetPort(self.address), '8000')

@@ -41,6 +41,7 @@ from zope.interface import implements
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
+from flumotion.common.netutils import addressGetHost
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base, config
@@ -163,7 +164,7 @@ class Dispatcher(log.Loggable):
 
         heaven = self._interfaceHeavens[iface]
         klass = heaven.avatarClass
-        host = common.addressGetHost(mind.broker.transport.getPeer())
+        host = addressGetHost(mind.broker.transport.getPeer())
         d = self._computeIdentity(keycard, host)
         d.addCallback(lambda identity: \
                       klass.makeAvatar(heaven, avatarId, identity, mind))

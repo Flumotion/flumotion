@@ -21,9 +21,7 @@
 
 import os
 import tempfile
-import time
 
-from twisted.internet import address
 from zope.interface import implements, Interface
 
 from flumotion.common import common
@@ -83,17 +81,6 @@ class TestEnsureDir(testsuite.TestCase):
         self.tempdir = tempfile.mkdtemp()
         common.ensureDir(self.tempdir, "a description")
         os.system("rm -r %s" % self.tempdir)
-
-
-class TestAddress(testsuite.TestCase):
-    def setUp(self):
-        self.address = address.IPv4Address('TCP', 'localhost', '8000')
-
-    def testGetHost(self):
-        self.failUnlessEqual(common.addressGetHost(self.address), 'localhost')
-
-    def testGetPort(self):
-        self.failUnlessEqual(common.addressGetPort(self.address), '8000')
 
 
 class TestObjRepr(testsuite.TestCase):

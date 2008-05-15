@@ -39,6 +39,7 @@ from zope.interface import implements
 from flumotion.configure import configure
 from flumotion.common import keycards, interfaces, common, errors
 from flumotion.common import log as flog
+from flumotion.common.netutils import addressGetHost
 from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials
 
@@ -653,8 +654,8 @@ class Avatar(pb.Avatar, flog.Loggable):
         jane = transport.getPeer()
         if tarzan and jane:
             self.debug("PB client connection seen by me is from me %s to %s" % (
-                common.addressGetHost(tarzan),
-                common.addressGetHost(jane)))
+                addressGetHost(tarzan),
+                addressGetHost(jane)))
         self.log('Client attached is mind %s', mind)
 
     def mindCallRemoteLogging(self, level, stackDepth, name, *args,

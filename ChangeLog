@@ -1,5 +1,17 @@
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/common.py:
+	* flumotion/common/medium.py:
+	* flumotion/common/netutils.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_netutils.py:
+	* flumotion/twisted/pb.py:
+	Move addressGetHost and addressGetPort from f.c.common
+	to f.c.netutils. Update callsites and tests.
+
+2008-05-15  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/message.py:

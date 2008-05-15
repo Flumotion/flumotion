@@ -29,8 +29,9 @@ from twisted.spread import pb
 from twisted.internet import defer, reactor
 from zope.interface import implements
 
-from flumotion.common import log, interfaces, bundleclient, errors, common
+from flumotion.common import log, interfaces, bundleclient, errors
 from flumotion.common import messages
+from flumotion.common.netutils import addressGetHost
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
@@ -86,8 +87,8 @@ class BaseMedium(fpb.Referenceable):
             self.debug("could not get connection info, reason %r" % e)
         if tarzan and jane:
             self.debug("connection is from me on %s to remote on %s" % (
-                common.addressGetHost(tarzan),
-                common.addressGetHost(jane)))
+                addressGetHost(tarzan),
+                addressGetHost(jane)))
 
     def hasRemoteReference(self):
         """
