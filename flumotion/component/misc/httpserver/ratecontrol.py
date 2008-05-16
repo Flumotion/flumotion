@@ -66,6 +66,8 @@ class TokenBucketConsumer(log.Loggable):
     ignore pauseProducing. This is sufficient for our needs right now.
     """
 
+    logCategory = 'token-bucket'
+
     # NOTE: Performance is strongly correlated with this value.
     # Low values (e.g. 0.2) give a 'smooth' transfer, but very high cpu usage
     # if you have several hundred clients.
@@ -85,6 +87,9 @@ class TokenBucketConsumer(log.Loggable):
 
         self._finishing = False # If true, we'll stop once the current buffer
                                 # has been sent.
+
+        self._unregister = False # If true, we'll unregister from the consumer
+                                 # once the data has been sent.
 
         self._lastDrip = time.time()
         self._dripDC = None
@@ -118,6 +123,9 @@ class TokenBucketConsumer(log.Loggable):
         self._tryWrite()
 
     def _tryWrite(self):
+        if not self.consumer:
+            return
+
         while self.fillLevel > 0 and self._buffersSize > 0:
             # If we're permitted to write at the moment, do so.
             offset, buf = self._buffers[0]
@@ -143,13 +151,47 @@ class TokenBucketConsumer(log.Loggable):
         else:
             # No buffer remaining; ask for more data or finish
             if self._finishing:
-                self.consumer.finish()
+                if self._unregister:
+                    self._doUnregister()
+                self._doFinish()
             elif self.producer:
                 self.producer.resumeProducing()
+            elif self._unregister:
+                self._doUnregister()
+
+    def _doUnregister(self):
+        self.consumer.unregisterProducer()
+        self._unregister = False
+
+    def _doFinish(self):
+        self.debug('consumer <- finish()')
+        self.consumer.finish()
+        self._finishing = False
 
     def stopProducing(self):
+        self.debug('stopProducing; buffered data: %d', self._buffersSize)
         if self.producer is not None:
             self.producer.stopProducing()
+
+        if self._dripDC:
+            # don't produce after stopProducing()!
+            self._dripDC.cancel()
+            self._dripDC = None
+
+            # ...and then, we still may have pending things to do
+            if self._unregister:
+                self._doUnregister()
+
+            if self._finishing:
+                self._finishing = False
+                self.consumer.finish()
+
+        if self._buffersSize > 0:
+            # make sure we release all the buffers, just in case
+            self._buffers = []
+            self._buffersSize = 0
+
+        self.consumer = None
 
     def pauseProducing(self):
         pass
@@ -170,7 +212,10 @@ class TokenBucketConsumer(log.Loggable):
             self.producer.pauseProducing()
 
     def finish(self):
-        self._finishing = True
+        if self._dripDC:
+            self._finishing = True
+        elif self.consumer:
+            self._doFinish()
 
     def registerProducer(self, producer, streaming):
         self.debug("Producer registered: %r", producer)
@@ -179,8 +224,12 @@ class TokenBucketConsumer(log.Loggable):
         self.resumeProducing()
 
     def unregisterProducer(self):
+        self.debug('unregisterProducer; buffered data: %d', self._buffersSize)
         if self.producer is not None:
             self.producer = None
 
-            self.consumer.unregisterProducer()
-
+            if not self._dripDC:
+                self._doUnregister()
+            else:
+                # we need to wait until we've written the data
+                self._unregister = True

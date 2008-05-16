@@ -1,5 +1,17 @@
 2008-05-16  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/component/misc/httpserver/ratecontrol.py
+	(TokenBucketConsumer, TokenBucketConsumer.__init__,
+	  TokenBucketConsumer._tryWrite, TokenBucketConsumer._doUnregister,
+	  TokenBucketConsumer._doFinish, TokenBucketConsumer.stopProducing,
+	  TokenBucketConsumer.finish, TokenBucketConsumer.unregisterProducer):
+	Make finishing and unregistering work properly with our time
+	scheduled modus operandi. Release reference to consumer when asked
+	to stop producing and make the code work properly even when we don't
+	have a consumer.
+
+2008-05-16  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/component/misc/httpserver/file.py
 	(FileTransfer.stopProducing):
 	Finish the request even if we are stopped early (helps breaking
