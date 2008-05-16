@@ -1,3 +1,10 @@
+2008-05-16  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py
+	  (HTTPFileStreamer.do_stop):
+	Deregister properly when stopping, depending on whether we
+	registered a path or a prefix.
+
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/common.py:

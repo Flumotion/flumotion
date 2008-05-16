@@ -327,7 +327,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         l = [self.remove_all_clients()]
         if self.type == 'slave' and self._pbclient:
-            l.append(self._pbclient.deregisterPath(self.mountPoint))
+            if self._singleFile:
+                l.append(self._pbclient.deregisterPath(self.mountPoint))
+            else:
+                l.append(self._pbclient.deregisterPrefix(self.mountPoint))
         return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):
