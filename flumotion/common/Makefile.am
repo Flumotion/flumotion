@@ -23,6 +23,7 @@ flumotion_PYTHON = \
 	gstreamer.py \
 	identity.py \
 	interfaces.py \
+	i18n.py \
 	log.py \
 	keycards.py \
 	manhole.py \
