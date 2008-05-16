@@ -22,12 +22,11 @@
 import gst
 
 from flumotion.common import errors, gstreamer, messages
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class VideoTestMedium(feedcomponent.FeedComponentMedium):

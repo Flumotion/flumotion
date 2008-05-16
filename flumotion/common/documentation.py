@@ -26,6 +26,8 @@ Integration with online and installed documentation for messages.
 __version__ = "$Rev: 6125 $"
 
 from flumotion.common import common, errors
+from flumotion.common.i18n import getLL
+
 
 def getMessageWebLink(message, LL=None):
     """
@@ -37,7 +39,7 @@ def getMessageWebLink(message, LL=None):
         return None
 
     if not LL:
-        LL = common.getLL()
+        LL = getLL()
 
     from flumotion.project import project
     docURL = 'http://www.flumotion.net/doc/flumotion/manual'

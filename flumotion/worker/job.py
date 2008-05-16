@@ -31,12 +31,12 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import errors, log
 from flumotion.common import messages
+from flumotion.common.i18n import N_, gettexter
 from flumotion.configure import configure
 from flumotion.worker import base
 
 __version__ = "$Rev$"
-N_ = messages.N_
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class ComponentJobAvatar(base.BaseJobAvatar):

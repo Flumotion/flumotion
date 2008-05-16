@@ -200,29 +200,6 @@ def pathToModuleName(path):
 
     return ".".join(path.split(os.path.sep))
 
-def getLL():
-    """
-    Return the (at most) two-letter language code set for message translation.
-    """
-    # LANGUAGE is a GNU extension; it can be colon-seperated but we ignore the
-    # advanced stuff. If that's not present, just use LANG, as normal.
-    language = os.environ.get('LANGUAGE', None)
-    if language != None:
-        LL = language[:2]
-    else:
-        lang = os.environ.get('LANG', 'en')
-        LL = lang[:2]
-
-    return LL
-
-def gettexter(domain):
-    """
-    Returns a method you can use as _ to translate strings for the given
-    domain.
-    """
-    import gettext
-    return lambda s: gettext.dgettext(domain, s)
-
 def compareVersions(first, second):
     """
     Compares two version strings.  Returns -1, 0 or 1 if first is smaller than,

@@ -30,7 +30,7 @@ from zope.interface import implements
 from flumotion.common import gstreamer, errors
 from flumotion.common import messages, netutils, interfaces
 from flumotion.common.format import formatStorage, formatTime
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.base import http
 from flumotion.component.component import moods
@@ -40,7 +40,7 @@ from flumotion.twisted import fdserver
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 STATS_POLL_INTERVAL = 10
 UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
                                 # seconds

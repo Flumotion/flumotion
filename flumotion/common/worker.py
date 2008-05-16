@@ -29,13 +29,12 @@ import signal
 from twisted.spread import pb
 from twisted.internet import protocol
 
-from flumotion.twisted import flavors
 from flumotion.common import log, errors, messages
-
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
+from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class ProcessProtocol(protocol.ProcessProtocol):

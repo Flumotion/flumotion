@@ -28,7 +28,7 @@ from twisted.internet import defer
 
 from flumotion.common import errors, messages
 from flumotion.common.common import pathToModuleName
-from flumotion.common.messages import N_, ngettext
+from flumotion.common.i18n import N_, ngettext, gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard.basesteps import ConsumerStep
@@ -43,7 +43,7 @@ from flumotion.wizard.workerstep import WorkerWizardStep
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 _ = gettext.gettext
 
 

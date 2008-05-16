@@ -27,19 +27,17 @@ import time
 
 from twisted.internet import reactor, defer
 
-from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, pygobject, messages, log
 from flumotion.common import gstreamer
+from flumotion.common.i18n import N_, gettexter
+from flumotion.common.planet import moods
+from flumotion.component import component as basecomponent
 from flumotion.component import feed, padmonitor
 from flumotion.component.feeder import Feeder
 from flumotion.component.eater import Eater
 
-from flumotion.common.planet import moods
-
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class FeedComponent(basecomponent.BaseComponent):

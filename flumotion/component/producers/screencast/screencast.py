@@ -19,14 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component import feedcomponent
 from flumotion.common import errors, gstreamer, messages
+from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
 
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
 
 
 class Screencast(feedcomponent.ParseLaunchComponent):

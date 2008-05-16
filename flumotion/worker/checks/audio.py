@@ -21,15 +21,15 @@
 
 __version__ = "$Rev$"
 
-from flumotion.worker.checks import check
-from flumotion.common import messages, log, errors, gstreamer
-
 import gst
+
+from flumotion.common import messages, log, errors, gstreamer
+from flumotion.common.i18n import N_, gettexter
+from flumotion.worker.checks import check
 
 from gst010 import do_element_check
 
-from flumotion.common.messages import N_
-T_ = messages.gettexter()
+T_ = gettexter()
 
 def checkMixerTracks(source_factory, device, channels, id=None):
     """

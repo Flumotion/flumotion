@@ -37,13 +37,12 @@ from flumotion.configure import configure
 from flumotion.manager import base, config
 from flumotion.common import errors, interfaces, keycards, log, planet
 from flumotion.common import messages, common
-from flumotion.twisted import flavors
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
-
-from flumotion.common.messages import N_
+from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class ComponentAvatar(base.ManagerAvatar):

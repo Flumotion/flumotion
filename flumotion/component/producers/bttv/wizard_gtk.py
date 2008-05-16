@@ -34,7 +34,8 @@ import os
 from zope.interface import implements
 
 from flumotion.common import errors
-from flumotion.common.messages import N_, gettexter, Info
+from flumotion.common.i18n import N_, gettexter
+from flumotion.common.messages import Info
 from flumotion.wizard.basesteps import VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import VideoProducer

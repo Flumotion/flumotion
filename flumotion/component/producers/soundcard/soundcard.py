@@ -24,13 +24,13 @@ import gst.interfaces
 
 from twisted.internet import defer
 
+from flumotion.common import messages
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
-from flumotion.common import messages
-from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class Soundcard(feedcomponent.ParseLaunchComponent):

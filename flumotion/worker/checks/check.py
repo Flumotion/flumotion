@@ -25,10 +25,10 @@ import gst
 from twisted.internet import defer
 
 from flumotion.common import errors, log, messages, gstreamer
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 def handleGStreamerDeviceError(failure, device):

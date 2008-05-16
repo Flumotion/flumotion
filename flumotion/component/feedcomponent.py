@@ -36,16 +36,15 @@ from zope.interface import implements
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
 from flumotion.component import feed
-from flumotion.common import common, interfaces, errors, log, pygobject, messages
+from flumotion.common import common, interfaces, errors, log, pygobject, \
+     messages
 from flumotion.common import gstreamer
-
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):

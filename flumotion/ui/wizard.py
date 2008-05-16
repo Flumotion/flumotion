@@ -28,13 +28,14 @@ from twisted.internet.defer import Deferred
 
 from flumotion.configure import configure
 from flumotion.common import log, messages
+from flumotion.common.i18n import gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
 __version__ = "$Rev$"
 __pychecker__ = 'no-classattr no-argsused'
-T_ = messages.gettexter()
+T_ = gettexter()
 N_ = gettext.gettext
 
 # pychecker doesn't like the auto-generated widget attrs

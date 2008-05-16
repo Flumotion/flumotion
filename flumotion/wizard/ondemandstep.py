@@ -26,7 +26,8 @@ import gettext
 
 import gobject
 
-from flumotion.common.messages import N_, gettexter, Warning
+from flumotion.common.i18n import N_, gettexter
+from flumotion.common.messages import Warning
 from flumotion.wizard.models import HTTPServer
 from flumotion.wizard.workerstep import WorkerWizardStep
 

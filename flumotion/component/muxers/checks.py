@@ -22,13 +22,12 @@
 import string
 from twisted.internet import defer
 
-from flumotion.worker.checks import check
 from flumotion.common import gstreamer, messages
-
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
+from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 def checkOgg():

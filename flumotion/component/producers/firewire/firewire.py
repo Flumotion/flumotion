@@ -23,12 +23,11 @@ import gst
 from twisted.internet import defer
 
 from flumotion.common import errors, messages
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 # See comments in gstdvdec.c for details on the dv format.

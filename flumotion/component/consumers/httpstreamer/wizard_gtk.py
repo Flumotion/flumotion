@@ -44,7 +44,8 @@ import gtk
 from twisted.internet import defer
 
 from flumotion.common import errors, log
-from flumotion.common.messages import N_, ngettext, gettexter, Warning
+from flumotion.common.i18n import N_, gettexter, ngettext
+from flumotion.common.messages import Warning
 from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 

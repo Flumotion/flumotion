@@ -40,6 +40,7 @@ from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.netutils import addressGetHost
 from flumotion.common.planet import moods
@@ -48,11 +49,9 @@ from flumotion.manager import admin, component, worker, base, config
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 
-from flumotion.common.messages import N_
-
 __all__ = ['ManagerServerFactory', 'Vishnu']
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 LOCAL_IDENTITY = LocalIdentity('manager')
 
 

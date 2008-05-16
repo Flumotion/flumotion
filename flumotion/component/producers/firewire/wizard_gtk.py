@@ -26,7 +26,7 @@ import math
 from zope.interface import implements
 
 from flumotion.common import errors, messages
-from flumotion.common.messages import N_, gettexter
+from flumotion.common.i18n import N_, gettexter
 from flumotion.wizard.basesteps import AudioProducerStep, VideoProducerStep
 from flumotion.wizard.interfaces import IProducerPlugin
 from flumotion.wizard.models import AudioProducer, VideoProducer, \

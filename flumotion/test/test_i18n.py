@@ -19,27 +19,22 @@
 
 # Headers in this file shall remain intact.
 
-import locale
-
 import gettext
+import locale
 import os
 
-from flumotion.common import testsuite
+from twisted.spread import jelly
+from flumotion.common import messages, testsuite
+from flumotion.common.i18n import N_, gettexter, ngettext, Translator
 from flumotion.configure import configure
-
-
 
 # marking/translating for singulars
 _ = gettext.gettext
-def N_(format): return format
+T_ = gettexter()
 
 # marking for plurals can only be done with a "fake" ngettext
 # just adding, say, NP_ to --keyword for xgettext doesn't pick up on
 # the plurality
-
-# so we use this global ngettext for marking, and gettext.ngettext for
-# actually translating
-def ngettext(singular, plural, count): return (singular, plural, count)
 
 # this test uses the class-based gettext API
 class TestSingularClassbased(testsuite.TestCase):
@@ -131,3 +126,52 @@ class TestPluralGettext(TestGettext):
         self.assertEquals(self.edone % 1, "Ik vertaalde 1 ding")
         self.assertEquals(self.edcount, "Ik vertaalde %d dingen")
         self.assertEquals(self.edcount % 5, "Ik vertaalde 5 dingen")
+
+class TranslatableTest(testsuite.TestCase):
+    def testTranslatable(self):
+        t = T_(N_("%s can be translated"), "I")
+        self.assertEquals(t.domain, configure.PACKAGE)
+        self.assertEquals(t.format, "%s can be translated")
+        self.assertEquals(t.args, ("I",))
+
+    def testTranslatablePlural(self):
+        # Andy 3 is a droid in the Andy series and doesn't need translating
+        t = T_(ngettext("%s %d has %d thing", "%s %d has %d things", 5),
+            "Andy", 3, 5)
+        self.assertEquals(t.domain, configure.PACKAGE)
+        self.assertEquals(t.singular, "%s %d has %d thing")
+        self.assertEquals(t.plural, "%s %d has %d things")
+        self.assertEquals(t.count, 5)
+        self.assertEquals(t.args, ("Andy", 3, 5))
+        self.assertEquals(t.plural % t.args, "Andy 3 has 5 things")
+
+        # now translate to nl_NL
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        self.nl = gettext.translation(configure.PACKAGE, localedir, ["nl_NL"])
+        self.failUnless(self.nl)
+        text = self.nl.ngettext(t.singular, t.plural, t.count) % t.args
+        self.assertEquals(text, "Andy 3 heeft 5 dingen")
+
+class TranslatorTest(testsuite.TestCase):
+    def testTranslateOne(self):
+        t = T_(N_("%s can be translated"), "Andy")
+
+        translator = Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        translator.addLocaleDir(configure.PACKAGE, localedir)
+        text = translator.translateTranslatable(t, lang=["nl_NL"])
+        self.assertEquals(text, 'Andy kan vertaald worden')
+
+    def testTranslateMessage(self):
+        cmsg = messages.Error(T_(N_("Something is really wrong. ")))
+        t = T_(N_("But does %s know what ?"), "Andy")
+        cmsg.add(t)
+        mmsg = jelly.unjelly(jelly.jelly(cmsg))
+
+        translator = Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        translator.addLocaleDir(configure.PACKAGE, localedir)
+
+        text = translator.translate(mmsg, lang=["nl_NL"])
+        self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
+

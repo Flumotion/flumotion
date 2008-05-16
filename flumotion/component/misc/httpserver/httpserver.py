@@ -30,7 +30,7 @@ from twisted.cred import credentials
 from zope.interface import implements
 
 from flumotion.common import log, messages, errors, netutils, interfaces
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
@@ -39,7 +39,8 @@ from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
+
 
 class CancellableRequest(server.Request):
 

@@ -19,27 +19,26 @@
 
 # Headers in this file shall remain intact.
 
+import os
+import random
+import socket
+import string
 from urllib2 import urlparse
 
-from twisted.internet import protocol, reactor, address, error, defer
-
-from twisted.spread import pb
 from twisted.cred import portal
+from twisted.internet import protocol, reactor, address, error, defer
+from twisted.spread import pb
 from zope.interface import implements
 
 from flumotion.common import medium, log, messages
+from flumotion.common.i18n import N_, gettexter
+from flumotion.component import component
+from flumotion.component.component import moods
 from flumotion.twisted import credentials, fdserver, checkers
 from flumotion.twisted import reflect
 
-from flumotion.component import component
-from flumotion.component.component import moods
-
-import socket, string, os, random
-
-from flumotion.common.messages import N_
-
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class PorterAvatar(pb.Avatar, log.Loggable):

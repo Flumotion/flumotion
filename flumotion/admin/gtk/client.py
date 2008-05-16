@@ -41,8 +41,8 @@ from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
      ConnectionFailedError, PropertyError
+from flumotion.common.i18n import gettexter
 from flumotion.common.log import Loggable
-from flumotion.common.messages import gettexter
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
 from flumotion.manager import admin # Register types

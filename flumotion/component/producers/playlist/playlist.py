@@ -19,24 +19,23 @@
 
 # Headers in this file shall remain intact.
 
-import gst
-import gobject
 import time
 
+import gst
+import gobject
 from twisted.internet import defer, reactor
 
 from flumotion.common import errors, messages, log, fxml
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.base import watcher
-
-from flumotion.common.messages import N_
 
 import smartscale
 import singledecodebin
 import playlistparser
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 def _tsToString(ts):

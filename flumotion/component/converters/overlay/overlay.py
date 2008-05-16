@@ -22,17 +22,16 @@
 import os
 import tempfile
 
-
 from twisted.internet import defer
 
 from flumotion.common import log, messages, gstreamer
-
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.converters.overlay import genimg
 
 __version__ = "$Rev$"
-N_ = messages.N_
-T_ = messages.gettexter()
+N_ = N_
+T_ = gettexter()
 
 
 class Overlay(feedcomponent.ParseLaunchComponent):

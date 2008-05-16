@@ -19,16 +19,15 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component import feedcomponent
-from flumotion.common import errors, messages
-
-from flumotion.component.combiners.switch import basicwatchdog
 import gst
 
-from flumotion.common.messages import N_
+from flumotion.common import errors, messages
+from flumotion.common.i18n import N_, gettexter
+from flumotion.component import feedcomponent
+from flumotion.component.combiners.switch import basicwatchdog
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):

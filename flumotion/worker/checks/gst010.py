@@ -28,12 +28,12 @@ from twisted.internet.threads import deferToThread
 from twisted.internet import defer
 
 from flumotion.common import gstreamer, errors, log, messages
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
 from flumotion.twisted import defer as fdefer
 from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class BusResolution(fdefer.Resolution):

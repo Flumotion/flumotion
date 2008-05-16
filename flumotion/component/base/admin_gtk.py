@@ -35,7 +35,7 @@ from zope.interface import implements
 
 from flumotion.common import errors, log, common, messages
 from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, getLL, gettexter
 from flumotion.common.planet import AdminFlowState
 from flumotion.configure import configure
 from flumotion.twisted import flavors
@@ -43,7 +43,7 @@ from flumotion.ui.fgtk import ProxyWidgetMapping
 
 _ = gettext.gettext
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class BaseAdminGtk(log.Loggable):
@@ -129,7 +129,7 @@ class BaseAdminGtk(log.Loggable):
                 gtk.glade.bindtextdomain(self.gettextDomain, localeDir)
 
 
-            lang = common.getLL()
+            lang = getLL()
             self.debug("loading bundle for %s locales" % lang)
             bundleName = '%s-locale-%s' % (self.gettextDomain, lang)
             d = self.admin.bundleLoader.getBundleByName(bundleName)

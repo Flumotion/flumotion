@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common import messages, documentation, log
+from flumotion.common.i18n import Translator
 from flumotion.configure import configure
 
 from gettext import gettext as _
@@ -109,7 +110,7 @@ class MessagesView(gtk.VBox):
         self.show_all()
         self.clear()
 
-        self._translator = messages.Translator()
+        self._translator = Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
         # FIXME: add locales as messages from domains come in
         self._translator.addLocaleDir(configure.PACKAGE, localedir)

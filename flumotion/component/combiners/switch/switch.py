@@ -26,16 +26,15 @@ import gobject
 from twisted.internet import defer, reactor
 
 from flumotion.common import errors, messages, log
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
-from flumotion.worker.checks import check
 from flumotion.component import feedcomponent
 from flumotion.component.base import scheduler
 from flumotion.component.plugs import base
-
-from flumotion.common.messages import N_
+from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):

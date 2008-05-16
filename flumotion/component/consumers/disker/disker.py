@@ -34,16 +34,14 @@ from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
 from flumotion.common import common
 from flumotion.common.mimetypes import mimeTypeToExtention
-
+from flumotion.common.i18n import N_, gettexter
+from flumotion.common.pygobject import gsignal
 # proxy import
 from flumotion.component.component import moods
-from flumotion.common.pygobject import gsignal
-
-from flumotion.common.messages import N_
 
 __all__ = ['Disker']
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 

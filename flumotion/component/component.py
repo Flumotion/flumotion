@@ -32,19 +32,18 @@ from twisted.spread import pb
 from twisted.python import reflect
 from zope.interface import implements
 
+from flumotion.configure import configure
 from flumotion.common import interfaces, errors, log, planet, medium
 from flumotion.common import componentui, common, messages
 from flumotion.common import interfaces, reflectcall, debug
-
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
-from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
-from flumotion.common.messages import N_
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """

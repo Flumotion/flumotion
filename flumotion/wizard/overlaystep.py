@@ -21,7 +21,8 @@
 
 import gettext
 
-from flumotion.common.messages import N_, ngettext, gettexter, Warning
+from flumotion.common.i18n import N_, gettexter, ngettext
+from flumotion.common.messages import Warning
 from flumotion.wizard.models import VideoConverter
 from flumotion.wizard.workerstep import WorkerWizardStep
 

@@ -27,13 +27,13 @@ as seen by the bouncer.
 from twisted.internet import defer
 
 from flumotion.common import keycards, messages, errors, log, netutils
-from flumotion.component.bouncers import bouncer
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.keycards import KeycardUACPP
+from flumotion.component.bouncers import bouncer
 
 __all__ = ['IPBouncer']
 __version__ = "$Rev$"
-N_ = messages.N_
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class IPBouncer(bouncer.Bouncer):

@@ -30,12 +30,12 @@ from flumotion.common import common, errors, interfaces, log
 from flumotion.common import medium
 from flumotion.common import messages, signals
 from flumotion.common import planet, worker # register jelly
-from flumotion.common.messages import N_
+from flumotion.common.i18n import N_, gettexter
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"
-T_ = messages.gettexter()
+T_ = gettexter()
 
 
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):

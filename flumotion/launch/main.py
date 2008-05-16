@@ -64,8 +64,9 @@ from twisted.python import reflect
 from twisted.internet import reactor, defer
 
 from flumotion.common import log, common, registry, errors, messages
-from flumotion.twisted import flavors
+from flumotion.common.i18n import Translator
 from flumotion.common.options import OptionParser
+from flumotion.twisted import flavors
 
 from flumotion.launch import parse
 
@@ -111,7 +112,7 @@ class ComponentWrapper(object, log.Loggable):
     def instantiate(self):
         errors = []
         def haveError(value):
-            translator = messages.Translator()
+            translator = Translator()
             print "%s: %s" % (_headings[value.level],
                               translator.translate(value))
             if value.debug:
