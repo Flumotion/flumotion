@@ -35,6 +35,7 @@
       </sockets>
 
       <properties>
+         <!-- FIXME: the following comment is not valid anymore, right? -->
          <!-- Warning: mount_point of / is broken -->
         <property name="mount-point" type="string"
 		  description="The mount point the stream can be accessed on" />

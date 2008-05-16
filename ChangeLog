@@ -1,3 +1,16 @@
+2008-05-16  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/misc/httpserver/file.py
+	(FileTransfer.stopProducing):
+	Finish the request even if we are stopped early (helps breaking
+	circular references - fixes leaks).
+
+	* flumotion/component/misc/httpserver/file.py (FileTransfer.__init__,
+	  FileTransfer.resumeProducing):
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Add more comments, add logging, fix logging to be more conformant
+	with the interface.
+
 2008-05-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/Makefile.am (flumotion_PYTHON): Add

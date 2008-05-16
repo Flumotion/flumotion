@@ -327,6 +327,11 @@ class FileTransfer(log.Loggable):
     def __init__(self, file, size, consumer):
         """
         @param file: a file handle
+        @type  file: file
+        @param size: file position to which file should be read
+        @type  size: int
+        @param consumer: consumer to receive the data
+        @type  consumer: L{twisted.internet.interfaces.IFinishableConsumer}
         """
         self.file = file
         self.size = size
@@ -348,9 +353,9 @@ class FileTransfer(log.Loggable):
             # .resumeProducing again, so be prepared for a re-entrant call
             self.consumer.write(data)
         if self.consumer and self.file.tell() == self.size:
-            log.debug('request',
-                '[fd %5d] written entire file of %d bytes from fd %d',
-                self.consumer.transport.fileno(), self.size, self.file.fileno())
+            log.debug('file-transfer',
+                      'written entire file of %d bytes from fd %d',
+                      self.size, self.file.fileno())
             self.consumer.unregisterProducer()
             self.consumer.finish()
             self.consumer = None
@@ -359,9 +364,12 @@ class FileTransfer(log.Loggable):
         pass
 
     def stopProducing(self):
-        log.debug('request',
-            '[fd %5d] stop producing from fd %d at %d/%d bytes',
-            self.consumer.transport.fileno(), self.file.fileno(),
-            self.file.tell(), self.size)
+        log.debug('file-transfer', 'stop producing from fd %d at %d/%d bytes',
+                  self.file.fileno(), self.file.tell(), self.size)
         self.file.close()
+        # even though it's the consumer stopping us, from looking at
+        # twisted code it looks like we still are required to
+        # unregsiter and notify the request that we're done...
+        self.consumer.unregisterProducer()
+        self.consumer.finish()
         self.consumer = None
