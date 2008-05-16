@@ -85,7 +85,6 @@ class IHTTPConsumerPlugin(Interface):
         @type wizard: L{ConfigurationWizard}
         """
 
-    # FIXME: Rename to workerChanged
     def workerChanged(worker):
         """Called when the worker for the step changed.
         @param worker: the worker
