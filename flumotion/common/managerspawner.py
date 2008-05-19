@@ -23,6 +23,7 @@
 
 import gettext
 import os
+import shutil
 import tempfile
 
 from twisted.internet import reactor
