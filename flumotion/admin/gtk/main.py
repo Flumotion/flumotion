@@ -48,7 +48,8 @@ def _installGettext():
 
 def _connectToManager(win, manager, ssl):
     try:
-        info = connections.parsePBConnectionInfo(manager, ssl)
+        info = connections.parsePBConnectionInfo(manager,
+                                                 use_ssl=ssl)
     except OptionError, e:
         raise SystemExit("ERROR: %s" % (e,))
 
@@ -74,7 +75,7 @@ def main(args):
                       action="store", type="string", dest="manager",
                       help="the manager to connect to, e.g. localhost:7531")
     parser.add_option('', '--no-ssl',
-                      action="store_false", dest="ssl",
+                      action="store_false", dest="ssl", default=True,
                       help="disable encryption when connecting to the manager")
 
     options, args = parser.parse_args(args)
