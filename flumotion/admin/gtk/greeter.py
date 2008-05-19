@@ -22,10 +22,8 @@
 """Wizard run when the user first starts flumotion.
 """
 
-import errno
 import gettext
 import os
-import socket
 import tempfile
 
 import gobject
@@ -35,6 +33,7 @@ from twisted.internet import reactor, protocol, defer, error
 from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
 from flumotion.common.connection import parsePBConnectionInfo
 from flumotion.common.errors import ConnectionFailedError
+from flumotion.common.netutils import tryPort
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
 from flumotion.ui.simplewizard import SimpleWizard, WizardStep, \
@@ -220,35 +219,23 @@ This mode is only useful for testing Flumotion.
         self.label_starting.show()
         self.progressbar_starting.set_fraction(0.0)
         self.progressbar_starting.show()
-        # start a manager first
-        port = 7531
-        def tryPort(port=0):
-            # tries the given port, or a random one, and return None or port
-            # number
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.debug('Binding to port %d' % port)
-
-            try:
-                s.bind(('', port))
-                port = s.getsockname()[1]
-            except socket.error, e:
-                if e.args[0] == errno.EADDRINUSE:
-                    self.debug('Port %d already in use', port)
-                    port = None
-
-            s.close()
-            return port
-
-        if tryPort(port) is None:
-            port = tryPort()
-
-        # ready to start spawning processes
 
         def pulse():
             self.progressbar_starting.pulse()
             return True
-
         self._timeout_id = gobject.timeout_add(200, pulse)
+
+        self._startManager(state)
+        return '*signaled*'
+
+    # Private
+
+    def _startManager(self, state):
+        # start a manager first
+        if tryPort(7531) is None:
+            port = tryPort()
+
+        # ready to start spawning processes
 
         path = tempfile.mkdtemp(suffix='.flumotion')
         confDir = os.path.join(path, 'etc')
@@ -285,37 +272,28 @@ This mode is only useful for testing Flumotion.
         def chain(args, description, failMessage):
             d.addCallback(run, args, description, failMessage)
 
-        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-               "create", "manager", "admin", str(port)],
-              _('Creating manager ...'),
-              _("Could not create manager."))
-
-        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-               "start", "manager", "admin"],
-              _('Starting manager ...'),
-              _("Could not start manager."))
-
-        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-               "create", "worker", "admin", str(port)],
-              _('Creating worker ...'),
-              _("Could not create worker."))
-
-        chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-               "start", "worker", "admin"],
-              _('Starting worker ...'),
-              _("Could not start worker."))
+        for serviceName in [_('manager'), _('worker')]:
+            chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+                   "create", serviceName, "admin", str(port)],
+                  _('Creating %s ...') % serviceName,
+                  _("Could not create %s." % serviceName))
+            chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
+                   "start", serviceName, "admin"],
+                  _('Starting %s ...' % serviceName),
+                  _("Could not start %s." % serviceName))
 
         d.addErrback(lambda f: None)
 
         def done(result, state):
             # because of the ugly call-by-reference passing of state,
             # we have to update the existing dict, not re-bind with state =
+            state['connectionInfo'] = parsePBConnectionInfo(
+                'localhost',
+                username='user',
+                password='test',
+                port=port,
+                use_ssl=False)
             state.update({
-                'host': 'localhost',
-                'port': port,
-                'use_insecure': False,
-                'user': 'user',
-                'passwd': 'test',
                 'confDir': confDir,
                 'logDir': logDir,
                 'runDir': runDir,
@@ -326,9 +304,6 @@ This mode is only useful for testing Flumotion.
 
         # start chain
         d.callback(None)
-        return '*signaled*'
-
-    # Private
 
     def _finished(self, result):
         # result: start_new_error or start_new_success

@@ -1,3 +1,10 @@
+2008-05-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/greeter.py:
+	Clean up the manager invokation.
+	* flumotion/common/netutils.py (tryPort):
+	Move the checking if a port is open to here.
+
 2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* po/ca.po:

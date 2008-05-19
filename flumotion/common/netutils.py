@@ -24,6 +24,7 @@ Miscellaneous network functions for use in flumotion.
 """
 
 import array
+import errno
 import fcntl
 import re
 import socket
@@ -272,4 +273,26 @@ def addressGetPort(a):
         port = a.port
     except AttributeError:
         port = a[2]
+    return port
+
+def tryPort(port=0):
+    """Checks if the given port is unused
+    @param port: the port number or 0 for a random port
+    @type port: integer
+    @returns: port number or None if in use
+    @type: integer or None
+    """
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    try:
+        s.bind(('', port))
+        port = s.getsockname()[1]
+    except socket.error, e:
+        if e.args[0] != errno.EADDRINUSE:
+            raise
+        port = None
+    finally:
+        s.close()
+
     return port
