@@ -1,3 +1,8 @@
+2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* po/ca.po:
+	Reviewed and translated all the string according to TERMCAT and Softcatala.
+
 2008-05-16  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/misc/httpserver/ratecontrol.py
