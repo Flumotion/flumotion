@@ -1,5 +1,13 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/wizard/configurationwizard.py:
+	Add widget names for the toplevel windows and avoid using
+	dashes in the menu items used in the ui manger.
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/managerspawner.py (LocalManagerSpawner.stop):
 	Add a new stop method which can be used to stop and optionally
 	cleanup the temporary state created by the started manager & worker

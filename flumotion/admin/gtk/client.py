@@ -57,53 +57,53 @@ T_ = gettexter()
 
 MAIN_UI = """
 <ui>
-  <menubar name="menubar">
-    <menu action="connection">
-      <menuitem action="open-recent"/>
-      <menuitem action="open-existing"/>
-      <menuitem action="import-config"/>
-      <menuitem action="export-config"/>
+  <menubar name="Menubar">
+    <menu action="Connection">
+      <menuitem action="OpenRecent"/>
+      <menuitem action="OpenExisting"/>
+      <menuitem action="ImportConfig"/>
+      <menuitem action="ExportConfig"/>
       <separator name="sep1"/>
-      <placeholder name="recent"/>
+      <placeholder name="Recent"/>
       <separator name="sep2"/>
-      <menuitem action="quit"/>
+      <menuitem action="Quit"/>
     </menu>
-    <menu action="manage">
-      <menuitem action="start-component"/>
-      <menuitem action="stop-component"/>
-      <menuitem action="delete-component"/>
+    <menu action="Manage">
+      <menuitem action="StartComponent"/>
+      <menuitem action="StopComponent"/>
+      <menuitem action="DeleteComponent"/>
       <separator name="sep3"/>
-      <menuitem action="start-all"/>
-      <menuitem action="stop-all"/>
-      <menuitem action="clear-all"/>
+      <menuitem action="StartAll"/>
+      <menuitem action="StopAll"/>
+      <menuitem action="ClearAll"/>
       <separator name="sep4"/>
-      <menuitem action="run-wizard"/>
+      <menuitem action="RunConfigurationWizard"/>
     </menu>
-    <menu action="debug">
-      <menuitem action="debug-enable"/>
+    <menu action="Debug">
+      <menuitem action="EnableDebugging"/>
       <separator name="sep5"/>
-      <menuitem action="start-shell"/>
+      <menuitem action="StartShell"/>
     </menu>
-    <menu action="help">
-      <menuitem action="about"/>
+    <menu action="Help">
+      <menuitem action="About"/>
     </menu>
   </menubar>
-  <toolbar name="toolbar">
-    <toolitem action="open-recent"/>
+  <toolbar name="Toolbar">
+    <toolitem action="OpenRecent"/>
     <separator name="sep6"/>
-    <toolitem action="start-component"/>
-    <toolitem action="stop-component"/>
-    <toolitem action="delete-component"/>
+    <toolitem action="StartComponent"/>
+    <toolitem action="StopComponent"/>
+    <toolitem action="DeleteComponent"/>
     <separator name="sep7"/>
-    <toolitem action="run-wizard"/>
+    <toolitem action="RunConfigurationWizard"/>
   </toolbar>
 </ui>
 """
 
 RECENT_UI_TEMPLATE = '''<ui>
-  <menubar name="menubar">
-    <menu action="connection">
-      <placeholder name="recent">
+  <menubar name="Menubar">
+    <menu action="Connection">
+      <placeholder name="Recent">
       %s
       </placeholder>
     </menu>
@@ -260,6 +260,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             widgets[widget.get_name()] = widget
 
         window = self._window = widgets['main_window']
+        window.set_name("AdminWindow")
         vbox = widgets['vbox1']
         window.connect('delete-event', self._window_delete_event_cb)
 
@@ -270,72 +271,72 @@ class AdminClientWindow(Loggable, gobject.GObject):
                       self._on_uimanager__disconnect_proxy)
 
         # Normal actions
-        group = gtk.ActionGroup('actions')
+        group = gtk.ActionGroup('Actions')
         group.add_actions([
             # Connection
-            ('connection', None, _("_Connection")),
-            ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'),
+            ('Connection', None, _("_Connection")),
+            ('OpenRecent', gtk.STOCK_OPEN, _('_Open Recent Connection...'),
               None, _('Connect to a recently used connection'),
              self._connection_open_recent_cb),
-            ('open-existing', None, _('Open _Existing Connection...'), None,
+            ('OpenExisting', None, _('Open _Existing Connection...'), None,
              _('Connect to an previously used connection'),
              self._connection_open_existing_cb),
-            ('import-config', None, _('_Import Configuration...'), None,
+            ('ImportConfig', None, _('_Import Configuration...'), None,
              _('Import configuration from a file'),
              self._connection_import_configuration_cb),
-            ('export-config', None, _('_Export Configuration...'), None,
+            ('ExportConfig', None, _('_Export Configuration...'), None,
              _('Export current configuration to a file'),
              self._connection_export_configuration_cb),
-            ('quit', gtk.STOCK_QUIT, _('_Quit'), None,
+            ('Quit', gtk.STOCK_QUIT, _('_Quit'), None,
              _('Quit the application and disconnect from the manager'),
              self._connection_quit_cb),
 
             # Manage
-            ('manage', None, _('_Manage')),
-            ('start-component', 'flumotion-play', _('_Start Component(s)'),
+            ('Manage', None, _('_Manage')),
+            ('StartComponent', 'flumotion-play', _('_Start Component(s)'),
               None, _('Start the selected component(s)'),
              self._manage_start_component_cb),
-            ('stop-component', 'flumotion-pause', _('St_op Component(s)'),
+            ('StopComponent', 'flumotion-pause', _('St_op Component(s)'),
               None, _('Stop the selected component(s)'),
              self._manage_stop_component_cb),
-            ('delete-component', gtk.STOCK_DELETE, _('_Delete Component(s)'),
+            ('DeleteComponent', gtk.STOCK_DELETE, _('_Delete Component(s)'),
               None, _('Delete the selected component(s)'),
              self._manage_delete_component_cb),
-            ('start-all', None, _('Start _All'), None,
+            ('StartAll', None, _('Start _All'), None,
              _('Start all components'),
              self._manage_start_all_cb),
-            ('stop-all', None, _('Stop A_ll'), None,
+            ('StopAll', None, _('Stop A_ll'), None,
              _('Stop all components'),
              self._manage_stop_all_cb),
-            ('clear-all', gtk.STOCK_CLEAR, _('_Clear All'), None,
+            ('ClearAll', gtk.STOCK_CLEAR, _('_Clear All'), None,
              _('Remove all components'),
              self._manage_clear_all_cb),
-            ('run-wizard', 'flumotion-wizard', _('Run _Wizard'), None,
+            ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'), None,
              _('Run the configuration wizard'),
              self._manage_run_wizard_cb),
 
             # Debug
-            ('debug', None, _('_Debug')),
+            ('Debug', None, _('_Debug')),
 
             # Help
-            ('help', None, _('_Help')),
-            ('about', gtk.STOCK_ABOUT, _('_About'), None,
+            ('Help', None, _('_Help')),
+            ('About', gtk.STOCK_ABOUT, _('_About'), None,
              _('Displays an about dialog'),
              self._help_about_cb),
             ])
         group.add_toggle_actions([
-            ('debug-enable', None, _('Enable _Debugging'), None,
+            ('EnableDebugging', None, _('Enable _Debugging'), None,
              _('Enable debugging in the admin interface'),
              self._debug_enable_cb),
             ])
-        self._debugEnableAction = group.get_action('debug-enable')
+        self._debugEnableAction = group.get_action('EnableDebugging')
         uimgr.insert_action_group(group, 0)
 
         # Debug actions
-        self._debugActions = gtk.ActionGroup('actions')
+        self._debugActions = gtk.ActionGroup('Actions')
         self._debugActions.add_actions([
             # Debug
-            ('start-shell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
+            ('StartShell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
              _('Start an interactive debugging shell'),
              self._debug_start_shell_cb),
             ])
@@ -345,11 +346,11 @@ class AdminClientWindow(Loggable, gobject.GObject):
         uimgr.add_ui_from_string(MAIN_UI)
         window.add_accel_group(uimgr.get_accel_group())
 
-        menubar = uimgr.get_widget('/menubar')
+        menubar = uimgr.get_widget('/Menubar')
         vbox.pack_start(menubar, expand=False)
         vbox.reorder_child(menubar, 0)
 
-        toolbar = uimgr.get_widget('/toolbar')
+        toolbar = uimgr.get_widget('/Toolbar')
         toolbar.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
         toolbar.set_style(gtk.TOOLBAR_ICONS)
         vbox.pack_start(toolbar, expand=False)
@@ -359,12 +360,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         self._actiongroup = group
         self._uimgr = uimgr
-        self._start_component_action = group.get_action("start-component")
-        self._stop_component_action = group.get_action("stop-component")
-        self._delete_component_action = group.get_action("delete-component")
-        self._stop_all_action = group.get_action("stop-all")
-        self._start_all_action = group.get_action("start-all")
-        self._clear_all_action = group.get_action("clear-all")
+        self._start_component_action = group.get_action("StartComponent")
+        self._stop_component_action = group.get_action("StopComponent")
+        self._delete_component_action = group.get_action("DeleteComponent")
+        self._stop_all_action = group.get_action("StopAll")
+        assert self._stop_all_action
+        self._start_all_action = group.get_action("StartAll")
+        assert self._start_all_action
+        self._clear_all_action = group.get_action("ClearAll")
+        assert self._clear_all_action
 
         self._trayicon = FluTrayIcon(window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)

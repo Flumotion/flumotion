@@ -118,7 +118,9 @@ class ConfigurationWizard(SectionWizard):
 
     def __init__(self, parent=None, admin=None):
         SectionWizard.__init__(self, parent)
-        
+        # Set the name of the toplevel window, this is used by the
+        # ui unittest framework
+        self.window1.set_name('ConfigurationWizard')
         self._cursorWatch = gdk.Cursor(gdk.WATCH)
         self._tasks = []
         self._admin = admin
