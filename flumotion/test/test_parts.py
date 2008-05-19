@@ -112,7 +112,7 @@ class TestComponentsView(testsuite.TestCase):
         return astate
 
     def testNoneSelected(self):
-        self.failIf(self.view.get_selected_name())
+        self.failIf(self.view.get_selected_names())
 
     def testNoComponents(self):
         # no components, so should be unable to start or stop any component
@@ -135,9 +135,10 @@ class TestComponentsView(testsuite.TestCase):
             "Should be able to stop component one")
 
     # builds on testUpdate
-    def testSelected(self):
-        def assertSelected(view, state, test):
-            name = state.get('name')
+    def testOneSelected(self):
+        def assertSelected(view, states, test):
+            test.assertEqual(len(states), 1)
+            name = states[0].get('name')
             test.assertEqual(name, 'one', 'name %s is not one' % name)
             test.asserted = True
 
@@ -145,4 +146,405 @@ class TestComponentsView(testsuite.TestCase):
         self.view.connect('selection-changed', assertSelected, self)
         self.asserted = False
         self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testMultipleSelected(self):
+        def assertMultipleSelected(view, states, test):
+            test.assertEqual(len(states), 2)
+            name = states[0].get('name')
+            test.assertEqual(name, 'one', 'name %s is not one' % name)
+            name = states[1].get('name')
+            test.assertEqual(name, 'two', 'name %s is not one' % name)
+            test.asserted = True
+
+        self.testUpdate()
+        self.view.connect('selection-changed', assertMultipleSelected, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanStartOneWhenSleeping(self):
+        def assertCanStart(view, states, test):
+            test.failIf(not view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartOneWhenHappy(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartOneWhenSad(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sad.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartOneWhenHungry(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartOneWhenWaking(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.waking.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartOneWhenLost(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.lost.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStartWhenNoSelection(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view._view.get_selection().select_all()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().unselect_all()
+        self.failUnless(self.asserted)
+
+    def testCanStartMultipleWhenSleeping(self):
+        def assertCanStart(view, states, test):
+            test.failIf(not view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sleeping.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenOneIsSad(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenOneIsHappy(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.happy.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenOneIsHungry(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.hungry.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenOneIsWaking(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.waking.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenOneIsLost(self):
+        def assertCanStart(view, states, test):
+            test.failIf(view.can_start())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.lost.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanStopOneWhenHappy(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanStopOneWhenHungry(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanStopOneWhenSad(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sad.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanStopOneWhenWaking(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.waking.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanStopOneWhenLost(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.lost.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStopOneWhenSleeping(self):
+        def assertCanStop(view, states, test):
+            test.failIf(view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sad.sleeping.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.set_cursor('0')
+        self.failUnless(self.asserted)
+
+    def testCanNotStopWhenNoSelection(self):
+        def assertCanStop(view, states, test):
+            test.failIf(view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+        components['one'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view._view.get_selection().select_all()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.get_selection().unselect_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStopMultipleWhenOneIsSleeping(self):
+        def assertCanStop(view, states, test):
+            test.failIf(view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanStopMultipleWhenOneNoneIsSleeping(self):
+        def assertCanStop(view, states, test):
+            test.failIf(not view.can_stop())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+        components['two'] = c
+        c = self._createComponent(
+            {'name': 'three', 'mood': moods.hungry.value, 'pid': 3})
+        components['three'] = c
+        c = self._createComponent(
+            {'name': 'four', 'mood': moods.waking.value, 'pid': 4})
+        components['four'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.lost.value, 'pid': 5})
+        components['two'] = c
+        self.view.update(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStop, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
         self.failUnless(self.asserted)

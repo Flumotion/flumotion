@@ -168,10 +168,6 @@ class MessagesView(gtk.VBox):
                 buf.insert_with_tags_by_name(iter, translated,
                     tag.get_property('name'))
 
-        # FIXME:this clears all messages with the same id as the new one.
-        # effectively replacing.  Is this what we want ?
-        self.clear_message(m.id)
-
         # add a message button to show this message
         b = MessageButton(m)
         b.sigid = b.connect('toggled', on_toggled)

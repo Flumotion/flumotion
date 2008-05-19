@@ -174,9 +174,11 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._view.trigger_tooltip_query()
             self._view.get_selection().connect('changed', selection_changed_cb)
 
-        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int, str)
+        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object,
+                                     int, str)
 
-        self._view.connect('cursor-changed', self._view_cursor_changed_cb)
+        self._view.get_selection().connect('changed',
+                                            self._view_cursor_changed_cb)
         self._view.connect('button-press-event',
             self._view_button_press_event_cb)
         self._view.set_model(self._model)
@@ -186,7 +188,10 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         self._moodPixbufs = self._getMoodPixbufs()
         self._iters = {} # componentState -> model iter
-        self._last_state = None
+        self._last_states = None
+        self._view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self._view.set_rubber_banding(False)
+
     __init__ = with_construct_properties (__init__)
 
     def _add_columns(self):
@@ -236,7 +241,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         return path
 
-    def _tree_view_query_tooltip_cb(self, treeview, x, y, keyboard_tip, tooltip):
+    def _tree_view_query_tooltip_cb(self, treeview, x, y, keyboard_tip,
+                                     tooltip):
         path = self._tooltips_get_context(treeview, keyboard_tip, x, y)
         if path is None:
             return
@@ -248,81 +254,99 @@ class ComponentsView(log.Loggable, gobject.GObject):
         return True
 
     def _view_cursor_changed_cb(self, *args):
-        # name needs to exist before being used in the child functions
-        state = self.get_selected_state()
+        states = self.get_selected_states()
 
-        if not state:
+        if not states:
             self.debug('no component selected, emitting selection-changed None')
             self.emit('selection-changed', None)
             return
 
-        if state == self._last_state:
+        if states is self._last_states:
+            self.debug('no new components selected, no emitting signal')
             return
 
-        self._last_state = state
-        self.debug('component selected, emitting selection-changed')
-        self.emit('selection-changed', state)
+        self.debug('components selected, emitting selection-changed')
+        self.emit('selection-changed', states)
+        self._last_states = states
 
     def _view_button_press_event_cb(self, treeview, event):
-        # right-click ?
         if event.button != 3:
             return
-
-        # get iter from coordinates
-        x = int(event.x)
-        y = int(event.y)
+        path = treeview.get_path_at_pos(int(event.x),int(event.y))
+        selection = treeview.get_selection()
+        rows = selection.get_selected_rows()
+        if path[0] not in rows[1]:
+            selection.unselect_all()
+            selection.select_path(path[0])
+        states = self.get_selected_states()
+        self.debug("button pressed selected states %r", states)
         time = event.time
-        pthinfo = treeview.get_path_at_pos(x, y)
-        if pthinfo == None:
-            return
-
-        path, col, cellx, celly = pthinfo
-        model = treeview.get_model()
-        iter = model.get_iter(path)
-        state = model.get(iter, COL_STATE)[0]
-
-        popup = ComponentMenu(state)
+        popup = ComponentMenu(self)
         popup.popup(None, None, None, event.button, time)
-        popup.connect('activated', self._activated_cb, state)
+        popup.connect('activated', self._activated_cb, states)
         gtk.main_iteration()
+        return True
 
-    def _activated_cb(self, menu, action, state):
+    def _activated_cb(self, menu, action, states):
         self.debug('emitting activated')
-        self.emit('activated', state, action)
+        self.emit('activated', states, action)
 
-    def get_selected_name(self):
-        """
-        Get the name of the currently selected component, or None.
-
-        @rtype: string
-        """
-        selection = self._view.get_selection()
-        sel = selection.get_selected()
-        if not sel:
-            return None
-        model, iter = sel
-        if not iter:
-            return
-
-        return model.get(iter, COL_NAME)[0]
-
-    def get_selected_state(self):
-        """
-        Get the state of the currently selected component, or None.
-
-        @rtype: L{flumotion.common.component.AdminComponentState}
-        """
+    def _get_selected(self, col_name):
         selection = self._view.get_selection()
         if not selection:
             return None
-        sel = selection.get_selected()
-        if not sel:
-            return None
-        model, iter = sel
-        if not iter:
-            return
+        model, selected_tree_rows = selection.get_selected_rows()
+        selected = []
+        for tree_row in selected_tree_rows:
+            component_state = model[tree_row][col_name]
+            selected.append(component_state)
+        return selected
 
-        return model.get(iter, COL_STATE)[0]
+    def get_selected_names(self):
+        """
+        Get the names of the currently selected component, or None.
+
+        @rtype: string
+        """
+        return self._get_selected(COL_NAME)
+
+    def get_selected_states(self):
+        """
+        Get the states of the currently selected component, or None.
+
+        @rtype: L{flumotion.common.component.AdminComponentState}
+        """
+        return self._get_selected(COL_STATE)
+
+    def can_start(self):
+        """
+        Get whether the selected components can be started.
+
+        @rtype: bool
+        """
+        states = self.get_selected_states()
+        if not states:
+            return False
+        can_start = True
+        for state in states:
+            moodname = moods.get(state.get('mood')).name
+            can_start = can_start and moodname == 'sleeping'
+        return can_start
+
+    def can_stop(self):
+        """
+        Get whether the selected components can be stoped.
+
+        @rtype: bool
+        """
+        states = self.get_selected_states()
+        if not states:
+            return False
+        can_stop = True
+        for state in states:
+            moodname = moods.get(state.get('mood')).name
+            can_stop = can_stop and moodname != 'sleeping'
+        return can_stop
 
     def update_start_stop_props(self):
         oldstop = self.get_property('can-stop-any')
@@ -440,7 +464,7 @@ class ComponentMenu(gtk.Menu):
 
     gsignal('activated', str)
 
-    def __init__(self, state):
+    def __init__(self, componentsView):
         """
         @param state: L{flumotion.common.component.AdminComponentState}
         """
@@ -454,20 +478,21 @@ class ComponentMenu(gtk.Menu):
         self._items['restart'] = i
 
         i = gtk.MenuItem(_('_Start'))
-        mood = moods.get(state.get('mood'))
-        if mood == moods.happy:
+        can_start = componentsView.can_start()
+        if not can_start:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['start'] = i
 
         i = gtk.MenuItem(_('St_op'))
-        if mood == moods.sleeping:
+        can_stop = componentsView.can_stop()
+        if not can_stop:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['stop'] = i
 
         i = gtk.MenuItem(_('_Delete'))
-        if not (mood == moods.sleeping):
+        if not can_start:
             i.set_property('sensitive', False)
         self.append(i)
         self._items['delete'] = i

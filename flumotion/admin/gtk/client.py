@@ -127,7 +127,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         gobject.GObject.__init__(self)
 
         self._trayicon = None
-        self._current_component_state = None
+        self._current_component_states = None
         self._disconnected_dialog = None # set to a dialog when disconnected
         self._planetState = None
         self._components = None # name -> planet.AdminComponentState
@@ -145,6 +145,11 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
     # Public API
 
+    #FIXME: This function may not be called ever.
+    # It has not been properly tested
+    # with the multiselection (ticket #795).
+    # A ticket for reviewing that has been opened #961
+
     def stateSet(self, state, key, value):
         # called by model when state of something changes
         if not isinstance(state, AdminComponentState):
@@ -154,32 +159,25 @@ class AdminClientWindow(Loggable, gobject.GObject):
             self.statusbar.set('main', value)
         elif key == 'mood':
             self._update_component_actions()
-            current = self.components_view.get_selected_name()
+            current = self.components_view.get_selected_names()
             if value == moods.sleeping.value:
-                if state.get('name') == current:
-                    self._clear_messages()
+                if state.get('name') in current:
+                    self._messages_view.clear_message(value.id)
+
+    #FIXME: This function may not be called ever.
+    # It has not been properly tested
+    # with the multiselection (ticket #795).
+    # A ticket for reviewing that has been opened #961
 
     def componentCallRemoteStatus(self, state, pre, post, fail,
                                   methodName, *args, **kwargs):
-        if not state:
-            state = self.components_view.get_selected_state()
-            if not state:
-                return
-
-        label = getComponentLabel(state)
-        if not label:
-            return
-
-        mid = None
-        if pre:
-            mid = self.statusbar.push('main', pre % label)
-        d = self._admin.componentCallRemote(state, methodName, *args, **kwargs)
 
         def cb(result, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
             if post:
                 self.statusbar.push('main', post % label)
+
         def eb(failure, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
@@ -187,9 +185,25 @@ class AdminClientWindow(Loggable, gobject.GObject):
                          % (methodName, label, failure))
             if fail:
                 self.statusbar.push('main', fail % label)
+        if not state:
+            states = self.components_view.get_selected_states()
+            if not states:
+                return
+            for state in states:
+                self.componentCallRemoteStatus(state, pre, post, fail,
+                                                methodName, args, kwargs)
+        else:
+            label = getComponentLabel(state)
+            if not label:
+                return
 
-        d.addCallback(cb, self, mid)
-        d.addErrback(eb, self, mid)
+            mid = None
+            if pre:
+                mid = self.statusbar.push('main', pre % label)
+            d = self._admin.componentCallRemote(state, methodName, *args,
+                                                 **kwargs)
+            d.addCallback(cb, self, mid)
+            d.addErrback(eb, self, mid)
 
     def componentCallRemote(self, state, methodName, *args, **kwargs):
         self.componentCallRemoteStatus(None, None, None, None,
@@ -260,8 +274,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         group.add_actions([
             # Connection
             ('connection', None, _("_Connection")),
-            ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'), None,
-             _('Connect to a recently used connection'),
+            ('open-recent', gtk.STOCK_OPEN, _('_Open Recent Connection...'),
+              None, _('Connect to a recently used connection'),
              self._connection_open_recent_cb),
             ('open-existing', None, _('Open _Existing Connection...'), None,
              _('Connect to an previously used connection'),
@@ -278,14 +292,14 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
             # Manage
             ('manage', None, _('_Manage')),
-            ('start-component', 'flumotion-play', _('_Start Component'), None,
-             _('Start the selected component'),
+            ('start-component', 'flumotion-play', _('_Start Component(s)'),
+              None, _('Start the selected component(s)'),
              self._manage_start_component_cb),
-            ('stop-component', 'flumotion-pause', _('St_op Component'), None,
-             _('Stop the selected component'),
+            ('stop-component', 'flumotion-pause', _('St_op Component(s)'),
+              None, _('Stop the selected component(s)'),
              self._manage_stop_component_cb),
-            ('delete-component', gtk.STOCK_DELETE, _('_Delete Component'), None,
-             _('Delete the selected component'),
+            ('delete-component', gtk.STOCK_DELETE, _('_Delete Component(s)'),
+              None, _('Delete the selected component(s)'),
              self._manage_delete_component_cb),
             ('start-all', None, _('Start _All'), None,
              _('Start all components'),
@@ -549,7 +563,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         state = self._admin.getWorkerHeavenState()
         if not state.get('names'):
             self._error(
-                _('The wizard cannot be run because no workers are logged in.'))
+                _('The wizard cannot be run because no workers are \
+                logged in.'))
             return
 
         from flumotion.wizard.configurationwizard import ConfigurationWizard
@@ -572,15 +587,13 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin = None
 
     def _update_component_actions(self):
-        state = self._current_component_state
-        if state:
-            moodname = moods.get(state.get('mood')).name
-            can_start = moodname == 'sleeping'
-            can_stop = moodname != 'sleeping'
-        else:
-            can_start = False
-            can_stop = False
-        can_delete = bool(state and not can_stop)
+        can_start = self.components_view.can_start()
+        can_stop = self.components_view.can_stop()
+        can_delete = bool(self._current_component_states and can_start)
+        self._start_component_action.set_sensitive(can_start)
+        self._stop_component_action.set_sensitive(can_stop)
+        self._delete_component_action.set_sensitive(can_delete)
+        self.debug('can start %r, can stop %r' % (can_start, can_stop))
         can_start_all = self.components_view.get_property('can-start-any')
         can_stop_all = self.components_view.get_property('can-stop-any')
         # they're all in sleeping or lost
@@ -589,10 +602,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._stop_all_action.set_sensitive(can_stop_all)
         self._start_all_action.set_sensitive(can_start_all)
         self._clear_all_action.set_sensitive(can_clear_all)
-        self._start_component_action.set_sensitive(can_start)
-        self._stop_component_action.set_sensitive(can_stop)
-        self._delete_component_action.set_sensitive(can_delete)
-        self.debug('can start %r, can stop %r' % (can_start, can_stop))
 
     def _update_components(self):
         self.components_view.update(self._components)
@@ -676,6 +685,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
     # component view activation functions
 
     def _component_modify(self, state):
+
         def propertyErrback(failure):
             failure.trap(PropertyError)
             self._error("%s." % failure.getErrorMessage())
@@ -688,6 +698,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         def dialog_set_cb(dialog, element, property, value, state):
             cb = self._admin.setProperty(state, element, property, value)
             cb.addErrback(propertyErrback)
+
         def dialog_get_cb(dialog, element, property, state):
             cb = self._admin.getProperty(state, element, property)
             cb.addCallback(after_getProperty, dialog)
@@ -705,12 +716,11 @@ class AdminClientWindow(Loggable, gobject.GObject):
         del self._components[name]
 
         # if this component was selected, clear selection
-        if self._current_component_state == state:
-            self.debug('removing currently selected component state')
-            self._current_component_state = None
+        if self._current_component_states and state \
+           in self._current_component_states:
+            self._current_component_states.remove(state)
         # FIXME: would be nicer to do this incrementally instead
         self._update_components()
-
         # a component being removed means our selected component could
         # have gone away
         self._update_component_actions()
@@ -766,11 +776,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
         @param remoteMethodPrefix: prefix for remote method to run
         """
         if not state:
-            state = self.components_view.get_selected_state()
-            if not state:
-                self.statusbar.push('main', _("No component selected."))
-                return None
-
+            self.debug(" Trying to apply %s to a non component" %action +\
+                       " that may mean that the signal comes from the menu ")
+            selected_states = self.components_view.get_selected_states()
+            self.debug(" selected states %r when %s ", \
+                       selected_states, action)
+            for selected_state in self.components_view.get_selected_states():
+                self._component_do(selected_state, action, doing, done,
+                                    remoteMethodPrefix)
+            return
         name = getComponentLabel(state)
         if not name:
             return None
@@ -782,6 +796,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)
             self.statusbar.push('main', "%s component %s" % (done, name))
+
         def _actionErrback(failure, self, mid):
             self.statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
@@ -797,17 +812,18 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         return d
 
-    def _component_activate(self, state, action):
-        self.debug('action %s on component %s' % (action,
-                                                  state.get('name')))
+    def _component_activate(self, states, action):
+        self.debug('action %s on components %r' % (action, states))
         method_name = '_component_' + action
         if hasattr(self, method_name):
-            getattr(self, method_name)(state)
+            for state in states:
+                getattr(self, method_name)(state)
         else:
             self.warning("No method '%s' implemented" % method_name)
 
-    def _component_selection_changed(self, state):
-        self.debug('component %s has selection', state)
+    def _component_selection_changed(self, states):
+        self.debug('component %s has selection', states)
+
         def compSet(state, key, value):
             if key == 'mood':
                 self._update_component_actions()
@@ -816,42 +832,58 @@ class AdminClientWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateAppend on component state of %s' % name)
             if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
+                current = self.components_view.get_selected_names()
+                if name in current:
                     self._messages_view.add_message(value)
+                self._messages_view.add_message(value)
 
         def compRemove(state, key, value):
             name = state.get('name')
             self.debug('stateRemove on component state of %s' % name)
             if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
+                current = self.components_view.get_selected_names()
+                if name in current:
                     self._messages_view.clear_message(value.id)
 
-        if self._current_component_state:
-            self._current_component_state.removeListener(self)
-        self._current_component_state = state
-        if self._current_component_state:
-            self._current_component_state.addListener(
+        if self._current_component_states:
+            for current_component_state in self._current_component_states:
+                current_component_state.removeListener(self)
+        self._current_component_states = states
+        if self._current_component_states:
+            for current_component_state in self._current_component_states:
+                current_component_state.addListener(
                 self, compSet, compAppend, compRemove)
 
         self._update_component_actions()
-        self._component_view.show_object(state)
         self._clear_messages()
+        if not states:
+            return
 
-        if state:
+        statusbar_message = " "
+        if len(states) == 1:
+            self.debug("only one component is selected on the components view")
+            self._component_view.show_object(states[0])
+        else:
+            self._component_view.show_object(None)
+            self.debug("zero or more than one components are selected on the"+\
+                        " components view")
+        for state in states:
             name = getComponentLabel(state)
-
             messages = state.get('messages')
             if messages:
                 for m in messages:
                     self.debug('have message %r' % m)
+                    self.debug('message id %s' % m.id)
                     self._messages_view.add_message(m)
 
             if state.get('mood') == moods.sad.value:
                 self.debug('component %s is sad' % name)
-                self.statusbar.set('main',
-                    _("Component %s is sad") % name)
+                statusbar_message = statusbar_message +\
+                                    _("Component %s is sad. ") % name
+        if statusbar_message:
+            self.statusbar.set('main',
+                               statusbar_message)
+
 
         # FIXME: show statusbar things
         # self.statusbar.set('main', _('Showing UI for %s') % name)
@@ -902,8 +934,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         dialog = ProgressDialog(
             _("Reconnecting ..."),
             _("Lost connection to manager %s, reconnecting ...")
-            % (self._admin.adminInfoStr(),),
-            self._window)
+            % (self._admin.adminInfoStr(), ), self._window)
 
         dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         dialog.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
@@ -922,6 +953,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._show_connection_lost_dialog()
 
     def _connection_refused(self):
+
         def refused_later():
             self._fatal_error(
                 _("Connection to manager on %s was refused.") % (
@@ -1030,10 +1062,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             import code
 
         vars = \
-            {
-                "admin": self._admin,
-                "components": self._components
-            }
+            {"admin": self._admin, "components": self._components}
         message = """Flumotion Admin Debug Shell
 
 Local variables are:
@@ -1064,7 +1093,7 @@ You can do remote component calls using:
         self._connection_refused()
 
     def _admin_connection_failed_cb(self, admin, reason):
-        self._connection_failed(admin, reason)
+        self._connection_failed(reason)
 
     def _admin_update_cb(self, admin):
         self._update_components()
@@ -1080,8 +1109,8 @@ You can do remote component calls using:
     def _components_view_selection_changed_cb(self, view, state):
         self._component_selection_changed(state)
 
-    def _components_view_activated_cb(self, view, state, action):
-        self._component_activate(state, action)
+    def _components_view_activated_cb(self, view, states, action):
+        self._component_activate(states, action)
 
     def _component_view_start_stop_notify_cb(self, *args):
         self._update_component_actions()
