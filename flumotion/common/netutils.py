@@ -286,12 +286,13 @@ def tryPort(port=0):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        s.bind(('', port))
-        port = s.getsockname()[1]
-    except socket.error, e:
-        if e.args[0] != errno.EADDRINUSE:
-            raise
-        port = None
+        try:
+            s.bind(('', port))
+            port = s.getsockname()[1]
+        except socket.error, e:
+            if e.args[0] != errno.EADDRINUSE:
+                raise
+            port = None
     finally:
         s.close()
 
