@@ -89,8 +89,27 @@ class UITestCase(testsuite.TestCase):
         self._call(name, 'set_sensitive', True)
         self._callInc(name, 'set_active', is_active)
 
+    def setWidget(self, widget): 
+        self.window = gtk.Window() 
+        self.widget = widget 
+        self.setWindow(self.window) 
+        widget.reparent(self.window) 
+        self.window.show_all() 
+        self._pause()
+
+    def toggle(self):
+        isActive = self._callNow(name, 'get_active') 
+        self._callInc(name, 'set_sensitive', False) 
+        self._call(name, 'set_sensitive', True) 
+        self._callInc(name, 'set_active', not isActive) 
+        if process:
+            self._process()
+
     # Private
 
+    def _pause(self):
+        self._timeoutAdd(lambda: 0) 
+    
     def _timeoutAdd(self, proc, increase=True):
         def proc_no_return():
             try:

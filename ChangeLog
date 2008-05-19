@@ -1,3 +1,8 @@
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/test/gtkunit.py: Add back setWidget and toggle
+	methods which are used by the tests in flumotion-template.
+
 2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow.__init__,
