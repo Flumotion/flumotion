@@ -60,10 +60,10 @@ class LocalManagerSpawner(SignalMixin):
                    ]
 
     def __init__(self, port):
-        path = tempfile.mkdtemp(suffix='.flumotion')
-        self._confDir = os.path.join(path, 'etc')
-        self._logDir = os.path.join(path, 'var', 'log')
-        self._runDir = os.path.join(path, 'var', 'run')
+        self._path = tempfile.mkdtemp(suffix='.flumotion')
+        self._confDir = os.path.join(self._path, 'etc')
+        self._logDir = os.path.join(self._path, 'var', 'log')
+        self._runDir = os.path.join(self._path, 'var', 'run')
         self._port = port
 
     # Public
@@ -84,24 +84,8 @@ class LocalManagerSpawner(SignalMixin):
         # We need to run 4 commands in a row, and each of them can fail
         d = Deferred()
 
-        def run(result, args, description, failMessage):
-            self._setDescription(description)
-            args[0] = os.path.join(configure.sbindir, args[0])
-            protocol = GreeterProcessProtocol()
-            env = os.environ.copy()
-            paths = env['PATH'].split(os.pathsep)
-            if configure.bindir not in paths:
-                paths.insert(0, configure.bindir)
-            env['PATH'] = os.pathsep.join(paths)
-            reactor.spawnProcess(protocol, args[0], args, env=env)
-            def error(failure, failMessage):
-                self._error(failure, failMessage, args)
-                return failure
-            protocol.deferred.addErrback(error, failMessage)
-            return protocol.deferred
-
         def chain(args, description, failMessage):
-            d.addCallback(run, args, description, failMessage)
+            d.addCallback(self._spawnProcess, args, description, failMessage)
 
         for serviceName in [_('manager'), _('worker')]:
             chain(["flumotion",
@@ -124,12 +108,36 @@ class LocalManagerSpawner(SignalMixin):
 
         def done(result):
             self._finished()
-
         d.addCallback(done)
 
         # start chain
         d.callback(None)
 
+        return d
+
+    def stop(self, cleanUp=False):
+        d = Deferred()
+
+        def chain(args, description, failMessage):
+            d.addCallback(self._spawnProcess, args, description, failMessage)
+
+        for serviceName in [_('manager'), _('worker')]:
+            chain(["flumotion",
+                   "-C", self._confDir,
+                   "-L", self._logDir,
+                   "-R", self._runDir,
+                   "stop", serviceName, "admin"], '', '')
+
+        def done(result):
+            print 'cleanup'
+            if cleanUp:
+                self._cleanUp()
+        d.addCallback(done)
+
+        # start chain
+        d.callback(None)
+        return d
+    
     # Private
 
     def _finished(self):
@@ -140,3 +148,22 @@ class LocalManagerSpawner(SignalMixin):
 
     def _setDescription(self, description):
         self.emit('description-changed', description)
+
+    def _spawnProcess(self, result, args, description, failMessage):
+        self._setDescription(description)
+        args[0] = os.path.join(configure.sbindir, args[0])
+        protocol = GreeterProcessProtocol()
+        env = os.environ.copy()
+        paths = env['PATH'].split(os.pathsep)
+        if configure.bindir not in paths:
+            paths.insert(0, configure.bindir)
+        env['PATH'] = os.pathsep.join(paths)
+        reactor.spawnProcess(protocol, args[0], args, env=env)
+        def error(failure, failMessage):
+            self._error(failure, failMessage, args)
+            return failure
+        protocol.deferred.addErrback(error, failMessage)
+        return protocol.deferred
+
+    def _cleanUp(self):
+        shutil.rmtree(self._path)
