@@ -1,3 +1,8 @@
+2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* flumotion/admin/gtk/parts.py (ComponentsView.selection_changed_cb):
+	Check for availability of gtk.TreeView.set_rubber_banding
+
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/gtkunit.py: Add back setWidget and toggle

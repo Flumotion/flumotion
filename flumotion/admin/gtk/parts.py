@@ -190,7 +190,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._iters = {} # componentState -> model iter
         self._last_states = None
         self._view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self._view.set_rubber_banding(False)
+        if hasattr(gtk.TreeView, 'set_rubber_banding'):
+            self._view.set_rubber_banding(False)
 
     __init__ = with_construct_properties (__init__)
 
