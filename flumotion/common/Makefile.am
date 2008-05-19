@@ -26,6 +26,7 @@ flumotion_PYTHON = \
 	i18n.py \
 	log.py \
 	keycards.py \
+	managerspawner.py \
 	manhole.py \
 	medium.py \
 	messages.py \

@@ -1,5 +1,14 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/managerspawner.py:
+	* flumotion/wizard/configurationwizard.py:
+	Move the manager spawning code out of the greeter to
+	f.c.managerspawner.
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/sidebar.py:
 	* flumotion/ui/wizard.py:
 	* flumotion/wizard/configurationwizard.py:

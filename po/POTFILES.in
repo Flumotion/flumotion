@@ -73,6 +73,7 @@ flumotion/common/__init__.py
 flumotion/common/interfaces.py
 flumotion/common/keycards.py
 flumotion/common/log.py
+flumotion/common/managerspawner.py
 flumotion/common/manhole.py
 flumotion/common/medium.py
 flumotion/common/messages.py

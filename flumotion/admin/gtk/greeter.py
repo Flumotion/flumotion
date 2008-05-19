@@ -24,15 +24,15 @@
 
 import gettext
 import os
-import tempfile
 
 import gobject
 import gtk
-from twisted.internet import reactor, protocol, defer, error
+from twisted.internet import reactor
 
 from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
 from flumotion.common.connection import parsePBConnectionInfo
 from flumotion.common.errors import ConnectionFailedError
+from flumotion.common.managerspawner import LocalManagerSpawner
 from flumotion.common.netutils import tryPort
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
@@ -183,18 +183,6 @@ class LoadConnection(WizardStep):
         self.button_next.emit('clicked')
 
 
-class GreeterProcessProtocol(protocol.ProcessProtocol):
-    def __init__(self):
-        # no parent init
-        self.deferred = defer.Deferred()
-
-    def processEnded(self, failure):
-        if failure.check(error.ProcessDone):
-            self.deferred.callback(None)
-        else:
-            self.deferred.callback(failure)
-
-
 class StartNew(WizardStep):
     name = 'start_new'
     title = _('Start a new manager and worker')
@@ -231,81 +219,40 @@ This mode is only useful for testing Flumotion.
     # Private
 
     def _startManager(self, state):
-        # start a manager first
-        port = 7531
-        if tryPort(port) is None:
-            port = tryPort()
+        port = tryPort()
+        managerSpawner = LocalManagerSpawner(port)
+        managerSpawner.connect('error', self._on_spawner_error, state)
+        managerSpawner.connect('description-changed',
+                               self._on_spawner_description_changed)
+        managerSpawner.connect('finished', self._on_spawner_finished, state)
+        managerSpawner.start()
 
-        # ready to start spawning processes
+    def _on_spawner_error(self, spawner, failure, msg, args, state):
+        # error should trigger going to next page with an overview
+        state.update({
+            'command': ' '.join(args),
+            'error': msg,
+            'failure': failure,
+        })
+        self._finished('start_new_error')
 
-        path = tempfile.mkdtemp(suffix='.flumotion')
-        confDir = os.path.join(path, 'etc')
-        logDir = os.path.join(path, 'var', 'log')
-        runDir = os.path.join(path, 'var', 'run')
+    def _on_spawner_description_changed(self, spawner, description):
+        self.label_starting.set_text(description)
 
-        # We need to run 4 commands in a row, and each of them can fail
-        d = defer.Deferred()
-        def run(result, args, description, failMessage):
-            # run the given command
-            # show a dialog to say what we are doing
-            self.label_starting.set_text(description)
-            args[0] = os.path.join(configure.sbindir, args[0])
-            protocol = GreeterProcessProtocol()
-            env = os.environ.copy()
-            paths = env['PATH'].split(os.pathsep)
-            if configure.bindir not in paths:
-                paths.insert(0, configure.bindir)
-            env['PATH'] = os.pathsep.join(paths)
-            process = reactor.spawnProcess(protocol, args[0], args, env=env)
-            def error(failure, failMessage):
-                self.label_starting.set_text(_('Failed to %s') % description)
-                # error should trigger going to next page with an overview
-                state.update({
-                    'command': ' '.join(args),
-                    'error': failMessage,
-                    'failure': failure,
-                })
-                self._finished('start_new_error')
-                return failure
-            protocol.deferred.addErrback(error, failMessage)
-            return protocol.deferred
-
-        def chain(args, description, failMessage):
-            d.addCallback(run, args, description, failMessage)
-
-        for serviceName in [_('manager'), _('worker')]:
-            chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-                   "create", serviceName, "admin", str(port)],
-                  _('Creating %s ...') % serviceName,
-                  _("Could not create %s." % serviceName))
-            chain(["flumotion", "-C", confDir, "-L", logDir, "-R", runDir,
-                   "start", serviceName, "admin"],
-                  _('Starting %s ...' % serviceName),
-                  _("Could not start %s." % serviceName))
-
-        d.addErrback(lambda f: None)
-
-        def done(result, state):
-            # because of the ugly call-by-reference passing of state,
-            # we have to update the existing dict, not re-bind with state =
-            state['connectionInfo'] = parsePBConnectionInfo(
-                'localhost',
-                username='user',
-                password='test',
-                port=port,
-                use_ssl=True)
-            state.update({
-                'confDir': confDir,
-                'logDir': logDir,
-                'runDir': runDir,
-            })
-            self._finished('start_new_success')
-
-        d.addCallback(done, state)
-
-        # start chain
-        d.callback(None)
-
+    def _on_spawner_finished(self, spawner, state):
+        # because of the ugly call-by-reference passing of state,
+        # we have to update the existing dict, not re-bind with state =
+        state['connectionInfo'] = parsePBConnectionInfo(
+            'localhost',
+            username='user',
+            password='test',
+            port=spawner.getPort(),
+            use_ssl=True)
+        state.update(dict(confDir=spawner.getConfDir(),
+                          logDir=spawner.getLogDir(),
+                          runDir=spawner.getRunDir()))
+        self._finished('start_new_success')
+        
     def _finished(self, result):
         # result: start_new_error or start_new_success
         self.label_starting.hide()
