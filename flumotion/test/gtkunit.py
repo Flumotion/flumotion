@@ -21,141 +21,128 @@
 
 import os
 
+import gobject
+import gtk
 from twisted.internet import reactor
+
 from flumotion.common import testsuite
-
-try:
-    import gobject
-    import gtk
-except RuntimeError:
-    os._exit(0)
-
 
 _INTERVAL = 1 # in ms
 if os.environ.has_key('FLU_INTERVAL'):
     _INTERVAL = int(os.environ['FLU_INTERVAL'])
 
-_WINDOW = None
-def set_window(w):
-    global _WINDOW
-    _WINDOW = w
 
-_FAILED = False
-def assert_not_failed():
-    assert not _FAILED
+class UITestCase(testsuite.TestCase):
 
-def _assert(expr):
-    if not expr:
-        raise # to show the backtrace
-    _FAILED = True
+    # TestCase
 
-def timeout_add(proc, increase=True):
-    def proc_no_return():
-        try:
-            proc()
-        except:
-            #gobject.timeout_add(0, gtk.main_quit)
-            global _FAILED
-            _FAILED = True
-            reactor.callLater(0, os._exit, 1)
-            raise
-    gobject.timeout_add(timeout_add.n * _INTERVAL, proc_no_return)
-    if increase:
-        timeout_add.n += 1
-timeout_add.n = 0
+    def setUp(self):
+        self._window = None
+        self._n = 0
 
-def find_widget(parent, name):
-    if parent.get_name() == name:
-        return parent
-    if isinstance(parent, gtk.Container):
-        for kid in parent.get_children():
-            found = find_widget(kid, name)
-            if found:
-                return found
-    return None
+    # Public
 
-def call_now(name, method, *args, **kwargs):
-    w = find_widget(_WINDOW, name)
-    assert w
-    m = getattr(w, method)
-    return m(*args, **kwargs)
+    def setWindow(self, window):
+        self._window = window
 
+    def refreshUI(self):
+        while gtk.events_pending():
+            gtk.main_iteration()
 
-def _call(increase, name, method, *args, **kwargs):
-    def check():
-        call_now(name, method, *args, **kwargs)
+    def assertCallReturns(self, name, method, val, *args, **kwargs):
+        def check():
+            w = self._findWidget(self._window, name)
+            assert w
+            m = getattr(w, method)
+            self.assertEquals(m(*args, **kwargs), val)
+        self._timeoutAdd(check)
 
-    timeout_add(check, increase=increase)
+    def assertSensitive(self, name, s):
+        self.assertCallReturns(name, 'get_property', s, 'sensitive')
 
-def call(name, method, *args, **kwargs):
-    """
-    Call method on the widget with the given name, and given args.
-    """
-    _call(False, name, method, *args, **kwargs)
+    def click(self, name):
+        self._callInc(name, 'set_relief', gtk.RELIEF_HALF)
+        self._callInc(name, 'set_relief', gtk.RELIEF_NORMAL)
+        self._callInc(name, 'emit', 'clicked')
 
-def call_inc(name, method, *args, **kwargs):
-    """
-    Like call, but also increments the timer.
-    """
-    _call(True, name, method, *args, **kwargs)
+    def inactivate(self, name):
+        w = self._findWidget(self._window, name)
+        w.set_active(False)
 
-def assert_call_returns(name, method, val, *args, **kwargs):
-    def check():
-        w = find_widget(_WINDOW, name)
-        assert w
-        m = getattr(w, method)
-        _assert(m(*args, **kwargs) == val)
-    timeout_add(check)
+    def activate(self, name):
+        w = self._findWidget(self._window, name)
+        w.set_active(True)
 
-def click(name):
-    call_inc(name, 'set_relief', gtk.RELIEF_HALF)
-    call_inc(name, 'set_relief', gtk.RELIEF_NORMAL)
-    call_inc(name, 'emit', 'clicked')
+    def setText(self, name, text):
+        self._call(name, 'grab_focus')
+        self._callInc(name, 'delete_text', 0, -1)
+        for i in range(len(text)):
+            self._call(name, 'set_position', i)
+            self._call(name, 'insert_text', text[i], i)
+            self._callInc(name, 'set_position', i + 1)
 
-def set_text(name, text):
-    call(name, 'grab_focus')
-    call_inc(name, 'delete_text', 0, -1)
-    for i in range(len(text)):
-        call(name, 'set_position', i)
-        call(name, 'insert_text', text[i], i)
-        call_inc(name, 'set_position', i + 1)
+    def checkText(self, name, text):
+        self.assertCallReturns(name, 'get_text', text)
 
-def check_text(name, text):
-    assert_call_returns(name, 'get_text', text)
+    def setActive(self, name, is_active):
+        self._callInc(name, 'set_sensitive', False)
+        self._call(name, 'set_sensitive', True)
+        self._callInc(name, 'set_active', is_active)
 
-def set_active(name, is_active):
-    call_inc(name, 'set_sensitive', False)
-    call(name, 'set_sensitive', True)
-    call_inc(name, 'set_active', is_active)
+    # Private
 
-def pause():
-    timeout_add(lambda: 0)
+    def _timeoutAdd(self, proc, increase=True):
+        def proc_no_return():
+            try:
+                proc()
+            except:
+                #gobject.timeoutAdd(0, gtk.main_quit)
+                reactor.callLater(0, os._exit, 1)
+                raise
+        gobject.timeout_add(self._n * _INTERVAL, proc_no_return)
+        if increase:
+            self._n += 1
 
-# FIXME: maybe move methods above to this class instead ?
-class GtkTestCase(testsuite.TestCase):
-    def process(self):
+    def _findWidget(self, parent, name):
+        if parent.get_name() == name:
+            return parent
+        if isinstance(parent, gtk.Container):
+            for child in parent.get_children():
+                found = self._findWidget(child, name)
+                if found:
+                    return found
+        return None
+
+    def _process(self):
         """
         Make sure all previous timeouts are processed, so that all state
         is updated.
         """
-        timeout_add(gtk.main_quit, increase=False)
+        self.timeout_add(gtk.main_quit, increase=False)
         gtk.main()
 
-    def set_widget(self, widget):
-        self.window = gtk.Window()
-        self.widget = widget
-        set_window(self.window)
-        widget.reparent(self.window)
-        self.window.show_all()
-        pause()
+    def _callNow(self, name, method, *args, **kwargs):
+        w = self._findWidget(self._window, name)
+        assert w
+        m = getattr(w, method)
+        return m(*args, **kwargs)
 
-    def toggle(self, name, process=True):
+    def _batchCall(self, increase, name, method, *args, **kwargs):
+        def check():
+            self._callNow(name, method, *args, **kwargs)
+            
+        self._timeoutAdd(check, increase=increase)
+
+    def _call(self, name, method, *args, **kwargs):
         """
-        toggle a gtk.ToggleButton.
+        Call method on the widget with the given name, and given args.
         """
-        is_active = call_now(name, 'get_active')
-        call_inc(name, 'set_sensitive', False)
-        call(name, 'set_sensitive', True)
-        call_inc(name, 'set_active', not is_active)
-        if process:
-            self.process()
+        self._batchCall(False, name, method, *args, **kwargs)
+
+    def _callInc(self, name, method, *args, **kwargs):
+        """
+        Like call, but also increments the timer.
+        """
+        self._batchCall(True, name, method, *args, **kwargs)
+
+    

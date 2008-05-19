@@ -19,78 +19,61 @@
 
 # Headers in this file shall remain intact.
 
-import gtk
-
-from flumotion.admin.gtk import greeter
-from flumotion.common import testsuite
-from flumotion.test.gtkunit import set_text, assert_not_failed, \
-     assert_call_returns, click, check_text, set_window
+from flumotion.admin.gtk.greeter import Greeter
+from flumotion.test.gtkunit import UITestCase
 from flumotion.ui.simplewizard import SimpleWizard, WizardStep
 
 
-
-
-def prev():
-    click('button_prev')
-def next():
-    click('button_next')
-
-def check_prev_next(can_prev, can_next):
-    def assert_sensitive(name, s):
-        assert_call_returns(name, 'get_property', s, 'sensitive')
-    assert_sensitive('button_prev', can_prev)
-    assert_sensitive('button_next', can_next)
-
 class FakeAdminWindow:
-    def __init__(self):
-        pass
-
     def getWindow(self):
         return None
 
-class WizardTest(testsuite.TestCase):
+
+class WizardTest(UITestCase):
+    def _prev(self):
+        self.click('button_prev')
+
+    def _next(self):
+        self.click('button_next')
+
+    def _checkPrevNext(self,can_prev, can_next):
+        self.assertSensitive('button_prev', can_prev)
+        self.assertSensitive('button_next', can_next)
+    
     def testGreeter(self):
-        wiz = greeter.Greeter(FakeAdminWindow())
-        ass = self.assert_
-        ass(isinstance(wiz, SimpleWizard))
-        ass(isinstance(wiz.name, str))
-        ass(isinstance(wiz.page, WizardStep))
-        ass(isinstance(wiz.pages, dict))
-        ass(isinstance(wiz.page_stack, list))
-        ass(isinstance(wiz.state, dict))
+        greeter = Greeter(FakeAdminWindow())
+        self.failUnless(isinstance(greeter, SimpleWizard))
+        self.failUnless(isinstance(greeter.name, str))
+        self.failUnless(isinstance(greeter.page, WizardStep))
+        self.failUnless(isinstance(greeter.pages, dict))
+        self.failUnless(isinstance(greeter.page_stack, list))
+        self.failUnless(isinstance(greeter.state, dict))
 
-        set_window(wiz.window)
+        self.setWindow(greeter.window)
 
-        check_prev_next(False, True)
-        click('connect_to_existing')
-        next()
-        prev()
-        next()
-        check_prev_next(True, True)
-        set_text('host_entry', 'foolio')
-        check_prev_next(True, True)
-        click('ssl_check')
-        check_text('port_entry', '8642')
-        next()
-        prev()
-        next()
-        check_prev_next(True, False)
-        assert_call_returns('auth_method_combo', 'get_active', 0)
-        set_text('user_entry', 'bar')
-        check_prev_next(True, False)
-        set_text('passwd_entry', 'baz')
-        check_prev_next(True, True)
-        next()
+        self._checkPrevNext(False, True)
+        self.click('connect_to_existing')
+        self._next()
+        self._prev()
+        self._next()
+        self._checkPrevNext(True, True)
+        self.setText('host_entry', 'foolio')
+        self._checkPrevNext(True, True)
+        self.click('ssl_check')
+        self.checkText('port_entry', '8642')
+        self._next()
+        self._prev()
+        self._next()
+        self._checkPrevNext(True, False)
+        self.assertCallReturns('auth_method_combo', 'get_active', 0)
+        self.setText('user_entry', 'bar')
+        self._checkPrevNext(True, False)
+        self.setText('passwd_entry', 'baz')
+        self._checkPrevNext(True, True)
+        self._next()
 
-        state = wiz.run()
-
-        assert_not_failed()
-        wiz.hide()
-        gtk.main_iteration()
-        wiz.destroy()
-
-        while gtk.events_pending():
-            gtk.main_iteration()
+        state = greeter.run()
+        self.refreshUI()
 
         self.assertEquals(state.get('passwd'), 'baz')
         self.assertEquals(state.get('host'), 'foolio')

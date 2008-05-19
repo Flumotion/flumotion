@@ -1,5 +1,12 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_greeter.py (WizardTest.testGreeter):
+	* flumotion/test/gtkunit.py (UITestCase._process):
+	Transform the ui test functions into methods, camelcasify and remove
+	the unused ones.
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/greeter.py:
 	Clean up the manager invokation.
 	* flumotion/common/netutils.py (tryPort):
