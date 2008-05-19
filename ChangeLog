@@ -1,5 +1,11 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/greeter.py (StartNew._startManager): save the
+	port we're going to use in a variable for re-use later.
+	(StartNew._startManager.done): The started manager uses ssl.
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/test/gtkunit.py: Fix a couple of stupid typos.
 
 2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>

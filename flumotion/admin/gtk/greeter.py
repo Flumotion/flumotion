@@ -232,7 +232,8 @@ This mode is only useful for testing Flumotion.
 
     def _startManager(self, state):
         # start a manager first
-        if tryPort(7531) is None:
+        port = 7531
+        if tryPort(port) is None:
             port = tryPort()
 
         # ready to start spawning processes
@@ -292,7 +293,7 @@ This mode is only useful for testing Flumotion.
                 username='user',
                 password='test',
                 port=port,
-                use_ssl=False)
+                use_ssl=True)
             state.update({
                 'confDir': confDir,
                 'logDir': logDir,
