@@ -1,5 +1,10 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/managerspawner.py: Remove unused variable
+	found by pychecker.
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/greeter.py:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/managerspawner.py:

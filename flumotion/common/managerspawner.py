@@ -93,7 +93,7 @@ class LocalManagerSpawner(SignalMixin):
             if configure.bindir not in paths:
                 paths.insert(0, configure.bindir)
             env['PATH'] = os.pathsep.join(paths)
-            process = reactor.spawnProcess(protocol, args[0], args, env=env)
+            reactor.spawnProcess(protocol, args[0], args, env=env)
             def error(failure, failMessage):
                 self._error(failure, failMessage, args)
                 return failure
