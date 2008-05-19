@@ -149,14 +149,9 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     gladeFile = 'sectionwizard.glade'
 
-    sections = None
-
     def __init__(self, parent_window=None):
-        if self.sections is None:
-            raise TypeError("%r needs to have a class attribute called %r" % (
-                    self, 'sections'))
-
         self._steps = {}
+        self._sections = []
         self._currentSection = 0
         self._stack = _WalkableStack()
         self._currentStep = None
@@ -170,7 +165,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.window.connect_after('realize', self.on_window_realize)
         self.window.connect('destroy', self.on_window_destroy)
 
-        self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
 
         self._currentStep = self.getFirstStep()
@@ -182,6 +176,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         return len(self._steps)
 
     # Override this in subclass
+
     def getFirstStep(self):
         raise NotImplementedError
 
@@ -189,6 +184,14 @@ class SectionWizard(GladeWindow, log.Loggable):
         pass
 
     # Public API
+
+    def addStepSection(self, section):
+        """Adds a new step section
+        @param section: section to add
+        @type section: a WizardStep subclass
+        """
+        self.sidebar.append_section(section.section, section.name)
+        self._sections.append(section)
 
     def getStep(self, stepname):
         """Fetches a step. KeyError is raised when the step is not found.
@@ -240,7 +243,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def run(self, interactive, main=True):
         self._useMain = main
-        sectionClass = self.sections[self._currentSection]
+        sectionClass = self._sections[self._currentSection]
         section = sectionClass(self)
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
@@ -261,15 +264,6 @@ class SectionWizard(GladeWindow, log.Loggable):
             gtk.main()
         except KeyboardInterrupt:
             pass
-
-    def _getNextStep(self):
-        if self._currentSection + 1 == len(self.sections):
-            self._finish(completed=True)
-            return
-
-        self._currentSection += 1
-        nextStepClass = self.sections[self._currentSection]
-        return nextStepClass(self)
 
     def prepareNextStep(self, step):
         if hasattr(step, 'lastStep'):
@@ -299,6 +293,16 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._showNextStep(nextStep)
 
     # Private
+
+    def _getNextStep(self):
+        if self._currentSection + 1 == len(self._sections):
+            self._finish(completed=True)
+            return
+
+        self._currentSection += 1
+        nextStepClass = self._sections[self._currentSection]
+        print nextStepClass
+        return nextStepClass(self)
 
     def _updateButtons(self, hasNext):
         # update the forward and next buttons
@@ -398,9 +402,9 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._updateButtons(hasNext)
 
     def _getSectionByName(self, section_name):
-        for sectionClass in self.sections:
+        for sectionClass in self._sections:
             if sectionClass.section == section_name:
-                return self.sections.index(sectionClass)
+                return self._sections.index(sectionClass)
 
     # Callbacks
 

@@ -116,16 +116,9 @@ class SummaryStep(WizardStep):
 class ConfigurationWizard(SectionWizard):
     gsignal('finished', str)
 
-    sections = [
-        WelcomeStep,
-        ProductionStep,
-        ConversionStep,
-        ConsumptionStep,
-        LicenseStep,
-        SummaryStep]
-
     def __init__(self, parent=None, admin=None):
         SectionWizard.__init__(self, parent)
+        
         self._cursorWatch = gdk.Cursor(gdk.WATCH)
         self._tasks = []
         self._admin = admin
@@ -138,6 +131,13 @@ class ConfigurationWizard(SectionWizard):
         self.top_vbox.pack_start(self._workerList, False, False)
         self._workerList.connect('worker-selected',
                                   self.on_combobox_worker_changed)
+
+        self.addStepSection(WelcomeStep)
+        self.addStepSection(ProductionStep)
+        self.addStepSection(ConversionStep)
+        self.addStepSection(ConsumptionStep)
+        self.addStepSection(LicenseStep)
+        self.addStepSection(SummaryStep)
 
     # SectionWizard
 

@@ -164,25 +164,16 @@ class WizardSidebar(gtk.EventBox):
 
     # Public API
 
-    def set_sections(self, titles_and_names):
-        for w in self._sections:
-            self.vbox.remove(w)
-            del w
-
+    def append_section(self, title, name):
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
-        sections = []
-        self._active = self._top = -1
-
-        for title, name in titles_and_names:
-            w = SidebarSection(title, name)
-            w.connect('step-chosen', clicked_cb)
-            w.show()
-            w.set_active(False)
-            self.vbox.pack_start(w, False, False)
-            sections.append(w)
-        self._sections = sections
+        section = SidebarSection(title, name)
+        section.connect('step-chosen', clicked_cb)
+        section.show()
+        section.set_active(False)
+        self.vbox.pack_start(section, False, False)
+        self._sections.append(section)
 
     def show_step(self, section_name):
         for i, section in enumerate(self._sections):
@@ -198,7 +189,11 @@ class WizardSidebar(gtk.EventBox):
             active_section.push_step(step_name, step_title)
         else:
             # new section
-            assert self._sections[self._active + 1].name == section_name
+            if self._sections[self._active + 1].name != section_name:
+                raise AssertionError(
+                    "Expected next section to be %r, but is %r" % (
+                    section_name, self._sections[self._active + 1].name))
+
             self._set_active(self._active + 1)
             self._top += 1
             self._sections[self._active].push_header()

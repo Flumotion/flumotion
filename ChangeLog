@@ -1,5 +1,15 @@
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/sidebar.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	Don't use class variables to define the steps.
+	- Add a new methods addSection
+	- Use it in configuration wizard
+	- Transform sidebar.set_sections into append_section
+
+2008-05-19  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/greeter.py (StartNew._startManager): save the
 	port we're going to use in a variable for re-use later.
 	(StartNew._startManager.done): The started manager uses ssl.
