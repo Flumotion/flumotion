@@ -97,7 +97,7 @@ class UITestCase(testsuite.TestCase):
         self.window.show_all() 
         self._pause()
 
-    def toggle(self):
+    def toggle(self, name, process=True):
         isActive = self._callNow(name, 'get_active') 
         self._callInc(name, 'set_sensitive', False) 
         self._call(name, 'set_sensitive', True) 
@@ -137,7 +137,7 @@ class UITestCase(testsuite.TestCase):
         Make sure all previous timeouts are processed, so that all state
         is updated.
         """
-        self.timeout_add(gtk.main_quit, increase=False)
+        self._timeoutAdd(gtk.main_quit, increase=False)
         gtk.main()
 
     def _callNow(self, name, method, *args, **kwargs):
