@@ -1,14 +1,35 @@
 #!/bin/bash
 NAME=flumotion-test
-flumotion-manager -v -T tcp \
+PROTOCOL=tcp
+PORT=8642
+
+while getopts “n:sp:” OPTION
+do
+     case $OPTION in
+         n)
+             NAME=$OPTARG
+             ;;
+         s)
+             PROTOCOL=ssl
+             ;;
+         p)
+             PORT=$OPTARG
+             ;;
+     esac
+done
+
+flumotion-manager -v -T $PROTOCOL \
+                  -P $PORT \
                   -n $NAME \
                   conf/managers/default/planet.xml >& /tmp/$NAME.manager.log &
 manager_pid=$!
 
-flumotion-worker -v -T tcp -u user -p test >& /tmp/$NAME.worker.log  &
+flumotion-worker -v -T $PROTOCOL \
+                 -P $PORT \
+                 -u user -p test >& /tmp/$NAME.worker.log  &
 worker_pid=$!
 
-MANAGER=user:test@localhost:8654
+MANAGER=user:test@localhost:$PORT
 
 killed()
 {
@@ -19,13 +40,17 @@ killed()
 
 trap killed SIGINT SIGTERM
 
+EXTRAOPT=
+if [ "$PROTOCOL" = "tcp" ]; then
+  EXTRAOPT="--no-ssl"
+fi
+
 while true; do
-  flumotion-command --no-ssl \
-                    -m user:test@localhost:8642 \
+  flumotion-command -m $MANAGER $EXTRAOPT \
                     showworkers 2> /dev/null
   EXITCODE=$?
   if test "$EXITCODE" = "0"; then
-    echo 'Manager and Worker are ready and waiting.'
+    echo "Manager and Worker are ready and waiting. ($PROTOCOL/$PORT)"
     break
   fi
 done
