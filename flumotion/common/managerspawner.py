@@ -130,7 +130,6 @@ class LocalManagerSpawner(SignalMixin):
                    "stop", serviceName, "admin"], '', '')
 
         def done(result):
-            print 'cleanup'
             if cleanUp:
                 self._cleanUp()
         d.addCallback(done)
