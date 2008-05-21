@@ -122,10 +122,12 @@ class TestComponentsView(testsuite.TestCase):
     def testUpdate(self):
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
+             'type': 'first'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
+             'type': 'second'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -170,7 +172,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -186,7 +189,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -202,7 +206,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sad.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sad.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -218,7 +223,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -234,7 +240,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.waking.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.waking.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -250,7 +257,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.lost.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.lost.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -265,7 +273,8 @@ class TestComponentsView(testsuite.TestCase):
             test.asserted = True
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -282,10 +291,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.sleeping.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.sleeping.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -301,10 +312,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -320,10 +333,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.happy.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.happy.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -339,10 +354,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.hungry.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.hungry.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -358,10 +375,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.waking.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.waking.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -377,10 +396,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.lost.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.lost.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -396,7 +417,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -412,7 +434,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.hungry.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -428,7 +451,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sad.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sad.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -444,7 +468,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.waking.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.waking.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -460,7 +485,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.lost.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.lost.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -476,7 +502,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sad.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sad.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -492,7 +519,8 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -509,10 +537,12 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
@@ -528,19 +558,24 @@ class TestComponentsView(testsuite.TestCase):
 
         components = {}
         c = self._createComponent(
-            {'name': 'one', 'mood': moods.happy.value, 'pid': 1})
+            {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
+             'type': 'foo'})
         components['one'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.sad.value, 'pid': 2})
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
+             'type': 'foo'})
         components['two'] = c
         c = self._createComponent(
-            {'name': 'three', 'mood': moods.hungry.value, 'pid': 3})
+            {'name': 'three', 'mood': moods.hungry.value, 'pid': 3,
+             'type': 'foo'})
         components['three'] = c
         c = self._createComponent(
-            {'name': 'four', 'mood': moods.waking.value, 'pid': 4})
+            {'name': 'four', 'mood': moods.waking.value, 'pid': 4,
+             'type': 'foo'})
         components['four'] = c
         c = self._createComponent(
-            {'name': 'two', 'mood': moods.lost.value, 'pid': 5})
+            {'name': 'two', 'mood': moods.lost.value, 'pid': 5,
+             'type': 'foo'})
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
