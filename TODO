@@ -6,9 +6,6 @@
 		same set of properties can be repeated for, for example,
 		a streamer component
 
-* MEDIUM	expose a raw dv stream as a second feed on the firewire
-		producer and allow the disker to connect to it
-
 * MEDIUM	add api for admins to "subscribe" to admin methods in the
 		manager, so only relevant commands get sent
 
@@ -36,9 +33,6 @@
 * EASY		and force update every minute,
 		or when stats are different from last,
 	 	in http streamer UI
-
-* MEDIUM	integration with monitoring tools:
-		big brother: either:
 
 * HARD		transfer ALL code from manager
 
@@ -73,11 +67,6 @@
 		- component dependencies
 		and possibly remove feederset
 
-* MEDIUM	allow inspecting and changing debug level on the fly of
-		every process.  This way when a problem arises, before
-		stopping and restarting, we can increase it and retry to
-		get debug info
-
 * MEDIUM	allow placing markers in the logs, preferably in all
 		processes at the same time, same marker.  Allows you to
 		keep track of what you are doing during debugging
@@ -93,8 +82,6 @@
 
 * MEDIUM	merge before_show and worker_changed in wizard, since they
 		are pretty much the same anyway
-
-* MEDIUM	split out wizard steps into their component directories
 
 * EASY		add worker checks to all wizard steps now that infrastructure
 		is there
@@ -114,9 +101,6 @@
 
 * MEDIUM	allow the manager to reparse all known config files; easier
 	        than restarting manager and all workers
-
-* MEDIUM	run all worker checks in a spawned process - segfaults are less
-		painful that way.  maybe even start a job for it always
 
 * MEDIUM	when a component segfaults, allow
 		attaching gdb and filing a bug report
