@@ -278,7 +278,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('OpenRecent', gtk.STOCK_OPEN, _('_Open Recent Connection...'),
               None, _('Connect to a recently used connection'),
              self._connection_open_recent_cb),
-            ('OpenExisting', None, _('Open _Existing Connection...'), None,
+            ('OpenExisting', None, _('Connect to _running manager...'), None,
              _('Connect to an previously used connection'),
              self._connection_open_existing_cb),
             ('ImportConfig', None, _('_Import Configuration...'), None,
