@@ -80,9 +80,6 @@
 		helps ENORMOUSLY in debugging strange errors at a point
 		where the system is broken - like AlreadyConnectedError
 
-* MEDIUM	merge before_show and worker_changed in wizard, since they
-		are pretty much the same anyway
-
 * EASY		add worker checks to all wizard steps now that infrastructure
 		is there
 
