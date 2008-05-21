@@ -28,7 +28,7 @@ from twisted.internet import reactor, defer
 from flumotion.common import common, errors, planet, log
 from flumotion.admin import connections, admin
 
-from flumotion.monitor.nagios import util
+from flumotion.monitor.nagios import util, process
 
 __version__ = "$Rev$"
 
@@ -224,7 +224,7 @@ class Nagios(util.LogCommand):
     usage = "%prog %command"
     description = "Run Flumotion-related Nagios checks."
 
-    subCommandClasses = [Manager, ]
+    subCommandClasses = [Manager, process.ProcessCommand]
 
     def addOptions(self):
         self.parser.add_option('-v', '--version',

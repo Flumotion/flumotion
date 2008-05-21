@@ -1,3 +1,11 @@
+2008-05-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/Makefile.am:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/process.py:
+	  Add a process subcommand that allows checking for multiple
+	  worker/manager/job, vsize and orphaned status of jobs.
+
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:

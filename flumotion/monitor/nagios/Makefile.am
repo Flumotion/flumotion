@@ -5,6 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/monitor/nagios
 flumotion_PYTHON =	\
 	__init__.py	\
 	util.py		\
+	process.py	\
 	main.py
 
 TAGS_FILES = $(flumotion_PYTHON)
