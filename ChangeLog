@@ -1,5 +1,9 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py (AdminClientWindow._export_configuration):
+	Set the default export filename to configuration.xml and always append
+	.xml if it's missing.
+
 	* flumotion/test/test_parts.py (TestComponentsView.testUpdate):
 	Add 'type' key to the test components, so the tests can pass
 	after the latest sorting changes

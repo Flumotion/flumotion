@@ -1037,8 +1037,12 @@ class AdminClientWindow(Loggable, gobject.GObject):
                                    _('Export'), gtk.RESPONSE_ACCEPT))
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
-
+        d.set_current_name("configuration.xml")
+        
         def get_configuration(conf_xml, name, chooser):
+            if not name.endswith('.xml'):
+                name += '.xml'
+                
             file_exists = True
             if os.path.exists(name):
                 d = gtk.MessageDialog(self._window, gtk.DIALOG_MODAL,
@@ -1049,7 +1053,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
                     file_exists = False
             else:
                 file_exists = False
-
+                
             if not file_exists:
                 f = open(name, 'w')
                 f.write(conf_xml)
