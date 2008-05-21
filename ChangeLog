@@ -1,5 +1,8 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/production-wizard.glade: Change on demand radiobutton
+	label to "Stream files on demand"
+
 	* flumotion/admin/gtk/parts.py (ComponentsView._add_columns):
 	Rename the mood column to status
 
