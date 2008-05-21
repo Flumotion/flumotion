@@ -32,6 +32,7 @@ from flumotion.common import log, planet
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
+from flumotion.common.xmlwriter import cmpComponentType
 from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
@@ -381,12 +382,18 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._model.clear()
         self._iters = {}
 
-        # get a dictionary of components
-        names = components.keys()
-        names.sort()
+        # FIXME: When we can depend on Python 2.4, use
+        #        sorted(components.values(),
+        #               cmp=cmpComponentType,
+        #               key=operator.attrgetter('type'))
+        #
+        def componentSort(a, b):
+            return cmpComponentType(a.get('type'),
+                                    b.get('type'))
+        componentsSorted = components.values()
+        componentsSorted.sort(cmp=componentSort)
 
-        for name in names:
-            component = components[name]
+        for component in componentsSorted:
             self.debug('adding component %r to listview' % component)
             component.addListener(self, self.stateSet)
 

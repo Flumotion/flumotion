@@ -1,5 +1,8 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/parts.py (ComponentsView.update): Sort the
+	component list by component type, similar to the xml file.
+
 	* flumotion/test/test_greeter.py (WizardTest.testGreeter): Remove test
 	which checks auth_method_combo, which now is gone
 
