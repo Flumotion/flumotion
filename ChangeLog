@@ -1,5 +1,9 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/plugs/cortado/cortado.xml: Change the
+	description of the cortado plugin to be
+	"Publish embedded Java player page"
+
 	* flumotion/admin/gtk/dialogs.py: refactor already_connected_message
 	into showConnectionErrorDialog.
 

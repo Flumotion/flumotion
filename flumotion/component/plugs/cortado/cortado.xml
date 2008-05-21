@@ -10,7 +10,7 @@
                location="flumotion/component/plugs/cortado/wizard_gtk.py"
                function="CortadoWizardPlugin" />
       </entries>
-      <wizard _description="Stream to Java" type="http-consumer"
+      <wizard _description="Publish embedded Java player page" type="http-consumer"
               feeder="default" eater="default">
         <accept-format media-type="muxer:ogg"/>
         <accept-format media-type="muxer:multipart"/>
