@@ -65,7 +65,6 @@ class WizardTest(UITestCase):
         self._prev()
         self._next()
         self._checkPrevNext(True, False)
-        self.assertCallReturns('auth_method_combo', 'get_active', 0)
         self.setText('user_entry', 'bar')
         self._checkPrevNext(True, False)
         self.setText('passwd_entry', 'baz')

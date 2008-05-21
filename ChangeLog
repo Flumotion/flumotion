@@ -1,5 +1,8 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_greeter.py (WizardTest.testGreeter): Remove test
+	which checks auth_method_combo, which now is gone
+
 	* flumotion/admin/gtk/connections.py (Authenticate.__init__):
 	* data/glade/authenticate.glade:
 	Remove the label and combobox for authentication method, since we
