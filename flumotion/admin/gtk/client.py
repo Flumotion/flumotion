@@ -83,6 +83,7 @@ MAIN_UI = """
       <menuitem action="EnableDebugging"/>
       <separator name="sep5"/>
       <menuitem action="StartShell"/>
+      <menuitem action="DumpConfiguration"/>
     </menu>
     <menu action="Help">
       <menuitem action="About"/>
@@ -339,6 +340,10 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('StartShell', gtk.STOCK_EXECUTE, _('Start _Shell'), None,
              _('Start an interactive debugging shell'),
              self._debug_start_shell_cb),
+            ('DumpConfiguration', gtk.STOCK_EXECUTE,
+	     _('Dump configuration'), None,
+             _('Dumps the current manager configuration'),
+             self._debug_dump_configuration_cb),
             ])
         uimgr.insert_action_group(self._debugActions, 0)
         self._debugActions.set_sensitive(False)
@@ -1093,6 +1098,12 @@ You can do remote component calls using:
 """
         code.interact(local=vars, banner=message)
 
+    def _dump_configuration(self):
+        def gotConfiguration(xml):
+            print xml
+        d = self._admin.getConfiguration()
+        d.addCallback(gotConfiguration)
+
     def _about(self):
         about = AboutDialog(self._window)
         about.run()
@@ -1178,6 +1189,9 @@ You can do remote component calls using:
     def _debug_start_shell_cb(self, action):
         self._start_shell()
 
+    def _debug_dump_configuration_cb(self, action):
+        self._dump_configuration()
+	
     def _help_about_cb(self, action):
         self._about()
 
