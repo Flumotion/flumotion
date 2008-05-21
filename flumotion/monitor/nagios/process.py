@@ -199,6 +199,10 @@ class JobMultiple(util.LogCommand):
             if not p.cmd.startswith('flumotion-job'):
                 continue
 
+            # ignore workerPid 1, which is init - see orphaned for that
+            if p.ppid == 1:
+                continue
+
             t = (p.ppid, p.component)
             if not t in components.keys():
                 components[t] = []
@@ -212,12 +216,9 @@ class JobMultiple(util.LogCommand):
 
         l = []
         for (workerPid, component), pids in which:
-            # ignore workerPid 1, which is init - see orphaned for that
-            if workerPid == 1:
-                continue
-
             l.append('worker %d: component %s (%s)' % (
                 workerPid, component, ", ".join(pids)))
+
         return util.critical('%d multiple component job(s) running (%s).' % (
             len(which), ", ".join(l)))
 

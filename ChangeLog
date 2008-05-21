@@ -1,5 +1,10 @@
 2008-05-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/monitor/nagios/process.py:
+	  Remove process with parent pid 1 before looping over them.
+
+2008-05-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/monitor/nagios/Makefile.am:
 	* flumotion/monitor/nagios/main.py:
 	* flumotion/monitor/nagios/process.py:
