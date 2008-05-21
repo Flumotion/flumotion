@@ -1,5 +1,8 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/consumptionsteps.py (HTTPConsumptionStep.section):
+	Rename the streaming page from HTTP to HTTP Streaming.
+
 	* data/image/16x16/Makefile.am:
 	* data/image/16x16/pause.png:
 	* data/image/24x24/Makefile.am:

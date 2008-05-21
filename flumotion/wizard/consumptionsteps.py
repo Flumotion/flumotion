@@ -222,7 +222,7 @@ class HTTPConsumptionStep(WorkerWizardStep):
     to configure the common http properties of a stream
     """
     icon = 'consumption.png'
-    name = _('HTTP')
+    name = _('HTTP Streaming')
     gladeFile = 'http-wizard.glade'
     section = _('Consumption')
 
