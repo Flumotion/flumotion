@@ -1007,7 +1007,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         d = gtk.FileChooserDialog(_("Import Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                   _('Import'), gtk.RESPONSE_ACCEPT))
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
 
@@ -1025,7 +1025,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         d = gtk.FileChooserDialog(_("Export Configuration..."), self._window,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                   _('Export'), gtk.RESPONSE_ACCEPT))
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
 

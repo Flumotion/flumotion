@@ -1,5 +1,9 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py (AdminClientWindow._import_configuration)
+	(AdminClientWindow._export_configuration): Import and Export dialogs
+	should use a verb instead of just OK to confirm the dialog.
+
 	* flumotion/wizard/consumptionsteps.py (HTTPConsumptionStep.section):
 	Rename the streaming page from HTTP to HTTP Streaming.
 
