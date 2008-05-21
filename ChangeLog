@@ -1,5 +1,8 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/dialogs.py: refactor already_connected_message
+	into showConnectionErrorDialog.
+
 	* flumotion/admin/gtk/client.py (AdminClientWindow._create_ui):
 	Change the menu label to be "Connect to running manager"
 

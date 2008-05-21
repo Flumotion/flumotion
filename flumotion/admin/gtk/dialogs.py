@@ -27,7 +27,8 @@ import gobject
 import gtk
 
 from flumotion.configure import configure
-from flumotion.common.errors import ConnectionFailedError, \
+from flumotion.common.errors import AlreadyConnectedError, \
+     AlreadyConnectingError, ConnectionFailedError, \
      ConnectionRefusedError
 from flumotion.common.pygobject import gsignal
 
@@ -237,15 +238,13 @@ def showConnectionErrorDialog(failure, info, parent=None):
         title = _('Connection failed')
         message = (_("Connection to manager on %s failed (%s).")
                    % (str(info), str(failure)))
+    elif failure.check(AlreadyConnectedError,
+                       AlreadyConnectingError):
+        title =_('Already connected to %s') % (info,)
+        message = _("You cannot connect twice to the same manager. Try "
+                    "disconnecting first.")
     else:
         raise AssertionError(failure)
 
     dialog = ErrorDialog(title, parent, True, message)
     return dialog.run()
-
-def already_connected_message(info, parent=None):
-    d = ErrorDialog(_('Already connected to %s') % (info,), parent, True,
-                    _("You cannot connect twice to the same manager. Try "
-                      "disconnecting first."))
-    return d.run()
-
