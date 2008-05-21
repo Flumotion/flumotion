@@ -296,7 +296,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('StartComponent', 'flumotion-play', _('_Start Component(s)'),
               None, _('Start the selected component(s)'),
              self._manage_start_component_cb),
-            ('StopComponent', 'flumotion-pause', _('St_op Component(s)'),
+            ('StopComponent', 'flumotion-stop', _('St_op Component(s)'),
               None, _('Stop the selected component(s)'),
              self._manage_stop_component_cb),
             ('DeleteComponent', gtk.STOCK_DELETE, _('_Delete Component(s)'),

@@ -1,5 +1,15 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* data/image/16x16/Makefile.am:
+	* data/image/16x16/pause.png:
+	* data/image/24x24/Makefile.am:
+	* data/image/24x24/pause.png:
+	* flumotion/admin/gtk/client.py:
+	Create a stop icon and use it instead of pause in the
+	admin ui.
+
+2008-05-21  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/plugs/cortado/cortado.xml: Change the
 	description of the cortado plugin to be
 	"Publish embedded Java player page"
