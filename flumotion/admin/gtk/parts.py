@@ -197,7 +197,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
     def _add_columns(self):
         # put in all the columns
-        col = gtk.TreeViewColumn(_('Mood'), gtk.CellRendererPixbuf(),
+        col = gtk.TreeViewColumn(_('Status'), gtk.CellRendererPixbuf(),
                                  pixbuf=COL_MOOD)
         col.set_sort_column_id(COL_MOOD_VALUE)
         self._view.append_column(col)
