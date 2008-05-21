@@ -182,7 +182,6 @@ class Authenticate(GladeWidget):
 
     def __init__(self, *args):
         GladeWidget.__init__(self, *args)
-        self.auth_method_combo.set_active(0)
         self.set_property('can-activate', False)
         self.user_entry.connect('activate',
                                 lambda *x: self.passwd_entry.grab_focus())

@@ -1,5 +1,10 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/connections.py (Authenticate.__init__):
+	* data/glade/authenticate.glade:
+	Remove the label and combobox for authentication method, since we
+	only support one kind of method right now.
+
 	* data/glade/production-wizard.glade: Change on demand radiobutton
 	label to "Stream files on demand"
 
