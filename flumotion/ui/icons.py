@@ -60,6 +60,8 @@ def register_icons():
                               '24x24/play.png']),
         ('flumotion-pause', ['16x16/pause.png',
                               '24x24/pause.png']),
+        ('flumotion-stop', ['16x16/stop.png',
+                            '24x24/stop.png']),
         ('flumotion-about', ['16x16/about.png',
                               '24x24/about.png']),
         ('flumotion-mood-happy', ['mood-happy.png']),
