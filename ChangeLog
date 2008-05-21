@@ -1,5 +1,10 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py
+	(AdminClientWindow._import_configuration):
+	Add two file filters when importing configuration, one for *.xml 
+	and one for everything.
+
 	* flumotion/admin/gtk/parts.py (ComponentsView.update): Sort the
 	component list by component type, similar to the xml file.
 

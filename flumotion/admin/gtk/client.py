@@ -1004,22 +1004,31 @@ class AdminClientWindow(Loggable, gobject.GObject):
         d.addErrback(cancel)
 
     def _import_configuration(self):
-        d = gtk.FileChooserDialog(_("Import Configuration..."), self._window,
-                                  gtk.FILE_CHOOSER_ACTION_OPEN,
-                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   _('Import'), gtk.RESPONSE_ACCEPT))
-        d.set_modal(True)
-        d.set_default_response(gtk.RESPONSE_ACCEPT)
+        dialog = gtk.FileChooserDialog(
+            _("Import Configuration..."), self._window,
+            gtk.FILE_CHOOSER_ACTION_OPEN,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+             _('Import'), gtk.RESPONSE_ACCEPT))
+        dialog.set_modal(True)
+        dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+        ffilter = gtk.FileFilter()
+        ffilter.set_name(_("Flumotion XML Configuration files"))
+        ffilter.add_pattern("*.xml")
+        dialog.add_filter(ffilter)
+        ffilter = gtk.FileFilter()
+        ffilter.set_name(_("All files"))
+        ffilter.add_pattern("*")
+        dialog.add_filter(ffilter)
 
-        def response(d, response):
+        def response(dialog, response):
             if response == gtk.RESPONSE_ACCEPT:
-                name = d.get_filename()
+                name = dialog.get_filename()
                 conf_xml = open(name, 'r').read()
                 self._admin.loadConfiguration(conf_xml)
-            d.destroy()
+            dialog.destroy()
 
-        d.connect('response', response)
-        d.show()
+        dialog.connect('response', response)
+        dialog.show()
 
     def _export_configuration(self):
         d = gtk.FileChooserDialog(_("Export Configuration..."), self._window,
