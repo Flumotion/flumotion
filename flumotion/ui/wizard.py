@@ -36,7 +36,7 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 __version__ = "$Rev$"
 __pychecker__ = 'no-classattr no-argsused'
 T_ = gettexter()
-N_ = gettext.gettext
+N_ = _ = gettext.gettext
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -314,8 +314,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         if hasNext:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
-            # use APPLY, just like in gnomemeeting
-            self.button_next.set_label(gtk.STOCK_APPLY)
+            self.button_next.set_label(_('Finish'))
 
     def _setStepIcon(self, icon):
         icon_filename = os.path.join(configure.imagedir, 'wizard', icon)

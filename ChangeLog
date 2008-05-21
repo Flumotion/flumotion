@@ -1,6 +1,10 @@
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/admin/gtk/client.py (AdminClientWindow._import_configuration)
+	* flumotion/ui/wizard.py (SectionWizard._updateButtons): Use finish
+	instead of apply when completing the wizard
+
+	* flumotion/admin/gtk/client.py
+	(AdminClientWindow._import_configuration)
 	(AdminClientWindow._export_configuration): Import and Export dialogs
 	should use a verb instead of just OK to confirm the dialog.
 
