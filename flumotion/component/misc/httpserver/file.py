@@ -33,7 +33,6 @@ from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
-from flumotion.component.misc.httpserver import ratecontrol
 from flumotion.component.base import http as httpbase
 from flumotion.twisted import fdserver
 

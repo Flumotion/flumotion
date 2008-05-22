@@ -1,3 +1,8 @@
+2008-05-22  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/misc/httpserver/file.py:
+	Remove ratecontrol import - it's not used and shouldn't be there.
+
 2008-05-21  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
