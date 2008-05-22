@@ -151,19 +151,12 @@
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow.__init__,
 	  AdminClientWindow.stateSet,
-	  AdminClientWindow.componentCallRemoteStatus, AdminClientWindow.cb,
-	  AdminClientWindow.eb, AdminClientWindow._create_ui,
-	  AdminClientWindow.nullwizard,
+	  AdminClientWindow.componentCallRemoteStatus, 
+	  AdminClientWindow._create_ui,
 	  AdminClientWindow._update_component_actions,
-	  AdminClientWindow._component_modify, AdminClientWindow.dialog_set_cb,
 	  AdminClientWindow._remove_component, AdminClientWindow._component_do,
-	  AdminClientWindow._actionCallback,
-	  AdminClientWindow._component_activate,
 	  AdminClientWindow._component_selection_changed,
 	  AdminClientWindow.compAppend, AdminClientWindow.compRemove,
-	  AdminClientWindow.response, AdminClientWindow._connection_refused,
-	  AdminClientWindow._start_shell,
-	  AdminClientWindow._admin_connection_failed_cb,
 	  AdminClientWindow._components_view_activated_cb):
 	  Added multi selection
 	* flumotion/admin/gtk/message.py:
@@ -176,57 +169,13 @@
 	  ComponentsView.get_selected_names,
 	  ComponentsView.get_selected_states, ComponentsView.can_start,
 	  ComponentsView.can_stop, ComponentMenu.__init__):
-	  Added multi selection
-	* flumotion/test/test_parts.py (TestComponentsView.testNoneSelected,
-	  TestComponentsView.testOneSelected,
-	  TestComponentsView.assertSelected,
-	  TestComponentsView.testMultipleSelected,
-	  TestComponentsView.assertMultipleSelected,
-	  TestComponentsView.testCanStartOneWhenSleeping,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartOneWhenHappy,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartOneWhenSad,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartOneWhenHungry,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartOneWhenWaking,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartOneWhenLost,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartWhenNoSelection,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanStartMultipleWhenSleeping,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartMultipleWhenOneIsSad,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartMultipleWhenOneIsHappy,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartMultipleWhenOneIsHungry,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartMultipleWhenOneIsWaking,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanNotStartMultipleWhenOneIsLost,
-	  TestComponentsView.assertCanStart,
-	  TestComponentsView.testCanStopOneWhenHappy,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanStopOneWhenHungry,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanStopOneWhenSad,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanStopOneWhenWaking,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanStopOneWhenLost,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanNotStopOneWhenSleeping,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanNotStopWhenNoSelection,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanNotStopMultipleWhenOneIsSleeping,
-	  TestComponentsView.assertCanStop,
-	  TestComponentsView.testCanStopMultipleWhenOneNoneIsSleeping,
-	  TestComponentsView.assertCanStop):
-	  Added multi selection
+	  Added multi selection by returning multiple elements ( a list ) 
+	  instead of a single element on the get_selected*. Also, moved the
+	  can_start and can_stop from the 
+	  flumotion.admin.gtk.client.AdminClientWindow
+	  to this class as it is used for the context menu.
+	* flumotion/test/test_parts.py :
+	  Added tests for multi selection
 
 2008-05-19  Johan Dahlin  <johan@flumotion.com>
 
