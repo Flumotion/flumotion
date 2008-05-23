@@ -1,5 +1,10 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	CamelCase rename internal methods and varibles.
+
+2008-05-23  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/models.py (Component.link):
 	Add back accidentally removed append statements
 
