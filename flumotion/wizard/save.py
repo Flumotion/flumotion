@@ -346,20 +346,20 @@ class WizardSaver(object):
         # First, find all the trailing digits, for instance in
         # 'audio-producer42' -> '42'
         pos = -1
-        existingDigit = ''
+        trailingDigit = ''
         while True:
             lastChar = suggestedName[pos]
             if not lastChar.isdigit():
                 break
-            existingDigit = lastChar + existingDigit
+            trailingDigit = lastChar + trailingDigit
             pos -= 1
 
         # Now if we had a digit in the end, convert it to
-        # a number and increase it by one and remove the number
-        # from the existing name
-        if existingDigit:
-            digit = int(existingDigit) + 1
-            suggestedName = suggestedName[:-len(existingDigit)]
+        # a number and increase it by one and remove the trailing
+        # digits the existing component name
+        if trailingDigit:
+            digit = int(trailingDigit) + 1
+            suggestedName = suggestedName[:-len(trailingDigit)]
         # No number in the end, use 2 the first one so we end up
         # with 'audio-producer' and 'audio-producer2' in case of
         # a simple conflict

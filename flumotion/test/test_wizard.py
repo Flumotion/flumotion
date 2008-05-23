@@ -104,9 +104,9 @@ class WizardSaveTest(testsuite.TestCase):
         videoProducer = config['video-producer']
         self.failUnlessEqual(videoProducer.type, 'firewire')
 
-        self.failUnlessEqual(config['audio-encoder'].getFeeders(),
+        self.failUnlessEqual(config['audio-encoder'].getEaters(),
             ['video-producer:audio'])
-        self.failUnlessEqual(config['video-overlay'].getFeeders(),
+        self.failUnlessEqual(config['video-overlay'].getEaters(),
             ['video-producer:video'])
     testFirewireAudioAndVideo.skip = 'Maybe Andy\'s generator work broke this ?'
 
