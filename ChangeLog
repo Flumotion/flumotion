@@ -1,5 +1,8 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py (AdminClientWindow._connection_opened):
+	Show the client window even if the configuration wizard isn't run.
+
 	* flumotion/test/test_wizard_save.py:
 	* flumotion/wizard/configurationwriter.py:
 	* flumotion/wizard/models.py:

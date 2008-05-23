@@ -929,6 +929,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
             # ensure our window is shown
             self.show()
             self._run_wizard()
+        else:
+            self.show()
 
     def _show_connection_lost_dialog(self):
         RESPONSE_REFRESH = 1
