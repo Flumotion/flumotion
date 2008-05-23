@@ -58,10 +58,11 @@ class OnDemandStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you
     to configure an on demand configuration over HTTP
     """
-    gladeFile = 'ondemand-wizard.glade'
-    name = _('Demand')
+    name = 'Demand'
+    title  = _('Demand')
     sidebarName = _('On demand')
     section = _('Production')
+    gladeFile = 'ondemand-wizard.glade'
 
     def __init__(self, wizard):
         self.model = OnDemand()

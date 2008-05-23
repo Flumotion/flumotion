@@ -59,20 +59,22 @@ def _fraction_from_float(number, denominator):
 
 
 class WelcomeStep(WizardStep):
-    gladeFile = 'welcome-wizard.glade'
-    name = _('Welcome')
+    name = "Welcome"
+    title = _('Welcome')
     section = _('Welcome')
     icon = 'wizard.png'
+    gladeFile = 'welcome-wizard.glade'
 
     def getNext(self):
         return None
 
 
 class LicenseStep(WizardStep):
-    name = _("Content License")
-    gladeFile = "license-wizard.glade"
+    name = "ContentLicense"
+    title = _("Content License")
     section = _('License')
     icon = 'licenses.png'
+    gladeFile = "license-wizard.glade"
 
     # Public API
 
@@ -101,10 +103,11 @@ class LicenseStep(WizardStep):
 
 
 class SummaryStep(WizardStep):
-    name = _("Summary")
+    name = "Summary"
+    title = _("Summary")
     section = _("Summary")
-    gladeFile = "summary-wizard.glade"
     icon = 'summary.png'
+    gladeFile = "summary-wizard.glade"
     lastStep = True
 
     # WizardStep
@@ -531,7 +534,7 @@ class ConfigurationWizard(SectionWizard):
             for server in step.getServerConsumers():
                 save.addServerConsumer(server, consumerType)
 
-        licenseStep = self.getStep('Content License')
+        licenseStep = self.getStep('ContentLicense')
         if licenseStep.getLicenseType() == 'CC':
             save.setUseCCLicense(True)
 

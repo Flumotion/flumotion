@@ -47,10 +47,11 @@ class HTTPCommon(object):
 
 
 class ConsumptionStep(WizardStep):
-    name = _('Consumption')
-    gladeFile = 'consumption-wizard.glade'
+    name = 'Consumption'
+    title = _('Consumption')
     section = _('Consumption')
     icon = 'consumption.png'
+    gladeFile = 'consumption-wizard.glade'
 
     def __init__(self, wizard):
         self._httpCommon = HTTPCommon()
@@ -221,10 +222,11 @@ class HTTPConsumptionStep(WorkerWizardStep):
     """I am a step of the configuration wizard which allows you
     to configure the common http properties of a stream
     """
-    icon = 'consumption.png'
-    name = _('HTTP Streaming')
-    gladeFile = 'http-wizard.glade'
+    name = 'HTTPStreaming'
+    title = _('HTTP Streaming')
     section = _('Consumption')
+    icon = 'consumption.png'
+    gladeFile = 'http-wizard.glade'
 
     def __init__(self, wizard):
         consumptionStep = wizard.getStep('Consumption')

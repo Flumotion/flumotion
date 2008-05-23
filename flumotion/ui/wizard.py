@@ -96,6 +96,7 @@ class WizardStep(GladeWidget, log.Loggable):
 
     # set by subclasses
     name = None
+    title = None
     section = None
     icon = 'placeholder.png'
 
@@ -113,7 +114,7 @@ class WizardStep(GladeWidget, log.Loggable):
         GladeWidget.__init__(self)
         self.set_name(self.name)
         if not self.sidebarName:
-            self.sidebarName = self.name
+            self.sidebarName = self.title
         self.setup()
 
     def __repr__(self):
@@ -190,7 +191,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         @param section: section to add
         @type section: a WizardStep subclass
         """
-        self.sidebar.append_section(section.section, section.name)
+        self.sidebar.append_section(section.section, section.title)
         self._sections.append(section)
 
     def getStep(self, stepname):
@@ -301,7 +302,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         self._currentSection += 1
         nextStepClass = self._sections[self._currentSection]
-        print nextStepClass
         return nextStepClass(self)
 
     def _updateButtons(self, hasNext):
@@ -353,7 +353,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         hasNext = not hasattr(step, 'lastStep')
         if not step.visited and hasNext:
-            self.sidebar.push(step.section, step.name,
+            self.sidebar.push(step.section, step.title,
                               step.sidebarName)
         else:
             self.sidebar.show_step(step.section)
@@ -365,10 +365,9 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def _setStep(self, step):
         self._currentStep = step
-
         self._packStep(step)
         self._setStepIcon(step.icon)
-        self._setStepTitle(step.name)
+        self._setStepTitle(step.title)
 
         self._updateButtons(hasNext=True)
         self.blockNext(False)

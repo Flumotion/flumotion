@@ -37,11 +37,12 @@ class SmokeVideoEncoder(VideoEncoder):
 
 
 class SmokeStep(VideoEncoderStep):
-    name = _('Smoke encoder')
+    name = 'SmokeEncoder'
+    title = _('Smoke encoder')
     sidebarName = _('Smoke')
+    section = _('Conversion')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
-    section = _('Conversion')
     componentType = 'smoke'
 
     # WizardStep

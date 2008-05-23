@@ -72,11 +72,12 @@ class SoundcardProducer(AudioProducer):
 
 
 class SoundcardStep(AudioProducerStep):
-    name = _('Soundcard')
+    name = 'Soundcard'
+    title = _('Soundcard')
+    icon = 'soundcard.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'osssrc'
-    icon = 'soundcard.png'
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)

@@ -81,7 +81,8 @@ class TheoraVideoEncoder(VideoEncoder):
 
 
 class TheoraStep(VideoEncoderStep):
-    name = _('Theora encoder')
+    name = 'TheoraEncoder'
+    title = _('Theora encoder')
     sidebarName = _('Theora')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')

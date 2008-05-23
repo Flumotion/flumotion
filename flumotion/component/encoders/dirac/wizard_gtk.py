@@ -41,12 +41,13 @@ class DiracVideoEncoder(VideoEncoder):
         self.properties.bitrate = 400
 
 class DiracStep(VideoEncoderStep):
-    name = _('Dirac encoder')
+    name = 'Dirac encoder'
+    title = _('Dirac encoder')
     sidebarName = _('Dirac')
+    icon = 'xiphfish.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'dirac'
-    icon = 'xiphfish.png'
 
     # WizardStep
 

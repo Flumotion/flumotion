@@ -57,11 +57,12 @@ class TVCardProducer(VideoProducer):
 
 
 class TVCardStep(VideoProducerStep):
-    name = _('TV Card')
+    name = 'TVCard'
+    title = _('TV Card')
+    icon = 'tv.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'bttv'
-    icon = 'tv.png'
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)

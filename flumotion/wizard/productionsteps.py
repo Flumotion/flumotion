@@ -38,11 +38,11 @@ N_ = _ = gettext.gettext
 
 
 class ProductionStep(WizardStep):
-
-    gladeFile = 'production-wizard.glade'
-    name = _('Production')
+    name = 'Production'
+    title = _('Production')
     section = _('Production')
     icon = 'source.png'
+    gladeFile = 'production-wizard.glade'
 
     def __init__(self, wizard):
         self._audioProducer = None

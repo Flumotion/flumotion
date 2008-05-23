@@ -48,11 +48,12 @@ class WebcamProducer(VideoProducer):
 
 
 class WebcamStep(VideoProducerStep):
-    name = _('Webcam')
+    name = 'Webcam'
+    title = _('Webcam')
+    icon = 'webcam.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'video4linux'
-    icon = 'webcam.png'
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)

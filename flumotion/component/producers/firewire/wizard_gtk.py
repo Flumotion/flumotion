@@ -55,10 +55,10 @@ class FireWireProducer(AudioProducer, VideoProducer):
 
 
 class _FireWireCommon:
+    icon = 'firewire.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'firewire'
-    icon = 'firewire.png'
     width_corrections = ['none', 'pad', 'stretch']
 
     def __init__(self):

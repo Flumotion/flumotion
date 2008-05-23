@@ -43,9 +43,10 @@ def _fraction_from_float(number, denominator):
 
 
 class ConversionStep(WorkerWizardStep):
-    gladeFile = 'encoding-wizard.glade'
-    name = _('Encoding')
+    name = 'Encoding'
+    title = _('Encoding')
     section = _('Conversion')
+    gladeFile = 'encoding-wizard.glade'
 
     def __init__(self, wizard):
         self._audioEncoder = None
@@ -140,7 +141,7 @@ class ConversionStep(WorkerWizardStep):
         elif self.wizard.hasAudio():
             return self._getAudioPage()
         else:
-            return None
+            raise AssertionError
 
     # Private
 
@@ -252,3 +253,4 @@ class ConversionStep(WorkerWizardStep):
 
     def on_muxer__changed(self, combo):
         self._muxerChanged()
+

@@ -65,11 +65,12 @@ class Overlay(VideoConverter):
 
 
 class OverlayStep(WorkerWizardStep):
-    name = _('Overlay')
-    gladeFile = 'overlay-wizard.glade'
+    name = 'Overlay'
+    title = _('Overlay')
     section = _('Production')
-    componentType = 'overlay'
+    gladeFile = 'overlay-wizard.glade'
     icon = 'overlay.png'
+    componentType = 'overlay'
 
     def __init__(self, wizard, video_producer):
         self.model = Overlay(video_producer)
