@@ -1,5 +1,31 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/encoders/dirac/wizard_gtk.py:
+	* flumotion/component/encoders/jpeg/wizard_gtk.py:
+	* flumotion/component/encoders/mulaw/wizard_gtk.py:
+	* flumotion/component/encoders/smoke/wizard_gtk.py:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/component/encoders/vorbis/wizard_gtk.py:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	Add step.title and use that in user interfaces.
+	Keep step.name, but never display it, use it only internally
+	in the code.
+
+2008-05-23  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/dialogs.py:
 	* flumotion/test/test_dialogs.py:
