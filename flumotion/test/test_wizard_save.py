@@ -862,5 +862,27 @@ class TestWizardSave(testsuite.TestCase):
              '</planet>\n' % dict(version=configure.version)),
             configuration)
 
+    def testOndemand(self):
+        save = WizardSaver()
+
+        server = HTTPServer('ondemand-server-worker', '/mount-point/')
+        save.addServerConsumer(server, 'ondemand')
+
+        configuration = save.getXML()
+        testsuite.diffStrings(
+            ('<planet>\n'
+             '  <atmosphere>\n'
+             '    <component name="http-server-ondemand"\n'
+             '               type="http-server"\n'
+             '               project="flumotion"\n'
+             '               worker="ondemand-server-worker"\n'
+             '               version="%(version)s">\n'
+             '      \n'
+             '      <property name="mount-point">/mount-point/</property>\n'
+             '    </component>\n'
+             '  </atmosphere>\n'
+             '</planet>\n' % dict(version=configure.version)),
+            configuration)
+             
 if __name__ == '__main__':
     unittest.main()
