@@ -883,6 +883,32 @@ class TestWizardSave(testsuite.TestCase):
              '  </atmosphere>\n'
              '</planet>\n' % dict(version=configure.version)),
             configuration)
-             
+
+class TestNameConflicts(testsuite.TestCase):
+    def setUp(self):
+        self.save = WizardSaver()
+
+    def _addServer(self, name):
+        server = HTTPServer('ondemand-server-worker', '/mount-point/')
+        self.save.addServerConsumer(server, name)
+        
+    def testNameConflicts(self):
+        self.save.setExistingComponentNames(['http-server-ondemand'])
+        self._addServer('ondemand')
+        self.save.getXML()
+        
+        components = self.save.getAtmosphereComponents()
+        self.assertEquals(components[0].name, 'http-server-ondemand2')
+
+    def testNameConflictsDoubleDigits(self):
+        componentNames = ['http-server-ondemand'] + [
+            'http-server-ondemand%d' % i for i in range(2, 10)]
+        self.save.setExistingComponentNames(componentNames)
+        self._addServer('ondemand')
+        self.save.getXML()
+        
+        components = self.save.getAtmosphereComponents()
+        self.assertEquals(components[0].name, 'http-server-ondemand10')
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,16 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/save.py:
+	Resolve naming conflicts when a wizard stream, allows
+	you to run the wizard several times and still have unique component
+	names no matter what.
+
+2008-05-23  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/test/test_wizard_save.py (TestWizardSave.testOndemand):
 	Add a new test.
 

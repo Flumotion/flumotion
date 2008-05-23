@@ -578,6 +578,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         from flumotion.wizard.configurationwizard import ConfigurationWizard
         wizard = ConfigurationWizard(self._window, self._admin)
+        wizard.setExistingComponentNames(
+            self.components_view.getComponentNames())
         wizard.connect('finished', _wizard_finished_cb)
         wizard.run(True, state, False)
 

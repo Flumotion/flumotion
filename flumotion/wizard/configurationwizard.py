@@ -128,7 +128,8 @@ class ConfigurationWizard(SectionWizard):
         self._lastWorker = 0 # combo id last worker from step to step
 
         self._flowName = 'default'
-
+        self._existingComponentNames = []
+        
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
         self._workerList.connect('worker-selected',
@@ -423,16 +424,6 @@ class ConfigurationWizard(SectionWizard):
         d.addCallback(callback)
         return d
 
-    def _gotEntryPoint(self, (filename, procname)):
-        # The manager always returns / as a path separator, replace them with
-        # the separator since the rest of our infrastructure depends on that.
-        filename = filename.replace('/', os.path.sep)
-        modname = pathToModuleName(filename)
-        d = self._admin.getBundledFunction(modname, procname)
-        self.clear_msg('wizard-bundle')
-        self.taskFinished()
-        return d
-
     def getWizardEntry(self, componentType):
         """Fetches a wizard bundle from a specific kind of component
         @param componentType: the component type to get the wizard entry
@@ -482,8 +473,25 @@ class ConfigurationWizard(SectionWizard):
                                             provides=provides,
                                             accepts=accepts)
 
+    def setExistingComponentNames(self, componentNames):
+        """Tells the wizard about the existing components available, so
+        we can resolve naming conflicts when saving the configuration
+        @param componentNames: existing component names
+        @type componentNames: list of strings
+        """
+        self._existingComponentNames = componentNames
 
     # Private
+
+    def _gotEntryPoint(self, (filename, procname)):
+        # The manager always returns / as a path separator, replace them with
+        # the separator since the rest of our infrastructure depends on that.
+        filename = filename.replace('/', os.path.sep)
+        modname = pathToModuleName(filename)
+        d = self._admin.getBundledFunction(modname, procname)
+        self.clear_msg('wizard-bundle')
+        self.taskFinished()
+        return d
 
     def _setupWorker(self, step, worker):
         # get name of active worker
@@ -493,7 +501,8 @@ class ConfigurationWizard(SectionWizard):
     def _prepareSave(self):
         save = WizardSaver()
         save.setFlowName(self._flowName)
-
+        save.setExistingComponentNames(self._existingComponentNames)
+        
         productionStep = self.getStep('Production')
         if productionStep.hasOnDemand():
             ondemandStep = self.getStep('Demand')

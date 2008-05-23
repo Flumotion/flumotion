@@ -35,6 +35,7 @@ class WizardSaver(object):
     my getXML() method to get the xml configuration.
     """
     def __init__(self):
+        self._existingComponentNames = []
         self._flowComponents = []
         self._atmosphereComponents = []
         self._muxers = {}
@@ -132,7 +133,6 @@ class WizardSaver(object):
           audio/video/audio-video
         @type consumerType: string
         """
-        # FIXME: Do not hard code to http-server here
         server.name = 'http-server-%s' % (consumerType,)
         self._atmosphereComponents.append(server)
 
@@ -167,7 +167,7 @@ class WizardSaver(object):
 
         # [disk,http,shout2]-[audio,video,audio-video]
         consumer.name = prefix + '-' + consumerType
-
+        
         consumer.link(self._getMuxer(consumerType))
         self._flowComponents.append(consumer)
 
@@ -193,6 +193,28 @@ class WizardSaver(object):
         xml = writer.getXML()
         return xml
 
+    def setExistingComponentNames(self, componentNames):
+        """Tells the saver about the existing components available, so
+        we can resolve naming conflicts before fetching the configuration xml
+        @param componentNames: existing component names
+        @type componentNames: list of strings
+        """
+        self._existingComponentNames = componentNames
+
+    def getFlowComponents(self):
+        """Gets the flow components of the save instance
+        @returns: the flow components
+        @rtype: list of components
+        """
+        return self._flowComponents
+
+    def getAtmosphereComponents(self):
+        """Gets the atmosphere components of the save instance
+        @returns: the atmosphere components
+        @rtype: list of components
+        """
+        return self._atmosphereComponents
+
     # Private API
 
     def _getMuxer(self, name):
@@ -210,21 +232,12 @@ class WizardSaver(object):
         self._handleAudioProducer()
         self._handleVideoProducer()
         self._handleVideoOverlay()
+        self._handleSameProducers()
 
-        # In the case video producer and audio producer is the same
-        # component and on the same worker, remove the audio producer and
-        # rename the video producer.
-        video = self._videoProducer
-        audio = self._audioProducer
-        if (video is not None and
-            audio is not None and
-            video.componentType == audio.componentType and
-            video.worker == audio.worker):
-            self._flowComponents.remove(self._audioProducer)
-            self._audioProducer.name = 'producer-audio-video'
-            self._videoProducer.name = 'producer-audio-video'
-            self._audioProducer = self._videoProducer
-
+        # Naming conflicts can only be solved after the rest is done,
+        # since some components might get removed
+        self._resolveNameConflicts()
+        
     def _handleAudioProducer(self):
         if not self._audioProducer:
             return
@@ -279,6 +292,21 @@ class WizardSaver(object):
         if self._useCCLicense:
             self._videoOverlay.properties.cc_logo = True
 
+    def _handleSameProducers(self):
+        # In the case video producer and audio producer is the same
+        # component and on the same worker, remove the audio producer and
+        # rename the video producer.
+        video = self._videoProducer
+        audio = self._audioProducer
+        if (video is not None and
+            audio is not None and
+            video.componentType == audio.componentType and
+            video.worker == audio.worker):
+            self._flowComponents.remove(self._audioProducer)
+            self._audioProducer.name = 'producer-audio-video'
+            self._videoProducer.name = 'producer-audio-video'
+            self._audioProducer = self._videoProducer
+
     def _handleMuxers(self):
         # Add & link the muxers we will use
         audio_muxer = self._getMuxer('audio')
@@ -296,3 +324,43 @@ class WizardSaver(object):
             self._flowComponents.append(both_muxer)
             both_muxer.link(self._audioEncoder)
             both_muxer.link(self._videoEncoder)
+
+    def _resolveNameConflicts(self):
+        for component in (self._atmosphereComponents +
+                          self._flowComponents):
+            self._resolveComponentName(component)
+
+    def _resolveComponentName(self, component):
+        name = component.name
+        while name in self._existingComponentNames:
+            name = self._suggestName(name)
+
+        component.name = name
+        self._existingComponentNames.append(name)
+
+    def _suggestName(self, suggestedName):
+        # Resolve naming conflicts, using a simple algorithm
+        # First, find all the trailing digits, for instance in
+        # 'audio-producer42' -> '42'
+        pos = -1
+        existingDigit = ''
+        while True:
+            lastChar = suggestedName[pos]
+            if not lastChar.isdigit():
+                break
+            existingDigit = lastChar + existingDigit
+            pos -= 1
+
+        # Now if we had a digit in the end, convert it to
+        # a number and increase it by one and remove the number
+        # from the existing name
+        if existingDigit:
+            digit = int(existingDigit) + 1
+            suggestedName = suggestedName[:-len(existingDigit)]
+        # No number in the end, use 2 the first one so we end up
+        # with 'audio-producer' and 'audio-producer2' in case of
+        # a simple conflict
+        else:
+            digit = 2
+        return suggestedName + str(digit)
+

@@ -320,6 +320,16 @@ class ComponentsView(log.Loggable, gobject.GObject):
         """
         return self._get_selected(COL_STATE)
 
+    def getComponentNames(self):
+        """Fetches a list of all component names
+        @returns: component names
+        @rtype: list of strings
+        """
+        names = []
+        for row in self._model:
+            names.append(row[COL_NAME])
+        return names
+        
     def can_start(self):
         """
         Get whether the selected components can be started.
