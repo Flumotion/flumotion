@@ -159,6 +159,9 @@ class Component(object, log.Loggable):
         if not isinstance(component, Component):
             raise TypeError(
                 "component must be a Component, not %r" % (component,))
+        self.feeders.append(component)
+        component.eaters.append(self)
+
     def unlink(self, component):
         """Unlink two components from each other
         @param component: component to unlink from

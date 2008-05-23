@@ -1,5 +1,8 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/models.py (Component.link):
+	Add back accidentally removed append statements
+
 	* flumotion/admin/gtk/client.py (AdminClientWindow._connection_opened):
 	Show the client window even if the configuration wizard isn't run.
 
