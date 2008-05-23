@@ -30,7 +30,6 @@ from flumotion.configure import configure
 from flumotion.common.errors import AlreadyConnectedError, \
      AlreadyConnectingError, ConnectionFailedError, \
      ConnectionRefusedError
-from flumotion.common.pygobject import gsignal
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -115,69 +114,6 @@ class ErrorDialog(gtk.MessageDialog):
         self.connect('response', callback, deferred)
         self.show()
         return deferred
-
-
-class PropertyChangeDialog(gtk.Dialog):
-    """
-    I am a dialog to get and set GStreamer element properties on a component.
-    """
-
-    gsignal('set', str, str, object)
-    gsignal('get', str, str)
-
-    RESPONSE_FETCH = 0
-
-    def __init__(self, name, parent):
-        title = _("Change element property on '%s'") % name
-        gtk.Dialog.__init__(self, title, parent,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.connect('response', self.response_cb)
-        self._close = self.add_button(_('Close'), gtk.RESPONSE_CLOSE)
-        self._set = self.add_button(_('Set'), gtk.RESPONSE_APPLY)
-        self._fetch = self.add_button(_('Fetch current'), self.RESPONSE_FETCH)
-
-        hbox = gtk.HBox()
-        hbox.show()
-
-        label = gtk.Label(_('Element'))
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.element_combo = gtk.ComboBox()
-        self.element_entry = gtk.Entry()
-        self.element_entry.show()
-        hbox.pack_start(self.element_entry, False, False)
-
-        label = gtk.Label(_('Property'))
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.property_entry = gtk.Entry()
-        self.property_entry.show()
-        hbox.pack_start(self.property_entry, False, False)
-
-        label = gtk.Label(_('Value'))
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.value_entry = gtk.Entry()
-        self.value_entry.show()
-        hbox.pack_start(self.value_entry, False, False)
-
-        self.vbox.pack_start(hbox)
-
-    def response_cb(self, dialog, response):
-        if response == gtk.RESPONSE_APPLY:
-            self.emit('set', self.element_entry.get_text(),
-                      self.property_entry.get_text(),
-                      self.value_entry.get_text())
-        elif response == self.RESPONSE_FETCH:
-            self.emit('get', self.element_entry.get_text(),
-                      self.property_entry.get_text())
-        elif response == gtk.RESPONSE_CLOSE:
-            dialog.hide()
-
-    def update_value_entry(self, value):
-        self.value_entry.set_text(str(value))
-
-gobject.type_register(PropertyChangeDialog)
 
 
 class AboutDialog(gtk.Dialog):

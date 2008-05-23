@@ -56,44 +56,6 @@ class TestProgressDialog(testsuite.TestCase):
         gobject.timeout_add(5 * INTERVAL, stop, dialog)
         gtk.main()
 
-class TestPropertyChangeDialog(testsuite.TestCase):
-    def setUp(self):
-        self.window = gtk.Window()
-
-    def tearDown(self):
-        self.window.destroy()
-
-    def testDialog(self):
-        dialog = dialogs.PropertyChangeDialog("element", self.window)
-        dialog.connect('get', self.get_cb)
-        dialog.connect('set', self.set_cb)
-        dialog.show_all()
-
-        dialog.element_entry.set_text('fakesrc')
-        dialog.property_entry.set_text('silent')
-        gobject.timeout_add(1 * INTERVAL,
-            lambda b: b.emit('clicked'), dialog._fetch)
-        gtk.main()
-
-        # make sure it was hidden
-        self.failUnlessEqual(dialog.get_property('visible'), False)
-
-    def get_cb(self, dialog, element, property):
-        self.failUnlessEqual(dialog.get_property('visible'), True)
-
-        self.failUnlessEqual(element, 'fakesrc')
-        self.failUnlessEqual(property, 'silent')
-        dialog.update_value_entry(False)
-        dialog.value_entry.set_text('True')
-        dialog._set.emit('clicked')
-
-    def set_cb(self, dialog, element, property, value):
-        self.failUnlessEqual(element, 'fakesrc')
-        self.failUnlessEqual(property, 'silent')
-        # FIXME: should be possible to do gtk.TRUE
-        self.failUnlessEqual(value, 'True')
-        dialog._close.emit('clicked')
-        gtk.main_quit()
 
 class TestErrorDialog(testsuite.TestCase):
     def setUp(self):

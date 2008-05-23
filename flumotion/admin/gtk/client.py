@@ -26,21 +26,20 @@ import sys
 import gobject
 import gtk
 from gtk import glade
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.connections import get_recent_connections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
-     ProgressDialog, PropertyChangeDialog, showConnectionErrorDialog
+     ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.parts import getComponentLabel, ComponentsView, \
      AdminStatusbar
 from flumotion.configure import configure
-from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
-     ConnectionFailedError, PropertyError
+     ConnectionFailedError
 from flumotion.common.i18n import gettexter
 from flumotion.common.log import Loggable
 from flumotion.common.planet import AdminComponentState, moods
@@ -696,32 +695,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
     # component view activation functions
 
-    def _componentModify(self, state):
-
-        def propertyErrback(failure):
-            failure.trap(PropertyError)
-            self._error("%s." % failure.getErrorMessage())
-            return None
-
-        def after_getProperty(value, dialog):
-            self.debug('got value %r' % value)
-            dialog.update_value_entry(value)
-
-        def dialog_set_cb(dialog, element, property, value, state):
-            cb = self._admin.setProperty(state, element, property, value)
-            cb.addErrback(propertyErrback)
-
-        def dialog_get_cb(dialog, element, property, state):
-            cb = self._admin.getProperty(state, element, property)
-            cb.addCallback(after_getProperty, dialog)
-            cb.addErrback(propertyErrback)
-
-        name = state.get('name')
-        d = PropertyChangeDialog(name, self._window)
-        d.connect('get', dialog_get_cb, state)
-        d.connect('set', dialog_set_cb, state)
-        d.run()
-
     def _removeComponent(self, state):
         name = state.get('name')
         self.debug('removing component %s' % name)
@@ -737,17 +710,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         # have gone away
         self._updateComponentActions()
 
-    def _componentReload(self, state):
-        name = getComponentLabel(state)
-
-        dialog = ProgressDialog("Reloading",
-            _("Reloading component code for %s") % name, self._window)
-        d = self._admin.callRemote('reloadComponent', state)
-        d.addCallback(lambda result, dlg: dlg.destroy(), dialog)
-        # FIXME: better error handling
-        d.addErrback(lambda failure, dlg: dlg.destroy(), dialog)
-        dialog.start()
-
     def _componentStop(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
@@ -760,27 +722,12 @@ class AdminClientWindow(Loggable, gobject.GObject):
         """
         return self._componentDo(state, 'Start', 'Starting', 'Started')
 
-    def _componentRestart(self, state):
-        """
-        @returns: a L{twisted.internet.defer.Deferred}
-        """
-        d = self._componentStop(state)
-        d.addCallback(lambda r: self._componentStart(state))
-        return d
-
     def _componentDelete(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
         return self._componentDo(state, '', 'Deleting', 'Deleted',
             'deleteComponent')
-
-    def _componentKill(self, state):
-        workerName = state.get('workerRequested')
-        avatarId = componentId(state.get('parent').get('name'),
-                               state.get('name'))
-        self._admin.callRemote('workerCallRemote', workerName, 'killJob',
-                               avatarId)
 
     def _componentDo(self, state, action, doing, done,
         remoteMethodPrefix="component"):

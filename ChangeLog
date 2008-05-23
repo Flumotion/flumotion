@@ -1,6 +1,13 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/test/test_dialogs.py:
+	Remove unused code.
+
+2008-05-23  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/client.py:
 	CamelCase rename internal methods and varibles.
 
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
