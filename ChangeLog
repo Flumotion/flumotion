@@ -1,5 +1,10 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/wizard.py (SectionWizard.run):
+	* flumotion/wizard/configurationwizard.py:
+	(ConfigurationWizard.run):
+	Remove interactive cruft, which is unused.
+
 	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
 	* flumotion/component/encoders/dirac/wizard_gtk.py:
 	* flumotion/component/encoders/jpeg/wizard_gtk.py:

@@ -242,7 +242,7 @@ class SectionWizard(GladeWindow, log.Loggable):
             self.button_next.hide()
             self.button_next.show()
 
-    def run(self, interactive, main=True):
+    def run(self, main=True):
         self._useMain = main
         sectionClass = self._sections[self._currentSection]
         section = sectionClass(self)
@@ -250,21 +250,14 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._stack.push(section)
         self._setStep(section)
 
-        if not interactive:
-            while self.show_next():
-                pass
-            return self._finish(False)
-
         self.window.present()
         self.window.grab_focus()
 
-        if not self._useMain:
-            return
-
-        try:
-            gtk.main()
-        except KeyboardInterrupt:
-            pass
+        if self._useMain:
+            try:
+                gtk.main()
+            except KeyboardInterrupt:
+                pass
 
     def prepareNextStep(self, step):
         if hasattr(step, 'lastStep'):

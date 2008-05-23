@@ -158,11 +158,11 @@ class ConfigurationWizard(SectionWizard):
         SectionWizard.destroy(self)
         self._admin = None
 
-    def run(self, interactive, workerHeavenState, main=True):
+    def run(self, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
         self._workerList.setWorkerHeavenState(workerHeavenState)
 
-        SectionWizard.run(self, interactive, main)
+        SectionWizard.run(self, main)
 
     def beforeShowStep(self, step):
         if isinstance(step, WorkerWizardStep):
