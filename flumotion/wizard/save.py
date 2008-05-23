@@ -167,8 +167,8 @@ class WizardSaver(object):
 
         # [disk,http,shout2]-[audio,video,audio-video]
         consumer.name = prefix + '-' + consumerType
-        
-        consumer.link(self._getMuxer(consumerType))
+
+        self._getMuxer(consumerType).link(consumer)
         self._flowComponents.append(consumer)
 
     def setUseCCLicense(self, useCCLicense):
@@ -187,6 +187,11 @@ class WizardSaver(object):
         """
         self._handleProducers()
         self._handleMuxers()
+        # Naming conflicts can only be solved after the rest is done,
+        # since some components might get removed
+        self._resolveNameConflicts()
+        self._validateComponents()
+
         writer = ConfigurationWriter(self._flowName,
                                      self._flowComponents,
                                      self._atmosphereComponents)
@@ -217,6 +222,9 @@ class WizardSaver(object):
 
     # Private API
 
+    def _getAllComponents(self):
+        return self._atmosphereComponents + self._flowComponents
+
     def _getMuxer(self, name):
         if name in self._muxers:
             muxer = self._muxers[name]
@@ -234,10 +242,6 @@ class WizardSaver(object):
         self._handleVideoOverlay()
         self._handleSameProducers()
 
-        # Naming conflicts can only be solved after the rest is done,
-        # since some components might get removed
-        self._resolveNameConflicts()
-        
     def _handleAudioProducer(self):
         if not self._audioProducer:
             return
@@ -252,7 +256,7 @@ class WizardSaver(object):
         self._audioEncoder.name = 'encoder-audio'
         self._flowComponents.append(self._audioEncoder)
 
-        self._audioEncoder.link(self._audioProducer)
+        self._audioProducer.link(self._audioEncoder)
 
     def _handleVideoProducer(self):
         if not self._videoProducer:
@@ -267,16 +271,16 @@ class WizardSaver(object):
         self._videoEncoder.name = 'encoder-video'
         self._flowComponents.append(self._videoEncoder)
 
-        self._videoEncoder.link(self._videoProducer)
+        self._videoProducer.link(self._videoEncoder)
 
     def _handleVideoOverlay(self):
         if not self._videoOverlay:
             return
 
-        self._videoEncoder.unlink(self._videoProducer)
+        self._videoProducer.unlink(self._videoEncoder)
 
-        self._videoOverlay.link(self._videoProducer)
-        self._videoEncoder.link(self._videoOverlay)
+        self._videoProducer.link(self._videoOverlay)
+        self._videoOverlay.link(self._videoEncoder)
         self._flowComponents.append(self._videoOverlay)
 
         self._videoOverlay.name = 'overlay-video'
@@ -310,24 +314,23 @@ class WizardSaver(object):
     def _handleMuxers(self):
         # Add & link the muxers we will use
         audio_muxer = self._getMuxer('audio')
-        if audio_muxer.eaters:
+        if audio_muxer.feeders:
             self._flowComponents.append(audio_muxer)
-            audio_muxer.link(self._audioEncoder)
+            self._audioEncoder.link(audio_muxer)
 
         video_muxer = self._getMuxer('video')
-        if video_muxer.eaters:
+        if video_muxer.feeders:
             self._flowComponents.append(video_muxer)
-            video_muxer.link(self._videoEncoder)
+            self._videoEncoder.link(video_muxer)
 
         both_muxer = self._getMuxer('audio-video')
-        if both_muxer.eaters:
+        if both_muxer.feeders:
             self._flowComponents.append(both_muxer)
-            both_muxer.link(self._audioEncoder)
-            both_muxer.link(self._videoEncoder)
+            self._audioEncoder.link(both_muxer)
+            self._videoEncoder.link(both_muxer)
 
     def _resolveNameConflicts(self):
-        for component in (self._atmosphereComponents +
-                          self._flowComponents):
+        for component in self._getAllComponents():
             self._resolveComponentName(component)
 
     def _resolveComponentName(self, component):
@@ -364,3 +367,6 @@ class WizardSaver(object):
             digit = 2
         return suggestedName + str(digit)
 
+    def _validateComponents(self):
+        for component in self._getAllComponents():
+            component.validate()

@@ -29,6 +29,16 @@ from flumotion.common.fraction import fractionFromValue
 
 __version__ = "$Rev$"
 
+def _generateRandomString(numchars):
+    """Generate a random US-ASCII string of length numchars
+    """
+    s = ""
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    for unused in range(numchars):
+        s += chars[random.randint(0, len(chars)-1)]
+
+    return s
+
 
 class Properties(dict):
     """I am a special dictionary which you also can treat as an instance.
@@ -88,16 +98,17 @@ class Component(object, log.Loggable):
       component to this type
     @cvar feederType: restrict the feeders which can be linked with this
       component to this type
-    @cvar nameTemplate: template used to define the name of this component
     @cvar componentType: the type of the component, such as ogg-muxer,
       this is not mandatory in the class, can also be set in the instance.
+    @cvar isAtmosphereComponent: if this component should live in
+      the atmosphere instead of in a flow
     @ivar name: name of the component
     """
     eaterType = None
     feederType = None
     componentType = None
-    nameTemplate = "component"
-
+    isAtmosphereComponent = False
+    
     def __init__(self, worker=None):
         self.name = None
         self.worker = worker
@@ -105,7 +116,7 @@ class Component(object, log.Loggable):
         self.eaters = []
         self.properties = Properties()
         self.plugs = []
-
+        
     def __repr__(self):
         return '<%s.%s name=%r>' % (self.__class__.__module__,
                                     self.__class__.__name__, self.name)
@@ -148,10 +159,6 @@ class Component(object, log.Loggable):
         if not isinstance(component, Component):
             raise TypeError(
                 "component must be a Component, not %r" % (component,))
-
-        self.feeders.append(component)
-        component.eaters.append(self)
-
     def unlink(self, component):
         """Unlink two components from each other
         @param component: component to unlink from
@@ -164,14 +171,14 @@ class Component(object, log.Loggable):
         self.feeders.remove(component)
         component.eaters.remove(self)
 
-    def getFeeders(self):
-        """Get the names of all the feeders for this component
+    def getEaters(self):
+        """Get the names of all the eaters for this component
         @returns: feeder names
         """
 
         # Figure out the feeder names to use.
         # Ask the feeder component which name it wants us to use
-        for source in self.feeders:
+        for source in self.eaters:
             feederName = source.getFeederName(self)
             if feederName is None:
                 feederName = ''
@@ -206,10 +213,8 @@ class Plug(object):
 class Producer(Component):
     """I am a component which produces data.
     """
-    nameTemplate = "producer"
-
     def validate(self):
-        super(Component, self).validate()
+        super(Producer, self).validate()
 
         if self.eaters:
             raise ComponentValidationError(
@@ -237,10 +242,9 @@ class Producer(Component):
 class Encoder(Component):
     """I am a component which encodes data
     """
-    nameTemplate = "encoder"
 
     def validate(self):
-        super(Component, self).validate()
+        super(Encoder, self).validate()
 
         if not self.eaters:
             raise ComponentValidationError(
@@ -256,10 +260,9 @@ class Encoder(Component):
 class Muxer(Component):
     """I am a component which muxes data from different components together.
     """
-    nameTemplate = "muxer"
 
     def validate(self):
-        super(Component, self).validate()
+        super(Muxer, self).validate()
 
         if not self.eaters:
             raise ComponentValidationError(
@@ -274,24 +277,23 @@ class Muxer(Component):
 
 class Consumer(Component):
     eaterType = Muxer
-    nameTemplate = "consumer"
 
     def __init__(self, worker=None):
         Component.__init__(self, worker)
         self._porter = None
 
     def validate(self):
-        super(Component, self).validate()
-
-        if not self.eaters:
-            raise ComponentValidationError(
-                "consumer component %s must have at least one eater" %
-                (self.name,))
-
-        if self.feeders:
-            raise ComponentValidationError(
-                "consumer component %s must have at least one feeder" %
-                (self.name,))
+        super(Consumer, self).validate()
+        
+        if not self.isAtmosphereComponent:
+            if not self.eaters:
+                raise ComponentValidationError(
+                    "consumer component %s must have at least one eater" %
+                    (self.name,))
+            if self.feeders:
+                raise ComponentValidationError(
+                    "consumer component %s cannot have feeders" %
+                    (self.name,))
 
     def setPorter(self, porter):
         self._porter = porter
@@ -303,13 +305,10 @@ class Consumer(Component):
 class AudioProducer(Producer):
     """I am a component which produces audio
     """
-    nameTemplate = "audio-producer"
-
 
 class VideoProducer(Producer):
     """I am a component which produces video
     """
-    nameTemplate = "video-producer"
 
     def getFramerate(self):
         """Get the framerate video producer
@@ -337,15 +336,12 @@ class VideoConverter(Component):
     """I am a component which converts video
     """
 
-    nameTemplate = "video-converter"
-
 
 class AudioEncoder(Encoder):
     """I am a component which encodes audio
     """
 
     eaterType = AudioProducer
-    nameTemplate = "audio-encoder"
 
 
 class VideoEncoder(Encoder):
@@ -353,11 +349,11 @@ class VideoEncoder(Encoder):
     """
 
     eaterType = VideoProducer
-    nameTemplate = "video-encoder"
 
 
 class HTTPServer(Component):
     componentType = 'http-server'
+    isAtmosphereComponent = True
 
     def __init__(self, worker, mountPoint):
         """
@@ -390,22 +386,13 @@ class HTTPPlug(Plug):
         self.videoProducer = videoProducer
 
 
-def _generateRandomString(numchars):
-    """Generate a random US-ASCII string of length numchars
-    """
-    s = ""
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    for unused in range(numchars):
-        s += chars[random.randint(0, len(chars)-1)]
-
-    return s
-
-
 class Porter(Component):
     """I am a model representing the configuration file for a
     porter component.
     """
     componentType = 'porter'
+    isAtmosphereComponent = True
+
     def __init__(self, worker, port, username=None, password=None,
                  socketPath=None):
         super(Porter, self).__init__(worker=worker)

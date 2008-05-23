@@ -90,7 +90,7 @@ class ConfigurationWriter(XMLWriter):
                  ('worker', component.worker),
                  ('version', configure.version)]
         self.pushTag('component', attrs)
-        self._writeEaters(component.getFeeders())
+        self._writeEaters(component.getEaters())
         self._writeProperties(component.getProperties())
         self._writeComponentPlugs(component.plugs)
         self.popTag()

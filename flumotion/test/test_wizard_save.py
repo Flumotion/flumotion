@@ -233,7 +233,6 @@ class TestWizardSave(testsuite.TestCase):
         server = HTTPServer('server-worker', '/mount/')
         save.addServerConsumer(server, 'audio-video')
 
-
         save.setUseCCLicense(True)
 
         configuration = save.getXML()
@@ -353,9 +352,31 @@ class TestWizardSave(testsuite.TestCase):
         save.setAudioEncoder(self._createAudioEncoder())
         save.setVideoEncoder(self._createVideoEncoder())
 
+        save.setMuxer('default-muxer', 'muxer-worker')
+
+        porter = self._createPorter()
+        save.addPorter(porter, 'audio-video')
+
+        streamer = self._createHTTPStreamer()
+        streamer.setPorter(porter)
+        save.addConsumer(streamer, 'audio-video')
+
         configuration = save.getXML()
         testsuite.diffStrings(
             ('<planet>\n'
+             '  <atmosphere>\n'
+             '    <component name="porter-audio-video"\n'
+             '               type="porter"\n'
+             '               project="flumotion"\n'
+             '               worker="porter-worker"\n'
+             '               version="0.5.2.1">\n'
+             '      \n'
+             '      <property name="password">password</property>\n'
+             '      <property name="port">8080</property>\n'
+             '      <property name="socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="username">username</property>\n'
+             '    </component>\n'
+             '  </atmosphere>\n'
              '  <flow name="flow">\n'
              '    <component name="producer-audio-video"\n'
              '               type="both-producer"\n'
@@ -383,6 +404,31 @@ class TestWizardSave(testsuite.TestCase):
              '      <eater name="default">\n'
              '        <feed>producer-audio-video</feed>\n'
              '      </eater>\n'
+             '    </component>\n'
+             '    <component name="muxer-audio-video"\n'
+             '               type="default-muxer"\n'
+             '               project="flumotion"\n'
+             '               worker="muxer-worker"\n'
+             '               version="0.5.2.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>encoder-audio</feed>\n'
+             '        <feed>encoder-video</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '    <component name="http-audio-video"\n'
+             '               type="http-streamer"\n'
+             '               project="flumotion"\n'
+             '               worker="streamer-worker"\n'
+             '               version="0.5.2.1">\n'
+             '      <eater name="default">\n'
+             '        <feed>muxer-audio-video</feed>\n'
+             '      </eater>\n'
+             '      \n'
+             '      <property name="burst-on-connect">False</property>\n'
+             '      <property name="porter-password">password</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-username">username</property>\n'
+             '      <property name="type">slave</property>\n'
              '    </component>\n'
              '  </flow>\n'
              '</planet>\n' % dict(version=configure.version)),
@@ -546,7 +592,7 @@ class TestWizardSave(testsuite.TestCase):
 
         streamer = self._createHTTPStreamer()
         streamer.setPorter(porter)
-        save.addConsumer(streamer, 'audio-only')
+        save.addConsumer(streamer, 'audio')
 
         configuration = save.getXML()
         testsuite.diffStrings(
@@ -584,13 +630,22 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="bitrate">64000</property>\n'
              '    </component>\n'
-             '    <component name="http-audio-only"\n'
+             '    <component name="muxer-audio"\n'
+             '               type="ogg-muxer"\n'
+             '               project="flumotion"\n'
+             '               worker="muxer"\n'
+             '               version="%(version)s">\n'
+             '      <eater name="default">\n'
+             '        <feed>encoder-audio</feed>\n'
+             '      </eater>\n'
+             '    </component>\n'
+             '    <component name="http-audio"\n'
              '               type="http-streamer"\n'
              '               project="flumotion"\n'
              '               worker="streamer-worker"\n'
              '               version="%(version)s">\n'
              '      <eater name="default">\n'
-             '        <feed>muxer-audio-only</feed>\n'
+             '        <feed>muxer-audio</feed>\n'
              '      </eater>\n'
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'

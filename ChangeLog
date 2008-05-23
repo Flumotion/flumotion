@@ -1,5 +1,16 @@
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/save.py:
+	Clean up models, remove unused code and fix the validation:
+	- rename getFeeders to getEaters
+	- swap link calls around in saving code
+	- update tests lacking complete flows
+
+2008-05-23  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/parts.py:
 	* flumotion/test/test_wizard_save.py:
