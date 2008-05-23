@@ -129,7 +129,7 @@ class TestXMLWriter(testsuite.TestCase):
         c2.name = 'name'
         c2.componentType = 'second'
         c2.worker = 'worker'
-        c1.link(c2)
+        c2.link(c1)
 
         writer = ConfigurationWriter('flow', [c1, c2], [])
         testsuite.diffStrings(
