@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -28,13 +28,15 @@ from twisted.internet import reactor
 from twisted.python import log as twistedlog
 
 from flumotion.admin import connections
-from flumotion.common import log, connection
+from flumotion.common import log
 from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.configure import configure
 from flumotion.common.options import OptionParser
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+_retval = 0
 
 def _installGettext():
     import locale
@@ -55,21 +57,27 @@ def _connectToManager(win, manager, ssl):
 
     d = win.openConnection(info)
     def errbackConnectionRefused(failure):
+        global _retval
         failure.trap(ConnectionRefusedError)
         print >> sys.stderr, _(
             "ERROR: Could not connect to manager:\n"
             "       The connection to %r was refused.") % (
             manager,)
+        _retval = 1
         reactor.stop()
-
+    
     def errback(failure):
+        global _retval
         print >> sys.stderr, "ERROR: %s" % (failure.value,)
+        _retval = 1
         reactor.stop()
     d.addErrback(errbackConnectionRefused)
     d.addErrback(errback)
     return d
 
 def main(args):
+    global _retval
+
     parser = OptionParser(domain="flumotion-admin")
     parser.add_option('-m', '--manager',
                       action="store", type="string", dest="manager",
@@ -107,4 +115,4 @@ def main(args):
     d.addErrback(twistedlog.err)
 
     reactor.run()
-    return 0
+    return _retval
