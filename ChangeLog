@@ -1,3 +1,9 @@
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/client.py (MAIN_UI): Make
+	separator names unique and fix wizard.run() call,
+	now when interactive keyword arg is removed.
+
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/wizard.py (SectionWizard.run):

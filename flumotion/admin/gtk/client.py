@@ -62,25 +62,25 @@ MAIN_UI = """
       <menuitem action="OpenExisting"/>
       <menuitem action="ImportConfig"/>
       <menuitem action="ExportConfig"/>
-      <separator name="sep1"/>
+      <separator name="sep-conn1"/>
       <placeholder name="Recent"/>
-      <separator name="sep2"/>
+      <separator name="sep-conn2"/>
       <menuitem action="Quit"/>
     </menu>
     <menu action="Manage">
       <menuitem action="StartComponent"/>
       <menuitem action="StopComponent"/>
       <menuitem action="DeleteComponent"/>
-      <separator name="sep3"/>
+      <separator name="sep-manage1"/>
       <menuitem action="StartAll"/>
       <menuitem action="StopAll"/>
       <menuitem action="ClearAll"/>
-      <separator name="sep4"/>
+      <separator name="sep-manage2"/>
       <menuitem action="RunConfigurationWizard"/>
     </menu>
     <menu action="Debug">
       <menuitem action="EnableDebugging"/>
-      <separator name="sep5"/>
+      <separator name="sep-debug1"/>
       <menuitem action="StartShell"/>
       <menuitem action="DumpConfiguration"/>
     </menu>
@@ -90,11 +90,11 @@ MAIN_UI = """
   </menubar>
   <toolbar name="Toolbar">
     <toolitem action="OpenRecent"/>
-    <separator name="sep6"/>
+    <separator name="sep-toolbar1"/>
     <toolitem action="StartComponent"/>
     <toolitem action="StopComponent"/>
     <toolitem action="DeleteComponent"/>
-    <separator name="sep7"/>
+    <separator name="sep-toolbar2"/>
     <toolitem action="RunConfigurationWizard"/>
   </toolbar>
 </ui>
@@ -581,7 +581,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         wizard.setExistingComponentNames(
             self.components_view.getComponentNames())
         wizard.connect('finished', _wizard_finished_cb)
-        wizard.run(True, state, False)
+        wizard.run(state, False)
 
         self._wizard = wizard
         self._wizard.connect('destroy', nullwizard)
