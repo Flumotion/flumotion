@@ -3,6 +3,7 @@
 	* flumotion/admin/gtk/client.py:
 	* flumotion/wizard/configurationwizard.py:
 	Reuse http porters between wizards if the port is the same.
+	(ConfigurationWizard.save): Add the porter logic here as well.
 
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 

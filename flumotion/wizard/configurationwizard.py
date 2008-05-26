@@ -234,6 +234,16 @@ class ConfigurationWizard(SectionWizard):
         saver.setVideoEncoder(encodingStep.getVideoEncoder())
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
         
+        consumptionStep = self.getStep('Consumption')
+        httpPorter = consumptionStep.getHTTPPorter()
+        existingPorter = self._httpPorter
+        if existingPorter is None:
+            self.setHTTPPorter(httpPorter)
+        elif existingPorter.properties.port == httpPorter.properties.port:
+            httpPorter = existingPorter
+            assert httpPorter.exists, httpPorter
+        saver.addPorter(httpPorter, 'http')
+
         for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
