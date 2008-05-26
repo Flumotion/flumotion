@@ -1,5 +1,13 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/save.py:
+	Add a new state to the models, which is used to reference
+	to existing models, we do not want to write/validate or
+	resolve naming conflicts on them
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/plugs/cortado/wizard_gtk.py:
 	framerate can be a fraction, but cortado only accepts floats,
 	convert it appropriately here.

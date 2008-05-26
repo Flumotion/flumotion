@@ -334,6 +334,10 @@ class WizardSaver(object):
             self._resolveComponentName(component)
 
     def _resolveComponentName(self, component):
+        # If the component already exists, do not suggest a new name,
+        # since we want to link to it
+        if component.exists:
+            return
         name = component.name
         while name in self._existingComponentNames:
             name = self._suggestName(name)
@@ -369,4 +373,10 @@ class WizardSaver(object):
 
     def _validateComponents(self):
         for component in self._getAllComponents():
+            # There's no need to validate existing components,
+            # that allows us to provide 'fake' existing components,
+            # which simplifies sending incremental configuration snippets
+            # from the admin client
+            if component.exists:
+                continue
             component.validate()

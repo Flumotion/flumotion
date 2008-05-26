@@ -82,6 +82,12 @@ class ConfigurationWriter(XMLWriter):
             self._writeComponent(component)
 
     def _writeComponent(self, component):
+        # Do not write components which already exists in the flow,
+        # This is used to create configuration snippets sent to the
+        # wizard which links to existing components
+        if component.exists:
+            return
+        
         # FIXME: when the wizard can be split among projects, "project"
         # and "version" should be taken from the relevant project
         attrs = [('name', component.name),

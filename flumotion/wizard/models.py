@@ -103,6 +103,8 @@ class Component(object, log.Loggable):
     @cvar isAtmosphereComponent: if this component should live in
       the atmosphere instead of in a flow
     @ivar name: name of the component
+    @ivar exists: if the component already exists, if this is set to true,
+      a configuration saver or validator might chose to ignore this component
     """
     eaterType = None
     feederType = None
@@ -116,7 +118,8 @@ class Component(object, log.Loggable):
         self.eaters = []
         self.properties = Properties()
         self.plugs = []
-        
+        self.exists = False
+    
     def __repr__(self):
         return '<%s.%s name=%r>' % (self.__class__.__module__,
                                     self.__class__.__name__, self.name)
