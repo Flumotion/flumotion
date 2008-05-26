@@ -1,5 +1,8 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/base/admin_gtk.py:
+	Be more careful when setting the debug gst/flu masks. Fixes #977
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/wizard/configurationwizard.py:
 	Reuse http porters between wizards if the port is the same.

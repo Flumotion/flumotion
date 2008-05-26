@@ -38,6 +38,7 @@ from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
 from flumotion.common.i18n import N_, getLL, gettexter
 from flumotion.common.planet import AdminFlowState
 from flumotion.configure import configure
+from flumotion.extern.log.log import getDebug
 from flumotion.twisted import flavors
 from flumotion.ui.fgtk import ProxyWidgetMapping
 
@@ -535,12 +536,17 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         self._startTime = None
         self._debugging = None
-
+        self._initialFluMask = ''
+        self._initialGstMask = ''
+        
     def setDebugEnabled(self, enabled):
         BaseAdminGtkNode.setDebugEnabled(self, enabled)
         if self._debugging:
             self._debugging.set_property('visible', enabled)
 
+        self._initialFluMask = getDebug()
+        self._initialGstMask = os.environ.get('GST_DEBUG', '')
+        
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('main-vbox')
         assert self.widget, "No component-widget in %s" % self.gladeFile
@@ -569,6 +575,13 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         self._prepareDebugging()
 
+        if self._initialFluMask:
+            self.flu_mask.set_text(self._initialFluMask)
+            self.flu_mask.emit('changed')
+        if self._initialGstMask:
+            self.gst_mask.set_text(self._initialGstMask)
+            self.gst_mask.emit('changed')
+        
         self._debugging = self.wtree.get_widget('debugging')
         if self._debugEnabled:
             self._debugging.show()
@@ -599,17 +612,19 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
     def _on_flu_mask_changed(self, entry):
         debug = entry.get_text()
-        if self._debugEnabled and self._validateMask(debug):
-            self.admin.componentCallRemote(
-                self.state, 'setFluDebug', debug)
+        if not self._debugEnabled or not self._validateMask(debug):
+            return
+        self.admin.componentCallRemote(self.state, 'setFluDebug', debug)
 
     def _on_gst_mask_changed(self, entry):
         debug = entry.get_text()
-        if self._debugEnabled and self._validateMask(debug):
-            self.admin.componentCallRemote(
-                self.state, 'setGstDebug', debug)
+        if not self._debugEnabled or not self._validateMask(debug):
+            return
+        self.admin.componentCallRemote(self.state, 'setGstDebug', debug)
 
     def _prepareDebugging(self):
+        debugEnabled = self._debugEnabled
+        self._debugEnabled = False
         default = [(_('Nothing'), '*:0'),
                    (_('Everything'), '*:4'),
                    (_('Custom'), None)]
@@ -621,6 +636,8 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self.gst_profile.hide()
             self.gst_label.hide()
             self.gst_mask.hide()
+
+        self._debugEnabled = debugEnabled
 
     def _setStartTime(self, value):
         self._label_start_time.set_text(
