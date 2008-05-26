@@ -1,5 +1,9 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/xmlwriter.py (XMLWriter._calcAttrsLength):
+	check if Value is None before quoting it, raise a helpful
+	exception if it is.
+
 	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
 	* flumotion/component/encoders/theora/wizard_gtk.py:
 	* flumotion/wizard/configurationwizard.py:
