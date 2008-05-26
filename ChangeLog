@@ -1,6 +1,13 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/configurationwizard.py:
+	Remove a constructor argument from the configuration
+	wizard and move it to a setter accessor.
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/client.py:
 	Avoid saving references to the wizard in the admin window.
 
 	* flumotion/wizard/configurationwizard.py:

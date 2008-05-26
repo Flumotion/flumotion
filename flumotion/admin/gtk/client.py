@@ -563,14 +563,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
         workerHeavenState = self._admin.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
-                _('The wizard cannot be run because no workers are \
-                logged in.'))
+                _('The wizard cannot be run because no workers are'
+                  'logged in.'))
             return
 
         from flumotion.wizard.configurationwizard import ConfigurationWizard
-        wizard = ConfigurationWizard(self._window, self._admin)
+        wizard = ConfigurationWizard(self._window)
         wizard.setExistingComponentNames(
             self.components_view.getComponentNames())
+        wizard.setAdminModel(self._admin)
         wizard.setWorkerHeavenState(workerHeavenState)
         wizard.connect('finished', self._wizard_finished_cb)
         wizard.run(main=False)

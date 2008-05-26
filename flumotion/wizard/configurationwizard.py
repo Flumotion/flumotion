@@ -119,14 +119,14 @@ class SummaryStep(WizardStep):
 class ConfigurationWizard(SectionWizard):
     gsignal('finished', str)
 
-    def __init__(self, parent=None, admin=None):
+    def __init__(self, parent=None):
         SectionWizard.__init__(self, parent)
         # Set the name of the toplevel window, this is used by the
         # ui unittest framework
         self.window1.set_name('ConfigurationWizard')
         self._cursorWatch = gdk.Cursor(gdk.WATCH)
         self._tasks = []
-        self._admin = admin
+        self._adminModel = None
         self._workerHeavenState = None
         self._lastWorker = 0 # combo id last worker from step to step
 
@@ -150,7 +150,7 @@ class ConfigurationWizard(SectionWizard):
 
     def destroy(self):
         SectionWizard.destroy(self)
-        self._admin = None
+        self._adminModel = None
 
     def beforeShowStep(self, step):
         if isinstance(step, WorkerWizardStep):
@@ -192,6 +192,14 @@ class ConfigurationWizard(SectionWizard):
         """
         self._workerHeavenState = workerHeavenState
         self._workerList.setWorkerHeavenState(workerHeavenState)
+
+    def setAdminModel(self, adminModel):
+        """
+        Sets the admin model of the wizard
+        @param adminModel: the admin model
+        @type adminModel: L{AdminModel}
+        """
+        self._adminModel = adminModel
         
     def save(self):
         """Save the content of the wizard
@@ -305,7 +313,7 @@ class ConfigurationWizard(SectionWizard):
 
         @returns: a deferred returning a tuple of the missing elements
         """
-        if not self._admin:
+        if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
             return
 
@@ -316,7 +324,7 @@ class ConfigurationWizard(SectionWizard):
             return tuple(asked.difference(existing))
 
         self.waitForTask('check elements %r' % (elementNames,))
-        d = self._admin.checkElements(workerName, elementNames)
+        d = self._adminModel.checkElements(workerName, elementNames)
         d.addCallback(_checkElementsCallback, workerName)
         return d
 
@@ -329,7 +337,7 @@ class ConfigurationWizard(SectionWizard):
         @param workerName: name of the worker to check on
         @param elementNames: names of the elements to check
         """
-        if not self._admin:
+        if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
             return
 
@@ -367,11 +375,11 @@ class ConfigurationWizard(SectionWizard):
 
         @returns: a deferred returning None or Failure.
         """
-        if not self._admin:
+        if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
             return
 
-        d = self._admin.checkImport(workerName, moduleName)
+        d = self._adminModel.checkImport(workerName, moduleName)
         return d
 
     def requireImport(self, workerName, moduleName, projectName=None,
@@ -386,7 +394,7 @@ class ConfigurationWizard(SectionWizard):
         @param projectName: name of the module to import
         @param projectURL:  URL of the project
         """
-        if not self._admin:
+        if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
             return
 
@@ -423,7 +431,7 @@ class ConfigurationWizard(SectionWizard):
         @returns: L{twisted.internet.defer.Deferred}
         """
         self.debug('runInWorker(module=%r, function=%r)' % (module, function))
-        admin = self._admin
+        admin = self._adminModel
         if not admin:
             self.warning('skipping runInWorker, no admin')
             return defer.fail(errors.FlumotionError('no admin'))
@@ -489,7 +497,8 @@ class ConfigurationWizard(SectionWizard):
         """
         self.waitForTask('get wizard entry %s' % (componentType,))
         self.clear_msg('wizard-bundle')
-        d = self._admin.callRemote('getEntryByType', componentType, 'wizard')
+        d = self._adminModel.callRemote(
+            'getEntryByType', componentType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 
@@ -503,7 +512,8 @@ class ConfigurationWizard(SectionWizard):
         """
         self.waitForTask('get wizard plug %s' % (plugType,))
         self.clear_msg('wizard-bundle')
-        d = self._admin.callRemote('getPlugEntry', plugType, 'wizard')
+        d = self._adminModel.callRemote(
+            'getPlugEntry', plugType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 
@@ -524,9 +534,9 @@ class ConfigurationWizard(SectionWizard):
         """
         self.debug('querying wizard entries (wizardTypes=%r,provides=%r'
                    ',accepts=%r)'% (wizardTypes, provides, accepts))
-        return self._admin.getWizardEntries(wizardTypes=wizardTypes,
-                                            provides=provides,
-                                            accepts=accepts)
+        return self._adminModel.getWizardEntries(wizardTypes=wizardTypes,
+                                                 provides=provides,
+                                                 accepts=accepts)
 
     def setExistingComponentNames(self, componentNames):
         """Tells the wizard about the existing components available, so
@@ -543,7 +553,7 @@ class ConfigurationWizard(SectionWizard):
         # the separator since the rest of our infrastructure depends on that.
         filename = filename.replace('/', os.path.sep)
         modname = pathToModuleName(filename)
-        d = self._admin.getBundledFunction(modname, procname)
+        d = self._adminModel.getBundledFunction(modname, procname)
         self.clear_msg('wizard-bundle')
         self.taskFinished()
         return d
