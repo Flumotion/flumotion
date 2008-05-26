@@ -100,6 +100,7 @@ flumotion/component/base/component.glade
 flumotion/component/base/componentnode.py
 flumotion/component/base/eaters.glade
 flumotion/component/base/eatersnode.py
+flumotion/component/base/effectsnode.py
 flumotion/component/base/feeders.glade
 flumotion/component/base/feedersnode.py
 flumotion/component/base/http.py

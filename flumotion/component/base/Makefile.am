@@ -6,6 +6,7 @@ component_PYTHON = __init__.py \
 	baseadminnode.py \
 	componentnode.py \
 	eatersnode.py \
+	effectsnode.py \
 	feedersnode.py \
 	http.py \
 	scheduler.py \

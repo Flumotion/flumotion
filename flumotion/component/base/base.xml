@@ -13,6 +13,7 @@
           <filename location="componentnode.py" />
           <filename location="eatersnode.py" />
           <filename location="eaters.glade" />
+          <filename location="effectsnode.py" />
           <filename location="feedersnode.py" />
           <filename location="feeders.glade" />
           <filename location="statewatcher.py" />

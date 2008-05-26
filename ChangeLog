@@ -17,10 +17,11 @@
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	* flumotion/component/producers/looper/admin_gtk.py:
 	* flumotion/component/producers/videotest/admin_gtk.py:
-	Split f.c.base.admin_gtk into six pieces, new are:
+	Split f.c.base.admin_gtk into seven smaller pieces, new are:
 	- baseadminnode
 	- componentnode
 	- eatersnode
+	- effectsnode
 	- feedersnode
 	- statewatcher
 
