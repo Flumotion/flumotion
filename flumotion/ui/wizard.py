@@ -168,8 +168,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
 
-        self._currentStep = self.getFirstStep()
-
     def __nonzero__(self):
         return True
 
@@ -208,6 +206,15 @@ class SectionWizard(GladeWindow, log.Loggable):
                 return step
         else:
             raise KeyError(stepname)
+
+    def hasStep(self, stepName):
+        """Find out if a step with name stepName exists
+        @returns: if the stepName exists
+        """
+        for step in self._steps.values():
+            if step.get_name() == stepName:
+                return True
+        return False
 
     def getVisitedSteps(self):
         """Returns a sequence of steps which has been visited.
@@ -337,8 +344,6 @@ class SectionWizard(GladeWindow, log.Loggable):
                 pass
 
     def _showNextStep(self, step):
-        self._steps[step.name] = step
-
         while not self._stack.push(step):
             s = self._stack.pop()
             s.visited = False
@@ -357,6 +362,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self._updateButtons(hasNext)
 
     def _setStep(self, step):
+        self._steps[step.name] = step
         self._currentStep = step
         self._packStep(step)
         self._setStepIcon(step.icon)

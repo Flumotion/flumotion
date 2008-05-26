@@ -1,5 +1,12 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/wizard.py:
+	Add a new method hasStep, skip calling getFirstStep as it is
+	not used, update self._steps in _setStep instead of _showNextStep,
+	so the first step is actually added to the dict.
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/wizard/configurationwizard.py:
 	Remove a constructor argument from the configuration
