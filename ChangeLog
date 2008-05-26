@@ -1,5 +1,31 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/baseadminnode.py:
+	* flumotion/component/base/componentnode.py:
+	* flumotion/component/base/eatersnode.py:
+	* flumotion/component/base/effectsnode.py:
+	* flumotion/component/base/feedersnode.py:
+	* flumotion/component/base/statewatcher.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/combiners/switch/admin_gtk.py:
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/looper/admin_gtk.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	Split f.c.base.admin_gtk into six pieces, new are:
+	- baseadminnode
+	- componentnode
+	- eatersnode
+	- feedersnode
+	- statewatcher
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/base/admin_gtk.py:
 	Be more careful when setting the debug gst/flu masks. Fixes #977
 

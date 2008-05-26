@@ -24,7 +24,8 @@ import gtk
 
 from flumotion.common import errors
 
-from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 
 __version__ = "$Rev$"
 

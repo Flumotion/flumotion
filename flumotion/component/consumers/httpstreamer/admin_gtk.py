@@ -24,7 +24,8 @@ import os
 import time
 
 from flumotion.common.mimetypes import launchApplicationByUrl
-from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
 
 _ = gettext.gettext

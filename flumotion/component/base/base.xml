@@ -8,9 +8,14 @@
       <directories>
         <directory name="flumotion/component/base">
           <filename location="admin_gtk.py" />
+          <filename location="baseadminnode.py" />
           <filename location="component.glade" />
+          <filename location="componentnode.py" />
+          <filename location="eatersnode.py" />
           <filename location="eaters.glade" />
+          <filename location="feedersnode.py" />
           <filename location="feeders.glade" />
+          <filename location="statewatcher.py" />
         </directory>
       </directories>
     </bundle>

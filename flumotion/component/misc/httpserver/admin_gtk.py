@@ -24,7 +24,8 @@ import os
 import webbrowser
 
 from flumotion.common.format import formatStorage
-from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
 
 __version__ = "$Rev$"

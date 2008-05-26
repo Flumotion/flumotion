@@ -21,13 +21,14 @@
 
 from gettext import gettext as _
 
-from flumotion.component.base import admin_gtk
-from flumotion.component.effects.volume import admin_gtk as vadmin_gtk
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
+from flumotion.component.effects.volume.vadmin_gtk import VolumeAdminGtkNode
 
 __version__ = "$Rev$"
 
 
-class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
+class AudioTestAdminGtkNode(BaseAdminGtkNode):
     logCategory = 'audiotest'
     gladeFile = 'flumotion/component/producers/audiotest/audiotest.glade'
     uiStateHandlers = None
@@ -45,7 +46,7 @@ class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
             self.wave_changed_cb)
 
     def setUIState(self, state):
-        admin_gtk.BaseAdminGtkNode.setUIState(self, state)
+        BaseAdminGtkNode.setUIState(self, state)
         if not self.uiStateHandlers:
             self.uiStateHandlers = {'wave': self.waveSet,
                                     'frequency': self.frequencySet,
@@ -85,12 +86,12 @@ class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
         self._combobox.set_active(value)
         self._combobox.handler_unblock(self._combobox_change_id)
 
-class AudioTestAdminGtk(admin_gtk.BaseAdminGtk):
+class AudioTestAdminGtk(BaseAdminGtk):
     def setup(self):
-        volume = vadmin_gtk.VolumeAdminGtkNode(self.state, self.admin,
-                                               'volume', title=_("Volume"))
+        volume = VolumeAdminGtkNode(self.state, self.admin,
+                                    'volume', title=_("Volume"))
         self.nodes['Volume'] = volume
         audiotest = AudioTestAdminGtkNode(self.state, self.admin,
                                           title=_("Audio Test"))
         self.nodes['Audio Test'] = audiotest
-        return admin_gtk.BaseAdminGtk.setup(self)
+        return BaseAdminGtk.setup(self)

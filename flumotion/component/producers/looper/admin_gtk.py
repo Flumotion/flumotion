@@ -19,19 +19,17 @@
 
 # Headers in this file shall remain intact.
 
-from gettext import gettext as _
-
 import os
+import gettext
+
 import gst
-from twisted.internet import defer
 
-from flumotion.common import errors
-
-from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
-
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.glade import GladeWidget
 
 __version__ = "$Rev$"
+_ = gettext.gettext
 
 
 def time_to_string(value):

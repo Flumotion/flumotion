@@ -22,9 +22,9 @@
 from gettext import gettext as _
 
 import gtk
-
 from flumotion.common import enum
-from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui import fgtk
 
 __version__ = "$Rev$"
