@@ -1,5 +1,20 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/configurationwizard.py:
+	video/audio producer needs to be set before setting the overlay
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	We need to convert to a fraction first, before attempting
+	to parse it
+
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/parts.py:
+	Add a new menu item for adding a new streamer format.
+	Fixes #933
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/models.py:
 	* flumotion/wizard/save.py:
 	Add a new state to the models, which is used to reference

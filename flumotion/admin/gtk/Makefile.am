@@ -3,6 +3,7 @@ include $(top_srcdir)/common/python.mk
 componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
 component_PYTHON = \
 	__init__.py \
+	addformatwizard.py \
 	client.py \
 	connections.py \
 	componentview.py \

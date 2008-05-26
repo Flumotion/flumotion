@@ -76,6 +76,8 @@ MAIN_UI = """
       <menuitem action="StopAll"/>
       <menuitem action="ClearAll"/>
       <separator name="sep-manage2"/>
+      <menuitem action="AddFormat"/>
+      <separator name="sep-manage3"/>
       <menuitem action="RunConfigurationWizard"/>
     </menu>
     <menu action="Debug">
@@ -311,6 +313,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('ClearAll', gtk.STOCK_CLEAR, _('_Clear All'), None,
              _('Remove all components'),
              self._manage_clear_all_cb),
+            ('AddFormat', gtk.STOCK_ADD, _('Add new _format..'), None,
+             _('Add a new format to the current stream'),
+             self._manage_add_format_cb),
             ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'), None,
              _('Run the configuration wizard'),
              self._manage_run_wizard_cb),
@@ -373,6 +378,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         assert self._startAllAction
         self._clearAllAction = group.get_action("ClearAll")
         assert self._clearAllAction
+        self._addFormatAction = group.get_action("AddFormat")
+        assert self._addFormatAction
 
         self._trayicon = FluTrayIcon(window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
@@ -557,9 +564,38 @@ class AdminClientWindow(Loggable, gobject.GObject):
         wizard.destroy()
         self._dumpConfig(configuration)
         self._admin.loadConfiguration(configuration)
+        self._updateComponentActions()
         self.show()
 
-    def _runWizard(self):
+    def _runAddNewFormatWizard(self):
+        from flumotion.admin.gtk.addformatwizard import AddFormatWizard
+        wizard = AddFormatWizard(self._window)
+        for state in self.components_view.getComponentStates():
+            componentName = state.get('name')
+            # FIXME: This is not completely correct, we should instead:
+            #        Provide a new wizard page which allows the user to select
+            #        the producers he wants to use when adding a new format
+            if componentName == 'producer-audio':
+                component = wizard.setAudioProducer(componentName,
+                                                    state.get('type'))
+            elif componentName == 'producer-video':
+                component = wizard.setVideoProducer(componentName,
+                                                    state.get('type'))
+            else:
+                continue
+            
+            # Move over the properties from the configuration dict.
+            config = state.get('config')
+            for key, value in config['properties'].items():
+                component.properties[key] = value
+        self._runWizard(wizard)
+
+    def _runConfigurationWizard(self):
+        from flumotion.wizard.configurationwizard import ConfigurationWizard
+        wizard = ConfigurationWizard(self._window)
+        self._runWizard(wizard)
+
+    def _runWizard(self, wizard):
         workerHeavenState = self._admin.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
@@ -567,8 +603,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
                   'logged in.'))
             return
 
-        from flumotion.wizard.configurationwizard import ConfigurationWizard
-        wizard = ConfigurationWizard(self._window)
         wizard.setExistingComponentNames(
             self.components_view.getComponentNames())
         wizard.setAdminModel(self._admin)
@@ -597,23 +631,37 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self.debug('can start %r, can stop %r' % (canStart, canStop))
         canStartAll = self.components_view.get_property('can-start-any')
         canStopAll = self.components_view.get_property('can-stop-any')
-        # they're all in sleeping or lost
-        can_clearAll = canStartAll and not canStopAll
 
+        # they're all in sleeping or lost
+        canClearAll = canStartAll and not canStopAll
         self._stopAllAction.set_sensitive(canStopAll)
         self._startAllAction.set_sensitive(canStartAll)
-        self._clearAllAction.set_sensitive(can_clearAll)
+        self._clearAllAction.set_sensitive(canClearAll)
+
+        hasProducer = self._hasProducerComponent()
+        self._addFormatAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
         self.components_view.update(self._components)
         self._trayicon.update(self._components)
 
+    def _hasProducerComponent(self):
+        for state in self.components_view.getComponentStates():
+            if state is None:
+                continue
+            # FIXME: Not correct, should expose wizard state from
+            #        the registry.
+            name = state.get('name')
+            if 'producer' in name:
+                return True
+        return False
+        
     def _clearMessages(self):
         self._messages_view.clear()
         pstate = self._planetState
         if pstate and pstate.hasKey('messages'):
             for message in pstate.get('messages').values():
-                self._messages_view.add_message(message)
+                self._messages_view.addmessage(message)
 
     def _setPlanetState(self, planetState):
 
@@ -861,12 +909,13 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._componentView.set_single_admin(admin)
 
         self._setPlanetState(admin.planet)
+        self._updateComponentActions()
 
         if not self._components:
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
-            self._runWizard()
+            self._runConfigurationWizard()
         else:
             self.show()
 
@@ -1125,8 +1174,11 @@ You can do remote component calls using:
     def _manage_clear_all_cb(self, action):
         self._admin.cleanComponents()
 
+    def _manage_add_format_cb(self, action):
+        self._runAddNewFormatWizard()
+        
     def _manage_run_wizard_cb(self, action):
-        self._runWizard()
+        self._runConfigurationWizard()
 
     def _debug_enable_cb(self, action):
         self.setDebugEnabled(action.get_active())

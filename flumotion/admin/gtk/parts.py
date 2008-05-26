@@ -329,7 +329,17 @@ class ComponentsView(log.Loggable, gobject.GObject):
         for row in self._model:
             names.append(row[COL_NAME])
         return names
-        
+
+    def getComponentStates(self):
+        """Fetches a list of all component states
+        @returns: component states
+        @rtype: list of L{AdminComponentState}
+        """
+        names = []
+        for row in self._model:
+            names.append(row[COL_STATE])
+        return names
+
     def can_start(self):
         """
         Get whether the selected components can be started.

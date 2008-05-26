@@ -211,20 +211,22 @@ class ConfigurationWizard(SectionWizard):
         saver.setFlowName(self._flowName)
         saver.setExistingComponentNames(self._existingComponentNames)
 
+        productionStep = None
         if self.hasStep('Production'):
             productionStep = self.getStep('Production')
-            if productionStep.hasOnDemand():
-                ondemandStep = self.getStep('Demand')
-                saver.addServerConsumer(
-                    ondemandStep.getServerConsumer(), 'ondemand')
-                return saver
 
-            if productionStep.hasVideo():
-                overlayStep = self.getStep('Overlay')
-                saver.setVideoOverlay(overlayStep.getOverlay())
+        if productionStep and productionStep.hasOnDemand():
+            ondemandStep = self.getStep('Demand')
+            saver.addServerConsumer(
+                ondemandStep.getServerConsumer(), 'ondemand')
+            return saver
 
         saver.setAudioProducer(self.getAudioProducer())
         saver.setVideoProducer(self.getVideoProducer())
+
+        if productionStep and productionStep.hasVideo():
+            overlayStep = self.getStep('Overlay')
+            saver.setVideoOverlay(overlayStep.getOverlay())
 
         encodingStep = self.getStep('Encoding')
         saver.setAudioEncoder(encodingStep.getAudioEncoder())
