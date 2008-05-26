@@ -193,7 +193,7 @@ class DAG(log.Loggable):
 
         l = node.children
         if types:
-            l = filter(lambda n: n.type in types, l)
+            l = [n for n in l if n.type in types]
 
         return [(n.object, n.type) for n in l]
 
@@ -233,7 +233,7 @@ class DAG(log.Loggable):
 
         l = node.parents
         if types:
-            l = filter(lambda n: n.type in types, l)
+            l = [n for n in l if n.type in types]
 
         return [(n.object, n.type) for n in l]
 
@@ -296,7 +296,7 @@ class DAG(log.Loggable):
 
         # filter offspring by types
         if types:
-            offspring = filter(lambda n: n.type in types, offspring)
+            offspring = [n for n in offspring if n.type in types]
 
         # now that we have all offspring, return a sorted list of them
         ret = []
@@ -369,7 +369,7 @@ class DAG(log.Loggable):
 
         # filter offspring by types
         if types:
-            ancestors = filter(lambda n: n.type in types, ancestors)
+            ancestors = [n for n in ancestors if n.type in types]
 
         # now that we have all offspring, return a sorted list of them
         ret = []
@@ -475,8 +475,8 @@ class DAG(log.Loggable):
 
         # 2.3
         # 2.3.b: detect cycle
-        hasCycle = lambda n: self._begin[n] > 0 and self._end[n] == 0
-        nodes = filter(hasCycle, node.children)
+        nodes = [n for n in node.children
+                       if self._begin[n] > 0 and self._end[n] == 0]
         if nodes:
             raise CycleError('nodes %r' % nodes)
 

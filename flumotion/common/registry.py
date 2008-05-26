@@ -1562,9 +1562,10 @@ class RegistrySubsetWriter(RegistryWriter):
     def dump(self, fd):
         reg = self.fromRegistry or getRegistry()
         pred = None
+        bundles = reg.getBundles()
         if self.onlyBundles is not None:
-            pred = lambda b: b.name in self.onlyBundles
-        bundles = filter(pred, reg.getBundles())
+            bundles = [bundle for b in bundles
+                                  if b.name in self.onlyBundles]
 
         bundledfiles = {}
         for b in bundles:

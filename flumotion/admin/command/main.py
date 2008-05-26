@@ -78,7 +78,7 @@ def parse_commands(args):
         len(spec) > 3 and not spec[3]]
     nopt = len(optspecs)
 
-    vararg = filter(lambda spec: len(spec) > 3 and spec[3], argspecs)
+    vararg = [spec for spec in argspecs if len(spec) > 3 and spec[3]]
 
     # pop off argv[0] and the command name
     cargs = args[2:]

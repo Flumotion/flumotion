@@ -1104,17 +1104,17 @@ class Vishnu(log.Loggable):
         components = self.getComponentStates()
 
         # if any component is already in a mood change/command, fail
-        isPending = lambda c: c.get('moodPending') != None
-        components = filter(isPending, components)
-        if len(components) > 0:
+        components = [c for c in components
+                            if c.get('moodPending') != None]
+        if components:
             state = components[0]
-            raise errors.BusyComponentError(state,
+            raise errors.BusyComponentError(
+                state,
                 "moodPending is %s" % moods.get(state.get('moodPending')))
 
         # filter out the ones that aren't sleeping and stop them
-        components = self.getComponentStates()
-        isNotSleeping = lambda c: c.get('mood') is not moods.sleeping.value
-        components = filter(isNotSleeping, components)
+        components = [c for c in self.getComponentStates()
+                            if c.get('mood') is not moods.sleeping.value]
 
         # create a big deferred for stopping everything
         d = defer.Deferred()

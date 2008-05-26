@@ -363,10 +363,8 @@ def _findPackageCandidates(path, prefix=configure.PACKAGE):
     bundlePaths = [x[len(path) + 1:] for x in dirs]
 
     # remove some common candidates, like .svn subdirs, or containing -
-    isNotSvn = lambda x: x.find('.svn') == -1
-    bundlePaths = filter(isNotSvn, bundlePaths)
-    isNotDashed = lambda x: x.find('-') == -1
-    bundlePaths = filter(isNotDashed, bundlePaths)
+    bundlePaths = [path for path in bundlePaths if path.find('.svn') == -1]
+    bundlePaths = [path for path in bundlePaths if path.find('-') == -1]
 
     # convert paths to module namespace
     bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
@@ -409,17 +407,15 @@ def findEndModuleCandidates(path, prefix=configure.PACKAGE):
     importPaths = [x[len(path) + 1:] for x in files]
 
     # remove some common candidates, like .svn subdirs, or containing -
-    isNotSvn = lambda x: x.find('.svn') == -1
-    importPaths = filter(isNotSvn, importPaths)
-    isNotDashed = lambda x: x.find('-') == -1
-    importPaths = filter(isNotDashed, importPaths)
+    importPaths = [path for path in importPaths if path.find('.svn') == -1]
+    importPaths = [path for path in importPaths if path.find('-') == -1]
 
     # convert paths to module namespace
     endModules = [common.pathToModuleName(x) for x in importPaths]
 
     # remove all not starting with prefix
-    isInPrefix = lambda x: x and x.startswith(prefix)
-    endModules = filter(isInPrefix, endModules)
+    endModules = [module for module in endModules
+                             if module.startswith(prefix)]
 
     # sort them so that depending packages are after higher-up packages
     endModules.sort()
