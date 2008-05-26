@@ -727,3 +727,40 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         # verify avatar state
         self.failIf(avatar.jobState)
         self.failIf(avatar.componentState)
+
+    def testDeleteFlow(self):
+        __thisdir = os.path.dirname(os.path.abspath(__file__))
+        file = os.path.join(__thisdir, 'test.xml')
+
+        self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
+        s= self.vishnu.state
+        l = s.get('flows')
+        self.failUnless(l)
+        f = l[0]
+        self.failUnlessEqual(f.get('name'), 'testflow')
+        cs = f.get('components')
+        self.failUnless(cs)
+
+        self.assertRaises(ValueError, self.vishnu.deleteFlow, 'does-not-exist')
+
+        cs[0].addKey('moodPending', True)
+        self.assertRaises(errors.BusyComponentError,
+                          self.vishnu.deleteFlow, 'testflow')
+        cs[0].addKey('moodPending', None)
+
+        # Test atomicity
+        first = cs[0]
+        cs[1].addKey('moodPending', True)
+        self.assertRaises(errors.BusyComponentError,
+                          self.vishnu.deleteFlow, 'testflow')
+        cs[1].addKey('moodPending', None)
+        self.failUnless(first in cs)
+        
+        self.vishnu.deleteFlow('testflow')
+        l = s.get('flows')
+        self.failIf(l)
+
+        self.assertRaises(ValueError, self.vishnu.deleteFlow, 'testflow')
+
+        # now lets empty planet
+        return self.vishnu.emptyPlanet()

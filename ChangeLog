@@ -1,5 +1,10 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/manager/manager.py (Vishnu.deleteFlow): Remove
+	lisp cruft, use a simpler pythonic approach.
+	* flumotion/test/test_manager_manager.py (TestVishnu.testDeleteFlow):
+	Add test for this function
+
 	* flumotion/admin/gtk/client.py (MAIN_UI): Make
 	separator names unique and fix wizard.run() call,
 	now when interactive keyword arg is removed.

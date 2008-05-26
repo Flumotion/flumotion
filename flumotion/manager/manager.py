@@ -55,25 +55,6 @@ T_ = gettexter()
 LOCAL_IDENTITY = LocalIdentity('manager')
 
 
-def _find(list, value, proc=lambda x: x):
-    return list[[proc(x) for x in list].index(value)]
-
-def _first(list, proc=lambda x: x):
-    for x in list:
-        if proc(x): return x
-
-def _any(list, proc=lambda x: x):
-    return filter(proc, list)
-
-def _fint(*procs):
-    # intersection of functions
-    def int(*args, **kwargs):
-        for p in procs:
-            if not p(*args, **kwargs): return False
-        return True
-    return int
-
-
 # an internal class
 class Dispatcher(log.Loggable):
     """
@@ -999,8 +980,7 @@ class Vishnu(log.Loggable):
             # treat the atmosphere like a flow, although it's not
             flow = self.state.get('atmosphere')
         else:
-            flow = _first(self.state.get('flows'),
-                          lambda x: x.get('name') == flowName)
+            flow = self._getFlowByName(flowName)
         if not flow:
             self.info('Creating flow "%s"' % flowName)
             flow = planet.ManagerFlowState()
@@ -1081,6 +1061,11 @@ class Vishnu(log.Loggable):
         del self._componentMappers[c]
         return flow.remove('components', c)
 
+    def _getFlowByName(self, flowName):
+        for flow in self.state.get('flows'):
+            if flow.get('name') == flowName:
+                return flow
+
     def deleteFlow(self, flowName):
         """
         Empty the planet of a flow.
@@ -1088,17 +1073,16 @@ class Vishnu(log.Loggable):
         @returns: a deferred that will fire when the flow is removed.
         """
 
-        # first get all components to sleep
-        flow = _find(self.state.get('flows'), flowName, lambda x: x.get('name'))
+        flow = self._getFlowByName(flowName)
+        if flow is None:
+            raise ValueError("No flow called %s found" % (flowName,))
+
         components = flow.get('components')
-
-        # if any component is already in a mood change/command, fail
-        isBusy = lambda c: c.get('moodPending') != None
-        isNotSleeping = lambda c: c.get('mood') is not moods.sleeping.value
-        pred = _fint(isBusy, isNotSleeping)
-        if _any(components, pred):
-            raise errors.BusyComponentError(_first(components, pred))
-
+        for c in components:
+            # if any component is already in a mood change/command, fail
+            if (c.get('moodPending') != None or
+                c.get('mood') is not moods.sleeping.value):
+                raise errors.BusyComponentError(c)
         for c in components:
             del self._componentMappers[self._componentMappers[c].id]
             del self._componentMappers[c]
