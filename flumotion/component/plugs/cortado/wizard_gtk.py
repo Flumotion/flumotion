@@ -24,6 +24,7 @@
 
 from zope.interface import implements
 
+from flumotion.common.fraction import fractionAsFloat
 from flumotion.wizard.interfaces import IHTTPConsumerPlugin
 from flumotion.wizard.models import HTTPServer, HTTPPlug
 
@@ -73,7 +74,7 @@ class CortadoHTTPPlug(HTTPPlug):
 
         p.width = width
         p.height = height
-        p.framerate = framerate
+        p.framerate = fractionAsFloat(framerate)
         p.buffer_size = 40
 
         return p
