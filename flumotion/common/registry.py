@@ -1564,8 +1564,8 @@ class RegistrySubsetWriter(RegistryWriter):
         pred = None
         bundles = reg.getBundles()
         if self.onlyBundles is not None:
-            bundles = [bundle for b in bundles
-                                  if b.name in self.onlyBundles]
+            bundles = [b for b in bundles
+                             if b.name in self.onlyBundles]
 
         bundledfiles = {}
         for b in bundles:
