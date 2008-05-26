@@ -47,7 +47,6 @@ T_ = gettexter()
 _ = gettext.gettext
 
 
-
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
 
@@ -146,7 +145,8 @@ class ConfigurationWizard(SectionWizard):
 
     def completed(self):
         saver = self.save()
-        self.emit('finished', saver.getXML())
+        xml = saver.getXML()
+        self.emit('finished', xml)
 
     def destroy(self):
         SectionWizard.destroy(self)
@@ -210,20 +210,21 @@ class ConfigurationWizard(SectionWizard):
         saver = WizardSaver()
         saver.setFlowName(self._flowName)
         saver.setExistingComponentNames(self._existingComponentNames)
-        
-        productionStep = self.getStep('Production')
-        if productionStep.hasOnDemand():
-            ondemandStep = self.getStep('Demand')
-            saver.addServerConsumer(
-                ondemandStep.getServerConsumer(), 'ondemand')
-            return saver
 
-        saver.setAudioProducer(productionStep.getAudioProducer())
-        saver.setVideoProducer(productionStep.getVideoProducer())
+        if self.hasStep('Production'):
+            productionStep = self.getStep('Production')
+            if productionStep.hasOnDemand():
+                ondemandStep = self.getStep('Demand')
+                saver.addServerConsumer(
+                    ondemandStep.getServerConsumer(), 'ondemand')
+                return saver
 
-        if productionStep.hasVideo():
-            overlayStep = self.getStep('Overlay')
-            saver.setVideoOverlay(overlayStep.getOverlay())
+            if productionStep.hasVideo():
+                overlayStep = self.getStep('Overlay')
+                saver.setVideoOverlay(overlayStep.getOverlay())
+
+        saver.setAudioProducer(self.getAudioProducer())
+        saver.setVideoProducer(self.getVideoProducer())
 
         encodingStep = self.getStep('Encoding')
         saver.setAudioEncoder(encodingStep.getAudioEncoder())
@@ -239,9 +240,10 @@ class ConfigurationWizard(SectionWizard):
             for server in step.getServerConsumers():
                 saver.addServerConsumer(server, consumerType)
 
-        licenseStep = self.getStep('ContentLicense')
-        if licenseStep.getLicenseType() == 'CC':
-            saver.setUseCCLicense(True)
+        if self.hasStep('ContentLicense'):
+            licenseStep = self.getStep('ContentLicense')
+            if licenseStep.getLicenseType() == 'CC':
+                saver.setUseCCLicense(True)
 
         return saver
 
@@ -285,16 +287,14 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have audio
         @rtype: bool
         """
-        source_step = self.getStep('Production')
-        return source_step.hasAudio()
+        return bool(self.getAudioProducer())
 
     def hasVideo(self):
         """If the configured feed has a video stream
         @return: if we have video
         @rtype: bool
         """
-        source_step = self.getStep('Production')
-        return bool(source_step.getVideoProducer())
+        return bool(self.getVideoProducer())
 
     def getConsumptionSteps(self):
         """Fetches the consumption steps chosen by the user
@@ -303,6 +303,22 @@ class ConfigurationWizard(SectionWizard):
         for step in self.getVisitedSteps():
             if isinstance(step, ConsumerStep):
                 yield step
+
+    def getAudioProducer(self):
+        """Returns the selected audio producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.AudioProducer}
+        """
+        production = self.getStep('Production')
+        return production.getAudioProducer()
+
+    def getVideoProducer(self):
+        """Returns the selected video producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.VideoProducer}
+        """
+        production = self.getStep('Production')
+        return production.getVideoProducer()
 
     def checkElements(self, workerName, *elementNames):
         """

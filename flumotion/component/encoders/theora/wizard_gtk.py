@@ -110,7 +110,7 @@ class TheoraStep(VideoEncoderStep):
         # a number of frames, so we need the framerate and calculate
         # we need to go through the Step (which is the view) because models
         # don't have references to other models
-        producer = self.wizard.getStep('Production').getVideoProducer()
+        producer = self.wizard.getVideoProducer()
         self.model.framerate = fractionAsFloat(producer.getFramerate())
         self.debug('Framerate of video producer: %r' % self.model.framerate)
         step = 1 / self.model.framerate

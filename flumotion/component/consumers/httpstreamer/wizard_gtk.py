@@ -219,10 +219,9 @@ class HTTPSpecificStep(ConsumerStep):
         return 'http-streamer'
 
     def getServerConsumers(self):
-        source_step = self.wizard.getStep('Production')
         return self.plugarea.getServerConsumers(
-           source_step.getAudioProducer(),
-           source_step.getVideoProducer())
+           self.wizard.getAudioProducer(),
+           self.wizard.getVideoProducer())
 
     def getDefaultMountPath(self):
         return '/%s/' % (self.getConsumerType(),)

@@ -1,5 +1,15 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	Add two getAudioProducer/getVideoProducer methods to the wizard,
+	to avoid fetching the production step everywhere.
+	Check if license step and production step exists before adding them.
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/wizard.py:
 	Add a new method hasStep, skip calling getFirstStep as it is
 	not used, update self._steps in _setStep instead of _showNextStep,

@@ -114,15 +114,14 @@ class ConversionStep(WorkerWizardStep):
     def activated(self):
         data = [('muxer', self.muxer, None)]
 
-        production = self.wizard.getStep('Production')
-        audio_producer = production.getAudioProducer()
+        audio_producer = self.wizard.getAudioProducer()
         if audio_producer:
             data.append(('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER))
         else:
             self.audio.hide()
             self.label_audio.hide()
 
-        video_producer = production.getVideoProducer()
+        video_producer = self.wizard.getVideoProducer()
         if video_producer:
             data.append(('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER))
         else:
@@ -202,6 +201,8 @@ class ConversionStep(WorkerWizardStep):
 
     def _loadStep(self, combo):
         entry = combo.get_selected()
+        assert entry, 'combo %s has nothing selected' % (combo,)
+        
         def pluginLoaded(plugin, entry):
             if plugin is None:
                 self._createDummyModel(entry)
