@@ -47,6 +47,7 @@ from flumotion.common.pygobject import gsignal
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
+from flumotion.wizard.models import Porter
 
 admin # pyflakes
 
@@ -564,9 +565,29 @@ class AdminClientWindow(Loggable, gobject.GObject):
         wizard.destroy()
         self._dumpConfig(configuration)
         self._admin.loadConfiguration(configuration)
+
         self._updateComponentActions()
         self.show()
 
+    def _getHTTPPorter(self):
+        porters = []
+        for state in self.components_view.getComponentStates():
+            config = state.get('config')
+            if config['type'] == 'porter':
+                porters.append(config)
+
+        if len(porters) != 1:
+            return
+        config = porters[0]
+        properties = config['properties']
+        porter = Porter(worker=None,
+                        port=properties['port'],
+                        username=properties['username'],
+                        password=properties['password'],
+                        socketPath=properties['socket-path'])
+        porter.exists = True
+        return porter
+    
     def _runAddNewFormatWizard(self):
         from flumotion.admin.gtk.addformatwizard import AddFormatWizard
         wizard = AddFormatWizard(self._window)
@@ -607,6 +628,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
             self.components_view.getComponentNames())
         wizard.setAdminModel(self._admin)
         wizard.setWorkerHeavenState(workerHeavenState)
+        httpPorter = self._getHTTPPorter()
+        if httpPorter:
+            wizard.setHTTPPorter(httpPorter)
         wizard.connect('finished', self._wizard_finished_cb)
         wizard.run(main=False)
 
@@ -655,7 +679,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             if 'producer' in name:
                 return True
         return False
-        
+
     def _clearMessages(self):
         self._messages_view.clear()
         pstate = self._planetState

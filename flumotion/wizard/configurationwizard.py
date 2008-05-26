@@ -128,7 +128,8 @@ class ConfigurationWizard(SectionWizard):
         self._adminModel = None
         self._workerHeavenState = None
         self._lastWorker = 0 # combo id last worker from step to step
-
+        self._httpPorter = None
+        
         self._flowName = 'default'
         self._existingComponentNames = []
         
@@ -217,8 +218,8 @@ class ConfigurationWizard(SectionWizard):
 
         if productionStep and productionStep.hasOnDemand():
             ondemandStep = self.getStep('Demand')
-            saver.addServerConsumer(
-                ondemandStep.getServerConsumer(), 'ondemand')
+            consumer = ondemandStep.getServerConsumer()
+            saver.addServerConsumer(consumer, 'ondemand')
             return saver
 
         saver.setAudioProducer(self.getAudioProducer())
@@ -232,12 +233,12 @@ class ConfigurationWizard(SectionWizard):
         saver.setAudioEncoder(encodingStep.getAudioEncoder())
         saver.setVideoEncoder(encodingStep.getVideoEncoder())
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
-
-        consumptionStep = self.getStep('Consumption')
-        saver.addPorter(consumptionStep.getHTTPPorter(), 'http')
+        
         for step in self.getConsumptionSteps():
             consumerType = step.getConsumerType()
-            saver.addConsumer(step.getConsumerModel(), consumerType)
+            consumer = step.getConsumerModel()
+            consumer.setPorter(httpPorter)
+            saver.addConsumer(consumer, consumerType)
 
             for server in step.getServerConsumers():
                 saver.addServerConsumer(server, consumerType)
@@ -313,6 +314,15 @@ class ConfigurationWizard(SectionWizard):
         """
         production = self.getStep('Production')
         return production.getAudioProducer()
+
+    def setHTTPPorter(self, httpPorter):
+        """Sets the HTTP porter of the wizard.
+        If the http port set in the new wizard is identical to the old one,
+        this porter will be reused
+        @param httpPorter: the http porter
+        @type httpPorter: L{flumotion.wizard.models.Porter} instance
+        """
+        self._httpPorter = httpPorter
 
     def getVideoProducer(self):
         """Returns the selected video producer or None

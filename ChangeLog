@@ -1,5 +1,11 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/configurationwizard.py:
+	Reuse http porters between wizards if the port is the same.
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/configurationwizard.py:
 	video/audio producer needs to be set before setting the overlay
 	* flumotion/component/plugs/cortado/wizard_gtk.py:
