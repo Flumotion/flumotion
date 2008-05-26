@@ -1,5 +1,15 @@
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	Avoid saving references to the wizard in the admin window.
+
+	* flumotion/wizard/configurationwizard.py:
+	Make adding the steps and saving public, overridable methods.
+	Remove workerStateHeaven from run() and add an extra
+	setter.
+
+2008-05-26  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/registry.py:
 	Fix a typo, bundle->b
 

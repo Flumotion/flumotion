@@ -131,7 +131,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._disconnectedDialog = None # set to a dialog when disconnected
         self._planetState = None
         self._components = None # name -> planet.AdminComponentState
-        self._wizard = None
         self._admin = None
         self._widgets = {}
         self._window = None
@@ -448,8 +447,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         if self._admin:
             self.debug('Connecting to new model %r' % model)
-            if self._wizard:
-                self._wizard.destroy()
 
         self._admin = model
 
@@ -556,21 +553,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
         d.show_all()
         d.connect('response', self._close)
 
+    def _wizardFinshed(self, wizard, configuration):
+        wizard.destroy()
+        self._dumpConfig(configuration)
+        self._admin.loadConfiguration(configuration)
+        self.show()
+
     def _runWizard(self):
-        if self._wizard:
-            self._wizard.present()
-
-        def _wizard_finished_cb(wizard, configuration):
-            wizard.destroy()
-            self._dumpConfig(configuration)
-            self._admin.loadConfiguration(configuration)
-            self.show()
-
-        def nullwizard(*args):
-            self._wizard = None
-
-        state = self._admin.getWorkerHeavenState()
-        if not state.get('names'):
+        workerHeavenState = self._admin.getWorkerHeavenState()
+        if not workerHeavenState.get('names'):
             self._error(
                 _('The wizard cannot be run because no workers are \
                 logged in.'))
@@ -580,11 +571,9 @@ class AdminClientWindow(Loggable, gobject.GObject):
         wizard = ConfigurationWizard(self._window, self._admin)
         wizard.setExistingComponentNames(
             self.components_view.getComponentNames())
-        wizard.connect('finished', _wizard_finished_cb)
-        wizard.run(state, False)
-
-        self._wizard = wizard
-        self._wizard.connect('destroy', nullwizard)
+        wizard.setWorkerHeavenState(workerHeavenState)
+        wizard.connect('finished', self._wizard_finished_cb)
+        wizard.run(main=False)
 
     def _clear_admin(self):
         if not self._admin:
@@ -1079,6 +1068,9 @@ You can do remote component calls using:
         self._updateComponents()
 
     ### ui callbacks
+
+    def _wizard_finished_cb(self, wizard, configuration):
+        self._wizardFinshed(wizard, configuration)
 
     def _window_delete_event_cb(self, window, event):
         self._quit()

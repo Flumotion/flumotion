@@ -137,13 +137,7 @@ class ConfigurationWizard(SectionWizard):
         self.top_vbox.pack_start(self._workerList, False, False)
         self._workerList.connect('worker-selected',
                                   self.on_combobox_worker_changed)
-
-        self.addStepSection(WelcomeStep)
-        self.addStepSection(ProductionStep)
-        self.addStepSection(ConversionStep)
-        self.addStepSection(ConsumptionStep)
-        self.addStepSection(LicenseStep)
-        self.addStepSection(SummaryStep)
+        self.addSteps()
 
     # SectionWizard
 
@@ -151,18 +145,12 @@ class ConfigurationWizard(SectionWizard):
         return WelcomeStep(self)
 
     def completed(self):
-        save = self._prepareSave()
-        self.emit('finished', save.getXML())
+        saver = self.save()
+        self.emit('finished', saver.getXML())
 
     def destroy(self):
         SectionWizard.destroy(self)
         self._admin = None
-
-    def run(self, workerHeavenState, main=True):
-        self._workerHeavenState = workerHeavenState
-        self._workerList.setWorkerHeavenState(workerHeavenState)
-
-        SectionWizard.run(self, main)
 
     def beforeShowStep(self, step):
         if isinstance(step, WorkerWizardStep):
@@ -184,6 +172,70 @@ class ConfigurationWizard(SectionWizard):
         SectionWizard.blockNext(self, block)
 
     # Public API
+
+    def addSteps(self):
+        """Add the step sections of the wizard, can be
+        overridden in a subclass
+        """
+        self.addStepSection(WelcomeStep)
+        self.addStepSection(ProductionStep)
+        self.addStepSection(ConversionStep)
+        self.addStepSection(ConsumptionStep)
+        self.addStepSection(LicenseStep)
+        self.addStepSection(SummaryStep)
+
+    def setWorkerHeavenState(self, workerHeavenState):
+        """
+        Sets the worker heaven state of the wizard
+        @param workerHeavenState: the worker heaven state
+        @type workerHeavenState: L{WorkerComponentUIState}
+        """
+        self._workerHeavenState = workerHeavenState
+        self._workerList.setWorkerHeavenState(workerHeavenState)
+        
+    def save(self):
+        """Save the content of the wizard
+        Can be overridden in a subclass
+        @returns: wizard saver
+        @rtype: L{WizardSaver}
+        """
+        saver = WizardSaver()
+        saver.setFlowName(self._flowName)
+        saver.setExistingComponentNames(self._existingComponentNames)
+        
+        productionStep = self.getStep('Production')
+        if productionStep.hasOnDemand():
+            ondemandStep = self.getStep('Demand')
+            saver.addServerConsumer(
+                ondemandStep.getServerConsumer(), 'ondemand')
+            return saver
+
+        saver.setAudioProducer(productionStep.getAudioProducer())
+        saver.setVideoProducer(productionStep.getVideoProducer())
+
+        if productionStep.hasVideo():
+            overlayStep = self.getStep('Overlay')
+            saver.setVideoOverlay(overlayStep.getOverlay())
+
+        encodingStep = self.getStep('Encoding')
+        saver.setAudioEncoder(encodingStep.getAudioEncoder())
+        saver.setVideoEncoder(encodingStep.getVideoEncoder())
+        saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
+
+        consumptionStep = self.getStep('Consumption')
+        saver.addPorter(consumptionStep.getHTTPPorter(), 'http')
+        for step in self.getConsumptionSteps():
+            consumerType = step.getConsumerType()
+            saver.addConsumer(step.getConsumerModel(), consumerType)
+
+            for server in step.getServerConsumers():
+                saver.addServerConsumer(server, consumerType)
+
+        licenseStep = self.getStep('ContentLicense')
+        if licenseStep.getLicenseType() == 'CC':
+            saver.setUseCCLicense(True)
+
+        return saver
 
     def waitForTask(self, taskName):
         """Instruct the wizard that we're waiting for a task
@@ -501,45 +553,6 @@ class ConfigurationWizard(SectionWizard):
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
 
-    def _prepareSave(self):
-        save = WizardSaver()
-        save.setFlowName(self._flowName)
-        save.setExistingComponentNames(self._existingComponentNames)
-        
-        productionStep = self.getStep('Production')
-        if productionStep.hasOnDemand():
-            ondemandStep = self.getStep('Demand')
-            save.addServerConsumer(
-                ondemandStep.getServerConsumer(), 'ondemand')
-            return save
-
-        save.setAudioProducer(productionStep.getAudioProducer())
-        save.setVideoProducer(productionStep.getVideoProducer())
-
-        if productionStep.hasVideo():
-            overlayStep = self.getStep('Overlay')
-            save.setVideoOverlay(overlayStep.getOverlay())
-
-        encodingStep = self.getStep('Encoding')
-        save.setAudioEncoder(encodingStep.getAudioEncoder())
-        save.setVideoEncoder(encodingStep.getVideoEncoder())
-        save.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
-
-        consumptionStep = self.getStep('Consumption')
-        save.addPorter(consumptionStep.getHTTPPorter(), 'http')
-        for step in self.getConsumptionSteps():
-            consumerType = step.getConsumerType()
-            save.addConsumer(step.getConsumerModel(), consumerType)
-
-            for server in step.getServerConsumers():
-                save.addServerConsumer(server, consumerType)
-
-        licenseStep = self.getStep('ContentLicense')
-        if licenseStep.getLicenseType() == 'CC':
-            save.setUseCCLicense(True)
-
-        return save
-
     # Callbacks
 
     def on_combobox_worker_changed(self, combobox, worker):
@@ -559,4 +572,3 @@ class ConfigurationWizard(SectionWizard):
                     'properly and try again.')),
                 id='worker-error')
             self.add_msg(msg)
-
