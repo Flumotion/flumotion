@@ -1,5 +1,16 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/componentlist.py:
+	camelcasify ComponentList api.
+	Clean up ComponentList:
+	- move all ui creation to _createUI
+	- make a few unused methods private
+	- make the callbacks shorter by calling
+	  private methods
+
+2008-05-27  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/Makefile.am:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/componentlist.py:

@@ -163,7 +163,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             self.statusbar.set('main', value)
         elif key == 'mood':
             self._updateComponentActions()
-            current = self.components_view.get_selected_names()
+            current = self.components_view.getSelectedNames()
             if value == moods.sleeping.value:
                 if state.get('name') in current:
                     self._messages_view.clear_message(value.id)
@@ -190,7 +190,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             if fail:
                 self.statusbar.push('main', fail % label)
         if not state:
-            states = self.components_view.get_selected_states()
+            states = self.components_view.getSelectedStates()
             if not states:
                 return
             for state in states:
@@ -644,8 +644,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin = None
 
     def _updateComponentActions(self):
-        canStart = self._components.can_start()
-        canStop = self._components.can_stop()
+        canStart = self._components.canStart()
+        canStop = self._components.canStop()
         canDelete = bool(self._currentComponentStates and canStart)
         self._startComponentAction.set_sensitive(canStart)
         self._stopComponentAction.set_sensitive(canStop)
@@ -797,10 +797,10 @@ class AdminClientWindow(Loggable, gobject.GObject):
         if not state:
             self.debug(" Trying to apply %s to a non component" %action +\
                        " that may mean that the signal comes from the menu ")
-            selected_states = self._components.get_selected_states()
+            selected_states = self._components.getSelectedStates()
             self.debug(" selected states %r when %s ", \
                        selected_states, action)
-            for selectedState in self._components.get_selected_states():
+            for selectedState in self._components.getSelectedStates():
                 self._componentDo(selectedState, action, doing, done,
                                   remoteMethodPrefix)
             return
@@ -851,7 +851,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateAppend on component state of %s' % name)
             if key == 'messages':
-                current = self._components.get_selected_names()
+                current = self._components.getSelectedNames()
                 if name in current:
                     self._messages_view.add_message(value)
                 self._messages_view.add_message(value)
@@ -860,7 +860,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateRemove on component state of %s' % name)
             if key == 'messages':
-                current = self._components.get_selected_names()
+                current = self._components.getSelectedNames()
                 if name in current:
                     self._messages_view.clear_message(value.id)
 
