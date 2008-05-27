@@ -40,6 +40,8 @@ _ = gettext.gettext
 __version__ = "$Rev$"
 T_ = gettexter()
 
+# stupid pychecker
+locale
 
 class BaseAdminGtk(log.Loggable):
     """
