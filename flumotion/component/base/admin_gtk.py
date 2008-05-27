@@ -41,7 +41,7 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 # stupid pychecker
-locale
+dir(locale)
 
 class BaseAdminGtk(log.Loggable):
     """
