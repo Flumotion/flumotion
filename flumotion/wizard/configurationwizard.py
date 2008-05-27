@@ -141,9 +141,6 @@ class ConfigurationWizard(SectionWizard):
 
     # SectionWizard
 
-    def getFirstStep(self):
-        return WelcomeStep(self)
-
     def completed(self):
         saver = self.save()
         xml = saver.getXML()
@@ -244,7 +241,7 @@ class ConfigurationWizard(SectionWizard):
             assert httpPorter.exists, httpPorter
         saver.addPorter(httpPorter, 'http')
 
-        for step in self.getConsumptionSteps():
+        for step in self._getConsumptionSteps():
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
             consumer.setPorter(httpPorter)
@@ -300,30 +297,32 @@ class ConfigurationWizard(SectionWizard):
         @return: if we have audio
         @rtype: bool
         """
-        return bool(self.getAudioProducer())
+        productionStep = self.getStep('Production')
+        return productionStep.hasAudio()
 
     def hasVideo(self):
         """If the configured feed has a video stream
         @return: if we have video
         @rtype: bool
         """
-        return bool(self.getVideoProducer())
-
-    def getConsumptionSteps(self):
-        """Fetches the consumption steps chosen by the user
-        @returns: consumption steps
-        """
-        for step in self.getVisitedSteps():
-            if isinstance(step, ConsumerStep):
-                yield step
+        productionStep = self.getStep('Production')
+        return productionStep.hasVideo()
 
     def getAudioProducer(self):
         """Returns the selected audio producer or None
         @returns: producer or None
         @rtype: L{flumotion.wizard.models.AudioProducer}
         """
-        production = self.getStep('Production')
-        return production.getAudioProducer()
+        productionStep = self.getStep('Production')
+        return productionStep.getAudioProducer()
+
+    def getVideoProducer(self):
+        """Returns the selected video producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.VideoProducer}
+        """
+        productionStep = self.getStep('Production')
+        return productionStep.getVideoProducer()
 
     def setHTTPPorter(self, httpPorter):
         """Sets the HTTP porter of the wizard.
@@ -333,14 +332,6 @@ class ConfigurationWizard(SectionWizard):
         @type httpPorter: L{flumotion.wizard.models.Porter} instance
         """
         self._httpPorter = httpPorter
-
-    def getVideoProducer(self):
-        """Returns the selected video producer or None
-        @returns: producer or None
-        @rtype: L{flumotion.wizard.models.VideoProducer}
-        """
-        production = self.getStep('Production')
-        return production.getVideoProducer()
 
     def checkElements(self, workerName, *elementNames):
         """
@@ -585,6 +576,14 @@ class ConfigurationWizard(SectionWizard):
         self._existingComponentNames = componentNames
 
     # Private
+
+    def _getConsumptionSteps(self):
+        """Fetches the consumption steps chosen by the user
+        @returns: consumption steps
+        """
+        for step in self.getVisitedSteps():
+            if isinstance(step, ConsumerStep):
+                yield step
 
     def _gotEntryPoint(self, (filename, procname)):
         # The manager always returns / as a path separator, replace them with

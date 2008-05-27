@@ -1,5 +1,12 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	Fix audio-only regression, getAudio()/getVideo() needs to be
+	implemented differently for the two wizards.
+	Also remove unused getFirstStep() methods, and make a method
+	private.
+
 	* flumotion/test/test_parts.py (TestComponentsView):
 	update this test to, to reflect the lastest changes
 

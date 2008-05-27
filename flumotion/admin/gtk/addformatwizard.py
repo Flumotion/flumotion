@@ -29,14 +29,13 @@ class AddFormatWizard(ConfigurationWizard):
         ConfigurationWizard.__init__(self, parent)
         self._audioProducer = None
         self._videoProducer = None
-        
+
+    # ConfigurationWizard
+    
     def addSteps(self):
         self.addStepSection(ConversionStep)
         self.addStepSection(ConsumptionStep)
         self.addStepSection(SummaryStep)
-
-    def getFirstStep(self):
-        return ConversionStep(self)
 
     def setAudioProducer(self, name, componentType):
         self._audioProducer = AudioProducer()
@@ -52,6 +51,12 @@ class AddFormatWizard(ConfigurationWizard):
         self._videoProducer.componentType = componentType
         return self._videoProducer
 
+    def hasAudio(self):
+        return bool(self._audioProducer)
+    
+    def hasVideo(self):
+        return bool(self._videoProducer)
+    
     def getAudioProducer(self):
         return self._audioProducer
 
