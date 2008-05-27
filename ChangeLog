@@ -375,7 +375,7 @@
 
 	* flumotion/admin/gtk/client.py (AdminClientWindow.__init__,
 	  AdminClientWindow.stateSet,
-	  AdminClientWindow.componentCallRemoteStatus, 
+	  AdminClientWindow.componentCallRemoteStatus,
 	  AdminClientWindow._create_ui,
 	  AdminClientWindow._update_component_actions,
 	  AdminClientWindow._remove_component, AdminClientWindow._component_do,
@@ -393,9 +393,9 @@
 	  ComponentsView.get_selected_names,
 	  ComponentsView.get_selected_states, ComponentsView.can_start,
 	  ComponentsView.can_stop, ComponentMenu.__init__):
-	  Added multi selection by returning multiple elements ( a list ) 
+	  Added multi selection by returning multiple elements ( a list )
 	  instead of a single element on the get_selected*. Also, moved the
-	  can_start and can_stop from the 
+	  can_start and can_stop from the
 	  flumotion.admin.gtk.client.AdminClientWindow
 	  to this class as it is used for the context menu.
 	* flumotion/test/test_parts.py :
@@ -602,13 +602,13 @@
 	* flumotion/worker/base.py:
 	* flumotion/worker/main.py:
 	Move process related utilites from f.c.common to
-	f.c.process. Mark the untested ones without callsites 
+	f.c.process. Mark the untested ones without callsites
 	in flumotion as private.
 	Update callsites and split the tests too.
 
 2008-05-15  Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/common/common.py (writePidFile): 
+	* flumotion/common/common.py (writePidFile):
 	Refactor to avoid duplication.
 	Set chmod to 644 of created pid files.
 	Fixes #847
@@ -627,7 +627,7 @@
 	Do some underscore->camelcase renaming.
 	gtk/main.py is considerably shorter and easier to understand.
 	Add a PACKAGE variable used by gettext.
-	
+
 2008-05-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/main.py:
