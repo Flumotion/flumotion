@@ -33,13 +33,14 @@ flumotion/admin/config.py
 flumotion/admin/connections.py
 flumotion/admin/gtk/client.py
 flumotion/admin/gtk/componentview.py
+flumotion/admin/gtk/componentlist.py
 flumotion/admin/gtk/connections.py
 flumotion/admin/gtk/dialogs.py
 flumotion/admin/gtk/greeter.py
 flumotion/admin/gtk/__init__.py
 flumotion/admin/gtk/main.py
 flumotion/admin/gtk/message.py
-flumotion/admin/gtk/parts.py
+flumotion/admin/gtk/statusbar.py
 flumotion/admin/__init__.py
 flumotion/admin/multi.py
 flumotion/admin/rrdmon/config.py

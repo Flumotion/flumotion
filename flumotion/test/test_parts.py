@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -22,12 +22,11 @@
 import gtk
 from twisted.spread import jelly
 
-from flumotion.admin.gtk import parts
+from flumotion.admin.gtk.statusbar import AdminStatusbar
+from flumotion.admin.gtk.componentlist import ComponentList
 from flumotion.common import planet
 from flumotion.common import testsuite
 from flumotion.common.planet import moods
-
-
 
 
 class TestAdminStatusbar(testsuite.TestCase):
@@ -39,7 +38,7 @@ class TestAdminStatusbar(testsuite.TestCase):
         self.window.set_size_request(100, 100)
         self.window.add(self.widget)
         self.window.show_all()
-        self.bar = parts.AdminStatusbar(self.widget)
+        self.bar = AdminStatusbar(self.widget)
 
     def tearDown(self):
         # the iterations make sure the window goes away
@@ -94,7 +93,7 @@ class TestComponentsView(testsuite.TestCase):
         self.widget = gtk.TreeView()
         self.window.add(self.widget)
         self.window.show_all()
-        self.view = parts.ComponentsView(self.widget)
+        self.view = ComponentList(self.widget)
         gtk.main_iteration()
 
     def tearDown(self):

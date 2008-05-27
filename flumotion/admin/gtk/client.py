@@ -34,8 +34,8 @@ from flumotion.admin.connections import get_recent_connections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
-from flumotion.admin.gtk.parts import getComponentLabel, ComponentsView, \
-     AdminStatusbar
+from flumotion.admin.gtk.componentlist import getComponentLabel, ComponentList
+from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.configure import configure
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
@@ -129,19 +129,20 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def __init__(self):
         gobject.GObject.__init__(self)
 
-        self._trayicon = None
-        self._currentComponentStates = None
-        self._disconnectedDialog = None # set to a dialog when disconnected
-        self._planetState = None
-        self._components = None # name -> planet.AdminComponentState
         self._admin = None
-        self._widgets = {}
-        self._window = None
-        self._recentMenuID = None
+        self._currentComponentStates = None
+        self._components = None # ComponentList
+        self._componentStates = None # name -> planet.AdminComponentState
+        self._componentView = None
         self._debugEnabled = False
         self._debugActions = None
         self._debugEnableAction = None
-        self._componentView = None
+        self._disconnectedDialog = None # set to a dialog when disconnected
+        self._planetState = None
+        self._recentMenuID = None
+        self._trayicon = None
+        self._widgets = {}
+        self._window = None
         
         self._createUI()
         self._appendRecentConnections()
@@ -389,20 +390,20 @@ class AdminClientWindow(Loggable, gobject.GObject):
         # the widget containing the component view
         self._componentView = widgets['component_view']
 
-        self.components_view = ComponentsView(widgets['components_view'])
-        self.components_view.connect('selection_changed',
-            self._components_view_selection_changed_cb)
-        self.components_view.connect('activated',
-            self._components_view_activated_cb)
+        self._components = ComponentList(widgets['components_view'])
+        self._components.connect('selection_changed',
+            self._components_selection_changed_cb)
+        self._components.connect('activated',
+            self._components_activated_cb)
         self.statusbar = AdminStatusbar(widgets['statusbar'])
         self._updateComponentActions()
-        self.components_view.connect(
+        self._components.connect(
             'notify::can-start-any',
-            self._component_view_start_stop_notify_cb)
-        self.components_view.connect(
+            self._components_start_stop_notify_cb)
+        self._components.connect(
             'notify::can-stop-any',
-            self._component_view_start_stop_notify_cb)
-        self._component_view_start_stop_notify_cb()
+            self._components_start_stop_notify_cb)
+        self._components_start_stop_notify_cb()
 
         self._messages_view = widgets['messages_view']
         self._messages_view.hide()
@@ -568,7 +569,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
     def _getHTTPPorter(self):
         porters = []
-        for state in self.components_view.getComponentStates():
+        for state in self._components.getComponentStates():
             config = state.get('config')
             if config['type'] == 'porter':
                 porters.append(config)
@@ -588,7 +589,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def _runAddNewFormatWizard(self):
         from flumotion.admin.gtk.addformatwizard import AddFormatWizard
         wizard = AddFormatWizard(self._window)
-        for state in self.components_view.getComponentStates():
+        for state in self._components.getComponentStates():
             componentName = state.get('name')
             # FIXME: This is not completely correct, we should instead:
             #        Provide a new wizard page which allows the user to select
@@ -622,7 +623,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             return
 
         wizard.setExistingComponentNames(
-            self.components_view.getComponentNames())
+            self._components.getComponentNames())
         wizard.setAdminModel(self._admin)
         wizard.setWorkerHeavenState(workerHeavenState)
         httpPorter = self._getHTTPPorter()
@@ -643,15 +644,15 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._admin = None
 
     def _updateComponentActions(self):
-        canStart = self.components_view.can_start()
-        canStop = self.components_view.can_stop()
+        canStart = self._components.can_start()
+        canStop = self._components.can_stop()
         canDelete = bool(self._currentComponentStates and canStart)
         self._startComponentAction.set_sensitive(canStart)
         self._stopComponentAction.set_sensitive(canStop)
         self._deleteComponentAction.set_sensitive(canDelete)
         self.debug('can start %r, can stop %r' % (canStart, canStop))
-        canStartAll = self.components_view.get_property('can-start-any')
-        canStopAll = self.components_view.get_property('can-stop-any')
+        canStartAll = self._components.get_property('can-start-any')
+        canStopAll = self._components.get_property('can-stop-any')
 
         # they're all in sleeping or lost
         canClearAll = canStartAll and not canStopAll
@@ -663,11 +664,11 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._addFormatAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
-        self.components_view.update(self._components)
-        self._trayicon.update(self._components)
+        self._components.update(self._componentStates)
+        self._trayicon.update(self._componentStates)
 
     def _hasProducerComponent(self):
-        for state in self.components_view.getComponentStates():
+        for state in self._components.getComponentStates():
             if state is None:
                 continue
             # FIXME: Not correct, should expose wizard state from
@@ -689,7 +690,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         def flowStateAppend(state, key, value):
             self.debug('flow state append: key %s, value %r' % (key, value))
             if key == 'components':
-                self._components[value.get('name')] = value
+                self._componentStates[value.get('name')] = value
                 # FIXME: would be nicer to do this incrementally instead
                 self._updateComponents()
 
@@ -699,7 +700,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
         def atmosphereStateAppend(state, key, value):
             if key == 'components':
-                self._components[value.get('name')] = value
+                self._componentStates[value.get('name')] = value
                 # FIXME: would be nicer to do this incrementally instead
                 self._updateComponents()
 
@@ -734,7 +735,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._planetState = planetState
 
         # clear and rebuild list of components that interests us
-        self._components = {}
+        self._componentStates = {}
 
         planetState.addListener(self, append=planetStateAppend,
                                 remove=planetStateRemove,
@@ -757,7 +758,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
     def _removeComponent(self, state):
         name = state.get('name')
         self.debug('removing component %s' % name)
-        del self._components[name]
+        del self._componentStates[name]
 
         # if this component was selected, clear selection
         if self._currentComponentStates and state \
@@ -796,10 +797,10 @@ class AdminClientWindow(Loggable, gobject.GObject):
         if not state:
             self.debug(" Trying to apply %s to a non component" %action +\
                        " that may mean that the signal comes from the menu ")
-            selected_states = self.components_view.get_selected_states()
+            selected_states = self._components.get_selected_states()
             self.debug(" selected states %r when %s ", \
                        selected_states, action)
-            for selectedState in self.components_view.get_selected_states():
+            for selectedState in self._components.get_selected_states():
                 self._componentDo(selectedState, action, doing, done,
                                   remoteMethodPrefix)
             return
@@ -850,7 +851,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateAppend on component state of %s' % name)
             if key == 'messages':
-                current = self.components_view.get_selected_names()
+                current = self._components.get_selected_names()
                 if name in current:
                     self._messages_view.add_message(value)
                 self._messages_view.add_message(value)
@@ -859,7 +860,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateRemove on component state of %s' % name)
             if key == 'messages':
-                current = self.components_view.get_selected_names()
+                current = self._components.get_selected_names()
                 if name in current:
                     self._messages_view.clear_message(value.id)
 
@@ -932,7 +933,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._setPlanetState(admin.planet)
         self._updateComponentActions()
 
-        if not self._components:
+        if not self._componentStates:
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
@@ -964,7 +965,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         self._disconnectedDialog = dialog
 
     def _connectionLost(self):
-        self._components = {}
+        self._componentStates = {}
         self._updateComponents()
         self._clearMessages()
         if self._planetState:
@@ -1095,8 +1096,8 @@ class AdminClientWindow(Loggable, gobject.GObject):
         else:
             import code
 
-        vars = \
-            {"admin": self._admin, "components": self._components}
+        ns = { "admin": self._admin,
+               "components": self._componentStates }
         message = """Flumotion Admin Debug Shell
 
 Local variables are:
@@ -1108,7 +1109,7 @@ You can do remote component calls using:
          'methodName', arg1, arg2)
 
 """
-        code.interact(local=vars, banner=message)
+        code.interact(local=ns, banner=message)
 
     def _dumpConfiguration(self):
         def gotConfiguration(xml):
@@ -1152,13 +1153,13 @@ You can do remote component calls using:
     def _recent_action_activate_cb(self, action, conn):
         self._openConnectionInternal(conn.info)
 
-    def _components_view_selection_changed_cb(self, view, state):
+    def _components_selection_changed_cb(self, view, state):
         self._componentSelectionChanged(state)
 
-    def _components_view_activated_cb(self, view, states, action):
+    def _components_activated_cb(self, view, states, action):
         self._componentActivate(states, action)
 
-    def _component_view_start_stop_notify_cb(self, *args):
+    def _components_start_stop_notify_cb(self, *args):
         self._updateComponentActions()
 
     ### action callbacks
@@ -1188,11 +1189,11 @@ You can do remote component calls using:
         self._componentDelete(None)
 
     def _manage_start_all_cb(self, action):
-        for c in self._components.values():
+        for c in self._componentStates.values():
             self._componentStart(c)
 
     def _manage_stop_all_cb(self, action):
-        for c in self._components.values():
+        for c in self._componentStates.values():
             self._componentStop(c)
 
     def _manage_clear_all_cb(self, action):

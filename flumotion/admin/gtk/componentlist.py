@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,9 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import os
-
-from gettext import gettext as _
 
 import gobject
 import gtk
@@ -36,6 +35,8 @@ from flumotion.common.xmlwriter import cmpComponentType
 from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
+_ = gettext.gettext
+
 (COL_MOOD,
  COL_NAME,
  COL_WORKER,
@@ -57,89 +58,59 @@ def getComponentLabel(state):
     config = state.get('config')
     return config and config.get('label', config['name'])
 
-class AdminStatusbar:
-    """
-    I implement the status bar used in the admin UI.
-    """
-    def __init__(self, widget):
+
+class ComponentMenu(gtk.Menu):
+
+    gsignal('activated', str)
+
+    def __init__(self, componentsView):
         """
-        @param widget: a gtk.Statusbar to wrap.
+        @param state: L{flumotion.common.component.AdminComponentState}
         """
-        self._widget = widget
+        gtk.Menu.__init__(self)
+        self._items = {} # name -> gtk.MenuItem
 
-        self._cids = {} # hash of context -> context id
-        self._mids = {} # hash of context -> message id lists
-        self._contexts = ['main', 'notebook']
+        self.set_title(_('Component'))
 
-        for context in self._contexts:
-            self._cids[context] = widget.get_context_id(context)
-            self._mids[context] = []
+        i = gtk.MenuItem(_('_Restart'))
+        self.append(i)
+        self._items['restart'] = i
 
-    def clear(self, context=None):
-        """
-        Clear the status bar for the given context, or for all contexts
-        if none specified.
-        """
-        if context:
-            self._clear_context(context)
-            return
+        i = gtk.MenuItem(_('_Start'))
+        can_start = componentsView.can_start()
+        if not can_start:
+            i.set_property('sensitive', False)
+        self.append(i)
+        self._items['start'] = i
 
-        for context in self._contexts:
-            self._clear_context(context)
+        i = gtk.MenuItem(_('St_op'))
+        can_stop = componentsView.can_stop()
+        if not can_stop:
+            i.set_property('sensitive', False)
+        self.append(i)
+        self._items['stop'] = i
 
-    def push(self, context, message):
-        """
-        Push the given message for the given context.
+        i = gtk.MenuItem(_('_Delete'))
+        if not can_start:
+            i.set_property('sensitive', False)
+        self.append(i)
+        self._items['delete'] = i
 
-        @returns: message id
-        """
-        mid = self._widget.push(self._cids[context], message)
-        self._mids[context].append(mid)
-        return mid
+        self.append(gtk.SeparatorMenuItem())
 
-    def pop(self, context):
-        """
-        Pop the last message for the given context.
+        # connect callback
+        for name in self._items.keys():
+            i = self._items[name]
+            i.connect('activate', self._activated_cb, name)
 
-        @returns: message id popped, or None
-        """
-        if len(self._mids[context]):
-            mid = self._mids[context].pop()
-            self._widget.remove(self._cids[context], mid)
-            return mid
+        self.show_all()
 
-        return None
+    def _activated_cb(self, item, name):
+        self.emit('activated', name)
+gobject.type_register(ComponentMenu)
 
-    def set(self, context, message):
-        """
-        Replace the current top message for this context with this new one.
 
-        @returns: the message id of the message pushed
-        """
-        self.pop(context)
-        return self.push(context, message)
-
-    def remove(self, context, mid):
-        """
-        Remove the message with the given id from the given context.
-
-        @returns: whether or not the given mid was valid.
-        """
-        if not mid in self._mids[context]:
-            return False
-
-        self._mids[context].remove(mid)
-        self._widget.remove(self._cids[context], mid)
-        return True
-
-    def _clear_context(self, context):
-        if not context in self._cids.keys():
-            return
-
-        for mid in self._mids[context]:
-            self.remove(context, mid)
-
-class ComponentsView(log.Loggable, gobject.GObject):
+class ComponentList(log.Loggable, gobject.GObject):
     """
     I present a view on the list of components logged in to the manager.
     """
@@ -486,67 +457,4 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         self.update_start_stop_props()
 
-gobject.type_register(ComponentsView)
-
-class ComponentMenu(gtk.Menu):
-
-    gsignal('activated', str)
-
-    def __init__(self, componentsView):
-        """
-        @param state: L{flumotion.common.component.AdminComponentState}
-        """
-        gtk.Menu.__init__(self)
-        self._items = {} # name -> gtk.MenuItem
-
-        self.set_title(_('Component'))
-
-        i = gtk.MenuItem(_('_Restart'))
-        self.append(i)
-        self._items['restart'] = i
-
-        i = gtk.MenuItem(_('_Start'))
-        can_start = componentsView.can_start()
-        if not can_start:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['start'] = i
-
-        i = gtk.MenuItem(_('St_op'))
-        can_stop = componentsView.can_stop()
-        if not can_stop:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['stop'] = i
-
-        i = gtk.MenuItem(_('_Delete'))
-        if not can_start:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['delete'] = i
-
-        self.append(gtk.SeparatorMenuItem())
-
-        i = gtk.MenuItem(_('Reload _code'))
-        self.append(i)
-        self._items['reload'] = i
-
-        i = gtk.MenuItem(_('_Modify element property ...'))
-        self.append(i)
-        self._items['modify'] = i
-
-        i = gtk.MenuItem(_('_Kill job'))
-        self.append(i)
-        self._items['kill'] = i
-
-        # connect callback
-        for name in self._items.keys():
-            i = self._items[name]
-            i.connect('activate', self._activated_cb, name)
-
-        self.show_all()
-
-    def _activated_cb(self, item, name):
-        self.emit('activated', name)
-
-gobject.type_register(ComponentMenu)
+gobject.type_register(ComponentList)

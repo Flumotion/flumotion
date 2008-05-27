@@ -1,5 +1,21 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/gtk/statusbar.py:
+	* flumotion/test/test_parts.py:
+	Attempt to clean up the components_view vs
+	component_view mess, kill off f.a.g.parts,
+	- componentsview is renamed to componentlist and
+	  moved to componentlist.py
+	- adminstatusbar is moved to statusbar.py
+	Rename _components to -> _componentStatus
+	       components_view to -> _components
+
+2008-05-27  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/client.py:
 	Improve connection label,
 	Do some more camelcasing, move a callback to

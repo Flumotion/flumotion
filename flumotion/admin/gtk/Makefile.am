@@ -6,12 +6,13 @@ component_PYTHON = \
 	addformatwizard.py \
 	client.py \
 	connections.py \
+	componentlist.py \
 	componentview.py \
 	dialogs.py \
 	greeter.py \
 	message.py \
-	parts.py \
-	main.py
+	main.py \
+	statusbar.py
 
 all-local:
 	if test -e videotest.pyc; then rm videotest.pyc; fi
