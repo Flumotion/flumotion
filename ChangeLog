@@ -1,5 +1,11 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/fraction.py:
+	* flumotion/common/netutils.py:
+	Fix epydoc syntax
+
+2008-05-27  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	it's admin_gtk, not vadmin_gtk
 

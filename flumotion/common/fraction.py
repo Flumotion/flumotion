@@ -63,7 +63,7 @@ def fractionAsFloat(value):
     """
     Converts a fraction to a float
     @param value: the value to convert to a tuple, can be one of:
-    @rtype: a two sized tuple with 2 integers
+    @type value: a two sized tuple with 2 integers
     @returns: fraction representation in float
     @rtype: float
     """
@@ -75,7 +75,7 @@ def fractionAsString(value):
     """
     Converts a fraction to a string
     @param value: the value to convert to a tuple, can be one of:
-    @rtype: a two sized tuple with 2 integers
+    @type value: a two sized tuple with 2 integers
     @returns: fraction representation as a string
     @rtype: string
     """

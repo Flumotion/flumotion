@@ -280,7 +280,7 @@ def tryPort(port=0):
     @param port: the port number or 0 for a random port
     @type port: integer
     @returns: port number or None if in use
-    @type: integer or None
+    @rtype: integer or None
     """
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
