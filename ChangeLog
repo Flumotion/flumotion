@@ -1,5 +1,8 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_parts.py (TestComponentsView):
+	update this test to, to reflect the lastest changes
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/componentlist.py:
 	camelcasify ComponentList api.
