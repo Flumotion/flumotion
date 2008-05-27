@@ -23,7 +23,7 @@ from gettext import gettext as _
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
-from flumotion.component.effects.volume.vadmin_gtk import VolumeAdminGtkNode
+from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
 
 __version__ = "$Rev$"
 

@@ -1,3 +1,8 @@
+2008-05-27  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	it's admin_gtk, not vadmin_gtk
+
 2008-05-26  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/Makefile.am:
