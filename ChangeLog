@@ -1,5 +1,12 @@
 2008-05-27  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/client.py:
+	Improve connection label,
+	Do some more camelcasing, move a callback to
+	a real method.
+
+2008-05-27  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/fraction.py:
 	* flumotion/common/netutils.py:
 	Fix epydoc syntax

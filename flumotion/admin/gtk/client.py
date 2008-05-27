@@ -314,7 +314,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             ('ClearAll', gtk.STOCK_CLEAR, _('_Clear All'), None,
              _('Remove all components'),
              self._manage_clear_all_cb),
-            ('AddFormat', gtk.STOCK_ADD, _('Add new _format..'), None,
+            ('AddFormat', gtk.STOCK_ADD, _('Add new encoding _format...'), None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
             ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'), None,
@@ -515,9 +515,6 @@ class AdminClientWindow(Loggable, gobject.GObject):
             self._uimgr.remove_ui(self._recentMenuID)
             self._uimgr.ensure_update()
 
-        def recent_activate(action, conn):
-            self._openConnectionInternal(conn.info)
-
         ui = ""
         for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
             name = conn.host
@@ -525,7 +522,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
             action = gtk.Action(name, name,
                                 _('Connect to the manager on %s') % conn.host,
                                 '')
-            action.connect('activate', recent_activate, conn)
+            action.connect('activate', self._recent_action_activate_cb, conn)
             self._actiongroup.add_action(action)
 
         self._recentMenuID = self._uimgr.add_ui_from_string(
@@ -533,7 +530,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
 
     def _quit(self):
         """Quitting the application in a controlled manner"""
-        self._clear_admin()
+        self._clearAdmin()
         self._close()
 
     def _close(self, *args):
@@ -634,7 +631,7 @@ class AdminClientWindow(Loggable, gobject.GObject):
         wizard.connect('finished', self._wizard_finished_cb)
         wizard.run(main=False)
 
-    def _clear_admin(self):
+    def _clearAdmin(self):
         if not self._admin:
             return
 
@@ -1151,6 +1148,9 @@ You can do remote component calls using:
 
     def _trayicon_quit_cb(self, trayicon):
         self._quit()
+
+    def _recent_action_activate_cb(self, action, conn):
+        self._openConnectionInternal(conn.info)
 
     def _components_view_selection_changed_cb(self, view, state):
         self._componentSelectionChanged(state)
