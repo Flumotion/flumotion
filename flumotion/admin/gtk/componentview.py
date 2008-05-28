@@ -44,11 +44,12 @@ class NodeBook(gtk.Notebook, log.Loggable):
         @type  admingtk: L{flumotion.component.base.admin_gtk.BaseAdminGtk}
 
         """
+
+        self.admingtk = admingtk
         gtk.Notebook.__init__(self)
         self._debugEnabled = False
         self._pageWidgets = {}
 
-        self.admingtk = admingtk
         admingtk.setup()
         self.nodes = admingtk.getNodes()
         self._appendPages()
@@ -60,7 +61,8 @@ class NodeBook(gtk.Notebook, log.Loggable):
         @param enable: if debug should be enabled
         """
         self._debugEnabled = enabled
-        self.admingtk.setDebugEnabled(enabled)
+        if self.admingtk:
+            self.admingtk.setDebugEnabled(enabled)
         for name in _DEBUG_ONLY_PAGES:
             widget = self._pageWidgets.get(name)
             if widget is None:
@@ -268,7 +270,7 @@ class ComponentView(gtk.VBox, log.Loggable):
                 # needed for compatibility with managers with old code
                 if hasattr(self._widget.admingtk, 'cleanup'):
                     self._widget.admingtk.cleanup()
-                del self._widget.admingtk
+                self._widget.admingtk = None
         self._widget = None
 
     def _object_inactive_to_unset(self):

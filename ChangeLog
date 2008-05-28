@@ -1,5 +1,9 @@
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py:
+	Never delete admingtk, just set it to None and check before
+	using it.
+
 	* flumotion/component/base/componentnode.py:
 	Add debug logging and do not set an initial debug mask, should
 	really fix #977 :-)
