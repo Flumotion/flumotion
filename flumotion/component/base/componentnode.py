@@ -90,13 +90,6 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         self._prepareDebugging()
 
-        if self._initialFluMask:
-            self.flu_mask.set_text(self._initialFluMask)
-            self.flu_mask.emit('changed')
-        if self._initialGstMask:
-            self.gst_mask.set_text(self._initialGstMask)
-            self.gst_mask.emit('changed')
-        
         self._debugging = self.wtree.get_widget('debugging')
         if self._debugEnabled:
             self._debugging.show()
@@ -129,12 +122,16 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         debug = entry.get_text()
         if not self._debugEnabled or not self._validateMask(debug):
             return
+        self.info('setting flu debug to %s for %s' % (
+            debug, self.state.get('name')))
         self.admin.componentCallRemote(self.state, 'setFluDebug', debug)
 
     def _on_gst_mask_changed(self, entry):
         debug = entry.get_text()
         if not self._debugEnabled or not self._validateMask(debug):
             return
+        self.info('setting gst debug to %s for %s' % (
+            debug, self.state.get('name')))
         self.admin.componentCallRemote(self.state, 'setGstDebug', debug)
 
     def _prepareDebugging(self):

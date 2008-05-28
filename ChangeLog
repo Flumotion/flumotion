@@ -1,5 +1,9 @@
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/base/componentnode.py:
+	Add debug logging and do not set an initial debug mask, should
+	really fix #977 :-)
+
 	* flumotion/wizard/configurationwizard.py: Clean up documentation
 	strings and change a few parameter names for improved readability
 
