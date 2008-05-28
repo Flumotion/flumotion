@@ -247,7 +247,9 @@ class ManagerComponentState(flavors.StateCacheable):
         self._jobState = None
 
     def __repr__(self):
-        return "<ManagerComponentState %s>" % self._dict['name']
+        return "<%s.%s name=%r>" % (self.__module__,
+                                    self.__class__.__name__,
+                                    self._dict['name'])
 
     def setJobState(self, jobState):
         """
@@ -337,7 +339,9 @@ class AdminComponentState(flavors.StateRemoteCache):
     See L{ManagerComponentState}.
     """
     def __repr__(self):
-        return "<AdminComponentState %s>" % self._dict['name']
+        return "<%s.%s name=%r>" % (self.__module__,
+                                    self.__class__.__name__,
+                                    self._dict['name'])
 
 pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
 

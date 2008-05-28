@@ -1,5 +1,9 @@
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/planet.py (ManagerComponentState.__repr__)
+	(AdminComponentState.__repr__): Improve repr strings to print
+	the whole path to the class.
+
 	* flumotion/admin/gtk/Makefile.am:
 	* flumotion/admin/gtk/adminwindow.py:
 	* flumotion/admin/gtk/client.py:
