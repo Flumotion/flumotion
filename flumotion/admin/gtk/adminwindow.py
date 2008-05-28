@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+"""Main interface for the Gtk+ Admin client
+"""
+
 import gettext
 import os
 import sys
@@ -116,7 +119,7 @@ RECENT_UI_TEMPLATE = '''<ui>
 MAX_RECENT_ITEMS = 4
 
 
-class AdminClientWindow(Loggable, gobject.GObject):
+class AdminWindow(Loggable, gobject.GObject):
     '''Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
@@ -1217,4 +1220,4 @@ You can do remote component calls using:
     def _help_about_cb(self, action):
         self._about()
 
-gobject.type_register(AdminClientWindow)
+gobject.type_register(AdminWindow)

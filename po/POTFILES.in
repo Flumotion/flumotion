@@ -31,7 +31,7 @@ flumotion/admin/command/main.py
 flumotion/admin/command/utils.py
 flumotion/admin/config.py
 flumotion/admin/connections.py
-flumotion/admin/gtk/client.py
+flumotion/admin/gtk/adminwindow.py
 flumotion/admin/gtk/componentview.py
 flumotion/admin/gtk/componentlist.py
 flumotion/admin/gtk/connections.py

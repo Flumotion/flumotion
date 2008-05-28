@@ -1,5 +1,13 @@
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/main.py:
+	Rename client.AdminClientWindow to adminwindow.AdminWindow.
+
+2008-05-28  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/componentview.py:
 	Never delete admingtk, just set it to None and check before
 	using it.

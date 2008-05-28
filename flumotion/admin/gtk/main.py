@@ -98,8 +98,8 @@ def main(args):
     from flumotion.ui.icons import register_icons
     register_icons()
 
-    from flumotion.admin.gtk.client import AdminClientWindow
-    win = AdminClientWindow()
+    from flumotion.admin.gtk.adminwindow import AdminWindow
+    win = AdminWindow()
 
     if options.verbose or (options.debug and options.debug > 3):
         win.setDebugEnabled(True)

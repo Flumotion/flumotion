@@ -4,7 +4,7 @@ componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
 component_PYTHON = \
 	__init__.py \
 	addformatwizard.py \
-	client.py \
+	adminwindow.py \
 	connections.py \
 	componentlist.py \
 	componentview.py \
