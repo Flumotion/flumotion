@@ -86,6 +86,12 @@ class TestAdminStatusbar(testsuite.TestCase):
         self.bar.clear()
         self.failIf(self.bar.pop('main'))
         self.failIf(self.bar.pop('notebook'))
+        
+    def testClearAll(self):
+        self.bar.push('main', 'I am the first message')
+        self.bar.push('main', 'I am the second message')
+        self.bar.clear(None)
+        self.failIf(self.bar.pop('main'))
 
 class TestComponentsView(testsuite.TestCase):
     def setUp(self):

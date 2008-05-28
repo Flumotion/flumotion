@@ -103,7 +103,7 @@ class AdminStatusbar(object):
         if not context in self._cids.keys():
             return
 
-        for mid in self._mids[context]:
+        for mid in self._mids[context][:]:
             self.remove(context, mid)
 
 

@@ -566,7 +566,8 @@ class AdminWindow(Loggable, gobject.GObject):
         wizard.destroy()
         self._dumpConfig(configuration)
         self._admin.loadConfiguration(configuration)
-
+        self._clearMessages()
+        self.statusbar.clear(None)
         self._updateComponentActions()
         self.show()
 

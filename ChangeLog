@@ -1,5 +1,15 @@
 2008-05-28  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
+	reviewed by: Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/gtk/adminwindow.py (AdminWindow._wizardFinshed):
+	* flumotion/admin/gtk/statusbar.py (AdminStatusbar._clearContext):
+	* flumotion/test/test_parts.py (TestAdminStatusbar.testClear,
+	  TestAdminStatusbar.testClearAll):
+	Fixes #890 . When finishing the wizard all previous messages are clean up.
+
+2008-05-28  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/package.py (findEndModuleCandidates):
