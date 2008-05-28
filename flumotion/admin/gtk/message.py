@@ -123,7 +123,7 @@ class MessagesView(gtk.VBox):
             self.clear_message(i.message.id)
         self.hide()
 
-    def add_message(self, m):
+    def addMessage(self, m):
         """
         Add a message to me.
         @type  m: L{flumotion.common.messages.Message}
@@ -188,7 +188,7 @@ class MessagesView(gtk.VBox):
             b.set_active(True)
         self.show()
 
-    def clear_message(self, id):
+    def clearMessage(self, id):
         """
         Clear all messages with the given id.
         Will bring the remaining most important message to the front,

@@ -1,3 +1,13 @@
+2008-05-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/message.py:
+	* flumotion/ui/wizard.py:
+	Rename add_message to -> addMessage &
+	       clear_message to _clearMessage
+    Rename _messages_view to _messageView.
+	Fix a real bug at a callsite, which used to be addmessages.
+
 2008-05-28  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	reviewed by: Arek Korbik  <arkadini@gmail.com>

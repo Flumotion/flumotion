@@ -231,10 +231,10 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.window.hide()
 
     def clear_msg(self, id):
-        self.message_area.clear_message(id)
+        self.message_area.clearMessage(id)
 
     def add_msg(self, msg):
-        self.message_area.add_message(msg)
+        self.message_area.addMessage(msg)
 
     def goNext(self):
         """Show the next step, this is called when

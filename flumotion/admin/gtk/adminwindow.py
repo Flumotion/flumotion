@@ -169,7 +169,7 @@ class AdminWindow(Loggable, gobject.GObject):
             current = self.components_view.getSelectedNames()
             if value == moods.sleeping.value:
                 if state.get('name') in current:
-                    self._messages_view.clear_message(value.id)
+                    self._messageView.clearMessage(value.id)
 
     #FIXME: This function may not be called ever.
     # It has not been properly tested
@@ -408,8 +408,8 @@ class AdminWindow(Loggable, gobject.GObject):
             self._components_start_stop_notify_cb)
         self._components_start_stop_notify_cb()
 
-        self._messages_view = widgets['messages_view']
-        self._messages_view.hide()
+        self._messageView = widgets['messages_view']
+        self._messageView.hide()
 
         return window
 
@@ -683,11 +683,11 @@ class AdminWindow(Loggable, gobject.GObject):
         return False
 
     def _clearMessages(self):
-        self._messages_view.clear()
+        self._messageView.clear()
         pstate = self._planetState
         if pstate and pstate.hasKey('messages'):
             for message in pstate.get('messages').values():
-                self._messages_view.addmessage(message)
+                self._messageView.addMessage(message)
 
     def _setPlanetState(self, planetState):
 
@@ -729,11 +729,11 @@ class AdminWindow(Loggable, gobject.GObject):
 
         def planetStateSetitem(state, key, subkey, value):
             if key == 'messages':
-                self._messages_view.add_message(value)
+                self._messageView.addMessage(value)
 
         def planetStateDelitem(state, key, subkey, value):
             if key == 'messages':
-                self._messages_view.clear_message(value.id)
+                self._messageView.clearMessage(value.id)
 
         self.debug('parsing planetState %r' % planetState)
         self._planetState = planetState
@@ -857,8 +857,8 @@ class AdminWindow(Loggable, gobject.GObject):
             if key == 'messages':
                 current = self._components.getSelectedNames()
                 if name in current:
-                    self._messages_view.add_message(value)
-                self._messages_view.add_message(value)
+                    self._messageView.addMessage(value)
+                self._messageView.addMessage(value)
 
         def compRemove(state, key, value):
             name = state.get('name')
@@ -866,7 +866,7 @@ class AdminWindow(Loggable, gobject.GObject):
             if key == 'messages':
                 current = self._components.getSelectedNames()
                 if name in current:
-                    self._messages_view.clear_message(value.id)
+                    self._messageView.clearMessage(value.id)
 
         if self._currentComponentStates:
             for current_componentState in self._currentComponentStates:
@@ -897,11 +897,11 @@ class AdminWindow(Loggable, gobject.GObject):
                 for m in messages:
                     self.debug('have message %r' % m)
                     self.debug('message id %s' % m.id)
-                    self._messages_view.add_message(m)
+                    self._messageView.addMessage(m)
 
             if state.get('mood') == moods.sad.value:
                 self.debug('component %s is sad' % name)
-                statusbar_message = statusbar_message +\
+                statusbarMessage = statusbarMessage + \
                                     _("Component %s is sad. ") % name
         if statusbar_message:
             self.statusbar.set('main',
