@@ -1,6 +1,6 @@
 2008-05-28  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
-	reviewed by: <delete if not using a buddy>
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/package.py (findEndModuleCandidates):
 	On findEndModuleCandidates added checking that module is not None
