@@ -415,7 +415,7 @@ def findEndModuleCandidates(path, prefix=configure.PACKAGE):
 
     # remove all not starting with prefix
     endModules = [module for module in endModules
-                             if module.startswith(prefix)]
+                             if module and module.startswith(prefix)]
 
     # sort them so that depending packages are after higher-up packages
     endModules.sort()
