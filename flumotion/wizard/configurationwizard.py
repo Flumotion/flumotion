@@ -264,6 +264,7 @@ class ConfigurationWizard(SectionWizard):
         Each call to this method should have another call
         to taskFinished() when the task is actually done.
         @param taskName: name of the name
+        @type taskName: string
         """
         self.info("waiting for task %s" % (taskName,))
         if not self._tasks:
@@ -275,6 +276,7 @@ class ConfigurationWizard(SectionWizard):
     def taskFinished(self, blockNext=False):
         """Instruct the wizard that a task was finished.
         @param blockNext: if we should still next when done
+        @type blockNext: boolean
         """
         if not self._tasks:
             raise AssertionError(
@@ -289,6 +291,7 @@ class ConfigurationWizard(SectionWizard):
     def pendingTask(self):
         """Returns true if there are any pending tasks
         @returns: if there are pending tasks
+        @rtype: bool
         """
         return bool(self._tasks)
 
@@ -334,13 +337,13 @@ class ConfigurationWizard(SectionWizard):
         self._httpPorter = httpPorter
 
     def checkElements(self, workerName, *elementNames):
-        """
-        Check if the given list of GStreamer elements exist on the given worker.
-
+        """Check if the given list of GStreamer elements exist on the given worker.
         @param workerName: name of the worker to check on
+        @type workerName: string
         @param elementNames: names of the elements to check
-
+        @type elementNames: list of strings
         @returns: a deferred returning a tuple of the missing elements
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
@@ -358,13 +361,15 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     def requireElements(self, workerName, *elementNames):
-        """
-        Require that the given list of GStreamer elements exists on the
+        """Require that the given list of GStreamer elements exists on the
         given worker. If the elements do not exist, an error message is
         posted and the next button remains blocked.
-
         @param workerName: name of the worker to check on
+        @type workerName: string
         @param elementNames: names of the elements to check
+        @type elementNames: list of strings
+        @returns: element name
+        @rtype: deferred -> list of strings
         """
         if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
@@ -396,13 +401,13 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     def checkImport(self, workerName, moduleName):
-        """
-        Check if the given module can be imported.
-
+        """Check if the given module can be imported.
         @param workerName:  name of the worker to check on
+        @type workerName: string
         @param moduleName:  name of the module to import
-
-        @returns: a deferred returning None or Failure.
+        @type moduleName: string
+        @returns: a deferred firing None or Failure.
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
@@ -413,15 +418,19 @@ class ConfigurationWizard(SectionWizard):
 
     def requireImport(self, workerName, moduleName, projectName=None,
                        projectURL=None):
-        """
-        Require that the given module can be imported on the given worker.
+        """Require that the given module can be imported on the given worker.
         If the module cannot be imported, an error message is
         posted and the next button remains blocked.
-
         @param workerName:  name of the worker to check on
+        @type workerName: string
         @param moduleName:  name of the module to import
+        @type moduleName: string
         @param projectName: name of the module to import
+        @type projectName: string
         @param projectURL:  URL of the project
+        @type projectURL: string
+        @returns: a deferred firing None or Failure
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         if not self._adminModel:
             self.debug('No admin connected, not checking presence of elements')
@@ -450,37 +459,40 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     # FIXME: maybe add id here for return messages ?
-    def runInWorker(self, worker, module, function, *args, **kwargs):
+    def runInWorker(self, workerName, moduleName, functionName, *args, **kwargs):
+        """Run the given function and arguments on the selected worker.
+        @param workerName: name of the worker to run the function in
+        @type workerName: string
+        @param moduleName: name of the module where the function is found
+        @type moduleName: string
+        @param functionName: name of the function to run
+        @type functionName: string
+        @returns: a deferred firing the return value of the function
+        @rtype: L{twisted.internet.defer.Deferred}
         """
-        Run the given function and arguments on the selected worker.
-
-        @param worker:
-        @param module:
-        @param function:
-        @returns: L{twisted.internet.defer.Deferred}
-        """
-        self.debug('runInWorker(module=%r, function=%r)' % (module, function))
+        self.debug('runInWorker(moduleName=%r, functionName=%r)' % (
+            moduleName, functionName))
         admin = self._adminModel
         if not admin:
             self.warning('skipping runInWorker, no admin')
             return defer.fail(errors.FlumotionError('no admin'))
 
-        if not worker:
+        if not workerName:
             self.warning('skipping runInWorker, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
         def callback(result):
             self.debug('runInWorker callbacked a result')
-            self.clear_msg(function)
+            self.clear_msg(functionName)
 
             if not isinstance(result, messages.Result):
                 msg = messages.Error(T_(
                     N_("Internal error: could not run check code on worker.")),
                     debug=('function %r returned a non-Result %r'
-                           % (function, result)))
+                           % (functionName, result)))
                 self.add_msg(msg)
                 self.taskFinished(True)
-                raise errors.RemoteRunError(function, 'Internal error.')
+                raise errors.RemoteRunError(functionName, 'Internal error.')
 
             for m in result.messages:
                 self.debug('showing msg %r' % m)
@@ -489,7 +501,7 @@ class ConfigurationWizard(SectionWizard):
             if result.failed:
                 self.debug('... that failed')
                 self.taskFinished(True)
-                raise errors.RemoteRunFailure(function, 'Result failed')
+                raise errors.RemoteRunFailure(functionName, 'Result failed')
             self.debug('... that succeeded')
             self.taskFinished()
             return result.value
@@ -500,18 +512,19 @@ class ConfigurationWizard(SectionWizard):
                 debug = failure.value
             else:
                 debug = "Failure while running %s.%s:\n%s" % (
-                    module, function, failure.getTraceback())
+                    moduleName, functionName, failure.getTraceback())
 
             msg = messages.Error(T_(
                 N_("Internal error: could not run check code on worker.")),
                 debug=debug)
             self.add_msg(msg)
             self.taskFinished(True)
-            raise errors.RemoteRunError(function, 'Internal error.')
+            raise errors.RemoteRunError(functionName, 'Internal error.')
 
-        self.waitForTask('run in worker: %s.%s(%r, %r)' % (module, function,
-                                                           args, kwargs))
-        d = admin.workerRun(worker, module, function, *args, **kwargs)
+        self.waitForTask('run in worker: %s.%s(%r, %r)' % (
+            moduleName, functionName, args, kwargs))
+        d = admin.workerRun(workerName, moduleName,
+                            functionName, *args, **kwargs)
         d.addErrback(errback)
         d.addCallback(callback)
         return d
@@ -520,9 +533,11 @@ class ConfigurationWizard(SectionWizard):
         """Fetches a wizard bundle from a specific kind of component
         @param componentType: the component type to get the wizard entry
           bundle from.
+        @type componentType: string
         @returns: a deferred returning either::
           - factory of the component
           - noBundle error: if the component lacks a wizard bundle
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.waitForTask('get wizard entry %s' % (componentType,))
         self.clear_msg('wizard-bundle')
@@ -535,9 +550,11 @@ class ConfigurationWizard(SectionWizard):
         """Fetches a wizard bundle from a specific kind of plug
         @param plugType: the plug type to get the wizard entry
           bundle from.
+        @type plugType: string
         @returns: a deferred returning either::
           - factory of the plug
           - noBundle error: if the plug lacks a wizard bundle
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.waitForTask('get wizard plug %s' % (plugType,))
         self.clear_msg('wizard-bundle')
@@ -558,8 +575,9 @@ class ConfigurationWizard(SectionWizard):
         @param accepts:     formats accepted, eg ['theora']
         @type  accepts:     list of str
 
-        @returns: a deferred returning a list
+        @returns: a deferred firing a list
                   of L{flumotion.common.componentui.WizardEntryState}
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('querying wizard entries (wizardTypes=%r,provides=%r'
                    ',accepts=%r)'% (wizardTypes, provides, accepts))
@@ -580,6 +598,7 @@ class ConfigurationWizard(SectionWizard):
     def _getConsumptionSteps(self):
         """Fetches the consumption steps chosen by the user
         @returns: consumption steps
+        @rtype: generator of a L{ConsumerStep} instances
         """
         for step in self.getVisitedSteps():
             if isinstance(step, ConsumerStep):
