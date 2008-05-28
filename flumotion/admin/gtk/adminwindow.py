@@ -413,7 +413,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
         return window
 
-    def _on_uimanager__connect_proxy(self, uimgr, action, widget):
+    def _connectActionProxy(self, action, widget):
         tooltip = action.get_property('tooltip')
         if not tooltip:
             return
@@ -429,7 +429,7 @@ class AdminWindow(Loggable, gobject.GObject):
             cid2 = widget.child.connect('leave', self._on_tool_button__leave)
             widget.set_data('pygtk-app::proxy-signal-ids', (cid, cid2))
 
-    def _on_uimanager__disconnect_proxy(self, uimgr, action, widget):
+    def _disconnectActionProxy(self, action, widget):
         cids = widget.get_data('pygtk-app::proxy-signal-ids')
         if not cids:
             return
@@ -439,19 +439,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
         for name, cid in cids:
             widget.disconnect(cid)
-
-    def _on_menu_item__select(self, menuitem, tooltip):
-        self.statusbar.push('main', tooltip)
-
-    def _on_menu_item__deselect(self, menuitem):
-        self.statusbar.pop('main')
-
-    def _on_tool_button__enter(self, toolbutton, tooltip):
-        self.statusbar.push('main', tooltip)
-
-    def _on_tool_button__leave(self, toolbutton):
-        self.statusbar.pop('main')
-
+        
     def _setAdminModel(self, model):
         'set the model to which we are a view/controller'
         # it's ok if we've already been connected
@@ -561,6 +549,12 @@ class AdminWindow(Loggable, gobject.GObject):
         d = ErrorDialog(message, self._window)
         d.show_all()
         d.connect('response', self._close)
+
+    def _setStatusbarText(self, text):
+        self.statusbar.push('main', text)
+
+    def _clearLastStatusbarText(self):
+        self.statusbar.pop('main')
 
     def _wizardFinshed(self, wizard, configuration):
         wizard.destroy()
@@ -812,19 +806,18 @@ class AdminWindow(Loggable, gobject.GObject):
         if not name:
             return None
 
-        mid = self.statusbar.push('main',
-                                  _("%s component %s") % (doing, name))
+        mid = self._setStatusbarText(_("%s component %s") % (doing, name))
         d = self._admin.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)
-            self.statusbar.push('main', "%s component %s" % (done, name))
+            self._setStatusbarText("%s component %s" % (done, name))
 
         def _actionErrback(failure, self, mid):
             self.statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
                 action.lower(), name, failure))
-            self.statusbar.push('main',
+            self._setStatusbarText(
                 _("Failed to %(action)s component %(name)s") % {
                     'action': action.lower(),
                     'name': name,
@@ -882,7 +875,6 @@ class AdminWindow(Loggable, gobject.GObject):
         if not states:
             return
 
-        statusbar_message = " "
         if len(states) == 1:
             self.debug("only one component is selected on the components view")
             self._componentView.show_object(states[0])
@@ -890,6 +882,8 @@ class AdminWindow(Loggable, gobject.GObject):
             self._componentView.show_object(None)
             self.debug("zero or more than one components are selected on the"+\
                         " components view")
+
+        statusbarMessage = " "
         for state in states:
             name = getComponentLabel(state)
             messages = state.get('messages')
@@ -903,9 +897,8 @@ class AdminWindow(Loggable, gobject.GObject):
                 self.debug('component %s is sad' % name)
                 statusbarMessage = statusbarMessage + \
                                     _("Component %s is sad. ") % name
-        if statusbar_message:
-            self.statusbar.set('main',
-                               statusbar_message)
+        if statusbarMessage:
+            self._setStatusbarText(statusbarMessage)
 
 
         # FIXME: show statusbar things
@@ -1144,6 +1137,24 @@ You can do remote component calls using:
         self._updateComponents()
 
     ### ui callbacks
+
+    def _on_uimanager__connect_proxy(self, uimgr, action, widget):
+        self._connectActionProxy(action, widget)
+
+    def _on_uimanager__disconnect_proxy(self, uimgr, action, widget):
+        self._disconnectActionProxy(action, widget)
+
+    def _on_menu_item__select(self, menuitem, tooltip):
+        self._setStatusbarText(tooltip) 
+
+    def _on_menu_item__deselect(self, menuitem):
+        self._clearLastStatusbarText()
+
+    def _on_tool_button__enter(self, toolbutton, tooltip):
+        self._setStatusbarText(tooltip)
+
+    def _on_tool_button__leave(self, toolbutton):
+        self._clearLastStatusbarText()
 
     def _wizard_finished_cb(self, wizard, configuration):
         self._wizardFinshed(wizard, configuration)

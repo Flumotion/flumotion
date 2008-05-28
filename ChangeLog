@@ -1,6 +1,9 @@
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
+	(AdminWindow._componentSelectionChanged): Reorganize callbacks and
+	add a statusbar internal statusbar api.
+
 	* flumotion/admin/gtk/message.py:
 	* flumotion/ui/wizard.py:
 	Rename add_message to -> addMessage &
