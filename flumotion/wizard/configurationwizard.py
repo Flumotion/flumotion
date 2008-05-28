@@ -337,7 +337,8 @@ class ConfigurationWizard(SectionWizard):
         self._httpPorter = httpPorter
 
     def checkElements(self, workerName, *elementNames):
-        """Check if the given list of GStreamer elements exist on the given worker.
+        """Check if the given list of GStreamer elements exist on the
+        given worker.
         @param workerName: name of the worker to check on
         @type workerName: string
         @param elementNames: names of the elements to check
@@ -459,7 +460,8 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     # FIXME: maybe add id here for return messages ?
-    def runInWorker(self, workerName, moduleName, functionName, *args, **kwargs):
+    def runInWorker(self, workerName, moduleName, functionName,
+                    *args, **kwargs):
         """Run the given function and arguments on the selected worker.
         @param workerName: name of the worker to run the function in
         @type workerName: string
