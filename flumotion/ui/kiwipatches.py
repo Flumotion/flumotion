@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -65,6 +65,12 @@ def _open_glade(view, gladefile, domain):
     if not os.path.sep in gladefile:
         filename = os.path.splitext(os.path.basename(gladefile))[0]
         gladefile = environ.find_resource("glade", filename + '.glade')
+    else:
+        # environ.find_resources raises EnvironmentError if the file
+        # is not found, do the same here.
+        if not os.path.exists(gladefile):
+            raise EnvironmentError("glade file %s does not exist" % (
+                gladefile,))
     return FluLibgladeWidgetTree(view, gladefile, domain)
 
 # Fixing bug #3259, fixed in kiwi 1.99.15

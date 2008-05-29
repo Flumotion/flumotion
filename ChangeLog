@@ -1,5 +1,8 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/kiwipatches.py: raise EnvironmentError
+	when the glade file is missing
+
 	* bin/flumotion-debug (main): avatar -> adminAvatar
 
 	* flumotion/wizard/shout2steps.py:
