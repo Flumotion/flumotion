@@ -1,5 +1,8 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/save.py (WizardSaver._handleMuxers): Simplify
+	muxer saving, fixes #931
+
 	* data/glade/Makefile.am:
 	* flumotion/component/consumers/disker/Makefile.am:
 	* flumotion/component/consumers/disker/wizard.glade:
