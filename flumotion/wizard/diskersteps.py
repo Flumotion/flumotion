@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 import gettext
-import os
 
 from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep

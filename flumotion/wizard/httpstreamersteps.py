@@ -36,7 +36,6 @@ On the http-server the applet will be provided with help of a plug.
 """
 
 import gettext
-import os
 
 import gobject
 from kiwi.utils import gsignal
