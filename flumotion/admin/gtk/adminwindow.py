@@ -50,7 +50,7 @@ from flumotion.common.pygobject import gsignal
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
-from flumotion.wizard.models import Porter
+from flumotion.wizard.models import AudioProducer, Porter, VideoProducer
 
 admin # pyflakes
 
@@ -565,17 +565,29 @@ class AdminWindow(Loggable, gobject.GObject):
         self._updateComponentActions()
         self.show()
 
-    def _getHTTPPorter(self):
-        porters = []
-        for state in self._components.getComponentStates():
-            config = state.get('config')
-            if config['type'] == 'porter':
-                porters.append(config)
+    def _getComponentBy(self, componentType):
+        if componentType is None:
+            raise ValueError
+        componentStates = []
 
-        if len(porters) != 1:
-            return
-        config = porters[0]
-        properties = config['properties']
+        for state in self._componentStates.values():
+            config = state.get('config')
+            if componentType and config['type'] == componentType:
+                componentStates.append(state)
+                
+        if not componentStates:
+            return None
+        elif len(componentStates) == 1:
+            return componentStates[0]
+        else:
+            raise AssertionError(
+                "Attempted to fetch a component state by type %r, "
+                "expected one, but got %r" % (
+                componentType, componentStates))
+
+    def _getHTTPPorter(self):
+        porterState = self._getComponentBy(componentType='porter')
+        properties = porterState.get('config')['properties']
         porter = Porter(worker=None,
                         port=properties['port'],
                         username=properties['username'],
@@ -583,29 +595,45 @@ class AdminWindow(Loggable, gobject.GObject):
                         socketPath=properties['socket-path'])
         porter.exists = True
         return porter
+
+    def _createComponentsByWizardType(self, componentClass, entries):
+        def _getComponents():
+            for componentState in self._componentStates.values():
+                componentType = componentState.get('config')['type']
+                for entry in entries:
+                    if entry.componentType == componentType:
+                        yield (componentState, entry)
+
+            
+        for componentState, entry in _getComponents():
+            component = componentClass()
+            component.componentType = entry.componentType
+            component.description = entry.description
+            component.exists = True
+            config = componentState.get('config')
+            for key, value in config['properties'].items():
+                component.properties[key] = value
+            yield component
     
     def _runAddNewFormatWizard(self):
         from flumotion.admin.gtk.addformatwizard import AddFormatWizard
-        wizard = AddFormatWizard(self._window)
-        for state in self._components.getComponentStates():
-            componentName = state.get('name')
-            # FIXME: This is not completely correct, we should instead:
-            #        Provide a new wizard page which allows the user to select
-            #        the producers he wants to use when adding a new format
-            if componentName == 'producer-audio':
-                component = wizard.setAudioProducer(componentName,
-                                                    state.get('type'))
-            elif componentName == 'producer-video':
-                component = wizard.setVideoProducer(componentName,
-                                                    state.get('type'))
-            else:
-                continue
+        addFormatWizard = AddFormatWizard(self._window)
+        def cb(entries):
+            entryDict = {}
+            for entry in entries:
+                entryDict.setdefault(entry.type, []).append(entry)
+
+            audioProducers = self._createComponentsByWizardType(
+                    AudioProducer, entryDict['audio-producer'], )
+            videoProducers = self._createComponentsByWizardType(
+                    VideoProducer, entryDict['video-producer'])
+            addFormatWizard.setAudioProducers(audioProducers)
+            addFormatWizard.setVideoProducers(videoProducers)
+            self._runWizard(addFormatWizard)
             
-            # Move over the properties from the configuration dict.
-            config = state.get('config')
-            for key, value in config['properties'].items():
-                component.properties[key] = value
-        self._runWizard(wizard)
+        d = self._admin.getWizardEntries(
+            wizardTypes=['audio-producer', 'video-producer'])
+        d.addCallback(cb)  
 
     def _runConfigurationWizard(self):
         from flumotion.wizard.configurationwizard import ConfigurationWizard

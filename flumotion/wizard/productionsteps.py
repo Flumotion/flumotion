@@ -246,3 +246,101 @@ class ProductionStep(WizardStep):
 
     def on_demand_activate(self, radio):
         self.wizard.goNext()
+
+
+class SelectProducersStep(WizardStep):
+    name = 'Production'
+    title = _('Production')
+    section = _('Production')
+    icon = 'source.png'
+    gladeFile = 'select-producers-wizard.glade'
+
+    def __init__(self, wizard):
+        self._audioProducer = None
+        self._videoProducer = None
+        self._loadedSteps = None
+        WizardStep.__init__(self, wizard)
+
+    # Public API
+
+    def hasOnDemand(self):
+        return False
+    
+    def hasAudio(self):
+        """Returns if audio will be used in the stream
+        created by the wizard.
+
+        @returns: if audio will be used
+        @rtype:   bool
+        """
+        return self.has_audio.get_active()
+
+    def hasVideo(self):
+        """Returns if video will be used in the stream
+        created by the wizard.
+
+        @returns: if video will be used
+        @rtype:   bool
+        """
+        return self.has_video.get_active()
+
+    def getAudioProducer(self):
+        """Returns the selected audio producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.AudioProducer}
+        """
+        if self.has_audio.get_active():
+            return self.audio.get_selected()
+
+    def getVideoProducer(self):
+        """Returns the selected video producer or None
+        @returns: producer or None
+        @rtype: L{flumotion.wizard.models.VideoProducer}
+        """
+        if self.has_video.get_active():
+            return self.video.get_selected()
+
+    def setVideoProducers(self, videoProducers):
+        self.video.prefill([(N_(vp.description), vp) for vp in videoProducers])
+
+    def setAudioProducers(self, audioProducers):
+        self.audio.prefill([(N_(vp.description), vp) for vp in audioProducers])
+
+    # WizardStep
+
+    def setup(self):
+        self.audio.data_type = object
+        self.video.data_type = object
+        # We want to save the audio/video attributes as
+        # componentType in the respective models
+        self.audio.model_attribute = 'componentType'
+        self.video.model_attribute = 'componentType'
+
+        tips = gtk.Tooltips()
+        tips.set_tip(self.has_video, _('If you want to stream video'))
+        tips.set_tip(self.has_audio, _('If you want to stream audio'))
+
+    def getNext(self):
+        return None
+    
+    # Private API
+
+    def _verify(self):
+        canContinue = self.hasAudio() or self.hasVideo()
+        self.wizard.blockNext(not canContinue)
+
+    # Callbacks
+
+    def on_has_video__toggled(self, button):
+        self.video.set_sensitive(button.get_active())
+        self._verify()
+
+    def on_has_audio__toggled(self, button):
+        self.audio.set_sensitive(button.get_active())
+        self._verify()
+
+    def on_video__changed(self, button):
+        self._verify()
+
+    def on_audio__changed(self, button):
+        self._verify()

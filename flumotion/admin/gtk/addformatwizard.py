@@ -19,46 +19,43 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.wizard.models import AudioProducer, VideoProducer
 from flumotion.wizard.configurationwizard import ConfigurationWizard, \
      ConversionStep, ConsumptionStep, SummaryStep
+from flumotion.wizard.productionsteps import SelectProducersStep
 
 
 class AddFormatWizard(ConfigurationWizard):
     def __init__(self, parent=None):
+        self._selectProducerStep = None
         ConfigurationWizard.__init__(self, parent)
-        self._audioProducer = None
-        self._videoProducer = None
 
     # ConfigurationWizard
     
     def addSteps(self):
+        self._selectProducerStep = SelectProducersStep(self)
+        self.addStepSection(self._selectProducerStep)
         self.addStepSection(ConversionStep)
         self.addStepSection(ConsumptionStep)
         self.addStepSection(SummaryStep)
 
-    def setAudioProducer(self, name, componentType):
-        self._audioProducer = AudioProducer()
-        self._audioProducer.exists = True
-        self._audioProducer.name = name
-        self._audioProducer.componentType = componentType
-        return self._audioProducer
-
-    def setVideoProducer(self, name, componentType):
-        self._videoProducer = VideoProducer()
-        self._videoProducer.exists = True
-        self._videoProducer.name = name
-        self._videoProducer.componentType = componentType
-        return self._videoProducer
-
     def hasAudio(self):
-        return bool(self._audioProducer)
+        return self._selectProducerStep.hasAudio()
     
     def hasVideo(self):
-        return bool(self._videoProducer)
+        return self._selectProducerStep.hasVideo()
     
     def getAudioProducer(self):
-        return self._audioProducer
+        return self._selectProducerStep.getAudioProducer()
 
     def getVideoProducer(self):
-        return self._videoProducer
+        return self._selectProducerStep.getVideoProducer()
+
+    # Public API
+
+    def setAudioProducers(self, audioProducers):
+        self._selectProducerStep.setAudioProducers(audioProducers)
+        
+    def setVideoProducers(self, videoProducers):
+        self._selectProducerStep.setVideoProducers(videoProducers)
+
+    

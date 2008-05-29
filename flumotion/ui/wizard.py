@@ -252,7 +252,10 @@ class SectionWizard(GladeWindow, log.Loggable):
     def run(self, main=True):
         self._useMain = main
         sectionClass = self._sections[self._currentSection]
-        section = sectionClass(self)
+        if isinstance(sectionClass, object):
+            section = sectionClass
+        else:
+            section = sectionClass(self)
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
         self._setStep(section)
@@ -323,7 +326,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def _setStepTitle(self, title):
         self.label_title.set_markup(
-            '<span size="x-large">%s</span>' % escape(title))
+            '<span size="x-large">%s</span>' % escape(title or ''))
 
     def _packStep(self, step):
         # Remove previous step

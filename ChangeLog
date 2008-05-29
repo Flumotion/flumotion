@@ -1,5 +1,18 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/Makefile.am:
+	* data/glade/select-producers-wizard.glade:
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/productionsteps.py:
+	Add a new step in the format wizard which allows you
+	to select producers. Query the wizard for wizard information
+	about the steps before opening the wizard.
+
+2008-05-29  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/kiwipatches.py: raise EnvironmentError
 	when the glade file is missing
 

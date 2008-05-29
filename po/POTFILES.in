@@ -23,6 +23,7 @@ data/glade/overlay-wizard.glade
 data/glade/overview-wizard.glade
 data/glade/production-wizard.glade
 data/glade/sectionwizard.glade
+data/glade/select-producers-wizard.glade
 data/glade/shout2-wizard.glade
 data/glade/summary-wizard.glade
 data/glade/videotest.glade

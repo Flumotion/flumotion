@@ -223,8 +223,9 @@ class ConfigurationWizard(SectionWizard):
         saver.setVideoProducer(self.getVideoProducer())
 
         if productionStep and productionStep.hasVideo():
-            overlayStep = self.getStep('Overlay')
-            saver.setVideoOverlay(overlayStep.getOverlay())
+            if self.hasStep('Overlay'):
+                overlayStep = self.getStep('Overlay')
+                saver.setVideoOverlay(overlayStep.getOverlay())
 
         encodingStep = self.getStep('Encoding')
         saver.setAudioEncoder(encodingStep.getAudioEncoder())
