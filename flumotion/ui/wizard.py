@@ -19,8 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-import os
 import gettext
+import os
+import types
 
 import gobject
 import gtk
@@ -252,10 +253,10 @@ class SectionWizard(GladeWindow, log.Loggable):
     def run(self, main=True):
         self._useMain = main
         sectionClass = self._sections[self._currentSection]
-        if isinstance(sectionClass, object):
-            section = sectionClass
-        else:
+        if isinstance(sectionClass, (type, types.ClassType)):
             section = sectionClass(self)
+        else:
+            section = sectionClass
         self.sidebar.push(section.section, None, section.section)
         self._stack.push(section)
         self._setStep(section)

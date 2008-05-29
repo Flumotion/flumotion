@@ -1,5 +1,11 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	Handle the initial case where no porters are available
+	* flumotion/ui/wizard.py:
+	(SectionWizard.run): Invert the check of sections, so it work
+	with an empty initial wizard.
+
 	* data/glade/Makefile.am:
 	* data/glade/select-producers-wizard.glade:
 	* flumotion/admin/gtk/addformatwizard.py:

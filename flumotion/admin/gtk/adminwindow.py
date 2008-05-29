@@ -587,6 +587,8 @@ class AdminWindow(Loggable, gobject.GObject):
 
     def _getHTTPPorter(self):
         porterState = self._getComponentBy(componentType='porter')
+        if porterState is None:
+            return None
         properties = porterState.get('config')['properties']
         porter = Porter(worker=None,
                         port=properties['port'],
