@@ -1,5 +1,7 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* bin/flumotion-debug (main): avatar -> adminAvatar
+
 	* flumotion/wizard/shout2steps.py:
 	* flumotion/wizard/diskersteps.py:
 	* flumotion/wizard/httpstreamersteps.py:
@@ -7,11 +9,12 @@
 	Regression after fixing #931.
 
 	* flumotion/wizard/shout2steps.py:
-	I should test code before committing, I should test code before comitting
-	I should test code before committing, I should test code before comitting
-	I should test code before committing, I should test code before comitting
-	I should test code before comitting, I should test code before comitting
-	I shouldtest code before comitting I should test code before comitting
+	I should test code before committing, I should test code before
+	comitting, I should test code before committing, I should test code
+	before comitting, I should test code before committing, I should
+	test code before comitting, I should test code before comitting,
+	I should test code before comitting, I shouldtest code before
+	comitting I should test code before comitting
 	Regression after fixing #931.
 
 2008-05-29  Johan Dahlin  <johan@flumotion.com>

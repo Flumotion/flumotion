@@ -44,7 +44,8 @@ def _setup(ns):
     setup.setupPackagePath()
 
     ns['vishnu'] = vishnu = Vishnu('debug')
-    ns['avatar'] = AdminAvatar(vishnu.adminHeaven, 'admin', None, FakeMind())
+    ns['adminAvatar'] = AdminAvatar(vishnu.adminHeaven,
+                                    'admin', None, FakeMind())
 
 def main(args):
     parser = OptionParser()
