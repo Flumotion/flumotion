@@ -1,5 +1,7 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_wizard_save.py: Update import here too.
+
 	* flumotion/wizard/save.py (WizardSaver._handleMuxers): Simplify
 	muxer saving, fixes #931
 
