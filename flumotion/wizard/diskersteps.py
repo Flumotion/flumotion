@@ -83,8 +83,7 @@ class Disker(Consumer):
 
 
 class DiskStep(ConsumerStep):
-    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              'wizard.glade')
+    gladeFile = 'disker-wizard.glade'
     icon = 'kcmdevices.png'
 
     def __init__(self, wizard):

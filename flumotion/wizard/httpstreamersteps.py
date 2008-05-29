@@ -199,10 +199,7 @@ class HTTPSpecificStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
-    gladeFile = os.path.join(
-        os.path.dirname(
-        os.path.abspath(__file__)),
-        'wizard.glade')
+    gladeFile = 'httpstreamer-wizard.glade'
 
     def __init__(self, wizard):
         consumptionStep = wizard.getStep('Consumption')
