@@ -6,11 +6,10 @@ component_PYTHON = \
 	__init__.py \
 	disker.py  \
 	disker_plug.py  \
-	wizard_gtk.py  \
 	admin_gtk.py \
 	admin_text.py
 
-component_DATA = disker.xml disker.glade wizard.glade
+component_DATA = disker.xml disker.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

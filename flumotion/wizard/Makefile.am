@@ -9,12 +9,15 @@ flumotion_PYTHON = 		\
 	configurationwriter.py 	\
 	consumptionsteps.py 	\
 	conversionsteps.py 	\
+	diskersteps.py 		\
+	httpstreamersteps.py	\
 	interfaces.py 		\
 	models.py 		\
 	ondemandstep.py		\
 	overlaystep.py 		\
 	productionsteps.py 	\
 	save.py 		\
+	shout2steps.py 		\
 	worker.py 		\
 	workerstep.py
 

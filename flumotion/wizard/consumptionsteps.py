@@ -22,15 +22,15 @@
 import gettext
 
 from flumotion.common.python import any
-from flumotion.component.consumers.httpstreamer.wizard_gtk import \
-     HTTPBothStep, HTTPAudioStep, HTTPVideoStep
-from flumotion.component.consumers.disker.wizard_gtk import \
-     DiskBothStep, DiskAudioStep, DiskVideoStep
-from flumotion.component.consumers.shout2.wizard_gtk import \
-     Shout2BothStep, Shout2AudioStep, Shout2VideoStep
 from flumotion.configure import configure
 from flumotion.ui.wizard import WizardStep
+from flumotion.wizard.httpstreamersteps import HTTPBothStep, HTTPAudioStep, \
+     HTTPVideoStep
+from flumotion.wizard.diskersteps import DiskBothStep, DiskAudioStep, \
+     DiskVideoStep
 from flumotion.wizard.models import Porter
+from flumotion.wizard.shout2steps import Shout2BothStep, Shout2AudioStep, \
+     Shout2VideoStep
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"

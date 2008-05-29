@@ -16,13 +16,16 @@ glade_DATA =					\
 	sectionwizard.glade			\
 	audio-encoder-wizard.glade		\
 	consumption-wizard.glade		\
+	disker-wizard.glade				\
 	encoding-wizard.glade			\
-	http-wizard.glade			\
+	http-wizard.glade				\
+	httpstreamer-wizard.glade		\
 	license-wizard.glade			\
 	ondemand-wizard.glade			\
 	overlay-wizard.glade			\
 	overview-wizard.glade			\
 	production-wizard.glade			\
+	shout2-wizard.glade				\
 	summary-wizard.glade			\
 	welcome-wizard.glade
 

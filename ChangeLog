@@ -1,3 +1,19 @@
+2008-05-29  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/Makefile.am:
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/wizard.glade:
+	* flumotion/component/consumers/disker/wizard_gtk.py:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/wizard.glade:
+	* flumotion/component/consumers/httpstreamer/wizard_gtk.py:
+	* flumotion/component/consumers/shout2/Makefile.am:
+	* flumotion/component/consumers/shout2/wizard.glade:
+	* flumotion/component/consumers/shout2/wizard_gtk.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/consumptionsteps.py:
+	Move back consumer steps from f.c.c, to f.w, fixes #935
+
 2008-05-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
