@@ -158,21 +158,30 @@ class LabelPlaceholder(Placeholder):
     def getWidget(self):
         return self._label
 
+
+class PlanetPlaceholder(Placeholder):
+    """This is a placeholder used to display a Planet"""
+    def __init__(self):
+        self._widget = gtk.Label('')
+
+    def getWidget(self):
+        return self._widget
+
     
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'
 
     def __init__(self):
         gtk.VBox.__init__(self)
-        self.widget_constructor = None
         self._admin = None
-        self._widget = None
         self._currentComponentState = None
-        self._state = COMPONENT_UNSET
-        self._debugEnabled = False
         self._currentPlaceholder = None
-        self.setSingleAdmin(None)
+        self._debugEnabled = False
+        self._state = COMPONENT_UNSET
 
+        self._planetPlaceholder = PlanetPlaceholder()
+        self._addPlaceholder(self._planetPlaceholder)
+        
     # Public API
 
     def getDebugEnabled(self):
@@ -234,14 +243,11 @@ class ComponentView(gtk.VBox, log.Loggable):
         self._currentPlaceholder = placeholder
 
     def _removePlaceholder(self, placeholder):
-        if placeholder is None:
-            return
-
         widget = placeholder.getWidget()
         self.remove(widget)
 
         placeholder.removed()
-
+        
     def _getWidgetConstructor(self, componentState):
         if not isinstance(componentState, AdminComponentState):
             return LabelPlaceholder()
@@ -323,6 +329,7 @@ class ComponentView(gtk.VBox, log.Loggable):
                     placeholder, self._state,
                     oldComponentState, self._currentComponentState))
                 return
+            self._removePlaceholder(self._planetPlaceholder)
             self._addPlaceholder(placeholder)
 
         d = self._getWidgetConstructor(self._currentComponentState)
@@ -330,7 +337,8 @@ class ComponentView(gtk.VBox, log.Loggable):
 
     def _componentActiveToInactive(self):
         self._removePlaceholder(self._currentPlaceholder)
-
+        self._addPlaceholder(self._planetPlaceholder)
+        
     def _componentInactiveToUnset(self):
         self._currentComponentState.removeListener(self)
         self._currentComponentState = None

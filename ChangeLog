@@ -1,5 +1,9 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py (PlanetPlaceholder.getWidget):
+	Add a simple placeholder for planets, nothing to see yet, just improving
+	the infrastructure in preparation for #986
+
 	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): Improve
 	error message when an instance is already listening to remote cache
 
