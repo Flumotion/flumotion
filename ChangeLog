@@ -1,5 +1,8 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/ui/wizard.py (SectionWizard.__init__): Remove last
+	traces of getFirstStep.
+
 	* flumotion/admin/gtk/adminwindow.py
 	(AdminWindow._connectionOpened): update componentview callsite
 

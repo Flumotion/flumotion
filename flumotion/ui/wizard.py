@@ -177,9 +177,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     # Override this in subclass
 
-    def getFirstStep(self):
-        raise NotImplementedError
-
     def completed(self):
         pass
 
