@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -25,15 +25,21 @@ import os
 import gobject
 import gtk
 
-from flumotion.common import planet, errors, common, log
-from flumotion.common import componentui # ensure unjellier registered
+from flumotion.common import componentui, log
+from flumotion.common.common import pathToModuleName
+from flumotion.common.errors import NoBundleError, SleepingComponentError
+from flumotion.common.planet import AdminComponentState, moods
+
+# ensure unjellier registered
+componentui # pyflakes
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-
-componentui # pyflakes
-
 _DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
+(COMPONENT_UNSET,
+ COMPONENT_INACTIVE,
+ COMPONENT_ACTIVE) = range(3)
+
 
 class NodeBook(gtk.Notebook, log.Loggable):
     logCategory = 'nodebook'
@@ -42,9 +48,7 @@ class NodeBook(gtk.Notebook, log.Loggable):
         """
         @param admingtk: the GTK Admin with its nodes
         @type  admingtk: L{flumotion.component.base.admin_gtk.BaseAdminGtk}
-
         """
-
         self.admingtk = admingtk
         gtk.Notebook.__init__(self)
         self._debugEnabled = False
@@ -116,50 +120,69 @@ class NodeBook(gtk.Notebook, log.Loggable):
         return gtk.Label(title)
 
 
-(OBJECT_UNSET,
- OBJECT_INACTIVE,
- OBJECT_ACTIVE) = range(3)
-
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'
 
     def __init__(self):
         gtk.VBox.__init__(self)
         self.widget_constructor = None
+        self._admin = None
         self._widget = None
-        self._object_state = None
-        self._state = OBJECT_UNSET
+        self._componentState = None
+        self._state = COMPONENT_UNSET
         self._callStamp = 0
         self._debugEnabled = False
         self._currentNodebook = None
-        self.set_single_admin(None)
+        self.setSingleAdmin(None)
 
     # Public API
 
     def getDebugEnabled(self):
+        """Find out if debug is enabled
+        @returns: if debug is enabled
+        @rtype: bool
+        """
         return self._debugEnabled
 
     def setDebugEnabled(self, enabled):
+        """Sets if debug should be enabled
+        @param enabled: if debug should be enabled
+        @type enabled: bool
+        """
         self._debugEnabled = enabled
         if self._currentNodebook:
             self._currentNodebook.setDebugEnabled(enabled)
 
-    def show_object(self, state):
-        self._set_state(OBJECT_UNSET)
-        if state:
-            self._object_state = state
-            self._set_state(OBJECT_INACTIVE)
+    def activateComponent(self, component):
+        """Activates a component in the view
+        @param component: component to show
+        @type component: L{flumotion.common.component.AdminComponentState}
+        """
+        self._setState(COMPONENT_UNSET)
+        if component:
+            self._componentState = component
+            self._setState(COMPONENT_INACTIVE)
 
-    def set_single_admin(self, admin):
-        self.admin = admin
+    def setSingleAdmin(self, admin):
+        """Sets a single global admin for the component view
+        @param admin: the admin
+        @type admin: L{flumotion.admin.model.AdminModel}
+        """
+        self._admin = admin
 
-    def get_admin_for_object(self, object):
-        # override me to do e.g. multi.get_admin_for_object
-        return self.admin
+    def getAdminForComponent(self, component):
+        """Get the admin for a specific component
+        @param component: component 
+        @type component: L{flumotion.common.component.AdminComponentState}
+        @returns: the admin
+        @rtype: L{flumotion.admin.model.AdminModel}
+        """
+        # override me to do e.g. multi.getAdminForComponent
+        return self._admin
 
     # Private
 
-    def _pack_widget(self, widget):
+    def _packWidget(self, widget):
         assert self._widget == None
         self._widget = widget
         self._widget.show()
@@ -168,96 +191,97 @@ class ComponentView(gtk.VBox, log.Loggable):
         self._currentNodebook.setDebugEnabled(self._debugEnabled)
         return self._widget
 
-    def _get_widget_constructor(self, state):
-        def not_component_state():
+    def _getWidgetConstructor(self, state):
+        def notComponentState():
             return gtk.Label('')
 
-        def no_bundle(failure):
-            failure.trap(errors.NoBundleError)
+        def noBundle(failure):
+            failure.trap(NoBundleError)
             self.debug(
                 'No specific GTK admin for this component, using default')
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
 
-        def old_version(failure):
+        def oldVersion(failure):
             # This is compatibility with platform-3
             # FIXME: It would be better to do this using strict
             #        version checking of the manager
 
-            # File ".../flumotion/manager/admin.py", line 278, in perspective_getEntryByType
+            # File ".../flumotion/manager/admin.py", line 278, in
+            #   perspective_getEntryByType
             # exceptions.AttributeError: 'str' object has no attribute 'get'
             failure.trap(AttributeError)
 
             return admin.callRemote('getEntryByType', state, 'admin/gtk')
 
-        def got_entry_point((filename, procname)):
-            # The manager always returns / as a path separator, replace them with
-            # the separator since the rest of our infrastructure depends on that.
+        def gotEntryPoint((filename, procname)):
+            # The manager always returns / as a path separator, replace them
+            # with the separator since the rest of our infrastructure depends
+            # on that.
             filename = filename.replace('/', os.path.sep)
-            # getEntry for admin/gtk returns a factory function
-            # for creating
-            # flumotion.component.base.admin_gtk.BaseAdminGtk
-            # subclass instances
-            modname = common.pathToModuleName(filename)
+            # getEntry for admin/gtk returns a factory function for creating
+            # flumotion.component.base.admin_gtk.BaseAdminGtk subclass instances
+            modname = pathToModuleName(filename)
             return admin.getBundledFunction(modname, procname)
 
-        def got_factory(factory):
+        def gotFactory(factory):
             # instantiate from factory and wrap in a NodeBook
             return lambda: NodeBook(factory(state, admin))
 
-        def sleeping_component(failure):
-            failure.trap(errors.SleepingComponentError)
+        def sleepingComponent(failure):
+            failure.trap(SleepingComponentError)
             return lambda: gtk.Label(_('Component %s is still sleeping') %
                                      state.get('name'))
 
-        admin = self.get_admin_for_object(state)
-        if not isinstance(state, planet.AdminComponentState):
-            return not_component_state
+        admin = self.getAdminForComponent(state)
+        if not isinstance(state, AdminComponentState):
+            return notComponentState
 
         componentType = state.get('type')
         d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
-        d.addErrback(old_version)
-        d.addErrback(no_bundle)
-        d.addCallback(got_entry_point)
-        d.addCallback(got_factory)
-        d.addErrback(sleeping_component)
+        d.addErrback(oldVersion)
+        d.addErrback(noBundle)
+        d.addCallback(gotEntryPoint)
+        d.addCallback(gotFactory)
+        d.addErrback(sleepingComponent)
         return d
 
-    def _object_unset_to_inactive(self):
+    def _componentUnsetToInactive(self):
         def invalidate(_):
-            self._set_state(OBJECT_UNSET)
+            self._setState(COMPONENT_UNSET)
         def set(state, key, value):
             if key == 'mood':
-                if value not in [planet.moods.lost.value,
-                        planet.moods.sleeping.value, planet.moods.sad.value]:
-                    self._set_state(OBJECT_ACTIVE)
+                if value not in [moods.lost.value,
+                                 moods.sleeping.value,
+                                 moods.sad.value]:
+                    self._setState(COMPONENT_ACTIVE)
                 else:
-                    self._set_state(OBJECT_INACTIVE)
+                    self._setState(COMPONENT_INACTIVE)
 
-        assert self._object_state is not None
-        self._object_state.addListener(
+        assert self._componentState is not None
+        self._componentState.addListener(
             self, invalidate=invalidate, set=set)
-        if self._object_state.hasKey('mood'):
-            set(self._object_state, 'mood', self._object_state.get('mood'))
+        if self._componentState.hasKey('mood'):
+            set(self._componentState, 'mood', self._componentState.get('mood'))
 
-    def _object_inactive_to_active(self):
-        def got_widget_constructor(proc, callStamp):
+    def _componentInactiveToActive(self):
+        def gotWidgetConstructor(proc, callStamp):
             if callStamp != self._callStamp:
                 # in the time that _get_widget_constructor was running,
-                # perhaps the user selected another object; only update
+                # perhaps the user selected another component; only update
                 # the ui if that did not happen
                 self.debug('ignoring widget constructor %r, state %d, '
                            'callstamps %d/%d', proc, self._state,
                            callStamp, self._callStamp)
                 return
             widget = proc()
-            return self._pack_widget(widget)
+            return self._packWidget(widget)
 
         self._callStamp += 1
         callStamp = self._callStamp
-        d = self._get_widget_constructor(self._object_state)
-        d.addCallback(got_widget_constructor, callStamp)
+        d = self._getWidgetConstructor(self._componentState)
+        d.addCallback(gotWidgetConstructor, callStamp)
 
-    def _object_active_to_inactive(self):
+    def _componentActiveToInactive(self):
         # prevent got_widget_constructor from adding the widget above
         self._callStamp += 1
         if not self._widget:
@@ -273,25 +297,25 @@ class ComponentView(gtk.VBox, log.Loggable):
                 self._widget.admingtk = None
         self._widget = None
 
-    def _object_inactive_to_unset(self):
-        self._object_state.removeListener(self)
-        self._object_state = None
+    def _componentInactiveToUnset(self):
+        self._componentState.removeListener(self)
+        self._componentState = None
 
-    def _set_state(self, state):
-        uptable = [self._object_unset_to_inactive,
-                   self._object_inactive_to_active]
-        downtable = [self._object_inactive_to_unset,
-                     self._object_active_to_inactive]
+    def _setState(self, state):
+        uptable = [self._componentUnsetToInactive,
+                   self._componentInactiveToActive]
+        downtable = [self._componentInactiveToUnset,
+                     self._componentActiveToInactive]
         if self._state < state:
             while self._state < state:
-                self.log('object %r state change: %d++', self._object_state,
-                         self._state)
+                self.log('component %r state change: %d++',
+                         self._componentState, self._state)
                 self._state += 1
                 uptable[self._state - 1]()
         else:
             while self._state > state:
-                self.log('object %r state change: %d--', self._object_state,
-                         self._state)
+                self.log('component %r state change: %d--',
+                         self._componentState, self._state)
                 self._state -= 1
                 downtable[self._state]()
 

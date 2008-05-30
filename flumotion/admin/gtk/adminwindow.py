@@ -905,13 +905,14 @@ class AdminWindow(Loggable, gobject.GObject):
         if not states:
             return
 
+        state = None
         if len(states) == 1:
             self.debug("only one component is selected on the components view")
-            self._componentView.show_object(states[0])
-        else:
-            self._componentView.show_object(None)
-            self.debug("zero or more than one components are selected on the"+\
-                        " components view")
+            state = states[0]
+        elif states:
+            self.debug("more than one components are selected in the "
+                       "components view")
+        self._componentView.activateComponent(state)
 
         statusbarMessage = " "
         for state in states:
@@ -955,7 +956,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
         self.emit('connected')
 
-        self._componentView.set_single_admin(admin)
+        self._componentView.setSingleAdmin(admin)
 
         self._setPlanetState(admin.planet)
         self._updateComponentActions()

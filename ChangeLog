@@ -1,5 +1,12 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py
+	(AdminWindow._connectionOpened): update componentview callsite
+
+	* flumotion/admin/gtk/componentview.py:
+	CamelCasifying, fix imports, document, rename  methods and variables
+	to make more sense
+
 	* flumotion/admin/gtk/message.py: General maintainance,
 	clean up imports, improve naming, refactor large methods
 	into smaller ones, rename variables.
