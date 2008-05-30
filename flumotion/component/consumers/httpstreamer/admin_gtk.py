@@ -115,7 +115,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         if not self._link:
             self._link = self._createLinkWidget(uri)
 
-        self._link.set_uri(uri)
+        if self._link is not None:
+            self._link.set_uri(uri)
 
     def _createLinkWidget(self, uri):
         holder = self.wtree.get_widget('link-holder')
@@ -131,6 +132,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
     def _on_link_show_url(self, url):
         launchApplicationByUrl(url, self._stats.get('stream-mime'))
+
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):

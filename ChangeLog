@@ -1,5 +1,9 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(StatisticsAdminGtkNode._updateLabels): link can still be None,
+	really protect against it.
+
 	* flumotion/admin/gtk/adminwindow.py:
 	call activateComponent with None if no component is selected, this
 	allows you to deselect all to get back to the planet view
