@@ -2,7 +2,8 @@
 
 	* flumotion/admin/gtk/message.py: General maintainance,
 	clean up imports, improve naming, refactor large methods
-	into smaller ones
+	into smaller ones, rename variables.
+	And two tiny extra changes.
 
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 

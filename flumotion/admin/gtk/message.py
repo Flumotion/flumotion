@@ -26,9 +26,10 @@ import time
 import pango
 import gtk
 
-from flumotion.common.messages import ERROR, WARNING, INFO
-from flumotion.common import documentation, log
+from flumotion.common import log
+from flumotion.common.documentation import getMessageWebLink
 from flumotion.common.i18n import Translator
+from flumotion.common.messages import ERROR, WARNING, INFO
 from flumotion.configure import configure
 
 _ = gettext.gettext
@@ -202,7 +203,7 @@ class MessagesView(gtk.VBox):
             tag = textbuffer.create_tag(translated)
             tag.set_property('underline', pango.UNDERLINE_SINGLE)
             tag.set_property('1foreground', 'blue')
-            tag.set_data('link', documentation.getMessageWebLink(message))
+            tag.set_data('link', getMessageWebLink(message))
             textbuffer.insert_with_tags_by_name(titer, translated,
                                                 tag.get_property('name'))
     
@@ -245,6 +246,7 @@ class MessagesView(gtk.VBox):
         for tag in tags:
             if tag.get_data('link'):
                 cursor = gtk.gdk.Cursor(gtk.gdk.HAND2)
+                break
         textview.get_window(gtk.TEXT_WINDOW_TEXT).set_cursor(cursor)
         return False
 
