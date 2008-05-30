@@ -41,7 +41,29 @@ _DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
  COMPONENT_ACTIVE) = range(3)
 
 
-class NodeBook(gtk.Notebook, log.Loggable):
+class Placeholder(object):
+    """A placeholder contains a Widget subclass of a specific
+    component.
+    """
+
+    def getWidget(self):
+        raise NotImplementedError(
+            "%r must implement a getWidget() method")
+
+    def setDebugEnabled(self, enabled):
+        """Set if debug should be enabled.
+        Not all pages are visible unless debugging is set to true
+        @param enable: if debug should be enabled
+        """
+
+    def removed(self):
+        """Called when the placeholder is inactivated, eg
+        detached from the parent"""
+    
+
+class NotebookPlaceholder(Placeholder, log.Loggable):
+    """This is a placeholder containing a notebook with tabs
+    """
     logCategory = 'nodebook'
 
     def __init__(self, admingtk):
@@ -49,24 +71,32 @@ class NodeBook(gtk.Notebook, log.Loggable):
         @param admingtk: the GTK Admin with its nodes
         @type  admingtk: L{flumotion.component.base.admin_gtk.BaseAdminGtk}
         """
-        self.admingtk = admingtk
-        gtk.Notebook.__init__(self)
         self._debugEnabled = False
+        self._admingtk = admingtk
+        self._notebook = None
         self._pageWidgets = {}
 
+        self._notebook = gtk.Notebook()
         admingtk.setup()
         self.nodes = admingtk.getNodes()
         self._appendPages()
-        self.show()
+        self._notebook.show()
+
+    # BaseComponentHolder
+    def getWidget(self):
+        return self._notebook
+
+    def removed(self):
+        if self._admingtk:
+            # needed for compatibility with managers with old code
+            if hasattr(self._admingtk, 'cleanup'):
+                self._admingtk.cleanup()
+            self._admingtk = None
 
     def setDebugEnabled(self, enabled):
-        """Set if debug should be enabled.
-        Not all pages are visible unless debugging is set to true
-        @param enable: if debug should be enabled
-        """
         self._debugEnabled = enabled
-        if self.admingtk:
-            self.admingtk.setDebugEnabled(enabled)
+        if self._admingtk:
+            self._admingtk.setDebugEnabled(enabled)
         for name in _DEBUG_ONLY_PAGES:
             widget = self._pageWidgets.get(name)
             if widget is None:
@@ -90,7 +120,7 @@ class NodeBook(gtk.Notebook, log.Loggable):
         table.add(gtk.Label(_('Loading UI for %s...') % name))
         label = self._getTitleLabel(node, name)
         label.show()
-        self.append_page(table, label)
+        self._notebook.append_page(table, label)
 
         d = node.render()
         d.addCallback(self._renderWidget, table)
@@ -120,6 +150,15 @@ class NodeBook(gtk.Notebook, log.Loggable):
         return gtk.Label(title)
 
 
+class LabelPlaceholder(Placeholder):
+    """This is a placeholder with a label, with or without a text"""
+    def __init__(self, text=''):
+        self._label = gtk.Label(text)
+        
+    def getWidget(self):
+        return self._label
+
+    
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'
 
@@ -128,11 +167,10 @@ class ComponentView(gtk.VBox, log.Loggable):
         self.widget_constructor = None
         self._admin = None
         self._widget = None
-        self._componentState = None
+        self._currentComponentState = None
         self._state = COMPONENT_UNSET
-        self._callStamp = 0
         self._debugEnabled = False
-        self._currentNodebook = None
+        self._currentPlaceholder = None
         self.setSingleAdmin(None)
 
     # Public API
@@ -150,8 +188,8 @@ class ComponentView(gtk.VBox, log.Loggable):
         @type enabled: bool
         """
         self._debugEnabled = enabled
-        if self._currentNodebook:
-            self._currentNodebook.setDebugEnabled(enabled)
+        if self._currentPlaceholder:
+            self._currentPlaceholder.setDebugEnabled(enabled)
 
     def activateComponent(self, component):
         """Activates a component in the view
@@ -160,7 +198,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         """
         self._setState(COMPONENT_UNSET)
         if component:
-            self._componentState = component
+            self._currentComponentState = component
             self._setState(COMPONENT_INACTIVE)
 
     def setSingleAdmin(self, admin):
@@ -182,18 +220,31 @@ class ComponentView(gtk.VBox, log.Loggable):
 
     # Private
 
-    def _packWidget(self, widget):
-        assert self._widget == None
-        self._widget = widget
-        self._widget.show()
-        self.pack_start(self._widget, True, True)
-        self._currentNodebook = widget
-        self._currentNodebook.setDebugEnabled(self._debugEnabled)
-        return self._widget
+    def _addPlaceholder(self, placeholder):
+        if not isinstance(placeholder, Placeholder):
+            raise AssertionError(
+                "placeholder must be a Placeholder subclass, not %r" % (
+                placeholder,))
 
-    def _getWidgetConstructor(self, state):
-        def notComponentState():
-            return gtk.Label('')
+        widget = placeholder.getWidget()
+        widget.show()
+        self.pack_start(widget, True, True)
+
+        placeholder.setDebugEnabled(self._debugEnabled)
+        self._currentPlaceholder = placeholder
+
+    def _removePlaceholder(self, placeholder):
+        if placeholder is None:
+            return
+
+        widget = placeholder.getWidget()
+        self.remove(widget)
+
+        placeholder.removed()
+
+    def _getWidgetConstructor(self, componentState):
+        if not isinstance(componentState, AdminComponentState):
+            return LabelPlaceholder()
 
         def noBundle(failure):
             failure.trap(NoBundleError)
@@ -211,7 +262,8 @@ class ComponentView(gtk.VBox, log.Loggable):
             # exceptions.AttributeError: 'str' object has no attribute 'get'
             failure.trap(AttributeError)
 
-            return admin.callRemote('getEntryByType', state, 'admin/gtk')
+            return admin.callRemote(
+                'getEntryByType', componentState, 'admin/gtk')
 
         def gotEntryPoint((filename, procname)):
             # The manager always returns / as a path separator, replace them
@@ -225,18 +277,15 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         def gotFactory(factory):
             # instantiate from factory and wrap in a NodeBook
-            return lambda: NodeBook(factory(state, admin))
+            return NotebookPlaceholder(factory(componentState, admin))
 
         def sleepingComponent(failure):
             failure.trap(SleepingComponentError)
-            return lambda: gtk.Label(_('Component %s is still sleeping') %
-                                     state.get('name'))
-
-        admin = self.getAdminForComponent(state)
-        if not isinstance(state, AdminComponentState):
-            return notComponentState
-
-        componentType = state.get('type')
+            return LabelPlaceholder(_('Component %s is still sleeping') %
+                                    componentState.get('name'))
+        
+        admin = self.getAdminForComponent(componentState)
+        componentType = componentState.get('type')
         d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
         d.addErrback(oldVersion)
         d.addErrback(noBundle)
@@ -249,57 +298,42 @@ class ComponentView(gtk.VBox, log.Loggable):
         def invalidate(_):
             self._setState(COMPONENT_UNSET)
         def set(state, key, value):
-            if key == 'mood':
-                if value not in [moods.lost.value,
-                                 moods.sleeping.value,
-                                 moods.sad.value]:
-                    self._setState(COMPONENT_ACTIVE)
-                else:
-                    self._setState(COMPONENT_INACTIVE)
-
-        assert self._componentState is not None
-        self._componentState.addListener(
-            self, invalidate=invalidate, set=set)
-        if self._componentState.hasKey('mood'):
-            set(self._componentState, 'mood', self._componentState.get('mood'))
+            if key != 'mood':
+                return
+            if value not in [moods.lost.value,
+                             moods.sleeping.value,
+                             moods.sad.value]:
+                self._setState(COMPONENT_ACTIVE)
+            else:
+                self._setState(COMPONENT_INACTIVE)
+                
+        current = self._currentComponentState
+        assert current is not None
+        current.addListener(self, invalidate=invalidate, set=set)
+        if current.hasKey('mood'):
+            set(current, 'mood', current.get('mood'))
 
     def _componentInactiveToActive(self):
-        def gotWidgetConstructor(proc, callStamp):
-            if callStamp != self._callStamp:
+        def gotWidgetConstructor(placeholder, oldComponentState):
+            if oldComponentState != self._currentComponentState:
                 # in the time that _get_widget_constructor was running,
                 # perhaps the user selected another component; only update
                 # the ui if that did not happen
-                self.debug('ignoring widget constructor %r, state %d, '
-                           'callstamps %d/%d', proc, self._state,
-                           callStamp, self._callStamp)
+                self.debug('ignoring component %r, state %d, state %r/%r' % (
+                    placeholder, self._state,
+                    oldComponentState, self._currentComponentState))
                 return
-            widget = proc()
-            return self._packWidget(widget)
+            self._addPlaceholder(placeholder)
 
-        self._callStamp += 1
-        callStamp = self._callStamp
-        d = self._getWidgetConstructor(self._componentState)
-        d.addCallback(gotWidgetConstructor, callStamp)
+        d = self._getWidgetConstructor(self._currentComponentState)
+        d.addCallback(gotWidgetConstructor, self._currentComponentState)
 
     def _componentActiveToInactive(self):
-        # prevent got_widget_constructor from adding the widget above
-        self._callStamp += 1
-        if not self._widget:
-            return
-
-        self.remove(self._widget)
-        # widget maybe a gtk.Label or a NodeBook
-        if hasattr(self._widget, 'admingtk'):
-            if self._widget.admingtk:
-                # needed for compatibility with managers with old code
-                if hasattr(self._widget.admingtk, 'cleanup'):
-                    self._widget.admingtk.cleanup()
-                self._widget.admingtk = None
-        self._widget = None
+        self._removePlaceholder(self._currentPlaceholder)
 
     def _componentInactiveToUnset(self):
-        self._componentState.removeListener(self)
-        self._componentState = None
+        self._currentComponentState.removeListener(self)
+        self._currentComponentState = None
 
     def _setState(self, state):
         uptable = [self._componentUnsetToInactive,
@@ -309,13 +343,13 @@ class ComponentView(gtk.VBox, log.Loggable):
         if self._state < state:
             while self._state < state:
                 self.log('component %r state change: %d++',
-                         self._componentState, self._state)
+                         self._currentComponentState, self._state)
                 self._state += 1
                 uptable[self._state - 1]()
         else:
             while self._state > state:
                 self.log('component %r state change: %d--',
-                         self._componentState, self._state)
+                         self._currentComponentState, self._state)
                 self._state -= 1
                 downtable[self._state]()
 

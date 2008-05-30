@@ -1,5 +1,10 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py:
+	Avoid using timestamps, create an abstract base class
+	for different kind of widgets called placeholder.
+	Rename some variables to make even more sense.
+
 	* flumotion/ui/wizard.py (SectionWizard.__init__): Remove last
 	traces of getFirstStep.
 
