@@ -313,7 +313,8 @@ class StateRemoteCache(pb.RemoteCache):
             remove = listener.stateRemove
         self._ensureListeners()
         if listener in self._listeners:
-            raise KeyError, listener
+            raise KeyError(
+                "%r is already a listener of %r" % (listener, self))
         self._listeners[listener] = [set, append, remove, setitem,
                                      delitem, invalidate]
         if invalidate and hasattr(self, '_cache_invalid'):
