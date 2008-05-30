@@ -1,5 +1,8 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py: Add a proper doc-string
+	and remove a couple of more underscores.
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py
 	(StatisticsAdminGtkNode._updateLabels): link can still be None,
 	really protect against it.

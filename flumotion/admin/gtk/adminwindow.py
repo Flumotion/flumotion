@@ -20,6 +20,45 @@
 # Headers in this file shall remain intact.
 
 """Main interface for the Gtk+ Admin client
+
+Here is an overview of the different parts of the admin interface::
+
+ +--------------[ AdminWindow ]-------------+
+ | Menubar                                  |
+ +------------------------------------------+
+ | Toolbar                                  |
+ +--------------------+---------------------+
+ |                    |                     |
+ |                    |                     |
+ |                    |                     |
+ |                    |                     |
+ |  ComponentList     |   ComponentView     |
+ |                    |                     |
+ |                    |                     |
+ |                    |                     |
+ |                    |                     |
+ |                    |                     |
+ +--------------------+---------------------+
+ | AdminStatusbar                           |
+ +-------------------------------------------
+
+The main class which builds everything together is a L{AdminWindow},
+which is defined in this file:
+
+  - L{AdminWindow} creates the other UI parts internally, see the
+    L{AdminWindow._createUI}.
+  - Menubar and Toolbar are created by a GtkUIManager, see
+    L{AdminWindow._createUI} and L{MAIN_UI}.
+  - L{ComponentList<flumotion.admin.gtk.componentlist.ComponentList>}
+    is a list of all components, and is created in the
+    L{flumotion.admin.gtk.componentlist} module.
+  - L{ComponentView<flumotion.admin.gtk.componentview.ComponentView>}
+    contains a component specific view, usually a set of tabs, it is
+    created in the L{flumotion.admin.gtk.componentview} module.
+  - L{AdminStatus<flumotion.admin.gtk.statusbar.AdminStatus>} is a
+    statusbar displaying context specific hints and is defined in the 
+    L{flumotion.admin.gtk.statusbar} module.
+
 """
 
 import gettext
@@ -892,12 +931,12 @@ class AdminWindow(Loggable, gobject.GObject):
                     self._messageView.clearMessage(value.id)
 
         if self._currentComponentStates:
-            for current_componentState in self._currentComponentStates:
-                current_componentState.removeListener(self)
+            for currentComponentState in self._currentComponentStates:
+                currentComponentState.removeListener(self)
         self._currentComponentStates = states
         if self._currentComponentStates:
-            for current_componentState in self._currentComponentStates:
-                current_componentState.addListener(
+            for currentComponentState in self._currentComponentStates:
+                currentComponentState.addListener(
                 self, compSet, compAppend, compRemove)
 
         self._updateComponentActions()
