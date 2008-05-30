@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,26 +19,31 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import messages, documentation, log
+import gettext
+import os
+import time
+
+import pango
+import gtk
+
+from flumotion.common.messages import ERROR, WARNING, INFO
+from flumotion.common import documentation, log
 from flumotion.common.i18n import Translator
 from flumotion.configure import configure
 
-from gettext import gettext as _
-
-import os
-import time
-import gtk
-import pango
-
+_ = gettext.gettext
 __version__ = "$Rev$"
+_stock_icons = {
+    ERROR: gtk.STOCK_DIALOG_ERROR,
+    WARNING: gtk.STOCK_DIALOG_WARNING,
+    INFO: gtk.STOCK_DIALOG_INFO,
+    }
+_headings = {
+    ERROR: _('Error'),
+    WARNING: _('Warning'),
+    INFO: _('Note'),
+    }
 
-_stock_icons = {messages.ERROR: gtk.STOCK_DIALOG_ERROR,
-                messages.WARNING: gtk.STOCK_DIALOG_WARNING,
-                messages.INFO: gtk.STOCK_DIALOG_INFO}
-
-_headings = {messages.ERROR: _('Error'),
-             messages.WARNING: _('Warning'),
-             messages.INFO: _('Note')}
 
 class MessageButton(gtk.ToggleButton):
     """
@@ -60,6 +65,7 @@ class MessageButton(gtk.ToggleButton):
 
     def __repr__(self):
         return '<MessageButton for %s at %d>' % (self.message, id(self))
+
 
 # instantiated through create_function in glade files
 class MessagesView(gtk.VBox):
@@ -99,8 +105,9 @@ class MessagesView(gtk.VBox):
         tv.set_editable(False)
         #tv.set_sensitive(False)
         # connect signals to act on the hyperlink
-        tv.connect('event-after', self._textview_on_event_after)
-        tv.connect('motion-notify-event', self._textview_on_motion_notify_event)
+        tv.connect('event-after', self._after_textview__event)
+        tv.connect('motion-notify-event',
+                   self._on_textview___motion_notify_event)
         sw.add(tv)
 
         self.active_button = None
@@ -119,8 +126,8 @@ class MessagesView(gtk.VBox):
         """
         Remove all messages and hide myself.
         """
-        for i in self.buttonbox.get_children():
-            self.clear_message(i.message.id)
+        for child in self.buttonbox.get_children():
+            self.clearMessage(child.message.id)
         self.hide()
 
     def addMessage(self, m):
@@ -128,63 +135,17 @@ class MessagesView(gtk.VBox):
         Add a message to me.
         @type  m: L{flumotion.common.messages.Message}
         """
-        def on_toggled(b):
-            # on toggling the button, show the message
-            if not b.get_active():
-                if self.active_button == b:
-                    b.set_active(True)
-                return
-            old_active = self.active_button
-            self.active_button = b
-            if old_active and old_active != b:
-                old_active.set_active(False)
-            buf = gtk.TextBuffer()
-            # FIXME: it would be good to have a "Debug" button when
-            # applicable, instead of always showing the text
-            text = self._translator.translate(m)
-            # F0.4: timestamp was added in 0.4.2
-            if hasattr(m, 'timestamp'):
-                text += _("\nPosted on %s.\n") % time.strftime(
-                    "%c", time.localtime(m.timestamp))
-            if m.debug:
-                text += "\n\n" + _("Debug information:\n") + m.debug + '\n'
-            buf.set_text(text)
-            self.textview.set_buffer(buf)
-            self.label.set_markup('<b>%s</b>' %
-                _headings.get(m.level, _('Message')))
-
-            # if we have help information, add it to the end of the text view
-            # FIXME: it probably looks nicer right after the message and
-            # before the timestamp
-            description = getattr(m, 'description')
-            if description:
-                iter = buf.get_end_iter()
-                # we set the 'link' data field on tags to identify them
-                translated = self._translator.translateTranslatable(description)
-                tag = buf.create_tag(translated)
-                tag.set_property('underline', pango.UNDERLINE_SINGLE)
-                tag.set_property('foreground', 'blue')
-                tag.set_data('link', documentation.getMessageWebLink(m))
-                buf.insert_with_tags_by_name(iter, translated,
-                    tag.get_property('name'))
-
         # add a message button to show this message
         b = MessageButton(m)
-        b.sigid = b.connect('toggled', on_toggled)
+        b.sigid = b.connect('toggled', self._on_message_button__toggled, m)
         b.show()
         self.buttonbox.pack_start(b, False, False, 0)
 
-        # Sort all messages first by (reverse of) level, then priority
-        kids = [(-w.message.level, w.message.priority, w) for w in self.buttonbox.get_children()]
-        kids.sort()
-        kids.reverse()
-        kids = [(i, kids[i][2]) for i in range(len(kids))]
-        for x in kids:
-            self.buttonbox.reorder_child(x[1], x[0])
+        self._sortMessages()
 
         if not self.active_button:
             b.set_active(True)
-        elif b == kids[0][1]: # the first button, e.g. highest priority
+        elif b == children[0][1]: # the first button, e.g. highest priority
             b.set_active(True)
         self.show()
 
@@ -194,21 +155,84 @@ class MessagesView(gtk.VBox):
         Will bring the remaining most important message to the front,
         or hide the view completely if no messages are left.
         """
-        for b in self.buttonbox.get_children():
-            if b.message.id == id:
-                self.buttonbox.remove(b)
-                b.disconnect(b.sigid)
-                b.sigid = 0
-                if not self.buttonbox.get_children():
-                    self.active_button = None
-                    self.hide()
-                elif self.active_button == b:
-                    self.active_button = self.buttonbox.get_children()[0]
-                    self.active_button.set_active(True)
-                return
+        for button in self.buttonbox.get_children():
+            if button.message.id != id:
+                continue
+
+            self.buttonbox.remove(button)
+            button.disconnect(button.sigid)
+            button.sigid = 0
+            if not self.buttonbox.get_children():
+                self.active_button = None
+                self.hide()
+            elif self.active_button == button:
+                self.active_button = self.buttonbox.get_children()[0]
+                self.active_button.set_active(True)
+            break
+
+    # Private
+
+    def _addMessageToBuffer(self, message):
+        # FIXME: it would be good to have a "Debug" button when
+        # applicable, instead of always showing the text
+        text = self._translator.translate(message)
+
+        # F0.4: timestamp was added in 0.4.2
+        if hasattr(message, 'timestamp'):
+            text += _("\nPosted on %s.\n") % time.strftime(
+                "%c", time.localtime(message.timestamp))
+            
+        if message.debug:
+            text += "\n\n" + _("Debug information:\n") + message.debug + '\n'
+
+        textbuffer = gtk.TextBuffer()
+        textbuffer.set_text(text)
+        self.textview.set_buffer(textbuffer)
+        self.label.set_markup('<b>%s</b>' %
+            _headings.get(message.level, _('Message')))
+
+        # if we have help information, add it to the end of the text view
+        # FIXME: it probably looks nicer right after the message and
+        # before the timestamp
+        description = getattr(message, 'description')
+        if description:
+            titer = textbuffer.get_end_iter()
+            # we set the 'link' data field on tags to identify them
+            translated = self._translator.translateTranslatable(description)
+            tag = textbuffer.create_tag(translated)
+            tag.set_property('underline', pango.UNDERLINE_SINGLE)
+            tag.set_property('1foreground', 'blue')
+            tag.set_data('link', documentation.getMessageWebLink(message))
+            textbuffer.insert_with_tags_by_name(titer, translated,
+                                                tag.get_property('name'))
+    
+    def _sortMessages(self):
+        # Sort all messages first by (reverse of) level, then priority
+        children = [(-w.message.level, w.message.priority, w)
+                    for w in self.buttonbox.get_children()]
+        children.sort()
+        children.reverse()
+        children = [(i, children[i][2]) for i in range(len(children))]
+        for child in children:
+            self.buttonbox.reorder_child(child[1], child[0])
+
+    # Callbacks
+
+    def _on_message_button__toggled(self, button, message):
+        # on toggling the button, show the message
+        if not button.get_active():
+            if self.active_button == button:
+                button.set_active(True)
+            return
+        old_active = self.active_button
+        self.active_button = button
+        if old_active and old_active != button:
+            old_active.set_active(False)
+
+        self._addMessageToBuffer(message)
 
     # when the mouse cursor moves, set the cursor image accordingly
-    def _textview_on_motion_notify_event(self, textview, event):
+    def _on_textview___motion_notify_event(self, textview, event):
         x, y = textview.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
             int(event.x), int(event.y))
         tags = textview.get_iter_at_location(x, y).get_tags()
@@ -224,15 +248,15 @@ class MessagesView(gtk.VBox):
         textview.get_window(gtk.TEXT_WINDOW_TEXT).set_cursor(cursor)
         return False
 
-    def _textview_on_event_after(self, textview, event):
+    def _after_textview__event(self, textview, event):
         if event.type != gtk.gdk.BUTTON_RELEASE:
             return False
         if event.button != 1:
             return False
-        buffer = textview.get_buffer()
-
+        
+        textbuffer = textview.get_buffer()
         # we shouldn't follow a link if the user has selected something
-        bounds = buffer.get_selection_bounds()
+        bounds = textbuffer.get_selection_bounds()
         if bounds:
             [start, end] = bounds
             if start.get_offset() != end.get_offset():
