@@ -430,7 +430,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         if not states:
             self.debug('no component selected, emitting selection-changed None')
-            self.emit('selection-changed', None)
+            self.emit('selection-changed', [])
             return
 
         if states is self._lastStates:

@@ -901,17 +901,16 @@ class AdminWindow(Loggable, gobject.GObject):
                 self, compSet, compAppend, compRemove)
 
         self._updateComponentActions()
-        self._clearMessages()
-        if not states:
-            return
-
+        self._clearMessages() 
         state = None
-        if len(states) == 1:
-            self.debug("only one component is selected on the components view")
-            state = states[0]
-        elif states:
-            self.debug("more than one components are selected in the "
-                       "components view")
+        if states:
+            if len(states) == 1:
+                self.debug(
+                    "only one component is selected on the components view")
+                state = states[0]
+            elif states:
+                self.debug("more than one components are selected in the "
+                           "components view")
         self._componentView.activateComponent(state)
 
         statusbarMessage = " "
@@ -928,7 +927,7 @@ class AdminWindow(Loggable, gobject.GObject):
                 self.debug('component %s is sad' % name)
                 statusbarMessage = statusbarMessage + \
                                     _("Component %s is sad. ") % name
-        if statusbarMessage:
+        if statusbarMessage != " ":
             self._setStatusbarText(statusbarMessage)
 
 

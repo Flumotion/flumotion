@@ -1,5 +1,12 @@
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	call activateComponent with None if no component is selected, this
+	allows you to deselect all to get back to the planet view
+
+	* flumotion/admin/gtk/componentlist.py
+	(ComponentList._selectionChanged): emit an empty list instead of None
+
 	* flumotion/admin/gtk/componentview.py (PlanetPlaceholder.getWidget):
 	Add a simple placeholder for planets, nothing to see yet, just improving
 	the infrastructure in preparation for #986
