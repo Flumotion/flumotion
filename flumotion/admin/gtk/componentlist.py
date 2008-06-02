@@ -297,8 +297,8 @@ class ComponentList(log.Loggable, gobject.GObject):
             self.debug('adding component %r to listview' % component)
             component.addListener(self, self.stateSet)
 
-            iter = self._model.append()
-            self._iters[component] = iter
+            titer = self._model.append()
+            self._iters[component] = titer
 
             mood = component.get('mood')
             self.debug('component has mood %r' % mood)
@@ -306,16 +306,16 @@ class ComponentList(log.Loggable, gobject.GObject):
             self.debug('component has messages %r' % messages)
 
             if mood != None:
-                self._setMoodValue(iter, mood)
+                self._setMoodValue(titer, mood)
 
-            self._model.set(iter, COL_STATE, component)
+            self._model.set(titer, COL_STATE, component)
 
-            self._model.set(iter, COL_NAME, getComponentLabel(component))
+            self._model.set(titer, COL_NAME, getComponentLabel(component))
 
             pid = component.get('pid')
-            self._model.set(iter, COL_PID, (pid and str(pid)) or '')
+            self._model.set(titer, COL_PID, (pid and str(pid)) or '')
 
-            self._updateWorker(iter, component)
+            self._updateWorker(titer, component)
         self.debug('updated components view')
 
         self._updateStartStop()
@@ -327,17 +327,17 @@ class ComponentList(log.Loggable, gobject.GObject):
             self.warning('Got state change for unknown object %r' % state)
             return
 
-        iter = self._iters[state]
+        titer = self._iters[state]
         self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
 
         if key == 'mood':
-            self._setMoodValue(iter, value)
-            self._updateWorker(iter, state)
+            self._setMoodValue(titer, value)
+            self._updateWorker(titer, state)
         elif key == 'name':
             if value:
-                self._model.set(iter, COL_NAME, value)
+                self._model.set(titer, COL_NAME, value)
         elif key == 'workerName':
-            self._updateWorker(iter, state)
+            self._updateWorker(titer, state)
 
     # Private
 
@@ -352,7 +352,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         if oldstart != canStart:
             self.set_property('can-start-any', canStart)
 
-    def _updateWorker(self, iter, componentState):
+    def _updateWorker(self, titer, componentState):
         # update the worker name:
         # - italic [any worker] if no workerName/workerRequested
         # - italic if workerName, or no workerName but workerRequested
@@ -369,21 +369,21 @@ class ComponentList(log.Loggable, gobject.GObject):
         markup = workerName
         if mood == moods.sleeping.value:
             markup = "<i>%s</i>" % workerName
-        self._model.set(iter, COL_WORKER, markup)
+        self._model.set(titer, COL_WORKER, markup)
 
-    def _removeListenerForeach(self, model, path, iter):
+    def _removeListenerForeach(self, model, path, titer):
         # remove the listener for each state object
-        state = model.get(iter, COL_STATE)[0]
+        state = model.get(titer, COL_STATE)[0]
         state.removeListener(self)
 
-    def _setMoodValue(self, iter, value):
+    def _setMoodValue(self, titer, value):
         """
         Set the mood value on the given component name.
 
         @type  value: int
         """
-        self._model.set(iter, COL_MOOD, self._moodPixbufs[value])
-        self._model.set(iter, COL_MOOD_VALUE, value)
+        self._model.set(titer, COL_MOOD, self._moodPixbufs[value])
+        self._model.set(titer, COL_MOOD_VALUE, value)
 
         self._updateStartStop()
 
