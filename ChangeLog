@@ -1,11 +1,16 @@
 2008-06-02  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
-	reviewed by: <delete if not using a buddy>
-	patch by: <delete if not someone else's patch>
+	* env.in:
+	Rolled back to the previous one. Previous commit of this file was an error.
+
+2008-06-02  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* env.in:
 	* flumotion/admin/gtk/adminwindow.py (AdminWindow.__init__,
 	  AdminWindow._wizardFinshed, AdminWindow._connectionOpened):
+	  Fixes #927 by adding a self._configurationWizardIsRunning so 
+	  it can be controlled whether a wizard windows has been opened
+	  so that a new one does not need to be opened.
 
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
