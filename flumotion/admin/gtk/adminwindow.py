@@ -185,6 +185,7 @@ class AdminWindow(Loggable, gobject.GObject):
         self._trayicon = None
         self._widgets = {}
         self._window = None
+        self._configurationWizardIsRunning = False
         
         self._createUI()
         self._appendRecentConnections()
@@ -597,6 +598,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
     def _wizardFinshed(self, wizard, configuration):
         wizard.destroy()
+        self._configurationWizardIsRunning = False
         self._dumpConfig(configuration)
         self._admin.loadConfiguration(configuration)
         self._clearMessages()
@@ -999,10 +1001,11 @@ class AdminWindow(Loggable, gobject.GObject):
         self._setPlanetState(admin.planet)
         self._updateComponentActions()
 
-        if not self._componentStates:
+        if not self._componentStates and not self._configurationWizardIsRunning:
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
+            self._configurationWizardIsRunning = True
             self._runConfigurationWizard()
         else:
             self.show()

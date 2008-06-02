@@ -1,3 +1,12 @@
+2008-06-02  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	reviewed by: <delete if not using a buddy>
+	patch by: <delete if not someone else's patch>
+
+	* env.in:
+	* flumotion/admin/gtk/adminwindow.py (AdminWindow.__init__,
+	  AdminWindow._wizardFinshed, AdminWindow._connectionOpened):
+
 2008-05-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py: Add a proper doc-string
