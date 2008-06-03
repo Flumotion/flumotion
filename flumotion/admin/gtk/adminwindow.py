@@ -691,12 +691,13 @@ class AdminWindow(Loggable, gobject.GObject):
             runWizard()
             return
 
-        if not yesno(_("Running the Configuration Wizard again will remove "
-                       "all components from the current stream and create "
-                       "a new one."),
-                     parent=self._window,
-                     buttons=((_("Keep the current stream"), gtk.RESPONSE_NO),
-                              (_("Run the Wizard anyway"), gtk.RESPONSE_YES))):
+        if yesno(_("Running the Configuration Wizard again will remove "
+                   "all components from the current stream and create "
+                   "a new one."),
+                 parent=self._window,
+                 buttons=((_("Keep the current stream"), gtk.RESPONSE_NO),
+                          (_("Run the Wizard anyway"), gtk.RESPONSE_YES))
+                 ) != gtk.RESPONSE_YES:
             return
 
         d = self._admin.cleanComponents()

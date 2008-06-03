@@ -1,6 +1,10 @@
 2008-06-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py
+	(AdminWindow._runConfigurationWizard): Make it possible to close
+	the popup question dialog by clicking on the close button.
+
+	* flumotion/admin/gtk/adminwindow.py
 	(AdminWindow._runConfigurationWizard):
 	Clean the state before running the configuration wizard,
 	fixes #998.
