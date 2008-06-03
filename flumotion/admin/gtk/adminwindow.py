@@ -68,6 +68,7 @@ import sys
 import gobject
 import gtk
 from gtk import glade
+from kiwi.ui.dialogs import yesno
 from twisted.internet import reactor
 from zope.interface import implements
 
@@ -680,8 +681,26 @@ class AdminWindow(Loggable, gobject.GObject):
 
     def _runConfigurationWizard(self):
         from flumotion.wizard.configurationwizard import ConfigurationWizard
-        wizard = ConfigurationWizard(self._window)
-        self._runWizard(wizard)
+
+        def runWizard():
+            configurationWizard = ConfigurationWizard(self._window)
+            self._runWizard(configurationWizard)
+            self._configurationWizardIsRunning = True
+            
+        if not self._componentStates:
+            runWizard()
+            return
+
+        if not yesno(_("Running the Configuration Wizard again will remove "
+                       "all components from the current stream and create "
+                       "a new one."),
+                     parent=self._window,
+                     buttons=((_("Keep the current stream"), gtk.RESPONSE_NO),
+                              (_("Run the Wizard anyway"), gtk.RESPONSE_YES))):
+            return
+
+        d = self._admin.cleanComponents()
+        d.addCallback(lambda unused: runWizard())
 
     def _runWizard(self, wizard):
         workerHeavenState = self._admin.getWorkerHeavenState()
@@ -1005,7 +1024,6 @@ class AdminWindow(Loggable, gobject.GObject):
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
-            self._configurationWizardIsRunning = True
             self._runConfigurationWizard()
         else:
             self.show()
