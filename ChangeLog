@@ -1,3 +1,26 @@
+2008-06-03  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/debug-marker.glade:
+	New interface for sending a marker to the manager to write it on the log.
+	* flumotion/admin/gtk/adminwindow.py:
+	Added a new action on the debug menu that opens a window for sending
+	a marker to the manager to write it on the log.
+	* flumotion/admin/gtk/debugmarkerview.py:
+	New interface for sending a marker to the manager to write it on the log.
+	* flumotion/common/medium.py:
+	Added a new remote method that writes a marker to the logs.
+	* flumotion/extern/log/log.py:
+	Added a new method that writes a marker to the logs.
+	Added also new utility functions that gets the name and the int 
+	of a debug level.
+	* flumotion/extern/log/test_log.py:
+	Tests the previous.
+	* flumotion/manager/base.py:
+	Added a new perspective methos to write a marker on the logs.
+	Fixes #979
+
 2008-06-03  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py

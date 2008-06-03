@@ -78,6 +78,7 @@ from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.componentlist import getComponentLabel, ComponentList
+from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.configure import configure
 from flumotion.common.connection import PBConnectionInfo
@@ -129,6 +130,7 @@ MAIN_UI = """
       <separator name="sep-debug1"/>
       <menuitem action="StartShell"/>
       <menuitem action="DumpConfiguration"/>
+      <menuitem action="WriteDebugMarker"/>
     </menu>
     <menu action="Help">
       <menuitem action="About"/>
@@ -391,9 +393,13 @@ class AdminWindow(Loggable, gobject.GObject):
              _('Start an interactive debugging shell'),
              self._debug_start_shell_cb),
             ('DumpConfiguration', gtk.STOCK_EXECUTE,
-	     _('Dump configuration'), None,
+         _('Dump configuration'), None,
              _('Dumps the current manager configuration'),
              self._debug_dump_configuration_cb),
+             ('WriteDebugMarker', gtk.STOCK_EXECUTE,
+             _('Write debug marker...'), None,
+             _('Writes a debug marker to all the logs'),
+             self._debug_write_debug_marker_cb)
             ])
         uimgr.insert_action_group(self._debugActions, 0)
         self._debugActions.set_sensitive(False)
@@ -1025,6 +1031,7 @@ class AdminWindow(Loggable, gobject.GObject):
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
+            self._configurationWizardIsRunning = True
             self._runConfigurationWizard()
         else:
             self.show()
@@ -1268,7 +1275,17 @@ You can do remote component calls using:
     def _components_start_stop_notify_cb(self, *args):
         self._updateComponentActions()
 
+    def _set_debug_marker(self):
+        def setMarker(_, marker, level):
+            self._admin.callRemote('writeFluDebugMarker', level, marker)
+        debugMarkerDialog = DebugMarkerDialog()
+        debugMarkerDialog.connect('set-marker', setMarker)
+        debugMarkerDialog.show()
+
     ### action callbacks
+
+    def _debug_write_debug_marker_cb(self, action):
+        self._set_debug_marker()
 
     def _connection_open_recent_cb(self, action):
         self._openRecentConnection()
@@ -1319,7 +1336,7 @@ You can do remote component calls using:
 
     def _debug_dump_configuration_cb(self, action):
         self._dumpConfiguration()
-	
+    
     def _help_about_cb(self, action):
         self._about()
 

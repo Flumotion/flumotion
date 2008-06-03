@@ -28,6 +28,7 @@ from twisted.spread import pb, flavors
 from twisted.python import failure, reflect
 
 from flumotion.common import errors, interfaces, log, common
+from flumotion.common.planet import moods
 from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"
@@ -70,6 +71,27 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
 
         self.debug("created new Avatar with id %s", avatarId)
 
+    def perspective_writeFluDebugMarker(self, level, marker):
+        """
+        Sets a marker that will be prefixed to the log strings. Setting this
+        marker to multiple elements at a time helps debugging.
+        @param marker: A string to prefix all the log strings.
+        @param level: The log level. It can be log.ERROR, log.DEBUG,
+                      log.WARN, log.INFO or log.LOG
+        """
+
+        self.writeMarker(marker, level)
+        workers = self.vishnu.workerHeaven.state.get('names')
+        componentStates = self.vishnu.getComponentStates()
+        for worker in workers:
+            self.perspective_workerCallRemote(worker, 'writeFluDebugMarker',
+                                              level, marker)
+        for componentState in componentStates:
+            if componentState.get('mood') == moods.happy.value:
+                self.perspective_componentCallRemote(componentState,
+                                                     'writeFluDebugMarker',
+                                                 level, marker)
+
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity, mind):
         return defer.succeed((heaven, avatarId, remoteIdentity, mind))
     makeAvatarInitArgs = classmethod(makeAvatarInitArgs)
@@ -77,6 +99,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     def makeAvatar(klass, heaven, avatarId, remoteIdentity, mind):
         log.debug('manager-avatar', 'making avatar with avatarId %s',
                   avatarId)
+
         def have_args(args):
             log.debug('manager-avatar', 'instantiating with args=%r', args)
             return klass(*args)

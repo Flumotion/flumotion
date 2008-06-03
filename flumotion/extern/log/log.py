@@ -60,18 +60,43 @@ COLORS = {ERROR: 'RED',
           }
 
 _FORMATTED_LEVELS = []
+_LEVEL_NAMES = ['ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG']
 
 def getLevelName(level):
     """
     Return the name of a log level.
+    @param level: The level we want to know the name
+    @type level: int 
+    @return: The name of the level
+    @rtype: str
     """
     assert isinstance(level, int) and level > 0 and level < 6, \
-           "Bad debug level"
-    return ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')[level - 1]
+           TypeError("Bad debug level")
+    return getLevelNames()[level - 1]
+
+def getLevelNames():
+    """
+    Return a list with the level names
+    @return: A list with the level names
+    @rtype: list of str
+    """
+    return _LEVEL_NAMES
+
+def getLevelInt(levelName):
+    """
+    Return the integer value of the levelName.
+    @param levelName: The string value of the level name
+    @type levelName: str
+    @return: The value of the level name we are interested in.
+    @rtype: int 
+    """
+    assert isinstance(levelName, str) and levelName in getLevelNames(), \
+        "Bad debug level name"
+    return  getLevelNames().index(levelName)+1
 
 def getFormattedLevelName(level):
     assert isinstance(level, int) and level > 0 and level < 6, \
-           "Bad debug level"
+           TypeError("Bad debug level")
     return _FORMATTED_LEVELS[level - 1]
 
 def registerCategory(category):
@@ -285,17 +310,18 @@ def doLog(level, object, category, format, args, where=-1,
     if level > getCategoryLevel(category):
         return ret
 
-    for handler in _log_handlers_limited:
-        # set this a second time, just in case there weren't unlimited
-        # loggers there before
+    if _log_handlers_limited:
         if filePath is None and line is None:
             (filePath, line) = getFileLine(where=where)
         ret['filePath'] = filePath
         ret['line'] = line
-        try:
-            handler(level, object, category, filePath, line, message)
-        except TypeError:
-            raise SystemError, "handler %r raised a TypeError" % handler
+        for handler in _log_handlers_limited:
+            # set this a second time, just in case there weren't unlimited
+            # loggers there before
+            try:
+                handler(level, object, category, filePath, line, message)
+            except TypeError:
+                raise SystemError, "handler %r raised a TypeError" % handler
 
         return ret
 
@@ -380,7 +406,6 @@ def stderrHandler(level, object, category, file, line, message):
     sys.stderr.flush()
 
 def _preformatLevels(noColorEnvVarName):
-    levels = ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')
     format = '%-5s'
 
     try:
@@ -397,9 +422,9 @@ def _preformatLevels(noColorEnvVarName):
 
         t = termcolor.TerminalController()
         formatter = lambda level: ''.join((t.BOLD, getattr(t, COLORS[level]),
-                            format % (levels[level-1],), t.NORMAL))
+                            format % (_LEVEL_NAMES[level-1],), t.NORMAL))
     else:
-        formatter = lambda level: format % (levels[level-1],)
+        formatter = lambda level: format % (_LEVEL_NAMES[level-1],)
 
     for level in ERROR, WARN, INFO, DEBUG, LOG:
         _FORMATTED_LEVELS.append(formatter(level))
@@ -647,6 +672,27 @@ class Loggable:
     """
 
     logCategory = 'default'
+
+    def writeMarker(self, marker, level):
+        """
+        Sets a marker that written to the logs. Setting this
+        marker to multiple elements at a time helps debugging.
+        @param marker: A string write to the log.
+        @type marker: str
+        @param level: The log level. It can be log.WARN, log.INFO,
+        log.DEBUG, log.ERROR or log.LOG.
+        @type marker: int
+        """
+        if level == WARN:
+            self.warning('%s', marker)
+        elif level == INFO:
+            self.info('%s', marker)
+        elif level == DEBUG:
+            self.debug('%s', marker)
+        elif level == ERROR:
+            self.error('%s', marker)
+        elif level == LOG:
+            self.log('%s', marker)
 
     def error(self, *args):
         """Log an error.  By default this will also raise an exception."""

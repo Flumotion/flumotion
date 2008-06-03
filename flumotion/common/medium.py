@@ -301,3 +301,14 @@ class PingingMedium(BaseMedium):
         self.remote.notifyOnDisconnect(stopPingingCb)
 
         self.startPinging(self._disconnect)
+
+    def remote_writeFluDebugMarker(self, level, marker):
+        """
+        Sets a marker that will be prefixed to the log strings. Setting this
+        marker to multiple elements at a time helps debugging.
+        @param marker: A string to prefix all the log strings.
+        @type marker: str
+        """
+        self.writeMarker(marker, level)
+
+
