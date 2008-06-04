@@ -35,8 +35,9 @@ __version__ = "$Rev$"
 class FluLibgladeWidgetTree(glade.XML):
     def __init__(self, view, gladefile, domain=None):
         self._view = view
+        typeDict = getattr(view, 'gladeTypedict', {}) or {}
         glade.XML.__init__(self, gladefile, domain,
-                           typedict=view.gladeTypedict or {})
+                           typedict=typeDict)
 
         for widget in self.get_widget_prefix(''):
             setattr(self._view, widget.get_name(), widget)
