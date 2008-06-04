@@ -1,6 +1,10 @@
 2008-06-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
+	(AdminWindow._createUI): Use kiwi GladeDelegate, make
+	statusbar private
+
+	* flumotion/admin/gtk/adminwindow.py:
 	Rename internal variables and some internal methods to be easier
 	to read. Use show instead of show_all.
 	Call _updateComponents a bit more often.

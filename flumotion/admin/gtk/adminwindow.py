@@ -67,7 +67,7 @@ import sys
 
 import gobject
 import gtk
-from gtk import glade
+from kiwi.ui.delegates import GladeDelegate
 from kiwi.ui.dialogs import yesno
 from twisted.internet import reactor
 from zope.interface import implements
@@ -80,7 +80,6 @@ from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.componentlist import getComponentLabel, ComponentList
 from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
-from flumotion.configure import configure
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
      ConnectionFailedError
@@ -161,18 +160,26 @@ RECENT_UI_TEMPLATE = '''<ui>
 MAX_RECENT_ITEMS = 4
 
 
-class AdminWindow(Loggable, gobject.GObject):
+class AdminWindow(Loggable, GladeDelegate):
     '''Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
+    
+    # GladeDelegate
+    gladefile = 'admin.glade'
+    toplevel_name = 'main_window'
 
+    # Loggable
+    logCategory = 'adminwindow'
+
+    # Interfaces we implement
     implements(IStateListener)
 
-    logCategory = 'adminview'
+    # Signals
     gsignal('connected')
 
     def __init__(self):
-        gobject.GObject.__init__(self)
+        GladeDelegate.__init__(self)
 
         self._adminModel = None
         self._currentComponentStates = None
@@ -186,9 +193,8 @@ class AdminWindow(Loggable, gobject.GObject):
         self._planetState = None
         self._recentMenuID = None
         self._trayicon = None
-        self._window = None
         self._configurationWizardIsRunning = False
-        
+
         self._createUI()
         self._appendRecentConnections()
 
@@ -299,19 +305,20 @@ class AdminWindow(Loggable, gobject.GObject):
 
     def _createUI(self):
         self.debug('creating UI')
-        # returns the window
-        # called from __init__
-        wtree = glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
-        wtree.signal_autoconnect(self)
 
-        widgets = {}
-        for widget in wtree.get_widget_prefix(''):
-            widgets[widget.get_name()] = widget
-
-        window = self._window = widgets['main_window']
-        window.set_name("AdminWindow")
-        vbox = widgets['vbox1']
-        window.connect('delete-event', self._window_delete_event_cb)
+        # Widgets created in admin.glade
+        self._window = self.toplevel
+        self._componentList = ComponentList(self.component_list)
+        del self.component_list
+        self._componentView = self.component_view
+        del self.component_view
+        self._statusbar = AdminStatusbar(self.statusbar)
+        del self.statusbar
+        self._messageView = self.messages_view
+        del self.messages_view
+        
+        self._window.set_name("AdminWindow")
+        self._window.connect('delete-event', self._window_delete_event_cb)
 
         uimgr = gtk.UIManager()
         uimgr.connect('connect-proxy',
@@ -404,17 +411,17 @@ class AdminWindow(Loggable, gobject.GObject):
         self._debugActions.set_sensitive(False)
 
         uimgr.add_ui_from_string(MAIN_UI)
-        window.add_accel_group(uimgr.get_accel_group())
+        self._window.add_accel_group(uimgr.get_accel_group())
 
         menubar = uimgr.get_widget('/Menubar')
-        vbox.pack_start(menubar, expand=False)
-        vbox.reorder_child(menubar, 0)
+        self.main_vbox.pack_start(menubar, expand=False)
+        self.main_vbox.reorder_child(menubar, 0)
 
         toolbar = uimgr.get_widget('/Toolbar')
         toolbar.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
         toolbar.set_style(gtk.TOOLBAR_ICONS)
-        vbox.pack_start(toolbar, expand=False)
-        vbox.reorder_child(toolbar, 1)
+        self.main_vbox.pack_start(toolbar, expand=False)
+        self.main_vbox.reorder_child(toolbar, 1)
 
         menubar.show_all()
 
@@ -432,19 +439,15 @@ class AdminWindow(Loggable, gobject.GObject):
         self._addFormatAction = group.get_action("AddFormat")
         assert self._addFormatAction
 
-        self._trayicon = FluTrayIcon(window)
+        self._trayicon = FluTrayIcon(self._window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
         self._trayicon.set_tooltip(_('Not connected'))
 
-        # the widget containing the component view
-        self._componentView = widgets['component_view']
-
-        self._componentList = ComponentList(widgets['components_view'])
         self._componentList.connect('selection_changed',
             self._components_selection_changed_cb)
         self._componentList.connect('activated',
             self._components_activated_cb)
-        self.statusbar = AdminStatusbar(widgets['statusbar'])
+
         self._updateComponentActions()
         self._componentList.connect(
             'notify::can-start-any',
@@ -454,10 +457,7 @@ class AdminWindow(Loggable, gobject.GObject):
             self._components_start_stop_notify_cb)
         self._components_start_stop_notify_cb()
 
-        self._messageView = widgets['messages_view']
         self._messageView.hide()
-
-        return window
 
     def _connectActionProxy(self, action, widget):
         tooltip = action.get_property('tooltip')
@@ -599,10 +599,10 @@ class AdminWindow(Loggable, gobject.GObject):
         errorDialog.connect('response', self._close)
 
     def _setStatusbarText(self, text):
-        self.statusbar.push('main', text)
+        self._statusbar.push('main', text)
 
     def _clearLastStatusbarText(self):
-        self.statusbar.pop('main')
+        self._statusbar.pop('main')
 
     def _wizardFinshed(self, wizard, configuration):
         wizard.destroy()
@@ -610,7 +610,7 @@ class AdminWindow(Loggable, gobject.GObject):
         self._dumpConfig(configuration)
         self._adminModel.loadConfiguration(configuration)
         self._clearMessages()
-        self.statusbar.clear(None)
+        self._statusbar.clear(None)
         self._updateComponentActions()
         self.show()
 
@@ -909,11 +909,11 @@ class AdminWindow(Loggable, gobject.GObject):
         d = self._adminModel.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):
-            self.statusbar.remove('main', mid)
+            self._statusbar.remove('main', mid)
             self._setStatusbarText("%s component %s" % (done, name))
 
         def _actionErrback(failure, self, mid):
-            self.statusbar.remove('main', mid)
+            self._statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
                 action.lower(), name, failure))
             self._setStatusbarText(
@@ -1002,15 +1002,15 @@ class AdminWindow(Loggable, gobject.GObject):
 
 
         # FIXME: show statusbar things
-        # self.statusbar.set('main', _('Showing UI for %s') % name)
-        # self.statusbar.set('main',
+        # self._statusbar.set('main', _('Showing UI for %s') % name)
+        # self._statusbar.set('main',
         #       _("Component %s is still sleeping") % name)
-        # self.statusbar.set('main', _("Requesting UI for %s ...") % name)
-        # self.statusbar.set('main', _("Loading UI for %s ...") % name)
-        # self.statusbar.clear('main')
-        # mid = self.statusbar.push('notebook',
+        # self._statusbar.set('main', _("Requesting UI for %s ...") % name)
+        # self._statusbar.set('main', _("Loading UI for %s ...") % name)
+        # self._statusbar.clear('main')
+        # mid = self._statusbar.push('notebook',
         #         _("Loading tab %s for %s ...") % (node.title, name))
-        # node.statusbar = self.statusbar # hack
+        # node.statusbar = self._statusbar # hack
 
     def _connectionOpened(self, admin):
         self.info('Connected to manager')
