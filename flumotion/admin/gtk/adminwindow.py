@@ -1219,6 +1219,13 @@ You can do remote component calls using:
         d = self._adminModel.getConfiguration()
         d.addCallback(gotConfiguration)
 
+    def _setDebugMarker(self):
+        def setMarker(_, marker, level):
+            self._adminModel.callRemote('writeFluDebugMarker', level, marker)
+        debugMarkerDialog = DebugMarkerDialog()
+        debugMarkerDialog.connect('set-marker', setMarker)
+        debugMarkerDialog.show()
+
     def _about(self):
         about = AboutDialog(self._window)
         about.run()
@@ -1282,17 +1289,10 @@ You can do remote component calls using:
     def _components_start_stop_notify_cb(self, *args):
         self._updateComponentActions()
 
-    def _set_debug_marker(self):
-        def setMarker(_, marker, level):
-            self._adminModel.callRemote('writeFluDebugMarker', level, marker)
-        debugMarkerDialog = DebugMarkerDialog()
-        debugMarkerDialog.connect('set-marker', setMarker)
-        debugMarkerDialog.show()
-
     ### action callbacks
 
     def _debug_write_debug_marker_cb(self, action):
-        self._set_debug_marker()
+        self._setDebugMarker()
 
     def _connection_open_recent_cb(self, action):
         self._openRecentConnection()
