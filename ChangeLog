@@ -1,5 +1,9 @@
 2008-06-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	Add an errback after cleaning the components and show
+	an error message if some components are busy.
+
 	* data/glade/select-producers-wizard.glade:
 	* flumotion/admin/gtk/adminwindow.py:
 	* flumotion/wizard/productionsteps.py:

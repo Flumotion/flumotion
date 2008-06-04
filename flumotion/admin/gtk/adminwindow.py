@@ -82,7 +82,7 @@ from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
-     ConnectionFailedError
+     ConnectionFailedError, BusyComponentError
 from flumotion.common.i18n import gettexter
 from flumotion.common.log import Loggable
 from flumotion.common.planet import AdminComponentState, moods
@@ -707,9 +707,16 @@ class AdminWindow(Loggable, GladeDelegate):
                  ) != gtk.RESPONSE_YES:
             return
 
+        def errback(failure):
+            failure.trap(BusyComponentError)
+            self._error(
+                _("Some component(s) are still busy and cannot be removed.\n"
+                  "Try again later."))
+            
         d = self._adminModel.cleanComponents()
         d.addCallback(lambda unused: runWizard())
-
+        d.addErrback(errback)
+        
     def _runWizard(self, wizard):
         workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
