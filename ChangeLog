@@ -1,5 +1,9 @@
 2008-06-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/effects/volume/admin_gtk.py
+	(VolumeAdminGtkNode.setUIState):
+	check can be None, when shutting down.
+
 	* flumotion/admin/gtk/adminwindow.py:
 	Refactor and reuse the same error message when
 	cleaning the components from the toolbar too, not just

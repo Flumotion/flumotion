@@ -80,7 +80,8 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
         # element it is true
         if state.get("volume-allow-increase"):
             check = self.wtree.get_widget('volume-set-check')
-            check.set_sensitive(True)
+            if check is not None:
+                check.set_sensitive(True)
         if state.get("volume-allow-set"):
             self._hscale.set_sensitive(True)
             changeLabel = self.wtree.get_widget('volume-change-label')
