@@ -302,10 +302,12 @@ class SelectProducersStep(WizardStep):
 
     def setVideoProducers(self, videoProducers):
         self.video.prefill([(N_(vp.description), vp) for vp in videoProducers])
+        self._updateWidgets()
 
     def setAudioProducers(self, audioProducers):
         self.audio.prefill([(N_(vp.description), vp) for vp in audioProducers])
-
+        self._updateWidgets()
+                
     # WizardStep
 
     def setup(self):
@@ -324,6 +326,19 @@ class SelectProducersStep(WizardStep):
         return None
     
     # Private API
+
+    def _updateWidgets(self):
+        # We can't call getAudio/VideoProducer here, since they
+        # depend on set_active() being enabled
+        hasAudio = bool(self.audio.get_model_strings())
+        hasVideo = bool(self.video.get_model_strings())
+        hasBoth = hasVideo and hasAudio
+        self.has_video.set_active(hasVideo)
+        self.has_audio.set_active(hasAudio)
+        self.audio.set_property('visible', hasAudio)
+        self.video.set_property('visible', hasVideo)
+        self.has_audio.set_property('visible', hasBoth)
+        self.has_video.set_property('visible', hasBoth)
 
     def _verify(self):
         canContinue = self.hasAudio() or self.hasVideo()

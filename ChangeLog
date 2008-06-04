@@ -1,5 +1,14 @@
 2008-06-04  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/select-producers-wizard.glade:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/wizard/productionsteps.py:
+	Make sure that the select production step is only showing
+	necessary widgets when opened.
+	Only show checkbuttons and combos when needed.
+
+2008-06-04  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/kiwipatches.py (FluLibgladeWidgetTree.__init__):
 	Do not require the view to have the gladeTypedict variable set.
 

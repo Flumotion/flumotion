@@ -74,14 +74,14 @@ to use for your streamer:</property>
 
 	      <child>
 		<widget class="GtkCheckButton" id="has_video">
-		  <property name="visible">True</property>
+		  <property name="visible">False</property>
 		  <property name="tooltip" translatable="yes">Enable this to stream video</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">_Video:</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <property name="active">True</property>
+		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
 		  <signal name="toggled" handler="on_has_video__toggled" last_modification_time="Thu, 30 Sep 2004 14:09:48 GMT"/>
@@ -100,7 +100,7 @@ to use for your streamer:</property>
 
 	  <child>
 	    <widget class="GtkComboBox" id="video">
-	      <property name="visible">True</property>
+	      <property name="visible">False</property>
 	      <property name="add_tearoffs">False</property>
 	      <property name="focus_on_click">True</property>
 	      <signal name="changed" handler="on_video__changed" last_modification_time="Tue, 19 Oct 2004 13:57:44 GMT"/>
@@ -129,14 +129,14 @@ to use for your streamer:</property>
 
 	      <child>
 		<widget class="GtkCheckButton" id="has_audio">
-		  <property name="visible">True</property>
+		  <property name="visible">False</property>
 		  <property name="tooltip" translatable="yes">Enable this to stream audio</property>
 		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">_Audio:</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <property name="active">True</property>
+		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
 		  <signal name="toggled" handler="on_has_audio__toggled" last_modification_time="Thu, 30 Sep 2004 14:09:43 GMT"/>
@@ -155,7 +155,7 @@ to use for your streamer:</property>
 
 	  <child>
 	    <widget class="GtkComboBox" id="audio">
-	      <property name="visible">True</property>
+	      <property name="visible">False</property>
 	      <property name="add_tearoffs">False</property>
 	      <property name="focus_on_click">True</property>
 	      <signal name="changed" handler="on_audio__changed" last_modification_time="Tue, 19 Oct 2004 13:57:48 GMT"/>
