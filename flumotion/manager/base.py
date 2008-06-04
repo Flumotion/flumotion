@@ -87,7 +87,8 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
             self.perspective_workerCallRemote(worker, 'writeFluDebugMarker',
                                               level, marker)
         for componentState in componentStates:
-            if componentState.get('mood') == moods.happy.value:
+            m = self.vishnu.getComponentMapper(componentState)
+            if m.avatar:
                 self.perspective_componentCallRemote(componentState,
                                                      'writeFluDebugMarker',
                                                  level, marker)

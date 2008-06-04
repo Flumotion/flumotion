@@ -1,3 +1,11 @@
+2008-06-04  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* flumotion/extern/log/log.py:
+	* flumotion/manager/base.py:
+	Fixes #1013: Sent the debug marker to all components that have
+	an avatar. Refactor writeDebugMarker to use a table for the 
+	methods instead of using a if/elif/else structure.
+
 2008-06-03  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>

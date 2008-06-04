@@ -683,16 +683,11 @@ class Loggable:
         log.DEBUG, log.ERROR or log.LOG.
         @type marker: int
         """
-        if level == WARN:
-            self.warning('%s', marker)
-        elif level == INFO:
-            self.info('%s', marker)
-        elif level == DEBUG:
-            self.debug('%s', marker)
-        elif level == ERROR:
-            self.error('%s', marker)
-        elif level == LOG:
-            self.log('%s', marker)
+        logHandlers = {WARN:self.warning, INFO:self.info, DEBUG: self.debug,
+                       ERROR: self.error, LOG:self.log}
+        logHandler = logHandlers.get(level)
+        if logHandler:
+            logHandler('%s', marker)
 
     def error(self, *args):
         """Log an error.  By default this will also raise an exception."""
