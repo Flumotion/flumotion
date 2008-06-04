@@ -31,6 +31,7 @@ from twisted.python import util
 from twisted.internet import defer
 
 from flumotion.common import log
+from flumotion.common.errors import SleepingComponentError
 from flumotion.common.i18n import getLL, gettexter
 from flumotion.component.base.componentnode import ComponentAdminGtkNode
 from flumotion.component.base.eatersnode import EatersAdminGtkNode
@@ -72,7 +73,8 @@ class BaseAdminGtk(log.Loggable):
 
         d = admin.componentCallRemote(state, 'getUIState')
         d.addCallback(self.setUIState)
-
+        d.addErrback(lambda failure: failure.trap(SleepingComponentError))
+        
     def setDebugEnabled(self, enabled):
         """Set if debug should be enabled.
         Not all pages are visible unless debugging is set to true
