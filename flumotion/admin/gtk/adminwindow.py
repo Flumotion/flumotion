@@ -174,9 +174,9 @@ class AdminWindow(Loggable, gobject.GObject):
     def __init__(self):
         gobject.GObject.__init__(self)
 
-        self._admin = None
+        self._adminModel = None
         self._currentComponentStates = None
-        self._components = None # ComponentList
+        self._componentList = None # ComponentList
         self._componentStates = None # name -> planet.AdminComponentState
         self._componentView = None
         self._debugEnabled = False
@@ -186,7 +186,6 @@ class AdminWindow(Loggable, gobject.GObject):
         self._planetState = None
         self._recentMenuID = None
         self._trayicon = None
-        self._widgets = {}
         self._window = None
         self._configurationWizardIsRunning = False
         
@@ -250,8 +249,8 @@ class AdminWindow(Loggable, gobject.GObject):
             mid = None
             if pre:
                 mid = self.statusbar.push('main', pre % label)
-            d = self._admin.componentCallRemote(state, methodName, *args,
-                                                 **kwargs)
+            d = self._adminModel.componentCallRemote(
+                state, methodName, *args, **kwargs)
             d.addCallback(cb, self, mid)
             d.addErrback(eb, self, mid)
 
@@ -305,7 +304,7 @@ class AdminWindow(Loggable, gobject.GObject):
         wtree = glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         wtree.signal_autoconnect(self)
 
-        widgets = self._widgets
+        widgets = {}
         for widget in wtree.get_widget_prefix(''):
             widgets[widget.get_name()] = widget
 
@@ -440,17 +439,17 @@ class AdminWindow(Loggable, gobject.GObject):
         # the widget containing the component view
         self._componentView = widgets['component_view']
 
-        self._components = ComponentList(widgets['components_view'])
-        self._components.connect('selection_changed',
+        self._componentList = ComponentList(widgets['components_view'])
+        self._componentList.connect('selection_changed',
             self._components_selection_changed_cb)
-        self._components.connect('activated',
+        self._componentList.connect('activated',
             self._components_activated_cb)
         self.statusbar = AdminStatusbar(widgets['statusbar'])
         self._updateComponentActions()
-        self._components.connect(
+        self._componentList.connect(
             'notify::can-start-any',
             self._components_start_stop_notify_cb)
-        self._components.connect(
+        self._componentList.connect(
             'notify::can-stop-any',
             self._components_start_stop_notify_cb)
         self._components_start_stop_notify_cb()
@@ -492,23 +491,25 @@ class AdminWindow(Loggable, gobject.GObject):
         # it's ok if we've already been connected
         self.debug('setting model')
 
-        if self._admin:
+        if self._adminModel:
             self.debug('Connecting to new model %r' % model)
 
-        self._admin = model
+        self._adminModel = model
 
         # window gets created after model connects initially, so check
         # here
-        if self._admin.isConnected():
+        if self._adminModel.isConnected():
             self._connectionOpened(model)
 
-        self._admin.connect('connected', self._admin_connected_cb)
-        self._admin.connect('disconnected', self._admin_disconnected_cb)
-        self._admin.connect('connection-refused',
-                           self._admin_connection_refused_cb)
-        self._admin.connect('connection-failed',
-                           self._admin_connection_failed_cb)
-        self._admin.connect('update', self._admin_update_cb)
+        self._adminModel.connect('connected',
+                                 self._admin_connected_cb)
+        self._adminModel.connect('disconnected',
+                                 self._admin_disconnected_cb)
+        self._adminModel.connect('connection-refused',
+                                 self._admin_connection_refused_cb)
+        self._adminModel.connect('connection-failed',
+                                 self._admin_connection_failed_cb)
+        self._adminModel.connect('update', self._admin_update_cb)
 
     def _openConnection(self, info):
         self._trayicon.set_tooltip(_("Connecting to %s:%s") % (
@@ -584,18 +585,18 @@ class AdminWindow(Loggable, gobject.GObject):
         self.debug('Configuration=%s' % fd.read())
 
     def _error(self, message):
-        d = ErrorDialog(message, self._window,
-                        close_on_response=True)
-        d.show_all()
+        errorDialog = ErrorDialog(message, self._window,
+                                  close_on_response=True)
+        errorDialog.show()
 
-    def _fatal_error(self, message, tray=None):
+    def _fatalError(self, message, tray=None):
         if tray:
             self._trayicon.set_tooltip(tray)
 
         self.info(message)
-        d = ErrorDialog(message, self._window)
-        d.show_all()
-        d.connect('response', self._close)
+        errorDialog = ErrorDialog(message, self._window)
+        errorDialog.show()
+        errorDialog.connect('response', self._close)
 
     def _setStatusbarText(self, text):
         self.statusbar.push('main', text)
@@ -607,7 +608,7 @@ class AdminWindow(Loggable, gobject.GObject):
         wizard.destroy()
         self._configurationWizardIsRunning = False
         self._dumpConfig(configuration)
-        self._admin.loadConfiguration(configuration)
+        self._adminModel.loadConfiguration(configuration)
         self._clearMessages()
         self.statusbar.clear(None)
         self._updateComponentActions()
@@ -681,7 +682,7 @@ class AdminWindow(Loggable, gobject.GObject):
             addFormatWizard.setVideoProducers(videoProducers)
             self._runWizard(addFormatWizard)
             
-        d = self._admin.getWizardEntries(
+        d = self._adminModel.getWizardEntries(
             wizardTypes=['audio-producer', 'video-producer'])
         d.addCallback(cb)  
 
@@ -706,11 +707,11 @@ class AdminWindow(Loggable, gobject.GObject):
                  ) != gtk.RESPONSE_YES:
             return
 
-        d = self._admin.cleanComponents()
+        d = self._adminModel.cleanComponents()
         d.addCallback(lambda unused: runWizard())
 
     def _runWizard(self, wizard):
-        workerHeavenState = self._admin.getWorkerHeavenState()
+        workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
                 _('The wizard cannot be run because no workers are'
@@ -718,8 +719,8 @@ class AdminWindow(Loggable, gobject.GObject):
             return
 
         wizard.setExistingComponentNames(
-            self._components.getComponentNames())
-        wizard.setAdminModel(self._admin)
+            self._componentList.getComponentNames())
+        wizard.setAdminModel(self._adminModel)
         wizard.setWorkerHeavenState(workerHeavenState)
         httpPorter = self._getHTTPPorter()
         if httpPorter:
@@ -728,26 +729,26 @@ class AdminWindow(Loggable, gobject.GObject):
         wizard.run(main=False)
 
     def _clearAdmin(self):
-        if not self._admin:
+        if not self._adminModel:
             return
 
-        self._admin.disconnect_by_func(self._admin_connected_cb)
-        self._admin.disconnect_by_func(self._admin_disconnected_cb)
-        self._admin.disconnect_by_func(self._admin_connection_refused_cb)
-        self._admin.disconnect_by_func(self._admin_connection_failed_cb)
-        self._admin.disconnect_by_func(self._admin_update_cb)
-        self._admin = None
+        self._adminModel.disconnect_by_func(self._admin_connected_cb)
+        self._adminModel.disconnect_by_func(self._admin_disconnected_cb)
+        self._adminModel.disconnect_by_func(self._admin_connection_refused_cb)
+        self._adminModel.disconnect_by_func(self._admin_connection_failed_cb)
+        self._adminModel.disconnect_by_func(self._admin_update_cb)
+        self._adminModel = None
 
     def _updateComponentActions(self):
-        canStart = self._components.canStart()
-        canStop = self._components.canStop()
+        canStart = self._componentList.canStart()
+        canStop = self._componentList.canStop()
         canDelete = bool(self._currentComponentStates and canStart)
         self._startComponentAction.set_sensitive(canStart)
         self._stopComponentAction.set_sensitive(canStop)
         self._deleteComponentAction.set_sensitive(canDelete)
         self.debug('can start %r, can stop %r' % (canStart, canStop))
-        canStartAll = self._components.get_property('can-start-any')
-        canStopAll = self._components.get_property('can-stop-any')
+        canStartAll = self._componentList.get_property('can-start-any')
+        canStopAll = self._componentList.get_property('can-stop-any')
 
         # they're all in sleeping or lost
         canClearAll = canStartAll and not canStopAll
@@ -759,11 +760,11 @@ class AdminWindow(Loggable, gobject.GObject):
         self._addFormatAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
-        self._components.update(self._componentStates)
+        self._componentList.update(self._componentStates)
         self._trayicon.update(self._componentStates)
 
     def _hasProducerComponent(self):
-        for state in self._components.getComponentStates():
+        for state in self._componentList.getComponentStates():
             if state is None:
                 continue
             # FIXME: Not correct, should expose wizard state from
@@ -814,6 +815,7 @@ class AdminWindow(Loggable, gobject.GObject):
                                   remove=flowStateRemove)
                 for c in value.get('components'):
                     flowStateAppend(value, 'components', c)
+                self._updateComponents()
 
         def planetStateRemove(state, key, value):
             self.debug('something got removed from the planet')
@@ -892,10 +894,10 @@ class AdminWindow(Loggable, gobject.GObject):
         if not state:
             self.debug(" Trying to apply %s to a non component" %action +\
                        " that may mean that the signal comes from the menu ")
-            selected_states = self._components.getSelectedStates()
+            selected_states = self._componentList.getSelectedStates()
             self.debug(" selected states %r when %s ", \
                        selected_states, action)
-            for selectedState in self._components.getSelectedStates():
+            for selectedState in self._componentList.getSelectedStates():
                 self._componentDo(selectedState, action, doing, done,
                                   remoteMethodPrefix)
             return
@@ -904,7 +906,7 @@ class AdminWindow(Loggable, gobject.GObject):
             return None
 
         mid = self._setStatusbarText(_("%s component %s") % (doing, name))
-        d = self._admin.callRemote(remoteMethodPrefix + action, state)
+        d = self._adminModel.callRemote(remoteMethodPrefix + action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)
@@ -940,12 +942,13 @@ class AdminWindow(Loggable, gobject.GObject):
         def compSet(state, key, value):
             if key == 'mood':
                 self._updateComponentActions()
-
+                self._updateComponents()
+                
         def compAppend(state, key, value):
             name = state.get('name')
             self.debug('stateAppend on component state of %s' % name)
             if key == 'messages':
-                current = self._components.getSelectedNames()
+                current = self._componentList.getSelectedNames()
                 if name in current:
                     self._messageView.addMessage(value)
                 self._messageView.addMessage(value)
@@ -954,7 +957,7 @@ class AdminWindow(Loggable, gobject.GObject):
             name = state.get('name')
             self.debug('stateRemove on component state of %s' % name)
             if key == 'messages':
-                current = self._components.getSelectedNames()
+                current = self._componentList.getSelectedNames()
                 if name in current:
                     self._messageView.clearMessage(value.id)
 
@@ -1017,8 +1020,8 @@ class AdminWindow(Loggable, gobject.GObject):
 
         # FIXME: have a method for this
         self._window.set_title(_('%s - Flumotion Administration') %
-            self._admin.adminInfoStr())
-        self._trayicon.set_tooltip(self._admin.adminInfoStr())
+            self._adminModel.adminInfoStr())
+        self._trayicon.set_tooltip(self._adminModel.adminInfoStr())
 
         self.emit('connected')
 
@@ -1041,7 +1044,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
         def response(dialog, response_id):
             if response_id == RESPONSE_REFRESH:
-                self._admin.reconnect()
+                self._adminModel.reconnect()
             else:
                 # FIXME: notify admin of cancel
                 dialog.stop()
@@ -1051,7 +1054,7 @@ class AdminWindow(Loggable, gobject.GObject):
         dialog = ProgressDialog(
             _("Reconnecting ..."),
             _("Lost connection to manager %s, reconnecting ...")
-            % (self._admin.adminInfoStr(), ), self._window)
+            % (self._adminModel.adminInfoStr(), ), self._window)
 
         dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         dialog.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
@@ -1072,20 +1075,22 @@ class AdminWindow(Loggable, gobject.GObject):
     def _connectionRefused(self):
 
         def refused_later():
-            self._fatal_error(
+            self._fatalError(
                 _("Connection to manager on %s was refused.") % (
-                self._admin.connectionInfoStr()),
-                _("Connection to %s was refused") % self._admin.adminInfoStr())
+                self._adminModel.connectionInfoStr()),
+                _("Connection to %s was refused") %
+                (self._adminModel.adminInfoStr(),))
 
         self.debug("handling connection-refused")
         reactor.callLater(0, refused_later)
         self.debug("handled connection-refused")
 
     def _connectionFailed(self, reason):
-        return self._fatal_error(
+        return self._fatalError(
             _("Connection to manager on %s failed (%s).") % (
-            self._admin.connectionInfoStr(), reason),
-            _("Connection to %s failed") % self._admin.adminInfoStr())
+            self._adminModel.connectionInfoStr(), reason),
+            _("Connection to %s failed") %
+            (self._adminModel.adminInfoStr(),))
 
     def _openRecentConnection(self):
         d = ConnectionsDialog(parent=self._window)
@@ -1137,17 +1142,18 @@ class AdminWindow(Loggable, gobject.GObject):
             if response == gtk.RESPONSE_ACCEPT:
                 name = dialog.get_filename()
                 conf_xml = open(name, 'r').read()
-                self._admin.loadConfiguration(conf_xml)
+                self._adminModel.loadConfiguration(conf_xml)
             dialog.destroy()
 
         dialog.connect('response', response)
         dialog.show()
 
     def _exportConfiguration(self):
-        d = gtk.FileChooserDialog(_("Export Configuration..."), self._window,
-                                  gtk.FILE_CHOOSER_ACTION_SAVE,
-                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   _('Export'), gtk.RESPONSE_ACCEPT))
+        d = gtk.FileChooserDialog(
+            _("Export Configuration..."), self._window,
+            gtk.FILE_CHOOSER_ACTION_SAVE,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+             _('Export'), gtk.RESPONSE_ACCEPT))
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.set_current_name("configuration.xml")
@@ -1158,9 +1164,10 @@ class AdminWindow(Loggable, gobject.GObject):
                 
             file_exists = True
             if os.path.exists(name):
-                d = gtk.MessageDialog(self._window, gtk.DIALOG_MODAL,
-                                      gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
-                                      _("File already exists.\nOverwrite?"))
+                d = gtk.MessageDialog(
+                    self._window, gtk.DIALOG_MODAL,
+                    gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
+                    _("File already exists.\nOverwrite?"))
                 d.connect("response", lambda self, response: d.hide())
                 if d.run() == gtk.RESPONSE_YES:
                     file_exists = False
@@ -1175,7 +1182,7 @@ class AdminWindow(Loggable, gobject.GObject):
 
         def response(d, response):
             if response == gtk.RESPONSE_ACCEPT:
-                deferred = self._admin.getConfiguration()
+                deferred = self._adminModel.getConfiguration()
                 name = d.get_filename()
                 deferred.addCallback(getConfiguration, name, d)
             else:
@@ -1191,7 +1198,7 @@ class AdminWindow(Loggable, gobject.GObject):
         else:
             import code
 
-        ns = { "admin": self._admin,
+        ns = { "admin": self._adminModel,
                "components": self._componentStates }
         message = """Flumotion Admin Debug Shell
 
@@ -1209,7 +1216,7 @@ You can do remote component calls using:
     def _dumpConfiguration(self):
         def gotConfiguration(xml):
             print xml
-        d = self._admin.getConfiguration()
+        d = self._adminModel.getConfiguration()
         d.addCallback(gotConfiguration)
 
     def _about(self):
@@ -1277,7 +1284,7 @@ You can do remote component calls using:
 
     def _set_debug_marker(self):
         def setMarker(_, marker, level):
-            self._admin.callRemote('writeFluDebugMarker', level, marker)
+            self._adminModel.callRemote('writeFluDebugMarker', level, marker)
         debugMarkerDialog = DebugMarkerDialog()
         debugMarkerDialog.connect('set-marker', setMarker)
         debugMarkerDialog.show()
@@ -1320,7 +1327,7 @@ You can do remote component calls using:
             self._componentStop(c)
 
     def _manage_clear_all_cb(self, action):
-        self._admin.cleanComponents()
+        self._adminModel.cleanComponents()
 
     def _manage_add_format_cb(self, action):
         self._runAddNewFormatWizard()

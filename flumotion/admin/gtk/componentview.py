@@ -340,7 +340,8 @@ class ComponentView(gtk.VBox, log.Loggable):
         self._addPlaceholder(self._planetPlaceholder)
         
     def _componentInactiveToUnset(self):
-        self._currentComponentState.removeListener(self)
+        if self._currentComponentState:
+            self._currentComponentState.removeListener(self)
         self._currentComponentState = None
 
     def _setState(self, state):

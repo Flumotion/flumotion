@@ -1,9 +1,21 @@
+2008-06-04  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Rename internal variables and some internal methods to be easier
+	to read. Use show instead of show_all.
+	Call _updateComponents a bit more often.
+
+	* flumotion/admin/gtk/componentview.py
+	(ComponentView._componentInactiveToUnset): check if
+	self._currentComponentState is None before using it to avoid
+	a shutdown race.
+
 2008-06-04  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion/extern/log/log.py:
 	* flumotion/manager/base.py:
 	Fixes #1013: Sent the debug marker to all components that have
-	an avatar. Refactor writeDebugMarker to use a table for the 
+	an avatar. Refactor writeDebugMarker to use a table for the
 	methods instead of using a if/elif/else structure.
 
 2008-06-03  Jordi Massaguer i Pla  <jordi@flumotion.com>
@@ -21,7 +33,7 @@
 	Added a new remote method that writes a marker to the logs.
 	* flumotion/extern/log/log.py:
 	Added a new method that writes a marker to the logs.
-	Added also new utility functions that gets the name and the int 
+	Added also new utility functions that gets the name and the int
 	of a debug level.
 	* flumotion/extern/log/test_log.py:
 	Tests the previous.
