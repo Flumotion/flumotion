@@ -707,15 +707,8 @@ class AdminWindow(Loggable, GladeDelegate):
                  ) != gtk.RESPONSE_YES:
             return
 
-        def errback(failure):
-            failure.trap(BusyComponentError)
-            self._error(
-                _("Some component(s) are still busy and cannot be removed.\n"
-                  "Try again later."))
-            
-        d = self._adminModel.cleanComponents()
+        d = self._clearAllComponents()
         d.addCallback(lambda unused: runWizard())
-        d.addErrback(errback)
         
     def _runWizard(self, wizard):
         workerHeavenState = self._adminModel.getWorkerHeavenState()
@@ -857,6 +850,16 @@ class AdminWindow(Loggable, GladeDelegate):
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
 
+    def _clearAllComponents(self):
+        d = self._adminModel.cleanComponents()
+        def busyComponentError(failure):
+            failure.trap(BusyComponentError)
+            self._error(
+                _("Some component(s) are still busy and cannot be removed.\n"
+                  "Try again later."))
+        d.addErrback(busyComponentError)
+        return d
+    
     # component view activation functions
 
     def _removeComponent(self, state):
@@ -1046,7 +1049,7 @@ class AdminWindow(Loggable, GladeDelegate):
         else:
             self.show()
 
-    def _show_connectionLost_dialog(self):
+    def _showConnectionLostDialog(self):
         RESPONSE_REFRESH = 1
 
         def response(dialog, response_id):
@@ -1077,11 +1080,10 @@ class AdminWindow(Loggable, GladeDelegate):
             self._planetState.removeListener(self)
             self._planetState = None
 
-        self._show_connectionLost_dialog()
+        self._showConnectionLostDialog()
 
     def _connectionRefused(self):
-
-        def refused_later():
+        def refusedLater():
             self._fatalError(
                 _("Connection to manager on %s was refused.") % (
                 self._adminModel.connectionInfoStr()),
@@ -1089,7 +1091,7 @@ class AdminWindow(Loggable, GladeDelegate):
                 (self._adminModel.adminInfoStr(),))
 
         self.debug("handling connection-refused")
-        reactor.callLater(0, refused_later)
+        reactor.callLater(0, refusedLater)
         self.debug("handled connection-refused")
 
     def _connectionFailed(self, reason):
@@ -1334,7 +1336,7 @@ You can do remote component calls using:
             self._componentStop(c)
 
     def _manage_clear_all_cb(self, action):
-        self._adminModel.cleanComponents()
+        self._clearAllComponents()
 
     def _manage_add_format_cb(self, action):
         self._runAddNewFormatWizard()
