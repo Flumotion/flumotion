@@ -1,5 +1,13 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	Do not call workerChanged each time a step is activated,
+	add a convinience method on the wizard to check if it didn't
+	change. Fixes #992
+
+2008-06-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/producers/soundcard/wizard_gtk.py
 	(SoundcardStep._update_inputs.checkFailed): trap RemoteRunFailure
 

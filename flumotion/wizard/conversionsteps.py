@@ -210,8 +210,7 @@ class ConversionStep(WorkerWizardStep):
             # FIXME: verify that factory implements IEncoderPlugin
             step = plugin.getConversionStep()
             if isinstance(step, WorkerWizardStep):
-                step.worker = self.worker
-                step.workerChanged(self.worker)
+                self.wizard.workerChangedForStep(step, self.worker)
             return step
 
         d = self._loadPlugin(entry)

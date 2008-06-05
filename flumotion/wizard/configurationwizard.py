@@ -129,6 +129,7 @@ class ConfigurationWizard(SectionWizard):
         self._workerHeavenState = None
         self._lastWorker = 0 # combo id last worker from step to step
         self._httpPorter = None
+        self._stepWorkers = {}
         
         self._flowName = 'default'
         self._existingComponentNames = []
@@ -596,6 +597,20 @@ class ConfigurationWizard(SectionWizard):
         """
         self._existingComponentNames = componentNames
 
+    def workerChangedForStep(self, step, workerName):
+        """Tell a step that its worker changed.
+        @param step: step which worker changed for
+        @type step: a L{WorkerWizardStep} subclass
+        @param workerName: name of the worker
+        @type workerName: string
+        """
+        if self._stepWorkers.get(step) == workerName:
+            return
+
+        self.debug('calling %r.workerChanged' % step)
+        step.workerChanged(workerName)
+        self._stepWorkers[step] = workerName
+
     # Private
 
     def _getConsumptionSteps(self):
@@ -632,8 +647,7 @@ class ConfigurationWizard(SectionWizard):
             step = self._currentStep
             if step and isinstance(step, WorkerWizardStep):
                 self._setupWorker(step, worker)
-                self.debug('calling %r.workerChanged' % step)
-                step.workerChanged(worker)
+                self.workerChangedForStep(step, worker)
         else:
             msg = messages.Error(T_(
                     N_('All workers have logged out.\n'
