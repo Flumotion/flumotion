@@ -1,5 +1,10 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/producers/bttv/wizard_gtk.py
+	(TVCardStep.setup): Tweak last commit: avoid using a different
+	combobox mode, just set an empty string, prevents errors
+	when we get real values here.
+
 	* flumotion/wizard/configurationwizard.py:
 	* flumotion/wizard/conversionsteps.py:
 	Do not call workerChanged each time a step is activated,
