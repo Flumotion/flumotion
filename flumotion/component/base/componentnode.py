@@ -85,6 +85,8 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self._label_uptime = self.wtree.get_widget('label-uptime')
         self._label_cpu = self.wtree.get_widget('label-cpu')
         self._label_vsize = self.wtree.get_widget('label-vsize')
+        self._label_component_type = self.wtree.get_widget(
+            'label-component-type')
 
         self.widget.show()
 
@@ -93,6 +95,9 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self._debugging = self.wtree.get_widget('debugging')
         if self._debugEnabled:
             self._debugging.show()
+
+        componentType = self.state.get('config')['type']
+        self._label_component_type.set_text(componentType)
 
         return self.widget
 

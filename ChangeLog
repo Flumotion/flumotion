@@ -1,5 +1,11 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/base/component.glade:
+	* flumotion/component/base/componentnode.py:
+	Add component type to the UI, fixes #987
+
+2008-06-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/producers/bttv/wizard_gtk.py
 	(TVCardStep.setup): Tweak last commit: avoid using a different
 	combobox mode, just set an empty string, prevents errors
