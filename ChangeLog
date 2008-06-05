@@ -1,5 +1,9 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/message.py (MessagesView.addMessage):
+	Reuse the firstButton
+	(MessagesView._sortMessages): Return the first button sorted
+
 	* flumotion/component/producers/bttv/wizard.glade: Rename
 	tvnorm to signal.
 

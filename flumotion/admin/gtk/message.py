@@ -142,11 +142,11 @@ class MessagesView(gtk.VBox):
         b.show()
         self.buttonbox.pack_start(b, False, False, 0)
 
-        self._sortMessages()
+        firstButton = self._sortMessages()
 
         if not self.active_button:
             b.set_active(True)
-        elif b == children[0][1]: # the first button, e.g. highest priority
+        elif b == firstButton:
             b.set_active(True)
         self.show()
 
@@ -217,6 +217,9 @@ class MessagesView(gtk.VBox):
         for child in children:
             self.buttonbox.reorder_child(child[1], child[0])
 
+        # the first button, e.g. highest priority
+        return children[0][1]
+    
     # Callbacks
 
     def _on_message_button__toggled(self, button, message):
