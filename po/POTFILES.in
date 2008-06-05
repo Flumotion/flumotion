@@ -110,6 +110,8 @@ flumotion/component/base/feeders.glade
 flumotion/component/base/feedersnode.py
 flumotion/component/base/http.py
 flumotion/component/base/__init__.py
+flumotion/component/base/properties.glade
+flumotion/component/base/propertiesnode.py
 flumotion/component/base/scheduler.py
 flumotion/component/base/statewatcher.py
 flumotion/component/base/watcher.py

@@ -1,5 +1,12 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/base/Makefile.am:
+	Add properties.glade here
+	* po/POTFILES.in:
+	And newly added files here
+
+2008-06-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/componentview.py:
 	* flumotion/component/base/Makefile.am:
 	* flumotion/component/base/admin_gtk.py:
