@@ -1,5 +1,8 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/producers/bttv/wizard.glade: Rename
+	tvnorm to signal.
+
 	* flumotion/component/producers/bttv/wizard_gtk.py
 	(TVCardStep.setup): We need to call prefill() before adding
 	the widgets to the proxy

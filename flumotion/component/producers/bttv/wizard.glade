@@ -50,7 +50,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkComboBox" id="tvnorm">
+	    <widget class="GtkComboBox" id="signal">
 	      <property name="visible">True</property>
 	      <property name="add_tearoffs">False</property>
 	      <property name="focus_on_click">True</property>
