@@ -36,6 +36,7 @@ from flumotion.common.i18n import getLL, gettexter
 from flumotion.component.base.componentnode import ComponentAdminGtkNode
 from flumotion.component.base.eatersnode import EatersAdminGtkNode
 from flumotion.component.base.feedersnode import FeedersAdminGtkNode
+from flumotion.component.base.propertiesnode import PropertiesAdminGtkNode
 
 _ = gettext.gettext
 __version__ = "$Rev$"
@@ -153,6 +154,10 @@ class BaseAdminGtk(log.Loggable):
                 self.debug("Component has eaters, show Eaters node")
                 self.nodes['Eaters'] = EatersAdminGtkNode(
                     self.state, self.admin)
+
+            # add a properties node
+            self.nodes['Properties'] = PropertiesAdminGtkNode(self.state,
+                self.admin)
 
         d = fetchTranslations()
         d.addCallback(addPages)

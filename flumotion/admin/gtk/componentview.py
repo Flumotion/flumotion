@@ -35,7 +35,7 @@ componentui # pyflakes
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-_DEBUG_ONLY_PAGES = ['Eaters', 'Feeders']
+_DEBUG_ONLY_PAGES = ['Eaters', 'Feeders', 'Properties']
 (COMPONENT_UNSET,
  COMPONENT_INACTIVE,
  COMPONENT_ACTIVE) = range(3)

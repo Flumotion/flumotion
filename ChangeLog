@@ -1,5 +1,16 @@
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/properties.glade:
+	* flumotion/component/base/propertiesnode.py:
+	Add a Properties Tab which is only visible in debug mode.
+	First part of #832
+
+2008-06-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/base/component.glade:
 	* flumotion/component/base/componentnode.py:
 	Add component type to the UI, fixes #987

@@ -9,6 +9,7 @@ component_PYTHON = __init__.py \
 	effectsnode.py \
 	feedersnode.py \
 	http.py \
+	propertiesnode.py \
 	scheduler.py \
 	statewatcher.py	\
 	watcher.py
