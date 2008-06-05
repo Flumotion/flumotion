@@ -80,6 +80,8 @@ class TVCardStep(VideoProducerStep):
         self.channel.data_type = str
         self.signal.data_type = str
 
+        self.channel.prefill([('...', '')])
+        self.signal.prefill([('...', '')])
         self.device.prefill(['/dev/video0',
                              '/dev/video1',
                              '/dev/video2',

@@ -1,3 +1,9 @@
+2008-06-05  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/producers/bttv/wizard_gtk.py
+	(TVCardStep.setup): We need to call prefill() before adding
+	the widgets to the proxy
+
 2008-06-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/admin_gtk.py
