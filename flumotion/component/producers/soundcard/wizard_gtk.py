@@ -25,6 +25,7 @@ import os
 from zope.interface import implements
 
 from flumotion.common import enum
+from flumotion.common.errors import RemoteRunFailure
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
 from flumotion.wizard.basesteps import AudioProducerStep
@@ -164,7 +165,7 @@ class SoundcardStep(AudioProducerStep):
             element_name, device, channels, id='soundcard-check')
 
         def checkFailed(failure):
-            print 'FIXME: trap', failure
+            failure.trap(RemoteRunFailure)
             self._clear_combos()
             self.wizard.taskFinished()
 
