@@ -112,12 +112,14 @@
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/debug-marker.glade:
-	New interface for sending a marker to the manager to write it on the log.
+	New interface for sending a marker to the manager to write
+	it on the log.
 	* flumotion/admin/gtk/adminwindow.py:
 	Added a new action on the debug menu that opens a window for sending
 	a marker to the manager to write it on the log.
 	* flumotion/admin/gtk/debugmarkerview.py:
-	New interface for sending a marker to the manager to write it on the log.
+	New interface for sending a marker to the manager to write it
+	on the log.
 	* flumotion/common/medium.py:
 	Added a new remote method that writes a marker to the logs.
 	* flumotion/extern/log/log.py:
@@ -286,7 +288,8 @@
 	* flumotion/admin/gtk/statusbar.py (AdminStatusbar._clearContext):
 	* flumotion/test/test_parts.py (TestAdminStatusbar.testClear,
 	  TestAdminStatusbar.testClearAll):
-	Fixes #890 . When finishing the wizard all previous messages are clean up.
+	Fixes #890 . When finishing the wizard all previous messages are
+	clean up.
 
 2008-05-28  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
@@ -778,7 +781,8 @@
 2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* po/ca.po:
-	Reviewed and translated all the string according to TERMCAT and Softcatala.
+	Reviewed and translated all the string according to TERMCAT and
+	Softcatala.
 
 2008-05-16  Arek Korbik  <arkadini@gmail.com>
 
