@@ -1,3 +1,10 @@
+2008-06-06  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/componentlist.py:
+	Remove the column header and label and reduce the size
+	of the icon to be 24x24 instead of 40x40.
+	Fixes #171
+
 2008-06-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/base/Makefile.am:

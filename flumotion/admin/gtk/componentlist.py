@@ -165,7 +165,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         treeSelection.connect('changed', self._view_cursor_changed_cb)
 
         # put in all the columns
-        col = gtk.TreeViewColumn(_('Status'), gtk.CellRendererPixbuf(),
+        col = gtk.TreeViewColumn('', gtk.CellRendererPixbuf(),
                                  pixbuf=COL_MOOD)
         col.set_sort_column_id(COL_MOOD_VALUE)
         treeView.append_column(col)
@@ -416,8 +416,9 @@ class ComponentList(log.Loggable, gobject.GObject):
         pixbufs = {}
         for i in range(0, len(moods)):
             name = moods.get(i).name
-            pixbufs[i] = gtk.gdk.pixbuf_new_from_file(os.path.join(
-                configure.imagedir, 'mood-%s.png' % name))
+            pixbufs[i] = gtk.gdk.pixbuf_new_from_file_at_size(
+                os.path.join(configure.imagedir, 'mood-%s.png' % name),
+                24, 24)
 
         return pixbufs
 
