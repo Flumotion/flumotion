@@ -534,7 +534,7 @@
 	* flumotion/wizard/productionsteps.py:
 	Add step.title and use that in user interfaces.
 	Keep step.name, but never display it, use it only internally
-	in the code.
+	in the code. Fixes #902
 
 2008-05-23  Johan Dahlin  <johan@flumotion.com>
 
