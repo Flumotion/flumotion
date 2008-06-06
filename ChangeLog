@@ -1983,7 +1983,7 @@
 	which blocks the interface and prevents you from clicking next.
 	This replaces the old block_next(True/False) calls which were
 	dangerous since they weren't stacked.
-	Fixes #917
+	Fixes #917 and #888
 
 2008-04-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
