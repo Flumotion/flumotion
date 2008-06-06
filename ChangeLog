@@ -225,7 +225,7 @@
 2008-05-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/kiwipatches.py: raise EnvironmentError
-	when the glade file is missing
+	when the glade file is missing. Fixes #953
 
 	* bin/flumotion-debug (main): avatar -> adminAvatar
 
