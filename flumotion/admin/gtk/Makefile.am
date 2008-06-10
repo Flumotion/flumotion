@@ -8,6 +8,7 @@ component_PYTHON = \
 	connections.py \
 	componentlist.py \
 	componentview.py \
+	debugmarkerview.py \
 	dialogs.py \
 	greeter.py \
 	message.py \
