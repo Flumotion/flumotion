@@ -151,6 +151,7 @@ def checkElements(elementNames):
             gst.element_factory_make(name)
             ret.append(name)
         except gst.PluginNotFoundError:
+            log.debug('check', 'no plugin found for element factory %s', name)
             pass
     log.debug('check', 'checkElements: returning elements names %r', ret)
     return ret
