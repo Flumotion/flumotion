@@ -82,6 +82,7 @@ def ensureDir(dir, description):
 
 
 # FIXME: fix epydoc to correctly spell deprecated
+# F0.6
 def componentPath(componentName, parentName):
     """
     Create a path string out of the name of a component and its parent.
@@ -111,9 +112,10 @@ def parseComponentId(componentId):
     @rtype:  tuple of (str, str)
     @return: tuple of (flowName, componentName)
     """
+    assert componentId is not None, "componentId should not be None"
     list = componentId.split("/")
     assert len(list) == 3, \
-        "componentId %s should have exactly two components" % componentId
+        "componentId %s should have exactly two parts" % componentId
     assert list[0] == '', \
         "componentId %s should start with /" % componentId
     return (list[1], list[2])

@@ -1,5 +1,11 @@
 2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  Mark a function for deprecation.
+	  Assertion/debug fixes.
+
+2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/configurationwizard.py:
 	  Doc string cleanup.
 
