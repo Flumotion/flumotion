@@ -29,7 +29,6 @@ from flumotion.worker.checks.gst010 import do_element_check
 
 __version__ = "$Rev$"
 
-
 def checkTVCard(device, id='check-tvcard'):
     """
     Probe the given device node as a TV card.
