@@ -128,6 +128,7 @@ class Manager(util.LogCommand):
             default="ssl")
 
     def parse(self, argv):
+        # instantiated here so our subcommands can chain to it
         self.managerDeferred = defer.Deferred()
 
         self.debug('parse: chain up')
@@ -135,6 +136,10 @@ class Manager(util.LogCommand):
         # all subcommands will have a chance to chain up to the deferred
         ret = util.LogCommand.parse(self, argv)
         self.debug('parse: chained up')
+
+        if ret is None:
+            self.debug('parse returned None, help/usage printed')
+            return ret
 
         if ret:
             self.debug('parse returned %r' % ret)
