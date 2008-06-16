@@ -464,14 +464,18 @@ class ConfigurationWizard(SectionWizard):
     # FIXME: maybe add id here for return messages ?
     def runInWorker(self, workerName, moduleName, functionName,
                     *args, **kwargs):
-        """Run the given function and arguments on the selected worker.
-        @param workerName: name of the worker to run the function in
-        @type workerName: string
-        @param moduleName: name of the module where the function is found
-        @type moduleName: string
+        """
+        Run the given function and arguments on the selected worker.
+        The given function should return a L{messages.Result}.
+
+        @param workerName:   name of the worker to run the function in
+        @type  workerName:   string
+        @param moduleName:   name of the module where the function is found
+        @type  moduleName:   string
         @param functionName: name of the function to run
-        @type functionName: string
-        @returns: a deferred firing the return value of the function
+        @type  functionName: string
+
+        @returns: a deferred firing the Result's value.
         @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('runInWorker(moduleName=%r, functionName=%r)' % (

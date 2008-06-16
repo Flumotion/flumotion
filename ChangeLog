@@ -1,3 +1,8 @@
+2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/configurationwizard.py:
+	  Doc string cleanup.
+
 2008-06-10  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion/admin/gtk/Makefile.am:
