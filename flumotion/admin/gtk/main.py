@@ -28,25 +28,16 @@ from twisted.internet import reactor
 from twisted.python import log as twistedlog
 
 from flumotion.admin import connections
-from flumotion.common import log
+from flumotion.common import log, connection, i18n
 from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.configure import configure
 from flumotion.common.options import OptionParser
 
-__version__ = "$Rev$"
 _ = gettext.gettext
 
+__version__ = "$Rev$"
+
 _retval = 0
-
-def _installGettext():
-    import locale
-
-    localedir = os.path.join(configure.localedatadir, 'locale')
-    log.debug("locale", "Loading locales from %s" % localedir)
-    gettext.bindtextdomain(configure.PACKAGE, localedir)
-    gettext.textdomain(configure.PACKAGE)
-    locale.bindtextdomain(configure.PACKAGE, localedir)
-    locale.textdomain(configure.PACKAGE)
 
 def _connectToManager(win, manager, ssl):
     try:
@@ -88,7 +79,7 @@ def main(args):
 
     options, args = parser.parse_args(args)
 
-    _installGettext()
+    i18n.installGettext()
 
     if len(args) > 1:
         log.error('flumotion-admin',

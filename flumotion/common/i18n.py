@@ -247,3 +247,13 @@ def getLL():
         LL = lang[:2]
 
     return LL
+
+def installGettext():
+    import locale
+
+    localedir = os.path.join(configure.localedatadir, 'locale')
+    log.debug("locale", "Loading locales from %s" % localedir)
+    gettext.bindtextdomain(configure.PACKAGE, localedir)
+    gettext.textdomain(configure.PACKAGE)
+    locale.bindtextdomain(configure.PACKAGE, localedir)
+    locale.textdomain(configure.PACKAGE)

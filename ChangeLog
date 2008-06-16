@@ -1,5 +1,13 @@
 2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/i18n.py:
+	  Extract installGettext() from gtk.main; since this should be usable
+	  from other commands.
+	* flumotion/admin/gtk/main.py:
+	  Use it.
+
+2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/monitor/nagios/main.py:
 	  Short-circuit to end when usage/help of a subcommand got printed.
 
