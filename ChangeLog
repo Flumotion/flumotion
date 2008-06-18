@@ -2,7 +2,7 @@
 
 	* flumotion/admin/gtk/adminwindow.py:
 	  Don't add a message twice, only add it when its component is
-	  in the selection.
+	  in the selection (Fixes bug in changeset [6707]).
 
 2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
