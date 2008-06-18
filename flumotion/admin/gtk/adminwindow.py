@@ -961,7 +961,6 @@ class AdminWindow(Loggable, GladeDelegate):
                 current = self._componentList.getSelectedNames()
                 if name in current:
                     self._messageView.addMessage(value)
-                self._messageView.addMessage(value)
 
         def compRemove(state, key, value):
             name = state.get('name')

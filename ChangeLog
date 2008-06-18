@@ -1,3 +1,9 @@
+2008-06-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	  Don't add a message twice, only add it when its component is
+	  in the selection.
+
 2008-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/i18n.py:
