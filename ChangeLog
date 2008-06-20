@@ -1,5 +1,10 @@
 2008-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/gdp/gdp.py:
+	  Add error for http://bugzilla.gnome.org/show_bug.cgi?id=532364
+
+2008-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/launch/main.py:
 	  Make sure errors are translated.
 
