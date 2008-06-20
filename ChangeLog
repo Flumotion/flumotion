@@ -1,5 +1,16 @@
 2008-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* flumotion/component/consumers/Makefile.am:
+	* flumotion/component/consumers/gdp (added):
+	* flumotion/component/consumers/gdp/gdp.py (added):
+	* flumotion/component/consumers/gdp/__init__.py (added):
+	* flumotion/component/consumers/gdp/Makefile.am (added):
+	* flumotion/component/consumers/gdp/gdp.xml (added):
+	  Add a GDP consumer.
+
+2008-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/gdp/gdp.py:
 	  Add error for http://bugzilla.gnome.org/show_bug.cgi?id=532364
 
