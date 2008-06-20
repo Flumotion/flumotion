@@ -64,8 +64,9 @@ from twisted.python import reflect
 from twisted.internet import reactor, defer
 
 from flumotion.common import log, common, registry, errors, messages
-from flumotion.common.i18n import Translator
+from flumotion.common import i18n
 from flumotion.common.options import OptionParser
+from flumotion.configure import configure
 from flumotion.twisted import flavors
 
 from flumotion.launch import parse
@@ -112,7 +113,10 @@ class ComponentWrapper(object, log.Loggable):
     def instantiate(self):
         errors = []
         def haveError(value):
-            translator = Translator()
+            translator = i18n.Translator()
+            localedir = os.path.join(configure.localedatadir, 'locale')
+            # FIXME: add locales as messages from domains come in
+            translator.addLocaleDir(configure.PACKAGE, localedir)
             print "%s: %s" % (_headings[value.level],
                               translator.translate(value))
             if value.debug:
@@ -234,6 +238,8 @@ def main(args):
 
     log.debug('launch', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
+
+    i18n.installGettext()
 
     # verbose overrides --debug
     if options.verbose:
