@@ -249,6 +249,10 @@ def getLL():
     return LL
 
 def installGettext():
+    """
+    Sets up gettext so that the program gets translated.
+    Use this in any Flumotion end-user application that needs translations.
+    """
     import locale
 
     localedir = os.path.join(configure.localedatadir, 'locale')
