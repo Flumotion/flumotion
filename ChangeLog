@@ -1,3 +1,8 @@
+2008-06-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/gdp/gdp.py:
+	  Remove unused imports/symbols.
+
 2008-06-23  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/videotest.glade:
