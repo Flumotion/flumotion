@@ -1,3 +1,14 @@
+2008-06-23  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/encoders/speex/wizard_gtk.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/diskersteps.py:
+	* flumotion/wizard/shout2steps.py:
+	Add title for the rest of the wizard steps.
+	Do not translate the stepname in getStep.
+	Fixes #1015.
+
 2008-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/preview/preview.py:

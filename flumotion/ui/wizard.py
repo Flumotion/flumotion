@@ -37,7 +37,7 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 __version__ = "$Rev$"
 __pychecker__ = 'no-classattr no-argsused'
 T_ = gettexter()
-N_ = _ = gettext.gettext
+_ = gettext.gettext
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -196,9 +196,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         @type stepname: str
         @returns: a L{WizardStep} instance or raises KeyError
         """
-        # Title and name of the page is the same, so we have to lookup
-        # The translated version for now
-        stepname = N_(stepname)
         for step in self._steps.values():
             if step.get_name() == stepname:
                 return step

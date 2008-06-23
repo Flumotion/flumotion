@@ -222,14 +222,16 @@ class _FireWireCommon:
 
 
 class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
-    name = _('Firewire')
+    name = 'Firewire'
+    title = _('Firewire')
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
         _FireWireCommon.__init__(self)
 
 
 class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
-    name = _('Firewire audio')
+    name = 'Firewire audio'
+    title = _('Firewire audio')
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)
