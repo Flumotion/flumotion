@@ -1,5 +1,9 @@
 2008-06-23  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/connections.py (Connections.grab_focus): Use
+	len() instead of relying on __nonzero__, avoids focus grabbing attempt
+	of non existing items.
+
 	* data/glade/sectionwizard.glade:
 	* flumotion/ui/wizard.py:
 	Set a mnemonic for the Finish button, fixes #1032

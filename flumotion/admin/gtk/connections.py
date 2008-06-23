@@ -78,7 +78,7 @@ class Connections(GladeWidget):
     # Public API
 
     def grab_focus(self):
-        if self._connections:
+        if len(self._connections):
             self._connections.select(self._connections[0])
         self._connections.grab_focus()
 
