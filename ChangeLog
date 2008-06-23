@@ -1,5 +1,9 @@
 2008-06-23  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/sectionwizard.glade:
+	* flumotion/ui/wizard.py:
+	Set a mnemonic for the Finish button, fixes #1032
+
 	* flumotion/component/encoders/speex/wizard_gtk.py:
 	* flumotion/component/producers/firewire/wizard_gtk.py:
 	* flumotion/ui/wizard.py:

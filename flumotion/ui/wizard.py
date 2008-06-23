@@ -312,7 +312,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         if hasNext:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
-            self.button_next.set_label(_('Finish'))
+            self.button_next.set_label(_('_Finish'))
 
     def _setStepIcon(self, icon):
         icon_filename = os.path.join(configure.imagedir, 'wizard', icon)
