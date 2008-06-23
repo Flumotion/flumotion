@@ -1,5 +1,13 @@
 2008-06-23  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/videotest.glade:
+	* flumotion/component/producers/bttv/wizard.glade:
+	* flumotion/component/producers/videotest/wizard.glade:
+	* flumotion/component/producers/webcam/wizard.glade:
+	Framerate -> Frame Rate. Fixes #1018
+
+2008-06-23  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/connections.py (Connections.grab_focus): Use
 	len() instead of relying on __nonzero__, avoids focus grabbing attempt
 	of non existing items.
