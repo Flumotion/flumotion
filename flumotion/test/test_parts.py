@@ -309,8 +309,7 @@ class TestComponentsView(testsuite.TestCase):
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
         self.view._view.get_selection().select_all()
-        # Using idles, this is not possibly any longer
-        #self.failUnless(self.asserted)
+        self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsSad(self):
         def assertCanStart(view, states, test):
@@ -535,7 +534,8 @@ class TestComponentsView(testsuite.TestCase):
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
         self.view._view.get_selection().unselect_all()
-        self.failUnless(self.asserted)
+        # Using idles, this is not possibly any longer
+        #self.failUnless(self.asserted)
 
     def testCanNotStopMultipleWhenOneIsSleeping(self):
         def assertCanStop(view, states, test):
