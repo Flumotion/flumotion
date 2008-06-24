@@ -1,5 +1,13 @@
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	Do not reset the selection when a component starts/stops.
+	Rename update to clearAndRebuild to make it easier to understand
+	what's doing on. Fixes #1033
+
+2008-06-24  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/adminwindow.py: Clean up the
 	componentDo method which calls remote actions and updates the
 	statusbar. Add documentation, use plural gettext and make it

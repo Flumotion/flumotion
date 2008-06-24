@@ -217,7 +217,7 @@ class ComponentList(log.Loggable, gobject.GObject):
             canStop = canStop and moodname != 'sleeping'
         return canStop
 
-    def update(self, components):
+    def clearAndRebuild(self, components):
         """
         Update the components view by removing all old components and
         showing the new ones.

@@ -770,7 +770,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._addFormatAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
-        self._componentList.update(self._componentStates)
+        self._componentList.clearAndRebuild(self._componentStates)
         self._trayicon.update(self._componentStates)
 
     def _hasProducerComponent(self):
@@ -996,7 +996,6 @@ class AdminWindow(Loggable, GladeDelegate):
         def compSet(state, key, value):
             if key == 'mood':
                 self._updateComponentActions()
-                self._updateComponents()
                 
         def compAppend(state, key, value):
             name = state.get('name')
