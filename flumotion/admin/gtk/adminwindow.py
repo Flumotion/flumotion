@@ -69,7 +69,7 @@ import gobject
 import gtk
 from kiwi.ui.delegates import GladeDelegate
 from kiwi.ui.dialogs import yesno
-from twisted.internet import reactor
+from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
@@ -87,6 +87,7 @@ from flumotion.common.i18n import gettexter
 from flumotion.common.log import Loggable
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
+from flumotion.configure import configure
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
@@ -95,7 +96,7 @@ from flumotion.wizard.models import AudioProducer, Porter, VideoProducer
 admin # pyflakes
 
 __version__ = "$Rev$"
-_ = gettext.gettext
+N_ = _ = gettext.gettext
 T_ = gettexter()
 
 MAIN_UI = """
@@ -608,7 +609,7 @@ class AdminWindow(Loggable, GladeDelegate):
         errorDialog.connect('response', self._close)
 
     def _setStatusbarText(self, text):
-        self._statusbar.push('main', text)
+        return self._statusbar.push('main', text)
 
     def _clearLastStatusbarText(self):
         self._statusbar.pop('main')
@@ -890,60 +891,94 @@ class AdminWindow(Loggable, GladeDelegate):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
-        return self._componentDo(state, 'Stop', 'Stopping', 'Stopped')
+        return self._componentDo(state, 'componentStop',
+                                 'Stop', 'Stopping', 'Stopped')
 
     def _componentStart(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
-        return self._componentDo(state, 'Start', 'Starting', 'Started')
+        return self._componentDo(state, 'componentStart',
+                                 'Start', 'Starting', 'Started')
 
     def _componentDelete(self, state):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
-        return self._componentDo(state, '', 'Deleting', 'Deleted',
-            'deleteComponent')
+        return self._componentDo(state, 'deleteComponent',
+                                 'Delete', 'Deleting', 'Deleted')
 
-    def _componentDo(self, state, action, doing, done,
-        remoteMethodPrefix="component"):
+    def _componentDo(self, state, methodName, action, doing, done):
+        """Do something with a component and update the statusbar
+        @param state: componentState
+        @type state: L{AdminComponentState}
+        @param methodName: name of the method to call
+        @type methodName: str
+        @param action: string used to explain that to do
+        @type action: str
+        @param doing: string used to explain that the action started
+        @type doing: str
+        @param done: string used to explain that the action was completed
+        @type done: str
         """
-        @param remoteMethodPrefix: prefix for remote method to run
-        """
-        if not state:
-            self.debug(" Trying to apply %s to a non component" %action +\
-                       " that may mean that the signal comes from the menu ")
-            selected_states = self._componentList.getSelectedStates()
-            self.debug(" selected states %r when %s ", \
-                       selected_states, action)
-            for selectedState in self._componentList.getSelectedStates():
-                self._componentDo(selectedState, action, doing, done,
-                                  remoteMethodPrefix)
+        if state is None:
+            states = self._componentList.getSelectedStates()
+        else:
+            states = [state]
+
+        if not states:
             return
-        name = getComponentLabel(state)
-        if not name:
-            return None
-
-        mid = self._setStatusbarText(_("%s component %s") % (doing, name))
-        d = self._adminModel.callRemote(remoteMethodPrefix + action, state)
-
-        def _actionCallback(result, self, mid):
+        
+        def callbackSingle(result, self, mid, name):
             self._statusbar.remove('main', mid)
-            self._setStatusbarText("%s component %s" % (done, name))
+            self._setStatusbarText(
+                _("%s component %s") % (done, name))
 
-        def _actionErrback(failure, self, mid):
+        def errbackSingle(failure, self, mid, name):
             self._statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
                 action.lower(), name, failure))
             self._setStatusbarText(
-                _("Failed to %(action)s component %(name)s") % {
+                _("Failed to %(action)s component %(name)s.") % {
                     'action': action.lower(),
                     'name': name,
                 })
 
-        d.addCallback(_actionCallback, self, mid)
-        d.addErrback(_actionErrback, self, mid)
+        def callbackMultiple(results, self, mid):
+            self._statusbar.remove('main', mid)
+            self._setStatusbarText(
+                _("%s components.") % (done,))
+            
+        def errbackMultiple(failure, self, mid):
+            self._statusbar.remove('main', mid)
+            self.warning("Failed to %s some components: %s." % (
+                action.lower(), failure))
+            self._setStatusbarText(
+                _("Failed to %s some components.") % (action,))
+            
+        # first %s is one of Stopping/Starting/Deleting
+        # second %s is a list of component names
+        f = gettext.dngettext(configure.PACKAGE,
+                              N_("%s component %s"),
+                              N_("%s components %s"), len(states))
+        statusText = f % (doing,
+                          ', '.join([getComponentLabel(s) for s in states]))
+        mid = self._setStatusbarText(statusText)
 
+        if len(states) == 1:
+            state = states[0]
+            name = getComponentLabel(state)
+            d = self._adminModel.callRemote(methodName, state)
+            d.addCallback(callbackSingle, self, mid, name)
+            d.addErrback(errbackSingle, self, mid, name)
+        else:
+            deferreds = []
+            for state in states:
+                d = self._adminModel.callRemote(methodName, state)
+                deferreds.append(d)
+            d = defer.DeferredList(deferreds)
+            d.addCallback(callbackMultiple, self, mid)
+            d.addErrback(errbackMultiple, self, mid)
         return d
 
     def _componentActivate(self, states, action):

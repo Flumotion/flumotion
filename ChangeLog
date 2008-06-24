@@ -1,5 +1,10 @@
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py: Clean up the
+	componentDo method which calls remote actions and updates the
+	statusbar. Add documentation, use plural gettext and make it
+	only display one string when updating multiple components.
+
 	* flumotion/admin/gtk/componentlist.py:
 	(ComponentList._selectionChanged): Clean up the code to
 	set the selection and emit the selection-changed in an idle
