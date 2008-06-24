@@ -2,9 +2,10 @@
 
 	* flumotion/admin/gtk/adminwindow.py:
 	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/test/test_parts.py:
 	Do not reset the selection when a component starts/stops.
 	Rename update to clearAndRebuild to make it easier to understand
-	what's doing on. Fixes #1033
+	what's doing on. Update tests. Fixes #1033
 
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
