@@ -144,6 +144,11 @@ MAIN_UI = """
     <separator name="sep-toolbar2"/>
     <toolitem action="RunConfigurationWizard"/>
   </toolbar>
+  <popup name="ComponentContextMenu">
+    <menuitem action="StartComponent"/>
+    <menuitem action="StopComponent"/>
+    <menuitem action="DeleteComponent"/>
+  </popup>
 </ui>
 """
 
@@ -183,6 +188,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._adminModel = None
         self._currentComponentStates = None
+        self._componentContextMenu = None
         self._componentList = None # ComponentList
         self._componentStates = None # name -> planet.AdminComponentState
         self._componentView = None
@@ -423,6 +429,9 @@ class AdminWindow(Loggable, GladeDelegate):
         self.main_vbox.pack_start(toolbar, expand=False)
         self.main_vbox.reorder_child(toolbar, 1)
 
+        self._componentContextMenu = uimgr.get_widget('/ComponentContextMenu')
+        self._componentContextMenu.show()
+        
         menubar.show_all()
 
         self._actiongroup = group
@@ -445,8 +454,8 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._componentList.connect('selection_changed',
             self._components_selection_changed_cb)
-        self._componentList.connect('activated',
-            self._components_activated_cb)
+        self._componentList.connect('show-popup-menu',
+                                    self._components_show_popup_menu_cb)
 
         self._updateComponentActions()
         self._componentList.connect(
@@ -455,7 +464,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._componentList.connect(
             'notify::can-stop-any',
             self._components_start_stop_notify_cb)
-        self._components_start_stop_notify_cb()
+        self._updateComponentActions()
 
         self._messageView.hide()
 
@@ -1021,6 +1030,10 @@ class AdminWindow(Loggable, GladeDelegate):
         #         _("Loading tab %s for %s ...") % (node.title, name))
         # node.statusbar = self._statusbar # hack
 
+    def _componentShowPopupMenu(self, event_button, event_time):
+        self._componentContextMenu.popup(None, None, None,
+                                         event_button, event_time)
+
     def _connectionOpened(self, admin):
         self.info('Connected to manager')
         if self._disconnectedDialog:
@@ -1288,13 +1301,13 @@ You can do remote component calls using:
     def _recent_action_activate_cb(self, action, conn):
         self._openConnectionInternal(conn.info)
 
-    def _components_selection_changed_cb(self, view, state):
+    def _components_show_popup_menu_cb(self, clist, event_button, event_time):
+        self._componentShowPopupMenu(event_button, event_time)
+        
+    def _components_selection_changed_cb(self, clist, state):
         self._componentSelectionChanged(state)
 
-    def _components_activated_cb(self, view, states, action):
-        self._componentActivate(states, action)
-
-    def _components_start_stop_notify_cb(self, *args):
+    def _components_start_stop_notify_cb(self, clist, pspec):
         self._updateComponentActions()
 
     ### action callbacks

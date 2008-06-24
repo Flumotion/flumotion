@@ -1,3 +1,11 @@
+2008-06-24  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	Transform the context menu into using GtkUIManager, reuse
+	the callbacks and logic already used for the menu/toolbar.
+	Fixes #1034
+
 2008-06-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/gdp/gdp.py:

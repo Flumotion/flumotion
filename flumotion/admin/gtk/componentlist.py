@@ -67,55 +67,6 @@ def getComponentLabel(state):
     return config and config.get('label', config['name'])
 
 
-class ComponentMenu(gtk.Menu):
-
-    gsignal('activated', str)
-
-    def __init__(self, componentsView):
-        """
-        @param state: L{flumotion.common.component.AdminComponentState}
-        """
-        gtk.Menu.__init__(self)
-        self._items = {} # name -> gtk.MenuItem
-
-        self.set_title(_('Component'))
-
-        i = gtk.MenuItem(_('_Restart'))
-        self.append(i)
-        self._items['restart'] = i
-
-        i = gtk.MenuItem(_('_Start'))
-        canStart = componentsView.canStart()
-        if not canStart:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['start'] = i
-
-        i = gtk.MenuItem(_('St_op'))
-        canStop = componentsView.canStop()
-        if not canStop:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['stop'] = i
-
-        i = gtk.MenuItem(_('_Delete'))
-        if not canStart:
-            i.set_property('sensitive', False)
-        self.append(i)
-        self._items['delete'] = i
-
-        # connect callback
-        for name in self._items.keys():
-            i = self._items[name]
-            i.connect('activate', self._activated_cb, name)
-
-        self.show_all()
-
-    def _activated_cb(self, item, name):
-        self.emit('activated', name)
-gobject.type_register(ComponentMenu)
-
-
 class ComponentList(log.Loggable, gobject.GObject):
     """
     I present a view on the list of components logged in to the manager.
@@ -126,7 +77,7 @@ class ComponentList(log.Loggable, gobject.GObject):
     logCategory = 'components'
 
     gsignal('selection-changed', object)  # state-or-None
-    gsignal('activated', object, str) # state, action name
+    gsignal('show-popup-menu', int, int) # button, click time
     #gsignal('right-clicked', object, int, float)
 
     gproperty(bool, 'can-start-any', 'True if any component can be started',
@@ -422,10 +373,6 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         return pixbufs
 
-    def _activate(self, states, action):
-        self.debug('emitting activated')
-        self.emit('activated', states, action)
-
     def _selectionChanged(self):
         states = self.getSelectedStates()
 
@@ -456,16 +403,11 @@ class ComponentList(log.Loggable, gobject.GObject):
             selection.select_path(path[0])
         states = self.getSelectedStates()
         self.debug("button pressed selected states %r", states)
-        popup = ComponentMenu(self)
-        popup.popup(None, None, None, event.button, event.time)
-        popup.connect('activated', self._activated_cb, states)
+        self.emit('show-popup-menu', event.button, event.time)
         gtk.main_iteration()
         return True
 
     # Callbacks
-
-    def _activated_cb(self, menu, action, states):
-        self._activate(states, action)
 
     def _tree_view_query_tooltip_cb(self, treeview, x, y, keyboard_tip,
                                     tooltip):
