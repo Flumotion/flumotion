@@ -1,5 +1,10 @@
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/test/test_parts.py:
+	(TestComponentsView.testCanNotStartWhenNoSelection)
+	(TestComponentsView.testCanStartMultipleWhenSleeping.assertCanStart):
+	Disable the last check as it we emit selection-changed in an idle now
+
 	* flumotion/admin/gtk/adminwindow.py:
 	* flumotion/admin/gtk/componentlist.py:
 	* flumotion/test/test_parts.py:
