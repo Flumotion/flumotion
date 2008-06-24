@@ -378,7 +378,11 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         if not states:
             self.debug('no component selected, emitting selection-changed None')
-            self.emit('selection-changed', [])
+            # Emit this in an idle, since popups will not be shown
+            # before this has completed, and it might possibly take a long
+            # time to finish all the callbacks connected to selection-changed
+            # This is not the proper fix, but makes the popups show up faster
+            gobject.idle_add(self.emit, 'selection-changed', [])
             return
 
         if states is self._lastStates:
@@ -395,17 +399,14 @@ class ComponentList(log.Loggable, gobject.GObject):
             MOODS_INFO[moods.get(mood)]))
 
     def _showPopupMenu(self, event):
-        path = self._view.get_path_at_pos(int(event.x),int(event.y))
+        retval = self._view.get_path_at_pos(int(event.x), int(event.y))
+        if retval is None:
+            return
+        clicked_path, column, x, y = retval
         selection = self._view.get_selection()
-        rows = selection.get_selected_rows()
-        if path[0] not in rows[1]:
-            selection.unselect_all()
-            selection.select_path(path[0])
-        states = self.getSelectedStates()
-        self.debug("button pressed selected states %r", states)
+        selection.unselect_all()
+        selection.select_path(clicked_path)
         self.emit('show-popup-menu', event.button, event.time)
-        gtk.main_iteration()
-        return True
 
     # Callbacks
 

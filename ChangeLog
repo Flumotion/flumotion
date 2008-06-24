@@ -1,5 +1,10 @@
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentlist.py:
+	(ComponentList._selectionChanged): Clean up the code to
+	set the selection and emit the selection-changed in an idle
+	for speed reasons.
+
 	* flumotion/admin/gtk/adminwindow.py:
 	* flumotion/admin/gtk/componentlist.py:
 	Transform the context menu into using GtkUIManager, reuse
