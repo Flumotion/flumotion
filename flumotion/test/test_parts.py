@@ -134,7 +134,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
              'type': 'second'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         # no component is sleeping, so cannot start any
         self.failIf(self.view.get_property('can-start-any'))
@@ -180,7 +180,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -197,7 +197,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -214,7 +214,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.sad.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -231,7 +231,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.hungry.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -248,7 +248,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.waking.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -265,7 +265,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.lost.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -281,7 +281,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view._view.get_selection().select_all()
         self.view.connect('selection-changed', assertCanStart, self)
@@ -303,7 +303,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.sleeping.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -324,7 +324,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -345,7 +345,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.happy.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -366,7 +366,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.hungry.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -387,7 +387,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.waking.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -408,7 +408,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.lost.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -425,7 +425,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -442,7 +442,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.hungry.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -459,7 +459,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.sad.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -476,7 +476,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.waking.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -493,7 +493,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.lost.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -510,7 +510,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.sad.sleeping.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -527,7 +527,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'one', 'mood': moods.happy.value, 'pid': 1,
              'type': 'foo'})
         components['one'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view._view.get_selection().select_all()
         self.view.connect('selection-changed', assertCanStop, self)
@@ -549,7 +549,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
@@ -582,7 +582,7 @@ class TestComponentsView(testsuite.TestCase):
             {'name': 'two', 'mood': moods.lost.value, 'pid': 5,
              'type': 'foo'})
         components['two'] = c
-        self.view.update(components)
+        self.view.clearAndRebuild(components)
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStop, self)
         self.asserted = False
