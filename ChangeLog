@@ -1,3 +1,8 @@
+2008-06-25  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/test_manager_component.py: Add testing of
+	component feed reconnections by ComponentHeaven.
+
 2008-06-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_parts.py:
