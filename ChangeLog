@@ -1,3 +1,19 @@
+2008-06-25  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/Makefile.am:
+	* data/glade/production-wizard.glade:
+	* data/glade/scenario-wizard.glade:
+	* flumotion/ui/sidebar.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/scenarios.py:
+	* po/POTFILES.in:
+	Add a Scenario Wizard page, refactor the logic
+	to separate Scenario classes. Fixes #999
+
 2008-06-25  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/test_manager_component.py: Add testing of

@@ -25,6 +25,7 @@ glade_DATA =					\
 	overlay-wizard.glade			\
 	overview-wizard.glade			\
 	production-wizard.glade			\
+	scenario-wizard.glade			\
 	select-producers-wizard.glade	\
 	shout2-wizard.glade				\
 	summary-wizard.glade			\

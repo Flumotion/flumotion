@@ -182,6 +182,13 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     # Public API
 
+    def cleanFutureSteps(self):
+        """Removes all the steps in front of the current one"""
+        oldSections = self._sections[self._currentSection+1:][:]
+        for i, oldSection in enumerate(oldSections):
+            self.sidebar.remove_section(oldSection.title)
+            self._sections.remove(oldSection)
+
     def addStepSection(self, section):
         """Adds a new step section
         @param section: section to add

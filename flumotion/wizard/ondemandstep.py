@@ -88,8 +88,7 @@ class OnDemandStep(WorkerWizardStep):
         self._runChecks()
 
     def getNext(self):
-        from flumotion.wizard.configurationwizard import SummaryStep
-        return SummaryStep(self.wizard)
+        return None
 
     # Public
 

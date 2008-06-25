@@ -23,6 +23,7 @@ import gettext
 import os
 import sets
 
+import gtk
 from gtk import gdk
 from twisted.internet import defer
 
@@ -31,13 +32,10 @@ from flumotion.common.common import pathToModuleName
 from flumotion.common.i18n import N_, ngettext, gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.wizard import SectionWizard, WizardStep
-from flumotion.wizard.basesteps import ConsumerStep
-from flumotion.wizard.consumptionsteps import ConsumptionStep
-from flumotion.wizard.conversionsteps import ConversionStep
-from flumotion.wizard.productionsteps import ProductionStep
-from flumotion.wizard.save import WizardSaver
+from flumotion.wizard.scenarios import LiveScenario, OnDemandScenario
 from flumotion.wizard.worker import WorkerList
 from flumotion.wizard.workerstep import WorkerWizardStep
+
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -68,51 +66,57 @@ class WelcomeStep(WizardStep):
         return None
 
 
-class LicenseStep(WizardStep):
-    name = "ContentLicense"
-    title = _("Content License")
-    section = _('License')
-    icon = 'licenses.png'
-    gladeFile = "license-wizard.glade"
-
-    # Public API
-
-    def getLicenseType(self):
-        """Get the selected license type
-        @returns: the license type or None
-        @rtype: string or None
-        """
-        if self.set_license.get_active():
-            return self.license.get_selected()
+class ScenarioStep(WizardStep):
+    name = "Scenario"
+    title = _('Scenario')
+    section = _('Scenario')
+    icon = 'wizard.png'
+    gladeFile = 'scenario-wizard.glade'
 
     # WizardStep
-
+    def __init__(self, wizard):
+        self._currentScenarioClass = None
+        self._radioGroup = None
+        self._scenarioRadioButtons = []
+        super(ScenarioStep, self).__init__(wizard)
+        
     def setup(self):
-        self.license.prefill([
-            (_('Creative Commons'), 'CC'),
-            (_('Commercial'), 'Commercial')])
-
+        self.addScenario(LiveScenario)
+        self.addScenario(OnDemandScenario)
+        firstButton = self.scenarios_box.get_children()[0]
+        firstButton.set_active(True)
+        firstButton.toggled()
+        firstButton.grab_focus()
+        
     def getNext(self):
-        return None
+        self.wizard.cleanFutureSteps()
+        scenario = self._currentScenarioClass(self.wizard)
+        scenario.addSteps()
+        self.wizard.setScenario(scenario)
+
+    # Public
+
+    def addScenario(self, scenarioClass):
+        button = gtk.RadioButton(self._radioGroup, scenarioClass.short)
+        button.connect('toggled', self._on_radiobutton__toggled, scenarioClass)
+        button.connect('activate', self._on_radiobutton__activate)
+
+        self.scenarios_box.pack_start(button, False, False)
+        button.show()
+        
+        if self._radioGroup is None:
+            self._radioGroup = button
+        
+    # Private
 
     # Callbacks
 
-    def on_set_license__toggled(self, button):
-        self.license.set_sensitive(button.get_active())
-
-
-class SummaryStep(WizardStep):
-    name = "Summary"
-    title = _("Summary")
-    section = _("Summary")
-    icon = 'summary.png'
-    gladeFile = "summary-wizard.glade"
-    lastStep = True
-
-    # WizardStep
-
-    def getNext(self):
-        return None
+    def _on_radiobutton__activate(self, radio):
+        self.wizard.goNext()
+        
+    def _on_radiobutton__toggled(self, radio, scenarioClass):
+        if radio.get_active():
+            self._currentScenarioClass = scenarioClass
 
 
 class ConfigurationWizard(SectionWizard):
@@ -130,9 +134,7 @@ class ConfigurationWizard(SectionWizard):
         self._lastWorker = 0 # combo id last worker from step to step
         self._httpPorter = None
         self._stepWorkers = {}
-        
-        self._flowName = 'default'
-        self._existingComponentNames = []
+        self._scenario = None
         
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
@@ -143,7 +145,7 @@ class ConfigurationWizard(SectionWizard):
     # SectionWizard
 
     def completed(self):
-        saver = self.save()
+        saver = self._scenario.save()
         xml = saver.getXML()
         self.emit('finished', xml)
 
@@ -172,16 +174,32 @@ class ConfigurationWizard(SectionWizard):
 
     # Public API
 
+    # FIXME: Remove this and make fgc create a new scenario
     def addSteps(self):
         """Add the step sections of the wizard, can be
         overridden in a subclass
         """
+        # These two steps are independent of the scenarios, they
+        # should always be added.
         self.addStepSection(WelcomeStep)
-        self.addStepSection(ProductionStep)
-        self.addStepSection(ConversionStep)
-        self.addStepSection(ConsumptionStep)
-        self.addStepSection(LicenseStep)
-        self.addStepSection(SummaryStep)
+        self.addStepSection(ScenarioStep)
+
+    def setScenario(self, scenario):
+        """Sets the current scenario of the wizard.
+        Normally called by ScenarioStep to tell the wizard the current scenario
+        just after creating it.
+        @param scenario: the scenario of the wizard
+        @type scenario: a L{flumotion.wizard.scenarios.Scenario} subclass
+        """
+        scenario.setExistingComponentNames(self._existingComponentNames)
+        self._scenario = scenario
+
+    def getScenario(self):
+        """Fetches the currently set scenario of the wizard.
+        @returns scenario: the scenario of the wizard
+        @rtype: a L{flumotion.wizard.scenarios.Scenario} subclass
+        """
+        return self._scenario
 
     def setWorkerHeavenState(self, workerHeavenState):
         """
@@ -199,65 +217,6 @@ class ConfigurationWizard(SectionWizard):
         @type adminModel: L{AdminModel}
         """
         self._adminModel = adminModel
-        
-    def save(self):
-        """Save the content of the wizard
-        Can be overridden in a subclass
-        @returns: wizard saver
-        @rtype: L{WizardSaver}
-        """
-        saver = WizardSaver()
-        saver.setFlowName(self._flowName)
-        saver.setExistingComponentNames(self._existingComponentNames)
-
-        productionStep = None
-        if self.hasStep('Production'):
-            productionStep = self.getStep('Production')
-
-        if productionStep and productionStep.hasOnDemand():
-            ondemandStep = self.getStep('Demand')
-            consumer = ondemandStep.getServerConsumer()
-            saver.addServerConsumer(consumer, 'ondemand')
-            return saver
-
-        saver.setAudioProducer(self.getAudioProducer())
-        saver.setVideoProducer(self.getVideoProducer())
-
-        if productionStep and productionStep.hasVideo():
-            if self.hasStep('Overlay'):
-                overlayStep = self.getStep('Overlay')
-                saver.setVideoOverlay(overlayStep.getOverlay())
-
-        encodingStep = self.getStep('Encoding')
-        saver.setAudioEncoder(encodingStep.getAudioEncoder())
-        saver.setVideoEncoder(encodingStep.getVideoEncoder())
-        saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
-        
-        consumptionStep = self.getStep('Consumption')
-        httpPorter = consumptionStep.getHTTPPorter()
-        existingPorter = self._httpPorter
-        if existingPorter is None:
-            self.setHTTPPorter(httpPorter)
-        elif existingPorter.properties.port == httpPorter.properties.port:
-            httpPorter = existingPorter
-            assert httpPorter.exists, httpPorter
-        saver.addPorter(httpPorter, 'http')
-
-        for step in self._getConsumptionSteps():
-            consumerType = step.getConsumerType()
-            consumer = step.getConsumerModel()
-            consumer.setPorter(httpPorter)
-            saver.addConsumer(consumer, consumerType)
-
-            for server in step.getServerConsumers():
-                saver.addServerConsumer(server, consumerType)
-
-        if self.hasStep('ContentLicense'):
-            licenseStep = self.getStep('ContentLicense')
-            if licenseStep.getLicenseType() == 'CC':
-                saver.setUseCCLicense(True)
-
-        return saver
 
     def waitForTask(self, taskName):
         """Instruct the wizard that we're waiting for a task
@@ -297,6 +256,7 @@ class ConfigurationWizard(SectionWizard):
         """
         return bool(self._tasks)
 
+    # FIXME: Move to scenario
     def hasAudio(self):
         """If the configured feed has a audio stream
         @return: if we have audio
@@ -338,6 +298,9 @@ class ConfigurationWizard(SectionWizard):
         """
         self._httpPorter = httpPorter
 
+    def getHTTPPorter(self):
+        return self._httpPorter
+    
     def checkElements(self, workerName, *elementNames):
         """Check if the given list of GStreamer elements exist on the
         given worker.
@@ -616,15 +579,6 @@ class ConfigurationWizard(SectionWizard):
         self._stepWorkers[step] = workerName
 
     # Private
-
-    def _getConsumptionSteps(self):
-        """Fetches the consumption steps chosen by the user
-        @returns: consumption steps
-        @rtype: generator of a L{ConsumerStep} instances
-        """
-        for step in self.getVisitedSteps():
-            if isinstance(step, ConsumerStep):
-                yield step
 
     def _gotEntryPoint(self, (filename, procname)):
         # The manager always returns / as a path separator, replace them with

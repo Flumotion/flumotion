@@ -125,7 +125,10 @@ class SidebarSection(gtk.VBox):
 
     def pop_header(self):
         assert not self.buttons
-        assert self.title.sensitive
+        # FIXME: This breaks when calling sidebar.remove_section(),
+        #        remove_section will have to update self._active or
+        #        preferably just rewrite the whole BEEP thing
+        #assert self.title.sensitive
         self.title.set_sensitive(False)
 
     def push_step(self, step_name, step_title):
@@ -154,6 +157,7 @@ class WizardSidebar(gtk.EventBox):
         self._active = -1
         self._top = -1
         self._sections = []
+        self._sectionsByName = {}
 
         self.set_size_request(160, -1)
         self.vbox = gtk.VBox()
@@ -165,6 +169,10 @@ class WizardSidebar(gtk.EventBox):
     # Public API
 
     def append_section(self, title, name):
+        """Adds a new section to the sidebar
+        @param title: title of the section
+        @param name: name of the section
+        """
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
@@ -174,6 +182,15 @@ class WizardSidebar(gtk.EventBox):
         section.set_active(False)
         self.vbox.pack_start(section, False, False)
         self._sections.append(section)
+        self._sectionsByName[name] = section
+        
+    def remove_section(self, name):
+        """Removes a section by name
+        @param name: name of the section
+        """
+        section = self._sectionsByName.pop(name)
+        self._sections.remove(section)
+        self.vbox.remove(section)
 
     def show_step(self, section_name):
         for i, section in enumerate(self._sections):

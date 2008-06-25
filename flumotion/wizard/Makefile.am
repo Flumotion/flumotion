@@ -17,6 +17,7 @@ flumotion_PYTHON = 		\
 	overlaystep.py 		\
 	productionsteps.py 	\
 	save.py 		\
+	scenarios.py 		\
 	shout2steps.py 		\
 	worker.py 		\
 	workerstep.py

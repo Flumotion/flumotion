@@ -25,7 +25,6 @@ import gtk
 
 from flumotion.common.errors import NoBundleError
 from flumotion.ui.wizard import WizardStep
-from flumotion.wizard.ondemandstep import OnDemandStep
 
 # Register components
 from flumotion.common import componentui
@@ -37,7 +36,7 @@ __pychecker__ = 'no-classattr no-argsused'
 N_ = _ = gettext.gettext
 
 
-class ProductionStep(WizardStep):
+class LiveProductionStep(WizardStep):
     name = 'Production'
     title = _('Production')
     section = _('Production')
@@ -51,15 +50,6 @@ class ProductionStep(WizardStep):
         WizardStep.__init__(self, wizard)
 
     # Public API
-
-    def hasOnDemand(self):
-        """Returns a boolean if on-demand will be used
-        in the stream
-
-        @returns: if on-demand was selected
-        @rtype:   bool
-        """
-        return self.on_demand.get_active()
 
     def hasAudio(self):
         """Returns if audio will be used in the stream
@@ -142,11 +132,8 @@ class ProductionStep(WizardStep):
         tips.set_tip(self.has_audio, _('If you want to stream audio'))
 
         self._populateCombos()
-        self._updateSensitivity()
 
     def getNext(self):
-        if self.hasOnDemand():
-            return OnDemandStep(self.wizard)
         if self.hasVideo():
             return self.getVideoStep()
         elif self.hasAudio():
@@ -217,11 +204,6 @@ class ProductionStep(WizardStep):
         canContinue = self.hasAudio() or self.hasVideo()
         self.wizard.blockNext(not canContinue)
 
-    def _updateSensitivity(self):
-        liveStream = self.live_stream.get_active()
-        self.live_vbox.set_sensitive(liveStream)
-        self.demand_label.set_sensitive(not liveStream)
-
     # Callbacks
 
     def on_has_video__toggled(self, button):
@@ -237,15 +219,6 @@ class ProductionStep(WizardStep):
 
     def on_audio__changed(self, button):
         self._verify()
-
-    def on_live_stream_toggled(self, radio):
-        self._updateSensitivity()
-
-    def on_live_stream_activate(self, radio):
-        self.wizard.goNext()
-
-    def on_demand_activate(self, radio):
-        self.wizard.goNext()
 
 
 class SelectProducersStep(WizardStep):
@@ -263,9 +236,6 @@ class SelectProducersStep(WizardStep):
 
     # Public API
 
-    def hasOnDemand(self):
-        return False
-    
     def hasAudio(self):
         """Returns if audio will be used in the stream
         created by the wizard.
