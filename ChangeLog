@@ -1,9 +1,15 @@
+2008-06-26  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py (AdminWindow._runWizard): Add
+	missing space in error message.
+
 2008-06-26  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* po/ca.po:
 	Updated.
 
 2008-06-26  Johan Dahlin  <johan@flumotion.com>
+
 
 	* flumotion/admin/gtk/addformatwizard.py: Update the imports
 	after the last change.

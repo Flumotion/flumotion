@@ -724,7 +724,7 @@ class AdminWindow(Loggable, GladeDelegate):
         workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
-                _('The wizard cannot be run because no workers are'
+                _('The wizard cannot be run because no workers are '
                   'logged in.'))
             return
 
