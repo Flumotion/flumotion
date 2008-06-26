@@ -122,7 +122,6 @@ MAIN_UI = """
       <menuitem action="ClearAll"/>
       <separator name="sep-manage2"/>
       <menuitem action="AddFormat"/>
-      <menuitem action="AddStreamer"/>
       <separator name="sep-manage3"/>
       <menuitem action="RunConfigurationWizard"/>
     </menu>
@@ -378,9 +377,6 @@ class AdminWindow(Loggable, GladeDelegate):
             ('AddFormat', gtk.STOCK_ADD, _('Add new encoding _format...'), None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
-            ('AddStreamer', gtk.STOCK_ADD, _('Add new s_treamer...'), None,
-             _('Add a new streamer to the current stream'),
-             self._manage_add_streamer_cb),
             ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'), None,
              _('Run the configuration wizard'),
              self._manage_run_wizard_cb),
@@ -452,8 +448,6 @@ class AdminWindow(Loggable, GladeDelegate):
         assert self._clearAllAction
         self._addFormatAction = group.get_action("AddFormat")
         assert self._addFormatAction
-        self._addStreamerAction = group.get_action("AddStreamer")
-        assert self._addStreamerAction
 
         self._trayicon = FluTrayIcon(self._window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
@@ -702,24 +696,6 @@ class AdminWindow(Loggable, GladeDelegate):
             wizardTypes=['audio-producer', 'video-producer'])
         d.addCallback(cb)  
 
-    def _runAddNewStreamerWizard(self):
-        from flumotion.admin.gtk.addstreamerwizard import AddStreamerWizard
-        addStreamerWizard = AddStreamerWizard(self._window)
-        def cb(entries):
-            entryDict = {}
-            for entry in entries:
-                entryDict.setdefault(entry.type, []).append(entry)
-
-            muxers = self._createComponentsByWizardType(
-                muxers, entryDict['muxer'])
-            print muxers
-            addStreamerWizard.setMuxers(muxers)
-            self._runWizard(addStreamerWizard)
-            
-        d = self._adminModel.getWizardEntries(
-            wizardTypes=['muxer'])
-        d.addCallback(cb)  
-
     def _runConfigurationWizard(self):
         from flumotion.wizard.configurationwizard import ConfigurationWizard
 
@@ -792,8 +768,6 @@ class AdminWindow(Loggable, GladeDelegate):
 
         hasProducer = self._hasProducerComponent()
         self._addFormatAction.set_sensitive(hasProducer)
-        hasMuxer = self._hasMuxerComponent()
-        self._addStreamerAction.set_sensitive(hasMuxer)
 
     def _updateComponents(self):
         self._componentList.clearAndRebuild(self._componentStates)
@@ -807,17 +781,6 @@ class AdminWindow(Loggable, GladeDelegate):
             #        the registry.
             name = state.get('name')
             if 'producer' in name:
-                return True
-        return False
-
-    def _hasMuxerComponent(self):
-        for state in self._componentList.getComponentStates():
-            if state is None:
-                continue
-            # FIXME: Not correct, should expose wizard state from
-            #        the registry.
-            name = state.get('name')
-            if 'muxer' in name:
                 return True
         return False
 
@@ -1423,10 +1386,7 @@ You can do remote component calls using:
 
     def _manage_add_format_cb(self, action):
         self._runAddNewFormatWizard()
-
-    def _manage_add_streamer_cb(self, action):
-        self._runAddNewStreamerWizard()
-
+        
     def _manage_run_wizard_cb(self, action):
         self._runConfigurationWizard()
 
