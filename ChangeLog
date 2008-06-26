@@ -1,3 +1,8 @@
+2008-06-26  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/addformatwizard.py: Update the imports
+	after the last change.
+
 2008-06-25  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/Makefile.am:

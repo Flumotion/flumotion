@@ -19,8 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.wizard.configurationwizard import ConfigurationWizard, \
-     ConversionStep, ConsumptionStep, SummaryStep
+from flumotion.wizard.configurationwizard import ConfigurationWizard
+from flumotion.wizard.consumptionsteps import ConsumptionStep
+from flumotion.wizard.conversionsteps import ConversionStep
+from flumotion.wizard.scenarios import SummaryStep
 from flumotion.wizard.productionsteps import SelectProducersStep
 
 
