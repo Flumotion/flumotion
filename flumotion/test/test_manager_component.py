@@ -208,6 +208,7 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                                    '127.0.0.1', 1024)], []),
                             (c3, [('default-prime', '/a/comp2:default',
                                    '127.0.0.1', 1025)], [])], c1, c4)
+        self.resetEatFeed(c2, c3)
 
         self.detach(c1)
         self.assertNoEatFeed(*all)
@@ -485,3 +486,164 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                            c1, c2, c3, c4, c7)
         self.resetEatFeed(c5, c6)
     testAttachDetachMultipleFeedersVirtual.todo = 'Arek will fix this soon.'
+
+    def testAttachDetachMultipleFeedersComplex(self):
+        # create a flow too complex to draw its diagram in ASCII...
+        c1 = fca('a', 'comp1')
+        c2 = fca('a', 'comp2',
+                 eaters={'default': [('comp1:default', 'default-prime')]},
+                 feeders=['audio', 'video'],
+                 vfeeds=[('vcomp', 'vaudio', 'audio'),
+                         ('vcomp', 'vvideo', 'video')])
+        c3 = fca('a', 'comp3')
+        c4 = fca('a', 'comp4',
+                 eaters={'default': [('comp3:default', 'default-prime')]},
+                 feeders=['audio', 'video'],
+                 vfeeds=[('vcomp', 'vaudio', 'audio'),
+                         ('vcomp', 'vvideo', 'video')])
+        c5 = fca('a', 'comp5')
+        c6 = fca('a', 'comp6',
+                 eaters={'default': [('comp5:default', 'default-prime')]})
+        c7 = fca('a', 'comp7',
+                 eaters={'default': [('vcomp:vaudio', 'default-prime')]})
+        c8 = fca('a', 'comp8',
+                 eaters={'default': [('comp7:default', 'default-prime')]})
+
+        c9 = fca('a', 'comp9',
+                 eaters={'audio': [('vcomp:vaudio', 'audio-prime')],
+                         'video': [('vcomp:vvideo', 'video-prime')]})
+        cA = fca('a', 'compA',
+                 eaters={'default': [('comp9:default', 'default-prime')]})
+
+        cB = fca('a', 'compB',
+                 eaters={'audio': [('vcomp:vaudio', 'audio-prime')],
+                         'video': [('comp6:default', 'video-prime')]})
+        cC = fca('a', 'compC',
+                 eaters={'default': [('compB:default', 'default-prime')]})
+
+        all = [c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC]
+        def without(*cs):
+            ret = all[:]
+            for c in cs:
+                ret.remove(c)
+            return ret
+
+        self.assertNoEatFeed(*all)
+
+        self.attach(c1)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c2)
+        self.assertEatFeed([(c2, [('default-prime', '/a/comp1:default',
+                                   '127.0.0.1', 1024)], [])], *without(c2))
+        self.resetEatFeed(c2)
+
+        self.attach(c3)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c5)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c6)
+        self.assertEatFeed([(c6, [('default-prime', '/a/comp5:default',
+                                   '127.0.0.1', 1028)], [])], *without(c6))
+        self.resetEatFeed(c6)
+
+        self.attach(c7)
+        self.assertEatFeed([(c7, [('default-prime', '/a/comp2:audio',
+                                   '127.0.0.1', 1025)], [])], *without(c7))
+        self.resetEatFeed(c7)
+
+        self.attach(c8)
+        self.assertEatFeed([(c8, [('default-prime', '/a/comp7:default',
+                                   '127.0.0.1', 1030)], [])], *without(c8))
+        self.resetEatFeed(c8)
+
+        self.attach(c9)
+        self.assertEatFeed([(c9, [('audio-prime', '/a/comp2:audio',
+                                   '127.0.0.1', 1025),
+                                  ('video-prime', '/a/comp2:video',
+                                   '127.0.0.1', 1025)], [])], *without(c9))
+        self.resetEatFeed(c9)
+
+        self.attach(cA)
+        self.assertEatFeed([(cA, [('default-prime', '/a/comp9:default',
+                                   '127.0.0.1', 1032)], [])], *without(cA))
+        self.resetEatFeed(cA)
+
+        self.attach(cB)
+        self.assertEatFeed([(cB, [('audio-prime', '/a/comp2:audio',
+                                   '127.0.0.1', 1025),
+                                  ('video-prime', '/a/comp6:default',
+                                   '127.0.0.1', 1029)], [])], *without(cB))
+        self.resetEatFeed(cB)
+
+        # attach the second component providing vcomp:vaudio and vcomp:vvideo
+        # now that all the eaters of the virtual feeds are connected
+        self.attach(c4)
+        self.assertEatFeed([(c4, [('default-prime', '/a/comp3:default',
+                                   '127.0.0.1', 1026)], [])], *without(c4))
+        self.resetEatFeed(c4)
+
+        self.attach(cC)
+        self.assertEatFeed([(cC, [('default-prime', '/a/compB:default',
+                                   '127.0.0.1', 1034)], [])], *without(cC))
+        self.resetEatFeed(cC)
+
+        self.detach(c2)
+        self.assertEatFeed([(c7, [('default-prime', '/a/comp4:audio',
+                                   '127.0.0.1', 1027)], []),
+                            (c9, [('audio-prime', '/a/comp4:audio',
+                                   '127.0.0.1', 1027),
+                                  ('video-prime', '/a/comp4:video',
+                                   '127.0.0.1', 1027)], []),
+                            (cB, [('audio-prime', '/a/comp4:audio',
+                                   '127.0.0.1', 1027)], [])],
+                           *without(c7, c9, cB))
+        self.resetEatFeed(c7, c9, cB)
+
+        self.attach(c2)
+        self.assertEatFeed([(c2, [('default-prime', '/a/comp1:default',
+                                   '127.0.0.1', 1024)], [])], *without(c2))
+        self.resetEatFeed(c2)
+
+        self.detach(c1)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c1)
+        self.assertEatFeed([(c2, [('default-prime', '/a/comp1:default',
+                                   '127.0.0.1', 1024)], [])], *without(c2))
+        self.resetEatFeed(c2)
+
+        self.detach(c3)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c3)
+        self.assertEatFeed([(c4, [('default-prime', '/a/comp3:default',
+                                   '127.0.0.1', 1026)], [])], *without(c4))
+        self.resetEatFeed(c4)
+
+        self.detach(c6)
+        self.assertNoEatFeed(*all)
+
+        self.attach(c6)
+        self.assertEatFeed([(c6, [('default-prime', '/a/comp5:default',
+                                   '127.0.0.1', 1028)], []),
+                            (cB, [('video-prime', '/a/comp6:default',
+                                   '127.0.0.1', 1029)], [])], *without(c6, cB))
+        self.resetEatFeed(c6, cB)
+
+        self.detach(c9)
+        self.assertNoEatFeed(*all)
+
+        # FIXME: don't rely on the order of components attaching for
+        # selection of virtual feed provider?
+        self.attach(c9)
+        self.assertEatFeed([(c9, [('audio-prime', '/a/comp4:audio',
+                                   '127.0.0.1', 1027),
+                                  ('video-prime', '/a/comp4:video',
+                                   '127.0.0.1', 1027)], []),
+                            (cA, [('default-prime', '/a/comp9:default',
+                                   '127.0.0.1', 1032)], [])], *without(c9, cA))
+        self.resetEatFeed(c9, cA)
+    testAttachDetachMultipleFeedersComplex.todo = 'Arek will fix this soon.'

@@ -1,3 +1,11 @@
+2008-06-27  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/test_manager_component.py
+	(TestComponentHeaven.testAttachDetachLinear): add missing reset.
+	(TestComponentHeaven.testAttachDetachMultipleFeedersComplex): add
+	a more complex test with multiple feeders and eaters in the same
+	component.
+
 2008-06-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py
