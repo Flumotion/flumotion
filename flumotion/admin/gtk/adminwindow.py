@@ -981,15 +981,6 @@ class AdminWindow(Loggable, GladeDelegate):
             d.addErrback(errbackMultiple, self, mid)
         return d
 
-    def _componentActivate(self, states, action):
-        self.debug('action %s on components %r' % (action, states))
-        method_name = '_component_' + action
-        if hasattr(self, method_name):
-            for state in states:
-                getattr(self, method_name)(state)
-        else:
-            self.warning("No method '%s' implemented" % method_name)
-
     def _componentSelectionChanged(self, states):
         self.debug('component %s has selection', states)
 
