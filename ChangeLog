@@ -1,3 +1,9 @@
+2008-06-27  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py
+	(AdminWindow._componentDo): Change the components so they
+	actually show up in the po files
+
 2008-06-27  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/test_manager_component.py

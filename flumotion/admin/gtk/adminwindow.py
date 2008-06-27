@@ -956,11 +956,15 @@ class AdminWindow(Loggable, GladeDelegate):
             self._setStatusbarText(
                 _("Failed to %s some components.") % (action,))
             
-        # first %s is one of Stopping/Starting/Deleting
-        # second %s is a list of component names
-        f = gettext.dngettext(configure.PACKAGE,
-                              N_("%s component %s"),
-                              N_("%s components %s"), len(states))
+        f = gettext.dngettext(
+            configure.PACKAGE,
+            # first %s is one of Stopping/Starting/Deleting
+            # second %s is a component name like "audio-producer"
+            N_("%s component %s"),
+            # first %s is one of Stopping/Starting/Deleting
+            # second %s is a list of component names, like
+            # "audio-producer, video-producer"
+            N_("%s components %s"), len(states))
         statusText = f % (doing,
                           ', '.join([getComponentLabel(s) for s in states]))
         mid = self._setStatusbarText(statusText)
