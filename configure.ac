@@ -109,6 +109,11 @@ fi
 
 AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
 
+
+dnl XVFB can be used for documentation building and testing because
+dnl some things need to import gtk
+AC_CHECK_PROG(XVFB, Xvfb, yes, no)
+
 dnl check for documentation
 AC_ARG_ENABLE(docs,
               [AC_HELP_STRING([--enable-docs],
@@ -118,6 +123,9 @@ AC_ARG_ENABLE(docs,
 if test "x$enable_docs" = "xyes"; then
     AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
     if test "x$EPYDOC" = "xno"; then
+      enable_docs=no
+    fi
+    if test "x$XVFB" = "xno"; then
       enable_docs=no
     fi
 else

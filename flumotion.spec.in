@@ -44,6 +44,7 @@ BuildRequires:	python-kiwi >= %{kiwi_minver}
 
 # docs
 BuildRequires:	epydoc
+BuildRequires:  xorg-x11-server-Xvfb
 
 # sigh, libtool
 BuildRequires:  gcc-c++
