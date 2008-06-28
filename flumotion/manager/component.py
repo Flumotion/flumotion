@@ -1,8 +1,8 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_manager_manager -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_manager_component -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -521,17 +521,18 @@ class FeedMap(object, log.Loggable):
         self._dirty = True
         # NB, feedDeps is dirty. Scrub it of avatars that have logged
         # out
-        return [a for a in self.feedDeps.pop(avatar, [])
+        return [(a, f) for a, f in self.feedDeps.pop(avatar, [])
                 if a.avatarId in self.avatars]
 
-    def getFeederAvatar(self, eater, feedId):
+    def _getFeederAvatar(self, eater, feedId):
+        # FIXME: 'get' part is confusing - this methods _modifies_ structures!
         flowName = eater.getParentName()
         compName, feedName = common.parseFeedId(feedId)
         ffid = common.fullFeedId(flowName, compName, feedName)
         feeder = None
         if ffid in self.feeds:
             feeder, feedName = self.feeds[ffid][0]
-            self.feedDeps.add(feeder, eater)
+            self.feedDeps.add(feeder, (eater, ffid))
             if feeder.getFeedId(feedName) != feedId:
                 self.debug('chose %s for feed %s',
                            feeder.getFeedId(feedName), feedId)
@@ -555,7 +556,7 @@ class FeedMap(object, log.Loggable):
         for eater in self.avatars.values():
             for pairs in eater.getEaters().values():
                 for feedId, eName in pairs:
-                    feeder, fName = self.getFeederAvatar(eater, feedId)
+                    feeder, fName = self._getFeederAvatar(eater, feedId)
                     if feeder:
                         ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
                         eff.add(feeder.getFullFeedId(fName),
@@ -579,6 +580,27 @@ class FeedMap(object, log.Loggable):
                 ffid = avatar.getFullFeedId(alias)
                 if ffid in self.feedersForEaters:
                     ret.append(self.feedersForEaters[ffid])
+        return ret
+
+    def getFeedersForEater(self, avatar, ffid):
+        """Get the set of feeds that this component is eating from
+        for the given feedId.
+
+        @param avatar: the eater component
+        @type  avatar: L{ComponentAvatar}
+        @param ffid:   full feed id for which to return feeders
+        @type  ffid:   str
+        @return: a list of (eaterAlias, feederAvatar, feedName) tuples
+        @rtype:  list of (str, L{ComponentAvatar}, str)
+        """
+        self._recalc()
+        ret = []
+        for feeder, feedName in self.feeds.get(ffid, []):
+            rffid = feeder.getFullFeedId(feedName)
+            eff = self.eatersForFeeders.get(rffid, [])
+            for fName, eater, eaterName in eff:
+                if eater == avatar:
+                    ret.append((eaterName, feeder, feedName))
         return ret
 
     def getEatersForFeeders(self, avatar):
@@ -669,8 +691,11 @@ class ComponentHeaven(base.ManagerHeaven):
         assert avatar.avatarId not in self.avatars
         compsNeedingReconnect = self.feedMap.componentDetached(avatar)
         if self.vishnu.running:
-            for comp in compsNeedingReconnect:
-                self._connectEatersAndFeeders(comp)
+            self.debug('will reconnect: %r', compsNeedingReconnect)
+            # FIXME: this will need revision when we have the 'feedTo'
+            # direction working
+            for comp, ffid in compsNeedingReconnect:
+                self._connectEaters(comp, ffid)
 
     def mapNetFeed(self, fromAvatar, toAvatar):
         toHost = toAvatar.getClientAddress()
@@ -688,17 +713,17 @@ class ComponentHeaven(base.ManagerHeaven):
 
         return toHost, toPort
 
-    def _connectEatersAndFeeders(self, avatar):
-        def connect(fromComp, fromFeed, toComp, toFeed, method):
-            host, port = self.mapNetFeed(fromComp, toComp)
-            if port:
-                fullFeedId = toComp.getFullFeedId(toFeed)
-                proc = getattr(fromComp, method)
-                proc(fromFeed, fullFeedId, host, port)
-            else:
-                self.debug('postponing connection to %s: feed server '
-                           'unavailable', toComp.getFeedId(toFeed))
+    def _connectFeederToEater(self, fromComp, fromFeed, toComp, toFeed, method):
+        host, port = self.mapNetFeed(fromComp, toComp)
+        if port:
+            fullFeedId = toComp.getFullFeedId(toFeed)
+            proc = getattr(fromComp, method)
+            proc(fromFeed, fullFeedId, host, port)
+        else:
+            self.debug('postponing connection to %s: feed server '
+                       'unavailable', toComp.getFeedId(toFeed))
 
+    def _connectEatersAndFeeders(self, avatar):
         # FIXME: all connections are upstream for now
         def always(otherComp):
             return True
@@ -714,9 +739,17 @@ class ComponentHeaven(base.ManagerHeaven):
             for myFeedName, otherComp, otherFeedName in getPeers(myComp):
                 if initiate(otherComp):
                     # we initiate the connection
-                    connect(myComp, myFeedName, otherComp, otherFeedName,
-                            directMethod)
+                    self._connectFeederToEater(myComp, myFeedName, otherComp,
+                                               otherFeedName, directMethod)
                 else:
                     # make the other component initiate connection
-                    connect(otherComp, otherFeedName, myComp, myFeedName,
-                            reversedMethod)
+                    self._connectFeederToEater(otherComp, otherFeedName,
+                                               myComp, myFeedName,
+                                               reversedMethod)
+
+    def _connectEaters(self, avatar, ffid):
+        # FIXME: all connections are upstream for now
+        ffe = self.feedMap.getFeedersForEater(avatar, ffid)
+        for myFeedName, otherComp, otherFeedName in ffe:
+            self._connectFeederToEater(avatar, myFeedName, otherComp,
+                                       otherFeedName, 'eatFrom')

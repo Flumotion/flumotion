@@ -1,3 +1,13 @@
+2008-06-28  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/manager/component.py: Make ComponentHeaven not
+	reconnect components' eaters unnecesarily when it detaches
+	components. Make getFeederAvatar() private again, as it
+	should be. Split _connectEatersAndFeeders into two parts and reuse.
+
+	* flumotion/test/test_manager_component.py: Remove todo markers -
+	those tests should pass now.
+
 2008-06-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

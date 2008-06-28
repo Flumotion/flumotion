@@ -216,7 +216,6 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
         self.attach(c1)
         self.assertEatFeed([(c2, [('default-prime', '/a/comp1:default',
                                    '127.0.0.1', 1024)], [])], c1, c3, c4)
-    testAttachDetachLinear.todo = 'Arek will fix this soon.'
 
     def testAttachDetachMultipleEaters(self):
         # create 6 component flow, tee'ed at c2:
@@ -295,7 +294,6 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                                    '127.0.0.1', 1024)], [])],
                            c1, c3, c4, c5, c6)
         self.resetEatFeed(c2)
-    testAttachDetachMultipleEaters.todo = 'Arek will fix this soon.'
 
     def testAttachDetachMultipleFeedersSimple(self):
         # create 7 component flow, muxed(/switched/etc) at c5:
@@ -388,7 +386,6 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                                    '127.0.0.1', 1028)], [])],
                            c1, c2, c3, c4, c7)
         self.resetEatFeed(c5, c6)
-    testAttachDetachMultipleFeedersSimple.todo = 'Arek will fix this soon.'
 
     def testAttachDetachMultipleFeedersVirtual(self):
         # create 7 component flow, with c5 eating a virtual feed c2/c4:
@@ -485,7 +482,6 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                                    '127.0.0.1', 1028)], [])],
                            c1, c2, c3, c4, c7)
         self.resetEatFeed(c5, c6)
-    testAttachDetachMultipleFeedersVirtual.todo = 'Arek will fix this soon.'
 
     def testAttachDetachMultipleFeedersComplex(self):
         # create a flow too complex to draw its diagram in ASCII...
@@ -646,4 +642,3 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                             (cA, [('default-prime', '/a/comp9:default',
                                    '127.0.0.1', 1032)], [])], *without(c9, cA))
         self.resetEatFeed(c9, cA)
-    testAttachDetachMultipleFeedersComplex.todo = 'Arek will fix this soon.'
