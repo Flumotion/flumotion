@@ -1,6 +1,12 @@
 2008-06-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/epydoc.mk:
+	  Try and get a hopefully unique DISPLAY number by calling getpid
+	  and adding 10 (to stay out of the common 0-9 range).
+
+2008-06-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/epydoc.mk:
 	  Clean Xvfb.pid
 
 2008-06-29  Arek Korbik  <arkadini@gmail.com>
