@@ -1,3 +1,8 @@
+2008-06-29  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/extern/log/log.py (Loggable.writeMarker): Fix
+	docstring - please doc generator.
+
 2008-06-28  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/manager/component.py: Make ComponentHeaven not

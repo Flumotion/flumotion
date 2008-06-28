@@ -681,7 +681,7 @@ class Loggable:
         @type marker: str
         @param level: The log level. It can be log.WARN, log.INFO,
         log.DEBUG, log.ERROR or log.LOG.
-        @type marker: int
+        @type  level: int
         """
         logHandlers = {WARN:self.warning, INFO:self.info, DEBUG: self.debug,
                        ERROR: self.error, LOG:self.log}
