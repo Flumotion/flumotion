@@ -25,6 +25,7 @@ check-local-epydoc:
 
 clean-local-epydoc:
 	rm -rf html
+	-rm Xvfb.pid
 else
 EPYDOC_HTML =
 all-local-epydoc:
