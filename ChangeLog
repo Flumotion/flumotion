@@ -1,3 +1,8 @@
+2008-06-30  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	Don't use enum. Convert underscores to camelcase
+
 2008-06-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/epydoc.mk:

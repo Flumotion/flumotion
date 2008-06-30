@@ -24,7 +24,6 @@ import os
 
 from zope.interface import implements
 
-from flumotion.common import enum
 from flumotion.common.errors import RemoteRunFailure
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
@@ -52,10 +51,8 @@ SAMPLE_RATES = [48000,
                 16000,
                 11025,
                 8000]
-SoundcardSystem = enum.EnumClass(
-    'SoundcardSystem',
-    ['Alsa', 'OSS'],
-    element_name=['alsasrc', 'osssrc'])
+SOURCE_ELEMENTS = [(_('Alsa'), 'alsasrc'),
+                   (_('OSS'), 'osssrc')]
 
 
 class SoundcardProducer(AudioProducer):
@@ -82,14 +79,14 @@ class SoundcardStep(AudioProducerStep):
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)
-        self._block_update = False
+        self._blockUpdate = False
 
     # WizardStep
 
     def setup(self):
         # block updates, because populating a shown combobox will of course
         # trigger the callback
-        self._block_update = True
+        self._blockUpdate = True
         self.input_track.data_type = str
         self.channels.data_type = int
         self.rate.data_type = int
@@ -102,8 +99,7 @@ class SoundcardStep(AudioProducerStep):
         self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
         self.depth.prefill(BITDEPTHS)
         self.device.prefill([''])
-        self.source_element.prefill(
-            [(enum.nick, enum.element_name) for enum in SoundcardSystem])
+        self.source_element.prefill(SOURCE_ELEMENTS)
 
         self.add_proxy(self.model.properties,
                        ['input_track',
@@ -113,13 +109,13 @@ class SoundcardStep(AudioProducerStep):
                         'device',
                         'source_element'])
 
-        self._block_update = False
+        self._blockUpdate = False
 
     def workerChanged(self, worker):
         self.model.worker = worker
         self._clear_combos()
         self._update_devices()
-        self._update_inputs()
+        self._updateInputs()
 
     def getNext(self):
         return None
@@ -134,27 +130,27 @@ class SoundcardStep(AudioProducerStep):
         self.depth.set_sensitive(False)
 
     def _update_devices(self):
-        self._block_update = True
+        self._blockUpdate = True
         self.device.clear()
-        enum = self.source_element.get_selected()
-        if enum == SoundcardSystem.Alsa.element_name:
+        sourceElement = self.source_element.get_selected()
+        if sourceElement == 'alsasrc':
             self.device.prefill(ALSA_DEVICES)
-        elif enum == SoundcardSystem.OSS.element_name:
+        elif sourceElement == 'osssrc':
             self.device.prefill(OSS_DEVICES)
         else:
             raise AssertionError
-        self._block_update = False
+        self._blockUpdate = False
 
-    def _update_inputs(self):
-        if self._block_update:
+    def _updateInputs(self):
+        if self._blockUpdate:
             return
         self.wizard.waitForTask('soundcard checks')
 
         device = self.device.get_selected()
-        element_name = self.source_element.get_selected()
+        elementName = self.source_element.get_selected()
         channels = self.channels.get_selected() or 2
         assert device
-        assert element_name
+        assert elementName
         assert channels
         msg = Info(T_(
             N_("Probing soundcard, this can take a while...")),
@@ -162,7 +158,7 @@ class SoundcardStep(AudioProducerStep):
         self.wizard.add_msg(msg)
         d = self.runInWorker(
             'flumotion.worker.checks.audio', 'checkMixerTracks',
-            element_name, device, channels, id='soundcard-check')
+            elementName, device, channels, id='soundcard-check')
 
         def checkFailed(failure):
             failure.trap(RemoteRunFailure)
@@ -173,13 +169,13 @@ class SoundcardStep(AudioProducerStep):
             self.wizard.clear_msg('soundcard-check')
             self.wizard.taskFinished(False)
             self.label_devicename.set_label(deviceName)
-            self._block_update = True
+            self._blockUpdate = True
             self.channels.set_sensitive(True)
             self.rate.set_sensitive(True)
             self.depth.set_sensitive(True)
             self.input_track.prefill(tracks)
             self.input_track.set_sensitive(bool(tracks))
-            self._block_update = False
+            self._blockUpdate = False
 
         d.addCallback(soundcardCheckComplete)
         d.addErrback(checkFailed)
@@ -189,17 +185,17 @@ class SoundcardStep(AudioProducerStep):
     # Callbacks
 
     def on_source_element__changed(self, combo):
-        if not self._block_update:
+        if not self._blockUpdate:
             self._update_devices()
-            self._update_inputs()
+            self._updateInputs()
 
     def on_device__changed(self, combo):
-        self._update_inputs()
+        self._updateInputs()
 
     def on_channels__changed(self, combo):
         # FIXME: make it so that the number of channels can be changed
         # and the check gets executed with the new number
-        # self.update_inputs()
+        # self.updateInputs()
         pass
 
 
