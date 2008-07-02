@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""creating links to online/installed documentation
+"""creating links to online/installed documentation.
 Integration with online and installed documentation for messages.
 """
 
