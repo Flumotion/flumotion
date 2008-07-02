@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -23,14 +23,31 @@ import datetime
 import os
 from xml.dom import minidom, Node
 
+from flumotion.common import log, common
+from flumotion.common.connection import PBConnectionInfo, parsePBConnectionInfo
+from flumotion.common.errors import OptionError
 from flumotion.configure import configure
-from flumotion.common import connection, errors, log, common
-from flumotion.twisted import pb as fpb
+from flumotion.twisted.pb import Authenticator
 
 __version__ = "$Rev$"
 
 
 class RecentConnection(object):
+    """
+    I am an object representing a recent connection.
+    You can access some of my state and update the timestamp
+    (eg, when I was last connected to) by calling L{updateTimestamp}.
+    @ivar name: name of the recent connection usually host:port
+    @type name: string
+    @ivar host: hostname
+    @type host: string
+    @ivar filename: filename of the connection
+    @type filename: string
+    @ivar info: connection info
+    @type file: L{PBConnectionInfo}
+    @ivar timestamp: timestamp
+    @type timestamp: datetime.datetime
+    """
     def __init__(self, host, filename, info):
         self.name = str(info)
         self.host = host
@@ -43,8 +60,13 @@ class RecentConnection(object):
         os.utime(self.filename, None)
 
 
-def get_recent_connections():
-    def parse_connection(f):
+def getRecentConnections():
+    """
+    Fetches a list of recently used connections
+    @returns: recently used connections
+    @rtype: list of L{RecentConnection}
+    """
+    def _parseConnection(f):
         tree = minidom.parse(f)
         state = {}
         for n in [x for x in tree.documentElement.childNodes
@@ -53,11 +75,11 @@ def get_recent_connections():
             state[n.nodeName] = n.childNodes[0].wholeText
         state['port'] = int(state['port'])
         state['use_insecure'] = (state['use_insecure'] != '0')
-        authenticator = fpb.Authenticator(username=state['user'],
-                                          password=state['passwd'])
-        return connection.PBConnectionInfo(state['host'], state['port'],
-                                           not state['use_insecure'],
-                                           authenticator)
+        authenticator = Authenticator(username=state['user'],
+                                      password=state['passwd'])
+        return PBConnectionInfo(state['host'], state['port'],
+                                not state['use_insecure'],
+                                authenticator)
 
     try:
         # DSU, or as perl folks call it, a Schwartz Transform
@@ -76,7 +98,7 @@ def get_recent_connections():
     ret = []
     for f in [x[1] for x in files]:
         try:
-            state = parse_connection(f)
+            state = _parseConnection(f)
             ret.append(RecentConnection(str(state),
                                         filename=f,
                                         info=state))
@@ -84,24 +106,32 @@ def get_recent_connections():
             log.warning('connections', 'Error parsing %s: %r', f, e)
     return ret
 
-def parsePBConnectionInfo(managerString, use_ssl=True,
-                          defaultPort=configure.defaultSSLManagerPort):
+def parsePBConnectionInfoRecent(managerString, use_ssl=True,
+                                defaultPort=configure.defaultSSLManagerPort):
     """The same as L{flumotion.common.connection.parsePBConnectionInfo},
     but fills in missing information from the recent connections cache
     if possible.
+    @param managerString: manager string we should connect to
+    @type managerString: string
+    @param use_ssl: True if we should use ssl
+    @type use_ssl: bool
+    @param defaultPort: default port to use
+    @type defaultPort: int
+    @returns: connection info
+    @rtype: a L{PBConnectionInfo}
     """
-    recent = get_recent_connections()
+    recent = getRecentConnections()
     if not managerString:
         if recent:
             return recent[0].info
         else:
-            raise errors.OptionError('No string given and no recent '
-                                     'connections to use')
+            raise OptionError('No string given and no recent '
+                              'connections to use')
 
-    info = connection.parsePBConnectionInfo(managerString, username=None,
-                                            password=None,
-                                            port=defaultPort,
-                                            use_ssl=use_ssl)
+    info = parsePBConnectionInfo(managerString, username=None,
+                                 password=None,
+                                 port=defaultPort,
+                                 use_ssl=use_ssl)
 
     def compatible(i1, i2):
         if i1.port and i1.port != i2.port:
@@ -129,9 +159,9 @@ def parsePBConnectionInfo(managerString, use_ssl=True,
                 info.authenticator.password = recent.authenticator.password
                 break
     if not (info.authenticator.username and info.authenticator.password):
-        raise errors.OptionError('You are connecting to %s for the '
-                                 'first time; please specify a user and '
-                                 'password (e.g. user:test@%s).'
-                                 % (managerString, managerString))
+        raise OptionError('You are connecting to %s for the '
+                          'first time; please specify a user and '
+                          'password (e.g. user:test@%s).'
+                          % (managerString, managerString))
     else:
         return info

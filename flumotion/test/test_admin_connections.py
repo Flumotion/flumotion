@@ -21,15 +21,13 @@
 
 from flumotion.common import testsuite
 
-from flumotion.admin.connections import get_recent_connections, \
+from flumotion.admin.connections import getRecentConnections, \
      RecentConnection
-
-
 
 
 class AdminConnectiontionsTest(testsuite.TestCase):
     def testGetRecentConnections(self):
-        recent = get_recent_connections()
+        recent = getRecentConnections()
         if not recent:
             return
         assert isinstance(recent[0], RecentConnection)

@@ -1,3 +1,18 @@
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/command/main.py:
+	* flumotion/admin/connections.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/admin/rrdmon/config.py:
+	* flumotion/admin/text/greeter.py:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/test/test_admin_connections.py:
+	Rename get_recent_connections to getRecentConnections.
+	Rename parsePBConnectionInfo to parsePBConnectionRecent.
+	Update callsites and their import statements to be consistent
+
 2008-06-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/soundcard/wizard_gtk.py:

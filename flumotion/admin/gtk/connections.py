@@ -25,7 +25,7 @@ import gettext
 import gobject
 import gtk
 from kiwi.ui.objectlist import ObjectList, Column
-from flumotion.admin import connections
+from flumotion.admin.connections import getRecentConnections
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -53,7 +53,7 @@ class Connections(GladeWidget):
                    ]
         self._connections = ObjectList(
             columns,
-            objects=connections.get_recent_connections(),
+            objects=getRecentConnections(),
             mode=gtk.SELECTION_SINGLE)
         self._connections.connect(
             'row-activated',

@@ -80,7 +80,8 @@ their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.
 
 import os
 
-from flumotion.common import common, connection
+from flumotion.common import common
+from flumotion.common.connection import parsePBConnectionInfo
 from flumotion.common.errors import ConfigError
 from flumotion.common.fxml import Parser
 
@@ -150,7 +151,7 @@ class ConfigParser(Parser):
         table = {}
 
         basicOptions = (('manager', True,
-                         connection.parsePBConnectionInfo, None),
+                         parsePBConnectionInfo, None),
                         ('component-id', True, str, None),
                         ('ui-state-key', True, str, None),
                         ('sample-frequency', False, int, 300),

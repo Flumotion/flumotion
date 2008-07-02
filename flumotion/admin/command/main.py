@@ -25,7 +25,7 @@ import re
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin import connections
+from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.common import log, errors
 # make Message proxyable
 from flumotion.common import messages
@@ -164,8 +164,8 @@ def main(args):
     if options.usage or not args[1:]:
         usage(args)
 
-    connection = connections.parsePBConnectionInfo(options.manager,
-                                                   not options.no_ssl)
+    connection = parsePBConnectionInfoRecent(options.manager,
+                                             not options.no_ssl)
 
     command = parse_commands(args)
     quit = lambda: reactor.callLater(0, reactor.stop)

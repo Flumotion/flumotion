@@ -73,7 +73,7 @@ from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.connections import get_recent_connections
+from flumotion.admin.connections import getRecentConnections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
@@ -566,7 +566,7 @@ class AdminWindow(Loggable, GladeDelegate):
             self._uimgr.ensure_update()
 
         ui = ""
-        for conn in get_recent_connections()[:MAX_RECENT_ITEMS]:
+        for conn in getRecentConnections()[:MAX_RECENT_ITEMS]:
             name = conn.host
             ui += '<menuitem action="%s"/>' % name
             action = gtk.Action(name, name,

@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
 import sys
 
 import gettext
@@ -27,10 +26,9 @@ import gettext
 from twisted.internet import reactor
 from twisted.python import log as twistedlog
 
-from flumotion.admin import connections
-from flumotion.common import log, connection, i18n
+from flumotion.admin.connections import parsePBConnectionInfoRecent
+from flumotion.common import log, i18n
 from flumotion.common.errors import ConnectionRefusedError, OptionError
-from flumotion.configure import configure
 from flumotion.common.options import OptionParser
 
 _ = gettext.gettext
@@ -41,8 +39,7 @@ _retval = 0
 
 def _connectToManager(win, manager, ssl):
     try:
-        info = connections.parsePBConnectionInfo(manager,
-                                                 use_ssl=ssl)
+        info = parsePBConnectionInfoRecent(manager, use_ssl=ssl)
     except OptionError, e:
         raise SystemExit("ERROR: %s" % (e,))
 

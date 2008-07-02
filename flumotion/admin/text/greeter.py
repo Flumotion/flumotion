@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,11 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.admin import connections
-from flumotion.common import log, connection as fconnection
-from flumotion.twisted import flavors, pb as fpb
+from flumotion.admin.connections import getRecentConnections
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
+from flumotion.common.connection import PBConnectionInfo
+from flumotion.common import log
+from flumotion.twisted import flavors, pb as fpb
 
 from twisted.internet import reactor
 from zope.interface import implements
@@ -40,7 +41,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
     def __init__(self, stdscr):
         self.stdscr = stdscr
-        self.connections = connections.get_recent_connections()
+        self.connections = getRecentConnections()
         self.current_connection = 0
         self.state = 0
         self.current_input = ''
@@ -130,7 +131,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         port = int(self.inputs[2])
                     except ValueError:
                         port = 7531
-                    info = fconnection.PBConnectionInfo(self.inputs[1], port,
+                    info = PBConnectionInfo(self.inputs[1], port,
                       self.inputs[3] == 'Yes', fpb.Authenticator(
                         username=self.inputs[4], password=self.inputs[5]))
 

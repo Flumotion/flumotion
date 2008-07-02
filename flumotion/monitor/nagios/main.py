@@ -26,7 +26,8 @@ main for flumotion-nagios
 from twisted.internet import reactor, defer
 
 from flumotion.common import common, errors, planet, log
-from flumotion.admin import connections, admin
+from flumotion.admin.connections import parsePBConnectionInfoRecent
+from flumotion.admin import  admin
 
 from flumotion.monitor.nagios import util, process
 
@@ -190,8 +191,8 @@ class Manager(util.LogCommand):
 
 
     def connect(self, options):
-        connection = connections.parsePBConnectionInfo(options.manager,
-                                               options.transport == 'ssl')
+        connection = parsePBConnectionInfoRecent(options.manager,
+                                                 options.transport == 'ssl')
 
         # platform-3/trunk compatibility stuff to guard against
         # gratuitous changes
