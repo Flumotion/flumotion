@@ -1,5 +1,37 @@
 2008-07-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/command/__init__.py:
+	* flumotion/admin/command/commands.py:
+	* flumotion/admin/command/main.py:
+	* flumotion/admin/command/utils.py:
+	* flumotion/admin/connections.py:
+	* flumotion/admin/gtk/__init__.py:
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/debugmarkerview.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/admin/gtk/message.py:
+	* flumotion/admin/gtk/statusbar.py:
+	* flumotion/admin/multi.py:
+	* flumotion/admin/rrdmon/__init__.py:
+	* flumotion/admin/rrdmon/config.py:
+	* flumotion/admin/rrdmon/main.py:
+	* flumotion/admin/text/__init__.py:
+	* flumotion/admin/text/admin_text.py:
+	* flumotion/admin/text/connection.py:
+	* flumotion/admin/text/greeter.py:
+	* flumotion/admin/text/main.py:
+	* flumotion/admin/text/misc_curses.py:
+	* flumotion/admin/text/view.py:
+	Add toplevel docstrings and reorganize some imports.
+
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/admin.py:
 	Write the connection to disk before emitting the
 	connected signal

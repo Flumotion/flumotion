@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""assistant used to add new streamer format"""
+
 from flumotion.wizard.configurationwizard import ConfigurationWizard
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep

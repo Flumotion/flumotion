@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Statusbar used by the admin UI"""
+"""statusbar widget used by in admin window"""
 
 __version__ = "$Rev$"
 

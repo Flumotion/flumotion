@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""connection widgets and dialogs"""
+
 import os
 import gettext
 

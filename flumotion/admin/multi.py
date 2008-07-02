@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""admin model used to connect to multiple managers"""
+
 from twisted.internet import defer
 
 from flumotion.common import log, planet, errors, startset, watched

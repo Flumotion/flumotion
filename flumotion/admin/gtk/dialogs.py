@@ -20,6 +20,8 @@
 
 # Headers in this file shall remain intact.
 
+"""generic dialogs such as progress, error and about"""
+
 import gettext
 import os
 

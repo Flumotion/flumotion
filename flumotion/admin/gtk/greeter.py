@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Wizard run when the user first starts flumotion.
+"""greeter interface, displayed when the user first starts flumotion.
 """
 
 import gettext

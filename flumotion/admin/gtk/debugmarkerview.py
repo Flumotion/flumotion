@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""dialog to display debug markers"""
+
 import gettext
 
 import gobject

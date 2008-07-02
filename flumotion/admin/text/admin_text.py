@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""base view for displaying cursor components"""
+
 from zope.interface import implements
 
 from flumotion.common import log

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""utilities used by flumotion-command"""
+
 from flumotion.twisted.defer import defer_generator
 from flumotion.common import errors
 

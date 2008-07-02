@@ -19,17 +19,20 @@
 
 # Headers in this file shall remain intact.
 
+"""interface displayed when you first run the cursor interface"""
+
+import curses
+
+import gobject
+from twisted.internet import reactor
+from zope.interface import implements
+
 from flumotion.admin.connections import getRecentConnections
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common import log
 from flumotion.twisted import flavors, pb as fpb
-
-from twisted.internet import reactor
-from zope.interface import implements
-import gobject
-import curses
 
 __version__ = "$Rev$"
 

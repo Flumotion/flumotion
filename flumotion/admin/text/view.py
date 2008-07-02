@@ -19,11 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-import gobject
+"""main interface for the cursor admin client"""
+
+import curses
 import os
 import string
-import curses
 
+import gobject
 from twisted.internet import reactor
 from twisted.python import rebuild
 from zope.interface import implements

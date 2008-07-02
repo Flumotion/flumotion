@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Main interface for the Gtk+ Admin client
+"""admin window interface, the main interface of flumotion-admin.
 
 Here is an overview of the different parts of the admin interface::
 

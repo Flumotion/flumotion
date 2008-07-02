@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-"""
-"""
+"""flumotion-rrdmon modules and packages"""
 
 __version__ = "$Rev$"

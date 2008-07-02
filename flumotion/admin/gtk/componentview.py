@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""widget holder displaying a component specific views"""
+
 import gettext
 import os
 

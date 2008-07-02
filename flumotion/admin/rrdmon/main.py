@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""flumotion-rrdmon entry point, command line parsing and invokation"""
+
 import os
 import sys
 

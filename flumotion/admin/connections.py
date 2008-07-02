@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""recent connections"""
+
 import datetime
 import os
 from xml.dom import minidom, Node

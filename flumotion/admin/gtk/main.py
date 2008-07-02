@@ -19,9 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-import sys
+"""flumotion-admin entry point, command line parsing and invokation"""
 
 import gettext
+import sys
 
 from twisted.internet import reactor
 from twisted.python import log as twistedlog
@@ -31,10 +32,8 @@ from flumotion.common import log, i18n
 from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.common.options import OptionParser
 
-_ = gettext.gettext
-
 __version__ = "$Rev$"
-
+_ = gettext.gettext
 _retval = 0
 
 def _connectToManager(win, manager, ssl):

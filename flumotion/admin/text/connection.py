@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""connecting to a manager interface"""
+
 import curses
 
 from flumotion.admin.admin import AdminModel

@@ -19,18 +19,19 @@
 
 # Headers in this file shall remain intact.
 
-import sys
+"""flumotion-command entry point, command line parsing and invokation"""
+
 import re
+import sys
 
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
+from flumotion.admin.command.commands import commands
 from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.common import log, errors
 # make Message proxyable
 from flumotion.common import messages
-
-from flumotion.admin.command.commands import commands
 from flumotion.common.options import OptionParser
 
 __version__ = "$Rev$"

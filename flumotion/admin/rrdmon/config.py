@@ -21,7 +21,7 @@
 
 
 """
-RRD monitor configuration
+RRD monitor configuration parser.
 
 The format of the configuration file is as follows. *, +, and ? have
 their normal meanings: 0 or more, 1 or more, and 0 or 1, respectively.

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""flumotion-admin-text entry point, command line parsing and invokation"""
+
 import curses
 
 from twisted.internet import reactor

@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
+"""widget to display a list of components.
 This file contains a collection of widgets used to compose the list
 of components used in the administration interface.
 It contains:

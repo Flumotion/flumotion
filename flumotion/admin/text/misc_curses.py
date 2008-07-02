@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""utilties and misc code used by the cursor interface"""
+
 __version__ = "$Rev$"
 
 

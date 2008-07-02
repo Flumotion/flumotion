@@ -19,4 +19,6 @@
 
 # Headers in this file shall remain intact.
 
+"""flumotion-admin modules and packages"""
+
 __version__ = "$Rev$"

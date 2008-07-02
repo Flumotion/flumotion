@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""a view display messages containing warnings, errors and information."""
+
 import gettext
 import os
 import time

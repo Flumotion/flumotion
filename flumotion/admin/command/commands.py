@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+"""command registry and command implementations"""
+
 import os
 
 from twisted.internet import defer
