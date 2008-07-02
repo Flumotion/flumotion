@@ -1,5 +1,52 @@
 2008-07-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/avltree.py:
+	* flumotion/common/boot.py:
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/common.py:
+	* flumotion/common/componentui.py:
+	* flumotion/common/config.py:
+	* flumotion/common/connection.py:
+	* flumotion/common/dag.py:
+	* flumotion/common/debug.py:
+	* flumotion/common/documentation.py:
+	* flumotion/common/enum.py:
+	* flumotion/common/errors.py:
+	* flumotion/common/fraction.py:
+	* flumotion/common/fxml.py:
+	* flumotion/common/gstreamer.py:
+	* flumotion/common/i18n.py:
+	* flumotion/common/identity.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/log.py:
+	* flumotion/common/managerspawner.py:
+	* flumotion/common/manhole.py:
+	* flumotion/common/medium.py:
+	* flumotion/common/messages.py:
+	* flumotion/common/mimetypes.py:
+	* flumotion/common/netutils.py:
+	* flumotion/common/options.py:
+	* flumotion/common/package.py:
+	* flumotion/common/planet.py:
+	* flumotion/common/process.py:
+	* flumotion/common/pygobject.py:
+	* flumotion/common/reflectcall.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/reload.py:
+	* flumotion/common/server.py:
+	* flumotion/common/setup.py:
+	* flumotion/common/signals.py:
+	* flumotion/common/startset.py:
+	* flumotion/common/testsuite.py:
+	* flumotion/common/watched.py:
+	* flumotion/common/worker.py:
+	* flumotion/common/xmlwriter.py:
+	Update docstrings and reorganize imports, add
+	whitespace and some FIXME/notices.
+
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/command/__init__.py:
 	* flumotion/admin/command/commands.py:
 	* flumotion/admin/command/main.py:

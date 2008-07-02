@@ -23,6 +23,16 @@
 small common functions used by all processes
 """
 
+#
+# FIXME: Everything here should be removed and be placed in
+# modules which have more meaningful names.
+#
+# *********************************************************
+# DO NOT ADD NEW SYMBOLS HERE, ADD THEM TO OTHER MODULES OR
+# CREATE NEW ONES INSTEAD
+# *********************************************************
+#
+
 import os
 import time
 
@@ -485,3 +495,10 @@ def strftime(format, t):
     if percent:
         out.append('%')
     return ''.join(out)
+
+#
+# *********************************************************
+# DO NOT ADD NEW SYMBOLS HERE, ADD THEM TO OTHER MODULES OR
+# CREATE NEW ONES INSTEAD
+# *********************************************************
+#

@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-GStreamer helper functionality
+"""gstreamer helpers
 """
 
 from twisted.internet import defer

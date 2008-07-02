@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Server functionality.
+"""helper classes for creating a twisted server
 """
 
 import os
@@ -53,6 +52,7 @@ class _ServerContextFactory(log.Loggable):
             self.warning('SSL error: %r' % e.args)
             self.error('Could not open certificate %s' % self._pemFile)
         return ctx
+
 
 class IServable(Interface):
     """

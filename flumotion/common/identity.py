@@ -19,8 +19,9 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Manager-side identities of objects that can request operations from the manager.
+"""manager-side identities of objects.
+Manager-side identities of objects that can request operations
+from the manager.
 """
 
 __version__ = "$Rev$"
@@ -43,6 +44,7 @@ class Identity:
     def __str__(self):
         raise NotImplementedError
 
+
 class LocalIdentity(Identity):
     """
     I represent a local identity.
@@ -52,6 +54,7 @@ class LocalIdentity(Identity):
 
     def __str__(self):
         return "<%s>" % self.name
+
 
 class RemoteIdentity(Identity):
     """

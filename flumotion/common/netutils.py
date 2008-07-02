@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Miscellaneous network functions for use in flumotion.
+"""miscellaneous network functions.
 """
 
 import array

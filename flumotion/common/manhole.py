@@ -19,18 +19,20 @@
 
 # Headers in this file shall remain intact.
 
-import os
+"""opening a telnet or ssh manhole
+"""
+
 import base64
 import binascii
+import os
 
 from twisted.conch import error, manhole
 from twisted.conch.insults import insults
 from twisted.conch.ssh import keys
-from twisted.cred import credentials
+from twisted.cred import credentials, portal
 from twisted.cred.checkers import ICredentialsChecker
 from twisted.cred.error import UnauthorizedLogin
 from twisted.internet import defer, reactor
-from twisted.cred import portal
 from twisted.python import failure
 from zope import interface
 

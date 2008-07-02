@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Enum class implementation
+"""simple enum and implementation
 """
 
 from twisted.python.reflect import qual

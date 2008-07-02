@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2006 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Common routines to parsing XML.
+"""xml parsing routines
 
 Flumotion deals with two basic kinds of XML: config and registry. They
 correspond to data and schema, more or less. This file defines some base
@@ -28,7 +27,6 @@ parsing routines shared between both kinds of XML.
 """
 
 import sets
-
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
@@ -60,6 +58,7 @@ class ParserError(Exception):
 
     args[0]: str
     """
+
 
 class Parser(log.Loggable):
     """

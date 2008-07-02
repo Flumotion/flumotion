@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
+"""serializable translatable messages.
 support for serializable translatable messages from component/manager to admin
 """
 

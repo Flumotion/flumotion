@@ -16,14 +16,13 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Debugging helper code
+"""debugging helper code
 """
 
-import gc
-import sys
-import re
 import linecache
+import gc
+import re
+import sys
 import types
 
 from twisted.python.reflect import filenameToModuleName

@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Flumotion interfaces
+"""interfaces used by flumotion
 """
 
 from zope.interface import Interface

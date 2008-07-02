@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+"""xml serializer and component comparison
+"""
+
 from cStringIO import StringIO
 from xml.sax.saxutils import quoteattr
 

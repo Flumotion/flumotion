@@ -19,14 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-"""
-objects and functions used in dealing with packages
+"""objects and functions used in dealing with packages
 """
 
 import ihooks
+import glob
 import os
 import sys
-import glob
 
 from twisted.python import rebuild, reflect
 

@@ -19,12 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-"""
-This module provides utility functions for Flumotion.
+"""reloading of code
 """
 
 import sys
+
 from twisted.python.rebuild import rebuild
+
 from flumotion.common import log
 
 __version__ = "$Rev$"

@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Contains the base class for PB client-side mediums.
+"""base classes for PB client-side mediums.
 """
 
 import time
@@ -229,6 +228,7 @@ class BaseMedium(fpb.Referenceable):
         d = self.getBundledFunction(module, function)
         d.addCallback(gotFunction)
         return d
+
 
 class PingingMedium(BaseMedium):
     _pingInterval = configure.heartbeatInterval

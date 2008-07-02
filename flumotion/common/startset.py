@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-a data structure to manage asynchronous avatar starts and shutdowns
+"""a data structure to manage asynchronous avatar starts and shutdowns
 """
 
 from twisted.internet import defer

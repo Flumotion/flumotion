@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-getting coherent errors when calling procedures in named modules
+"""getting coherent errors when calling procedures in named modules
 """
 
 from twisted.python import reflect

@@ -19,9 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Serializable objects from worker through manager to admin for
-planet, flow, job and component.
+"""serializable objects from worker through manager to admin.
+Used by planet, flow, job and component.
 """
 
 from twisted.spread import pb

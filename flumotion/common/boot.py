@@ -19,8 +19,11 @@
 
 # Headers in this file shall remain intact.
 
+"""boostrapping functions for flumotion"""
+
 import os
 import sys
+
 from flumotion.common.log import safeprintf
 
 __version__ = "$Rev$"

@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
+"""self-balancing binary search tree.
 A pure python functional-style self-balancing binary search tree
 implementation, with an object-oriented wrapper. Useful for maintaining
 sorted sets, traversing sets in order, and closest-match lookups.

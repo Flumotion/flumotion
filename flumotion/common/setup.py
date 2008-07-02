@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Code related to setup and used as part of the bootstrapping of binaries.
+"""initalizing logging and package paths.
 """
 
 __version__ = "$Rev$"

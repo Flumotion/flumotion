@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Utilities for interacting with processes"""
+"""utilities for interacting with processes"""
 
 import errno
 import os

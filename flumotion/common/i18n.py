@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Helper functions and classes for internationalization (i18n)
+"""internationalization helpers
 """
 
 import os

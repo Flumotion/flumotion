@@ -16,8 +16,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Abstractions for dealing with PB connections.
+"""helpers for dealing with Twisted PB connections.
 """
 
 import re
@@ -55,6 +54,7 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
             return '%s:%d' % (self.host, self.port)
 
 pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
+
 
 _pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
 def parsePBConnectionInfo(string, username='user', password='test',

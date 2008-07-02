@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+"""testsuite base classes and helpers for diffing strings
+"""
+
 from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.trial import unittest

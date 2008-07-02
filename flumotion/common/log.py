@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Flumotion logging
+"""logging used by Flumotion, inspired by GStreamer
 
 Just like in GStreamer, five levels of log information are defined.
 These are, in order of decreasing verbosity: log, debug, info, warning, error.

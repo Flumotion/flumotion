@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Spawn a local manager and worker"""
+"""spawn a local manager and worker"""
 
 import gettext
 import os

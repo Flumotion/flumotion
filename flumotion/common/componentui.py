@@ -19,6 +19,14 @@
 
 # Headers in this file shall remain intact.
 
+"""jelliers for State shared between worker, manager and admin
+"""
+
+# FIXME: Users of this module relies heavily on side effects,
+#        this should be addressed so they have to call a function
+#        to register the unjelliers, imports should have as few
+#        side effects as possible
+
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
@@ -31,14 +39,17 @@ __version__ = "$Rev$"
 class WorkerComponentUIState(flavors.StateCacheable):
     pass
 
+
 class ManagerComponentUIState(flavors.StateCacheable, flavors.StateRemoteCache):
     def processUniqueID(self):
         # Make sure proxies for the same object are the same, if we are
         # later cached by someone else. See bug #519.
         return id(self.__dict__)
 
+
 class AdminComponentUIState(flavors.StateRemoteCache):
     pass
+
 
 pb.setUnjellyableForClass(WorkerComponentUIState, ManagerComponentUIState)
 pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
@@ -60,6 +71,7 @@ class WizardEntryState(pb.RemoteCopy):
         return [format.media_type for format in self.provides]
 
 pb.setUnjellyableForClass(registry.RegistryEntryWizard, WizardEntryState)
+
 
 class WizardEntryFormatState(pb.RemoteCopy):
     pass

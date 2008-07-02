@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
+"""directed acyclic graph implementation.
 Directed Acyclic Graph class and functionality
 """
 from flumotion.common import log

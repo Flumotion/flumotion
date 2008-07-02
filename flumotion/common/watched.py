@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+"""abstract data types with built-in notification support
+"""
+
 __version__ = "$Rev$"
 
 def _make_watched(type, *mutators):

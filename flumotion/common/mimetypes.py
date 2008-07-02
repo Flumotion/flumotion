@@ -19,20 +19,11 @@
 
 # Headers in this file shall remain intact.
 
-import subprocess
+"""convert mimetypes or launch an application based on one"""
 
-try:
-    import gnomevfs
-except ImportError:
-    gnomevfs = None
-try:
-    from win32com.shell import shell as win32shell
-except ImportError:
-    win32shell = None
-
-ASSOCSTR_COMMAND = 1
-ASSOCSTR_EXECUTABLE = 2
-
+__version__ = "$Rev$"
+_ASSOCSTR_COMMAND = 1
+_ASSOCSTR_EXECUTABLE = 2
 _EXTENSIONS = {
     'application/ogg': 'ogg',
     'audio/mpeg': 'mp3',
@@ -60,6 +51,16 @@ def launchApplicationByUrl(url, mimeType):
     @param url: the url to display
     @param mimeType: the mime type of the content
     """
+    try:
+        import gnomevfs
+    except ImportError:
+        gnomevfs = None
+
+    try:
+        from win32com.shell import shell as win32shell
+    except ImportError:
+        win32shell = None
+        
     if gnomevfs:
         app = gnomevfs.mime_get_default_application(mimeType)
         if not app:
@@ -73,13 +74,14 @@ def launchApplicationByUrl(url, mimeType):
         if ext is None:
             return
         assoc.Init(0, '.' + ext)
-        args = assoc.GetString(0, ASSOCSTR_COMMAND)
-        executable = assoc.GetString(0, ASSOCSTR_EXECUTABLE)
+        args = assoc.GetString(0, _ASSOCSTR_COMMAND)
+        executable = assoc.GetString(0, _ASSOCSTR_EXECUTABLE)
         args = args.replace("%1", url)
         args = args.replace("%L", url)
         shell = False
     else:
         return
 
+    import subprocess
     subprocess.Popen(args, executable=executable,
                      shell=shell)

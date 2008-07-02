@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
+"""configuration parsing utilities.
 Base classes for parsing of flumotion configuration files
 """
 

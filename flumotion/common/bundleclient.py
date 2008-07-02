@@ -19,9 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Bundle fetching, caching, and importing utilities for clients using
-bundled code and data
+"""bundle interface for fetching, caching and importing
 """
 
 import os

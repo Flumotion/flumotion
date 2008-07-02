@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Functions to convert to and from fractions
+"""convert to and from fractions
 """
 
 __version__ = "$Rev$"

@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-PyGTK helper functions
+"""pygobject helper functions
 """
 
 # moving this down causes havoc when running this file directly for some reason

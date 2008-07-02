@@ -19,8 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""
-Objects related to the state of workers.
+"""objects related to the state of workers.
 """
 
 import os

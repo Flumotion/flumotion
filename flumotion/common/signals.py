@@ -19,10 +19,15 @@
 
 # Headers in this file shall remain intact.
 
+"""synchronous message passing between python objects
+"""
+
 import warnings
+
 from flumotion.common import log
 
 __version__ = "$Rev$"
+
 
 class SignalMixin(object):
     __signals__ = ()

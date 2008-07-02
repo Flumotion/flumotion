@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 """
-serializable keycards used for authentication inside Flumotion
+serializable keycards used for authentication
 """
 
 from twisted.cred import credentials as tcredentials
@@ -31,12 +31,12 @@ from flumotion.twisted import credentials
 from flumotion.common import common
 
 __version__ = "$Rev$"
-
 _statesEnum = ['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 # state enum values
 (REFUSED,
  REQUESTING,
  AUTHENTICATED) = range(3)
+
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
     """
@@ -110,6 +110,7 @@ pb.setUnjellyableForClass(KeycardGeneric, KeycardGeneric)
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt
 
+
 UCPP = credentials.UsernameCryptPasswordPlaintext
 class KeycardUACPP(Keycard, UCPP):
     """
@@ -138,6 +139,7 @@ pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 # username, address, crypt password
 #       from UsernameCryptPasswordCrypt
 
+
 UCPCC = credentials.UsernameCryptPasswordCryptChallenger
 class KeycardUACPCC(Keycard, UCPCC):
     """
@@ -162,6 +164,7 @@ class KeycardUACPCC(Keycard, UCPCC):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
+
 
 class KeycardToken(Keycard, credentials.Token):
     """
@@ -190,6 +193,7 @@ class KeycardToken(Keycard, credentials.Token):
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 
+
 USPCC = credentials.UsernameSha256PasswordCryptChallenger
 class KeycardUASPCC(Keycard, USPCC):
     """
@@ -215,6 +219,7 @@ class KeycardUASPCC(Keycard, USPCC):
 
 pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
 
+
 class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
     def __init__(self, username):
         credentials.HTTPDigestChallenger.__init__(self, username)
@@ -232,6 +237,7 @@ class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardHTTPDigest, KeycardHTTPDigest)
+
 
 # F0.8
 class HTTPDigestKeycard(KeycardHTTPDigest):
