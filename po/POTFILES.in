@@ -87,6 +87,7 @@ flumotion/common/netutils.py
 flumotion/common/options.py
 flumotion/common/package.py
 flumotion/common/planet.py
+flumotion/common/poller.py
 flumotion/common/pygobject.py
 flumotion/common/python.py
 flumotion/common/reflectcall.py

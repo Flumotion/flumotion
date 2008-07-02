@@ -38,6 +38,7 @@ from flumotion.common import componentui, common, messages
 from flumotion.common import interfaces, reflectcall, debug
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
+from flumotion.common.poller import Poller
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
@@ -353,8 +354,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Start the cpu-usage updating.
         self._lastTime = time.time()
         self._lastClock = time.clock()
-        self._cpuPoller = common.Poller(self._pollCPU, 5)
-        self._memoryPoller = common.Poller(self._pollMemory, 60)
+        self._cpuPoller = Poller(self._pollCPU, 5)
+        self._memoryPoller = Poller(self._pollMemory, 60)
 
         self._shutdownHook = None
 

@@ -19,13 +19,13 @@
 
 # Headers in this file shall remain intact.
 
-import gst
-
 import time
 
+import gst
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common
+from flumotion.common import log
+from flumotion.common.poller import Poller
 
 __version__ = "$Rev$"
 
@@ -49,12 +49,12 @@ class PadMonitor(log.Loggable):
         # w.r.t. the GIL.
         self._probe_id = {}
 
-        self.check_poller = common.Poller(self._check_timeout,
-                                          self.PAD_MONITOR_PROBE_FREQUENCY,
-                                          immediately=True)
+        self.check_poller = Poller(self._check_timeout,
+                                   self.PAD_MONITOR_PROBE_FREQUENCY,
+                                   immediately=True)
 
-        self.watch_poller = common.Poller(self._watch_timeout,
-                                          self.PAD_MONITOR_TIMEOUT)
+        self.watch_poller = Poller(self._watch_timeout,
+                                   self.PAD_MONITOR_TIMEOUT)
 
     def logMessage(self, message, *args):
         if self._first:
@@ -159,9 +159,9 @@ class EaterPadMonitor(PadMonitor):
                  reconnectEater, *args):
         PadMonitor.__init__(self, pad, name, setActive, setInactive)
 
-        self._reconnectPoller = common.Poller(lambda: reconnectEater(*args),
-                                              self.PAD_MONITOR_TIMEOUT,
-                                              start=False)
+        self._reconnectPoller = Poller(lambda: reconnectEater(*args),
+                                       self.PAD_MONITOR_TIMEOUT,
+                                       start=False)
 
     def setInactive(self):
         PadMonitor.setInactive(self)

@@ -1,5 +1,17 @@
 2008-07-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/common/poller.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/component.py:
+	* flumotion/component/padmonitor.py:
+	Move f.c.common.poller to a new file
+	called f.c.poller. Update callsites and Makefiles
+
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/common.py:
 	* flumotion/common/format.py:
 	* flumotion/component/consumers/disker/disker.py:

@@ -90,7 +90,7 @@ import time
 from twisted.internet import defer, reactor
 
 from flumotion.common import keycards, common, errors
-
+from flumotion.common.poller import Poller
 from flumotion.component.plugs import base as pbase
 from flumotion.twisted import credentials
 
@@ -123,9 +123,9 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         self._idFormat = time.strftime('%Y%m%d%H%M%S-%%d')
         self._keycards = {} # keycard id -> Keycard
 
-        self._expirer = common.Poller(self._expire,
-                                      self.KEYCARD_EXPIRE_INTERVAL,
-                                      start=False)
+        self._expirer = Poller(self._expire,
+                               self.KEYCARD_EXPIRE_INTERVAL,
+                               start=False)
 
     def typeAllowed(self, keycard):
         """
