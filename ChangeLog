@@ -1,5 +1,27 @@
 2008-07-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/admin.py:
+	Write the connection to disk before emitting the
+	connected signal
+	* flumotion/admin/connections.py:
+	add a new function hasRecentConnections and refactor
+	the rest of the code so we can reuse part of the logic
+	from getRecentConnections.
+	Simplify getRecentConnections by unwindling unnecessary
+	list comprehensions
+	* flumotion/admin/gtk/adminwindow.py:
+	Disable the Open Recent Connection menu item when
+	there are no recent connections.
+	* flumotion/admin/gtk/connections.py:
+	Disable clear/clear all buttons when there are
+	no connections
+	* flumotion/admin/gtk/greeter.py:
+	Only show the recent connection option when
+	we actually have recent connections.
+	Fixes #1046
+
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/command/main.py:
 	* flumotion/admin/connections.py:
 	* flumotion/admin/gtk/adminwindow.py:

@@ -26,6 +26,7 @@ from xml.dom import minidom, Node
 from flumotion.common import log, common
 from flumotion.common.connection import PBConnectionInfo, parsePBConnectionInfo
 from flumotion.common.errors import OptionError
+from flumotion.common.python import sorted
 from flumotion.configure import configure
 from flumotion.twisted.pb import Authenticator
 
@@ -60,19 +61,42 @@ class RecentConnection(object):
         os.utime(self.filename, None)
 
 
+def _getRecentFilenames():
+    # DSU, or as perl folks call it, a Schwartz Transform
+    common.ensureDir(configure.registrydir, "registry dir")
+
+    for filename in os.listdir(configure.registrydir):
+        filename = os.path.join(configure.registrydir, filename)
+        if filename.endswith('.connection'):
+            yield filename
+
+def hasRecentConnections():
+    """
+    Returns if we have at least one recent connection
+    @returns: if we have a recent connection
+    @rtype: bool
+    """
+    gen = _getRecentFilenames()
+    try:
+        gen.next()
+    except StopIteration:
+        return False
+
+    return True
+
 def getRecentConnections():
     """
     Fetches a list of recently used connections
     @returns: recently used connections
     @rtype: list of L{RecentConnection}
     """
-    def _parseConnection(f):
-        tree = minidom.parse(f)
+    def _parseConnection(filename):
+        tree = minidom.parse(filename)
         state = {}
-        for n in [x for x in tree.documentElement.childNodes
-                    if x.nodeType != Node.TEXT_NODE
-                       and x.nodeType != Node.COMMENT_NODE]:
-            state[n.nodeName] = n.childNodes[0].wholeText
+        for childNode in tree.documentElement.childNodes:
+            if (childNode.nodeType != Node.TEXT_NODE and
+                childNode.nodeType != Node.COMMENT_NODE):
+                state[childNode.nodeName] = childNode.childNodes[0].wholeText
         state['port'] = int(state['port'])
         state['use_insecure'] = (state['use_insecure'] != '0')
         authenticator = Authenticator(username=state['user'],
@@ -81,30 +105,18 @@ def getRecentConnections():
                                 not state['use_insecure'],
                                 authenticator)
 
-    try:
-        # DSU, or as perl folks call it, a Schwartz Transform
-        common.ensureDir(configure.registrydir, "registry dir")
-        files = os.listdir(configure.registrydir)
-        files = [os.path.join(configure.registrydir, f) for f in files]
-        files = [(os.stat(f).st_mtime, f) for f in files
-                                          if f.endswith('.connection')]
-    except OSError, e:
-        log.warning('connections', 'Error: %s: %s', e.strerror, e.filename)
-        return []
-
-    files.sort()
-    files.reverse()
-
-    ret = []
-    for f in [x[1] for x in files]:
+    recentFilenames = _getRecentFilenames()
+    recentConnections = []
+    for filename in sorted(recentFilenames, reverse=True):
         try:
-            state = _parseConnection(f)
-            ret.append(RecentConnection(str(state),
-                                        filename=f,
-                                        info=state))
+            state = _parseConnection(filename)
+            recentConnections.append(
+                RecentConnection(str(state),
+                                 filename=filename,
+                                 info=state))
         except Exception, e:
-            log.warning('connections', 'Error parsing %s: %r', f, e)
-    return ret
+            log.warning('connections', 'Error parsing %s: %r', filename, e)
+    return recentConnections
 
 def parsePBConnectionInfoRecent(managerString, use_ssl=True,
                                 defaultPort=configure.defaultSSLManagerPort):

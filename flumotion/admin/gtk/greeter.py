@@ -29,6 +29,7 @@ import gobject
 import gtk
 from twisted.internet import reactor
 
+from flumotion.admin.connections import hasRecentConnections
 from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
 from flumotion.common.connection import parsePBConnectionInfo
 from flumotion.common.errors import ConnectionFailedError
@@ -67,10 +68,13 @@ class Initial(WizardStep):
             isAvailable = radio.get_name() in available_pages
             radio.set_sensitive(isAvailable)
 
-            if radio.get_active()and not radio.props.sensitive:
-                firstRadio = getattr(self, available_pages[0])
-                firstRadio.set_active(True)
-
+        hasRecent = hasRecentConnections()
+        self.load_connection.set_sensitive(hasRecent)
+        if hasRecent:
+            self.load_connection.set_active(True)
+        else:
+            self.connect_to_existing.set_active(True)
+        
         # Find which radio button should be focused:
         for radioName in available_pages:
             radio = getattr(self, radioName)

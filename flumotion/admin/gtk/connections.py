@@ -25,7 +25,8 @@ import gettext
 import gobject
 import gtk
 from kiwi.ui.objectlist import ObjectList, Column
-from flumotion.admin.connections import getRecentConnections
+from flumotion.admin.connections import getRecentConnections, \
+     hasRecentConnections
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -65,7 +66,13 @@ class Connections(GladeWidget):
         self.page.pack_start(self._connections)
         self.page.reorder_child(self._connections, 0)
         self._connections.show()
+        self._updateButtons()
 
+    def _updateButtons(self):
+        canClear = hasRecentConnections()
+        self.button_clear.set_sensitive(canClear)
+        self.button_clear_all.set_sensitive(canClear)
+        
     def _clear_all(self):
         for conn in self._connections:
             os.unlink(conn.filename)
@@ -92,7 +99,9 @@ class Connections(GladeWidget):
 
     def on_button_clear_clicked(self, button):
         conn = self._connections.get_selected()
-        self._clear(conn)
+        if conn:
+            self._clear(conn)
+        self._updateButtons()
 
     def on_button_clear_all_clicked(self, button):
         self._clear_all()

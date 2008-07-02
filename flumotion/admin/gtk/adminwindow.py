@@ -73,7 +73,8 @@ from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.connections import getRecentConnections
+from flumotion.admin.connections import getRecentConnections, \
+     hasRecentConnections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
@@ -437,6 +438,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._actiongroup = group
         self._uimgr = uimgr
+        self._openRecentAction = group.get_action("OpenRecent")
         self._startComponentAction = group.get_action("StartComponent")
         self._stopComponentAction = group.get_action("StopComponent")
         self._deleteComponentAction = group.get_action("DeleteComponent")
@@ -566,7 +568,8 @@ class AdminWindow(Loggable, GladeDelegate):
             self._uimgr.ensure_update()
 
         ui = ""
-        for conn in getRecentConnections()[:MAX_RECENT_ITEMS]:
+        connections = getRecentConnections()[:MAX_RECENT_ITEMS]
+        for conn in connections:
             name = conn.host
             ui += '<menuitem action="%s"/>' % name
             action = gtk.Action(name, name,
@@ -577,7 +580,8 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._recentMenuID = self._uimgr.add_ui_from_string(
             RECENT_UI_TEMPLATE % ui)
-
+        self._openRecentAction.set_sensitive(len(connections))
+                                             
     def _quit(self):
         """Quitting the application in a controlled manner"""
         self._clearAdmin()
@@ -749,6 +753,9 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel.disconnect_by_func(self._admin_update_cb)
         self._adminModel = None
 
+    def _updateConnectionActions(self):
+        self._openRecentAction.set_sensitive(hasRecentConnections())
+        
     def _updateComponentActions(self):
         canStart = self._componentList.canStart()
         canStop = self._componentList.canStop()
@@ -1079,6 +1086,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._componentView.setSingleAdmin(admin)
 
         self._setPlanetState(admin.planet)
+        self._updateConnectionActions()
         self._updateComponentActions()
 
         if not self._componentStates and not self._configurationWizardIsRunning:
@@ -1147,8 +1155,10 @@ class AdminWindow(Loggable, GladeDelegate):
 
         def on_have_connection(d, connectionInfo):
             d.destroy()
-            self._openConnectionInternal(connectionInfo.info)
-            connectionInfo.updateTimestamp()
+            if connectionInfo:
+                self._openConnectionInternal(connectionInfo.info)
+                connectionInfo.updateTimestamp()
+            self._updateConnectionActions()
 
         d.connect('have-connection', on_have_connection)
         d.show()

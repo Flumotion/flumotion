@@ -316,6 +316,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
             self.debug('Connected to manager and retrieved all state')
             self.connected = True
+            if self._writeConnection:
+                writeConnection()
             self.emit('connected')
 
         def writeConnection():
@@ -360,8 +362,6 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         d = self.callRemote('getPlanetState')
         d.addCallback(gotPlanetState)
         d.addCallback(gotWorkerHeavenState)
-        if self._writeConnection:
-            d.addCallback(lambda _: writeConnection())
         return d
 
     ### model functions; called by UI's to send requests to manager or comp
