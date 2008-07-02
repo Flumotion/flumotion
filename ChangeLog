@@ -1,5 +1,14 @@
 2008-07-02  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/common.py:
+	* flumotion/common/format.py:
+	* flumotion/component/consumers/disker/disker.py:
+
+	Move f.c.common.strftime to f.c.format, update callsites
+	and add documentation.
+
+2008-07-02  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/avltree.py:
 	* flumotion/common/boot.py:
 	* flumotion/common/bundleclient.py:

@@ -480,22 +480,6 @@ class Poller(object, log.Loggable):
             self._dc = None
         self.running = False
 
-def strftime(format, t):
-    """A version of time.strftime that can handle unicode formats."""
-    out = []
-    percent = False
-    for c in format:
-        if percent:
-            out.append(time.strftime('%'+c, t))
-            percent = False
-        elif c == '%':
-            percent = True
-        else:
-            out.append(c)
-    if percent:
-        out.append('%')
-    return ''.join(out)
-
 #
 # *********************************************************
 # DO NOT ADD NEW SYMBOLS HERE, ADD THEM TO OTHER MODULES OR

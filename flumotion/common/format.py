@@ -127,3 +127,22 @@ def formatTimeStamp(timeOrTuple):
     """
     return time.strftime("%Y-%m-%d %H:%M %Z", timeOrTuple)
 
+
+def strftime(format, t):
+    """A version of time.strftime that can handle unicode formats.
+    @param format: format to convert, see man strftime(3)
+    @param t: time tuple as returned by time.localtime()
+    """
+    out = []
+    percent = False
+    for c in format:
+        if percent:
+            out.append(time.strftime('%' + c, t))
+            percent = False
+        elif c == '%':
+            percent = True
+        else:
+            out.append(c)
+    if percent:
+        out.append('%')
+    return ''.join(out)
