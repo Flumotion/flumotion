@@ -34,7 +34,6 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
     I hold information on how to connect to a PB server somewhere. I can
     be transferred over the wire.
     """
-    __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy)
 
     def __init__(self, host, port, use_ssl, authenticator):
         self.host = host

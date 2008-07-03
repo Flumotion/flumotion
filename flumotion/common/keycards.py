@@ -23,12 +23,11 @@
 serializable keycards used for authentication
 """
 
-from twisted.cred import credentials as tcredentials
+from twisted.cred.credentials import ICredentials
 from twisted.spread import pb
 from zope.interface import implements
 
 from flumotion.twisted import credentials
-from flumotion.common import common
 
 __version__ = "$Rev$"
 _statesEnum = ['REFUSED', 'REQUESTING', 'AUTHENTICATED']
@@ -60,8 +59,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     @ivar  state:       state the keycard is in
     @type  state:       int
     """
-    implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy)
-        + (tcredentials.ICredentials,))
+    implements(ICredentials)
 
     def __init__(self):
         self.bouncerName = None
@@ -117,7 +115,6 @@ class KeycardUACPP(Keycard, UCPP):
     I am a keycard with a username, plaintext password and IP address.
     I get authenticated against a crypt password.
     """
-    implements(common.mergeImplements(Keycard, UCPP))
     def __init__(self, username, password, address):
         UCPP.__init__(self, username, password)
         Keycard.__init__(self)
@@ -146,7 +143,6 @@ class KeycardUACPCC(Keycard, UCPCC):
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a crypt password.
     """
-    implements(common.mergeImplements(Keycard, UCPCC))
     def __init__(self, username, address):
         UCPCC.__init__(self, username)
         Keycard.__init__(self)
@@ -171,7 +167,6 @@ class KeycardToken(Keycard, credentials.Token):
     I am a keycard with a token and IP address and a path (optional).
     I get authenticated by token and maybe IP address.
     """
-    implements(common.mergeImplements(Keycard,credentials.Token))
 
     def __init__(self, token, address, path=None):
         credentials.Token.__init__(self, token)
@@ -200,7 +195,6 @@ class KeycardUASPCC(Keycard, USPCC):
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a SHA-256 password.
     """
-    implements(common.mergeImplements(Keycard, USPCC))
     def __init__(self, username, address):
         USPCC.__init__(self, username)
         Keycard.__init__(self)

@@ -22,36 +22,8 @@
 import os
 import tempfile
 
-from zope.interface import implements, Interface
-
 from flumotion.common import common
 from flumotion.common import testsuite
-
-
-class I1(Interface): pass
-class I2(Interface): pass
-
-class A:
-    implements(I1)
-
-class B:
-    implements(I2)
-
-class C: pass
-
-
-class TestMergeImplements(testsuite.TestCase):
-    def testTwoImplements(self):
-        self.assertEquals(common.mergeImplements(A, B), (I1, I2))
-
-    def testFirstWithout(self):
-        self.assertEquals(common.mergeImplements(B, C), (I2,))
-
-    def testSecondWithout(self):
-        self.assertEquals(common.mergeImplements(A, C), (I1,))
-
-    def testBothWithout(self):
-        self.assertEquals(common.mergeImplements(C, C), ( ))
 
 
 class TestVersion(testsuite.TestCase):

@@ -57,23 +57,6 @@ def version(binary):
     block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
     return "\n".join(block)
 
-def mergeImplements(*classes):
-    """
-    Merge the __implements__ tuples of the given classes into one tuple.
-    """
-    allYourBase = ()
-    for clazz in classes:
-        try:
-            interfaces = [i for i in clazz.__implemented__]
-        except AttributeError:
-            # with twisted 2.0.1, we get AttributeError with a simple
-            # class C: pass
-            # which does not have C.__implemented__
-            interfaces = []
-        for interface in interfaces:
-            allYourBase += (interface,)
-    return allYourBase
-
 def ensureDir(dir, description):
     """
     Ensure the given directory exists, creating it if not.
