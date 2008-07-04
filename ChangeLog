@@ -1,5 +1,8 @@
 2008-07-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/misc/httpserver/Makefile.am (httpserver_DATA):
+	dist httpfile.glade too.
+
 	* data/glade/httpstreamer-wizard.glade:
 	Do not hard code a width of the mount point entry
 	* flumotion/wizard/httpstreamersteps.py:

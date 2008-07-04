@@ -9,7 +9,10 @@ httpserver_PYTHON =	\
 	httpserver.py		\
 	ratecontrol.py
 
-httpserver_DATA = httpserver.xml httpserver.glade
+httpserver_DATA = 		\
+	httpfile.glade		\
+	httpserver.xml 		\
+	httpserver.glade
 
 TAGS_FILES = $(httpserver_PYTHON)
 
