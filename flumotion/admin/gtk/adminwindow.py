@@ -84,7 +84,7 @@ from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
      ConnectionFailedError, BusyComponentError
-from flumotion.common.i18n import gettexter
+from flumotion.common.i18n import N_, gettexter
 from flumotion.common.log import Loggable
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.pygobject import gsignal
@@ -97,7 +97,7 @@ from flumotion.wizard.models import AudioProducer, Porter, VideoProducer
 admin # pyflakes
 
 __version__ = "$Rev$"
-N_ = _ = gettext.gettext
+_ = gettext.gettext
 T_ = gettexter()
 
 MAIN_UI = """

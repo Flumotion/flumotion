@@ -22,12 +22,12 @@
 import gettext
 
 from flumotion.common.errors import NoBundleError
+from flumotion.common.i18n import N_
 from flumotion.wizard.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
-N_ = _ = gettext.gettext
 
 _PREFERRED_VIDEO_ENCODER = "theora"
 _PREFERRED_AUDIO_ENCODER = "vorbis"

@@ -24,6 +24,7 @@ import gettext
 import gtk
 
 from flumotion.common.errors import NoBundleError
+from flumotion.common.i18n import N_
 from flumotion.ui.wizard import WizardStep
 
 # Register components
@@ -33,7 +34,6 @@ __version__ = "$Rev$"
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
-N_ = _ = gettext.gettext
 
 
 class LiveProductionStep(WizardStep):

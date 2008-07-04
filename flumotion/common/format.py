@@ -27,11 +27,11 @@ import locale
 import sys
 import time
 
+from flumotion.common.i18n import N_
 from flumotion.configure import configure
 
 _ = gettext.gettext
 __version__ = "$Rev$"
-N_ = lambda m: m
 
 
 def formatStorage(units, precision=2):
