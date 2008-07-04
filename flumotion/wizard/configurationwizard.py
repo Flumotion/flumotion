@@ -135,6 +135,7 @@ class ConfigurationWizard(SectionWizard):
         self._httpPorter = None
         self._stepWorkers = {}
         self._scenario = None
+        self._existingComponentNames = []
         
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
@@ -563,7 +564,9 @@ class ConfigurationWizard(SectionWizard):
         @type componentNames: list of strings
         """
         self._existingComponentNames = componentNames
-
+        if self._scenario is not None:
+            self._scenario.setExistingComponentNames(componentNames)
+            
     def workerChangedForStep(self, step, workerName):
         """Tell a step that its worker changed.
         @param step: step which worker changed for

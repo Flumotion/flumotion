@@ -24,7 +24,7 @@
 from flumotion.wizard.configurationwizard import ConfigurationWizard
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
-from flumotion.wizard.scenarios import SummaryStep
+from flumotion.wizard.scenarios import LiveScenario, SummaryStep
 from flumotion.wizard.productionsteps import SelectProducersStep
 
 
@@ -32,7 +32,8 @@ class AddFormatWizard(ConfigurationWizard):
     def __init__(self, parent=None):
         self._selectProducerStep = None
         ConfigurationWizard.__init__(self, parent)
-
+        self.setScenario(LiveScenario(self))
+            
     # ConfigurationWizard
     
     def addSteps(self):

@@ -1,3 +1,11 @@
+2008-07-04  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	Set a scenario for the format wizard and update the component
+	names of the scenario when the change if one is set, fixes
+	a regression in the add format wizard.
+
 2008-07-04  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/productionsteps.py:
