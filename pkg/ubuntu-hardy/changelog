@@ -1,3 +1,9 @@
+flumotion (0.5.99-0flu20080704~hardy1) hardy; urgency=low
+
+  * New snapshot
+
+ -- Johan Dahlin <johan@flumotion.com>  Fri, 04 Jul 2008 11:56:51 -0300
+
 flumotion (0.5.2-1flu1~hardy4) hardy; urgency=low
 
   * Update to SVN 2008-05-07-2
