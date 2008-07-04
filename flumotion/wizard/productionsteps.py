@@ -34,6 +34,7 @@ __version__ = "$Rev$"
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
+_ = gettext.gettext
 
 
 class LiveProductionStep(WizardStep):
