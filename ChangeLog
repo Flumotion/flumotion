@@ -5,6 +5,15 @@
 
 2008-07-03  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/common/format.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	Always import N_ instead of defining it.
+
+2008-07-03  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/common.py:
 	* flumotion/common/connection.py:
 	* flumotion/common/keycards.py:
