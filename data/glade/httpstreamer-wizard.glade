@@ -59,7 +59,6 @@
 
 		  <child>
 		    <widget class="GtkEntry" id="mount_point">
-		      <property name="width_request">100</property>
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="editable">True</property>

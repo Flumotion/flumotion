@@ -220,7 +220,9 @@ class HTTPSpecificStep(ConsumerStep):
            self.wizard.getVideoProducer())
 
     def getDefaultMountPath(self):
-        return '/%s/' % (self.getConsumerType(),)
+        encodingStep = self.wizard.getStep('Encoding')
+        return '/%s-%s/' % (str(encodingStep.getMuxerFormat()),
+                            self.getConsumerType(),)
 
     # WizardStep
 

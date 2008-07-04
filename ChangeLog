@@ -1,5 +1,11 @@
 2008-07-04  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/httpstreamer-wizard.glade:
+	Do not hard code a width of the mount point entry
+	* flumotion/wizard/httpstreamersteps.py:
+	Include the muxer format in the url, so instead of 'audio-video'
+	it's now 'ogg-audio-video', to avoid collissions, part of #995
+
 	* flumotion/admin/gtk/addformatwizard.py:
 	* flumotion/wizard/configurationwizard.py:
 	Set a scenario for the format wizard and update the component
