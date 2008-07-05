@@ -31,14 +31,13 @@ from zope.interface import implements
 
 from flumotion.common import errors, interfaces, debug
 from flumotion.common import medium
-from flumotion.twisted import pb as fpb
+from flumotion.twisted.pb import ReconnectingFPBClientFactory
 
 __version__ = "$Rev$"
 JOB_SHUTDOWN_TIMEOUT = 5
-factoryClass = fpb.ReconnectingFPBClientFactory
 
 
-class WorkerClientFactory(factoryClass):
+class WorkerClientFactory(ReconnectingFPBClientFactory):
     """
     I am a client factory for the worker to log in to the manager.
     """
@@ -55,7 +54,7 @@ class WorkerClientFactory(factoryClass):
         self._managerPort = port
         self.medium = medium
         # doing this as a class method triggers a doc error
-        factoryClass.__init__(self)
+        ReconnectingFPBClientFactory.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
 
@@ -64,7 +63,7 @@ class WorkerClientFactory(factoryClass):
         @param reason: L{twisted.spread.pb.failure.Failure}
         """
         # this method exists so that we log the failure
-        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
+        ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
         # delay is now updated
         self.debug("failed to connect, will try to reconnect in %f seconds" % self.delay)

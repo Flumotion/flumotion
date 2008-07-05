@@ -1,3 +1,8 @@
+2008-07-05  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/worker/medium.py: Fixup imports and avoid
+	an unnecessary assignment.
+
 2008-07-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/misc/httpserver/Makefile.am (httpserver_DATA):
