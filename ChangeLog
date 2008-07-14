@@ -1,5 +1,10 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/playlist/playlistparser.py:
+	  One more shadow cleanup.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/bundle.py:
 	* flumotion/common/common.py:
 	* flumotion/common/config.py:

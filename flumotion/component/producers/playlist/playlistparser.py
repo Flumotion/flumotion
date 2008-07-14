@@ -36,8 +36,8 @@ __version__ = "$Rev$"
 
 
 class PlaylistItem(object, log.Loggable):
-    def __init__(self, id, timestamp, uri, offset, duration):
-        self.id = id
+    def __init__(self, piid, timestamp, uri, offset, duration):
+        self.id = piid
         self.timestamp = timestamp
         self.uri = uri
         self.offset = offset
@@ -80,13 +80,13 @@ class Playlist(object, log.Loggable):
             item, position)
         return item
 
-    def removeItems(self, id):
+    def removeItems(self, piid):
         current = self._getCurrentItem()
 
-        if id not in self._itemsById:
+        if piid not in self._itemsById:
             return
 
-        items = self._itemsById[id]
+        items = self._itemsById[piid]
         for item in items:
             if (current and item.timestamp < current.timestamp +
                     current.duration):
@@ -95,9 +95,10 @@ class Playlist(object, log.Loggable):
             self.unlinkItem(item)
             self.producer.unscheduleItem(item)
 
-        del self._itemsById[id]
+        del self._itemsById[piid]
 
-    def addItem(self, id, timestamp, uri, offset, duration, hasAudio, hasVideo):
+    def addItem(self, piid, timestamp, uri, offset, duration,
+                hasAudio, hasVideo):
         """
         Add an item to the playlist.
 
@@ -113,14 +114,14 @@ class Playlist(object, log.Loggable):
         if current:
             self.items = current
 
-        newitem = PlaylistItem(id, timestamp, uri, offset, duration)
+        newitem = PlaylistItem(piid, timestamp, uri, offset, duration)
         newitem.hasAudio = hasAudio
         newitem.hasVideo = hasVideo
 
-        if id in self._itemsById:
-            self._itemsById[id].append(newitem)
+        if piid in self._itemsById:
+            self._itemsById[piid].append(newitem)
         else:
-            self._itemsById[id] = [newitem]
+            self._itemsById[piid] = [newitem]
 
         # prev starts strictly before the new item
         # next starts after the new item, and ends after the end of the new item
@@ -272,11 +273,13 @@ class PlaylistParser(object, log.Loggable):
         def _discoverer_done(disc, is_media):
             if is_media:
                 self.debug("Discovery complete, media found")
+                # FIXME: does item exist because it is popped below ?
+                # if so, that's ugly and non-obvious and should be fixed
                 uri = "file://" + item[0]
                 timestamp = item[1]
                 duration = item[2]
                 offset = item[3]
-                id = item[4]
+                piid = item[4]
 
                 hasA = disc.is_audio
                 hasV = disc.is_video
@@ -289,8 +292,8 @@ class PlaylistParser(object, log.Loggable):
                     offset = 0
 
                 if duration > 0:
-                    self.playlist.addItem(id, timestamp, uri, offset, duration,
-                        hasA, hasV)
+                    self.playlist.addItem(piid, timestamp, uri,
+                        offset, duration, hasA, hasV)
                 else:
                     self.warning("Duration of item is zero, not adding")
             else:
@@ -321,7 +324,7 @@ class PlaylistParser(object, log.Loggable):
         disc.connect('discovered', _discovered)
         disc.discover()
 
-    def addItemToPlaylist(self, filename, timestamp, duration, offset, id):
+    def addItemToPlaylist(self, filename, timestamp, duration, offset, piid):
         # We only want to add it if it's plausibly schedulable.
         end = timestamp
         if duration is not None:
@@ -333,7 +336,8 @@ class PlaylistParser(object, log.Loggable):
         if filename[0] != '/' and self._baseDirectory:
             filename = self._baseDirectory + filename
 
-        self._pending_items.append((filename, timestamp, duration, offset, id))
+        self._pending_items.append((filename, timestamp, duration, offset,
+            piid))
 
         # Now launch the discoverer for any pending items
         self.startDiscovery()
@@ -348,11 +352,11 @@ class PlaylistXMLParser(PlaylistParser):
         fileHandle = StringIO(data)
         self.parseFile(fileHandle)
 
-    def replaceFile(self, file, id):
-        self.playlist.removeItems(id)
-        self.parseFile(file, id)
+    def replaceFile(self, file, piid):
+        self.playlist.removeItems(piid)
+        self.parseFile(file, piid)
 
-    def parseFile(self, file, id=None):
+    def parseFile(self, file, piid=None):
         """
         Parse a playlist file. Adds the contents of the file to the existing
         playlist, overwriting any existing entries for the same time period.
@@ -372,7 +376,7 @@ class PlaylistXMLParser(PlaylistParser):
                 if child.nodeType == Node.ELEMENT_NODE and \
                         child.nodeName == 'entry':
                     self.debug("Parsing entry")
-                    self._parsePlaylistEntry(parser, child, id)
+                    self._parsePlaylistEntry(parser, child, piid)
         finally:
             self.unblockDiscovery()
 
@@ -393,7 +397,7 @@ class PlaylistXMLParser(PlaylistParser):
                 out.append(None)
         return out
 
-    def _parsePlaylistEntry(self, parser, entry, id):
+    def _parsePlaylistEntry(self, parser, entry, piid):
         mandatory = ['filename', 'time']
         optional = ['duration', 'offset']
 
@@ -411,7 +415,7 @@ class PlaylistXMLParser(PlaylistParser):
         # Assume UTF-8 filesystem.
         filename = filename.encode("UTF-8")
 
-        self.addItemToPlaylist(filename, timestamp, duration, offset, id)
+        self.addItemToPlaylist(filename, timestamp, duration, offset, piid)
 
     def _parseTimestamp(self, ts):
         # Take TS in YYYY-MM-DDThh:mm:ss.ssZ format, return timestamp in
