@@ -70,11 +70,22 @@ class IcalBouncer(bouncer.Bouncer):
         if currentEvents:
             event = currentEvents[0]
             keycard.state = keycards.AUTHENTICATED
-            duration = event.end - datetime.now()
+            now = datetime.now()
+            nowInTz = datetime(now.year, now.month, now.day,
+                                  now.hour, now.minute, now.second,
+                                  tzinfo=scheduler.LOCAL)
+            end = event.currentEnd
+            duration = end - nowInTz
             durationSecs = duration.days * 86400 + duration.seconds
             keycard.duration = durationSecs
             self.addKeycard(keycard)
-            self.info("autheticated login")
+            self.info("authenticated login")
             return keycard
         self.info("failed in authentication, outside hours")
         return None
+
+    def do_stop(self):
+        self.icalScheduler.stopWatchingIcalFile()
+        for event in self.icalScheduler.getCurrentEvents():
+            self.icalScheduler.removeEvent(event)
+

@@ -46,6 +46,7 @@ import time
 
 from flumotion.admin import multi
 from flumotion.common import log, common
+from flumotion.common.eventcalendar import LOCAL
 from flumotion.component.base import scheduler
 
 # register the unjellyable
@@ -123,7 +124,7 @@ class RRDMonitor(log.Loggable):
 
     def startScheduler(self, sources):
         r = random.Random()
-        now = scheduler.now()
+        now = datetime.datetime.now(LOCAL)
 
         def eventStarted(event):
             self.pollData(*event.content)
@@ -144,7 +145,7 @@ class RRDMonitor(log.Loggable):
                     sourceGetName(source),
                     sourceGetFileName(source))
 
-            self.scheduler.addEvent(now+offset,
+            self.scheduler.addEvent(now.isoformat(), now+offset,
                                     now+offset+datetime.timedelta(seconds=1),
                                     data,
                                     datetime.timedelta(seconds=freq))

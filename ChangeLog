@@ -1,3 +1,17 @@
+2008-07-14  Jordi Massaguer i Pla  <jordi at flumotion dot com>
+
+	* flumotion/admin/rrdmon/rrdmon.py:
+	* flumotion/common/eventcalendar.py:
+	* flumotion/component/base/scheduler.py:
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/combiners/switch/switch.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/test/test_component_base_scheduler.py:
+	* flumotion/test/test_component_base_vevent.py:
+	Extracted event and calendar code from scheduler to eventcalendar.
+	Changed implementation so it handles better recur events and exdates.
+	More tests have been added in order to have coverage.
+
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_manager_manager.py:

@@ -53,17 +53,17 @@ class ICalSwitchPlug(base.ComponentPlug):
         self.sched = None
         try:
             def eventStarted(event):
-                self.debug("event started %r", event)
+                self.debug("event started %r", event.uid)
                 component.switch_to("backup")
-            def eventStopped(event):
-                self.debug("event stopped %r", event)
+            def eventEnded(event):
+                self.debug("event ended %r", event.uid)
                 component.switch_to("master")
 
             # if an event starts, semantics are to switch to backup
-            # if an event stops, semantics are to switch to master
+            # if an event ends, semantics are to switch to master
             filename = self.args['properties']['ical-schedule']
             self.sched = scheduler.ICalScheduler(open(filename, 'r'))
-            self._sid = self.sched.subscribe(eventStarted, eventStopped)
+            self._sid = self.sched.subscribe(eventStarted, eventEnded)
             if self.sched.getCurrentEvents():
                 component.idealFeed = "backup"
         except ValueError:

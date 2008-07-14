@@ -309,10 +309,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.icalScheduler = scheduler.ICalScheduler(open(
                     icalfn, 'r'))
                 self.icalScheduler.subscribe(self.eventStarted,
-                    self.eventStopped)
+                    self.eventEnded)
                 currentEvents = self.icalScheduler.getCurrentEvents()
                 if currentEvents:
-                    self._startFilenameTemplate = currentEvents[0]
+                    self._startFilenameTemplate = currentEvents[0].content
                     self._recordAtStart = True
                 else:
                     self._recordAtStart = False
@@ -343,9 +343,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             sink.get_pad('sink').add_event_probe(self._markers_event_probe)
 
     def eventStarted(self, event):
-        self.change_filename(event.content, event.start.timetuple())
+        self.debug('starting recording of %s', event.content)
+        self.change_filename(event.content, event.currentStart.timetuple())
 
-    def eventStopped(self, event):
+    def eventEnded(self, event):
+        self.debug('ending recording of %s', event.content)
         self.stop_recording()
 
     def parse_ical(self, icsStr):
