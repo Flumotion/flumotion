@@ -98,38 +98,37 @@ class KeycardsNode(BaseAdminGtkNode):
         (model, pathlist) = treeselection.get_selected_rows()
         ids = []
         for path in pathlist:
-            iter = model.get_iter(path)
-            id = model.get_value(iter, COLUMN_ID)
-            ids.append(id)
+            model_iter = model.get_iter(path)
+            ids.append(model.get_value(model_iter, COLUMN_ID))
 
         self.debug('expiring %d keycards' % len(ids))
 
         d = defer.succeed(None)
-        for id in ids:
+        for keycard_id in ids:
             # we need to pass in i as well, to make sure we actually iterate
             # instead of adding a bunch of lambdas with the same id to expire
             d.addCallback(lambda res, i: self.callRemote('expireKeycardId', i),
-                id)
+                keycard_id)
 
         return d
 
     def _append(self, data):
-        id = data['id']
-        iter = self.model.append()
+        keycard_id = data['id']
+        model_iter = self.model.append()
         # GtkListStore garantuees validity of iter as long as row lives
-        self._iters[id] = iter
-        self.model.set_value(iter, COLUMN_ID, id)
+        self._iters[keycard_id] = model_iter
+        self.model.set_value(model_iter, COLUMN_ID, keycard_id)
 
         if 'username' in data.keys():
-            self.model.set_value(iter, COLUMN_USER, data['username'])
+            self.model.set_value(model_iter, COLUMN_USER, data['username'])
         if 'address' in data.keys():
-            self.model.set_value(iter, COLUMN_ADDRESS, data['address'])
+            self.model.set_value(model_iter, COLUMN_ADDRESS, data['address'])
 
     def _remove(self, data):
-        id = data['id']
-        iter = self._iters[id]
-        del self._iters[id]
-        self.model.remove(iter)
+        keycard_id = data['id']
+        model_iter = self._iters[keycard_id]
+        del self._iters[keycard_id]
+        self.model.remove(model_iter)
 
 class HTPasswdCryptAdminGtk(BaseAdminGtk):
     def setup(self):

@@ -258,7 +258,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             # zeroes out all value labels
             self.labels[name].set_text('')
 
-        for type in (
+        for name in (
             'eater-name', 'connected-since', 'connection-time',
             'eating-from', 'timestamp-discont-timestamp-current',
             'offset-discont-offset-current',
@@ -270,7 +270,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             'timestamp-discont-total',         'offset-discont-total',
             'connections-total',
             ):
-            set_label(type)
+            set_label(name)
 
         # handle selection changes on the tree widget
         def sel_changed(sel):

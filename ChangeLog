@@ -1,5 +1,22 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/bundle.py:
+	* flumotion/component/base/eatersnode.py:
+	* flumotion/component/base/feedersnode.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/file.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/config.py:
+	  More shadow cleanups.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/python.py:
 	  Just like we conditionally implement any, do the same for all
 	* flumotion/component/combiners/switch/switch.py:

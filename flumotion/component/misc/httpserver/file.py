@@ -166,13 +166,13 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         first = 0
         last = fileSize - 1
 
-        range = request.getHeader('range')
-        if range is not None:
+        requestRange = request.getHeader('range')
+        if requestRange is not None:
             # We have a partial data request.
             # for interpretation of range, see RFC 2068 14.36
             # examples: bytes=500-999; bytes=-500 (suffix mode; last 500)
-            self.log('range request, %r', range)
-            rangeKeyValue = string.split(range, '=')
+            self.log('range request, %r', requestRange)
+            rangeKeyValue = string.split(requestRange, '=')
             if len(rangeKeyValue) != 2:
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
                 return ''

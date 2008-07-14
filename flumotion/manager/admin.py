@@ -274,15 +274,15 @@ class AdminAvatar(base.ManagerAvatar):
 
         ensure_sane(self.vishnu.configDir, '/')
         ensure_sane(filename)
-        dir = os.path.join(self.vishnu.configDir, "flows")
-        self.debug('told to save flow as %s/%s.xml', dir, filename)
+        directory = os.path.join(self.vishnu.configDir, "flows")
+        self.debug('told to save flow as %s/%s.xml', directory, filename)
         try:
-            makedirs(dir, 0770)
+            makedirs(directory, 0770)
         except OSError, e:
             if e.errno != errno.EEXIST:
                 raise e
         prev = os.umask(0007)
-        output = open(os.path.join(dir, filename + '.xml'), 'a')
+        output = open(os.path.join(directory, filename + '.xml'), 'a')
         os.umask(prev)
         return output
 

@@ -406,7 +406,7 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
 
         attrs = self.parseAttributes(node, ('name', 'type'),
                 ('label', 'worker', 'project', 'version',))
-        name, type, label, worker, project, version = attrs
+        name, componentType, label, worker, project, version = attrs
         if needsWorker and not worker:
             raise errors.ConfigError('component %s does not specify the worker '
                               'that it is to run on' % (name,))
@@ -448,8 +448,8 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
             # map old <source> nodes to new <eater> nodes
             eaters.append((None, feedId))
 
-        return ConfigEntryComponent(name, parent, type, label, properties,
-                                    plugs, worker, eaters,
+        return ConfigEntryComponent(name, parent, componentType, label,
+                                    properties, plugs, worker, eaters,
                                     isClockMaster, project, version,
                                     virtual_feeds)
 

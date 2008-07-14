@@ -149,15 +149,15 @@ class Unbundler:
         @rtype: string
         @returns: the full path to the directory where it was unpacked
         """
-        dir = self.unbundlePath(bundle)
+        directory = self.unbundlePath(bundle)
 
         filelike = StringIO.StringIO(bundle.getZip())
-        zip = zipfile.ZipFile(filelike, "r")
-        zip.testzip()
+        zipFile = zipfile.ZipFile(filelike, "r")
+        zipFile.testzip()
 
-        filepaths = zip.namelist()
+        filepaths = zipFile.namelist()
         for filepath in filepaths:
-            path = os.path.join(dir, filepath)
+            path = os.path.join(directory, filepath)
             parent = os.path.split(path)[0]
             try:
                 makedirs(parent)
@@ -165,7 +165,7 @@ class Unbundler:
                 # Reraise error unless if it's an already existing
                 if err.errno != errno.EEXIST or not os.path.isdir(parent):
                     raise
-            data = zip.read(filepath)
+            data = zipFile.read(filepath)
 
             # atomically write to path, see #373
             fd, tempname = tempfile.mkstemp(dir=parent)
@@ -178,7 +178,7 @@ class Unbundler:
             if os.path.exists(path):
                 os.unlink(path)
             os.rename(tempname, path)
-        return dir
+        return directory
 
 class Bundler:
     """
@@ -188,7 +188,7 @@ class Bundler:
         """
         Create a new bundle.
         """
-        self._files = {} # dictionary of BundledFile's indexed on path
+        self._bundledFiles = {} # dictionary of BundledFile's indexed on path
         self.name = name
         self._bundle = Bundle(name)
 
@@ -204,7 +204,7 @@ class Bundler:
         """
         if destination == None:
             destination = os.path.split(source)[1]
-        self._files[source] = BundledFile(source, destination)
+        self._bundledFiles[source] = BundledFile(source, destination)
         return destination
 
     def bundle(self):
@@ -220,8 +220,8 @@ class Bundler:
             return self._bundle
 
         update = False
-        for file in self._files.values():
-            if file.hasChanged():
+        for bundledFile in self._bundledFiles.values():
+            if bundledFile.hasChanged():
                 update = True
                 break
 
@@ -235,7 +235,7 @@ class Bundler:
     def _buildzip(self):
         filelike = StringIO.StringIO()
         zip = zipfile.ZipFile(filelike, "w")
-        for bundledFile in self._files.values():
+        for bundledFile in self._bundledFiles.values():
             bundledFile.pack(zip)
         zip.close()
         data = filelike.getvalue()

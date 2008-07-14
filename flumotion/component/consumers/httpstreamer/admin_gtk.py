@@ -51,13 +51,13 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self._statistics = self.wtree.get_widget('main_vbox')
         self.widget = self._statistics
 
-        for type in ['uptime', 'mime', 'current-bitrate', 'bitrate',
+        for name in ['uptime', 'mime', 'current-bitrate', 'bitrate',
                      'totalbytes']:
-            self._registerLabel('stream-' + type)
-        for type in ['current', 'average', 'max', 'peak', 'peak-time']:
-            self._registerLabel('clients-' + type)
-        for type in ['bitrate', 'bitrate-current', 'totalbytes']:
-            self._registerLabel('consumption-' + type)
+            self._registerLabel('stream-' + name)
+        for name in ['current', 'average', 'max', 'peak', 'peak-time']:
+            self._registerLabel('clients-' + name)
+        for name in ['bitrate', 'bitrate-current', 'totalbytes']:
+            self._registerLabel('consumption-' + name)
 
         if self._stats:
             self._shown = True

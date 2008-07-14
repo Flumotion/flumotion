@@ -242,10 +242,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if 'issuer-class' in props:
             self.httpauth.setIssuerClass(props['issuer-class'])
         if 'ip-filter' in props:
-            filter = http.LogFilter()
+            logFilter = http.LogFilter()
             for f in props['ip-filter']:
-                filter.addIPFilter(f)
-            self._logfilter = filter
+                logFilter.addIPFilter(f)
+            self._logfilter = logFilter
 
         socket = 'flumotion.component.misc.httpserver.ratecontroller.RateController'
         plugs = self.plugs.get(socket, [])

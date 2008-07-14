@@ -244,13 +244,13 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             # zeroes out all value labels
             self.labels[name].set_text('')
 
-        for type in ('feeder-name', 'eater-name',
+        for name in ('feeder-name', 'eater-name',
                      'bytes-read-current', 'buffers-dropped-current',
                      'connected-since', 'connection-time',
                      'disconnected-since', 'disconnection-time',
                      'bytes-read-total', 'buffers-dropped-total',
                      'connections-total', 'last-activity'):
-            set_label(type)
+            set_label(name)
 
         self._table_connected = self.wtree.get_widget('table-current-connected')
         self._table_disconnected = self.wtree.get_widget(

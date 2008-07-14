@@ -508,10 +508,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.httpauth.setRequesterId(self.config['avatarId'])
 
         if properties.has_key('ip-filter'):
-            filter = http.LogFilter()
+            logFilter = http.LogFilter()
             for f in properties['ip-filter']:
-                filter.addIPFilter(f)
-            self.resource.setLogFilter(filter)
+                logFilter.addIPFilter(f)
+            self.resource.setLogFilter(logFilter)
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
@@ -598,7 +598,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         to avoid saturating admin clients with traffic when many clients are
         connecting/disconnecting.
         """
-        def set(k, v):
+        def setIfChanged(k, v):
             if self.uiState.get(k) != v:
                 self.uiState.set(k, v)
 
@@ -617,7 +617,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._lastUpdate = now
             # fixme: have updateState just update what changed itself
             # without the hack above
-            self.updateState(set)
+            self.updateState(setIfChanged)
         elif not self._updateUI_DC:
             # Otherwise, schedule doing this in a few seconds (unless an update
             # was already scheduled)

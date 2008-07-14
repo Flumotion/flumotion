@@ -345,8 +345,8 @@ class PlaylistXMLParser(PlaylistParser):
         """
         Parse playlist XML document data
         """
-        file = StringIO(data)
-        self.parseFile(file)
+        fileHandle = StringIO(data)
+        self.parseFile(fileHandle)
 
     def replaceFile(self, file, id):
         self.playlist.removeItems(id)
