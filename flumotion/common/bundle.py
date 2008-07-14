@@ -234,10 +234,10 @@ class Bundler:
     # and return the zip file data
     def _buildzip(self):
         filelike = StringIO.StringIO()
-        zip = zipfile.ZipFile(filelike, "w")
+        zipFile = zipfile.ZipFile(filelike, "w")
         for bundledFile in self._bundledFiles.values():
-            bundledFile.pack(zip)
-        zip.close()
+            bundledFile.pack(zipFile)
+        zipFile.close()
         data = filelike.getvalue()
         filelike.close()
         return data

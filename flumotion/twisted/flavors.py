@@ -141,8 +141,8 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key] = value
-        list = [o.callRemote('set', key, value) for o in self._observers]
-        return defer.DeferredList(list)
+        dList = [o.callRemote('set', key, value) for o in self._observers]
+        return defer.DeferredList(dList)
 
     def append(self, key, value):
         """
@@ -153,8 +153,8 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key].append(value)
-        list = [o.callRemote('append', key, value) for o in self._observers]
-        return defer.DeferredList(list)
+        dList = [o.callRemote('append', key, value) for o in self._observers]
+        return defer.DeferredList(dList)
 
     def remove(self, key, value):
         """
@@ -169,8 +169,8 @@ class StateCacheable(pb.Cacheable):
         except ValueError:
             raise ValueError('value %r not in list %r for key %r' % (
                 value, self._dict[key], key))
-        list = [o.callRemote('remove', key, value) for o in self._observers]
-        dl = defer.DeferredList(list)
+        dList = [o.callRemote('remove', key, value) for o in self._observers]
+        dl = defer.DeferredList(dList)
         return dl
 
     def setitem(self, key, subkey, value):
@@ -182,9 +182,9 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key][subkey] = value
-        list = [o.callRemote('setitem', key, subkey, value)
+        dList = [o.callRemote('setitem', key, subkey, value)
                 for o in self._observers]
-        return defer.DeferredList(list)
+        return defer.DeferredList(dList)
 
     def delitem(self, key, subkey):
         """
@@ -200,9 +200,9 @@ class StateCacheable(pb.Cacheable):
         except KeyError:
             raise KeyError('key %r not in dict %r for key %r' % (
                 subkey, self._dict[key], key))
-        list = [o.callRemote('delitem', key, subkey, value) for o in
+        dList = [o.callRemote('delitem', key, subkey, value) for o in
                 self._observers]
-        dl = defer.DeferredList(list)
+        dl = defer.DeferredList(dList)
         return dl
 
     # pb.Cacheable methods
@@ -302,7 +302,7 @@ class StateRemoteCache(pb.RemoteCache):
         @type  invalidate: procedure(object) -> None
         """
         if not (set or append or remove or setitem or delitem or invalidate):
-            # FIXME: remove this behavior in 0.6
+            # FIXME: remove this behavior in F0.6
             import sys
             log.safeprintf(sys.stderr,
                            "Warning: Use of deprecated %r.addListener(%r)"

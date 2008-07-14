@@ -65,18 +65,18 @@ class ManagerPlanetState(flavors.StateCacheable):
 
         @rtype: list of L{ManagerComponentState}
         """
-        list = []
+        ret = []
 
         a = self.get('atmosphere')
         if a:
-            list.extend(a.get('components'))
+            ret.extend(a.get('components'))
 
         flows = self.get('flows')
         if flows:
             for flow in flows:
-                list.extend(flow.get('components'))
+                ret.extend(flow.get('components'))
 
-        return list
+        return ret
 
 
 class AdminPlanetState(flavors.StateRemoteCache):
@@ -124,8 +124,8 @@ class ManagerAtmosphereState(flavors.StateCacheable):
         # make a copy, so we can iterate safely while modifying
         components = self.get('components')[:]
 
-        list = [self.remove('components', c) for c in components]
-        return defer.DeferredList(list)
+        dList = [self.remove('components', c) for c in components]
+        return defer.DeferredList(dList)
 
 class AdminAtmosphereState(flavors.StateRemoteCache):
     """
@@ -170,8 +170,8 @@ class ManagerFlowState(flavors.StateCacheable):
         # take a copy of the list because we're modifying while running
         components = self.get('components')[:]
 
-        list = [self.remove('components', c) for c in components]
-        return defer.DeferredList(list)
+        dList = [self.remove('components', c) for c in components]
+        return defer.DeferredList(dList)
 
 class AdminFlowState(flavors.StateRemoteCache):
     """
@@ -265,9 +265,9 @@ class ManagerComponentState(flavors.StateCacheable):
             if v != None:
                 self.set(key, v)
         for key in _jobStateListKeys:
-            list = jobState.get(key)
-            if list != None:
-                for v in list:
+            valueList = jobState.get(key)
+            if valueList != None:
+                for v in valueList:
                     self.append(key, v)
         # set mood last; see #552
         self.set('mood', jobState.get('mood'))

@@ -75,6 +75,8 @@ class RegistryEntryComponent:
         @type  filename:   str
         @param properties: dict of name -> property
         @type  properties: dict of str -> L{RegistryEntryProperty}
+        @param files:      list of files
+        @type  files:      list of L{RegistryEntryFile}
         @param entries:    dict of entry point type -> entry
         @type  entries:    dict of str -> L{RegistryEntryEntry}
         @param sockets:    list of sockets supported by the element
@@ -115,6 +117,9 @@ class RegistryEntryComponent:
         return name in self.properties.keys()
 
     def getFiles(self):
+        """
+        @rtype: list of L{RegistryEntryFile}
+        """
         return self.files
 
     def getEntries(self):
@@ -243,9 +248,15 @@ class RegistryEntryBundle:
         return self.name
 
     def getDependencies(self):
+        """
+        @rtype: list of str
+        """
         return self.dependencies
 
     def getDirectories(self):
+        """
+        @rtype: list of L{RegistryEntryBundleDirectory}
+        """
         return self.directories
 
     def getProject(self):
@@ -493,7 +504,7 @@ class RegistryParser(fxml.Parser):
         #   <wizard>
         # </component>
 
-        type, baseDir, description = self.parseAttributes(node,
+        componentType, baseDir, description = self.parseAttributes(node,
             required=('type', 'base'), optional=('description',))
 
         files = []
@@ -531,8 +542,8 @@ class RegistryParser(fxml.Parser):
         needs_sync, clock_priority = synchronization.unbox()
 
         return RegistryEntryComponent(self.filename,
-                                      type, source, description, baseDir,
-                                      properties, files,
+                                      componentType, source, description,
+                                      baseDir, properties, files,
                                       entries, eaters, feeders,
                                       needs_sync, clock_priority,
                                       sockets, wizards)
@@ -548,11 +559,11 @@ class RegistryParser(fxml.Parser):
 
         attrs = self.parseAttributes(node, required=('name', 'type'),
             optional=('required', 'multiple', 'description'))
-        name, type, required, multiple, description = attrs
+        name, propertyType, required, multiple, description = attrs
         required = common.strToBool(required)
         multiple = common.strToBool(multiple)
-        return RegistryEntryProperty(name, type, description, required=required,
-                                     multiple=multiple)
+        return RegistryEntryProperty(name, propertyType, description,
+                                     required=required, multiple=multiple)
 
     def _parseCompoundProperty(self, node):
         # <compound-property name="..." required="yes/no" multiple="yes/no">
@@ -601,10 +612,10 @@ class RegistryParser(fxml.Parser):
         # <file name="..." type=""/>
         # returns: RegistryEntryFile
 
-        name, type = self.parseAttributes(node, ('name', 'type'))
-        dir = os.path.split(self.filename)[0]
-        filename = os.path.join(dir, name)
-        return RegistryEntryFile(filename, type)
+        name, fileType = self.parseAttributes(node, ('name', 'type'))
+        directory = os.path.split(self.filename)[0]
+        filename = os.path.join(directory, name)
+        return RegistryEntryFile(filename, fileType)
 
     def _parseFiles(self, node):
         # <files>
@@ -622,8 +633,8 @@ class RegistryParser(fxml.Parser):
         # <socket type=""/>
         # returns: str of the type
 
-        type, = self.parseAttributes(node, ('type',))
-        return type
+        socketType, = self.parseAttributes(node, ('type',))
+        return socketType
 
     def _parseSockets(self, node):
         # <sockets>
@@ -639,8 +650,8 @@ class RegistryParser(fxml.Parser):
 
     def _parseEntry(self, node):
         attrs = self.parseAttributes(node, ('type', 'location', 'function'))
-        type, location, function = attrs
-        return RegistryEntryEntry(type, location, function)
+        entryType, location, function = attrs
+        return RegistryEntryEntry(entryType, location, function)
 
     def _parseEntries(self, node):
         # <entries>
@@ -686,10 +697,10 @@ class RegistryParser(fxml.Parser):
 
     def _parsePlugEntry(self, node):
         attrs = self.parseAttributes(node, ('location', 'function'), ('type',))
-        location, function, type = attrs
-        if not type:
-            type = 'default'
-        return RegistryEntryEntry(type, location, function)
+        location, function, entryType = attrs
+        if not entryType:
+            entryType = 'default'
+        return RegistryEntryEntry(entryType, location, function)
 
     def _parseDefaultPlugEntry(self, node):
         return {'default': self._parsePlugEntry(node)}
@@ -721,7 +732,7 @@ class RegistryParser(fxml.Parser):
         #   <wizard>
         # </plug>
 
-        type, socket = self.parseAttributes(node, ('type', 'socket'))
+        plugType, socket = self.parseAttributes(node, ('type', 'socket'))
 
         entries = {}
         properties = {}
@@ -738,9 +749,10 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         if not 'default' in entries:
-            raise fxml.ParserError("<plug> %s needs a default <entry>" % type)
+            raise fxml.ParserError(
+                "<plug> %s needs a default <entry>" % plugType)
 
-        return RegistryEntryPlug(self.filename, type,
+        return RegistryEntryPlug(self.filename, plugType,
                                  socket, entries, properties,
                                  wizards)
 
@@ -962,7 +974,7 @@ class RegistryParser(fxml.Parser):
         attrs = self.parseAttributes(node,
                                      ('type', '_description'),
                                      ('feeder', 'eater'))
-        type, description, feeder, eater = attrs
+        wizardType, description, feeder, eater = attrs
 
         accepts = []
         provides = []
@@ -976,16 +988,16 @@ class RegistryParser(fxml.Parser):
 
         parent_type = node.parentNode.getAttribute('type')
 
-        if not type in validTypes:
+        if not wizardType in validTypes:
             raise fxml.ParserError(
                 "<wizard>'s type attribute is %s must be one of %s" % (
                 parent_type,
                 ', '.join(validTypes)))
 
-        isProducer = type.endswith('-producer')
-        isEncoder = type.endswith('-encoder')
-        isMuxer = (type == 'muxer')
-        isConsumer = type.endswith('-consumer')
+        isProducer = wizardType.endswith('-producer')
+        isEncoder = wizardType.endswith('-encoder')
+        isMuxer = (wizardType == 'muxer')
+        isConsumer = wizardType.endswith('-consumer')
 
         err = None
         # Producers and Encoders cannot have provided
@@ -1008,7 +1020,7 @@ class RegistryParser(fxml.Parser):
         if err:
             raise fxml.ParserError(err)
 
-        return RegistryEntryWizard(parent_type, type, description,
+        return RegistryEntryWizard(parent_type, wizardType, description,
                                    feeder, eater, accepts, provides)
 
     def _parseAcceptFormat(self, node):
@@ -1061,16 +1073,16 @@ class RegistryDirectory(log.Loggable):
 
             dirs.append(root)
 
-            for dir in directory_files:
-                filename = os.path.join(root, dir)
+            for entry in directory_files:
+                path = os.path.join(root, entry)
                 # if it's a .xml file, then add it to the list
-                if not os.path.isdir(filename):
-                    if filename.endswith('.xml'):
-                        files.append(filename)
+                if not os.path.isdir(path):
+                    if path.endswith('.xml'):
+                        files.append(path)
                 # if it's a directory and not an svn directory, then get
                 # its files and add them
-                elif dir != '.svn':
-                    newFiles, newDirs = self._getFileLists(filename)
+                elif entry != '.svn':
+                    newFiles, newDirs = self._getFileLists(path)
                     files.extend(newFiles)
                     dirs.extend(newDirs)
 
@@ -1216,13 +1228,13 @@ class RegistryWriter(log.Loggable):
                             provide.media_type))
                 w(6, '</wizard>')
 
-            files = component.getFiles()
-            if files:
+            registryEntryFiles = component.getFiles()
+            if registryEntryFiles:
                 w(6, '<files>')
-                for file in files:
+                for entryFile in registryEntryFiles:
                     w(8, '<file name="%s" type="%s"/>' % (
-                        file.getName(),
-                        file.getType()))
+                        entryFile.getName(),
+                        entryFile.getType()))
                 w(6, '</files>')
 
             _dump_entries(6, component.getEntries())
@@ -1265,12 +1277,12 @@ class RegistryWriter(log.Loggable):
                     w(8, '<dependency name="%s"/>' % dependency)
                 w(6, '</dependencies>')
 
-            dirs = bundle.getDirectories()
-            if dirs:
+            bundleDirectories = bundle.getDirectories()
+            if bundleDirectories:
                 w(6, '<directories>')
-                for dir in dirs:
-                    w(8, '<directory name="%s">' % dir.getName())
-                    for filename in dir.getFiles():
+                for directory in bundleDirectories:
+                    w(8, '<directory name="%s">' % directory.getName())
+                    for filename in directory.getFiles():
                         w(10, '<filename location="%s" relative="%s"/>' % (
                             filename.getLocation(), filename.getRelative()))
                     w(8, '</directory>')
@@ -1412,15 +1424,15 @@ class ComponentRegistry(log.Loggable):
                 self.debug('Adding bundle %s' % bundleName)
                 for d in b.getDirectories():
                     directory = d.getName()
-                    for file in d.getFiles():
+                    for bundleFilename in d.getFiles():
                         try:
                             basedir = b.getBaseDir()
                         except errors.NoProjectError, e:
                             self.warning("Could not load project %s" % e.args)
                             raise
                         fullpath = os.path.join(basedir, directory,
-                                                file.getLocation())
-                        relative = file.getRelative()
+                                                bundleFilename.getLocation())
+                        relative = bundleFilename.getRelative()
                         self.log('Adding path %s as %s to bundle %s' % (
                             fullpath, relative, bundleName))
                         try:
@@ -1474,8 +1486,8 @@ class ComponentRegistry(log.Loggable):
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
         # point to nonexistent directories
         registryPaths = sets.Set(self._getRegistryPathsFromEnviron())
-        oldRegistryPaths = sets.Set([dir.getPath()
-                                     for dir in self.getDirectories()])
+        oldRegistryPaths = sets.Set([directory.getPath()
+                                     for directory in self.getDirectories()])
         if registryPaths != oldRegistryPaths:
             if oldRegistryPaths - registryPaths:
                 return True
@@ -1496,18 +1508,18 @@ class ComponentRegistry(log.Loggable):
         self.info('Saving registry to %s' % self.filename)
 
         # create parent directory
-        dir = os.path.split(self.filename)[0]
-        if not os.path.exists(dir):
+        directory = os.path.split(self.filename)[0]
+        if not os.path.exists(directory):
             try:
-                makedirs(dir)
+                makedirs(directory)
             except OSError, e:
                 if e.errno == errno.EACCES:
                     self.error('Registry directory %s could not be created !' %
-                        dir)
+                        directory)
                 else:
                     raise
 
-        if not os.path.isdir(dir):
+        if not os.path.isdir(directory):
             self.error('Registry directory %s is not a directory !')
         try:
             fd = open(self.filename, 'w')
@@ -1632,8 +1644,9 @@ def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
         ret = {}
         for bundle in allbundles:
             for directory in bundle.getDirectories():
-                for file in directory.getFiles():
-                    path = os.path.join(directory.getName(), file.getLocation())
+                for bundleFile in directory.getFiles():
+                    path = os.path.join(directory.getName(),
+                        bundleFile.getLocation())
                     parts = path.split(os.path.sep)
                     if parts[-1].startswith('__init__.py'):
                         parts.pop()

@@ -276,22 +276,22 @@ class DAG(log.Loggable):
             return []
 
         # catches CycleError as well
-        sorted = self._sortPreferred()
+        sortedNodes = self._sortPreferred()
 
         # start by adding our node to our to be expanded list
-        list = [node]
+        nodeList = [node]
         offspring = []
         expand = True
         # as long as we need to expand, loop over all offspring ...
         while expand:
             expand = False
-            for n in list:
+            for n in nodeList:
                 if n.children:
                     # .. and for every item add all of its children
                     # which triggers requiring further expansion
                     expand = True
-                    list.remove(n)
-                    list.extend(n.children)
+                    nodeList.remove(n)
+                    nodeList.extend(n.children)
                     offspring.extend(n.children)
 
         # filter offspring by types
@@ -300,7 +300,7 @@ class DAG(log.Loggable):
 
         # now that we have all offspring, return a sorted list of them
         ret = []
-        for n in sorted:
+        for n in sortedNodes:
             if n in offspring:
                 ret.append((n.object, n.type))
 
@@ -349,22 +349,22 @@ class DAG(log.Loggable):
             return []
 
         # catches CycleError as well
-        sorted = self._sortPreferred()
+        sortedNodes = self._sortPreferred()
 
         # start by adding our node to our to be expanded list
-        list = [node]
+        nodeList = [node]
         ancestors = []
         expand = True
         # as long as we need to expand, loop over all offspring ...
         while expand:
             expand = False
-            for n in list:
+            for n in nodeList:
                 if n.parents:
                     # .. and for every item add all of its children
                     # which triggers requiring further expansion
                     expand = True
-                    list.remove(n)
-                    list.extend(n.parents)
+                    nodeList.remove(n)
+                    nodeList.extend(n.parents)
                     ancestors.extend(n.parents)
 
         # filter offspring by types
@@ -373,7 +373,7 @@ class DAG(log.Loggable):
 
         # now that we have all offspring, return a sorted list of them
         ret = []
-        for n in sorted:
+        for n in sortedNodes:
             if n in ancestors:
                 ret.append((n.object, n.type))
 

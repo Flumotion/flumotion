@@ -333,9 +333,9 @@ def _listPyFileRecursively(path):
     # get all the dirs containing python code
     dirs = _listDirRecursively(path)
 
-    for dir in dirs:
-        pyfiles = glob.glob(os.path.join(dir, '*.py*'))
-        dontkeep = glob.glob(os.path.join(dir, '*__init__.py*'))
+    for directory in dirs:
+        pyfiles = glob.glob(os.path.join(directory, '*.py*'))
+        dontkeep = glob.glob(os.path.join(directory, '*__init__.py*'))
         for f in dontkeep:
             if f in pyfiles:
                 pyfiles.remove(f)

@@ -1,6 +1,27 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundle.py:
+	* flumotion/common/common.py:
+	* flumotion/common/config.py:
+	* flumotion/common/dag.py:
+	* flumotion/common/debug.py:
+	* flumotion/common/package.py:
+	* flumotion/common/planet.py:
+	* flumotion/common/process.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/twisted/flavors.py:
+	* flumotion/twisted/portal.py:
+	  shadow cleanups
+	* flumotion/common/reload.py:
+	* flumotion/component/component.py:
+	  rename reload to reloadFlumotion
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundle.py:
 	* flumotion/component/base/eatersnode.py:
 	* flumotion/component/base/feedersnode.py:
 	* flumotion/component/bouncers/admin_gtk.py:

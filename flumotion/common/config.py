@@ -146,8 +146,8 @@ def buildPlugsSet(plugsList, sockets):
     ret = {}
     for socket in sockets:
         ret[socket] = []
-    for type, propertyList in plugsList:
-        plug = ConfigEntryPlug(type, propertyList)
+    for plugType, propertyList in plugsList:
+        plug = ConfigEntryPlug(plugType, propertyList)
         if plug.socket not in ret:
             raise ConfigError("Unsupported socket type: %s"
                               % (plug.socket,))
@@ -156,13 +156,13 @@ def buildPlugsSet(plugsList, sockets):
 
 class ConfigEntryPlug(log.Loggable):
     "I represent a <plug> entry in a planet config file"
-    def __init__(self, type, propertyList):
+    def __init__(self, plugType, propertyList):
         try:
-            defs = registry.getRegistry().getPlug(type)
+            defs = registry.getRegistry().getPlug(plugType)
         except KeyError:
-            raise ConfigError("unknown plug type: %s" % type)
+            raise ConfigError("unknown plug type: %s" % plugType)
 
-        self.type = type
+        self.type = plugType
         self.socket = defs.getSocket()
         self.properties = buildPropertyDict(propertyList,
                                             defs.getProperties())
@@ -223,13 +223,14 @@ class BaseConfigParser(fxml.Parser):
             # <plug type=...>
             #   <property>
             # socket is unneeded and deprecated; we don't use it.
-            type, socket = self.parseAttributes(node, ('type',), ('socket',))
+            plugType, socket = self.parseAttributes(
+                node, ('type',), ('socket',))
             properties = []
             parsers = {'property': (self._parseProperty, properties.append),
                        'compound-property': (self._parseCompoundProperty,
                                              properties.append)}
             self.parseFromTable(node, parsers)
-            return type, properties
+            return plugType, properties
 
         parsers = {'plug': (parsePlug, plugs.append)}
         self.parseFromTable(node, parsers)

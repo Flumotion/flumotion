@@ -148,7 +148,7 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
                                '%s.log' % (processType,))
     log.debug(processType, 'Further logging will be done to %s', logPath)
 
-    file = _acquirePidFile(processType, processName)
+    pidFile = _acquirePidFile(processType, processName)
 
     # here we daemonize; so we also change our pid
     _daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
@@ -156,7 +156,7 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
     log.debug(processType, 'Started daemon')
 
     # from now on I should keep running until killed, whatever happens
-    path = writePidFile(processType, processName, file=file)
+    path = writePidFile(processType, processName, file=pidFile)
     log.debug(processType, 'written pid file %s', path)
 
     # import inside function so we avoid affecting startup
@@ -236,9 +236,9 @@ def getPid(type, name=None):
     if not os.path.exists(pidPath):
         return
 
-    file = open(pidPath, 'r')
-    pid = file.readline()
-    file.close()
+    pidFile = open(pidPath, 'r')
+    pid = pidFile.readline()
+    pidFile.close()
     if not pid or int(pid) == 0:
         return
 

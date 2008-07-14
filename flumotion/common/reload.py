@@ -31,7 +31,7 @@ from flumotion.common import log
 __version__ = "$Rev$"
 
 
-def reload():
+def reloadFlumotion():
     """Properly reload all flumotion-related modules currently loaded."""
     needs_reload = lambda name: name.startswith('flumotion')
     for name in filter(needs_reload, sys.modules.keys()):

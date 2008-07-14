@@ -69,8 +69,8 @@ class BouncerPortal(log.Loggable):
             # must return a deferred
             return self.bouncer.getKeycardClasses()
         else:
-            list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
-            return defer.succeed(list)
+            interfaces = [reflect.qual(k) for k in self.bouncer.keycardClasses]
+            return defer.succeed(interfaces)
 
     def login(self, keycard, mind, *ifaces):
         """

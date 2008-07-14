@@ -133,9 +133,9 @@ def parseFeedId(feedId):
     """
     assert not feedId.startswith('/'), \
            "feedId must not start with '/': %s" % feedId
-    list = feedId.split(":")
-    assert len(list) == 2, "feedId %s should contain exactly one ':'" % feedId
-    return (list[0], list[1])
+    parts = feedId.split(":")
+    assert len(parts) == 2, "feedId %s should contain exactly one ':'" % feedId
+    return (parts[0], parts[1])
 
 def fullFeedId(flowName, componentName, feedName):
     """
@@ -157,10 +157,10 @@ def parseFullFeedId(fullFeedId):
     @rtype:  tuple of (str, str, str)
     @return: tuple of (flowName, componentName, feedName)
     """
-    list = fullFeedId.split(":")
-    assert len(list) == 2
-    flowName, componentName = parseComponentId(list[0])
-    return (flowName, componentName, list[1])
+    parts = fullFeedId.split(":")
+    assert len(parts) == 2
+    flowName, componentName = parseComponentId(parts[0])
+    return (flowName, componentName, parts[1])
 
 def objRepr(object):
     """

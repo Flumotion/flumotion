@@ -239,9 +239,9 @@ class Bouncer(component.BaseComponent):
     def generateKeycardId(self):
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
-        id = self._idFormat % self._idCounter
+        keycardId = self._idFormat % self._idCounter
         self._idCounter += 1
-        return id
+        return keycardId
 
     def addKeycard(self, keycard):
         # give keycard an id and store it in our hash
@@ -249,39 +249,38 @@ class Bouncer(component.BaseComponent):
             # already in there
             return
 
-        id = self.generateKeycardId()
-        keycard.id = id
+        keycardId = self.generateKeycardId()
+        keycard.id = keycardId
 
         if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
             self.log('immediately expiring keycard %r', keycard)
             return
 
-        self._keycards[id] = keycard
+        self._keycards[keycardId] = keycard
         data = keycard.getData()
-        self._keycardDatas[id] = data
+        self._keycardDatas[keycardId] = data
 
         self.uiState.append('keycards', data)
         self.debug("added keycard with id %s, ttl %r", keycard.id,
                    getattr(keycard, 'ttl', None))
 
     def removeKeycard(self, keycard):
-        id = keycard.id
-        if not self._keycards.has_key(id):
+        if not self._keycards.has_key(keycard.id):
             raise KeyError
 
-        del self._keycards[id]
+        del self._keycards[keycard.id]
 
-        data = self._keycardDatas[id]
+        data = self._keycardDatas[keycard.id]
         self.uiState.remove('keycards', data)
-        del self._keycardDatas[id]
-        self.info("removed keycard with id %s" % id)
+        del self._keycardDatas[keycard.id]
+        self.info("removed keycard with id %s" % keycard.id)
 
-    def removeKeycardId(self, id):
-        self.debug("removing keycard with id %s" % id)
-        if not self._keycards.has_key(id):
+    def removeKeycardId(self, keycardId):
+        self.debug("removing keycard with id %s" % keycardId)
+        if not self._keycards.has_key(keycardId):
             raise KeyError
 
-        keycard = self._keycards[id]
+        keycard = self._keycards[keycardId]
         self.removeKeycard(keycard)
 
     def keepAlive(self, issuerName, ttl):
@@ -291,15 +290,16 @@ class Bouncer(component.BaseComponent):
 
     def expireAllKeycards(self):
         return defer.DeferredList(
-            [self.expireKeycardId(id) for id in self._keycards.keys()])
+            [self.expireKeycardId(keycardId)
+                for keycardId in self._keycards.keys()])
 
-    def expireKeycardId(self, id):
-        self.log("expiring keycard with id %r", id)
-        if not self._keycards.has_key(id):
+    def expireKeycardId(self, keycardId):
+        self.log("expiring keycard with id %r", keycardId)
+        if not self._keycards.has_key(keycardId):
             raise KeyError
 
-        keycard = self._keycards[id]
-        self.removeKeycardId(id)
+        keycard = self._keycards[keycardId]
+        self.removeKeycardId(keycardId)
 
         if self.medium:
             return self.medium.callRemote('expireKeycard',

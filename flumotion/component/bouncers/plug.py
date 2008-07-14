@@ -186,9 +186,9 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         return keycard in self._keycards.values()
 
     def generateKeycardId(self):
-        id = self._idFormat % self._idCounter
+        keycardId = self._idFormat % self._idCounter
         self._idCounter += 1
-        return id
+        return keycardId
 
     def addKeycard(self, keycard):
         # give keycard an id and store it in our hash
@@ -196,32 +196,30 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
             # already in there
             return
 
-        id = self.generateKeycardId()
-        keycard.id = id
+        keycard.id = self.generateKeycardId()
 
         if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
             self.log('immediately expiring keycard %r', keycard)
             return
 
-        self._keycards[id] = keycard
+        self._keycards[keycard.id] = keycard
 
         self.debug("added keycard with id %s" % keycard.id)
 
     def removeKeycard(self, keycard):
-        id = keycard.id
-        if not self._keycards.has_key(id):
+        if not self._keycards.has_key(keycard.id):
             raise KeyError
 
-        del self._keycards[id]
+        del self._keycards[keycard.id]
 
-        self.debug("removed keycard with id %s" % id)
+        self.debug("removed keycard with id %s" % keycard.id)
 
-    def removeKeycardId(self, id):
-        self.debug("removing keycard with id %s" % id)
-        if not self._keycards.has_key(id):
+    def removeKeycardId(self, keycardId):
+        self.debug("removing keycard with id %s" % keycardId)
+        if not self._keycards.has_key(keycardId):
             raise KeyError
 
-        keycard = self._keycards[id]
+        keycard = self._keycards[keycardId]
         self.removeKeycard(keycard)
 
     def keepAlive(self, issuerName, ttl):
@@ -231,14 +229,15 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
     def expireAllKeycards(self):
         return defer.DeferredList(
-            [self.expireKeycardId(id) for id in self._keycards.keys()])
+            [self.expireKeycardId(keycardId)
+                for keycardId in self._keycards.keys()])
 
-    def expireKeycardId(self, id):
-        self.log("expiring keycard with id %r", id)
-        if not self._keycards.has_key(id):
+    def expireKeycardId(self, keycardId):
+        self.log("expiring keycard with id %r", keycardId)
+        if not self._keycards.has_key(keycardId):
             raise KeyError
 
-        keycard = self._keycards.pop(id)
+        keycard = self._keycards.pop(keycardId)
 
         return self.medium.callRemote('expireKeycard',
                                       keycard.requesterId, keycard.id)

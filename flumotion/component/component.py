@@ -248,8 +248,8 @@ class BaseComponentMedium(medium.PingingMedium):
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
-        from flumotion.common.reload import reload as freload
-        freload()
+        from flumotion.common.reload import reloadFlumotion
+        reloadFlumotion()
 
     def remote_getUIState(self):
         """Get a WorkerComponentUIState containing details needed to

@@ -97,7 +97,7 @@ def trace_stop():
         sys.settrace(None)
         _indent = ''
 
-def print_stack(file=None):
+def print_stack(handle=None):
     f = sys._getframe(1)
     output = []
     while f:
@@ -117,10 +117,10 @@ def print_stack(file=None):
         output.append('  File "%s", line %d, in %s\n' % (filename,lineno,name))
         f = f.f_back
     output.reverse()
-    if file is None:
-        file = sys.stdout
+    if handle is None:
+        handle = sys.stdout
     for line in output:
-        file.write(line)
+        handle.write(line)
 
 class UncollectableMonitor(object):
     def __init__(self, period=120):

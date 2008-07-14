@@ -285,11 +285,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.file = None
         # make element sad
         self.setMood(moods.sad)
-        id = "error-writing-%s" % self.location
+        messageId = "error-writing-%s" % self.location
         m = messages.Error(T_(N_(
             "Error writing to file %s.  Maybe disk is full." % (
             self.location))),
-            id=id, priority=40)
+            id=messageId, priority=40)
         self.addMessage(m)
 
     def configure_pipeline(self, pipeline, properties):
