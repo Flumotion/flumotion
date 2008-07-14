@@ -1,5 +1,10 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_manager_manager.py:
+	  Fix another set_ deprecation.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  Don't rename Warning just yet, suppress it.
 	* misc/pycheckerrc:

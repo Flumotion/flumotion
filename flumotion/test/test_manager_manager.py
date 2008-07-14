@@ -42,7 +42,7 @@ class MyListener(log.Loggable):
 
     def __init__(self, state):
         self._setters = {} # (state, key, value) tuple -> list of deferred
-        state.addListener(self, set=self.stateSet)
+        state.addListener(self, set_=self.stateSet)
 
     def notifyOnSet(self, state, key, value):
         self.debug("notify on state %r key %r set to value %r" % (
