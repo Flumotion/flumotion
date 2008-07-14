@@ -32,7 +32,7 @@ class StateWatcher(object):
         self.delitemers = delitemers
         self.shown = False
 
-        state.addListener(self, set=self.onSet, append=self.onAppend,
+        state.addListener(self, set_=self.onSet, append=self.onAppend,
                           remove=self.onRemove, setitem=self.onSetItem,
                           delitem=self.onDelItem)
 

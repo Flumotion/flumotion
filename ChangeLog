@@ -1,5 +1,23 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/flavors.py:
+	  Deprecate set= kwarg, and add set_= kwarg as suggested by PEP-8.
+	* flumotion/admin/command/commands.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/admin/gtk/componentview.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/common/planet.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/baseadminnode.py:
+	* flumotion/component/base/statewatcher.py:
+	* flumotion/test/test_common_planet.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/ui/trayicon.py:
+	  Update callers.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_component_httpserver.py:
 	  Rename uses of file to httpfile.
 

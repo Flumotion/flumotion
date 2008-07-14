@@ -246,7 +246,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         for component in componentsSorted:
             self.debug('adding component %r to listview' % component)
-            component.addListener(self, self.stateSet)
+            component.addListener(self, set_=self.stateSet)
 
             titer = self._model.append()
             self._iters[component] = titer

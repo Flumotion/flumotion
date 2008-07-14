@@ -179,9 +179,9 @@ class TestStateSet(StateTest):
     def listen(self, state):
         def event(type):
             return lambda *x: self.changes.append((type,) + x)
-        state.addListener(self, event('set'), event('append'),
-                          event('remove'), event('setitem'),
-                          event('delitem'))
+        state.addListener(self, set_=event('set'), append=event('append'),
+                          remove=event('remove'), setitem=event('setitem'),
+                          delitem=event('delitem'))
 
     # listener tests
     def testStateSetListener(self):
@@ -282,7 +282,7 @@ class TestFullListener(StateTest):
         # ask server to set the name
         def add_listener_and_set_name(state):
             d.state = state # monkeypatch
-            state.addListener(self, set=customStateSet)
+            state.addListener(self, set_=customStateSet)
             return self.perspective.callRemote('setStateName', 'robin')
 
         def check_results(_):
@@ -351,7 +351,7 @@ class TestFullListener(StateTest):
             self.assertEquals(calls, [('invalidate', state),
                                       ('invalidate', state)])
 
-            state.addListener(3, set=unused)
+            state.addListener(3, set_=unused)
             self.assertEquals(calls, [('invalidate', state),
                                       ('invalidate', state)])
 

@@ -186,9 +186,9 @@ class BaseAdminGtkNode(log.Loggable):
         is ready. Chain up if you provide your own implementation.
         """
         self.uiState = state
-        state.addListener(self, self.stateSet, self.stateAppend,
-                          self.stateRemove, self.stateSetitem,
-                          self.stateDelitem)
+        state.addListener(self, set_=self.stateSet, append=self.stateAppend,
+                          remove=self.stateRemove, setitem=self.stateSetitem,
+                          delitem=self.stateDelitem)
 
     def stateSet(self, state, key, value):
         "Override me"

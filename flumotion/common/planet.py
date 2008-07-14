@@ -281,8 +281,8 @@ class ManagerComponentState(flavors.StateCacheable):
                     getattr(self, attr)(key, value)
             return event
 
-        jobState.addListener(self, proxy('set'), proxy('append'),
-                             proxy('remove'))
+        jobState.addListener(self, set_=proxy('set'), append=proxy('append'),
+                             remove=proxy('remove'))
 
     def set(self, key, value):
         # extend set so we can log mood changes

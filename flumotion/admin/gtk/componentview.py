@@ -305,7 +305,7 @@ class ComponentView(gtk.VBox, log.Loggable):
     def _componentUnsetToInactive(self):
         def invalidate(_):
             self._setState(COMPONENT_UNSET)
-        def set(state, key, value):
+        def set_(state, key, value):
             if key != 'mood':
                 return
             if value not in [moods.lost.value,
@@ -317,9 +317,9 @@ class ComponentView(gtk.VBox, log.Loggable):
                 
         current = self._currentComponentState
         assert current is not None
-        current.addListener(self, invalidate=invalidate, set=set)
+        current.addListener(self, invalidate=invalidate, set_=set_)
         if current.hasKey('mood'):
-            set(current, 'mood', current.get('mood'))
+            set_(current, 'mood', current.get('mood'))
 
     def _componentInactiveToActive(self):
         def gotWidgetConstructor(placeholder, oldComponentState):

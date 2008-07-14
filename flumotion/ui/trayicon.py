@@ -107,7 +107,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         self._components = components
         for component in components.values():
             try:
-                component.addListener(self, self.stateSet)
+                component.addListener(self, set_=self.stateSet)
             except KeyError:
                 pass
 

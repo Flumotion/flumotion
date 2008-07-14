@@ -356,7 +356,7 @@ class MoodListener(defer.Deferred):
     def __init__(self, moods, state):
         defer.Deferred.__init__(self)
         self._moodsFinal = moods
-        state.addListener(self, self.stateSet)
+        state.addListener(self, set_=self.stateSet)
 
     def stateSet(self, object, key, value):
         if key == 'mood' and moods[value] in self._moodsFinal:

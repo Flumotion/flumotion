@@ -268,7 +268,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self._components = components
         for name in self._components.keys():
             component = self._components[name]
-            component.addListener(self, compStateSet)
+            component.addListener(self, set_=compStateSet)
 
             # get bundle for component
             d = self.getEntry(component, 'admin/text')
@@ -317,8 +317,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 if value.get('name') != 'default':
                     return
                 #self.debug('default flow started')
-                value.addListener(self, flowStateAppend,
-                                  flowStateRemove)
+                value.addListener(self, append=flowStateAppend,
+                                  remove=flowStateRemove)
                 for c in value.get('components'):
                     flowStateAppend(value, 'components', c)
 

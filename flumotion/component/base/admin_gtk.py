@@ -96,8 +96,8 @@ class BaseAdminGtk(log.Loggable):
 
     def setUIState(self, state):
         self.debug('starting listening to state %r', state)
-        state.addListener(self, self.stateSet, self.stateAppend,
-                          self.stateRemove)
+        state.addListener(self, set_=self.stateSet, append=self.stateAppend,
+                          remove=self.stateRemove)
         self.uiState = state
         for node in self.getNodes().values():
             node.gotUIState(state)

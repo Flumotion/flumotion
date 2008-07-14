@@ -267,8 +267,9 @@ class StateRemoteCache(pb.RemoteCache):
             # arbitrary order; should be fired in order of connecting.
             self._listeners = {}
 
+    #F0.8: remove set=None and move set_=None there
     def addListener(self, listener, set=None, append=None, remove=None,
-                    setitem=None, delitem=None, invalidate=None):
+                    setitem=None, delitem=None, invalidate=None, set_=None):
         """
         Adds a listener to the remote cache.
 
@@ -286,8 +287,8 @@ class StateRemoteCache(pb.RemoteCache):
                            cache state change notifications.
         @type  listener:   object implementing
                            L{flumotion.twisted.flavors.IStateListener}
-        @param set:        procedure to call when a value is set
-        @type  set:        procedure(object, key, value) -> None
+        @param set_:       procedure to call when a value is set
+        @type  set_:       procedure(object, key, value) -> None
         @param append:     procedure to call when a value is appended to a list
         @type  append:     procedure(object, key, value) -> None
         @param remove:     procedure to call when a value is removed from
@@ -302,17 +303,21 @@ class StateRemoteCache(pb.RemoteCache):
                            invalidated.
         @type  invalidate: procedure(object) -> None
         """
-        # don't shadow builtin set
-        setter = set
+        # F0.8: remove set
+        if set:
+            import warnings
+            warnings.warn('Please use the set_ kwarg instead',
+                DeprecationWarning, stacklevel=2)
+            set_ = set
 
-        if not (setter or append or remove or setitem or delitem or invalidate):
+        if not (set_ or append or remove or setitem or delitem or invalidate):
             # FIXME: remove this behavior in F0.6
             import sys
             log.safeprintf(sys.stderr,
                            "Warning: Use of deprecated %r.addListener(%r)"
                            " without explicit event handlers\n", self,
                            listener)
-            setter = listener.stateSet
+            set_ = listener.stateSet
             append = listener.stateAppend
             remove = listener.stateRemove
 
@@ -320,7 +325,7 @@ class StateRemoteCache(pb.RemoteCache):
         if listener in self._listeners:
             raise KeyError(
                 "%r is already a listener of %r" % (listener, self))
-        self._listeners[listener] = [setter, append, remove, setitem,
+        self._listeners[listener] = [set_, append, remove, setitem,
                                      delitem, invalidate]
         if invalidate and hasattr(self, '_cache_invalid'):
             invalidate(self)
