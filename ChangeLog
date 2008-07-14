@@ -1,5 +1,10 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/flavors.py:
+	  Don't shadow set.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/httpserver.xml:
 	  Rename uses of file to httpfile.
 

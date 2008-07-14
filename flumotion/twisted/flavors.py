@@ -276,6 +276,9 @@ class StateRemoteCache(pb.RemoteCache):
         given as the 'set', 'append', and 'remove', 'setitem', and
         'delitem' keyword arguments.
 
+        Always call this method using keyword arguments for the functions;
+        calling them with positional arguments is not supported.
+
         Setting one of the event handlers to None will ignore that
         event. It is an error for all event handlers to be None.
 
@@ -299,21 +302,25 @@ class StateRemoteCache(pb.RemoteCache):
                            invalidated.
         @type  invalidate: procedure(object) -> None
         """
-        if not (set or append or remove or setitem or delitem or invalidate):
+        # don't shadow builtin set
+        setter = set
+
+        if not (setter or append or remove or setitem or delitem or invalidate):
             # FIXME: remove this behavior in F0.6
             import sys
             log.safeprintf(sys.stderr,
                            "Warning: Use of deprecated %r.addListener(%r)"
                            " without explicit event handlers\n", self,
                            listener)
-            set = listener.stateSet
+            setter = listener.stateSet
             append = listener.stateAppend
             remove = listener.stateRemove
+
         self._ensureListeners()
         if listener in self._listeners:
             raise KeyError(
                 "%r is already a listener of %r" % (listener, self))
-        self._listeners[listener] = [set, append, remove, setitem,
+        self._listeners[listener] = [setter, append, remove, setitem,
                                      delitem, invalidate]
         if invalidate and hasattr(self, '_cache_invalid'):
             invalidate(self)
