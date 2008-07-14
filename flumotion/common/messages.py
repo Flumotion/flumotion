@@ -135,11 +135,15 @@ def Error(*args, **kwargs):
     """
     return Message(ERROR, *args, **kwargs)
 
+# FIXME: figure out a way to not be shadowing the Warning builtin without
+# breaking all other code
+__pychecker__ = 'no-shadowbuiltin'
 def Warning(*args, **kwargs):
     """
     Create a L{Message} at WARNING level, indicating a potential problem.
     """
     return Message(WARNING, *args, **kwargs)
+__pychecker__ = ''
 
 def Info(*args, **kwargs):
     """
