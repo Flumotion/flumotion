@@ -21,7 +21,7 @@
 
 import gettext
 
-from flumotion.common.python import any
+from flumotion.common.python import any as pany
 from flumotion.configure import configure
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard.httpstreamersteps import HTTPBothStep, HTTPAudioStep, \
@@ -118,9 +118,9 @@ class ConsumptionStep(WizardStep):
         shout2_audio_video = self.shout2_audio_video.get_active()
 
         blockNext = True
-        if ((disk and any([disk_audio, disk_video, disk_audio_video])) or
-            (http and any([http_audio, http_video, http_audio_video])) or
-            (shout2 and any([shout2_audio, shout2_video, shout2_audio_video]))):
+        if ((disk and pany([disk_audio, disk_video, disk_audio_video])) or
+            (http and pany([http_audio, http_video, http_audio_video])) or
+            (shout2 and pany([shout2_audio, shout2_video, shout2_audio_video]))):
             blockNext = False
         self.wizard.blockNext(blockNext)
 

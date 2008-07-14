@@ -1,5 +1,15 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/python.py:
+	  Just like we conditionally implement any, do the same for all
+	* flumotion/component/combiners/switch/switch.py:
+	  Use it here.
+	* flumotion/wizard/consumptionsteps.py:
+	  Rename any to pany; I'd prefer python.any but I'll defer until
+	  after discussing with Johan.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/common.py:
 	* flumotion/wizard/httpstreamersteps.py:

@@ -25,7 +25,7 @@ import gobject
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import errors, messages, log
+from flumotion.common import errors, messages, log, python
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
 from flumotion.component import feedcomponent
@@ -224,8 +224,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                                          'get_switch_elements')
 
     def is_active(self, feed):
-        all = lambda seq: reduce(bool.__and__, seq, True)
-        return all([self.eaters[alias].isActive()
+        return python.all([self.eaters[alias].isActive()
                     for alias in self.logicalFeeds[feed]])
 
     def feedSetActive(self, feed):

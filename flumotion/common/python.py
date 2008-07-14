@@ -50,6 +50,17 @@ if sys.version_info[:2] < (2, 5):
 else:
     any = any
 
+# all() was introduced in 2.5
+if sys.version_info[:2] < (2, 5):
+    def all(seq):
+        for item in seq:
+            if not item:
+                return False
+        return True
+else:
+    all = all
+
+
 # python2.4's os.makedirs() lacks EEXIST checks, so here's almost a
 # literal copy from the python2.5's version of os module
 if sys.version_info[:2] < (2, 5):
