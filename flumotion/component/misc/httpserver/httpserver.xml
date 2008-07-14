@@ -100,7 +100,7 @@
         <directories>
             <directory name="flumotion/component/misc/httpserver">
                 <filename location="httpserver.py" />
-                <filename location="file.py" />
+                <filename location="httpfile.py" />
             </directory>
         </directories>
     </bundle>
