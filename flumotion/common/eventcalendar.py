@@ -68,12 +68,17 @@ class Point(Loggable):
     """
     I represent a start or an end point linked to an event instance
     of an event.
-    @param which: 'start' or 'end'
     """
 
     def __init__(self, eventInstance, which, timestamp):
         """
-        @type  event: L{Event}
+        @param eventInstance: An instance of an event.
+        @type  eventInstance: EventInstance
+        @param which: 'start' or 'end'
+        @type  which: str
+        @param timestamp: Timestamp of this point. It will
+                          be used when comparing Points.
+        @type  timestamp: datetime
         """
         self.which = which
         self.timestamp = timestamp
