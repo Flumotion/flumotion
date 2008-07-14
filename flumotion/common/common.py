@@ -104,12 +104,12 @@ def parseComponentId(componentId):
     @return: tuple of (flowName, componentName)
     """
     assert componentId is not None, "componentId should not be None"
-    list = componentId.split("/")
-    assert len(list) == 3, \
+    l = componentId.split("/")
+    assert len(l) == 3, \
         "componentId %s should have exactly two parts" % componentId
-    assert list[0] == '', \
+    assert l[0] == '', \
         "componentId %s should start with /" % componentId
-    return (list[1], list[2])
+    return (l[1], l[2])
 
 def feedId(componentName, feedName):
     """

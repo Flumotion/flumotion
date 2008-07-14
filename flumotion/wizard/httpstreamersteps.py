@@ -42,9 +42,8 @@ from kiwi.utils import gsignal
 import gtk
 from twisted.internet import defer
 
-from flumotion.common import errors, log
+from flumotion.common import errors, log, messages
 from flumotion.common.i18n import N_, gettexter, ngettext
-from flumotion.common.messages import Warning
 from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
@@ -310,7 +309,7 @@ class HTTPSpecificStep(ConsumerStep):
         def importError(failure):
             print 'FIXME: trap', failure, 'in .../httpstreamer/wizard_gtk.py'
             self.info('could not import twisted-web')
-            message = Warning(T_(N_(
+            message = messages.Warning(T_(N_(
                 "Worker '%s' cannot import module '%s'."),
                 self.worker, 'twisted.web'))
             message.add(T_(N_("\nThis module is part of the '%s'."),
@@ -336,7 +335,7 @@ class HTTPSpecificStep(ConsumerStep):
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
                     "Worker '%s' is missing GStreamer elements '%s'.",
                     len(elements))
-                message = Warning(
+                message = messages.Warning(
                     T_(f, self.worker, "', '".join(elements)), id='httpstreamer')
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished(True)

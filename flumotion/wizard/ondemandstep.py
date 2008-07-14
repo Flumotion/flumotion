@@ -26,8 +26,9 @@ import gettext
 
 import gobject
 
+from flumotion.common import messages
+
 from flumotion.common.i18n import N_, gettexter
-from flumotion.common.messages import Warning
 from flumotion.wizard.models import HTTPServer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
@@ -103,7 +104,7 @@ class OnDemandStep(WorkerWizardStep):
         def importError(failure):
             failure.trap(ImportError)
             self.info('could not import twisted-web')
-            message = Warning(T_(N_(
+            message = messages.Warning(T_(N_(
                 "Worker '%s' cannot import module '%s'."),
                 self.worker, 'twisted.web'))
             message.add(T_(N_("\nThis module is part of the '%s'."),
@@ -116,7 +117,7 @@ class OnDemandStep(WorkerWizardStep):
 
         def checkPathFinished(pathExists, path):
             if not pathExists:
-                message = Warning(T_(N_(
+                message = messages.Warning(T_(N_(
                     "Directory '%s' does not exist, "
                     "or is not readable on worker '%s'.")
                                   % (path, self.worker)))

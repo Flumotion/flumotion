@@ -338,8 +338,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
             import os
             import md5
-            sum = md5.new(s).hexdigest()
-            f = os.path.join(configure.registrydir, '%s.connection' % sum)
+            md5sum = md5.new(s).hexdigest()
+            f = os.path.join(configure.registrydir, '%s.connection' % md5sum)
             try:
                 h = open(f, 'w')
                 h.write(s)

@@ -21,8 +21,9 @@
 
 import gettext
 
+from flumotion.common import messages
+
 from flumotion.common.i18n import N_, gettexter, ngettext
-from flumotion.common.messages import Warning
 from flumotion.wizard.models import VideoConverter
 from flumotion.wizard.workerstep import WorkerWizardStep
 
@@ -111,7 +112,7 @@ class OverlayStep(WorkerWizardStep):
         self.model.can_overlay = False
         def importError(error):
             self.info('could not import PIL')
-            message = Warning(
+            message = messages.Warning(
                 T_(N_("Worker '%s' cannot import module '%s'."),
                    self.worker, 'PIL'))
             message.add(
@@ -137,7 +138,7 @@ class OverlayStep(WorkerWizardStep):
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
                     "Worker '%s' is missing GStreamer elements '%s'.",
                     len(elements))
-                message = Warning(
+                message = messages.Warning(
                     T_(f, self.worker, "', '".join(elements)), id='overlay')
                 message.add(
                     T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
