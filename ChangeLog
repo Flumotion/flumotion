@@ -1,5 +1,10 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	  Suppress SystemError shadows builtin.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/tags:
 	  add Python tags
 	* flumotion/common/python.py:

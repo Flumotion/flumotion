@@ -148,12 +148,15 @@ class NoPerspectiveError(pb.Error):
 class FatalError(pb.Error):
     "A fatal error"
 
+# F0.8
+__pychecker__ = 'no-shadowbuiltin'
 class SystemError(FatalError):
     def __init__(self, *args, **kwargs):
         import warnings
         warnings.warn("Please use builtin SystemError or errors.FatalError",
             DeprecationWarning, stacklevel=2)
         pb.Error.__init__(self, *args, **kwargs)
+__pychecker__ = ''
 
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"
