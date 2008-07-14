@@ -21,22 +21,25 @@
 
 # Headers in this file shall remain intact.
 
-from icalendar import Calendar
-from datetime import tzinfo, date, datetime, timedelta
-from dateutil import rrule, tz, parser
-from flumotion.extern.log.log import Loggable
-
+import datetime
 import time
 
+from icalendar import Calendar
+from dateutil import rrule, tz, parser
 
-class LocalTimezone(tzinfo):
-    STDOFFSET = timedelta(seconds=-time.timezone)
+from flumotion.extern.log.log import Loggable
+
+
+
+
+class LocalTimezone(datetime.tzinfo):
+    STDOFFSET = datetime.timedelta(seconds=-time.timezone)
     if time.daylight:
-        DSTOFFSET = timedelta(seconds=-time.altzone)
+        DSTOFFSET = datetime.timedelta(seconds=-time.altzone)
     else:
         DSTOFFSET = STDOFFSET
     DSTDIFF = DSTOFFSET - STDOFFSET
-    ZERO = timedelta(0)
+    ZERO = datetime.timedelta(0)
 
     def utcoffset(self, dt):
         if self._isdst(dt):
@@ -125,7 +128,7 @@ def toDateTime(d):
     @return: If d was an event instance of date, it returns the equivalent
      datetime.Otherwise, it returns d.
     """
-    if isinstance(d, date) and not isinstance(d, datetime):
+    if isinstance(d, datetime.date) and not isinstance(d, datetime):
         return datetime(d.year, d.month, d.day, tzinfo=LOCAL)
     return d
 
@@ -160,7 +163,7 @@ class Event(Loggable):
         @type  exdates:     list of L{datetime.datetime} or None
         """
         if not now:
-            now = datetime.now(LOCAL)
+            now = datetime.datetime.now(LOCAL)
         self.end = self.__addTimeZone(end, LOCAL)
         self.start = self.__addTimeZone(start, LOCAL)
         self.content = content

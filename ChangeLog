@@ -1,5 +1,10 @@
 2008-07-14  Jordi Massaguer i Pla  <jordi at flumotion dot com>
 
+	* flumotion/common/eventcalendar.py:
+	Changed import order.
+
+2008-07-14  Jordi Massaguer i Pla  <jordi at flumotion dot com>
+
 	* flumotion/admin/rrdmon/rrdmon.py:
 	* flumotion/common/eventcalendar.py:
 	* flumotion/component/base/scheduler.py:
