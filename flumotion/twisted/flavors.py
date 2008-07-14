@@ -279,26 +279,24 @@ class StateRemoteCache(pb.RemoteCache):
         Setting one of the event handlers to None will ignore that
         event. It is an error for all event handlers to be None.
 
-        @param listener: A new listener object that wants to receive
-                       cache state change notifications.
-        @type listener: object implementing
-                        L{flumotion.twisted.flavors.IStateListener}
-        @param    set: A procedure to call when a value is set
-        @type     set: procedure(object, key, value) -> None
-        @param append: A procedure to call when a value is appended to a
-                       list
-        @type  append: procedure(object, key, value) -> None
-        @param remove: A procedure to call when a value is removed from
-                       a list
-        @type  remove: procedure(object, key, value) -> None
-        @param setitem: A procedure to call when a value is set in a
-                       dict.
-        @type  setitem: procedure(object, key, subkey, value) -> None
-        @param delitem: A procedure to call when a value is removed
-                       from a dict.
-        @type  delitem: procedure(object, key, subkey, value) -> None
-        @param invalidate: A procedure to call when this cache has been
-                       invalidated.
+        @param listener:   new listener object that wants to receive
+                           cache state change notifications.
+        @type  listener:   object implementing
+                           L{flumotion.twisted.flavors.IStateListener}
+        @param set:        procedure to call when a value is set
+        @type  set:        procedure(object, key, value) -> None
+        @param append:     procedure to call when a value is appended to a list
+        @type  append:     procedure(object, key, value) -> None
+        @param remove:     procedure to call when a value is removed from
+                           a list
+        @type  remove:     procedure(object, key, value) -> None
+        @param setitem:    procedure to call when a value is set in a dict
+        @type  setitem:    procedure(object, key, subkey, value) -> None
+        @param delitem:    procedure to call when a value is removed
+                           from a dict.
+        @type  delitem:    procedure(object, key, subkey, value) -> None
+        @param invalidate: procedure to call when this cache has been
+                           invalidated.
         @type  invalidate: procedure(object) -> None
         """
         if not (set or append or remove or setitem or delitem or invalidate):
