@@ -1,5 +1,15 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/tags:
+	  add Python tags
+	* flumotion/common/python.py:
+	  comment pychecker tag
+	* flumotion/admin/connections.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	  add local pychecker suppression for P2.5 builtins
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/flavors.py:
 	  Deprecate set= kwarg, and add set_= kwarg as suggested by PEP-8.
 	* flumotion/admin/command/commands.py:

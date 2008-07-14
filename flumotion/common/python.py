@@ -25,9 +25,10 @@ forward compatibility with future python versions
 
 import sys
 
-__pychecker__ = 'no-shadowbuiltin'
 __version__ = "$Rev$"
 
+# we're possibly redefining some builtins, so don't warn
+__pychecker__ = 'no-shadowbuiltin'
 
 # sorted() was introduced in 2.4
 if sys.version_info[:2] < (2, 4):
