@@ -1,5 +1,10 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_component_httpserver.py:
+	  Rename uses of file to httpfile.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  Deprecate errors.SystemError since it shadows Python's builtin.
 	  Make errors.FatalError instead.

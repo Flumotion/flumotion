@@ -30,7 +30,7 @@ from twisted.web.static import Data
 
 from flumotion.common import log
 from flumotion.common import testsuite
-from flumotion.component.misc.httpserver import file, httpserver
+from flumotion.component.misc.httpserver import httpfile, httpserver
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.test import test_http
 
@@ -294,7 +294,7 @@ class TestTextFile(testsuite.TestCase):
         os.write(fd, 'a text file')
         os.close(fd)
         self.component = FakeComponent()
-        self.resource = file.File(self.path, self.component)
+        self.resource = httpfile.File(self.path, self.component)
 
     def tearDown(self):
         os.unlink(self.path)
@@ -411,8 +411,8 @@ class TestDirectory(testsuite.TestCase):
         h.close()
         self.component = FakeComponent()
         # a directory resource
-        self.resource = file.File(self.path, self.component,
-            { 'video/x-flv': file.FLVFile } )
+        self.resource = httpfile.File(self.path, self.component,
+            { 'video/x-flv': httpfile.FLVFile } )
 
     def tearDown(self):
         os.system('rm -r %s' % self.path)
@@ -420,7 +420,7 @@ class TestDirectory(testsuite.TestCase):
     def testGetChild(self):
         fr = FakeRequest()
         r = self.resource.getChild('test.flv', fr)
-        self.assertEquals(r.__class__, file.FLVFile)
+        self.assertEquals(r.__class__, httpfile.FLVFile)
 
     def testFLV(self):
         fr = FakeRequest()
@@ -439,7 +439,7 @@ class TestDirectory(testsuite.TestCase):
             server.NOT_DONE_YET)
         def finish(result):
             self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
-            expected = file.FLVFile.header + 'fake FLV file'
+            expected = httpfile.FLVFile.header + 'fake FLV file'
             self.assertEquals(fr.data, expected)
             self.assertEquals(fr.getHeader('Content-Length'),
                 str(len(expected)))
