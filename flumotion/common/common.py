@@ -57,19 +57,20 @@ def version(binary):
     block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
     return "\n".join(block)
 
-def ensureDir(dir, description):
+def ensureDir(directory, description):
     """
     Ensure the given directory exists, creating it if not.
-    Raises a SystemError if this fails, including the given description.
+
+    @raises L{errors.FatalError}: if the directory could not be created.
     """
-    if not os.path.exists(dir):
+    if not os.path.exists(directory):
         try:
-            makedirs(dir)
+            makedirs(directory)
         except OSError, e:
             from flumotion.common import errors
-            raise errors.SystemError(
+            raise errors.FatalError(
                 "could not create %s directory %s: %s" % (
-                description, dir, str(e)))
+                description, directory, str(e)))
 
 
 # FIXME: fix epydoc to correctly spell deprecated

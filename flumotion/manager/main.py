@@ -234,7 +234,7 @@ def main(args):
         # e is a socket.error()
         message = "Could not listen on port %d: %s" % (
             e.port, e.socketError.args[1])
-        raise errors.SystemError, message
+        raise errors.FatalError, message
 
     if options.daemonizeTo and not options.daemonize:
         sys.stderr.write(

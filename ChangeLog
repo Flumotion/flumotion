@@ -1,5 +1,18 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	  Deprecate errors.SystemError since it shadows Python's builtin.
+	  Make errors.FatalError instead.
+	* flumotion/common/boot.py:
+	* flumotion/common/common.py:
+	* flumotion/common/process.py:
+	* flumotion/manager/main.py:
+	* flumotion/service/service.py:
+	* flumotion/worker/main.py:
+	  Use errors.FatalError.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/flavors.py:
 	  Don't shadow set.
 

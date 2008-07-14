@@ -145,10 +145,15 @@ class PropertyError(pb.Error):
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"
 
+class FatalError(pb.Error):
+    "A fatal error"
 
-class SystemError(pb.Error):
-    "A system error, is usually fatal"
-
+class SystemError(FatalError):
+    def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn("Please use builtin SystemError or errors.FatalError",
+            DeprecationWarning, stacklevel=2)
+        pb.Error.__init__(self, *args, **kwargs)
 
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"

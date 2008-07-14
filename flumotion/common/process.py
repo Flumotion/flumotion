@@ -93,7 +93,7 @@ def _daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
         os.chdir(directory)
     except OSError, e:
         from flumotion.common import errors
-        raise errors.SystemError, "Failed to change directory to %s: %s" % (
+        raise errors.FatalError, "Failed to change directory to %s: %s" % (
             directory, e.strerror)
     os.umask(0)
     os.setsid()
@@ -187,14 +187,16 @@ def writePidFile(type, name=None, file=None):
     @rtype:   str
     @returns: full path to the pid file that was written
     """
-    if file is None:
+    # don't shadow builtin file
+    pidFile = file
+    if pidFile is None:
         ensureDir(configure.rundir, "rundir")
         filename = _getPidPath(type, name)
-        file = open(filename, 'w')
+        pidFile = open(filename, 'w')
     else:
-        filename = file.name
-    file.write("%d\n" % (os.getpid(),))
-    file.close()
+        filename = pidFile.name
+    pidFile.write("%d\n" % (os.getpid(),))
+    pidFile.close()
     os.chmod(filename, 0644)
     return filename
 

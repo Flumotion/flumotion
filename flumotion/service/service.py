@@ -69,22 +69,22 @@ class Servicer(log.Loggable):
 
         which = args[0]
         if which not in ['manager', 'worker']:
-            raise errors.SystemError, 'Please specify either manager or worker'
+            raise errors.FatalError, 'Please specify either manager or worker'
 
         if len(args) < 2:
-            raise errors.SystemError, 'Please specify which %s to %s' % (
+            raise errors.FatalError, 'Please specify which %s to %s' % (
                 which, command)
 
         name = args[1]
         if which == 'manager':
             managers = self.getManagers()
             if not managers.has_key(name):
-                raise errors.SystemError, 'No manager "%s"' % name
+                raise errors.FatalError, 'No manager "%s"' % name
             managers = [name, ]
         elif which == 'worker':
             workers = self.getWorkers()
             if not name in workers:
-                raise errors.SystemError, 'No worker with name %s' % name
+                raise errors.FatalError, 'No worker with name %s' % name
             workers = [name, ]
 
         return (managers, workers)
@@ -278,11 +278,11 @@ class Servicer(log.Loggable):
         Create a default manager or worker config.
         """
         if len(args) == 0:
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Please specify 'manager' or 'worker' to create."
         kind = args[0]
         if len(args) == 1:
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Please specify name of %s to create." % kind
         name = args[1]
 
@@ -295,7 +295,7 @@ class Servicer(log.Loggable):
         elif kind == 'worker':
             self.createWorker(name, managerPort=port, randomFeederports=True)
         else:
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Please specify 'manager' or 'worker' to create."
 
     def createManager(self, name, port=7531):
@@ -307,7 +307,7 @@ class Servicer(log.Loggable):
         self.info("Creating manager %s" % name)
         managerDir = os.path.join(self.managersDir, name)
         if os.path.exists(managerDir):
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Manager directory %s already exists" % managerDir
         makedirs(managerDir)
 
@@ -355,7 +355,7 @@ user:PSfNpHTkpTx1M
         self.info("Creating worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if os.path.exists(workerFile):
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Worker file %s already exists." % workerFile
 
         feederports = "  <!-- <feederports>8600-8639</feederports> -->"
@@ -398,7 +398,7 @@ user:PSfNpHTkpTx1M
         managerDir = os.path.join(self.managersDir, name)
         planetFile = os.path.join(managerDir, 'planet.xml')
         if not os.path.exists(planetFile):
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Planet file %s does not exist" % planetFile
         self.info("Loading planet %s" % planetFile)
 
@@ -407,7 +407,7 @@ user:PSfNpHTkpTx1M
         for flowName in flowNames:
             flowFile = os.path.join(flowsDir, "%s.xml" % flowName)
             if not os.path.exists(flowFile):
-                raise errors.SystemError, \
+                raise errors.FatalError, \
                     "Flow file %s does not exist" % flowFile
             flowFiles.append(flowFile)
             self.info("Loading flow %s" % flowFile)
@@ -415,10 +415,10 @@ user:PSfNpHTkpTx1M
         pid = getPid('manager', name)
         if pid:
             if checkPidRunning(pid):
-                raise errors.SystemError, \
+                raise errors.FatalError, \
                     "Manager %s is already running (with pid %d)" % (name, pid)
             else:
-                raise errors.SystemError, \
+                raise errors.FatalError, \
                     "Manager %s is dead (stale pid %d)" % (name, pid)
 
         dirOptions = self._getDirOptions()
@@ -453,16 +453,16 @@ user:PSfNpHTkpTx1M
         self.info("Starting worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if not os.path.exists(workerFile):
-            raise errors.SystemError, \
+            raise errors.FatalError, \
                 "Worker file %s does not exist" % workerFile
 
         pid = getPid('worker', name)
         if pid:
             if checkPidRunning(pid):
-                raise errors.SystemError, \
+                raise errors.FatalError, \
                     "Worker %s is already running (with pid %d)" % (name, pid)
             else:
-                raise errors.SystemError, \
+                raise errors.FatalError, \
                     "Worker %s is dead (stale pid %d)" % (name, pid)
 
         # we are sure the worker is not running and there's no pid file

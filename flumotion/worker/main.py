@@ -101,11 +101,11 @@ def _readConfig(workerFile, options):
     try:
         cfg = config.WorkerConfigXML(workerFile)
     except config.ConfigError, value:
-        raise errors.SystemError(
+        raise errors.FatalError(
             "Could not load configuration from %s: %s" % (
             workerFile, value))
     except IOError, e:
-        raise errors.SystemError(
+        raise errors.FatalError(
             "Could not load configuration from %s: %s" % (
             workerFile, e.strerror))
 
