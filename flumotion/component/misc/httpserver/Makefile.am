@@ -2,10 +2,10 @@ include $(top_srcdir)/common/python.mk
 
 httpserverdir = $(libdir)/flumotion/python/flumotion/component/misc/httpserver
 
-httpserver_PYTHON =	\
+httpserver_PYTHON =		\
 	__init__.py		\
-	admin_gtk.py	\
-	file.py			\
+	admin_gtk.py		\
+	httpfile.py		\
 	httpserver.py		\
 	ratecontrol.py
 

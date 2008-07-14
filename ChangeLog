@@ -1,5 +1,14 @@
 2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/httpfile.py (added):
+	* flumotion/component/misc/httpserver/file.py (deleted):
+	  renamed to not clash with file builtin.
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	  Rename uses of file to httpfile.
+
+2008-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/playlist/playlistparser.py:
 	  One more shadow cleanup.
 

@@ -34,7 +34,7 @@ from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
-from flumotion.component.misc.httpserver import file
+from flumotion.component.misc.httpserver import httpfile
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
@@ -175,7 +175,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # FIXME: maybe we want to allow the configuration to specify
         # additional mime -> File class mapping ?
         self._mimeToResource = {
-            'video/x-flv': file.FLVFile,
+            'video/x-flv': httpfile.FLVFile,
         }
 
         # store number of connected clients
@@ -391,7 +391,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             return None
 
         self.debug('Starting with mount point "%s"' % self.mountPoint)
-        factory = file.MimedFileFactory(self.httpauth,
+        factory = httpfile.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource,
             rateController=self._rateControlPlug)
 
