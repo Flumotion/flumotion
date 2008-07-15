@@ -210,12 +210,12 @@ class SchedulerTest(testsuite.TestCase):
         self._scheduler.removeEvent(e2)
         self._scheduler.removeEvent(e1)
         self._scheduler._cancelScheduledCalls()
-        self.assertTrue(len(current)==2)
-        self.assertTrue((current[0].content == 'event1' and
+        self.assertEquals(len(current), 2)
+        self.failIf(not ((current[0].content == 'event1' and
                          current[1].content == 'event2')
                          or
                          (current[0].content == 'event2' and
-                          current[1].content == 'event1'))
+                          current[1].content == 'event1')))
 
     def testRecurrenceEventsDaily(self):
         now = _now()
@@ -228,7 +228,7 @@ class SchedulerTest(testsuite.TestCase):
         e1 = self._scheduler.addEvent(uid, start, end, "event1",
                                       rrule=rrule, now=now)
         current = self._scheduler.getCurrentEvents(now)[:]
-        self.assertTrue(len(current)==1)
+        self.assertEquals(len(current), 1)
         content = current[0].content
         currentStart = current[0].start
         currentEnd = current[0].end
@@ -244,7 +244,7 @@ class SchedulerTest(testsuite.TestCase):
                                      rrule, None)
         self.assertEquals(currentStartCurrent, start)
         self.assertEquals(currentEndCurrent, end)
-        self.assertTrue(len(current2) == 1)
+        self.assertEquals(len(current2), 1)
         self.assertEventAttribsEqual(e2, start, end, 'event1',
                                      rrule, None)
         self.assertEquals(currentStartCurrent2, start + timedelta(days=1))
@@ -260,14 +260,14 @@ class SchedulerTest(testsuite.TestCase):
         e1 = self._scheduler.addEvent(uid, start, end, "event1",
                                       rrule=rrule, now=now)
         current = self._scheduler.getCurrentEvents(now)[:]
-        self.assertTrue(len(current) == 1)
+        self.assertEquals(len(current), 1)
         content = current[0].content
         currentStart = current[0].start
         currentEnd = current[0].end
         currentStartCurrent = current[0].currentStart
         currentEndCurrent = current[0].currentEnd
         current2 = self._scheduler.getCurrentEvents(now + timedelta(hours=1))
-        self.assertTrue(len(current2) == 1)
+        self.assertEquals(len(current2), 1)
         e2 = current2[0]
         currentStartCurrent2 = current2[0].currentStart
         currentEndCurrent2 = current2[0].currentEnd
@@ -278,7 +278,7 @@ class SchedulerTest(testsuite.TestCase):
         self.assertEquals(currentStartCurrent, now - timedelta(hours=1) +
                           timedelta(minutes=2))
         self.assertEquals(currentEndCurrent, now + timedelta(minutes=2))
-        self.assertTrue(len(current2) == 1)
+        self.assertEquals(len(current2), 1)
         self.assertEventAttribsEqual(e2, start, end,
                                      content, rrule, None)
         self.assertEquals(currentStartCurrent2, now + timedelta(minutes=2))
@@ -359,7 +359,7 @@ class SchedulerTest(testsuite.TestCase):
         e1 = self._scheduler.addEvent(uid, start, end, content,
                                       rrule=rrule, now=now)
         current = self._scheduler.getCurrentEvents()[:]
-        self.assertTrue(len(current) == 1)
+        self.assertEquals(len(current), 1)
         self._scheduler.removeEvent(e1)
         self._scheduler._cancelScheduledCalls()
         event = current[0]
@@ -377,7 +377,7 @@ class SchedulerTest(testsuite.TestCase):
         current = self._scheduler.getCurrentEvents()[:]
         self._scheduler.removeEvent(e1)
         self._scheduler._cancelScheduledCalls()
-        self.assertTrue(len(current) == 1)
+        self.assertEquals(len(current), 1)
         event = current[0]
         self.assertEventAttribsEqual(event, start, end, 'event1',
                                      None, None)
@@ -390,7 +390,7 @@ class SchedulerTest(testsuite.TestCase):
         self._scheduler.addEvent(uid, start, end, "event1", now=now)
         current = self._scheduler.getCurrentEvents()[:]
         self._scheduler._cancelScheduledCalls()
-        self.assertTrue(not current)
+        self.failIf(current)
 
     def testCurrentEventsDoNotStartLaterThanTomorrow(self):
         now = _now()
@@ -403,7 +403,7 @@ class SchedulerTest(testsuite.TestCase):
         current = self._scheduler.getCurrentEvents()[:]
         self._scheduler.removeEvent(e1)
         self._scheduler._cancelScheduledCalls()
-        self.assertTrue(not current)
+        self.failIf(current)
 
     def testReplaceFutureEvent(self):
         uid = 'uid'
@@ -487,10 +487,10 @@ class SchedulerTest(testsuite.TestCase):
         self._scheduler.removeEvent(newEvent1)
         events = self._scheduler._eventSets[uid]._events
         self._scheduler._cancelScheduledCalls()
-        self.assertTrue(((newEvent0.content == event.content and
+        self.failIf(not (((newEvent0.content == event.content and
                           newEvent1.content == new_e.content) or
                         ((newEvent1.content == event.content) and
-                         newEvent0.content == new_e.content)))
+                         newEvent0.content == new_e.content))))
         self.failIf(events)
 
     def testNoReplaceOnNewCurrentEvent(self):
@@ -726,7 +726,7 @@ class ICalSchedulerTest(testsuite.TestCase):
 class SchedulerFunctionsTest(testsuite.TestCase):
 
     def testToDateTime(self):
-        self.assertNot(eventcalendar.toDateTime(None))
+        self.failif(eventcalendar.toDateTime(None))
         dateTime = datetime(2015, 4, 4, 8, 0, 0, tzinfo=scheduler.LOCAL)
         self.assertEquals(dateTime, eventcalendar.toDateTime(dateTime))
         d = date(2015, 4, 4)
