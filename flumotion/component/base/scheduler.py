@@ -211,19 +211,19 @@ class Scheduler(log.Loggable):
 
         def _getNextEvent(now):
             earliest = now + self.windowSize
-            type = None
+            which = None
             result = None
             for event in self.getCurrentEvents(now, self.windowSize):
                 self.debug("current event %s", event.uid)
                 if event.currentStart < earliest and event.currentStart > now:
                     earliest = event.currentStart
-                    type = 'start'
+                    which = 'start'
                     result = event
                 if event.currentEnd < earliest:
                     earliest = event.currentEnd
-                    type = 'end'
+                    which = 'end'
                     result = event
-            return result, type
+            return result, which
 
         def doStart(e):
             self._eventStarted(e)
