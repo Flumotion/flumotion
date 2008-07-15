@@ -1,5 +1,10 @@
 2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
 
+	* flumotion/test/Makefile.am:
+	added the ics files.
+
+2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
+
 	* flumotion/test/test-exdate.ics:
 	* flumotion/test/test-google.ics:
 	They are needed for some tests and were missing.

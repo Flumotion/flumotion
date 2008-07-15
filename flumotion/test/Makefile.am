@@ -85,6 +85,8 @@ EXTRA_DIST = 					\
 	test_workerconfig.py			\
 	test_worker_job.py			\
 	test_worker_medium.py			\
-	test_worker_worker.py
+	test_worker_worker.py	\
+	test-exdate.ics \
+	test-google.ics
 
 check-local: trial
