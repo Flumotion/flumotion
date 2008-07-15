@@ -21,12 +21,14 @@ done
 flumotion-manager -v -T $PROTOCOL \
                   -P $PORT \
                   -n $NAME \
-                  conf/managers/default/planet.xml >& /tmp/$NAME.manager.log &
+                  -d 5 \
+		  conf/managers/default/planet.xml >& /tmp/$NAME.manager.log &
 manager_pid=$!
 
 flumotion-worker -v -T $PROTOCOL \
                  -P $PORT \
-                 -u user -p test >& /tmp/$NAME.worker.log  &
+                 -d 5 \
+		 -u user -p test >& /tmp/$NAME.worker.log  &
 worker_pid=$!
 
 MANAGER=user:test@localhost:$PORT
