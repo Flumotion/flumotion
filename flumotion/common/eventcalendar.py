@@ -133,8 +133,8 @@ def toDateTime(d):
     @return: If d was an event instance of date, it returns the equivalent
      datetime.Otherwise, it returns d.
     """
-    if isinstance(d, datetime.date) and not isinstance(d, datetime):
-        return datetime(d.year, d.month, d.day, tzinfo=LOCAL)
+    if isinstance(d, datetime.date) and not isinstance(d, datetime.datetime):
+        return datetime.datetime(d.year, d.month, d.day, tzinfo=LOCAL)
     return d
 
 
@@ -191,7 +191,7 @@ class Event(Loggable):
     def __addTimeZone(self, dateTime, now):
         if dateTime.tzinfo is not None:
             return dateTime
-        return datetime(dateTime.year, dateTime.month, dateTime.day,
+        return datetime.datetime(dateTime.year, dateTime.month, dateTime.day,
                         dateTime.hour, dateTime.minute, dateTime.second,
                         dateTime.microsecond, now)
 
@@ -404,7 +404,7 @@ def parseCalendar(cal):
         dt = toDateTime(v.dt)
         if dt.tzinfo is None:
             tzinfo = tz.gettz(v.params['TZID'])
-            dt = datetime(dt.year, dt.month, dt.day,
+            dt = datetime.datetime(dt.year, dt.month, dt.day,
                 dt.hour, dt.minute, dt.second,
                 dt.microsecond, tzinfo)
         return dt

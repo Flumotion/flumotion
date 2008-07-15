@@ -1,5 +1,12 @@
 2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
 
+	* flumotion/common/eventcalendar.py:
+	Added the datetime namespace.
+	* flumotion/component/base/scheduler.py:
+	renamed type to which as type was shadowing a builtin.
+
+2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
+
 	* flumotion/component/base/scheduler.py:
 	rename type to which as type was shadowing a builtin.
 

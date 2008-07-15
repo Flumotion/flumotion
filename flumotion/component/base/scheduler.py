@@ -239,18 +239,18 @@ class Scheduler(log.Loggable):
 
         now = datetime.now(LOCAL)
 
-        event, type = _getNextEvent(now)
+        event, which = _getNextEvent(now)
 
         def toSeconds(td):
             return max(td.days*24*3600 + td.seconds + td.microseconds/1e6, 0)
 
         if event:
-            if type == 'start':
+            if which == 'start':
                 self.debug("schedule start event at %s", str(event.currentStart - now))
                 
                 seconds = toSeconds(event.currentStart - now)
                 dc = reactor.callLater(seconds, doStart, event)
-            elif type == 'end':
+            elif which == 'end':
                 self.debug("schedule end event at %s", str(event.currentEnd - now))
                 
                 seconds = toSeconds(event.currentEnd - now)
