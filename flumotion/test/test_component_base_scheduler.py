@@ -726,7 +726,7 @@ class ICalSchedulerTest(testsuite.TestCase):
 class SchedulerFunctionsTest(testsuite.TestCase):
 
     def testToDateTime(self):
-        self.failif(eventcalendar.toDateTime(None))
+        self.failIf(eventcalendar.toDateTime(None))
         dateTime = datetime(2015, 4, 4, 8, 0, 0, tzinfo=scheduler.LOCAL)
         self.assertEquals(dateTime, eventcalendar.toDateTime(dateTime))
         d = date(2015, 4, 4)

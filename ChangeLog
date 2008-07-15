@@ -1,5 +1,11 @@
 2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
+	* flumotion/test/test_component_base_scheduler.py
+	replaced asserts for asserts that are available on previous
+	versions of twisted.
+
+2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
 	* flumotion/test/test_component_base_scheduler.py:
 	replaced asserts for asserts that are available on previous
 	versions of twisted.
