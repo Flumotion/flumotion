@@ -1,3 +1,9 @@
+2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* flumotion/common/Makefile.am: added eventcalendar
+	* flumotion/test/Makefile.am: added test_component_base_vevent
+	
+
 2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
 
 	* flumotion/test/Makefile.am:

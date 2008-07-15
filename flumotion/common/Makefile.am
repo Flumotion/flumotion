@@ -49,7 +49,8 @@ flumotion_PYTHON = \
 	testsuite.py \
 	watched.py \
 	worker.py \
-	xmlwriter.py
+	xmlwriter.py \
+	eventcalendar.py 
 
 TAGS_DEPENDENCIES = $(flumotion_PYTHON)
 ETAGS_ARGS = --lang=python $(flumotion_PYTHON)

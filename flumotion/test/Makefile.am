@@ -35,6 +35,7 @@ EXTRA_DIST = 					\
 	test_common_signals.py			\
 	test_common_xmlwriter.py		\
 	test_component_base_scheduler.py	\
+	test_component_base_vevent.py	\
 	test_component_base_watcher.py		\
 	test_component_bouncers_bouncer.py	\
 	test_component_bouncers_component.py	\
@@ -86,7 +87,7 @@ EXTRA_DIST = 					\
 	test_worker_job.py			\
 	test_worker_medium.py			\
 	test_worker_worker.py	\
-	test-exdate.ics \
+	test-exdate.ics	\
 	test-google.ics
 
 check-local: trial
