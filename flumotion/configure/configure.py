@@ -69,20 +69,28 @@ different configdir, logdir and rundir.
 @var  defaultGstPortRange:    the default range of internal GStreamer ports
 @type defaultGstPortRange:    list of ints
 
+@var  PACKAGE:      Flumotion package
+@type PACKAGE:      string
 @var  version:      Flumotion version number
 @type version:      string
 @var  versionTuple: Flumotion version number
 @type versionTuple: 4-tuple of integers
+
+# default values for service-related stuff
+
+@var  processTermWait: how long to wait before timing out term signals
+@type processTermWait int
+@var  processKillWait: how long to wait before timing out kill signals
+@type processKillWait int
+@var  heartbeatInterval: component heartbeat interval, in seconds
+@type heartbeatInterval: int
 '''
 
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
 #       really know what you're doing
 
-# FIXME: document all the module variables
-
 import os
-import sys
 
 __version__ = "$Rev$"
 
@@ -96,31 +104,39 @@ else:
     from flumotion.configure import installed
     _config = installed.get()
 
-# default values for ports
-_config['defaultTCPManagerPort'] = 8642
-_config['defaultSSLManagerPort'] = 7531
-_config['defaultHTTPStreamPort'] = 8800
-_config['defaultGstPortRange'] = range(8600, 8639 + 1)
-
-# default values for service-related stuff
-# how long to wait before timing out term and kill signals
-_config['processTermWait'] = 10
-_config['processKillWait'] = 5
-
-# default value for component heartbeat interval, in seconds
-_config['heartbeatInterval'] = 5
-
-_config['bindir'] = os.path.dirname(os.path.abspath(sys.argv[0]))
-
-_config['PACKAGE'] = 'flumotion'
-
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))
-    if len (t) < 4:
+    if len(t) < 4:
         t = t + (0,)
     return t
-_config['versionTuple'] = _versionStringToTuple(_config['version'])
 
-for key, value in _config.items():
-    dictionary = locals()
-    dictionary[key] = value
+isinstalled = _config['isinstalled']
+
+cachedir = _config['cachedir']
+configdir = _config['configdir']
+daemondir = _config['daemondir']
+datadir = _config['datadir']
+gladedir = _config['gladedir']
+imagedir = _config['imagedir']
+logdir = _config['logdir']
+localedatadir = _config['localedatadir']
+pythondir = _config['pythondir']
+registrydir = _config['registrydir']
+rundir = _config['rundir']
+bindir = _config['bindir']
+sbindir = _config['sbindir']
+
+defaultTCPManagerPort = 8642
+defaultSSLManagerPort = 7531
+defaultHTTPStreamPort = 8800
+defaultGstPortRange = range(8600, 8639 + 1)
+
+PACKAGE = 'flumotion'
+version = _config['version']
+versionTuple = _versionStringToTuple(version)
+
+processTermWait = 10
+processKillWait = 5
+heartbeatInterval = 5
+
+
