@@ -27,7 +27,7 @@
       <child>
 	<widget class="GtkLabel" id="label1">
 	  <property name="visible">True</property>
-	  <property name="label" translatable="yes">Congratulations ! You are now ready to use 
+	  <property name="label" translatable="yes">Congratulations. You are now ready to use 
 your streaming server.
 
 When you press &amp;quot;Apply&amp;quot;, your configuration will be automatically loaded on your network.  This will take some time.</property>

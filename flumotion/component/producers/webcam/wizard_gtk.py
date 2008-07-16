@@ -105,7 +105,7 @@ class WebcamStep(VideoProducerStep):
 
         device = self.device.get_selected()
         msg = Info(T_(
-                N_("Probing webcam, this can take a while...")),
+                N_("Probing the webcam. This can take a while...")),
             id='webcam-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker('flumotion.worker.checks.video', 'checkWebcam',

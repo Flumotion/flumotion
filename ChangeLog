@@ -1,3 +1,22 @@
+2008-07-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* data/glade/production-wizard.glade:
+	* data/glade/select-producers-wizard.glade:
+	* data/glade/summary-wizard.glade:
+	* flumotion/component/producers/bttv/wizard_gtk.py
+	  (TVCardStep._runChecks):
+	* flumotion/component/producers/soundcard/soundcard.py
+	  (Soundcard.configure_pipeline):
+	* flumotion/component/producers/soundcard/wizard_gtk.py 
+	(SoundcardStep._updateInputs):
+	* flumotion/component/producers/webcam/wizard_gtk.py
+	  (WebcamStep._runChecks):
+	* flumotion/test/test_i18n.py (TranslatorTest.testTranslateMessage):
+	* flumotion/wizard/diskersteps.py (DiskBothStep):
+	* flumotion/wizard/httpstreamersteps.py (HTTPBothStep):
+	* flumotion/wizard/shout2steps.py (Shout2BothStep): Minor English 
+	corrections for translated strings.
+
 2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion/test/test_component_base_scheduler.py

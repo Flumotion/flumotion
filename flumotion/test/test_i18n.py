@@ -164,7 +164,7 @@ class TranslatorTest(testsuite.TestCase):
 
     def testTranslateMessage(self):
         cmsg = messages.Error(T_(N_("Something is really wrong. ")))
-        t = T_(N_("But does %s know what ?"), "Andy")
+        t = T_(N_("But does %s know what?"), "Andy")
         cmsg.add(t)
         mmsg = jelly.unjelly(jelly.jelly(cmsg))
 

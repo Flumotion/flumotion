@@ -166,7 +166,7 @@ class DiskStep(ConsumerStep):
 
 class DiskBothStep(DiskStep):
     name = 'Disk (audio & video)'
-    title = _('Disk (audio & video)')
+    title = _('Disk (audio and video)')
     sidebarName = _('Disk audio/video')
 
     # ConsumerStep

@@ -71,7 +71,7 @@ class SoundcardProducer(AudioProducer):
 
 class SoundcardStep(AudioProducerStep):
     name = 'Soundcard'
-    title = _('Soundcard')
+    title = _('Sound Card')
     icon = 'soundcard.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
@@ -153,7 +153,7 @@ class SoundcardStep(AudioProducerStep):
         assert elementName
         assert channels
         msg = Info(T_(
-            N_("Probing soundcard, this can take a while...")),
+            N_("Probing the sound card. This can take a while...")),
                             id='soundcard-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker(

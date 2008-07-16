@@ -115,7 +115,7 @@ class TVCardStep(VideoProducerStep):
         device = self.device.get_selected()
         assert device
         msg = Info(T_(
-            N_("Probing TV-card, this can take a while...")),
+            N_("Probing the TV card. This can take a while...")),
                             id='tvcard-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker('flumotion.worker.checks.video', 'checkTVCard',

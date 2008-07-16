@@ -79,7 +79,7 @@ class Shout2Step(ConsumerStep):
 
 class Shout2BothStep(Shout2Step):
     name = 'Icecast streamer (audio & video)'
-    title = _('Icecast streamer (audio & video)')
+    title = _('Icecast streamer (audio and video)')
     sidebarName = _('Icecast audio/video')
 
     # ConsumerStep

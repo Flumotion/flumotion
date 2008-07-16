@@ -375,7 +375,7 @@ class HTTPSpecificStep(ConsumerStep):
 
 class HTTPBothStep(HTTPSpecificStep):
     name = 'HTTPStreamerBoth'
-    title = _('HTTP Streamer (audio & video)')
+    title = _('HTTP Streamer (audio and video)')
     sidebarName = _('HTTP audio/video')
 
     # ConsumerStep
