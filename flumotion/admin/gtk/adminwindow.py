@@ -56,7 +56,7 @@ which is defined in this file:
     contains a component specific view, usually a set of tabs, it is
     created in the L{flumotion.admin.gtk.componentview} module.
   - L{AdminStatus<flumotion.admin.gtk.statusbar.AdminStatus>} is a
-    statusbar displaying context specific hints and is defined in the 
+    statusbar displaying context specific hints and is defined in the
     L{flumotion.admin.gtk.statusbar} module.
 
 """
@@ -171,7 +171,7 @@ class AdminWindow(Loggable, GladeDelegate):
     '''Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
-    
+
     # GladeDelegate
     gladefile = 'admin.glade'
     toplevel_name = 'main_window'
@@ -324,7 +324,7 @@ class AdminWindow(Loggable, GladeDelegate):
         del self.statusbar
         self._messageView = self.messages_view
         del self.messages_view
-        
+
         self._window.set_name("AdminWindow")
         self._window.connect('delete-event', self._window_delete_event_cb)
 
@@ -433,7 +433,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._componentContextMenu = uimgr.get_widget('/ComponentContextMenu')
         self._componentContextMenu.show()
-        
+
         menubar.show_all()
 
         self._actiongroup = group
@@ -497,7 +497,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         for name, cid in cids:
             widget.disconnect(cid)
-        
+
     def _setAdminModel(self, model):
         'set the model to which we are a view/controller'
         # it's ok if we've already been connected
@@ -581,7 +581,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._recentMenuID = self._uimgr.add_ui_from_string(
             RECENT_UI_TEMPLATE % ui)
         self._openRecentAction.set_sensitive(len(connections))
-                                             
+
     def _quit(self):
         """Quitting the application in a controlled manner"""
         self._clearAdmin()
@@ -637,7 +637,7 @@ class AdminWindow(Loggable, GladeDelegate):
             config = state.get('config')
             if componentType and config['type'] == componentType:
                 componentStates.append(state)
-                
+
         if not componentStates:
             return None
         elif len(componentStates) == 1:
@@ -669,7 +669,7 @@ class AdminWindow(Loggable, GladeDelegate):
                     if entry.componentType == componentType:
                         yield (componentState, entry)
 
-            
+
         for componentState, entry in _getComponents():
             component = componentClass()
             component.componentType = entry.componentType
@@ -679,7 +679,7 @@ class AdminWindow(Loggable, GladeDelegate):
             for key, value in config['properties'].items():
                 component.properties[key] = value
             yield component
-    
+
     def _runAddNewFormatWizard(self):
         from flumotion.admin.gtk.addformatwizard import AddFormatWizard
         addFormatWizard = AddFormatWizard(self._window)
@@ -695,10 +695,10 @@ class AdminWindow(Loggable, GladeDelegate):
             addFormatWizard.setAudioProducers(audioProducers)
             addFormatWizard.setVideoProducers(videoProducers)
             self._runWizard(addFormatWizard)
-            
+
         d = self._adminModel.getWizardEntries(
             wizardTypes=['audio-producer', 'video-producer'])
-        d.addCallback(cb)  
+        d.addCallback(cb)
 
     def _runConfigurationWizard(self):
         from flumotion.wizard.configurationwizard import ConfigurationWizard
@@ -707,7 +707,7 @@ class AdminWindow(Loggable, GladeDelegate):
             configurationWizard = ConfigurationWizard(self._window)
             self._runWizard(configurationWizard)
             self._configurationWizardIsRunning = True
-            
+
         if not self._componentStates:
             runWizard()
             return
@@ -723,7 +723,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         d = self._clearAllComponents()
         d.addCallback(lambda unused: runWizard())
-        
+
     def _runWizard(self, wizard):
         workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
@@ -755,7 +755,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
     def _updateConnectionActions(self):
         self._openRecentAction.set_sensitive(hasRecentConnections())
-        
+
     def _updateComponentActions(self):
         canStart = self._componentList.canStart()
         canStop = self._componentList.canStop()
@@ -876,7 +876,7 @@ class AdminWindow(Loggable, GladeDelegate):
                   "Try again later."))
         d.addErrback(busyComponentError)
         return d
-    
+
     # component view activation functions
 
     def _removeComponent(self, state):
@@ -935,7 +935,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         if not states:
             return
-        
+
         def callbackSingle(result, self, mid, name):
             self._statusbar.remove('main', mid)
             self._setStatusbarText(
@@ -955,14 +955,14 @@ class AdminWindow(Loggable, GladeDelegate):
             self._statusbar.remove('main', mid)
             self._setStatusbarText(
                 _("%s components.") % (done,))
-            
+
         def errbackMultiple(failure, self, mid):
             self._statusbar.remove('main', mid)
             self.warning("Failed to %s some components: %s." % (
                 action.lower(), failure))
             self._setStatusbarText(
                 _("Failed to %s some components.") % (action,))
-            
+
         f = gettext.dngettext(
             configure.PACKAGE,
             # first %s is one of Stopping/Starting/Deleting
@@ -1217,11 +1217,11 @@ class AdminWindow(Loggable, GladeDelegate):
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.set_current_name("configuration.xml")
-        
+
         def getConfiguration(conf_xml, name, chooser):
             if not name.endswith('.xml'):
                 name += '.xml'
-                
+
             file_exists = True
             if os.path.exists(name):
                 d = gtk.MessageDialog(
@@ -1233,7 +1233,7 @@ class AdminWindow(Loggable, GladeDelegate):
                     file_exists = False
             else:
                 file_exists = False
-                
+
             if not file_exists:
                 f = open(name, 'w')
                 f.write(conf_xml)
@@ -1317,7 +1317,7 @@ You can do remote component calls using:
         self._disconnectActionProxy(action, widget)
 
     def _on_menu_item__select(self, menuitem, tooltip):
-        self._setStatusbarText(tooltip) 
+        self._setStatusbarText(tooltip)
 
     def _on_menu_item__deselect(self, menuitem):
         self._clearLastStatusbarText()
@@ -1342,7 +1342,7 @@ You can do remote component calls using:
 
     def _components_show_popup_menu_cb(self, clist, event_button, event_time):
         self._componentShowPopupMenu(event_button, event_time)
-        
+
     def _components_selection_changed_cb(self, clist, state):
         self._componentSelectionChanged(state)
 
@@ -1391,7 +1391,7 @@ You can do remote component calls using:
 
     def _manage_add_format_cb(self, action):
         self._runAddNewFormatWizard()
-        
+
     def _manage_run_wizard_cb(self, action):
         self._runConfigurationWizard()
 
@@ -1403,7 +1403,7 @@ You can do remote component calls using:
 
     def _debug_dump_configuration_cb(self, action):
         self._dumpConfiguration()
-    
+
     def _help_about_cb(self, action):
         self._about()
 
