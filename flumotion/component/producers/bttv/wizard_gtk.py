@@ -139,11 +139,11 @@ class TVCardStep(VideoProducerStep):
                 self.wizard.taskFinished(True)
                 return None
 
-            deviceName, channels, norms = result
+            deviceName, channels, signals = result
             self.wizard.clear_msg('tvcard-check')
-            self.channel.prefill(norms)
+            self.channel.prefill(channels)
             self.channel.set_sensitive(True)
-            self.signal.prefill(channels)
+            self.signal.prefill(signals)
             self.signal.set_sensitive(True)
             self.wizard.taskFinished()
 

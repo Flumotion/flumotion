@@ -1,5 +1,9 @@
 2008-07-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/bttv/wizard_gtk.py
+	(TVCardStep._clearCombos): channel and norm was swapped.
+	Rename norm to signal. Found by Rozstrojenie Jazni.
+
 	* flumotion/admin/gtk/adminwindow.py
 	(AdminWindow._componentSelectionChanged): 
 	It's compSet instead of _compSet. Now why didn't pychecker find this?
