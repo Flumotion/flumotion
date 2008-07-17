@@ -998,7 +998,7 @@ class AdminWindow(Loggable, GladeDelegate):
         def compSet(state, key, value):
             if key == 'mood':
                 self._updateComponentActions()
-                
+
         def compAppend(state, key, value):
             name = state.get('name')
             self.debug('stateAppend on component state of %s' % name)
@@ -1022,10 +1022,10 @@ class AdminWindow(Loggable, GladeDelegate):
         if self._currentComponentStates:
             for currentComponentState in self._currentComponentStates:
                 currentComponentState.addListener(
-                self, set=_compSet, append=compAppend, remove=compRemove)
+                self, set=compSet, append=compAppend, remove=compRemove)
 
         self._updateComponentActions()
-        self._clearMessages() 
+        self._clearMessages()
         state = None
         if states:
             if len(states) == 1:

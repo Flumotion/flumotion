@@ -1,3 +1,9 @@
+2008-07-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/adminwindow.py
+	(AdminWindow._componentSelectionChanged): 
+	It's compSet instead of _compSet. Now why didn't pychecker find this?
+
 2008-07-16  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/configure/configure.py:
