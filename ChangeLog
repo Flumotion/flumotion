@@ -21,6 +21,9 @@
 
 2008-07-18  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	set BINDIR, so it gets properly expanded in installed.py
+
 	* flumotion/test/test_greeter.py (WizardTest.testGreeter): 
 	Going prev/next unselected the previously selected option,
 	workaround that by selecting the option we want again.

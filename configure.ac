@@ -41,6 +41,9 @@ AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
 AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
 AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
 
+AS_AC_EXPAND(BINDIR, $bindir)
+AC_MSG_NOTICE(Using bindir $BINDIR)
+
 AS_AC_EXPAND(SBINDIR, $sbindir)
 AC_MSG_NOTICE(Using sbindir $SBINDIR)
 
