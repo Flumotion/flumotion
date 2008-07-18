@@ -30,7 +30,7 @@
 	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">
 Please write the debug marker you want to write 
-on your logs and select the debug level. Press Ok
+to your logs and select the debug level. Press Ok
 when you are ready.
 </property>
 	  <property name="use_underline">False</property>

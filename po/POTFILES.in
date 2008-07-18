@@ -5,6 +5,7 @@ data/glade/authenticate.glade
 data/glade/connection-dialog.glade
 data/glade/connections.glade
 data/glade/consumption-wizard.glade
+data/glade/debug-marker.glade
 data/glade/disker-wizard.glade
 data/glade/encoding-wizard.glade
 data/glade/greeter-authenticate.glade

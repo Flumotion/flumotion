@@ -1,5 +1,14 @@
 2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/debug-marker.glade:
+	  Fix string.
+	* po/POTFILES.in:
+	  Add for translation.
+	* po/POTFILES.skip (added):
+	  Don't scan i18n.py
+
+2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/POTFILES.in:
 	  Fix up for file->httpfile rename.
 
