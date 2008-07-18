@@ -1,3 +1,9 @@
+2008-07-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/test_greeter.py (WizardTest.testGreeter): 
+	Going prev/next unselected the previously selected option,
+	workaround that by selecting the option we want again.
+
 2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/gtkunit.py:

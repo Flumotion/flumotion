@@ -55,6 +55,9 @@ class WizardTest(UITestCase):
         self.click('connect_to_existing')
         self._next()
         self._prev()
+        # FIXME: Save the last option selected instead of
+        #        always selecting the first
+        self.click('connect_to_existing')
         self._next()
         self._checkPrevNext(True, True)
         self.setText('host_entry', 'foolio')
