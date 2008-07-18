@@ -1,3 +1,8 @@
+2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* po/POTFILES.in:
+	  Fix up for file->httpfile rename.
+
 2008-07-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_greeter.py (WizardTest.testGreeter): 

@@ -213,7 +213,7 @@ flumotion/component/feeder.py
 flumotion/component/feed.py
 flumotion/component/__init__.py
 flumotion/component/misc/httpserver/admin_gtk.py
-flumotion/component/misc/httpserver/file.py
+flumotion/component/misc/httpserver/httpfile.py
 flumotion/component/misc/httpserver/httpfile.glade
 flumotion/component/misc/httpserver/httpserver.glade
 flumotion/component/misc/httpserver/httpserver.py
