@@ -142,7 +142,7 @@ class UITestCase(testsuite.TestCase):
 
     def _callNow(self, name, method, *args, **kwargs):
         w = self._findWidget(self._window, name)
-        assert w
+        assert w, "Couldn't find widget %s" % name
         m = getattr(w, method)
         return m(*args, **kwargs)
 
