@@ -61,7 +61,7 @@ def ensureDir(directory, description):
     """
     Ensure the given directory exists, creating it if not.
 
-    @raises L{errors.FatalError}: if the directory could not be created.
+    @raise L{errors.FatalError}: if the directory could not be created.
     """
     if not os.path.exists(directory):
         try:

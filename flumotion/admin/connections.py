@@ -45,14 +45,15 @@ class RecentConnection(object):
     I am an object representing a recent connection.
     You can access some of my state and update the timestamp
     (eg, when I was last connected to) by calling L{updateTimestamp}.
-    @ivar name: name of the recent connection usually host:port
-    @type name: string
-    @ivar host: hostname
-    @type host: string
-    @ivar filename: filename of the connection
-    @type filename: string
-    @ivar info: connection info
-    @type file: L{PBConnectionInfo}
+
+    @ivar name:      name of the recent connection usually host:port
+    @type name:      string
+    @ivar host:      hostname
+    @type host:      string
+    @ivar filename:  filename of the connection
+    @type filename:  string
+    @ivar info:      connection info
+    @type info:      L{PBConnectionInfo}
     @ivar timestamp: timestamp
     @type timestamp: datetime.datetime
     """

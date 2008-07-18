@@ -27,13 +27,15 @@ __version__ = "$Rev$"
 def fractionFromValue(value):
     """
     Converts a value to a fraction
+
     @param value: the value to convert to a tuple
-    @type: one of
+    @type  value: one of
       - string, unicode
       - number, eg int/float/long
       - two sized tuple
+
     @returns: the fraction
-    @rtype: a two sized tuple with 2 integers
+    @rtype:   a two sized tuple with 2 integers
     """
     def _frac(num, denom=1):
         return int(num), int(denom)

@@ -1,5 +1,12 @@
 2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/connections.py:
+	* flumotion/common/common.py:
+	* flumotion/common/fraction.py:
+	  Doc string fixes.
+
+2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/debug-marker.glade:
 	  Fix string.
 	* po/POTFILES.in:
