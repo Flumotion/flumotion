@@ -89,27 +89,27 @@ class UITestCase(testsuite.TestCase):
         self._call(name, 'set_sensitive', True)
         self._callInc(name, 'set_active', is_active)
 
-    def setWidget(self, widget): 
-        self.window = gtk.Window() 
-        self.widget = widget 
-        self.setWindow(self.window) 
-        widget.reparent(self.window) 
-        self.window.show_all() 
+    def setWidget(self, widget):
+        self.window = gtk.Window()
+        self.widget = widget
+        self.setWindow(self.window)
+        widget.reparent(self.window)
+        self.window.show_all()
         self._pause()
 
     def toggle(self, name, process=True):
-        isActive = self._callNow(name, 'get_active') 
-        self._callInc(name, 'set_sensitive', False) 
-        self._call(name, 'set_sensitive', True) 
-        self._callInc(name, 'set_active', not isActive) 
+        isActive = self._callNow(name, 'get_active')
+        self._callInc(name, 'set_sensitive', False)
+        self._call(name, 'set_sensitive', True)
+        self._callInc(name, 'set_active', not isActive)
         if process:
             self._process()
 
     # Private
 
     def _pause(self):
-        self._timeoutAdd(lambda: 0) 
-    
+        self._timeoutAdd(lambda: 0)
+
     def _timeoutAdd(self, proc, increase=True):
         def proc_no_return():
             try:
@@ -149,7 +149,7 @@ class UITestCase(testsuite.TestCase):
     def _batchCall(self, increase, name, method, *args, **kwargs):
         def check():
             self._callNow(name, method, *args, **kwargs)
-            
+
         self._timeoutAdd(check, increase=increase)
 
     def _call(self, name, method, *args, **kwargs):
@@ -164,4 +164,4 @@ class UITestCase(testsuite.TestCase):
         """
         self._batchCall(True, name, method, *args, **kwargs)
 
-    
+

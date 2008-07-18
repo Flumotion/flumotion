@@ -39,7 +39,7 @@ class WizardTest(UITestCase):
     def _checkPrevNext(self,can_prev, can_next):
         self.assertSensitive('button_prev', can_prev)
         self.assertSensitive('button_next', can_next)
-    
+
     def testGreeter(self):
         greeter = Greeter(FakeAdminWindow())
         self.failUnless(isinstance(greeter, SimpleWizard))
