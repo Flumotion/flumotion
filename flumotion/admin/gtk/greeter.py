@@ -74,7 +74,7 @@ class Initial(WizardStep):
             self.load_connection.set_active(True)
         else:
             self.connect_to_existing.set_active(True)
-        
+
         # Find which radio button should be focused:
         for radioName in available_pages:
             radio = getattr(self, radioName)
@@ -256,7 +256,7 @@ This mode is only useful for testing Flumotion.
                           logDir=spawner.getLogDir(),
                           runDir=spawner.getRunDir()))
         self._finished('start_new_success')
-        
+
     def _finished(self, result):
         # result: start_new_error or start_new_success
         self.label_starting.hide()
