@@ -40,7 +40,7 @@ def listDirectory(path):
     global _backends
     if not _backends:
         _registerBackends()
-    if not backends:
+    if not _backends:
         raise AssertionError(
             "there are no vfs backends available")
     backend = _backends[0]
