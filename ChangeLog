@@ -1,6 +1,11 @@
 2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion.spec.in:
+	added the multilanguage label.
+
+2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* flumotion.spec.in:
 	removed the multilanguage label.
 
 2008-07-21  Johan Dahlin  <johan@flumotion.com>
