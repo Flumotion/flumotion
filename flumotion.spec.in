@@ -126,7 +126,7 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 %{__install} -m 0644 -D doc/redhat/flumotion.logrotate \
     %{buildroot}%{_sysconfdir}/logrotate.d/flumotion
 
-%find_lang flumotion
+#%find_lang flumotion
 
 %clean
 rm -rf $RPM_BUILD_ROOT
