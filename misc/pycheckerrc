@@ -9,7 +9,7 @@
 evil = []
 
 # ignore import errors
-ignoreImportErrors = 1
+ignoreImportErrors = 0
 
 # unused imports
 importUsed = 1
