@@ -22,8 +22,10 @@ Requires:	%{gstreamer} >= %{gst_minver}
 Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
 Requires:	%{gstreamer}-python >= %{gstpy_minver}
 Requires:	python-twisted-core >= 2.4.0
-Requires:  python-twisted-conch
-Requires:  python-iCalendar
+Requires:	python-twisted-conch
+Requires:	python-iCalendar
+Requires:	python-dateutil
+Requires:	pygtk2-libglade
 Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
 Requires:	pyOpenSSL
@@ -41,6 +43,8 @@ BuildRequires:	python-twisted-names
 BuildRequires:	python-twisted-web
 BuildRequires:  python-twisted-conch
 BuildRequires:  python-iCalendar
+BuildRequires:  python-dateutil
+BuildRequires:  pygtk2-libglade
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel

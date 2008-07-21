@@ -1,3 +1,8 @@
+2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* flumotion.spec.in:
+	Added pygtk2-libglade and python-dateutil packages.
+
 2008-07-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/vfsgio.py:
