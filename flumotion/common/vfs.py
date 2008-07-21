@@ -40,6 +40,9 @@ def listDirectory(path):
     global _backends
     if not _backends:
         _registerBackends()
+    if not backends:
+        raise AssertionError(
+            "there are no vfs backends available")
     backend = _backends[0]
     log.info('vfs', 'listing directory %s using %r' % (path, backend))
     return succeed(backend(path))
@@ -59,23 +62,23 @@ def _registerBackends():
             continue
 
         log.info('vfs', 'adding backend %s' % (backend,))
-        impl = getattr(module, attributeName)
-        _backends.append(impl)
+        backend = getattr(module, attributeName)
+        try:
+            backend('/')
+        except ImportError:
+            continue
+        _backends.append(backend)
 
     registerVFSJelly()
 
 def registerVFSJelly():
     """Register the jelly used by different backends
     """
-    try:
-        from flumotion.common.vfsgnome import registerGnomeVFSJelly
-        registerGnomeVFSJelly()
-    except ImportError:
-        pass
-    try:
-        from flumotion.common.vfsgio import registerGIOJelly
-        registerGIOJelly()
-    except ImportError:
-        pass
+
+    from flumotion.common.vfsgnome import registerGnomeVFSJelly
+    registerGnomeVFSJelly()
+
+    from flumotion.common.vfsgio import registerGIOJelly
+    registerGIOJelly()
 
     log.info('jelly', 'VFS registered')

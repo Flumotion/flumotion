@@ -1,3 +1,11 @@
+2008-07-21  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/common/vfs.py:
+	* flumotion/test/test_common_vfs.py:
+	simplify imports, try to instantiate a directory to see
+	if we get an import error or not, since this all changed
+	due to pychecker, sigh.
+
 2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion.spec.in:
@@ -24,7 +32,7 @@
 	* flumotion/common/vfsgnome.py:
 	Remove MissingDependencyError in favor of just ImportError.
 
-2008-07-21  Johan Dahlin  <johan@flumotion.com>
+2008-07-21  johan dahlin  <johan@flumotion.com>
 
 	* data/glade/ondemand-wizard.glade:
 	* flumotion/common/Makefile.am:
