@@ -175,3 +175,12 @@ class TranslatorTest(testsuite.TestCase):
         text = translator.translate(mmsg, lang=["nl_NL"])
         self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
 
+class TestFormat(testsuite.TestCase):
+    def testFormat(self):
+        t = T_('string with a %s format', 'X')
+        self.assertEquals(t.untranslated(), 'string with a X format')
+
+    def testFormatNoArgument(self):
+        t = T_('string with a %s format')
+        self.assertEquals(t.untranslated(), 'string with a %s format')
+
