@@ -8,6 +8,9 @@
 # list of evil C extensions that crash the interpreter
 evil = []
 
+# ignore import errors
+ignoreImportErrors = 1
+
 # unused imports
 importUsed = 1
 
