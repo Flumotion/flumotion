@@ -25,10 +25,13 @@
 import gettext
 
 import gobject
+import gtk
 
 from flumotion.common import messages
 
 from flumotion.common.i18n import N_, gettexter
+from flumotion.common.vfs import registerVFSJelly
+from flumotion.ui.fileselector import FileSelectorDialog
 from flumotion.wizard.models import HTTPServer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
@@ -77,12 +80,13 @@ class OnDemandStep(WorkerWizardStep):
         self.port.data_type = int
         self.mount_point.data_type = str
 
-        self.add_proxy(self.model.properties,
+        self._proxy = self.add_proxy(self.model.properties,
                        ['path',
                         'port',
                         'mount_point'])
 
         self.mount_point.set_text("/")
+        registerVFSJelly()
 
     def workerChanged(self, worker):
         self.model.worker = worker
@@ -155,6 +159,22 @@ class OnDemandStep(WorkerWizardStep):
         #        tasks are done.
         self.wizard.blockNext(self.mount_point.get_text() == '')
 
+    def _showFileSelector(self):
+        def response(fs, response):
+            fs.hide()
+            if response == gtk.RESPONSE_OK:
+                self.model.properties.path = fs.getFilename()
+                self._proxy.update('path')
+        def deleteEvent(fs, event):
+            pass
+        fs = FileSelectorDialog(self.wizard.window,
+                                self.wizard.getAdminModel())
+        fs.connect('response', response)
+        fs.connect('delete-event', deleteEvent)
+        fs.selector.setWorkerName(self.model.worker)
+        fs.setDirectory(self.model.properties.path)
+        fs.show_all()
+
     # Callbacks
 
     def on_mount_point_changed(self, entry):
@@ -164,3 +184,5 @@ class OnDemandStep(WorkerWizardStep):
     def on_path__changed(self, entry):
         self._scheduleCheck()
 
+    def on_select__clicked(self, button):
+        self._showFileSelector()

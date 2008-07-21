@@ -33,6 +33,7 @@ EXTRA_DIST = 					\
 	test_common_process.py			\
 	test_common_pygobject.py		\
 	test_common_signals.py			\
+	test_common_vfs.py			\
 	test_common_xmlwriter.py		\
 	test_component_base_scheduler.py	\
 	test_component_base_vevent.py	\

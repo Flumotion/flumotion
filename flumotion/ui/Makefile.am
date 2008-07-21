@@ -5,6 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/ui
 flumotion_PYTHON = 	\
 	__init__.py 	\
 	fgtk.py 	\
+	fileselector.py	\
 	fvumeter.py 	\
 	glade.py 	\
 	kiwipatches.py 	\

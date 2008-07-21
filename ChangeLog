@@ -1,3 +1,25 @@
+2008-07-21  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/ondemand-wizard.glade:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/errors.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/vfs.py:
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	* flumotion/configure/configure.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_vfs.py:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/fileselector.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/worker/medium.py:
+	Add a file selector dialog to the on demand step.
+	Add a vfs framework with two backends (gnomevfs and gio),
+	add tests and documentation. Fixes #1050
+
 2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/connections.py:

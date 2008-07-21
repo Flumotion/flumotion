@@ -99,6 +99,9 @@ flumotion/common/setup.py
 flumotion/common/signals.py
 flumotion/common/startset.py
 flumotion/common/testsuite.py
+flumotion/common/vfs.py
+flumotion/common/vfsgio.py
+flumotion/common/vfsgnome.py
 flumotion/common/watched.py
 flumotion/common/worker.py
 flumotion/component/base/admin_gtk.py
@@ -429,6 +432,7 @@ flumotion/twisted/portal.py
 flumotion/twisted/reflect.py
 flumotion/twisted/rtsp.py
 flumotion/ui/fgtk.py
+flumotion/ui/fileselector.py
 flumotion/ui/glade.py
 flumotion/ui/icons.py
 flumotion/ui/__init__.py

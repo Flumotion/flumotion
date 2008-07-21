@@ -79,7 +79,7 @@ class ScenarioStep(WizardStep):
         self._radioGroup = None
         self._scenarioRadioButtons = []
         super(ScenarioStep, self).__init__(wizard)
-        
+
     def setup(self):
         self.addScenario(LiveScenario)
         self.addScenario(OnDemandScenario)
@@ -87,7 +87,7 @@ class ScenarioStep(WizardStep):
         firstButton.set_active(True)
         firstButton.toggled()
         firstButton.grab_focus()
-        
+
     def getNext(self):
         self.wizard.cleanFutureSteps()
         scenario = self._currentScenarioClass(self.wizard)
@@ -103,17 +103,17 @@ class ScenarioStep(WizardStep):
 
         self.scenarios_box.pack_start(button, False, False)
         button.show()
-        
+
         if self._radioGroup is None:
             self._radioGroup = button
-        
+
     # Private
 
     # Callbacks
 
     def _on_radiobutton__activate(self, radio):
         self.wizard.goNext()
-        
+
     def _on_radiobutton__toggled(self, radio, scenarioClass):
         if radio.get_active():
             self._currentScenarioClass = scenarioClass
@@ -136,7 +136,7 @@ class ConfigurationWizard(SectionWizard):
         self._stepWorkers = {}
         self._scenario = None
         self._existingComponentNames = []
-        
+
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
         self._workerList.connect('worker-selected',
@@ -219,6 +219,13 @@ class ConfigurationWizard(SectionWizard):
         """
         self._adminModel = adminModel
 
+    def getAdminModel(self):
+        """Gets the admin model of the wizard
+        @returns adminModel: the admin model
+        @rtype adminModel: L{AdminModel}
+        """
+        return self._adminModel
+
     def waitForTask(self, taskName):
         """Instruct the wizard that we're waiting for a task
         to be finished. This changes the cursor and prevents
@@ -243,7 +250,7 @@ class ConfigurationWizard(SectionWizard):
         if not self._tasks:
             raise AssertionError(
                 "Stray call to taskFinished(), forgot to call waitForTask()?")
-        
+
         taskName = self._tasks.pop()
         self.info("task %s has now finished" % (taskName,))
         if not self._tasks:
@@ -301,7 +308,7 @@ class ConfigurationWizard(SectionWizard):
 
     def getHTTPPorter(self):
         return self._httpPorter
-    
+
     def checkElements(self, workerName, *elementNames):
         """Check if the given list of GStreamer elements exist on the
         given worker.
@@ -566,7 +573,7 @@ class ConfigurationWizard(SectionWizard):
         self._existingComponentNames = componentNames
         if self._scenario is not None:
             self._scenario.setExistingComponentNames(componentNames)
-            
+
     def workerChangedForStep(self, step, workerName):
         """Tell a step that its worker changed.
         @param step: step which worker changed for

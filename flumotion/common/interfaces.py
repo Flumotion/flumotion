@@ -22,7 +22,7 @@
 """interfaces used by flumotion
 """
 
-from zope.interface import Interface
+from zope.interface import Attribute, Interface
 
 __version__ = "$Rev$"
 
@@ -121,4 +121,34 @@ class IFeedServerParent(Interface):
         @param componentId:
         @param feedName: a feed name
         @param fd: a file descriptor
+        """
+
+
+class IFile(Interface):
+    """I am an interface representing a file and it's metadata.
+    """
+    filename = Attribute('the name of the file')
+    iconNames = Attribute("""icon names that should be used to represent
+      this file in a graphical interface""")
+
+    def getPath():
+        """Returns the complete path to the file, including
+        the filename itself.
+        @returns: the complete path to the file
+        @rtype: str
+        """
+
+
+class IDirectory(IFile):
+    """I am an interface representing a directory and it's metadata.
+    I extend the IFile interface.
+    To list files of a certain directory you first need to call
+    L{flumotion.common.vfs.listDirectory}, which will return
+    an object implementing this interface.
+    """
+
+    def getFiles():
+        """Fetches all the files in the directory specified.
+        @returns: list of files
+        @rtype: a deferred firing a list of objects implementing L{IFile}.
         """

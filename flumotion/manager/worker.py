@@ -28,6 +28,7 @@ from twisted.internet import defer
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import worker, common
+from flumotion.common.vfs import registerVFSJelly
 
 __version__ = "$Rev$"
 
@@ -56,6 +57,8 @@ class WorkerAvatar(base.ManagerAvatar):
 
         self.heaven.workerAttached(self)
         self.vishnu.workerAttached(self)
+
+        registerVFSJelly()
 
     def getName(self):
         return self.avatarId

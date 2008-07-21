@@ -31,6 +31,7 @@ from zope.interface import implements
 
 from flumotion.common import errors, interfaces, debug
 from flumotion.common import medium
+from flumotion.common.vfs import listDirectory, registerVFSJelly
 from flumotion.twisted.pb import ReconnectingFPBClientFactory
 
 __version__ = "$Rev$"
@@ -141,6 +142,7 @@ class WorkerMedium(medium.PingingMedium):
         """
         self.brain = brain
         self.factory = None
+        registerVFSJelly()
 
     def startConnecting(self, connectionInfo):
         info = connectionInfo
@@ -277,3 +279,11 @@ class WorkerMedium(medium.PingingMedium):
 
     def remote_getVersions(self):
         return debug.getVersions()
+
+    def remote_listDirectory(self, directoryName):
+        """List the directory called path
+        @returns: the directory
+        @rtype: deferred that will fire an object implementing L{IDirectory}
+        """
+        return listDirectory(directoryName)
+
