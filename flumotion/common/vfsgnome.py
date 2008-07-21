@@ -24,19 +24,16 @@
 
 import os
 
+import gnomevfs
 from twisted.internet.defer import succeed
 from twisted.spread.flavors import Copyable, RemoteCopy
 from twisted.spread.jelly import setUnjellyableForClass
 from zope.interface import implements
 
 from flumotion.common import log
-from flumotion.common.errors import MissingDependencyError, AccessDeniedError
+from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
 
-try:
-    import gnomevfs
-except ImportError, e:
-    raise MissingDependencyError(e)
 
 
 class GnomeVFSFile(Copyable, RemoteCopy):

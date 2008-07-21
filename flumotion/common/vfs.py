@@ -28,7 +28,6 @@ It's designed to be used over twisted.spread and is thus using deferreds.
 
 from twisted.internet.defer import succeed
 
-from flumotion.common.errors import MissingDependencyError
 from flumotion.common import log
 
 _backends = []
@@ -54,7 +53,7 @@ def _registerBackends():
         ]:
         try:
             module = __import__(backend, {}, {}, ' ')
-        except MissingDependencyError:
+        except ImportError:
             log.info('vfs', 'skipping backend %s, dependency missing' % (
                 backend,))
             continue
@@ -71,12 +70,12 @@ def registerVFSJelly():
     try:
         from flumotion.common.vfsgnome import registerGnomeVFSJelly
         registerGnomeVFSJelly()
-    except (ImportError, MissingDependencyError):
+    except ImportError:
         pass
     try:
         from flumotion.common.vfsgio import registerGIOJelly
         registerGIOJelly()
-    except (ImportError, MissingDependencyError):
+    except ImportError:
         pass
 
     log.info('jelly', 'VFS registered')

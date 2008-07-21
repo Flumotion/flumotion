@@ -1,3 +1,11 @@
+2008-07-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/errors.py:
+	* flumotion/common/vfs.py:
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	Remove MissingDependencyError in favor of just ImportError.
+
 2008-07-21  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/ondemand-wizard.glade:

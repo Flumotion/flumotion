@@ -317,9 +317,5 @@ class MissingElementError(GStreamerError):
     "A needed element is missing"
 
 
-class MissingDependencyError(Exception):
-    "A dependency is missing for the functionally to be used"
-
-
 class AccessDeniedError(Exception):
     "Access is denied to this object, usually a file or directory"
