@@ -24,7 +24,6 @@
 
 import os
 
-import gio
 import gobject
 from twisted.internet.defer import succeed
 from twisted.spread.flavors import Copyable, RemoteCopy
@@ -34,6 +33,11 @@ from zope.interface import implements
 from flumotion.common import log
 from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
+
+# gio is only imported inside nested scopes so that
+# pychecker can ignore them, If pychecker ever gets fixed,
+# move it back where it belongs
+__pychecker__ = 'keepgoing'
 
 
 class GIOFile(Copyable, RemoteCopy):
@@ -48,6 +52,7 @@ class GIOFile(Copyable, RemoteCopy):
         self.iconNames = self._getIconNames()
 
     def _getIconNames(self):
+        import gio
         gFile = gio.File(self._filename)
         gFileInfo = gFile.query_info('standard::icon')
         gIcon = gFileInfo.get_icon()
@@ -66,6 +71,7 @@ class GIODirectory(Copyable, RemoteCopy):
     implements(IDirectory)
 
     def __init__(self, path):
+        import gio
         gfile = gio.File(os.path.abspath(path))
         self.path = path
         self.filename = gfile.get_basename()
@@ -85,6 +91,7 @@ class GIODirectory(Copyable, RemoteCopy):
     # IDirectory
 
     def getFiles(self):
+        import gio
         log.info('vfsgio', 'getting files for %s' % (self.path,))
         retval = []
         gfile = gio.File(os.path.abspath(self.path))

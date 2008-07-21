@@ -24,7 +24,6 @@
 
 import os
 
-import gnomevfs
 from twisted.internet.defer import succeed
 from twisted.spread.flavors import Copyable, RemoteCopy
 from twisted.spread.jelly import setUnjellyableForClass
@@ -34,6 +33,10 @@ from flumotion.common import log
 from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
 
+# gnomevfs is only imported inside nested scopes so that
+# pychecker can ignore them, If pychecker ever gets fixed,
+# move it back where it belongs
+__pychecker__ = 'keepgoing'
 
 
 class GnomeVFSFile(Copyable, RemoteCopy):
@@ -60,6 +63,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
     implements(IDirectory)
 
     def __init__(self, path):
+        import gnomevfs
         fileInfo = gnomevfs.get_file_info(os.path.abspath(path))
         self.path = path
         self.filename = fileInfo.name
@@ -73,6 +77,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
     # IDirectory
 
     def getFiles(self):
+        import gnomevfs
         log.info('vfsgnome', 'getting files for %s' % (self.path,))
         retval = []
         try:

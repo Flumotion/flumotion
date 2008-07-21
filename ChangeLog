@@ -1,3 +1,10 @@
+2008-07-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	Add keepgoing and move the imports to scopes, this should
+	fix buildbot on machines which lacks gnomevfs or gio
+
 2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion.spec.in:
