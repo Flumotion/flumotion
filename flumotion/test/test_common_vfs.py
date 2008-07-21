@@ -30,14 +30,6 @@ from flumotion.common.vfs import listDirectory
 class VFSTest(TestCase):
     def setUp(self):
         self.path = os.path.dirname(__file__)
-        try:
-            os.mkdir(os.path.join(self.path, 'access-denied'), 000)
-        except OSError, e:
-            if e.errno != errno.EEXIST:
-                raise
-
-    def tearDown(self):
-        os.rmdir(os.path.join(self.path, 'access-denied'))
 
     def testListDirectory(self):
         try:
