@@ -1,3 +1,9 @@
+2008-07-22  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/common/i18n.py:
+	Return untranslated singular strings with or
+	without arguments.
+
 2008-07-22  Pedro Gracia  <pedro@flumotion>
 
 	* flumotion/common/i18n.py:
