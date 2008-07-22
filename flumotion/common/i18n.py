@@ -123,11 +123,7 @@ class TranslatableSingular(Translatable, FancyEqMixin):
         self.args = args
 
     def untranslated(self):
-        if self.args:
-            result =  self.format % self.args
-        else:
-            result = self.format
-        return result
+        return self.format % self.args
 pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 
 

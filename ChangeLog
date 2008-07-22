@@ -1,3 +1,9 @@
+2008-07-22  Pedro Gracia  <pedro@flumotion>
+
+	* flumotion/common/i18n.py:
+	* flumotion/common/netutils.py:
+	Reverting r7049. Cause: moap cl ci with no prep before.
+
 2008-07-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentlist.py:

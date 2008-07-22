@@ -28,7 +28,6 @@ import fcntl
 import re
 import socket
 import struct
-import platform
 
 from twisted.internet import address
 
@@ -42,15 +41,6 @@ __version__ = "$Rev$"
 #
 # WARNING: Horribly linux-specific. Horribly IPv4 specific. Also, just horrible.
 
-# ioctl calls are platform specific
-system = platform.system()
-if system == 'Linux':
-    SIOCGIFCONF = 0x8912
-    SIOCGIFADDR = 0x8915
-elif system == 'SunOS':
-    SIOCGIFCONF = 0xC008695C
-    SIOCGIFADDR = 0xC020690D
-
 def find_all_interface_names():
     """
     Find the names of all available network interfaces
@@ -63,7 +53,7 @@ def find_all_interface_names():
     names = array.array('B', '\0' * bytes)
     outbytes = struct.unpack('iP', fcntl.ioctl(
         s.fileno(),
-        SIOCGIFCONF,
+        0x8912, #SIOCGIFCONF
         struct.pack('iP', bytes, names.buffer_info()[0])
     ))[0]
     namestr = names.tostring()
@@ -76,7 +66,7 @@ def get_address_for_interface(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
-        SIOCGIFADDR,
+        0x8915, #SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
 
