@@ -10,7 +10,7 @@
       <synchronization required="yes" />
 
       <wizard type="video-producer" feeder="default"
-              _description="Test video source"/>
+              _description="Test video producer"/>
 
       <entries>
         <entry type="component" location="videotest.py"

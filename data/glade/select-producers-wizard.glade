@@ -28,7 +28,7 @@
       <child>
 	<widget class="GtkLabel" id="label">
 	  <property name="visible">True</property>
-	  <property name="label" translatable="yes">Please select the sources you want 
+	  <property name="label" translatable="yes">Please select the producers you want 
 to use for your streamer:</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>

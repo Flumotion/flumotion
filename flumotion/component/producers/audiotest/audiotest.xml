@@ -17,7 +17,7 @@
                function="AudioTestWizardPlugin" />
       </entries>
 
-      <wizard type="audio-producer" _description="Test audio source"
+      <wizard type="audio-producer" _description="Test audio producer"
               feeder="default" />
 
       <!-- priority to this clock so that when testing, clock choice is

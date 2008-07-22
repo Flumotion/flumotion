@@ -34,7 +34,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Please select the sources you want 
+	      <property name="label" translatable="yes">Please select the producers you want 
 to use in your live stream:</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
