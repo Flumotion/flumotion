@@ -1,3 +1,9 @@
+2008-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/configure/uninstalled.py.in:
+	  Find writable build dir by looking at srcdir, not cwd.
+	  Fixes distcheck for depending projects.
+
 2008-07-22  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/common/i18n.py:

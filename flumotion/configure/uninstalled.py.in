@@ -30,12 +30,12 @@ def get():
 
     __toplevelwrite = __toplevel
 
-    # distcheck hack: if we live in a path containing _build, it means
-    # we're running in distcheck mode and we should write everything
+    # distcheck hack: if our __toplevel contains a directory _build, it means
+    # it was generated in distcheck mode and we should write everything
     # under the writable builddir
-    if os.getcwd().find('_build') > -1:
-        srcdir = os.getcwd().split('_build')[0]
-        __toplevelwrite = os.path.join(srcdir, '_build')
+    # Don't change this without testing distcheck on an add-on project!
+    if os.path.exists(os.path.join(__toplevel, '_build')):
+        __toplevelwrite = os.path.join(__toplevel, '_build')
 
     __cachedir = os.environ.get('FLU_CACHE_DIR',
                                 os.path.join(__toplevelwrite, 'cache'))
