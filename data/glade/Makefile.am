@@ -4,6 +4,7 @@ glade_DATA =					\
 	authenticate.glade			\
 	connection-dialog.glade			\
 	connections.glade			\
+	debug-marker.glade			\
 	greeter-initial.glade			\
 	greeter-connect_to_existing.glade	\
 	greeter-authenticate.glade		\
@@ -16,9 +17,9 @@ glade_DATA =					\
 	sectionwizard.glade			\
 	audio-encoder-wizard.glade		\
 	consumption-wizard.glade		\
-	disker-wizard.glade				\
+	disker-wizard.glade			\
 	encoding-wizard.glade			\
-	http-wizard.glade				\
+	http-wizard.glade			\
 	httpstreamer-wizard.glade		\
 	license-wizard.glade			\
 	ondemand-wizard.glade			\
@@ -26,8 +27,8 @@ glade_DATA =					\
 	overview-wizard.glade			\
 	production-wizard.glade			\
 	scenario-wizard.glade			\
-	select-producers-wizard.glade	\
-	shout2-wizard.glade				\
+	select-producers-wizard.glade		\
+	shout2-wizard.glade			\
 	summary-wizard.glade			\
 	welcome-wizard.glade
 
