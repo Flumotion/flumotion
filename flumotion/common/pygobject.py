@@ -99,30 +99,6 @@ def gsignal(name, *args):
 
 PARAM_CONSTRUCT = 1<<9
 
-def with_construct_properties(__init__):
-    """
-    Wrap a class' __init__ method in a procedure that will construct
-    gobject properties. This is necessary because pygtk's object
-    construction is a bit broken.
-
-    Usage::
-
-        class Foo(GObject):
-            def __init__(self):
-                GObject.__init(self)
-            __init__ = with_construct_properties(__init__)
-    """
-    frame = sys._getframe(1)
-    _locals = frame.f_locals
-    gproperties = _locals['__gproperties__']
-    def hacked_init(self, *args, **kwargs):
-        __init__(self, *args, **kwargs)
-        self.__gproperty_values = {}
-        for p, v in gproperties.items():
-            if v[-1] & PARAM_CONSTRUCT:
-                self.set_property(p, v[3])
-    return hacked_init
-
 def gproperty(type_, name, desc, *args, **kwargs):
     """
     Add a GObject property to the current object.

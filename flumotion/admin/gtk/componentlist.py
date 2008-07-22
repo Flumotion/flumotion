@@ -38,12 +38,19 @@ from flumotion.configure import configure
 from flumotion.common import log, planet
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
-from flumotion.common.pygobject import with_construct_properties
 from flumotion.common.xmlwriter import cmpComponentType
 from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+MOODS_INFO = {
+    moods.sad: _('Sad'),
+    moods.happy: _('Happy'),
+    moods.sleeping: _('Sleeping'),
+    moods.waking: _('Waking'),
+    moods.hungry: _('Hungry'),
+    moods.lost: _('Lost')
+    }
 
 (COL_MOOD,
  COL_NAME,
@@ -53,14 +60,6 @@ _ = gettext.gettext
  COL_MOOD_VALUE, # to sort COL_MOOD
  COL_CPU) = range(7)
 
-MOODS_INFO = {
-    moods.sad: _('Sad'),
-    moods.happy: _('Happy'),
-    moods.sleeping: _('Sleeping'),
-    moods.waking: _('Waking'),
-    moods.hungry: _('Hungry'),
-    moods.lost: _('Lost')
-    }
 
 def getComponentLabel(state):
     config = state.get('config')
@@ -76,19 +75,20 @@ class ComponentList(log.Loggable, gobject.GObject):
 
     logCategory = 'components'
 
-    gsignal('selection-changed', object)  # state-or-None
+    gsignal('selection-changed', object) # state-or-None
     gsignal('show-popup-menu', int, int) # button, click time
-    #gsignal('right-clicked', object, int, float)
 
     gproperty(bool, 'can-start-any', 'True if any component can be started',
-              False, construct=True)
+              False)
     gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
-              False, construct=True)
+              False)
     def __init__(self, treeView):
         """
         @param treeView: the gtk.TreeView to put the view in.
         """
-        self.__gobject_init__()
+        gobject.GObject.__init__(self)
+        self.set_property('can-start-any', False)
+        self.set_property('can-stop-any', False)
 
         self._iters = {} # componentState -> model iter
         self._lastStates = None
@@ -108,7 +108,7 @@ class ComponentList(log.Loggable, gobject.GObject):
             object,         # state
             int,            # mood-value
             str,            # cpu
-            ) 
+            )
         treeView.set_model(treeModel)
 
         treeSelection = treeView.get_selection()
@@ -148,8 +148,6 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         self._model = treeModel
         self._view = treeView
-
-    __init__ = with_construct_properties (__init__)
 
     def getSelectedNames(self):
         """
@@ -272,7 +270,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._updateStartStop()
 
     # IStateListener implementation
-    
+
     def stateSet(self, state, key, value):
         if not isinstance(state, planet.AdminComponentState):
             self.warning('Got state change for unknown object %r' % state)
@@ -426,7 +424,6 @@ class ComponentList(log.Loggable, gobject.GObject):
             self._showPopupMenu(event)
             return True
         return False
-
 
 
 gobject.type_register(ComponentList)
