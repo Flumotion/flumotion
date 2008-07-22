@@ -30,7 +30,7 @@
 	  <property name="label" translatable="yes">Congratulations. You are now ready to use 
 your streaming server.
 
-When you press &amp;quot;Apply&amp;quot;, your configuration will be automatically loaded on your network.  This will take some time.</property>
+When you press &amp;quot;Finish&amp;quot;, your configuration will be automatically loaded on your network.  This will take some time.</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">True</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>

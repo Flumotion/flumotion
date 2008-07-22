@@ -1,3 +1,8 @@
+2008-07-22  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/summary-wizard.glade:
+	it should be Finish instead of Apply.
+
 2008-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/configure/uninstalled.py.in:
