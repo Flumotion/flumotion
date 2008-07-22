@@ -25,7 +25,6 @@ import gtk
 from flumotion.common import testsuite
 from flumotion.common import errors, pygobject
 from flumotion.common.pygobject import gsignal, gproperty
-from flumotion.common.pygobject import with_construct_properties
 
 
 
@@ -59,12 +58,12 @@ class TestPyGObject(testsuite.TestCase):
         class Foo(gobject.GObject):
             gsignal('hcf', bool, str)
             gproperty(bool, 'burning', 'If the object is burning',
-                      False, construct=True)
+                      False)
 
             def __init__(xself):
                 gobject.GObject.__init__(xself)
                 xself.connect('hcf', xself.on_hcf)
-            __init__ = with_construct_properties (__init__)
+                xself.set_property('burning', False)
 
             def on_hcf(xself, again_self, x, y):
                 self.assert_(isinstance(x, bool))
