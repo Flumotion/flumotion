@@ -34,12 +34,6 @@
 	Return untranslated singular strings with or
 	without arguments.
 
-2008-07-22  Pedro Gracia  <pedro@flumotion>
-
-	* flumotion/common/i18n.py:
-	* flumotion/common/netutils.py:
-	Reverting r7049. Cause: moap cl ci with no prep before.
-
 2008-07-22  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentlist.py:
@@ -55,18 +49,8 @@
 
 	* flumotion/common/i18n.py:
 	* flumotion/test/test_i18n.py:
-	Return untranslated strings (singular and plural) 
+	Return untranslated strings (singular and plural)
 	with or without arguments ok.
-
-2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
-
-	* flumotion.spec.in:
-	added the multilanguage label.
-
-2008-07-21  Jordi Massaguer i Pla  <jordi@flumotion.com>
-
-	* flumotion.spec.in:
-	removed the multilanguage label.
 
 2008-07-21  Johan Dahlin  <johan@flumotion.com>
 
@@ -150,7 +134,7 @@
 	* configure.ac:
 	set BINDIR, so it gets properly expanded in installed.py
 
-	* flumotion/test/test_greeter.py (WizardTest.testGreeter): 
+	* flumotion/test/test_greeter.py (WizardTest.testGreeter):
 	Going prev/next unselected the previously selected option,
 	workaround that by selecting the option we want again.
 
@@ -166,7 +150,7 @@
 	Rename norm to signal. Found by Rozstrojenie Jazni.
 
 	* flumotion/admin/gtk/adminwindow.py
-	(AdminWindow._componentSelectionChanged): 
+	(AdminWindow._componentSelectionChanged):
 	It's compSet instead of _compSet. Now why didn't pychecker find this?
 
 2008-07-16  Johan Dahlin  <johan@gnome.org>
@@ -183,14 +167,14 @@
 	  (TVCardStep._runChecks):
 	* flumotion/component/producers/soundcard/soundcard.py
 	  (Soundcard.configure_pipeline):
-	* flumotion/component/producers/soundcard/wizard_gtk.py 
+	* flumotion/component/producers/soundcard/wizard_gtk.py
 	(SoundcardStep._updateInputs):
 	* flumotion/component/producers/webcam/wizard_gtk.py
 	  (WebcamStep._runChecks):
 	* flumotion/test/test_i18n.py (TranslatorTest.testTranslateMessage):
 	* flumotion/wizard/diskersteps.py (DiskBothStep):
 	* flumotion/wizard/httpstreamersteps.py (HTTPBothStep):
-	* flumotion/wizard/shout2steps.py (Shout2BothStep): Minor English 
+	* flumotion/wizard/shout2steps.py (Shout2BothStep): Minor English
 	corrections for translated strings.
 
 2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
@@ -205,12 +189,10 @@
 	replaced asserts for asserts that are available on previous
 	versions of twisted.
 
-
 2008-07-15  Jordi Massaguer i Pla  <jordi@flumotion.com>
 
 	* flumotion/common/Makefile.am: added eventcalendar
 	* flumotion/test/Makefile.am: added test_component_base_vevent
-	
 
 2008-07-15  Jordi Massaguer i Pla  <jordi at flumotion dot com>
 
