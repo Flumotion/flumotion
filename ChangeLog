@@ -1,3 +1,9 @@
+2008-07-23  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/overlaystep.py:
+	Change the default overlay text to Flumotion, update tests.
+
 2008-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/production-wizard.glade:

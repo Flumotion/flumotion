@@ -41,7 +41,7 @@ class Overlay(VideoConverter):
         self.can_overlay = False
         self.show_logo = True
         self.properties.show_text = True
-        self.properties.text = _("Fluendo")
+        self.properties.text = _("Flumotion")
 
     # Public API
 
