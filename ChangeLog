@@ -1,3 +1,11 @@
+2008-07-24  Sebastien Merle  <sebastien@fluendo.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/componentlist.py:
+	Fix the behavior of the component list right-click context menu
+	to keep current selection if done on a select component.
+
 2008-07-24  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:

@@ -399,13 +399,16 @@ class ComponentList(log.Loggable, gobject.GObject):
             MOODS_INFO[moods.get(mood)]))
 
     def _showPopupMenu(self, event):
+        selection = self._view.get_selection()
         retval = self._view.get_path_at_pos(int(event.x), int(event.y))
         if retval is None:
+            selection.unselect_all()
             return
-        clicked_path, column, x, y = retval
-        selection = self._view.get_selection()
-        selection.unselect_all()
-        selection.select_path(clicked_path)
+        clicked_path = retval[0]
+        selected_path = selection.get_selected_rows()[1]
+        if clicked_path not in selected_path:
+            selection.unselect_all()
+            selection.select_path(clicked_path)
         self.emit('show-popup-menu', event.button, event.time)
 
     # Callbacks
