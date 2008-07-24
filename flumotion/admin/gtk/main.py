@@ -31,10 +31,12 @@ from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.common import log, i18n
 from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.common.options import OptionParser
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 _retval = 0
+_OPEN_BUG_URL = "https://code.fluendo.com/flumotion/trac/newticket?%s"
 
 def _connectToManager(win, manager, ssl):
     try:
@@ -52,7 +54,7 @@ def _connectToManager(win, manager, ssl):
             manager,)
         _retval = 1
         reactor.stop()
-    
+
     def errback(failure):
         global _retval
         print >> sys.stderr, "ERROR: %s" % (failure.value,)
@@ -61,6 +63,41 @@ def _connectToManager(win, manager, ssl):
     d.addErrback(errbackConnectionRefused)
     d.addErrback(errback)
     return d
+
+def _exceptionHandler(exctype, value, tb):
+    if exctype is KeyboardInterrupt:
+        return
+
+    import urllib
+    import webbrowser
+    from flumotion.extern.exceptiondialog import ExceptionDialog
+    from flumotion.common.debug import getVersions
+
+    dialog = ExceptionDialog((exctype, value, tb))
+    response = dialog.run()
+    if response == ExceptionDialog.RESPONSE_BUG:
+        revision = max(getVersions().values())
+        description = """
+Please describe what you did:
+
+
+Collected information from your system:
+
+Flumotion version: %(version)s
+Flumotion SVN revision: %(revision)s
+
+Python Traceback:
+%(traceback)s
+""" % (dict(traceback=dialog.getDescription(),
+                    version=configure.version,
+                    revision=revision,
+                    args=sys.argv))
+        params = dict(component='flumotion',
+                      summary=dialog.getSummary(),
+                      description=description)
+        data = urllib.urlencode(params)
+        webbrowser.open_new(_OPEN_BUG_URL % (data,))
+    dialog.destroy()
 
 def main(args):
     global _retval
@@ -84,6 +121,8 @@ def main(args):
 
     from flumotion.ui.icons import register_icons
     register_icons()
+
+    sys.excepthook = _exceptionHandler
 
     from flumotion.admin.gtk.adminwindow import AdminWindow
     win = AdminWindow()

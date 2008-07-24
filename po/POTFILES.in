@@ -314,6 +314,7 @@ flumotion/configure/__init__.py
 flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/code.py
+flumotion/extern/exceptiondialog.py
 flumotion/extern/fdpass/__init__.py
 flumotion/extern/__init__.py
 flumotion/extern/pytrayicon/eggtrayicon.c

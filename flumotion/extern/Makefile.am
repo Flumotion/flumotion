@@ -5,6 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/extern
 flumotion_PYTHON = 	\
 	__init__.py 	\
 	code.py		\
+	exceptiondialog.py
 	unixcrypt.py
 
 logdir = $(libdir)/flumotion/python/flumotion/extern/log
