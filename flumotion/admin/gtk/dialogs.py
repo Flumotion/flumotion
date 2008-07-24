@@ -145,15 +145,15 @@ class AboutDialog(gtk.Dialog):
             '© 2004, 2005, 2006, 2007, 2008 Fluendo S.L.')
         authors = (
                    'Johan Dahlin',
+                   'Pedro Gracia Fajardo',
                    'Arek Korbik',
+                   'Jordi Massaguer Pla',
                    'Zaheer Abbas Merali',
                    'Sébastien Merle',
                    'Mike Smith',
                    'Wim Taymans',
                    'Thomas Vander Stichele',
                    'Andy Wingo',
-                   'Jordi Massaguer Pla',
-                   'Pedro Gracia Fajardo',
         )
         text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:

@@ -1,3 +1,8 @@
+2008-07-24  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/gtk/dialogs.py:
+	Keep authors sorted by last name.
+
 2008-07-24  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard_save.py:
