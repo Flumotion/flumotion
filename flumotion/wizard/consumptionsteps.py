@@ -42,7 +42,7 @@ class HTTPCommon(object):
         self.has_client_limit = False
         self.has_bandwidth_limit = False
         self.client_limit = 1000
-        self.bandgwidth_limit = 500
+        self.bandwidth_limit = 500
         self.burst_on_connect = False
 
 
@@ -63,12 +63,12 @@ class ConsumptionStep(WizardStep):
 
     def getHTTPCommon(self):
         return self._httpCommon
-    
+
     def getHTTPPorter(self):
         return self._httpPorter
-    
+
     # WizardStep
-    
+
     def activated(self):
         has_audio = self.wizard.hasAudio()
         has_video = self.wizard.hasVideo()
@@ -235,7 +235,7 @@ class HTTPConsumptionStep(WorkerWizardStep):
         WorkerWizardStep.__init__(self, wizard)
 
     # WizardStep
-    
+
     def setup(self):
         self.bandwidth_limit.data_type = float
         self.burst_on_connect.data_type = bool
@@ -259,7 +259,7 @@ class HTTPConsumptionStep(WorkerWizardStep):
         self.porter.worker = worker
 
     # Private
-    
+
     def _verify(self):
         self.client_limit.set_sensitive(
             self.has_client_limit.get_active())

@@ -798,6 +798,8 @@ class TestWizardSave(testsuite.TestCase):
         save.setMuxer('default-muxer', 'muxer-worker')
 
         streamer = self._createHTTPStreamer()
+        streamer._common.has_bandwidth_limit = True
+        streamer._common.bandwidth_limit = 123
         streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 
@@ -904,6 +906,7 @@ class TestWizardSave(testsuite.TestCase):
              '        <feed>muxer-audio-video</feed>\n'
              '      </eater>\n'
              '      \n'
+             '      <property name="bandwidth-limit">123000000</property>\n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
              '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
@@ -943,12 +946,12 @@ class TestNameConflicts(testsuite.TestCase):
     def _addServer(self, name):
         server = HTTPServer('ondemand-server-worker', '/mount-point/')
         self.save.addServerConsumer(server, name)
-        
+
     def testNameConflicts(self):
         self.save.setExistingComponentNames(['http-server-ondemand'])
         self._addServer('ondemand')
         self.save.getXML()
-        
+
         components = self.save.getAtmosphereComponents()
         self.assertEquals(components[0].name, 'http-server-ondemand2')
 
@@ -958,7 +961,7 @@ class TestNameConflicts(testsuite.TestCase):
         self.save.setExistingComponentNames(componentNames)
         self._addServer('ondemand')
         self.save.getXML()
-        
+
         components = self.save.getAtmosphereComponents()
         self.assertEquals(components[0].name, 'http-server-ondemand10')
 
