@@ -287,6 +287,8 @@ class ComponentList(log.Loggable, gobject.GObject):
                 self._model.set(titer, COL_NAME, value)
         elif key == 'workerName':
             self._updateWorker(titer, state)
+        elif key == 'pid':
+            self._model.set(titer, COL_PID, (value and str(value) or ''))
 
     # Private
 

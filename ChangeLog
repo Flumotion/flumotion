@@ -1,3 +1,8 @@
+2008-07-23  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/gtk/componentlist.py (ComponentList.stateSet):
+	Update PID dynamically, too. Fixes #993.
+
 2008-07-23  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py:
