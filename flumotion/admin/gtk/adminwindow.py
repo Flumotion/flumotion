@@ -81,6 +81,7 @@ from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.componentlist import getComponentLabel, ComponentList
 from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
+from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
 from flumotion.common.errors import ConnectionRefusedError, \
      ConnectionFailedError, BusyComponentError
@@ -150,6 +151,7 @@ MAIN_UI = """
     <menuitem action="StartComponent"/>
     <menuitem action="StopComponent"/>
     <menuitem action="DeleteComponent"/>
+    <menuitem action="KillComponent"/>
   </popup>
 </ui>
 """
@@ -205,6 +207,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._createUI()
         self._appendRecentConnections()
+        self.setDebugEnabled(False)
 
     # Public API
 
@@ -293,6 +296,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._debugActions.set_sensitive(enabled)
         self._debugEnableAction.set_active(enabled)
         self._componentView.setDebugEnabled(enabled)
+        self._killComponentAction.set_property('visible', enabled)
 
     def getWindow(self):
         """Get the gtk window for the admin interface
@@ -390,6 +394,12 @@ class AdminWindow(Loggable, GladeDelegate):
             ('About', gtk.STOCK_ABOUT, _('_About'), None,
              _('Displays an about dialog'),
              self._help_about_cb),
+
+            # Only in context menu
+            ('KillComponent', None, _('_Kill Component'), None,
+             _('Kills the currently selected component'),
+             self._kill_component_cb),
+
             ])
         group.add_toggle_actions([
             ('EnableDebugging', None, _('Enable _Debugging'), None,
@@ -450,6 +460,8 @@ class AdminWindow(Loggable, GladeDelegate):
         assert self._clearAllAction
         self._addFormatAction = group.get_action("AddFormat")
         assert self._addFormatAction
+        self._killComponentAction = group.get_action("KillComponent")
+        assert self._killComponentAction
 
         self._trayicon = FluTrayIcon(self._window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
@@ -772,6 +784,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._stopAllAction.set_sensitive(canStopAll)
         self._startAllAction.set_sensitive(canStartAll)
         self._clearAllAction.set_sensitive(canClearAll)
+        self._killComponentAction.set_sensitive(canStop)
 
         hasProducer = self._hasProducerComponent()
         self._addFormatAction.set_sensitive(hasProducer)
@@ -991,6 +1004,14 @@ class AdminWindow(Loggable, GladeDelegate):
             d.addCallback(callbackMultiple, self, mid)
             d.addErrback(errbackMultiple, self, mid)
         return d
+
+    def _killSelectedComponents(self):
+        for state in self._componentList.getSelectedStates():
+            workerName = state.get('workerRequested')
+            avatarId = componentId(state.get('parent').get('name'),
+                                   state.get('name'))
+            self._adminModel.callRemote(
+                'workerCallRemote', workerName, 'killJob', avatarId)
 
     def _componentSelectionChanged(self, states):
         self.debug('component %s has selection', states)
@@ -1406,5 +1427,8 @@ You can do remote component calls using:
 
     def _help_about_cb(self, action):
         self._about()
+
+    def _kill_component_cb(self, action):
+        self._killSelectedComponents()
 
 gobject.type_register(AdminWindow)
