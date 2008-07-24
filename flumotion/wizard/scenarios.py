@@ -130,10 +130,9 @@ class Scenario(object):
             self.__class__.__name__,))
         
 class LiveScenario(Scenario):
-    short = _("Live Stream")
+    short = _("Set up a live stream")
     description = _(
-        """This allows you to create a live stream from the sources
-of a video and/or audio device.
+        """Allows you to create a live stream from a device or a file.
         """)
 
     # Scenario
@@ -205,7 +204,7 @@ of a video and/or audio device.
 
 class OnDemandScenario(Scenario):
     short = _("Stream files on demand")
-    description = _("""Allows you to serve a collection of files from disk""")
+    description = _("""Allows you to serve a collection of files from disk.""")
 
     # Scenario
 
