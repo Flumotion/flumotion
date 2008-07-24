@@ -152,6 +152,8 @@ class AboutDialog(gtk.Dialog):
                    'Wim Taymans',
                    'Thomas Vander Stichele',
                    'Andy Wingo',
+                   'Jordi Massaguer Pla',
+                   'Pedro Gracia Fajardo',
         )
         text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:

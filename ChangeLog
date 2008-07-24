@@ -1,3 +1,8 @@
+2008-07-24  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/admin/gtk/dialogs.py:
+	Add Jordi and myself in authors.
+
 2008-07-24  Sebastien Merle  <sebastien@fluendo.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
