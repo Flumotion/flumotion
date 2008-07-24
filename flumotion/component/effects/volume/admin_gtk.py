@@ -85,7 +85,8 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
         if state.get("volume-allow-set"):
             self._hscale.set_sensitive(True)
             changeLabel = self.wtree.get_widget('volume-change-label')
-            changeLabel.set_sensitive(True)
+            if changeLabel is not None:
+                changeLabel.set_sensitive(True)
 
     def _createEnoughLevelWidgets(self, numchannels):
         """

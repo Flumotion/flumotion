@@ -1,3 +1,8 @@
+2008-07-24  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/effects/volume/admin_gtk.py: check if the
+	label is None before trying to call a method on it.
+
 2008-07-24  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/admin/gtk/dialogs.py:
