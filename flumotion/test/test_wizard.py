@@ -38,7 +38,7 @@ from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 
 
-class WizardStepTest: # JOHAN BROKE THIS (testsuite.TestCase):
+class WizardStepTest(testsuite.TestCase):
     def setUpClass(self):
         wiz = ConfigurationWizard()
         self.steps = wiz._steps
@@ -57,12 +57,14 @@ class WizardStepTest: # JOHAN BROKE THIS (testsuite.TestCase):
             if s.get_name() != 'Summary':
                 getNextRet = s.getNext()
                 self.assert_(not getNextRet or isinstance(getNextRet, str))
+    testLoadSteps.skip = 'Johan you broke this'
 
     def testStepComponentProperties(self):
         for s in self.steps:
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(s.get_component_properties(), dict))
+    testStepComponentProperties.skip = 'Johan you broke this'
 
 
 class TestAdmin(admin.AdminModel):
