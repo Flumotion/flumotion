@@ -562,7 +562,7 @@ class SectionWizard(GladeWindow, log.Loggable):
     def completed(self):
         pass
 
-    def beforeShowStep(step):
+    def beforeShowStep(self, step):
         pass
 
     # Public API

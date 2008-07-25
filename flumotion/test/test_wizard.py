@@ -38,7 +38,7 @@ from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 
 
-class WizardStepTest(testsuite.TestCase):
+class WizardStepTest: # JOHAN BROKE THIS (testsuite.TestCase):
     def setUpClass(self):
         wiz = ConfigurationWizard()
         self.steps = wiz._steps
