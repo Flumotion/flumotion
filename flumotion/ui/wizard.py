@@ -144,65 +144,230 @@ class WizardStep(GladeWidget, log.Loggable):
         do some logic, eg setup the default state"""
 
 
-class SectionWizard(GladeWindow, log.Loggable):
-    gsignal('destroy')
+class SidebarButton(gtk.Button):
+
+    def __init__(self, name, padding=0):
+        self.bg = None
+        self.fg = None
+        self.fgi = None
+        self.pre_bg = None
+        self.sensitive = False
+
+        gtk.Button.__init__(self)
+        self.set_name(name)
+        a = gtk.Alignment(0.0, 0.5)
+        a.set_property('left-padding', padding)
+        a.show()
+        self.label = gtk.Label()
+        self.label.show()
+        a.add(self.label)
+        self.add(a)
+        self.set_relief(gtk.RELIEF_NONE)
+        self.set_property('can_focus', False) # why?
+        self.connect_after('realize', SidebarButton.on_realize)
+        self.set_sensitive(True)
+
+    def on_realize(self):
+        # have to get the style from the theme, but it's not really
+        # there until we're realized
+        style = self.get_style()
+
+        self.bg = style.bg[gtk.STATE_SELECTED]
+        self.fg = style.fg[gtk.STATE_SELECTED]
+        self.fgi = style.light[gtk.STATE_SELECTED]
+        self.pre_bg = style.bg[gtk.STATE_ACTIVE]
+
+        self.set_sensitive(self.sensitive)
+        self.modify_bg(gtk.STATE_NORMAL, self.bg)
+        self.modify_bg(gtk.STATE_INSENSITIVE, self.bg)
+        self.modify_bg(gtk.STATE_PRELIGHT, self.pre_bg)
+        self.modify_bg(gtk.STATE_ACTIVE, self.pre_bg)
+        self.label.modify_fg(gtk.STATE_NORMAL, self.fg)
+
+    def set_sensitive(self, sensitive):
+        self.sensitive = sensitive
+        if not self.fgi:
+            return
+
+        def pc(c):
+            return '#%02x%02x%02x' % (c.red>>8, c.green>>8, c.blue>>8)
+
+        # CZECH THIS SHIT. You *can* set the fg/text on a label, but it
+        # will still emboss the color in the INSENSITIVE state. The way
+        # to avoid embossing is to use pango attributes (e.g. via
+        # <span>), but then in INSENSITIVE you get stipple. Where is
+        # this documented? Grumble.
+        if sensitive:
+            m = '<small>%s</small>' % self.name
+        else:
+            m = ('<small><span foreground="%s">%s</span></small>'
+                 % (pc(self.fgi), self.name))
+        self.label.set_markup(m)
+
+        gtk.Button.set_sensitive(self, sensitive)
+gobject.type_register(SidebarButton)
+
+
+class SidebarSection(gtk.VBox):
+    gsignal('step-chosen', str)
+
+    def __init__(self, title, name):
+        gtk.VBox.__init__(self)
+
+        self.set_name(title)
+        self.buttons = []
+
+        self.title = SidebarButton(title, 10)
+        self.title.show()
+        self.title.set_sensitive(False)
+        self.pack_start(self.title, False, False)
+        self.title.connect('clicked', lambda b: self.emit('step-chosen', name))
+
+    def __repr__(self):
+        return '<SidebarSection object %s>' % self.name
+
+    def set_active(self, active):
+        if active:
+            for button in self.buttons:
+                button.show()
+        else:
+            for button in self.buttons:
+                button.hide()
+
+    def push_header(self):
+        assert not self.buttons
+        assert not self.title.sensitive
+        self.title.set_sensitive(True)
+
+    def pop_header(self):
+        assert not self.buttons
+        # FIXME: This breaks when calling sidebar.remove_section(),
+        #        remove_section will have to update self._active or
+        #        preferably just rewrite the whole BEEP thing
+        #assert self.title.sensitive
+        self.title.set_sensitive(False)
+
+    def push_step(self, step_name, step_title):
+        assert self.title.sensitive
+
+        def clicked_cb(b, name):
+            self.emit('step-chosen', name)
+
+        button = SidebarButton(step_title, 20)
+        button.connect('clicked', clicked_cb, step_name)
+        self.pack_start(button, False, False)
+        button.show()
+        self.buttons.append(button)
+
+    def pop_step(self):
+        b = self.buttons.pop()
+        self.remove(b)
+gobject.type_register(SidebarSection)
+
+
+class WizardSidebar(gtk.EventBox, log.Loggable):
+    gsignal('step-chosen', str)
 
     logCategory = 'wizard'
 
-    gladeFile = 'sectionwizard.glade'
+    def __init__(self, wizard):
+        # FIXME: Remove this reference
+        self._wizard = wizard
 
-    def __init__(self, parent_window=None):
-        self._steps = {}
+        # FIXME: Join these three into one
         self._sections = []
+        self._sections2 = []
+        self._sectionsByName = {}
+
+        self._active = -1
         self._currentSection = 0
-        self._stack = _WalkableStack()
         self._currentStep = None
-        self._useMain = True
+        self._stack = _WalkableStack()
+        self._steps = {}
+        self._top = -1
 
-        GladeWindow.__init__(self, parent_window)
-        for k, v in self.widgets.items():
-            setattr(self, k, v)
-        self.window.set_icon_from_file(os.path.join(configure.imagedir,
-                                                    'fluendo.png'))
-        self.window.connect_after('realize', self.on_window_realize)
-        self.window.connect('destroy', self.on_window_destroy)
+        gtk.EventBox.__init__(self)
+        self.connect_after('realize', self.after_realize)
+        self.set_size_request(160, -1)
 
-        self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
-
-    def __nonzero__(self):
-        return True
-
-    def __len__(self):
-        return len(self._steps)
-
-    # Override this in subclass
-
-    def completed(self):
-        pass
+        self.vbox = gtk.VBox()
+        self.vbox.set_border_width(5)
+        self.vbox.show()
+        self.add(self.vbox)
 
     # Public API
 
+    def appendSection(self, title, name):
+        """Adds a new section to the sidebar
+        @param title: title of the section
+        @param name: name of the section
+        """
+        def clicked_cb(b, name):
+            self.emit('step-chosen', name)
+
+        section = SidebarSection(title, name)
+        section.connect('step-chosen', clicked_cb)
+        section.show()
+        section.set_active(False)
+        self.vbox.pack_start(section, False, False)
+        self._sections.append(section)
+        self._sectionsByName[name] = section
+
+    def removeSection(self, name):
+        """Removes a section by name
+        @param name: name of the section
+        """
+        section = self._sectionsByName.pop(name)
+        self._sections.remove(section)
+        self.vbox.remove(section)
+
+    def jumpTo(self, section_name):
+        for i, section in enumerate(self._sections):
+            if section.name == section_name:
+                self._set_active(i)
+                return
+        raise AssertionError()
+
+    def push(self, section_name, step_name, step_title):
+        active_section = self._sections[self._active]
+        if active_section.name == section_name:
+            # same section
+            active_section.push_step(step_name, step_title)
+        else:
+            # new section
+            if self._sections[self._active + 1].name != section_name:
+                raise AssertionError(
+                    "Expected next section to be %r, but is %r" % (
+                    section_name, self._sections[self._active + 1].name))
+
+            self._set_active(self._active + 1)
+            self._top += 1
+            self._sections[self._active].push_header()
+
+    def pop(self):
+        top_section = self._sections[self._top]
+        if top_section.buttons:
+            top_section.pop_step()
+        else:
+            top_section.pop_header()
+            self._top -= 1
+            if self._top < 0:
+                return False
+            if self._top < self._active:
+                self._set_active(self._top)
+        return True
+
     def cleanFutureSteps(self):
-        """Removes all the steps in front of the current one"""
-        oldSections = self._sections[self._currentSection+1:][:]
+        oldSections = self._sections2[self._currentSection+1:][:]
         for i, oldSection in enumerate(oldSections):
-            self.sidebar.remove_section(oldSection.title)
-            self._sections.remove(oldSection)
+            self.removeSection(oldSection.title)
+            self._sections2.remove(oldSection)
 
     def addStepSection(self, section):
-        """Adds a new step section
-        @param section: section to add
-        @type section: a WizardStep subclass
-        """
-        self.sidebar.append_section(section.section, section.title)
-        self._sections.append(section)
+        self.appendSection(section.section, section.title)
+        self._sections2.append(section)
 
     def getStep(self, stepname):
-        """Fetches a step. KeyError is raised when the step is not found.
-        @param stepname: name of the step to fetch
-        @type stepname: str
-        @returns: a L{WizardStep} instance or raises KeyError
-        """
         for step in self._steps.values():
             if step.get_name() == stepname:
                 return step
@@ -210,70 +375,33 @@ class SectionWizard(GladeWindow, log.Loggable):
             raise KeyError(stepname)
 
     def hasStep(self, stepName):
-        """Find out if a step with name stepName exists
-        @returns: if the stepName exists
-        """
         for step in self._steps.values():
             if step.get_name() == stepName:
                 return True
         return False
 
     def getVisitedSteps(self):
-        """Returns a sequence of steps which has been visited.
-        Visited means that the state of the step should be considered
-        when finishing the wizard.
-        @returns: sequence of visited steps.
-        @rtype: sequence of L{WizardStep}
-        """
         for step in self._steps.values():
             if step.visited:
                 yield step
 
-    def hide(self):
-        self.window.hide()
-
-    def clear_msg(self, id):
-        self.message_area.clearMessage(id)
-
-    def add_msg(self, msg):
-        self.message_area.addMessage(msg)
-
-    def goNext(self):
-        """Show the next step, this is called when
-        the next button is clicked
-        """
-        self.prepareNextStep(self._currentStep)
-
-    def blockNext(self, block):
-        self.button_next.set_sensitive(not block)
-        # work around a gtk+ bug #56070
-        if not block:
-            self.button_next.hide()
-            self.button_next.show()
-
-    def run(self, main=True):
-        self._useMain = main
-        sectionClass = self._sections[self._currentSection]
+    def pushSteps(self):
+        sectionClass = self._sections2[self._currentSection]
         if isinstance(sectionClass, (type, types.ClassType)):
-            section = sectionClass(self)
+            section = sectionClass(self._wizard)
         else:
             section = sectionClass
-        self.sidebar.push(section.section, None, section.section)
+
+        self.push(section.section, None, section.section)
         self._stack.push(section)
         self._setStep(section)
 
-        self.window.present()
-        self.window.grab_focus()
-
-        if self._useMain:
-            try:
-                gtk.main()
-            except KeyboardInterrupt:
-                pass
+    def canGoBack(self):
+        return self._stack.pos != 0
 
     def prepareNextStep(self, step):
         if hasattr(step, 'lastStep'):
-            self._finish(completed=True)
+            self._wizard.finish(completed=True)
             return
 
         next = step.getNext()
@@ -298,47 +426,231 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         self._showNextStep(nextStep)
 
+    def jumpToStep(self, name):
+        # If we're jumping to the same step don't do anything to
+        # avoid unnecessary ui flashes
+        if self.getStep(name) == self._currentStep:
+            return
+        self._stack.skipTo(lambda x: x.name == name)
+        step = self._stack.current()
+        self.sidebar.jumpTo(step.section)
+        self._currentSection = self._getSectionByName(step.section)
+        self._setStep(step)
+
+    def showPreviousStep(self):
+        step = self._stack.back()
+        self._currentSection = self._getSectionByName(step.section)
+        self._setStep(step)
+        self._wizard.updateButtons(hasNext=True)
+        self.jumpTo(step.section)
+        hasNext = not hasattr(step, 'lastStep')
+        self._wizard.updateButtons(hasNext)
+
+    def getCurrentStep(self):
+        return self._currentStep
+
     # Private
 
+    def _set_active(self, i):
+        if self._active >= 0:
+            self._sections[self._active].set_active(False)
+        self._active = i
+        if self._active >= 0:
+            self._sections[self._active].set_active(True)
+
+        l = len(self._sections)
+        for i, section in enumerate(self._sections):
+            if i <= self._active:
+                pos = i
+                pack_type = gtk.PACK_START
+            else:
+                pos = l - i
+                pack_type = gtk.PACK_END
+            self.vbox.child_set_property(section, 'pack_type', pack_type)
+            self.vbox.reorder_child(section, pos)
+
+    def _showNextStep(self, step):
+        while not self._stack.push(step):
+            s = self._stack.pop()
+            s.visited = False
+            self.pop()
+
+        hasNext = not hasattr(step, 'lastStep')
+        if not step.visited and hasNext:
+            self.push(step.section,
+                      step.title,
+                      step.sidebarName)
+        else:
+            self.jumpTo(step.section)
+
+        step.visited = True
+        self._setStep(step)
+
+        self._wizard.updateButtons(hasNext)
+
+    def _setStep(self, step):
+        self._steps[step.name] = step
+        self._currentStep = step
+
+        self._wizard.blockNext(False)
+        self._wizard.packStep(step)
+
+        self._wizard.beforeShowStep(step)
+
+        self.debug('showing step %r' % step)
+        step.show()
+        step.activated()
+
+    def _getSectionByName(self, section_name):
+        for sectionClass in self._sections2:
+            if sectionClass.section == section_name:
+                return self._sections2.index(sectionClass)
+
     def _getNextStep(self):
-        if self._currentSection + 1 == len(self._sections):
-            self._finish(completed=True)
+        if self._currentSection + 1 == len(self._sections2):
+            self._wizard.finish(completed=True)
             return
 
         self._currentSection += 1
-        nextStepClass = self._sections[self._currentSection]
-        return nextStepClass(self)
+        nextStepClass = self._sections2[self._currentSection]
+        return nextStepClass(self._wizard)
 
-    def _updateButtons(self, hasNext):
-        # update the forward and next buttons
-        # hasNext: whether or not there is a next step
-        can_go_back = self._stack.pos != 0
-        self.button_prev.set_sensitive(can_go_back)
+    # Callbacks
 
-        # XXX: Use the current step, not the one on the top of the stack
-        if hasNext:
-            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
-        else:
-            self.button_next.set_label(_('_Finish'))
+    def after_realize(self, eventbox):
+        # have to get the style from the theme, but it's not really
+        # there until we're realized
+        style = self.get_style()
+        self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
 
-    def _setStepIcon(self, icon):
-        icon_filename = os.path.join(configure.imagedir, 'wizard', icon)
-        assert os.path.exists(icon_filename)
-        self.image_icon.set_from_file(icon_filename)
+gobject.type_register(WizardSidebar)
 
-    def _setStepTitle(self, title):
-        self.label_title.set_markup(
-            '<span size="x-large">%s</span>' % escape(title or ''))
 
-    def _packStep(self, step):
+class SectionWizard(GladeWindow, log.Loggable):
+    gsignal('destroy')
+
+    logCategory = 'wizard'
+
+    gladeFile = 'sectionwizard.glade'
+
+    def __init__(self, parent_window=None):
+        self._useMain = True
+
+        GladeWindow.__init__(self, parent_window)
+        for k, v in self.widgets.items():
+            setattr(self, k, v)
+        self.window.set_icon_from_file(os.path.join(configure.imagedir,
+                                                    'fluendo.png'))
+        self.window.connect_after('realize', self.on_window_realize)
+        self.window.connect('destroy', self.on_window_destroy)
+
+        self.sidebar = WizardSidebar(self)
+        self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
+        self.sidebar.set_size_request(160, -1)
+        self.hbox_main.pack_start(self.sidebar, False, False)
+        self.hbox_main.reorder_child(self.sidebar, 0)
+        self.sidebar.show()
+
+    def __nonzero__(self):
+        return True
+
+    def __len__(self):
+        return len(self._steps)
+
+    # Override this in subclass
+
+    def completed(self):
+        pass
+
+    def beforeShowStep(step):
+        pass
+
+    # Public API
+
+    def cleanFutureSteps(self):
+        """Removes all the steps in front of the current one"""
+        self.sidebar.cleanFutureSteps()
+
+    def addStepSection(self, section):
+        """Adds a new step section
+        @param section: section to add
+        @type section: a WizardStep subclass
+        """
+        self.sidebar.addStepSection(section)
+
+    def getStep(self, stepname):
+        """Fetches a step. KeyError is raised when the step is not found.
+        @param stepname: name of the step to fetch
+        @type stepname: str
+        @returns: a L{WizardStep} instance or raises KeyError
+        """
+        return self.sidebar.getStep(stepname)
+
+    def hasStep(self, stepName):
+        """Find out if a step with name stepName exists
+        @returns: if the stepName exists
+        """
+        return self.sidebar.hasStep(stepName)
+
+    def getVisitedSteps(self):
+        """Returns a sequence of steps which has been visited.
+        Visited means that the state of the step should be considered
+        when finishing the wizard.
+        @returns: sequence of visited steps.
+        @rtype: sequence of L{WizardStep}
+        """
+        return self.sidebar.getVisitedSteps()
+
+    def getCurrentStep(self):
+        return self.sidebar.getCurrentStep()
+
+    def hide(self):
+        self.window.hide()
+
+    def clear_msg(self, id):
+        self.message_area.clearMessage(id)
+
+    def add_msg(self, msg):
+        self.message_area.addMessage(msg)
+
+    def goNext(self):
+        """Show the next step, this is called when
+        the next button is clicked
+        """
+        self.sidebar.prepareNextStep(self.sidebar.getCurrentStep())
+
+    def blockNext(self, block):
+        self.button_next.set_sensitive(not block)
+        # work around a gtk+ bug #56070
+        if not block:
+            self.button_next.hide()
+            self.button_next.show()
+
+    def run(self, main=True):
+        self._useMain = main
+        self.sidebar.pushSteps()
+
+        self.window.present()
+        self.window.grab_focus()
+
+        if self._useMain:
+            try:
+                gtk.main()
+            except KeyboardInterrupt:
+                pass
+
+    def packStep(self, step):
         # Remove previous step
         map(self.content_area.remove, self.content_area.get_children())
         self.message_area.clear()
 
         # Add current
         self.content_area.pack_start(step, True, True, 0)
+        self._setStepIcon(step.icon)
+        self._setStepTitle(step.title)
+        self.updateButtons(hasNext=True)
 
-    def _finish(self, main=True, completed=True):
+    def finish(self, main=True, completed=True):
         if completed:
             self.completed()
 
@@ -348,65 +660,28 @@ class SectionWizard(GladeWindow, log.Loggable):
             except RuntimeError:
                 pass
 
-    def _showNextStep(self, step):
-        while not self._stack.push(step):
-            s = self._stack.pop()
-            s.visited = False
-            self.sidebar.pop()
+    def updateButtons(self, hasNext):
+        # update the forward and next buttons
+        # hasNext: whether or not there is a next step
+        canGoBack = self.sidebar.canGoBack()
+        self.button_prev.set_sensitive(canGoBack)
 
-        hasNext = not hasattr(step, 'lastStep')
-        if not step.visited and hasNext:
-            self.sidebar.push(step.section, step.title,
-                              step.sidebarName)
+        # XXX: Use the current step, not the one on the top of the stack
+        if hasNext:
+            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
-            self.sidebar.show_step(step.section)
+            self.button_next.set_label(_('_Finish'))
 
-        step.visited = True
-        self._setStep(step)
+    # Private
 
-        self._updateButtons(hasNext)
+    def _setStepIcon(self, icon):
+        icon_filename = os.path.join(configure.imagedir, 'wizard', icon)
+        assert os.path.exists(icon_filename)
+        self.image_icon.set_from_file(icon_filename)
 
-    def _setStep(self, step):
-        self._steps[step.name] = step
-        self._currentStep = step
-        self._packStep(step)
-        self._setStepIcon(step.icon)
-        self._setStepTitle(step.title)
-
-        self._updateButtons(hasNext=True)
-        self.blockNext(False)
-
-        self.beforeShowStep(step)
-
-        self.debug('showing step %r' % step)
-        step.show()
-        step.activated()
-
-    def _jumpToStep(self, name):
-        step = self.getStep(name)
-        # If we're jumping to the same step don't do anything to
-        # avoid unnecessary ui flashes
-        if step == self._currentStep:
-            return
-        self._stack.skipTo(lambda x: x.name == name)
-        step = self._stack.current()
-        self.sidebar.show_step(step.section)
-        self._currentSection = self._getSectionByName(step.section)
-        self._setStep(step)
-
-    def _showPreviousStep(self):
-        step = self._stack.back()
-        self._currentSection = self._getSectionByName(step.section)
-        self._setStep(step)
-        self._updateButtons(hasNext=True)
-        self.sidebar.show_step(step.section)
-        hasNext = not hasattr(step, 'lastStep')
-        self._updateButtons(hasNext)
-
-    def _getSectionByName(self, section_name):
-        for sectionClass in self._sections:
-            if sectionClass.section == section_name:
-                return self._sections.index(sectionClass)
+    def _setStepTitle(self, title):
+        self.label_title.set_markup(
+            '<span size="x-large">%s</span>' % escape(title or ''))
 
     # Callbacks
 
@@ -424,16 +699,16 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.emit('destroy')
 
     def on_window_delete_event(self, wizard, event):
-        self._finish(self._useMain, completed=False)
+        self.finish(self._useMain, completed=False)
 
     def on_button_prev_clicked(self, button):
-        self._showPreviousStep()
+        self.sidebar.showPreviousStep()
 
     def on_button_next_clicked(self, button):
         self.goNext()
 
     def on_sidebar_step_chosen(self, sidebar, name):
-        self._jumpToStep(name)
+        self.sidebar.jumpToStep(name)
 
 
 gobject.type_register(SectionWizard)

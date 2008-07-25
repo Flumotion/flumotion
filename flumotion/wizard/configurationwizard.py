@@ -612,7 +612,7 @@ class ConfigurationWizard(SectionWizard):
         if worker:
             self.clear_msg('worker-error')
             self._lastWorker = worker
-            step = self._currentStep
+            step = self.getCurrentStep()
             if step and isinstance(step, WorkerWizardStep):
                 self._setupWorker(step, worker)
                 self.workerChangedForStep(step, worker)

@@ -438,7 +438,6 @@ flumotion/ui/glade.py
 flumotion/ui/icons.py
 flumotion/ui/__init__.py
 flumotion/ui/kiwipatches.py
-flumotion/ui/sidebar.py
 flumotion/ui/simplewizard.py
 flumotion/ui/trayicon.py
 flumotion/ui/wizard.py

@@ -1,7 +1,19 @@
 2008-07-25  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/sectionwizard.glade:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/sidebar.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	Move the wizard sidebar into the wizard.py file.
+	Move all logic step/section/stack logic from the SectionWizard
+	class into the sidear. This is an incremental change in the
+	process of making the sidebars implementation nicer.
+
+2008-07-25  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/consumptionsteps.py
-	(ConsumptionStep._getSteps): 
+	(ConsumptionStep._getSteps):
 	Set the bandwidth_limit to a float instead of an int
 	to make kiwi happy.
 

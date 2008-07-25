@@ -11,7 +11,6 @@ flumotion_PYTHON = 	\
 	kiwipatches.py 	\
 	linkwidget.py 	\
 	icons.py 	\
-	sidebar.py 	\
 	simplewizard.py \
 	trayicon.py 	\
 	wizard.py
