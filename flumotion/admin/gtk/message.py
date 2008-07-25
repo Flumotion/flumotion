@@ -138,6 +138,11 @@ class MessagesView(gtk.VBox):
         Add a message to me.
         @type  m: L{flumotion.common.messages.Message}
         """
+        # clear all previously added messages with the same id.  This allows
+        # us to replace for example a "probing" message with the
+        # result message
+        self.clearMessage(m.id)
+
         # add a message button to show this message
         b = MessageButton(m)
         b.sigid = b.connect('toggled', self._on_message_button__toggled, m)

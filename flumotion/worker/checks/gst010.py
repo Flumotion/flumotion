@@ -140,7 +140,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
         pipeline.set_state(gst.STATE_PLAYING)
         return resolution.d
 
-def check1394(id):
+def check1394(mid):
     """
     Probe the firewire device.
 
@@ -150,6 +150,8 @@ def check1394(id):
      - succesful, with a None value: no device found
      - succesful, with a dictionary of width, height, and par as a num/den pair
      - failed
+
+    @param mid: the id to set on the message.
 
     @rtype: L{twisted.internet.defer.Deferred} of
             L{flumotion.common.messages.Result}
@@ -174,7 +176,7 @@ def check1394(id):
     # first check if the obvious device node exists
     if not os.path.exists('/dev/raw1394'):
         m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),
-            id=id)
+            id=mid)
         result.add(m)
         return defer.succeed(result)
 
@@ -206,13 +208,14 @@ def check1394(id):
                            "Check permissions on the device.")))
 
             if not m:
-                m = check.handleGStreamerDeviceError(failure, 'Firewire')
+                m = check.handleGStreamerDeviceError(failure, 'Firewire',
+                    mid=mid)
 
         if not m:
             m = messages.Error(T_(N_("Could not probe Firewire device.")),
                 debug=check.debugFailure(failure))
 
-        m.id = id
+        m.id = mid
         result.add(m)
         return result
     d.addCallback(check.callbackResult, result)

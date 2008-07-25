@@ -1,5 +1,14 @@
 2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/message.py:
+	  Override previous messages with the same id.
+	* flumotion/worker/checks/check.py:
+	* flumotion/worker/checks/gst010.py:
+	  Make sure the message id is passed on so it can be overridden.
+	  Fixes #1061.
+
+2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_wizard.py:
 	* flumotion/ui/wizard.py:
 	  Fix Johan's build breakage.

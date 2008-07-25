@@ -31,11 +31,15 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 
-def handleGStreamerDeviceError(failure, device):
+def handleGStreamerDeviceError(failure, device, mid=None):
     """
     Handle common GStreamer GstErrors or other.
     Return a message or None.
     """
+    if not mid:
+        log.warning('check',
+            'handleGStreamerDeviceError: no message id specified')
+
     m = None
 
     if failure.check(errors.GStreamerGstError):
@@ -48,32 +52,32 @@ def handleGStreamerDeviceError(failure, device):
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for reading.  "
-                       "Check permissions on the device."), device))
+                       "Check permissions on the device."), device), id=mid)
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for writing.  "
-                       "Check permissions on the device."), device))
+                       "Check permissions on the device."), device), id=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s'.  "
-                       "Check permissions on the device."), device))
+                       "Check permissions on the device."), device), id=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_BUSY):
                 m = messages.Error(T_(
-                    N_("Device '%s' is already in use."), device))
+                    N_("Device '%s' is already in use."), device), id=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_SETTINGS):
                 m = messages.Error(T_(
                     N_("Device '%s' did not accept the requested settings."),
                     device),
-                    debug="%s\n%s" % (gerror.message, debug))
+                    debug="%s\n%s" % (gerror.message, debug), id=mid)
 
         # fallback GStreamer GstError handling
         if not m:
             m = messages.Error(T_(N_("Internal unhandled GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
-                    gerror.message, gerror.domain, gerror.code, debug))
+                    gerror.message, gerror.domain, gerror.code, debug), id=mid)
     elif failure.check(errors.GStreamerError):
         m = messages.Error(T_(N_("Internal GStreamer error.")),
-            debug=debugFailure(failure))
+            debug=debugFailure(failure), id=mid)
     log.debug('check', 'handleGStreamerError: returning %r' % m)
     return m
 
@@ -92,16 +96,18 @@ def callbackResult(value, result):
     result.succeed(value)
     return result
 
-def errbackResult(failure, result, id, device):
+def errbackResult(failure, result, mid, device):
     """
     I am an errback to add to a do_element_check deferred, after your
     specific one.
     
     I handle several generic cases, including some generic GStreamer errors.
+
+    @param mid: the id to set on the message
     """
     m = None
     if failure.check(errors.GStreamerGstError):
-        m = handleGStreamerDeviceError(failure, device)
+        m = handleGStreamerDeviceError(failure, device, mid=mid)
 
     if not m:
         log.debug('check', 'unhandled failure: %r (%s)\nTraceback:\n%s' % (
@@ -109,14 +115,16 @@ def errbackResult(failure, result, id, device):
         m = messages.Error(T_(N_("Could not probe device '%s'."), device),
             debug=debugFailure(failure))
 
-    m.id = id
+    m.id = mid
     result.add(m)
     return result
 
-def errbackNotFoundResult(failure, result, id, device):
+def errbackNotFoundResult(failure, result, mid, device):
     """
     I am an errback to add to a do_element_check deferred
     to check for RESOURCE_ERROR_NOT_FOUND, and add a message to the result.
+
+    @param mid: the id to set on the message
     """
     failure.trap(errors.GStreamerGstError)
     source, gerror, debug = failure.value.args
@@ -124,7 +132,7 @@ def errbackNotFoundResult(failure, result, id, device):
     if gerror.domain == "gst-resource-error-quark" and \
         gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
         m = messages.Warning(T_(
-            N_("No device found on %s."), device), id=id)
+            N_("No device found on %s."), device), id=mid)
         result.add(m)
         return result
 
