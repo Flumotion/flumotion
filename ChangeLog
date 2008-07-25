@@ -1,5 +1,10 @@
 2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/message.py:
+	  Fix typo.  Fixes #1077.
+
+2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/styleguide:
 	* flumotion/component/base/eatersnode.py:
 	* flumotion/component/base/feedersnode.py:

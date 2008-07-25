@@ -204,7 +204,7 @@ class MessagesView(gtk.VBox):
             translated = self._translator.translateTranslatable(description)
             tag = textbuffer.create_tag(translated)
             tag.set_property('underline', pango.UNDERLINE_SINGLE)
-            tag.set_property('1foreground', 'blue')
+            tag.set_property('foreground', 'blue')
             tag.set_data('link', getMessageWebLink(message))
             textbuffer.insert_with_tags_by_name(titer, translated,
                                                 tag.get_property('name'))
