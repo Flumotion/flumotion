@@ -42,7 +42,7 @@ class HTTPCommon(object):
         self.has_client_limit = False
         self.has_bandwidth_limit = False
         self.client_limit = 1000
-        self.bandwidth_limit = 500
+        self.bandwidth_limit = 500.0
         self.burst_on_connect = False
 
 

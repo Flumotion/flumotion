@@ -1,5 +1,12 @@
 2008-07-25  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/consumptionsteps.py
+	(ConsumptionStep._getSteps): 
+	Set the bandwidth_limit to a float instead of an int
+	to make kiwi happy.
+
+2008-07-25  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/extern/exceptiondialog.py
 	(TracebackViewer._showException): scroll to the end
 
