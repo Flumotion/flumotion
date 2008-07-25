@@ -71,32 +71,56 @@ def _exceptionHandler(exctype, value, tb):
     import urllib
     import webbrowser
     from flumotion.extern.exceptiondialog import ExceptionDialog
+    from flumotion.common.common import pathToModuleName
     from flumotion.common.debug import getVersions
 
     dialog = ExceptionDialog((exctype, value, tb))
     response = dialog.run()
-    if response == ExceptionDialog.RESPONSE_BUG:
-        revision = max(getVersions().values())
-        description = """
-Please describe what you did:
+    if response != ExceptionDialog.RESPONSE_BUG:
+        dialog.destroy()
+        return
 
+    versions = getVersions()
+    filenames = {}
+    for filename in dialog.getFilenames():
+        moduleName = pathToModuleName(filename)
+        if not moduleName in versions:
+            continue
+        filenames[filename] = versions[moduleName]
+    sortedNames = filenames.keys()
+    sortedNames.sort()
+    extra = ' * Filename revisions:\n'
+    for filename in sortedNames:
+        rev = filenames[filename]
+        link = '[source:flumotion/%s/%s#%s r%s]' % (
+            configure.branchName, filename, rev, rev)
+        extra += "   - %s: %s\n" % (filename, link)
+    revision = max(versions.values())
+    description = """
+Please describe what you were doing when the crash happened.
+ADD YOUR TEXT HERE
 
 Collected information from your system:
 
-Flumotion version: %(version)s
-Flumotion SVN revision: %(revision)s
-
+ * Flumotion version: '''%(version)s'''
+ * Flumotion SVN revision: [source:flumotion/%(branch)s#%(revision)s r%(revision)s]
+%(extra)s
 Python Traceback:
+{{{
 %(traceback)s
+}}}
 """ % (dict(traceback=dialog.getDescription(),
-                    version=configure.version,
-                    revision=revision,
-                    args=sys.argv))
-        params = dict(component='flumotion',
-                      summary=dialog.getSummary(),
-                      description=description)
-        data = urllib.urlencode(params)
-        webbrowser.open_new(_OPEN_BUG_URL % (data,))
+            version=configure.version,
+            branch=configure.branchName,
+            revision=revision,
+            args=sys.argv,
+            extra=extra))
+    params = dict(component='flumotion',
+                  summary=dialog.getSummary(),
+                  description=description,
+                  keywords='generated')
+    data = urllib.urlencode(params)
+    webbrowser.open_new(_OPEN_BUG_URL % (data,))
     dialog.destroy()
 
 def main(args):

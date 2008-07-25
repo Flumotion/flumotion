@@ -75,6 +75,8 @@ different configdir, logdir and rundir.
 @type version:      string
 @var  versionTuple: Flumotion version number
 @type versionTuple: 4-tuple of integers
+@var  branchName:   Flumotion branch name
+@type branchName:   string
 
 # default values for service-related stuff
 
@@ -134,6 +136,7 @@ defaultGstPortRange = range(8600, 8639 + 1)
 PACKAGE = 'flumotion'
 version = _config['version']
 versionTuple = _versionStringToTuple(version)
+branchName = 'trunk'
 
 processTermWait = 10
 processKillWait = 5

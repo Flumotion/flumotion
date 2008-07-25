@@ -27,8 +27,6 @@ import linecache
 import os
 import sys
 import traceback
-import urllib
-import webbrowser
 
 import pango
 import gtk
@@ -87,7 +85,7 @@ class TracebackViewer(gtk.ScrolledWindow):
         else:
             self._buffer.insert(end_iter, text)
 
-    def _printTraceback(self, tb, limit=None):
+    def _printTraceback(self):
         """Print up to 'limit' stack trace entries from the traceback 'tb'.
 
         If 'limit' is omitted or None, all entries are printed.  If 'file'
@@ -96,32 +94,19 @@ class TracebackViewer(gtk.ScrolledWindow):
         method.
         """
 
-        if limit is None:
-            limit = getattr(sys, 'tracebacklimit', None)
-
-        n = 0
-        while tb is not None:
-            if limit is not None and n >= limit:
-                break
-            n += 1
-
+        for tb in self._getTracebacks():
             co = tb.tb_frame.f_code
             self._printFile(co.co_filename, tb.tb_lineno, co.co_name)
             line = linecache.getline(co.co_filename, tb.tb_lineno)
             if line:
                 self._print('    ' + line.strip())
-            tb = tb.tb_next
 
     def _showException(self):
         widget = gtk.grab_get_current()
         if widget is not None:
             widget.grab_remove()
 
-        firsttb = tb = self._tb
-        while firsttb.tb_next:
-            firsttb = firsttb.tb_next
-        self._tb = firsttb
-        self._printTraceback(tb)
+        self._printTraceback()
         msg = traceback.format_exception_only(self._exctype, self._value)[0]
         result = msg.split(' ', 1)
         if len(result) == 1:
@@ -132,10 +117,25 @@ class TracebackViewer(gtk.ScrolledWindow):
         self._insertText(msg, 'exc')
         self._insertText(' ' + arguments)
 
+    def _getTracebacks(self, limit=None):
+        if limit is None:
+            limit = getattr(sys, 'tracebacklimit', None)
+
+        n = 0
+        tb = self._tb
+        while tb is not None:
+            if limit is not None and n >= limit:
+                break
+            n += 1
+
+            yield tb
+            tb = tb.tb_next
+
     # Public API
 
     def getSummary(self):
-        filename = os.path.basename(self._tb.tb_frame.f_code.co_filename)
+        lastFilename = list(self.getFilenames())[-1]
+        filename = os.path.basename(lastFilename)
         text = self.getDescription()
         for lastline in text.split('\n')[::-1]:
             if lastline != '':
@@ -144,6 +144,14 @@ class TracebackViewer(gtk.ScrolledWindow):
 
     def getDescription(self):
         return self._buffer.get_text(*self._buffer.get_bounds())
+
+    def getFilenames(self):
+        cwd = os.getcwd()
+        for tb in self._getTracebacks():
+            filename = tb.tb_frame.f_code.co_filename
+            if filename.startswith(cwd):
+                filename = filename.replace(cwd, '')[1:]
+            yield filename
 
 
 class ExceptionDialog(HIGAlertDialog):
@@ -192,3 +200,6 @@ class ExceptionDialog(HIGAlertDialog):
 
     def getDescription(self):
         return self._dw.getDescription()
+
+    def getFilenames(self):
+        return self._dw.getFilenames()
