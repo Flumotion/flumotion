@@ -80,54 +80,54 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self._updateDisconnectionTime()
 
     def _setEaterConnectionItem(self, state, key, value):
-        if key == 'feedId':
+        if key == 'feed-id':
             self.labels['eating-from'].set_text(str(value))
         # timestamps
-        elif key == 'countTimestampDiscont':
+        elif key == 'count-timestamp-discont':
             self.labels['timestamp-discont-count-current'].set_text(str(value))
             if value > 0:
                 self._expander_discont_current.show()
-        elif key == 'timeTimestampDiscont':
+        elif key == 'time-timestamp-discont':
             text = formatTimeStamp(time.localtime(value))
             self.labels['timestamp-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_timestamp_discont_current.show()
-        elif key == 'lastTimestampDiscont':
+        elif key == 'last-timestamp-discont':
             text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-last-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
-        elif key == 'totalTimestampDiscont':
+        elif key == 'total-timestamp-discont':
             text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-total-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
-        elif key == 'timestampTimestampDiscont':
+        elif key == 'timestamp-timestamp-discont':
             if value is None:
                 return
             text = formatTime(value, fractional=9)
             self.labels['timestamp-discont-timestamp-current'].set_text(text)
         # offsets
-        elif key == 'countOffsetDiscont':
+        elif key == 'count-offset-discont':
             self.labels['offset-discont-count-current'].set_text(str(value))
             if value > 0:
                 self._expander_discont_current.show()
-        elif key == 'timeOffsetDiscont':
+        elif key == 'time-offset-discont':
             text = formatTimeStamp(time.localtime(value))
             self.labels['offset-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_offset_discont_current.show()
-        elif key == 'lastOffsetDiscont':
+        elif key == 'last-offset-discont':
             text = _("%d units") % value
             self.labels['offset-discont-last-current'].set_text(text)
             if value > 0:
                 self._vbox_offset_discont_current.show()
-        elif key == 'totalOffsetDiscont':
+        elif key == 'total-offset-discont':
             text = _("%d units") % value
             self.labels['offset-discont-total-current'].set_text(text)
             if value > 0:
                 self._vbox_offset_discont_current.show()
-        elif key == 'offsetOffsetDiscont':
+        elif key == 'offset-offset-discont':
             if value is None:
                 return
             text = _("%d units") % value
@@ -203,19 +203,19 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         @param uiState: the component's uiState
         @param state:   the eater's uiState
         """
-        eaterId = state.get('eaterAlias')
+        eaterId = state.get('eater-alias')
         i = self.treemodel.append(None)
         self.treemodel.set(i, 0, eaterId, 1, state)
         w = StateWatcher(state,
             {
                 'fd':                    self._setEaterFD,
-                'eaterAlias':            self._setEaterName,
-                'lastConnect':           self._setEaterLastConnect,
-                'countTimestampDiscont': self._setEaterCountTimestampDiscont,
-                'totalTimestampDiscont': self._setEaterTotalTimestampDiscont,
-                'countOffsetDiscont':    self._setEaterCountOffsetDiscont,
-                'totalOffsetDiscont':    self._setEaterTotalOffsetDiscont,
-                'totalConnections':      self._setEaterTotalConnections,
+                'eater-alias':            self._setEaterName,
+                'last-connect':           self._setEaterLastConnect,
+                'count-timestamp-discont': self._setEaterCountTimestampDiscont,
+                'total-timestamp-discont': self._setEaterTotalTimestampDiscont,
+                'count-offset-discont':    self._setEaterCountOffsetDiscont,
+                'total-offset-discont':    self._setEaterTotalOffsetDiscont,
+                'total-connections':      self._setEaterTotalConnections,
                 # need to have a setter for connection to be able to show
                 # it initially
                 'connection':            self._setEaterConnection,

@@ -113,7 +113,7 @@ class FeederClient:
     """
     def __init__(self, clientId):
         self.uiState = componentui.WorkerComponentUIState()
-        self.uiState.addKey('clientId', clientId)
+        self.uiState.addKey('client-id', clientId)
         self.fd = None
         self.uiState.addKey('fd', None)
 
@@ -121,18 +121,18 @@ class FeederClient:
         # Unknown, not supported
         # these are supported
         for key in (
-            'bytesReadCurrent',      # bytes read over current connection
-            'bytesReadTotal',        # bytes read over all connections
+            'bytes-read-current',    # bytes read over current connection
+            'bytes-read-total',      # bytes read over all connections
             'reconnects',            # number of connections made by this client
-            'lastConnect',           # last client connection, in epoch seconds
-            'lastDisconnect',        # last client disconnect, in epoch seconds
-            'lastActivity',          # last time client read or connected
+            'last-connect',          # last client connection, in epoch seconds
+            'last-disconnect',       # last client disconnect, in epoch seconds
+            'last-activity',         # last time client read or connected
             ):
             self.uiState.addKey(key, 0)
         # these are possibly unsupported
         for key in (
-            'buffersDroppedCurrent', # buffers dropped over current connection
-            'buffersDroppedTotal',   # buffers dropped over all connections
+            'buffers-dropped-current', # buffers dropped over current connection
+            'buffers-dropped-total',   # buffers dropped over all connections
             ):
             self.uiState.addKey(key, None)
 
@@ -157,12 +157,12 @@ class FeederClient:
             # since that would break integer addition below
             buffersDropped = 0
 
-        self.uiState.set('bytesReadCurrent', bytesSent)
-        self.uiState.set('buffersDroppedCurrent', buffersDropped)
-        self.uiState.set('bytesReadTotal', self._bytesReadBefore + bytesSent)
-        self.uiState.set('lastActivity', timeLastActivity)
+        self.uiState.set('bytes-read-current', bytesSent)
+        self.uiState.set('buffers-dropped-current', buffersDropped)
+        self.uiState.set('bytes-read-total', self._bytesReadBefore + bytesSent)
+        self.uiState.set('last-activity', timeLastActivity)
         if buffersDropped is not None:
-            self.uiState.set('buffersDroppedTotal',
+            self.uiState.set('buffers-dropped-total',
                 self._buffersDroppedBefore + buffersDropped)
 
     def connected(self, fd, when=None):
@@ -183,22 +183,22 @@ class FeederClient:
 
         self.fd = fd
         self.uiState.set('fd', fd)
-        self.uiState.set('lastConnect', when)
+        self.uiState.set('last-connect', when)
         self.uiState.set('reconnects', self.uiState.get('reconnects', 0) + 1)
 
     def _updateUIStateForDisconnect(self, fd, when):
         if self.fd == fd:
             self.fd = None
             self.uiState.set('fd', None)
-        self.uiState.set('lastDisconnect', when)
+        self.uiState.set('last-disconnect', when)
 
         # update our internal counters and reset current counters to 0
-        self._bytesReadBefore += self.uiState.get('bytesReadCurrent')
-        self.uiState.set('bytesReadCurrent', 0)
-        if self.uiState.get('buffersDroppedCurrent') is not None:
+        self._bytesReadBefore += self.uiState.get('bytes-read-current')
+        self.uiState.set('bytes-read-current', 0)
+        if self.uiState.get('buffers-dropped-current') is not None:
             self._buffersDroppedBefore += self.uiState.get(
-                'buffersDroppedCurrent')
-            self.uiState.set('buffersDroppedCurrent', 0)
+                'buffers-dropped-current')
+            self.uiState.set('buffers-dropped-current', 0)
 
     def disconnected(self, when=None, fd=None):
         """

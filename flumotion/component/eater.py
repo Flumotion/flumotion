@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_feedcomponent010 -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -46,39 +46,40 @@ class Eater:
         self.depayName = self.elementName + '-depay'
         self.setPadMonitor(None)
         self.uiState = componentui.WorkerComponentUIState()
-        self.uiState.addKey('eaterAlias')
-        self.uiState.set('eaterAlias', eaterAlias)
-        self.uiState.addKey('eaterName')
-        self.uiState.set('eaterName', eaterName)
+        self.uiState.addKey('eater-alias')
+        self.uiState.set('eater-alias', eaterAlias)
+        self.uiState.addKey('eater-name')
+        self.uiState.set('eater-name', eaterName)
         # dict for the current connection
         connectionDict = {
-            "feedId":                None,
-            "timeTimestampDiscont":  None,
-            "timestampTimestampDiscont":  0.0,  # ts of buffer after discont,
-                                                # in float seconds
-            "lastTimestampDiscont":  0.0,
-            "totalTimestampDiscont": 0.0,
-            "countTimestampDiscont": 0,
-            "timeOffsetDiscont":     None,
-            "offsetOffsetDiscont":   0,         # offset of buffer after discont
-            "lastOffsetDiscont":     0,
-            "totalOffsetDiscont":    0,
-            "countOffsetDiscont":    0,
+            "feed-id":                      None,
+            "time-timestamp-discont":       None,
+            "timestamp-timestamp-discont":  0.0,  # ts of buffer after discont,
+                                                  # in float seconds
+            "last-timestamp-discont":        0.0,
+            "total-timestamp-discont":       0.0,
+            "count-timestamp-discont":       0,
+            "time-offset-discont":           None,
+            "offset-offset-discont":         0,   # offset of buffer
+                                                  # after discont
+            "last-offset-discont":           0,
+            "total-offset-discont":          0,
+            "count-offset-discont":          0,
 
          }
         self.uiState.addDictKey('connection', connectionDict)
 
         for key in (
-            'lastConnect',           # last client connection, in epoch seconds
-            'lastDisconnect',        # last client disconnect, in epoch seconds
-            'totalConnections',      # number of connections made by this client
-            'countTimestampDiscont', # number of timestamp disconts seen
-            'countOffsetDiscont',    # number of timestamp disconts seen
+            'last-connect',           # last client connection, in epoch seconds
+            'last-disconnect',        # last client disconnect, in epoch seconds
+            'total-connections',      # number of connections by this client
+            'count-timestamp-discont', # number of timestamp disconts seen
+            'count-offset-discont',    # number of timestamp disconts seen
             ):
             self.uiState.addKey(key, 0)
         for key in (
-            'totalTimestampDiscont', # total timestamp discontinuity
-            'totalOffsetDiscont',    # total offset discontinuity
+            'total-timestamp-discont', # total timestamp discontinuity
+            'total-offset-discont',    # total offset discontinuity
             ):
             self.uiState.addKey(key, 0.0)
         self.uiState.addKey('fd', None)
@@ -99,20 +100,20 @@ class Eater:
         self.feedId = feedId
         self.fd = fd
 
-        self.uiState.set('lastConnect', when)
+        self.uiState.set('last-connect', when)
         self.uiState.set('fd', fd)
-        self.uiState.set('totalConnections',
-            self.uiState.get('totalConnections', 0) + 1)
+        self.uiState.set('total-connections',
+            self.uiState.get('total-connections', 0) + 1)
 
-        self.uiState.setitem("connection", 'feedId', feedId)
-        self.uiState.setitem("connection", "countTimestampDiscont", 0)
-        self.uiState.setitem("connection", "timeTimestampDiscont",  None)
-        self.uiState.setitem("connection", "lastTimestampDiscont",  0.0)
-        self.uiState.setitem("connection", "totalTimestampDiscont", 0.0)
-        self.uiState.setitem("connection", "countOffsetDiscont",    0)
-        self.uiState.setitem("connection", "timeOffsetDiscont",     None)
-        self.uiState.setitem("connection", "lastOffsetDiscont",     0)
-        self.uiState.setitem("connection", "totalOffsetDiscont",    0)
+        self.uiState.setitem("connection", 'feed-id', feedId)
+        self.uiState.setitem("connection", "count-timestamp-discont", 0)
+        self.uiState.setitem("connection", "time-timestamp-discont",  None)
+        self.uiState.setitem("connection", "last-timestamp-discont",  0.0)
+        self.uiState.setitem("connection", "total-timestamp-discont", 0.0)
+        self.uiState.setitem("connection", "count-offset-discont",    0)
+        self.uiState.setitem("connection", "time-offset-discont",     None)
+        self.uiState.setitem("connection", "last-offset-discont",     0)
+        self.uiState.setitem("connection", "total-offset-discont",    0)
 
     def disconnected(self, when=None):
         """
@@ -123,7 +124,7 @@ class Eater:
             when = time.time()
 
         def updateUIState():
-            self.uiState.set('lastDisconnect', when)
+            self.uiState.set('last-disconnect', when)
             self.fd = None
             self.uiState.set('fd', None)
 
@@ -150,18 +151,18 @@ class Eater:
         uiState = self.uiState
 
         c = uiState.get('connection') # dict
-        uiState.setitem('connection', 'countTimestampDiscont',
-            c.get('countTimestampDiscont', 0) + 1)
-        uiState.set('countTimestampDiscont',
-            uiState.get('countTimestampDiscont', 0) + 1)
+        uiState.setitem('connection', 'count-timestamp-discont',
+            c.get('count-timestamp-discont', 0) + 1)
+        uiState.set('count-timestamp-discont',
+            uiState.get('count-timestamp-discont', 0) + 1)
 
-        uiState.setitem('connection', 'timeTimestampDiscont', time.time())
-        uiState.setitem('connection', 'timestampTimestampDiscont', timestamp)
-        uiState.setitem('connection', 'lastTimestampDiscont', seconds)
-        uiState.setitem('connection', 'totalTimestampDiscont',
-            c.get('totalTimestampDiscont', 0) + seconds)
-        uiState.set('totalTimestampDiscont',
-            uiState.get('totalTimestampDiscont', 0) + seconds)
+        uiState.setitem('connection', 'time-timestamp-discont', time.time())
+        uiState.setitem('connection', 'timestamp-timestamp-discont', timestamp)
+        uiState.setitem('connection', 'last-timestamp-discont', seconds)
+        uiState.setitem('connection', 'total-timestamp-discont',
+            c.get('total-timestamp-discont', 0) + seconds)
+        uiState.set('total-timestamp-discont',
+            uiState.get('total-timestamp-discont', 0) + seconds)
 
     def offsetDiscont(self, units, offset):
         """
@@ -171,15 +172,15 @@ class Eater:
         uiState = self.uiState
 
         c = uiState.get('connection') # dict
-        uiState.setitem('connection', 'countOffsetDiscont',
-            c.get('countOffsetDiscont', 0) + 1)
-        uiState.set('countOffsetDiscont',
-            uiState.get('countOffsetDiscont', 0) + 1)
+        uiState.setitem('connection', 'count-offset-discont',
+            c.get('count-offset-discont', 0) + 1)
+        uiState.set('count-offset-discont',
+            uiState.get('count-offset-discont', 0) + 1)
 
-        uiState.setitem('connection', 'timeOffsetDiscont', time.time())
-        uiState.setitem('connection', 'offsetOffsetDiscont', offset)
-        uiState.setitem('connection', 'lastOffsetDiscont', units)
-        uiState.setitem('connection', 'totalOffsetDiscont',
-            c.get('totalOffsetDiscont', 0) + units)
-        uiState.set('totalOffsetDiscont',
-            uiState.get('totalOffsetDiscont', 0) + units)
+        uiState.setitem('connection', 'time-offset-discont', time.time())
+        uiState.setitem('connection', 'offset-offset-discont', offset)
+        uiState.setitem('connection', 'last-offset-discont', units)
+        uiState.setitem('connection', 'total-offset-discont',
+            c.get('total-offset-discont', 0) + units)
+        uiState.set('total-offset-discont',
+            uiState.get('total-offset-discont', 0) + units)

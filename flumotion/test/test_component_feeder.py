@@ -39,7 +39,7 @@ class TestFeeder(testsuite.TestCase):
         client = self.feeder.clientConnected(clientId, 3, lambda _: None)
         clients = self.feeder.getClients()
         self.failUnless(client in clients)
-        self.assertEquals(client.uiState.get('clientId'), clientId)
+        self.assertEquals(client.uiState.get('client-id'), clientId)
 
     def testReconnect(self):
         clientId = '/default/muxer-video'
@@ -82,8 +82,8 @@ class TestFeeder(testsuite.TestCase):
         self.assertEquals(client.uiState.get(key), value)
 
     def clientAssertStats(self, client, brc, bdc, brt, bdt, reconnects):
-        self.clientAssertEquals(client, 'bytesReadCurrent', brc)
-        self.clientAssertEquals(client, 'buffersDroppedCurrent', bdc)
-        self.clientAssertEquals(client, 'bytesReadTotal', brt)
-        self.clientAssertEquals(client, 'buffersDroppedTotal', bdt)
+        self.clientAssertEquals(client, 'bytes-read-current', brc)
+        self.clientAssertEquals(client, 'buffers-dropped-current', bdc)
+        self.clientAssertEquals(client, 'bytes-read-total', brt)
+        self.clientAssertEquals(client, 'buffers-dropped-total', bdt)
         self.clientAssertEquals(client, 'reconnects', reconnects)

@@ -1,3 +1,44 @@
+2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/styleguide:
+	* flumotion/component/base/eatersnode.py:
+	* flumotion/component/base/feedersnode.py:
+	* flumotion/component/eater.py:
+	* flumotion/component/feeder.py:
+	* flumotion/test/test_component_feeder.py:
+	  Fix uiState key naming to be lowercase-hyphenated.
+	  feeder uiState:
+	  - clientId         -> client-id
+	  - bytesReadCurrent -> bytes-read-current
+	  - bytesReadTotal   -> bytes-read-total
+	  - lastConnect      -> last-connect
+	  - lastDisconnect   -> last-disconnect
+	  - lastActivity     -> last-activity
+	  - buffersDroppedCurrent -> buffers-dropped-current
+	  - buffersDroppedTotal   -> buffers-dropped-total
+	  eater uiState:
+	  - eaterAlias            -> eater-alias
+	  - eaterName             -> eater-name
+	  - lastConnect           -> last-connect
+	  - lastDisconnect        -> last-disconnect
+	  - totalConnections      -> total-connections
+	  - countTimestampDiscont -> count-timestamp-discont
+	  - countOffsetDiscont    -> count-offset-discont
+	  - totalTimestampDiscont -> total-timestamp-discont
+	  - totalOffsetDiscont    -> total-offset-discont
+	  eater uiState, connection dict:
+	  - feedId                -> feed-id
+	  - timeTimestampDiscont      -> time-timestamp-discont
+	  - timestampTimestampDiscont -> timestamp-timestamp-discont
+	  - lastTimestampDiscont      -> last-timestamp-discont
+	  - totalTimestampDiscont     -> total-timestamp-discont
+	  - countTimestampDiscont     -> count-timestamp-discont
+	  - timeOffsetDiscont         -> time-offset-discont
+	  - offsetOffsetDiscont       -> offset-offset-discont
+	  - lastOffsetDiscont         -> last-offset-discont
+	  - totalOffsetDiscont        -> total-offset-discont
+	  - countTimestampDiscont     -> count-offset-discont
+
 2008-07-25  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:

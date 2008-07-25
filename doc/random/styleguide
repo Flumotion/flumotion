@@ -93,6 +93,8 @@ NAMING
   testFormatTime
 - Twisted coding standard:
   http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
+- component properties and uiState keys should be named lowercase and
+  hyphenated.
 
 MODULES
 -------

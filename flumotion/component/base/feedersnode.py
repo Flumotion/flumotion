@@ -170,22 +170,22 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         @param state:       the feeder client's uiState
         """
 
-        printableClientId = self._mungeClientId(state.get('clientId'))
+        printableClientId = self._mungeClientId(state.get('client-id'))
         for row in self.treemodel:
             if self.treemodel.get_value(row.iter, 1) == feederState:
                 break
         i = self.treemodel.append(row.iter)
         self.treemodel.set(i, 0, printableClientId, 1, state)
         w = StateWatcher(state, {
-            'clientId':              self.setFeederClientName,
-            'bytesReadCurrent':      self.setFeederClientBytesReadCurrent,
-            'buffersDroppedCurrent': self.setFeederClientBuffersDroppedCurrent,
-            'bytesReadTotal':        self.setFeederClientBytesReadTotal,
-            'buffersDroppedTotal':   self.setFeederClientBuffersDroppedTotal,
+            'client-id':              self.setFeederClientName,
+            'bytes-read-current':      self.setFeederClientBytesReadCurrent,
+            'buffers-dropped-current': self.setFeederClientBuffersDroppedCurrent,
+            'bytes-read-total':        self.setFeederClientBytesReadTotal,
+            'buffers-dropped-total':   self.setFeederClientBuffersDroppedTotal,
             'reconnects':            self.setFeederClientReconnects,
-            'lastConnect':           self.setFeederClientLastConnect,
-            'lastDisconnect':        self.setFeederClientLastDisconnect,
-            'lastActivity':          self.setFeederClientLastActivity,
+            'last-connect':           self.setFeederClientLastConnect,
+            'last-disconnect':        self.setFeederClientLastDisconnect,
+            'last-activity':          self.setFeederClientLastActivity,
             'fd':                    self.setFeederClientFD,
         }, {}, {})
         self.treemodel.set(i, 2, w, 3, 'client')
