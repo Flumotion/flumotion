@@ -117,6 +117,10 @@ class TracebackViewer(gtk.ScrolledWindow):
         self._insertText(msg, 'exc')
         self._insertText(' ' + arguments)
 
+        # scroll to end
+        vadj = self.get_vadjustment()
+        vadj.set_value(vadj.upper)
+
     def _getTracebacks(self, limit=None):
         if limit is None:
             limit = getattr(sys, 'tracebacklimit', None)

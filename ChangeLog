@@ -1,5 +1,10 @@
 2008-07-25  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/extern/exceptiondialog.py
+	(TracebackViewer._showException): scroll to the end
+
+2008-07-25  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/main.py:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/bugreporter.py:
