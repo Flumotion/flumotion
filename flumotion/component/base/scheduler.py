@@ -175,17 +175,16 @@ class Scheduler(log.Loggable):
         self._reschedule()
 
     def subscribe(self, eventStarted, eventEnded):
-        """Subscribe to event happenings in the scheduler.
+        """
+        Subscribe to event happenings in the scheduler.
 
-        @param eventStarted: Function that will be called when an event
-        starts.
-        @type eventStarted: Event -> None
-        @param eventStopped: Function that will be called when an event
-        ends.
-        @type eventEnded: Event -> None
+        @param eventStarted: function that will be called when an event starts
+        @type  eventStarted: function taking L{Event}
+        @param eventEnded:   function that will be called when an event ends
+        @type  eventEnded:   function taking L{Event}
 
         @returns: A subscription ID that can later be passed to
-        unsubscribe().
+                  unsubscribe().
         """
         sid = self._subscribeId
         self._subscribeId += 1

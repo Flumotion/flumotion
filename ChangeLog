@@ -1,5 +1,11 @@
 2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/component/base/scheduler.py:
+	  Doc fixes.
+
+2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_wizard.py:
 	  Mark test as skip instead.
 
