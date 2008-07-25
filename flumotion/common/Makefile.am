@@ -6,6 +6,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	avltree.py \
 	boot.py \
+	bugreporter.py \
 	bundle.py \
 	bundleclient.py \
 	connection.py \

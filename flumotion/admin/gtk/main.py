@@ -31,12 +31,10 @@ from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.common import log, i18n
 from flumotion.common.errors import ConnectionRefusedError, OptionError
 from flumotion.common.options import OptionParser
-from flumotion.configure import configure
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 _retval = 0
-_OPEN_BUG_URL = "https://code.fluendo.com/flumotion/trac/newticket?%s"
 
 def _connectToManager(win, manager, ssl):
     try:
@@ -68,59 +66,18 @@ def _exceptionHandler(exctype, value, tb):
     if exctype is KeyboardInterrupt:
         return
 
-    import urllib
-    import webbrowser
     from flumotion.extern.exceptiondialog import ExceptionDialog
-    from flumotion.common.common import pathToModuleName
-    from flumotion.common.debug import getVersions
-
     dialog = ExceptionDialog((exctype, value, tb))
     response = dialog.run()
     if response != ExceptionDialog.RESPONSE_BUG:
         dialog.destroy()
         return
 
-    versions = getVersions()
-    filenames = {}
-    for filename in dialog.getFilenames():
-        moduleName = pathToModuleName(filename)
-        if not moduleName in versions:
-            continue
-        filenames[filename] = versions[moduleName]
-    sortedNames = filenames.keys()
-    sortedNames.sort()
-    extra = ' * Filename revisions:\n'
-    for filename in sortedNames:
-        rev = filenames[filename]
-        link = '[source:flumotion/%s/%s#%s r%s]' % (
-            configure.branchName, filename, rev, rev)
-        extra += "   - %s: %s\n" % (filename, link)
-    revision = max(versions.values())
-    description = """
-Please describe what you were doing when the crash happened.
-ADD YOUR TEXT HERE
-
-Collected information from your system:
-
- * Flumotion version: '''%(version)s'''
- * Flumotion SVN revision: [source:flumotion/%(branch)s#%(revision)s r%(revision)s]
-%(extra)s
-Python Traceback:
-{{{
-%(traceback)s
-}}}
-""" % (dict(traceback=dialog.getDescription(),
-            version=configure.version,
-            branch=configure.branchName,
-            revision=revision,
-            args=sys.argv,
-            extra=extra))
-    params = dict(component='flumotion',
-                  summary=dialog.getSummary(),
-                  description=description,
-                  keywords='generated')
-    data = urllib.urlencode(params)
-    webbrowser.open_new(_OPEN_BUG_URL % (data,))
+    from flumotion.common.bugreporter import BugReporter
+    br = BugReporter()
+    br.submit(dialog.getFilenames(),
+              dialog.getDescription(),
+              dialog.getSummary())
     dialog.destroy()
 
 def main(args):

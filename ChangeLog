@@ -1,6 +1,14 @@
 2008-07-25  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/main.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/bugreporter.py:
+	Move the non-UI bits of the bug reporter to
+	a separate file in flumotion.common.
+
+2008-07-25  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/main.py:
 	use trac syntax, add filename revisions
 	* flumotion/configure/configure.py:
 	add branchName
