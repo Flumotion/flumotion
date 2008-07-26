@@ -167,13 +167,13 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                         # connected
                         m = messages.Info(T_(N_(
                             "The camera has now been reconnected.")),
-                            id="firewire-bus-reset-%d" % s['nodecount'],
+                            mid="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
                     elif s['current-device-change'] == -1:
                         # disconnected
                         m = messages.Warning(T_(N_(
                             "The camera has been disconnected.")),
-                            id="firewire-bus-reset-%d" % s['nodecount'],
+                            mid="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)

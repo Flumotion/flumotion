@@ -40,7 +40,7 @@ def checkVorbis():
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                string.join([str(x) for x in version], '.'), 'vorbis'),
-            id = 'vorbis-check')
+            mid='vorbis-check')
         m.add(T_(N_(
             "Synchronization between audio and video may not be correct.\n")))
         m.add(T_(N_(
@@ -61,7 +61,7 @@ def checkTheora():
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                string.join([str(x) for x in version], '.'), 'theora'),
-            id = 'theora-check')
+            mid='theora-check')
         m.add(T_(N_(
             "Synchronization between audio and video may not be correct.\n")))
         m.add(T_(N_(

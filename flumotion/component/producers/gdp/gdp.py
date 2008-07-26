@@ -36,7 +36,7 @@ class GDPProducer(feedcomponent.ParseLaunchComponent):
             m = messages.Error(T_(N_(
                 "Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                    ".".join([str(x) for x in version]), 'tcp'),
-                id = 'tcp-check')
+                mid='tcp-check')
             m.add(T_(N_("The GDP producer cannot function with this bug.\n")))
             m.add(T_(N_("Please upgrade '%s' to version %s."),
                 'gst-plugins-base', '0.10.20'))

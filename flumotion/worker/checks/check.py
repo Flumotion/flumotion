@@ -52,32 +52,32 @@ def handleGStreamerDeviceError(failure, device, mid=None):
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for reading.  "
-                       "Check permissions on the device."), device), id=mid)
+                       "Check permissions on the device."), device), mid=mid)
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for writing.  "
-                       "Check permissions on the device."), device), id=mid)
+                       "Check permissions on the device."), device), mid=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s'.  "
-                       "Check permissions on the device."), device), id=mid)
+                       "Check permissions on the device."), device), mid=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_BUSY):
                 m = messages.Error(T_(
-                    N_("Device '%s' is already in use."), device), id=mid)
+                    N_("Device '%s' is already in use."), device), mid=mid)
             elif gerror.code == int(gst.RESOURCE_ERROR_SETTINGS):
                 m = messages.Error(T_(
                     N_("Device '%s' did not accept the requested settings."),
                     device),
-                    debug="%s\n%s" % (gerror.message, debug), id=mid)
+                    debug="%s\n%s" % (gerror.message, debug), mid=mid)
 
         # fallback GStreamer GstError handling
         if not m:
             m = messages.Error(T_(N_("Internal unhandled GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
-                    gerror.message, gerror.domain, gerror.code, debug), id=mid)
+                    gerror.message, gerror.domain, gerror.code, debug), mid=mid)
     elif failure.check(errors.GStreamerError):
         m = messages.Error(T_(N_("Internal GStreamer error.")),
-            debug=debugFailure(failure), id=mid)
+            debug=debugFailure(failure), mid=mid)
     log.debug('check', 'handleGStreamerError: returning %r' % m)
     return m
 
@@ -132,7 +132,7 @@ def errbackNotFoundResult(failure, result, mid, device):
     if gerror.domain == "gst-resource-error-quark" and \
         gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
         m = messages.Warning(T_(
-            N_("No device found on %s."), device), id=mid)
+            N_("No device found on %s."), device), mid=mid)
         result.add(m)
         return result
 

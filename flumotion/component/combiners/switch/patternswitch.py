@@ -39,12 +39,12 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
             props = self.config['properties']
             eaterName = props.get('eater-with-stream-markers', None)
             if eaterName != 'video-master' and eaterName != 'video-backup':
-                warnStr = "The value provided for the " \
+                warnStr = N_("The value provided for the " \
                     "eater-with-stream-markers property " \
-                    "must be one of video-backup, video-master."
+                    "must be one of video-backup, video-master.")
                 self.warning(warnStr)
                 self.addMessage(messages.Error(T_(N_(warnStr)),
-                    id="eater-with-stream-markers-wrong"))
+                    mid="eater-with-stream-markers-wrong"))
             return result
         d.addCallback(checkConfig)
         return d

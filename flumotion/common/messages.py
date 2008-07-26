@@ -64,11 +64,12 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     anchor = None
     description = None
 
-    compareAttributes = ["level", "translatables", "debug", "id", "priority",
+    compareAttributes = ["level", "translatables", "debug", "mid", "priority",
         "timestamp"]
 
+    # F0.8: remove id= in favor of mid=
     def __init__(self, level, translatable, debug=None, id=None, priority=50,
-        timestamp=None):
+        timestamp=None, mid=None):
         """
         Create a new message.
 
@@ -96,7 +97,7 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
                              level
         @param timestamp:    time since epoch at which the message was
                              generated, in seconds.
-        @param id:           A unique id for this kind of message, as
+        @param mid:          A unique id for this kind of message, as
                              discussed above. If not given, will be
                              generated from the contents of the
                              translatable.
@@ -104,8 +105,14 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         self.level = level
         self.translatables = []
         self.debug = debug
+        if id:
+            import warnings
+            warnings.warn('Please use the mid kwarg instead',
+                DeprecationWarning, stacklevel=3)
+            mid = id
+            
         # FIXME: untranslated is a really poor choice of id
-        self.id = id or translatable.untranslated()
+        self.id = mid or translatable.untranslated()
         self.priority = priority
         self.timestamp = timestamp or time.time()
         # -1 is in __init__, -2 is in the subclass __init__, -3 is in the caller

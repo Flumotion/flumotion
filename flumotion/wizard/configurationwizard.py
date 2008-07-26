@@ -621,5 +621,5 @@ class ConfigurationWizard(SectionWizard):
                     N_('All workers have logged out.\n'
                     'Make sure your Flumotion network is running '
                     'properly and try again.')),
-                id='worker-error')
+                mid='worker-error')
             self.add_msg(msg)

@@ -154,7 +154,7 @@ class SoundcardStep(AudioProducerStep):
         assert channels
         msg = Info(T_(
             N_("Probing the sound card. This can take a while...")),
-                            id='soundcard-check')
+                            mid='soundcard-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker(
             'flumotion.worker.checks.audio', 'checkMixerTracks',

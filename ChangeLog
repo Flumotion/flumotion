@@ -1,5 +1,31 @@
 2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/messages.py:
+	  deprecate id= keyword arg in favor of mid=
+	* flumotion/component/base/baseadminnode.py:
+	* flumotion/component/combiners/switch/patternswitch.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/gdp/gdp.py:
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/component/producers/playlist/playlist.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/worker/checks/check.py:
+	* flumotion/worker/checks/encoder.py:
+	  Follow through.
+
+2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/bttv/wizard_gtk.py:
 	* flumotion/component/producers/firewire/wizard_gtk.py:
 	* flumotion/component/producers/soundcard/wizard_gtk.py:

@@ -425,7 +425,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             self.addMessage(
                 messages.Warning(T_(N_(
                     "Failed to parse a playlist from file %s: %s" %
-                        (file, e))), id=msgid))
+                        (file, e))), mid=msgid))
 
     def do_setup(self):
         playlist = playlistparser.Playlist(self)

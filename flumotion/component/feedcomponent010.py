@@ -216,7 +216,7 @@ class FeedComponent(basecomponent.BaseComponent):
             "Internal GStreamer error.")),
             debug="%s\n%s: %d\n%s" % (
                 gerror.message, gerror.domain, gerror.code, debug),
-            id=mid, priority=40)
+            mid=mid, priority=40)
         return m
 
     def bus_message_received_cb(self, bus, message):
@@ -374,7 +374,7 @@ class FeedComponent(basecomponent.BaseComponent):
             m = messages.Warning(T_(N_(
                     "Your gst-plugins-base is too old, so "
                     "feeder statistics will be unavailable.")),
-                    id='multifdsink')
+                    mid='multifdsink')
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s."), 'gst-plugins-base',
                 '0.10.11'))
@@ -649,7 +649,7 @@ class FeedComponent(basecomponent.BaseComponent):
             msg = "Cannot find feeder named '%s'" % feedName
             mid = "feedToFD-%s" % feedName
             m = messages.Warning(T_(N_("Internal Flumotion error.")),
-                debug=msg, id=mid, priority=40)
+                debug=msg, mid=mid, priority=40)
             self.state.append('messages', m)
             self.warning(msg)
             cleanup(fd)

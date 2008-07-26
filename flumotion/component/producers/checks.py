@@ -57,9 +57,10 @@ def checkTicket347():
     (major, minor, nano) = gobject.pygtk_version
     if (major, minor, nano) < (2, 8, 6):
         m = messages.Warning(T_(
-            N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"),
+            N_("Version %d.%d.%d of the PyGTK library contains "
+                "a memory leak.\n"),
             major, minor, nano),
-            id = 'ticket-347')
+            mid='ticket-347')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of "
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
@@ -77,9 +78,10 @@ def checkTicket348():
     (major, minor, nano) = gst.pygst_version
     if (major, minor, nano) < (0, 10, 3):
         m = messages.Warning(T_(
-            N_("Version %d.%d.%d of the gst-python library contains a large memory leak.\n"),
+            N_("Version %d.%d.%d of the gst-python library contains "
+                "a large memory leak.\n"),
             major, minor, nano),
-            id = 'ticket-348')
+            mid='ticket-348')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of "
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
@@ -100,7 +102,7 @@ def checkTicket349():
         m = messages.Error(T_(
             N_("Version %d.%d.%d of the GStreamer library is too old.\n"),
             major, minor, micro),
-            id = 'ticket-349')
+            mid='ticket-349')
         m.add(T_(N_("The '%s' component needs a newer version of '%s'.\n"),
                     'looper', 'gstreamer'))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
@@ -112,7 +114,7 @@ def checkTicket349():
         m = messages.Error(T_(
             N_("Version %d.%d.%d of the gst-python library is too old.\n"),
             major, minor, micro),
-            id = 'ticket-349')
+            mid='ticket-349')
         m.add(T_(N_("The '%s' component needs a newer version of '%s'.\n"),
                     'looper', 'gst-python'))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),

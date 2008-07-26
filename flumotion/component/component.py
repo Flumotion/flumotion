@@ -489,7 +489,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 self.warning('Setup failed: %s', txt)
                 m = messages.Error(T_(N_("Could not setup component.")),
                                    debug=txt,
-                                   id="component-setup-%s" % self.name)
+                                   mid="component-setup-%s" % self.name)
                 # will call setMood(moods.sad)
                 self.addMessage(m)
 
@@ -620,7 +620,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
             m = messages.Warning(T_(N_(
                 "Your configuration uses deprecated properties.  "
                 "Please update your configuration and correct them.\n")),
-                id = "deprecated")
+                mid="deprecated")
             for old, new in found:
                 m.add(T_(N_(
                 "Please rename '%s' to '%s'.\n"),

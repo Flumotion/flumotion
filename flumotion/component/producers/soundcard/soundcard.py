@@ -76,8 +76,11 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         if gst.pygst_version < (0, 10, 7):
             allowVolumeSet = False
             m = messages.Info(T_(
-                N_("The soundcard volume cannot be changed with this version of the 'gst-python' library.\n")), id = 'mixer-track-setting')
-            m.add(T_(N_("Please upgrade '%s' to version %s or later if you require this functionality."),
+                N_("The soundcard volume cannot be changed with this version "
+                    "of the 'gst-python' library.\n")),
+                mid='mixer-track-setting')
+            m.add(T_(N_("Please upgrade '%s' to version %s or later "
+                "if you require this functionality."),
                 'gst-python', '0.10.7'))
             self.addMessage(m)
 

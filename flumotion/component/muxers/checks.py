@@ -40,7 +40,7 @@ def checkOgg():
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                string.join([str(x) for x in version], '.'), 'ogg'),
-            id = 'ogg-check')
+            mid='ogg-check')
         m.add(T_(N_("The generated Ogg stream will not be fully compliant, "
             "and possibly not even play correctly.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s."), 'gst-plugins-base',

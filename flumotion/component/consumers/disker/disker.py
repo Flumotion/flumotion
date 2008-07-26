@@ -113,7 +113,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 "The configuration property 'rotate-type' should be set to "
                 "'size', time', or 'none', not '%s'. "
                 "Please fix the configuration."),
-                    rotateType), id='rotate-type')
+                    rotateType), mid='rotate-type')
             self.addMessage(m)
             raise errors.ComponentSetupHandledError()
 
@@ -123,7 +123,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 m = messages.Error(T_(N_(
                     "The configuration property '%s' should be set. "
                     "Please fix the configuration."),
-                        rotateType), id='rotate-type')
+                        rotateType), mid='rotate-type')
                 self.addMessage(m)
                 raise errors.ComponentSetupHandledError()
 
@@ -289,7 +289,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         m = messages.Error(T_(N_(
             "Error writing to file %s.  Maybe disk is full." % (
             self.location))),
-            id=messageId, priority=40)
+            mid=messageId, priority=40)
         self.addMessage(m)
 
     def configure_pipeline(self, pipeline, properties):
@@ -319,7 +319,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             except ValueError:
                 m = messages.Warning(T_(N_(
                     "Error parsing ical file %s, so not scheduling any"
-                    " events." % icalfn)), id="error-parsing-ical")
+                    " events." % icalfn)), mid="error-parsing-ical")
                 self.addMessage(m)
 
         elif icalfn:
@@ -327,7 +327,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                       "scheduling but the necessary modules " \
                       "dateutil and/or icalendar are not installed"
             self.warning(warnStr)
-            m = messages.Warning(T_(N_(warnStr)), id="error-parsing-ical")
+            m = messages.Warning(T_(N_(warnStr)), mid="error-parsing-ical")
             self.addMessage(m)
 
         sink = self.get_element('fdsink')
@@ -405,7 +405,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 m = messages.Warning(T_(N_('Failed expanding filename prefix: '
                                            '%r <-- %r.'),
                                         self._marker_prefix, data),
-                                     id='expand-marker-prefix')
+                                     mid='expand-marker-prefix')
                 self.addMessage(m)
                 self.warning('Failed expanding filename prefix: '
                              '%r <-- %r; %r' %

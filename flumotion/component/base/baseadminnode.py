@@ -230,7 +230,7 @@ class BaseAdminGtkNode(log.Loggable):
             m = messages.Error(T_(N_(
                 "Internal error in component UI.  "
                 "Please file a bug against the component.")),
-                debug=debug, id="render")
+                debug=debug, mid="render")
             self.addMessage(m)
 
             label = gtk.Label(_("Internal error.\nSee component error "
