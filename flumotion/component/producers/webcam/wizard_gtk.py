@@ -109,7 +109,7 @@ class WebcamStep(VideoProducerStep):
             id='webcam-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker('flumotion.worker.checks.video', 'checkWebcam',
-                           device, id='webcam-check')
+                           device, mid='webcam-check')
 
         def errRemoteRunFailure(failure):
             failure.trap(errors.RemoteRunFailure)

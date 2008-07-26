@@ -119,7 +119,7 @@ class TVCardStep(VideoProducerStep):
                             id='tvcard-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker('flumotion.worker.checks.video', 'checkTVCard',
-                               device, id='tvcard-check')
+                               device, mid='tvcard-check')
 
         def errRemoteRunFailure(failure):
             failure.trap(errors.RemoteRunFailure)

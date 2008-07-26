@@ -1,3 +1,13 @@
+2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/worker/checks/audio.py:
+	* flumotion/worker/checks/video.py:
+	  Change id to mid on all worker checks.
+
 2008-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

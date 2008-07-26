@@ -31,7 +31,7 @@ from gst010 import do_element_check
 
 T_ = gettexter()
 
-def checkMixerTracks(source_factory, device, channels, id=None):
+def checkMixerTracks(source_factory, device, channels, mid=None):
     """
     Probe the given GStreamer element factory with the given device for
     audio mixer tracks.
@@ -63,7 +63,7 @@ def checkMixerTracks(source_factory, device, channels, id=None):
     d = do_element_check(pipeline, 'source', get_tracks,
         set_state_deferred=True)
 
-    def errbackAlsaBugResult(failure, result, id, device):
+    def errbackAlsaBugResult(failure, result, mid, device):
         # alsasrc in gst-plugins-base <= 0.10.14 was accidentally reporting
         # GST_RESOURCE_ERROR_WRITE when it could not be opened for reading.
         if not failure.check(errors.GStreamerGstError):
@@ -91,8 +91,8 @@ def checkMixerTracks(source_factory, device, channels, id=None):
         
 
     d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(errbackAlsaBugResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
+    d.addErrback(check.errbackNotFoundResult, result, mid, device)
+    d.addErrback(errbackAlsaBugResult, result, mid, device)
+    d.addErrback(check.errbackResult, result, mid, device)
 
     return d

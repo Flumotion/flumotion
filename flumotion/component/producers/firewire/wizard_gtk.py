@@ -178,7 +178,7 @@ class _FireWireCommon:
             id='firewire-check')
         self.wizard.add_msg(msg)
         d = self.runInWorker('flumotion.worker.checks.gst010', 'check1394',
-            id='firewire-check')
+            mid='firewire-check')
 
         def firewireCheckDone(options):
             self.wizard.clear_msg('firewire-check')

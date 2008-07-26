@@ -29,7 +29,7 @@ from flumotion.worker.checks.gst010 import do_element_check
 
 __version__ = "$Rev$"
 
-def checkTVCard(device, id='check-tvcard'):
+def checkTVCard(device, mid='check-tvcard'):
     """
     Probe the given device node as a TV card.
     Return a deferred firing a human-readable device name, a list of channel
@@ -49,12 +49,12 @@ def checkTVCard(device, id='check-tvcard'):
     d = do_element_check(pipeline, 'source', get_name_channels_norms)
 
     d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
+    d.addErrback(check.errbackNotFoundResult, result, mid, device)
+    d.addErrback(check.errbackResult, result, mid, device)
 
     return d
 
-def checkWebcam(device, id):
+def checkWebcam(device, mid):
     """
     Probe the given device node as a webcam.
 
@@ -144,7 +144,7 @@ def checkWebcam(device, id):
     d = tryV4L2()
     d.addErrback(tryV4L1)
     d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
+    d.addErrback(check.errbackNotFoundResult, result, mid, device)
+    d.addErrback(check.errbackResult, result, mid, device)
 
     return d

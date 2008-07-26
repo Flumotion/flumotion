@@ -158,7 +158,7 @@ class SoundcardStep(AudioProducerStep):
         self.wizard.add_msg(msg)
         d = self.runInWorker(
             'flumotion.worker.checks.audio', 'checkMixerTracks',
-            elementName, device, channels, id='soundcard-check')
+            elementName, device, channels, mid='soundcard-check')
 
         def checkFailed(failure):
             failure.trap(RemoteRunFailure)
