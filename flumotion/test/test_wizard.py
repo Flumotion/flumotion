@@ -39,7 +39,7 @@ from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 
 class WizardStepTest(testsuite.TestCase):
-    def setUpClass(self):
+    def nosetUpClass(self):
         wiz = ConfigurationWizard()
         self.steps = wiz._steps
 
