@@ -1,5 +1,10 @@
 2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/productionsteps.py:
+	  Fix tooltips.
+
+2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/validate-registry.py:
 	  Fail if there are undocumented components or properties.
 	* flumotion/component/bouncers/bouncer.xml:

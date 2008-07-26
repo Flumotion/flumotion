@@ -129,8 +129,10 @@ class LiveProductionStep(WizardStep):
         self.video.model_attribute = 'componentType'
 
         tips = gtk.Tooltips()
-        tips.set_tip(self.has_video, _('If you want to stream video'))
-        tips.set_tip(self.has_audio, _('If you want to stream audio'))
+        tips.set_tip(self.has_video,
+            _('Select this if you want to stream video'))
+        tips.set_tip(self.has_audio,
+            _('Select this if you want to stream audio'))
 
         self._populateCombos()
 
@@ -290,8 +292,10 @@ class SelectProducersStep(WizardStep):
         self.video.model_attribute = 'componentType'
 
         tips = gtk.Tooltips()
-        tips.set_tip(self.has_video, _('If you want to stream video'))
-        tips.set_tip(self.has_audio, _('If you want to stream audio'))
+        tips.set_tip(self.has_video,
+            _('Select this if you want to stream video'))
+        tips.set_tip(self.has_audio,
+            _('Select this if you want to stream audio'))
 
     def getNext(self):
         return None
