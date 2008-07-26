@@ -2,7 +2,8 @@
 
   <components>
     <component type="ivtv-producer"
-               base="flumotion/component/producers/ivtv">
+               base="flumotion/component/producers/ivtv"
+               description="A producer that captures from IVTV devices">
       <source location="flumotion.component.producers.ivtv.ivtv" />
       <feeder name="video" />
       <feeder name="audio" />
@@ -13,10 +14,14 @@
       </entries>
 
       <properties>
-        <property name="width" type="int" required="false" />
-        <property name="height" type="int" required="false" />
-	<property name="device" type="string" required="false" />
-	<property name="deinterlacer" type="string" required="false" />
+        <property name="width" type="int" required="false"
+		  description="The width of the video to capture" />
+        <property name="height" type="int" required="false"
+		  description="The height of the video to capture" />
+	<property name="device" type="string" required="false"
+		  description="The device to capture from (/dev/video0)" />
+	<property name="deinterlacer" type="string" required="false"
+                  description="The GStreamer partial pipeline to use for deinterlacing" />
       </properties>
     </component>
   </components>

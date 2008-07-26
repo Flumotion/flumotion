@@ -2,15 +2,19 @@
 
   <components>
 
-    <component type="vorbis-encoder" base="flumotion/component/encoders/vorbis">
+    <component type="vorbis-encoder"
+               base="flumotion/component/encoders/vorbis"
+               description="An audio encoder that encodes to Vorbis.">
       <source location="flumotion.component.encoders.vorbis.vorbis" />
       <eater name="default" />
       <feeder name="default" />
       <properties>
         <property name="bitrate" type="int"
                   description="Bitrate to encode at (in bps)" />
-        <property name="quality" type="float" />
-        <property name="channels" type="int" />
+        <property name="quality" type="float"
+                  description="Quality to encode at (from -0.1 to 1.0).  Only used if bitrate is not set." />
+        <property name="channels" type="int"
+                  description="The number of audio channels to encode" />
       </properties>
       <entries>
         <entry type="component" location="vorbis.py"

@@ -3,7 +3,8 @@
   <components>
 
     <component type="unixdomain-producer"
-               base="flumotion/component/producers/unixdomain">
+               base="flumotion/component/producers/unixdomain"
+               description="A producer that produces from a UNIX domain socket.  Mostly used for testing.">
       <source location="flumotion.component.producers.unixdomain.unixdomain" />
       <feeder name="default" />
       <entries>

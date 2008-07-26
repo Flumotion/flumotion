@@ -25,11 +25,12 @@
       <synchronization required="yes" clock-priority="110" />
 
       <properties>
-        <property name="volume" type="float" />
+        <property name="volume" type="float"
+                  description="Volume of test signal (0.0 - 1.0)" />
         <property name="rate" type="int"
-                  description="samplerate (in Hz)" />
+                  description="Samplerate (in Hz)" />
         <property name="frequency" type="int"
-                  description="frequency of test signal (in Hz)" />
+                  description="Frequency of test signal (in Hz)" />
         <property name="drop-probability" type="float"
                   description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>

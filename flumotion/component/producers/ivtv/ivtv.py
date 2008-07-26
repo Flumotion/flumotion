@@ -23,18 +23,20 @@ from flumotion.component import feedcomponent
 __version__ = "$Rev$"
 
 
-# this is a producer component for ivtv
 class Ivtv(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
-        width = properties.get('width', 0)
-        height = properties.get('height', 0)
         device = properties.get('device', '/dev/video0')
         deinterlacer = properties.get('deinterlacer', '')
+
+        # by default, we let GStreamer decide width and height
+        width = properties.get('width', 0)
+        height = properties.get('height', 0)
         if width > 0 and height > 0:
             scaling_template = (" videoscale method=1 ! "
                 "video/x-raw-yuv,width=%d,height=%d " % (width, height))
         else:
             scaling_template = ""
+
         return ("filesrc name=src location=%s ! decodebin name=d ! queue !  "
                 " %s ! %s ! ffmpegcolorspace ! video/x-raw-yuv "
                 " ! @feeder:video@ d. ! queue ! audioconvert ! audio/x-raw-int "

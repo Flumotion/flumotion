@@ -1,7 +1,8 @@
 <registry>
   <components>
     <component type="ical-bouncer"
-               base="flumotion/component/bouncers">
+               base="flumotion/component/bouncers"
+               description="A bouncer that allows access to a stream when there is an event in the iCalendar file.">
 
       <source location="flumotion.component.bouncers.icalbouncer" />
 
@@ -12,7 +13,7 @@
 
       <properties>
         <property name="file" type="string" required="yes"
-                  description="path to iCal file to use" />
+                  description="Path to iCalendar file to use" />
       </properties>
     </component>
   </components>

@@ -1,18 +1,20 @@
 <registry>
   <components>
     <component type="icecast-producer"
-               base="flumotion/component/producers/icecast">
-      <source location="flumotion.component.producers.icecast.icecast"/>
+               base="flumotion/component/producers/icecast"
+               description="A producer that produces a stream from an Icecast server.">
+      <source location="flumotion.component.producers.icecast.icecast" />
 
-      <feeder name="default"/>
+      <feeder name="default" />
 
       <entries>
         <entry type="component" location="icecast.py"
-               function="Icecast"/>
+               function="Icecast" />
       </entries>
 
       <properties>
-        <property name="url" type="string" required="true"/>
+        <property name="url" type="string" required="true"
+                  description="URL of the Icecast stream to produce from" />
       </properties>
     </component>
   </components>

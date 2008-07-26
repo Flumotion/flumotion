@@ -2,7 +2,7 @@
   <components>
     <component type="disk-consumer"
                base="flumotion/component/consumers/disker"
-               description="Archives a stream to disk.">
+               description="A consumer that archives a stream to disk.">
       <source location="flumotion.component.consumers.disker.disker" />
 
       <eater name="default" />
@@ -21,18 +21,25 @@
       </sockets>
 
       <properties>
-        <property name="directory" type="string" required="yes" />
+        <property name="directory" type="string" required="yes"
+                  description="Directory where to save the archives" />
         <property name="rotate-type" type="string" required="no"
                   description="'size', 'time', or 'none' (default 'none')" />
         <property name="size" type="long"
                   description="Maximum size of each file (in bytes)" />
         <property name="time" type="long"
                   description="Maximum duration of each file (in seconds)" />
-        <property name="start-recording" type="bool" required="no" />
-        <property name="symlink-to-last-recording" type="string" required="no" />
-        <property name="symlink-to-current-recording" type="string" required="no" />
-        <property name="ical-schedule" type="string" required="no" />
-        <property name="filename" type="string" required="no" />
+        <property name="start-recording" type="bool" required="no"
+                  description="Whether to start recording when the component starts (defaults to True) "/>
+        <property name="symlink-to-last-recording" type="string" required="no"
+                  description="If set, this symlink will be created and point to the latest finished recording." />
+        <property name="symlink-to-current-recording" type="string"
+                  required="no"
+                  description="If set, this symlink will be created and point to the latest started recording." />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, the given iCalendar schedule will be used to decide when to record.  Every event defined indicates a recording, and the event description will be used as the filename template. "/>
+        <property name="filename" type="string" required="no" 
+                  description="If set, the given template will be used to decide filenames for recordings.  The template will be expanded according to strftime(3)" />
         <property name="react-to-stream-markers" type="bool" required="no"
                   description="Start/stop the disker when stream marker events are received" />
         <property name="stream-marker-filename-prefix" type="string"

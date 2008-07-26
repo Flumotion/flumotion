@@ -1,5 +1,30 @@
 2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/validate-registry.py:
+	  Fail if there are undocumented components or properties.
+	* flumotion/component/bouncers/bouncer.xml:
+	* flumotion/component/bouncers/icalbouncer.xml:
+	* flumotion/component/combiners/switch/switch.xml:
+	* flumotion/component/consumers/disker/disker.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/shout2/shout2.xml:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/porter/porter.xml:
+	* flumotion/component/misc/repeater/repeater.xml:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/icecast/icecast.xml:
+	* flumotion/component/producers/ivtv/ivtv.py:
+	* flumotion/component/producers/ivtv/ivtv.xml:
+	* flumotion/component/producers/rtsp/rtsp.xml:
+	* flumotion/component/producers/unixdomain/unixdomain.xml:
+	* flumotion/component/producers/webcam/webcam.xml:
+	  Document properties and components.
+	  Fixes #1069 in 1.5 of the 6 estimated hours.
+
+2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/theora/theora.py:
 	* flumotion/component/encoders/theora/theora.xml:
 	  If nobody understands the keyframe-threshold property then it

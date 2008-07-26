@@ -30,4 +30,35 @@ for name in bundlerNames:
             name, e.filename))
         exitCode += 1
 
+# verify all components
+def componentError(c, msg):
+    global exitCode
+    sys.stderr.write("Component %s from %s %s.\n" %(
+            c.type, c.filename, msg))
+    exitCode += 1
+
+for c in registry.getComponents():
+    if c.type != c.type.lower():
+        componentError(c, 'contains capitals')
+    if c.type.find('_') > -1:
+        componentError(c, 'contains underscores')
+    if not c.description:
+        componentError(c, 'is missing a description')
+
+    def propertyError(c, p, msg):
+        global exitCode
+        sys.stderr.write("Property %s on component %s from %s %s.\n" %(
+                p.name, c.type, c.filename, msg))
+        exitCode += 1
+
+    for p in c.getProperties():
+        if p.name != p.name.lower():
+            propertyError(c, p, "contains capitals")
+        if p.name.find('_') > -1:
+            propertyError(c, p, "contains underscores")
+        if not p.description:
+            propertyError(c, p, "is missing a description")
+
+    #import code; code.interact(local=locals())
+
 sys.exit(exitCode)

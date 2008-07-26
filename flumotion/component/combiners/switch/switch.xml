@@ -3,7 +3,7 @@
   <components>
     <component type="single-switch-combiner"
                base="flumotion/component/combiners/switch"
-               description="A single stream type switching component">
+               description="A switcher switching between two input feeds of the same stream type.">
       <source location="flumotion.component.combiners.switch.switch" />
       <eater name="master" />
       <eater name="backup" />
@@ -15,7 +15,8 @@
                function="GUIClass" />
       </entries>
       <properties>
-        <property name="ical-schedule" type="string" required="no" />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
       </properties>
     </component>
     <component type="av-switch-combiner"
@@ -35,14 +36,21 @@
                function="GUIClass" />
       </entries>
       <properties>
-        <property name="ical-schedule" type="string" required="no" />
-	<property name="video-width" type="int" required="no" />
-	<property name="video-height" type="int" required="no" />
-	<property name="video-framerate" type="fraction" required="no" />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
+	<property name="video-width" type="int" required="no"
+		  description="If set, the width of the outgoing video" />
+	<property name="video-height" type="int" required="no"
+		  description="If set, the height of the outgoing video" />
+	<property name="video-framerate" type="fraction" required="no"
+		  description="If set, the framerate of the outgoing video" />
 	<property name="video-pixel-aspect-ratio" type="fraction"
-	          required="no" />
-	<property name="audio-samplerate" type="int" required="no" />
-	<property name="audio-channels" type="int" required="no" />
+	          required="no"
+		  description="If set, the pixel aspect ratio of the outgoing video" />
+	<property name="audio-samplerate" type="int" required="no"
+		  description="If set, the samplerate of the outgoing audio" />
+	<property name="audio-channels" type="int" required="no"
+		  description="If set, the number of channels of the outgoing audio" />
       </properties>
     </component>
     <component type="single-basic-watchdog-combiner"
@@ -59,7 +67,8 @@
                function="GUIClass" />
       </entries>
       <properties>
-        <property name="ical-schedule" type="string" required="no" />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
       </properties>
     </component>
     <component type="av-basic-watchdog-combiner"
@@ -79,14 +88,21 @@
                function="GUIClass" />
       </entries>
       <properties>
-        <property name="ical-schedule" type="string" required="no" />
-	<property name="video-width" type="int" required="no" />
-	<property name="video-height" type="int" required="no" />
-	<property name="video-framerate" type="fraction" required="no" />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
+	<property name="video-width" type="int" required="no"
+		  description="If set, the width of the outgoing video" />
+	<property name="video-height" type="int" required="no"
+		  description="If set, the height of the outgoing video" />
+	<property name="video-framerate" type="fraction" required="no"
+		  description="If set, the framerate of the outgoing video" />
 	<property name="video-pixel-aspect-ratio" type="fraction"
-	          required="no" />
-	<property name="audio-samplerate" type="int" required="no" />
-	<property name="audio-channels" type="int" required="no" />
+	          required="no"
+		  description="If set, the pixel aspect ratio of the outgoing video" />
+	<property name="audio-samplerate" type="int" required="no"
+		  description="If set, the samplerate of the outgoing audio" />
+	<property name="audio-channels" type="int" required="no"
+		  description="If set, the number of channels of the outgoing audio" />
       </properties>
     </component>
     <component type="av-pattern-switch-combiner"
@@ -106,15 +122,22 @@
                function="GUIClass" />
       </entries>
       <properties>
-        <property name="ical-schedule" type="string" required="no" />
-	<property name="video-width" type="int" required="no" />
-	<property name="video-height" type="int" required="no" />
-	<property name="video-framerate" type="fraction" required="no" />
+        <property name="ical-schedule" type="string" required="no"
+                  description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
+	<property name="video-width" type="int" required="no"
+		  description="If set, the width of the outgoing video" />
+	<property name="video-height" type="int" required="no"
+		  description="If set, the height of the outgoing video" />
+	<property name="video-framerate" type="fraction" required="no"
+		  description="If set, the framerate of the outgoing video" />
 	<property name="video-pixel-aspect-ratio" type="fraction"
-	          required="no" />
-	<property name="audio-samplerate" type="int" required="no" />
-	<property name="audio-channels" type="int" required="no" />
-	<property name="eater-with-stream-markers" type="string" required="yes" />
+	          required="no"
+		  description="If set, the pixel aspect ratio of the outgoing video" />
+	<property name="audio-samplerate" type="int" required="no"
+		  description="If set, the samplerate of the outgoing audio" />
+	<property name="audio-channels" type="int" required="no"
+		  description="If set, the number of channels of the outgoing audio" />
+	<property name="eater-with-stream-markers" type="string" required="yes"                   description="Name of the eater that will have stream markers on which to switch (one of 'video-backup', 'video-master')" />
       </properties>
     </component>
 

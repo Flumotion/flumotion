@@ -2,7 +2,7 @@
   <components>
     <component type="http-streamer"
                base="flumotion/component/consumers/httpstreamer"
-               description="A consumers that streams over HTTP.">
+               description="A consumer that streams over HTTP.">
 <!-- old way of specifying component source -->
       <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
 

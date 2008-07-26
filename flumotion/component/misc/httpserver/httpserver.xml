@@ -9,16 +9,20 @@
       </entries>
 
       <properties>
-        <property name="rate" required="true" type="int" description="The average rate to send all files at, in bits per second" />
-        <property name="max-level" type="int" description="The maximum amount of data to send at full rate at any given moment, in bits" /> <!-- TODO: Describe this better -->
-        <property name="initial-level" type="int" description="The initial amount of data that can be sent at full speed, in bits" />
+        <property name="rate" required="true" type="int"
+                  description="The average rate to send all files at, in bits per second" />
+        <property name="max-level" type="int"
+                  description="The maximum amount of data to send at full rate at any given moment, in bits" /> <!-- TODO: Describe this better -->
+        <property name="initial-level" type="int"
+                  description="The initial amount of data that can be sent at full speed, in bits" />
       </properties>
     </plug>
   </plugs>
 
   <components>
 
-    <component type="http-server" base="flumotion/component/misc/httpserver">
+    <component type="http-server" base="flumotion/component/misc/httpserver"
+               description="An on demand HTTP server.">
       <source location="flumotion.component.misc.httpserver.httpserver" />
       <entries>
         <entry type="component" location="httpserver.py"
