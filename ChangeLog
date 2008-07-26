@@ -1,5 +1,12 @@
 2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/theora/theora.xml:
+	  If nobody understands the keyframe-threshold property then it
+	  shouldn't even be exposed.
+
+2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  deprecate id= keyword arg in favor of mid=
 	* flumotion/component/base/baseadminnode.py:

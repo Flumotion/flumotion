@@ -46,7 +46,6 @@ class Theora(feedcomponent.ParseLaunchComponent):
 
         props = ('bitrate',
                  'quality',
-                 'keyframe-threshold',
                  'keyframe-mindistance',
                  ('quick-compress', 'quick'),
                  ('keyframe-maxdistance', 'keyframe-freq'),

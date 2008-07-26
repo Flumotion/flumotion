@@ -24,14 +24,14 @@
                   description="Bitrate to encode at (in bps)" />
         <property name="quality" type="int"
                   description="Encoding quality (0-63, if not using bitrate)" />
-        <property name="keyframe-threshold" type="int" />
         <property name="keyframe-mindistance" type="int"
                   description="Minimum distance between keyframes (in frames)" />
         <property name="keyframe-maxdistance" type="int"
                   description="Maximum distance between keyframes (in frames)" />
         <property name="quick-compress" type="bool"
                   description="Whether to use quick, lower-quality compression"/>
-        <property name="noise-sensitivity" type="int" />
+        <property name="noise-sensitivity" type="int"
+                  description="Noise sensitivity (defaults to 1)" />
         <property name="sharpness" type="int"
                   description="Sharpness encoder parameter: 0, 1, or 2"/>
       </properties>
