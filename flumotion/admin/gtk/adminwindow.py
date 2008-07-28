@@ -459,7 +459,10 @@ class AdminWindow(Loggable, GladeDelegate):
         self._clearAllAction = group.get_action("ClearAll")
         assert self._clearAllAction
         self._addFormatAction = group.get_action("AddFormat")
-        assert self._addFormatAction
+        self._addFormatAction.set_sensitive(False)
+        self._runConfigurationWizardAction = (
+            group.get_action("RunConfigurationWizard"))
+        self._runConfigurationWizardAction.set_sensitive(False)
         self._killComponentAction = group.get_action("KillComponent")
         assert self._killComponentAction
 
@@ -515,7 +518,7 @@ class AdminWindow(Loggable, GladeDelegate):
         # it's ok if we've already been connected
         self.debug('setting model')
 
-        if self._adminModel:
+        if self._adminModel is not None:
             self.debug('Connecting to new model %r' % model)
 
         self._adminModel = model
@@ -534,6 +537,9 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel.connect('connection-failed',
                                  self._admin_connection_failed_cb)
         self._adminModel.connect('update', self._admin_update_cb)
+
+        self._addFormatAction.set_sensitive(True)
+        self._runConfigurationWizardAction.set_sensitive(True)
 
     def _openConnection(self, info):
         self._trayicon.set_tooltip(_("Connecting to %s:%s") % (
@@ -737,6 +743,9 @@ class AdminWindow(Loggable, GladeDelegate):
         d.addCallback(lambda unused: runWizard())
 
     def _runWizard(self, wizard):
+        if self._adminModel is None:
+            return
+
         workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
@@ -755,7 +764,7 @@ class AdminWindow(Loggable, GladeDelegate):
         wizard.run(main=False)
 
     def _clearAdmin(self):
-        if not self._adminModel:
+        if self._adminModel is None:
             return
 
         self._adminModel.disconnect_by_func(self._admin_connected_cb)
@@ -764,6 +773,9 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel.disconnect_by_func(self._admin_connection_failed_cb)
         self._adminModel.disconnect_by_func(self._admin_update_cb)
         self._adminModel = None
+
+        self._addFormatAction.set_sensitive(False)
+        self._runConfigurationWizardAction.set_sensitive(False)
 
     def _updateConnectionActions(self):
         self._openRecentAction.set_sensitive(hasRecentConnections())
