@@ -368,20 +368,26 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         self._sections2.append(section)
 
     def getStep(self, stepname):
-        for step in self._steps.values():
+        for step in self.getSteps():
             if step.get_name() == stepname:
                 return step
         else:
             raise KeyError(stepname)
 
+    def getCurrentStep(self):
+        return self._currentStep
+
+    def getSteps(self):
+        return self._steps.values()
+
     def hasStep(self, stepName):
-        for step in self._steps.values():
+        for step in self.getSteps():
             if step.get_name() == stepName:
                 return True
         return False
 
     def getVisitedSteps(self):
-        for step in self._steps.values():
+        for step in self.getSteps():
             if step.visited:
                 yield step
 
@@ -429,7 +435,7 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
     def jumpToStep(self, name):
         # If we're jumping to the same step don't do anything to
         # avoid unnecessary ui flashes
-        if self.getStep(name) == self._currentStep:
+        if self.getStep(name) == self.getCurrentStep():
             return
         self._stack.skipTo(lambda x: x.name == name)
         step = self._stack.current()
@@ -445,9 +451,6 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         self.jumpTo(step.section)
         hasNext = not hasattr(step, 'lastStep')
         self._wizard.updateButtons(hasNext)
-
-    def getCurrentStep(self):
-        return self._currentStep
 
     # Private
 
@@ -555,7 +558,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         return True
 
     def __len__(self):
-        return len(self._steps)
+        return len(self.getSteps())
 
     # Override this in subclass
 
@@ -577,6 +580,13 @@ class SectionWizard(GladeWindow, log.Loggable):
         @type section: a WizardStep subclass
         """
         self.sidebar.addStepSection(section)
+
+    def getSteps(self):
+        """Returns a sequence of all steps
+        @returns: sequence of visited steps.
+        @rtype: sequence of L{WizardStep}
+        """
+        return self.sidebar.getSteps()
 
     def getStep(self, stepname):
         """Fetches a step. KeyError is raised when the step is not found.
@@ -602,6 +612,10 @@ class SectionWizard(GladeWindow, log.Loggable):
         return self.sidebar.getVisitedSteps()
 
     def getCurrentStep(self):
+        """Get the current step
+        @returns: the current step
+        @rtype: L{WizardStep}
+        """
         return self.sidebar.getCurrentStep()
 
     def hide(self):

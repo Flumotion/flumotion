@@ -25,26 +25,17 @@ from twisted.spread import jelly
 from flumotion.common import worker
 from flumotion.common import testsuite
 
-try:
-    from flumotion.ui import fgtk
-except RuntimeError:
-    import os
-    os._exit(0)
-
 from flumotion.admin import admin
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 
-
-
 class WizardStepTest(testsuite.TestCase):
-    def nosetUpClass(self):
-        wiz = ConfigurationWizard()
-        self.steps = wiz._steps
+    def setUp(self):
+        self.wizard = ConfigurationWizard()
 
     def testLoadSteps(self):
-        for s in self.steps:
+        for s in self.wizard.getSteps():
             self.assert_(isinstance(s, WizardStep))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'icon'))
@@ -57,14 +48,12 @@ class WizardStepTest(testsuite.TestCase):
             if s.get_name() != 'Summary':
                 getNextRet = s.getNext()
                 self.assert_(not getNextRet or isinstance(getNextRet, str))
-    testLoadSteps.skip = 'Johan you broke this'
 
     def testStepComponentProperties(self):
-        for s in self.steps:
+        for s in self.wizard.getSteps():
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(s.get_component_properties(), dict))
-    testStepComponentProperties.skip = 'Johan you broke this'
 
 
 class TestAdmin(admin.AdminModel):
@@ -72,8 +61,9 @@ class TestAdmin(admin.AdminModel):
         return admin.AdminClientFactory('medium', 'user', 'pass')
 
     def workerRun(self, worker, module, function, *args, **kwargs):
-        success = {('localhost', 'flumotion.worker.checks.video', 'checkTVCard'):
-                   {'height': 576, 'width': 720, 'par': (59,54)}}
+        success = {
+            ('localhost', 'flumotion.worker.checks.video', 'checkTVCard'):
+            {'height': 576, 'width': 720, 'par': (59,54)}}
         failures = {}
 
         key = (worker, module, function)

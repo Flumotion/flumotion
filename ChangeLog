@@ -1,3 +1,10 @@
+2008-07-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/test/test_wizard.py:
+	* flumotion/ui/wizard.py:
+	Add wizard.getSteps(). Refactor wizard/sidebar to use it internally.
+	Document it and use it in the tests.
+
 2008-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/productionsteps.py:
