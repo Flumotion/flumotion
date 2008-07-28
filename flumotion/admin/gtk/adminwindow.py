@@ -770,10 +770,6 @@ class AdminWindow(Loggable, GladeDelegate):
         wizard.connect('finished', self._wizard_finished_cb)
         wizard.run(main=False)
 
-    def _checkComponentsBeforeWizard(self):
-
-        return True
-
     def _clearAdmin(self):
         if self._adminModel is None:
             return
