@@ -1,6 +1,12 @@
 2008-07-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
+	Do not run the configuration wizard if there are lost components.
+	Fixes #1066
+
+2008-07-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
 	Do not make it possible to run methods accessing the admin model
 	before the wizard has connected to a server.
 	Fixes #1075

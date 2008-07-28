@@ -730,6 +730,13 @@ class AdminWindow(Loggable, GladeDelegate):
             runWizard()
             return
 
+        for componentState in self._componentList.getComponentStates():
+            if componentState.get('mood') == moods.lost.value:
+                self._error(
+                    _("Cannot run the configuration wizard since there "
+                      "is at least one component in the lost state"))
+                return
+
         if yesno(_("Running the Configuration Wizard again will remove "
                    "all components from the current stream and create "
                    "a new one."),
@@ -762,6 +769,10 @@ class AdminWindow(Loggable, GladeDelegate):
             wizard.setHTTPPorter(httpPorter)
         wizard.connect('finished', self._wizard_finished_cb)
         wizard.run(main=False)
+
+    def _checkComponentsBeforeWizard(self):
+
+        return True
 
     def _clearAdmin(self):
         if self._adminModel is None:
