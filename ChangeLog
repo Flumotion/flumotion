@@ -1,3 +1,9 @@
+2008-07-29  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/common/process.py:
+	Changed back the _daemonize function to daemonize,
+	because it's used by external projects (ft).
+
 2008-07-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/consumptionsteps.py:

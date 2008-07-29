@@ -58,7 +58,7 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
     reactor.addSystemEventTrigger('after', 'shutdown',
                                   shutdownEnded)
 
-def _daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
+def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
               directory='/'):
     '''
     This forks the current process into a daemon.
@@ -68,6 +68,8 @@ def _daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     These arguments are optional and default to /dev/null.
 
     The fork will switch to the given directory.
+    
+    Used by external projects (ft).
     '''
     # Redirect standard file descriptors.
     si = open(stdin, 'r')
@@ -151,7 +153,7 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
     pidFile = _acquirePidFile(processType, processName)
 
     # here we daemonize; so we also change our pid
-    _daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
+    daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
 
     log.debug(processType, 'Started daemon')
 
