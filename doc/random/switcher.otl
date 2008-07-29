@@ -1,0 +1,39 @@
+High-level
+	stream of buffers coming out of switch component's feeder
+	should always be a single segment with monotonically increasing timestamps
+	may have discontinuities
+	switch can have multiple feeders
+		both feeders should use the same segment
+
+	audio case:
+		master starts at GST timestamp b
+		slave starts at GST timestampt c
+	single feed case: possible 
+
+	multiple feed case: possible behaviours
+		switch all feeds to slave at the earliest timestamp where any master feed goes hungry
+			this means the switcher needs to buffer for N - 1 feeds (both master and backup) until the slowest master feed catches up to the current point
+			this also means that in case of a problem, switch increases the latency until the problem is detected
+		switch all feeds to slave at the latest timestamp where any feed goes hungry
+			this introduces discontinuities for N-1 feeds
+		switch each feed independently, but in sync, so that when all have switched the output is in sync just like the incoming backup signal
+			not a correct experience
+			but continuous output
+
+	muxer problems
+		ogg muxer will currently wait for slowest feed to catch up
+		FLV muxer probably muxes as they come in (verify)
+		ASF: no idea
+
+	implementation details
+		multi input feeder
+			N pipelines, each with input-selector
+		switch is requested
+			emit "block" on all N input selectors
+				returns the "running time" corresponding to the last pushed out buffer timestamp + duration
+				blocks all sink pads
+			we take the biggest running time
+			these running times are close to each other and have the same zero base
+			there is a check in the switch component for a maximum delta
+			get property for running_time as
+			emit "switch"
