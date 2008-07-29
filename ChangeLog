@@ -1,3 +1,9 @@
+2008-07-29  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/consumptionsteps.py:
+	Only show shoutcast2 streams for ogg and mp3 content.
+	Fixes #1059
+
 2008-07-28  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:

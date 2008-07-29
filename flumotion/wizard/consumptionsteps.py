@@ -70,21 +70,32 @@ class ConsumptionStep(WizardStep):
     # WizardStep
 
     def activated(self):
-        has_audio = self.wizard.hasAudio()
-        has_video = self.wizard.hasVideo()
-        has_both = has_audio and has_video
+        hasAudio = self.wizard.hasAudio()
+        hasVideo = self.wizard.hasVideo()
+        hasBoth = hasAudio and hasVideo
+
+        possibleButtons = [self.http_audio_video,
+                           self.http_audio,
+                           self.http_video,
+                           self.disk_audio_video,
+                           self.disk_audio,
+                           self.disk_video,
+                           ]
+        shoutButtons = [self.shout2_audio_video,
+                        self.shout2_audio,
+                        self.shout2_video]
+
+        if self._canEmbedShout():
+            possibleButtons.extend(shoutButtons)
+        else:
+            self.shout2.set_active(False)
+            self.shout2.hide()
+            for button in shoutButtons:
+                button.hide()
 
         # Hide all checkbuttons if we don't have both audio and video selected
-        for checkbutton in (self.http_audio_video,
-                            self.http_audio,
-                            self.http_video,
-                            self.disk_audio_video,
-                            self.disk_audio,
-                            self.disk_video,
-                            self.shout2_audio_video,
-                            self.shout2_audio,
-                            self.shout2_video):
-            checkbutton.set_property('visible', has_both)
+        for checkbutton in possibleButtons:
+            checkbutton.set_property('visible', hasBoth)
 
     def getNext(self, step=None):
         steps = self._getSteps()
@@ -124,6 +135,14 @@ class ConsumptionStep(WizardStep):
             blockNext = False
         self.wizard.blockNext(blockNext)
 
+    def _canEmbedShout(self):
+        encodingStep = self.wizard.getStep('Encoding')
+        # Shoutcasts supports only mp3 and ogg
+        if (encodingStep.getAudioFormat() == 'mp3' or
+            encodingStep.getMuxerFormat() == 'ogg'):
+            return True
+        return False
+
     def _getSteps(self):
         uielements = []
         retval = []
@@ -140,7 +159,7 @@ class ConsumptionStep(WizardStep):
                  [self.disk_audio,
                   self.disk_video,
                   self.disk_audio_video]))
-        if self.shout2.get_active():
+        if self.shout2.get_active() and self._canEmbedShout():
             uielements.append(
                 ([Shout2AudioStep, Shout2VideoStep, Shout2BothStep],
                  [self.shout2_audio,
