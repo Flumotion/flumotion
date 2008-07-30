@@ -135,6 +135,7 @@ MAIN_UI = """
       <menuitem action="WriteDebugMarker"/>
     </menu>
     <menu action="Help">
+      <menuitem action="Contents"/>
       <menuitem action="About"/>
     </menu>
   </menubar>
@@ -391,6 +392,9 @@ class AdminWindow(Loggable, GladeDelegate):
 
             # Help
             ('Help', None, _('_Help')),
+            ('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1',
+             _('Open the flumotion manual'),
+             self._help_contents_cb),
             ('About', gtk.STOCK_ABOUT, _('_About'), None,
              _('Displays an about dialog'),
              self._help_about_cb),
@@ -1331,6 +1335,18 @@ You can do remote component calls using:
         about.run()
         about.destroy()
 
+    def _showHelp(self):
+        for path in os.environ['PATH'].split(':'):
+            executable = os.path.join(path, 'gnome-help')
+            if os.path.exists(executable):
+                break
+        else:
+            self._error(
+                _("Cannot find a program to display the flumotion manual."))
+            return
+        gobject.spawn_async([executable,
+                             'ghelp:%s' % (configure.PACKAGE,)])
+
     ### admin model callbacks
 
     def _admin_connected_cb(self, admin):
@@ -1443,6 +1459,9 @@ You can do remote component calls using:
 
     def _debug_dump_configuration_cb(self, action):
         self._dumpConfiguration()
+
+    def _help_contents_cb(self, action):
+        self._showHelp()
 
     def _help_about_cb(self, action):
         self._about()

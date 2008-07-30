@@ -1,3 +1,9 @@
+2008-07-30  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Add a Help->Contents menu which launches gnome-help.
+	Fixes #1076.
+
 2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
