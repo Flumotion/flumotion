@@ -1,3 +1,9 @@
+2008-07-30  Johan Dahlin  <johan@fluendo.com>
+
+	Update the fluendo logs to use the 'new' flumotion logo.
+	Logos contributed by Eduardo Aquino.
+	Fixes #1057
+
 2008-07-29  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/common/process.py:
