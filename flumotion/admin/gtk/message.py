@@ -189,7 +189,7 @@ class MessagesView(gtk.VBox):
         if hasattr(message, 'timestamp'):
             text += _("\nPosted on %s.\n") % time.strftime(
                 "%c", time.localtime(message.timestamp))
-            
+
         if message.debug:
             text += "\n\n" + _("Debug information:\n") + message.debug + '\n'
 
@@ -213,7 +213,7 @@ class MessagesView(gtk.VBox):
             tag.set_data('link', getMessageWebLink(message))
             textbuffer.insert_with_tags_by_name(titer, translated,
                                                 tag.get_property('name'))
-    
+
     def _sortMessages(self):
         # Sort all messages first by (reverse of) level, then priority
         children = [(-w.message.level, w.message.priority, w)
@@ -226,7 +226,7 @@ class MessagesView(gtk.VBox):
 
         # the first button, e.g. highest priority
         return children[0][1]
-    
+
     # Callbacks
 
     def _on_message_button__toggled(self, button, message):
@@ -265,7 +265,7 @@ class MessagesView(gtk.VBox):
             return False
         if event.button != 1:
             return False
-        
+
         textbuffer = textview.get_buffer()
         # we shouldn't follow a link if the user has selected something
         bounds = textbuffer.get_selection_bounds()
