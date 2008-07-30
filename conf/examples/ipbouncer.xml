@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!-- This example shows how to configure an ip-based bouncer for authenticating
+     end users connecting to the streamers. The flow has two streamers,
+     and both of them use the configured bouncer. -->
+<planet>
+  <atmosphere>
+    <component name="bouncer" project="flumotion"
+               type="ip-bouncer"
+               version="0.5.2.1" worker="localhost">
+      <property name="deny-default">True</property>
+      <property name="allow">127.0.0.1/32</property>
+      <property name="allow">192.168.1.0/24</property>
+    </component>
+  </atmosphere>
+
+  <flow name="default">
+    <component name="producer-audio" project="flumotion"
+               type="audiotest-producer" version="0.5.2.1" worker="localhost">
+
+      <property name="frequency">440</property>
+      <property name="rate">8000</property>
+      <property name="volume">1.0</property>
+    </component>
+
+    <component name="encoder-audio" project="flumotion"
+               type="vorbis-encoder" version="0.5.2.1" worker="localhost">
+      <eater name="default">
+        <feed alias="default">producer-audio:default</feed>
+      </eater>
+      <property name="quality">0.5</property>
+    </component>
+
+    <component name="muxer-audio" project="flumotion"
+               type="ogg-muxer" version="0.5.2.1" worker="localhost">
+      <eater name="default">
+        <feed alias="default">encoder-audio:default</feed>
+      </eater>
+    </component>
+
+    <component name="http-audio" project="flumotion"
+               type="http-streamer" version="0.5.2.1" worker="localhost">
+      <eater name="default">
+        <feed alias="default">muxer-audio:default</feed>
+      </eater>
+
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="client-limit">1024</property>
+      <property name="mount-point">/</property>
+      <property name="port">8800</property>
+      <property name="bouncer">bouncer</property>
+    </component>
+
+    <component name="http-audio-2" project="flumotion"
+               type="http-streamer" version="0.5.2.1" worker="localhost">
+      <eater name="default">
+        <feed alias="default">muxer-audio:default</feed>
+      </eater>
+
+      <property name="bandwidth-limit">10</property>
+      <property name="burst-on-connect">True</property>
+      <property name="client-limit">1024</property>
+      <property name="mount-point">/</property>
+      <property name="port">8801</property>
+      <property name="bouncer">bouncer</property>
+    </component>
+
+
+  </flow>
+</planet>

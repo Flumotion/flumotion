@@ -1,4 +1,6 @@
 CONFIG = 						\
+	examples/bouncer.xml				\
+	examples/ipbouncer.xml				\
 	examples/twores.xml				\
 	examples/default.xml 				\
 	examples/discont.xml 				\

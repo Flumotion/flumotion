@@ -1,5 +1,13 @@
 2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/Makefile.am:
+	* conf/examples/ipbouncer.xml (added):
+	* conf/examples/bouncer.xml (added):
+	  Add two examples that use bouncers for stream authentication.
+	  The first uses a htpasswdcrypt-bouncer, the second an ip bouncer.
+
+2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Complain when the type of a property is not in the list of
 	  accepted types.
