@@ -68,7 +68,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     These arguments are optional and default to /dev/null.
 
     The fork will switch to the given directory.
-    
+
     Used by external projects (ft).
     '''
     # Redirect standard file descriptors.
