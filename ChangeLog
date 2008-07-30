@@ -1,3 +1,8 @@
+2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
+	  python-iCalendar is completely optional, not required.
+
 2008-07-30  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:
@@ -418,7 +423,7 @@
 
 	* flumotion.spec.in:
 	Added python-twisted-conch and python-iCalendar as Requires and
-        BuildRequires.
+	BuildRequires.
 
 2008-07-21  Johan Dahlin  <johan@gnome.org>
 
