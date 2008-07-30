@@ -14,9 +14,9 @@
       <synchronization required="yes" clock-priority="110" />
 
       <properties>
-        <property name="audio" type="boolean"
+        <property name="audio" type="bool"
                   description="Output audio"/>
-        <property name="video" type="boolean"
+        <property name="video" type="bool"
                   description="Output video"/>
 
         <property name="video-pattern" type="string"

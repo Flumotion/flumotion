@@ -1,3 +1,13 @@
+2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  Complain when the type of a property is not in the list of
+	  accepted types.
+	* flumotion/component/bouncers/ipbouncer.xml:
+	* flumotion/component/producers/playlist/playlist.xml:
+	  Fix the two registry files that wrongly used boolean instead of
+	  bool.
+
 2008-07-30  Johan Dahlin  <johan@fluendo.com>
 
 	* data/make-dummy-cert: Return 1 if we failed to generate

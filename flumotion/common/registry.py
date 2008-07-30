@@ -560,6 +560,13 @@ class RegistryParser(fxml.Parser):
         attrs = self.parseAttributes(node, required=('name', 'type'),
             optional=('required', 'multiple', 'description'))
         name, propertyType, required, multiple, description = attrs
+        # see flumotion.common.config.parsePropertyValue
+        allowed = ('string', 'rawstring', 'int', 'long', 'bool',
+            'float', 'fraction')
+        if propertyType not in allowed:
+            raise fxml.ParserError(
+                "<property> %s's type is not one of %s" % (
+                    name, ", ".join(allowed)))
         required = common.strToBool(required)
         multiple = common.strToBool(multiple)
         return RegistryEntryProperty(name, propertyType, description,

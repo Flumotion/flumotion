@@ -10,7 +10,7 @@
       </entries>
       <properties>
 <!-- newlines are not preserved in descriptions -->
-        <property name="deny-default" type="boolean" required="no"
+        <property name="deny-default" type="bool" required="no"
                   description="Whether to default to denying authentication.
 Defaults to True, which is equivalent to Apache's 'Order Allow,Deny'"/>
         <property name="allow" type="string" required="no" multiple="yes"
