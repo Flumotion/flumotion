@@ -34,6 +34,7 @@ def node(l, v, r, b):
     between the right and left sides, respectively."""
     return (l, v, r, b)
 
+
 def height(tree):
     """Return the height of an AVL tree. Relies on the balance factors
     being consistent."""
@@ -46,15 +47,21 @@ def height(tree):
         else:
             return height(r) + 1
 
+
 def debug(tree, level=0):
     """Print out a debugging representation of an AVL tree."""
     if tree is None:
         return
     l, v, r, b = tree
     debug(l, level+1)
-    bchr = {-2:'--',-1:'-',0:'0',1:'+',2:'++'}.get(b,'?')
+    bchr = {-2: '--',
+            -1: '-',
+            0: '0',
+            1: '+',
+            2: '++'}.get(b, '?')
     print '%s%s: %r' % ('    '*level, bchr, v)
     debug(r, level+1)
+
 
 def fromseq(seq):
     """Populate and return an AVL tree from an iterable sequence."""
@@ -62,6 +69,7 @@ def fromseq(seq):
     for x in seq:
         _, t = insert(t, x)
     return t
+
 
 def _balance(hdiff, l, v, r, b):
     """Internal method to rebalance an AVL tree, called as needed."""
@@ -153,6 +161,7 @@ def _balance(hdiff, l, v, r, b):
     else:
         return hdiff, node(l, v, r, b)
 
+
 def insert(tree, value):
     """Insert a value into an AVL tree. Returns a tuple of
     (heightdifference, tree). The original tree is unmodified."""
@@ -175,11 +184,13 @@ def insert(tree, value):
                 b += 1
             return _balance(hdiff, l, v, newr, b)
         else:
-            raise ValueError('tree already has value %r' % (value,))
+            raise ValueError('tree already has value %r' % (value, ))
+
 
 def delete(tree, value):
     """Delete a value from an AVL tree. Like L{insert}, returns a tuple
     of (heightdifference, tree). The original tree is unmodified."""
+
     def popmin((l, v, r, b)):
         if l is None:
             minv = v
@@ -192,10 +203,10 @@ def delete(tree, value):
                     hdiff = 0
                 b += 1
 
-            return (minv,) + _balance(hdiff, newl, v, r, b)
+            return (minv, ) + _balance(hdiff, newl, v, r, b)
 
     if tree is None:
-        raise ValueError('tree has no value %r' % (value,))
+        raise ValueError('tree has no value %r' % (value, ))
     else:
         l, v, r, b = tree
         if value < v:
@@ -231,6 +242,7 @@ def delete(tree, value):
                     b -= 1
                 return _balance(hdiff, l, newv, newr, b)
 
+
 def lookup(tree, value):
     """Look up a node in an AVL tree. Returns a node tuple or False if
     the value was not found."""
@@ -245,6 +257,7 @@ def lookup(tree, value):
         else:
             return tree
 
+
 def iterate(tree):
     """Iterate over an AVL tree, starting with the lowest-ordered
     value."""
@@ -255,6 +268,7 @@ def iterate(tree):
         yield v
         for x in iterate(r):
             yield x
+
 
 def iteratereversed(tree):
     """Iterate over an AVL tree, starting with the highest-ordered
@@ -267,7 +281,9 @@ def iteratereversed(tree):
         for x in iteratereversed(l):
             yield x
 
+
 class AVLTree(object):
+
     def __init__(self, seq=()):
         self._len = len(seq)
         self.tree = fromseq(seq)

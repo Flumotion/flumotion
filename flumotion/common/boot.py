@@ -30,9 +30,12 @@ __version__ = "$Rev$"
 # Keep in sync with configure.ac
 PYGTK_REQ = (2, 8, 4)
 KIWI_REQ = (1, 9, 13)
-
 GST_REQ = {'0.10': {'gstreamer': (0, 10, 0, 1),
                     'gst-python': (0, 10, 0, 1)}}
+USE_GOPTION_PARSER = False
+USE_GTK = False
+USE_GST = True
+
 
 def init_gobject():
     """
@@ -52,6 +55,7 @@ def init_gobject():
                          % '.'.join(map(str, PYGTK_REQ)))
 
     gobject.threads_init()
+
 
 def _init_gst_version(gst_majorminor):
 
@@ -83,18 +87,22 @@ def _init_gst_version(gst_majorminor):
         pygst_version = gst.pygst_version
 
     if gst_req[:2] != gst_version[:2]:
-        raise SystemExit('ERROR: Expected GStreamer %s, but got incompatible %s'
-                         % (gst_majorminor, tup2version(gst_version[:2])))
+        raise SystemExit(
+            'ERROR: Expected GStreamer %s, but got incompatible %s'
+            % (gst_majorminor, tup2version(gst_version[:2])))
 
     if gst_version < gst_req:
-        raise SystemExit('ERROR: GStreamer %s too old; install %s or newer'
-                         % (tup2version(gst_version), tup2version(gst_req)))
+        raise SystemExit(
+            'ERROR: GStreamer %s too old; install %s or newer'
+            % (tup2version(gst_version), tup2version(gst_req)))
 
     if pygst_version < pygst_req:
-        raise SystemExit('ERROR: gst-python %s too old; install %s or newer'
-                         % (tup2version(pygst_version), tup2version(pygst_req)))
+        raise SystemExit(
+            'ERROR: gst-python %s too old; install %s or newer'
+            % (tup2version(pygst_version), tup2version(pygst_req)))
 
     return True
+
 
 def init_gst():
     """
@@ -119,9 +127,10 @@ def init_gst():
                 break
         if not gst_majorminor:
             raise SystemExit('ERROR: no GStreamer available '
-                             '(looking for versions %r)' % (GST_REQ.keys(),))
+                             '(looking for versions %r)' % (GST_REQ.keys(), ))
 
     return gst_majorminor
+
 
 def init_kiwi():
     try:
@@ -135,7 +144,7 @@ def init_kiwi():
 
     return True
 
-USE_GOPTION_PARSER = False
+
 def init_option_parser(gtk, gst):
     # We should only use the GOption parser if we are already going to
     # import gobject, and if we can find a recent enough version of
@@ -152,8 +161,7 @@ def init_option_parser(gtk, gst):
         else:
             USE_GOPTION_PARSER = False
 
-USE_GTK = False
-USE_GST = True
+
 def boot(path, gtk=False, gst=True, installReactor=True):
     # python 2.5 and twisted < 2.5 don't work together
     pythonMM = sys.version_info[0:2]
@@ -194,8 +202,10 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     # there is no race condition here -- the reactor doesn't handle
     # signals until it is run().
     reactor.killed = False
+
     def setkilled(killed):
         reactor.killed = killed
+
     reactor.addSystemEventTrigger('before', 'startup', setkilled, False)
     reactor.addSystemEventTrigger('before', 'shutdown', setkilled, True)
 
@@ -212,6 +222,7 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     __pychecker__ = 'no-reuseattr'
 
     if os.getenv('FLU_PROFILE'):
+
         def catching(proc, *args, **kwargs):
             import statprof
             statprof.start()
@@ -221,6 +232,7 @@ def boot(path, gtk=False, gst=True, installReactor=True):
                 statprof.stop()
                 statprof.display()
     elif os.getenv('FLU_ATEXIT'):
+
         def catching(proc, *args, **kwargs):
             env = os.getenv('FLU_ATEXIT').split(' ')
             fqfn = env.pop(0)
@@ -235,6 +247,7 @@ def boot(path, gtk=False, gst=True, installReactor=True):
                          atexitproc, env)
                 atexitproc(*env)
     else:
+
         def catching(proc, *args, **kwargs):
             return proc(*args, **kwargs)
 
