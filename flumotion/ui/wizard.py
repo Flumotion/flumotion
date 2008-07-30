@@ -104,6 +104,10 @@ class WizardStep(GladeWidget, log.Loggable):
     # optional
     sidebarName = None
 
+    docSection = None
+    docAnchor = None
+    docVersion = 'remote' # 'local' or 'remote'
+
     def __init__(self, wizard):
         """
         @param wizard: the wizard this step is a part of
@@ -531,6 +535,7 @@ gobject.type_register(WizardSidebar)
 
 class SectionWizard(GladeWindow, log.Loggable):
     gsignal('destroy')
+    gsignal('help-clicked', str, str, str) # section, anchor, version
 
     logCategory = 'wizard'
 
@@ -686,6 +691,11 @@ class SectionWizard(GladeWindow, log.Loggable):
         else:
             self.button_next.set_label(_('_Finish'))
 
+        self.button_next.grab_focus()
+        step = self.getCurrentStep()
+        hasHelp = bool(step.docSection and step.docAnchor)
+        self.button_help.set_sensitive(hasHelp)
+
     # Private
 
     def _setStepIcon(self, icon):
@@ -696,6 +706,11 @@ class SectionWizard(GladeWindow, log.Loggable):
     def _setStepTitle(self, title):
         self.label_title.set_markup(
             '<span size="x-large">%s</span>' % escape(title or ''))
+
+    def _helpClicked(self):
+        step = self.getCurrentStep()
+        self.emit('help-clicked', step.docSection, step.docAnchor,
+                  step.docVersion)
 
     # Callbacks
 
@@ -714,6 +729,9 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def on_window_delete_event(self, wizard, event):
         self.finish(self._useMain, completed=False)
+
+    def on_button_help_clicked(self, button):
+        self._helpClicked()
 
     def on_button_prev_clicked(self, button):
         self.sidebar.showPreviousStep()

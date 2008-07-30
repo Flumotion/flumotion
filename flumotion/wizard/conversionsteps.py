@@ -47,6 +47,9 @@ class ConversionStep(WorkerWizardStep):
     title = _('Encoding')
     section = _('Conversion')
     gladeFile = 'encoding-wizard.glade'
+    docSection = 'chapter-using-assistant'
+    docAnchor = 'figure-configure-assistant-encoders'
+    docVersion = 'local'
 
     def __init__(self, wizard):
         self._audioEncoder = None

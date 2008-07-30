@@ -27,33 +27,58 @@ __version__ = "$Rev: 6125 $"
 
 from flumotion.common import common, errors
 from flumotion.common.i18n import getLL
+from flumotion.configure import configure
 
 
-def getMessageWebLink(message, LL=None):
+def getMessageWebLink(message):
     """
     Get the on-line documentation link target for this message, if any.
 
-    @param LL: language code
+    @param message: the message
+    @type message: L{flumotion.common.messages.Message}
     """
     if not message.description:
         return None
 
-    if not LL:
-        LL = getLL()
-
     from flumotion.project import project
-    docURL = 'http://www.flumotion.net/doc/flumotion/manual'
     try:
-        docURL = project.get(message.project, 'docurl')
+        projectURL = project.get(message.project, 'docurl')
     except errors.NoProjectError:
-        pass
+        projectURL = None
+
+    return getWebLink(section=message.section,
+                      anchor=message.anchor,
+                      version=message.version,
+                      projectURL=projectURL)
+
+
+def getWebLink(section, anchor, version=None, projectURL=None):
+    """
+    Get a documentation link based on the parameters.
+
+    @param section: section, usually the name of the html file
+    @type  section: string
+    @param  anchor: name of the anchor, part of a section
+    @type   anchor: string
+    @param  version: optional, version to use. If this is not specified
+                     the version from configure.version will be used
+    @type   version: string
+    @param  projectURL, url for the project this link belongs to.
+    @type   projectURL: string
+    @returns: the constructed documentation link
+    @rtype: string
+    """
+    if version is None:
+        version = configure.version
 
     # FIXME: if the version has a nano, do something sensible, like
     # drop the nano or always link to trunk version
-    versionTuple = message.version.split('.')
+    versionTuple = version.split('.')
     version = common.versionTupleToString(versionTuple[:3])
 
-    url = '%s/%s/%s/html/%s.html#%s' % (
-        docURL, LL, version, message.section, message.anchor)
+    if projectURL is None:
+        projectURL = 'http://www.flumotion.net/doc/flumotion/manual'
 
-    return url
+    return '%s/%s/%s/html/%s.html#%s' % (
+        projectURL, getLL(), version, section, anchor)
+

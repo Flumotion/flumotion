@@ -1,3 +1,25 @@
+2008-07-30  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/sectionwizard.glade:
+	* flumotion/common/documentation.py:
+	* flumotion/common/planet.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/manager/manager.py:
+	* flumotion/ui/wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/scenarios.py:
+	Add a help button to the wizard.
+	Add docSection/docAnchor/docVersion class variables for the
+	WizardSteps, add a couple of annotations.
+	Export a version state variable over pb for the flumotion
+	admin client to use.
+	Add a new API for creating a link based on just section/anchor/version,
+	which does not require a message.
+	Fixes #826
+
 2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:

@@ -213,6 +213,7 @@ class Vishnu(log.Loggable):
 
         self.state = planet.ManagerPlanetState()
         self.state.set('name', name)
+        self.state.set('version', configure.version)
 
         self.plugs = {} # socket -> list of plugs
 

@@ -77,6 +77,9 @@ class SummaryStep(WizardStep):
     icon = 'summary.png'
     gladeFile = "summary-wizard.glade"
     lastStep = True
+    docSection = 'chapter-using-assistant'
+    docAnchor = 'figure-configure-assistant-summary'
+    docVersion = 'local'
 
     # WizardStep
 
@@ -128,7 +131,7 @@ class Scenario(object):
         """
         raise NotImplementedError("%s.save" % (
             self.__class__.__name__,))
-        
+
 class LiveScenario(Scenario):
     short = _("Set up a live stream")
     description = _(
@@ -136,7 +139,7 @@ class LiveScenario(Scenario):
         """)
 
     # Scenario
-    
+
     def addSteps(self):
         self.wizard.addStepSection(LiveProductionStep)
         self.wizard.addStepSection(ConversionStep)
@@ -163,7 +166,7 @@ class LiveScenario(Scenario):
         saver.setAudioEncoder(encodingStep.getAudioEncoder())
         saver.setVideoEncoder(encodingStep.getVideoEncoder())
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
-        
+
         consumptionStep = self.wizard.getStep('Consumption')
         httpPorter = consumptionStep.getHTTPPorter()
         existingPorter = self.wizard.getHTTPPorter()
@@ -191,7 +194,7 @@ class LiveScenario(Scenario):
         return saver
 
     # Private
-    
+
     def _getConsumptionSteps(self):
         """Fetches the consumption steps chosen by the user
         @returns: consumption steps

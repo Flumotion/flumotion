@@ -22,6 +22,7 @@
 import gettext
 import os
 import sets
+import webbrowser
 
 import gtk
 from gtk import gdk
@@ -29,8 +30,10 @@ from twisted.internet import defer
 
 from flumotion.common import errors, messages
 from flumotion.common.common import pathToModuleName
+from flumotion.common.documentation import getWebLink
 from flumotion.common.i18n import N_, ngettext, gettexter
 from flumotion.common.pygobject import gsignal
+from flumotion.configure import configure
 from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard.scenarios import LiveScenario, OnDemandScenario
 from flumotion.wizard.worker import WorkerList
@@ -61,6 +64,9 @@ class WelcomeStep(WizardStep):
     section = _('Welcome')
     icon = 'wizard.png'
     gladeFile = 'welcome-wizard.glade'
+    docSection = 'chapter-using-assistant'
+    docAnchor = 'figure-configure-assistant-welcome'
+    docVersion = 'local'
 
     def getNext(self):
         return None
@@ -124,6 +130,7 @@ class ConfigurationWizard(SectionWizard):
 
     def __init__(self, parent=None):
         SectionWizard.__init__(self, parent)
+        self.connect('help-clicked', self._on_wizard__help_clicked)
         # Set the name of the toplevel window, this is used by the
         # ui unittest framework
         self.window1.set_name('ConfigurationWizard')
@@ -605,6 +612,15 @@ class ConfigurationWizard(SectionWizard):
         self.debug('%r setting worker to %s' % (step, worker))
         step.worker = worker
 
+    def _showHelpLink(self, section, anchor, docVersion):
+        if docVersion == 'remote':
+            version = self._adminModel.planet.get('version')
+        else:
+            version = configure.version
+
+        url = getWebLink(section, anchor, version=version)
+        webbrowser.open(url)
+
     # Callbacks
 
     def on_combobox_worker_changed(self, combobox, worker):
@@ -623,3 +639,6 @@ class ConfigurationWizard(SectionWizard):
                     'properly and try again.')),
                 mid='worker-error')
             self.add_msg(msg)
+
+    def _on_wizard__help_clicked(self, wizard, section, anchor, version):
+        self._showHelpLink(section, anchor, version)

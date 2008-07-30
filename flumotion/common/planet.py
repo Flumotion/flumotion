@@ -48,6 +48,7 @@ class ManagerPlanetState(flavors.StateCacheable):
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
+        self.addKey('version')
         self.addKey('parent')
         self.addKey('manager')
         self.addKey('atmosphere')
