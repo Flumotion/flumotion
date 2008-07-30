@@ -137,7 +137,7 @@ class ConsumptionStep(WizardStep):
 
     def _canEmbedShout(self):
         encodingStep = self.wizard.getStep('Encoding')
-        # Shoutcasts supports only mp3 and ogg
+        # Shoutcast supports only mp3 and ogg
         if (encodingStep.getAudioFormat() == 'mp3' or
             encodingStep.getMuxerFormat() == 'ogg'):
             return True
