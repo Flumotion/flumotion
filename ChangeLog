@@ -1,5 +1,12 @@
 2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	  Change the message about maximum clients to something more
+	  friendly, and link to the documentation.  Worked on the first
+	  try, whee!
+
+2008-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/Makefile.am:
 	* conf/examples/ipbouncer.xml (added):
 	* conf/examples/bouncer.xml (added):
