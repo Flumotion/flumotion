@@ -39,7 +39,7 @@ ADD YOUR TEXT HERE
 Collected information from your system:
 
  * Flumotion version: '''%(version)s'''
- * Flumotion SVN revision: [source:flumotion/%(branch)s#%(revision)s r%(revision)s]
+ * Flumotion SVN revision: [source:flumotion/%(branch)s#%(rev)s r%(rev)s]
 %(extra)s
 Python Traceback:
 {{{
@@ -53,6 +53,7 @@ class BugReporter(object):
     """I am a class that collects information about the system
     and reports the information to the Flumotion bug report system.
     """
+
     def __init__(self):
         self._baseURL = _TRAC_URL
         self._component = _BUG_COMPONENT
@@ -83,7 +84,7 @@ class BugReporter(object):
         description = _BUG_TEMPLATE % (
             dict(extra=self._processFilenames(filenames),
                  branch=configure.branchName,
-                 revision=max(self._versions.values()),
+                 rev=max(self._versions.values()),
                  traceback=traceback,
                  version=configure.version))
         return description
@@ -109,5 +110,5 @@ class BugReporter(object):
             params['component'] = self._component,
 
         data = urllib.urlencode(params)
-        reportURL = "%s/newticket?%s" % (self._baseURL, data,)
+        reportURL = "%s/newticket?%s" % (self._baseURL, data, )
         webbrowser.open_new(reportURL)

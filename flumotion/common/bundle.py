@@ -41,6 +41,7 @@ class BundledFile:
     """
     I represent one file as managed by a bundler.
     """
+
     def __init__(self, source, destination):
         self.source = source
         self.destination = destination
@@ -97,10 +98,12 @@ class BundledFile:
         zip.write(self.source, self.destination)
         self.zipped = True
 
+
 class Bundle:
     """
     I am a bundle of files, represented by a zip file and md5sum.
     """
+
     def __init__(self, name):
         self.zip = None
         self.md5sum = None
@@ -119,11 +122,13 @@ class Bundle:
         """
         return self.zip
 
+
 class Unbundler:
     """
     I unbundle bundles by unpacking them in the given directory
     under directories with the bundle's md5sum.
     """
+
     def __init__(self, directory):
         self._undir = directory
 
@@ -180,10 +185,12 @@ class Unbundler:
             os.rename(tempname, path)
         return directory
 
+
 class Bundler:
     """
     I bundle files into a bundle so they can be cached remotely easily.
     """
+
     def __init__(self, name):
         """
         Create a new bundle.
@@ -197,7 +204,7 @@ class Bundler:
         Add files to the bundle.
 
         @param source: the path to the file to add to the bundle.
-        @param destination: a relative path to store this file in in the bundle.
+        @param destination: a relative path to store this file in the bundle.
         If unspecified, this will be stored in the top level.
 
         @returns: the path the file got stored as
@@ -232,6 +239,7 @@ class Bundler:
 
     # build the zip file containing the files registered in the bundle
     # and return the zip file data
+
     def _buildzip(self):
         filelike = StringIO.StringIO()
         zipFile = zipfile.ZipFile(filelike, "w")
@@ -242,10 +250,12 @@ class Bundler:
         filelike.close()
         return data
 
+
 class BundlerBasket:
     """
     I manage bundlers that are registered through me.
     """
+
     def __init__(self):
         """
         Create a new bundler basket.
@@ -263,7 +273,7 @@ class BundlerBasket:
 
         @param bundleName: the name of the bundle this file is a part of
         @param source: the path to the file to add to the bundle
-        @param destination: a relative path to store this file in in the bundle.
+        @param destination: a relative path to store this file in the bundle.
         If unspecified, this will be stored in the top level
         """
         # get the bundler and create it if need be
@@ -329,7 +339,7 @@ class BundlerBasket:
         """
         Return the bundle by name, or None if not found.
         """
-        if self._bundlers.has_key(bundlerName):
+        if bundlerName in self._bundlers:
             return self._bundlers[bundlerName]
         return None
 
@@ -337,7 +347,7 @@ class BundlerBasket:
         """
         Return the bundler name by import statement, or None if not found.
         """
-        if self._imports.has_key(importString):
+        if importString in self._imports:
             return self._imports[importString]
         return None
 
@@ -345,7 +355,7 @@ class BundlerBasket:
         """
         Return the bundler name by filename, or None if not found.
         """
-        if self._files.has_key(filename):
+        if filename in self._files:
             return self._files[filename]
         return None
 
@@ -358,6 +368,7 @@ class BundlerBasket:
         """
         return self._bundlers.keys()
 
+
 class MergedBundler(Bundler):
     """
     I am a bundler, with the extension that I can also bundle other
@@ -367,6 +378,7 @@ class MergedBundler(Bundler):
     bundle with a union of all subbundlers' files, in addition to any
     loose files that you added to me.
     """
+
     def __init__(self, name='merged-bundle'):
         Bundler.__init__(self, name)
         self._subbundlers = {}

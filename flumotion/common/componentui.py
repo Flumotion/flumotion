@@ -36,11 +36,15 @@ __version__ = "$Rev$"
 
 
 # state of a component used for UI purposes
+
+
 class WorkerComponentUIState(flavors.StateCacheable):
     pass
 
 
-class ManagerComponentUIState(flavors.StateCacheable, flavors.StateRemoteCache):
+class ManagerComponentUIState(flavors.StateCacheable,
+                              flavors.StateRemoteCache):
+
     def processUniqueID(self):
         # Make sure proxies for the same object are the same, if we are
         # later cached by someone else. See bug #519.
@@ -56,6 +60,7 @@ pb.setUnjellyableForClass(ManagerComponentUIState, AdminComponentUIState)
 
 
 class WizardEntryState(pb.RemoteCopy):
+
     def getAcceptedMediaTypes(self):
         """
         Fetches a list of media types this components accepts.

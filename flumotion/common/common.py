@@ -43,6 +43,7 @@ from flumotion.configure import configure
 
 __version__ = "$Rev$"
 
+
 def version(binary):
     """
     Print a version block for the flumotion binaries.
@@ -56,6 +57,7 @@ def version(binary):
     block.append("part of Flumotion - a streaming media server")
     block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
     return "\n".join(block)
+
 
 def ensureDir(directory, description):
     """
@@ -73,15 +75,16 @@ def ensureDir(directory, description):
                 description, directory, str(e)))
 
 
-# FIXME: fix epydoc to correctly spell deprecated
-# F0.6
 def componentPath(componentName, parentName):
+    # FIXME: fix epydoc to correctly spell deprecated
+    # F0.6
     """
     Create a path string out of the name of a component and its parent.
 
     @depreciated: Use @componentId instead
     """
     return '/%s/%s' % (parentName, componentName)
+
 
 def componentId(parentName, componentName):
     """
@@ -94,6 +97,7 @@ def componentId(parentName, componentName):
     @rtype: str
     """
     return '/%s/%s' % (parentName, componentName)
+
 
 def parseComponentId(componentId):
     """
@@ -112,6 +116,7 @@ def parseComponentId(componentId):
         "componentId %s should start with /" % componentId
     return (l[1], l[2])
 
+
 def feedId(componentName, feedName):
     """
     Create a C{feedId} based on the C{componentName} and C{feedName}.
@@ -124,6 +129,7 @@ def feedId(componentName, feedName):
     @rtype: str
     """
     return "%s:%s" % (componentName, feedName)
+
 
 def parseFeedId(feedId):
     """
@@ -138,6 +144,7 @@ def parseFeedId(feedId):
     assert len(parts) == 2, "feedId %s should contain exactly one ':'" % feedId
     return (parts[0], parts[1])
 
+
 def fullFeedId(flowName, componentName, feedName):
     """
     Create a C{fullFeedId} based on the C{flowName}, C{componentName} and
@@ -151,6 +158,7 @@ def fullFeedId(flowName, componentName, feedName):
     """
     return feedId(componentId(flowName, componentName), feedName)
 
+
 def parseFullFeedId(fullFeedId):
     """
     @since: 0.3.1
@@ -163,12 +171,14 @@ def parseFullFeedId(fullFeedId):
     flowName, componentName = parseComponentId(parts[0])
     return (flowName, componentName, parts[1])
 
+
 def objRepr(object):
     """
     Return a string giving the fully qualified class of the given object.
     """
     c = object.__class__
     return "%s.%s" % (c.__module__, c.__name__)
+
 
 def pathToModuleName(path):
     """
@@ -193,6 +203,7 @@ def pathToModuleName(path):
         return None
 
     return ".".join(path.split(os.path.sep))
+
 
 def compareVersions(first, second):
     """
@@ -231,6 +242,7 @@ def compareVersions(first, second):
 
     return 0
 
+
 def checkVersionsCompat(version, against):
     """Checks if two versions are compatible.
 
@@ -261,6 +273,7 @@ def checkVersionsCompat(version, against):
         round2 = lambda x: ((x + 1) // 2) * 2
         return round2(version[1]) == round2(against[1])
 
+
 def versionTupleToString(versionTuple):
     """
     Converts a version tuple to a string.  If the tuple has a zero nano number,
@@ -277,6 +290,7 @@ def versionTupleToString(versionTuple):
 
     return ".".join([str(i) for i in versionTuple])
 
+
 def _uniq(l, key=lambda x: x):
     """
     Filters out duplicate entries in a list.
@@ -286,6 +300,7 @@ def _uniq(l, key=lambda x: x):
         if key(x) not in [key(y) for y in out]:
             out.append(x)
     return out
+
 
 def get_all_methods(obj, method, subclass_first):
     mro = type(obj).__mro__
@@ -307,6 +322,7 @@ def get_all_methods(obj, method, subclass_first):
     # to avoid calling them twice.
     return _uniq(procs, lambda proc: proc.im_func)
 
+
 def call_each_method(obj, method, *args, **kwargs):
     """
     Invoke all implementations of a method on an object.
@@ -318,6 +334,7 @@ def call_each_method(obj, method, *args, **kwargs):
     for proc in get_all_methods(obj, method, True):
         proc(obj, *args, **kwargs)
 
+
 def call_each_method_reversed(obj, method, *args, **kwargs):
     """
     Invoke all implementations of a method on an object.
@@ -327,6 +344,7 @@ def call_each_method_reversed(obj, method, *args, **kwargs):
     """
     for proc in get_all_methods(obj, method, False):
         proc(obj, *args, **kwargs)
+
 
 class InitMixin(object):
     """
@@ -348,6 +366,7 @@ class InitMixin(object):
     def __init__(self, *args, **kwargs):
         call_each_method_reversed(self, 'init', *args, **kwargs)
 
+
 def strToBool(string):
     """
     @type  string: str
@@ -358,6 +377,7 @@ def strToBool(string):
         return True
 
     return False
+
 
 def assertSSLAvailable():
     """Assert that twisted has support for SSL connections.

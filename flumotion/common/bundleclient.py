@@ -64,9 +64,11 @@ class BundleLoader(log.Loggable):
                   bundlePath is the directory to register
                   for this package.
         """
+
         def annotated(d, *extraVals):
+
             def annotatedReturn(ret):
-                return (ret,) + extraVals
+                return (ret, ) + extraVals
             d.addCallback(annotatedReturn)
             return d
 
@@ -128,6 +130,7 @@ class BundleLoader(log.Loggable):
         @returns: a deferred that will fire when the given module is loaded,
                   giving the loaded module.
         """
+
         def gotBundles(bundles):
             self.debug('Got bundles %r', bundles)
 
@@ -151,6 +154,7 @@ class BundleLoader(log.Loggable):
         @returns: a deferred returning the absolute path under which the
                   bundle is extracted.
         """
+
         def gotBundles(bundles):
             name, path = bundles[-1]
             assert name == bundleName
@@ -170,6 +174,7 @@ class BundleLoader(log.Loggable):
         @returns: a deferred returning the absolute path to a local copy
                   of the given file.
         """
+
         def gotBundles(bundles):
             name, bundlePath = bundles[-1]
             path = os.path.join(bundlePath, fileName)
