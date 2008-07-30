@@ -1,5 +1,10 @@
 2008-07-30  Johan Dahlin  <johan@flumotion.com>
 
+	* misc/pep8.py:
+	Add a script which checks PEP-8 compilance.
+
+2008-07-30  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/common/avltree.py:
 	* flumotion/common/boot.py:
 	PEP-8 compilance, run the pep8.py script over this file.
