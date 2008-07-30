@@ -313,6 +313,20 @@ class Servicer(log.Loggable):
 
         planetFile = os.path.join(managerDir, 'planet.xml')
 
+        # create a default.pem file if it doesn't exist yet
+        pemFile = os.path.join(configure.configdir, 'default.pem')
+        if not os.path.exists(pemFile):
+            # files in datadir are usually not executable, so call through sh
+            retval = os.system("sh %s %s" % (
+                os.path.join(configure.datadir, 'make-dummy-cert'), pemFile))
+
+            # If we couldn't generate the file, it means that we probably
+            # don't have openssl installed. If so, don't include the complete
+            # to the pemfile which means that the the default pem file which
+            # is shipped with flumotion will be used instead.
+            if retval != 0:
+                pemFile = 'default.pem'
+
         # generate the file
         handle = open(planetFile, 'w')
         handle.write("""<planet>
@@ -323,9 +337,7 @@ class Servicer(log.Loggable):
     <transport>ssl</transport>
     <!-- certificate path can be relative to $sysconfdir/flumotion,
          or absolute -->
-<!--
-    <certificate>default.pem</certificate>
--->
+    <certificate>%(pemFile)s</certificate>
     <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
       <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
@@ -335,13 +347,6 @@ user:PSfNpHTkpTx1M
 </planet>
 """ % locals())
         handle.close()
-
-        # create a default.pem file if it doesn't exist yet
-        pemFile = os.path.join(configure.configdir, 'default.pem')
-        if not os.path.exists(pemFile):
-            # files in datadir are usually not executable, so call through sh
-            os.system("sh %s %s" % (
-                os.path.join(configure.datadir, 'make-dummy-cert'), pemFile))
 
         return True
 
