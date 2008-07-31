@@ -40,7 +40,6 @@ class TestVideoProducer(VideoProducer):
         super(TestVideoProducer, self).__init__()
 
         self.properties.pattern = 0
-        self.properties.format = 'video/x-raw-yuv'
 
 
 class TestVideoProducerStep(VideoProducerStep):
@@ -55,20 +54,16 @@ class TestVideoProducerStep(VideoProducerStep):
 
     def setup(self):
         self.pattern.data_type = int
-        self.format.data_type = str
         self.framerate.data_type = float
 
         self.pattern.prefill([
             (_('SMPTE Color bars'), 0),
             (_('Random (television snow)'), 1),
             (_('Totally black'), 2)])
-        self.format.prefill([
-            (_('YUV'), 'video/x-raw-yuv'),
-            (_('RGB'), 'video/x-raw-rgb')])
 
         self.add_proxy(self.model.properties,
                        ['pattern', 'width', 'height',
-                        'framerate', 'format'])
+                        'framerate'])
 
         sizegroup = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
         sizegroup.add_widget(self.width)

@@ -492,7 +492,6 @@ class TestWizardSave(testsuite.TestCase):
              '               worker="worker"\n'
              '               version="%(version)s">\n'
              '      \n'
-             '      <property name="format">video/x-raw-yuv</property>\n'
              '      <property name="height">240</property>\n'
              '      <property name="pattern">0</property>\n'
              '      <property name="width">320</property>\n'

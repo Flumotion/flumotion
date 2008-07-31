@@ -1,3 +1,11 @@
+2008-07-31  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/producers/videotest/wizard.glade:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* flumotion/test/test_wizard_save.py:
+	Remove YUV/RGB combo from video test src page in the wizard
+	Fixes #1091.
+
 2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:
