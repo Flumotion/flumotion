@@ -1,3 +1,11 @@
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  Use _description for components and properties, so they are properly
+	  extracted for translation.
+	  Add a DeprecationWarning when using the untranslatable description
+	  attribute, but still work.
+
 2008-07-30  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/bugreporter.py:
