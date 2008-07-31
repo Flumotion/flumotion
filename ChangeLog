@@ -1,3 +1,14 @@
+2008-07-31  Johan Dahlin  <johan@flumotion.com>
+
+	* data/Makefile.am:
+	* data/image/Makefile.am:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/ui/icons.py:
+	* flumotion/ui/simplewizard.py:
+	* flumotion/ui/trayicon.py:
+	* flumotion/ui/wizard.py:
+	Update the icons, use the flumotion icon everywhere.
+
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

@@ -50,7 +50,7 @@ def _register_stock_icons(names):
     ifact.add_default()
 
 def register_icons():
-    iconfile = os.path.join(configure.imagedir, 'fluendo.png')
+    iconfile = os.path.join(configure.imagedir, 'flumotion.png')
     gtk.window_set_default_icon_from_file(iconfile)
 
     _register_stock_icons([

@@ -170,7 +170,7 @@ class SimpleWizard(GladeWindow):
     def _setup_ui(self):
         w = self.widgets
 
-        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
+        iconfile = os.path.join(configure.imagedir, 'flumotion.png')
         self.window.set_icon_from_file(iconfile)
         w['image_icon'].set_from_file(iconfile)
 

@@ -130,7 +130,7 @@ class AboutDialog(gtk.Dialog):
 
         image = gtk.Image()
         self.vbox.pack_start(image)
-        image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
+        image.set_from_file(os.path.join(configure.imagedir, 'flumotion.png'))
         image.show()
 
         version = gtk.Label(

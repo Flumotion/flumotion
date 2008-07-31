@@ -548,7 +548,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         for k, v in self.widgets.items():
             setattr(self, k, v)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
-                                                    'fluendo.png'))
+                                                    'flumotion.png'))
         self.window.connect_after('realize', self.on_window_realize)
         self.window.connect('destroy', self.on_window_destroy)
 

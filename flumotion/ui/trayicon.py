@@ -80,7 +80,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         self._tray_event_box = gtk.EventBox()
         self._tray_image = gtk.Image()
         pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join(
-            configure.imagedir, 'fluendo.png'))
+            configure.imagedir, 'flumotion.png'))
         scaled_buf = pixbuf.scale_simple(24, 24, gtk.gdk.INTERP_BILINEAR)
         self._tray_image.set_from_pixbuf(scaled_buf)
         self._tray_event_box.add(self._tray_image)
@@ -139,7 +139,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         # if no components, show fluendo logo
         if len(names) == 0:
             pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join(
-                configure.imagedir, 'fluendo.png'))
+                configure.imagedir, 'flumotion.png'))
             scaled_buf = pixbuf.scale_simple(24, 24, gtk.gdk.INTERP_BILINEAR)
             self._tray_image.set_from_pixbuf(scaled_buf)
         else:

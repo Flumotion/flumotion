@@ -1,7 +1,7 @@
 SUBDIRS = wizard 16x16 24x24
 
 image_DATA = \
-	fluendo.png 		\
+	flumotion.png 		\
 	mood-happy.png 		\
 	mood-sad.png 		\
 	mood-waking.png 	\
