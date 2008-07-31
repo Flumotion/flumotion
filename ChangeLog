@@ -1,4 +1,10 @@
-2008-07-31  Johan Dahlin  <johan@gnome.org>
+2008-07-31  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/httpstreamer-wizard.glade:
+	The mount point entry on the streamer page should be wider.
+	Fixes #1102.
+
+2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/component/producers/videotest/wizard.glade:
 	* flumotion/component/producers/videotest/wizard_gtk.py:
