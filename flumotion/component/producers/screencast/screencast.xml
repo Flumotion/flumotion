@@ -4,7 +4,7 @@
 
     <component type="screencast-producer"
                base="flumotion/component/producers/screencast"
-               description="Capture video from a screen.">
+               _description="Capture video from a screen.">
       <source location="flumotion.component.producers.screencast.screencast" />
       <feeder name="default"/>
 
@@ -17,15 +17,15 @@
 
       <properties>
         <property name="height" type="int"
-                  description="Height in pixels" />
+                  _description="Height in pixels" />
         <property name="width" type="int"
-                  description="Width in pixels" />
+                  _description="Width in pixels" />
         <property name="x-offset" type="int"
-                  description="Capture a subwindow offset by this many pixels from the left" />
+                  _description="Capture a subwindow offset by this many pixels from the left" />
         <property name="y-offset" type="int"
-                  description="Capture a subwindow offset by this many pixels from the top" />
+                  _description="Capture a subwindow offset by this many pixels from the top" />
         <property name="framerate" type="fraction"
-                  description="Video framerate as numerator/denominator" />
+                  _description="Video framerate as numerator/denominator" />
       </properties>
     </component>
 

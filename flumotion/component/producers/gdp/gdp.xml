@@ -3,7 +3,7 @@
   <components>
 
     <component type="gdp-producer" base="flumotion/component/producers/gdp"
-               description="Produces a feed from a GStreamer TCP server.">
+               _description="Produces a feed from a GStreamer TCP server.">
       <source location="flumotion.component.producers.gdp.gdp" />
       <feeder name="default" />
       <entries>
@@ -12,9 +12,9 @@
       </entries>
       <properties>
         <property name="host" type="string"
-                  description="Host name or IP address of the GStreamer TCP server." />
+                  _description="Host name or IP address of the GStreamer TCP server." />
         <property name="port" type="int"
-                  description="Port of the GStreamer TCP server." />
+                  _description="Port of the GStreamer TCP server." />
       </properties>
     </component>
 

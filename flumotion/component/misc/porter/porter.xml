@@ -2,7 +2,7 @@
   <components>
     <component type="porter"
                base="flumotion/component/misc/porter"
-               description="A component that listens to a network port on behalf of other components (like http-streamer and http-server).">
+               _description="A component that listens to a network port on behalf of other components (like http-streamer and http-server).">
 
       <source location="flumotion.component.misc.porter.porter"/>
 
@@ -13,21 +13,21 @@
 
       <properties>
         <property name="username" type="string"
-                  description="username to authenticate to the porter" />
+                  _description="username to authenticate to the porter" />
         <property name="password" type="string"
-                  description="password to authenticate to the porter" />
+                  _description="password to authenticate to the porter" />
         <property name="socket-path" type="string"
-                  description="socket path to use to connect to the porter" />
+                  _description="socket path to use to connect to the porter" />
         <property name="port" type="int"
-                  description="network port for the porter to listen on" />
+                  _description="network port for the porter to listen on" />
         <!-- when an admin asks, via getPorterDetails, what our port is, we will
              report this one. allows for e.g. iptables to redirect 80 -> 8800. -->
         <property name="iptables-port" type="int"
-                  description="network port for the porter to report (useful when using iptables to redirect incoming 80 to 8800)" />
+                  _description="network port for the porter to report (useful when using iptables to redirect incoming 80 to 8800)" />
         <property name="interface" type="string"
-                  description="IP address or hostname associated with the interface we want to listen on" />
+                  _description="IP address or hostname associated with the interface we want to listen on" />
         <property name="protocol" type="string"
-                  description="porter protocol to use (defaults to flumotion.component.misc.porter.porter.HTTPPorterProtocol')" />
+                  _description="porter protocol to use (defaults to flumotion.component.misc.porter.porter.HTTPPorterProtocol')" />
       </properties>
     </component>
   </components>

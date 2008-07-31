@@ -3,7 +3,7 @@
   <components>
     <component type="rtsp-producer"
                base="flumotion/component/producers/rtsp"
-               description="A producer that produces from an RTSP stream.">
+               _description="A producer that produces from an RTSP stream.">
       <source location="flumotion.component.producers.rtsp.rtsp" />
       <feeder name="video" />
       <feeder name="audio" />
@@ -15,15 +15,15 @@
 
       <properties>
         <property name="width" type="int" required="false"
-                  description="Width of the outgoing video" />
+                  _description="Width of the outgoing video" />
         <property name="height" type="int" required="false"
-                  description="Height of the outgoing video" />
+                  _description="Height of the outgoing video" />
 	<property name="framerate" type="fraction" required="false"
-                  description="Framerate of the outgoing video" />
+                  _description="Framerate of the outgoing video" />
 	<property name="has-audio" type="bool" required="false"
-                  description="Whether the stream ha audio" />
+                  _description="Whether the stream ha audio" />
 	<property name="location" type="string" required="true"
-                  description="URL of the RTSP stream" />
+                  _description="URL of the RTSP stream" />
       </properties>
     </component>
   </components>

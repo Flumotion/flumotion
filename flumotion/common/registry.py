@@ -600,9 +600,18 @@ class RegistryParser(fxml.Parser):
         # </compound-property>
         # returns: RegistryEntryCompoundProperty
 
+        # F0.8: remove description, require _description
         attrs = self.parseAttributes(node, required=('name',),
-            optional=('required', 'multiple', 'description'))
-        name, required, multiple, description = attrs
+            optional=('required', 'multiple', 'description', '_description'))
+        name, required, multiple, description, _description = attrs
+        if description:
+            import warnings
+            warnings.warn("Please change '<compound-property description=...'"
+                " to '<compound-property _description=...' for %s" % name,
+                DeprecationWarning)
+        if _description:
+            description = _description
+        # see flumotion.common.config.parsePropertyValue
         required = common.strToBool(required)
         multiple = common.strToBool(multiple)
 

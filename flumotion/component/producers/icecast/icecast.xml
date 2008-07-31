@@ -2,7 +2,7 @@
   <components>
     <component type="icecast-producer"
                base="flumotion/component/producers/icecast"
-               description="A producer that produces a stream from an Icecast server.">
+               _description="A producer that produces a stream from an Icecast server.">
       <source location="flumotion.component.producers.icecast.icecast" />
 
       <feeder name="default" />
@@ -14,7 +14,7 @@
 
       <properties>
         <property name="url" type="string" required="true"
-                  description="URL of the Icecast stream to produce from" />
+                  _description="URL of the Icecast stream to produce from" />
       </properties>
     </component>
   </components>

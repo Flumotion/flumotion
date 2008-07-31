@@ -3,7 +3,7 @@
   <components>
 
     <component type="smoke-encoder" base="flumotion/component/encoders/smoke"
-               description="An encoder using JPEG frames and delta frames.">
+               _description="An encoder using JPEG frames and delta frames.">
       <source location="flumotion.component.encoders.smoke.smoke" />
       <eater name="default" />
       <feeder name="default" />
@@ -19,13 +19,13 @@
       </wizard>
       <properties>
         <property name="qmin" type="int"
-                  description="Minimum JPEG quality (0-100 %, default 10 %)" />
+                  _description="Minimum JPEG quality (0-100 %, default 10 %)" />
         <property name="qmax" type="int"
-                  description="Maximum JPEG quality (0-100 %, default 85 %)" />
+                  _description="Maximum JPEG quality (0-100 %, default 85 %)" />
         <property name="threshold" type="int"
-                  description="Motion estimation threshold (0 - 10000000, default 3000) "/>
+                  _description="Motion estimation threshold (0 - 10000000, default 3000) "/>
         <property name="keyframe" type="int"
-                  description="How often should a keyframe appear (in frames, default 20" />
+                  _description="How often should a keyframe appear (in frames, default 20" />
       </properties>
     </component>
 

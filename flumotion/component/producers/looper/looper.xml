@@ -2,7 +2,7 @@
   <components>
     <component type="loop-producer"
                base="flumotion/component/producers/looper"
-               description="Produces a raw audio/video feed from an Ogg file,
+               _description="Produces a raw audio/video feed from an Ogg file,
 looping continuously.">
       <source location="flumotion.component.producers.looper.looper" />
       <feeder name="audio"/>
@@ -20,13 +20,13 @@ looping continuously.">
 
       <properties>
         <property name="height" type="int"
-                  description="Height to scale the video to" />
+                  _description="Height to scale the video to" />
         <property name="width" type="int"
-                  description="Width to scale the video to" />
+                  _description="Width to scale the video to" />
         <property name="framerate" type="fraction"
-                  description="Framerate to output" />
+                  _description="Framerate to output" />
         <property name="location" type="string" required="yes"
-                  description="Location of the source file to loop" />
+                  _description="Location of the source file to loop" />
       </properties>
     </component>
   </components>

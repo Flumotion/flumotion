@@ -2,7 +2,7 @@
   <components>
     <component type="saltsha256-bouncer"
                base="flumotion/component/bouncers"
-               description="Bouncer using salted sha256 passwords.">
+               _description="Bouncer using salted sha256 passwords.">
 
       <source location="flumotion.component.bouncers.saltsha256" />
 
@@ -13,9 +13,9 @@
 
       <properties>
         <property name="filename" type="string"
-                  description="An htpasswd-like file to use as a backend" />
+                  _description="An htpasswd-like file to use as a backend" />
         <property name="data" type="rawstring"
-                  description="In-line htpasswd-like data to use as a backend" />
+                  _description="In-line htpasswd-like data to use as a backend" />
       </properties>
     </component>
   </components>

@@ -22,25 +22,25 @@
       </wizard>
       <properties>
         <property name="width" type="int" required="true"
-                  description="width of the cortado applet" />
+                  _description="width of the cortado applet" />
         <property name="height" type="int" required="true"
-                  description="height of the cortado applet" />
+                  _description="height of the cortado applet" />
         <property name="html-template" type="string"
-                  description="HTML template to use to serve the cortado applet" />
+                  _description="HTML template to use to serve the cortado applet" />
         <property name="index" type="string"
-                  description="The name of the index file, default is index.html" />
+                  _description="The name of the index file, default is index.html" />
         <property name="has-audio" type="bool" required="true"
-                  description="If audio should be streamed" />
+                  _description="If audio should be streamed" />
         <property name="has-video" type="bool" required="true"
-                  description="If video should be streamed" />
+                  _description="If video should be streamed" />
         <property name="stream-url" type="string" required="true"
-                  description="url to the stream we're displaying" />
+                  _description="url to the stream we're displaying" />
         <property name="codebase" type="string" required="true"
-                  description="baserl used to fetch the cortado applet code" />
+                  _description="baserl used to fetch the cortado applet code" />
         <property name="buffer-size" type="int" required="true"
-                  description="size of the buffer in cortado applet" />
+                  _description="size of the buffer in cortado applet" />
         <property name="framerate" type="float" required="true"
-                  description="framerate used in the cortado applet" />
+                  _description="framerate used in the cortado applet" />
       </properties>
     </plug>
   </plugs>

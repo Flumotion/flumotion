@@ -2,7 +2,7 @@
   <components>
     <component type="webcam-producer"
                base="flumotion/component/producers/webcam"
-               description="Produces a raw video feed from a webcam.">
+               _description="Produces a raw video feed from a webcam.">
       <source location="flumotion.component.producers.webcam.webcam" />
 
       <feeder name="default" />
@@ -23,32 +23,32 @@
 
       <properties>
         <property name="device" type="string" required="yes"
-                  description="Path to device node to capture from" />
+                  _description="Path to device node to capture from" />
 
         <property name="mime" type="string"
-                  description="Mime type of video to produce (e.g. video/x-raw-yuv)" />
+                  _description="Mime type of video to produce (e.g. video/x-raw-yuv)" />
         <property name="format" type="string"
-                  description="Colorspace fourcc to capture in" />
+                  _description="Colorspace fourcc to capture in" />
 
         <property name="width" type="int"
-		  description="The width of the video to capture" />
+		  _description="The width of the video to capture" />
         <property name="height" type="int"
-		  description="The height of the video to capture" />
+		  _description="The height of the video to capture" />
         <property name="framerate" type="fraction"
-		  description="The framerate of the video to capture" />
+		  _description="The framerate of the video to capture" />
 
         <property name="element-factory" type="string" required="no"
-                  description="Element factory from which to instantiate the capture element, defaults to 'v4lsrc'" />
+                  _description="Element factory from which to instantiate the capture element, defaults to 'v4lsrc'" />
 
 <!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no"
-                  description="Hue of the video (0-65535)" />
+                  _description="Hue of the video (0-65535)" />
         <property name="saturation" type="int" required="no"
-                  description="Saturation of the video (0-65535)" />
+                  _description="Saturation of the video (0-65535)" />
         <property name="brightness" type="int" required="no"
-                  description="Brightness of the video (0-65535)" />
+                  _description="Brightness of the video (0-65535)" />
         <property name="contrast" type="int" required="no"
-                  description="Contrast of the video (0-65535)" />
+                  _description="Contrast of the video (0-65535)" />
       </properties>
     </component>
   </components>

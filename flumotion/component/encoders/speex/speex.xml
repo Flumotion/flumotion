@@ -3,7 +3,7 @@
   <components>
 
     <component type="speex-encoder" base="flumotion/component/encoders/speex"
-               description="Encodes a raw audio feed using the Speex speech codec.">
+               _description="Encodes a raw audio feed using the Speex speech codec.">
       <source location="flumotion.component.encoders.speex.speex" />
       <eater name="default" />
       <feeder name="default" />
@@ -18,7 +18,7 @@
       </wizard>
       <properties>
         <property name="bitrate" type="int"
-                  description="Bitrate to encode at (in bps)" />
+                  _description="Bitrate to encode at (in bps)" />
       </properties>
     </component>
 

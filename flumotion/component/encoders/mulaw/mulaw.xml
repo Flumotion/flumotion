@@ -3,7 +3,7 @@
   <components>
 
     <component type="mulaw-encoder" base="flumotion/component/encoders/mulaw"
-               description="Encodes raw audio to mu-law.">
+               _description="Encodes raw audio to mu-law.">
       <source location="flumotion.component.encoders.mulaw.mulaw"/>
       <eater name="default"/>
       <feeder name="default"/>

@@ -1,5 +1,54 @@
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	  Also handle _description for compound-property.
+	* flumotion/component/bouncers/bouncer.xml:
+	* flumotion/component/bouncers/htpasswdcrypt.xml:
+	* flumotion/component/bouncers/icalbouncer.xml:
+	* flumotion/component/bouncers/ipbouncer.xml:
+	* flumotion/component/bouncers/saltsha256.xml:
+	* flumotion/component/bouncers/tokentest.xml:
+	* flumotion/component/combiners/composite/composite.xml:
+	* flumotion/component/combiners/switch/switch.xml:
+	* flumotion/component/consumers/disker/disker.xml:
+	* flumotion/component/consumers/gdp/gdp.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/preview/preview.xml:
+	* flumotion/component/consumers/shout2/shout2.xml:
+	* flumotion/component/converters/overlay/overlay.xml:
+	* flumotion/component/converters/pipeline/pipeline.xml:
+	* flumotion/component/encoders/dirac/dirac.xml:
+	* flumotion/component/encoders/jpeg/jpeg.xml:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/smoke/smoke.xml:
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/porter/porter.xml:
+	* flumotion/component/misc/repeater/repeater.xml:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/plugs/cortado/cortado.xml:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/gdp/gdp.xml:
+	* flumotion/component/producers/icecast/icecast.xml:
+	* flumotion/component/producers/ivtv/ivtv.xml:
+	* flumotion/component/producers/looper/looper.xml:
+	* flumotion/component/producers/pipeline/pipeline.xml:
+	* flumotion/component/producers/playlist/playlist.xml:
+	* flumotion/component/producers/rtsp/rtsp.xml:
+	* flumotion/component/producers/screencast/screencast.xml:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/unixdomain/unixdomain.xml:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/webcam/webcam.xml:
+	  Fix deprecation of all description tags.  Let's get
+	  translating!
+
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  implement bundleErrback to correctly handle typical potential
 	  problems with untrusted code nicely.

@@ -3,7 +3,7 @@
   <components>
 
     <component type="jpeg-encoder" base="flumotion/component/encoders/jpeg"
-               description="Encodes raw video feed to JPEG frames.">
+               _description="Encodes raw video feed to JPEG frames.">
       <source location="flumotion.component.encoders.jpeg.jpeg" />
       <eater name="default" />
       <feeder name="default" />
@@ -15,9 +15,9 @@
       </entries>
       <properties>
         <property name="quality" type="int"
-                  description="Quality of JPEG encoding (from 0 to 100 %)" />
+                  _description="Quality of JPEG encoding (from 0 to 100 %)" />
         <property name="framerate" type="fraction"
-                  description="Framerate to encode at" />
+                  _description="Framerate to encode at" />
       </properties>
       <wizard _description="JPEG" type="video-encoder"
               feeder="default" eater="default">

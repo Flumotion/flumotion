@@ -2,7 +2,7 @@
   <components>
     <component type="tokentest-bouncer"
                base="flumotion/component/bouncers"
-               description="A test bouncer that only allows one token.">
+               _description="A test bouncer that only allows one token.">
 
       <source location="flumotion.component.bouncers.tokentestbouncer" />
 
@@ -13,7 +13,7 @@
 
       <properties>
         <property name="authorized-token" type="string" required="True"
-                  description="The token that is authorized" />
+                  _description="The token that is authorized" />
       </properties>
     </component>
   </components>
@@ -24,7 +24,7 @@
              function="TokenTestPlug"/>
       <properties>
         <property name="authorized-token" type="string" required="True"
-                  description="The token that is authorized" />
+                  _description="The token that is authorized" />
       </properties>
     </plug>
   </plugs>

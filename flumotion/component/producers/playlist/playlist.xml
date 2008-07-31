@@ -2,7 +2,7 @@
   <components>
     <component type="playlist-producer"
                base="flumotion/component/producers/playlist"
-               description="Produces a raw audio/video feed from a playlist of input files, scheduled for particular times.">
+               _description="Produces a raw audio/video feed from a playlist of input files, scheduled for particular times.">
       <source location="flumotion.component.producers.playlist.playlist"/>
       <feeder name="audio"/>
       <feeder name="video"/>
@@ -15,33 +15,33 @@
 
       <properties>
         <property name="audio" type="bool"
-                  description="Output audio"/>
+                  _description="Output audio"/>
         <property name="video" type="bool"
-                  description="Output video"/>
+                  _description="Output video"/>
 
         <property name="video-pattern" type="string"
-                  description="Output video pattern for default video"/>
+                  _description="Output video pattern for default video"/>
         <property name="audio-wave" type="string"
-                  description="Output audio wave for default audio"/>
+                  _description="Output audio wave for default audio"/>
 
         <property name="height" type="int"
-                  description="Scaled output height of video" />
+                  _description="Scaled output height of video" />
         <property name="width" type="int"
-                  description="Scaled output width of video" />
+                  _description="Scaled output width of video" />
         <property name="framerate" type="fraction"
-                  description="Framerate to output" />
+                  _description="Framerate to output" />
         <property name="samplerate" type="int"
-                  description="Samplerate to output" />
+                  _description="Samplerate to output" />
         <property name="channels" type="int"
-                  description="Audio channels to output" />
+                  _description="Audio channels to output" />
 
         <property name="playlist" type="string"
-                  description="Location of the initial playlist file if any" />
+                  _description="Location of the initial playlist file if any" />
         <property name="playlist-directory" type="string"
-                  description="Location of a directory to monitor for playlist files to add" />
+                  _description="Location of a directory to monitor for playlist files to add" />
 
         <property name="base-directory" type="string"
-                  description="Base directory for relative paths in playlist files" />
+                  _description="Base directory for relative paths in playlist files" />
       </properties>
     </component>
   </components>

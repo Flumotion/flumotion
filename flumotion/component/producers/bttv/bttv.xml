@@ -2,7 +2,7 @@
   <components>
     <component type="tvcard-producer"
                base="flumotion/component/producers/bttv"
-              description="A producer that captures a raw video feed from a TV card.">
+              _description="A producer that captures a raw video feed from a TV card.">
       <source location="flumotion.component.producers.bttv.bttv" />
 
       <feeder name="default" />
@@ -23,26 +23,26 @@
 
       <properties>
         <property name="device" type="string" required="yes"
-                  description="Path to the device node" />
+                  _description="Path to the device node" />
         <property name="channel" type="string" required="no"
-                  description="Input channel (TV/Composite1/S-Video/...)" />
+                  _description="Input channel (TV/Composite1/S-Video/...)" />
         <property name="signal" type="string" required="no"
-                  description="Signal type (PAL/SECAM/NTSC/...)" />
+                  _description="Signal type (PAL/SECAM/NTSC/...)" />
         <property name="width" type="int"
-                  description="Width of the produced video" />
+                  _description="Width of the produced video" />
         <property name="height" type="int"
-                  description="Height of the produced video" />
+                  _description="Height of the produced video" />
         <property name="framerate" type="fraction"
-                  description="Frame rate of the produced video" />
+                  _description="Frame rate of the produced video" />
 <!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no"
-                  description="Hue of the video (0-65535)" />
+                  _description="Hue of the video (0-65535)" />
         <property name="saturation" type="int" required="no"
-                  description="Saturation of the video (0-65535)" />
+                  _description="Saturation of the video (0-65535)" />
         <property name="brightness" type="int" required="no"
-                  description="Brightness of the video (0-65535)" />
+                  _description="Brightness of the video (0-65535)" />
         <property name="contrast" type="int" required="no"
-                  description="Contrast of the video (0-65535)" />
+                  _description="Contrast of the video (0-65535)" />
       </properties>
     </component>
   </components>

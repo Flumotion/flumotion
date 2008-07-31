@@ -2,7 +2,7 @@
   <components>
 
     <component type="ogg-muxer" base="flumotion/component/muxers"
-               description="Muxes encoded feeds into an Ogg feed.">
+               _description="Muxes encoded feeds into an Ogg feed.">
       <source location="flumotion.component.muxers.ogg"/>
       <feeder name="default"/>
       <eater name="default" multiple="yes"/>
@@ -21,7 +21,7 @@
     </component>
 
     <component type="multipart-muxer" base="flumotion/component/muxers"
-               description="Muxes encoded feeds into a Multipart feed.">
+               _description="Muxes encoded feeds into a Multipart feed.">
       <source location="flumotion.component.muxers.multipart"/>
       <feeder name="default"/>
       <eater name="default" multiple="yes"/>

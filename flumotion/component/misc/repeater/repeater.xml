@@ -3,7 +3,7 @@
   <components>
 
     <component type="repeater" base="flumotion/component/misc/repeater"
-               description="A component that simply repeats the feed without any processing.  Useful to transport a feed to a different worker before feeding it to multiple other eaters.">
+               _description="A component that simply repeats the feed without any processing.  Useful to transport a feed to a different worker before feeding it to multiple other eaters.">
       <source location="flumotion.component.misc.repeater.repeater"/>
       <eater name="default"/>
       <feeder name="default"/>
@@ -13,7 +13,7 @@
       </entries>
       <properties>
         <property name="drop-probability" type="float"
-                  description="Fraction of buffers to drop (0.0 - 1.0)" />
+                  _description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
 

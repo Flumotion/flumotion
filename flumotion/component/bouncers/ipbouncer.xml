@@ -1,7 +1,7 @@
 <registry>
   <components>
     <component type="ip-bouncer" base="flumotion/component/bouncers"
-               description="A bouncer that authenticates based on remote IP address.">
+               _description="A bouncer that authenticates based on remote IP address.">
       <source location="flumotion.component.bouncers.ipbouncer"/>
 
       <entries>
@@ -11,13 +11,13 @@
       <properties>
 <!-- newlines are not preserved in descriptions -->
         <property name="deny-default" type="bool" required="no"
-                  description="Whether to default to denying authentication.
+                  _description="Whether to default to denying authentication.
 Defaults to True, which is equivalent to Apache's 'Order Allow,Deny'"/>
         <property name="allow" type="string" required="no" multiple="yes"
-                  description="Match rule for allowing authentication. Match
+                  _description="Match rule for allowing authentication. Match
 rules are IP blocks, e.g. 127.0.0.1/32."/>
         <property name="deny" type="string" required="no" multiple="yes"
-                  description="Match rule for denying authentication.
+                  _description="Match rule for denying authentication.
 Uses same syntax as allow rules."/>
       </properties>
     </component>

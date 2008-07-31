@@ -2,7 +2,7 @@
   <components>
     <component type="videotest-producer"
                base="flumotion/component/producers/videotest"
-               description="Produces a raw video feed with a test signal.">
+               _description="Produces a raw video feed with a test signal.">
       <source location="flumotion.component.producers.videotest.videotest" />
 
       <feeder name="default" />
@@ -25,21 +25,21 @@
 
       <properties>
         <property name="height" type="int"
-                  description="Height in pixels" />
+                  _description="Height in pixels" />
         <property name="width" type="int"
-                  description="Width in pixels" />
+                  _description="Width in pixels" />
         <property name="framerate" type="fraction"
-                  description="Video framerate as numerator/denominator" />
+                  _description="Video framerate as numerator/denominator" />
 	<property name="pixel-aspect-ratio" type="fraction"
-		  description="Video pixel aspect ratio as numerator/denominator" />
+		  _description="Video pixel aspect ratio as numerator/denominator" />
         <property name="format" type="string"
-                  description="Video format" />
+                  _description="Video format" />
         <property name="pattern" type="int"
-                  description="Test pattern to show (smpte/snow/black/...)" />
+                  _description="Test pattern to show (smpte/snow/black/...)" />
         <property name="drop-probability" type="float"
-                  description="Fraction of buffers to drop (0.0 - 1.0)" />
+                  _description="Fraction of buffers to drop (0.0 - 1.0)" />
         <property name="overlay-timestamps" type="bool"
-                  description="Whether to overlay buffer timestamps" />
+                  _description="Whether to overlay buffer timestamps" />
       </properties>
     </component>
   </components>

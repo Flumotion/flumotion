@@ -3,7 +3,7 @@
   <components>
 
     <component type="gdp-consumer" base="flumotion/component/consumers/gdp"
-               description="Consumes a feed as a GStreamer TCP server.">
+               _description="Consumes a feed as a GStreamer TCP server.">
       <source location="flumotion.component.consumers.gdp.gdp" />
       <eater name="default" />
       <entries>
@@ -12,7 +12,7 @@
       </entries>
       <properties>
         <property name="port" type="int"
-                  description="Port of the GStreamer TCP server." />
+                  _description="Port of the GStreamer TCP server." />
       </properties>
     </component>
 

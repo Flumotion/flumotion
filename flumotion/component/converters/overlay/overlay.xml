@@ -2,7 +2,7 @@
   <components>
     <component type="overlay-converter"
                base="flumotion/component/converters/overlay"
-               description="Overlays text and images onto a raw video feed.">
+               _description="Overlays text and images onto a raw video feed.">
       <source location="flumotion.component.converters.overlay.overlay"/>
       <eater name="default" />
       <feeder name="default" />
@@ -12,21 +12,21 @@
       </entries>
       <properties>
         <property name="show-text" type="bool"
-                  description="Whether to show text" />
+                  _description="Whether to show text" />
         <property name="text" type="string"
-                  description="Text to show" />
+                  _description="Text to show" />
 
         <property name="fluendo-logo" type="bool"
-                  description="Whether to show a Fluendo logo" />
+                  _description="Whether to show a Fluendo logo" />
         <property name="cc-logo" type="bool"
-                  description="Whether to show a Creative Commons logo" />
+                  _description="Whether to show a Creative Commons logo" />
         <property name="xiph-logo" type="bool"
-                  description="Whether to show a Xiph logo" />
+                  _description="Whether to show a Xiph logo" />
 
         <property name="width" type="int" required="yes"
-                  description="Width of the overlaid image" />
+                  _description="Width of the overlaid image" />
         <property name="height" type="int" required="yes"
-                  description="Height of the overlaid image" />
+                  _description="Height of the overlaid image" />
       </properties>
     </component>
 
