@@ -24,6 +24,9 @@ class ProcessFactory:
         """
         @rtype: L{Process} instance
         """
+        # this is a factory function, so suppress inconsistent return value
+        # warnings
+        __pychecker__ = '--no-returnvalues'
         handle = open('/proc/%d/stat' % pid)
         line = handle.read()
         fields = line.split(' ')
@@ -228,7 +231,6 @@ class JobOrphaned(util.LogCommand):
 
     def do(self, args):
         # get a list of pid, vsize and sort on vsize in reverse order
-        l = []
         processes = getProcesses(prefix='flumotion-job')
         orphaned = [str(pid) for pid, p in processes.items() if p.ppid == 1]
         if not orphaned:

@@ -1,5 +1,12 @@
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	  pychecker more.
+	* flumotion/monitor/nagios/process.py:
+	  Fix a pychecker complaint.
+
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Also handle _description for compound-property.
 	* flumotion/component/bouncers/bouncer.xml:

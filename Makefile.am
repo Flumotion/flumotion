@@ -42,6 +42,8 @@ PYCHECKER_WHITELIST = \
 	    flumotion/job/*.py 			\
 	    flumotion/launch/*.py 		\
 	    flumotion/manager/*.py 		\
+	    flumotion/monitor/*.py 		\
+	    flumotion/monitor/*/*.py 		\
 	    flumotion/service/*.py		\
 	    flumotion/worker/*.py 		\
 	    flumotion/worker/checks/*.py 	\
