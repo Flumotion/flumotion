@@ -1,5 +1,12 @@
 2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/sectionwizard.glade:
+	* flumotion/ui/wizard.py:
+	Add a finish button, and always show and make it
+	sensitive iff it wizard can be finished.
+
+2008-07-31  Johan Dahlin  <johan@flumotion.com>
+
 	* data/Makefile.am:
 	* data/image/Makefile.am:
 	* flumotion/admin/gtk/dialogs.py:
