@@ -109,7 +109,7 @@ else:
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))
     if len(t) < 4:
-        t = t + (0,)
+        t = t + (0, )
     return t
 
 isinstalled = _config['isinstalled']

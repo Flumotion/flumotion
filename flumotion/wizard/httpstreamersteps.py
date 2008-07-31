@@ -221,7 +221,7 @@ class HTTPSpecificStep(ConsumerStep):
     def getDefaultMountPath(self):
         encodingStep = self.wizard.getStep('Encoding')
         return '/%s-%s/' % (str(encodingStep.getMuxerFormat()),
-                            self.getConsumerType(),)
+                            self.getConsumerType(), )
 
     # WizardStep
 
@@ -249,7 +249,7 @@ class HTTPSpecificStep(ConsumerStep):
 
     def _populatePlugins(self):
         def gotEntries(entries):
-            log.debug('httpwizard', 'got %r' % (entries,))
+            log.debug('httpwizard', 'got %r' % (entries, ))
             for entry in entries:
                 if not self._canAddPlug(entry):
                     continue

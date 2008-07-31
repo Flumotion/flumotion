@@ -59,7 +59,7 @@ class AdminAvatar(base.ManagerAvatar):
 
     # override pb.Avatar implementation so we can run admin actions
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
-        benignMethods = ('ping',)
+        benignMethods = ('ping', )
 
         args = broker.unserialize(args)
         kwargs = broker.unserialize(kwargs)

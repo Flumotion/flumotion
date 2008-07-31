@@ -47,7 +47,7 @@ def fractionFromValue(value):
         elif noSlashes == 1:
             parts = value.split('/')
         else:
-            raise ValueError('Expected at most one /, not %r' % (value,))
+            raise ValueError('Expected at most one /, not %r' % (value, ))
         return _frac(*parts)
     elif isinstance(value, tuple):
         if len(value) != 2:

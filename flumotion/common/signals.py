@@ -55,7 +55,7 @@ class SignalMixin(object):
         self.__ensureSignals()
 
         if signalId not in self.__signalConnections:
-            raise ValueError('Unknown signal ID: %s' % (signalId,))
+            raise ValueError('Unknown signal ID: %s' % (signalId, ))
 
         del self.__signalConnections[signalId]
 
@@ -74,7 +74,7 @@ class SignalMixin(object):
                 break
         else:
             raise ValueError(
-                'No signal connected to function: %r' % (function,))
+                'No signal connected to function: %r' % (function, ))
 
         del self.__signalConnections[signalId]
 

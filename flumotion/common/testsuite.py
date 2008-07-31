@@ -39,7 +39,7 @@ class TestCase(unittest.TestCase):
         def failUnlessFailure(self, deferred, *expectedFailures):
             def _cb(result):
                 self.fail("did not catch an error, instead got %r" %
-                          (result,))
+                          (result, ))
             def _eb(failure):
                 failure.trap(*expectedFailures)
                 return failure.value
@@ -248,7 +248,7 @@ def _diff(old, new, desc):
 
     raise AssertionError(
         ("\nError while comparing strings:\n"
-         "%s") % (output,))
+         "%s") % (output, ))
 
 def diffStrings(orig, new, desc='input'):
     def _tolines(s):

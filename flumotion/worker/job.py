@@ -149,7 +149,7 @@ class ComponentJobAvatar(base.BaseJobAvatar):
 
 
 class ComponentJobInfo(base.JobInfo):
-    __slots__ = ('conf',)
+    __slots__ = ('conf', )
 
     def __init__(self, pid, avatarId, type, moduleName, methodName,
                  nice, bundles, conf):
@@ -282,7 +282,7 @@ class CheckJobHeaven(base.BaseJobHeaven):
                        job.avatarId)
             return defer.succeed(job)
 
-        avatarId = 'check-%d' % (self._checkCount,)
+        avatarId = 'check-%d' % (self._checkCount, )
         self._checkCount += 1
 
         self.debug('spawning new job %s to run a check', avatarId)

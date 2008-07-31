@@ -92,7 +92,7 @@ class GIODirectory(Copyable, RemoteCopy):
 
     def getFiles(self):
         import gio
-        log.info('vfsgio', 'getting files for %s' % (self.path,))
+        log.info('vfsgio', 'getting files for %s' % (self.path, ))
         retval = []
         gfile = gio.File(os.path.abspath(self.path))
         try:
@@ -111,7 +111,7 @@ class GIODirectory(Copyable, RemoteCopy):
             else:
                 obj = GIOFile(self.path, gfile)
             retval.append(obj)
-        log.info('vfsgio', 'returning %r' % (retval,))
+        log.info('vfsgio', 'returning %r' % (retval, ))
         return succeed(retval)
 
 

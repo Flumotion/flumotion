@@ -113,7 +113,7 @@ def buildEatersDict(eatersList, eaterDefs):
             if not eaterDefs:
                 raise errors.ConfigError(
                     "Feed %r cannot be connected, component has no eaters" %
-                    (feedId,))
+                    (feedId, ))
             # cope with old <source> entries
             eater = eaterDefs[0].getName()
         if alias is None:
@@ -134,7 +134,7 @@ def buildEatersDict(eatersList, eaterDefs):
         if e.getRequired() and not eater in eaters:
             raise errors.ConfigError("Component wants to eat on %s,"
                               " but no feeders specified."
-                              % (e.getName(),))
+                              % (e.getName(), ))
         if not e.getMultiple() and len(eaters.get(eater, [])) > 1:
             raise errors.ConfigError("Component does not support multiple "
                               "sources feeding %s (%r)"
@@ -147,7 +147,7 @@ def buildEatersDict(eatersList, eaterDefs):
     while aliases:
         alias = aliases.pop()
         if alias in aliases:
-            raise errors.ConfigError("Duplicate alias: %s" % (alias,))
+            raise errors.ConfigError("Duplicate alias: %s" % (alias, ))
 
     return eaters
 
@@ -174,7 +174,7 @@ def buildVirtualFeeds(feedPairs, feeders):
             common.parseFeedId(virtual)
         except:
             raise errors.ConfigError('virtual feed name not a valid feedId: %s'
-                              % (virtual,))
+                              % (virtual, ))
         ret[virtual] = real
     return ret
 
@@ -202,7 +202,7 @@ def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
         keyBase = ()
 
     for k in old:
-        key = (keyBase + (k,))
+        key = (keyBase + (k, ))
         if k not in new:
             onlyOld.append((key, old[k]))
         elif old[k] != new[k]:
@@ -212,7 +212,7 @@ def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
                 diff.append((key, old[k], new[k]))
 
     for k in new:
-        key = (keyBase + (k,))
+        key = (keyBase + (k, ))
         if k not in old:
             onlyNew.append((key, new[k]))
 
@@ -222,7 +222,7 @@ def dictDiffMessageString((old, new, diff), oldLabel='old',
                           newLabel='new'):
     def ref(label, k):
         return "%s%s: '%s'" % (label,
-                               ''.join(["[%r]" % (subk,)
+                               ''.join(["[%r]" % (subk, )
                                         for subk in k[:-1]]),
                                k[-1])
 
@@ -261,7 +261,7 @@ class ConfigEntryComponent(log.Loggable):
         except errors.ConfigError, e:
             # reuse the original exception?
             e.args = ("While parsing component %s: %s"
-                      % (name, log.getExceptionMessage(e)),)
+                      % (name, log.getExceptionMessage(e)), )
             raise
 
     def _buildVersionTuple(self, version):
@@ -405,14 +405,14 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         # </component>
 
         attrs = self.parseAttributes(node, ('name', 'type'),
-                ('label', 'worker', 'project', 'version',))
+                ('label', 'worker', 'project', 'version', ))
         name, componentType, label, worker, project, version = attrs
         if needsWorker and not worker:
             raise errors.ConfigError('component %s does not specify the worker '
-                              'that it is to run on' % (name,))
+                              'that it is to run on' % (name, ))
         elif worker and not needsWorker:
             raise errors.ConfigError('component %s specifies a worker to run '
-                              'on, but does not need a worker' % (name,))
+                              'on, but does not need a worker' % (name, ))
 
         properties = []
         plugs = []
@@ -457,7 +457,7 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         return self._parseFeedId(self.parseTextNode(node))
 
     def _parseFeed(self, node):
-        alias, = self.parseAttributes(node, (), ('alias',))
+        alias, = self.parseAttributes(node, (), ('alias', ))
         feedId = self._parseFeedId(self.parseTextNode(node))
         return feedId, alias
 
@@ -465,14 +465,14 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         # <eater name="eater-name">
         #   <feed alias="foo"?>feeding-component:feed-name</feed>*
         # </eater>
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         feeds = []
         parsers = {'feed': (self._parseFeed, feeds.append)}
         self.parseFromTable(node, parsers)
         if len(feeds) == 0:
             # we have an eater node with no feeds
             raise errors.ConfigError(
-                "Eater node %s with no <feed> nodes, is not allowed" % (name,))
+                "Eater node %s with no <feed> nodes, is not allowed" % (name, ))
         return [(name, feedId, alias) for feedId, alias in feeds]
 
 class PlanetConfigParser(FlumotionConfigParser):
@@ -501,7 +501,7 @@ class PlanetConfigParser(FlumotionConfigParser):
         root = self.doc.documentElement
         if root.nodeName != 'planet':
             raise errors.ConfigError("unexpected root node': %s" %
-                (root.nodeName,))
+                (root.nodeName, ))
 
         parsers = {'atmosphere': (self._parseAtmosphere,
                                   self.atmosphere.components.update),
@@ -533,7 +533,7 @@ class PlanetConfigParser(FlumotionConfigParser):
         #   ...
         # </flow>
         # "name" cannot be atmosphere or manager
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         if name == 'atmosphere':
             raise errors.ConfigError("<flow> cannot have 'atmosphere' as name")
         if name == 'manager':
@@ -633,7 +633,7 @@ class ManagerConfigParser(FlumotionConfigParser):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
             raise errors.ConfigError("unexpected root node': %s" %
-                (root.nodeName,))
+                (root.nodeName, ))
 
         parsers = {'atmosphere': (_ignore, _ignore),
                    'flow': (_ignore, _ignore),
@@ -644,7 +644,7 @@ class ManagerConfigParser(FlumotionConfigParser):
     def _parseManagerWithoutRegistry(self, node):
         # We parse without asking for a registry so the registry doesn't
         # verify before knowing the debug level
-        name, = self.parseAttributes(node, (), ('name',))
+        name, = self.parseAttributes(node, (), ('name', ))
         ret = ConfigEntryManager(name, None, None, None, None, None,
                                  None, self.plugs)
 
@@ -683,7 +683,7 @@ class ManagerConfigParser(FlumotionConfigParser):
         def gotcomponent(val):
             if self.bouncer is not None:
                 raise errors.ConfigError('can only have one bouncer '
-                                  '(%s is superfluous)' % (val.name,))
+                                  '(%s is superfluous)' % (val.name, ))
             # FIXME: assert that it is a bouncer !
             self.bouncer = val
         def parseplugs(node):
@@ -711,7 +711,7 @@ class ManagerConfigParser(FlumotionConfigParser):
         root = self.doc.documentElement
         if not root.nodeName == 'planet':
             raise errors.ConfigError("unexpected root node': %s" %
-                (root.nodeName,))
+                (root.nodeName, ))
 
         parsers = {'atmosphere': (_ignore, _ignore),
                    'flow': (_ignore, _ignore),

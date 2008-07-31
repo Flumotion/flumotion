@@ -990,14 +990,14 @@ class AdminWindow(Loggable, GladeDelegate):
         def callbackMultiple(results, self, mid):
             self._statusbar.remove('main', mid)
             self._setStatusbarText(
-                _("%s components.") % (done,))
+                _("%s components.") % (done, ))
 
         def errbackMultiple(failure, self, mid):
             self._statusbar.remove('main', mid)
             self.warning("Failed to %s some components: %s." % (
                 action.lower(), failure))
             self._setStatusbarText(
-                _("Failed to %s some components.") % (action,))
+                _("Failed to %s some components.") % (action, ))
 
         f = gettext.dngettext(
             configure.PACKAGE,
@@ -1181,7 +1181,7 @@ class AdminWindow(Loggable, GladeDelegate):
                 _("Connection to manager on %s was refused.") % (
                 self._adminModel.connectionInfoStr()),
                 _("Connection to %s was refused") %
-                (self._adminModel.adminInfoStr(),))
+                (self._adminModel.adminInfoStr(), ))
 
         self.debug("handling connection-refused")
         reactor.callLater(0, refusedLater)
@@ -1192,7 +1192,7 @@ class AdminWindow(Loggable, GladeDelegate):
             _("Connection to manager on %s failed (%s).") % (
             self._adminModel.connectionInfoStr(), reason),
             _("Connection to %s failed") %
-            (self._adminModel.adminInfoStr(),))
+            (self._adminModel.adminInfoStr(), ))
 
     def _openRecentConnection(self):
         d = ConnectionsDialog(parent=self._window)
@@ -1345,7 +1345,7 @@ You can do remote component calls using:
                 _("Cannot find a program to display the flumotion manual."))
             return
         gobject.spawn_async([executable,
-                             'ghelp:%s' % (configure.PACKAGE,)])
+                             'ghelp:%s' % (configure.PACKAGE, )])
 
     ### admin model callbacks
 

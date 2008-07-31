@@ -125,7 +125,7 @@ def get_plugin_version(plugin_name):
 
     versionTuple = tuple([int(x) for x in plugin.get_version().split('.')])
     if len(versionTuple) < 4:
-        versionTuple = versionTuple + (0,)
+        versionTuple = versionTuple + (0, )
     return versionTuple
 
 # GstPython should have something for this, but doesn't.

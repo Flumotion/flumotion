@@ -539,7 +539,7 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         kwargs = broker.unserialize(kwargs)
         method = getattr(self, "remote_%s" % message, None)
         if method is None:
-            raise pb.NoSuchMethod("No such method: remote_%s" % (message,))
+            raise pb.NoSuchMethod("No such method: remote_%s" % (message, ))
 
         level = flog.DEBUG
         if message == 'ping': level = flog.LOG
@@ -561,13 +561,13 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): %r', (flog.ellipsize(result),), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): failure %r', (failure,), args, kwargs)
+                '): failure %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 
@@ -599,7 +599,7 @@ class Avatar(pb.Avatar, flog.Loggable):
             args, kwargs):
         method = getattr(self, "perspective_%s" % message, None)
         if method is None:
-            raise pb.NoSuchMethod("No such method: perspective_%s" % (message,))
+            raise pb.NoSuchMethod("No such method: perspective_%s" % (message, ))
 
         level = flog.DEBUG
         if message == 'ping': level = flog.LOG
@@ -618,13 +618,13 @@ class Avatar(pb.Avatar, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): %r', (flog.ellipsize(result),), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): failure %r', (failure,), args, kwargs)
+                '): failure %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 
@@ -688,14 +688,14 @@ class Avatar(pb.Avatar, flog.Loggable):
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (flog.ellipsize(result),), args, kwargs)
+                '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
 
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (failure,), args, kwargs)
+                '): %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 

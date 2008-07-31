@@ -58,10 +58,10 @@ def _registerBackends():
             module = __import__(backend, {}, {}, ' ')
         except ImportError:
             log.info('vfs', 'skipping backend %s, dependency missing' % (
-                backend,))
+                backend, ))
             continue
 
-        log.info('vfs', 'adding backend %s' % (backend,))
+        log.info('vfs', 'adding backend %s' % (backend, ))
         backend = getattr(module, attributeName)
         try:
             backend('/')

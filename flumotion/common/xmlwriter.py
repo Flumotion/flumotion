@@ -45,7 +45,7 @@ class XMLWriter(object):
         for attr, value in attributes:
             if value is None:
                 raise ValueError(
-                    "value for attribute %s cannot be None" % (attr,))
+                    "value for attribute %s cannot be None" % (attr, ))
             attrLength += 1 + len(attr) + len(quoteattr(value))
         return attrLength + indent
 
@@ -64,7 +64,7 @@ class XMLWriter(object):
                 attrValue += '\n%s' % (self._indentChar * indentLen)
             if value is None:
                 raise ValueError(
-                    "value for attribute %s cannot be None" % (attr,))
+                    "value for attribute %s cannot be None" % (attr, ))
             attrValue += ' %s=%s' % (attr, quoteattr(value))
             if first:
                 first = False
@@ -76,7 +76,7 @@ class XMLWriter(object):
         self.writeLine('<%s%s>' % (tagName, attrs))
 
     def _closeTag(self, tagName):
-        self.writeLine('</%s>' % (tagName,))
+        self.writeLine('</%s>' % (tagName, ))
 
     # Public API
 
@@ -101,7 +101,7 @@ class XMLWriter(object):
         """
         if attributes is None:
             attributes = []
-        prefix = '<%s' % (tagName,)
+        prefix = '<%s' % (tagName, )
         if data is not None:
             suffix = '>%s</%s>' % (data, tagName)
         else:

@@ -121,7 +121,7 @@ class IntegrationPlanGenerationTest(testsuite.TestCase):
         plan.wait(process, 0)
         self.assertPlansEqual(plan.ops, [(plan.vm.checkExits, ()),
                                          (plan.vm.spawn, process),
-                                         (plan.vm.checkExits, (process,)),
+                                         (plan.vm.checkExits, (process, )),
                                          (plan.vm.wait, process, 0)])
         plan._cleanOutputDir()
 

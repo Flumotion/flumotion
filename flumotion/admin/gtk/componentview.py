@@ -244,7 +244,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         if not isinstance(placeholder, Placeholder):
             raise AssertionError(
                 "placeholder must be a Placeholder subclass, not %r" % (
-                placeholder,))
+                placeholder, ))
 
         widget = placeholder.getWidget()
         widget.show()

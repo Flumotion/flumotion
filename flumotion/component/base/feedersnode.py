@@ -79,7 +79,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             return
         value = self._mungeClientId(value)
         self.labels['eater-name'].set_markup(_('<b>%s</b>')
-                                             % (value,))
+                                             % (value, ))
 
     def setFeederClientBytesReadCurrent(self, state, value):
         txt = value and (formatStorage(value) + _('Byte')) or ''

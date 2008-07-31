@@ -121,7 +121,7 @@ class Scenario(object):
     def addSteps(self):
         """Add the wizard section steps specific for this scenario"""
         raise NotImplementedError("%s.addSteps" % (
-            self.__class__.__name__,))
+            self.__class__.__name__, ))
 
     def save(self):
         """Save the content of the wizard
@@ -130,7 +130,7 @@ class Scenario(object):
         @rtype: L{WizardSaver}
         """
         raise NotImplementedError("%s.save" % (
-            self.__class__.__name__,))
+            self.__class__.__name__, ))
 
 class LiveScenario(Scenario):
     short = _("Set up a live stream")

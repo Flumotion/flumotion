@@ -43,7 +43,7 @@ class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
     logCategory = 'htpasswdcrypt'
     # challenger type first, because it's more secure thus preferable
     keycardClasses = (keycards.KeycardUACPCC, keycards.KeycardUACPP)
-    challengeResponseClasses = (keycards.KeycardUACPCC,)
+    challengeResponseClasses = (keycards.KeycardUACPCC, )
 
     def do_setup(self):
         conf = self.config

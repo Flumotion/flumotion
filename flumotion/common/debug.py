@@ -213,7 +213,7 @@ class AllocMonitor(object):
             w = new[k]
             size += w.size
             if not w.parents:
-                print "Unreferenced object %r, what?" % (w,)
+                print "Unreferenced object %r, what?" % (w, )
             for p in w.parents:
                 if id(p.obj) == id(self.__dict__):
                     continue

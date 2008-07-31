@@ -251,7 +251,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
             bundler = basket.getBundlerByName(name)
             if not bundler:
                 raise errors.NoBundleError('The bundle named "%s" was not found'
-                                           % (name,))
+                                           % (name, ))
             zips[name] = bundler.bundle().getZip()
         return zips
 

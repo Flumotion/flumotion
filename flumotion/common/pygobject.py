@@ -150,7 +150,7 @@ def gproperty(type_, name, desc, *args, **kwargs):
         else:
             raise Exception('Invalid GObject property flag: %r=%r' % (k, v))
 
-    _dict[name] = (type_, name, desc) + args + tuple((flags,))
+    _dict[name] = (type_, name, desc) + args + tuple((flags, ))
 
 def type_register(klass):
     if klass.__gtype__.pytype is not klass:

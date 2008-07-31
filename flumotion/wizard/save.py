@@ -67,7 +67,7 @@ class WizardSaver(object):
             not isinstance(audioProducer, AudioProducer)):
             raise TypeError(
                 "audioProducer must be a AudioProducer subclass, not %r" % (
-                audioProducer,))
+                audioProducer, ))
         self._audioProducer = audioProducer
 
     def setVideoProducer(self, videoProducer):
@@ -79,7 +79,7 @@ class WizardSaver(object):
             not isinstance(videoProducer, VideoProducer)):
             raise TypeError(
                 "videoProducer must be a VideoProducer subclass, not %r" % (
-                videoProducer,))
+                videoProducer, ))
         self._videoProducer = videoProducer
 
     def setVideoOverlay(self, videoOverlay):
@@ -98,7 +98,7 @@ class WizardSaver(object):
             not isinstance(audioEncoder, AudioEncoder)):
             raise TypeError(
                 "audioEncoder must be a AudioEncoder subclass, not %r" % (
-                audioEncoder,))
+                audioEncoder, ))
         self._audioEncoder = audioEncoder
 
     def setVideoEncoder(self, videoEncoder):
@@ -110,7 +110,7 @@ class WizardSaver(object):
             not isinstance(videoEncoder, VideoEncoder)):
             raise TypeError(
                 "videoEncoder must be a VideoEncoder subclass, not %r" % (
-                videoEncoder,))
+                videoEncoder, ))
         self._videoEncoder = videoEncoder
 
     def setMuxer(self, muxerType, muxerWorker):
@@ -133,7 +133,7 @@ class WizardSaver(object):
           audio/video/audio-video
         @type consumerType: string
         """
-        server.name = 'http-server-%s' % (consumerType,)
+        server.name = 'http-server-%s' % (consumerType, )
         self._atmosphereComponents.append(server)
 
     def addPorter(self, porter, consumerType):
@@ -144,7 +144,7 @@ class WizardSaver(object):
           audio/video/audio-video
         @type consumerType: string
         """
-        porter.name = 'porter-%s' % (consumerType,)
+        porter.name = 'porter-%s' % (consumerType, )
         self._atmosphereComponents.append(porter)
 
     def addConsumer(self, consumer, consumerType):

@@ -180,7 +180,7 @@ def _parse_typed_args(spec, args):
             f.close()
             return contents
         except OSError:
-            raise ParseException("Failed to read file %s" % (filename,))
+            raise ParseException("Failed to read file %s" % (filename, ))
 
     def _do_parse_typed_args(spec, args):
         accum = []
@@ -316,10 +316,10 @@ def do_managerinvoke(model, quit, methodName, *args):
 
     try:
         v = d.value()
-        print "Invoke of %s was successful." % (methodName,)
+        print "Invoke of %s was successful." % (methodName, )
         print v
     except errors.NoMethodError:
-        print "No method '%s' on manager" % (methodName,)
+        print "No method '%s' on manager" % (methodName, )
 
     quit()
 do_managerinvoke = defer_generator(do_managerinvoke)
@@ -422,7 +422,7 @@ def do_avatar_action(model, quit, avatarPath, action):
             print "Components in flow now completed action %s." % action[0]
         elif avatarPath[0] == 'atmosphere':
             print "Components in atmosphere now completed action %s." % (
-                action[0],)
+                action[0], )
         elif avatarPath[0] == 'root':
             print "Components in / now completed action %s." % action[0]
         else:
@@ -432,7 +432,7 @@ do_avatar_action = defer_generator(do_avatar_action)
 
 def do_stop(model, quit, avatarPath):
     return do_avatar_action(model, quit, avatarPath, ('stop', 'componentStop',
-        (moods.sleeping,), moods.can_stop))
+        (moods.sleeping, ), moods.can_stop))
 
 def do_start(model, quit, avatarPath):
     return do_avatar_action(model, quit, avatarPath, ('start', 'componentStart',

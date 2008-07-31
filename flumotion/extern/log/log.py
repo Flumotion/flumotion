@@ -123,7 +123,7 @@ def registerCategory(category):
 
         # our glob is unix filename style globbing, so cheat with fnmatch
         # fnmatch.fnmatch didn't work for this, so don't use it
-        if category in fnmatch.filter((category,), spec):
+        if category in fnmatch.filter((category, ), spec):
             # we have a match, so set level based on string or int
             if not value:
                 continue
@@ -262,9 +262,9 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
         debugArgs.extend(items)
     debugArgs.extend(endArgs)
     format = startFormat \
-              + ', '.join(('%s',) * len(args)) \
+              + ', '.join(('%s', ) * len(args)) \
               + (kwargs and ', ' or '') \
-              + ', '.join(('%s=%r',) * len(kwargs)) \
+              + ', '.join(('%s=%r', ) * len(kwargs)) \
               + endFormat
     return format, debugArgs
 
@@ -422,9 +422,9 @@ def _preformatLevels(noColorEnvVarName):
 
         t = termcolor.TerminalController()
         formatter = lambda level: ''.join((t.BOLD, getattr(t, COLORS[level]),
-                            format % (_LEVEL_NAMES[level-1],), t.NORMAL))
+                            format % (_LEVEL_NAMES[level-1], ), t.NORMAL))
     else:
-        formatter = lambda level: format % (_LEVEL_NAMES[level-1],)
+        formatter = lambda level: format % (_LEVEL_NAMES[level-1], )
 
     for level in ERROR, WARN, INFO, DEBUG, LOG:
         _FORMATTED_LEVELS.append(formatter(level))

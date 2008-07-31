@@ -204,7 +204,7 @@ class ConversionStep(WorkerWizardStep):
 
     def _loadStep(self, combo):
         entry = combo.get_selected()
-        assert entry, 'combo %s has nothing selected' % (combo,)
+        assert entry, 'combo %s has nothing selected' % (combo, )
         
         def pluginLoaded(plugin, entry):
             if plugin is None:

@@ -31,7 +31,7 @@ class LogTester(log.Loggable):
 
 class LogFunctionTester(log.Loggable):
     def logFunction(self, format, *args):
-        return (("override " + format),) + args[1:]
+        return (("override " + format), ) + args[1:]
 
 class TestLog(unittest.TestCase):
     def setUp(self):

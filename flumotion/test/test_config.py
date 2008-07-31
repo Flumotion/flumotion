@@ -1123,11 +1123,11 @@ class TestDictDiff(testsuite.TestCase):
         ass = self.assertOND
         ass({}, {}, [], [], [])
 
-        ass({'foo': 'bar'}, {}, [(('foo',), 'bar')], [], [])
+        ass({'foo': 'bar'}, {}, [(('foo', ), 'bar')], [], [])
 
-        ass({}, {'foo': 'bar'}, [], [(('foo',), 'bar')], [])
+        ass({}, {'foo': 'bar'}, [], [(('foo', ), 'bar')], [])
 
-        ass({'foo': 'bar'}, {'foo': 'baz'}, [], [], [(('foo',), 'bar', 'baz')])
+        ass({'foo': 'bar'}, {'foo': 'baz'}, [], [], [(('foo', ), 'bar', 'baz')])
 
     def testRecursive(self):
         ass = self.assertOND
@@ -1135,7 +1135,7 @@ class TestDictDiff(testsuite.TestCase):
 
         ass({'foo': {'bar': 'baz'}},
             {},
-            [(('foo',), {'bar':'baz'})],
+            [(('foo', ), {'bar':'baz'})],
             [],
             [])
 
@@ -1154,7 +1154,7 @@ class TestDictDiff(testsuite.TestCase):
         ass({},
             {'foo': {'bar': 'baz'}},
             [],
-            [(('foo',), {'bar':'baz'})],
+            [(('foo', ), {'bar':'baz'})],
             [])
 
         ass({'foo': {'bar': 'baz'}},

@@ -40,7 +40,7 @@ def _connectToManager(win, manager, ssl):
     try:
         info = parsePBConnectionInfoRecent(manager, use_ssl=ssl)
     except OptionError, e:
-        raise SystemExit("ERROR: %s" % (e,))
+        raise SystemExit("ERROR: %s" % (e, ))
 
     d = win.openConnection(info)
     def errbackConnectionRefused(failure):
@@ -49,13 +49,13 @@ def _connectToManager(win, manager, ssl):
         print >> sys.stderr, _(
             "ERROR: Could not connect to manager:\n"
             "       The connection to %r was refused.") % (
-            manager,)
+            manager, )
         _retval = 1
         reactor.stop()
 
     def errback(failure):
         global _retval
-        print >> sys.stderr, "ERROR: %s" % (failure.value,)
+        print >> sys.stderr, "ERROR: %s" % (failure.value, )
         _retval = 1
         reactor.stop()
     d.addErrback(errbackConnectionRefused)
@@ -97,7 +97,7 @@ def main(args):
 
     if len(args) > 1:
         log.error('flumotion-admin',
-                  'too many arguments: %r' % (args[1:],))
+                  'too many arguments: %r' % (args[1:], ))
         return 1
 
     from flumotion.ui.icons import register_icons

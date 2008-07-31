@@ -255,7 +255,7 @@ class ComponentAvatar(base.ManagerAvatar):
         if self.clocking:
             self.heaven.masterClockAvailable(self.avatarId, self.clocking)
         else:
-            (port,) = self.vishnu.reservePortsOnWorker(self.getWorkerName(), 1)
+            (port, ) = self.vishnu.reservePortsOnWorker(self.getWorkerName(), 1)
             self.debug('provideMasterClock on port %d', port)
 
             d = self.mindCallRemote('provideMasterClock', port)

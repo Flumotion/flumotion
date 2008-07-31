@@ -296,7 +296,7 @@ class ComponentTestHelper(object, log.Loggable):
             pass
 
         def setup_failed(failure):
-            self.info('*! 1: setup_failed: %r' % (failure,))
+            self.info('*! 1: setup_failed: %r' % (failure, ))
             failure.trap(defer.FirstError)
             return failure.value.subFailure
 
@@ -306,14 +306,14 @@ class ComponentTestHelper(object, log.Loggable):
                 self.debug('About to ask to provide_master_clock()...')
                 d = self._master.comp.provide_master_clock(7600 - 1) # ...hack?
                 def _passthrough_debug(_res):
-                    self.debug('After provide_master_clock() : %r' % (_res,))
+                    self.debug('After provide_master_clock() : %r' % (_res, ))
                     return _res
                 d.addCallback(_passthrough_debug)
                 return d
             return None
 
         def add_delay(value):
-            self.debug('** 3: add_delay: %r' % (value,))
+            self.debug('** 3: add_delay: %r' % (value, ))
             if delay:
                 return delayed_d(delay, value)
             return defer.succeed(value)
@@ -362,12 +362,12 @@ class ComponentTestHelper(object, log.Loggable):
         d = defer.DeferredList([c.stop() for c in rcomps],
                                fireOnOneErrback=1, consumeErrors=1)
         def stop_flow_report(results):
-            self.debug('stop_flow_report: %r' % (results,))
+            self.debug('stop_flow_report: %r' % (results, ))
             return results
         def stop_flow_failed(failure):
-            self.info('stop_flow_failed: %r' % (failure,))
+            self.info('stop_flow_failed: %r' % (failure, ))
             failure.trap(defer.FirstError)
-            self.info('stop_flow_failed! %r' % (failure.value.subFailure,))
+            self.info('stop_flow_failed! %r' % (failure.value.subFailure, ))
             return failure.value.subFailure
         d.addCallbacks(stop_flow_report, stop_flow_failed)
         return d
@@ -377,7 +377,7 @@ class ComponentTestHelper(object, log.Loggable):
         if not HAVE_GTK2REACTOR:
             raise WrongReactor("gtk2reactor isn't available")
 
-        self.debug('run_flow: tasks: %r' % (tasks,))
+        self.debug('run_flow: tasks: %r' % (tasks, ))
         flow_d = start_d
 
         if tasks is None:
@@ -406,7 +406,7 @@ class ComponentTestHelper(object, log.Loggable):
             chained_d = defer.DeferredList([stop_d] + tasks,
                                            fireOnOneErrback=1, consumeErrors=1)
             def chained_failed(failure):
-                self.info('chained_failed: %r' % (failure,))
+                self.info('chained_failed: %r' % (failure, ))
                 failure.trap(defer.FirstError)
                 return failure.value.subFailure
             chained_d.addErrback(chained_failed)
@@ -415,7 +415,7 @@ class ComponentTestHelper(object, log.Loggable):
             chained_d = stop_d
 
         def start_complete(result):
-            self.debug('start_complete: %r' % (result,))
+            self.debug('start_complete: %r' % (result, ))
             flow_started_finished[0] = True
             callids[0] = reactor.callLater(duration, stop_d.callback, None)
             if tasks:
@@ -430,7 +430,7 @@ class ComponentTestHelper(object, log.Loggable):
             return chained_d
 
         def flow_complete(result):
-            self.debug('flow_complete: %r' % (result,))
+            self.debug('flow_complete: %r' % (result, ))
             flow_started_finished[1] = True
             return result
 
@@ -444,7 +444,7 @@ class ComponentTestHelper(object, log.Loggable):
                 stop_timeout_d.errback(StopTimeout('flow stop timed out'))
 
         def clean_calls(result):
-            self.debug('clean_calls: %r' % (result,))
+            self.debug('clean_calls: %r' % (result, ))
             for i, cid in enumerate(callids):
                 if cid is not None:
                     if cid.active():
@@ -459,12 +459,12 @@ class ComponentTestHelper(object, log.Loggable):
                                      fireOnOneErrback=1, fireOnOneCallback=1)
 
         def guard_failed(failure):
-            self.info('guard_failed: %r' % (failure,))
+            self.info('guard_failed: %r' % (failure, ))
             failure.trap(defer.FirstError)
             return failure.value.subFailure
         if stop_flow:
             def _force_stop_flow(result):
-                self.debug('_force_stop_flow: %r' % (result,))
+                self.debug('_force_stop_flow: %r' % (result, ))
                 d = defer.DeferredList([self.stop_flow(), stop_timeout_d],
                                        fireOnOneErrback=1, fireOnOneCallback=1,
                                        consumeErrors=1)
@@ -472,15 +472,15 @@ class ComponentTestHelper(object, log.Loggable):
                     if isinstance(result, failure.Failure):
                         # always return the run's failure first
                         # what do I return if both the run and stop failed?
-                        self.debug('_return_orig[R]: %r' % (result,))
+                        self.debug('_return_orig[R]: %r' % (result, ))
                         return result
                     elif isinstance(stop_result, failure.Failure):
                         # return failure from stop
-                        self.debug('_return_orig[S]: %r' % (stop_result,))
+                        self.debug('_return_orig[S]: %r' % (stop_result, ))
                         return stop_result
                     return result
                 def force_stop_failed(failure):
-                    self.info('force_stop_failed: %r' % (failure,))
+                    self.info('force_stop_failed: %r' % (failure, ))
                     failure.trap(defer.FirstError)
                     return failure.value.subFailure
                 d.addCallbacks(lambda r: r[0], force_stop_failed)

@@ -35,13 +35,13 @@ def get_gst_version(gst):
     elif hasattr(gst, 'version'):
         return gst.version()
     else:
-        return gst.gst_version + (0,)
+        return gst.gst_version + (0, )
 
 def get_pygst_version(gst):
     if hasattr(gst, 'get_pygst_version'):
         return gst.get_pygst_version()
     else:
-        return gst.pygst_version + (0,)
+        return gst.pygst_version + (0, )
 
 def checkTicket347():
     """

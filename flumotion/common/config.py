@@ -82,7 +82,7 @@ def parseCompoundPropertyValue(name, definition, value):
     #    pass
     else:
         raise ConfigError('simple value specified where compound property'
-                          ' (name=%r) expected' % (name,))
+                          ' (name=%r) expected' % (name, ))
     return parsed
 
 def buildPropertyDict(propertyList, propertySpecList):
@@ -103,7 +103,7 @@ def buildPropertyDict(propertyList, propertySpecList):
     prop_specs = dict([(x.name, x) for x in propertySpecList])
     for name, value in propertyList:
         if not name in prop_specs:
-            raise ConfigError('unknown property %s' % (name,))
+            raise ConfigError('unknown property %s' % (name, ))
         definition = prop_specs[name]
 
         if isinstance(definition, registry.RegistryEntryCompoundProperty):
@@ -111,7 +111,7 @@ def buildPropertyDict(propertyList, propertySpecList):
         else:
             if isinstance(value, (list, tuple)):
                 raise ConfigError('compound value specified where simple'
-                                  ' property (name=%r) expected' % (name,))
+                                  ' property (name=%r) expected' % (name, ))
             parsed = parsePropertyValue(name, definition.type, value)
         if definition.multiple:
             vals = ret.get(name, [])
@@ -120,13 +120,13 @@ def buildPropertyDict(propertyList, propertySpecList):
         else:
             if name in ret:
                 raise ConfigError("multiple value specified but not "
-                                  "allowed for property %s" % (name,))
+                                  "allowed for property %s" % (name, ))
             ret[name] = parsed
 
     for name, definition in prop_specs.items():
         if definition.isRequired() and not name in ret:
             raise ConfigError("required but unspecified property %s"
-                              % (name,))
+                              % (name, ))
     return ret
 
 def buildPlugsSet(plugsList, sockets):
@@ -150,7 +150,7 @@ def buildPlugsSet(plugsList, sockets):
         plug = ConfigEntryPlug(plugType, propertyList)
         if plug.socket not in ret:
             raise ConfigError("Unsupported socket type: %s"
-                              % (plug.socket,))
+                              % (plug.socket, ))
         ret[plug.socket].append(plug.config)
     return ret
 
@@ -224,7 +224,7 @@ class BaseConfigParser(fxml.Parser):
             #   <property>
             # socket is unneeded and deprecated; we don't use it.
             plugType, socket = self.parseAttributes(
-                node, ('type',), ('socket',))
+                node, ('type', ), ('socket', ))
             properties = []
             parsers = {'property': (self._parseProperty, properties.append),
                        'compound-property': (self._parseCompoundProperty,
@@ -237,7 +237,7 @@ class BaseConfigParser(fxml.Parser):
         return plugs
 
     def _parseProperty(self, node):
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         return name, self.parseTextNode(node, lambda x: x)
 
     def _parseCompoundProperty(self, node):
@@ -245,7 +245,7 @@ class BaseConfigParser(fxml.Parser):
         #   <property name="name">value</property>*
         #   <compound-property name="name">...</compound-property>*
         # </compound-property>
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         properties = []
         parsers = {'property': (self._parseProperty, properties.append),
                    'compound-property': (self._parseCompoundProperty,

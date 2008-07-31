@@ -127,14 +127,14 @@ def checkWebcam(device, mid):
                      version, minVersion)
             return defer.fail(NotImplementedError())
 
-        pipeline = 'v4l2src name=source device=%s ! fakesink' % (device,)
+        pipeline = 'v4l2src name=source device=%s ! fakesink' % (device, )
         d = do_element_check(pipeline, 'source', probeDevice,
                              state=gst.STATE_PAUSED, set_state_deferred=True)
         return d
 
     def tryV4L1(_):
         log.debug('webcam', 'trying v4l1')
-        pipeline = 'v4lsrc name=source device=%s ! fakesink' % (device,)
+        pipeline = 'v4lsrc name=source device=%s ! fakesink' % (device, )
         d = do_element_check(pipeline, 'source', probeDevice,
                              state=gst.STATE_PAUSED, set_state_deferred=True)
         return d

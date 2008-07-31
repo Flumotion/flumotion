@@ -121,7 +121,7 @@ class CortadoPlug(ComponentPlug):
         if not filename:
             raise ComponentStartError(
                 "Could not find cortado jar file")
-        log.debug('cortado', 'Attaching to %r' % (component,))
+        log.debug('cortado', 'Attaching to %r' % (component, ))
         resource = CortadoDirectoryResource(component.getMountPoint(),
                                             self.args['properties'],
                                             filename)

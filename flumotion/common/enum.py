@@ -99,7 +99,7 @@ class EnumClass(object):
 
         # we reset __enums__ to {} otherwise it retains the other registered
         # ones
-        etype = EnumMetaClass(type_name, (Enum,), {'__enums__': {}})
+        etype = EnumMetaClass(type_name, (Enum, ), {'__enums__': {}})
         for value, name in enumerate(names):
             enum = etype(value, name, nicks[value])
             for extra_key, extra_values in extras.items():

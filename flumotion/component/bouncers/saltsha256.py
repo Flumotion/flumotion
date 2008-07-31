@@ -45,8 +45,8 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
     """
 
     logCategory = 'passwdsaltsha256'
-    keycardClasses = (keycards.KeycardUASPCC,)
-    challengeResponseClasses = (keycards.KeycardUASPCC,)
+    keycardClasses = (keycards.KeycardUASPCC, )
+    challengeResponseClasses = (keycards.KeycardUASPCC, )
 
 
     def do_setup(self):

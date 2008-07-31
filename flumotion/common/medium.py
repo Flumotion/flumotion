@@ -127,14 +127,14 @@ class BaseMedium(fpb.Referenceable):
         def callback(result):
             format, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %s', (log.ellipsize(result),), args, kwargs)
+                '): %s', (log.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
 
         def errback(failure):
             format, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
-                '): %r', (failure,), args, kwargs)
+                '): %r', (failure, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return failure
 

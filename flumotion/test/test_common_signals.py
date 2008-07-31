@@ -39,7 +39,7 @@ class TestSignalMixin(testsuite.TestCase):
         o.connect('foo', trackEmission, 'foo')
         o.emit('foo')
 
-        self.assertEquals(emissions, [('foo', (o,), {})])
+        self.assertEquals(emissions, [('foo', (o, ), {})])
 
     def testMixin(self):
         o = TestObject()
@@ -57,14 +57,14 @@ class TestSignalMixin(testsuite.TestCase):
         o.connect('bar', trackEmission, 'bar', baz='qux')
 
         o.emit('foo')
-        self.assertEquals(emissions, [('foo', (o,), {})])
+        self.assertEquals(emissions, [('foo', (o, ), {})])
         o.emit('foo', 1)
-        self.assertEquals(emissions, [('foo', (o,), {}),
-                                      ('foo', (o,1,), {})])
+        self.assertEquals(emissions, [('foo', (o, ), {}),
+                                      ('foo', (o,1, ), {})])
         o.emit('bar', 'xyzzy')
-        self.assertEquals(emissions, [('foo', (o,), {}),
-                                      ('foo', (o,1,), {}),
-                                      ('bar', (o,'xyzzy',), {'baz':'qux'})])
+        self.assertEquals(emissions, [('foo', (o, ), {}),
+                                      ('foo', (o,1, ), {}),
+                                      ('bar', (o,'xyzzy', ), {'baz':'qux'})])
 
     def testDisconnect(self):
         o = TestObject()

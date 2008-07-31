@@ -105,14 +105,14 @@ class TestEnum(testsuite.TestCase):
     def testEnumError(self):
         # nicks of incorrect length
         self.assertRaises(TypeError, enum.EnumClass, 'Foo',
-                          ('a', 'b'), ('c',))
+                          ('a', 'b'), ('c', ))
         self.assertRaises(TypeError, enum.EnumClass, 'Bar',
-                          ('a',), ('b', 'c'))
+                          ('a', ), ('b', 'c'))
         # extra of invalid type
         self.assertRaises(TypeError, enum.EnumClass, 'Baz',
                           ('a', 'b'), ('b', 'c'), extra=None)
         self.assertRaises(TypeError, enum.EnumClass, 'Boz',
-                          ('a', 'b'), ('b', 'c'), extra=('e',))
+                          ('a', 'b'), ('b', 'c'), extra=('e', ))
 
     def testEnumSet(self):
         FooType = enum.EnumClass('FooType', ('Foo', 'Bar'))

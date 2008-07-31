@@ -159,7 +159,7 @@ class ProcessesStillRunningException(Exception):
         self.processes = processes
     def __str__(self):
         return ('Processes still running at end of test: %r'
-                % (self.processes,))
+                % (self.processes, ))
 
 class TimeoutException(Exception):
     def __init__(self, process, status):
@@ -197,7 +197,7 @@ class Process:
 
     def __init__(self, name, argv, testDir):
         self.name = name
-        self.argv = (_which(argv[0]),) + argv[1:]
+        self.argv = (_which(argv[0]), ) + argv[1:]
         self.testDir = testDir
 
         self.pid = None
@@ -346,7 +346,7 @@ class PlanExecutor:
         self.timeout = timeout
         d = defer.Deferred()
         def run_op(_, op):
-            # print 'Last result: %r' % (_,)
+            # print 'Last result: %r' % (_, )
             # print 'Now running: %s(%r)' % (op[0].__name__, op[1:])
             return op[0](*op[1:])
         for op in ops:
@@ -412,7 +412,7 @@ class Plan:
         self.timeout = timeout
 
     def spawn(self, command, *args):
-        allArgs = (command,) + args
+        allArgs = (command, ) + args
         process, = self.spawnPar(allArgs)
         return process
 

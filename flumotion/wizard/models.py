@@ -62,7 +62,7 @@ class Properties(dict):
         if attr in dict.__dict__:
             raise AttributeError(
                 "Cannot set property %r, it's a dictionary attribute"
-                % (attr,))
+                % (attr, ))
         dict.__setitem__(self, attr, value)
 
     def __setattr__(self, attr, value):
@@ -84,7 +84,7 @@ class Properties(dict):
         return dict.__contains__(self, value.replace('_', '-'))
 
     def __repr__(self):
-        return '<Properties %r>' % (dict.__repr__(self),)
+        return '<Properties %r>' % (dict.__repr__(self), )
 
 
 class Component(object, log.Loggable):
@@ -128,14 +128,14 @@ class Component(object, log.Loggable):
     @property
     def component_type(self):
         import warnings
-        warnings.warn('Use %s.componentType' % (self.__class__.__name,),
+        warnings.warn('Use %s.componentType' % (self.__class__.__name, ),
                       DeprecationWarning, stacklevel=2)
         return self.componentType
 
     def validate(self):
         if not self.worker:
             raise ComponentValidationError(
-                "component %s must have a worker set" % (self.name,))
+                "component %s must have a worker set" % (self.name, ))
 
     def getWorker(self):
         return self.worker
@@ -161,7 +161,7 @@ class Component(object, log.Loggable):
         """
         if not isinstance(component, Component):
             raise TypeError(
-                "component must be a Component, not %r" % (component,))
+                "component must be a Component, not %r" % (component, ))
         self.feeders.append(component)
         component.eaters.append(self)
 
@@ -172,7 +172,7 @@ class Component(object, log.Loggable):
         """
         if not isinstance(component, Component):
             raise TypeError(
-                "component must be a Component, not %r" % (component,))
+                "component must be a Component, not %r" % (component, ))
 
         self.feeders.remove(component)
         component.eaters.remove(self)
@@ -225,12 +225,12 @@ class Producer(Component):
         if self.eaters:
             raise ComponentValidationError(
                 "producer component %s can not have any easters" %
-                (self.name,))
+                (self.name, ))
 
         if not self.feeders:
             raise ComponentValidationError(
                 "producer component %s must have at least one feeder" %
-                (self.name,))
+                (self.name, ))
 
     def getProperties(self):
         properties = super(Producer, self).getProperties()
@@ -255,12 +255,12 @@ class Encoder(Component):
         if not self.eaters:
             raise ComponentValidationError(
                 "encoder component %s must have at least one eater" %
-                (self.name,))
+                (self.name, ))
 
         if not self.feeders:
             raise ComponentValidationError(
                 "encoder component %s must have at least one feeder" %
-                (self.name,))
+                (self.name, ))
 
 
 class Muxer(Component):
@@ -273,12 +273,12 @@ class Muxer(Component):
         if not self.eaters:
             raise ComponentValidationError(
                 "muxer component %s must have at least one eater" %
-                (self.name,))
+                (self.name, ))
 
         if not self.feeders:
             raise ComponentValidationError(
                 "muxer component %s must have at least one feeder" %
-                (self.name,))
+                (self.name, ))
 
 
 class Consumer(Component):
@@ -295,11 +295,11 @@ class Consumer(Component):
             if not self.eaters:
                 raise ComponentValidationError(
                     "consumer component %s must have at least one eater" %
-                    (self.name,))
+                    (self.name, ))
             if self.feeders:
                 raise ComponentValidationError(
                     "consumer component %s cannot have feeders" %
-                    (self.name,))
+                    (self.name, ))
 
     def setPorter(self, porter):
         self._porter = porter
@@ -413,7 +413,7 @@ class Porter(Component):
         self.properties.password = password
 
         if socketPath is None:
-            socketPath = 'flu-%s.socket' % (_generateRandomString(6),)
+            socketPath = 'flu-%s.socket' % (_generateRandomString(6), )
         self.properties.socket_path = socketPath
 
     # Public API

@@ -61,10 +61,10 @@ class FDPorterServer(Connection):
         protocol.dataReceived(additionalData)
 
     def getHost(self):
-        return address.IPv4Address('TCP', *(self.socket.getsockname() + ('INET',)))
+        return address.IPv4Address('TCP', *(self.socket.getsockname() + ('INET', )))
 
     def getPeer(self):
-        return address.IPv4Address('TCP', *(self.client + ('INET',)))
+        return address.IPv4Address('TCP', *(self.client + ('INET', )))
 
 class PorterMedium(medium.BaseMedium):
     """

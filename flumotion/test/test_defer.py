@@ -194,7 +194,7 @@ class TestDefer(testsuite.TestCase):
         d.addCallback(checkexceptionchain)
         def checkResult(res):
             assert self.result == ['oserror', 'zerodivisionerror'],\
-                   "Unexpected exception chain: %r" % (self.result,)
+                   "Unexpected exception chain: %r" % (self.result, )
         d.addCallback(checkResult)
         return d
 

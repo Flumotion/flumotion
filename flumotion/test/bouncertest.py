@@ -94,7 +94,7 @@ class TrivialBouncerTest(testsuite.TestCase):
 
                 if furtherChecks:
                     args = furtherChecks.pop(0)
-                    args += (furtherChecks,)
+                    args += (furtherChecks, )
                     reactor.callLater(*args)
                 else:
                     d.callback('success')

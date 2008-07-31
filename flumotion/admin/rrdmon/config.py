@@ -118,7 +118,7 @@ class ConfigParser(Parser):
 
         res = {}
         table = {}
-        basicOptions = (('rra-spec', True, str, None),)
+        basicOptions = (('rra-spec', True, str, None), )
         for k, required, parser, default in basicOptions:
             table[k] = strparser(parser), ressetter(k)
             if not required:
@@ -145,7 +145,7 @@ class ConfigParser(Parser):
                 raise ConfigError('rrdfile paths should be absolute')
             return str(v)
 
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
 
         res = {'name': name}
         table = {}

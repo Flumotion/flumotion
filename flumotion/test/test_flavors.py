@@ -178,7 +178,7 @@ class TestStateSet(StateTest):
 
     def listen(self, state):
         def event(type):
-            return lambda *x: self.changes.append((type,) + x)
+            return lambda *x: self.changes.append((type, ) + x)
         state.addListener(self, set_=event('set'), append=event('append'),
                           remove=event('remove'), setitem=event('setitem'),
                           delitem=event('delitem'))

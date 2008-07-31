@@ -92,7 +92,7 @@ def callbackResult(value, result):
     """
     I am a callback to add to a do_element_check deferred.
     """
-    log.debug('check', 'returning succeeded Result, value %r' % (value,))
+    log.debug('check', 'returning succeeded Result, value %r' % (value, ))
     result.succeed(value)
     return result
 

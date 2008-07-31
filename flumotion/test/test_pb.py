@@ -56,7 +56,7 @@ class FakePortalWrapperPlaintext:
         self.broker = FakeBroker()
         self.checker = checkers.FlexibleCredentialsChecker()
         self.checker.addUser("username", "password")
-        self.portal = portal.Portal(FakeTRealm(), (self.checker,))
+        self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
 class FakePortalWrapperCrypt:
     # a fake wrapper with a checker that lets username, crypt(password, iq) in
@@ -64,7 +64,7 @@ class FakePortalWrapperCrypt:
         self.checker = checkers.CryptChecker()
         cryptPassword = crypt.crypt('password', 'iq')
         self.checker.addUser("username", cryptPassword)
-        self.portal = portal.Portal(FakeTRealm(), (self.checker,))
+        self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
 # FIXME: using real portal
 class FakeBouncerPortal:

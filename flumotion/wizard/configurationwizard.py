@@ -242,7 +242,7 @@ class ConfigurationWizard(SectionWizard):
         @param taskName: name of the name
         @type taskName: string
         """
-        self.info("waiting for task %s" % (taskName,))
+        self.info("waiting for task %s" % (taskName, ))
         if not self._tasks:
             if self.window1.window is not None:
                 self.window1.window.set_cursor(self._cursorWatch)
@@ -259,7 +259,7 @@ class ConfigurationWizard(SectionWizard):
                 "Stray call to taskFinished(), forgot to call waitForTask()?")
 
         taskName = self._tasks.pop()
-        self.info("task %s has now finished" % (taskName,))
+        self.info("task %s has now finished" % (taskName, ))
         if not self._tasks:
             self.window1.window.set_cursor(None)
             self.blockNext(blockNext)
@@ -336,7 +336,7 @@ class ConfigurationWizard(SectionWizard):
             self.taskFinished()
             return tuple(asked.difference(existing))
 
-        self.waitForTask('check elements %r' % (elementNames,))
+        self.waitForTask('check elements %r' % (elementNames, ))
         d = self._adminModel.checkElements(workerName, elementNames)
         d.addCallback(_checkElementsCallback, workerName)
         return d
@@ -356,10 +356,10 @@ class ConfigurationWizard(SectionWizard):
             self.debug('No admin connected, not checking presence of elements')
             return
 
-        self.debug('requiring elements %r' % (elementNames,))
+        self.debug('requiring elements %r' % (elementNames, ))
         def gotMissingElements(elements, workerName):
             if elements:
-                self.warning('elements %r do not exist' % (elements,))
+                self.warning('elements %r do not exist' % (elements, ))
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
                     "Worker '%s' is missing GStreamer elements '%s'.",
                     len(elements))
@@ -375,7 +375,7 @@ class ConfigurationWizard(SectionWizard):
             self.taskFinished(bool(elements))
             return elements
 
-        self.waitForTask('require elements %r' % (elementNames,))
+        self.waitForTask('require elements %r' % (elementNames, ))
         d = self.checkElements(workerName, *elementNames)
         d.addCallback(gotMissingElements, workerName)
 
@@ -525,7 +525,7 @@ class ConfigurationWizard(SectionWizard):
           - noBundle error: if the component lacks a wizard bundle
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.waitForTask('get wizard entry %s' % (componentType,))
+        self.waitForTask('get wizard entry %s' % (componentType, ))
         self.clear_msg('wizard-bundle')
         d = self._adminModel.callRemote(
             'getEntryByType', componentType, 'wizard')
@@ -542,7 +542,7 @@ class ConfigurationWizard(SectionWizard):
           - noBundle error: if the plug lacks a wizard bundle
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.waitForTask('get wizard plug %s' % (plugType,))
+        self.waitForTask('get wizard plug %s' % (plugType, ))
         self.clear_msg('wizard-bundle')
         d = self._adminModel.callRemote(
             'getPlugEntry', plugType, 'wizard')

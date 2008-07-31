@@ -37,7 +37,7 @@ def checkCortado():
     else:
         msg = filename
 
-    log.debug('cortadocheck', 'filename - %s' % (msg,))
+    log.debug('cortadocheck', 'filename - %s' % (msg, ))
     result = Result()
     result.succeed(filename)
     log.debug('cortadocheck', 'done, returning')

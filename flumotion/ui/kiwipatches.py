@@ -71,7 +71,7 @@ def _open_glade(view, gladefile, domain):
         # is not found, do the same here.
         if not os.path.exists(gladefile):
             raise EnvironmentError("glade file %s does not exist" % (
-                gladefile,))
+                gladefile, ))
     return FluLibgladeWidgetTree(view, gladefile, domain)
 
 # Fixing bug #3259, fixed in kiwi 1.99.15

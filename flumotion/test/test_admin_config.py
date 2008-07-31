@@ -56,7 +56,7 @@ class AdminConfigTest(testsuite.TestCase):
                '<plugs>'
                '</plugs>'
                '</admin>')
-        parser = AdminConfig(('foo.bar',), doc)
+        parser = AdminConfig(('foo.bar', ), doc)
         self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
 
     def testUnknownPlug(self):
@@ -67,7 +67,7 @@ class AdminConfigTest(testsuite.TestCase):
                '</plugs>'
                '</admin>')
         self.assertRaises(errors.UnknownPlugError,
-                          lambda: AdminConfig(('foo.bar',), doc))
+                          lambda: AdminConfig(('foo.bar', ), doc))
 
     def testUnknownSocket(self):
         doc = ('<admin>'
@@ -77,5 +77,5 @@ class AdminConfigTest(testsuite.TestCase):
                '</plugs>'
                '</admin>')
         self.assertRaises(errors.ConfigError,
-                          lambda: AdminConfig(('foo.bar',), doc))
+                          lambda: AdminConfig(('foo.bar', ), doc))
 

@@ -466,7 +466,7 @@ class RegistryParser(fxml.Parser):
             return self._components[name]
         except KeyError:
             raise errors.UnknownComponentError("unknown component type:"
-                                               " %s" % (name,))
+                                               " %s" % (name, ))
 
     def getPlugs(self):
         return self._plugs.values()
@@ -476,7 +476,7 @@ class RegistryParser(fxml.Parser):
             return self._plugs[name]
         except KeyError:
             raise errors.UnknownPlugError("unknown plug type: %s"
-                                          % (name,))
+                                          % (name, ))
 
     def _parseComponents(self, node):
         # <components>
@@ -563,7 +563,7 @@ class RegistryParser(fxml.Parser):
 
     def _parseSource(self, node):
         # <source location="..."/>
-        location, = self.parseAttributes(node, ('location',))
+        location, = self.parseAttributes(node, ('location', ))
         return location
 
     def _parseProperty(self, node):
@@ -601,7 +601,7 @@ class RegistryParser(fxml.Parser):
         # returns: RegistryEntryCompoundProperty
 
         # F0.8: remove description, require _description
-        attrs = self.parseAttributes(node, required=('name',),
+        attrs = self.parseAttributes(node, required=('name', ),
             optional=('required', 'multiple', 'description', '_description'))
         name, required, multiple, description, _description = attrs
         if description:
@@ -670,7 +670,7 @@ class RegistryParser(fxml.Parser):
         # <socket type=""/>
         # returns: str of the type
 
-        socketType, = self.parseAttributes(node, ('type',))
+        socketType, = self.parseAttributes(node, ('type', ))
         return socketType
 
     def _parseSockets(self, node):
@@ -711,7 +711,7 @@ class RegistryParser(fxml.Parser):
 
     def _parseEater(self, node):
         # <eater name="..." [required="yes/no"] [multiple="yes/no"]/>
-        attrs = self.parseAttributes(node, ('name',), ('required', 'multiple'))
+        attrs = self.parseAttributes(node, ('name', ), ('required', 'multiple'))
         name, required, multiple = attrs
         # only required defaults to True
         required = common.strToBool(required or 'True')
@@ -721,7 +721,7 @@ class RegistryParser(fxml.Parser):
 
     def _parseFeeder(self, node):
         # <feeder name="..."/>
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         return name
 
     def _parseSynchronization(self, node):
@@ -733,7 +733,7 @@ class RegistryParser(fxml.Parser):
         return required, clock_priority
 
     def _parsePlugEntry(self, node):
-        attrs = self.parseAttributes(node, ('location', 'function'), ('type',))
+        attrs = self.parseAttributes(node, ('location', 'function'), ('type', ))
         location, function, entryType = attrs
         if not entryType:
             entryType = 'default'
@@ -853,7 +853,7 @@ class RegistryParser(fxml.Parser):
         #   <directories>
         # </bundle>
 
-        attrs = self.parseAttributes(node, ('name',), ('project', 'under'))
+        attrs = self.parseAttributes(node, ('name', ), ('project', 'under'))
         name, project, under = attrs
         project = project or configure.PACKAGE
         under = under or 'pythondir'
@@ -870,7 +870,7 @@ class RegistryParser(fxml.Parser):
         return RegistryEntryBundle(name, project, under, dependencies, directories)
 
     def _parseBundleDependency(self, node):
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
         return name
 
     def _parseBundleDependencies(self, node):
@@ -898,7 +898,7 @@ class RegistryParser(fxml.Parser):
         return directories
 
     def _parseBundleDirectoryFilename(self, node, name):
-        attrs = self.parseAttributes(node, ('location',), ('relative',))
+        attrs = self.parseAttributes(node, ('location', ), ('relative', ))
         location, relative = attrs
 
         if not relative:
@@ -910,7 +910,7 @@ class RegistryParser(fxml.Parser):
         # <directory name="">
         #   <filename location="" [ relative="" ] >
         # </directory>
-        name, = self.parseAttributes(node, ('name',))
+        name, = self.parseAttributes(node, ('name', ))
 
         filenames = []
         def parseFilename(node):
@@ -992,7 +992,7 @@ class RegistryParser(fxml.Parser):
 
     def _parseDirectory(self, node):
         # <directory filename="..."/>
-        filename, = self.parseAttributes(node, ('filename',))
+        filename, = self.parseAttributes(node, ('filename', ))
         return RegistryDirectory(filename)
 
     def _parseComponentWizard(self, node):
@@ -1040,19 +1040,19 @@ class RegistryParser(fxml.Parser):
         # Producers and Encoders cannot have provided
         if accepts and (isProducer or isEncoder):
             err = ('<wizard type="%s"> does not allow an accepted '
-                   'media-type.') % (parent_type,)
+                   'media-type.') % (parent_type, )
         # Encoders, Muxers and Consumers must have an accepted
         elif not accepts and (isMuxer or isConsumer):
             err = ('<wizard type="%s"> requires at least one accepted '
-                   'media-type.') % (parent_type,)
+                   'media-type.') % (parent_type, )
         # Producers and Consumers cannot have provided
         elif provides and (isProducer or isConsumer):
             err = ('<wizard type="%s"> does not allow a provided '
-                   'media-type.') % (parent_type,)
+                   'media-type.') % (parent_type, )
         # Producers, Encoders and Muxers must have exactly one provided
         if len(provides) != 1 and (isEncoder or isMuxer):
             err = ('<wizard type="%s"> requires exactly one provided '
-                   'media-type.') % (parent_type,)
+                   'media-type.') % (parent_type, )
 
         if err:
             raise fxml.ParserError(err)
@@ -1062,12 +1062,12 @@ class RegistryParser(fxml.Parser):
 
     def _parseAcceptFormat(self, node):
         # <accept-format media-type="..."/>
-        media_type, = self.parseAttributes(node, ('media-type',))
+        media_type, = self.parseAttributes(node, ('media-type', ))
         return RegistryEntryWizardFormat(media_type)
 
     def _parseProvideFormat(self, node):
         # <provide-format media-type="..."/>
-        media_type, = self.parseAttributes(node, ('media-type',))
+        media_type, = self.parseAttributes(node, ('media-type', ))
         return RegistryEntryWizardFormat(media_type)
 
 
@@ -1193,14 +1193,14 @@ class RegistryWriter(log.Loggable):
                     w(i, ('<property name="%s" type="%s"'
                           % (prop.getName(), prop.getType())))
                     w(i, ('          description=%s'
-                          % (e(prop.getDescription()),)))
+                          % (e(prop.getDescription()), )))
                     w(i, ('          required="%s" multiple="%s"/>'
                           % (prop.isRequired(), prop.isMultiple())))
 
         def _dump_compound(i, cprop, ioff=2):
-            w(i, ('<compound-property name="%s"' % (cprop.getName(),)))
+            w(i, ('<compound-property name="%s"' % (cprop.getName(), )))
             w(i, ('                   description=%s'
-                  % (e(cprop.getDescription()),)))
+                  % (e(cprop.getDescription()), )))
             w(i, ('                   required="%s" multiple="%s">'
                   % (cprop.isRequired(), cprop.isMultiple())))
             _dump_proplist(i + ioff, cprop.getProperties())
@@ -1228,7 +1228,7 @@ class RegistryWriter(log.Loggable):
             w(4, '<component type="%s" base="%s"' % (
                 component.getType(), component.getBase()))
             w(4, '           description=%s>'
-                % (e(component.getDescription()),))
+                % (e(component.getDescription()), ))
 
             w(6, '<source location="%s"/>' % component.getSource())
             for x in component.getEaters():

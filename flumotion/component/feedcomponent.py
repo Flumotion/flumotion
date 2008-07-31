@@ -411,7 +411,7 @@ class ParseLaunchComponent(FeedComponent):
                 try:
                     pos = block.index(':')
                 except ValueError:
-                    raise TypeError("Template %r has no colon" % (block,))
+                    raise TypeError("Template %r has no colon" % (block, ))
                 prefix = block[:pos+1]
                 if prefix not in templatizers:
                     raise TypeError("Template %r has invalid prefix %r"

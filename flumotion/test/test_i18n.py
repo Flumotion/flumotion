@@ -132,7 +132,7 @@ class TranslatableTest(testsuite.TestCase):
         t = T_(N_("%s can be translated"), "I")
         self.assertEquals(t.domain, configure.PACKAGE)
         self.assertEquals(t.format, "%s can be translated")
-        self.assertEquals(t.args, ("I",))
+        self.assertEquals(t.args, ("I", ))
 
     def testTranslatablePlural(self):
         # Andy 3 is a droid in the Andy series and doesn't need translating

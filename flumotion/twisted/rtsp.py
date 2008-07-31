@@ -476,7 +476,7 @@ class ErrorResource(RTSPResource):
         resource.Resource.__init__(self)
         self.code = code
         self.body = ""
-        if lines != (None,):
+        if lines != (None, ):
             self.body = "\n".join(lines) + "\n\n"
 
         # HACK!

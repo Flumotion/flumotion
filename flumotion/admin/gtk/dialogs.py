@@ -173,14 +173,14 @@ def showConnectionErrorDialog(failure, info, parent=None):
         message = (
             _('"%s" refused your connection.\n'
               'Check your user name and password and try again.')
-            % (info.host,))
+            % (info.host, ))
     elif failure.check(ConnectionFailedError):
         title = _('Connection failed')
         message = (_("Connection to manager on %s failed (%s).")
                    % (str(info), str(failure)))
     elif failure.check(AlreadyConnectedError,
                        AlreadyConnectingError):
-        title =_('Already connected to %s') % (info,)
+        title =_('Already connected to %s') % (info, )
         message = _("You cannot connect twice to the same manager. Try "
                     "disconnecting first.")
     else:

@@ -314,7 +314,7 @@ class TrivialBouncer(Bouncer):
     Useful as a concrete bouncer class for which all users are accepted whenever
     the bouncer is enabled.
     """
-    keycardClasses = (keycards.KeycardGeneric,)
+    keycardClasses = (keycards.KeycardGeneric, )
 
     def do_authenticate(self, keycard):
         self.addKeycard(keycard)

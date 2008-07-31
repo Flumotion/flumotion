@@ -86,7 +86,7 @@ class CryptChecker(log.Loggable):
     I check credentials using a crypt-based backend.
     """
     implements(checkers.ICredentialsChecker)
-    credentialInterfaces = (credentials.IUsernameCryptPassword,)
+    credentialInterfaces = (credentials.IUsernameCryptPassword, )
 
     logCategory = 'cryptchecker'
 
@@ -130,7 +130,7 @@ class Sha256Checker(log.Loggable):
     I check credentials using a SHA-256-based backend.
     """
     implements(checkers.ICredentialsChecker)
-    credentialInterfaces = (credentials.IUsernameSha256Password,)
+    credentialInterfaces = (credentials.IUsernameSha256Password, )
 
     logCategory = 'sha256checker'
 

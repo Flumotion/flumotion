@@ -1076,7 +1076,7 @@ class Vishnu(log.Loggable):
 
         flow = self._getFlowByName(flowName)
         if flow is None:
-            raise ValueError("No flow called %s found" % (flowName,))
+            raise ValueError("No flow called %s found" % (flowName, ))
 
         components = flow.get('components')
         for c in components:

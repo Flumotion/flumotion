@@ -1,5 +1,12 @@
 2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
+	* *.py:
+	Replace ",)" with ", )", according to PEP-8,
+	removes a couple of 100 warnings spotted by
+	pep8.py
+
+2008-07-31  Johan Dahlin  <johan@flumotion.com>
+
 	* data/glade/httpstreamer-wizard.glade:
 	The mount point entry on the streamer page should be wider.
 	Fixes #1102.

@@ -48,6 +48,7 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
 
     def shutdownStarted():
         log.info(processType, "Stopping %s '%s'", processType, processName)
+
     def shutdownEnded():
         log.info(processType, "Stopped %s '%s'", processType, processName)
 
@@ -57,6 +58,7 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
                                   shutdownStarted)
     reactor.addSystemEventTrigger('after', 'shutdown',
                                   shutdownEnded)
+
 
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
               directory='/'):
@@ -113,6 +115,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     # don't add stuff here that can fail, because from now on the program
     # will keep running regardless of tracebacks
 
+
 def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """
     Daemonize a process, writing log files and PID files to conventional
@@ -147,7 +150,7 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
                                '%s.%s.log' % (processType, processName))
     else:
         logPath = os.path.join(configure.logdir,
-                               '%s.log' % (processType,))
+                               '%s.log' % (processType, ))
     log.debug(processType, 'Further logging will be done to %s', logPath)
 
     pidFile = _acquirePidFile(processType, processName)
@@ -163,6 +166,7 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
 
     # import inside function so we avoid affecting startup
     from twisted.internet import reactor
+
     def _deletePidFile():
         log.debug(processType, 'deleting pid file')
         deletePidFile(processType, processName)
@@ -181,6 +185,7 @@ def _getPidPath(type, name=None):
         type, name, path))
     return path
 
+
 def writePidFile(type, name=None, file=None):
     """
     Write a pid file in the run directory, using the given process type
@@ -197,10 +202,11 @@ def writePidFile(type, name=None, file=None):
         pidFile = open(filename, 'w')
     else:
         filename = pidFile.name
-    pidFile.write("%d\n" % (os.getpid(),))
+    pidFile.write("%d\n" % (os.getpid(), ))
     pidFile.close()
     os.chmod(filename, 0644)
     return filename
+
 
 def _acquirePidFile(type, name=None):
     """
@@ -215,6 +221,7 @@ def _acquirePidFile(type, name=None):
     path = _getPidPath(type, name)
     return open(path, 'w')
 
+
 def deletePidFile(type, name=None):
     """
     Delete the pid file in the run directory, using the given process type
@@ -226,6 +233,7 @@ def deletePidFile(type, name=None):
     path = _getPidPath(type, name)
     os.unlink(path)
     return path
+
 
 def getPid(type, name=None):
     """
@@ -248,6 +256,7 @@ def getPid(type, name=None):
 
     return int(pid)
 
+
 def signalPid(pid, signum):
     """
     Send the given process a signal.
@@ -267,6 +276,7 @@ def signalPid(pid, signum):
             return False
         raise
 
+
 def termPid(pid):
     """
     Send the given process a TERM signal.
@@ -274,6 +284,7 @@ def termPid(pid):
     @returns: whether or not the process with the given pid was running
     """
     return signalPid(pid, signal.SIGTERM)
+
 
 def killPid(pid):
     """
@@ -283,6 +294,7 @@ def killPid(pid):
     """
     return signalPid(pid, signal.SIGKILL)
 
+
 def checkPidRunning(pid):
     """
     Check if the given pid is currently running.
@@ -290,6 +302,7 @@ def checkPidRunning(pid):
     @returns: whether or not a process with that pid is active.
     """
     return signalPid(pid, 0)
+
 
 def waitPidFile(type, name=None):
     """
@@ -307,12 +320,14 @@ def waitPidFile(type, name=None):
 
     return pid
 
+
 def waitForTerm():
     """
     Wait until we get killed by a TERM signal (from someone else).
     """
 
     class Waiter:
+
         def __init__(self):
             self.sleeping = True
             import signal
