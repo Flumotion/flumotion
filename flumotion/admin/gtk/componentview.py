@@ -213,18 +213,23 @@ class ComponentView(gtk.VBox, log.Loggable):
             self._setState(COMPONENT_INACTIVE)
 
     def setSingleAdmin(self, admin):
-        """Sets a single global admin for the component view
+        """
+        Sets a single global admin for the component view
+
         @param admin: the admin
-        @type admin: L{flumotion.admin.model.AdminModel}
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         """
         self._admin = admin
 
     def getAdminForComponent(self, component):
-        """Get the admin for a specific component
+        """
+        Get the admin for a specific component
+
         @param component: component 
-        @type component: L{flumotion.common.component.AdminComponentState}
+        @type  component: L{flumotion.common.component.AdminComponentState}
+
         @returns: the admin
-        @rtype: L{flumotion.admin.model.AdminModel}
+        @rtype:   L{flumotion.admin.admin.AdminModel}
         """
         # override me to do e.g. multi.getAdminForComponent
         return self._admin

@@ -1,5 +1,10 @@
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/componentview.py:
+	  Clean up docstrings.
+
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/eatersnode.py:
 	  Fix docstring.
 
