@@ -1192,14 +1192,14 @@ class RegistryWriter(log.Loggable):
                 else:
                     w(i, ('<property name="%s" type="%s"'
                           % (prop.getName(), prop.getType())))
-                    w(i, ('          description=%s'
+                    w(i, ('          _description=%s'
                           % (e(prop.getDescription()), )))
                     w(i, ('          required="%s" multiple="%s"/>'
                           % (prop.isRequired(), prop.isMultiple())))
 
         def _dump_compound(i, cprop, ioff=2):
             w(i, ('<compound-property name="%s"' % (cprop.getName(), )))
-            w(i, ('                   description=%s'
+            w(i, ('                   _description=%s'
                   % (e(cprop.getDescription()), )))
             w(i, ('                   required="%s" multiple="%s">'
                   % (cprop.isRequired(), cprop.isMultiple())))
@@ -1227,7 +1227,7 @@ class RegistryWriter(log.Loggable):
         for component in self.components:
             w(4, '<component type="%s" base="%s"' % (
                 component.getType(), component.getBase()))
-            w(4, '           description=%s>'
+            w(4, '           _description=%s>'
                 % (e(component.getDescription()), ))
 
             w(6, '<source location="%s"/>' % component.getSource())

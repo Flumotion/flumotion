@@ -99,7 +99,7 @@ class TestRegistry(testsuite.TestCase):
   <components>
     <component type="component" base="/">
       <properties>
-        <property name="source" type="string" required="yes" multiple="yes" description="a source property" />
+        <property name="source" type="string" required="yes" multiple="yes" _description="a source property" />
       </properties>
     </component>
   </components>
@@ -123,13 +123,13 @@ class TestRegistry(testsuite.TestCase):
   <components>
     <component type="component" base="/">
       <properties>
-        <property name="source" type="string" required="yes" multiple="no" description="a source property" />
+        <property name="source" type="string" required="yes" multiple="no" _description="a source property" />
         <compound-property name="group" required="yes" multiple="yes"
-                           description="a group of properties">
+                           _description="a group of properties">
           <property name="first" type="int" required="yes" multiple="no"
-                    description="a required int property" />
+                    _description="a required int property" />
           <property name="last" type="bool" required="no" multiple="yes"
-                    description="an optional bool property" />
+                    _description="an optional bool property" />
         </compound-property>
       </properties>
     </component>
@@ -264,7 +264,7 @@ class TestRegistry(testsuite.TestCase):
 <registry>
   <components>
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <entries>
         <entry type="test/test" location="loc" function="main"/>
       </entries>
@@ -276,7 +276,7 @@ class TestRegistry(testsuite.TestCase):
         <entry type="default" location="loc" function="main"/>
       </entries>
       <properties>
-        <property name="qux" type="string" description="a quxy property"/>
+        <property name="qux" type="string" _description="a quxy property"/>
       </properties>
     </plug>
   </plugs>
@@ -302,7 +302,7 @@ class TestRegistry(testsuite.TestCase):
   <components>
 
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <source location="None"/>
       <synchronization required="no" clock-priority="100"/>
       <properties>
@@ -322,7 +322,7 @@ class TestRegistry(testsuite.TestCase):
       </entries>
       <properties>
         <property name="qux" type="string"
-                  description="a quxy property"
+                  _description="a quxy property"
                   required="False" multiple="False"/>
       </properties>
     </plug>
@@ -354,12 +354,12 @@ class TestRegistry(testsuite.TestCase):
 <registry>
   <components>
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <entries>
         <entry type="test/test" location="loc" function="main"/>
       </entries>
       <properties>
-        <property name="c" type="int" description="c property %lt;needs escaping&gt;"/>
+        <property name="c" type="int" _description="c property %lt;needs escaping&gt;"/>
       </properties>
     </component>
   </components>
@@ -370,12 +370,12 @@ class TestRegistry(testsuite.TestCase):
   <components>
 
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <source location="None"/>
       <synchronization required="no" clock-priority="100"/>
       <properties>
         <property name="c" type="int"
-                  description="c property %lt;needs escaping&gt;"
+                  _description="c property %lt;needs escaping&gt;"
                   required="False" multiple="False"/>
       </properties>
       <entries>
@@ -401,15 +401,15 @@ class TestRegistry(testsuite.TestCase):
 <registry>
   <components>
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <entries>
         <entry type="test/test" location="loc" function="main"/>
       </entries>
       <properties>
-        <compound-property name="cgrr" description="an cgrry property">
-          <property name="c" type="int" description="c property"/>
+        <compound-property name="cgrr" _description="an cgrry property">
+          <property name="c" type="int" _description="c property"/>
         </compound-property>
-        <property name="cux" type="string" description="a cuxy property"/>
+        <property name="cux" type="string" _description="a cuxy property"/>
       </properties>
     </component>
   </components>
@@ -417,9 +417,9 @@ class TestRegistry(testsuite.TestCase):
     <plug type="baz" socket="frogger">
       <entry location="loc" function="main"/>
       <properties>
-        <property name="qux" type="string" description="a quxy property"/>
-        <compound-property name="grr" description="an agrry property">
-          <property name="a" type="int" description="a property"/>
+        <property name="qux" type="string" _description="a quxy property"/>
+        <compound-property name="grr" _description="an agrry property">
+          <property name="a" type="int" _description="a property"/>
         </compound-property>
       </properties>
     </plug>
@@ -446,19 +446,19 @@ class TestRegistry(testsuite.TestCase):
   <components>
 
     <component type="bar" base="base/dir"
-               description="A bar component.">
+               _description="A bar component.">
       <source location="None"/>
       <synchronization required="no" clock-priority="100"/>
       <properties>
         <compound-property name="cgrr"
-                           description="an cgrry property"
+                           _description="an cgrry property"
                            required="False" multiple="False">
           <property name="c" type="int"
-                    description="c property"
+                    _description="c property"
                     required="False" multiple="False"/>
         </compound-property>
         <property name="cux" type="string"
-                  description="a cuxy property"
+                  _description="a cuxy property"
                   required="False" multiple="False"/>
       </properties>
       <entries>
@@ -476,13 +476,13 @@ class TestRegistry(testsuite.TestCase):
       </entries>
       <properties>
         <property name="qux" type="string"
-                  description="a quxy property"
+                  _description="a quxy property"
                   required="False" multiple="False"/>
         <compound-property name="grr"
-                           description="an agrry property"
+                           _description="an agrry property"
                            required="False" multiple="False">
           <property name="a" type="int"
-                    description="a property"
+                    _description="a property"
                     required="False" multiple="False"/>
         </compound-property>
       </properties>

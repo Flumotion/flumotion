@@ -1,3 +1,10 @@
+2008-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  Write out the registry with _description tags.
+	* flumotion/test/test_registry.py:
+	  Update tests for new _description attribute.
+
 2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
 	* *.py:
