@@ -1,3 +1,5 @@
+include $(top_srcdir)/common/common.mk
+
 CONFIG = 						\
 	examples/bouncer.xml				\
 	examples/ipbouncer.xml				\
@@ -17,5 +19,4 @@ EXTRA_DIST = 						\
 	workers/default.xml 				\
 	$(CONFIG)
 
-check:
-	for f in $(CONFIG); do $(top_builddir)/env python $(top_srcdir)/misc/validate-config.py $(srcdir)/$$f; done
+check-local: check-local-config

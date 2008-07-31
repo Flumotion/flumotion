@@ -1,5 +1,4 @@
-check-local: check-local-pychecker check-local-registry
-
+# these are toplevel targets
 test:
 	@make check -C flumotion/test
 
@@ -8,6 +7,10 @@ check-docs:
 
 check-local-registry:
 	$(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
+
+# this is a target for any directory containing CONFIG in its Makefile.am
+check-local-config:
+	for f in $(CONFIG); do $(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-config.py $(srcdir)/$$f"; done
 
 coverage:
 	@trial --temp-directory=_trial_coverage --coverage flumotion.test

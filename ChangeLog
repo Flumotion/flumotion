@@ -1,5 +1,17 @@
 2008-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* common/Makefile.am:
+	* conf/Makefile.am:
+	* misc/validate-config.py (deleted):
+	* common/validate-config.py (added):
+	  Move to common since we want to use it in other projects.
+	  Change to setup package path so we can use it in other projects.
+	* common/common.mk:
+	  Remove check-local target since it can't be overridden properly.
+
+2008-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Write out the registry with _description tags.
 	* flumotion/test/test_registry.py:
