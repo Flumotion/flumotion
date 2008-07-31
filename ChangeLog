@@ -1,5 +1,10 @@
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/eatersnode.py:
+	  Fix docstring.
+
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  Use _description for components and properties, so they are properly
 	  extracted for translation.

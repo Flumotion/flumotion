@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 """
-Feeders tab in the component UI
+Eaters tab in the component UI
 """
 
 import gettext
