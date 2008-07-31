@@ -249,6 +249,41 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self._deferredConnect = d
         return d
 
+    def bundleErrback(self, failure, fileName='<unknown>'):
+        """
+        Handle all coding mistakes that could be triggered by loading bundles.
+        This is a convenience method to help in properly reporting problems.
+        The EntrySyntaxError should be caught and wrapped in a UI message,
+        with the message generated here as debug information.
+
+        @param failure: the failure to be handled
+        @type  failure: L{twisted.python.failure.Failure}
+        @param filename: name of the file being loaded
+        @type  filename: str
+
+        @raises: L{errors.EntrySyntaxError}
+        """
+        try:
+            raise failure.value
+        except SyntaxError, e:
+            # the syntax error can happen in the entry file, or any import
+            where = getattr(e, 'filename', "<entry file>")
+            lineno = getattr(e, 'lineno', 0)
+            msg = "Syntax Error at %s:%d while executing %s" % (
+                where, lineno, fileName)
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
+        except NameError, e:
+            msg = "NameError while executing %s: %s" % (
+                fileName, " ".join(e.args))
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
+        except ImportError, e:
+            msg = "ImportError while executing %s: %s" % (fileName,
+                " ".join(e.args))
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
+
     def shutdown(self):
         self.debug('shutting down')
         if self.clientFactory is not None:

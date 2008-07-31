@@ -27,10 +27,14 @@ import os
 import gobject
 import gtk
 
-from flumotion.common import componentui, log
+from flumotion.common import componentui, log, errors, messages
 from flumotion.common.common import pathToModuleName
-from flumotion.common.errors import NoBundleError, SleepingComponentError
 from flumotion.common.planet import AdminComponentState, moods
+      
+from flumotion.common.i18n import N_, gettexter
+from gettext import gettext as _
+
+T_ = gettexter()
 
 # ensure unjellier registered
 componentui # pyflakes
@@ -260,7 +264,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             return LabelPlaceholder()
 
         def noBundle(failure):
-            failure.trap(NoBundleError)
+            failure.trap(errors.NoBundleError)
             self.debug(
                 'No specific GTK admin for this component, using default')
             return ("flumotion/component/base/admin_gtk.py", "BaseAdminGtk")
@@ -286,16 +290,42 @@ class ComponentView(gtk.VBox, log.Loggable):
             # getEntry for admin/gtk returns a factory function for creating
             # flumotion.component.base.admin_gtk.BaseAdminGtk subclass instances
             modname = pathToModuleName(filename)
-            return admin.getBundledFunction(modname, procname)
+            
+            # we call hostile code, so we should handle exceptions:
+            d = admin.getBundledFunction(modname, procname)
+            d.addErrback(admin.bundleErrback, filename)
+
+            def handleSyntaxError(failure):
+                failure.trap(errors.EntrySyntaxError)
+                msg = failure.value.args[0]
+
+                m = messages.Error(T_(
+                    N_("This component has a UI bug.")), debug=msg)
+                componentState.observe_append('messages', m)
+
+                raise errors.HandledException(failure.value)
+
+            d.addErrback(handleSyntaxError)
+
+            return d
 
         def gotFactory(factory):
-            # instantiate from factory and wrap in a NodeBook
-            return NotebookPlaceholder(factory(componentState, admin))
+            # instantiate from factory and wrap in a NotebookPlaceHolder
+            widget = factory(componentState, admin)
+            return NotebookPlaceholder(widget)
 
         def sleepingComponent(failure):
-            failure.trap(SleepingComponentError)
-            return LabelPlaceholder(_('Component %s is still sleeping') %
+            failure.trap(errors.SleepingComponentError)
+            return LabelPlaceholder(_("Component '%s' is still sleeping.") %
                                     componentState.get('name'))
+
+        def handledExceptionErrback(failure):
+            # already handle, so let call chain short-circuit here and
+            # just return
+            failure.trap(errors.HandledException)
+            return LabelPlaceholder(_("Component '%s' has a UI bug.") %
+                                    componentState.get('name'))
+
         
         admin = self.getAdminForComponent(componentState)
         componentType = componentState.get('type')
@@ -305,6 +335,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         d.addCallback(gotEntryPoint)
         d.addCallback(gotFactory)
         d.addErrback(sleepingComponent)
+        d.addErrback(handledExceptionErrback)
         return d
 
     def _componentUnsetToInactive(self):

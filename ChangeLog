@@ -1,5 +1,14 @@
 2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  implement bundleErrback to correctly handle typical potential
+	  problems with untrusted code nicely.
+	* flumotion/admin/gtk/componentview.py:
+	  Use it.  Properly mark some exceptions as handled so we only get
+	  one message about them.
+
+2008-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/componentview.py:
 	  Clean up docstrings.
 
