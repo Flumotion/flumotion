@@ -41,7 +41,7 @@ import os
 from flumotion.common.python import makedirs
 from flumotion.configure import configure
 
-__version__ = "$Rev$"
+__version__="$Rev$"
 
 
 def version(binary):
