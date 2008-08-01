@@ -33,19 +33,23 @@ from flumotion.common.fraction import fractionFromValue
 
 __version__ = "$Rev$"
 
+
 def parsePropertyValue(propName, type, value):
     # XXX: We might end up calling float(), which breaks
     #      when using LC_NUMERIC when it is not C -- only in python
     #      2.3 though, no prob in 2.4. See PEP 331
     if sys.version_info < (2, 4):
         locale.setlocale(locale.LC_NUMERIC, "C")
+
     def tryStr(s):
         try:
             return str(s)
         except UnicodeEncodeError:
             return s
+
     def strWithoutNewlines(s):
         return tryStr(' '.join([x.strip() for x in s.split('\n')]))
+
     def boolean(v):
         if isinstance(v, bool):
             return v
@@ -69,6 +73,7 @@ def parsePropertyValue(propName, type, value):
                           % (propName, value, type,
                              log.getExceptionMessage(e)))
 
+
 def parseCompoundPropertyValue(name, definition, value):
     if isinstance(value, (list, tuple)):
         try:
@@ -84,6 +89,7 @@ def parseCompoundPropertyValue(name, definition, value):
         raise ConfigError('simple value specified where compound property'
                           ' (name=%r) expected' % (name, ))
     return parsed
+
 
 def buildPropertyDict(propertyList, propertySpecList):
     """Build a property dict suitable for forming part of a component
@@ -129,6 +135,7 @@ def buildPropertyDict(propertyList, propertySpecList):
                               % (name, ))
     return ret
 
+
 def buildPlugsSet(plugsList, sockets):
     """Build a plugs dict suitable for forming part of a component
     config.
@@ -154,8 +161,10 @@ def buildPlugsSet(plugsList, sockets):
         ret[plug.socket].append(plug.config)
     return ret
 
+
 class ConfigEntryPlug(log.Loggable):
     "I represent a <plug> entry in a planet config file"
+
     def __init__(self, plugType, propertyList):
         try:
             defs = registry.getRegistry().getPlug(plugType)
@@ -219,6 +228,7 @@ class BaseConfigParser(fxml.Parser):
         self.checkAttributes(node)
 
         plugs = []
+
         def parsePlug(node):
             # <plug type=...>
             #   <property>
@@ -252,4 +262,3 @@ class BaseConfigParser(fxml.Parser):
                                          properties.append)}
         self.parseFromTable(node, parsers)
         return name, properties
-

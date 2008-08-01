@@ -95,6 +95,7 @@ def _createParser():
 
     return parser
 
+
 def _readConfig(workerFile, options):
     # modifies options dict in-place
     log.info('worker', 'Reading configuration from %s' % workerFile)

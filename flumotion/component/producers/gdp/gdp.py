@@ -29,6 +29,7 @@ __version__ = "$Rev$"
 
 
 class GDPProducer(feedcomponent.ParseLaunchComponent):
+
     def do_check(self):
         # handle http://bugzilla.gnome.org/show_bug.cgi?id=532364
         version = gstreamer.get_plugin_version('tcp')

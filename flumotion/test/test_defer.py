@@ -26,8 +26,6 @@ from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator, RetryingDeferred
 
 
-
-
 class TestDefer(testsuite.TestCase):
     result = None
     error = None
@@ -58,6 +56,7 @@ class TestDefer(testsuite.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
+
         def checkResult(res):
             assert self.result == 42
         d.addCallback(checkResult)
@@ -77,6 +76,7 @@ class TestDefer(testsuite.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
+
         def checkResult(res):
             assert self.result == None
         d.addCallback(checkResult)
@@ -103,12 +103,14 @@ class TestDefer(testsuite.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
+
         def checkResult(res):
             assert self.result == 81
         d.addCallback(checkResult)
         return d
 
     def testBarfOnNongenerator(self):
+
         def nongen():
             pass
         try:
@@ -119,8 +121,10 @@ class TestDefer(testsuite.TestCase):
 
     def testException(self):
         self.result = None
+
         def divide_later(x, y):
             d = defer.Deferred()
+
             def divide():
                 try:
                     d.callback(x/y)
@@ -147,14 +151,17 @@ class TestDefer(testsuite.TestCase):
 
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
+
         def checkResult(res):
             assert self.result == True
         d.addCallback(checkResult)
         return d
 
     def testExceptionChain(self):
+
         def divide_later(x, y):
             d = defer.Deferred()
+
             def divide():
                 try:
                     d.callback(x/y)
@@ -192,14 +199,18 @@ class TestDefer(testsuite.TestCase):
         d.addErrback(zerodivisionerrorback)
         d.addErrback(runtimeerrorback)
         d.addCallback(checkexceptionchain)
+
         def checkResult(res):
             assert self.result == ['oserror', 'zerodivisionerror'],\
                    "Unexpected exception chain: %r" % (self.result, )
         d.addCallback(checkResult)
         return d
 
+
 class TestRetryingDeferred(testsuite.TestCase):
+
     def testSimple(self):
+
         def genDef():
             return defer.succeed(True)
 
@@ -210,6 +221,7 @@ class TestRetryingDeferred(testsuite.TestCase):
 
     def testRetryOnce(self):
         self.__first = True
+
         def genDef():
             if self.__first:
                 self.__first = False

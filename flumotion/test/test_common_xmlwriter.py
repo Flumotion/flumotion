@@ -24,6 +24,7 @@ from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
 
 
 class TestXMLWriter(TestCase):
+
     def testIndent(self):
         xw = XMLWriter()
         xw.pushTag('tag',
@@ -90,6 +91,7 @@ class TestXMLWriter(TestCase):
 
 
 class TestCompareComponentTypes(TestCase):
+
     def testEncoderMuxer(self):
         components = ['ogg-muxer',
                       'vorbis-encoder',

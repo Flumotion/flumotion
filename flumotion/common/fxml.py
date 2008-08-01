@@ -42,6 +42,7 @@ class Box:
     to set a scalar value can do so, getting around the limitations of
     Python's lexical scoping.
     """
+
     def __init__(self, val=None):
         self.set(val)
 

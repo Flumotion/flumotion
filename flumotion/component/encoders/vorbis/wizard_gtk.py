@@ -34,6 +34,7 @@ _ = gettext.gettext
 
 class VorbisAudioEncoder(AudioEncoder):
     componentType = 'vorbis-encoder'
+
     def __init__(self):
         super(VorbisAudioEncoder, self).__init__()
         self.has_bitrate = True
@@ -98,6 +99,7 @@ class VorbisStep(AudioEncoderStep):
 
 class VorbisWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = VorbisAudioEncoder()

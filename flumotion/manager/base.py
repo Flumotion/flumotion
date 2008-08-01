@@ -333,6 +333,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         classes = self.vishnu.bouncer.keycardClasses
         return [reflect.qual(c) for c in classes]
 
+
 class ManagerHeaven(pb.Root, log.Loggable):
     """
     I am a base class for heavens in the manager.
@@ -356,6 +357,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
                           # manager.Dispatcher
 
     ### ManagerHeaven methods
+
     def getAvatar(self, avatarId):
         """
         Get the avatar with the given id.

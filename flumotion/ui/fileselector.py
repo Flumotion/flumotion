@@ -43,6 +43,7 @@ _ = gettext.gettext
 
 
 class _File(object):
+
     def __init__(self, fileInfo, icon):
         self._fileinfo = fileInfo
         self.filename = fileInfo.filename
@@ -58,6 +59,7 @@ class FileSelector(ObjectList):
     """
 
     gsignal('selected', object)
+
     def __init__(self, parent, adminModel):
         """Creates a new FileSelector
         @param parent: parent window
@@ -142,6 +144,7 @@ class FileSelector(ObjectList):
 class FileSelectorDialog(gtk.Dialog):
     """I am a dialog which contains a file selector dialog
     """
+
     def __init__(self, parent, adminModel):
         """Creates a new RemoteFileSelectorDialog
         @param parent: parent window

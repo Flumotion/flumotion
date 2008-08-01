@@ -135,6 +135,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):
+
     def setup(self):
         statistics = StatisticsAdminGtkNode(self.state, self.admin,
             _("Statistics"))
@@ -146,6 +147,7 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self.nodes['Statistics'].setStats(state)
 
     # FIXME: tie this to the statistics node better
+
     def component_statsChanged(self, stats):
         # FIXME: decide on state/stats/statistics
         self.nodes['Statistics'].setStats(stats)

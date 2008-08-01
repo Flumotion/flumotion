@@ -72,19 +72,18 @@ class BaseAdminText(log.Loggable):
     def stateSet(self, object, key, value):
         self.uiStateChanged(object)
 
-
     def stateAppend(self, object, key, value):
         self.uiStateChanged(object)
-
 
     def stateRemove(self, object, key, value):
         self.uiStateChanged(object)
 
-
     # given an input text return possible completions
+
     def getCompletions(self, input):
         return []
 
     # run command, return string with result
+
     def runCommand(self, command):
         return ""

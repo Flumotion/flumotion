@@ -40,6 +40,7 @@ T_ = gettexter()
 
 class FireWireProducer(AudioProducer, VideoProducer):
     componentType = 'firewire-producer'
+
     def __init__(self):
         super(FireWireProducer, self).__init__()
 
@@ -224,6 +225,7 @@ class _FireWireCommon:
 class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
     name = 'Firewire'
     title = _('Firewire')
+
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
         _FireWireCommon.__init__(self)
@@ -251,6 +253,7 @@ class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
 
 class FireWireWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
 

@@ -37,11 +37,13 @@ def get_gst_version(gst):
     else:
         return gst.gst_version + (0, )
 
+
 def get_pygst_version(gst):
     if hasattr(gst, 'get_pygst_version'):
         return gst.get_pygst_version()
     else:
         return gst.pygst_version + (0, )
+
 
 def checkTicket347():
     """
@@ -70,6 +72,7 @@ def checkTicket347():
     result.succeed(None)
     return defer.succeed(result)
 
+
 def checkTicket348():
     result = messages.Result()
     import pygst
@@ -90,6 +93,7 @@ def checkTicket348():
 
     result.succeed(None)
     return defer.succeed(result)
+
 
 def checkTicket349():
     result = messages.Result()

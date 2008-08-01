@@ -29,8 +29,6 @@ from flumotion.common import fxml
 from flumotion.common import testsuite
 
 
-
-
 class FakeProducer(object):
     position = -1
 
@@ -46,8 +44,10 @@ class FakeProducer(object):
     def getCurrentPosition(self):
         return self.position
 
+
 class FakeDiscoverer(object):
     filename = None
+
     def __init__(self, filename):
         FakeDiscoverer.filename = filename
 
@@ -57,7 +57,9 @@ class FakeDiscoverer(object):
     connect = noop
     discover = noop
 
+
 class TestPlaylist(testsuite.TestCase):
+
     def setUp(self):
         producer = FakeProducer()
 

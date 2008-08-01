@@ -25,5 +25,6 @@ __version__ = "$Rev$"
 
 
 class Mulaw(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         return 'mulawenc name=encoder'

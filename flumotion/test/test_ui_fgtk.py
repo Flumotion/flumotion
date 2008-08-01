@@ -31,11 +31,11 @@ except RuntimeError:
     os._exit(0)
 
 
-
 INTERVAL = 100 # in ms
 
 
 class VUTest(testsuite.TestCase):
+
     def testScale(self):
         w = FVUMeter()
 

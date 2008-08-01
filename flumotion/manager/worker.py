@@ -65,6 +65,7 @@ class WorkerAvatar(base.ManagerAvatar):
 
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
                            mind):
+
         def havePorts(res):
             log.debug('worker-avatar', 'got port information')
             (_s1, feedServerPort), (_s2, (ports, random)) = res
@@ -147,6 +148,7 @@ class WorkerAvatar(base.ManagerAvatar):
         return self.mindCallRemote('getComponents')
 
     ### IPerspective methods, called by the worker's component
+
     def perspective_componentAddMessage(self, avatarId, message):
         """
         Called by the worker to tell the manager to add a given message to
@@ -160,6 +162,7 @@ class WorkerAvatar(base.ManagerAvatar):
         """
         self.debug('received message from component %s' % avatarId)
         self.vishnu.componentAddMessage(avatarId, message)
+
 
 class WorkerHeaven(base.ManagerHeaven):
     """
@@ -176,6 +179,7 @@ class WorkerHeaven(base.ManagerHeaven):
         self.state = worker.ManagerWorkerHeavenState()
 
     ### my methods
+
     def workerAttached(self, workerAvatar):
         """
         Notify the heaven that the given worker has logged in.

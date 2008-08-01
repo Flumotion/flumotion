@@ -31,6 +31,8 @@ __version__ = "$Rev$"
 
 
 # Fake Protocol
+
+
 class DumbProtocol(Protocol):
     """ Dumb Protocol, doesn't do anything """
 
@@ -46,6 +48,8 @@ class DumbProtocol(Protocol):
         # FIXME : We should maybe lose connection here ....
 
 # UnixDomainDumbFactory
+
+
 class UnixDomainDumbFactory(ServerFactory):
 
     protocol = DumbProtocol
@@ -54,6 +58,8 @@ class UnixDomainDumbFactory(ServerFactory):
         self.component = component
 
 # Component
+
+
 class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
 
     def init(self):

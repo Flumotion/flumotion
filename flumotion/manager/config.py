@@ -34,7 +34,9 @@ __version__ = "$Rev$"
 def _ignore(*args):
     pass
 
+
 def upgradeEaters(conf):
+
     def parseFeedId(feedId):
         if feedId.find(':') == -1:
             return "%s:default" % feedId
@@ -56,6 +58,7 @@ def upgradeEaters(conf):
         for s in sourceConfig:
             sources.append(parseFeedId(s))
         conf['source'] = sources
+
 
 def upgradeAliases(conf):
     eaters = dict(conf.get('eater', {})) # a copy
@@ -85,6 +88,7 @@ def upgradeAliases(conf):
 UPGRADERS = [upgradeEaters, upgradeAliases]
 CURRENT_VERSION = len(UPGRADERS)
 
+
 def buildEatersDict(eatersList, eaterDefs):
     """Build a eaters dict suitable for forming part of a component
     config.
@@ -100,7 +104,9 @@ def buildEatersDict(eatersList, eaterDefs):
                        L{flumotion.common.registry.RegistryEntryEater}
     @returns: Dict of eaterName => [(feedId, eaterAlias)]
     """
+
     def parseEaterTuple(tup):
+
         def parse(eaterName, feedId, eaterAlias=None):
             if eaterAlias is None:
                 eaterAlias = eaterName
@@ -179,6 +185,7 @@ def buildVirtualFeeds(feedPairs, feeders):
         ret[virtual] = real
     return ret
 
+
 def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
              keyBase=None):
     """Compute the difference between two config dicts.
@@ -219,8 +226,10 @@ def dictDiff(old, new, onlyOld=None, onlyNew=None, diff=None,
 
     return onlyOld, onlyNew, diff
 
+
 def dictDiffMessageString((old, new, diff), oldLabel='old',
                           newLabel='new'):
+
     def ref(label, k):
         return "%s%s: '%s'" % (label,
                                ''.join(["[%r]" % (subk, )
@@ -237,6 +246,7 @@ def dictDiffMessageString((old, new, diff), oldLabel='old',
         out.append('    %s = %r' % (ref(oldLabel, k), oldv))
         out.append('    %s = %r' % (ref(newLabel, k), newv))
     return '\n'.join(out)
+
 
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
@@ -273,6 +283,7 @@ class ConfigEntryComponent(log.Loggable):
             return version
         elif isinstance(version, str):
             try:
+
                 def parse(maj, min, mic, nan=0):
                     return maj, min, mic, nan
                 return parse(*map(int, version.split('.')))
@@ -336,8 +347,10 @@ class ConfigEntryComponent(log.Loggable):
     def getWorker(self):
         return self.worker
 
+
 class ConfigEntryFlow:
     "I represent a <flow> entry in a planet config file"
+
     def __init__(self, name, components):
         self.name = name
         self.components = {}
@@ -347,8 +360,10 @@ class ConfigEntryFlow:
                     'flow %s already has component named %s' % (name, c.name))
             self.components[c.name] = c
 
+
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
+
     def __init__(self, name, host, port, transport, certificate, bouncer,
             fludebug, plugs):
         self.name = name
@@ -360,13 +375,16 @@ class ConfigEntryManager:
         self.fludebug = fludebug
         self.plugs = plugs
 
+
 class ConfigEntryAtmosphere:
     "I represent a <atmosphere> entry in a planet config file"
+
     def __init__(self):
         self.components = {}
 
     def __len__(self):
         return len(self.components)
+
 
 class FlumotionConfigParser(fluconfig.BaseConfigParser):
     """
@@ -516,15 +534,16 @@ class PlanetConfigParser(FlumotionConfigParser):
         self.doc.unlink()
         self.doc = None
 
-
     def _parseAtmosphere(self, node):
         # <atmosphere>
         #   <component>
         #   ...
         # </atmosphere>
         ret = {}
+
         def parseComponent(node):
             return self.parseComponent(node, 'atmosphere', False, True)
+
         def gotComponent(comp):
             ret[comp.name] = comp
         parsers = {'component': (parseComponent, gotComponent)}
@@ -544,6 +563,7 @@ class PlanetConfigParser(FlumotionConfigParser):
             raise errors.ConfigError("<flow> cannot have 'manager' as name")
 
         components = []
+
         def parseComponent(node):
             return self.parseComponent(node, name, True, True)
         parsers = {'component': (parseComponent, components.append)}
@@ -581,6 +601,7 @@ class PlanetConfigParser(FlumotionConfigParser):
         return ConfigEntryFlow(name, components)
 
     # FIXME: remove, this is only used by the tests
+
     def getComponentEntries(self):
         """
         Get all component entries from both atmosphere and all flows
@@ -604,6 +625,8 @@ class PlanetConfigParser(FlumotionConfigParser):
 
 # FIXME: manager config and flow configs are currently conflated in the
 # planet config files; need to separate.
+
+
 class ManagerConfigParser(FlumotionConfigParser):
     """
     I parse manager configuration out of a planet configuration file.
@@ -654,14 +677,18 @@ class ManagerConfigParser(FlumotionConfigParser):
 
         def simpleparse(proc):
             return lambda node: self.parseTextNode(node, proc)
+
         def recordval(k):
+
             def record(v):
                 if getattr(ret, k):
                     raise errors.ConfigError('duplicate %s: %s'
                                       % (k, getattr(ret, k)))
                 setattr(ret, k, v)
             return record
+
         def enum(*allowed):
+
             def eparse(v):
                 v = str(v)
                 if v not in allowed:
@@ -682,17 +709,21 @@ class ManagerConfigParser(FlumotionConfigParser):
         return ret
 
     def _parseManagerWithRegistry(self, node):
+
         def parsecomponent(node):
             return self.parseComponent(node, 'manager', False, False)
+
         def gotcomponent(val):
             if self.bouncer is not None:
                 raise errors.ConfigError('can only have one bouncer '
                                   '(%s is superfluous)' % (val.name, ))
             # FIXME: assert that it is a bouncer !
             self.bouncer = val
+
         def parseplugs(node):
             return fluconfig.buildPlugsSet(self.parsePlugs(node),
                                            self.MANAGER_SOCKETS)
+
         def gotplugs(newplugs):
             for socket in self.plugs:
                 self.plugs[socket].extend(newplugs[socket])
@@ -728,6 +759,7 @@ class ManagerConfigParser(FlumotionConfigParser):
 
 
 class PlanetXMLWriter(XMLWriter):
+
     def __init__(self, planetState):
         super(PlanetXMLWriter, self).__init__()
         self._writePlanet(planetState)
@@ -755,6 +787,7 @@ class PlanetXMLWriter(XMLWriter):
         #               cmp=cmpComponentType,
         #               key=operator.attrgetter('type'))
         #
+
         def componentSort(a, b):
             return cmpComponentType(a.get('type'), b.get('type'))
         components = list(flow.get('components'))
@@ -794,6 +827,7 @@ class PlanetXMLWriter(XMLWriter):
         self.popTag()
 
     def _writeProperties(self, properties):
+
         def serialise(propVal):
             if isinstance(propVal, tuple): # fractions are our only tuple type
                 return "%d/%d" % propVal
@@ -821,6 +855,7 @@ class PlanetXMLWriter(XMLWriter):
             attrs = [('name', name),
                      ('real', real)]
             self.writeTag('virtual-feed', attrs)
+
 
 def exportPlanetXml(p):
     pw = PlanetXMLWriter(p)

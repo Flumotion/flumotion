@@ -29,6 +29,7 @@ __version__ = "$Rev$"
 
 
 class XMLWriter(object):
+
     def __init__(self):
         self._data = StringIO()
         self._tagStack = []

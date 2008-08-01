@@ -37,6 +37,7 @@ class Eater:
     @ivar feedId:  id of the feed this is eating from
     @ivar uiState: the serializable UI State for this eater
     """
+
     def __init__(self, eaterAlias, eaterName):
         self.eaterAlias = eaterAlias
         self.eaterName = eaterName

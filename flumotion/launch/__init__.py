@@ -24,4 +24,3 @@ code for flumotion-launch
 """
 
 __version__ = "$Rev$"
-

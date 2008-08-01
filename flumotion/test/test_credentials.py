@@ -33,7 +33,9 @@ CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredUCPCC = credentials.UsernameCryptPasswordCryptChallenger
 CredUSPCC = credentials.UsernameSha256PasswordCryptChallenger
 
+
 class TestUsername(testsuite.TestCase):
+
     def testWithPlaintext(self):
         cred = credentials.Username('user', 'test')
         self.failUnless(cred.checkPassword('test'))
@@ -44,7 +46,9 @@ class TestUsername(testsuite.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
+
 class TestUsernameCryptPasswordCrypt(testsuite.TestCase):
+
     def testWithPlaintext(self):
         cred = CredCrypt('user')
         cred.setPasswordSalt('test', 'qi')
@@ -69,7 +73,9 @@ class TestUsernameCryptPasswordCrypt(testsuite.TestCase):
         self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
+
 class TestUsernameCryptPasswordPlaintext(testsuite.TestCase):
+
     def testWithPlaintext(self):
         cred = CredPlaintext('user', 'test')
         self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
@@ -80,7 +86,9 @@ class TestUsernameCryptPasswordPlaintext(testsuite.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
+
 class TestUsernameCryptPasswordCryptChallenger(testsuite.TestCase):
+
     def testWithPlaintext(self):
         cred = CredUCPCC('user')
 
@@ -112,7 +120,9 @@ class TestUsernameCryptPasswordCryptChallenger(testsuite.TestCase):
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
 
+
 class TestUsernameSha256PasswordCryptChallenger(testsuite.TestCase):
+
     def setUp(self):
         self.salt = 'iamsalt'
         # known good salted sha-256 password

@@ -35,6 +35,7 @@ def flatten(seq):
 
 
 class TestManagerConfigParser(testsuite.TestCase):
+
     def _buildManager(self, child, extra=''):
         xml = '<planet><manager%s>%s</manager></planet>' % (extra, child)
         return StringIO(xml)
@@ -110,6 +111,7 @@ class TestManagerConfigParser(testsuite.TestCase):
 
 
 class TestPlanetConfigParser(testsuite.TestCase):
+
     def _buildPlanet(self, child, extra=''):
         xml = '<planet%s>%s</planet>' % (extra, child)
         return StringIO(xml)

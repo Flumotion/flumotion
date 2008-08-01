@@ -42,6 +42,7 @@ __version__ = "$Rev$"
 # this might be a little heavy; we could consider only comparing
 # on id, once we verify that all id's are unique
 
+
 class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     """
     I am a message to be shown in a UI.
@@ -68,6 +69,7 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         "timestamp"]
 
     # F0.8: remove id= in favor of mid=
+
     def __init__(self, level, translatable, debug=None, id=None, priority=50,
         timestamp=None, mid=None):
         """
@@ -136,6 +138,8 @@ pb.setUnjellyableForClass(Message, Message)
 
 # these are implemented as factory functions instead of classes because
 # properly proxying to the correct subclass is hard with Copyable/RemoteCopy
+
+
 def Error(*args, **kwargs):
     """
     Create a L{Message} at ERROR level, indicating a failure that needs
@@ -146,6 +150,8 @@ def Error(*args, **kwargs):
 # FIXME: figure out a way to not be shadowing the Warning builtin without
 # breaking all other code
 __pychecker__ = 'no-shadowbuiltin'
+
+
 def Warning(*args, **kwargs):
     """
     Create a L{Message} at WARNING level, indicating a potential problem.
@@ -153,11 +159,13 @@ def Warning(*args, **kwargs):
     return Message(WARNING, *args, **kwargs)
 __pychecker__ = ''
 
+
 def Info(*args, **kwargs):
     """
     Create a L{Message} at INFO level.
     """
     return Message(INFO, *args, **kwargs)
+
 
 class Result(pb.Copyable, pb.RemoteCopy):
     """
@@ -169,6 +177,7 @@ class Result(pb.Copyable, pb.RemoteCopy):
     @ivar messages: list of messages
     @type messages: list of L{Message}
     """
+
     def __init__(self):
         self.messages = []
         self.value = None

@@ -30,8 +30,6 @@ from dateutil import rrule, tz, parser
 from flumotion.extern.log.log import Loggable
 
 
-
-
 class LocalTimezone(datetime.tzinfo):
     STDOFFSET = datetime.timedelta(seconds=-time.timezone)
     if time.daylight:
@@ -445,6 +443,7 @@ def parseCalendar(cal):
 
         eventSets[event.uid].addEvent(event)
     return eventSets.values()
+
 
 def parseCalendarFromFile(file):
     """

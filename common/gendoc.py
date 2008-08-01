@@ -23,6 +23,8 @@ package.getPackager().install()
 
 # monkey patching twisted doc errors
 from twisted.spread import pb
+
+
 def login(self, credentials, client=None):
     """Login and get perspective from remote PB server.
 
@@ -30,11 +32,15 @@ def login(self, credentials, client=None):
     supported.
 
     @return: Deferred of RemoteReference to the perspective."""
+
+
 def getRootObject(self):
     """Get root object of remote PB server.
 
     @return: Deferred of the root object.
     """
+
+
 def getPerspective(self, username, password, serviceName,
                        perspectiveName=None, client=None):
     """Get perspective from remote PB server.
@@ -50,6 +56,7 @@ pb.PBClientFactory.getPerspective = getPerspective
 
 from twisted.internet.posixbase import PosixReactorBase
 
+
 def listenUDP(self, port, protocol, interface='', maxPacketSize=8192):
     """Connects a given DatagramProtocol to the given numeric UDP port.
 
@@ -57,6 +64,7 @@ def listenUDP(self, port, protocol, interface='', maxPacketSize=8192):
 
     @returns: object conforming to IListeningPort.
     """
+
 
 def connectUDP(self, remotehost, remoteport, protocol, localport=0,
                interface='', maxPacketSize=8192):

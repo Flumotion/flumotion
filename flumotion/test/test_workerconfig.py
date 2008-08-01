@@ -23,12 +23,12 @@ from flumotion.common import testsuite
 from flumotion.worker import config
 
 
-
-
 def parse(string):
     return config.WorkerConfigXML(None, string)
 
+
 class TestConfig(testsuite.TestCase):
+
     def testParseEmpty(self):
         conf = parse('<worker></worker>')
         self.assertEquals(conf.name, None)
@@ -57,7 +57,6 @@ class TestConfig(testsuite.TestCase):
         conf = parse(s)
         self.assertEquals(conf.feederports, [1000, 1001, 1002])
         self.assertEquals(conf.randomFeederports, False)
-
 
     def testParseManager(self):
         conf = parse("""<worker><manager>

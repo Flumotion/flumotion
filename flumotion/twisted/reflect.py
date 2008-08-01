@@ -40,6 +40,8 @@ __version__ = "$Rev$"
 ### between
 ### filed as http://www.twistedmatrix.com/users/roundup.twistd/twisted/issue698
 ### remove this when fixed and depending on new upstream twisted
+
+
 def namedAny(name):
     """Get a fully named package, module, module-global object, or attribute.
     """

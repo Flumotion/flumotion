@@ -40,6 +40,7 @@ class DiracVideoEncoder(VideoEncoder):
 
         self.properties.bitrate = 400
 
+
 class DiracStep(VideoEncoderStep):
     name = 'Dirac encoder'
     title = _('Dirac encoder')
@@ -64,8 +65,10 @@ class DiracStep(VideoEncoderStep):
         # unknown ? Should we wait on it ?
         self.wizard.requireElements(worker, 'schroenc')
 
+
 class DiracWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = DiracVideoEncoder()

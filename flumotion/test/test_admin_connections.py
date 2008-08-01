@@ -26,6 +26,7 @@ from flumotion.admin.connections import getRecentConnections, \
 
 
 class AdminConnectiontionsTest(testsuite.TestCase):
+
     def testGetRecentConnections(self):
         recent = getRecentConnections()
         if not recent:

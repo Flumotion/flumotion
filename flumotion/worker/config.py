@@ -35,18 +35,23 @@ __version__ = "$Rev$"
 class ConfigError(Exception):
     pass
 
+
 class ConfigEntryManager:
     "I represent a <manager> entry in a worker config file"
+
     def __init__(self, host, port, transport):
         self.host = host
         self.port = port
         self.transport = transport
 
+
 class ConfigEntryAuthentication:
     "I represent a <authentication> entry in a worker config file"
+
     def __init__(self, username, password):
         self.username = username
         self.password = password
+
 
 class WorkerConfigXML(log.Loggable):
     logCategory = 'config'
@@ -76,6 +81,7 @@ class WorkerConfigXML(log.Loggable):
         self.parse()
 
     # FIXME: privatize, called from __init__
+
     def parse(self):
         # <worker name="default">
         #     <manager>
@@ -107,6 +113,7 @@ class WorkerConfigXML(log.Loggable):
             else:
                 raise ConfigError("unexpected node under '%s': %s" % (
                     root.nodeName, node.nodeName))
+
     def parseManager(self, node):
         # <manager>
         #   <host>...</host>

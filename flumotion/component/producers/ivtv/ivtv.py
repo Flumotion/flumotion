@@ -24,6 +24,7 @@ __version__ = "$Rev$"
 
 
 class Ivtv(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         device = properties.get('device', '/dev/video0')
         deinterlacer = properties.get('deinterlacer', '')

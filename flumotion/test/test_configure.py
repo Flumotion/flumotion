@@ -25,9 +25,8 @@ from flumotion.configure import configure
 from flumotion.common import testsuite
 
 
-
-
 class TestConfig(testsuite.TestCase):
+
     def testVariables(self):
         assert hasattr(configure, 'configdir')
         assert isinstance(configure.configdir, str)

@@ -18,6 +18,7 @@ import sys
 debug = sys.stdout.write
 debug = lambda x: x
 
+
 class REO:
     flags = 0
 
@@ -33,8 +34,10 @@ class REO:
         else:
             self.reo = None
 
+
 class Block(REO):
     flags = re.MULTILINE
+
 
 class Stop(REO):
     blocks = None
@@ -49,6 +52,7 @@ class Stop(REO):
         if not self.blocks:
             self.blocks = []
         self.blocks.append(block)
+
 
 class Start(REO):
     stops = None
@@ -192,10 +196,6 @@ class Filter:
                     # suspected block lines and the stop line
                     if not blockFound:
                         self._buffer += lines + line
-
-
-
-
 
             self._stdout.write(self._buffer)
             self._stdout.flush()

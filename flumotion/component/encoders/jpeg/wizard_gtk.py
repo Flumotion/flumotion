@@ -79,6 +79,7 @@ class JPEGStep(VideoEncoderStep):
 
 class JPEGWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = JPEGVideoEncoder()

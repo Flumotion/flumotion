@@ -26,9 +26,8 @@ from flumotion.common import testsuite
 from flumotion.worker import worker
 
 
-
-
 class FakeOptions:
+
     def __init__(self):
         self.name = 'fakeworker'
         self.feederports = []
@@ -36,6 +35,7 @@ class FakeOptions:
 
 
 class TestCheckJobHeaven(testsuite.TestCase):
+
     def setUp(self):
         self.brain = worker.WorkerBrain(FakeOptions())
         self.checkHeaven = self.brain.checkHeaven

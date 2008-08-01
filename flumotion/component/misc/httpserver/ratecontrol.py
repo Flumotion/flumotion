@@ -29,11 +29,13 @@ from twisted.internet import reactor
 
 from flumotion.component.plugs import base as plugbase
 
+
 class RateController(plugbase.ComponentPlug):
 
     # Create a producer-consumer proxy that sits between a FileTransfer object
     # and a request object.
     # You may return a Deferred here.
+
     def createProducerConsumerProxy(self, consumer, request):
         pass
 
@@ -52,6 +54,7 @@ class FixedRatePlug(RateController):
     def createProducerConsumerProxy(self, consumer, request):
         return TokenBucketConsumer(consumer, self._maxLevel,
             self._rateBytesPerSec, self._initialLevel)
+
 
 class TokenBucketConsumer(log.Loggable):
     """

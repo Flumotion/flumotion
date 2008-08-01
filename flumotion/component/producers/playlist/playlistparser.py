@@ -36,6 +36,7 @@ __version__ = "$Rev$"
 
 
 class PlaylistItem(object, log.Loggable):
+
     def __init__(self, piid, timestamp, uri, offset, duration):
         self.id = piid
         self.timestamp = timestamp
@@ -48,6 +49,7 @@ class PlaylistItem(object, log.Loggable):
 
         self.next = None
         self.prev = None
+
 
 class Playlist(object, log.Loggable):
     logCategory = 'playlist-list'
@@ -201,6 +203,7 @@ class Playlist(object, log.Loggable):
         if item.next:
             item.next.prev = item.prev
 
+
 class PlaylistParser(object, log.Loggable):
     logCategory = 'playlist-parse'
 
@@ -267,6 +270,7 @@ class PlaylistParser(object, log.Loggable):
         self._pending_items = [elt for (ts, elt) in sortlist]
 
     def _discoverPending(self):
+
         def _discovered(disc, is_media):
             self.debug("Discovered!")
             reactor.callFromThread(_discoverer_done, disc, is_media)
@@ -343,6 +347,7 @@ class PlaylistParser(object, log.Loggable):
         # Now launch the discoverer for any pending items
         self.startDiscovery()
 
+
 class PlaylistXMLParser(PlaylistParser):
     logCategory = 'playlist-xml'
 
@@ -383,6 +388,7 @@ class PlaylistXMLParser(PlaylistParser):
 
     # A simplified private version of this code from fxml without the
     # undesirable unicode->str conversions.
+
     def _parseAttributes(self, node, required, optional):
         out = []
         for k in required:

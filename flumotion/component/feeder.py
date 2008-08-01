@@ -37,6 +37,7 @@ class Feeder:
     @ivar feederName: name of the feeder
     @ivar uiState: the serializable UI State for this feeder
     """
+
     def __init__(self, feederName):
         self.feederName = feederName
         self.elementName = 'feeder:' + feederName
@@ -101,6 +102,7 @@ class Feeder:
         """
         return self._clients.values()
 
+
 class FeederClient:
     """
     This class groups information related to the client of a feeder.
@@ -111,6 +113,7 @@ class FeederClient:
     @ivar clientId: id of the client of the feeder
     @ivar fd:       file descriptor the client is currently using, or None.
     """
+
     def __init__(self, clientId):
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('client-id', clientId)

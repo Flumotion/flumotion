@@ -26,6 +26,7 @@ __version__ = "$Rev$"
 
 
 class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
+
     def setup(self):
         volume = VolumeAdminGtkNode(self.state, self.admin,
                                     'inputVolume', 'Input Volume')

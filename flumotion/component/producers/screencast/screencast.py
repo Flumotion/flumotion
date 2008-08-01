@@ -27,7 +27,9 @@ __version__ = "$Rev$"
 
 
 class Screencast(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
+
         def getProps():
             ret = []
             for k, default in (('width', 320),

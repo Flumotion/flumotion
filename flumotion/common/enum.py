@@ -50,6 +50,7 @@ class EnumMetaClass(type):
 class Enum(object, jelly.Jellyable):
 
     __metaclass__ = EnumMetaClass
+
     def __init__(self, value, name, nick=None):
         self.value = value
         self.name = name
@@ -82,6 +83,7 @@ class Enum(object, jelly.Jellyable):
 
 
 class EnumClass(object):
+
     def __new__(klass, type_name, names=(), nicks=(), **extras):
         if nicks:
             if len(names) != len(nicks):
@@ -114,6 +116,8 @@ class EnumClass(object):
 
 # Enum unjellyer should not be a new style class,
 # otherwise Twsited 2.0.1 will not recognise it.
+
+
 class EnumUnjellyer(jelly.Unjellyable):
 
     def unjellyFor(self, unjellier, jellyList):

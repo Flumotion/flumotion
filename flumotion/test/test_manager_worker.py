@@ -27,23 +27,28 @@ from flumotion.common import testsuite
 from flumotion.manager import worker
 
 
-
-
 class FakeTransport:
+
     def getPeer(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+
     def getHost(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+
     def loseConnection(self):
         pass
 
+
 class FakeBroker:
+
     def __init__(self):
         self.transport = FakeTransport()
 
+
 class FakeMind(log.Loggable):
+
     def __init__(self, testcase):
         self.broker = FakeBroker()
         self.testcase = testcase
@@ -91,19 +96,24 @@ class FakeWorkerMind(FakeMind):
         # need to return the avatarId for comparison
         return avatarId
 
+
 class FakeVishnu:
+
     def workerAttached(self, avatar):
         pass
 
     def workerDetached(self, avatar):
         pass
 
+
 class TestHeaven(testsuite.TestCase):
+
     def testConstructor(self):
         h = worker.WorkerHeaven(None)
         assert isinstance(h, worker.WorkerHeaven)
 
     def testAdd(self):
+
         def gotAvatar(res):
             interface, avatar, cleanup = res
             assert 'foo' in [a.getName() for a in h.getAvatars()]

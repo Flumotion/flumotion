@@ -36,6 +36,7 @@ def printMultiline(indent, data):
             segment += " %s" % frags.pop(0)
         print '  %s  %s' % (' ' * indent, segment)
 
+
 def printProperty(prop, indent):
     pname = prop.getName()
     desc = prop.getDescription()
@@ -51,6 +52,7 @@ def printProperty(prop, indent):
         printMultiline(indent, 'subproperties: %s' %
                        ', '.join(subprop_names))
 
+
 def printProperties(props, indent):
     properties = [(p.getName(), p) for p in props]
     properties.sort()
@@ -59,8 +61,10 @@ def printProperties(props, indent):
         for _, p in properties:
             printProperty(p, indent)
 
+
 class _NestedPropertyError(Exception):
     pass
+
 
 def getNestedProperty(c, ppath):
     obj_class = 'Component'

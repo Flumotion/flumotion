@@ -34,9 +34,8 @@ import os
 from twisted.web import http
 
 
-
-
 class PipeTransport:
+
     def __init__(self):
         self.rfd, self.wfd = os.pipe()
         fcntl.fcntl(self.rfd, fcntl.F_SETFL, os.O_NONBLOCK)
@@ -60,6 +59,8 @@ class PipeTransport:
         return data
 
 # a mockery of twisted.web.http.Request
+
+
 class FakeRequest:
     transport = PipeTransport()
     method = 'GET'
@@ -105,8 +106,10 @@ class FakeRequest:
 
 # fake mediums that only do authenticate
 
+
 class FakeAuthMedium:
     # this medium allows HTTP auth with fakeuser/fakepasswd
+
     def authenticate(self, bouncerName, keycard):
         if keycard.username == 'fakeuser' and keycard.password == 'fakepasswd':
             keycard.state = keycards.AUTHENTICATED
@@ -114,14 +117,17 @@ class FakeAuthMedium:
 
         return defer.succeed(None)
 
+
 class FakeTokenMedium:
     # this medium allows HTTP auth if there is a "LETMEIN" token
+
     def authenticate(self, bouncerName, keycard):
         if keycard.token == 'LETMEIN':
             keycard.state = keycards.AUTHENTICATED
             return defer.succeed(keycard)
 
         return defer.succeed(None)
+
 
 class FakeStreamer:
     caps = None
@@ -149,9 +155,11 @@ class FakeStreamer:
 
 class TestHTTPStreamingResource(testsuite.TestCase):
     # helpers
+
     def deferAssertUnauthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
         # the request is not authorized
+
         def checkResult(res):
             errorCode = http.UNAUTHORIZED
             self.assertEquals(request.headers.get('content-type', ''),
@@ -177,6 +185,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def deferAssertAuthorized(self, httpauth, request):
         # make the resource authenticate the request, and verify
         # the request is authorized
+
         def checkResult(res):
             self.failIfEquals(request.response, http.OK)
 
@@ -309,7 +318,9 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         #assert request.headers['Date'] == 'FakeDate'
         #assert request.headers['Content-Type'] == 'application/x-ogg'
 
+
 class TestHTTPRoot(testsuite.TestCase):
+
     def testRenderRootStreamer(self):
         # a streamer that is at /
         root = resources.HTTPRoot()

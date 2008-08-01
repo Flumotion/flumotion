@@ -390,7 +390,6 @@ user:PSfNpHTkpTx1M
 
         return True
 
-
     def startManager(self, name, flowNames):
         """
         Start the manager as configured in the manager directory for the given

@@ -24,4 +24,3 @@ code for jobs executing for workers
 """
 
 __version__ = "$Rev$"
-

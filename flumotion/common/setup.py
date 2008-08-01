@@ -32,6 +32,7 @@ def setup():
     from flumotion.common import log
     log.init()
 
+
 def setupPackagePath():
     """
     set up all project paths specified in the FLU_PROJECT_PATH environment

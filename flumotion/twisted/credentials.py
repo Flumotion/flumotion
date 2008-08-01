@@ -44,6 +44,7 @@ class Username:
     I am your average username and password credentials.
     """
     implements(credentials.IUsernamePassword)
+
     def __init__(self, username, password=''):
         self.username = username
         self.password = password
@@ -54,6 +55,7 @@ class Username:
 IUsernamePassword = credentials.IUsernamePassword
 
 IUsernameHashedPassword = credentials.IUsernameHashedPassword
+
 
 class IUsernameCryptPassword(credentials.ICredentials):
     """
@@ -79,6 +81,7 @@ class IUsernameCryptPassword(credentials.ICredentials):
         password matches.
         """
 
+
 class UsernameCryptPasswordPlaintext:
     """
     I take a username and a plaintext password.
@@ -86,6 +89,7 @@ class UsernameCryptPasswordPlaintext:
     """
 
     implements(IUsernameCryptPassword)
+
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -95,6 +99,7 @@ class UsernameCryptPasswordPlaintext:
         salt = cryptPassword[:2]
         encrypted = crypt.crypt(self.password, salt)
         return encrypted == cryptPassword
+
 
 class UsernameCryptPasswordCrypt:
     """
@@ -107,6 +112,7 @@ class UsernameCryptPasswordCrypt:
     """
 
     implements(IUsernameCryptPassword)
+
     def __init__(self, username, cryptPassword=None):
         self.username = username
         self.cryptPassword = cryptPassword
@@ -126,6 +132,7 @@ class UsernameCryptPasswordCrypt:
         """
         return self.cryptPassword == cryptPassword
 
+
 def cryptRespond(challenge, cryptPassword):
     """
     Respond to a given crypt challenge with our cryptPassword.
@@ -135,6 +142,7 @@ def cryptRespond(challenge, cryptPassword):
     md.update(cryptPassword)
     md.update(challenge)
     return md.digest()
+
 
 def dataToHex(data):
     """
@@ -146,6 +154,8 @@ def dataToHex(data):
     return "".join(l)
 
 # copied from twisted.spread.pb.challenge()
+
+
 def cryptChallenge():
     """
     I return some random data.
@@ -155,6 +165,7 @@ def cryptChallenge():
         crap = crap + chr(random.randint(65, 90) + x - x) # pychecker madness
     crap = md5.new(crap).digest()
     return crap
+
 
 class UsernameCryptPasswordCryptChallenger:
     """
@@ -198,6 +209,7 @@ class UsernameCryptPasswordCryptChallenger:
         expected = cryptRespond(self.challenge, cryptPassword)
         return self.response == expected
 
+
 class IToken(credentials.ICredentials):
     """I encapsulate a token.
 
@@ -208,11 +220,13 @@ class IToken(credentials.ICredentials):
     @ivar token: The token associated with these credentials.
     """
 
+
 class Token:
     implements(IToken)
 
     def __init__(self, token):
         self.token = token
+
 
 class IUsernameSha256Password(credentials.ICredentials):
     """
@@ -240,6 +254,8 @@ class IUsernameSha256Password(credentials.ICredentials):
 
 # our Sha256 passwords are salted;
 # ie the password string is salt + dataToHex(SHA256 digest(salt + password))
+
+
 class UsernameSha256PasswordCryptChallenger:
     """
     I take a username.
@@ -284,6 +300,7 @@ class UsernameSha256PasswordCryptChallenger:
 
         expected = cryptRespond(self.challenge, sha256Password)
         return self.response == expected
+
 
 class HTTPDigestChallenger(log.Loggable):
     _algorithm = "MD5" # MD5-sess also supported

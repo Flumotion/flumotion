@@ -81,6 +81,7 @@ class ComponentList(log.Loggable, gobject.GObject):
               False)
     gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
               False)
+
     def __init__(self, treeView):
         """
         @param treeView: the gtk.TreeView to put the view in.
@@ -139,6 +140,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         if gtk.pygtk_version >= (2, 12, 1):
             treeView.props.has_tooltip = True
             treeView.connect("query-tooltip", self._tree_view_query_tooltip_cb)
+
             def selection_changed_cb(selection):
                 treeView.trigger_tooltip_query()
             treeSelection.connect('changed', selection_changed_cb)
@@ -235,6 +237,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         #               cmp=cmpComponentType,
         #               key=operator.attrgetter('type'))
         #
+
         def componentSort(a, b):
             return cmpComponentType(a.get('type'),
                                     b.get('type'))

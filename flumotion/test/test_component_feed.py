@@ -34,8 +34,6 @@ from flumotion.twisted import pb as fpb
 from flumotion.worker import feedserver
 
 
-
-
 class FakeWorkerBrain(log.Loggable):
     _deferredFD = None
 
@@ -57,6 +55,7 @@ class FakeWorkerBrain(log.Loggable):
         self.waitForFD().callback((componentId, eaterAlias, fd, feedId))
         return True
 
+
 def countOpenFileDescriptors():
     import resource
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -73,6 +72,8 @@ def countOpenFileDescriptors():
     return n
 
 # subclass feedserver so that we can test some avatar logout details
+
+
 class FeedServer(feedserver.FeedServer):
     _deferredAvatarLogout = None
 
@@ -89,6 +90,8 @@ class FeedServer(feedserver.FeedServer):
 
 # these tests test both flumotion.worker.feedserver and
 # flumotion.component.feed.
+
+
 class FeedTestCase(testsuite.TestCase, log.Loggable):
     bouncerconf = {'name': 'testbouncer',
                    'plugs': {},
@@ -120,7 +123,9 @@ class FeedTestCase(testsuite.TestCase, log.Loggable):
         d.addCallback(lambda _: self.assertAdditionalFDsOpen(0, 'tearDown'))
         return d
 
+
 class TestFeedClient(FeedTestCase, log.Loggable):
+
     def testConnectWithoutDroppingPB(self):
         client = feed.FeedMedium(logName='test')
         factory = feed.FeedClientFactory(client)
@@ -200,7 +205,9 @@ class TestFeedClient(FeedTestCase, log.Loggable):
         d.addCallbacks(loginOk, loginFailed)
         return d
 
+
 class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
+
     def testConnectAndFeed(self):
         client = feed.FeedMedium(logName='test')
 
@@ -300,7 +307,9 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
         d.addCallback(checkfds)
         return d
 
+
 class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
+
     def testConnectAndFeed(self):
         client = feed.FeedMedium(logName='test')
 
@@ -344,6 +353,7 @@ class TestDownstreamFeedClient(FeedTestCase, log.Loggable):
             # callstack, close the fd from within a callLater instead to
             # avoid corrupting the reactor's internal state.
             d = defer.Deferred()
+
             def loseConnection():
                 t.connectionLost(failure.Failure(main.CONNECTION_DONE))
                 d.callback(None)

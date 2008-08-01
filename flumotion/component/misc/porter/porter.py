@@ -45,6 +45,7 @@ class PorterAvatar(pb.Avatar, log.Loggable):
     """
     An Avatar in the porter representing a streamer
     """
+
     def __init__(self, avatarId, porter, mind):
         self.avatarId = avatarId
         self.porter = porter
@@ -76,6 +77,7 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.log("Perspective called: deregistering default")
         self.porter.deregisterPrefix(prefix, self)
 
+
 class PorterRealm(log.Loggable):
     """
     A Realm within the Porter that creates Avatars for streamers logging into
@@ -99,6 +101,7 @@ class PorterRealm(log.Loggable):
         else:
             raise NotImplementedError("no interface")
 
+
 class PorterMedium(component.BaseComponentMedium):
 
     def remote_getPorterDetails(self):
@@ -110,6 +113,7 @@ class PorterMedium(component.BaseComponentMedium):
         return (self.comp._socketPath, self.comp._username,
                 self.comp._password, self.comp._iptablesPort,
                 self.comp._interface)
+
 
 class Porter(component.BaseComponent, log.Loggable):
     """
@@ -235,7 +239,6 @@ class Porter(component.BaseComponent, log.Loggable):
         else:
             return self.findPrefixMatch(path)
 
-
     def generateSocketPath(self):
         """
         Generate a socket pathname in an appropriate location
@@ -355,7 +358,9 @@ class Porter(component.BaseComponent, log.Loggable):
             self.setMood(moods.sad)
             return defer.fail(e)
 
+
 class PorterProtocolFactory(protocol.Factory):
+
     def __init__(self, porter, protocol):
         self._porter = porter
         self.protocol = protocol
@@ -364,6 +369,7 @@ class PorterProtocolFactory(protocol.Factory):
         p = self.protocol(self._porter)
         p.factory = self
         return p
+
 
 class PorterProtocol(protocol.Protocol, log.Loggable):
     """
@@ -490,6 +496,7 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         """
         raise NotImplementedError
 
+
 class HTTPPorterProtocol(PorterProtocol):
     scheme = 'http'
     protos = ["HTTP/1.0", "HTTP/1.1"]
@@ -515,6 +522,7 @@ class HTTPPorterProtocol(PorterProtocol):
 
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
+
 
 class RTSPPorterProtocol(HTTPPorterProtocol):
     scheme = 'rtsp'

@@ -33,25 +33,34 @@ __version__ = "$Rev$"
 
 boot.USE_GOPTION_PARSER = False
 
+
 def OptparseOptionParserClass():
     from optparse import OptionParser as BaseOP
+
     class OptionParser(BaseOP):
+
         def __init__(self, usage, description, domain):
             self.domain = domain
             BaseOP.__init__(self, usage=usage, description=description)
     return OptionParser
 
+
 def OptparseOptionGroupClass():
     from optparse import OptionGroup as BaseOG
+
     class OptionGroup(BaseOG):
+
         def __init__(self, parser, title, description=None, **kwargs):
             BaseOG.__init__(self, parser, title, description,
                             **kwargs)
     return OptionGroup
 
+
 def GOptionOptionParserClass(use_gst):
     from gobject.option import OptionParser as BaseOP
+
     class OptionParser(BaseOP):
+
         def __init__(self, usage, description, domain):
             self.domain = domain
             BaseOP.__init__(self, usage=usage, description=description)
@@ -65,15 +74,19 @@ def GOptionOptionParserClass(use_gst):
                     pass
     return OptionParser
 
+
 def GOptionOptionGroupClass():
     from goption.option import OptionGroup as BaseOG
+
     class OptionGroup(BaseOG):
+
         def __init__(self, parser, title, description=None, **kwargs):
             if not description:
                 description = title.capitalize() + " options"
             BaseOG.__init__(self, title, description,
                             option_list=[], **kwargs)
     return OptionGroup
+
 
 def OptionParser(usage="", description="", domain=""):
     """I have two responsibilities:
@@ -89,6 +102,7 @@ def OptionParser(usage="", description="", domain=""):
         OptionParser = OptparseOptionParserClass()
 
     class FOptionParser(OptionParser):
+
         def __init__(self, usage, description, domain):
             OptionParser.__init__(self, usage, description, domain)
             self._add_common_options()

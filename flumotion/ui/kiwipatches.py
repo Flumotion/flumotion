@@ -32,7 +32,10 @@ __version__ = "$Rev$"
 
 # Kiwi monkey patch, allows us to specify a
 # gladeTypedict on the View.
+
+
 class FluLibgladeWidgetTree(glade.XML):
+
     def __init__(self, view, gladefile, domain=None):
         self._view = view
         typeDict = getattr(view, 'gladeTypedict', {}) or {}
@@ -56,6 +59,7 @@ class FluLibgladeWidgetTree(glade.XML):
     def get_sizegroups(self):
         return []
 
+
 def _open_glade(view, gladefile, domain):
     if not gladefile:
         raise ValueError("A gladefile wasn't provided.")
@@ -76,11 +80,14 @@ def _open_glade(view, gladefile, domain):
 
 # Fixing bug #3259, fixed in kiwi 1.99.15
 old_proxy_entry_init = ProxyEntry.__init__
+
+
 def proxy_entry_init(*args, **kwargs):
     try:
         old_proxy_entry_init(*args, **kwargs)
     except TypeError:
         pass
+
 
 def install_patches():
     views._open_glade = _open_glade

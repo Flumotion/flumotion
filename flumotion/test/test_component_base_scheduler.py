@@ -344,6 +344,7 @@ class SchedulerTest(testsuite.TestCase):
         Test weekly recurrence rules that starts on one day and spawns to
         the day after, even though they were not planned for the next day.
         """
+
         def yesterdayDayOfTheWeek(now):
             yesterday = now - timedelta(days=1)
             day = calendar.weekday(yesterday.year, yesterday.month,
@@ -570,6 +571,7 @@ class SchedulerTest(testsuite.TestCase):
 
 
 class ICalSchedulerTest(testsuite.TestCase):
+
     def setUp(self):
         self._scheduler = scheduler.ICalScheduler(None)
 

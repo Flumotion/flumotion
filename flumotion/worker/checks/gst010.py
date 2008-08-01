@@ -49,6 +49,7 @@ class BusResolution(fdefer.Resolution):
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
+
 def do_element_check(pipeline_str, element_name, check_proc, state=None,
     set_state_deferred=False):
     """
@@ -68,6 +69,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
               fail.
     @rtype: L{twisted.internet.defer.Deferred}
     """
+
     def run_check(pipeline, resolution):
         element = pipeline.get_by_name(element_name)
         try:
@@ -85,7 +87,6 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
         # set pipeline state to NULL so worker does not consume
         # unnecessary resources
         pipeline.set_state(gst.STATE_NULL)
-
 
     def message_rcvd(bus, message, pipeline, resolution):
         t = message.type
@@ -134,6 +135,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
     log.debug('check', 'setting state to playing')
     if set_state_deferred:
         d = deferToThread(pipeline.set_state, gst.STATE_PLAYING)
+
         def stateChanged(res):
             return resolution.d
         d.addCallback(stateChanged)
@@ -141,6 +143,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
     else:
         pipeline.set_state(gst.STATE_PLAYING)
         return resolution.d
+
 
 def check1394(mid):
     """

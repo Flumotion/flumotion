@@ -138,6 +138,7 @@ class TheoraStep(VideoEncoderStep):
 
 class TheoraWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TheoraVideoEncoder()

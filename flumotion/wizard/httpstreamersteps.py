@@ -61,6 +61,7 @@ class HTTPStreamer(Consumer):
     @ivar hostname: the hostname this will be streamed on
     """
     componentType = 'http-streamer'
+
     def __init__(self, common):
         super(HTTPStreamer, self).__init__()
         self._common = common
@@ -97,6 +98,7 @@ class HTTPStreamer(Consumer):
         return properties
 
     # Private
+
     def _getPort(self):
         return self._common.port
 
@@ -110,6 +112,7 @@ class PlugPluginLine(gtk.VBox):
     @ivar plugin: plugin instance
     """
     gsignal('enable-changed')
+
     def __init__(self, plugin, description):
         """
         @param plugin: plugin instance
@@ -141,6 +144,7 @@ class PlugPluginArea(gtk.VBox):
     of the plugins and their internal state. You can ask me to add new plugins
     or get the internal models of the plugins.
     """
+
     def __init__(self, streamer):
         self.streamer = streamer
         gtk.VBox.__init__(self, spacing=6)
@@ -248,16 +252,19 @@ class HTTPSpecificStep(ConsumerStep):
     # Private
 
     def _populatePlugins(self):
+
         def gotEntries(entries):
             log.debug('httpwizard', 'got %r' % (entries, ))
             for entry in entries:
                 if not self._canAddPlug(entry):
                     continue
+
                 def response(factory, entry):
                     # FIXME: verify that factory implements IHTTPConsumerPlugin
                     plugin = factory(self.wizard)
                     if hasattr(plugin, 'workerChanged'):
                         d = plugin.workerChanged(self.worker)
+
                         def cb(found, plugin, entry):
                             if found:
                                 self._addPlug(
@@ -406,4 +413,3 @@ class HTTPVideoStep(HTTPSpecificStep):
 
     def getConsumerType(self):
         return 'video'
-

@@ -23,13 +23,14 @@ from flumotion.component.bouncers import component
 from flumotion.test import bouncertest
 
 
-
-
 class FakeBouncerMedium(bouncertest.FakeMedium, component.BouncerMedium):
+
     def __init__(self):
         pass
 
+
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
+
     def setUp(self):
         plugs = {component.BOUNCER_SOCKET:
                  [{'socket': component.BOUNCER_SOCKET,

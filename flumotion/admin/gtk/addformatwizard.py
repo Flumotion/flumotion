@@ -29,6 +29,7 @@ from flumotion.wizard.productionsteps import SelectProducersStep
 
 
 class AddFormatWizard(ConfigurationWizard):
+
     def __init__(self, parent=None):
         self._selectProducerStep = None
         ConfigurationWizard.__init__(self, parent)

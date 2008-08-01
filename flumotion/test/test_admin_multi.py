@@ -28,13 +28,13 @@ from flumotion.common import connection
 from flumotion.twisted import pb
 
 
-
-
 class MultiAdminTest(testsuite.TestCaseWithManager):
+
     def testConstructor(self):
         model = multi.MultiAdminModel()
 
     def testConnectSuccess(self):
+
         def connected(_):
             self.assertEqual(len(self.vishnu.adminHeaven.avatars),
                              1)
@@ -46,6 +46,7 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
         return d
 
     def testConnectFailure(self):
+
         def connected(_):
             self.fail('should not have connected')
 
@@ -66,7 +67,9 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
         return d
 
     def testReconnect(self):
+
         class Listener:
+
             def __init__(self):
                 self.disconnectDeferred = defer.Deferred()
                 self.reconnectDeferred = defer.Deferred()

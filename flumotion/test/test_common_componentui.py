@@ -31,7 +31,9 @@ class FakeObject:
 class FakeAdmin(testsuite.TestAdmin):
     pass
 
+
 class FakeWorker(testsuite.TestWorker):
+
     def remote_getState(self):
         if not hasattr(self, 'state'):
             self.state = componentui.WorkerComponentUIState()
@@ -48,7 +50,9 @@ class FakeWorker(testsuite.TestWorker):
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
 
+
 class TestRoot(testsuite.TestManagerRoot):
+
     def remote_workerGetState(self):
         d = self.workerReference.callRemote('getState')
         d.addCallback(self._workerGotState)
@@ -71,7 +75,9 @@ class TestRoot(testsuite.TestManagerRoot):
     def remote_workerHaveAdopted(self, name):
         return self.workerReference.callRemote('haveAdopted', name)
 
+
 class TestStateSet(testsuite.TestCase):
+
     def setUp(self):
         self.changes = []
 
@@ -91,7 +97,6 @@ class TestStateSet(testsuite.TestCase):
         yield self.worker.stop()
     tearDown = defer_generator_method(tearDown)
 
-
     def reset(self):
         self.changes = []
 
@@ -99,6 +104,7 @@ class TestStateSet(testsuite.TestCase):
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
+
         def workerGetStateCallback(state):
             self.failUnless(state)
             self.failUnless(state.hasKey('name'))
@@ -119,11 +125,13 @@ class TestStateSet(testsuite.TestCase):
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
+
         def workerGetStateCallback(state):
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
 
             d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
+
             def workerBearChildCallback(result):
                 self.failUnlessEqual(state.get('children'), ['batman', ])
             d.addCallback(workerBearChildCallback)
@@ -132,6 +140,7 @@ class TestStateSet(testsuite.TestCase):
         return d
 
     def listen(self, state):
+
         def event(type):
             return lambda o, k, v: self.changes.append((type, o, k, v))
         state.addListener(self, event('set'), event('append'),
@@ -140,7 +149,9 @@ class TestStateSet(testsuite.TestCase):
     # This is a simple test to show that explicitly del'ing the
     # state causes a decache further up and so no changes to be
     # sent from the Cachable object.  This is only for Twisted 2.x
+
     def testSimpleStateListener(self):
+
         def getStateCallback(state):
             self.listen(state)
             self._state = state
@@ -164,6 +175,7 @@ class TestStateSet(testsuite.TestCase):
         return d
 
     def testStateListener(self):
+
         def getStateCallback(state):
             self.listen(state)
             self._state = state
@@ -212,7 +224,9 @@ class TestStateSet(testsuite.TestCase):
     # change state by appending children
     # verify if we have the right number of items proxied,
     # ie the manager reference doesn't do something weird
+
     def testStateListenerIntermediate(self):
+
         def workerGetStateCallback(state):
             self.listen(state)
             self.failUnless(state)
@@ -277,6 +291,7 @@ class TestStateSet(testsuite.TestCase):
         self.reset()
         # get the state
         d = self.admin.remoteRoot.callRemote('workerGetState')
+
         def workerGetStateCallback(state):
             self.listen(state)
             self.failUnless(state)
@@ -286,6 +301,7 @@ class TestStateSet(testsuite.TestCase):
 
             # change state by adding children
             d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
+
             def workerBearChildCallback(res):
                 self.failIf(self.changes)
             d.addCallback(workerBearChildCallback)

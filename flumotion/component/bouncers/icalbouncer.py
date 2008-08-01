@@ -43,6 +43,7 @@ try:
 except ImportError:
     HAS_ICAL = False
 
+
 class IcalBouncer(bouncer.Bouncer):
 
     logCategory = 'icalbouncer'
@@ -88,4 +89,3 @@ class IcalBouncer(bouncer.Bouncer):
         self.icalScheduler.stopWatchingIcalFile()
         for event in self.icalScheduler.getCurrentEvents():
             self.icalScheduler.removeEvent(event)
-

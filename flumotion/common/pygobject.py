@@ -79,6 +79,7 @@ def gobject_set_property(object, property, value):
 
     object.set_property(property, value)
 
+
 def gsignal(name, *args):
     """
     Add a GObject signal to the current object.
@@ -98,6 +99,7 @@ def gsignal(name, *args):
     _dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
 
 PARAM_CONSTRUCT = 1<<9
+
 
 def gproperty(type_, name, desc, *args, **kwargs):
     """
@@ -151,6 +153,7 @@ def gproperty(type_, name, desc, *args, **kwargs):
             raise Exception('Invalid GObject property flag: %r=%r' % (k, v))
 
     _dict[name] = (type_, name, desc) + args + tuple((flags, ))
+
 
 def type_register(klass):
     if klass.__gtype__.pytype is not klass:

@@ -59,6 +59,7 @@ class AdminConfigParser(fluconfig.BaseConfigParser):
         def parseplugs(node):
             return fluconfig.buildPlugsSet(self.parsePlugs(node),
                                  self.plugs.keys())
+
         def addplugs(plugs):
             for socket in plugs:
                 self.plugs[socket].extend(plugs[socket])
@@ -76,4 +77,3 @@ class AdminConfigParser(fluconfig.BaseConfigParser):
         """
         fluconfig.BaseConfigParser.add(self, file)
         self._parse()
-

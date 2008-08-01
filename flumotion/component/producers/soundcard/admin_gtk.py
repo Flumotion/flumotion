@@ -26,6 +26,7 @@ __version__ = "$Rev$"
 
 
 class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
+
     def setup(self):
         self._nodes = {}
         volume = vadmin_gtk.VolumeAdminGtkNode(self.state, self.admin,

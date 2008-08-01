@@ -15,6 +15,8 @@ from flumotion.monitor.nagios import util
 __version__ = "$Rev: 6687 $"
 
 # ad-hoc library
+
+
 class ProcessFactory:
     """
     I create a Process instance or subclass.
@@ -55,6 +57,7 @@ class Process:
     @ivar  rss:     number of pages in real memory, minus 3.
     @type  rss:     int
     """
+
     def __init__(self, pid):
         handle = open('/proc/%d/stat' % pid)
         line = handle.read()
@@ -76,7 +79,9 @@ class Process:
     def __repr__(self):
         return '<process %d: %s>' % (self.pid, self.cmd)
 
+
 class JobProcess(Process):
+
     def __init__(self, pid):
         Process.__init__(self, pid)
 
@@ -88,7 +93,9 @@ class JobProcess(Process):
     def __repr__(self):
         return '<flumotion-job %d: %s>' % (self.pid, self.component)
 
+
 class WorkerProcess(Process):
+
     def __init__(self, pid):
         Process.__init__(self, pid)
 
@@ -105,7 +112,9 @@ class WorkerProcess(Process):
     def __repr__(self):
         return '<flumotion-worker %d: %s>' % (self.pid, self.service)
 
+
 class ManagerProcess(Process):
+
     def __init__(self, pid):
         Process.__init__(self, pid)
 
@@ -154,6 +163,7 @@ def getProcesses(prefix='flumotion'):
 
 # actual command implementations
 
+
 def getMultiple(prefix='flumotion'):
     processes = getProcesses(prefix=prefix)
 
@@ -167,6 +177,7 @@ def getMultiple(prefix='flumotion'):
 
     # count the number of service names with more than one prefixed running
     return [s for s, p in serviceToProcess.items() if len(p) > 1]
+
 
 def parseSize(size):
     """
@@ -232,6 +243,7 @@ class JobMultiple(util.LogCommand):
         return util.critical('%d multiple component job(s) running (%s).' % (
             len(which), ", ".join(l)))
 
+
 class JobOrphaned(util.LogCommand):
     name = 'orphaned'
     description = "Check for orphaned job processes (without a parent worker)."
@@ -245,6 +257,7 @@ class JobOrphaned(util.LogCommand):
 
         return util.critical('%d orphaned job process(es) running (%s).' % (
             len(orphaned), ", ".join(orphaned)))
+
 
 class JobVSize(util.LogCommand):
     name = 'vsize'
@@ -299,6 +312,7 @@ class JobVSize(util.LogCommand):
         return util.ok('No job processes above warning level '
             '(highest is %d at %s)' % (pid, formatStorage(vsize)))
 
+
 class Job(util.LogCommand):
     description = "Check job processes."
 
@@ -318,10 +332,12 @@ class ManagerMultiple(util.LogCommand):
 
         return util.ok('no manager services running more than once')
 
+
 class Manager(util.LogCommand):
     description = "Check manager processes."
 
     subCommandClasses = [ManagerMultiple, ]
+
 
 class WorkerMultiple(util.LogCommand):
     name = 'multiple'
@@ -336,11 +352,13 @@ class WorkerMultiple(util.LogCommand):
 
         return util.ok('no worker services running more than once')
 
+
 class Worker(util.LogCommand):
     description = "Check worker processes."
     usage = "worker [command]"
 
     subCommandClasses = [WorkerMultiple, ]
+
 
 class ProcessCommand(util.LogCommand):
     name = "process"

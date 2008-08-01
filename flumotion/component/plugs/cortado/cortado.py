@@ -34,6 +34,7 @@ from flumotion.configure import configure
 
 __version__ = "$Rev$"
 
+
 def _htmlbool(value):
     if value:
         return 'true'
@@ -109,6 +110,7 @@ class CortadoPlug(ComponentPlug):
     """I am a component plug for a http-server which plugs in a
     http resource containing a cortado java applet.
     """
+
     def start(self, component):
         """
         @type component: L{HTTPFileStreamer}

@@ -32,10 +32,9 @@ import md5
 import time
 
 
-
-
 class TestBundler(testsuite.TestCase):
     # everything we need to set up the test environment
+
     def setUp(self):
         # create test file
         (handle, self.filename) = tempfile.mkstemp()
@@ -52,11 +51,13 @@ class TestBundler(testsuite.TestCase):
 
     # create a bundle of one file and check whether we get the correct
     # md5sum
+
     def testBundlerOneSum(self):
         b = self.bundler.bundle()
         sum = b.md5sum
 
     # create a bundle of two files and check the md5sum changed
+
     def testBundlerTwoSum(self):
         b = self.bundler.bundle()
         sum = b.md5sum
@@ -72,6 +73,7 @@ class TestBundler(testsuite.TestCase):
         os.unlink(path)
 
     # create a bundle of one file then unpack and check if it's the same
+
     def testBundlerOneFile(self):
         data = open(self.filename, "r").read()
         md5sum = md5.new(data).hexdigest()
@@ -90,6 +92,7 @@ class TestBundler(testsuite.TestCase):
 
     # create a bundle of two files then update one of them and check
     # the md5sum changes
+
     def testBundlerTwoFiles(self):
         data = open(self.filename, "r").read()
 
@@ -120,6 +123,8 @@ class TestBundler(testsuite.TestCase):
         os.unlink(path)
 
 # we test the Unbundler using the Bundler, should be enough
+
+
 class TestUnbundler(testsuite.TestCase):
 
     def setUp(self):
@@ -168,8 +173,10 @@ class TestUnbundler(testsuite.TestCase):
         two = open(newfile, "r").read()
         self.assertEquals(one, two)
 
+
 class TestBundlerBasket(testsuite.TestCase):
     # everything we need to set up the test environment
+
     def setUp(self):
         # create test files
         self.tempdir = tempfile.mkdtemp()

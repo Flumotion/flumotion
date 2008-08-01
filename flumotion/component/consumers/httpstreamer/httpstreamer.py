@@ -47,7 +47,10 @@ UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
 
 
 # FIXME: generalize this class and move it out here ?
+
+
 class Stats:
+
     def __init__(self, sink):
         self.sink = sink
 
@@ -199,6 +202,7 @@ class Stats:
 
 
 class HTTPMedium(feedcomponent.FeedComponentMedium):
+
     def __init__(self, comp):
         """
         @type comp: L{Stats}
@@ -225,6 +229,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         return self.callRemote('removeKeycardId', bouncerName, keycardId)
 
     ### remote methods for manager to call on
+
     def remote_expireKeycard(self, keycardId):
         self.comp.httpauth.expireKeycard(keycardId)
 
@@ -245,6 +250,8 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
 
 ### the actual component is a streamer using multifdsink
+
+
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     implements(interfaces.IStreamingComponent)
 
@@ -598,6 +605,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         to avoid saturating admin clients with traffic when many clients are
         connecting/disconnecting.
         """
+
         def setIfChanged(k, v):
             if self.uiState.get(k) != v:
                 self.uiState.set(k, v)
@@ -668,6 +676,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._pending_removals[fd] = (stats, reason)
 
     # this can be called from both application and streaming thread !
+
     def _client_fd_removed_cb(self, sink, fd):
         (stats, reason) = self._pending_removals.pop(fd)
 

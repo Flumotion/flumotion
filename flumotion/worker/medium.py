@@ -75,6 +75,7 @@ class WorkerClientFactory(ReconnectingFPBClientFactory):
     def gotDeferredLogin(self, d):
         # the deferred from the login is now available
         # add some of our own to it
+
         def remoteDisconnected(remoteReference):
             if reactor.killed:
                 self.log('Connection to manager lost due to shutdown')
@@ -124,6 +125,7 @@ class WorkerClientFactory(ReconnectingFPBClientFactory):
         d.addErrback(NoSuchMethodErrback)
         d.addErrback(loginFailedErrback)
 
+
 class WorkerMedium(medium.PingingMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
@@ -167,6 +169,7 @@ class WorkerMedium(medium.PingingMedium):
         self.factory.stopTrying()
 
     ### pb.Referenceable method for the manager's WorkerAvatar
+
     def remote_getPorts(self):
         """
         Gets the set of TCP ports that this worker is configured to use.
@@ -289,4 +292,3 @@ class WorkerMedium(medium.PingingMedium):
         @rtype: deferred that will fire an object implementing L{IDirectory}
         """
         return listDirectory(directoryName)
-

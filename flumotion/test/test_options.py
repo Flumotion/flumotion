@@ -24,9 +24,8 @@ from flumotion.common.options import OptionGroup, OptionParser
 from flumotion.common.log import getLogSettings, setLogSettings
 
 
-
-
 class TestOptions(testsuite.TestCase):
+
     def setUp(self):
         self.log_settings = getLogSettings()
 

@@ -95,6 +95,7 @@ class LiveProductionStep(WizardStep):
         @returns: video step
         @rtype: a deferred returning a L{basesteps.VideoProducerStep} instance
         """
+
         def stepLoaded(step):
             if step is not None:
                 self._videoProducer = step.model
@@ -111,6 +112,7 @@ class LiveProductionStep(WizardStep):
         @returns: audio step
         @rtype: a deferred returning a L{basesteps.AudioProducerStep} instance
         """
+
         def stepLoaded(step):
             if step is not None:
                 self._audioProducer = step.model
@@ -150,6 +152,7 @@ class LiveProductionStep(WizardStep):
     # Private API
 
     def _populateCombos(self):
+
         def gotEntries(entries, combo, default_type):
             data = []
             default = None
@@ -173,12 +176,14 @@ class LiveProductionStep(WizardStep):
             combo.set_sensitive(False)
 
         self.wizard.waitForTask('querying producers')
+
         def done(_):
             self.wizard.taskFinished()
             self._loadedSteps = True
         d.addCallback(done)
 
     def _loadPlugin(self, componentType, type):
+
         def gotFactory(factory):
             return factory(self.wizard)
 
@@ -192,6 +197,7 @@ class LiveProductionStep(WizardStep):
         return d
 
     def _loadStep(self, combo, type):
+
         def pluginLoaded(plugin, entry):
             # FIXME: verify that factory implements IProductionPlugin
             step = plugin.getProductionStep(type)

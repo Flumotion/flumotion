@@ -31,6 +31,8 @@ for name in bundlerNames:
         exitCode += 1
 
 # verify all components
+
+
 def componentError(c, msg):
     global exitCode
     sys.stderr.write("Component %s from %s %s.\n" %(

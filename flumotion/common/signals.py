@@ -60,6 +60,7 @@ class SignalMixin(object):
         del self.__signalConnections[signalId]
 
     # F0.8
+
     def disconnect_by_func(self, func):
         warnings.warn("Please call disconnectByFunction instead",
             DeprecationWarning, stacklevel=2)

@@ -59,6 +59,7 @@ class WorkerListStore(gtk.ListStore):
                     return
 gobject.type_register(WorkerListStore)
 
+
 class WorkerList(gtk.HBox):
     gsignal('worker-selected', str)
     _combobox = None

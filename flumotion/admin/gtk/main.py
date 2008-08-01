@@ -36,6 +36,7 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 _retval = 0
 
+
 def _connectToManager(win, manager, ssl):
     try:
         info = parsePBConnectionInfoRecent(manager, use_ssl=ssl)
@@ -43,6 +44,7 @@ def _connectToManager(win, manager, ssl):
         raise SystemExit("ERROR: %s" % (e, ))
 
     d = win.openConnection(info)
+
     def errbackConnectionRefused(failure):
         global _retval
         failure.trap(ConnectionRefusedError)
@@ -62,6 +64,7 @@ def _connectToManager(win, manager, ssl):
     d.addErrback(errback)
     return d
 
+
 def _exceptionHandler(exctype, value, tb):
     if exctype is KeyboardInterrupt:
         return
@@ -79,6 +82,7 @@ def _exceptionHandler(exctype, value, tb):
               dialog.getDescription(),
               dialog.getSummary())
     dialog.destroy()
+
 
 def main(args):
     global _retval

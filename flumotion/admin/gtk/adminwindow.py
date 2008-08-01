@@ -685,6 +685,7 @@ class AdminWindow(Loggable, GladeDelegate):
         return porter
 
     def _createComponentsByWizardType(self, componentClass, entries):
+
         def _getComponents():
             for componentState in self._componentStates.values():
                 componentType = componentState.get('config')['type']
@@ -706,6 +707,7 @@ class AdminWindow(Loggable, GladeDelegate):
     def _runAddNewFormatWizard(self):
         from flumotion.admin.gtk.addformatwizard import AddFormatWizard
         addFormatWizard = AddFormatWizard(self._window)
+
         def cb(entries):
             entryDict = {}
             for entry in entries:
@@ -907,6 +909,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
     def _clearAllComponents(self):
         d = self._adminModel.cleanComponents()
+
         def busyComponentError(failure):
             failure.trap(BusyComponentError)
             self._error(
@@ -1179,6 +1182,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._showConnectionLostDialog()
 
     def _connectionRefused(self):
+
         def refusedLater():
             self._fatalError(
                 _("Connection to manager on %s was refused.") % (
@@ -1321,12 +1325,14 @@ You can do remote component calls using:
         code.interact(local=ns, banner=message)
 
     def _dumpConfiguration(self):
+
         def gotConfiguration(xml):
             print xml
         d = self._adminModel.getConfiguration()
         d.addCallback(gotConfiguration)
 
     def _setDebugMarker(self):
+
         def setMarker(_, marker, level):
             self._adminModel.callRemote('writeFluDebugMarker', level, marker)
         debugMarkerDialog = DebugMarkerDialog()

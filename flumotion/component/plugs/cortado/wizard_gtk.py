@@ -31,6 +31,8 @@ from flumotion.wizard.models import HTTPServer, HTTPPlug
 __version__ = "$Rev$"
 
 # Copied from posixpath.py
+
+
 def slashjoin(a, *p):
     """Join two or more pathname components, inserting '/' as needed"""
     path = a
@@ -87,6 +89,7 @@ class CortadoHTTPServer(HTTPServer):
     Most of the interesting logic here is actually in a plug.
     """
     componentType = 'http-server'
+
     def __init__(self, streamer, audioProducer, videoProducer, mountPoint):
         """
         @param streamer: streamer
@@ -126,6 +129,7 @@ class CortadoHTTPServer(HTTPServer):
 
 class CortadoWizardPlugin(object):
     implements(IHTTPConsumerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
 
@@ -133,6 +137,7 @@ class CortadoWizardPlugin(object):
         d = self.wizard.runInWorker(
             worker,
             'flumotion.worker.checks.cortado', 'checkCortado')
+
         def check(found):
             return bool(found)
         d.addCallback(check)

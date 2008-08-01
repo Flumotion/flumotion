@@ -49,6 +49,7 @@ def reflectCall(moduleName, methodName, *args, **kwargs):
     proc = getattr(module, methodName)
     return proc(*args, **kwargs)
 
+
 def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
     """
     @param err: The type of error to throw
@@ -103,6 +104,7 @@ def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
     log.debug('reflectcall', 'returning %r' % ret)
 
     return ret
+
 
 def createComponent(moduleName, methodName, config):
     """

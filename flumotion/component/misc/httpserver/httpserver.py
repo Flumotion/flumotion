@@ -100,6 +100,7 @@ class Site(server.Site):
 
 
 class HTTPFileMedium(component.BaseComponentMedium):
+
     def __init__(self, comp):
         """
         @type comp: L{HTTPFileStreamer}
@@ -311,6 +312,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             # fire callback so component gets happy
             d.callback(None)
         # we are responsible for setting component happy
+
         def setComponentHappy(result):
             self.httpauth.scheduleKeepAlive()
             self.setMood(moods.happy)

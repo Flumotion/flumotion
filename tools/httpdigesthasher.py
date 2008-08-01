@@ -3,6 +3,7 @@
 import md5
 import sys
 
+
 def _calculateHA1MD5(username, realm, password):
     """
     Calculate H(A1) as from specification (RFC2617) section 3.2.2, for the

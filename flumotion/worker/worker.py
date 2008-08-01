@@ -41,6 +41,7 @@ class ProxyBouncer(log.Loggable):
     I am a bouncer that proxies authenticate calls to a remote FPB root
     object.
     """
+
     def __init__(self, remote):
         """
         @param remote: an object that has .callRemote()
@@ -60,6 +61,8 @@ class ProxyBouncer(log.Loggable):
         return self._remote.callRemote('authenticate', None, keycard)
 
 # Similar to Vishnu, but for worker related classes
+
+
 class WorkerBrain(log.Loggable):
     """
     I am the main object in the worker process, managing jobs and everything
@@ -117,6 +120,7 @@ class WorkerBrain(log.Loggable):
         self._installHUPHandler()
 
     def _installHUPHandler(self):
+
         def sighup(signum, frame):
             if self._oldHUPHandler:
                 self.log('got SIGHUP, calling previous handler %r',
@@ -197,6 +201,7 @@ class WorkerBrain(log.Loggable):
         return defer_call_later(defer.DeferredList(l))
 
     ### These methods called by feed server
+
     def feedToFD(self, componentId, feedName, fd, eaterId):
         """
         Called from the FeedAvatar to pass a file descriptor on to
@@ -226,6 +231,7 @@ class WorkerBrain(log.Loggable):
         return avatar.receiveFeed(eaterAlias, fd, feedId)
 
     ### these methods called by WorkerMedium
+
     def getPorts(self):
         return self.ports, self.options.randomFeederports
 
@@ -237,6 +243,7 @@ class WorkerBrain(log.Loggable):
 
     def create(self, avatarId, type, moduleName, methodName, nice,
                conf):
+
         def getBundles():
             # set up bundles as we need to have a pb connection to
             # download the modules -- can't do that in the kid yet.
@@ -272,6 +279,7 @@ class WorkerBrain(log.Loggable):
         return d
 
     def runCheck(self, module, function, *args, **kwargs):
+
         def getBundles():
             self.debug('setting up bundles for %s', module)
             return self.medium.bundleLoader.getBundles(moduleName=module)

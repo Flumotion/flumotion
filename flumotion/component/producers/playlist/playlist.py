@@ -44,6 +44,7 @@ def _tsToString(ts):
     """
     return time.ctime(ts/gst.SECOND)
 
+
 def videotest_gnl_src(name, start, duration, priority, pattern=None):
     src = gst.element_factory_make('videotestsrc')
     if pattern:
@@ -60,6 +61,7 @@ def videotest_gnl_src(name, start, duration, priority, pattern=None):
     gnlsrc.add(src)
 
     return gnlsrc
+
 
 def audiotest_gnl_src(name, start, duration, priority, wave=None):
     src = gst.element_factory_make('audiotestsrc')
@@ -78,6 +80,7 @@ def audiotest_gnl_src(name, start, duration, priority, wave=None):
 
     return gnlsrc
 
+
 def file_gnl_src(name, uri, caps, start, duration, offset, priority):
     src = singledecodebin.SingleDecodeBin(caps, uri)
     gnlsrc = gst.element_factory_make('gnlsource', name)
@@ -90,12 +93,15 @@ def file_gnl_src(name, uri, caps, start, duration, offset, priority):
 
     return gnlsrc
 
+
 class PlaylistProducerMedium(feedcomponent.FeedComponentMedium):
+
     def __init__(self, comp):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
     def remote_add_playlist(self, data):
         self.comp.addPlaylist(data)
+
 
 class PlaylistProducer(feedcomponent.FeedComponent):
     logCategory = 'playlist-prod'

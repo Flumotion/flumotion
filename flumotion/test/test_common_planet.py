@@ -29,9 +29,8 @@ from flumotion.common.planet import moods
 from flumotion.twisted import flavors
 
 
-
-
 class ManagerComponentStateTest(testsuite.TestCase):
+
     def setUp(self):
         self.state = planet.ManagerComponentState()
 
@@ -41,12 +40,15 @@ class ManagerComponentStateTest(testsuite.TestCase):
         self.failUnlessEqual(self.state._dict['name'], 'mynameis')
 
     def testSetWrongArg(self):
+
         def assign(object):
             object.state.set('wrongarg', 'failure')
 
         self.assertRaises(KeyError, assign, self)
 
+
 class AllComponentStateTest(testsuite.TestCase):
+
     def setUp(self):
         self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
@@ -71,7 +73,9 @@ class AllComponentStateTest(testsuite.TestCase):
         self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
         self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
+
 class InvalidateTest(testsuite.TestCase):
+
     def testInvalidate(self):
         mcomp = planet.ManagerComponentState()
         mflow = planet.ManagerFlowState()
@@ -87,6 +91,7 @@ class InvalidateTest(testsuite.TestCase):
         acomp, = aflow.get('components')
 
         invalidates = []
+
         def invalidate(obj):
             invalidates.append(obj)
 
@@ -101,6 +106,8 @@ class InvalidateTest(testsuite.TestCase):
 # FIXME: this test doesn't do anything since unjelly(jelly()) creates a
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
+
+
 class ListenerTest(testsuite.TestCase):
     implements(flavors.IStateListener)
 

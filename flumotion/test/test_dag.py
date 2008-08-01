@@ -159,6 +159,7 @@ class TestDAG(testsuite.TestCase):
 
 # example as shown in
 # http://www.cs.cornell.edu/courses/cs312/2004fa/lectures/lecture15.htm
+
     def testExample(self):
         graph = dag.DAG()
 
@@ -202,7 +203,9 @@ class TestDAG(testsuite.TestCase):
         graph.addEdge(5, 4)
         self.assertRaises(dag.CycleError, graph.sort)
 
+
 class FakeDep:
+
     def __init__(self, name):
         self.name = name
 
@@ -228,7 +231,9 @@ class FakeComponent(FakeDep):
 
 (feeder, eater, worker, kid, component) = range(0, 5)
 
+
 class TestPlanet(testsuite.TestCase):
+
     def testPlanet(self):
         graph = dag.DAG()
 

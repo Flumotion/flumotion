@@ -94,6 +94,7 @@ class Scenario(object):
       - Which steps should be shown
       - How the configuration for the steps should be saved
     """
+
     def __init__(self, wizard):
         self.wizard = wizard
         self._flowName = 'default'
@@ -131,6 +132,7 @@ class Scenario(object):
         """
         raise NotImplementedError("%s.save" % (
             self.__class__.__name__, ))
+
 
 class LiveScenario(Scenario):
     short = _("Set up a live stream")

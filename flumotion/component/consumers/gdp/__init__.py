@@ -24,4 +24,3 @@ code for porter clients and servers
 """
 
 __version__ = "$Rev: 6125 $"
-

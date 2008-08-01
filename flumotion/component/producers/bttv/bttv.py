@@ -33,6 +33,7 @@ __version__ = "$Rev$"
 
 
 def arg_filtered(proc, *args):
+
     def ret(*_args):
         for spec in args:
             if len(spec) == 3:
@@ -60,6 +61,7 @@ def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
         parent = parent.get_parent()
     b = parent.get_bus()
     b.connect('message::state-changed', bus_watch_func)
+
 
 class BTTV(feedcomponent.ParseLaunchComponent):
 

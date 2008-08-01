@@ -11,6 +11,7 @@ win.add(image)
 
 win.show_all()
 
+
 def data_get_cb(data):
     #print 'New data', len(data)
     loader = gtk.gdk.PixbufLoader('jpeg')
@@ -21,6 +22,8 @@ def data_get_cb(data):
     image.set_from_pixbuf(pixbuf)
 
 d = ''
+
+
 def readsome(f):
     global d
 

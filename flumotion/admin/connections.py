@@ -57,6 +57,7 @@ class RecentConnection(object):
     @ivar timestamp: timestamp
     @type timestamp: datetime.datetime
     """
+
     def __init__(self, host, filename, info):
         self.name = str(info)
         self.host = host
@@ -78,6 +79,7 @@ def _getRecentFilenames():
         if filename.endswith('.connection'):
             yield filename
 
+
 def hasRecentConnections():
     """
     Returns if we have at least one recent connection
@@ -92,12 +94,14 @@ def hasRecentConnections():
 
     return True
 
+
 def getRecentConnections():
     """
     Fetches a list of recently used connections
     @returns: recently used connections
     @rtype: list of L{RecentConnection}
     """
+
     def _parseConnection(filename):
         tree = minidom.parse(filename)
         state = {}
@@ -125,6 +129,7 @@ def getRecentConnections():
         except Exception, e:
             log.warning('connections', 'Error parsing %s: %r', filename, e)
     return recentConnections
+
 
 def parsePBConnectionInfoRecent(managerString, use_ssl=True,
                                 defaultPort=configure.defaultSSLManagerPort):

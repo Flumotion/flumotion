@@ -69,6 +69,7 @@ class VideoTestAdminText(BaseAdminText):
                     return d
         elif string.lower(command_split[0]) == 'getpattern':
             # get pattern
+
             def getpattern_cb(uiState):
                 return self.patterns[uiState.get('pattern')]
             d = self.callRemote("getUIState")

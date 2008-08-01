@@ -40,12 +40,15 @@ __version__ = "$Rev$"
 
 
 # add our own mime types to the ones parsed from /etc/mime.types
+
+
 def loadMimeTypes():
     d = static.loadMimeTypes()
     d['.flv'] = 'video/x-flv'
     return d
 
 # this file is inspired by/adapted from twisted.web.static
+
 
 class File(resource.Resource, filepath.FilePath, log.Loggable):
     contentTypes = loadMimeTypes()
@@ -99,6 +102,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
     def render(self, request):
         self.debug('[fd %5d] render incoming request %r',
             request.transport.fileno(), request)
+
         def terminateSimpleRequest(res, request):
             if res != server.NOT_DONE_YET:
                 self.debug('finish request %r' % request)
@@ -259,6 +263,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         """
         request.setHeader("Content-Length", str(last - first + 1))
 
+
 class MimedFileFactory(log.Loggable):
     """
     I create File subclasses based on the mime type of the given path.
@@ -284,6 +289,7 @@ class MimedFileFactory(log.Loggable):
         self.debug("mimetype %s, class %r" % (mimeType, klazz))
         return klazz(path, self._httpauth, mimeToResource=self._mimeToResource,
             rateController=self._rateController)
+
 
 class FLVFile(File):
     """
@@ -316,6 +322,7 @@ class FLVFile(File):
 
         if first == 0 and start:
             request.write(self.header)
+
 
 class FileTransfer(log.Loggable):
     """

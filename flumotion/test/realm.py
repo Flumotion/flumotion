@@ -30,8 +30,6 @@ from flumotion.configure import configure
 from flumotion.component.bouncers import htpasswdcrypt
 
 
-
-
 class TestRealm(log.Loggable):
     implements(portal.IRealm, server.IServable)
     logCategory = 'fakerealm'

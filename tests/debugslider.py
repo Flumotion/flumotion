@@ -26,7 +26,9 @@ import gobject
 #pygst.require('0.10')
 import gst
 
+
 class DebugSlider(gtk.HScale):
+
     def __init__(self):
         adj = gtk.Adjustment(int(gst.debug_get_default_threshold()),
                              0, 5, 1, 0, 0)

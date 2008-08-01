@@ -25,11 +25,13 @@ from flumotion.ui.simplewizard import SimpleWizard, WizardStep
 
 
 class FakeAdminWindow:
+
     def getWindow(self):
         return None
 
 
 class WizardTest(UITestCase):
+
     def _prev(self):
         self.click('button_prev')
 

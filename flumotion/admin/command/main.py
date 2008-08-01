@@ -36,12 +36,15 @@ from flumotion.common.options import OptionParser
 
 __version__ = "$Rev$"
 
+
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')
     sys.exit(1)
 
+
 def warn(string):
     sys.stderr.write('Warning: ' + string + '\n')
+
 
 def command_usage():
     for name, desc, argspecs, proc in commands:
@@ -54,6 +57,7 @@ def command_usage():
                 sys.stdout.write(' %s' % spec[0].upper())
         sys.stdout.write('\n')
 
+
 def usage(args, exitval=0):
     print 'usage: %s [OPTIONS] -m MANAGER COMMAND COMMAND-ARGS...' % args[0]
     print ''
@@ -63,6 +67,7 @@ def usage(args, exitval=0):
     print ''
     print 'See %s -h for help on the available options.' % args[0]
     sys.exit(exitval)
+
 
 def parse_commands(args):
     op = args[1]
@@ -115,6 +120,7 @@ def parse_commands(args):
     proc = commandspec[3]
 
     def command(model, quit):
+
         def print_traceback(failure):
             import traceback
             warn('Operation %s failed:' % op)
@@ -125,6 +131,7 @@ def parse_commands(args):
         return d
 
     return command
+
 
 def setup_reactor(info):
     model = AdminModel()
@@ -147,6 +154,7 @@ def setup_reactor(info):
     return d
 
 pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
+
 
 def main(args):
     parser = OptionParser(domain="flumotion-command")
@@ -178,6 +186,7 @@ def main(args):
     d.addCallback(lambda model: command(model, quit))
     # assume that whatever raised the error already printed -- this is a
     # bit geto
+
     def errback(failure):
         reactor.exitStatus = 1
         quit()

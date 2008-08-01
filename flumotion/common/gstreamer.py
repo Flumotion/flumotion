@@ -45,6 +45,7 @@ def caps_repr(caps):
     else:
         return value
 
+
 def verbose_deep_notify_cb(object, orig, pspec, component):
     """
     A default deep-notify signal handler for pipelines.
@@ -68,6 +69,7 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
         return
 
     component.debug('%s: %s = %r', orig.get_path_string(), pspec.name, output)
+
 
 def element_factory_has_property(element_factory, property_name):
     """
@@ -99,6 +101,7 @@ def element_factory_has_property_value(element_factory, property_name, value):
 
     return True
 
+
 def element_factory_exists(name):
     """
     Check if the given element factory name exists.
@@ -112,6 +115,7 @@ def element_factory_exists(name):
         return True
 
     return False
+
 
 def get_plugin_version(plugin_name):
     """
@@ -131,6 +135,8 @@ def get_plugin_version(plugin_name):
     return versionTuple
 
 # GstPython should have something for this, but doesn't.
+
+
 def get_state_change(old, new):
     table = {(gst.STATE_NULL, gst.STATE_READY):
              gst.STATE_CHANGE_NULL_TO_READY,
@@ -146,7 +152,9 @@ def get_state_change(old, new):
              gst.STATE_CHANGE_READY_TO_NULL}
     return table.get((old, new), 0)
 
+
 class StateChangeMonitor(dict, log.Loggable):
+
     def __init__(self):
         # statechange -> [ deferred ]
         dict.__init__(self)

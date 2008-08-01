@@ -29,11 +29,15 @@ __version__ = "$Rev$"
 class LogTester(log.Loggable):
     logCategory = 'testlog'
 
+
 class LogFunctionTester(log.Loggable):
+
     def logFunction(self, format, *args):
         return (("override " + format), ) + args[1:]
 
+
 class TestLog(unittest.TestCase):
+
     def setUp(self):
         self.category = self.level = self.message = None
         self.tester = LogTester()
@@ -41,12 +45,14 @@ class TestLog(unittest.TestCase):
         log.reset()
 
     # just test for parsing semi- or non-valid FLU_DEBUG variables
+
     def testSetDebug(self):
         log.setDebug(":5")
         log.setDebug("*")
         log.setDebug("5")
 
     # test for adding a log handler
+
     def handler(self, level, object, category, file, line, message):
         self.level = level
         self.object = object
@@ -121,6 +127,7 @@ class TestLog(unittest.TestCase):
         assert self.message == 'log'
 
     # test that we get all log messages
+
     def testLogHandler(self):
         log.setDebug("testlog:3")
         log.addLogHandler(self.handler)
@@ -131,7 +138,9 @@ class TestLog(unittest.TestCase):
         self.tester.warning("also visible")
         assert self.message == 'also visible'
 
+
 class TestOwnLogHandler(unittest.TestCase):
+
     def setUp(self):
         self.category = self.level = self.message = None
         self.tester = LogFunctionTester()
@@ -145,6 +154,7 @@ class TestOwnLogHandler(unittest.TestCase):
         self.message = message
 
     # test if our own log handler correctly mangles the message
+
     def testOwnLogHandlerLimited(self):
         log.setDebug("testlog:3")
         log.addLogHandler(self.handler)
@@ -155,7 +165,9 @@ class TestOwnLogHandler(unittest.TestCase):
     def testLogHandlerAssertion(self):
         self.assertRaises(TypeError, log.addLimitedLogHandler, None)
 
+
 class TestGetExceptionMessage(unittest.TestCase):
+
     def func3(self):
         self.func2()
 
@@ -185,7 +197,9 @@ class TestGetExceptionMessage(unittest.TestCase):
         self.failUnless("test_log.py" in message)
         self.failUnless("TypeError" in message)
 
+
 class TestLogSettings(unittest.TestCase):
+
     def testSet(self):
         old = log.getLogSettings()
         log.setDebug('*:5')
@@ -193,6 +207,7 @@ class TestLogSettings(unittest.TestCase):
 
         log.setLogSettings(old)
         self.assertEquals(old, log.getLogSettings())
+
 
 class TestWriteMark(unittest.TestCase):
 

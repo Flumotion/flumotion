@@ -25,9 +25,8 @@ from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer import httpstreamer
 
 
-
-
 class TestOldProperties(testsuite.TestCase):
+
     def setUp(self):
         # config and properties copied from an actual log file, which
         # explains the unicode keys

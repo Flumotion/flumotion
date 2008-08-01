@@ -50,6 +50,7 @@ class UITestCase(testsuite.TestCase):
             gtk.main_iteration()
 
     def assertCallReturns(self, name, method, val, *args, **kwargs):
+
         def check():
             w = self._findWidget(self._window, name)
             assert w
@@ -111,6 +112,7 @@ class UITestCase(testsuite.TestCase):
         self._timeoutAdd(lambda: 0)
 
     def _timeoutAdd(self, proc, increase=True):
+
         def proc_no_return():
             try:
                 proc()
@@ -147,6 +149,7 @@ class UITestCase(testsuite.TestCase):
         return m(*args, **kwargs)
 
     def _batchCall(self, increase, name, method, *args, **kwargs):
+
         def check():
             self._callNow(name, method, *args, **kwargs)
 
@@ -163,5 +166,3 @@ class UITestCase(testsuite.TestCase):
         Like call, but also increments the timer.
         """
         self._batchCall(True, name, method, *args, **kwargs)
-
-

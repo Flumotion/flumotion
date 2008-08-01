@@ -25,9 +25,8 @@ from flumotion.common import testsuite
 from flumotion.common import registry, log, reflectcall
 
 
-
-
 class TestInit(testsuite.TestCase):
+
     def testInit(self):
         r = registry.getRegistry()
         components = [c.getType() for c in r.getComponents()]

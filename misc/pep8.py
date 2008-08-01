@@ -858,6 +858,5 @@ def _main():
     if options.benchmark:
         print_benchmark(elapsed)
 
-
 if __name__ == '__main__':
     _main()

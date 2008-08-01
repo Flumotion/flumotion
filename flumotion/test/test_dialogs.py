@@ -26,11 +26,11 @@ from flumotion.admin.gtk import dialogs
 from flumotion.common import testsuite
 
 
-
 INTERVAL = 100 # in ms
 
 
 class TestProgressDialog(testsuite.TestCase):
+
     def setUp(self):
         self.window = gtk.Window()
 
@@ -58,6 +58,7 @@ class TestProgressDialog(testsuite.TestCase):
 
 
 class TestErrorDialog(testsuite.TestCase):
+
     def setUp(self):
         self.window = gtk.Window()
 
@@ -97,6 +98,7 @@ class TestErrorDialog(testsuite.TestCase):
 
         gobject.timeout_add(1 * INTERVAL, lambda b: b.emit('clicked'), button)
         d = dialog.run()
+
         def check_visibility():
             self.failUnlessEqual(dialog.get_property('visible'), False)
             gtk.main_quit()

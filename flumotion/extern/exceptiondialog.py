@@ -41,6 +41,7 @@ EXCEPTION_COLOR = '#880000'
 
 
 class TracebackViewer(gtk.ScrolledWindow):
+
     def __init__(self, excTuple):
         exctype, value, tb = excTuple
         self._exctype = exctype
@@ -163,6 +164,7 @@ class ExceptionDialog(HIGAlertDialog):
     and code to report a bug.
     """
     RESPONSE_BUG = 1
+
     def __init__(self, excTuple):
         """
         @param excTuple:

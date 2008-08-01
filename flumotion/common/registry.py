@@ -55,8 +55,10 @@ _VALID_WIZARD_PLUG_TYPES = [
     'http-consumer',
     ]
 
+
 def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
+
 
 class RegistryEntryComponent:
     """
@@ -170,6 +172,7 @@ class RegistryEntryComponent:
     def getSockets(self):
         return self.sockets
 
+
 class RegistryEntryPlug:
     """
     I represent a <plug> entry in the registry
@@ -232,8 +235,10 @@ class RegistryEntryPlug:
     def getSocket(self):
         return self.socket
 
+
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
+
     def __init__(self, name, project, under, dependencies, directories):
         self.name = name
         self.project = project
@@ -272,8 +277,10 @@ class RegistryEntryBundle:
         from flumotion.project import project
         return project.get(self.project, self.under)
 
+
 class RegistryEntryBundleDirectory:
     "This class represents a <directory> entry in the registry"
+
     def __init__(self, name, files):
         self.name = name
         self.files = files
@@ -284,8 +291,10 @@ class RegistryEntryBundleDirectory:
     def getFiles(self):
         return self.files
 
+
 class RegistryEntryBundleFilename:
     "This class represents a <filename> entry in the registry"
+
     def __init__(self, location, relative):
         self.location = location
         self.relative = relative
@@ -329,8 +338,10 @@ class RegistryEntryProperty:
     def isMultiple(self):
         return self.multiple
 
+
 class RegistryEntryCompoundProperty(RegistryEntryProperty):
     "This class represents a <compound-property> entry in the registry"
+
     def __init__(self, name, description, properties, required=False,
                  multiple=False):
         RegistryEntryProperty.__init__(self, name, 'compound', description,
@@ -355,8 +366,10 @@ class RegistryEntryCompoundProperty(RegistryEntryProperty):
         """
         return name in self.properties
 
+
 class RegistryEntryFile:
     "This class represents a <file> entry in the registry"
+
     def __init__(self, filename, type):
         self.filename = filename
         self.type = type
@@ -373,8 +386,10 @@ class RegistryEntryFile:
     def isType(self, type):
         return self.type == type
 
+
 class RegistryEntryEntry:
     "This class represents a <entry> entry in the registry"
+
     def __init__(self, type, location, function):
         self.type = type
         self.location = location
@@ -396,8 +411,10 @@ class RegistryEntryEntry:
     def getFunction(self):
         return self.function
 
+
 class RegistryEntryEater:
     "This class represents a <eater> entry in the registry"
+
     def __init__(self, name, required=True, multiple=False):
         self.name = name
         self.required = required
@@ -412,8 +429,10 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
 
+
 class RegistryEntryWizard(pb.Copyable):
     "This class represents a <wizard> entry in the registry"
+
     def __init__(self, componentType, type, description, feeder,
                  eater, accepts, provides):
         self.componentType = componentType
@@ -434,6 +453,7 @@ class RegistryEntryWizardFormat(pb.Copyable):
     This class represents an <accept-format> or <provide-format>
     entry in the registry
     """
+
     def __init__(self, media_type):
         self.media_type = media_type
 
@@ -487,6 +507,7 @@ class RegistryParser(fxml.Parser):
         # </components>
 
         components = {}
+
         def addComponent(comp):
             components[comp.getType()] = comp
 
@@ -619,6 +640,7 @@ class RegistryParser(fxml.Parser):
         multiple = common.strToBool(multiple)
 
         properties = {}
+
         def addProperty(prop):
             properties[prop.getName()] = prop
 
@@ -637,6 +659,7 @@ class RegistryParser(fxml.Parser):
         # </properties>
 
         properties = {}
+
         def addProperty(prop):
             properties[prop.getName()] = prop
 
@@ -700,6 +723,7 @@ class RegistryParser(fxml.Parser):
         # returns: dict of type -> entry
 
         entries = {}
+
         def addEntry(entry):
             if entry.getType() in entries:
                 raise fxml.ParserError("entry %s already specified"
@@ -754,6 +778,7 @@ class RegistryParser(fxml.Parser):
         # returns: dict of type -> entry
 
         entries = {}
+
         def addEntry(entry):
             if entry.getType() in entries:
                 raise fxml.ParserError("entry %s already specified"
@@ -806,6 +831,7 @@ class RegistryParser(fxml.Parser):
         self.checkAttributes(node)
 
         plugs = {}
+
         def addPlug(plug):
             plugs[plug.getType()] = plug
 
@@ -815,6 +841,7 @@ class RegistryParser(fxml.Parser):
         return plugs
 
     ## Component registry specific functions
+
     def parseRegistryFile(self, file):
         """
         @param file: The file to parse, either as an open file object,
@@ -844,6 +871,7 @@ class RegistryParser(fxml.Parser):
         # </bundles>
 
         bundles = {}
+
         def addBundle(bundle):
             bundles[bundle.getName()] = bundle
 
@@ -919,6 +947,7 @@ class RegistryParser(fxml.Parser):
         name, = self.parseAttributes(node, ('name', ))
 
         filenames = []
+
         def parseFilename(node):
             return self._parseBundleDirectoryFilename(node, name)
 
@@ -928,6 +957,7 @@ class RegistryParser(fxml.Parser):
         return RegistryEntryBundleDirectory(name, filenames)
 
     ## Base registry specific functions
+
     def parseRegistry(self, file):
         """
         @param file: The file to parse, either as an open file object,
@@ -988,6 +1018,7 @@ class RegistryParser(fxml.Parser):
         # </directories>
 
         directories = {}
+
         def addDirectory(d):
             directories[d.getPath()] = d
 
@@ -1078,12 +1109,15 @@ class RegistryParser(fxml.Parser):
 
 
 # FIXME: filename -> path
+
+
 class RegistryDirectory(log.Loggable):
     """
     I represent a directory under a path managed by the registry.
     I can be queried for a list of partial registry .xml files underneath
     the given path, under the given prefix.
     """
+
     def __init__(self, path, prefix=configure.PACKAGE):
         self._path = path
         self._prefix = prefix
@@ -1132,6 +1166,7 @@ class RegistryDirectory(log.Loggable):
         return files, dirs
 
     def rebuildNeeded(self, mtime):
+
         def _rebuildNeeded(file):
             try:
                 if _getMTime(file) > mtime:
@@ -1161,7 +1196,9 @@ class RegistryDirectory(log.Loggable):
     def getPath(self):
         return self._path
 
+
 class RegistryWriter(log.Loggable):
+
     def __init__(self, components, plugs, bundles, directories):
         """
         @param components: components to write
@@ -1188,6 +1225,7 @@ class RegistryWriter(log.Loggable):
 
         def w(i, msg):
             print >> fd, ' '*i + msg
+
         def e(attr):
             return saxutils.quoteattr(attr)
 
@@ -1348,6 +1386,7 @@ class RegistryWriter(log.Loggable):
 
         w(0, '</registry>')
 
+
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
 
@@ -1424,6 +1463,7 @@ class ComponentRegistry(log.Loggable):
 
     # fixme: these methods inconsistenly molest and duplicate those of
     # the parser.
+
     def isEmpty(self):
         return len(self._parser._components) == 0
 
@@ -1461,6 +1501,7 @@ class ComponentRegistry(log.Loggable):
         """
         @rtype: L{flumotion.common.bundle.BundlerBasket}
         """
+
         def load():
             ret = BundlerBasket()
             for b in self.getBundles():
@@ -1601,7 +1642,9 @@ class ComponentRegistry(log.Loggable):
                     self._parser.removeDirectoryByPath(path)
             self.save(True)
 
+
 class RegistrySubsetWriter(RegistryWriter):
+
     def __init__(self, fromRegistry=None, onlyBundles=None):
         """
         @param fromRegistry: The registry to subset, or the default.
@@ -1738,6 +1781,7 @@ def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
     bundlers_used = [b.name for b in bundler.getSubBundlers()]
     regwriter = RegistrySubsetWriter(onlyBundles=bundlers_used)
     regwriter.dump(open(outreg, 'w'))
+
 
 def getRegistry():
     """

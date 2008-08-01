@@ -62,7 +62,4 @@ class DiskerAdminText(BaseAdminText):
             i.callback(filename)
         self.filename_change_defers = []
 
-
-
-
 UIClass = DiskerAdminText

@@ -24,6 +24,7 @@
 
 __version__ = "$Rev$"
 
+
 def fractionFromValue(value):
     """
     Converts a value to a fraction
@@ -62,6 +63,7 @@ def fractionFromValue(value):
             "Cannot convert %r of type %s to a fraction" % (
             value, type(value).__name__))
 
+
 def fractionAsFloat(value):
     """
     Converts a fraction to a float
@@ -73,6 +75,7 @@ def fractionAsFloat(value):
     assert type(value) in [list, tuple], value
     assert len(value) == 2, value
     return float(value[0]) / float(value[1])
+
 
 def fractionAsString(value):
     """

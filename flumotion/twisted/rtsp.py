@@ -161,6 +161,7 @@ RESPONSES = {
 class RTSPError(Exception):
     """An exception with the RTSP status code and a str as arguments"""
 
+
 class RTSPRequest(http.Request, flog.Loggable):
     logCategory = 'request'
     code = OK
@@ -175,6 +176,7 @@ class RTSPRequest(http.Request, flog.Loggable):
     # base method override
 
     # copied from HTTP since we have our own set of RESPONSES
+
     def setResponseCode(self, code, message=None):
         """
         Set the RTSP response code.
@@ -313,6 +315,7 @@ class RTSPRequest(http.Request, flog.Loggable):
             self._renderCallback(result, resrc)
 
     # TODO: Refactor this and renderCallback to be cleaner and share code.
+
     def _renderErrback(self, failure, resrc):
         body = self._error(INTERNAL_SERVER_ERROR,
             "Request failed: %r" % failure)
@@ -360,6 +363,8 @@ class RTSPRequest(http.Request, flog.Loggable):
 
 # RTSP keeps the initial request alive, pinging it regularly.
 # for now we just keep it persistent for ever
+
+
 class RTSPChannel(http.HTTPChannel):
 
     requestFactory = RTSPRequest
@@ -374,6 +379,7 @@ class RTSPChannel(http.HTTPChannel):
 #    protocol = RTSPChannel
 #    timeout = 60
 
+
 class RTSPSite(server.Site):
     """
     I am a ServerFactory that can be used in
@@ -385,8 +391,10 @@ class RTSPSite(server.Site):
 
     def logRequest(self, ip, requestLine, headerLines):
         pass
+
     def logReply(self, code, message, headerLines, body):
         pass
+
 
 class RTSPResource(resource.Resource, flog.Loggable):
     """
@@ -425,12 +433,14 @@ class RTSPResource(resource.Resource, flog.Loggable):
         return res
 
     # FIXME: remove
+
     def noputChild(self, path, r):
         self.log('RTSPResource.putChild(%r, %s, %r)' % (self, path, r))
         return resource.Resource.putChild(self, path, r)
 
     # needs to be done for ALL responses
     # see 12.17 CSeq and H14.19 Date
+
     def render_startCSeqDate(self, request, method):
         """
         Set CSeq and Date on response to given request.
@@ -482,7 +492,9 @@ class RTSPResource(resource.Resource, flog.Loggable):
         # the Resource.get_HEAD refers to this -- pacify pychecker
         raise NotImplementedError
 
+
 class ErrorResource(RTSPResource):
+
     def __init__(self, code, *lines):
         resource.Resource.__init__(self)
         self.code = code
@@ -509,6 +521,8 @@ class ErrorResource(RTSPResource):
     def getChild(self, chname, request):
         return self
 
+
 class NoResource(ErrorResource):
+
     def __init__(self, message=None):
         ErrorResource.__init__(self, NOT_FOUND, message)

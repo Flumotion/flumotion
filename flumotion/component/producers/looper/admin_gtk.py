@@ -59,6 +59,7 @@ class FileInfo(GladeWidget):
     def set_video(self, video):
         self.videolabel.set_markup(video or "<i>No video</i>")
 
+
 class LooperNode(BaseAdminGtkNode):
     logCategory = 'looper'
 
@@ -121,7 +122,9 @@ class LooperNode(BaseAdminGtkNode):
         if handler:
             handler(value)
 
+
 class LooperAdminGtk(BaseAdminGtk):
+
     def setup(self):
         looper = LooperNode(self.state, self.admin, title=_("Looper"))
         self.nodes['Looper'] = looper

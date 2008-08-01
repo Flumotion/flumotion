@@ -32,6 +32,7 @@ __version__ = "$Rev$"
 class ManagerManholePlug(lifecycle.ManagerLifecycle):
     """
     """
+
     def __init__(self, args):
         lifecycle.ManagerLifecycle.__init__(self, args)
         self.useSSH = False

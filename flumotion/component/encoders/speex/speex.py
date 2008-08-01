@@ -25,6 +25,7 @@ __version__ = "$Rev$"
 
 
 class Speex(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         return 'speexenc name=encoder'
 

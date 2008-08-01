@@ -28,12 +28,12 @@ from flumotion.twisted import pb as fpb
 from flumotion.worker import medium
 
 
-
-
 class TestWorkerAvatar(fpb.PingableAvatar):
+
     def __init__(self, avatarId, mind):
         fpb.PingableAvatar.__init__(self, avatarId)
         self.setMind(mind)
+
 
 class TestWorkerRealm(realm.TestRealm):
     deferredAvatar = None
@@ -61,6 +61,7 @@ class TestWorkerRealm(realm.TestRealm):
 
 
 class TestWorkerMedium(testsuite.TestCase):
+
     def setUp(self):
         self.realm = TestWorkerRealm()
 
@@ -76,6 +77,7 @@ class TestWorkerMedium(testsuite.TestCase):
         def connected(avatar):
             m.stopConnecting()
             return self.realm.getDeferredLogout()
+
         def disconnected(avatar):
             self.assertEquals(avatar.avatarId, 'foo')
 

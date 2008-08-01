@@ -36,10 +36,13 @@ class TestCase(unittest.TestCase):
 
     # TestCase in Twisted 2.0 doesn't define failUnlessFailure method.
     if not hasattr(unittest.TestCase, 'failUnlessFailure'):
+
         def failUnlessFailure(self, deferred, *expectedFailures):
+
             def _cb(result):
                 self.fail("did not catch an error, instead got %r" %
                           (result, ))
+
             def _eb(failure):
                 failure.trap(*expectedFailures)
                 return failure.value
@@ -48,6 +51,7 @@ class TestCase(unittest.TestCase):
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
+
 
 class TestClient(pb.Referenceable):
 
@@ -102,6 +106,7 @@ class TestWorker(TestClient):
 
 class TestManagerRoot(pb.Root, log.Loggable):
     logCategory = "testmanagerroot"
+
     def remote_identify(self, who, reference):
         """
         Called by a TestClient to announce the type of client, and give
@@ -117,6 +122,7 @@ class TestManagerRoot(pb.Root, log.Loggable):
 
 
 class TestManager:
+
     def run(self, rootClass):
         """
         Run the test manager.  Return port it is listening on.
@@ -181,6 +187,7 @@ class TestPB(log.Loggable):
 
 
 class TestCaseWithManager(TestCase):
+
     def setUp(self):
         from flumotion.twisted import pb
         from flumotion.common import server, connection
@@ -236,6 +243,7 @@ class TestCaseWithManager(TestCase):
         d.addCallback(lambda _: self.tport.stopListening())
         return d
 
+
 def _diff(old, new, desc):
     import difflib
     lines = difflib.unified_diff(old, new)
@@ -250,7 +258,9 @@ def _diff(old, new, desc):
         ("\nError while comparing strings:\n"
          "%s") % (output, ))
 
+
 def diffStrings(orig, new, desc='input'):
+
     def _tolines(s):
         return [line + '\n' for line in s.split('\n')]
 

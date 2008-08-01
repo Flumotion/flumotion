@@ -31,6 +31,8 @@ from flumotion.common import testsuite
 # an object that subclasses from both Cacheable and RemoteCache
 # can be serialized over more than one PB connection
 # state changes on the "master" still get serialized to the slaves
+
+
 class FakeKeycard(pb.Cacheable, pb.RemoteCache):
     name = None
     observers = None
@@ -146,8 +148,10 @@ class TestOnePB(testsuite.TestCase):
         d.addCallback(_receiveCb)
         return d
 
+
 class TestTwoPB(testsuite.TestCase):
     # test if our classes work over two chained PB connections
+
     def setUp(self):
         self.pb1 = testsuite.TestPB()
         self.pb2 = testsuite.TestPB()

@@ -30,6 +30,7 @@
 import os
 import sys
 
+
 def main(args):
     if len(sys.argv) < 2:
         sys.stderr.write('Please specify a gettext domain\n')

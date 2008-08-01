@@ -131,6 +131,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
 
 class HTTPFileAdminGtk(BaseAdminGtk):
+
     def setup(self):
         statistics = StatisticsAdminGtkNode(self.state, self.admin,
             _("Statistics"))

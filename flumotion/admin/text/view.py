@@ -69,7 +69,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         # get initial info we need
         self.setPlanetState(self.admin.planet)
 
-
     def _setAdminModel(self, model):
         self.admin = model
 
@@ -146,7 +145,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             self.lasty = cury
             #self.stdscr.refresh()
 
-
     def gotEntryCallback(self, result, name):
         entryPath, filename, methodName = result
         filepath = os.path.join(entryPath, filename)
@@ -202,7 +200,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         #moduleName = common.pathToModuleName(fileName)
         #statement = 'import %s' % moduleName
         self._comptextui[name] = instance
-
 
     def gotEntryNoBundleErrback(self, failure, name):
         failure.trap(errors.NoBundleError)
@@ -283,6 +280,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.show()
 
     def setPlanetState(self, planetState):
+
         def flowStateAppend(state, key, value):
             self.debug('flow state append: key %s, value %r' % (key, value))
             if state.get('name') != 'default':
@@ -429,14 +427,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                             except KeyError:
                                 pass
 
-
     def _runCommand_cb(self, result):
         self.command_result = result
         self.debug("Result received: %s" % result)
         self.show()
-
-
-
 
     def get_available_commands(self, input):
         input_split = input.split()
@@ -541,6 +535,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.stdscr.clrtobot()
 
     ### admin model callbacks
+
     def admin_connected_cb(self, admin):
         self.info('Connected to manager')
 
@@ -582,6 +577,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             self.debug('Worker %s logged out.' % value)
 
     # act as keyboard input
+
     def doRead(self):
         """ Input is ready! """
         c = self.stdscr.getch() # read a character
@@ -662,6 +658,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
     # remote calls
     # eg from components notifying changes
+
     def componentCall(self, componentState, methodName, *args, **kwargs):
         # FIXME: for now, we only allow calls to go through that have
         # their UI currently displayed.  In the future, maybe we want

@@ -34,11 +34,14 @@ __version__ = "$Rev$"
 
 
 ### Generice Cacheable/RemoteCache for state objects
+
+
 class IStateListener(Interface):
     """
     I am an interface for objects that want to listen to changes on
     cached states.
     """
+
     def stateSet(self, object, key, value):
         """
         @type  object: L{StateRemoteCache}
@@ -72,6 +75,7 @@ class IStateListener(Interface):
         The given value has been removed from the list given by the key.
         """
 
+
 class StateCacheable(pb.Cacheable):
     """
     I am a cacheable state object.
@@ -79,11 +83,13 @@ class StateCacheable(pb.Cacheable):
     I cache key-value pairs, where values can be either single objects
     or list of objects.
     """
+
     def __init__(self):
         self._observers = []
         self._dict = {}
 
     # our methods
+
     def addKey(self, key, value=None):
         """
         Add a key to the state cache so it can be used with set.
@@ -92,6 +98,7 @@ class StateCacheable(pb.Cacheable):
 
     # don't use [] as the default value, it creates only one reference and
     # reuses it
+
     def addListKey(self, key, value=None):
         """
         Add a key for a list of objects to the state cache.
@@ -102,6 +109,7 @@ class StateCacheable(pb.Cacheable):
 
     # don't use {} as the default value, it creates only one reference and
     # reuses it
+
     def addDictKey(self, key, value=None):
         """
         Add a key for a dict value to the state cache.
@@ -206,6 +214,7 @@ class StateCacheable(pb.Cacheable):
         return dl
 
     # pb.Cacheable methods
+
     def getStateToCacheAndObserveFor(self, perspective, observer):
         self._observers.append(observer)
         return self._dict
@@ -227,16 +236,19 @@ class StateCacheable(pb.Cacheable):
 # Instead, invalidation will only be performed by the application, if at
 # all, via an explicit call to invalidate().
 
+
 class StateRemoteCache(pb.RemoteCache):
     """
     I am a remote cache of a state object.
     """
+
     def __init__(self):
         self._listeners = {}
         # no constructor
         # pb.RemoteCache.__init__(self)
 
     # our methods
+
     def hasKey(self, key):
         return key in self._dict.keys()
 
@@ -268,6 +280,7 @@ class StateRemoteCache(pb.RemoteCache):
             self._listeners = {}
 
     #F0.8: remove set=None and move set_=None there
+
     def addListener(self, listener, set=None, append=None, remove=None,
                     setitem=None, delitem=None, invalidate=None, set_=None):
         """
@@ -337,6 +350,7 @@ class StateRemoteCache(pb.RemoteCache):
         del self._listeners[listener]
 
     # pb.RemoteCache methods
+
     def setCopyableState(self, dict):
         self._dict = dict
 

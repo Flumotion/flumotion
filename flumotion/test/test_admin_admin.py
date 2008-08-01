@@ -27,13 +27,13 @@ from flumotion.common import testsuite
 from flumotion.twisted import pb
 
 
-
-
 class AdminTest(testsuite.TestCaseWithManager):
+
     def testConstructor(self):
         model = admin.AdminModel()
 
     def testConnectSuccess(self):
+
         def connected(_):
             self.failUnless(a.planet is not None)
             self.assertEqual(len(self.vishnu.adminHeaven.avatars),
@@ -57,6 +57,7 @@ class AdminTest(testsuite.TestCaseWithManager):
 
             def _disconnected(_):
                 disconnectDeferred.callback(None)
+
             def _connected(_):
                 map(a.disconnect, ids)
                 reconnectDeferred.callback(None)
@@ -83,6 +84,7 @@ class AdminTest(testsuite.TestCaseWithManager):
         return d
 
     def testConnectFailure(self):
+
         def connected(_):
             self.fail('should not have connected')
 

@@ -56,17 +56,20 @@ HTTP_SERVER = '%s/%s' % (HTTP_SERVER_NAME, HTTP_SERVER_VERSION)
 ### This is new Issuer code that eventually should move to e.g.
 ### flumotion.common.keycards or related
 
+
 class Issuer(log.Loggable):
     """
     I am a base class for all Issuers.
     An issuer issues keycards of a given class based on an object
     (incoming HTTP request, ...)
     """
+
     def issue(self, *args, **kwargs):
         """
         Return a keycard, or None, based on the given arguments.
         """
         raise NotImplementedError
+
 
 class HTTPGenericIssuer(Issuer):
     """
@@ -74,10 +77,12 @@ class HTTPGenericIssuer(Issuer):
     standard HTTP request.  Useful for authenticating based on
     server-side checks such as time, rather than client credentials.
     """
+
     def issue(self, request):
         keycard = keycards.KeycardGeneric()
         self.debug("Asking for authentication, generic HTTP")
         return keycard
+
 
 class HTTPAuthIssuer(Issuer):
     """
@@ -85,6 +90,7 @@ class HTTPAuthIssuer(Issuer):
     an incoming L{twisted.protocols.http.Request} request's standard
     HTTP authentication information.
     """
+
     def issue(self, request):
         # for now, we're happy with a UACPP keycard; the password arrives
         # plaintext anyway
@@ -95,12 +101,14 @@ class HTTPAuthIssuer(Issuer):
             keycard.username, keycard.password, keycard.address))
         return keycard
 
+
 class HTTPTokenIssuer(Issuer):
     """
     I create L{flumotion.common.keycards.KeycardToken} keycards based on
     an incoming L{twisted.protocols.http.Request} request's GET "token"
     parameter.
     """
+
     def issue(self, request):
         if not 'token' in request.args.keys():
             return None
@@ -115,6 +123,7 @@ class HTTPTokenIssuer(Issuer):
         return keycard
 
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
+
 
 class HTTPAuthentication(log.Loggable):
     """
@@ -151,7 +160,9 @@ class HTTPAuthentication(log.Loggable):
             self.plug = None
 
     def scheduleKeepAlive(self, tryingAgain=False):
+
         def timeout():
+
             def reschedule(res):
                 if isinstance(res, failure.Failure):
                     self.info('keepAlive failed, rescheduling in %d '
@@ -252,13 +263,16 @@ class HTTPAuthentication(log.Loggable):
         return self.component.medium.removeKeycardId(bouncerName, keycard.id)
 
     # FIXME: check this
+
     def clientDone(self, fd):
         return self.component.remove_client(fd)
 
     def doCleanupKeycard(self, bouncerName, keycard):
         # cleanup this one keycard, and take the opportunity to retry
         # previous failed cleanups
+
         def cleanup(bouncerName, keycard):
+
             def cleanupLater(res, pair):
                 self.log('failed to clean up keycard %r, will do '
                          'so later', keycard)
@@ -386,7 +400,9 @@ class HTTPAuthentication(log.Loggable):
         request.write(html)
         request.finish()
 
+
 class LogFilter:
+
     def __init__(self):
         self.filters = [] # list of (network, mask)
 

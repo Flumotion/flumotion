@@ -141,6 +141,7 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
                 clamp(decay[i], -90.0, 0.0))
 
     # when volume has been set by another admin client
+
     def volumeSet(self, volume):
         self._hscale.handler_block(self._scale_changed_id)
 
@@ -165,6 +166,7 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
             handler(value)
 
     # run when the scale is moved by user
+
     def cb_volume_set(self, widget):
         # do something
         volume = self._hscale.get_value()
@@ -182,6 +184,7 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
         pass
 
     # when the "increase volume" checkbutton is toggled
+
     def _check_toggled_cb(self, widget):
         checked = widget.get_property('active')
         self.debug('checkbutton toggled; now %r' % checked)

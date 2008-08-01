@@ -64,6 +64,7 @@ class Colorbalance(feedcomponent.Effect):
                 state.addKey('colorbalance-%s' % k, 0.0)
 
     # State change handling for 0.10
+
     def _bus_message_received_cb(self, bus, message, hue, saturation,
         brightness, contrast):
         """
@@ -123,11 +124,13 @@ class Colorbalance(feedcomponent.Effect):
         self.effect_setColorBalanceProperty('Brightness', brightness)
         self.effect_setColorBalanceProperty('Contrast', contrast)
 
+
 def _value_to_percent(value, min, max):
     """
     Convert an integer value between min and max to a percentage.
     """
     return float(value - min) / float(max - min) * 100.0
+
 
 def _percent_to_value(percentage, min, max):
     """

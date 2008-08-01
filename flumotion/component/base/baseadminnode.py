@@ -106,10 +106,12 @@ class BaseAdminGtkNode(log.Loggable):
                                               *args, **kwargs)
 
     # FIXME: do this automatically if there is a gladeFile class attr set
+
     def loadGladeFile(self, gladeFile, domain=configure.PACKAGE):
         """
         Returns: a deferred returning the widget tree from the glade file.
         """
+
         def _getBundledFileCallback(result, gladeFile):
             path = result
             if not os.path.exists(path):
@@ -304,4 +306,3 @@ class BaseAdminGtkNode(log.Loggable):
         @type  message: L{flumotion.common.messages.Message}
         """
         self.state.observe_append('messages', message)
-

@@ -37,6 +37,7 @@ WIDTH = 36
 BORDER = 8
 FONT_SIZE = 22
 
+
 def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
                      width, height):
     from PIL import Image

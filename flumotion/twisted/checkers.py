@@ -36,6 +36,8 @@ __version__ = "$Rev$"
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it
+
+
 class FlexibleCredentialsChecker(log.Loggable):
     """
     I am an in-memory username/password credentials checker that also
@@ -64,6 +66,7 @@ class FlexibleCredentialsChecker(log.Loggable):
             return failure.Failure(errors.NotAuthenticatedError())
 
     ### ICredentialsChecker interface methods
+
     def requestAvatarId(self, credentials):
         avatarId = getattr(credentials, 'avatarId', None)
 
@@ -80,6 +83,7 @@ class FlexibleCredentialsChecker(log.Loggable):
                 avatarId)
         else:
             return defer.fail(errors.NotAuthenticatedError())
+
 
 class CryptChecker(log.Loggable):
     """
@@ -114,6 +118,7 @@ class CryptChecker(log.Loggable):
             return failure.Failure(errors.NotAuthenticatedError())
 
     ### ICredentialsChecker methods
+
     def requestAvatarId(self, credentials):
         if credentials.username in self.users:
             return defer.maybeDeferred(
@@ -124,6 +129,7 @@ class CryptChecker(log.Loggable):
             self.debug("user '%s' refused, not in storage backend" %
                 credentials.username)
             return defer.fail(errors.NotAuthenticatedError())
+
 
 class Sha256Checker(log.Loggable):
     """
@@ -160,6 +166,7 @@ class Sha256Checker(log.Loggable):
             return failure.Failure(errors.NotAuthenticatedError())
 
     ### ICredentialsChecker methods
+
     def requestAvatarId(self, credentials):
         if credentials.username in self.users:
             salt, data = self.users[credentials.username]

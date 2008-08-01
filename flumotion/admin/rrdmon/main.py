@@ -35,6 +35,8 @@ from flumotion.configure import configure
 __version__ = "$Rev$"
 
 # more standard helper functions necessary...
+
+
 def _createParser():
     parser = OptionParser(domain="flumotion-rrdmon")
 
@@ -62,6 +64,7 @@ def _createParser():
 
     return parser
 
+
 def _readConfig(confXml, options):
     # modifies options dict in-place
     log.info('rrdmon', 'Reading configuration from %s' % confXml)
@@ -71,6 +74,7 @@ def _readConfig(confXml, options):
         and not 'FLU_DEBUG' in os.environ:
         options.debug = cfg['debug']
     return cfg
+
 
 def main(args):
     parser = _createParser()

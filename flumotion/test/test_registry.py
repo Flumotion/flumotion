@@ -29,9 +29,8 @@ from flumotion.common import testsuite
 from flumotion.common import registry, fxml, common
 
 
-
-
 class TestRegistry(testsuite.TestCase):
+
     def setUp(self):
         self.reg = registry.ComponentRegistry()
         self.reg.clean()
@@ -262,6 +261,7 @@ class TestRegistry(testsuite.TestCase):
 
     # addFromString does not parse <directory> toplevel entries since they
     # should not be in partial registry files
+
     def testDump(self):
         xml = """
 <registry>
@@ -516,7 +516,9 @@ class TestRegistry(testsuite.TestCase):
         self._compareRegistryAfterDump(xml, target,
                                        'testDumpWithCompoundProperties')
 
+
 class TestComponentEntry(testsuite.TestCase):
+
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
@@ -545,6 +547,7 @@ class TestComponentEntry(testsuite.TestCase):
         self.assertEquals(self.multiple_entry.getClockPriority(), 100)
         self.assertEquals(self.multiple_entry.getSockets(), [])
 
+
 def rmdir(root):
     for file in os.listdir(root):
         filename = os.path.join(root, file)
@@ -554,7 +557,9 @@ def rmdir(root):
             os.remove(filename)
     os.rmdir(root)
 
+
 class TestFindComponents(testsuite.TestCase):
+
     def setUp(self):
         self.reg = registry.ComponentRegistry()
         self.reg.clean()

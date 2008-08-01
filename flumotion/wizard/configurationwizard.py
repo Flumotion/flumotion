@@ -51,6 +51,7 @@ _ = gettext.gettext
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
 
+
 def _fraction_from_float(number, denominator):
     """
     Return a string to be used in serializing to XML.
@@ -80,6 +81,7 @@ class ScenarioStep(WizardStep):
     gladeFile = 'scenario-wizard.glade'
 
     # WizardStep
+
     def __init__(self, wizard):
         self._currentScenarioClass = None
         self._radioGroup = None
@@ -183,6 +185,7 @@ class ConfigurationWizard(SectionWizard):
     # Public API
 
     # FIXME: Remove this and make fgc create a new scenario
+
     def addSteps(self):
         """Add the step sections of the wizard, can be
         overridden in a subclass
@@ -272,6 +275,7 @@ class ConfigurationWizard(SectionWizard):
         return bool(self._tasks)
 
     # FIXME: Move to scenario
+
     def hasAudio(self):
         """If the configured feed has a audio stream
         @return: if we have audio
@@ -331,6 +335,7 @@ class ConfigurationWizard(SectionWizard):
             return
 
         asked = sets.Set(elementNames)
+
         def _checkElementsCallback(existing, workerName):
             existing = sets.Set(existing)
             self.taskFinished()
@@ -357,6 +362,7 @@ class ConfigurationWizard(SectionWizard):
             return
 
         self.debug('requiring elements %r' % (elementNames, ))
+
         def gotMissingElements(elements, workerName):
             if elements:
                 self.warning('elements %r do not exist' % (elements, ))
@@ -418,6 +424,7 @@ class ConfigurationWizard(SectionWizard):
             return
 
         self.debug('requiring module %s' % moduleName)
+
         def _checkImportErrback(failure):
             self.warning('could not import %s', moduleName)
             message = messages.Error(T_(N_(
@@ -440,6 +447,7 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     # FIXME: maybe add id here for return messages ?
+
     def runInWorker(self, workerName, moduleName, functionName,
                     *args, **kwargs):
         """

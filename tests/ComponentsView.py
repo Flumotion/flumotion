@@ -30,7 +30,9 @@ from flumotion.admin.gtk import parts
 from flumotion.common import planet
 from flumotion.common.planet import moods
 
+
 class TestComponentsView:
+
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.TreeView()

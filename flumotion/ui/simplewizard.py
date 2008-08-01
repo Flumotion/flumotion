@@ -81,10 +81,13 @@ __version__ = "$Rev$"
 # instances).
 #
 
+
 class WizardCancelled(Exception):
     pass
 
 # fixme: doc vmethods
+
+
 class WizardStep(GladeWidget, log.Loggable):
     # all values filled in by subclasses
     name = None
@@ -271,6 +274,7 @@ class SimpleWizard(GladeWindow):
         """
         loop = gobject.MainLoop()
         d = self.runAsync()
+
         def async_done(_):
             loop.quit()
         d.addCallbacks(async_done, async_done)
@@ -294,6 +298,7 @@ class SimpleWizard(GladeWindow):
         self.show()
         from twisted.internet import defer
         d = defer.Deferred()
+
         def finished(x):
             self.disconnect(i)
             self.hide()

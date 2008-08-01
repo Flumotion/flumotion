@@ -39,6 +39,7 @@ __version__ = "$Rev$"
 defaultSSLPort = configure.defaultSSLManagerPort
 defaultTCPPort = configure.defaultTCPManagerPort
 
+
 def _createParser():
     usagemessage = "usage: %prog [options] manager.xml flow1.xml [...]"
     desc = "The manager is the core component of the Flumotion streaming\
@@ -96,12 +97,14 @@ def _createParser():
 
     return parser
 
+
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     # since this is run after daemonizing, it should show errors, but not stop
     for path in paths:
         log.debug('manager', 'Loading configuration file from (%s)' % path)
         vishnu.loadComponentConfigurationXML(path, manager.LOCAL_IDENTITY)
+
 
 def main(args):
     parser = _createParser()

@@ -232,6 +232,4 @@ class SmartVideoScale(gst.Bin):
         self.capsfilter.props.caps = caps
         self.debug("done")
 
-
-
 gobject.type_register(SmartVideoScale)

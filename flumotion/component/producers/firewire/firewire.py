@@ -32,7 +32,9 @@ T_ = gettexter()
 
 # See comments in gstdvdec.c for details on the dv format.
 
+
 class Firewire(feedcomponent.ParseLaunchComponent):
+
     def do_check(self):
         self.debug('running PyGTK/PyGST checks')
         from flumotion.component.producers import checks
@@ -148,6 +150,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.volume.set_property('volume', value)
 
     # detect camera unplugging or other cause of firewire bus reset
+
     def _bus_message_received_cb(self, bus, message):
         """
         @param bus: the message bus sending the message

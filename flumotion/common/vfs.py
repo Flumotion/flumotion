@@ -32,6 +32,7 @@ from flumotion.common import log
 
 _backends = []
 
+
 def listDirectory(path):
     """List the directory called path
     @returns: the directory
@@ -70,6 +71,7 @@ def _registerBackends():
         _backends.append(backend)
 
     registerVFSJelly()
+
 
 def registerVFSJelly():
     """Register the jelly used by different backends

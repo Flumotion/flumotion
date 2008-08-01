@@ -107,11 +107,15 @@ class ConfigParser(Parser):
         self.doc = self.getRoot(file)
 
     def _parseArchive(self, node):
+
         def strparser(parser):
+
             def parsestr(node):
                 return self.parseTextNode(node, parser)
             return parsestr
+
         def ressetter(k):
+
             def setter(v):
                 res[k] = v
             return setter
@@ -132,14 +136,19 @@ class ConfigParser(Parser):
         return res
 
     def _parseSource(self, node):
+
         def strparser(parser):
+
             def parsestr(node):
                 return self.parseTextNode(node, parser)
             return parsestr
+
         def ressetter(k):
+
             def setter(v):
                 res[k] = v
             return setter
+
         def filename(v):
             if v[0] != os.sep:
                 raise ConfigError('rrdfile paths should be absolute')
@@ -186,10 +195,13 @@ class ConfigParser(Parser):
             raise ConfigError("unexpected root node: %s" % root.nodeName)
 
         def strparser(parser):
+
             def parsestr(node):
                 return self.parseTextNode(node, parser)
             return parsestr
+
         def ressetter(k):
+
             def setter(v):
                 res[k] = v
             return setter

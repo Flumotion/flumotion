@@ -30,6 +30,7 @@ from flumotion.common.planet import moods
 
 
 class TestAdminStatusbar(testsuite.TestCase):
+
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.Statusbar()
@@ -93,7 +94,9 @@ class TestAdminStatusbar(testsuite.TestCase):
         self.bar.clear(None)
         self.failIf(self.bar.pop('main'))
 
+
 class TestComponentsView(testsuite.TestCase):
+
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.TreeView()
@@ -142,7 +145,9 @@ class TestComponentsView(testsuite.TestCase):
             "Should be able to stop component one")
 
     # builds on testUpdate
+
     def testOneSelected(self):
+
         def assertSelected(view, states, test):
             test.assertEqual(len(states), 1)
             name = states[0].get('name')
@@ -156,6 +161,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testMultipleSelected(self):
+
         def assertMultipleSelected(view, states, test):
             test.assertEqual(len(states), 2)
             name = states[0].get('name')
@@ -171,6 +177,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStartOneWhenSleeping(self):
+
         def assertCanStart(view, states, test):
             test.failIf(not view.canStart())
             test.asserted = True
@@ -188,6 +195,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartOneWhenHappy(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -205,6 +213,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartOneWhenSad(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -222,6 +231,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartOneWhenHungry(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -239,6 +249,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartOneWhenWaking(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -256,6 +267,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartOneWhenLost(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -273,6 +285,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartWhenNoSelection(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -291,6 +304,7 @@ class TestComponentsView(testsuite.TestCase):
         #self.failUnless(self.asserted)
 
     def testCanStartMultipleWhenSleeping(self):
+
         def assertCanStart(view, states, test):
             test.failIf(not view.canStart())
             test.asserted = True
@@ -312,6 +326,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsSad(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -333,6 +348,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsHappy(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -354,6 +370,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsHungry(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -375,6 +392,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsWaking(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -396,6 +414,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStartMultipleWhenOneIsLost(self):
+
         def assertCanStart(view, states, test):
             test.failIf(view.canStart())
             test.asserted = True
@@ -417,6 +436,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopOneWhenHappy(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True
@@ -434,6 +454,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopOneWhenHungry(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True
@@ -451,6 +472,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopOneWhenSad(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True
@@ -468,6 +490,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopOneWhenWaking(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True
@@ -485,6 +508,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopOneWhenLost(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True
@@ -502,6 +526,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStopOneWhenSleeping(self):
+
         def assertCanStop(view, states, test):
             test.failIf(view.canStop())
             test.asserted = True
@@ -519,6 +544,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanNotStopWhenNoSelection(self):
+
         def assertCanStop(view, states, test):
             test.failIf(view.canStop())
             test.asserted = True
@@ -538,6 +564,7 @@ class TestComponentsView(testsuite.TestCase):
         #self.failUnless(self.asserted)
 
     def testCanNotStopMultipleWhenOneIsSleeping(self):
+
         def assertCanStop(view, states, test):
             test.failIf(view.canStop())
             test.asserted = True
@@ -559,6 +586,7 @@ class TestComponentsView(testsuite.TestCase):
         self.failUnless(self.asserted)
 
     def testCanStopMultipleWhenOneNoneIsSleeping(self):
+
         def assertCanStop(view, states, test):
             test.failIf(not view.canStop())
             test.asserted = True

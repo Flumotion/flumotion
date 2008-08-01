@@ -50,6 +50,7 @@ def _debug(*args):
 # only Controller is to be shown in epydoc
 __all__ = ('Controller', )
 
+
 class Controller(gobject.GObject):
     """
     Controller for a video test producer, used to generate a video test feed.
@@ -99,21 +100,27 @@ class Controller(gobject.GObject):
         # the model doesn't currently have a prepare
 
     ### callbacks
+
     def view_width_changed_cb(self, view, width):
         _debug("width changed to %d" % width)
         self.model.set_width(width)
+
     def view_height_changed_cb(self, view, height):
         _debug("height changed to %d" % height)
         self.model.set_height(height)
+
     def view_framerate_changed_cb(self, view, framerate):
         _debug("framerate changed to %f" % framerate)
         self.model.set_framerate(framerate)
+
     def view_format_changed_cb(self, view, format):
         _debug("format changed to %f" % format)
         self.model.set_format(format)
+
     def view_pattern_changed_cb(self, view, index):
         _debug("pattern changed to index %d" % index)
         self.model.set_pattern(index)
+
 
 class View(gobject.GObject):
     gsignal('width-changed', int)
@@ -180,21 +187,25 @@ class View(gobject.GObject):
         self._format_combo.set_active(index)
 
     ### timeouts
+
     def view_width_timeout(self, widget):
         width = widget.get_value()
         self.emit('width-changed', width)
         self._width_timeout = 0
         return gtk.FALSE
+
     def view_height_timeout(self, widget):
         height = widget.get_value()
         self.emit('height-changed', height)
         self._height_timeout = 0
         return gtk.FALSE
+
     def view_framerate_timeout(self, widget):
         framerate = widget.get_value()
         self.emit('framerate-changed', framerate)
         self._framerate_timeout = 0
         return gtk.FALSE
+
     def view_format_timeout(self, widget):
         format = widget.get_active()
         self.emit('format-changed', format)
@@ -231,7 +242,9 @@ class View(gobject.GObject):
         index = widget.get_active()
         self.emit('pattern-changed', index)
 
+
 class Model:
+
     def __init__(self):
         self._src = gst.Element('videotestsrc')
         self._src.set_property('sync', True)
@@ -336,6 +349,7 @@ if __name__ == '__main__':
     exposed_cb_id = -1
     width = 320
     height = 240
+
     def area_exposed_cb(widget, event, thread, sink):
         'drawing area shown, get xid and start streaming'
         xid = widget.window.xid
@@ -358,6 +372,7 @@ if __name__ == '__main__':
     def view_width_changed_cb(widget, value, area):
         width = value
         area.set_size_request(width, height)
+
     def view_height_changed_cb(widget, value, area):
         height = value
         area.set_size_request(width, height)

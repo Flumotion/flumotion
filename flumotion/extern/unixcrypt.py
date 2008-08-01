@@ -396,7 +396,6 @@ def toByte(value):
     return value
 
 
-
 def toInt(value):
     if value & 0x80000000:
         value = - ((~value & 0xffffffff) + 1)
@@ -440,7 +439,6 @@ def PERM_OP(a, b, n, m, results):
     results[1] = toInt(b)
 
     return None
-
 
 
 def HPERM_OP(a, n, m):
@@ -592,10 +590,6 @@ def body(schedule, Eswap0, Eswap1):
     left = results[1]
 
     return [left, right]
-
-
-
-
 
 
 def crypt(plaintext, salt):

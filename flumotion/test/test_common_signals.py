@@ -23,16 +23,17 @@ from flumotion.common import signals
 from flumotion.common import testsuite
 
 
-
-
 class TestObject(signals.SignalMixin):
     __signals__ = ('foo', 'bar')
 
+
 class TestSignalMixin(testsuite.TestCase):
+
     def testEmitSelf(self):
         o = TestObject()
 
         emissions = []
+
         def trackEmission(*args, **kwargs):
             emissions.append((args[-1], args[:-1], kwargs))
 
@@ -50,6 +51,7 @@ class TestSignalMixin(testsuite.TestCase):
         self.assertRaises(ValueError, o.emit, 'qux')
 
         emissions = []
+
         def trackEmission(*args, **kwargs):
             emissions.append((args[-1], args[:-1], kwargs))
 

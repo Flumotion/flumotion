@@ -159,10 +159,10 @@ class TVCardStep(VideoProducerStep):
 
 class BTTVWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TVCardProducer()
 
     def getProductionStep(self, type):
         return TVCardStep(self.wizard, self.model)
-

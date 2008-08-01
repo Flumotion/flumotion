@@ -27,10 +27,10 @@ from flumotion.common import testsuite
 from flumotion.twisted import flavors
 
 
-
-
 class TestStateCacheable(flavors.StateCacheable):
     pass
+
+
 class TestStateRemoteCache(flavors.StateRemoteCache):
     pass
 
@@ -85,7 +85,9 @@ class TestRoot(testsuite.TestManagerRoot):
     def remote_haveAdopted(self, name):
         return self.state.remove('children', name)
 
+
 class StateTest(testsuite.TestCase):
+
     def setUp(self):
         self.changes = []
         self.runServer()
@@ -120,7 +122,9 @@ class StateTest(testsuite.TestCase):
         d = self.sport.stopListening()
         return d
 
+
 class TestStateSet(StateTest):
+
     def testStateSet(self):
         d = self.runClient()
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
@@ -188,6 +192,7 @@ class TestStateSet(StateTest):
         return d
 
     def listen(self, state):
+
         def event(type):
             return lambda *x: self.changes.append((type, ) + x)
         state.addListener(self, set_=event('set'), append=event('append'),
@@ -195,12 +200,14 @@ class TestStateSet(StateTest):
                           delitem=event('delitem'))
 
     # listener tests
+
     def testStateSetListener(self):
         # start everything and get the state
         d = self.runClient()
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
         # ask server to set the name
+
         def add_listener_and_set_name(state):
             d.state = state # monkeypatch
             self.listen(state)
@@ -281,7 +288,9 @@ class TestStateSet(StateTest):
         d.addCallback(check_remove_results_and_stop)
         return d
 
+
 class TestFullListener(StateTest):
+
     def testStateSetListener(self):
         # start everything and get the state
         d = self.runClient()
@@ -291,6 +300,7 @@ class TestFullListener(StateTest):
             self.changes.append(('set', state, key, value))
 
         # ask server to set the name
+
         def add_listener_and_set_name(state):
             d.state = state # monkeypatch
             state.addListener(self, set_=customStateSet)
@@ -346,9 +356,12 @@ class TestFullListener(StateTest):
 
     def testInvalidate(self):
         calls = []
+
         def check_invalidation(state):
+
             def invalidate(obj):
                 calls.append(('invalidate', obj))
+
             def unused(*args):
                 assert False, 'should not be reached'
             self.assertEquals(calls, [])
@@ -375,6 +388,7 @@ class TestFullListener(StateTest):
 
 
 class TestState(testsuite.TestCase):
+
     def testStateAddKey(self):
         c = flavors.StateCacheable()
 

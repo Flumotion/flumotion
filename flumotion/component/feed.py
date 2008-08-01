@@ -37,6 +37,8 @@ __version__ = "$Rev$"
 
 
 # copied from fdserver.py so that it can be bundled
+
+
 class _SocketMaybeCloser(tcp._SocketCloser):
     keepSocketAlive = False
 
@@ -54,17 +56,21 @@ class _SocketMaybeCloser(tcp._SocketCloser):
         else:
             tcp._SocketCloser._closeSocket(self)
 
+
 class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
     pass
+
 
 class PassableClientConnector(tcp.Connector):
     # It is unfortunate, but it seems that either we override this
     # private-ish method or reimplement BaseConnector.connect(). This is
     # the path that tcp.py takes, so we take it too.
+
     def _makeTransport(self):
         return PassableClientConnection(self.host, self.port,
                                         self.bindAddress, self,
                                         self.reactor)
+
 
 class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
     """
@@ -79,6 +85,8 @@ class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
         self.medium = medium
 
 # not a BaseMedium because we are going to do strange things to the transport
+
+
 class FeedMedium(fpb.Referenceable):
     """
     I am a client for a Feed Server.
@@ -154,6 +162,7 @@ class FeedMedium(fpb.Referenceable):
                   (feedId, fd). In an error case it will errback and close the
                   remote connection.
         """
+
         def connected(remote):
             self.setRemoteReference(remote)
             return remote.callRemote('sendFeed', fullFeedId)
@@ -202,6 +211,7 @@ class FeedMedium(fpb.Referenceable):
                   (feedId, fd). In an error case it will errback and close the
                   remote connection.
         """
+
         def connected(remote):
             assert isinstance(remote.broker.transport, _SocketMaybeCloser)
             self.setRemoteReference(remote)
@@ -224,6 +234,7 @@ class FeedMedium(fpb.Referenceable):
             self.setRemoteReference(None)
 
             d = defer.Deferred()
+
             def loseConnection():
                 t.connectionLost(failure.Failure(main.CONNECTION_DONE))
                 d.callback((fullFeedId, fd))
@@ -261,6 +272,7 @@ class FeedMedium(fpb.Referenceable):
         self.setRemoteReference(None)
 
     ### IMedium methods
+
     def setRemoteReference(self, remoteReference):
         self.remote = remoteReference
 

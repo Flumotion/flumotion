@@ -43,8 +43,6 @@ __all__ = ['Disker']
 __version__ = "$Rev$"
 T_ = gettexter()
 
-
-
 """
 Disker has a property 'ical-schedule'. This allows an ical file to be
 specified in the config and have recordings scheduled based on events.
@@ -69,20 +67,25 @@ try:
 except ImportError:
     HAS_ICAL = False
 
+
 class DiskerMedium(feedcomponent.FeedComponentMedium):
     # called when admin ui wants to stop recording. call changeFilename to
     # restart
+
     def remote_stopRecording(self):
         self.comp.stop_recording()
 
     # called when admin ui wants to change filename (this starts recording if
     # the disker isn't currently writing to disk)
+
     def remote_changeFilename(self, filenameTemplate=None):
         self.comp.change_filename(filenameTemplate)
 
     # called when admin ui wants updated state (current filename info)
+
     def remote_notifyState(self):
         self.comp.update_ui_state()
+
 
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     componentMediumClass = DiskerMedium
@@ -275,6 +278,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     # callback for when a client is removed so we can figure out
     # errors
+
     def _client_removed_cb(self, element, arg0, client_status):
         # check if status is error
         if client_status == 4:

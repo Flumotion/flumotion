@@ -198,6 +198,7 @@ class GtkInterpreter(threading.Thread):
 
 # Read user input in a loop, and send each line to the interpreter thread.
 
+
 def interact(banner=None, reader=None, local=None):
     interpreter = GtkInterpreter(locals=local)
     interpreter.interact(banner, reader)

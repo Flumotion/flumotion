@@ -28,6 +28,7 @@ from flumotion.common.vfs import listDirectory
 
 
 class VFSTest(TestCase):
+
     def setUp(self):
         self.path = os.path.dirname(__file__)
 

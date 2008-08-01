@@ -78,6 +78,7 @@ class FeedServer(log.Loggable):
         return d
 
     ### IRealm method
+
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
         avatar = FeedAvatar(self, avatarId, mind)
         return (pb.IPerspective, avatar,
@@ -87,11 +88,13 @@ class FeedServer(log.Loggable):
         self.debug('feed avatar logged out: %s', avatar.avatarId)
 
     ## proxy these to the brain
+
     def feedToFD(self, componentId, feedId, fd, eaterId):
         return self._brain.feedToFD(componentId, feedId, fd, eaterId)
 
     def eatFromFD(self, componentId, eaterAlias, fd, feedId):
         return self._brain.eatFromFD(componentId, eaterAlias, fd, feedId)
+
 
 class FeedAvatar(fpb.Avatar):
     """

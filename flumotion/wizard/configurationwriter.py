@@ -74,6 +74,7 @@ class ConfigurationWriter(XMLWriter):
         #               cmp=cmpComponentType,
         #               key=operator.attrgetter('componentType'))
         #
+
         def componentSort(a, b):
             return cmpComponentType(a.componentType,
                                     b.componentType)

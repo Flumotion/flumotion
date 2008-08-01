@@ -78,7 +78,9 @@ class Component(object):
     def as_config_dict(self):
         return copy.deepcopy(self.config_entry.config)
 
+
 class ComponentStore:
+
     def __init__(self):
         self._names = {}
         self._last_component = None
@@ -245,10 +247,12 @@ class Linker:
         for link in self.links:
             print '%s:%s => %s:%s' % tuple(link)
 
+
 def parse_plug(arg):
     plugargs = arg.split(',')
     plug = plugargs.pop(0)[1:]
     return plug, [parse_prop(arg) for arg in plugargs]
+
 
 def parse_prop(arg):
     prop = arg[:arg.index('=')]
@@ -257,7 +261,9 @@ def parse_prop(arg):
         err('Invalid property setting: %s' % arg)
     return prop, val
 
+
 def parse_arg(arg, components, linker):
+
     def assert_in_component(msg):
         if linker.pending() or not components:
             err('Invalid grammar: %s' % msg)
@@ -294,6 +300,7 @@ def parse_arg(arg, components, linker):
         components.add(arg)
         if linker.pending():
             linker.link(eatercompname=components.last())
+
 
 def parse_args(args):
     """Parse flumotion-launch arguments.

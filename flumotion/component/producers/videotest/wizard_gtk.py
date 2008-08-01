@@ -77,10 +77,10 @@ class TestVideoProducerStep(VideoProducerStep):
 
 class VideoTestWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TestVideoProducer()
 
     def getProductionStep(self, type):
         return TestVideoProducerStep(self.wizard, self.model)
-

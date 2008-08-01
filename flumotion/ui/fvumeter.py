@@ -80,6 +80,7 @@ class FVUMeter(gtk.DrawingArea):
     rightborder = 65
 
     # Returns the meter deflection percentage given a db value
+
     def iec_scale(self, db):
         pct = 0.0
 
@@ -235,4 +236,3 @@ class FVUMeter(gtk.DrawingArea):
             layout)
 
 gobject.type_register(FVUMeter)
-

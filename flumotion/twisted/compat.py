@@ -36,11 +36,14 @@ warnings.warn(
     "This module is deprecated, use zope.interface directly instead",
     DeprecationWarning)
 
+
 def implementsInterface(object, interface):
     return interface.providedBy(object)
 
+
 def implementedBy(object):
     return zi.implementedBy(object)
+
 
 def isInterface(object):
     return isinstance(object, zi.InterfaceClass)

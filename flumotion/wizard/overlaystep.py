@@ -110,6 +110,7 @@ class OverlayStep(WorkerWizardStep):
 
     def _checkElements(self):
         self.model.can_overlay = False
+
         def importError(error):
             self.info('could not import PIL')
             message = messages.Warning(
@@ -165,4 +166,3 @@ class OverlayStep(WorkerWizardStep):
 
     def on_show_text__toggled(self, button):
         self.text.set_sensitive(button.get_active())
-

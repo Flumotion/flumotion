@@ -82,12 +82,14 @@ def handleGStreamerDeviceError(failure, device, mid=None):
     log.debug('check', 'handleGStreamerError: returning %r' % m)
     return m
 
+
 def debugFailure(failure):
     """
     Create debug info from a failure.
     """
     return "Failure %r: %s\n%s" % (failure, failure.getErrorMessage(),
         failure.getTraceback())
+
 
 def callbackResult(value, result):
     """
@@ -96,6 +98,7 @@ def callbackResult(value, result):
     log.debug('check', 'returning succeeded Result, value %r' % (value, ))
     result.succeed(value)
     return result
+
 
 def errbackResult(failure, result, mid, device):
     """
@@ -120,6 +123,7 @@ def errbackResult(failure, result, mid, device):
     result.add(m)
     return result
 
+
 def errbackNotFoundResult(failure, result, mid, device):
     """
     I am an errback to add to a do_element_check deferred
@@ -140,6 +144,7 @@ def errbackNotFoundResult(failure, result, mid, device):
     # let failure fall through otherwise
     return failure
 
+
 class CheckProcError(Exception):
     'Utility error for element checker procedures'
     data = None
@@ -147,9 +152,11 @@ class CheckProcError(Exception):
     def __init__(self, data):
         self.data = data
 
+
 def checkImport(moduleName):
     log.debug('check', 'checkImport: %s', moduleName)
     __import__(moduleName)
+
 
 def checkElements(elementNames):
     log.debug('check', 'checkElements: element names to check %r',
@@ -164,6 +171,7 @@ def checkElements(elementNames):
             pass
     log.debug('check', 'checkElements: returning elements names %r', ret)
     return ret
+
 
 def checkDirectory(pathName):
     """
@@ -183,6 +191,7 @@ def checkDirectory(pathName):
 
     result.succeed(succeeded)
     return result
+
 
 def checkPlugin(pluginName, packageName, minimumVersion=None,
                 featureName=None, featureCheck=None):
@@ -239,6 +248,8 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
     return defer.succeed(result)
 
 # FIXME: I would prefer to have this in flumotion/component/base/check.py
+
+
 def do_check(obj, callable, *args, **kwargs):
     """
     This method can be used in component do_check vmethods.
@@ -250,6 +261,7 @@ def do_check(obj, callable, *args, **kwargs):
 
     @rtype: L{twisted.internet.defer.Deferred}
     """
+
     def checkCallback(result):
         for m in result.messages:
             obj.addMessage(m)

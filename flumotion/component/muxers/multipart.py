@@ -27,5 +27,6 @@ __version__ = "$Rev$"
 
 
 class Multipart(feedcomponent.MultiInputParseLaunchComponent):
+
     def get_muxer_string(self, properties):
         return 'multipartmux name=muxer'

@@ -26,8 +26,6 @@ from twisted.internet import defer, reactor
 from flumotion.common import keycards
 
 
-
-
 class FakeMedium:
     calls = []
 
@@ -37,6 +35,7 @@ class FakeMedium:
             self.calls = []
         self.calls.append((method, args, kwargs))
         return defer.succeed(None)
+
 
 class TrivialBouncerTest(testsuite.TestCase):
     obj = None
@@ -77,6 +76,7 @@ class TrivialBouncerTest(testsuite.TestCase):
         self.setKeycardExpireInterval(0.5)
 
         def checkTimeout(k):
+
             def check(expected, inBouncer, furtherChecks):
                 if k.ttl != expected:
                     d.errback(AssertionError('ttl %r != expected %r'
@@ -120,6 +120,7 @@ class TrivialBouncerTest(testsuite.TestCase):
         return d
 
     def testKeepAlive(self):
+
         def adjustTTL(_):
             self.assertEquals(k.ttl, 0.75)
             self.obj.keepAlive('bar', 10)
@@ -138,6 +139,7 @@ class TrivialBouncerTest(testsuite.TestCase):
         return d
 
     def testAutoExpire(self):
+
         def authenticated(_):
             self.assertAttr(k, 'state', keycards.AUTHENTICATED)
             self.assertAttr(k, 'ttl', 0)

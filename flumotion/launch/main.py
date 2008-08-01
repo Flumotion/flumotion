@@ -111,6 +111,7 @@ class ComponentWrapper(object, log.Loggable):
 
     def instantiate(self):
         errors = []
+
         def haveError(value):
             translator = i18n.Translator()
             localedir = os.path.join(configure.localedatadir, 'locale')
@@ -146,10 +147,12 @@ class ComponentWrapper(object, log.Loggable):
                    eaterAlias, feedId, fd)
         return self.component.eatFromFD(eaterAlias, feedId, fd)
 
+
 def make_pipes(wrappers):
     fds = {} # feedcompname:feeder => (fd, start())
     wrappersByName = dict([(wrapper.name, wrapper)
                            for wrapper in wrappers])
+
     def starter(wrapper, feedName, write):
         return lambda: wrapper.feedToFD(feedName, write)
     for wrapper in wrappers:
@@ -163,6 +166,7 @@ def make_pipes(wrappers):
                 start = starter(wrappersByName[compName], feederName, write)
                 fds[feedId] = (read, start)
     return fds
+
 
 def start_components(wrappers, fds):
     # figure out the links and start the components
@@ -180,6 +184,7 @@ def start_components(wrappers, fds):
             assert master
             need_sync.remove(master)
             d = master.provideMasterClock(7600 - 1) # hack!
+
             def addNeedSync(clocking):
                 return need_sync, clocking
             d.addCallback(addNeedSync)
@@ -218,6 +223,7 @@ def start_components(wrappers, fds):
         d.addCallback(do_start, wrapper)
     d.addErrback(do_stop)
     return d
+
 
 def main(args):
     from flumotion.common import setup

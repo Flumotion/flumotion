@@ -67,7 +67,9 @@ version="0.3.0.1" worker="default">
   </flow>
 </planet>"""
 
+
 class TestStopStart(common.FlumotionManagerWorkerTest):
+
     def testAudioTestMultipleStopStarts(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
         httpPort = random.randrange(12800, 12899)

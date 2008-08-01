@@ -34,6 +34,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
     def configure_pipeline(self, pipeline, properties):
         # Later, when the typefind element has successfully found the type
         # of the data, we'll rebuild the pipeline.
+
         def have_caps(tf, prob, caps):
             capsname = caps[0].get_name()
             # We should add appropriate parsers for any given format here. For

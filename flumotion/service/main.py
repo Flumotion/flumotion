@@ -22,6 +22,7 @@ from flumotion.configure import configure
 from flumotion.service import service
 from flumotion.common.options import OptionParser
 
+
 def main(args):
     parser = OptionParser(domain=configure.PACKAGE)
 

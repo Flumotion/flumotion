@@ -34,7 +34,9 @@ __version__ = "$Rev$"
 # process. For example the multiadmin uses this to manage its
 # connections to remote managers.
 
+
 class StartSet(log.Loggable):
+
     def __init__(self, avatarLoggedIn, alreadyStartingError,
                  alreadyRunningError):
         """Create a StartSet, a data structure for managing starts and
@@ -91,6 +93,7 @@ class StartSet(log.Loggable):
             self.debug('waiting for previous %s to shut down like it '
                        'said it would', avatarId)
             # fixme: i don't understand this code
+
             def ensureShutdown(res,
                                shutdown=self._shutdownDeferreds[avatarId]):
                 shutdown.addCallback(lambda _: res)

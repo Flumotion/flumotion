@@ -38,13 +38,17 @@ class TestKeycardUACPP(testsuite.TestCase):
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
 
+
 class TestKeycardUACPCC(testsuite.TestCase):
+
     def testInit(self):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
 
+
 class TestKeycardToken(testsuite.TestCase):
+
     def testInit(self):
         keycard = keycards.KeycardToken('token', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
@@ -56,7 +60,9 @@ class TestKeycardToken(testsuite.TestCase):
 
         repr(keycard)
 
+
 class TestKeycardHTTPDigest(testsuite.TestCase):
+
     def testInit(self):
         keycard = keycards.KeycardHTTPDigest('username')
         self.assertEquals(keycard.state, keycards.REQUESTING)
@@ -67,7 +73,10 @@ class TestKeycardHTTPDigest(testsuite.TestCase):
         repr(keycard)
 
 # F0.8
+
+
 class TestHTTPDigestKeycard(testsuite.TestCase):
+
     def testInit(self):
         keycard = keycards.HTTPDigestKeycard('username')
         self.assertEquals(keycard.state, keycards.REQUESTING)
@@ -76,10 +85,14 @@ class TestHTTPDigestKeycard(testsuite.TestCase):
         message='Use KeycardHTTPDigest instead.', category=DeprecationWarning)]
 
 # test the base class repr
+
+
 class MyKeycard(keycards.Keycard):
     pass
 
+
 class TestMyKeycard(testsuite.TestCase):
+
     def testInit(self):
         keycard = MyKeycard()
         self.assertEquals(keycard.state, keycards.REQUESTING)
@@ -88,8 +101,12 @@ class TestMyKeycard(testsuite.TestCase):
 
 
 # test sending keycards back and forth
+
+
 class Admin(testsuite.TestAdmin):
     pass
+
+
 class Worker(testsuite.TestWorker):
     keycard = None
 
@@ -105,7 +122,9 @@ class Worker(testsuite.TestWorker):
         #print "Worker keycard %r, id: %d" % (keycard, id(keycard))
         pass
 
+
 class Root(testsuite.TestManagerRoot):
+
     def remote_workerGetKeycard(self):
         d = self.workerReference.callRemote('getKeycard')
         d.addCallback(self._printKeycard)
@@ -120,7 +139,9 @@ class Root(testsuite.TestManagerRoot):
         #print "Manager keycard %r, id: %d" % (keycard, id(keycard))
         return keycard
 
+
 class TestKeycardSending(testsuite.TestCase):
+
     def setUp(self):
         self.m = testsuite.TestManager()
         port = self.m.run(Root)
@@ -143,6 +164,7 @@ class TestKeycardSending(testsuite.TestCase):
 
     def testSend(self):
         d = self.a.remoteRoot.callRemote('workerGetKeycard')
+
         def getKeycardCallback(keycard):
             # now send back the keycard to see what happens
             d2 = self.a.remoteRoot.callRemote('workerGiveKeycard', keycard)

@@ -28,8 +28,6 @@ flumotion.common.setup.setup()
 from flumotion.common import log
 
 
-
-
 def useGtk2Reactor():
     var = 'FLU_TEST_GTK2_REACTOR'
 

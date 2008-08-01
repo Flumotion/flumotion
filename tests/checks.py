@@ -50,6 +50,7 @@ data = ("checkTVCard('/dev/video0')",
         "checkMixerTracks('osssrc', '/dev/dsp')",
         "check1394()")
 
+
 def make_model():
     from flumotion.worker.checks import video
 
@@ -62,6 +63,7 @@ def make_model():
 
 
 class Window(gtk.Window):
+
     def __init__(self):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.current_deferred = None

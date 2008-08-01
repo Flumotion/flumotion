@@ -88,6 +88,7 @@ class NotebookPlaceholder(Placeholder, log.Loggable):
         self._notebook.show()
 
     # BaseComponentHolder
+
     def getWidget(self):
         return self._notebook
 
@@ -167,6 +168,7 @@ class LabelPlaceholder(Placeholder):
 
 class PlanetPlaceholder(Placeholder):
     """This is a placeholder used to display a Planet"""
+
     def __init__(self):
         self._widget = gtk.Label('')
 
@@ -339,8 +341,10 @@ class ComponentView(gtk.VBox, log.Loggable):
         return d
 
     def _componentUnsetToInactive(self):
+
         def invalidate(_):
             self._setState(COMPONENT_UNSET)
+
         def set_(state, key, value):
             if key != 'mood':
                 return
@@ -358,6 +362,7 @@ class ComponentView(gtk.VBox, log.Loggable):
             set_(current, 'mood', current.get('mood'))
 
     def _componentInactiveToActive(self):
+
         def gotWidgetConstructor(placeholder, oldComponentState):
             if oldComponentState != self._currentComponentState:
                 # in the time that _get_widget_constructor was running,

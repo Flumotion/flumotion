@@ -27,9 +27,8 @@ from flumotion.common import errors, pygobject
 from flumotion.common.pygobject import gsignal, gproperty
 
 
-
-
 class SetProperty(testsuite.TestCase):
+
     def testButton(self):
         b = gtk.Button()
 
@@ -53,8 +52,11 @@ class SetProperty(testsuite.TestCase):
         pygobject.gobject_set_property(b, 'can-focus', [])
         self.assertEquals(b.get_property('can-focus'), False)
 
+
 class TestPyGObject(testsuite.TestCase):
+
     def testPyGObject(self):
+
         class Foo(gobject.GObject):
             gsignal('hcf', bool, str)
             gproperty(bool, 'burning', 'If the object is burning',

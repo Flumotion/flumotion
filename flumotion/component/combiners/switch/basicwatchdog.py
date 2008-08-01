@@ -29,6 +29,8 @@ __version__ = "$Rev$"
 
 # These basic watchdog components switch to backup
 # when the master eater(s) have gone hungry
+
+
 class SingleBasicWatchdog(switch.SingleSwitch):
     logCategory = "comb-single-basic-watchdog"
 
@@ -61,6 +63,7 @@ class SingleBasicWatchdog(switch.SingleSwitch):
             if allStarted:
                 self.startedFine = True
                 self._started = []
+
 
 class AVBasicWatchdog(switch.AVSwitch):
     logCategory = "comb-av-basic-watchdog"

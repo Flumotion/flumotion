@@ -40,6 +40,7 @@ class ClientFactory(log.Loggable):
     @type options: dict
     @param options: dictionary of optparse options
     """
+
     def __init__(self, loop, options):
         self.count = 0
         self.clients = {}
@@ -89,6 +90,7 @@ class ClientFactory(log.Loggable):
         return value
 
     # create a new client
+
     def _create_client(self):
         # parse readsize and readrate options
         if not self._options.readsize:

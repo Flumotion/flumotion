@@ -76,7 +76,6 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             self.stdscr.addstr(cury + 1, 10, "New connection...")
         self.stdscr.refresh()
 
-
     def display_current_input_line(self):
         cury = self.displayed_connections + 5 + self.state
         if self.state > 0 and self.state < 5:

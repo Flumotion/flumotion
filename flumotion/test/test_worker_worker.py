@@ -23,9 +23,8 @@ from flumotion.common import testsuite
 from flumotion.worker import worker
 
 
-
-
 class FakeOptions:
+
     def __init__(self):
         self.host = 'localhost'
         self.port = 9999
@@ -34,6 +33,8 @@ class FakeOptions:
         self.randomFeederports = False
         self.name = 'fakeworker'
 
+
 class TestBrain(testsuite.TestCase):
+
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())

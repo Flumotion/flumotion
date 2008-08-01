@@ -68,6 +68,7 @@ class BaseMedium(fpb.Referenceable):
         """
         self.debug('%r.setRemoteReference: %r' % (self, remoteReference))
         self.remote = remoteReference
+
         def nullRemote(x):
             self.debug('%r: disconnected from %r' % (self, self.remote))
             self.remote = None
@@ -171,6 +172,7 @@ class BaseMedium(fpb.Referenceable):
 
         @returns: a callable, the given function in the given module.
         """
+
         def gotModule(mod):
             if hasattr(mod, function):
                 return getattr(mod, function)
@@ -211,7 +213,9 @@ class BaseMedium(fpb.Referenceable):
         @returns: the return value of the given function in the module.
         """
         self.debug('runBundledFunction(%r, %r)', module, function)
+
         def gotFunction(proc):
+
             def invocationError(failure):
                 self.warning('Exception raised while calling '
                              '%s.%s(*args=%r, **kwargs=%r): %s',
@@ -250,6 +254,7 @@ class PingingMedium(BaseMedium):
         self._pingCheck()
 
     def _ping(self):
+
         def pingback(result):
             self._lastPingback = time.time()
             self.log('pinged, pingback at %r' % self._lastPingback)
@@ -280,6 +285,7 @@ class PingingMedium(BaseMedium):
         else:
             self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
                                                   self._pingCheck)
+
     def stopPinging(self):
         if self._pingCheckDC:
             self._pingCheckDC.cancel()
@@ -295,6 +301,7 @@ class PingingMedium(BaseMedium):
 
     def setRemoteReference(self, remote):
         BaseMedium.setRemoteReference(self, remote)
+
         def stopPingingCb(x):
             self.debug('stop pinging')
             self.stopPinging()
@@ -310,5 +317,3 @@ class PingingMedium(BaseMedium):
         @type marker: str
         """
         self.writeMarker(marker, level)
-
-

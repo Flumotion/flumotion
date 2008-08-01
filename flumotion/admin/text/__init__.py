@@ -22,4 +22,3 @@
 """flumotion-admin-text modules and packages"""
 
 __version__ = "$Rev$"
-

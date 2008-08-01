@@ -25,9 +25,8 @@ from flumotion.component.bouncers import plug
 from flumotion.test import bouncertest
 
 
-
-
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
+
     def setUp(self):
         args = {'socket': 'flumotion.component.bouncers.plug.BouncerPlug',
                 'type': 'trivial-bouncer-plug',

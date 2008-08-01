@@ -24,7 +24,10 @@ __version__ = "$Rev$"
 
 
 # this is a producer component for rtsp sources eg axis network cameras
+
+
 class Rtsp(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         width = properties.get('width', 0)
         height = properties.get('height', 0)

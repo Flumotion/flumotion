@@ -28,9 +28,8 @@ from twisted.internet import defer, reactor
 from flumotion.component import feeder
 
 
-
-
 class TestFeeder(testsuite.TestCase):
+
     def setUp(self):
         self.feeder = feeder.Feeder('video:default')
 

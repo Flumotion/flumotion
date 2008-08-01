@@ -82,6 +82,7 @@ class ComponentAvatar(base.ManagerAvatar):
         reactor.callLater(0, self.heaven.componentAttached, self)
 
     ### python methods
+
     def __repr__(self):
         mood = '(unknown)'
         if self.componentState:
@@ -92,8 +93,10 @@ class ComponentAvatar(base.ManagerAvatar):
                                       self.avatarId, mood)
 
     ### ComponentAvatar methods
+
     def makeAvatarInitArgs(klass, heaven, avatarId, remoteIdentity,
                            mind):
+
         def gotStates(result):
             (_s1, conf), (_s2, jobState), (_s3, clocking) = result
             assert _s1 and _s2 and _s3 # fireOnErrback=1
@@ -137,6 +140,7 @@ class ComponentAvatar(base.ManagerAvatar):
         base.ManagerAvatar.onShutdown(self)
 
     # my methods
+
     def addMessage(self, level, id, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
@@ -189,6 +193,7 @@ class ComponentAvatar(base.ManagerAvatar):
         #  (2) we don't know anything about this component, but it has a
         #      state and config. We deal with it, creating all the
         #      neccesary internal state.
+
         def verifyExistingComponentState(conf, state):
             # condition (1)
             state.setJobState(self.jobState)
@@ -242,6 +247,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
+
         def success(clocking):
             self.clocking = clocking
             self.heaven.masterClockAvailable(self.avatarId, clocking)
@@ -412,6 +418,7 @@ class ComponentAvatar(base.ManagerAvatar):
                                    host, port)
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
+
     def authenticate(self, keycard):
         """
         Authenticate the given keycard.
@@ -443,6 +450,7 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.mindCallRemote('expireKeycard', keycardId)
 
     ### IPerspective methods, called by the worker's component
+
     def perspective_cleanShutdown(self):
         """
         Called by a component to tell the manager that it's shutting down
@@ -491,7 +499,9 @@ class ComponentAvatar(base.ManagerAvatar):
 
         return self.heaven.getAvatar(requesterId).expireKeycard(keycardId)
 
+
 class dictlist(dict):
+
     def add(self, key, value):
         if key not in self:
             self[key] = []
@@ -502,8 +512,10 @@ class dictlist(dict):
         if not self[key]:
             del self[key]
 
+
 class FeedMap(object, log.Loggable):
     logName = 'feed-map'
+
     def __init__(self):
         self.avatars = {}
         self._ordered_avatars = []
@@ -622,6 +634,7 @@ class FeedMap(object, log.Loggable):
                 ret.extend(self.eatersForFeeders[ffid])
         return ret
 
+
 class ComponentHeaven(base.ManagerHeaven):
     """
     I handle all registered components and provide L{ComponentAvatar}s
@@ -639,6 +652,7 @@ class ComponentHeaven(base.ManagerHeaven):
         self.feedMap = FeedMap()
 
     ### our methods
+
     def feedServerAvailable(self, workerName):
         self.debug('feed server %s logged in, we can connect to its port',
                    workerName)
@@ -730,8 +744,10 @@ class ComponentHeaven(base.ManagerHeaven):
 
     def _connectEatersAndFeeders(self, avatar):
         # FIXME: all connections are upstream for now
+
         def always(otherComp):
             return True
+
         def never(otherComp):
             return False
         directions = [(self.feedMap.getFeedersForEaters,

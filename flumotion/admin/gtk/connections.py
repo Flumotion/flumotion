@@ -39,6 +39,7 @@ _ = gettext.gettext
 def format_timestamp(stamp):
     return stamp.strftime('%x')
 
+
 class Connections(GladeWidget):
     gladeFile = 'connections.glade'
 

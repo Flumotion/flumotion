@@ -30,9 +30,11 @@ T_ = gettexter()
 
 
 class VideoTestMedium(feedcomponent.FeedComponentMedium):
+
     def remote_setPattern(self, pattern):
         return self.comp.set_element_property('source', 'pattern',
                                               pattern)
+
 
 class VideoTest(feedcomponent.ParseLaunchComponent):
     componentMediumClass = VideoTestMedium
@@ -78,7 +80,9 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
             "identity name=identity silent=TRUE ! %s" % caps
 
     # Set properties
+
     def configure_pipeline(self, pipeline, properties):
+
         def notify_pattern(obj, pspec):
             self.uiState.set('pattern', int(obj.get_property('pattern')))
 

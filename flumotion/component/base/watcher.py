@@ -101,12 +101,14 @@ class BaseWatcher(log.Loggable):
 
     # FIXME: this API has tripped up two people thus far, including its
     # author. make subscribe() call start() if necessary?
+
     def start(self):
         """Start checking for file changes.
 
         Subscribers will be notified asynchronously of changes to the
         watched files.
         """
+
         def checkFiles():
             self.log("checking for file changes")
             new = self.getFileData()
@@ -195,6 +197,7 @@ class BaseWatcher(log.Loggable):
         """
         raise NotImplementedError
 
+
 class DirectoryWatcher(BaseWatcher):
     """
     Directory Watcher
@@ -210,6 +213,7 @@ class DirectoryWatcher(BaseWatcher):
         return [os.path.join(self.path, f)
                 for f in os.listdir(self.path)
                 if f not in self._ignorefiles]
+
 
 class FilesWatcher(BaseWatcher):
     """

@@ -34,6 +34,7 @@ class IProducerPlugin(Interface):
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """
+
     def __call__(wizard):
         """Creates producer plugins
         @param wizard: the wizard
@@ -59,6 +60,7 @@ class IEncoderPlugin(Interface):
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """
+
     def __call__(wizard):
         """Creates encoder plugins
         @param wizard: the wizard
@@ -79,6 +81,7 @@ class IHTTPConsumerPlugin(Interface):
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """
+
     def __call__(wizard):
         """Creates http consumer plugins
         @param wizard: the wizard

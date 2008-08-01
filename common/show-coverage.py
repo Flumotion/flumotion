@@ -1,7 +1,9 @@
 import os
 import sys
 
+
 class Presentation:
+
     def __init__(self, name, lines, covered):
         self.name = name
         self.lines = lines
@@ -18,6 +20,7 @@ class Presentation:
 
 
 class Coverage:
+
     def __init__(self):
         self.files = []
         self.total_lines = 0
@@ -69,6 +72,7 @@ class Coverage:
 
         self.total_lines += p.lines
         self.total_covered += p.covered
+
 
 def main(args):
     c = Coverage()

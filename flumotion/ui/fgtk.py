@@ -34,6 +34,7 @@ __version__ = "$Rev$"
 
 
 class FProxyComboBox(ProxyComboBox):
+
     def set_enum(self, enum_class, value_filter=()):
         """
         Set the given enum_class on the combobox.
@@ -69,5 +70,3 @@ class ProxyWidgetMapping:
             return self.types[name]
         else:
             return gobject.type_from_name(name)
-
-

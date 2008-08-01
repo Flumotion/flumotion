@@ -23,6 +23,7 @@ import os
 
 CORTADO_PREFIX = "@CORTADO_PREFIX@"
 
+
 def getCortadoFilename():
     directories = ['/usr/local', '/usr']
     prefix = CORTADO_PREFIX[:]
@@ -36,13 +37,15 @@ def getCortadoFilename():
         if os.path.exists(name):
             return name
         # OpenSuSE
-        name = os.path.join(directory, 'share', 'java', 'cortado', 'cortado-ovt.jar')
+        name = os.path.join(directory, 'share',
+                            'java', 'cortado', 'cortado-ovt.jar')
         if os.path.exists(name):
             return name
         # ant install_applet
         for version in ['0.2.2', '0.2.1', '0.2.0']:
-            name = os.path.join(directory, 'share', 'cortado',
-                                'cortado-ovt-stripped-%s.1.jar' % (version,))
+            name = os.path.join(
+                directory, 'share', 'cortado',
+                'cortado-ovt-stripped-%s.1.jar' % (version, ))
             if os.path.exists(name):
                 return name
     return None

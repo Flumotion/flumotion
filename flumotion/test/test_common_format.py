@@ -24,6 +24,7 @@ from flumotion.common.format import formatStorage, formatTime
 
 
 class TestFormatStorage(TestCase):
+
     def testBytes(self):
         value = 4
         assert formatStorage(value) == "4.00 "
@@ -61,6 +62,7 @@ class TestFormatStorage(TestCase):
 
 
 class TestFormatTime(TestCase):
+
     def testFractionalSecond(self):
         value = 1.1
         self.assertEquals(formatTime(value, fractional=2),

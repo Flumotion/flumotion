@@ -42,6 +42,7 @@ class ConfigError(Exception):
     args[0]: str
     """
 
+
 class NoProjectError(Exception):
     "The given project does not exist"
 
@@ -51,6 +52,8 @@ class NoSSLError(Exception):
 
 
 # connection errors
+
+
 class ConnectionError(pb.Error):
     "General connection error"
 
@@ -92,6 +95,8 @@ class PipelineParseError(pb.Error):
 
 
 # remote method errors
+
+
 class RemoteMethodError(pb.Error):
     """
     Generic remote method error.
@@ -101,6 +106,7 @@ class RemoteMethodError(pb.Error):
     @ivar debug:      optional additional debug message
     @type debug:      str
     """
+
     def __init__(self, methodName, debug=None):
         self.methodName = methodName
         self.debug = debug
@@ -108,6 +114,7 @@ class RemoteMethodError(pb.Error):
         self.args = (methodName, debug)
 
     # this allows us to decide how it gets serialized
+
     def __str__(self):
         msg = "%s on method '%s'" % (self.__class__.__name__, self.methodName)
         if self.debug:
@@ -129,11 +136,15 @@ class NoMethodError(RemoteMethodError):
 
 # FIXME: subclass from both entry/bundle and syntax errors ?
 # FIXME: name ?
+
+
 class EntrySyntaxError(pb.Error):
     "Syntax error while getting entry point in a bundle"
 
 
 # other errors
+
+
 class NotReadyError(pb.Error):
     "The component is not ready yet"
 
@@ -145,18 +156,23 @@ class PropertyError(pb.Error):
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"
 
+
 class FatalError(pb.Error):
     "A fatal error"
 
 # F0.8
 __pychecker__ = 'no-shadowbuiltin'
+
+
 class SystemError(FatalError):
+
     def __init__(self, *args, **kwargs):
         import warnings
         warnings.warn("Please use builtin SystemError or errors.FatalError",
             DeprecationWarning, stacklevel=2)
         pb.Error.__init__(self, *args, **kwargs)
 __pychecker__ = ''
+
 
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"
@@ -171,6 +187,8 @@ class InsufficientPrivilegesError(pb.Error):
 
 
 # component errors
+
+
 class ComponentError(pb.Error):
     """
     Error while doing something to a component.
@@ -180,6 +198,8 @@ class ComponentError(pb.Error):
 
 
 # FIXME: rename, component first
+
+
 class SleepingComponentError(ComponentError):
     "Component is sleeping, cannot handle request"
 
@@ -288,6 +308,8 @@ class UnknownPlugError(pb.Error):
 
 
 # effect errors
+
+
 class UnknownEffectError(pb.Error):
     "A given effect or effect type does not exist"
 
@@ -305,6 +327,8 @@ class TimeoutException(Exception):
 
 
 # serializable GStreamer errors
+
+
 class GStreamerError(pb.Error):
     "Generic GStreamer error"
 

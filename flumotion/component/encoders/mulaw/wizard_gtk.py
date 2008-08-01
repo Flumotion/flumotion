@@ -54,10 +54,10 @@ class MulawStep(AudioEncoderStep):
 
 class MulawWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = MulawAudioEncoder()
 
     def getConversionStep(self):
         return MulawStep(self.wizard, self.model)
-

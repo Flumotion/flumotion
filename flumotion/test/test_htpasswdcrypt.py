@@ -32,7 +32,10 @@ bouncerconf = {'name': 'testbouncer',
                'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
 # this is a type that should not be allowed
+
+
 class TestHTPasswdCryptKeycard(testsuite.TestCase):
+
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
@@ -42,12 +45,15 @@ class TestHTPasswdCryptKeycard(testsuite.TestCase):
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def wrongKeycardClassCallback(result):
             self.failIf(result)
         d.addCallback(wrongKeycardClassCallback)
         return d
 
+
 class TestHTPasswdCryptUACPP(testsuite.TestCase):
+
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
@@ -61,6 +67,7 @@ class TestHTPasswdCryptUACPP(testsuite.TestCase):
     def testOk(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def okCallback(result):
             self.assertEquals(result.state, keycards.AUTHENTICATED)
         d.addCallback(okCallback)
@@ -69,6 +76,7 @@ class TestHTPasswdCryptUACPP(testsuite.TestCase):
     def testWrongUser(self):
         keycard = keycards.KeycardUACPP('wronguser', 'test', '127.0.0.1')
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def wrongUserCallback(result):
             self.failIf(result)
         d.addCallback(wrongUserCallback)
@@ -77,12 +85,15 @@ class TestHTPasswdCryptUACPP(testsuite.TestCase):
     def testWrongPassword(self):
         keycard = keycards.KeycardUACPP('test', 'wrongpass', '127.0.0.1')
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def wrongPasswordCallback(result):
             self.assertEquals(result, None)
         d.addCallback(wrongPasswordCallback)
         return d
 
+
 class TestHTPasswdCryptUACPCC(testsuite.TestCase):
+
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
@@ -97,11 +108,13 @@ class TestHTPasswdCryptUACPCC(testsuite.TestCase):
 
         # submit for auth
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def okCallback(result):
             self.assertEquals(result.state, keycards.REQUESTING)
             # respond to challenge and resubmit
             result.setPassword('test')
             dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
             def authenticatedCallback(result):
                 self.assertEquals(result.state, keycards.AUTHENTICATED)
             dd.addCallback(authenticatedCallback)
@@ -118,12 +131,14 @@ class TestHTPasswdCryptUACPCC(testsuite.TestCase):
 
         # submit for auth
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def tamperCallback(result):
             self.assertEquals(result.state, keycards.REQUESTING)
             # mess with challenge, respond to challenge and resubmit
             result.challenge = "I am a h4x0r"
             result.setPassword('test')
             dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
             def tamperAuthenticateCallback(result):
                 self.failIf(result)
             dd.addCallback(tamperAuthenticateCallback)

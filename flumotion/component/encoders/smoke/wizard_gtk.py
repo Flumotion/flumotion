@@ -54,10 +54,10 @@ class SmokeStep(VideoEncoderStep):
 
 class SmokeWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = SmokeVideoEncoder()
 
     def getConversionStep(self):
         return SmokeStep(self.wizard, self.model)
-

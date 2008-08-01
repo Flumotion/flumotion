@@ -34,12 +34,15 @@ __version__ = "$Rev$"
 
 
 # Very similar to tcp.Server, but we need to call things in a different order
+
+
 class FDPorterServer(Connection):
     """
     A connection class for use with passed FDs.
     Similar to tcp.Server, but gets the initial FD from a different source,
     obviously, and also passes along some data with the original connection.
     """
+
     def __init__(self, sock, protocol, addr, additionalData):
         Connection.__init__(self, sock, protocol)
         self.client = addr
@@ -67,12 +70,14 @@ class FDPorterServer(Connection):
     def getPeer(self):
         return address.IPv4Address('TCP', *(self.client + ('INET', )))
 
+
 class PorterMedium(medium.BaseMedium):
     """
     A medium we use to talk to the porter.
     Mostly, we use this to say what mountpoints (or perhaps, later,
     (hostname, mountpoint) pairs?) we expect to receive requests for.
     """
+
     def registerPath(self, path):
         return self.callRemote("registerPath", path)
 
@@ -84,6 +89,7 @@ class PorterMedium(medium.BaseMedium):
 
     def deregisterPrefix(self, prefix):
         return self.callRemote("deregisterPrefix", prefix)
+
 
 class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     """
@@ -127,7 +133,9 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     def deregisterDefault(self):
         return self.medium.deregisterPrefix("/")
 
+
 class HTTPPorterClientFactory(PorterClientFactory):
+
     def __init__(self, childFactory, mountPoints, do_start_deferred,
                  prefixes=None):
         """

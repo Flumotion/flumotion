@@ -22,6 +22,7 @@
 import os
 from flumotion.common.log import safeprintf
 
+
 def get():
     # where am I on the disk ?
     __thisdir = os.path.dirname(os.path.abspath(__file__))

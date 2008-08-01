@@ -50,6 +50,7 @@ class Disker(Consumer):
       time will be multiplied by this value when saved
     """
     componentType = 'disk-consumer'
+
     def __init__(self):
         super(Disker, self).__init__()
         self.has_time = False
@@ -195,5 +196,3 @@ class DiskVideoStep(DiskStep):
 
     def getConsumerType(self):
         return 'video'
-
-

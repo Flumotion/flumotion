@@ -28,6 +28,7 @@ __version__ = "$Rev$"
 class BouncerMedium(component.BaseComponentMedium):
 
     logCategory = 'bouncermedium'
+
     def remote_authenticate(self, keycard):
         """
         Authenticates the given keycard.

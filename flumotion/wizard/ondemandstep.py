@@ -45,6 +45,7 @@ class OnDemand(HTTPServer):
     an on demand HTTP server component.
     """
     componentType = 'http-server'
+
     def __init__(self, worker=None):
         super(OnDemand, self).__init__(worker, mountPoint='/')
         self.properties.path = '/tmp'
@@ -160,11 +161,13 @@ class OnDemandStep(WorkerWizardStep):
         self.wizard.blockNext(self.mount_point.get_text() == '')
 
     def _showFileSelector(self):
+
         def response(fs, response):
             fs.hide()
             if response == gtk.RESPONSE_OK:
                 self.model.properties.path = fs.getFilename()
                 self._proxy.update('path')
+
         def deleteEvent(fs, event):
             pass
         fs = FileSelectorDialog(self.wizard.window,

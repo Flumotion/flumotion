@@ -26,6 +26,7 @@ __version__ = "$Rev$"
 
 
 class Shout2Consumer(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         pipestr = 'shout2send name=shout2-streamer sync=1 protocol=3'
 
@@ -44,6 +45,7 @@ class Shout2Consumer(feedcomponent.ParseLaunchComponent):
         return pipestr
 
     def configure_pipeline(self, pipeline, properties):
+
         def _connection_problem(self, error):
             # apparently error is an int
             self.warning('Connection problem: %r', error)

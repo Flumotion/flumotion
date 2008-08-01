@@ -225,7 +225,9 @@ videoTestXML = """<?xml version="1.0" ?>
   </flow>
 </planet>"""
 
+
 class TestFlumotion(common.FlumotionManagerWorkerTest):
+
     def testManagerWorker(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
         plan.kill(w, 0)

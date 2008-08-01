@@ -34,11 +34,13 @@ def get_admin_for_object(object):
     warnings.warn('Use getAdminForObject', DeprecationWarning, stacklevel=2)
     return getAdminForObject(object)
 
+
 def getAdminForObject(object):
     if object.get('parent'):
         return get_admin_for_object(object.get('parent'))
     else:
         return object.admin
+
 
 class MultiAdminModel(log.Loggable):
     logCategory = 'multiadmin'
@@ -53,6 +55,7 @@ class MultiAdminModel(log.Loggable):
                                            errors.AlreadyConnectedError)
 
     # Listener implementation
+
     def emit(self, signal_name, *args, **kwargs):
         self.debug('emit %r %r %r' % (signal_name, args, kwargs))
         assert signal_name != 'handler'
@@ -191,6 +194,7 @@ class MultiAdminModel(log.Loggable):
         '''Call a method on the remote component object associated with
         a component state'''
         admin = get_admin_for_object(object)
+
         def do_op(object):
             admin.callRemote('component'+op, object)
         self.for_each_component(object, do_op)

@@ -28,6 +28,7 @@ __version__ = "$Rev$"
 
 
 class Repeater(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         dp = ""
         if 'drop-probability' in properties:

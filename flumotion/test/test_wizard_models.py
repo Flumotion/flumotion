@@ -25,13 +25,14 @@ from flumotion.common import testsuite
 from flumotion.wizard.models import Component, Properties
 
 
-
-
 class TestComponent(testsuite.TestCase):
+
     def setUp(self):
         self.component = Component()
 
+
 class TestProperties(testsuite.TestCase):
+
     def setUp(self):
         self.props = Properties()
 

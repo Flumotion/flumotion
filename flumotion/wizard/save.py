@@ -34,6 +34,7 @@ class WizardSaver(object):
     To use me, add some components by some of the methods and then call
     my getXML() method to get the xml configuration.
     """
+
     def __init__(self):
         self._existingComponentNames = []
         self._flowComponents = []

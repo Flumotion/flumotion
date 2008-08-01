@@ -25,9 +25,8 @@ from flumotion.common import avltree
 from flumotion.common import testsuite
 
 
-
-
 class TestAVLTree(testsuite.TestCase):
+
     def assertBalanced(self, tree):
         if tree is None:
             return 0

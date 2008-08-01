@@ -165,6 +165,7 @@ class TerminalController:
 # Example use case: progress bar
 #######################################################################
 
+
 class ProgressBar:
     """
     A 3-line progress bar, which looks like::

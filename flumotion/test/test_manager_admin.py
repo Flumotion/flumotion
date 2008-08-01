@@ -25,28 +25,34 @@ from flumotion.common import keycards, testsuite, interfaces
 from flumotion.manager import admin, manager
 
 
-
-
 class FakeTransport:
+
     def getPeer(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+
     def getHost(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
 
+
 class FakeBroker:
+
     def __init__(self):
         self.transport = FakeTransport()
 
+
 class FakeMind:
+
     def __init__(self):
         self.broker = FakeBroker()
 
     def notifyOnDisconnect(self, proc):
         pass
 
+
 class TestAdminAvatar(testsuite.TestCase):
+
     def setUp(self):
         self.vishnu = manager.Vishnu('test', unsafeTracebacks=True)
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
@@ -56,6 +62,7 @@ class TestAdminAvatar(testsuite.TestCase):
                                                  FakeMind(),
                                                  pb.IPerspective,
                                                  interfaces.IAdminMedium)
+
         def gotAvatar((iface, avatar, cleanup)):
             self.avatar = avatar
             self._cleanup = cleanup

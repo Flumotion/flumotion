@@ -23,8 +23,6 @@ from flumotion.common import testsuite
 from flumotion.component.misc.porter import porter
 
 
-
-
 class FakeTransport:
     connected = True
     _fileno = 5
@@ -46,6 +44,7 @@ class FakeTransport:
     def fileno(self):
         return self._fileno
 
+
 class FakePorter:
     foundDestination = False
 
@@ -56,22 +55,30 @@ class FakePorter:
 
         return None
 
+
 class FakeBroker:
+
     def __init__(self):
         self.transport = FakeTransport(self)
 
+
 class FakeMind:
+
     def __init__(self):
         self.broker = FakeBroker()
 
+
 class FakeAvatar:
+
     def __init__(self):
         self.mind = FakeMind()
 
     def isAttached(self):
         return True
 
+
 class TestPorterProtocol(testsuite.TestCase):
+
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
@@ -95,6 +102,7 @@ class TestPorterProtocol(testsuite.TestCase):
 
 
 class TestHTTPPorterProtocol(testsuite.TestCase):
+
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)
@@ -130,7 +138,9 @@ class TestHTTPPorterProtocol(testsuite.TestCase):
         self.failUnless(self.p.foundDestination)
         self.failIf(self.t.written)
 
+
 class TestHTTPPorterProtocolParser(testsuite.TestCase):
+
     def setUp(self):
         self.p = FakePorter()
         self.pp = porter.HTTPPorterProtocol(self.p)

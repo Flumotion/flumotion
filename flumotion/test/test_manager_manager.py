@@ -33,8 +33,6 @@ from flumotion.manager import component, manager
 from flumotion.twisted import flavors
 
 
-
-
 class MyListener(log.Loggable):
     # a helper object that you can get deferreds from that fire when
     # a certain state has a certain key set to a certain value
@@ -71,9 +69,11 @@ class MyListener(log.Loggable):
                 d.callback(None)
             del self._setters[t]
 
+
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
     ### for the tests, ie sourceComponentName:feedName
+
     def __init__(self, name='fake', parent='eve', eaters=[], port=-1,
                  listen_host='127.0.0.1'):
         self.name = name
@@ -107,7 +107,9 @@ class FakeComponentAvatar(log.Loggable):
     def cleanup(self):
         pass
 
+
 class TestComponentMapper(testsuite.TestCase):
+
     def setUp(self):
         self._mappers = {}
         self.heaven = component.ComponentHeaven(manager.Vishnu('test'))
@@ -143,6 +145,7 @@ class TestComponentMapper(testsuite.TestCase):
 
         # a componentAvatar gets created with this avatarId
         # lookup mapper and add
+
         class FakeAvatar:
             pass
         avatar = FakeAvatar()
@@ -181,21 +184,29 @@ class TestComponentMapper(testsuite.TestCase):
         self.failIf(m.avatar)
         self.assertEquals(m.state, state)
 
+
 class FakeTransport:
+
     def getPeer(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+
     def getHost(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+
     def loseConnection(self):
         pass
 
+
 class FakeBroker:
+
     def __init__(self):
         self.transport = FakeTransport()
 
+
 class FakeMind(log.Loggable):
+
     def __init__(self, testcase):
         self.broker = FakeBroker()
         self.testcase = testcase
@@ -210,6 +221,7 @@ class FakeMind(log.Loggable):
         if hasattr(self, method):
             m = getattr(self, method)
             try:
+
                 def gotResult(res):
                     self.debug('callRemote(%s) succeeded with %r', name, res)
                     return res
@@ -222,6 +234,7 @@ class FakeMind(log.Loggable):
                 return defer.fail(e)
         else:
             raise AttributeError('no method %s on self %r' % (name, self))
+
 
 class FakeWorkerMind(FakeMind):
 
@@ -264,6 +277,7 @@ class FakeWorkerMind(FakeMind):
         reactor.callLater(0, d.callback, [])
         return d
 
+
 class FakeComponentMind(FakeMind):
 
     logCategory = 'fakecomponentmind'
@@ -301,6 +315,7 @@ class FakeComponentMind(FakeMind):
     def remote_provideMasterClock(self, port):
         # Turn happy; we must do this asynchronously, otherwise the tests
         # synchronously log out a client where that shouldn't be possible.
+
         def turnHappy():
             self.state.observe_set('mood', moods.happy.value)
         reactor.callLater(0, turnHappy)
@@ -333,6 +348,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         self._components = {} # id -> avatar
 
     # helper functions
+
     def _requestAvatar(self, avatarId, mind, iface, avatarDict):
         d = self.vishnu.dispatcher.requestAvatar(avatarId, None,
             mind, pb.IPerspective, iface)
@@ -421,6 +437,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         return self.vishnu.emptyPlanet()
 
     def testLoadComponentWithSynchronization(self):
+
         def loadProducer():
             compType = "pipeline-producer"
             compId = common.componentId("testflow", "producer-video-test")
@@ -434,6 +451,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         self.assertRaises(NotImplementedError, loadProducer)
 
     def testLoadComponent(self):
+
         def loadProducerFromFile():
             __thisdir = os.path.dirname(os.path.abspath(__file__))
             file = os.path.join(__thisdir, 'testLoadComponent.xml')
@@ -578,6 +596,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
     def testConfigAfterWorker(self):
         # test a config with three components being loaded after the worker
         # logs in
+
         def loadConfigAndOneWorker(workerAvatar):
             log.debug('unittest', 'loadConfigAndOneWorker')
             self.failUnlessEqual(len(self._workers), 1)

@@ -46,6 +46,7 @@ def list():
 
     return [n[len('flumotion.project.'):] for n in modules]
 
+
 def get(project, attribute, default=None):
     """
     Get an attribute from a project's module.

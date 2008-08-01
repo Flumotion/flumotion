@@ -33,15 +33,15 @@ from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
      ComponentUnitTestMixin, pipeline_src, pipeline_cnv
 
 
-
-
-
 class CompTestTestCase(log.Loggable, testsuite.TestCase,
                        ComponentUnitTestMixin):
     logCategory = 'comptest-test'
 
+
 class TestCompTestGtk2Reactorness(testsuite.TestCase):
+
     def test_mixin_class(self):
+
         class TestCompTestUnitTestMixin(testsuite.TestCase,
                                         ComponentUnitTestMixin):
             pass
@@ -65,11 +65,12 @@ class TestCompTestGtk2Reactorness(testsuite.TestCase):
         else:
             self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
 
+
 class TestComponentWrapper(testsuite.TestCase):
+
     def test_get_unique_name(self):
         self.failIfEquals(ComponentWrapper.get_unique_name(),
                           ComponentWrapper.get_unique_name())
-
 
     def test_invalid_type(self):
         self.failUnlessRaises(errors.UnknownComponentError,
@@ -84,7 +85,6 @@ class TestComponentWrapper(testsuite.TestCase):
                            'avatarId': '/default/pp', 'eater': {},
                            'source': [], 'plugs': {}, 'properties': {},
                            'type': 'pipeline-producer'})
-
 
     def test_simple_link(self):
         pp = ComponentWrapper('pipeline-producer', None, name='pp')
@@ -111,7 +111,6 @@ class TestComponentWrapper(testsuite.TestCase):
                           {'default': [('fwp:video', 'default'),
                                        ('fwp:audio', 'default-bis')]})
 
-
     def test_instantiate_errors(self):
         pp = ComponentWrapper('pipeline-producer', None, name='pp')
         self.failUnlessRaises(TypeError, pp.instantiate) # None()!?
@@ -132,7 +131,9 @@ class TestComponentWrapper(testsuite.TestCase):
         d.addCallback(lambda _: pp.stop())
         return d
 
+
 class TestCompTestSetup(CompTestTestCase):
+
     def setUp(self):
         self.prod = pipeline_src()
         self.cnv1 = pipeline_cnv()
@@ -221,7 +222,9 @@ class TestCompTestSetup(CompTestTestCase):
         self.assertEquals(master.sync, None)
         self.failIfEquals(slave.sync, None)
 
+
 class TestCompTestFlow(CompTestTestCase):
+
     def setUp(self):
         self.duration = 2.0
 
@@ -243,7 +246,6 @@ class TestCompTestFlow(CompTestTestCase):
         d.addBoth(lambda _: comptest.cleanup_reactor())
         return d
 
-
     def test_setup_fail_gst_linking(self):
         p2 = pipeline_src('fakesink') # this just can't work!
         c2 = pipeline_cnv('fakesink') # and neither can this!
@@ -257,6 +259,7 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.start_flow()
 
         if old_debug_level != gst.LEVEL_NONE:
+
             def _restore_gst_debug_level(rf):
                 gst.debug_set_default_threshold(old_debug_level)
                 return rf
@@ -266,6 +269,7 @@ class TestCompTestFlow(CompTestTestCase):
     def test_setup_started_and_happy(self):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
         d = self.p.start_flow()
+
         def check_happy(_):
             for c in (self.prod, self.cnv1, self.cnv2):
                 self.assertEquals(moods.get(c.comp.getMood()), moods.happy)
@@ -286,6 +290,7 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.run_flow(self.duration)
 
         if old_debug_level != gst.LEVEL_NONE:
+
             def _restore_gst_debug_level(rf):
                 gst.debug_set_default_threshold(old_debug_level)
                 return rf
@@ -295,9 +300,12 @@ class TestCompTestFlow(CompTestTestCase):
     def test_run_start_timeout(self):
         start_delay_time = 5.0
         self.p.guard_timeout = 2.0
+
         class LingeringCompWrapper(ComponentWrapper):
+
             def start(self, *a, **kw):
                 d = ComponentWrapper.start(self, *a, **kw)
+
                 def delay_start(result):
                     dd = defer.Deferred()
                     reactor.callLater(start_delay_time, dd.callback, result)
@@ -331,6 +339,7 @@ class TestCompTestFlow(CompTestTestCase):
         mux.feed(self.cnv1)
 
         self.clock_slave = p2
+
         def check_clocking(_):
             self.warning('check_clocking: %s %r' %
                          (self.clock_slave.name,
@@ -356,9 +365,11 @@ class TestCompTestFlow(CompTestTestCase):
         self.tasks_fired = []
         self.tasks = []
         num_tasks = 5
+
         def tasks_started(result, index):
             self.tasks_fired[index] = True
             return result
+
         def tasks_check(result):
             self.failIfIn(False, self.tasks_fired)
             self.failIfIn(False, self.tasks_fired)
@@ -393,10 +404,13 @@ class TestCompTestFlow(CompTestTestCase):
     def test_run_stop_timeout(self):
         stop_delay_time = 6.0
         self.p.guard_timeout = 4.0
+
         class DelayingCompWrapper(ComponentWrapper):
             do_delay = True
+
             def stop(self, *a, **kw):
                 d = ComponentWrapper.stop(self, *a, **kw)
+
                 def delay_stop(result):
                     if self.do_delay:
                         self.do_delay = False
@@ -418,7 +432,9 @@ class TestCompTestFlow(CompTestTestCase):
 
         class CustomWrenchException(Exception):
             pass
+
         def insert_wrenches_into_cogs(_):
+
             def insert_wrench(c):
                 raise CustomWrenchException("Wasn't that loose?")
             d = defer.Deferred()
@@ -436,13 +452,16 @@ class TestCompTestFlow(CompTestTestCase):
 
         class CustomFlowException(Exception):
             pass
+
         class CustomStopException(Exception):
             pass
 
         class BrokenCompWrapper(ComponentWrapper):
             do_break = True
+
             def stop(self, *a, **kw):
                 d = ComponentWrapper.stop(self, *a, **kw)
+
                 def delay_stop(result):
                     # breaking once should be enough
                     if self.do_break:
@@ -456,7 +475,9 @@ class TestCompTestFlow(CompTestTestCase):
 
         class CustomFlowException(Exception):
             pass
+
         def insert_flow_errors(_):
+
             def insert_error(_ignore):
                 raise CustomFlowException("Exception!")
             d = defer.Deferred()

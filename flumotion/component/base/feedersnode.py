@@ -137,12 +137,14 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
             self._table_connected.show()
 
     # FIXME: add a timeout to update this ?
+
     def updateConnectionTime(self):
         if self._lastConnect:
             text = formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
+
     def updateDisconnectionTime(self):
         if self._lastDisconnect:
             text = formatTime(time.time() - self._lastDisconnect)
@@ -164,6 +166,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.treeview.expand_all()
 
     # FIXME: this docstring is confusing
+
     def addFeederClient(self, feederState, state):
         """
         @param feederState: the component's uiState
@@ -227,6 +230,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.treeview.append_column(col)
         sel = self.treeview.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
+
         def sel_changed(sel):
             model, i = sel.get_selected()
             self.select(i and model.get_value(i, 2))
@@ -265,4 +269,3 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.wtree.get_widget('box-right').hide()
 
         return self.widget
-

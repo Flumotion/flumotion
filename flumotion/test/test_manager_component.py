@@ -29,14 +29,19 @@ from flumotion.manager import component, manager
 
 
 class _DictAttrClass(object):
+
     def __init__(self, **kw):
         for k, v in kw.items():
             setattr(self, k, v)
+
+
 def dac(**kw):
     return _DictAttrClass(**kw)
 
+
 class FakeComponentAvatar(log.Loggable):
     _nextPort = 1024
+
     def __init__(self, parent, name, eaters=None, feeders=None, vfeeds=None,
                  clockMaster=False, worker='localhost', host='127.0.0.1',
                  fport=-1):
@@ -115,10 +120,13 @@ class FakeComponentAvatar(log.Loggable):
         self._feedlog.append((feederName, fullFeedId, host, port))
 fca = FakeComponentAvatar
 
+
 class FakeVishnu(log.Loggable):
     running = True
 
+
 class TestComponentHeaven(log.Loggable, testsuite.TestCase):
+
     def setUp(self):
         self.vishnu = v = FakeVishnu()
         self.heaven = component.ComponentHeaven(v)
@@ -517,6 +525,7 @@ class TestComponentHeaven(log.Loggable, testsuite.TestCase):
                  eaters={'default': [('compB:default', 'default-prime')]})
 
         all = [c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC]
+
         def without(*cs):
             ret = all[:]
             for c in cs:

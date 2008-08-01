@@ -63,6 +63,7 @@ class PatternNode(BaseAdminGtkNode):
             handler(state.get(k))
 
     def cb_pattern_changed(self, combobox):
+
         def _setPatternErrback(failure):
             self.warning("Failure %s setting pattern: %s" % (
                 failure.type, failure.getErrorMessage()))
@@ -85,7 +86,9 @@ class PatternNode(BaseAdminGtkNode):
         if handler:
             handler(value)
 
+
 class VideoTestAdminGtk(BaseAdminGtk):
+
     def setup(self):
         # FIXME: have constructor take self instead ?
         pattern = PatternNode(self.state, self.admin, title=_("Pattern"))

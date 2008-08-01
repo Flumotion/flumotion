@@ -23,7 +23,9 @@ from flumotion.component import feedcomponent
 
 __version__ = "$Rev$"
 
+
 class Smoke(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         return 'ffmpegcolorspace ! smokeenc name=encoder'
 

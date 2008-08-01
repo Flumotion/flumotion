@@ -38,12 +38,14 @@ _EXTENSIONS = {
     'video/x-msvideo': 'avi',
 }
 
+
 def mimeTypeToExtention(mimeType):
     """Converts a mime type to a file extension.
     @param mimeType: the mime type
     @returns: file extenion if found or data otherwise
     """
     return _EXTENSIONS.get(mimeType, 'data')
+
 
 def launchApplicationByUrl(url, mimeType):
     """Launches an application in the background for

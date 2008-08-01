@@ -32,11 +32,13 @@ class ManagerLifecycle(base.ManagerPlug):
     actions in response to the ManagerPlug start() and stop() methods.
     """
 
+
 class ManagerLifecyclePrinter(ManagerLifecycle):
     """
     Example implementation of the ManagerLifecyle socket, just prints
     things on the console. Pretty stupid!
     """
+
     def start(self, vishnu):
         info = vishnu.connectionInfo
         print ('started manager running on %s:%d (%s)'
@@ -49,6 +51,7 @@ class ManagerLifecyclePrinter(ManagerLifecycle):
                % (info['host'], info['port'],
                   info['using_ssl'] and 'with ssl' or 'without ssl'))
 
+
 class ComponentLifecycle(base.ComponentPlug):
     """
     Base class for plugs that are started when a component is started,
@@ -57,14 +60,15 @@ class ComponentLifecycle(base.ComponentPlug):
     actions in response to the ComponentPlug start() and stop() methods.
     """
 
+
 class ComponentLifecyclePrinter(ComponentLifecycle):
     """
     Example implementation of the ComponentLifecyle socket, just prints
     things on the console. Pretty stupid!
     """
+
     def start(self, component):
         print 'Component has been started'
 
     def stop(self, component):
         print 'Component is stopping'
-

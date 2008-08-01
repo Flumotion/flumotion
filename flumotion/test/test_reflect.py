@@ -23,9 +23,8 @@ from flumotion.twisted import reflect
 from flumotion.common import testsuite
 
 
-
-
 class TestSimple(testsuite.TestCase):
+
     def testSimple(self):
         s = reflect.namedAny('flumotion.test.test_reflect.TestSimple')
         self.failUnlessIdentical(s, TestSimple)

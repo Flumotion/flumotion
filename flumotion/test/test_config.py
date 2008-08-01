@@ -120,21 +120,27 @@ regchunk = """
 reg = registry.getRegistry()
 reg.addFromString(regchunk)
 
+
 def ConfigXML(string, parser=config.PlanetConfigParser):
     f = StringIO(string)
     conf = parser(f)
     f.close()
     return conf
 
+
 def ManagerConfigXML(string):
     return ConfigXML(string, config.ManagerConfigParser)
 
+
 class TestFunctions(testsuite.TestCase):
+
     def testBuildEatersDict(self):
+
         def assertEaters(comptype, l, expected):
             defs = reg.getComponent(comptype)
             self.assertEquals(config.buildEatersDict(l, defs.getEaters()),
                               expected)
+
         def assertRaises(comptype, l, err):
             defs = reg.getComponent(comptype)
             self.assertRaises(err, config.buildEatersDict, l,
@@ -155,7 +161,9 @@ class TestFunctions(testsuite.TestCase):
                      [(None, 'foo:bar')],
                      {'default': [('foo:bar', 'default')]})
 
+
 class TestConfig(testsuite.TestCase):
+
     def testParseEmpty(self):
         conf = ConfigXML('<planet/>')
         self.failIf(conf.getPath())
@@ -466,7 +474,6 @@ class TestConfig(testsuite.TestCase):
         conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(errors.ConfigError, conf.parse)
-
 
     def testParseManagerError(self):
         xml = """<planet><manager>
@@ -1065,9 +1072,11 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
     def testVirtualFeeds(self):
+
         def assertFail(s):
             conf = ConfigXML(s)
             self.assertRaises(errors.ConfigError, conf.parse)
+
         def assertPass(s, feeds):
             conf = ConfigXML(s)
             conf.parse()
@@ -1132,6 +1141,7 @@ class TestConfig(testsuite.TestCase):
 
 
 class TestDictDiff(testsuite.TestCase):
+
     def assertOND(self, d1, d2, old, new, diff):
         o, n, d = config.dictDiff(d1, d2)
         self.assertEquals(old, o)

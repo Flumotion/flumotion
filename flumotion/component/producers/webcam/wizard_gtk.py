@@ -209,10 +209,10 @@ class WebcamStep(VideoProducerStep):
 
 class WebcamWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = WebcamProducer()
 
     def getProductionStep(self, type):
         return WebcamStep(self.wizard, self.model)
-

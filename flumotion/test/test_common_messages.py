@@ -35,6 +35,7 @@ T_ = gettexter()
 
 
 class SerializeTest(testsuite.TestCase):
+
     def testSerialize(self):
         text = N_("Something is really wrong.")
         self.cmsg = messages.Error(T_(text))
@@ -58,7 +59,9 @@ class SerializeTest(testsuite.TestCase):
         self.failUnless(messages.Info(T_(N_("Note"))))
         self.failUnless(messages.Warning(T_(N_("warning"))))
 
+
 class ResultTest(testsuite.TestCase):
+
     def setUp(self):
         self.translator = Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
@@ -92,11 +95,16 @@ class ResultTest(testsuite.TestCase):
         self.assertEquals(text, "o jeetje")
 
 # test if appending and removing messages works across a PB connection
+
+
 class TestStateCacheable(flavors.StateCacheable):
     pass
+
+
 class TestStateRemoteCache(flavors.StateRemoteCache):
     pass
 pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
+
 
 class TestRoot(testsuite.TestManagerRoot, log.Loggable):
 
@@ -140,7 +148,9 @@ class TestRoot(testsuite.TestManagerRoot, log.Loggable):
     def remote_removeOtherMessage(self):
         self.state.remove('messages', self.other)
 
+
 class PBSerializationTest(testsuite.TestCase):
+
     def setUp(self):
         self.changes = []
         self.runServer()
@@ -149,6 +159,7 @@ class PBSerializationTest(testsuite.TestCase):
         return self.stopServer()
 
     # helper functions to start PB comms
+
     def runClient(self):
         f = pb.PBClientFactory()
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
@@ -181,19 +192,23 @@ class PBSerializationTest(testsuite.TestCase):
         return d
 
     # actual tests
+
     def testGetSameTranslatableTwice(self):
         # getting the remote translatable twice
         # should result in equal (but not necessarily the same) object
 
         # start everything
         d = self.runClient()
+
         def runClientCallback(result):
             # get the message
             dd = self.perspective.callRemote('getSameTranslatable')
+
             def getSameTranslatableCallback(t1):
                 self.failUnless(t1)
                 # get it again
                 dd = self.perspective.callRemote('getSameTranslatable')
+
                 def getSameTranslatableAgainCallback(t2):
                     self.failUnless(t2)
                     # check if they proxied to objects that are equal,
@@ -204,6 +219,7 @@ class PBSerializationTest(testsuite.TestCase):
 
                     # stop
                     d = self.stopClient()
+
                     def stopClientCallback(res):
                         pass
                     d.addCallback(stopClientCallback)
@@ -221,17 +237,21 @@ class PBSerializationTest(testsuite.TestCase):
 
         # start everything
         d = self.runClient()
+
         def runClientCallback(result):
             d = self.perspective.callRemote('getEqualTranslatable')
+
             def getEqualTranslatableCallback(t1):
                 self.failUnless(t1)
                 d = self.perspective.callRemote('getEqualTranslatable')
+
                 def getEqualAgainCallback(t2):
                     self.failUnless(t2)
                     self.assertEquals(t1, t2)
                     self.failUnless(t1 == t2)
                     self.failIf(t1 is t2)
                     d = self.stopClient()
+
                     def stopClientCallback(res):
                         pass
                     d.addCallback(stopClientCallback)
@@ -249,17 +269,21 @@ class PBSerializationTest(testsuite.TestCase):
 
         # start everything
         d = self.runClient()
+
         def runClientCallback(result):
             d = self.perspective.callRemote('getMessage')
+
             def getMessageCallback(m1):
                 self.failUnless(m1)
                 d = self.perspective.callRemote('getMessage')
+
                 def getMessageAgainCallback(m2):
                     self.failUnless(m2)
                     self.assertEquals(m1, m2)
                     self.failUnless(m1 == m2)
                     self.failIf(m1 is m2)
                     d = self.stopClient()
+
                     def stopClientCallback(res):
                         pass
                     d.addCallback(stopClientCallback)
@@ -272,10 +296,12 @@ class PBSerializationTest(testsuite.TestCase):
         return d
 
     def testMessageAppendRemove(self):
+
         def clientRunning(result):
             d = self.perspective.callRemote('getState')
             d.addCallback(gotState)
             return d
+
         def gotState(result):
             self._state = result
             self.failUnless(self._state)
@@ -285,6 +311,7 @@ class PBSerializationTest(testsuite.TestCase):
             d = self.perspective.callRemote('appendMessage')
             d.addCallback(messageAdded)
             return d
+
         def messageAdded(result):
             l = self._state.get('messages')
             self.assertEquals(len(l), 1)
@@ -294,6 +321,7 @@ class PBSerializationTest(testsuite.TestCase):
             d = self.perspective.callRemote('appendOtherMessage')
             d.addCallback(otherMessageAdded)
             return d
+
         def otherMessageAdded(result):
             l = self._state.get('messages')
             self.assertEquals(len(l), 2)
@@ -304,6 +332,7 @@ class PBSerializationTest(testsuite.TestCase):
             d = self.perspective.callRemote('removeOtherMessage')
             d.addCallback(removedOtherMessage)
             return d
+
         def removedOtherMessage(result):
             l = self._state.get('messages')
             self.assertEquals(len(l), 1)
@@ -313,12 +342,14 @@ class PBSerializationTest(testsuite.TestCase):
             d = self.perspective.callRemote('removeMessage')
             d.addCallback(removedFirstMessage)
             return d
+
         def removedFirstMessage(result):
             l = self._state.get('messages')
             self.assertEquals(len(l), 0)
 
             # stop
             d = self.stopClient()
+
             def stopClientCallback(res):
                 pass
             d.addCallback(stopClientCallback)

@@ -103,6 +103,7 @@ __version__ = "$Rev$"
 class BouncerMedium(component.BaseComponentMedium):
 
     logCategory = 'bouncermedium'
+
     def remote_authenticate(self, keycard):
         """
         Authenticates the given keycard.
@@ -143,6 +144,7 @@ class BouncerMedium(component.BaseComponentMedium):
 
     def remote_getEnabled(self):
         return self.comp.getEnabled()
+
 
 class Bouncer(component.BaseComponent):
     """
@@ -307,6 +309,7 @@ class Bouncer(component.BaseComponent):
         else:
             return defer.succeed(None)
 
+
 class TrivialBouncer(Bouncer):
     """
     A very trivial bouncer implementation.
@@ -321,6 +324,7 @@ class TrivialBouncer(Bouncer):
         keycard.state = keycards.AUTHENTICATED
 
         return keycard
+
 
 class ChallengeResponseBouncer(Bouncer):
     """

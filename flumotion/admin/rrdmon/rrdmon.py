@@ -56,16 +56,21 @@ componentui # pyflakes
 
 __version__ = "$Rev$"
 
+
 def sourceGetFileName(source):
     return source['rrd-file']
+
 
 def sourceGetName(source):
     return source['name']
 
+
 def sourceGetSampleFrequency(source):
     return source['sample-frequency']
 
+
 def sourceGetDS(source):
+
     def makeDS():
         if source['is-gauge']:
             return 'DS:%s:GAUGE:%d:U:U' % (source['name'],
@@ -75,16 +80,21 @@ def sourceGetDS(source):
                                             2*source['sample-frequency'])
     return source['rrd-ds-spec'] or makeDS()
 
+
 def sourceGetRRAList(source):
+
     def archiveGetRRA(archive):
         return 'RRA:' + archive['rra-spec']
     return [archiveGetRRA(archive) for archive in source['archives']]
 
+
 def sourceGetConnectionInfo(source):
     return source['manager']
 
+
 def sourceGetComponentId(source):
     return source['component-id']
+
 
 def sourceGetUIStateKey(source):
     return source['ui-state-key']
@@ -128,6 +138,7 @@ class RRDMonitor(log.Loggable):
 
         def eventStarted(event):
             self.pollData(*event.content)
+
         def eventStopped(event):
             pass
 
@@ -152,6 +163,7 @@ class RRDMonitor(log.Loggable):
 
     def pollData(self, managerId, componentId, uiStateKey, dsName,
                  rrdFile):
+
         def stateListToDict(l):
             return dict([(x.get('name'), x) for x in l])
 

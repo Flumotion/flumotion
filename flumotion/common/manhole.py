@@ -65,6 +65,8 @@ __version__ = "$Rev$"
 
 # It has been modified to check a particular authorized_keys file
 # instead of poking in users' ~/.ssh directories.
+
+
 class SSHPublicKeyChecker(log.Loggable):
     try:
         credentialInterfaces = credentials.ISSHPrivateKey,
@@ -123,6 +125,7 @@ class SSHPublicKeyChecker(log.Loggable):
             return failure.Failure(UnauthorizedLogin())
         return f
 
+
 def openSSHManhole(authorizedKeysFile, namespace, portNum=-1):
     from twisted.conch import manhole_ssh
 
@@ -135,6 +138,7 @@ def openSSHManhole(authorizedKeysFile, namespace, portNum=-1):
     sshFactory = manhole_ssh.ConchFactory(sshPortal)
     port = reactor.listenTCP(portNum, sshFactory, interface='localhost')
     return port
+
 
 def openAnonymousTelnetManhole(namespace, portNum=-1):
     from twisted.conch import telnet

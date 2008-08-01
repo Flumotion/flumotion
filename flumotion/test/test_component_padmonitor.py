@@ -28,8 +28,6 @@ from flumotion.common import testsuite
 from flumotion.component import padmonitor
 
 
-
-
 class TestPadMonitor(testsuite.TestCase):
 
     def _run_pipeline(self, pipeline):
@@ -51,6 +49,7 @@ class TestPadMonitor(testsuite.TestCase):
         self._run_pipeline(pipeline)
         # Now give the reactor a chance to process the callFromThread()
         d = defer.Deferred()
+
         def finishTest():
             self.assertEquals(monitor.isActive(), True)
             monitor.detach()
@@ -70,6 +69,7 @@ class TestPadMonitor(testsuite.TestCase):
         srcpad = identity.get_pad('src')
 
         # Now give the reactor a chance to process the callFromThread()
+
         def finished():
             monitor.detach()
             d.callback(True)

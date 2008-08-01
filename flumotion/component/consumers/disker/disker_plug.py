@@ -24,7 +24,6 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-
 class DiskerPlug(base.ComponentPlug):
     """
     Base class for disker plugs.

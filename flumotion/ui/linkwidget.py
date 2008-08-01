@@ -27,6 +27,7 @@ __version__ = "$Rev$"
 
 
 class LinkWidgetOld(gtk.EventBox):
+
     def __init__(self, uri):
         gtk.EventBox.__init__(self)
         self.connect('button-press-event', self._on_button_press_event)
@@ -78,6 +79,7 @@ class LinkWidgetOld(gtk.EventBox):
             self._callback(url)
 
     # Callbacks
+
     def _on_button_press_event(self, widget, event):
         # signal handler for button press on stream url
         # check if left click
@@ -108,7 +110,9 @@ class LinkWidgetOld(gtk.EventBox):
 
 
 if hasattr(gtk, 'LinkButton'):
+
     class LinkWidget(gtk.LinkButton):
+
         def __init__(self, uri):
             gtk.LinkButton.__init__(self, uri)
             self.connect('pressed', self._on_pressed)

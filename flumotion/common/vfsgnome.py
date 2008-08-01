@@ -104,5 +104,3 @@ def registerGnomeVFSJelly():
     setUnjellyableForClass(GnomeVFSFile, GnomeVFSFile)
     setUnjellyableForClass(GnomeVFSDirectory, GnomeVFSDirectory)
     log.info('jelly', 'GnomeVFS registered')
-
-

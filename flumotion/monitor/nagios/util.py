@@ -34,14 +34,17 @@ __version__ = "$Rev$"
 
 
 class LogCommand(command.Command, log.Loggable):
+
     def __init__(self, parentCommand=None, **kwargs):
         command.Command.__init__(self, parentCommand, **kwargs)
         self.logCategory = self.name
 
     # command.Command has a fake debug method, so choose the right one
+
     def debug(self, format, *args):
         kwargs = {}
         log.Loggable.doLog(self, log.DEBUG, -2, format, *args, **kwargs)
+
 
 def findComponent(planet, avatarId):
     """
@@ -66,20 +69,25 @@ def findComponent(planet, avatarId):
 
 # Nagios has standard exit codes
 # We cheat by putting the exit code in the reactor.
+
+
 def ok(msg):
     sys.stdout.write('OK: %s\n' % msg)
     reactor.exitStatus = 0
     return 0
+
 
 def warning(msg):
     sys.stdout.write('WARNING: %s\n' % msg)
     reactor.exitStatus = 1
     return 1
 
+
 def critical(msg):
     sys.stdout.write('CRITICAL: %s\n' % msg)
     reactor.exitStatus = 2
     return 2
+
 
 def unknown(msg):
     sys.stdout.write('UNKNOWN: %s\n' % msg)
@@ -87,14 +95,19 @@ def unknown(msg):
     return 3
 
 # equivalent exceptions that allow us to stop deferred flows
+
+
 class NagiosException(Exception):
     pass
+
 
 class NagiosWarning(NagiosException):
     pass
 
+
 class NagiosCritical(NagiosException):
     pass
+
 
 class NagiosUnknown(NagiosException):
     pass

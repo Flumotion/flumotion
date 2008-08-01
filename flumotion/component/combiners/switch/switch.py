@@ -38,6 +38,7 @@ T_ = gettexter()
 
 
 class SwitchMedium(feedcomponent.FeedComponentMedium):
+
     def remote_switchToMaster(self):
         return self.comp.switch_to("master")
 
@@ -47,14 +48,18 @@ class SwitchMedium(feedcomponent.FeedComponentMedium):
     def remote_switchTo(self, logicalFeed):
         return self.comp.switch_to(logicalFeed)
 
+
 class ICalSwitchPlug(base.ComponentPlug):
+
     def start(self, component):
         self._sid = None
         self.sched = None
         try:
+
             def eventStarted(event):
                 self.debug("event started %r", event.uid)
                 component.switch_to("backup")
+
             def eventEnded(event):
                 self.debug("event ended %r", event.uid)
                 component.switch_to("master")
@@ -78,6 +83,7 @@ class ICalSwitchPlug(base.ComponentPlug):
     def stop(self, component):
         if self.sched:
             self.sched.unsubscribe(self._sid)
+
 
 class Switch(feedcomponent.MultiInputParseLaunchComponent):
     logCategory = 'switch'
@@ -126,6 +132,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.state.remove('messages', m)
 
     def do_check(self):
+
         def checkSignal(fact):
             fact = fact.load()
             signals = gobject.signal_list_names(fact.get_element_type())
@@ -168,6 +175,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                                          'get_logical_feeds')
 
     def configure_pipeline(self, pipeline, properties):
+
         def getDownstreamElement(e):
             for pad in e.pads():
                 if pad.get_direction() is gst.PAD_SRC:
@@ -200,6 +208,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.do_switch()
 
     def install_logical_feed_watches(self):
+
         def eaterSetActive(eaterAlias):
             for feed, aliases in self.logicalFeeds.items():
                 if eaterAlias in aliases:
@@ -237,6 +246,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.debug('feed %r is now inactive', feed)
 
     # this function is used by the watchdogs
+
     def auto_switch(self):
         allFeeds = self.feedsByPriority[:]
         feed = None
@@ -256,6 +266,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
     # switch_to should only be called when the ideal feed is requested to be
     # changed, so not by watchdog reasons.
+
     def switch_to(self, feed):
         """
         @param feed: a logical feed
@@ -331,6 +342,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.activeFeed = feed
         self.uiState.set("active-eater", feed)
 
+
 class SingleSwitch(Switch):
     logCategory = "single-switch"
 
@@ -344,6 +356,7 @@ class SingleSwitch(Switch):
 
     def get_switch_elements(self, pipeline):
         return [pipeline.get_by_name('muxer')]
+
 
 class AVSwitch(Switch):
     logCategory = "av-switch"
@@ -387,6 +400,7 @@ class AVSwitch(Switch):
                               list(missing))
 
     def get_pipeline_string(self, properties):
+
         def i420caps(framerate, par, width, height):
             return ("video/x-raw-yuv,width=%d,height=%d,framerate=%d/%d,"
                     "pixel-aspect-ratio=%d/%d,format=(fourcc)I420"

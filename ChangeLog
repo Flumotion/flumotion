@@ -1,6 +1,15 @@
 2008-08-01  Johan Dahlin  <johan@flumotion.com>
 
-	* *.py: Make flumotion pep-8 clean
+	* *.py: make flumotion pep-8 clean, try two
+	- whitespace only changes were accidentially not
+	  included
+	- installed.py/uninstalled.py that were generated
+	  are now updated
+	- cortado_location.py is pep8 clean now aswell.
+
+2008-08-01  Johan Dahlin  <johan@flumotion.com>
+
+	* *.py: make flumotion pep-8 clean
 
 2008-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 

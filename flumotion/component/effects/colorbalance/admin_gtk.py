@@ -68,6 +68,7 @@ class ColorbalanceAdminGtkNode(EffectAdminGtkNode):
         def errback(failure, label):
             self.warning("Failure %s changing colorbalance %s: %s",
                          failure.type, label, failure.getErrorMessage())
+
         def callback(result, label):
             self.debug("remote replied colorbalance %s changed to %f",
                        label, result)

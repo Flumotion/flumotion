@@ -42,6 +42,7 @@ def is_raw(caps):
             return True
     return False
 
+
 class SingleDecodeBin(gst.Bin):
 
     __gsttemplates__ = (

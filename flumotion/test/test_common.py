@@ -27,6 +27,7 @@ from flumotion.common import testsuite
 
 
 class TestVersion(testsuite.TestCase):
+
     def testVersion(self):
         self.failUnless(common.version('abinary'))
 
@@ -40,16 +41,19 @@ class TestVersion(testsuite.TestCase):
 
 
 class TestComponentPath(testsuite.TestCase):
+
     def testPath(self):
         self.assertEqual(common.componentId('Adam', 'Cain'), '/Adam/Cain')
 
 
 class TestEnsureDir(testsuite.TestCase):
+
     def testNonExisting(self):
         self.tempdir = tempfile.mkdtemp()
         os.system("rm -r %s" % self.tempdir)
         common.ensureDir(self.tempdir, "a description")
         os.system("rm -r %s" % self.tempdir)
+
     def testExisting(self):
         self.tempdir = tempfile.mkdtemp()
         common.ensureDir(self.tempdir, "a description")
@@ -57,12 +61,14 @@ class TestEnsureDir(testsuite.TestCase):
 
 
 class TestObjRepr(testsuite.TestCase):
+
     def testMe(self):
         self.assertEquals(common.objRepr(self),
             'flumotion.test.test_common.TestObjRepr')
 
 
 class TestPathToModule(testsuite.TestCase):
+
     def testPaths(self):
         tests = {
             'flumotion/common/common.py': 'flumotion.common.common',
@@ -78,6 +84,7 @@ class TestPathToModule(testsuite.TestCase):
 
 
 class TestCompareVersions(testsuite.TestCase):
+
     def testBadVersion(self):
         self.assertRaises(ValueError, common.compareVersions, "no", "version")
 
@@ -105,12 +112,14 @@ class TestCompareVersions(testsuite.TestCase):
 
 
 class InitA(common.InitMixin):
+
     def __init__(self):
         self.inited = []
         common.InitMixin.__init__(self, 3, 4, x=5, y=6)
 
 
 class InitB(InitA):
+
     def init(self, *args, **kwargs):
         self.inited.append((InitB, args, kwargs))
 
@@ -120,11 +129,13 @@ class InitC(InitB):
 
 
 class InitD(InitC):
+
     def init(self, *args, **kwargs):
         self.inited.append((InitD, args, kwargs))
 
 
 class TestInitMixin(testsuite.TestCase):
+
     def testInitA(self):
         self.assertEquals(InitA().inited, [])
 

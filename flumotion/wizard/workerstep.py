@@ -39,5 +39,3 @@ class WorkerWizardStep(WizardStep):
     def runInWorker(self, module, function, *args, **kwargs):
         return self.wizard.runInWorker(self.worker, module, function,
                                          *args, **kwargs)
-
-

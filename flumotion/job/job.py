@@ -199,6 +199,7 @@ class JobMedium(medium.BaseMedium):
         return fdefer.defer_call_later(dl)
 
     ### our methods
+
     def shutdown(self):
         """
         Shut down the job process completely, cleaning up the component
@@ -308,6 +309,7 @@ class JobMedium(medium.BaseMedium):
 
         return comp
 
+
 class JobClientBroker(pb.Broker, log.Loggable):
     """
     A pb.Broker subclass that handles FDs being passed (with associated data)
@@ -328,12 +330,14 @@ class JobClientBroker(pb.Broker, log.Loggable):
         # file descriptors get delivered to the component
         self.debug('received fds %r, message %r' % (fds, message))
         if message.startswith('sendFeed '):
+
             def parseargs(_, feedName, eaterId=None):
                 return feedName, eaterId
             feedName, eaterId = parseargs(*message.split(' '))
             self.factory.medium.component.feedToFD(feedName, fds[0],
                                                    os.close, eaterId)
         elif message.startswith('receiveFeed '):
+
             def parseargs2(_, eaterAlias, feedId=None):
                 return eaterAlias, feedId
             eaterAlias, feedId = parseargs2(*message.split(' '))
@@ -351,6 +355,7 @@ class JobClientBroker(pb.Broker, log.Loggable):
             self.info('rotated stderr')
         else:
             self.warning('Unknown message received: %r' % message)
+
 
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
@@ -378,13 +383,16 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.protocol = JobClientBroker
 
     ### pb.PBClientFactory methods
+
     def buildProtocol(self, addr):
         p = self.protocol(fdserver.FDServer)
         p.factory = self
         return p
 
     # FIXME: might be nice if jobs got a password to use to log in to brain
+
     def login(self, username):
+
         def haveReference(remoteReference):
             self.info('Logged in to worker')
             self.debug('perspective %r connected', remoteReference)
@@ -401,6 +409,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     # the pb server.  Ideally though we would have gotten a notice before.
     # This ensures we shut down the component/job in ALL cases where the worker
     # goes away.
+
     def stopFactory(self):
         self.debug('shutting down medium')
         self.medium.shutdown()

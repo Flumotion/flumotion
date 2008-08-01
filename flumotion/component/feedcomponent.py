@@ -71,6 +71,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.logName = component.name
 
     ### Referenceable remote methods which can be called from manager
+
     def remote_attachPadMonitorToFeeder(self, feederName):
         self.comp.attachPadMonitorToFeeder(feederName)
 
@@ -142,6 +143,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         @returns: (deferred, cancel) pair, where cancel is a thunk that
         you can call to cancel any pending connection attempt.
         """
+
         def gotFeed((feedId, fd)):
             self._feederPendingConnections.pop(eaterAlias, None)
             self.comp.eatFromFD(eaterAlias, feedId, fd)
@@ -187,6 +189,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         Called on by the manager-side ComponentAvatar.
         """
+
         def gotFeed((fullFeedId, fd)):
             self._eaterPendingConnections.pop(feederName, None)
             self.comp.feedToFD(feederName, fd, os.close, fullFeedId)
@@ -270,6 +273,7 @@ from feedcomponent010 import FeedComponent
 
 FeedComponent.componentMediumClass = FeedComponentMedium
 
+
 class ParseLaunchComponent(FeedComponent):
     """A component using gst-launch syntax
 
@@ -313,6 +317,7 @@ class ParseLaunchComponent(FeedComponent):
             self.EATER_TMPL += " check-imperfect-offset=1"
 
     ### FeedComponent interface implementations
+
     def create_pipeline(self):
         try:
             unparsed = self.get_pipeline_string(self.config['properties'])
@@ -349,6 +354,7 @@ class ParseLaunchComponent(FeedComponent):
         self.configure_pipeline(self.pipeline, self.config['properties'])
 
     ### ParseLaunchComponent interface for subclasses
+
     def get_pipeline_string(self, properties):
         """
         Method that must be implemented by subclasses to produce the
@@ -371,6 +377,7 @@ class ParseLaunchComponent(FeedComponent):
         pass
 
     ### private methods
+
     def add_default_eater_feeder(self, pipeline):
         if len(self.eaters) == 1:
             eater = 'eater:' + self.eaters.keys()[0]
@@ -461,6 +468,7 @@ class ParseLaunchComponent(FeedComponent):
         """
         return '!'
 
+
 class Effect(log.Loggable):
     """
     I am a part of a feed component for a specific group
@@ -507,6 +515,7 @@ class Effect(log.Loggable):
         @rtype:  L{FeedComponent}
         """
         return self.component
+
 
 class MultiInputParseLaunchComponent(ParseLaunchComponent):
     """
@@ -560,10 +569,12 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         # So, now it's guaranteed to return. However, we want to return the
         # queue size to its original value. Doing this in a thread-safe manner
         # is rather tricky...
+
         def _block_cb(pad, blocked):
             # This is called from streaming threads, but we don't do anything
             # here so it's safe.
             pass
+
         def _underrun_cb(element):
             # Called from a streaming thread. The queue element does not hold
             # the queue lock when this is called, so we block our sinkpad,

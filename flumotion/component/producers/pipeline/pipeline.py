@@ -27,5 +27,6 @@ __version__ = "$Rev$"
 
 class Producer(feedcomponent.ParseLaunchComponent):
     logCategory = 'prod-pipe'
+
     def get_pipeline_string(self, properties):
         return properties['pipeline']

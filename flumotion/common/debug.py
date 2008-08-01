@@ -43,6 +43,7 @@ def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
         ignore_files_re = re.compile(ignore_files_re)
 
     if not write:
+
         def write(indent, str, *args):
             print (indent + str) % args
 
@@ -89,6 +90,7 @@ def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
         assert _indent == ''
         sys.settrace(do_trace)
 
+
 def trace_stop():
     global _tracing, _indent
     assert _tracing > 0
@@ -96,6 +98,7 @@ def trace_stop():
     if not _tracing:
         sys.settrace(None)
         _indent = ''
+
 
 def print_stack(handle=None):
     f = sys._getframe(1)
@@ -123,7 +126,9 @@ def print_stack(handle=None):
     for line in output:
         handle.write(line)
 
+
 class UncollectableMonitor(object):
+
     def __init__(self, period=120):
         known = {}
 
@@ -174,7 +179,9 @@ class UncollectableMonitor(object):
             keys.sort()
             return 'dict with keys %r @ 0x%x' % (keys, id(obj))
 
+
 class AllocMonitor(object):
+
     def __init__(self, period=10, analyze=None, allocPrint=None):
         self.period = period
         self.objset = None
@@ -283,6 +290,7 @@ class AllocMonitor(object):
                               len(directAllocs) == 1 and "object" or "objects")
         for wrap in directAllocs:
             print '  ' + self._wrapperRepr(wrap)
+
 
 def getVersions():
     """

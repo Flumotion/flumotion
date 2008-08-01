@@ -45,6 +45,7 @@ class ManagerPlanetState(flavors.StateCacheable):
      - flows (list): list of L{ManagerFlowState}
     """
     # FIXME: why is there a 'parent' key ?
+
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
@@ -85,6 +86,7 @@ class AdminPlanetState(flavors.StateRemoteCache):
     I represent the state of a planet in an admin client.
     See L{ManagerPlanetState}.
     """
+
     def invalidate(self):
         for flow in self.get('flows'):
             flow.invalidate()
@@ -94,6 +96,7 @@ class AdminPlanetState(flavors.StateRemoteCache):
         flavors.StateRemoteCache.invalidate(self)
 
 pb.setUnjellyableForClass(ManagerPlanetState, AdminPlanetState)
+
 
 class ManagerAtmosphereState(flavors.StateCacheable):
     """
@@ -128,11 +131,13 @@ class ManagerAtmosphereState(flavors.StateCacheable):
         dList = [self.remove('components', c) for c in components]
         return defer.DeferredList(dList)
 
+
 class AdminAtmosphereState(flavors.StateRemoteCache):
     """
     I represent the state of an atmosphere in an admin client.
     See L{ManagerAtmosphereState}.
     """
+
     def invalidate(self):
         for component in self.get('components'):
             component.invalidate()
@@ -140,6 +145,7 @@ class AdminAtmosphereState(flavors.StateRemoteCache):
         flavors.StateRemoteCache.invalidate(self)
 
 pb.setUnjellyableForClass(ManagerAtmosphereState, AdminAtmosphereState)
+
 
 class ManagerFlowState(flavors.StateCacheable):
     """
@@ -151,6 +157,7 @@ class ManagerFlowState(flavors.StateCacheable):
      - parent:            L{ManagerPlanetState}
      - components (list): list of L{ManagerComponentState}
     """
+
     def __init__(self, **kwargs):
         """
         ManagerFlowState constructor. Any keyword arguments are
@@ -174,11 +181,13 @@ class ManagerFlowState(flavors.StateCacheable):
         dList = [self.remove('components', c) for c in components]
         return defer.DeferredList(dList)
 
+
 class AdminFlowState(flavors.StateRemoteCache):
     """
     I represent the state of a flow in an admin client.
     See L{ManagerFlowState}.
     """
+
     def invalidate(self):
         for component in self.get('components'):
             component.invalidate()
@@ -202,6 +211,8 @@ _jobStateKeys = ['mood', 'manager-ip', 'pid', 'workerName']
 _jobStateListKeys = ['messages', ]
 
 # FIXME: maybe make Atmosphere and Flow subclass from a ComponentGroup class ?
+
+
 class ManagerComponentState(flavors.StateCacheable):
     """
     I represent the state of a component in the manager.
@@ -275,7 +286,9 @@ class ManagerComponentState(flavors.StateCacheable):
         # only proxy keys we want proxied; eaterNames and feederNames
         # are ignored for example
         proxiedKeys = _jobStateKeys + _jobStateListKeys
+
         def proxy(attr):
+
             def event(state, key, value):
                 if key in proxiedKeys:
                     getattr(self, attr)(key, value)
@@ -333,11 +346,13 @@ class ManagerComponentState(flavors.StateCacheable):
                       " %s now lost", self.get('name'))
             self.setMood(moods.lost.value)
 
+
 class AdminComponentState(flavors.StateRemoteCache):
     """
     I represent the state of a component in the admin client.
     See L{ManagerComponentState}.
     """
+
     def __repr__(self):
         return "<%s.%s name=%r>" % (self.__module__,
                                     self.__class__.__name__,
@@ -347,6 +362,8 @@ pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
 
 # state of an existing component running in a job process
 # exchanged between worker and manager
+
+
 class WorkerJobState(flavors.StateCacheable):
     """
     I represent the state of a job in the worker, running a component.
@@ -367,12 +384,14 @@ class WorkerJobState(flavors.StateCacheable):
 
     @todo: change eaterNames and feederNames to eaterFeedIds and ...
     """
+
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         for k in _jobStateKeys:
             self.addKey(k)
         for k in _jobStateListKeys:
             self.addListKey(k)
+
 
 class ManagerJobState(flavors.StateRemoteCache):
     """

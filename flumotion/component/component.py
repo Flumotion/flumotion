@@ -46,12 +46,14 @@ from flumotion.twisted import pb as fpb
 __version__ = "$Rev$"
 T_ = gettexter()
 
+
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """
     I am a client factory for a component logging in to the manager.
     """
     logCategory = 'component'
     perspectiveInterface = interfaces.IComponentMedium
+
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
@@ -76,7 +78,9 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
 
     # vmethod implementation
+
     def gotDeferredLogin(self, d):
+
         def remoteDisconnected(remoteReference):
             if reactor.killed:
                 self.log('Connection to manager lost due to shutdown')
@@ -122,9 +126,11 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         d.addErrback(loginFailedErrback)
 
     # we want to save the authenticator
+
     def startLogin(self, authenticator):
         self.medium.setAuthenticator(authenticator)
         return fpb.ReconnectingFPBClientFactory.startLogin(self, authenticator)
+
 
 def _maybeDeferredChain(procs, *args, **kwargs):
     """
@@ -139,6 +145,7 @@ def _maybeDeferredChain(procs, *args, **kwargs):
 
     @rtype: L{twisted.internet.defer.Deferred}
     """
+
     def call_proc(_, p):
         log.debug('', 'calling %r', p)
         return p(*args, **kwargs)
@@ -149,6 +156,8 @@ def _maybeDeferredChain(procs, *args, **kwargs):
     return d
 
 # needs to be before BaseComponent because BaseComponent references it
+
+
 class BaseComponentMedium(medium.PingingMedium):
     """
     I am a medium interfacing with a manager-side avatar.
@@ -176,6 +185,7 @@ class BaseComponentMedium(medium.PingingMedium):
         medium.PingingMedium.setRemoteReference(self, reference)
 
     ### our methods
+
     def setup(self, config):
         pass
 
@@ -220,6 +230,7 @@ class BaseComponentMedium(medium.PingingMedium):
 
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
+
     def remote_getState(self):
         """
         Return the state of the component, which will be serialized to a
@@ -323,6 +334,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.setup()
 
     # BaseComponent interface for subclasses related to component protocol
+
     def init(self):
         """
         A subclass should do as little as possible in its init method.
@@ -468,12 +480,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self._shutdownHook()
 
     ### BaseComponent implementation related to compoment protocol
+
     def setup(self):
         """
         Sets up the component.  Called during __init__, so be sure not
         to raise exceptions, instead adding messages to the component
         state.
         """
+
         def run_setups():
             setups = common.get_all_methods(self, 'do_setup', False)
             return _maybeDeferredChain(setups, self)
@@ -530,6 +544,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         return _maybeDeferredChain(stops, self)
 
     ### BaseComponent public methods
+
     def getName(self):
         return self.name
 
@@ -679,4 +694,3 @@ class BaseComponent(common.InitMixin, log.Loggable):
         vsize = int(fields[22])
         self.log('vsize is %d', vsize)
         self.uiState.set('virtual-size', vsize)
-

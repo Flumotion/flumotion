@@ -25,9 +25,8 @@ from twisted.trial import unittest
 from flumotion.common import gstreamer
 
 
-
-
 class Factory(unittest.TestCase):
+
     def testFakeSrc(self):
         hassync = gstreamer.element_factory_has_property('fakesrc', 'sync')
         self.failUnless(hassync)
@@ -63,14 +62,18 @@ def run_it_a_little_while(p):
     m = p.get_bus().poll(gst.MESSAGE_EOS, -1)
     p.set_state(gst.STATE_NULL)
 
+
 class DeepNotify(unittest.TestCase):
+
     def testDeepNotify(self):
         component = FakeComponent()
         pipeline = gst.parse_launch('fakesrc num-buffers=3 ! fakesink')
         pipeline.connect('deep-notify', gstreamer.verbose_deep_notify_cb,
             component)
 
+
 class TestProperty(unittest.TestCase):
+
     def testHasProperty(self):
         b = gstreamer.element_factory_has_property('fakesrc', 'num-buffers')
         self.failUnless(b)

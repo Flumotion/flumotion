@@ -66,6 +66,7 @@ class Mood(util.LogCommand):
 
     def _callback(self, result):
         d = self.parentCommand.adminModel.callRemote('getPlanetState')
+
         def gotPlanetStateCb(result):
             self.debug('gotPlanetStateCb')
             c = util.findComponent(result, self._component)
@@ -105,6 +106,7 @@ class Mood(util.LogCommand):
 
 # The Manager root command will take care of stopping the reactor and returning
 # the exit value.
+
 
 class Manager(util.LogCommand):
     usage = "manager [-m manager-string] %command"
@@ -154,6 +156,7 @@ class Manager(util.LogCommand):
         self.connect(self.options)
 
         # chain up an exit after our child commands have had the chance.
+
         def cb(result):
             self.debug('parse: cb: done')
             reactor.callLater(0, reactor.stop)
@@ -191,7 +194,6 @@ class Manager(util.LogCommand):
 
         return reactor.exitStatus
 
-
     def connect(self, options):
         connection = parsePBConnectionInfoRecent(options.manager,
                                                  options.transport == 'ssl')
@@ -228,6 +230,7 @@ class Manager(util.LogCommand):
             util.critical("Manager refused connection.")
         self.managerDeferred.errback(failure)
 
+
 class Nagios(util.LogCommand):
     usage = "%prog %command"
     description = "Run Flumotion-related Nagios checks."
@@ -244,6 +247,7 @@ class Nagios(util.LogCommand):
         if options.version:
             print common.version("flumotion-nagios")
             return 0
+
 
 def main(args):
     c = Nagios()

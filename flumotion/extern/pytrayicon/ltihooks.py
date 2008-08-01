@@ -64,8 +64,11 @@ class LibtoolHooks(ihooks.Hooks):
 importer = ihooks.ModuleImporter()
 importer.set_hooks(LibtoolHooks())
 
+
 def install():
     importer.install()
+
+
 def uninstall():
     importer.uninstall()
 

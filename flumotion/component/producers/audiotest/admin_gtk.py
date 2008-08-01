@@ -86,7 +86,9 @@ class AudioTestAdminGtkNode(BaseAdminGtkNode):
         self._combobox.set_active(value)
         self._combobox.handler_unblock(self._combobox_change_id)
 
+
 class AudioTestAdminGtk(BaseAdminGtk):
+
     def setup(self):
         volume = VolumeAdminGtkNode(self.state, self.admin,
                                     'volume', title=_("Volume"))

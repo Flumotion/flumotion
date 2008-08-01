@@ -68,6 +68,7 @@ def formatStorage(units, precision=2):
     format = "%%.%df %%s" % precision
     return format % (value, prefix)
 
+
 def formatTime(seconds, fractional=0):
     """
     Nicely format time in a human-readable format.
@@ -114,6 +115,7 @@ def formatTime(seconds, fractional=0):
 
     chunks.append(chunk)
     return " ".join(chunks)
+
 
 def formatTimeStamp(timeOrTuple):
     """

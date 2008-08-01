@@ -106,6 +106,7 @@ else:
     from flumotion.configure import installed
     _config = installed.get()
 
+
 def _versionStringToTuple(versionString):
     t = tuple(map(int, versionString.split('.')))
     if len(t) < 4:
@@ -141,6 +142,3 @@ branchName = 'trunk'
 processTermWait = 10
 processKillWait = 5
 heartbeatInterval = 5
-
-
-

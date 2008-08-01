@@ -39,6 +39,7 @@ _ = gettext.gettext
 
 
 class GreeterProcessProtocol(ProcessProtocol):
+
     def __init__(self):
         # no parent init
         self.deferred = Deferred()
@@ -159,6 +160,7 @@ class LocalManagerSpawner(SignalMixin):
             paths.insert(0, configure.bindir)
         env['PATH'] = os.pathsep.join(paths)
         reactor.spawnProcess(protocol, args[0], args, env=env)
+
         def error(failure, failMessage):
             self._error(failure, failMessage, args)
             return failure

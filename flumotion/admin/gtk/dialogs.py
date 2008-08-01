@@ -38,6 +38,7 @@ _ = gettext.gettext
 
 
 class ProgressDialog(gtk.Dialog):
+
     def __init__(self, title, message, parent = None):
         gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
@@ -84,6 +85,7 @@ class ProgressDialog(gtk.Dialog):
 
 
 class ErrorDialog(gtk.MessageDialog):
+
     def __init__(self, message, parent=None, close_on_response=True,
                  secondary_text=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
@@ -110,6 +112,7 @@ class ErrorDialog(gtk.MessageDialog):
         # twisted's reactor.
         from twisted.internet import defer
         deferred = defer.Deferred()
+
         def callback(_, response, deferred):
             self.destroy()
             deferred.callback(None)
@@ -119,6 +122,7 @@ class ErrorDialog(gtk.MessageDialog):
 
 
 class AboutDialog(gtk.Dialog):
+
     def __init__(self, parent=None):
         gtk.Dialog.__init__(self, _('About Flumotion'), parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -166,6 +170,7 @@ class AboutDialog(gtk.Dialog):
         info.set_justify(gtk.JUSTIFY_FILL)
         info.set_line_wrap(True)
         info.show()
+
 
 def showConnectionErrorDialog(failure, info, parent=None):
     if failure.check(ConnectionRefusedError):

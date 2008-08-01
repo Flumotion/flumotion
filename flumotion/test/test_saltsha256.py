@@ -27,7 +27,6 @@ from flumotion.common import keycards
 from flumotion.component.bouncers import saltsha256
 
 
-
 bouncerconf = {
     'name': 'testbouncer',
     'plugs': {},
@@ -51,12 +50,15 @@ class TestWrongKeycardClass(testsuite.TestCase):
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def wrongKeycardClassCallback(result):
             self.failIf(result)
         d.addCallback(wrongKeycardClassCallback)
         return d
 
+
 class TestSaltSha256USCPCC(testsuite.TestCase):
+
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256(bouncerconf)
 
@@ -71,11 +73,13 @@ class TestSaltSha256USCPCC(testsuite.TestCase):
 
         # submit for auth
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def okCallback(result):
             self.assertEquals(result.state, keycards.REQUESTING)
             # respond to challenge and resubmit
             result.setPassword('test')
             dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
             def authenticatedCallback(result):
                 self.assertEquals(result.state, keycards.AUTHENTICATED)
             dd.addCallback(authenticatedCallback)
@@ -92,12 +96,14 @@ class TestSaltSha256USCPCC(testsuite.TestCase):
 
         # submit for auth
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
         def tamperCallback(result):
             self.assertEquals(result.state, keycards.REQUESTING)
             # mess with challenge, respond to challenge and resubmit
             result.challenge = "I am a h4x0r"
             result.setPassword('test')
             dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
             def tamperAuthenticateCallback(result):
                 self.failIf(result)
             dd.addCallback(tamperAuthenticateCallback)

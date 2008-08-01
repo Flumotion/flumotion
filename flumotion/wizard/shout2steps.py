@@ -30,6 +30,7 @@ _ = gettext.gettext
 
 class Shout2Consumer(Consumer):
     componentType = 'shout2-consumer'
+
     def __init__(self):
         super(Shout2Consumer, self).__init__()
         self.properties.ip = '127.0.0.1'

@@ -28,10 +28,13 @@ __version__ = "$Rev$"
 
 
 # See also flumotion.medium.BaseMedium.
+
+
 class IMedium(Interface):
     """I am a base interface for PB client-side mediums interfacing with
     manager-side avatars.
     """
+
     def setRemoteReference(remoteReference):
         """Set the RemoteReference to the manager-side avatar.
         @param remoteReference: L{twisted.spread.pb.RemoteReference}
@@ -101,6 +104,7 @@ class IFeedMedium(IMedium):
 class IHeaven(Interface):
     """My implementors manage avatars logging in to the manager.
     """
+
     def createAvatar(avatarId):
         """Creates a new avatar matching the type of heaven.
         @param avatarId:
@@ -118,6 +122,7 @@ class IFeedServerParent(Interface):
     FeedServer to hand off file descriptors to eaters and feeders managed
     by the parent.
     """
+
     def feedToFD(componentId, feedName, fd):
         """Make the component feed the given feed to the fd.
         @param componentId:

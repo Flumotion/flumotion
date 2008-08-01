@@ -29,6 +29,7 @@ from flumotion.worker.checks.gst010 import do_element_check
 
 __version__ = "$Rev$"
 
+
 def checkTVCard(device, mid='check-tvcard'):
     """
     Probe the given device node as a TV card.
@@ -54,6 +55,7 @@ def checkTVCard(device, mid='check-tvcard'):
 
     return d
 
+
 def checkWebcam(device, mid):
     """
     Probe the given device node as a webcam.
@@ -69,6 +71,7 @@ def checkWebcam(device, mid):
     """
     # FIXME: add code that checks permissions and ownership on errors,
     # so that we can offer helpful hints on what to do.
+
     def probeDevice(element):
         name = element.get_property('device-name')
         caps = element.get_pad("src").get_caps()
@@ -99,8 +102,11 @@ def checkWebcam(device, mid):
             else:
                 # scalar
                 proc(struct, vals)
+
         def addRatesForWidth(struct, width):
+
             def addRatesForHeight(struct, height):
+
                 def addRate(struct, rate):
                     if (width, height) not in sizes:
                         sizes[(width, height)] = []

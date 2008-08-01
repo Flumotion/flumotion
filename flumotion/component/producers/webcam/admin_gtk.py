@@ -27,6 +27,7 @@ __version__ = "$Rev$"
 
 
 class WebcamAdminGtk(BaseAdminGtk):
+
     def setup(self):
         self._nodes = {}
         colorbalance = ColorbalanceAdminGtkNode(self.state, self.admin,

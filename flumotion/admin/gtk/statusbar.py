@@ -28,6 +28,7 @@ class AdminStatusbar(object):
     """
     I implement the status bar used in the admin UI.
     """
+
     def __init__(self, widget):
         """
         @param widget: a gtk.Statusbar to wrap.
@@ -105,5 +106,3 @@ class AdminStatusbar(object):
 
         for mid in self._mids[context][:]:
             self.remove(context, mid)
-
-

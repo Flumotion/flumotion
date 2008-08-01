@@ -48,6 +48,8 @@ __version__ = "$Rev$"
 
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
+
+
 class AdminAvatar(base.ManagerAvatar):
     """
     I am an avatar created for an administrative client interface.
@@ -58,6 +60,7 @@ class AdminAvatar(base.ManagerAvatar):
     logCategory = 'admin-avatar'
 
     # override pb.Avatar implementation so we can run admin actions
+
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         benignMethods = ('ping', )
 
@@ -71,6 +74,7 @@ class AdminAvatar(base.ManagerAvatar):
             self, broker, message, args, kwargs)
 
     ### pb.Avatar IPerspective methods
+
     def perspective_getPlanetState(self):
         """
         Get the planet state.
@@ -123,6 +127,7 @@ class AdminAvatar(base.ManagerAvatar):
         return d
 
     # Generic interface to call into a component
+
     def perspective_componentCallRemote(self, componentState, methodName,
                                         *args, **kwargs):
         """
@@ -268,6 +273,7 @@ class AdminAvatar(base.ManagerAvatar):
         """
         self.vishnu.adminAction(self.remoteIdentity,
                                 '_saveFlowFile', (), {})
+
         def ensure_sane(name, extra=''):
             if not re.match('^[a-zA-Z0-9_' + extra + '-]+$', name):
                 raise errors.ConfigError, \
@@ -311,6 +317,7 @@ class AdminAvatar(base.ManagerAvatar):
         f.close()
 
         if saveAs:
+
             def success(res):
                 self.debug('loadConfiguration succeeded, writing flow to %r',
                            output)
@@ -318,6 +325,7 @@ class AdminAvatar(base.ManagerAvatar):
                 output.write(xml)
                 output.close()
                 return res
+
             def failure(res):
                 self.debug('loadConfiguration failed, leaving %r as it was',
                            output)
@@ -393,7 +401,6 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_cleanComponents(self):
         return self.vishnu.emptyPlanet()
 
-
     def perspective_getWizardEntries(self, types=None, provides=None,
                                      accepts=None):
         """
@@ -408,6 +415,7 @@ class AdminAvatar(base.ManagerAvatar):
         @type  accepts: list of strings
         @returns: L{componentui.WizardEntryState}
         """
+
         def extract(wizards):
             for wizard in wizards:
                 if types is not None:

@@ -27,6 +27,7 @@ __version__ = "$Rev$"
 
 
 class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
+
     def setup(self):
         colorbalance = ColorbalanceAdminGtkNode(self.state, self.admin,
                                                 'outputColorbalance',

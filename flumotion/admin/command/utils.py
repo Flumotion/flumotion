@@ -26,11 +26,13 @@ from flumotion.common import errors
 
 __version__ = "$Rev$"
 
+
 def avatarId(string):
     split = string.split('/')
     assert len(split) == 3
     assert not split[0]
     return split[1:]
+
 
 def avatarPath(string):
     split = string.split('/')
@@ -45,6 +47,7 @@ def avatarPath(string):
             return ['root']
         else:
             return ['flow'] + split[1:]
+
 
 def find_component(planet, avatarId):
     if avatarId[0] == 'atmosphere':
@@ -63,6 +66,7 @@ def find_component(planet, avatarId):
     print ('Could not find component named %s in flow %s'
            % (avatarId[1], avatarId[0]))
     return None
+
 
 def get_component_uistate(model, avatarId, component=None, quiet=False):
     if not component:

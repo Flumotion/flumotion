@@ -51,16 +51,20 @@ saltsha256Conf = {
 
 ### lots of fake objects to have fun with
 
+
 class FakePortalWrapperPlaintext:
     # a fake wrapper with a checker that lets username, password in
+
     def __init__(self):
         self.broker = FakeBroker()
         self.checker = checkers.FlexibleCredentialsChecker()
         self.checker.addUser("username", "password")
         self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
+
 class FakePortalWrapperCrypt:
     # a fake wrapper with a checker that lets username, crypt(password, iq) in
+
     def __init__(self):
         self.checker = checkers.CryptChecker()
         cryptPassword = crypt.crypt('password', 'iq')
@@ -68,13 +72,17 @@ class FakePortalWrapperCrypt:
         self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
 # FIXME: using real portal
+
+
 class FakeBouncerPortal:
     # a fake wrapper implementing BouncerPortal lookalike
+
     def __init__(self, bouncer):
         self.bouncer = bouncer
 
     def login(self, keycard, mind, interfaces):
         return self.bouncer.authenticate(keycard)
+
 
 class FakeAvatar(tpb.Avatar):
     implements(tpb.IPerspective)
@@ -107,15 +115,20 @@ class FakeFRealm(FakeTRealm):
     def requestAvatar(self, avatarId, keycard, mind, *interfaces):
         return FakeTRealm.requestAvatar(self, avatarId, mind, *interfaces)
 
+
 class FakeMind(tpb.Referenceable):
     pass
+
 
 class FakeBroker(tpb.Broker):
     pass
 
 # our test for twisted's challenger
 # this is done for comparison with our challenger
+
+
 class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
+
     def setUp(self):
         # PB server creates a challenge
         self.challenge = tpb.challenge()
@@ -143,7 +156,10 @@ class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
         return d
 
 ### SHINY NEW FPB
+
+
 class Test_BouncerWrapper(testsuite.TestCase):
+
     def setUp(self):
         broker = FakeBroker()
 
@@ -193,6 +209,7 @@ class Test_BouncerWrapper(testsuite.TestCase):
             keycard.setPassword('test')
             d = self.wrapper.remote_login(keycard, None,
                 'twisted.spread.pb.IPerspective')
+
             def uacpccOkCallback2(result):
                 self.assert_(isinstance(result, tpb.AsReferenceable))
                 return result
@@ -216,6 +233,7 @@ class Test_BouncerWrapper(testsuite.TestCase):
             keycard.setPassword('test')
             d = self.wrapper.remote_login(keycard, "avatarId",
                 'twisted.spread.pb.IPerspective')
+
             def uacpccWrongUserErrback(failure):
                 self.assert_(isinstance(failure.type(),
                     errors.NotAuthenticatedError))
@@ -240,6 +258,7 @@ class Test_BouncerWrapper(testsuite.TestCase):
             keycard.setPassword('wrong')
             d = self.wrapper.remote_login(keycard, "avatarId",
                 'twisted.spread.pb.IPerspective')
+
             def uacpccWrongPasswordErrback(failure):
                 self.assert_(isinstance(failure.type(),
                     errors.NotAuthenticatedError))
@@ -268,6 +287,7 @@ class Test_BouncerWrapper(testsuite.TestCase):
             keycard.setPassword('test')
             d = self.wrapper.remote_login(keycard, "avatarId",
                 'twisted.spread.pb.IPerspective')
+
             def uacpccTamperErrback(failure):
                 self.assert_(isinstance(failure.type(),
                     errors.NotAuthenticatedError))
@@ -277,7 +297,9 @@ class Test_BouncerWrapper(testsuite.TestCase):
         d.addCallback(uacpccTamperCallback)
         return d
 
+
 class Test_FPortalRoot(testsuite.TestCase):
+
     def setUp(self):
         self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), 'bouncer')
         self.root = pb._FPortalRoot(self.bouncerPortal)
@@ -287,7 +309,9 @@ class Test_FPortalRoot(testsuite.TestCase):
         self.failUnless(isinstance(root, pb._BouncerWrapper))
         self.assertEquals(root.broker, 'a')
 
+
 class TestAuthenticator(testsuite.TestCase):
+
     def testIssueNoInfo(self):
         # not setting any useful auth info on the authenticator does not
         # allow us to issue a keycard
@@ -316,6 +340,8 @@ class TestAuthenticator(testsuite.TestCase):
 
 # time for the big kahuna
 # base class so we can use different bouncers
+
+
 class Test_FPBClientFactory(testsuite.TestCase):
 
     def setUp(self):
@@ -349,9 +375,12 @@ class Test_FPBClientFactory(testsuite.TestCase):
             return d
 
 # test with htpasswdcrypt bouncer first
+
+
 class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
     bouncerClass = htpasswdcrypt.HTPasswdCrypt
     bouncerConf = htpasswdcryptConf
+
     def testOk(self):
         factory = pb.FPBClientFactory()
         a = pb.Authenticator(username="user", password="test",
@@ -396,6 +425,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
 
 # FIXME: rewrite such that we can enforce a challenger, possibly
 # by setting a property on the bouncer
+
     def notestUACPCCOk(self):
         factory = pb.FPBClientFactory()
 
@@ -410,6 +440,7 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             keycard.setPassword('test')
             d = factory.login(keycard, 'MIND')
             # check if we have a remote reference
+
             def uacpccOkCallback2(result):
                 self.assert_(isinstance(result, tpb.RemoteReference))
                 return self.clientDisconnect(factory, result)
@@ -505,6 +536,8 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         return d
 
 # test with sha256 bouncer
+
+
 class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
     bouncerClass = saltsha256.SaltSha256
     bouncerConf = saltsha256Conf
@@ -576,6 +609,7 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         return d
 
 # FIXME: do this with a fake authenticator that tampers with the challenge
+
     def notestUACPCCTamperWithChallenge(self):
         factory = pb.FPBClientFactory()
 

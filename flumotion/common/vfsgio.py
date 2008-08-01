@@ -121,5 +121,3 @@ def registerGIOJelly():
     setUnjellyableForClass(GIOFile, GIOFile)
     setUnjellyableForClass(GIODirectory, GIODirectory)
     log.info('jelly', 'GIO registered')
-
-

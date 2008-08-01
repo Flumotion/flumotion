@@ -31,6 +31,7 @@ from gst010 import do_element_check
 
 T_ = gettexter()
 
+
 def checkMixerTracks(source_factory, device, channels, mid=None):
     """
     Probe the given GStreamer element factory with the given device for

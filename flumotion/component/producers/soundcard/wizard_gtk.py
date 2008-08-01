@@ -203,10 +203,10 @@ class SoundcardStep(AudioProducerStep):
 
 class SoundcardWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = SoundcardProducer()
 
     def getProductionStep(self, type):
         return SoundcardStep(self.wizard, self.model)
-

@@ -44,18 +44,21 @@ __all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
            'pipeline_cnv']
 
 
-
 class ComponentTestException(Exception):
     pass
+
 
 class WrongReactor(ComponentTestException):
     pass
 
+
 class StartTimeout(ComponentTestException):
     pass
 
+
 class FlowTimeout(ComponentTestException):
     pass
+
 
 class StopTimeout(ComponentTestException):
     pass
@@ -68,12 +71,14 @@ def delayed_d(time, val):
     reactor.callLater(time, d.callback, val)
     return d
 
+
 def override_value_callback(_result, value):
     """
     Ignore the result returned from the deferred callback chain and
     return the given value.
     """
     return value
+
 
 def call_and_passthru_callback(result, callable_, *args, **kwargs):
     """Invoke the callable_ and passthrough the original result."""
@@ -158,6 +163,7 @@ class ComponentWrapper(object, log.Loggable):
     def instantiate(self):
         self.comp = self.comp_class(self.cfg)
         self.debug('instantiate:: %r' % self.comp.state)
+
         def append(instance, key, value):
             self.debug('append %r: %r' % (value.level, value))
             if key == 'messages':
@@ -173,6 +179,7 @@ class ComponentWrapper(object, log.Loggable):
 
         prev = self.comp.state.set
         d = defer.Deferred()
+
         def set(key, value):
             self.debug('set %r: %r', key, value)
             prev(key, value)
@@ -271,7 +278,9 @@ class ComponentTestHelper(object, log.Loggable):
 
     def _make_pipes(self):
         fds = {}
+
         def feed_starter(c, feed_name, w_fd, feed_id):
+
             def _feed_starter():
                 self.debug('_feed_starter: %r, %r' % (feed_name, feed_id))
                 return c.feedToFD(feed_name, w_fd, eaterId=feed_id)
@@ -305,6 +314,7 @@ class ComponentTestHelper(object, log.Loggable):
             if self._master is not None:
                 self.debug('About to ask to provide_master_clock()...')
                 d = self._master.comp.provide_master_clock(7600 - 1) # ...hack?
+
                 def _passthrough_debug(_res):
                     self.debug('After provide_master_clock() : %r' % (_res, ))
                     return _res
@@ -361,9 +371,11 @@ class ComponentTestHelper(object, log.Loggable):
         rcomps.reverse()
         d = defer.DeferredList([c.stop() for c in rcomps],
                                fireOnOneErrback=1, consumeErrors=1)
+
         def stop_flow_report(results):
             self.debug('stop_flow_report: %r' % (results, ))
             return results
+
         def stop_flow_failed(failure):
             self.info('stop_flow_failed: %r' % (failure, ))
             failure.trap(defer.FirstError)
@@ -405,6 +417,7 @@ class ComponentTestHelper(object, log.Loggable):
             # if have tasks, run simultaneously with the main timer deferred
             chained_d = defer.DeferredList([stop_d] + tasks,
                                            fireOnOneErrback=1, consumeErrors=1)
+
             def chained_failed(failure):
                 self.info('chained_failed: %r' % (failure, ))
                 failure.trap(defer.FirstError)
@@ -419,6 +432,7 @@ class ComponentTestHelper(object, log.Loggable):
             flow_started_finished[0] = True
             callids[0] = reactor.callLater(duration, stop_d.callback, None)
             if tasks:
+
                 def _fire_chained():
                     callids[2] = None
                     for t in tasks:
@@ -463,11 +477,13 @@ class ComponentTestHelper(object, log.Loggable):
             failure.trap(defer.FirstError)
             return failure.value.subFailure
         if stop_flow:
+
             def _force_stop_flow(result):
                 self.debug('_force_stop_flow: %r' % (result, ))
                 d = defer.DeferredList([self.stop_flow(), stop_timeout_d],
                                        fireOnOneErrback=1, fireOnOneCallback=1,
                                        consumeErrors=1)
+
                 def _return_orig_result(stop_result):
                     if isinstance(result, failure.Failure):
                         # always return the run's failure first
@@ -479,6 +495,7 @@ class ComponentTestHelper(object, log.Loggable):
                         self.debug('_return_orig[S]: %r' % (stop_result, ))
                         return stop_result
                     return result
+
                 def force_stop_failed(failure):
                     self.info('force_stop_failed: %r' % (failure, ))
                     failure.trap(defer.FirstError)
@@ -494,9 +511,11 @@ class ComponentTestHelper(object, log.Loggable):
         callids[1] = reactor.callLater(self.guard_timeout, flow_timed_out)
         return guard_d
 
+
 class ComponentUnitTestMixin:
     if not HAVE_GTK2REACTOR:
         skip = 'gtk2reactor is required for this test case'
+
 
 def cleanup_reactor(force=False):
     if not HAVE_GTK2REACTOR and not force:
@@ -514,12 +533,14 @@ def cleanup_reactor(force=False):
             if interfaces.IProcessTransport.providedBy(sel):
                 sel.signalProcess('KILL')
 
+
 def pipeline_src(pipelinestr='fakesrc datarate=1024 is-live=true ! '
                  'video/x-raw-rgb,framerate=(fraction)8/1,width=32,height=24'):
     fs_name = ComponentWrapper.get_unique_name('ppln-src-')
 
     return ComponentWrapper('pipeline-producer', Producer, name=fs_name,
                             props={'pipeline': pipelinestr})
+
 
 def pipeline_cnv(pipelinestr='identity'):
     fs_name = ComponentWrapper.get_unique_name('ppln-cnv-')

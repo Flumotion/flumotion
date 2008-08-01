@@ -57,7 +57,9 @@ class TokenTestBase(log.Loggable):
             self.info('keycard %r unauthorized, returning None', keycard)
             return None
 
+
 class TokenTestPlug(TokenTestBase, plug.BouncerPlug):
+
     def __init__(self, args):
         plug.BouncerPlug.__init__(self, args)
         self.haveProperties(args['properties'])

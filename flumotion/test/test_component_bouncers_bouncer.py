@@ -23,13 +23,14 @@ from flumotion.component.bouncers import bouncer
 from flumotion.test import bouncertest
 
 
-
-
 class FakeBouncerMedium(bouncertest.FakeMedium, bouncer.BouncerMedium):
+
     def __init__(self):
         pass
 
+
 class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
+
     def setUp(self):
         self.obj = bouncer.TrivialBouncer({'name': 'fake',
                                            'avatarId': '/default/fake',

@@ -31,6 +31,7 @@ T_ = gettexter()
 
 
 class AudioTestMedium(feedcomponent.FeedComponentMedium):
+
     def remote_setFrequency(self, frequency):
         """
         @type frequency: int
@@ -42,6 +43,7 @@ class AudioTestMedium(feedcomponent.FeedComponentMedium):
         @type wave: int
         """
         return self.comp.setWave(wave)
+
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
     componentMediumClass = AudioTestMedium

@@ -36,11 +36,13 @@ environ.add_resource('glade', configure.gladedir)
 
 install_patches()
 
+
 def _unbrokenNamedAny(qual):
     # ihooks breaks namedAny, so split up by module, attribute
     module_name, attribute = qual.rsplit(".", 1)
     module = namedAny(module_name)
     return getattr(module, attribute, None)
+
 
 def _flumotion_glade_custom_handler(xml, proc, name, *args):
     widget_class = _unbrokenNamedAny(proc)
@@ -61,9 +63,6 @@ def _flumotion_glade_custom_handler(xml, proc, name, *args):
     return widget
 
 glade.set_custom_handler(_flumotion_glade_custom_handler)
-
-
-
 
 
 class GladeBacked(GladeDelegate):
@@ -113,6 +112,7 @@ class GladeWidget(gtk.VBox, GladeBacked):
     Remember to chain up if you customize __init__().
 
     '''
+
     def __init__(self):
         GladeBacked.__init__(self)
         gtk.VBox.__init__(self)

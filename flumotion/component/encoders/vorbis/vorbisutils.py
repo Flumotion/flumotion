@@ -33,6 +33,7 @@ def get_preferred_sample_rate(maxrate):
 
     return 8000
 
+
 def get_max_sample_rate(bitrate, channels):
     # maybe better in a hashtable/associative array?
     # ZAHEER: these really are "magic" limits that i found by trial and

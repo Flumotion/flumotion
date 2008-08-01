@@ -29,6 +29,7 @@ from flumotion.common.fraction import fractionFromValue
 
 __version__ = "$Rev$"
 
+
 def _generateRandomString(numchars):
     """Generate a random US-ASCII string of length numchars
     """
@@ -58,6 +59,7 @@ class Properties(dict):
     >>> p
     <Properties {'this-is-outrageous': True}>
     """
+
     def __setitem__(self, attr, value):
         if attr in dict.__dict__:
             raise AttributeError(
@@ -125,6 +127,7 @@ class Component(object, log.Loggable):
                                     self.__class__.__name__, self.name)
 
     # Backwards compatibility
+
     @property
     def component_type(self):
         import warnings
@@ -209,6 +212,7 @@ class Plug(object):
     @cvar plugType: the type of the plug, such as cortado,
       this is not mandatory in the class, can also be set in the instance.
     """
+
     def __init__(self):
         self.properties = Properties()
 
@@ -219,6 +223,7 @@ class Plug(object):
 class Producer(Component):
     """I am a component which produces data.
     """
+
     def validate(self):
         super(Producer, self).validate()
 
@@ -312,6 +317,7 @@ class AudioProducer(Producer):
     """I am a component which produces audio
     """
 
+
 class VideoProducer(Producer):
     """I am a component which produces video
     """
@@ -372,6 +378,7 @@ class HTTPServer(Component):
 
 
 class HTTPPlug(Plug):
+
     def __init__(self, server, streamer, audioProducer, videoProducer):
         """
         @param server: server

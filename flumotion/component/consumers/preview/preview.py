@@ -27,5 +27,6 @@ __version__ = "$Rev$"
 
 
 class Preview(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         return 'decodebin ! ffmpegcolorspace ! autovideosink qos=false'

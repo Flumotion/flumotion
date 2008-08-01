@@ -39,6 +39,7 @@ def cleanup_curses(stdscr):
     curses.echo()
     curses.endwin()
 
+
 def _runInterface(options):
     # initialise curses
 
@@ -78,6 +79,7 @@ def _runInterface(options):
         greeter = AdminTextGreeter(stdscr)
         reactor.addReader(greeter)
         greeter.show()
+
 
 def main(args):
     parser = OptionParser(domain="flumotion-admin-text")

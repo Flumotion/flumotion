@@ -49,13 +49,17 @@ __version__ = "$Rev$"
 MAGIC_SIGNATURE = ''.join(map(chr, [253, 252, 142, 127, 7, 71, 185, 234,
                                     161, 117, 238, 216, 220, 54, 200, 163]))
 
+
 class FDServer(unix.Server):
+
     def sendFileDescriptor(self, fileno, data=""):
         message = struct.pack("@16sI", MAGIC_SIGNATURE, len(data)) + data
         return fdpass.writefds(self.fileno(), [fileno], message)
 
+
 class FDPort(unix.Port):
     transport = FDServer
+
 
 class FDClient(unix.Client): #, log.Loggable):
 
@@ -105,9 +109,12 @@ class FDClient(unix.Client): #, log.Loggable):
               #  self.debug("No FDs, passing to dataReceived")
                 return self.protocol.dataReceived(message)
 
+
 class FDConnector(unix.Connector):
+
     def _makeTransport(self):
         return FDClient(self.address, self, self.reactor)
+
 
 class FDPassingBroker(pb.Broker, log.Loggable):
     """
@@ -131,6 +138,7 @@ class FDPassingBroker(pb.Broker, log.Loggable):
     # This is the complex bit. If our underlying transport receives a file
     # descriptor, this gets called - along with the data we got with the FD.
     # We create an appropriate protocol object, and attach it to the reactor.
+
     def fileDescriptorsReceived(self, fds, message):
         if len(fds) == 1:
             fd = fds[0]
@@ -162,6 +170,7 @@ class FDPassingBroker(pb.Broker, log.Loggable):
         else:
             self.warning("Unexpected: FD-passing message with len(fds) != 1")
 
+
 class _SocketMaybeCloser(tcp._SocketCloser):
     keepSocketAlive = False
 
@@ -179,12 +188,14 @@ class _SocketMaybeCloser(tcp._SocketCloser):
         else:
             tcp.Server._closeSocket(self)
 
+
 class PassableServerConnection(_SocketMaybeCloser, tcp.Server):
     """
     A subclass of tcp.Server that permits passing the FDs used to other
     processes (by just calling close(2) rather than shutdown(2) on them)
     """
     pass
+
 
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection

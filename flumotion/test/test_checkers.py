@@ -36,10 +36,12 @@ CredCrypt = credentials.UsernameCryptPasswordCrypt
 
 
 class TestFlexibleWithPassword(testsuite.TestCase):
+
     def setUp(self):
         self.checker = checkers.FlexibleCredentialsChecker(user='test')
 
     def testCredPlaintextCorrect(self):
+
         def credPlaintextCorrectCallback(result):
             self.assertEquals(result, 'user')
         cred = tcredentials.UsernamePassword('user', 'test')
@@ -48,6 +50,7 @@ class TestFlexibleWithPassword(testsuite.TestCase):
         return d
 
     def testCredPlaintextCorrectWithId(self):
+
         def credPlaintextCorrectWithIdCallback(result):
             self.assertEquals(result, 'requested')
             return True
@@ -68,12 +71,15 @@ class TestFlexibleWithPassword(testsuite.TestCase):
         d.addErrback(credPlaintextWrongErrback)
         return d
 
+
 class TestFlexibleWithoutPassword(testsuite.TestCase):
+
     def setUp(self):
         self.checker = checkers.FlexibleCredentialsChecker(user='test')
         self.checker.allowPasswordless(True)
 
     def testCredPlaintextCorrect(self):
+
         def credPlaintextCorrectCallback(result):
             self.assertEquals(result, 'user')
             return True
@@ -83,6 +89,7 @@ class TestFlexibleWithoutPassword(testsuite.TestCase):
         return d
 
     def testCredPlaintextCorrectWithId(self):
+
         def credPlaintextCorrectWithIdCallback(result):
             self.assertEquals(result, 'requested')
             return True
@@ -92,11 +99,14 @@ class TestFlexibleWithoutPassword(testsuite.TestCase):
         d.addCallback(credPlaintextCorrectWithIdCallback)
         return d
 
+
 class TestCryptCheckerInit(testsuite.TestCase):
+
     def setUp(self):
         self.checker = checkers.CryptChecker(user='qi1Lftt0GZC0o')
 
     def testCredPlaintext(self):
+
         def credPlaintextCallback(result):
             self.assertEquals(result, 'user')
             return True
@@ -105,7 +115,9 @@ class TestCryptCheckerInit(testsuite.TestCase):
         d.addCallback(credPlaintextCallback)
         return d
 
+
 class TestCryptCheckerAddUser(testsuite.TestCase):
+
     def setUp(self):
         username = 'user'
         cryptPassword = crypt.crypt('test', 'qi')
@@ -113,6 +125,7 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         self.checker.addUser(username, cryptPassword)
 
     def testCredPlaintext(self):
+
         def credPlaintextCallback(result):
             self.assertEquals(result, 'user')
             return True
@@ -144,6 +157,7 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredCrypt(self):
+
         def credCryptCallback(result):
             self.assertEquals(result, 'user')
             return True

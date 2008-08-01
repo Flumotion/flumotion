@@ -35,6 +35,7 @@ class PatternEventSwitcher(basicwatchdog.AVBasicWatchdog):
 
     def do_check(self):
         d = basicwatchdog.AVBasicWatchdog.do_check(self)
+
         def checkConfig(result):
             props = self.config['properties']
             eaterName = props.get('eater-with-stream-markers', None)

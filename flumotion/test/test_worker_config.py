@@ -23,9 +23,8 @@ from flumotion.common import testsuite
 from flumotion.worker import config
 
 
-
-
 class WorkerConfigTest(testsuite.TestCase):
+
     def testRandomFeederPorts(self):
         conf = config.WorkerConfigXML(None, string="""
 <worker>

@@ -35,6 +35,7 @@ class IdentityProvider(base.ManagerPlug):
     L{flumotion.manager.manager.Vishnu.computeIdentity} for more
     information.
     """
+
     def computeIdentity(self, keycard, remoteHost):
         """
         @param keycard:    the keycard that the remote host used to log in.
@@ -46,6 +47,7 @@ class IdentityProvider(base.ManagerPlug):
                 L{flumotion.common.identity.RemoteIdentity}
         """
         raise NotImplementedError
+
 
 class ExampleIdentityProvider(IdentityProvider):
     """

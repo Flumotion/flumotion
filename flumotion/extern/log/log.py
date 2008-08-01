@@ -61,6 +61,7 @@ COLORS = {ERROR: 'RED',
 _FORMATTED_LEVELS = []
 _LEVEL_NAMES = ['ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG']
 
+
 def getLevelName(level):
     """
     Return the name of a log level.
@@ -73,6 +74,7 @@ def getLevelName(level):
            TypeError("Bad debug level")
     return getLevelNames()[level - 1]
 
+
 def getLevelNames():
     """
     Return a list with the level names
@@ -80,6 +82,7 @@ def getLevelNames():
     @rtype: list of str
     """
     return _LEVEL_NAMES
+
 
 def getLevelInt(levelName):
     """
@@ -93,10 +96,12 @@ def getLevelInt(levelName):
         "Bad debug level name"
     return  getLevelNames().index(levelName)+1
 
+
 def getFormattedLevelName(level):
     assert isinstance(level, int) and level > 0 and level < 6, \
            TypeError("Bad debug level")
     return _FORMATTED_LEVELS[level - 1]
+
 
 def registerCategory(category):
     """
@@ -133,6 +138,7 @@ def registerCategory(category):
     # store it
     _categories[category] = level
 
+
 def getCategoryLevel(category):
     """
     @param category: string
@@ -144,6 +150,7 @@ def getCategoryLevel(category):
     if not category in _categories:
         registerCategory(category)
     return _categories[category]
+
 
 def setLogSettings(state):
     """Update the current log settings.
@@ -164,6 +171,7 @@ def setLogSettings(state):
     for category in _categories:
         registerCategory(category)
 
+
 def getLogSettings():
     """Fetches the current log settings.
     The returned object can be sent to setLogSettings to restore the
@@ -175,6 +183,7 @@ def getLogSettings():
             _log_handlers,
             _log_handlers_limited)
 
+
 def _canShortcutLogging(category, level):
     if _log_handlers:
         # we have some loggers operating without filters, have to do
@@ -182,6 +191,7 @@ def _canShortcutLogging(category, level):
         return False
     else:
         return level > getCategoryLevel(category)
+
 
 def scrubFilename(filename):
     '''
@@ -194,6 +204,7 @@ def scrubFilename(filename):
             return filename[i:]
 
     return filename
+
 
 def getFileLine(where=-1):
     """
@@ -237,6 +248,7 @@ def getFileLine(where=-1):
 
     return scrubFilename(co.co_filename), lineno
 
+
 def ellipsize(o):
     """
     Ellipsize the representation of the given object.
@@ -247,6 +259,7 @@ def ellipsize(o):
 
     r = r[:60] + ' ... ' + r[-15:]
     return r
+
 
 def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     """
@@ -266,6 +279,7 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
               + ', '.join(('%s=%r', ) * len(kwargs)) \
               + endFormat
     return format, debugArgs
+
 
 def doLog(level, object, category, format, args, where=-1,
     filePath=None, line=None):
@@ -324,6 +338,7 @@ def doLog(level, object, category, format, args, where=-1,
 
         return ret
 
+
 def errorObject(object, cat, format, *args):
     """
     Log a fatal error message in the given category.
@@ -339,6 +354,7 @@ def errorObject(object, cat, format, *args):
     else:
         raise SystemExit(format)
 
+
 def warningObject(object, cat, format, *args):
     """
     Log a warning message in the given category.
@@ -346,11 +362,13 @@ def warningObject(object, cat, format, *args):
     """
     doLog(WARN, object, cat, format, args)
 
+
 def infoObject(object, cat, format, *args):
     """
     Log an informational message in the given category.
     """
     doLog(INFO, object, cat, format, args)
+
 
 def debugObject(object, cat, format, *args):
     """
@@ -358,11 +376,13 @@ def debugObject(object, cat, format, *args):
     """
     doLog(DEBUG, object, cat, format, args)
 
+
 def logObject(object, cat, format, *args):
     """
     Log a log message.  Used for debugging recurring events.
     """
     doLog(LOG, object, cat, format, args)
+
 
 def safeprintf(file, format, *args):
     """Write to a file object, ignoring errors.
@@ -378,6 +398,7 @@ def safeprintf(file, format, *args):
             # ssh connection and the ssh connection is closed
             os._exit(os.EX_OSERR)
         # otherwise ignore it, there's nothing you can do
+
 
 def stderrHandler(level, object, category, file, line, message):
     """
@@ -403,6 +424,7 @@ def stderrHandler(level, object, category, file, line, message):
     safeprintf(sys.stderr, '%-4s %s %s\n', "", message, where)
 
     sys.stderr.flush()
+
 
 def _preformatLevels(noColorEnvVarName):
     format = '%-5s'
@@ -431,6 +453,8 @@ def _preformatLevels(noColorEnvVarName):
 ### "public" useful API
 
 # setup functions
+
+
 def init(envVarName, enableColorOutput=False):
     """
     Initialize the logging system and parse the environment variable
@@ -457,6 +481,7 @@ def init(envVarName, enableColorOutput=False):
 
     _initialized = True
 
+
 def setDebug(string):
     """Set the DEBUG string.  This controls the log output."""
     global _DEBUG
@@ -470,6 +495,7 @@ def setDebug(string):
     for category in _categories:
         registerCategory(category)
 
+
 def getDebug():
     """
     Returns the currently active DEBUG string.
@@ -477,6 +503,7 @@ def getDebug():
     """
     global _DEBUG
     return _DEBUG
+
 
 def setPackageScrubList(*packages):
     """
@@ -489,6 +516,7 @@ def setPackageScrubList(*packages):
     global _PACKAGE_SCRUB_LIST
     _PACKAGE_SCRUB_LIST = packages
 
+
 def reset():
     """
     Resets the logging system, removing all log handlers.
@@ -498,6 +526,7 @@ def reset():
     _log_handlers = []
     _log_handlers_limited = []
     _initialized = False
+
 
 def addLogHandler(func):
     """
@@ -518,6 +547,7 @@ def addLogHandler(func):
     if func not in _log_handlers:
         _log_handlers.append(func)
 
+
 def addLimitedLogHandler(func):
     """
     Add a custom log handler.
@@ -535,6 +565,7 @@ def addLimitedLogHandler(func):
 
     if func not in _log_handlers_limited:
         _log_handlers_limited.append(func)
+
 
 def removeLogHandler(func):
     """
@@ -566,22 +597,30 @@ def removeLimitedLogHandler(func):
     _log_handlers_limited.remove(func)
 
 # public log functions
+
+
 def error(cat, format, *args):
     errorObject(None, cat, format, *args)
+
 
 def warning(cat, format, *args):
     warningObject(None, cat, format, *args)
 
+
 def info(cat, format, *args):
     infoObject(None, cat, format, *args)
 
+
 def debug(cat, format, *args):
     debugObject(None, cat, format, *args)
+
 
 def log(cat, format, *args):
     logObject(None, cat, format, *args)
 
 # public utility functions
+
+
 def getExceptionMessage(exception, frame=-1, filename=None):
     """
     Return a short message based on an exception, useful for debugging.
@@ -601,6 +640,7 @@ def getExceptionMessage(exception, frame=-1, filename=None):
         msg = ": %s" % str(exception)
     return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" \
         % locals()
+
 
 def reopenOutputFiles():
     """
@@ -626,6 +666,7 @@ def reopenOutputFiles():
     if _stderr:
         reopen(_stderr, sys.stderr.fileno(), 0)
         debug('log', 'opened log %r', _stderr)
+
 
 def outputToFiles(stdout=None, stderr=None):
     """
@@ -660,6 +701,8 @@ def outputToFiles(stdout=None, stderr=None):
 
 
 # base class for loggable objects
+
+
 class Loggable:
     """
     Base class for objects that want to be able to log messages with
@@ -788,6 +831,7 @@ _initializedTwisted = False
 # make a singleton
 __theTwistedLogObserver = None
 
+
 def _getTheTwistedLogObserver():
     # used internally and in test
     global __theTwistedLogObserver
@@ -799,6 +843,8 @@ def _getTheTwistedLogObserver():
 
 
 # public helper methods
+
+
 def getFailureMessage(failure):
     """
     Return a short message based on L{twisted.python.failure.Failure}.
@@ -814,6 +860,7 @@ def getFailureMessage(failure):
     return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" \
         % locals()
 
+
 def warningFailure(failure, swallow=True):
     """
     Log a warning about a Failure. Useful as an errback handler:
@@ -825,6 +872,7 @@ def warningFailure(failure, swallow=True):
     warning('', getFailureMessage(failure))
     if not swallow:
         return failure
+
 
 def logTwisted():
     """
@@ -859,6 +907,8 @@ def logTwisted():
 
 # we need an object as the observer because startLoggingWithObserver
 # expects a bound method
+
+
 class TwistedLogObserver(Loggable):
     """
     Twisted log observer that integrates with our logging.

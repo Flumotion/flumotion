@@ -34,6 +34,7 @@ T_ = gettexter()
 
 
 class Soundcard(feedcomponent.ParseLaunchComponent):
+
     def do_check(self):
         self.debug('running PyGTK/PyGST checks')
         from flumotion.component.producers import checks

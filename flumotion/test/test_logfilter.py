@@ -24,9 +24,8 @@ from flumotion.common import testsuite
 from flumotion.component.base import http
 
 
-
-
 class TestLogFilter(testsuite.TestCase):
+
     def testSimpleFilter(self):
         filterdef = "192.168.1.0/24"
         filter = http.LogFilter()

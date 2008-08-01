@@ -23,8 +23,7 @@ from flumotion.common import testsuite
 from flumotion.component.base import watcher
 
 
-
-
 class WatcherTest(testsuite.TestCase):
+
     def testInstantiate(self):
         watcher.BaseWatcher(30)

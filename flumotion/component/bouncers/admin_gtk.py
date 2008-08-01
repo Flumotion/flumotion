@@ -41,6 +41,7 @@ __version__ = "$Rev$"
 
 
 class KeycardsNode(BaseAdminGtkNode):
+
     def render(self):
         self._iters = {} # iter -> data dict mapping
         self.model = gtk.ListStore(str, str, str)
@@ -130,7 +131,9 @@ class KeycardsNode(BaseAdminGtkNode):
         del self._iters[keycard_id]
         self.model.remove(model_iter)
 
+
 class HTPasswdCryptAdminGtk(BaseAdminGtk):
+
     def setup(self):
         # FIXME: have constructor take self instead ?
         keycards = KeycardsNode(self.state, self.admin, _("Keycards"))

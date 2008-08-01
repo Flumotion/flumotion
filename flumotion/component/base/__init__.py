@@ -24,4 +24,3 @@ Base classes for components and their UIs.
 """
 
 __version__ = "$Rev$"
-

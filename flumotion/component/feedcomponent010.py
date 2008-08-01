@@ -51,6 +51,7 @@ class FeedComponent(basecomponent.BaseComponent):
     logCategory = 'feedcomponent'
 
     ### BaseComponent interface implementations
+
     def init(self):
         # add keys for eaters and feeders uiState
         self.feeders = {} # feeder feedName -> Feeder
@@ -134,6 +135,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("Setup completed")
 
     ### FeedComponent interface for subclasses
+
     def create_pipeline(self):
         """
         Subclasses have to implement this method.
@@ -163,6 +165,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self._pad_monitors.attach(pad, elementName)
 
     ### FeedComponent methods
+
     def addEffect(self, effect):
         self.effects[effect.name] = effect
         effect.setComponent(self)
@@ -170,6 +173,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def connect_feeders(self, pipeline):
         # Connect to the client-fd-removed signals on each feeder, so we
         # can clean up properly on removal.
+
         def client_fd_removed(sink, fd, feeder):
             # Called (as a signal callback) when the FD is no longer in
             # use by multifdsink.
@@ -221,6 +225,7 @@ class FeedComponent(basecomponent.BaseComponent):
         return m
 
     def bus_message_received_cb(self, bus, message):
+
         def state_changed():
             if src == self.pipeline:
                 old, new, pending = message.parse_state_changed()
@@ -272,12 +277,14 @@ class FeedComponent(basecomponent.BaseComponent):
         discontinuities.
         @type eaterWatchElements: Dict of elementName => Eater.
         """
+
         def on_element_message(bus, message):
             src = message.src
             name = src.get_name()
             if name in eaterWatchElements:
                 eater = eaterWatchElements[name]
                 s = message.structure
+
                 def timestampDiscont():
                     prevTs = s["prev-timestamp"]
                     prevDuration = s["prev-duration"]
@@ -312,6 +319,7 @@ class FeedComponent(basecomponent.BaseComponent):
         bus.connect("message::element", on_element_message)
 
     def install_eater_event_probes(self, eater):
+
         def fdsrc_event(pad, event):
             # An event probe used to consume unwanted EOS events on eaters.
             # Called from GStreamer threads.
@@ -472,6 +480,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         @returns: a deferred firing a (ip, port, base_time) triple.
         """
+
         def pipelinePaused(r):
             clock = self.pipeline.get_clock()
             # make sure the pipeline sticks with this clock
@@ -511,6 +520,7 @@ class FeedComponent(basecomponent.BaseComponent):
             return defer.maybeDeferred(pipelinePaused, None)
 
     ### BaseComponent interface implementation
+
     def try_start_pipeline(self):
         """
         Tell the component to start.
@@ -621,6 +631,7 @@ class FeedComponent(basecomponent.BaseComponent):
         pygobject.gobject_set_property(element, property, value)
 
     ### methods to connect component eaters and feeders
+
     def reconnectEater(self, eaterAlias):
         if not self.medium:
             self.debug("Can't reconnect eater %s, running "
@@ -751,4 +762,3 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if not pipeline_playing:
             self.try_start_pipeline()
-

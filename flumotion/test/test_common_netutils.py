@@ -30,6 +30,7 @@ from flumotion.common.netutils import addressGetHost, addressGetPort
 
 
 class TestIpv4Parse(testsuite.TestCase):
+
     def assertParseInvariant(self, ipv4String):
         self.assertEquals(ipv4IntToString(ipv4StringToInt(ipv4String)),
                           ipv4String)
@@ -58,7 +59,9 @@ class TestIpv4Parse(testsuite.TestCase):
         self.assertParseFails('1.1.1.256')
         self.assertParseFails('1.1.1.-3')
 
+
 class TestRoutingTable(testsuite.TestCase):
+
     def testAddRemove(self):
         net = RoutingTable()
         net.addSubnet('foo', '192.168.0.0', 24)
@@ -214,6 +217,7 @@ class TestRoutingTable(testsuite.TestCase):
 
 
 class TestAddress(testsuite.TestCase):
+
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
 

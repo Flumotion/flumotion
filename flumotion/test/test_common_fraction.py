@@ -25,6 +25,7 @@ from flumotion.common.fraction import fractionFromValue, fractionAsFloat, \
 
 
 class TestFraction(TestCase):
+
     def testFractionFromValue(self):
         self.assertEquals(fractionFromValue('1'), (1, 1))
         self.assertEquals(fractionFromValue('1/1'), (1, 1))

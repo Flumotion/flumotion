@@ -35,6 +35,7 @@ _PREFERRED_AUDIO_ENCODER = "vorbis"
 # the denominator arg for all calls of this function was sniffed from
 # the glade file's spinbutton adjustment
 
+
 def _fraction_from_float(number, denominator):
     """
     Return a string to be used in serializing to XML.
@@ -193,6 +194,7 @@ class ConversionStep(WorkerWizardStep):
             self._videoEncoder = encoder
 
     def _loadPlugin(self, entry):
+
         def gotFactory(factory):
             return factory(self.wizard)
 
@@ -225,6 +227,7 @@ class ConversionStep(WorkerWizardStep):
         return d
 
     def _getAudioPage(self):
+
         def stepLoaded(step):
             if step is not None:
                 self._audioEncoder = step.model
@@ -236,6 +239,7 @@ class ConversionStep(WorkerWizardStep):
         return d
 
     def _getVideoPage(self):
+
         def stepLoaded(step):
             if step is not None:
                 self._videoEncoder = step.model
@@ -260,4 +264,3 @@ class ConversionStep(WorkerWizardStep):
 
     def on_muxer__changed(self, combo):
         self._muxerChanged()
-

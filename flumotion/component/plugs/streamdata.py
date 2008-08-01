@@ -29,6 +29,7 @@ class StreamDataProvider(base.ComponentPlug):
     Base class for streamdata plugs, a plug that allows a streamer's
     getStreamData() method to be pluggable.
     """
+
     def getStreamData(self):
         """Get the stream data for a streamer.
 
@@ -38,6 +39,7 @@ class StreamDataProvider(base.ComponentPlug):
         core does not currently include such a component, however.
         """
         raise NotImplementedError
+
 
 class ExampleStreamDataProvider(StreamDataProvider):
     description = None

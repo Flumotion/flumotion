@@ -89,6 +89,7 @@ def guess_public_ip():
 
     return '127.0.0.1'
 
+
 def guess_public_hostname():
     """
     Attempt to guess a public hostname for this system.
@@ -99,6 +100,7 @@ def guess_public_hostname():
         return socket.gethostbyaddr(ip)[0]
     except socket.error:
         return ip
+
 
 def ipv4StringToInt(s):
     try:
@@ -114,12 +116,14 @@ def ipv4StringToInt(s):
         ret += n
     return ret
 
+
 def ipv4IntToString(n):
     l = []
     for i in range(4):
         l.append((n>>(i*8)) & 0xff)
     l.reverse()
     return '.'.join(map(str, l))
+
 
 def countTrailingZeroes32(n):
     tz = 0
@@ -131,7 +135,9 @@ def countTrailingZeroes32(n):
             tz += 1
     return tz
 
+
 class RoutingTable(object):
+
     def fromFile(klass, f, requireNames=True, defaultRouteName='*default*'):
         """
         Make a new routing table, populated from entries in an open
@@ -246,6 +252,7 @@ class RoutingTable(object):
         # Yield the default route
         yield None
 
+
 def addressGetHost(a):
     """
     Get the host name of an IPv4 address.
@@ -264,6 +271,7 @@ def addressGetHost(a):
         host = a[1]
     return host
 
+
 def addressGetPort(a):
     """
     Get the port number of an IPv4 address.
@@ -276,6 +284,7 @@ def addressGetPort(a):
     except AttributeError:
         port = a[2]
     return port
+
 
 def tryPort(port=0):
     """Checks if the given port is unused

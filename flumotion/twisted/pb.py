@@ -60,6 +60,7 @@ __version__ = "$Rev$"
 # this way you can request a different avatarId than the user you authenticate
 # with, or you can login without a username
 
+
 class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     """
     I am an extended Perspective Broker client factory using generic
@@ -85,11 +86,13 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     _fpbconnector = None
 
     ## from protocol.ClientFactory
+
     def startedConnecting(self, connector):
         self._fpbconnector = connector
         return pb.PBClientFactory.startedConnecting(self, connector)
 
     ## from twisted.spread.pb.ClientFactory
+
     def disconnect(self):
         if self._fpbconnector:
             try:
@@ -104,6 +107,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
 
         @rtype: L{twisted.internet.defer.Deferred} returning list of str
         """
+
         def getRootObjectCb(root):
             return root.callRemote('getKeycardClasses')
 
@@ -200,6 +204,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         self.debug("FPBClientFactory(): authenticated %r" % keycard)
         return keycard
 
+
 class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
                                   protocol.ReconnectingClientFactory):
     """
@@ -244,11 +249,13 @@ class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
         self._doingLogin = True
 
     # methods to override
+
     def gotDeferredLogin(self, deferred):
         """
         The deferred from login is now available.
         """
         raise NotImplementedError
+
 
 class ReconnectingFPBClientFactory(FPBClientFactory,
                                    protocol.ReconnectingClientFactory):
@@ -294,12 +301,14 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
 
     # TODO: This is a poorly named method; it just provides the appropriate
     # authentication information, and doesn't actually _start_ login at all.
+
     def startLogin(self, authenticator):
         assert not isinstance(authenticator, keycards.Keycard)
         self._authenticator = authenticator
         self._doingLogin = True
 
     # methods to override
+
     def gotDeferredLogin(self, deferred):
         """
         The deferred from login is now available.
@@ -312,6 +321,8 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
 # in other terms, you can request different "kinds" of avatars from the same
 # PB server.
 # this code needs to be sent upstream to Twisted
+
+
 class _FPortalRoot:
     """
     Root object, used to login to bouncer.
@@ -327,6 +338,7 @@ class _FPortalRoot:
 
     def rootObject(self, broker):
         return _BouncerWrapper(self.bouncerPortal, broker)
+
 
 class _BouncerWrapper(pb.Referenceable, flog.Loggable):
 
@@ -359,6 +371,7 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
             - a L{flumotion.common.errors.NotAuthenticatedError} when
               authentication is denied
         """
+
         def loginResponse(result):
             self.log("loginResponse: result=%r", result)
             # if the result is a keycard, we're not yet ready
@@ -377,6 +390,7 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
         d = self.bouncerPortal.login(keycard, mind, *interfaces)
         d.addCallback(loginResponse)
         return d
+
 
 class Authenticator(flog.Loggable, pb.Referenceable):
     """
@@ -455,11 +469,13 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         return defer.succeed(None)
 
     # non-challenge types
+
     def issue_KeycardUACPP(self):
         return keycards.KeycardUACPP(self.username, self.password,
             self.address)
 
     # challenge types
+
     def issue_KeycardUACPCC(self):
         return keycards.KeycardUACPCC(self.username, self.address)
 
@@ -494,11 +510,13 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         return keycard
 
     ### pb.Referenceable methods
+
     def remote_issue(self, interfaces):
         return self.issue(interfaces)
 
     def remote_respond(self, keycard):
         return self.respond(keycard)
+
 
 class RemoteAuthenticator:
     """
@@ -519,6 +537,7 @@ class RemoteAuthenticator:
         return ret
 
     def issue(self, interfaces):
+
         def issueCb(keycard):
             keycard.avatarId = self.avatarId
             return keycard
@@ -541,6 +560,7 @@ class Referenceable(pb.Referenceable, flog.Loggable):
 
 
     # a referenceable that logs receiving remote messages
+
     def remoteMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args)
         kwargs = broker.unserialize(kwargs)
@@ -566,12 +586,14 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         d = defer.maybeDeferred(method, *args, **kwargs)
 
         # log coming out of the method
+
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
                 '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
+
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
@@ -581,6 +603,7 @@ class Referenceable(pb.Referenceable, flog.Loggable):
 
         d.addCallbacks(callback, errback)
         return broker.serialize(d, self.perspective)
+
 
 class Avatar(pb.Avatar, flog.Loggable):
     """
@@ -597,6 +620,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         self.debug("created new Avatar with id %s", avatarId)
 
     # a referenceable that logs receiving remote messages
+
     def perspectiveMessageReceived(self, broker, message, args, kwargs):
         args = broker.unserialize(args)
         kwargs = broker.unserialize(kwargs)
@@ -625,12 +649,14 @@ class Avatar(pb.Avatar, flog.Loggable):
         d = defer.maybeDeferred(method, *args, **kwargs)
 
         # log coming out of the method
+
         def callback(result):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
                 '): %r', (flog.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
+
         def errback(failure):
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
@@ -654,6 +680,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         """
         self.mind = mind
+
         def nullMind(x):
             self.debug('%r: disconnected from %r' % (self, self.mind))
             self.mind = None
@@ -733,6 +760,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         if self.mind:
             return self.mind.broker.transport.loseConnection()
 
+
 class PingableAvatar(Avatar):
     _pingCheckInterval = configure.heartbeatInterval * 2.5
 
@@ -770,6 +798,7 @@ class PingableAvatar(Avatar):
         self.mind.notifyOnDisconnect(stopPingCheckingCb)
 
         # Now we have a remote reference, so start checking pings.
+
         def _disconnect():
             if self.mind:
                 self.mind.broker.transport.loseConnection()

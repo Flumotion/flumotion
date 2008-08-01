@@ -36,6 +36,7 @@ class AdminAction(base.ManagerPlug):
     has the right permissions, and some others might want to log the
     action to a database. Defines the admin action API methods.
     """
+
     def action(self, identity, method, args, kwargs):
         """
         @type  identity: L{flumotion.common.identity.Identity}

@@ -38,6 +38,7 @@ _ = gettext.gettext
 
 
 class HTTPCommon(object):
+
     def __init__(self):
         self.has_client_limit = False
         self.has_bandwidth_limit = False

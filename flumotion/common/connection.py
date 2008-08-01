@@ -56,6 +56,8 @@ pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
 
 
 _pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
+
+
 def parsePBConnectionInfo(string, username='user', password='test',
                           port=7531, use_ssl=True):
     """

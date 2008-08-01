@@ -32,6 +32,7 @@ class Logger(base.ComponentPlug):
     Base class for logger implementations. Should be renamed to
     StreamLogger later...
     """
+
     def event(self, type, args):
         """
         Handle a log event.
@@ -50,6 +51,7 @@ class Logger(base.ComponentPlug):
         # do nothing by default
         pass
 
+
 def _http_session_completed_to_apache_log(args):
     # ident is something that should in theory come from identd but in
     # practice is never there
@@ -61,6 +63,7 @@ def _http_session_completed_to_apache_log(args):
                args['method'], args['uri'], args['clientproto'],
                args['response'], args['bytes-sent'], args['referer'],
                args['user-agent'], args['time-connected']))
+
 
 class ApacheLogger(Logger):
     filename = None

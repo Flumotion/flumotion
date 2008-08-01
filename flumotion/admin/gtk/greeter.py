@@ -378,6 +378,8 @@ class Greeter(SimpleWizard):
 
 
 # This is used by the gtk admin to connect to an existing manager
+
+
 class ConnectExisting(SimpleWizard):
     name = 'greeter'
     steps = [ConnectToExisting, Authenticate]

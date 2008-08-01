@@ -37,7 +37,10 @@ T_ = gettexter()
 # the plurality
 
 # this test uses the class-based gettext API
+
+
 class TestSingularClassbased(testsuite.TestCase):
+
     def setUp(self):
         localedir = os.path.join(configure.localedatadir, 'locale')
         mo = gettext.find(configure.PACKAGE, localedir, ["nl_NL"])
@@ -58,7 +61,10 @@ class TestSingularClassbased(testsuite.TestCase):
 # these tests use the regular gettext API
 
 # helper class for gettext API tests
+
+
 class TestGettext(testsuite.TestCase):
+
     def setUp(self):
         self.oldlocaledir = gettext.bindtextdomain(configure.PACKAGE)
         self.oldlocale = locale.setlocale(locale.LC_MESSAGES)
@@ -78,7 +84,9 @@ class TestGettext(testsuite.TestCase):
         gettext.bindtextdomain(configure.PACKAGE, self.oldlocaledir)
         locale.setlocale(locale.LC_MESSAGES, self.oldlocale)
 
+
 class TestSingularGettext(TestGettext):
+
     def setUp(self):
         TestGettext.setUp(self)
         self.able = N_("I am a translatable string")
@@ -92,7 +100,9 @@ class TestSingularGettext(TestGettext):
     def testTranslated(self):
         self.assertEquals(self.ed, "Ik ben een vertaalde string")
 
+
 class TestPluralGettext(TestGettext):
+
     def setUp(self):
         TestGettext.setUp(self)
 
@@ -127,7 +137,9 @@ class TestPluralGettext(TestGettext):
         self.assertEquals(self.edcount, "Ik vertaalde %d dingen")
         self.assertEquals(self.edcount % 5, "Ik vertaalde 5 dingen")
 
+
 class TranslatableTest(testsuite.TestCase):
+
     def testTranslatable(self):
         t = T_(N_("%s can be translated"), "I")
         self.assertEquals(t.domain, configure.PACKAGE)
@@ -152,7 +164,9 @@ class TranslatableTest(testsuite.TestCase):
         text = self.nl.ngettext(t.singular, t.plural, t.count) % t.args
         self.assertEquals(text, "Andy 3 heeft 5 dingen")
 
+
 class TranslatorTest(testsuite.TestCase):
+
     def testTranslateOne(self):
         t = T_(N_("%s can be translated"), "Andy")
 
@@ -175,7 +189,9 @@ class TranslatorTest(testsuite.TestCase):
         text = translator.translate(mmsg, lang=["nl_NL"])
         self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
 
+
 class TestFormat(testsuite.TestCase):
+
     def testFormat(self):
         t = T_('string with a %s format', 'X')
         self.assertEquals(t.untranslated(), 'string with a X format')
@@ -183,4 +199,3 @@ class TestFormat(testsuite.TestCase):
     def testFormatNoArgument(self):
         t = T_('string with a %s format')
         self.assertEquals(t.untranslated(), 'string with a %s format')
-

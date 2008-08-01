@@ -204,6 +204,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
         'close the connection'
         self.emit('stopped', self._id, reason)
 
+
 class HTTPClientStatic(HTTPClient):
     """
     HTTP client reading at regular intervals with a fixed read size and
@@ -211,6 +212,7 @@ class HTTPClientStatic(HTTPClient):
     """
 
     logCategory = "h-c-s"
+
     def __init__(self, id, url, rate = 5000, readsize = 1024):
         self._rate = rate
         self._readsize = readsize

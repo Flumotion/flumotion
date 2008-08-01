@@ -21,7 +21,10 @@
 
 # this class is a bit of an experiment
 # editor's note: "experiment" is an excuse for undocumented and uncommented
+
+
 class StateWatcher(object):
+
     def __init__(self, state, setters, appenders, removers,
             setitemers=None, delitemers=None):
         self.state = state
@@ -81,4 +84,3 @@ class StateWatcher(object):
                     self.onRemove(self.state, k, v)
             self.state.removeListener(self)
             self.state = None
-

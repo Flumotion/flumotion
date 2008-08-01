@@ -31,6 +31,7 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     I am a base class for all GTK+-based component effect Admin UI nodes.
     I am a view on a set of properties for an effect on a component.
     """
+
     def __init__(self, state, admin, effectName, title=None):
         """
         @param state: state of component this is a UI for

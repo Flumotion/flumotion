@@ -78,6 +78,7 @@ class PadMonitor(log.Loggable):
             d.callback(None)
 
     def _check_timeout(self):
+
         def probe_cb(pad, buffer):
             """
             Periodically scheduled buffer probe, that ensures that we're
@@ -155,7 +156,9 @@ class PadMonitor(log.Loggable):
         for setActive in self._doSetActive:
             setActive(self.name)
 
+
 class EaterPadMonitor(PadMonitor):
+
     def __init__(self, pad, name, setActive, setInactive,
                  reconnectEater, *args):
         PadMonitor.__init__(self, pad, name, setActive, setInactive)
@@ -185,6 +188,7 @@ class EaterPadMonitor(PadMonitor):
 
 
 class PadMonitorSet(dict, log.Loggable):
+
     def __init__(self, setActive, setInactive):
         # These callbacks will be called when the set as a whole is
         # active or inactive.
@@ -198,6 +202,7 @@ class PadMonitorSet(dict, log.Loggable):
         If data flow ceases for too long, we turn hungry. If data flow resumes,
         we return to happy.
         """
+
         def monitorActive(name):
             self.info('Pad data flow at %s is active', name)
             if self.isActive() and not self._wasActive:

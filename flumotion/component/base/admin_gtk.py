@@ -45,6 +45,7 @@ T_ = gettexter()
 # stupid pychecker
 dir(locale)
 
+
 class BaseAdminGtk(log.Loggable):
     """
     I am a base class for all GTK+-based Admin views.
@@ -109,6 +110,7 @@ class BaseAdminGtk(log.Loggable):
 
     # FIXME: .setup() is subclassable, while .render() on nodes has
     # haveWidgetTree.  choose one of the two patterns in general
+
     def setup(self):
         """
         Set up the admin view so it can display nodes.
@@ -176,6 +178,7 @@ class BaseAdminGtk(log.Loggable):
         return self.nodes
 
     # FIXME: deprecated
+
     def render(self):
         """
         Render the GTK+ admin view for this component and return the
@@ -197,5 +200,3 @@ class BaseAdminGtk(log.Loggable):
 
     def stateRemove(self, object, key, value):
         self.uiStateChanged(object)
-
-

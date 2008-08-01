@@ -81,4 +81,3 @@ def getWebLink(section, anchor, version=None, projectURL=None):
 
     return '%s/%s/%s/html/%s.html#%s' % (
         projectURL, getLL(), version, section, anchor)
-

@@ -102,7 +102,9 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             connector, reason)
 
     # vmethod implementation
+
     def gotDeferredLogin(self, d):
+
         def success(remote):
             self.medium.setRemoteReference(remote)
 
@@ -138,6 +140,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
+
+
 class AdminModel(medium.PingingMedium, signals.SignalMixin):
     """
     I live in the admin client.
@@ -307,6 +311,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return self.connectToManager(self.connectionInfo, keepTrying)
 
     # FIXME: give these three sensible names
+
     def adminInfoStr(self):
         return self.managerId
 
@@ -317,6 +322,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
                                and 'https' or 'http')
 
     # used in fgc
+
     def managerInfoStr(self):
         assert self.planet
         return '%s (%s)' % (self.planet.get('name'), self.managerId)
@@ -339,6 +345,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference %r", remoteReference)
+
         def gotPlanetState(planet):
             self.planet = planet
             # monkey, Monkey, MONKEYPATCH!!!!!
@@ -388,6 +395,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         medium.PingingMedium.setRemoteReference(self, remoteReference)
 
         # fixme: push the disconnect notification upstream
+
         def remoteDisconnected(remoteReference):
             self.debug("emitting disconnected")
             self.connected = False
@@ -403,10 +411,12 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
     ### model functions; called by UI's to send requests to manager or comp
 
     ## view management functions
+
     def isConnected(self):
         return self.connected
 
     ## generic remote call methods
+
     def componentCallRemote(self, componentState, methodName, *args, **kwargs):
         """
         Call the given method on the given component with the given args.
@@ -421,6 +431,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         d = self.callRemote('componentCallRemote',
                             componentState, methodName,
                             *args, **kwargs)
+
         def errback(failure):
             msg = None
             if failure.check(errors.NoMethodError):
@@ -456,6 +467,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
                                methodName, *args, **kwargs)
 
     ## manager remote methods
+
     def loadConfiguration(self, xml_string):
         return self.callRemote('loadConfiguration', xml_string)
 
@@ -466,6 +478,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         return self.callRemote('cleanComponents')
 
     ## worker remote methods
+
     def checkElements(self, workerName, elements):
         return self.workerCallRemote(workerName, 'checkElements', elements)
 

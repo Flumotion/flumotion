@@ -128,7 +128,9 @@ class FilenameNode(BaseAdminGtkNode):
             failure.type, failure.getErrorMessage()))
         return None
 
+
 class DiskerAdminGtk(BaseAdminGtk):
+
     def setup(self):
         filename = FilenameNode(self.state, self.admin, "Filename")
         self.nodes['Filename'] = filename

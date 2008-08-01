@@ -41,7 +41,6 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 
-
 class ComponentAdminGtkNode(BaseAdminGtkNode):
     gladeFile = os.path.join('flumotion', 'component', 'base',
         'component.glade')
@@ -192,6 +191,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
                 self.stateSet(uiState, key, uiState.get(key))
 
     # IStateListener Interface
+
     def stateSet(self, object, key, value):
         if key == 'cpu-percent':
             self._updateCPU(value)
@@ -207,4 +207,3 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
     def stateRemove(self, object, key, value):
         pass
-

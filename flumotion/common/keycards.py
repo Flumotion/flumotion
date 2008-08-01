@@ -71,6 +71,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.state = REQUESTING
 
     # F0.8
+
     def setDomain(self, domain):
         """
         Set the domain of the requester on the keycard.
@@ -110,11 +111,14 @@ pb.setUnjellyableForClass(KeycardGeneric, KeycardGeneric)
 
 
 UCPP = credentials.UsernameCryptPasswordPlaintext
+
+
 class KeycardUACPP(Keycard, UCPP):
     """
     I am a keycard with a username, plaintext password and IP address.
     I get authenticated against a crypt password.
     """
+
     def __init__(self, username, password, address):
         UCPP.__init__(self, username, password)
         Keycard.__init__(self)
@@ -138,11 +142,14 @@ pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 
 
 UCPCC = credentials.UsernameCryptPasswordCryptChallenger
+
+
 class KeycardUACPCC(Keycard, UCPCC):
     """
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a crypt password.
     """
+
     def __init__(self, username, address):
         UCPCC.__init__(self, username)
         Keycard.__init__(self)
@@ -190,11 +197,14 @@ pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 
 
 USPCC = credentials.UsernameSha256PasswordCryptChallenger
+
+
 class KeycardUASPCC(Keycard, USPCC):
     """
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a SHA-256 password.
     """
+
     def __init__(self, username, address):
         USPCC.__init__(self, username)
         Keycard.__init__(self)
@@ -215,6 +225,7 @@ pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
 
 
 class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
+
     def __init__(self, username):
         credentials.HTTPDigestChallenger.__init__(self, username)
         Keycard.__init__(self)
@@ -234,7 +245,10 @@ pb.setUnjellyableForClass(KeycardHTTPDigest, KeycardHTTPDigest)
 
 
 # F0.8
+
+
 class HTTPDigestKeycard(KeycardHTTPDigest):
+
     def __init__(self, username):
         import warnings
         warnings.warn('Use KeycardHTTPDigest instead.', DeprecationWarning,

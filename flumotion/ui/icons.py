@@ -49,6 +49,7 @@ def _register_stock_icons(names):
         ifact.add(stock_name, iset)
     ifact.add_default()
 
+
 def register_icons():
     iconfile = os.path.join(configure.imagedir, 'flumotion.png')
     gtk.window_set_default_icon_from_file(iconfile)

@@ -22,9 +22,8 @@
 from flumotion.common import testsuite
 
 
-
-
 class TestPublicUI(testsuite.TestCase):
+
     def testPublicUIAPI(self):
         from flumotion.admin.admin import AdminModel
         from flumotion.admin.gtk import connections

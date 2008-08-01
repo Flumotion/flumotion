@@ -31,9 +31,8 @@ import twisted.python.util
 from twisted.trial.unittest import FailTest
 
 
-
-
 class TestPackagePath(testsuite.TestCase):
+
     def setUp(self):
         # store our old sys.path
         self.syspath = sys.path[:]
@@ -71,6 +70,7 @@ class TestPackagePath(testsuite.TestCase):
         self.assertRaises(ImportError, self._import, "mypackage.B")
 
     # create the file system layout for our test
+
     def _createOne(self):
         self.onedir = os.path.join(self.tempdir, "one")
         os.mkdir(self.onedir)
@@ -106,10 +106,12 @@ class TestPackagePath(testsuite.TestCase):
 
     # a way of making import statements into functions so we can
     # use assertRaises
+
     def _import(self, which):
         exec("import %s" % which)
 
     # a way of failing if a method call raises
+
     def _failIfRaises(self, exception, f, *args, **kwargs):
         self._assertions += 1
         try:
@@ -259,7 +261,9 @@ class TestPackagePath(testsuite.TestCase):
         HTMLDOMImplementation
         packager.unregister()
 
+
 class TestRecursively(testsuite.TestCase):
+
     def testListDir(self):
         self.tempdir = tempfile.mkdtemp()
 

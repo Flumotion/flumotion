@@ -270,6 +270,7 @@ class Scheduler(log.Loggable):
                 self._delayedCall.cancel()
             self._delayedCall = None
 
+
 class ICalScheduler(Scheduler):
 
     def __init__(self, fileObj):
@@ -290,6 +291,7 @@ class ICalScheduler(Scheduler):
         parseFromFile(fileObj)
 
         if hasattr(fileObj, 'name'):
+
             def fileChanged(f):
                 self.debug("ics file changed")
                 parseFromFile(open(f, 'r'))

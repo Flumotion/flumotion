@@ -242,6 +242,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         return self.medium.callRemote('expireKeycard',
                                       keycard.requesterId, keycard.id)
 
+
 class TrivialBouncerPlug(BouncerPlug):
     """
     A very trivial bouncer implementation.
@@ -256,6 +257,7 @@ class TrivialBouncerPlug(BouncerPlug):
         keycard.state = keycards.AUTHENTICATED
 
         return keycard
+
 
 class ChallengeResponseBouncerPlug(BouncerPlug):
     """

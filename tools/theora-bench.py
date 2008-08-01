@@ -10,7 +10,9 @@ import gst
 import time
 import sys
 
+
 class SlidingWindow:
+
     def __init__(self, size):
         self._window = [0.0] * size
 
@@ -35,7 +37,9 @@ class SlidingWindow:
         if self.average > self.max:
             self.max = self.average
 
+
 class TheoraBench:
+
     def __init__(self, filename, outTemplate, width=None, height=None,
         framerate=None):
         self.framerate = None

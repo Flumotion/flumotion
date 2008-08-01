@@ -41,6 +41,7 @@ from flumotion.wizard.save import WizardSaver
 
 
 class TestXMLWriter(testsuite.TestCase):
+
     def testEmpty(self):
         writer = ConfigurationWriter('', [], [])
         testsuite.diffStrings(
@@ -155,6 +156,7 @@ class TestXMLWriter(testsuite.TestCase):
 
 
 class TestWizardSave(testsuite.TestCase):
+
     def _createAudioProducer(self, componentType='audio-producer',
                              worker='audio-producer-worker'):
         audioProducer = AudioProducer()
@@ -946,7 +948,9 @@ class TestWizardSave(testsuite.TestCase):
              '</planet>\n' % dict(version=configure.version)),
             configuration)
 
+
 class TestNameConflicts(testsuite.TestCase):
+
     def setUp(self):
         self.save = WizardSaver()
 

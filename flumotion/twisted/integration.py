@@ -108,16 +108,26 @@ __version__ = "$Rev$"
 # the waker. This is twisted bug #1997.
 reactor.wakeUp = lambda: reactor.waker and reactor.waker.wakeUp()
 
+
 def log(format, *args):
     flog.doLog(flog.LOG, None, 'integration', format, args, -2)
+
+
 def debug(format, *args):
     flog.doLog(flog.DEBUG, None, 'integration', format, args, -2)
+
+
 def info(format, *args):
     flog.doLog(flog.INFO, None, 'integration', format, args, -2)
+
+
 def warning(format, *args):
     flog.doLog(flog.WARN, None, 'integration', format, args, -2)
+
+
 def error(format, *args):
     flog.doLog(flog.ERROR, None, 'integration', format, args, -2)
+
 
 def _which(executable):
     if os.sep in executable:
@@ -129,39 +139,53 @@ def _which(executable):
                 return os.path.join(path, executable)
     raise CommandNotFoundException(executable)
 
+
 class UnexpectedExitCodeException(Exception):
+
     def __init__(self, process, expectedCode, actualCode):
         Exception.__init__(self)
         self.process = process
         self.expected = expectedCode
         self.actual = actualCode
+
     def __str__(self):
         return ('Expected exit code %r from %r, but got %r'
                 % (self.expected, self.process, self.actual))
 
+
 class UnexpectedExitException(Exception):
+
     def __init__(self, process):
         Exception.__init__(self)
         self.process = process
+
     def __str__(self):
         return 'The process %r exited prematurely.' % self.process
 
+
 class CommandNotFoundException(Exception):
+
     def __init__(self, command):
         Exception.__init__(self)
         self.command = command
+
     def __str__(self):
         return 'Command %r not found in the PATH.' % self.command
 
+
 class ProcessesStillRunningException(Exception):
+
     def __init__(self, processes):
         Exception.__init__(self)
         self.processes = processes
+
     def __str__(self):
         return ('Processes still running at end of test: %r'
                 % (self.processes, ))
 
+
 class TimeoutException(Exception):
+
     def __init__(self, process, status):
         self.process = process
         self.status = status
@@ -170,7 +194,9 @@ class TimeoutException(Exception):
         return ('Timed out waiting for %r to exit with status %r'
                 % (self.process, self.status))
 
+
 class ProcessProtocol(protocol.ProcessProtocol):
+
     def __init__(self):
         self.exitDeferred = defer.Deferred()
         self.timedOut = False
@@ -264,6 +290,7 @@ class Process:
         assert self.state != self.NOT_STARTED
         info('waiting for process %r to exit', self)
         d = self.protocol.getDeferred()
+
         def got_exit(res):
             debug('process %r exited with status %r', self, res)
             if res != status:
@@ -276,6 +303,7 @@ class Process:
                                                 self.protocol.timeout,
                                                 self,
                                                 status)
+
             def cancel_timeout(res):
                 debug('cancelling timeout for %r', self)
                 if self._timeoutDC.active():
@@ -286,6 +314,7 @@ class Process:
 
     def __repr__(self):
         return '<Process %s in state %s>' % (self.name, self.state)
+
 
 class PlanExecutor:
     # both the vm and its ops
@@ -313,6 +342,7 @@ class PlanExecutor:
 
     def wait(self, process, exitCode):
         assert process in self.processes
+
         def remove_from_processes_list(_):
             self.processes.remove(process)
         d = process.wait(exitCode, timeout=self.timeout)
@@ -331,11 +361,13 @@ class PlanExecutor:
                     continue
                 d = defer.Deferred()
                 dlist.append(d)
+
                 def callbacker(d):
                     return lambda status: d.callback(status.value.exitCode)
                 p.protocol.processEnded = callbacker(d)
                 p.kill(sig=signal.SIGKILL)
             d = defer.DeferredList(dlist)
+
             def error(_):
                 if failure:
                     return failure
@@ -348,6 +380,7 @@ class PlanExecutor:
     def run(self, ops, timeout=20):
         self.timeout = timeout
         d = defer.Deferred()
+
         def run_op(_, op):
             # print 'Last result: %r' % (_, )
             # print 'Now running: %s(%r)' % (op[0].__name__, op[1:])
@@ -364,7 +397,9 @@ class PlanExecutor:
         reactor.callLater(0, d.callback, None)
         return d
 
+
 class Plan:
+
     def __init__(self, testCase, testName):
         self.name = testName
         self.testCaseName = testCase.__class__.__name__
@@ -452,8 +487,10 @@ class Plan:
         d.addCallback(lambda _: self._cleanOutputDir())
         return d
 
+
 def test(proc):
     testName = proc.__name__
+
     def wrappedtest(self):
         plan = Plan(self, testName)
         proc(self, plan)

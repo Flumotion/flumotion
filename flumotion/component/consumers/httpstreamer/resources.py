@@ -65,6 +65,8 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
 ### the Twisted resource that handles the base URL
+
+
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
@@ -183,6 +185,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._redirectOnFull = url
 
     # FIXME: rename to writeHeaders
+
     def _writeHeaders(self, request):
         """
         Write out the HTTP headers for the incoming HTTP request.
@@ -379,6 +382,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     ### resource.Resource methods
 
     # this is the callback receiving the request initially
+
     def _render(self, request):
         fd = request.transport.fileno()
         # we store the fd again in the request using it as an id for later
@@ -468,6 +472,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     render_GET = _render
     render_HEAD = _render
+
 
 class HTTPRoot(web_resource.Resource, log.Loggable):
     logCategory = "httproot"

@@ -36,8 +36,11 @@ __version__ = "$Rev: 6693 $"
 # Taken from twisted.python.util; modified so that if compareAttributes
 # grows, but we get a message from a remote side that doesn't have one
 # of the new attributes, that we don't raise an exception
+
+
 class FancyEqMixin:
     compareAttributes = ()
+
     def __eq__(self, other):
         if not self.compareAttributes:
             return self is other
@@ -57,17 +60,20 @@ class FancyEqMixin:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
 def N_(format):
     """
     Mark a singular string for translation, without translating it.
     """
     return format
 
+
 def ngettext(singular, plural, count):
     """
     Mark a plural string for translation, without translating it.
     """
     return (singular, plural, count)
+
 
 def gettexter(domain=configure.PACKAGE):
     """
@@ -82,6 +88,7 @@ def gettexter(domain=configure.PACKAGE):
 
     @param domain: the gettext domain to create translatables for.
     """
+
     def create(format, *args):
         if isinstance(format, str):
             return TranslatableSingular(domain, format, *args)
@@ -104,6 +111,7 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
 # of two different Copyable objects, but with the same args, will
 # also pass equality
 # For our purposes, this is fine.
+
 
 class TranslatableSingular(Translatable, FancyEqMixin):
     """
@@ -241,6 +249,7 @@ class Translator(log.Loggable):
             strings.append(self.translateTranslatable(t, lang))
         return "".join(strings)
 
+
 def getLL():
     """
     Return the (at most) two-letter language code set for message translation.
@@ -255,6 +264,7 @@ def getLL():
         LL = lang[:2]
 
     return LL
+
 
 def installGettext():
     """

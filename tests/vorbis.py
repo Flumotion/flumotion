@@ -27,6 +27,7 @@ import gst
 import gobject
 gobject.threads_init()
 
+
 def make_pipeline():
     s = ('audiotestsrc num-buffers=1000 ! audio/x-raw-int,channels=1,rate=8000'
          ' ! audioresample name=ar ! audioconvert ! capsfilter name=cf'
@@ -35,6 +36,7 @@ def make_pipeline():
     return gst.parse_launch(s)
 
 handle = None
+
 
 def buffer_probe(pad, buffer, cf):
     # this comes from another thread
@@ -48,6 +50,7 @@ def buffer_probe(pad, buffer, cf):
                     gst.caps_from_string(caps_str))
     pad.remove_buffer_probe(handle)
     return True
+
 
 def setup_pipeline():
     global handle

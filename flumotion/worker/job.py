@@ -40,7 +40,9 @@ T_ = gettexter()
 
 
 class ComponentJobAvatar(base.BaseJobAvatar):
+
     def haveMind(self):
+
         def bootstrap(*args):
             return self.mindCallRemote('bootstrap', *args)
 
@@ -239,8 +241,10 @@ class ComponentJobHeaven(base.BaseJobHeaven):
 
 
 class CheckJobAvatar(base.BaseJobAvatar):
+
     def haveMind(self):
         # FIXME: drills down too much?
+
         def gotPid(pid):
             self.pid = pid
             job = self._heaven.getJobInfo(pid)
@@ -312,7 +316,9 @@ class CheckJobHeaven(base.BaseJobHeaven):
         return d
 
     def runCheck(self, bundles, moduleName, methodName, *args, **kwargs):
+
         def haveJob(job):
+
             def callProc(_):
                 return job.mindCallRemote('runFunction', moduleName,
                                           methodName, *args, **kwargs)

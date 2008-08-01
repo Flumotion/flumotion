@@ -26,15 +26,15 @@ from flumotion.common import testsuite
 from flumotion.admin import config
 
 
-
-
 def AdminConfig(sockets, string):
     f = StringIO(string)
     conf = config.AdminConfigParser(sockets, f)
     f.close()
     return conf
 
+
 class AdminConfigTest(testsuite.TestCase):
+
     def testMinimal(self):
         doc = ('<admin>'
                '<plugs>'
@@ -80,4 +80,3 @@ class AdminConfigTest(testsuite.TestCase):
                '</admin>')
         self.assertRaises(errors.ConfigError,
                           lambda: AdminConfig(('foo.bar', ), doc))
-

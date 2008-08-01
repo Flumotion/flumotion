@@ -29,12 +29,11 @@ from flumotion.common import testsuite
 from flumotion.twisted import integration
 
 
-
-
 def _call_in_reactor(proc):
     # Because twisted doesn't have its signal handlers installed until
     # the reactor is running, we have to wrap the low-level tests in a
     # callLater.
+
     def test(self):
         d = defer.Deferred()
         d.addCallback(lambda _: proc(self))
@@ -47,7 +46,9 @@ def _call_in_reactor(proc):
         pass
     return test
 
+
 class IntegrationProcessTest(testsuite.TestCase):
+
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
 
@@ -79,6 +80,7 @@ class IntegrationProcessTest(testsuite.TestCase):
 
         def cleanup(_):
             d = defer.Deferred()
+
             def processEnded(res):
                 d.callback(res)
             # bypass the already-timed-out check
@@ -103,6 +105,7 @@ class IntegrationProcessTest(testsuite.TestCase):
 
 
 class IntegrationPlanGenerationTest(testsuite.TestCase):
+
     def assertPlansEqual(self, expected, got):
         if got != expected:
             # pretty-print first
@@ -136,7 +139,9 @@ class IntegrationPlanGenerationTest(testsuite.TestCase):
                                          (plan.vm.wait, process, None)])
         plan._cleanOutputDir()
 
+
 class IntegrationPlanExecuteTest(testsuite.TestCase):
+
     def testTransientProcess(self):
         plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')
@@ -180,14 +185,18 @@ class IntegrationPlanExecuteTest(testsuite.TestCase):
         return d
 
 # the decorator handles compat issues
+
+
 class IntegrationTestDecoratorTest(testsuite.TestCase):
     #@integration.test <- FIXME: P2.3
+
     def testTransientProcess(self, plan):
         p = plan.spawn('echo', 'foo')
         plan.wait(p, 0)
     testTransientProcess = integration.test(testTransientProcess)
 
     #@integration.test
+
     def testParallelWait(self, plan):
         p1, p2 = plan.spawnPar(('echo', 'foo'),
                                ('echo', 'bar'))
@@ -196,18 +205,21 @@ class IntegrationTestDecoratorTest(testsuite.TestCase):
     testParallelWait = integration.test(testParallelWait)
 
     #@integration.test
+
     def testFalse(self, plan):
         p = plan.spawn('false')
         plan.wait(p, 1)
     testFalse = integration.test(testFalse)
 
     #@integration.test
+
     def testKill(self, plan):
         p = plan.spawn('cat', '/dev/random')
         plan.kill(p)
     testKill = integration.test(testKill)
 
     #@integration.test
+
     def testParallelStartAndKill(self, plan):
         p1, p2 = plan.spawnPar(('cat', '/dev/random'),
                                ('cat', '/dev/random'))

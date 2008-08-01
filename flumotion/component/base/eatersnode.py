@@ -179,6 +179,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
 
     # when we initially get the uiState, connection is an already set dict
     # this makes sure we handle getting that dict initially
+
     def _setEaterConnection(self, state, value):
         # can be called with None value due to StateWatcher
         if value is None:
@@ -187,12 +188,14 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             self._setEaterConnectionItem(state, k, v)
 
     # FIXME: add a timeout to update this ?
+
     def _updateConnectionTime(self):
         if self._lastConnect:
             text = formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
+
     def _updateDisconnectionTime(self):
         if self._lastDisconnect:
             text = formatTime(time.time() - self._lastDisconnect)
@@ -248,6 +251,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         sel.set_mode(gtk.SELECTION_SINGLE)
 
         # get to know and set labels
+
         def set_label(name):
             self.labels[name] = self.wtree.get_widget('label-' + name)
             if self.labels[name] is None:
@@ -270,6 +274,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             set_label(name)
 
         # handle selection changes on the tree widget
+
         def sel_changed(sel):
             model, i = sel.get_selected()
             self.select(i and model.get_value(i, 2))
@@ -314,4 +319,3 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         # see #575
         self.widget.show()
         return self.widget
-

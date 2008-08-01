@@ -37,6 +37,7 @@ T_ = gettexter()
 
 
 class ProcessProtocol(protocol.ProcessProtocol):
+
     def __init__(self, loggable, avatarId, processType, where):
         self.loggable = loggable
         self.avatarId = avatarId
@@ -126,12 +127,14 @@ class ProcessProtocol(protocol.ProcessProtocol):
 
         self.setPid(None)
 
+
 class PortSet(log.Loggable):
     """
     A list of ports that keeps track of which are available for use on a
     given machine.
     """
     # not very efficient mkay
+
     def __init__(self, logName, ports, randomPorts=False):
         self.logName = logName
         self.ports = ports
@@ -188,6 +191,8 @@ class PortSet(log.Loggable):
         return len(filter(None, self.used))
 
 # worker heaven state proxy objects
+
+
 class ManagerWorkerHeavenState(flavors.StateCacheable):
     """
     I represent the state of the worker heaven on the manager.
@@ -197,6 +202,7 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
      - names   (list): list of worker names that we have state for
      - workers (list): list of L{ManagerWorkerState}
     """
+
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addListKey('names', [])
@@ -204,6 +210,7 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
 
     def __repr__(self):
         return "%r" % self._dict
+
 
 class AdminWorkerHeavenState(flavors.StateRemoteCache):
     """
@@ -214,6 +221,7 @@ class AdminWorkerHeavenState(flavors.StateRemoteCache):
 
 pb.setUnjellyableForClass(ManagerWorkerHeavenState, AdminWorkerHeavenState)
 
+
 class ManagerWorkerState(flavors.StateCacheable):
     """
     I represent the state of a worker in the manager.
@@ -221,6 +229,7 @@ class ManagerWorkerState(flavors.StateCacheable):
      - name: name of the worker
      - host: the IP address of the worker as seen by the manager
     """
+
     def __init__(self, **kwargs):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
@@ -231,6 +240,7 @@ class ManagerWorkerState(flavors.StateCacheable):
     def __repr__(self):
         return ("<ManagerWorkerState for %s on %s>"
                 % (self.get('name'), self.get('host')))
+
 
 class AdminWorkerState(flavors.StateRemoteCache):
     """

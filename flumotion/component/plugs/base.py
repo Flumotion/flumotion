@@ -29,6 +29,7 @@ class Plug(log.Loggable):
     Base class for plugs. Provides an __init__ method that receives the
     plug args and sets them to the 'args' attribute.
     """
+
     def __init__(self, args):
         """
         @param args: The plug args
@@ -38,12 +39,14 @@ class Plug(log.Loggable):
         """
         self.args = args
 
+
 class ComponentPlug(Plug):
     """
     Base class for plugs that live in a component. Subclasses can
     implement the start and stop vmethods, which will be called with the
     component as an argument.
     """
+
     def start(self, component):
         pass
 
@@ -54,12 +57,14 @@ class ComponentPlug(Plug):
         self.stop(component)
         self.start(component)
 
+
 class ManagerPlug(Plug):
     """
     Base class for plugs that live in the manager. Subclasses can
     implement the start and stop vmethods, which will be called with the
     manager vishnu as an argument.
     """
+
     def start(self, vishnu):
         pass
 

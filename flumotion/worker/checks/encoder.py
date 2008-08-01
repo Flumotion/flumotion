@@ -51,6 +51,7 @@ def checkVorbis():
     result.succeed(None)
     return defer.succeed(result)
 
+
 def checkTheora():
     """
     Check for a recent enough Theora encoder.

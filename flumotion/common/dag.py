@@ -32,12 +32,14 @@ class CycleError(Exception):
     A cycle was detected during execution of a function.
     """
 
+
 class Node:
     """
     I represent a Node in a Graph.
 
     I am private to the Graph.
     """
+
     def __init__(self, object, type=0):
         self.object = object
         self.type = type
@@ -54,6 +56,7 @@ class Node:
 
         return True
 
+
 class DAG(log.Loggable):
     """
     I represent a Directed Acyclic Graph.
@@ -61,6 +64,7 @@ class DAG(log.Loggable):
     You can add objects to me as Nodes and then express dependency by
     adding edges.
     """
+
     def __init__(self):
         self._nodes = {} # map of (object, type) -> NodeX
         self._tainted = False # True after add/remove and no cycle check done
@@ -127,7 +131,6 @@ class DAG(log.Loggable):
     def _getNode(self, object, type=0):
         value = self._nodes[(object, type)]
         return value
-
 
     def addEdge(self, parent, child, parenttype=0, childtype=0):
         """
@@ -254,7 +257,6 @@ class DAG(log.Loggable):
         ret = [n[0] for n in typedparents]
         return ret
 
-
     def getOffspringTyped(self, object, objtype=0, *types):
         """
         I return a list of (object, type) tuples that are offspring of
@@ -330,7 +332,6 @@ class DAG(log.Loggable):
 
         return ret
 
-
     def getAncestorsTyped(self, object, objtype=0, *types):
         """
         I return a list of (object, type) tuples that are ancestors of
@@ -398,7 +399,6 @@ class DAG(log.Loggable):
         ret = [n[0] for n in typedancestors]
 
         return ret
-
 
     def isFloating(self, object, objtype=0):
         """

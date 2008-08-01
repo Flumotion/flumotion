@@ -31,6 +31,7 @@ T_ = gettexter()
 
 
 class LooperMedium(feedcomponent.FeedComponentMedium):
+
     def __init__(self, comp):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
@@ -54,6 +55,7 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
 # To loop a segment, when you get the segment_done message
 # asynchronously, just do a new segment seek.
 
+
 class Looper(feedcomponent.ParseLaunchComponent):
 
     componentMediumClass = LooperMedium
@@ -74,6 +76,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.uiState.addKey('position', 0)
 
     def do_check(self):
+
         def on_result(result):
             for m in result.messages:
                 self.addMessage(m)
@@ -132,6 +135,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         return base.make_message_for_gstreamer_error(gerror, debug)
 
     def run_discoverer(self):
+
         def discovered(d, ismedia):
             self.uiState.set('info-location', self.filelocation)
             self.uiState.set('info-duration',
@@ -168,6 +172,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.uiState.set('num-iterations', self.nbiterations)
 
     def configure_pipeline(self, pipeline, properties):
+
         def on_message(bus, message):
             handlers = {(pipeline, gst.MESSAGE_SEGMENT_DONE):
                         self.on_segment_done,
@@ -180,6 +185,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.oggdemux = pipeline.get_by_name("demux")
 
         for name in 'aident', 'vident':
+
             def blocked(x, is_blocked):
                 if not x in self.pads_awaiting_block:
                     return
@@ -216,6 +222,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
 
     def do_setup(self):
+
         def check_time():
             self.log("checking position")
             try:

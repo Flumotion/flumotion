@@ -42,11 +42,13 @@ _ = gettext.gettext
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
 
+
 def escape(text):
     return text.replace('&', '&amp;')
 
 
 class _WalkableStack(object):
+
     def __init__(self):
         self.l = []
         self.height = -1
@@ -306,6 +308,7 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         @param title: title of the section
         @param name: name of the section
         """
+
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
@@ -415,6 +418,7 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
             nextStep = next
         elif isinstance(next, Deferred):
             d = next
+
             def getStep(step):
                 if step is None:
                     step = self._getNextStep()

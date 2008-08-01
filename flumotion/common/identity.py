@@ -41,6 +41,7 @@ class Identity:
 
     Subclasses should only implement __str__
     """
+
     def __str__(self):
         raise NotImplementedError
 
@@ -49,6 +50,7 @@ class LocalIdentity(Identity):
     """
     I represent a local identity.
     """
+
     def __init__(self, name):
         self.name = name
 
@@ -62,6 +64,7 @@ class RemoteIdentity(Identity):
 
     I hold the username and host of the remote avatar.
     """
+
     def __init__(self, username, host):
         self.username = username
         self.host = host

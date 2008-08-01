@@ -56,6 +56,8 @@ LOCAL_IDENTITY = LocalIdentity('manager')
 
 
 # an internal class
+
+
 class Dispatcher(log.Loggable):
     """
     I implement L{twisted.cred.portal.IRealm}.
@@ -97,7 +99,9 @@ class Dispatcher(log.Loggable):
         self._interfaceHeavens[interface] = heaven
 
     ### IRealm methods
+
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
+
         def got_avatar(avatar):
             if avatar.avatarId in heaven.avatars:
                 raise errors.AlreadyConnectedError(avatar.avatarId)
@@ -108,6 +112,7 @@ class Dispatcher(log.Loggable):
             # uses these kwargs to set its own info. so don't change
             # these args or their order or you will break your test
             # suite.
+
             def cleanup(avatarId=avatar.avatarId, avatar=avatar, mind=mind):
                 self.info('lost connection to client %r', avatar)
                 del heaven.avatars[avatar.avatarId]
@@ -151,11 +156,13 @@ class Dispatcher(log.Loggable):
         d.addCallbacks(got_avatar, got_error)
         return d
 
+
 class ComponentMapper:
     """
     I am an object that ties together different objects related to a
     component.  I am used as values in a lookup hash in the vishnu.
     """
+
     def __init__(self):
         self.state = None       # ManagerComponentState; created first
         self.id = None          # avatarId of the eventual ComponentAvatar
@@ -198,6 +205,7 @@ class Vishnu(log.Loggable):
                                               admin.AdminHeaven)
 
         self.running = True
+
         def setStopped():
             self.running = False
         reactor.addSystemEventTrigger('before', 'shutdown', setStopped)
@@ -575,9 +583,11 @@ class Vishnu(log.Loggable):
         bouncer = reflectcall.createComponent(moduleName, methodName,
                                               conf.bouncer.getConfigDict())
         d = bouncer.waitForHappy()
+
         def setupCallback(result):
             bouncer.debug('started')
             self.setBouncer(bouncer)
+
         def setupErrback(failure):
             self.warning('Error starting manager bouncer')
         d.addCallbacks(setupCallback, setupErrback)
@@ -601,6 +611,7 @@ class Vishnu(log.Loggable):
         conf.unlink()
 
     __pychecker__ = 'maxargs=11' # hahaha
+
     def loadComponent(self, identity, componentType, componentId,
                       componentLabel, properties, workerName,
                       plugs, eaters, isClockMaster, virtualFeeds):
@@ -723,6 +734,7 @@ class Vishnu(log.Loggable):
         # NB: reset moodPending if asked to stop without an avatar
         # because we changed above to allow stopping even if moodPending
         # is happy
+
         def stopSad():
             self.debug('asked to stop a sad component without avatar')
             for mid in componentState.get('messages')[:]:
@@ -734,8 +746,10 @@ class Vishnu(log.Loggable):
             return defer.succeed(None)
 
         def stopLost():
+
             def gotComponents(comps):
                 return avatarId in comps
+
             def gotJobRunning(running):
                 if running:
                     self.warning('asked to stop lost component %r, but '
@@ -831,6 +845,7 @@ class Vishnu(log.Loggable):
             m.state.setMood(moods.sad.value)
 
     # FIXME: unify naming of stuff like this
+
     def workerAttached(self, workerAvatar):
         # called when a worker logs in
         workerId = workerAvatar.avatarId
@@ -846,6 +861,7 @@ class Vishnu(log.Loggable):
         # also add components we have that are lost but not
         # in list given by worker
         d = workerAvatar.getComponents()
+
         def workerAvatarComponentListReceived(workerComponents):
             # list() is called to work around a pychecker bug. FIXME.
             lostComponents = list([c for c in self.getComponentStates()

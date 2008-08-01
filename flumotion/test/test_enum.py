@@ -25,9 +25,8 @@ from flumotion.common import enum
 from flumotion.common import testsuite
 
 
-
-
 class TestEnum(testsuite.TestCase):
+
     def testEnumSimple(self):
         en = enum.EnumClass('TestEnum')
         self.assertEquals(en.__name__, 'TestEnum')

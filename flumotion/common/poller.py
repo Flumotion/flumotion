@@ -94,6 +94,7 @@ class Poller(object, log.Loggable):
         """Run the poller immediately, regardless of when it was last
         run.
         """
+
         def reschedule(v):
             self._reschedule()
             return v

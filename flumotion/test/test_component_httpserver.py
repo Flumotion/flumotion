@@ -35,9 +35,8 @@ from flumotion.component.plugs.base import ComponentPlug
 from flumotion.test import test_http
 
 
-
-
 class MountTest(log.Loggable, testsuite.TestCase):
+
     def setUp(self):
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
         A = os.path.join(self.path, 'A')
@@ -174,23 +173,28 @@ class MountTest(log.Loggable, testsuite.TestCase):
 
 
 class _Resource(Resource):
+
     def __init__(self, path):
         Resource.__init__(self)
         self.putChild(path, Data("baz", "text/html"))
 
 
 class SimpleTestPlug(ComponentPlug):
+
     def start(self, component):
         component.setRootResource(_Resource(path='foobar'))
 
 
 class SimpleTestPlug2(ComponentPlug):
+
     def start(self, component):
         component.setRootResource(_Resource(path='noogie'))
 
 PLUGTYPE = 'flumotion.component.plugs.lifecycle.ComponentLifecycle'
 
+
 class PlugTest(testsuite.TestCase):
+
     def setUp(self):
         self.component = None
 
@@ -260,7 +264,10 @@ class PlugTest(testsuite.TestCase):
 
 
 # FIXME: maybe merge into test_http's fake request ?
+
+
 class FakeRequest(test_http.FakeRequest):
+
     def __init__(self, **kwargs):
         test_http.FakeRequest.__init__(self, **kwargs)
         self.finishDeferred = defer.Deferred()
@@ -277,6 +284,7 @@ class FakeRequest(test_http.FakeRequest):
     def registerProducer(self, producer, streaming):
         self.producer = producer
         producer.resumeProducing()
+
     def unregisterProducer(self):
         pass
 
@@ -285,11 +293,13 @@ class FakeRequest(test_http.FakeRequest):
 
 
 class FakeComponent:
+
     def startAuthentication(self, request):
         return defer.succeed(None)
 
 
 class TestTextFile(testsuite.TestCase):
+
     def setUp(self):
         fd, self.path = tempfile.mkstemp()
         os.write(fd, 'a text file')
@@ -367,6 +377,7 @@ class TestTextFile(testsuite.TestCase):
         return fr.finishDeferred
 
     # FIXME: this test hangs
+
     def notestRangeTooBig(self):
         # a too big range just gets the whole file
         fr = FakeRequest(headers={'range': 'bytes=0-100'})
@@ -405,6 +416,7 @@ class TestTextFile(testsuite.TestCase):
 
 
 class TestDirectory(testsuite.TestCase):
+
     def setUp(self):
         self.path = tempfile.mkdtemp()
         h = open(os.path.join(self.path, 'test.flv'), 'w')
@@ -427,6 +439,7 @@ class TestDirectory(testsuite.TestCase):
         fr = FakeRequest()
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
+
         def finish(result):
             self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             self.assertEquals(fr.data, 'a fake FLV file')
@@ -438,6 +451,7 @@ class TestDirectory(testsuite.TestCase):
         fr = FakeRequest(args={'start': [2]})
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
+
         def finish(result):
             self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             expected = httpfile.FLVFile.header + 'fake FLV file'
@@ -452,6 +466,7 @@ class TestDirectory(testsuite.TestCase):
         fr = FakeRequest(args={'start': [0]})
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
+
         def finish(result):
             self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             self.assertEquals(fr.data, 'a fake FLV file')
@@ -463,6 +478,7 @@ class TestDirectory(testsuite.TestCase):
         fr = FakeRequest(headers={'range': 'bytes=7-'}, args={'start': [2]})
         self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
             server.NOT_DONE_YET)
+
         def finish(result):
             self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
             expected = 'FLV file'

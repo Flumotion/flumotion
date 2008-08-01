@@ -70,6 +70,7 @@ class SpeexStep(AudioEncoderStep):
 
 class SpeexWizardPlugin(object):
     implements(IEncoderPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = SpeexAudioEncoder()

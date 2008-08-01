@@ -167,6 +167,8 @@ class Client(pb.Referenceable, log.Loggable):
         self.perspective.broker.transport = self.transport
 
 # server has a feeder
+
+
 class Server(log.Loggable):
     logCategory = "server"
 
@@ -192,6 +194,7 @@ class Server(log.Loggable):
     def stop(self):
         self.pipeline.set_state(gst.STATE_NULL)
 
+
 class Dispatcher(log.Loggable):
     logCategory = "dispatcher"
     implements(portal.IRealm)
@@ -211,11 +214,13 @@ class Dispatcher(log.Loggable):
         reactor.callLater(0, avatar.attached, mind)
         return (pb.IPerspective, avatar, avatar.detached)
 
+
 class ClientAvatar(pb.Avatar, log.Loggable):
     logCategory = "clientavatar"
     # server-side object for client handling
     # if immediateStop, do not actually stream but try to shut down
     # the streaming immediately
+
     def __init__(self, server):
         self.server = server
         server.client = self
@@ -265,7 +270,9 @@ class ClientAvatar(pb.Avatar, log.Loggable):
             self.debug("adding fd %d to multifdsink" % fd)
             self.server.sink.emit('add', fd)
 
+
 class TestClientEater(testsuite.TestCase):
+
     def startClient(self):
         factory = pb.PBClientFactory()
         factory.unsafeTracebacks = 1
@@ -293,6 +300,7 @@ class TestClientEater(testsuite.TestCase):
         d = defer.Deferred()
         s = self.startServer()
         c = self.startClient()
+
         def stop(result):
             log.debug("main", "stop")
             gst.debug("main: stop")
@@ -316,6 +324,7 @@ class TestClientEater(testsuite.TestCase):
         d = defer.Deferred()
         s = self.startServer(immediateStop=True)
         c = self.startClient()
+
         def stop(result):
             log.debug("main", "stop")
             gst.debug("main: stop")

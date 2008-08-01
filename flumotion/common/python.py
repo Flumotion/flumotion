@@ -32,6 +32,7 @@ __pychecker__ = 'no-shadowbuiltin'
 
 # sorted() was introduced in 2.4
 if sys.version_info[:2] < (2, 4):
+
     def sorted(seq, reverse=False):
         seq = seq[:]
         seq.sort()
@@ -43,6 +44,7 @@ else:
 
 # any() was introduced in 2.5
 if sys.version_info[:2] < (2, 5):
+
     def any(seq):
         for item in seq:
             if item:
@@ -53,6 +55,7 @@ else:
 
 # all() was introduced in 2.5
 if sys.version_info[:2] < (2, 5):
+
     def all(seq):
         for item in seq:
             if not item:

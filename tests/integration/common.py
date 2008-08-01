@@ -35,6 +35,8 @@ log.debug('integration', 'top_src_dir is %s' % top_src_dir)
 
 # munge the path to include builddir/bin/ and scripts/; also add
 # FLU_PROJECT_PATH to the env so that spawned processes pick it up
+
+
 def mungeEnv():
     from flumotion.configure import configure
     os.environ['PATH'] = os.path.join(top_src_dir, 'scripts') + ':' \
@@ -76,7 +78,9 @@ workerXML = """
 </worker>
 """
 
+
 class FlumotionManagerWorkerTest(unittest.TestCase):
+
     def makeFile(self, name, content):
         f = open(name, 'w')
         f.write(content)

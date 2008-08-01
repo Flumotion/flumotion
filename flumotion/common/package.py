@@ -66,6 +66,7 @@ class PackageHooks(ihooks.Hooks):
 
         return ret
 
+
 class Packager(log.Loggable):
     """
     I am an object through which package paths can be registered, to support
@@ -294,6 +295,7 @@ class Packager(log.Loggable):
         self.debug('uninstalling custom importer')
         self._importer.uninstall()
 
+
 def _listDirRecursively(path):
     """
     I'm similar to os.listdir, but I work recursively and only return
@@ -318,6 +320,7 @@ def _listDirRecursively(path):
         retval.append(path)
 
     return retval
+
 
 def _listPyFileRecursively(path):
     """
@@ -345,6 +348,7 @@ def _listPyFileRecursively(path):
         retval.extend(pyfiles)
 
     return retval
+
 
 def _findPackageCandidates(path, prefix=configure.PACKAGE):
     """
@@ -391,6 +395,7 @@ def _findPackageCandidates(path, prefix=configure.PACKAGE):
 
     return bundlePackages
 
+
 def findEndModuleCandidates(path, prefix=configure.PACKAGE):
     """
     I take a directory and return a list of candidate python end modules
@@ -430,6 +435,7 @@ def findEndModuleCandidates(path, prefix=configure.PACKAGE):
 
 # singleton factory function
 __packager = None
+
 
 def getPackager():
     """

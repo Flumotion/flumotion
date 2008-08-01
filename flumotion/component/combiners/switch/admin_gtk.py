@@ -73,7 +73,9 @@ class SwitchingNode(BaseAdminGtkNode):
                 self.radioButton[value].handler_unblock(
                     self.radioButtonHandlers[value])
 
+
 class SwitcherAdminGtk(BaseAdminGtk):
+
     def setup(self):
         swNode = SwitchingNode(self.state, self.admin, "Switching")
         self.nodes['Switcher'] = swNode

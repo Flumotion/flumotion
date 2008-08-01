@@ -35,12 +35,17 @@ __version__ = "$Rev$"
 
 
 # copied from flumotion/twisted/integration.py
+
+
 class CommandNotFoundException(Exception):
+
     def __init__(self, command):
         Exception.__init__(self)
         self.command = command
+
     def __str__(self):
         return 'Command %r not found in the PATH.' % self.command
+
 
 def _which(executable):
     if os.sep in executable:
@@ -80,6 +85,7 @@ def do_getprop(model, quit, avatarId, propname):
     quit()
 do_getprop = defer_generator(do_getprop)
 
+
 def do_listprops(model, quit, avatarId):
     d = utils.get_component_uistate(model, avatarId)
     yield d
@@ -89,6 +95,7 @@ def do_listprops(model, quit, avatarId):
             print k
     quit()
 do_listprops = defer_generator(do_listprops)
+
 
 def do_showplanet(model, quit):
     d = model.callRemote('getPlanetState')
@@ -108,6 +115,7 @@ def do_showplanet(model, quit):
     quit()
 do_showplanet = defer_generator(do_showplanet)
 
+
 def do_getmood(model, quit, avatarId):
     d = model.callRemote('getPlanetState')
     yield d
@@ -125,7 +133,9 @@ def do_getmood(model, quit, avatarId):
     quit()
 do_getmood = defer_generator(do_getmood)
 
+
 def do_showcomponent(model, quit, avatarId):
+
     def show_uistate(k, v, indent=0):
         if isinstance(v, list):
             show_uistate(k, '<list>', indent)
@@ -169,10 +179,13 @@ def do_showcomponent(model, quit, avatarId):
     quit()
 do_showcomponent = defer_generator(do_showcomponent)
 
+
 class ParseException(Exception):
     pass
 
+
 def _parse_typed_args(spec, args):
+
     def _readFile(filename):
         try:
             f = open(filename)
@@ -231,6 +244,7 @@ def _parse_typed_args(spec, args):
     else:
         return res
 
+
 def do_invoke(model, quit, avatarId, methodName, *args):
     d = model.callRemote('getPlanetState')
     yield d
@@ -263,6 +277,7 @@ def do_invoke(model, quit, avatarId, methodName, *args):
     quit()
 do_invoke = defer_generator(do_invoke)
 
+
 def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     if args:
         args = _parse_typed_args(args[0], args[1:])
@@ -284,6 +299,7 @@ def do_workerinvoke(model, quit, workerName, moduleName, methodName, *args):
     quit()
 do_workerinvoke = defer_generator(do_workerinvoke)
 
+
 def do_workerremoteinvoke(model, quit, workerName, methodName, *args):
     if args:
         args = _parse_typed_args(args[0], args[1:])
@@ -303,6 +319,7 @@ def do_workerremoteinvoke(model, quit, workerName, methodName, *args):
 
     quit()
 do_workerremoteinvoke = defer_generator(do_workerremoteinvoke)
+
 
 def do_managerinvoke(model, quit, methodName, *args):
     if args:
@@ -324,6 +341,7 @@ def do_managerinvoke(model, quit, methodName, *args):
     quit()
 do_managerinvoke = defer_generator(do_managerinvoke)
 
+
 def do_loadconfiguration(model, quit, confFile, saveAs):
     print 'Loading configuration from file: %s' % confFile
 
@@ -342,6 +360,7 @@ def do_loadconfiguration(model, quit, confFile, saveAs):
     quit()
 do_loadconfiguration = defer_generator(do_loadconfiguration)
 
+
 def do_showworkers(model, quit):
     d = model.callRemote('getWorkerHeavenState')
     yield d
@@ -352,7 +371,9 @@ def do_showworkers(model, quit):
     quit()
 do_showworkers = defer_generator(do_showworkers)
 
+
 class MoodListener(defer.Deferred):
+
     def __init__(self, moods, state):
         defer.Deferred.__init__(self)
         self._moodsFinal = moods
@@ -364,6 +385,8 @@ class MoodListener(defer.Deferred):
 
 # FIXME: nicer to rewrite do_stop, do_start and do_delete to run some common
 # code
+
+
 def do_avatar_action(model, quit, avatarPath, action):
     """
     @type action: a tuple of (actionName, remoteCall, moods, checkMoodFunc)
@@ -397,6 +420,7 @@ def do_avatar_action(model, quit, avatarPath, action):
         # else: message already printed in find_component()
 
     if len(components) > 0:
+
         def actionComponent(c):
             if action[3](moods[c.get('mood')]):
                 return model.callRemote(action[1], c)
@@ -429,6 +453,7 @@ def do_avatar_action(model, quit, avatarPath, action):
             print "Component now completed action %s." % action[0]
     quit()
 do_avatar_action = defer_generator(do_avatar_action)
+
 
 def do_stop(model, quit, avatarPath):
     return do_avatar_action(model, quit, avatarPath, ('stop', 'componentStop',

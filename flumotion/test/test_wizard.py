@@ -31,6 +31,7 @@ from flumotion.wizard.configurationwizard import ConfigurationWizard
 
 
 class WizardStepTest(testsuite.TestCase):
+
     def setUp(self):
         self.wizard = ConfigurationWizard()
 
@@ -59,6 +60,7 @@ class WizardStepTest(testsuite.TestCase):
 
 
 class TestAdmin(admin.AdminModel):
+
     def _makeFactory(self, username, password):
         return admin.AdminClientFactory('medium', 'user', 'pass')
 
@@ -76,7 +78,9 @@ class TestAdmin(admin.AdminModel):
         else:
             assert False
 
+
 class WizardSaveTest(testsuite.TestCase):
+
     def setUp(self):
         self.wizard = ConfigurationWizard()
         self.wizard.admin = TestAdmin('user', 'test')

@@ -26,7 +26,9 @@ from flumotion.common.process import checkPidRunning, deletePidFile, getPid, \
      killPid, termPid, waitForTerm, waitPidFile, writePidFile
 from flumotion.common.testsuite import TestCase
 
+
 class TestPid(TestCase):
+
     def testAll(self):
         pid = getPid('test', 'default')
         self.failIf(pid)
@@ -38,6 +40,7 @@ class TestPid(TestCase):
 
 
 class TestProcess(TestCase):
+
     def testTermPid(self):
         ret = os.fork()
         if ret == 0:
@@ -75,4 +78,3 @@ class TestProcess(TestCase):
 
         # so should init as pid 1, but run as root
         self.failUnless(checkPidRunning(1))
-

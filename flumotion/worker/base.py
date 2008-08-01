@@ -78,6 +78,7 @@ class JobInfo(object):
     """
     __slots__ = ('pid', 'avatarId', 'type', 'moduleName', 'methodName',
                  'nice', 'bundles')
+
     def __init__(self, pid, avatarId, type, moduleName, methodName, nice,
                  bundles):
         self.pid = pid
@@ -88,7 +89,9 @@ class JobInfo(object):
         self.nice = nice
         self.bundles = bundles
 
+
 class JobProcessProtocol(worker.ProcessProtocol):
+
     def __init__(self, heaven, avatarId, startSet):
         self._startSet = startSet
         self._deferredStart = startSet.createRegistered(avatarId)
@@ -187,6 +190,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         self._port = port
 
     ### portal.IRealm method
+
     def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
             avatar = self.avatarClass(self, avatarId, mind)
@@ -250,6 +254,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
             # If our jobs fail to shut down nicely within some period of
             # time, shut them down less nicely
             dc = reactor.callLater(JOB_SHUTDOWN_TIMEOUT, self.kill)
+
             def cancelDelayedCall(res, dc):
                 # be nice to unit tests
                 if dc.active():

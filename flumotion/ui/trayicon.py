@@ -129,6 +129,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
             self._show_popup_menu()
 
     # FIXME: looks like cutnpaste from a similar function, squash duplication
+
     def _update_mood(self):
         """
         This method goes through all the components to

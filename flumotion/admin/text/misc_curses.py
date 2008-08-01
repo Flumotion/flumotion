@@ -26,6 +26,8 @@ __version__ = "$Rev$"
 
 # taken from a twisted example
 # emulates an fd
+
+
 class CursesStdIO:
     """fake fd to be registered as a reader with the twisted reactor.
        Curses classes needing input should extend this"""

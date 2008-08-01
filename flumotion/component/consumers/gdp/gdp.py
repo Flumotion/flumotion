@@ -25,6 +25,7 @@ __version__ = "$Rev: 6125 $"
 
 
 class GDPConsumer(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         port = properties['port']
 

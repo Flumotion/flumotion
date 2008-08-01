@@ -24,8 +24,11 @@
 
 __version__ = "$Rev$"
 
+
 def _make_watched(type, *mutators):
+
     class Watched(type):
+
         def __init__(self):
             type.__init__(self)
             self.watch_id = 0
@@ -44,6 +47,7 @@ def _make_watched(type, *mutators):
                 proc(self)
 
     def mutate(method):
+
         def do_mutate(self, *args, **kwargs):
             method(self, *args, **kwargs)
             self.notify_changed()
@@ -57,4 +61,3 @@ WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
                             'sort', 'reverse')
 WatchedDict = _make_watched(dict, '__setitem__', '__delitem__', 'pop',
                             'popitem', 'update')
-

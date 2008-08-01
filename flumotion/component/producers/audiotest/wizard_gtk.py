@@ -74,6 +74,7 @@ class TestAudioProducerStep(AudioProducerStep):
 
 class AudioTestWizardPlugin(object):
     implements(IProducerPlugin)
+
     def __init__(self, wizard):
         self.wizard = wizard
         self.model = TestAudioProducer()

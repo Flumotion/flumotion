@@ -52,6 +52,7 @@ class MessageButton(gtk.ToggleButton):
     """
     I am a button at the top right of the message view, representing a message.
     """
+
     def __init__(self, message):
         gtk.ToggleButton.__init__(self)
 
@@ -71,6 +72,8 @@ class MessageButton(gtk.ToggleButton):
 
 
 # instantiated through create_function in glade files
+
+
 class MessagesView(gtk.VBox):
     """
     I am a widget that can show messages.
@@ -78,6 +81,7 @@ class MessagesView(gtk.VBox):
     # I am a vbox with first row the label and icons,
     # second row a separator
     # and third row a text view
+
     def __init__(self):
         gtk.VBox.__init__(self)
 
@@ -243,6 +247,7 @@ class MessagesView(gtk.VBox):
         self._addMessageToBuffer(message)
 
     # when the mouse cursor moves, set the cursor image accordingly
+
     def _on_textview___motion_notify_event(self, textview, event):
         x, y = textview.window_to_buffer_coords(gtk.TEXT_WINDOW_WIDGET,
             int(event.x), int(event.y))
@@ -287,5 +292,3 @@ class MessagesView(gtk.VBox):
                 break
 
         return False
-
-
