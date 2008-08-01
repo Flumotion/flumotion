@@ -1,6 +1,14 @@
 2008-08-01  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
+	Remove trailing :
+	* common/common.mk:
+	Also run it on all files in the sourcedir, in case
+	they are not the same
+
+2008-08-01  Johan Dahlin  <johan@flumotion.com>
+
+	* Makefile.am:
 	* common/common.mk:
 	Add check-local-pep8 which runs the pep8.py script
 	on all python files in the tree
