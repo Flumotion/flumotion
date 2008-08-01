@@ -682,6 +682,7 @@ def input_file(filename):
     errors = Checker(filename).check_all()
     if options.testsuite and not errors:
         message("%s: %s" % (filename, "no errors found"))
+    return errors
 
 
 def input_dir(dirname):
@@ -690,7 +691,8 @@ def input_dir(dirname):
     """
     dirname = dirname.rstrip('/')
     if excluded(dirname):
-        return
+        return 0
+    errors = 0
     for root, dirs, files in os.walk(dirname):
         if options.verbose:
             message('directory ' + root)
@@ -702,7 +704,8 @@ def input_dir(dirname):
                 dirs.remove(subdir)
         files.sort()
         for filename in files:
-            input_file(os.path.join(root, filename))
+            errors += input_file(os.path.join(root, filename))
+    return errors
 
 
 def excluded(filename):
@@ -847,16 +850,18 @@ def _main():
         import doctest
         return doctest.testmod()
     start_time = time.time()
+    errors = 0
     for path in args:
         if os.path.isdir(path):
-            input_dir(path)
+            errors += input_dir(path)
         else:
-            input_file(path)
+            errors += input_file(path)
     elapsed = time.time() - start_time
     if options.statistics:
         print_statistics()
     if options.benchmark:
         print_benchmark(elapsed)
+    return errors > 0
 
 if __name__ == '__main__':
-    _main()
+    sys.exit(_main())

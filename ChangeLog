@@ -1,5 +1,15 @@
 2008-08-01  Johan Dahlin  <johan@flumotion.com>
 
+	* Makefile.am:
+	* common/common.mk:
+	Add check-local-pep8 which runs the pep8.py script
+	on all python files in the tree
+	* misc/pep8.py:
+	Return a non-zero exit code if there were any errors
+	found
+
+2008-08-01  Johan Dahlin  <johan@flumotion.com>
+
 	* *.py: make flumotion pep-8 clean, try two
 	- whitespace only changes were accidentially not
 	  included
