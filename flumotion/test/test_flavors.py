@@ -36,16 +36,27 @@ class TestStateRemoteCache(flavors.StateRemoteCache):
 
 pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
 
-class FakeObject: pass
+
+class FakeObject:
+    pass
+
+
 class FakeListener:
     # listener interface
     implements(flavors.IStateListener)
 
-    def stateSet(self, state, key, value): pass
-    def stateAppend(self, state, key, value): pass
-    def stateRemove(self, state, key, value): pass
+    def stateSet(self, state, key, value):
+        pass
+
+    def stateAppend(self, state, key, value):
+        pass
+
+    def stateRemove(self, state, key, value):
+        pass
+
 
 class TestRoot(testsuite.TestManagerRoot):
+
     def remote_getState(self):
         self.state = TestStateCacheable()
         self.state.addKey('name', 'lois')

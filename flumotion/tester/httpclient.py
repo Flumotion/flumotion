@@ -117,7 +117,8 @@ class HTTPClient(gobject.GObject, log.Loggable):
                 self.emit('stopped', self._id, client.STOPPED_REFUSED)
                 return
             else:
-                self.warning("%4d: unhandled URLError with code %d" % (self._id, code))
+                self.warning("%4d: unhandled URLError with code %d" % (
+                    self._id, code))
                 self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
                 return
         except socket.error, (code, msg):
@@ -127,7 +128,8 @@ class HTTPClient(gobject.GObject, log.Loggable):
                 self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
                 return
             else:
-                self.warning("%4d: unhandled socket.error with code %d" % (self._id, code))
+                self.warning("%4d: unhandled socket.error with code %d" % (
+                    self._id, code))
                 self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
                 return
         if not self._handle:
@@ -194,9 +196,9 @@ class HTTPClient(gobject.GObject, log.Loggable):
 
         #calculate stats
         rate = self._bytes / (now - self._start_time) / 1024.0
-        #print "%d: %f: read: %d bytes, nominal actual rate: %f" % (self._id, now, self._bytes, rate)
+        #print "%d: %f: read: %d bytes, nominal actual rate: %f" %
+        # (self._id, now, self._bytes, rate)
         return False
-
 
     def close(self, reason):
         'close the connection'
@@ -232,12 +234,15 @@ class HTTPClientStatic(HTTPClient):
         return self._readsize
 
 lastbyte = {}
+
+
 def verify(client, data):
-    if not lastbyte.has_key(client):
+    if not client in lastbyte:
         next = ord(data[0])
     else:
         next = ord(lastbyte[client]) + 1
-        if next > 255: next = 0
+        if next > 255:
+            next = 0
     #print " next byte: %x" % next
     print len(data)
 
@@ -250,7 +255,8 @@ def verify(client, data):
     buffer = struct.pack("B" * len(bytes), *bytes)
     #print "comparing buffer to data: %d - %d" % (len(buffer), len(data))
     #print "comparing buffer to data: %d - %d" % (ord(buffer[0]), ord(data[0]))
-    #print "comparing buffer to data: %d - %d" % (ord(buffer[-1]), ord(data[-1]))
+    #print "comparing buffer to data: %d - %d" % (ord(buffer[-1]),
+    #  ord(data[-1]))
     if (buffer != data):
         print "WOAH NELLY !"
         return False

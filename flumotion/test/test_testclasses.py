@@ -37,7 +37,8 @@ class FakeKeycard(pb.Cacheable, pb.RemoteCache):
 
     def getStateToCacheAndObserveFor(self, perspective, observer):
         # we can't implement __init__ due to pb.RemoteCache, so ...
-        if not self.observers: self.observers = []
+        if not self.observers:
+            self.observers = []
         self.observers.append(observer)
         return {'name': self.name}
 
@@ -79,11 +80,20 @@ class FakeKeycard(pb.Cacheable, pb.RemoteCache):
 
 pb.setUnjellyableForClass(FakeKeycard, FakeKeycard)
 
-class FakeCacheable(pb.Cacheable): pass
-class FakeRemoteCache(pb.RemoteCache): pass
+
+class FakeCacheable(pb.Cacheable):
+    pass
+
+
+class FakeRemoteCache(pb.RemoteCache):
+    pass
+
+
 pb.setUnjellyableForClass(FakeCacheable, FakeRemoteCache)
 
+
 class TestOnePB(testsuite.TestCase):
+
     def setUp(self):
         self.pb = testsuite.TestPB()
         return self.pb.start()

@@ -160,7 +160,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
                 self.idealFeed = name
             self.feedsByPriority.append(name)
 
-        return feedcomponent.MultiInputParseLaunchComponent.create_pipeline(self)
+        return feedcomponent.MultiInputParseLaunchComponent.create_pipeline(
+            self)
 
     def get_logical_feeds(self):
         raise errors.NotImplementedError('subclasses should implement '

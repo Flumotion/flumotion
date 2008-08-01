@@ -72,7 +72,7 @@ def defer_generator(proc):
                 print 'flumotion.twisted.defer: ' + \
                     'Unhandled error calling', proc.__name__, ':', f.type
                 traceback.print_exc()
-            with_saved_callbacks (lambda: d.addErrback(print_traceback))
+            with_saved_callbacks(lambda: d.addErrback(print_traceback))
             raise
         result.addErrback(default_errback, result)
 
@@ -163,8 +163,8 @@ class Resolution:
 
     def callback(self, result):
         """
-        Make the result succeed, triggering the callbacks with the given result.
-        If a result was already reached, do nothing.
+        Make the result succeed, triggering the callbacks with
+        the given result. If a result was already reached, do nothing.
         """
         if not self.fired:
             self.fired = True
@@ -212,7 +212,8 @@ class RetryingDeferred(object):
         Start trying. Returns a deferred that will fire when this operation
         eventually succeeds. That deferred will only errback if this
         RetryingDeferred is cancelled (it will then errback with the result of
-        the next attempt if one is in progress, or a CancelledError. # TODO: yeah?
+        the next attempt if one is in progress, or a CancelledError.
+        # TODO: yeah?
         """
         self._masterD = defer.Deferred()
         self._running = True

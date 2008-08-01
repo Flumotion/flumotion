@@ -49,8 +49,9 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.state = 0
         self.current_input = ''
         curses.curs_set(0)
-        self.entries = [ '', 'Hostname', 'Port', 'Secure?', 'Username', 'Password' ]
-        self.inputs = [ '', 'localhost', '7531', 'Yes', 'user', '' ]
+        self.entries = ['', 'Hostname', 'Port', 'Secure?',
+                         'Username', 'Password']
+        self.inputs = ['', 'localhost', '7531', 'Yes', 'user', '']
 
     def show(self):
         self.stdscr.addstr(0, 0, "Please choose a connection:")
@@ -69,7 +70,8 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             cury = cury + 1
         self.displayed_connections = cury - 3
         if cury - 3 == self.current_connection:
-            self.stdscr.addstr(cury + 1, 10, "New connection...", curses.A_REVERSE)
+            self.stdscr.addstr(cury + 1, 10, "New connection...",
+                               curses.A_REVERSE)
         else:
             self.stdscr.addstr(cury + 1, 10, "New connection...")
         self.stdscr.refresh()
@@ -78,12 +80,13 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     def display_current_input_line(self):
         cury = self.displayed_connections + 5 + self.state
         if self.state > 0 and self.state < 5:
-            self.stdscr.addstr(cury, 10, "%s: %s" % (self.entries[self.state],self.current_input))
+            self.stdscr.addstr(cury, 10, "%s: %s" % (self.entries[self.state],
+                                                     self.current_input))
         elif self.state == 5:
             # password entry
             self.stdscr.addstr(cury, 10, "%s: " % self.entries[self.state])
         else:
-            self.stdscr.move(cury,10)
+            self.stdscr.move(cury, 10)
         self.stdscr.clrtobot()
         self.stdscr.refresh()
 
@@ -94,7 +97,7 @@ class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         c= self.stdscr.getch()
         if self.state == 0:
             if c == curses.KEY_DOWN:
-                if self.current_connection >= self.displayed_connections :
+                if self.current_connection >= self.displayed_connections:
                     self.current_connection = 0
                 else:
                     self.current_connection = self.current_connection + 1

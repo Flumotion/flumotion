@@ -29,8 +29,8 @@ __version__ = "$Rev$"
 
 
 class VideoTestAdminText(BaseAdminText):
-    commands = [ 'setpattern', 'getpattern' ]
-    patterns = [ 'smpte', 'snow', 'black' ]
+    commands = ['setpattern', 'getpattern']
+    patterns = ['smpte', 'snow', 'black']
 
     def setup(self):
         pass

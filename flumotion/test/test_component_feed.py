@@ -45,13 +45,15 @@ class FakeWorkerBrain(log.Loggable):
         return self._deferredFD
 
     def feedToFD(self, componentId, feedName, fd, eaterId):
-        self.info('feed to fd: %s %s %d %s', componentId, feedName, fd, eaterId)
+        self.info('feed to fd: %s %s %d %s',
+                  componentId, feedName, fd, eaterId)
         self.waitForFD().callback((componentId, feedName, fd, eaterId))
         # need to return True for server to keep fd open
         return True
 
     def eatFromFD(self, componentId, eaterAlias, fd, feedId):
-        self.info('eat from fd: %s %s %d %s', componentId, eaterAlias, fd, feedId)
+        self.info('eat from fd: %s %s %d %s',
+                  componentId, eaterAlias, fd, feedId)
         self.waitForFD().callback((componentId, eaterAlias, fd, feedId))
         return True
 
@@ -170,9 +172,10 @@ class TestFeedClient(FeedTestCase, log.Loggable):
                                                    password='badpass'))
 
         def loginOk(root):
-            raise AssertionError, 'should not get here'
+            raise AssertionError('should not get here')
 
         def loginFailed(failure):
+
             def gotRoot(root):
                 # an idempotent method, should return a network failure if
                 # the remote side disconnects as it should
@@ -183,7 +186,7 @@ class TestFeedClient(FeedTestCase, log.Loggable):
                 self.info('success')
 
             def gotKeycardClasses(classes):
-                raise AssertionError, 'should not get here'
+                raise AssertionError('should not get here')
 
             self.info('loginFailed: %s', log.getFailureMessage(failure))
             failure.trap(errors.NotAuthenticatedError)
@@ -220,7 +223,8 @@ class TestUpstreamFeedClient(FeedTestCase, log.Loggable):
             # either just before or just after this, we received a
             # sendFeedReply call from the feedserver. so now we're
             # waiting on the component to get its fd
-            self.assertAdditionalFDsOpen(3, 'feedSent (socket, client, server)')
+            self.assertAdditionalFDsOpen(
+                3, 'feedSent (socket, client, server)')
 
             # This is poking the feedmedium's internals, but in the end,
             # this test is of the feed medium's internals, so that's ok.

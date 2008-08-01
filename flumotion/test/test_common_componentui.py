@@ -24,9 +24,9 @@ from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
 
 
+class FakeObject:
+    pass
 
-
-class FakeObject: pass
 
 class FakeAdmin(testsuite.TestAdmin):
     pass
@@ -170,7 +170,8 @@ class TestStateSet(testsuite.TestCase):
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
             self.failIf(self.changes, self.changes)
-            return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
+            return self.admin.remoteRoot.callRemote(
+                'workerBearChild', 'batman')
 
         def workerBearChildCallback(res):
             state = self._state
@@ -187,7 +188,8 @@ class TestStateSet(testsuite.TestCase):
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
             self.failIf(self.changes, self.changes)
-            return self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
+            return self.admin.remoteRoot.callRemote(
+                'workerHaveAdopted', 'batman')
 
         def workerHaveAdoptedCallback(res):
             state = self._state
@@ -217,7 +219,8 @@ class TestStateSet(testsuite.TestCase):
             self.failUnless(state.hasKey('children'))
             self.failIf(self.changes, self.changes)
             self._state = state
-            return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
+            return self.admin.remoteRoot.callRemote(
+                'workerBearChild', 'batman')
 
         def workerBearChildCallback(result):
             state = self._state

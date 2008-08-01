@@ -56,7 +56,8 @@ class PackageHooks(ihooks.Hooks):
             return ret
 
         # get full paths to the package
-        paths = [os.path.join(path, name.replace('.', os.sep)) for path in packagePaths]
+        paths = [os.path.join(path, name.replace('.', os.sep))
+                 for path in packagePaths]
         for path in paths:
             if not path in m.__path__:
                 log.log('packager', 'adding path %s for package %s' % (
@@ -245,7 +246,8 @@ class Packager(log.Loggable):
             # rebuild.rebuild(package)
             # self.log('rebuilt package %s with paths %r' % (packageName,
             #     package.__path__))
-            self.log('fixed up %s, __path__ %s ...' % (packageName, package.__path__))
+            self.log('fixed up %s, __path__ %s ...' % (
+                packageName, package.__path__))
 
         # now rebuild all non-package modules in this packagePath if this
         # is not a new package
@@ -421,7 +423,8 @@ def findEndModuleCandidates(path, prefix=configure.PACKAGE):
 
     # make unique
     res = {}
-    for b in endModules: res[b] = 1
+    for b in endModules:
+        res[b] = 1
 
     return res.keys()
 

@@ -110,7 +110,7 @@ class Component(object, log.Loggable):
     feederType = None
     componentType = None
     isAtmosphereComponent = False
-    
+
     def __init__(self, worker=None):
         self.name = None
         self.worker = worker
@@ -119,7 +119,7 @@ class Component(object, log.Loggable):
         self.properties = Properties()
         self.plugs = []
         self.exists = False
-    
+
     def __repr__(self):
         return '<%s.%s name=%r>' % (self.__class__.__module__,
                                     self.__class__.__name__, self.name)
@@ -290,7 +290,7 @@ class Consumer(Component):
 
     def validate(self):
         super(Consumer, self).validate()
-        
+
         if not self.isAtmosphereComponent:
             if not self.eaters:
                 raise ComponentValidationError(

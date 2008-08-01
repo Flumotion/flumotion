@@ -61,7 +61,8 @@ class FDPorterServer(Connection):
         protocol.dataReceived(additionalData)
 
     def getHost(self):
-        return address.IPv4Address('TCP', *(self.socket.getsockname() + ('INET', )))
+        return address.IPv4Address('TCP', *(
+            self.socket.getsockname() + ('INET', )))
 
     def getPeer(self):
         return address.IPv4Address('TCP', *(self.client + ('INET', )))
@@ -142,8 +143,8 @@ class HTTPPorterClientFactory(PorterClientFactory):
         # If we still have the deferred, fire it (this happens after we've
         # completed log in the _first_ time, not subsequent times)
         if self._do_start_deferred:
-            self.debug("Firing initial deferred: should indicate that login is "
-                "complete")
+            self.debug("Firing initial deferred: should indicate "
+                       "that login is complete")
             self._do_start_deferred.callback(None)
             self._do_start_deferred = None
 
@@ -156,10 +157,10 @@ class HTTPPorterClientFactory(PorterClientFactory):
         deferred.addCallback(self.medium.setRemoteReference)
         for mount in self._mountPoints:
             self.debug("Registering mount point %s with porter", mount)
-            deferred.addCallback(lambda r,m: self.registerPath(m),
+            deferred.addCallback(lambda r, m: self.registerPath(m),
                 mount)
         for mount in self._prefixes:
             self.debug("Registering mount prefix %s with porter", mount)
-            deferred.addCallback(lambda r,m: self.registerPrefix(m),
+            deferred.addCallback(lambda r, m: self.registerPrefix(m),
                 mount)
         deferred.addCallback(self._fireDeferred)

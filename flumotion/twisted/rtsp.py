@@ -50,112 +50,113 @@ SERVER_PROTOCOL = "RTSP/1.0"
 SERVER_STRING = "Flumotion RTP"
 
 # response codes
-CONTINUE                        = 100
+CONTINUE = 100
 
-OK                              = 200
-CREATED                         = 201
-LOW_STORAGE                     = 250
+OK = 200
+CREATED = 201
+LOW_STORAGE = 250
 
-MULTIPLE_CHOICE                 = 300
-MOVED_PERMANENTLY               = 301
-MOVED_TEMPORARILY               = 302
-SEE_OTHER                       = 303
-NOT_MODIFIED                    = 304
-USE_PROXY                       = 305
+MULTIPLE_CHOICE = 300
+MOVED_PERMANENTLY = 301
+MOVED_TEMPORARILY = 302
+SEE_OTHER = 303
+NOT_MODIFIED = 304
+USE_PROXY = 305
 
-BAD_REQUEST                     = 400
-UNAUTHORIZED                    = 401
-PAYMENT_REQUIRED                = 402
-FORBIDDEN                       = 403
-NOT_FOUND                       = 404
-NOT_ALLOWED                     = 405
-NOT_ACCEPTABLE                  = 406
-PROXY_AUTH_REQUIRED             = 407
-REQUEST_TIMEOUT                 = 408
-GONE                            = 410
-LENGTH_REQUIRED                 = 411
-PRECONDITION_FAILED             = 412
-REQUEST_ENTITY_TOO_LARGE        = 413
-REQUEST_URI_TOO_LONG            = 414
-UNSUPPORTED_MEDIA_TYPE          = 415
+BAD_REQUEST = 400
+UNAUTHORIZED = 401
+PAYMENT_REQUIRED = 402
+FORBIDDEN = 403
+NOT_FOUND = 404
+NOT_ALLOWED = 405
+NOT_ACCEPTABLE = 406
+PROXY_AUTH_REQUIRED = 407
+REQUEST_TIMEOUT = 408
+GONE = 410
+LENGTH_REQUIRED = 411
+PRECONDITION_FAILED = 412
+REQUEST_ENTITY_TOO_LARGE = 413
+REQUEST_URI_TOO_LONG = 414
+UNSUPPORTED_MEDIA_TYPE = 415
 
-PARAMETER_NOT_UNDERSTOOD        = 451
-CONFERENCE_NOT_FOUND            = 452
-NOT_ENOUGH_BANDWIDTH            = 453
-SESSION_NOT_FOUND               = 454
-METHOD_INVALID_STATE            = 455
-HEADER_FIELD_INVALID            = 456
-INVALID_RANGE                   = 457
-PARAMETER_READ_ONLY             = 458
-AGGREGATE_NOT_ALLOWED           = 459
-AGGREGATE_ONLY_ALLOWED          = 460
-UNSUPPORTED_TRANSPORT           = 461
-DESTINATION_UNREACHABLE         = 462
+PARAMETER_NOT_UNDERSTOOD = 451
+CONFERENCE_NOT_FOUND = 452
+NOT_ENOUGH_BANDWIDTH = 453
+SESSION_NOT_FOUND = 454
+METHOD_INVALID_STATE = 455
+HEADER_FIELD_INVALID = 456
+INVALID_RANGE = 457
+PARAMETER_READ_ONLY = 458
+AGGREGATE_NOT_ALLOWED = 459
+AGGREGATE_ONLY_ALLOWED = 460
+UNSUPPORTED_TRANSPORT = 461
+DESTINATION_UNREACHABLE = 462
 
-INTERNAL_SERVER_ERROR           = 500
-NOT_IMPLEMENTED                 = 501
-BAD_GATEWAY                     = 502
-SERVICE_UNAVAILABLE             = 503
-GATEWAY_TIMEOUT                 = 504
-RTSP_VERSION_NOT_SUPPORTED      = 505
-OPTION_NOT_SUPPORTED            = 551
+INTERNAL_SERVER_ERROR = 500
+NOT_IMPLEMENTED = 501
+BAD_GATEWAY = 502
+SERVICE_UNAVAILABLE = 503
+GATEWAY_TIMEOUT = 504
+RTSP_VERSION_NOT_SUPPORTED = 505
+OPTION_NOT_SUPPORTED = 551
 
 RESPONSES = {
     # 100
-    CONTINUE:                   "Continue",
+    CONTINUE: "Continue",
 
     # 200
-    OK:                         "OK",
-    CREATED:                    "Created",
-    LOW_STORAGE:                "Low on Storage Space",
+    OK: "OK",
+    CREATED: "Created",
+    LOW_STORAGE: "Low on Storage Space",
 
     # 300
-    MULTIPLE_CHOICE:            "Multiple Choices",
-    MOVED_PERMANENTLY:          "Moved Permanently",
-    MOVED_TEMPORARILY:          "Moved Temporarily",
-    SEE_OTHER:                  "See Other",
-    NOT_MODIFIED:               "Not Modified",
-    USE_PROXY:                  "Use Proxy",
+    MULTIPLE_CHOICE: "Multiple Choices",
+    MOVED_PERMANENTLY: "Moved Permanently",
+    MOVED_TEMPORARILY: "Moved Temporarily",
+    SEE_OTHER: "See Other",
+    NOT_MODIFIED: "Not Modified",
+    USE_PROXY: "Use Proxy",
 
     # 400
-    BAD_REQUEST:                "Bad Request",
-    UNAUTHORIZED:               "Unauthorized",
-    PAYMENT_REQUIRED:           "Payment Required",
-    FORBIDDEN:                  "Forbidden",
-    NOT_FOUND:                  "Not Found",
-    NOT_ALLOWED:                "Method Not Allowed",
-    NOT_ACCEPTABLE:             "Not Acceptable",
-    PROXY_AUTH_REQUIRED:        "Proxy Authentication Required",
-    REQUEST_TIMEOUT:            "Request Time-out",
-    GONE:                       "Gone",
-    LENGTH_REQUIRED:            "Length Required",
-    PRECONDITION_FAILED:        "Precondition Failed",
-    REQUEST_ENTITY_TOO_LARGE:   "Request Entity Too Large",
-    REQUEST_URI_TOO_LONG:       "Request-URI Too Large",
-    UNSUPPORTED_MEDIA_TYPE:     "Unsupported Media Type",
+    BAD_REQUEST: "Bad Request",
+    UNAUTHORIZED: "Unauthorized",
+    PAYMENT_REQUIRED: "Payment Required",
+    FORBIDDEN: "Forbidden",
+    NOT_FOUND: "Not Found",
+    NOT_ALLOWED: "Method Not Allowed",
+    NOT_ACCEPTABLE: "Not Acceptable",
+    PROXY_AUTH_REQUIRED: "Proxy Authentication Required",
+    REQUEST_TIMEOUT: "Request Time-out",
+    GONE: "Gone",
+    LENGTH_REQUIRED: "Length Required",
+    PRECONDITION_FAILED: "Precondition Failed",
+    REQUEST_ENTITY_TOO_LARGE: "Request Entity Too Large",
+    REQUEST_URI_TOO_LONG: "Request-URI Too Large",
+    UNSUPPORTED_MEDIA_TYPE: "Unsupported Media Type",
 
-    PARAMETER_NOT_UNDERSTOOD:   "Parameter Not Understood",
-    CONFERENCE_NOT_FOUND:       "Conference Not Found",
-    NOT_ENOUGH_BANDWIDTH:       "Not Enough Bandwidth",
-    SESSION_NOT_FOUND:          "Session Not Found",
-    METHOD_INVALID_STATE:       "Method Not Valid In This State",
-    HEADER_FIELD_INVALID:       "Header Field Not Valid for Resource",
-    INVALID_RANGE:              "Invalid Range",
-    PARAMETER_READ_ONLY:        "Parameter is Read-Only",
-    AGGREGATE_NOT_ALLOWED:      "Aggregate operation not allowed",
-    AGGREGATE_ONLY_ALLOWED:     "Only aggregate operation allowed",
-    UNSUPPORTED_TRANSPORT:      "Unsupported transport",
-    DESTINATION_UNREACHABLE:    "Destination unreachable",
+    PARAMETER_NOT_UNDERSTOOD: "Parameter Not Understood",
+    CONFERENCE_NOT_FOUND: "Conference Not Found",
+    NOT_ENOUGH_BANDWIDTH: "Not Enough Bandwidth",
+    SESSION_NOT_FOUND: "Session Not Found",
+    METHOD_INVALID_STATE: "Method Not Valid In This State",
+    HEADER_FIELD_INVALID: "Header Field Not Valid for Resource",
+    INVALID_RANGE: "Invalid Range",
+    PARAMETER_READ_ONLY: "Parameter is Read-Only",
+    AGGREGATE_NOT_ALLOWED: "Aggregate operation not allowed",
+    AGGREGATE_ONLY_ALLOWED: "Only aggregate operation allowed",
+    UNSUPPORTED_TRANSPORT: "Unsupported transport",
+    DESTINATION_UNREACHABLE: "Destination unreachable",
 
     # 500
-    INTERNAL_SERVER_ERROR:      "Internal Server Error",
-    NOT_IMPLEMENTED:            "Not Implemented",
-    BAD_GATEWAY:                "Bad Gateway",
-    SERVICE_UNAVAILABLE:        "Service Unavailable",
-    GATEWAY_TIMEOUT:            "Gateway Time-out",
+    INTERNAL_SERVER_ERROR: "Internal Server Error",
+    NOT_IMPLEMENTED: "Not Implemented",
+    BAD_GATEWAY: "Bad Gateway",
+    SERVICE_UNAVAILABLE: "Service Unavailable",
+    GATEWAY_TIMEOUT: "Gateway Time-out",
     RTSP_VERSION_NOT_SUPPORTED: "RTSP Version not supported",
-    OPTION_NOT_SUPPORTED:       "Option not supported",
+    OPTION_NOT_SUPPORTED: "Option not supported",
 }
+
 
 class RTSPError(Exception):
     """An exception with the RTSP status code and a str as arguments"""
@@ -271,7 +272,8 @@ class RTSPRequest(http.Request, flog.Loggable):
             # if we got fed crap, they're in other chunks, and we ignore them
 
         self.postpath = map(unquote, rest.split('/'))
-        self.log('split up self.path in host %s, port %r, pre %r and post %r' % (
+        self.log(
+            'split up self.path in host %s, port %r, pre %r and post %r' % (
             self.host, self.port, self.prepath, self.postpath))
         return True
 
@@ -401,7 +403,8 @@ class RTSPResource(resource.Resource, flog.Loggable):
     def getChild(self, path, request):
         return NoResource()
         # use WithDefault so static children have a chance too
-        self.log('RTSPResource.getChild(%r, %s, <request>), pre %r, post %r' % (
+        self.log(
+            'RTSPResource.getChild(%r, %s, <request>), pre %r, post %r' % (
             self, path, request.prepath, request.postpath))
         res = resource.Resource.getChild(self, path, request)
         self.log('RTSPResource.getChild(%r, %s, <request>) returns %r' % (
@@ -409,11 +412,15 @@ class RTSPResource(resource.Resource, flog.Loggable):
         return res
 
     def getChildWithDefault(self, path, request):
-        self.log('RTSPResource.getChildWithDefault(%r, %s, <request>), pre %r, post %r' % (
+        self.log(
+            'RTSPResource.getChildWithDefault(%r, %s, <request>), pre %r, '
+            'post %r' % (
             self, path, request.prepath, request.postpath))
         self.log('children: %r' % self.children.keys())
         res = resource.Resource.getChildWithDefault(self, path, request)
-        self.log('RTSPResource.getChildWithDefault(%r, %s, <request>) returns %r' % (
+        self.log(
+            'RTSPResource.getChildWithDefault(%r, %s, <request>) '
+            'returns %r' % (
             self, path, res))
         return res
 
@@ -459,12 +466,16 @@ class RTSPResource(resource.Resource, flog.Loggable):
         # hacks for Real
         if 'Real' in request.received_headers.get('user-agent', ''):
             self.debug('Detected Real client, sending specific headers')
-            # request.setHeader('Public', 'OPTIONS, DESCRIBE, ANNOUNCE, PLAY, SETUP, GET_PARAMETER, SET_PARAMETER, TEARDOWN')
+            # request.setHeader('Public', 'OPTIONS, DESCRIBE, ANNOUNCE, PLAY,
+            #                   SETUP, GET_PARAMETER, SET_PARAMETER, TEARDOWN')
             # Public seems to be the same as allowed-methods, and real clients
             # seem to respect SET_PARAMETER not listed here
-            request.setHeader('Public', 'OPTIONS, DESCRIBE, ANNOUNCE, PLAY, SETUP, TEARDOWN')
+            request.setHeader(
+                'Public',
+                'OPTIONS, DESCRIBE, ANNOUNCE, PLAY, SETUP, TEARDOWN')
             # without a RealChallenge1, clients don't even go past OPTIONS
-            request.setHeader('RealChallenge1', '28d49444034696e1d523f2819b8dcf4c')
+            request.setHeader('RealChallenge1',
+                              '28d49444034696e1d523f2819b8dcf4c')
             #request.setHeader('StatsMask', '3')
 
     def render_GET(self, request):

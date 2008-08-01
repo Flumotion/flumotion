@@ -168,7 +168,7 @@ class ConfigEntryPlug(log.Loggable):
                                             defs.getProperties())
         self.config = {'type': self.type,
                        'socket': self.socket,
-                       'entries' : self._parseEntries(defs),
+                       'entries': self._parseEntries(defs),
                        'properties': self.properties}
 
     def _parseEntries(self, entries):

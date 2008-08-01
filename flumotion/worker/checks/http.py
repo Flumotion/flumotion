@@ -28,7 +28,8 @@ __version__ = "$Rev$"
 
 def runHTTPStreamerChecks():
     """Runs all the http checks
-    @returns: a deferred returning a guess of the public hostname for this worker
+    @returns: a deferred returning a guess of the public
+              hostname for this worker
     """
     # FIXME: Move over more checks from httpstreamer.py
     log.debug('httpcheck', 'Checking...')

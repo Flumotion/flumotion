@@ -91,7 +91,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # If set, a URL to redirect a user to when the limits above are reached
         self._redirectOnFull = None
 
-        self._removing = {} # Optional deferred notification of client removals.
+        self._removing = {} # Optional deferred notification of client removals
 
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
@@ -241,9 +241,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             if no == errno.EBADF:
                 self.info('[fd %5d] client gone before writing header' % fd)
             elif no == errno.ECONNRESET:
-                self.info('[fd %5d] client reset connection writing header' % fd)
+                self.info(
+                    '[fd %5d] client reset connection writing header' % fd)
             else:
-                self.info('[fd %5d] unhandled write error when writing header: %s' % (fd, s))
+                self.info(
+                    '[fd %5d] unhandled write error when writing header: %s'
+                    % (fd, s))
         # trigger cleanup of request
         del request
         return False
@@ -268,7 +271,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if maxclients != -1:
             neededfds = maxclients + self.__reserve_fds__
 
-            # Bug in python 2.4.3, see http://sourceforge.net/tracker/index.php?func=detail&aid=1494314&group_id=5470&atid=105470
+            # Bug in python 2.4.3, see
+            # http://sourceforge.net/tracker/index.php?func=detail&
+            #   aid=1494314&group_id=5470&atid=105470
             if version[:3] == (2, 4, 3) and \
                 not hasattr(socket, "has_2_4_3_patch"):
                 self.warning(

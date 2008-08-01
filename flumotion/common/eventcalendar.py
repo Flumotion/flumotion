@@ -108,7 +108,7 @@ class EventInstance(Loggable):
         self.start = start
         self.end = end
         #this is for recurrence events so we keep track of the
-        #original start and end but also the current ones        
+        #original start and end but also the current ones
         self.currentStart = start
         self.currentEnd = end
 
@@ -291,7 +291,8 @@ class EventSet(Loggable):
 
         # now, find all instances between the two given times
         if recurring:
-            eventInstances = self._getEventInstancesRecur(recurring, start, end)
+            eventInstances = self._getEventInstancesRecur(
+                recurring, start, end)
 
         # now, find all events with a RECURRENCE-ID pointing to an instance,
         # and replace with the new instance

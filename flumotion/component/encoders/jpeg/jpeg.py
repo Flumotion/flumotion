@@ -27,9 +27,10 @@ __version__ = "$Rev$"
 
 
 class JPEG(feedcomponent.ParseLaunchComponent):
+
     def get_pipeline_string(self, properties):
         framerate = ''
-        if properties.has_key('framerate'):
+        if 'framerate' in properties:
             frac = properties['framerate']
             framerate = '(fraction)%d/%d' % (frac[0], frac[1])
 

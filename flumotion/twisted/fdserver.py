@@ -118,9 +118,10 @@ class FDPassingBroker(pb.Broker, log.Loggable):
     """
     # FIXME: looks like we can only use our own subclasses that take
     # three __init__ args
+
     def __init__(self, childFactory, connectionClass, **kwargs):
         """
-        @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+        @param connectionClass: subclass of L{twisted.internet.tcp.Connection}
         """
         pb.Broker.__init__(self, **kwargs)
 
@@ -165,10 +166,11 @@ class _SocketMaybeCloser(tcp._SocketCloser):
     keepSocketAlive = False
 
     def _closeSocket(self):
-        # We override this (from tcp._SocketCloser) so that we can close sockets
-        # properly in the normal case, but once we've passed our socket on via
-        # the FD-channel, we just close() it (not calling shutdown() which will
-        # close the TCP channel without closing the FD itself)
+        # We override this (from tcp._SocketCloser) so that we can close
+        # sockets properly in the normal case, but once we've passed our
+        # socket on via the FD-channel, we just close() it (not calling
+        # shutdown() which will close the TCP channel without closing
+        # the FD itself)
         if self.keepSocketAlive:
             try:
                 self.socket.close()

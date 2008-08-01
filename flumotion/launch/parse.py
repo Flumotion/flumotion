@@ -122,7 +122,8 @@ class ComponentStore:
         if need_sync:
             master = need_sync[-1]
             for x in need_sync:
-                x.config_entry.config['clock-master'] = master.config_entry.config['avatarId']
+                x.config_entry.config['clock-master'] = (
+                    master.config_entry.config['avatarId'])
 
     def sorted_configs(self, partial_orders):
         sort = dag.topological_sort
@@ -144,9 +145,12 @@ class ComponentStore:
     def __iter__(self):
         return self.components.__iter__()
 
+
 class Linker:
+
     def __init__(self, get_last_component):
-        # links: [(feedercomponentname, feeder, eatercomponentname, eater), ...]
+        # links: [(feedercomponentname, feeder,
+        #          eatercomponentname, eater), ...]
         self.links = []
         self._tmp = None
         self.get_last_component = get_last_component
@@ -193,9 +197,11 @@ class Linker:
         for link in self.get_links():
             assert link[0] and link[2]
             if not link[0] in component_types:
-                err('Invalid grammar: no feeder component %s to link from' % link[0])
+                err('Invalid grammar: no feeder component %s to link from' % (
+                    link[0], ))
             if not link[2] in component_types:
-                err('Invalid grammar: no eater component %s to link to' % link[2])
+                err('Invalid grammar: no eater component %s to link to' % (
+                    link[2], ))
 
         reg = registry.getRegistry()
         for link in self.get_links():
@@ -204,7 +210,8 @@ class Linker:
             compreg = reg.getComponent(comptype)
             if link[1]:
                 if not link[1] in compreg.getFeeders():
-                    err('Component %s has no feeder named %s' % (compname, link[1]))
+                    err('Component %s has no feeder named %s' % (
+                        compname, link[1]))
                 # leave link[1] unchanged
             else:
                 if not compreg.getFeeders():
@@ -218,7 +225,8 @@ class Linker:
             eaters = compreg.getEaters()
             if link[3]:
                 if not link[3] in [x.getName() for x in eaters]:
-                    err('Component %s has no eater named %s' % (compname, link[3]))
+                    err('Component %s has no eater named %s' % (
+                        compname, link[3]))
                 # leave link[1] unchanged
             else:
                 if not eaters:

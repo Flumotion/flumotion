@@ -189,6 +189,7 @@ class VolumeAdminGtkNode(EffectAdminGtkNode):
         if checked:
             self._hscale.set_range(0.0, 4.0)
         else:
-            if value > 1.0: value = 1.0
+            if value > 1.0:
+                value = 1.0
             self._hscale.set_range(0.0, 1.0)
         self.volumeSet(value)

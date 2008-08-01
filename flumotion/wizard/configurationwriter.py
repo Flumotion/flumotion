@@ -39,7 +39,8 @@ class ConfigurationWriter(XMLWriter):
         """
         @param flowName: name of the flow
         @param flowComponents: components to be included in the flow
-        @param atmosphereComponents: components to be included in the atmosphere
+        @param atmosphereComponents: components to be included
+            in the atmosphere
         """
         super(ConfigurationWriter, self).__init__()
         self._flowName = flowName
@@ -87,7 +88,7 @@ class ConfigurationWriter(XMLWriter):
         # wizard which links to existing components
         if component.exists:
             return
-        
+
         # FIXME: when the wizard can be split among projects, "project"
         # and "version" should be taken from the relevant project
         attrs = [('name', component.name),

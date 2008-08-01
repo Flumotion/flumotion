@@ -211,7 +211,7 @@ class ComponentJobHeaven(base.BaseJobHeaven):
         # arguments to run it with configurable, but this'll do for now.
         # FLU_VALGRIND_JOB takes a comma-seperated list of full component
         # avatar IDs.
-        if os.environ.has_key('FLU_VALGRIND_JOB'):
+        if 'FLU_VALGRIND_JOB' in os.environ:
             jobnames = os.environ['FLU_VALGRIND_JOB'].split(',')
             if avatarId in jobnames:
                 realexecutable = 'valgrind'
@@ -324,9 +324,11 @@ class CheckJobHeaven(base.BaseJobHeaven):
                 if not termtimeout.active():
                     self.info("Discarding error %s", res)
                     res = messages.Result()
-                    res.add(messages.Error(T_(N_("Check timed out.")),
-                                           debug=("Timed out running %s."%methodName)))
+                    res.add(messages.Error(
+                        T_(N_("Check timed out.")),
+                        debug=("Timed out running %s."%methodName)))
                 else:
+
                     def expire():
                         if (job, expireDC) in self.jobPool:
                             self.debug('stopping idle check job process %s',

@@ -51,11 +51,10 @@ class Overlay(feedcomponent.ParseLaunchComponent):
     def configure_pipeline(self, pipeline, properties):
         p = properties
         self.fixRenamedProperties(p, [
-                ('show_text',    'show-text'),
+                ('show_text', 'show-text'),
                 ('fluendo_logo', 'fluendo-logo'),
-                ('cc_logo',      'cc-logo'),
-                ('xiph_logo',    'xiph-logo')
-            ])
+                ('cc_logo', 'cc-logo'),
+                ('xiph_logo', 'xiph-logo')])
 
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
@@ -80,7 +79,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         source = self.get_element('source')
         source.set_property('location', self._filename)
 
-        if gstreamer.get_plugin_version('videomixer') == (0,10,7,0):
+        if gstreamer.get_plugin_version('videomixer') == (0, 10, 7, 0):
             m = messages.Warning(
                 T_(N_("The 'videomixer' GStreamer element has a bug in this "
                       "version (0.10.7). You may see many errors in the debug "

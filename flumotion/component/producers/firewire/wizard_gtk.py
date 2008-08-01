@@ -123,7 +123,7 @@ class _FireWireCommon:
     def _update_width_correction(self):
         self._width_correction = None
         for i in type(self).width_corrections:
-            if getattr(self,'radiobutton_width_'+i).get_active():
+            if getattr(self, 'radiobutton_width_' + i).get_active():
                 self._width_correction = i
                 break
         assert self._width_correction
@@ -170,7 +170,7 @@ class _FireWireCommon:
             ow = sw + (8 - (sw % 8)) % 8
             sw = ow
 
-        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
+        return dict(sw=sw, sh=sh, ow=ow, oh=oh)
 
     def _run_checks(self):
         self._setSensitive(False)

@@ -28,7 +28,8 @@ from flumotion.common import log
 from flumotion.common.errors import ComponentStartError
 from flumotion.component.misc.httpserver.httpserver import HTTPFileStreamer
 from flumotion.component.plugs.base import ComponentPlug
-from flumotion.component.plugs.cortado.cortado_location import getCortadoFilename
+from flumotion.component.plugs.cortado.cortado_location import \
+     getCortadoFilename
 from flumotion.configure import configure
 
 __version__ = "$Rev$"
@@ -138,11 +139,11 @@ def test():
     properties = {'has-audio': True,
                   'has-video': True,
                   'codebase': '/',
-                  'width' : 320,
-                  'height' : 240,
-                  'stream-url' : '/stream.ogg',
+                  'width': 320,
+                  'height': 240,
+                  'stream-url': '/stream.ogg',
                   'buffer-size': 40,
-                  'framerate' : 1}
+                  'framerate': 1}
     root = CortadoDirectoryResource('/', properties, getCortadoFilename())
     site = Site(root)
 

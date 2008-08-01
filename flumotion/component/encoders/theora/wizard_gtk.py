@@ -63,7 +63,7 @@ class TheoraVideoEncoder(VideoEncoder):
             raise AssertionError
 
         properties.noise_sensitivity = max(
-            int(properties.noise_sensitivity * (32768 / 100.)),  1)
+            int(properties.noise_sensitivity * (32768 / 100.)), 1)
 
         # convert the human-friendly delta to maxdistance
         # FIXME: I think the theora-encoder component should not expose

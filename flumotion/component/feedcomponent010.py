@@ -140,7 +140,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         @rtype: L{gst.Pipeline}
         """
-        raise NotImplementedError, "subclass must implement create_pipeline"
+        raise NotImplementedError(
+            "subclass must implement create_pipeline")
 
     def set_pipeline(self, pipeline):
         """
@@ -367,7 +368,8 @@ class FeedComponent(basecomponent.BaseComponent):
         # start checking feeders, if we have a sufficiently recent multifdsink
         if self._get_stats_supported:
             self._feeder_probe_cl = reactor.callLater(
-                self.FEEDER_STATS_UPDATE_FREQUENCY, self._feeder_probe_calllater)
+                self.FEEDER_STATS_UPDATE_FREQUENCY,
+                self._feeder_probe_calllater)
         else:
             self.warning("Feeder statistics unavailable, your "
                 "gst-plugins-base is too old")
@@ -484,9 +486,9 @@ class FeedComponent(basecomponent.BaseComponent):
                        clock, gst.TIME_ARGS(base_time))
 
             if self.medium:
-                # FIXME: This isn't always correct. We need a more flexible API,
-                # and a proper network map, to do this. Even then, it's not
-                # always going to be possible.
+                # FIXME: This isn't always correct. We need a more
+                # flexible API, and a proper network map, to do this.
+                # Even then, it's not always going to be possible.
                 ip = self.medium.getIP()
             else:
                 ip = "127.0.0.1"
@@ -544,15 +546,16 @@ class FeedComponent(basecomponent.BaseComponent):
                         # There is an unavoidable race here: we can't know
                         # whether the fd has been removed from multifdsink.
                         # However, if we call get-stats on an fd that
-                        # multifdsink doesn't know about, we just get a 0-length
-                        # array. We ensure that we don't reuse the FD too soon
-                        # so this can't result in calling this on a valid but
-                        # WRONG fd
+                        # multifdsink doesn't know about, we just get a
+                        # 0-length array. We ensure that we don't reuse
+                        # the FD too soon so this can't result in calling
+                        # this on a valid but WRONG fd
                         self.debug('Feeder element for feed %s does not know '
                             'client fd %d' % (feedId, client.fd))
                     else:
                         client.setStats(array)
-        self._feeder_probe_cl = reactor.callLater(self.FEEDER_STATS_UPDATE_FREQUENCY,
+        self._feeder_probe_cl = reactor.callLater(
+            self.FEEDER_STATS_UPDATE_FREQUENCY,
             self._feeder_probe_calllater)
 
     def unblock_eater(self, eaterAlias):
@@ -579,18 +582,21 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
-        self.debug("%s: getting property %s of element %s" % (self.getName(), property, element_name))
+        self.debug("%s: getting property %s of element %s" % (
+            self.getName(), property, element_name))
         element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name
             self.warning(msg)
             raise errors.PropertyError(msg)
 
-        self.debug('getting property %s on element %s' % (property, element_name))
+        self.debug('getting property %s on element %s' % (
+            property, element_name))
         try:
             value = element.get_property(property)
         except (ValueError, TypeError):
-            msg = "Property '%s' on element '%s' does not exist" % (property, element_name)
+            msg = "Property '%s' on element '%s' does not exist" % (
+                property, element_name)
             self.warning(msg)
             raise errors.PropertyError(msg)
 
@@ -637,7 +643,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # We must have a pipeline in READY or above to do this. Do a
         # non-blocking (zero timeout) get_state.
-        if not self.pipeline or self.pipeline.get_state(0)[1] == gst.STATE_NULL:
+        if (not self.pipeline or
+            self.pipeline.get_state(0)[1] == gst.STATE_NULL):
             self.warning('told to feed %s to fd %d, but pipeline not '
                          'running yet', feedName, fd)
             cleanup(fd)

@@ -41,9 +41,14 @@ class PipeTransport:
         self.rfd, self.wfd = os.pipe()
         fcntl.fcntl(self.rfd, fcntl.F_SETFL, os.O_NONBLOCK)
 
-    def fileno(self): return self.wfd
-    def write(self, data): os.write(self.wfd, data)
-    def read(self, len=4096): return os.read(self.rfd, len)
+    def fileno(self):
+        return self.wfd
+
+    def write(self, data):
+        os.write(self.wfd, data)
+
+    def read(self, len=4096):
+        return os.read(self.rfd, len)
 
     def readall(self):
         data = ''
@@ -88,8 +93,11 @@ class FakeRequest:
     def setHeader(self, field, value):
         self.headers[field] = value
 
-    def write(self, text): self.data = self.data + text
-    def finish(self): pass
+    def write(self, text):
+        self.data = self.data + text
+
+    def finish(self):
+        pass
 
     getUser = lambda s: s.user
     getPassword = lambda s: s.passwd
@@ -123,11 +131,21 @@ class FakeStreamer:
         self.medium = mediumClass()
         self.plugs = {'flumotion.component.plugs.loggers.Logger': {}}
 
-    def get_content_type(self): return self.mime
-    def add_client(self, fd): pass
-    def connect(self, *args): pass
-    def debug(self, *args): pass
-    def getName(self): return "fakestreamer"
+    def get_content_type(self):
+        return self.mime
+
+    def add_client(self, fd):
+        pass
+
+    def connect(self, *args):
+        pass
+
+    def debug(self, *args):
+        pass
+
+    def getName(self):
+        return "fakestreamer"
+
 
 class TestHTTPStreamingResource(testsuite.TestCase):
     # helpers
@@ -172,7 +190,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         resource = resources.HTTPStreamingResource(streamer, httpauth)
         self.failIf(resource.isReady())
         status = resource.render(FakeRequest(ip=''))
-        self.assertEquals(status,  server.NOT_DONE_YET)
+        self.assertEquals(status, server.NOT_DONE_YET)
 
     def testRenderReachedMaxClients(self):
         streamer = FakeStreamer()
@@ -198,7 +216,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         expected = resources.ERROR_TEMPLATE % {
             'code': error_code,
             'error': http.RESPONSES[error_code]}
-        self.assertEquals(data,  expected)
+        self.assertEquals(data, expected)
 
     def testRenderHTTPAuthUnauthorized(self):
         streamer = FakeStreamer()
@@ -307,14 +325,14 @@ class TestHTTPRoot(testsuite.TestCase):
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
         output = r.render(request)
-        self.assertEquals(output,  server.NOT_DONE_YET)
+        self.assertEquals(output, server.NOT_DONE_YET)
 
         # a request for /a/b should give 404
         log.debug('unittest', 'requesting /a/b, should 404')
         request = FakeRequest(ip='', postpath=['a', 'b'])
         r = site.getResourceFor(request)
         output = r.render(request)
-        self.assertEquals(request.response,  http.NOT_FOUND)
+        self.assertEquals(request.response, http.NOT_FOUND)
 
     def testRenderTopStreamer(self):
         # a streamer that is at /a
@@ -331,7 +349,7 @@ class TestHTTPRoot(testsuite.TestCase):
         request = FakeRequest(ip='')
         r = site.getResourceFor(request)
         output = r.render(request)
-        self.assertEquals(request.response,  http.NOT_FOUND)
+        self.assertEquals(request.response, http.NOT_FOUND)
 
         # a request for /a should work
         log.debug('unittest', 'requesting /a, should work')
@@ -339,14 +357,14 @@ class TestHTTPRoot(testsuite.TestCase):
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
         output = r.render(request)
-        self.assertEquals(output,  server.NOT_DONE_YET)
+        self.assertEquals(output, server.NOT_DONE_YET)
 
         # a request for /a/b should give 404
         log.debug('unittest', 'requesting /a/b, should 404')
         request = FakeRequest(ip='', postpath=['a', 'b'])
         r = site.getResourceFor(request)
         output = r.render(request)
-        self.assertEquals(request.response,  http.NOT_FOUND)
+        self.assertEquals(request.response, http.NOT_FOUND)
 
     def testRenderTreeStreamer(self):
         # a streamer that is at /a/b
@@ -363,7 +381,7 @@ class TestHTTPRoot(testsuite.TestCase):
         request = FakeRequest(ip='')
         r = site.getResourceFor(request)
         output = r.render(request)
-        self.assertEquals(request.response,  http.NOT_FOUND)
+        self.assertEquals(request.response, http.NOT_FOUND)
 
         # a request for /a/b should work
         log.debug('unittest', 'requesting /a/b, should work')
@@ -371,4 +389,4 @@ class TestHTTPRoot(testsuite.TestCase):
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
         output = r.render(request)
-        self.assertEquals(output,  server.NOT_DONE_YET)
+        self.assertEquals(output, server.NOT_DONE_YET)

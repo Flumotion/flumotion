@@ -105,39 +105,39 @@ class ComponentWrapper(object, log.Loggable):
         cfg['type'] = type_
         reg = ComponentWrapper._registry.getComponent(type_)
 
-        if not cfg.has_key('source'):
+        if not 'source' in cfg:
             cfg['source'] = []
 
-        if not cfg.has_key('eater'):
+        if not 'eater' in cfg:
             cfg['eater'] = dict([(e.getName(), []) for e in reg.getEaters()
                                  if e.getRequired()])
 
-        if not cfg.has_key('feed'):
+        if not 'feed' in cfg:
             cfg['feed'] = reg.getFeeders()[:]
 
         if plugs is not None:
             cfg['plugs'] = plugs
-        if not cfg.has_key('plugs'):
+        if not 'plugs' in cfg:
             cfg['plugs'] = dict([(s, []) for s in reg.getSockets()])
 
         if name:
             cfg['name'] = name
-        if not cfg.has_key('name'):
+        if not 'name' in cfg:
             cfg['name'] = ComponentWrapper.get_unique_name()
         self.name = cfg['name']
 
-        if not cfg.has_key('parent'):
+        if not 'parent' in cfg:
             cfg['parent'] = 'default'
 
-        if not cfg.has_key('avatarId'):
+        if not 'avatarId' in cfg:
             cfg['avatarId'] = common.componentId(cfg['parent'], self.name)
 
         if props is not None:
             cfg['properties'] = props
-        if not cfg.has_key('properties'):
+        if not 'properties' in cfg:
             cfg['properties'] = {}
 
-        if not cfg.has_key('clock-master'):
+        if not 'clock-master' in cfg:
             cfg['clock-master'] = None
 
         self.sync_master = cfg['clock-master']

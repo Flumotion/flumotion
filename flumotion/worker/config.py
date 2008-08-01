@@ -105,8 +105,8 @@ class WorkerConfigXML(log.Loggable):
             elif node.nodeName == 'debug':
                 self.fludebug = str(node.firstChild.nodeValue)
             else:
-                raise ConfigError("unexpected node under '%s': %s" % (root.nodeName, node.nodeName))
-
+                raise ConfigError("unexpected node under '%s': %s" % (
+                    root.nodeName, node.nodeName))
     def parseManager(self, node):
         # <manager>
         #   <host>...</host>
@@ -138,7 +138,8 @@ class WorkerConfigXML(log.Loggable):
                     raise ConfigError("<transport> must be ssl or tcp")
 
             else:
-                raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
+                raise ConfigError("unexpected '%s' node: %s" % (
+                    node.nodeName, child.nodeName))
 
         return ConfigEntryManager(host, port, transport)
 
@@ -160,7 +161,8 @@ class WorkerConfigXML(log.Loggable):
             elif child.nodeName == "password":
                 password = str(child.firstChild.nodeValue)
             else:
-                raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
+                raise ConfigError("unexpected '%s' node: %s" % (
+                    node.nodeName, child.nodeName))
 
         return ConfigEntryAuthentication(username, password)
 

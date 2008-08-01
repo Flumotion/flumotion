@@ -142,10 +142,10 @@ class GladeWindow(GladeBacked):
           gladeFile = 'my_gladeFile.glade'
           ...
 
-    Remember to chain up if you customize __init__(). Also note that GladeWindow
-    does *not* descend from GtkWindow, so you can't treat the resulting object
-    as a GtkWindow. The show, hide, destroy, and present methods are provided as
-    convenience wrappers.
+    Remember to chain up if you customize __init__(). Also note that
+    GladeWindow does *not* descend from GtkWindow, so you can't treat the
+    resulting object as a GtkWindow. The show, hide, destroy, and present
+    methods are provided as convenience wrappers.
 
     @ivar window: the gtk Window
     @type window: gtk.Window

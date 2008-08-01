@@ -79,8 +79,9 @@ class JobMedium(medium.BaseMedium):
         self._hasStoppedReactor = False
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
-    def remote_bootstrap(self, workerName, host, port, transport, authenticator,
-            packagePaths):
+
+    def remote_bootstrap(self, workerName, host, port,
+                         transport, authenticator, packagePaths):
         """
         I receive the information on how to connect to the manager. I also set
         up package paths to be able to run the component.
@@ -268,11 +269,12 @@ class JobMedium(medium.BaseMedium):
                 "raising ComponentCreateError(%s) and stopping job" % msg)
             # This is a Nasty Hack. We raise ComponentCreateError, which can be
             # caught on the other side and marshalled as a reasonably
-            # comprehensible error message. However, if we shutdown immediately,
-            # the PB connection won't be available, so the worker will just get
-            # an error about that! So, instead, we shut down in a tenth of a
-            # second, usually allowing the worker to get scheduled and read the
-            # exception over PB. Ick!
+            # comprehensible error message. However, if we shutdown
+            # immediately, the PB connection won't be available, so
+            # the worker will just get an error about that! So, instead,
+            # we shut down in a tenth of a second, usually allowing
+            # the worker to get scheduled and read the exception over PB.
+            # Ick!
             reactor.callLater(0.1, self.shutdown)
             raise errors.ComponentCreateError(msg)
 
@@ -301,7 +303,8 @@ class JobMedium(medium.BaseMedium):
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, managerClientFactory)
         else:
-            self.warning('Unknown transport protocol %s' % self._managerTransport)
+            self.warning(
+                'Unknown transport protocol %s' % self._managerTransport)
 
         return comp
 
@@ -312,9 +315,10 @@ class JobClientBroker(pb.Broker, log.Loggable):
     When an FD is seen, the FD should be added to a given eater or feeder
     element.
     """
+
     def __init__(self, connectionClass, **kwargs):
         """
-        @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+        @param connectionClass: subclass of L{twisted.internet.tcp.Connection}
         """
         pb.Broker.__init__(self, **kwargs)
 

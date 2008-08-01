@@ -33,9 +33,9 @@ class AddFormatWizard(ConfigurationWizard):
         self._selectProducerStep = None
         ConfigurationWizard.__init__(self, parent)
         self.setScenario(LiveScenario(self))
-            
+
     # ConfigurationWizard
-    
+
     def addSteps(self):
         self._selectProducerStep = SelectProducersStep(self)
         self.addStepSection(self._selectProducerStep)
@@ -45,10 +45,10 @@ class AddFormatWizard(ConfigurationWizard):
 
     def hasAudio(self):
         return self._selectProducerStep.hasAudio()
-    
+
     def hasVideo(self):
         return self._selectProducerStep.hasVideo()
-    
+
     def getAudioProducer(self):
         return self._selectProducerStep.getAudioProducer()
 
@@ -59,8 +59,6 @@ class AddFormatWizard(ConfigurationWizard):
 
     def setAudioProducers(self, audioProducers):
         self._selectProducerStep.setAudioProducers(audioProducers)
-        
+
     def setVideoProducers(self, videoProducers):
         self._selectProducerStep.setVideoProducers(videoProducers)
-
-    

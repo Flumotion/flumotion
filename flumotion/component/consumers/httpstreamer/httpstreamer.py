@@ -87,7 +87,7 @@ class Stats:
         else:
             dt = dt1 + dt2
             before = (dc1 * dt1) / dt
-            after =  dc2 * dt2 / dt
+            after = dc2 * dt2 / dt
             self.average_client_number = before + after
 
     def clientAdded(self):
@@ -167,9 +167,9 @@ class Stats:
     def updateState(self, set):
         c = self
 
-        bytes_sent      = c.getBytesSent()
-        bytes_received  = c.getBytesReceived()
-        uptime          = c.getUptime()
+        bytes_sent = c.getBytesSent()
+        bytes_received = c.getBytesReceived()
+        uptime = c.getUptime()
 
         set('stream-mime', c.get_mime())
         set('stream-url', c.getUrl())
@@ -313,15 +313,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
-            ('issuer',             'issuer-class'),
-            ('mount_point',        'mount-point'),
+            ('issuer', 'issuer-class'),
+            ('mount_point', 'mount-point'),
             ('porter_socket_path', 'porter-socket-path'),
-            ('porter_username',    'porter-username'),
-            ('porter_password',    'porter-password'),
-            ('user_limit',         'client-limit'),
-            ('bandwidth_limit',    'bandwidth-limit'),
-            ('burst_on_connect',   'burst-on-connect'),
-            ('burst_size',         'burst-size'),
+            ('porter_username', 'porter-username'),
+            ('porter_password', 'porter-password'),
+            ('user_limit', 'client-limit'),
+            ('bandwidth_limit', 'bandwidth-limit'),
+            ('burst_on_connect', 'burst-on-connect'),
+            ('burst_size', 'burst-size'),
             ])
 
         if props.get('type', 'master') == 'slave':
@@ -392,11 +392,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 sink.set_property('bytes-min', (self.burst_size + 512) * 1024)
 
                 # And then we need a maximum still further above that - the
-                # exact value doesn't matter too much, but we want it reasonably
-                # small to limit memory usage. multifdsink doesn't give us much
-                # control here, we can only specify the max values in buffers.
-                # We assume each buffer is close enough to 4kB - true for asf
-                # and ogg, at least
+                # exact value doesn't matter too much, but we want it
+                # reasonably small to limit memory usage. multifdsink doesn't
+                # give us much control here, we can only specify the max
+                # values in buffers. We assume each buffer is close enough
+                # to 4kB - true for asf and ogg, at least
                 sink.set_property('buffers-soft-max',
                     (self.burst_size + 1024) / 4)
                 sink.set_property('buffers-max',
@@ -430,9 +430,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # where nothing else is possible, but it's much preferable to just
         # configure this
         self.hostname = properties.get('hostname', None)
-        self.iface = self.hostname # We listen on this if explicitly configured,
-                                   # but not if it's only guessed at by the
-                                   # below code.
+        self.iface = self.hostname # We listen on this if explicitly
+                                   # configured, but not if it's only guessed
+                                   # at by the below code.
         if not self.hostname:
             # Don't call this nasty, nasty, probably flaky function unless we
             # need to.
@@ -465,7 +465,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.connect('client-fd-removed', self._client_fd_removed_cb)
         sink.connect('client-removed', self._client_removed_cb)
 
-        if properties.has_key('client-limit'):
+        if 'client-limit' in properties:
             limit = int(properties['client-limit'])
             self.resource.setUserLimit(limit)
             if limit != self.resource.maxclients:
@@ -479,7 +479,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 m.anchor = 'section-configuration-system-fd'
                 self.addMessage(m)
 
-        if properties.has_key('bandwidth-limit'):
+        if 'bandwidth-limit' in properties:
             limit = int(properties['bandwidth-limit'])
             if limit < 1000:
                 # The wizard used to set this as being in Mbps, oops.
@@ -488,26 +488,27 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 limit *= 1000000
             self.resource.setBandwidthLimit(limit)
 
-        if properties.has_key('redirect-on-overflow'):
+        if 'redirect-on-overflow' in properties:
             self.resource.setRedirectionOnLimits(
                 properties['redirect-on-overflow'])
 
-        if properties.has_key('bouncer'):
+        if 'bouncer' in properties:
             self.httpauth.setBouncerName(properties['bouncer'])
 
-        if properties.has_key('issuer-class'):
+        if 'issuer-class' in properties:
             self.httpauth.setIssuerClass(properties['issuer-class'])
 
-        if properties.has_key('duration'):
-            self.httpauth.setDefaultDuration(float(properties['duration']))
+        if 'duration' in properties:
+            self.httpauth.setDefaultDuration(
+                float(properties['duration']))
 
-        if properties.has_key('domain'):
+        if 'domain' in properties:
             self.httpauth.setDomain(properties['domain'])
 
-        if self.config.has_key('avatarId'):
+        if 'avatarId' in self.config:
             self.httpauth.setRequesterId(self.config['avatarId'])
 
-        if properties.has_key('ip-filter'):
+        if 'ip-filter' in properties:
             logFilter = http.LogFilter()
             for f in properties['ip-filter']:
                 logFilter.addIPFilter(f)
@@ -547,15 +548,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             plug = self.plugs[socket][-1]
             return plug.getStreamData()
         else:
-            return {
-                'protocol': 'HTTP',
-                'description': self.description,
-                'url' : self.getUrl()
-                }
+            return {'protocol': 'HTTP',
+                    'description': self.description,
+                    'url': self.getUrl()}
 
     def getLoadData(self):
         """Return a tuple (deltaadded, deltaremoved, bytes_transferred,
-        current_clients, current_load) of our current bandwidth and user values.
+        current_clients, current_load) of our current bandwidth and
+        user values.
         The deltas are estimates of how much bitrate is added, removed
         due to client connections, disconnections, per second.
         """
@@ -563,11 +563,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # multiply by the stream bitrate
         deltaadded, deltaremoved = self.getLoadDeltas()
 
-        bytes_received  = self.getBytesReceived()
-        uptime          = self.getUptime()
+        bytes_received = self.getBytesReceived()
+        uptime = self.getUptime()
         bitrate = bytes_received * 8 / uptime
 
-        bytes_sent      = self.getBytesSent()
+        bytes_sent = self.getBytesSent()
         clients_connected = self.getClients()
         current_load = bitrate * clients_connected
 
@@ -659,8 +659,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # We now use both client-removed and client-fd-removed. We call get-stats
     # from the first callback ('client-removed'), but don't actually start
     # removing the client until we get 'client-fd-removed'. This ensures that
-    # there's no window in which multifdsink still knows about the fd, but we've    # actually closed it, so we no longer get spurious duplicates.
+    # there's no window in which multifdsink still knows about the fd,
+    # but we've actually closed it, so we no longer get spurious duplicates.
     # this can be called from both application and streaming thread !
+
     def _client_removed_cb(self, sink, fd, reason):
         stats = sink.emit('get-stats', fd)
         self._pending_removals[fd] = (stats, reason)
@@ -734,7 +736,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         else:
             d = defer.succeed(None)
         self.httpauth.scheduleKeepAlive()
-        d.addCallback(lambda res: feedcomponent.ParseLaunchComponent.do_pipeline_playing(self))
+        d.addCallback(lambda res:
+                      feedcomponent.ParseLaunchComponent.do_pipeline_playing(
+            self))
         return d
 
     def do_setup(self):
@@ -775,13 +779,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             try:
                 self.debug('Listening on %d' % self.port)
                 iface = self.iface or ""
-                self._tport = reactor.listenTCP(self.port, server.Site(resource=root),
+                self._tport = reactor.listenTCP(
+                    self.port, server.Site(resource=root),
                     interface=iface)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
                 m = messages.Error(T_(N_(
-                    "Network error: TCP port %d is not available."), self.port))
+                    "Network error: TCP port %d is not available."),
+                                      self.port))
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))

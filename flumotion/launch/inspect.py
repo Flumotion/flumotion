@@ -158,7 +158,8 @@ def main(args):
             sockets = c.getSockets()
             print '\nClocking:'
             print '  Needs synchronisation: %r' % c.getNeedsSynchronization()
-            if c.getClockPriority() is not None and c.getNeedsSynchronization():
+            if (c.getClockPriority() is not None and
+                c.getNeedsSynchronization()):
                 print '  Clock priority: %d' % c.getClockPriority()
             print '\nSockets:'
             for socket in sockets:

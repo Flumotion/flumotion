@@ -25,7 +25,7 @@ Properties tab in the component UI
 
 import gettext
 import os
- 
+
 import gtk
 from kiwi.python import Settable
 from kiwi.ui.objectlist import ObjectList, Column
@@ -46,7 +46,7 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
     def haveWidgetTree(self):
         self.widget = gtk.VBox()
         self.widget.set_border_width(6)
-        
+
         self.properties = ObjectList(
             [Column('name'),
              Column('value')])
@@ -57,7 +57,7 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
         properties = self.state.get('config')['properties']
         propertyNames = properties.keys()[:]
         propertyNames.sort()
-        
+
         for name in propertyNames:
             self.properties.append(
                 Settable(name=name, value=properties[name]))

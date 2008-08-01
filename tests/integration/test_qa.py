@@ -35,7 +35,9 @@ httpFileXML = """<?xml version="1.0" ?>
 videoTestNoOverlayXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion"
+               type="videotest-producer"
+               version="0.3.0.1" worker="default">
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -43,15 +45,18 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
       <property name="pattern">0</property>
       <property name="width">32</property>
     </component>
-    <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
+    <component name="video-encoder" project="flumotion" type="theora-encoder"
+               version="0.3.0.1" worker="default">
       <source>video-source</source>
       <!-- properties -->
       <property name="bitrate">400000</property>
     </component>
-    <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+    <component name="muxer-video" project="flumotion" type="ogg-muxer"
+               version="0.3.0.1" worker="default">
       <source>video-encoder</source>
     </component>
-    <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+    <component name="http-video" project="flumotion" type="http-streamer"
+               version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
       <property name="bandwidth-limit">10</property>
@@ -60,7 +65,8 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
       <property name="port">%d</property>
       <property name="client-limit">1024</property>
     </component>
-    <component name="disk-video" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
+    <component name="disk-video" project="flumotion" type="disk-consumer"
+               version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
       <property name="directory">%s</property>
@@ -73,12 +79,14 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
 videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
 <planet>
   <atmosphere>
-    <component name="tokenbouncer" project="flumotion" type="tokentest-bouncer" version="0.3.0.1" worker="default">
+    <component name="tokenbouncer" project="flumotion"
+               type="tokentest-bouncer" version="0.3.0.1" worker="default">
       <property name="authorized-token">test</property>
     </component>
   </atmosphere>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion"
+               type="videotest-producer" version="0.3.0.1" worker="default">
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -86,15 +94,18 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
       <property name="pattern">0</property>
       <property name="width">32</property>
     </component>
-    <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
+    <component name="video-encoder" project="flumotion"
+               type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-source</source>
       <!-- properties -->
       <property name="bitrate">400000</property>
     </component>
-    <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+    <component name="muxer-video" project="flumotion" type="ogg-muxer"
+               version="0.3.0.1" worker="default">
       <source>video-encoder</source>
     </component>
-    <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+    <component name="http-video" project="flumotion" type="http-streamer"
+               version="0.3.0.1" worker="default">
       <source>muxer-video</source>
       <!-- properties -->
       <property name="bandwidth-limit">10</property>
@@ -111,23 +122,27 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
 audioTestXML="""<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="audio-source" project="flumotion" type="audiotest-producer" version="0.3.0.1" worker="default">
+    <component name="audio-source" project="flumotion"
+               type="audiotest-producer" version="0.3.0.1" worker="default">
 
       <property name="frequency">440</property>
       <property name="rate">8000</property>
       <property name="volume">1.0</property>
     </component>
 
-    <component name="audio-encoder" project="flumotion" type="vorbis-encoder" version="0.3.0.1" worker="default">
+    <component name="audio-encoder" project="flumotion"
+               type="vorbis-encoder" version="0.3.0.1" worker="default">
       <source>audio-source</source>
 
       <property name="quality">0.5</property>
     </component>
 
-    <component name="muxer-audio" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+    <component name="muxer-audio" project="flumotion"
+               type="ogg-muxer" version="0.3.0.1" worker="default">
       <source>audio-encoder</source>
     </component>
-    <component name="http-audio" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+    <component name="http-audio" project="flumotion"
+               type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
       <property name="bandwidth-limit">10</property>
@@ -137,7 +152,8 @@ audioTestXML="""<?xml version="1.0" ?>
       <property name="client-limit">1024</property>
     </component>
 
-    <component name="disk-audio" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
+    <component name="disk-audio" project="flumotion"
+               type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-audio</source>
 
       <property name="directory">%s</property>
@@ -151,7 +167,8 @@ audioTestXML="""<?xml version="1.0" ?>
 videoTestXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
-    <component name="video-source" project="flumotion" type="videotest-producer" version="0.3.0.1" worker="default">
+    <component name="video-source" project="flumotion"
+               type="videotest-producer" version="0.3.0.1" worker="default">
 
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
@@ -160,7 +177,8 @@ videoTestXML = """<?xml version="1.0" ?>
       <property name="width">160</property>
     </component>
 
-    <component name="video-overlay" project="flumotion" type="overlay-converter" version="0.3.0.1" worker="default">
+    <component name="video-overlay" project="flumotion"
+               type="overlay-converter" version="0.3.0.1" worker="default">
       <source>video-source</source>
 
       <property name="cc-logo">True</property>
@@ -172,17 +190,20 @@ videoTestXML = """<?xml version="1.0" ?>
       <property name="xiph-logo">True</property>
     </component>
 
-    <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
+    <component name="video-encoder" project="flumotion"
+               type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-overlay</source>
 
       <property name="bitrate">400000</property>
     </component>
 
-    <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+    <component name="muxer-video" project="flumotion"
+               type="ogg-muxer" version="0.3.0.1" worker="default">
       <source>video-encoder</source>
     </component>
 
-    <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+    <component name="http-video" project="flumotion"
+               type="http-streamer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
 
       <property name="bandwidth-limit">10</property>
@@ -192,7 +213,8 @@ videoTestXML = """<?xml version="1.0" ?>
       <property name="client-limit">1024</property>
     </component>
 
-    <component name="disk-video" project="flumotion" type="disk-consumer" version="0.3.0.1" worker="default">
+    <component name="disk-video" project="flumotion"
+               type="disk-consumer" version="0.3.0.1" worker="default">
       <source>muxer-video</source>
 
       <property name="directory">%s</property>
@@ -212,7 +234,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
 
     def testHttpFile(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
-        httpPort = random.randrange(12800,12899)
+        httpPort = random.randrange(12800, 12899)
         self.makeFile('httpfile-config.xml', httpFileXML % (httpPort,
             __file__))
         self.loadConfiguration(plan, 'httpfile-config.xml')
@@ -227,7 +249,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
 
     def testVideoTestNoOverlay(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
-        httpPort = random.randrange(12800,12899)
+        httpPort = random.randrange(12800, 12899)
         self.makeFile('videotest-nooverlay.xml', videoTestNoOverlayXML % (
             httpPort, os.getcwd()))
         self.loadConfiguration(plan, 'videotest-nooverlay.xml')
@@ -236,7 +258,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/default/disk-video')
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
-            httpPort,))
+            httpPort, ))
         plan.wait(h, 0)
         # now check files saved by disker
         cft = plan.spawn('check-disker-file-type', 'Ogg',
@@ -244,7 +266,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.wait(cft, 0)
         # clean up disk files
         clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
-            self.managerPort,), '/default/disk-video')
+            self.managerPort, ), '/default/disk-video')
         plan.wait(clean, 0)
         plan.kill(w, 0)
         plan.kill(m, 0)
@@ -261,7 +283,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/atmosphere/tokenbouncer')
         h = plan.spawn('check-token-for-http', 'http://localhost:%d/' % (
-            httpPort,), 'test', 'badtoken')
+            httpPort, ), 'test', 'badtoken')
         plan.wait(h, 0)
         plan.kill(w, 0)
         plan.kill(m, 0)
@@ -277,7 +299,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.waitForHappyComponent(plan, '/default/http-audio')
         self.waitForHappyComponent(plan, '/default/disk-audio')
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
-            httpPort,))
+            httpPort, ))
         plan.wait(h, 0)
         # now check files saved by disker
         cft = plan.spawn('check-disker-file-type', 'Ogg',
@@ -285,7 +307,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.wait(cft, 0)
         # clean up disk files
         clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
-            self.managerPort,), '/default/disk-audio')
+            self.managerPort, ), '/default/disk-audio')
         plan.wait(clean, 0)
 
         plan.kill(w, 0)
@@ -303,7 +325,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/default/disk-video')
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
-            httpPort,))
+            httpPort, ))
         plan.wait(h, 0)
         # change filename with disker
         cft = plan.spawn('check-disker-file-type', 'Ogg',
@@ -311,7 +333,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.wait(cft, 0)
         # clean up disk files
         clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
-            self.managerPort,), '/default/disk-video')
+            self.managerPort, ), '/default/disk-video')
         plan.wait(clean, 0)
 
         plan.kill(w, 0)

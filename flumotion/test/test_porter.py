@@ -151,18 +151,24 @@ class TestHTTPPorterProtocolParser(testsuite.TestCase):
         self.assertEquals(result, '/')
 
     def testParseWithHost(self):
-        result = self.pp.parseLine('GET http://some.server.somewhere/test HTTP/1.1\n')
+        result = self.pp.parseLine(
+            'GET http://some.server.somewhere/test HTTP/1.1\n')
         self.assertEquals(result, '/test')
 
-        result = self.pp.parseLine('GET http://some.server.somewhere:1234/ HTTP/1.1\n')
+        result = self.pp.parseLine(
+            'GET http://some.server.somewhere:1234/ HTTP/1.1\n')
         self.assertEquals(result, '/')
 
     def testParseWithParams(self):
-        result = self.pp.parseLine('GET http://some.server.somewhere:1234/test?arg1=val1&arg2=val2 HTTP/1.1\n')
+        result = self.pp.parseLine(
+            'GET http://some.server.somewhere:1234/test?'
+            'arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/test')
 
-        result = self.pp.parseLine('GET /test?arg1=val1&arg2=val2 HTTP/1.1\n')
+        result = self.pp.parseLine(
+            'GET /test?arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/test')
 
-        result = self.pp.parseLine('GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
+        result = self.pp.parseLine(
+            'GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
         self.assertEquals(result, '/')

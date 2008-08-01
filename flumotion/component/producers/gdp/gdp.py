@@ -22,7 +22,7 @@
 from flumotion.component import feedcomponent
 from flumotion.common import gstreamer, messages
 from flumotion.common.i18n import N_, gettexter
- 
+
 T_ = gettexter()
 
 __version__ = "$Rev$"

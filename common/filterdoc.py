@@ -114,11 +114,11 @@ singles = [
     "^Warning: UID conflict detected: __builtin__",
     "^Warning: UID conflict detected: twisted",
     ".*- pb.getObjectAt \(from twisted.spread.flavors.Root\)",
-    ".*- Deferred \(from twisted.trial.unittest.TestCase.run\)"
+    ".*- Deferred \(from twisted.trial.unittest.TestCase.run\)"]
 
-]
 
 class Filter:
+
     def __init__(self, stdin, stdout):
         self._stdin = stdin
         self._stdout = stdout

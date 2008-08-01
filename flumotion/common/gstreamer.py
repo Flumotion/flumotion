@@ -82,9 +82,11 @@ def element_factory_has_property(element_factory, property_name):
             return True
     return False
 
+
 def element_factory_has_property_value(element_factory, property_name, value):
     """
-    Check if the given element factory allows the given value for the given property.
+    Check if the given element factory allows the given value
+    for the given property.
 
     @rtype: boolean
     """

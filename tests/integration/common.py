@@ -110,7 +110,7 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
 
     def setUp(self):
         self.__cleanfiles = []
-        self.managerPort =  random.randrange(12530,12550)
+        self.managerPort = random.randrange(12530, 12550)
         self.startWorkerPort = random.randrange(12000, 12529)
         self.makeFile('planet.xml', managerXML % self.managerPort)
         self.makeFile('worker.xml', workerXML % (self.managerPort,

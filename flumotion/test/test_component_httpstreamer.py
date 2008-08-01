@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_httpstreamer -*-
+# -*- test-case-name: flumotion.test.test_component_httpstreamer -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -36,8 +36,7 @@ class TestOldProperties(testsuite.TestCase):
             u'mount_point': '/',
             u'bandwidth_limit': 10,
             u'port': 8800,
-            u'burst_on_connect': True
-        }
+            u'burst_on_connect': True}
         config = {
             'feed': [],
             'name': 'http-video',

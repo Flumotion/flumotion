@@ -184,13 +184,16 @@ class ProcessProtocol(protocol.ProcessProtocol):
         self.exitDeferred.errback(TimeoutException(process, status))
 
     def processEnded(self, status):
-        info('process ended with status %r, exit code %r', status, status.value.exitCode)
+        info('process ended with status %r, exit code %r',
+             status, status.value.exitCode)
         if self.timedOut:
             warning('already timed out??')
             print 'already timed out quoi?'
         else:
-            info('process ended with status %r, exit code %r', status, status.value.exitCode)
+            info('process ended with status %r, exit code %r',
+                 status, status.value.exitCode)
             self.exitDeferred.callback(status.value.exitCode)
+
 
 class Process:
     NOT_STARTED, STARTED, STOPPED = 'NOT-STARTED', 'STARTED', 'STOPPED'
@@ -434,7 +437,7 @@ class Plan:
         self.waitPar((process, status))
 
     def waitPar(self, *processStatusPairs):
-        processes = tuple([p for p,s in processStatusPairs])
+        processes = tuple([p for p, s in processStatusPairs])
         self._appendOp(self.vm.checkExits, processes)
         for process, status in processStatusPairs:
             self._appendOp(self.vm.wait, process, status)

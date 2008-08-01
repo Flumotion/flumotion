@@ -194,8 +194,7 @@ pb.setUnjellyableForClass(ManagerFlowState, AdminFlowState)
 """
 moods = enum.EnumClass(
     'Moods',
-    ('happy', 'hungry', 'waking', 'sleeping', 'lost', 'sad')
-)
+    ('happy', 'hungry', 'waking', 'sleeping', 'lost', 'sad'))
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
@@ -304,7 +303,8 @@ class ManagerComponentState(flavors.StateCacheable):
             log.log('componentstate', '%s already in mood %d',
                     self.get('name'), moodValue)
         else:
-            log.debug('componentstate', 'manager sets mood of %s from %s to %d',
+            log.debug('componentstate',
+                      'manager sets mood of %s from %s to %d',
                       self.get('name'), self.get('mood'), moodValue)
             self.set('mood', moodValue)
 

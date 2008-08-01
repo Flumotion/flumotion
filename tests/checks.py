@@ -57,7 +57,7 @@ def make_model():
     for s in data:
         i = m.append()
         m.set_value(i, 0, s)
-        m.set_value(i, 1, eval('lambda: video.%s'%s,{'video':video}))
+        m.set_value(i, 1, eval('lambda: video.%s'%s, {'video': video}))
     return m
 
 
@@ -68,7 +68,7 @@ class Window(gtk.Window):
         self.prepare_ui()
 
     def prepare_ui(self):
-        self.set_default_size(300,400)
+        self.set_default_size(300, 400)
         self.set_title('Flumotion Check Checker')
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
         self.connect('delete-event', lambda *x: reactor.stop())
@@ -119,11 +119,12 @@ class Window(gtk.Window):
         bu.connect('clicked', lambda *x: self.run_check())
 
     def error(self, message, secondary=None):
-        m = gtk.MessageDialog(self,
-                              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                              gtk.MESSAGE_ERROR,
-                              gtk.BUTTONS_OK,
-                              message)
+        m = gtk.MessageDialog(
+            self,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_OK,
+            message)
         if secondary:
             m.format_secondary_text(secondary)
         m.run()

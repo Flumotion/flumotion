@@ -60,11 +60,11 @@ class TestSignalMixin(testsuite.TestCase):
         self.assertEquals(emissions, [('foo', (o, ), {})])
         o.emit('foo', 1)
         self.assertEquals(emissions, [('foo', (o, ), {}),
-                                      ('foo', (o,1, ), {})])
+                                      ('foo', (o, 1, ), {})])
         o.emit('bar', 'xyzzy')
         self.assertEquals(emissions, [('foo', (o, ), {}),
-                                      ('foo', (o,1, ), {}),
-                                      ('bar', (o,'xyzzy', ), {'baz':'qux'})])
+                                      ('foo', (o, 1, ), {}),
+                                      ('bar', (o, 'xyzzy', ), {'baz':'qux'})])
 
     def testDisconnect(self):
         o = TestObject()

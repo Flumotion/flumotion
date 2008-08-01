@@ -156,14 +156,15 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         self.brain = brain
         self._socketPath = _getSocketPath()
         self._port = None
-        self._onShutdown = None # If set, a deferred to fire when our last child
-                                # process exits
+        self._onShutdown = None # If set, a deferred to fire when
+                                # our last child process exits
 
         self._jobInfos = {} # processid -> JobInfo
 
-        self._startSet = startset.StartSet(lambda x: x in self.avatars,
-                                           errors.ComponentAlreadyStartingError,
-                                           errors.ComponentAlreadyRunningError)
+        self._startSet = startset.StartSet(
+            lambda x: x in self.avatars,
+            errors.ComponentAlreadyStartingError,
+            errors.ComponentAlreadyRunningError)
 
     def listen(self):
         assert self._port is None

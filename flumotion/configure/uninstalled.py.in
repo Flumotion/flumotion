@@ -42,20 +42,20 @@ def get():
 
     ret = {
         'isinstalled': False,
-        'cachedir':      os.path.join(__cachedir),
-        'configdir':     os.path.join(__toplevel,      'conf'),
-        'daemondir':     os.path.join(__toplevelwrite),
-        'datadir':       os.path.join(__toplevel,      'data'),
-        'gladedir':      os.path.join(__toplevel,      'data', 'glade'),
-        'imagedir':      os.path.join(__toplevel,      'data', 'image'),
-        'logdir':        os.path.join(__toplevelwrite, 'log'),
+        'cachedir': os.path.join(__cachedir),
+        'configdir': os.path.join(__toplevel, 'conf'),
+        'daemondir': os.path.join(__toplevelwrite),
+        'datadir': os.path.join(__toplevel, 'data'),
+        'gladedir': os.path.join(__toplevel, 'data', 'glade'),
+        'imagedir': os.path.join(__toplevel, 'data', 'image'),
+        'logdir': os.path.join(__toplevelwrite, 'log'),
         'localedatadir': os.path.join(__toplevelwrite),
-        'pythondir':     os.path.join(__toplevel),
-        'registrydir':   os.path.join(__cachedir, 'registry'),
-        'rundir':        os.path.join(__toplevelwrite, 'run'),
-        'bindir':        os.path.join(__toplevelwrite, 'bin'),
-        'sbindir':       os.path.join(__toplevelwrite, 'bin'),
-        'version':       '@VERSION@',
+        'pythondir': os.path.join(__toplevel),
+        'registrydir': os.path.join(__cachedir, 'registry'),
+        'rundir': os.path.join(__toplevelwrite, 'run'),
+        'bindir': os.path.join(__toplevelwrite, 'bin'),
+        'sbindir': os.path.join(__toplevelwrite, 'bin'),
+        'version': '@VERSION@',
     }
 
     return ret

@@ -192,7 +192,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
     def addKeycard(self, keycard):
         # give keycard an id and store it in our hash
-        if self._keycards.has_key(keycard.id):
+        if keycard.id in self._keycards:
             # already in there
             return
 
@@ -207,7 +207,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         self.debug("added keycard with id %s" % keycard.id)
 
     def removeKeycard(self, keycard):
-        if not self._keycards.has_key(keycard.id):
+        if not keycard.id in self._keycards:
             raise KeyError
 
         del self._keycards[keycard.id]
@@ -216,7 +216,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
     def removeKeycardId(self, keycardId):
         self.debug("removing keycard with id %s" % keycardId)
-        if not self._keycards.has_key(keycardId):
+        if not keycardId in self._keycards:
             raise KeyError
 
         keycard = self._keycards[keycardId]
@@ -234,7 +234,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
 
     def expireKeycardId(self, keycardId):
         self.log("expiring keycard with id %r", keycardId)
-        if not self._keycards.has_key(keycardId):
+        if not keycardId in self._keycards:
             raise KeyError
 
         keycard = self._keycards.pop(keycardId)
@@ -246,8 +246,8 @@ class TrivialBouncerPlug(BouncerPlug):
     """
     A very trivial bouncer implementation.
 
-    Useful as a concrete bouncer class for which all users are accepted whenever
-    the bouncer is enabled.
+    Useful as a concrete bouncer class for which all users are
+    accepted whenever the bouncer is enabled.
     """
     keycardClasses = (keycards.KeycardGeneric, )
 
@@ -310,7 +310,7 @@ class ChallengeResponseBouncerPlug(BouncerPlug):
                     keycard.salt = self._db[keycard.username]
                 else:
                     # random-ish salt, otherwise it's too obvious
-                    string = str(random.randint(pow(10,10), pow(10, 11)))
+                    string = str(random.randint(pow(10, 10), pow(10, 11)))
                     md = md5.new()
                     md.update(string)
                     keycard.salt = md.hexdigest()[:2]

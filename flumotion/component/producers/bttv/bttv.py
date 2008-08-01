@@ -43,10 +43,12 @@ def arg_filtered(proc, *args):
             value = spec[1]
             if len(_args) <= index or key(_args[index]) != value:
                 return
-        return proc (*_args)
+        return proc(*_args)
     return ret
 
+
 def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
+
     def bus_watch_func(bus, message):
         proc(*args, **kwargs)
     bus_watch_func = arg_filtered(bus_watch_func,

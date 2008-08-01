@@ -30,7 +30,6 @@ import gtk
 from flumotion.common import componentui, log, errors, messages
 from flumotion.common.common import pathToModuleName
 from flumotion.common.planet import AdminComponentState, moods
-      
 from flumotion.common.i18n import N_, gettexter
 from gettext import gettext as _
 
@@ -65,7 +64,7 @@ class Placeholder(object):
     def removed(self):
         """Called when the placeholder is inactivated, eg
         detached from the parent"""
-    
+
 
 class NotebookPlaceholder(Placeholder, log.Loggable):
     """This is a placeholder containing a notebook with tabs
@@ -158,9 +157,10 @@ class NotebookPlaceholder(Placeholder, log.Loggable):
 
 class LabelPlaceholder(Placeholder):
     """This is a placeholder with a label, with or without a text"""
+
     def __init__(self, text=''):
         self._label = gtk.Label(text)
-        
+
     def getWidget(self):
         return self._label
 
@@ -173,7 +173,7 @@ class PlanetPlaceholder(Placeholder):
     def getWidget(self):
         return self._widget
 
-    
+
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'
 
@@ -187,7 +187,7 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         self._planetPlaceholder = PlanetPlaceholder()
         self._addPlaceholder(self._planetPlaceholder)
-        
+
     # Public API
 
     def getDebugEnabled(self):
@@ -229,7 +229,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         """
         Get the admin for a specific component
 
-        @param component: component 
+        @param component: component
         @type  component: L{flumotion.common.component.AdminComponentState}
 
         @returns: the admin
@@ -258,7 +258,7 @@ class ComponentView(gtk.VBox, log.Loggable):
         self.remove(widget)
 
         placeholder.removed()
-        
+
     def _getWidgetConstructor(self, componentState):
         if not isinstance(componentState, AdminComponentState):
             return LabelPlaceholder()
@@ -288,9 +288,10 @@ class ComponentView(gtk.VBox, log.Loggable):
             # on that.
             filename = filename.replace('/', os.path.sep)
             # getEntry for admin/gtk returns a factory function for creating
-            # flumotion.component.base.admin_gtk.BaseAdminGtk subclass instances
+            # flumotion.component.base.admin_gtk.BaseAdminGtk
+            # subclass instances
             modname = pathToModuleName(filename)
-            
+
             # we call hostile code, so we should handle exceptions:
             d = admin.getBundledFunction(modname, procname)
             d.addErrback(admin.bundleErrback, filename)
@@ -326,7 +327,6 @@ class ComponentView(gtk.VBox, log.Loggable):
             return LabelPlaceholder(_("Component '%s' has a UI bug.") %
                                     componentState.get('name'))
 
-        
         admin = self.getAdminForComponent(componentState)
         componentType = componentState.get('type')
         d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
@@ -350,7 +350,7 @@ class ComponentView(gtk.VBox, log.Loggable):
                 self._setState(COMPONENT_ACTIVE)
             else:
                 self._setState(COMPONENT_INACTIVE)
-                
+
         current = self._currentComponentState
         assert current is not None
         current.addListener(self, invalidate=invalidate, set_=set_)
@@ -376,7 +376,7 @@ class ComponentView(gtk.VBox, log.Loggable):
     def _componentActiveToInactive(self):
         self._removePlaceholder(self._currentPlaceholder)
         self._addPlaceholder(self._planetPlaceholder)
-        
+
     def _componentInactiveToUnset(self):
         if self._currentComponentState:
             self._currentComponentState.removeListener(self)

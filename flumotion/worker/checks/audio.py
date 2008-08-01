@@ -88,7 +88,6 @@ def checkMixerTracks(source_factory, device, channels, mid=None):
                 return result
 
         return failure
-        
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, mid, device)

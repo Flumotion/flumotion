@@ -55,10 +55,10 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
             ('scaled_width', 'scaled-width'),
-            ('is_square',    'is-square'),
+            ('is_square', 'is-square'),
             ])
         scaled_width = props.get('scaled-width', width)
-        is_square = props.get('is-square',  False)
+        is_square = props.get('is-square', False)
         framerate = props.get('framerate', (30, 2))
         framerate_float = float(framerate[0]) / framerate[1]
 
@@ -85,7 +85,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             # videobox in 0.8.8 has a stride problem outputting AYUV with odd
             # width I420 works fine, but is slower when overlay is used
 
-            pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ! video/x-raw-yuv,format=(fourcc)I420 ' % scale_correction
+            pad_pipe = ('! ffmpegcolorspace ! videobox right=-%d ! '
+                        'video/x-raw-yuv,format=(fourcc)I420 ' %
+                        (scale_correction, ))
         else:
             pad_pipe = ''
 
@@ -106,10 +108,12 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! videorate ! videoscale'
                     '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
                     '    ! videoscale'
-                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,'
+                    '      framerate=%(fr)s,format=(fourcc)YUY2'
                     '    %(pp)s'
                     '    ! @feeder:video@'
-                    '  demux. ! queue ! audio/x-raw-int ! volume name=setvolume'
+                    '  demux. ! queue ! audio/x-raw-int '
+                    '    ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder:audio@'
                     '    t. ! queue ! @feeder:dv@'
@@ -153,7 +157,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             # we have a firewire bus reset
             s = message.structure
             # current-device-change is only in gst-plugins-good >= 0.10.3
-            if s.has_key('current-device-change'):
+            if 'current-device-change' in s:
                 if s['current-device-change'] != 0:
                     # we actually have a connect or disconnect of the camera
                     # so first remove all the previous messages warning about a
@@ -161,7 +165,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
                     for m in self.state.get('messages'):
                         if m.id.startswith('firewire-bus-reset'):
-                            self.state.remove('messages',m)
+                            self.state.remove('messages', m)
 
                     if s['current-device-change'] == 1:
                         # connected

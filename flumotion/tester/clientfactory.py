@@ -50,12 +50,13 @@ class ClientFactory(log.Loggable):
         self.results = {}
         for i in range(client.STOPPED_SUCCESS, client.STOPPED_LAST + 1):
             self.results[i] = 0
-        self.info("Creating client factory for %d clients on %s" % (self.clientcount, self.url))
+        self.info("Creating client factory for %d clients on %s" % (
+            self.clientcount, self.url))
         self._rand = random.Random()
 
     def _client_stopped_cb(self, client, id, result):
         self.info("%4d: stopped: %d" % (id, result))
-        if self.results.has_key(result):
+        if result in self.results:
             self.results[result] += 1
         else:
             self.results[result] = 1
@@ -116,9 +117,15 @@ class ClientFactory(log.Loggable):
 
     def stats(self):
         'print some stats at the end of the run'
-        print "successful     clients: %d" % self.results[client.STOPPED_SUCCESS]
-        print "refused        clients: %d" % self.results[client.STOPPED_REFUSED]
-        print "error          clients: %d" % self.results[client.STOPPED_ERROR]
-        print "connect error  clients: %d" % self.results[client.STOPPED_CONNECT_ERROR]
-        print "read error     clients: %d" % self.results[client.STOPPED_READ_ERROR]
-        print "internal error clients: %d" % self.results[client.STOPPED_INTERNAL_ERROR]
+        print "successful     clients: %d" % (
+            self.results[client.STOPPED_SUCCESS], )
+        print "refused        clients: %d" % (
+            self.results[client.STOPPED_REFUSED], )
+        print "error          clients: %d" % (
+            self.results[client.STOPPED_ERROR], )
+        print "connect error  clients: %d" % (
+            self.results[client.STOPPED_CONNECT_ERROR], )
+        print "read error     clients: %d" % (
+            self.results[client.STOPPED_READ_ERROR], )
+        print "internal error clients: %d" % (
+            self.results[client.STOPPED_INTERNAL_ERROR], )

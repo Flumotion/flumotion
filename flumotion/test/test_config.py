@@ -232,7 +232,7 @@ class TestConfig(testsuite.TestCase):
         conf.parse()
 
         flow = conf.flows[0]
-        self.failUnless(flow.components.has_key('component-name'))
+        self.failUnless('component-name' in flow.components)
         component = flow.components['component-name']
         self.assertEquals(component.name, 'component-name')
         self.assertEquals(component.getName(), 'component-name')
@@ -261,7 +261,7 @@ class TestConfig(testsuite.TestCase):
         conf.parse()
 
         flow = conf.flows[0]
-        self.failUnless(flow.components.has_key('component-name'))
+        self.failUnless('component-name' in flow.components)
         component = flow.components['component-name']
         self.assertEquals(component.name, 'component-name')
         self.assertEquals(component.getName(), 'component-name')
@@ -290,10 +290,10 @@ class TestConfig(testsuite.TestCase):
         conf.parse()
 
         flow = conf.flows[0]
-        self.failUnless(flow.components.has_key('component-name'))
+        self.failUnless('component-name' in flow.components)
         conf = flow.components['component-name'].getConfigDict()
         self.assertEquals(conf['project'], configure.PACKAGE, conf['type'])
-        self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
+        self.assertEquals(conf['version'], (0, 4, 2, 0), conf['type'])
 
         # now the same, but without specifying project
         conf = ConfigXML(
@@ -310,10 +310,10 @@ class TestConfig(testsuite.TestCase):
         conf.parse()
 
         flow = conf.flows[0]
-        self.failUnless(flow.components.has_key('component-name'))
+        self.failUnless('component-name' in flow.components)
         conf = flow.components['component-name'].getConfigDict()
         self.assertEquals(conf['project'], configure.PACKAGE, conf['type'])
-        self.assertEquals(conf['version'], (0,4,2,0), conf['type'])
+        self.assertEquals(conf['version'], (0, 4, 2, 0), conf['type'])
 
     def testParseManager(self):
         conf = ManagerConfigXML(
@@ -341,7 +341,8 @@ class TestConfig(testsuite.TestCase):
              <planet>
                <manager name="aname">
                  <plugs>
-                   <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+                   <plug
+                   socket="flumotion.component.plugs.adminaction.AdminAction"
                          type="test-adminaction">
                      <property name="foo">bar</property>
                    </plug>
@@ -352,19 +353,20 @@ class TestConfig(testsuite.TestCase):
         self.failUnless(conf.manager)
         self.failIf(conf.manager.host)
         self.failIf(conf.bouncer)
-        self.assertEquals(conf.plugs,
-                          {'flumotion.component.plugs.adminaction.AdminAction':
-                           [{'type':'test-adminaction',
-                             'socket':
-                             'flumotion.component.plugs.adminaction.AdminAction',
-                             'entries': {'default':
-                                         {'function-name': 'Quxulator',
-                                          'module-name': 'qux.baz'}},
-                             'properties': {'foo': 'bar'}}],
-                           'flumotion.component.plugs.lifecycle.ManagerLifecycle':
-                           [],
-                           'flumotion.component.plugs.identity.IdentityProvider':
-                           []})
+        self.assertEquals(
+            conf.plugs,
+            {'flumotion.component.plugs.adminaction.AdminAction':
+             [{'type':'test-adminaction',
+               'socket':
+               'flumotion.component.plugs.adminaction.AdminAction',
+               'entries': {'default':
+                           {'function-name': 'Quxulator',
+                            'module-name': 'qux.baz'}},
+               'properties': {'foo': 'bar'}}],
+             'flumotion.component.plugs.lifecycle.ManagerLifecycle':
+             [],
+             'flumotion.component.plugs.identity.IdentityProvider':
+             []})
 
     def testParseManagerWithBogusPlug(self):
         conf = ManagerConfigXML(
@@ -502,7 +504,8 @@ class TestConfig(testsuite.TestCase):
     def testParseProperties(self):
         planet = ConfigXML(
              """<planet><flow name="default">
-             <component name="component-name" type="test-component" worker="foo">
+             <component name="component-name" type="test-component"
+                        worker="foo">
                <property name="one">string</property>
                <property name="two">1</property>
                <property name="three">2.5</property>
@@ -528,7 +531,7 @@ class TestConfig(testsuite.TestCase):
         self.failUnless(props.get('five'))
         self.assertEquals(props.get('six'), 3981391981389138998131389L)
         self.assertEquals(props.get('seven'), (30000, 1001))
-        self.assertEquals(props.get('eight'), [1,2])
+        self.assertEquals(props.get('eight'), [1, 2])
 
         # should be none -- no master in a pipeline that doesn't need
         # synchronization
@@ -577,7 +580,8 @@ class TestConfig(testsuite.TestCase):
                                              {'one': 'unicode', 'two': 2}])
         self.assertEquals(props.get('three'), [{'one': 'string', 'two': 1,
                                                 'three': 2.5,
-                                                'four': {'one':'s','two':1}}])
+                                                'four': {'one': 's',
+                                                         'two': 1}}])
         self.failUnless(props.get('five'))
 
     def testParseCompoundPropertiesError(self):
@@ -692,8 +696,9 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'frobulator',
-                           'entries': {'default':{'function-name': 'Frobulator',
-                                                  'module-name': 'bar.baz'}},
+                           'entries': {'default': {
+            'function-name': 'Frobulator',
+            'module-name': 'bar.baz'}},
                            'properties': {'rate': (3, 4)}})
 
     def testParsePlugsWithCompoundProperties(self):
@@ -730,12 +735,14 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(foobars[0],
                           {'socket': 'foo.bar',
                            'type': 'compoundulator',
-                           'entries': {'default': {'function-name': 'Xombulator',
-                                                   'module-name': 'xom.baz'}},
-                           'properties': {'cp1': [{'one': 'a string'},
-                                                  {'one': 'a second string'}],
-                                          'cp2': {'two': 2},
-                                          'act': True}})
+                           'entries': {'default': {
+            'function-name': 'Xombulator',
+            'module-name': 'xom.baz'}},
+                           'properties': {
+            'cp1': [{'one': 'a string'},
+                    {'one': 'a second string'}],
+            'cp2': {'two': 2},
+            'act': True}})
 
     def testParseNoPlugs(self):
         planet = ConfigXML(
@@ -830,8 +837,8 @@ class TestConfig(testsuite.TestCase):
              """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/atmosphere/atmocomp'))
-        self.failUnless(entries.has_key('/default/flowcomp'))
+        self.failUnless('/atmosphere/atmocomp' in entries)
+        self.failUnless('/default/flowcomp' in entries)
 
     def testParseComponentsWithEaters(self):
         conf = ConfigXML(
@@ -851,12 +858,13 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('eater'))
-        self.failUnless(cons['eater'].has_key('default'))
-        self.failUnless(cons['eater']['default'] == [("prod:default", 'default')])
+        self.failUnless('eater' in cons)
+        self.failUnless('default' in cons['eater'])
+        self.failUnless(cons['eater']['default'] == [
+            ("prod:default", 'default')])
         self.failUnless(cons['source'] == ["prod:default"])
 
     def testParseComponentsWithEatersNotSpecified(self):
@@ -888,12 +896,14 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('source'))
-        self.failUnless(cons['source'] == ["prod:default"])
-        self.failUnless(cons['eater']['default'] == [("prod:default", 'default')])
+        self.failUnless('source' in cons)
+        self.failUnless(cons['source'] == [
+            "prod:default"])
+        self.failUnless(cons['eater']['default'] == [
+            ("prod:default", 'default')])
 
     def testParseComponentsWithTwoEaters(self):
         conf = ConfigXML(
@@ -918,13 +928,13 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('eater'))
-        self.failUnless(cons['eater'].has_key('video'))
+        self.failUnless('eater' in cons)
+        self.failUnless('video' in cons['eater'])
         self.failUnless(cons['eater']['video'] == [("prod:default", 'video')])
-        self.failUnless(cons['eater'].has_key('audio'))
+        self.failUnless('audio' in cons['eater'])
         self.failUnless(cons['eater']['audio'] == [('prod2:default', 'audio')])
 
     def testParseComponentsWithTwoSources(self):
@@ -955,7 +965,8 @@ class TestConfig(testsuite.TestCase):
                            worker="foo"/>
                 <component name="prod2" type="test-component-with-feeder"
                            worker="foo"/>
-                <component name="cons" type="test-component-with-multiple-eater"
+                <component name="cons"
+                           type="test-component-with-multiple-eater"
                            worker="foo">
                   <eater name="default">
                     <feed>prod:default</feed>
@@ -967,14 +978,14 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('eater'))
-        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless('eater' in cons)
+        self.failUnless('default' in cons['eater'])
         self.failUnless(cons['eater']['default'] == [
             ("prod:default", 'default'), ("prod2:default", 'default-bis')])
-        self.failUnless(cons.has_key('source'))
+        self.failUnless('source' in cons)
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
 
@@ -986,7 +997,8 @@ class TestConfig(testsuite.TestCase):
                            worker="foo"/>
                 <component name="prod2" type="test-component-with-feeder"
                            worker="foo"/>
-                <component name="cons" type="test-component-with-multiple-eater"
+                <component name="cons"
+                           type="test-component-with-multiple-eater"
                            worker="foo">
                   <eater name="default">
                     <feed alias="one">prod:default</feed>
@@ -998,14 +1010,14 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('eater'))
-        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless('eater' in cons)
+        self.failUnless('default' in cons['eater'])
         self.failUnless(cons['eater']['default'] == [
             ("prod:default", 'one'), ("prod2:default", 'two')])
-        self.failUnless(cons.has_key('source'))
+        self.failUnless('source' in cons)
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
 
@@ -1018,7 +1030,8 @@ class TestConfig(testsuite.TestCase):
                            worker="foo"/>
                 <component name="prod2" type="test-component-with-feeder"
                            worker="foo"/>
-                <component name="cons" type="test-component-with-multiple-eater"
+                <component name="cons"
+                           type="test-component-with-multiple-eater"
                            worker="foo">
                   <source>prod:default</source>
                   <source>prod2:default</source>
@@ -1028,14 +1041,14 @@ class TestConfig(testsuite.TestCase):
             """)
         conf.parse()
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('/default/prod'))
-        self.failUnless(entries.has_key('/default/cons'))
+        self.failUnless('/default/prod' in entries)
+        self.failUnless('/default/cons' in entries)
         cons = entries['/default/cons'].getConfigDict()
-        self.failUnless(cons.has_key('eater'))
-        self.failUnless(cons['eater'].has_key('default'))
+        self.failUnless('eater' in cons)
+        self.failUnless('default' in cons['eater'])
         self.failUnless(cons['eater']['default'] == [
             ("prod:default", 'default'), ("prod2:default", 'default-bis')])
-        self.failUnless(cons.has_key('source'))
+        self.failUnless('source' in cons)
         self.failUnless(cons['source'] == [
             "prod:default", "prod2:default"])
 
@@ -1058,13 +1071,15 @@ class TestConfig(testsuite.TestCase):
         def assertPass(s, feeds):
             conf = ConfigXML(s)
             conf.parse()
-            cons = conf.getComponentEntries()['/default/component-name'].getConfigDict()
+            entries = conf.getComponentEntries()
+            cons = entries['/default/component-name'].getConfigDict()
             self.assertEquals(cons['virtual-feeds'], feeds)
 
         assertFail("""
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component-with-feeder"
+                 <component name="component-name"
+                            type="test-component-with-feeder"
                             worker="foo">
                    <virtual-feed name="invalid-name" real="default"/>
                  </component>
@@ -1074,7 +1089,8 @@ class TestConfig(testsuite.TestCase):
         assertFail("""
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component-with-feeder"
+                 <component name="component-name"
+                            type="test-component-with-feeder"
                             worker="foo">
                    <virtual-feed name="/invalid/feed:name" real="default"/>
                  </component>
@@ -1084,7 +1100,8 @@ class TestConfig(testsuite.TestCase):
         assertFail("""
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component-with-feeder"
+                 <component name="component-name"
+                            type="test-component-with-feeder"
                             worker="foo">
                    <virtual-feed name="valid:name" real="not-existing"/>
                  </component>
@@ -1094,7 +1111,8 @@ class TestConfig(testsuite.TestCase):
         assertPass("""
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component-with-feeder"
+                 <component name="component-name"
+                            type="test-component-with-feeder"
                             worker="foo">
                  </component>
                </flow>
@@ -1103,7 +1121,8 @@ class TestConfig(testsuite.TestCase):
         assertPass("""
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component-with-feeder"
+                 <component name="component-name"
+                            type="test-component-with-feeder"
                             worker="foo">
                    <virtual-feed name="valid:name" real="default"/>
                  </component>
@@ -1127,7 +1146,8 @@ class TestDictDiff(testsuite.TestCase):
 
         ass({}, {'foo': 'bar'}, [], [(('foo', ), 'bar')], [])
 
-        ass({'foo': 'bar'}, {'foo': 'baz'}, [], [], [(('foo', ), 'bar', 'baz')])
+        ass({'foo': 'bar'}, {'foo': 'baz'}, [], [],
+            [(('foo', ), 'bar', 'baz')])
 
     def testRecursive(self):
         ass = self.assertOND
@@ -1141,14 +1161,14 @@ class TestDictDiff(testsuite.TestCase):
 
         ass({'foo': {'bar': 'baz'}},
             {'foo': {}},
-            [(('foo','bar'), 'baz')],
+            [(('foo', 'bar'), 'baz')],
             [],
             [])
 
         ass({'foo': {}},
             {'foo': {'bar': 'baz'}},
             [],
-            [(('foo','bar'), 'baz')],
+            [(('foo', 'bar'), 'baz')],
             [])
 
         ass({},
@@ -1161,9 +1181,10 @@ class TestDictDiff(testsuite.TestCase):
             {'foo': {'bar': 'qux'}},
             [],
             [],
-            [(('foo','bar'), 'baz', 'qux')])
+            [(('foo', 'bar'), 'baz', 'qux')])
 
     def testHumanReadable(self):
+
         def test(d1, d2, s):
             msg = config.dictDiffMessageString(config.dictDiff(d1, d2))
             self.assertEquals(msg, s)

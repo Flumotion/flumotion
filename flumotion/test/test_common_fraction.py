@@ -31,12 +31,12 @@ class TestFraction(TestCase):
         self.assertEquals(fractionFromValue('2/1'), (2, 1))
         self.assertEquals(fractionFromValue('3/4'), (3, 4))
         #self.assertEquals(fractionFromValue('0.5'), (1, 2))
-        
+
         self.assertEquals(fractionFromValue('10'), (10, 1))
         self.assertEquals(fractionFromValue(u'10'), (10, 1))
         self.assertEquals(fractionFromValue(10), (10, 1))
         self.assertEquals(fractionFromValue(10L), (10, 1))
-        self.assertEquals(fractionFromValue(10.0), (10, 1)) 
+        self.assertEquals(fractionFromValue(10.0), (10, 1))
         self.assertRaises(ValueError, fractionFromValue, '1/2/3')
         self.assertRaises(ValueError, fractionFromValue, '/')
         self.assertRaises(ValueError, fractionFromValue, '1/')
@@ -51,4 +51,3 @@ class TestFraction(TestCase):
     def testFractionAsFloat(self):
         self.assertEquals(fractionAsFloat((10, 10)), 1)
         self.assertEquals(fractionAsFloat((4, 5)), 0.8)
-        

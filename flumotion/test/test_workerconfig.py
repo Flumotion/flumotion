@@ -52,7 +52,8 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(conf.randomFeederports, True)
 
     def testParseWorkerFeederPorts(self):
-        s = """<worker><feederports random="no">1000-1002</feederports></worker>"""
+        s = ('<worker><feederports random="no">'
+             '1000-1002</feederports></worker>')
         conf = parse(s)
         self.assertEquals(conf.feederports, [1000, 1001, 1002])
         self.assertEquals(conf.randomFeederports, False)
@@ -76,7 +77,8 @@ class TestConfig(testsuite.TestCase):
         s = """<worker><manager><port>badport</port></manager></worker>"""
         self.assertRaises(config.ConfigError, parse, s)
 
-        s = """<worker><manager><transport>badtransport</transport></manager></worker>"""
+        s = ('<worker><manager><transport>badtransport'
+             '</transport></manager></worker>')
         self.assertRaises(config.ConfigError, parse, s)
 
     def testParseAuthentication(self):
@@ -88,7 +90,7 @@ class TestConfig(testsuite.TestCase):
         self.assertEquals(conf.authentication.username, 'foobie')
         self.assertEquals(conf.authentication.password, 'boobie')
 
-
     def testParseAuthenticationError(self):
-        s = """<worker><authentication><invalid-name/></authentication></worker>"""
+        s = ('<worker><authentication><invalid-name/>'
+             '</authentication></worker>')
         self.assertRaises(config.ConfigError, parse, s)

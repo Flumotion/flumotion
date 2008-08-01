@@ -74,7 +74,7 @@ class Connections(GladeWidget):
         canClear = hasRecentConnections()
         self.button_clear.set_sensitive(canClear)
         self.button_clear_all.set_sensitive(canClear)
-        
+
     def _clear_all(self):
         for conn in self._connections:
             os.unlink(conn.filename)

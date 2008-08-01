@@ -68,7 +68,7 @@ def _readConfig(confXml, options):
     cfg = config.ConfigParser(confXml).parse()
     # command-line debug > environment debug > config file debug
     if not options.debug and cfg['debug'] \
-        and not os.environ.has_key('FLU_DEBUG'):
+        and not 'FLU_DEBUG' in os.environ:
         options.debug = cfg['debug']
     return cfg
 

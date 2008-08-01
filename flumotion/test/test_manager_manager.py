@@ -233,7 +233,8 @@ class FakeWorkerMind(FakeMind):
         self._createDeferreds = []
 
     def remote_getPorts(self):
-        return (range(7600,7608), False)
+        return (range(7600,
+                      7608), False)
 
     def remote_getFeedServerPort(self):
         return 7609
@@ -284,7 +285,7 @@ class FakeComponentMind(FakeMind):
             'workerName': workerName,
             'feederNames': [],
             'eaterNames': [],
-            'messages': [] }
+            'messages': []}
         self.state = state
 
     def remote_getState(self):
@@ -423,8 +424,9 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
         def loadProducer():
             compType = "pipeline-producer"
             compId = common.componentId("testflow", "producer-video-test")
-            compProps = [("pipeline", "videotestsrc ! video/x-raw-yuv,width=320,"
-                         "height=240,framerate=5/1,format=(fourcc)I420")]
+            compProps = [
+                ("pipeline", "videotestsrc ! video/x-raw-yuv,width=320,"
+                 "height=240,framerate=5/1,format=(fourcc)I420")]
             return self.vishnu.loadComponent(manager.LOCAL_IDENTITY,
                                              compType, compId, None, compProps,
                                              "worker", [], [], False, [])
@@ -565,7 +567,8 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
             # Now log out the worker.
             self._logoutAvatar(workerAvatar)
 
-        d = self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
+        d = self.vishnu.loadComponentConfigurationXML(
+            file, manager.LOCAL_IDENTITY)
         d.addCallback(confLoaded)
         d.addCallback(gotWorker)
         d.addCallback(confChecked)
@@ -581,8 +584,11 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
             self.failUnlessEqual(len(self._components), 0)
 
             # load configuration
-            d = self.vishnu.loadComponentConfigurationXML(file, manager.LOCAL_IDENTITY)
-            d.addCallback(lambda _: self._workers['worker'].mind.waitForComponentsCreate())
+            d = self.vishnu.loadComponentConfigurationXML(
+                file, manager.LOCAL_IDENTITY)
+            d.addCallback(lambda _:
+                          self._workers['worker'].mind.waitForComponentsCreate(
+                ))
             d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
@@ -755,7 +761,7 @@ class TestVishnu(log.Loggable, testsuite.TestCase):
                           self.vishnu.deleteFlow, 'testflow')
         cs[1].addKey('moodPending', None)
         self.failUnless(first in cs)
-        
+
         self.vishnu.deleteFlow('testflow')
         l = s.get('flows')
         self.failIf(l)

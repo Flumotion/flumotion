@@ -380,10 +380,12 @@ class AdminWindow(Loggable, GladeDelegate):
             ('ClearAll', gtk.STOCK_CLEAR, _('_Clear All'), None,
              _('Remove all components'),
              self._manage_clear_all_cb),
-            ('AddFormat', gtk.STOCK_ADD, _('Add new encoding _format...'), None,
+            ('AddFormat', gtk.STOCK_ADD, _('Add new encoding _format...'),
+             None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
-            ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'), None,
+            ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'),
+             None,
              _('Run the configuration wizard'),
              self._manage_run_wizard_cb),
 
@@ -427,8 +429,7 @@ class AdminWindow(Loggable, GladeDelegate):
              ('WriteDebugMarker', gtk.STOCK_EXECUTE,
              _('Write debug marker...'), None,
              _('Writes a debug marker to all the logs'),
-             self._debug_write_debug_marker_cb)
-            ])
+             self._debug_write_debug_marker_cb)])
         uimgr.insert_action_group(self._debugActions, 0)
         self._debugActions.set_sensitive(False)
 
@@ -745,9 +746,10 @@ class AdminWindow(Loggable, GladeDelegate):
                    "all components from the current stream and create "
                    "a new one."),
                  parent=self._window,
-                 buttons=((_("Keep the current stream"), gtk.RESPONSE_NO),
-                          (_("Run the Wizard anyway"), gtk.RESPONSE_YES))
-                 ) != gtk.RESPONSE_YES:
+                 buttons=((_("Keep the current stream"),
+                           gtk.RESPONSE_NO),
+                          (_("Run the Wizard anyway"),
+                           gtk.RESPONSE_YES))) != gtk.RESPONSE_YES:
             return
 
         d = self._clearAllComponents()
@@ -1133,7 +1135,8 @@ class AdminWindow(Loggable, GladeDelegate):
         self._updateConnectionActions()
         self._updateComponentActions()
 
-        if not self._componentStates and not self._configurationWizardIsRunning:
+        if (not self._componentStates and
+            not self._configurationWizardIsRunning):
             self.debug('no components detected, running wizard')
             # ensure our window is shown
             self.show()
@@ -1302,8 +1305,8 @@ class AdminWindow(Loggable, GladeDelegate):
         else:
             import code
 
-        ns = { "admin": self._adminModel,
-               "components": self._componentStates }
+        ns = {"admin": self._adminModel,
+              "components": self._componentStates}
         message = """Flumotion Admin Debug Shell
 
 Local variables are:

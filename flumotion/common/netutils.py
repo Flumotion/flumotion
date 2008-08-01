@@ -39,7 +39,9 @@ __version__ = "$Rev$"
 # Thanks to Paul Cannon, see
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439093
 #
-# WARNING: Horribly linux-specific. Horribly IPv4 specific. Also, just horrible.
+# WARNING: Horribly linux-specific. Horribly IPv4 specific.
+#          Also, just horrible.
+
 
 def find_all_interface_names():
     """
@@ -54,10 +56,11 @@ def find_all_interface_names():
     outbytes = struct.unpack('iP', fcntl.ioctl(
         s.fileno(),
         0x8912, #SIOCGIFCONF
-        struct.pack('iP', bytes, names.buffer_info()[0])
-    ))[0]
+        struct.pack('iP', bytes, names.buffer_info()[0])))[0]
     namestr = names.tostring()
-    return [namestr[i:i+size].split('\0', 1)[0] for i in range(0, outbytes, size)]
+    return [namestr[i:i+size].split('\0', 1)[0]
+            for i in range(0, outbytes, size)]
+
 
 def get_address_for_interface(ifname):
     """
@@ -67,8 +70,8 @@ def get_address_for_interface(ifname):
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x8915, #SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
+        struct.pack('256s', ifname[:15]))[20:24])
+
 
 def guess_public_ip():
     """

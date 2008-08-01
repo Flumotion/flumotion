@@ -94,9 +94,11 @@ class LooperNode(BaseAdminGtkNode):
     def positionSet(self, newposition):
         self.log("got new position : %d" % newposition)
         if self.fileinfowidget.duration:
-            percent = float(newposition % self.fileinfowidget.duration) / float(self.fileinfowidget.duration)
+            percent = (float(newposition % self.fileinfowidget.duration) /
+                       float(self.fileinfowidget.duration))
             self.positionbar.set_fraction(percent)
-            self.positionbar.set_text(time_to_string(newposition % self.fileinfowidget.duration))
+            self.positionbar.set_text(
+                time_to_string(newposition % self.fileinfowidget.duration))
 
     def numIterationsSet(self, numIterations):
         self.numiterlabel.set_text(str(numIterations))

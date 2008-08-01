@@ -46,7 +46,7 @@ class FilenameNode(BaseAdminGtkNode):
         if self.currentFilenamePendingText:
             self.currentFilenameLabel.set_text(self.currentFilenamePendingText)
         newbutton = self.wtree.get_widget('button-new')
-        newbutton.connect('clicked',self.cb_changefile_button_clicked)
+        newbutton.connect('clicked', self.cb_changefile_button_clicked)
         self.stopbutton = self.wtree.get_widget('button-stop')
         self.stopbutton.connect('clicked', self.cb_stop_button_clicked)
         if self.hasIcal:
@@ -56,7 +56,7 @@ class FilenameNode(BaseAdminGtkNode):
         d = self.callRemote("changeFilename")
         d.addErrback(self.changeFilenameErrback)
 
-    def changeFilenameErrback(self,failure):
+    def changeFilenameErrback(self, failure):
         self.warning("Failure %s changing filename: %s" % (
             failure.type, failure.getErrorMessage()))
         return None
@@ -114,7 +114,8 @@ class FilenameNode(BaseAdminGtkNode):
 
     def cb_schedule_recordings(self, widget):
         filename = self.filechooser.get_filename()
-        self.debug("filename is %r, uri %r, %r", filename, self.filechooser.get_uri(), self.filechooser)
+        self.debug("filename is %r, uri %r, %r", filename,
+                   self.filechooser.get_uri(), self.filechooser)
         if filename:
             icsStr = open(filename, "rb").read()
             d = self.callRemote("scheduleRecordings", icsStr)

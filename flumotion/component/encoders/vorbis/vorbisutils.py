@@ -21,7 +21,8 @@
 
 __version__ = "$Rev$"
 
-def get_preferred_sample_rate (maxrate):
+
+def get_preferred_sample_rate(maxrate):
     """ Get the preferred 'standard' sample rate not exceeded maxrate"""
     rates = [192000, 96000, 48000, 44100, 32000, 34000, 22050, 16000, 12000,
              11025, 8000]

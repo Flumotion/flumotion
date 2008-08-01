@@ -1,3 +1,7 @@
+2008-08-01  Johan Dahlin  <johan@flumotion.com>
+
+	* *.py: Make flumotion pep-8 clean
+
 2008-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

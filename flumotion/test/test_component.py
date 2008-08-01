@@ -121,14 +121,15 @@ class TestParser(testsuite.TestCase):
                    {}, ['bar', 'baz'])
 
     def testTwoBoth(self):
-        self.parse('@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
-                   lambda p: '%s ! %s ! %s ! %s' % (p.get_eater_template('src1'),
-                                          p.get_eater_template('src2'),
-                                          p.get_feeder_template('feed1'),
-                                          p.get_feeder_template('feed2')),
-                   {'qux': [('comp1:default', 'src1')],
-                    'zag': [('comp2:default', 'src2')]},
-                   ['feed1', 'feed2'])
+        self.parse(
+            '@eater:src1@ ! @eater:src2@ ! @feeder:feed1@ ! @feeder:feed2@',
+            lambda p: '%s ! %s ! %s ! %s' % (p.get_eater_template('src1'),
+                                             p.get_eater_template('src2'),
+                                             p.get_feeder_template('feed1'),
+                                             p.get_feeder_template('feed2')),
+            {'qux': [('comp1:default', 'src1')],
+             'zag': [('comp2:default', 'src2')]},
+            ['feed1', 'feed2'])
 
     def testErrors(self):
         comp = PipelineTest(None, None, '')

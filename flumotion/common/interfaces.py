@@ -43,21 +43,23 @@ class IMedium(Interface):
         """
 
     def callRemote(name, *args, **kwargs):
-        """Call a method through the remote reference to the manager-side avatar.
+        """Call a method through the remote reference to the
+        manager-side avatar.
         @param name: name of remote method
         """
 
 
 class IComponentMedium(IMedium):
-    """I am an interface for component-side mediums interfacing with server-side
-    avatars.
+    """I am an interface for component-side mediums interfacing
+    with server-side avatars.
     """
 
 
 class IStreamingComponent(Interface):
-    """An interface for streaming components, for plugs that require a streaming
-    component of some sort to use.
+    """An interface for streaming components, for plugs that
+    require a streaming component of some sort to use.
     """
+
     def getUrl():
         """Return a URL that the streaming component is streaming.
         """

@@ -25,7 +25,7 @@ Feeders tab in the component UI
 import gettext
 import os
 import time
- 
+
 import gtk
 
 from flumotion.common import common
@@ -176,17 +176,19 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
                 break
         i = self.treemodel.append(row.iter)
         self.treemodel.set(i, 0, printableClientId, 1, state)
-        w = StateWatcher(state, {
-            'client-id':              self.setFeederClientName,
-            'bytes-read-current':      self.setFeederClientBytesReadCurrent,
-            'buffers-dropped-current': self.setFeederClientBuffersDroppedCurrent,
-            'bytes-read-total':        self.setFeederClientBytesReadTotal,
-            'buffers-dropped-total':   self.setFeederClientBuffersDroppedTotal,
-            'reconnects':            self.setFeederClientReconnects,
-            'last-connect':           self.setFeederClientLastConnect,
-            'last-disconnect':        self.setFeederClientLastDisconnect,
-            'last-activity':          self.setFeederClientLastActivity,
-            'fd':                    self.setFeederClientFD,
+        w = StateWatcher(state,
+                         {
+            'client-id': self.setFeederClientName,
+            'bytes-read-current': self.setFeederClientBytesReadCurrent,
+            'buffers-dropped-current':
+            self.setFeederClientBuffersDroppedCurrent,
+            'bytes-read-total': self.setFeederClientBytesReadTotal,
+            'buffers-dropped-total': self.setFeederClientBuffersDroppedTotal,
+            'reconnects': self.setFeederClientReconnects,
+            'last-connect': self.setFeederClientLastConnect,
+            'last-disconnect': self.setFeederClientLastDisconnect,
+            'last-activity': self.setFeederClientLastActivity,
+            'fd': self.setFeederClientFD,
         }, {}, {})
         self.treemodel.set(i, 2, w, 3, 'client')
         self.treeview.expand_all()
@@ -252,7 +254,8 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
                      'connections-total', 'last-activity'):
             set_label(name)
 
-        self._table_connected = self.wtree.get_widget('table-current-connected')
+        self._table_connected = self.wtree.get_widget(
+            'table-current-connected')
         self._table_disconnected = self.wtree.get_widget(
             'table-current-disconnected')
         self._table_feedclient = self.wtree.get_widget('table-feedclient')

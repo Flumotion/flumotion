@@ -55,10 +55,10 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
         # we need either a filename or data
         props = conf['properties']
         filename = data = None
-        if props.has_key('filename'):
+        if 'filename' in props:
             filename = props['filename']
             self.debug('using file %s for passwords', filename)
-        elif props.has_key('data'):
+        elif 'data' in props:
             data = props['data']
             self.debug('using in-line data for passwords')
         else:
@@ -76,7 +76,8 @@ class SaltSha256(bouncer.ChallengeResponseBouncer):
         self.setChecker(checkers.Sha256Checker())
 
         for line in lines:
-            if not ':' in line: continue
+            if not ':' in line:
+                continue
             # when coming from a file, it ends in \n, so strip.
             # for data, we already splitted, so no \n, but strip is fine.
             name, salt, sha256Data = line.strip().split(':')

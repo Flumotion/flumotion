@@ -38,8 +38,8 @@ class Repeater(feedcomponent.ParseLaunchComponent):
                 self.addMessage(
                     messages.Warning(T_(N_(
                         "The 'drop-probability' property is specified, but "
-                        "it only works with GStreamer core newer than 0.10.12. "
-                        "You should update your version of GStreamer."))))
+                        "it only works with GStreamer core newer than 0.10.12."
+                        " You should update your version of GStreamer."))))
             else:
                 drop_probability = properties['drop-probability']
                 if drop_probability < 0.0 or drop_probability > 1.0:

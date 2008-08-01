@@ -80,7 +80,7 @@ class WebcamStep(VideoProducerStep):
                              '/dev/video2',
                              '/dev/video3'])
 
-        self.add_proxy(self.model.properties,['device'])
+        self.add_proxy(self.model.properties, ['device'])
 
         self._inSetup = False
 

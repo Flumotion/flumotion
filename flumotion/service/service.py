@@ -78,7 +78,7 @@ class Servicer(log.Loggable):
         name = args[1]
         if which == 'manager':
             managers = self.getManagers()
-            if not managers.has_key(name):
+            if not name in managers:
                 raise errors.FatalError, 'No manager "%s"' % name
             managers = [name, ]
         elif which == 'worker':
@@ -571,7 +571,8 @@ user:PSfNpHTkpTx1M
                     "for %d seconds, killing" % (pid,
                         configure.processTermWait))
                 killPid(pid)
-                termClock = killClock + 1.0 # so it does not get triggered again
+                # so it does not get triggered again
+                termClock = killClock + 1.0
 
             if time.clock() > killClock:
                 self.warning("Process with pid %d has not responded to KILL " \

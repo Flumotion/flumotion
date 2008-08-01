@@ -30,7 +30,7 @@ _EXTENSIONS = {
     'audio/x-flac': 'flac',
     'audio/x-wav': 'wav',
     'multipart/x-mixed-replace': 'multipart',
-    'video/mpegts':  'ts',
+    'video/mpegts': 'ts',
     'video/x-dv': 'dv',
     'video/x-flv': 'flv',
     'video/x-matroska': 'mkv',
@@ -60,7 +60,7 @@ def launchApplicationByUrl(url, mimeType):
         from win32com.shell import shell as win32shell
     except ImportError:
         win32shell = None
-        
+
     if gnomevfs:
         app = gnomevfs.mime_get_default_application(mimeType)
         if not app:

@@ -204,13 +204,13 @@ class TestRoutingTable(testsuite.TestCase):
         self.assertEquals(net.getRouteNames(), routeNames)
 
     def testRouteNamesOrder(self):
-        self.assertRouteNamesOrder('#comment\n'
-                                   '  \n'
-                                   '192.168.1.1/32 foo\n'
-                                   '192.168.2.1/32 bar\n'
-                                   '192.168.3.1/32 foo\n'
-                                   ,
-                                   ['foo', 'bar'])
+        self.assertRouteNamesOrder(
+            '#comment\n'
+            '  \n'
+            '192.168.1.1/32 foo\n'
+            '192.168.2.1/32 bar\n'
+            '192.168.3.1/32 foo\n',
+            ['foo', 'bar'])
 
 
 class TestAddress(testsuite.TestCase):

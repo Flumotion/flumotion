@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_base_scheduler -*-
+# -*- test-case-name: flumotion.test.test_component_base_scheduler -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -245,18 +245,20 @@ class Scheduler(log.Loggable):
 
         if event:
             if which == 'start':
-                self.debug("schedule start event at %s", str(event.currentStart - now))
-                
+                self.debug(
+                    "schedule start event at %s",
+                    str(event.currentStart - now))
                 seconds = toSeconds(event.currentStart - now)
                 dc = reactor.callLater(seconds, doStart, event)
             elif which == 'end':
-                self.debug("schedule end event at %s", str(event.currentEnd - now))
-                
+                self.debug(
+                    "schedule end event at %s",
+                    str(event.currentEnd - now))
                 seconds = toSeconds(event.currentEnd - now)
                 dc = reactor.callLater(seconds, doEnd, event)
         else:
-            self.debug("schedule rescheduling at %s", str(self.windowSize))
-            
+            self.debug(
+                "schedule rescheduling at %s", str(self.windowSize))
             seconds = toSeconds(self.windowSize)
             dc = reactor.callLater(seconds, self._reschedule)
         self._nextStart = seconds

@@ -2,7 +2,8 @@
 # (c)2000 Michal J Wallace (sabren@manifestation.com)
 # made available to one and all under the python license.
 #
-# Based on perl code by Martin Vorlaender, martin@radiogaga.harz.de, 11-DEC-1997.
+# Based on perl code by Martin Vorlaender, martin@radiogaga.harz.de,
+# 11-DEC-1997.
 # which was based upon Java source code written by jdumas@zgs.com,
 # which was based upon C source code written by Eric Young, eay@psych.uq.oz.au.
 #
@@ -375,10 +376,8 @@ cov_2char = (
 def ushr(n, s):
     """only for ints! (mimics the Java >>> operator)"""
 
-    s = s & 0x1f;
-    return( (n >> s) & (~0 >> s) ) # perl ~0 == 4294967295
-
-
+    s = s & 0x1f
+    return (n >> s) & (~0 >> s) # perl ~0 == 4294967295
 
 
 def toByte(value):
@@ -389,8 +388,10 @@ def toByte(value):
     value = value & 0xff # makes it a byte
     if (value & 0x80):
         value = -((~value & 0xff)+1) # is this right?? perl was:
-                                     # $value = -((~$value & 0xff) + 1) if $value & 0x80;
-                                     # but perl's "~" and python's "~" don't do the
+                                     # $value = -((~$value & 0xff) + 1)
+                                     # if $value & 0x80;
+                                     # but perl's "~" and python's "~"
+                                     # don't do the
                                      # same thing exactly...
     return value
 
@@ -412,7 +413,7 @@ def byteToUnsigned(value):
 def fourBytesToInt(b, offset):
 
     value = byteToUnsigned(b[offset])
-    value = value | (byteToUnsigned(b[offset+1]) <<  8)
+    value = value | (byteToUnsigned(b[offset+1]) << 8)
     value = value | (byteToUnsigned(b[offset+2]) << 16)
     value = value | (byteToUnsigned(b[offset+3]) << 24)
 
@@ -423,15 +424,15 @@ def intToFourBytes(iValue, b, offset):
 
     b[offset] = toByte(ushr(iValue, 0) & 0xff)
     b[offset+1] = toByte(ushr(iValue, 8) & 0xff)
-    b[offset+2] = toByte(ushr(iValue,16) & 0xff)
-    b[offset+3] = toByte(ushr(iValue,24) & 0xff)
+    b[offset+2] = toByte(ushr(iValue, 16) & 0xff)
+    b[offset+3] = toByte(ushr(iValue, 24) & 0xff)
 
     return None
 
 
 def PERM_OP(a, b, n, m, results):
 
-    t = (ushr(a,n) ^ b) & m
+    t = (ushr(a, n) ^ b) & m
     a = a ^ (t << n)    # is order of operations right?
     b = b ^ t
 
@@ -481,8 +482,8 @@ def des_set_key(key):
     d = results[0]
     c = results[1]
 
-    d = (    ((d & 0x000000ff) << 16) |     (d & 0x0000ff00)  |
-             ushr(d & 0x00ff0000,    16) | ushr(c & 0xf0000000, 4))
+    d = (((d & 0x000000ff) << 16) | (d & 0x0000ff00) |
+         ushr(d & 0x00ff0000, 16) | ushr(c & 0xf0000000, 4))
 
     c = c & 0x0fffffff
 
@@ -499,73 +500,71 @@ def des_set_key(key):
         c = c & 0x0fffffff
         d = d & 0x0fffffff
 
-        s = skb0[     (c   ) & 0x3f                       ]| \
+        s = skb0[(c) & 0x3f]| \
             skb1[(ushr(c, 6) & 0x03) | (ushr(c, 7) & 0x3c)]| \
-            skb2[(ushr(c,13) & 0x0f) | (ushr(c,14) & 0x30)]| \
-            skb3[(ushr(c,20) & 0x01) | (ushr(c,21) & 0x06) | \
-                 (ushr(c,22) & 0x38)]
+            skb2[(ushr(c, 13) & 0x0f) | (ushr(c, 14) & 0x30)]| \
+            skb3[(ushr(c, 20) & 0x01) | (ushr(c, 21) & 0x06) | \
+                 (ushr(c, 22) & 0x38)]
 
-        t = skb4[     (d   ) & 0x3f                        ]| \
-            skb5[(ushr(d, 7) & 0x03) | (ushr(d, 8) & 0x3c) ]| \
-            skb6[ ushr(d,15) & 0x3f                        ]| \
-            skb7[(ushr(d,21) & 0x0f) | (ushr(d,22) & 0x30)]
+        t = skb4[(d) & 0x3f]| \
+            skb5[(ushr(d, 7) & 0x03) | (ushr(d, 8) & 0x3c)]| \
+            skb6[ushr(d, 15) & 0x3f]| \
+            skb7[(ushr(d, 21) & 0x0f) | (ushr(d, 22) & 0x30)]
 
-	schedule[j] = (    (t << 16) | (s & 0x0000ffff)) & 0xffffffff
-        s             = (ushr(s,   16) | (t & 0xffff0000))
+        schedule[j] = ((t << 16) |
+                       (s & 0x0000ffff)) & 0xffffffff
+        s = (ushr(s, 16) | (t & 0xffff0000))
         j = j + 1
 
-        s             = (s << 4) | ushr(s,28)
-        schedule[j] = s & 0xffffffff;
+        s = (s << 4) | ushr(s, 28)
+        schedule[j] = s & 0xffffffff
         j = j + 1
 
     return schedule
 
 
-
 def D_ENCRYPT(L, R, S, E0, E1, s):
 
-    v = R ^ ushr(R,16)
+    v = R ^ ushr(R, 16)
     u = v & E0
     v = v & E1
     u = (u ^ (u << 16)) ^ R ^ s[S]
     t = (v ^ (v << 16)) ^ R ^ s[S + 1]
     t = ushr(t, 4) | (t << 28)
 
-    L = L ^ (SPtrans1[    (t    ) & 0x3f] | \
-             SPtrans3[ushr(t,  8) & 0x3f] | \
+    L = L ^ (SPtrans1[(t) & 0x3f] | \
+             SPtrans3[ushr(t, 8) & 0x3f] | \
              SPtrans5[ushr(t, 16) & 0x3f] | \
              SPtrans7[ushr(t, 24) & 0x3f] | \
-             SPtrans0[    (u    ) & 0x3f] | \
-             SPtrans2[ushr(u,  8) & 0x3f] | \
+             SPtrans0[(u) & 0x3f] | \
+             SPtrans2[ushr(u, 8) & 0x3f] | \
              SPtrans4[ushr(u, 16) & 0x3f] | \
              SPtrans6[ushr(u, 24) & 0x3f])
 
     return L
 
 
-
-
 def body(schedule, Eswap0, Eswap1):
 
-    left  = 0
+    left = 0
     right = 0
-    t     = 0
+    t = 0
 
 
     for j in range(25):
 
         for i in range(0, ITERATIONS * 2, 4):
-            left  = D_ENCRYPT(left,  right, i,     Eswap0, Eswap1, schedule)
-            right = D_ENCRYPT(right, left,  i + 2, Eswap0, Eswap1, schedule)
+            left = D_ENCRYPT(left, right, i, Eswap0, Eswap1, schedule)
+            right = D_ENCRYPT(right, left, i + 2, Eswap0, Eswap1, schedule)
 
         left, right = right, left
 
-    t = right;
+    t = right
 
     right = ushr(left, 1) | (left << 31)
-    left  = ushr(t   , 1) | (t    << 31)
+    left = ushr(t, 1) | (t << 31)
 
-    left  = left & 0xffffffff
+    left = left & 0xffffffff
     right = right & 0xffffffff
 
     results = [None, None]
@@ -615,7 +614,7 @@ def crypt(plaintext, salt):
 
     key = [0] * 8
 
-    iChar = map( lambda c: ord(c) << 1, plaintext)
+    iChar = map(lambda c: ord(c) << 1, plaintext)
 
     for i in range(len(key)):
         if i >= len(iChar):
@@ -624,7 +623,7 @@ def crypt(plaintext, salt):
 
 
     schedule = des_set_key(key)
-    out      = body(schedule, Eswap0, Eswap1)
+    out = body(schedule, Eswap0, Eswap1)
 
     b = [None] * 9
 
@@ -657,4 +656,4 @@ def crypt(plaintext, salt):
 
 
 if __name__=="__main__":
-    print crypt("cat","hat")
+    print crypt("cat", "hat")

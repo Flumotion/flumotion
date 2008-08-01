@@ -137,7 +137,7 @@ class LocalManagerSpawner(SignalMixin):
         # start chain
         d.callback(None)
         return d
-    
+
     # Private
 
     def _finished(self):

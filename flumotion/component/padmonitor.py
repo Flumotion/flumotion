@@ -132,8 +132,9 @@ class PadMonitor(log.Loggable):
             delta = now - self._last_data_time
 
             if self._active and delta > self.PAD_MONITOR_TIMEOUT:
-                self.info("No data received on pad %s for > %r seconds, setting "
-                    "to hungry", self.name, self.PAD_MONITOR_TIMEOUT)
+                self.info("No data received on pad %s for > %r seconds, "
+                          "setting to hungry",
+                          self.name, self.PAD_MONITOR_TIMEOUT)
                 self.setInactive()
             elif not self._active and delta < self.PAD_MONITOR_TIMEOUT:
                 self.info("Receiving data again on pad %s, flow active",

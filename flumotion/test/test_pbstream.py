@@ -48,9 +48,11 @@ from flumotion.common import testsuite
 #   - replies OK (ie return from the handler)
 #   - waits for emptying of twisted send queue
 #   - in a callLater(0), ie outside of the deferred, stops writing to transport
-# - PB Server receives the result from callRemote('feedTo') and starts streaming
-
+# - PB Server receives the result from callRemote('feedTo') and
+#   starts streaming
 # Client has an eater
+
+
 class Client(pb.Referenceable, log.Loggable):
     """
     The Client has a GStreamer pipeline that uses an fdsrc to receive a GDP
@@ -66,7 +68,9 @@ class Client(pb.Referenceable, log.Loggable):
 
     def __init__(self):
         self.debug("creating")
-        self.pipeline = gst.parse_launch("fdsrc name=src ! gdpdepay ! oggdemux ! vorbisdec ! fakesink name=sink signal-handoffs=TRUE")
+        self.pipeline = gst.parse_launch(
+            "fdsrc name=src ! gdpdepay ! oggdemux ! vorbisdec"
+            " ! fakesink name=sink signal-handoffs=TRUE")
         self.perspective = None
         self.src = self.pipeline.get_by_name('src')
         self.sink = self.pipeline.get_by_name('sink')
@@ -175,7 +179,9 @@ class Server(log.Loggable):
         self.immediateStop = immediateStop
 
     def start(self):
-        self.pipeline = gst.parse_launch("audiotestsrc ! audioconvert ! vorbisenc ! oggmux ! gdppay ! multifdsink name=sink")
+        self.pipeline = gst.parse_launch(
+            "audiotestsrc ! audioconvert ! vorbisenc ! "
+            "oggmux ! gdppay ! multifdsink name=sink")
         self.sink = self.pipeline.get_by_name('sink')
         self.sink.connect('client-removed', self.client_removed_handler)
         self.pipeline.set_state(gst.STATE_PLAYING)

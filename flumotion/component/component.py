@@ -613,7 +613,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         """
         found = []
         for old, new in list:
-            if properties.has_key(old):
+            if old in properties:
                 found.append((old, new))
 
         if found:

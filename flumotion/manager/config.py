@@ -49,7 +49,7 @@ def upgradeEaters(conf):
         eatersDict = {}
         eatersTuple = [(None, parseFeedId(s)) for s in sourceConfig]
         eatersDict = buildEatersDict(eatersTuple, eaters)
-        conf['eater'] =  eatersDict
+        conf['eater'] = eatersDict
 
     if sourceConfig:
         sources = []
@@ -60,7 +60,7 @@ def upgradeEaters(conf):
 def upgradeAliases(conf):
     eaters = dict(conf.get('eater', {})) # a copy
     concat = lambda lists: reduce(list.__add__, lists, [])
-    if not reduce(lambda x,y: y and isinstance(x, tuple),
+    if not reduce(lambda x, y: y and isinstance(x, tuple),
                   concat(eaters.values()),
                   True):
         for eater in eaters:
@@ -120,7 +120,8 @@ def buildEatersDict(eatersList, eaterDefs):
             alias = eater
         feeders = eaters.get(eater, [])
         if feedId in feeders:
-            raise errors.ConfigError("Already have a feedId %s eating from %s" %
+            raise errors.ConfigError(
+                "Already have a feedId %s eating from %s" %
                 (feedId, eater))
         while alias in [a for f, a in feeders]:
             log.warning('config', "Duplicate alias %s for eater %s, "
@@ -408,8 +409,9 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
                 ('label', 'worker', 'project', 'version', ))
         name, componentType, label, worker, project, version = attrs
         if needsWorker and not worker:
-            raise errors.ConfigError('component %s does not specify the worker '
-                              'that it is to run on' % (name, ))
+            raise errors.ConfigError(
+                'component %s does not specify the worker '
+                'that it is to run on' % (name, ))
         elif worker and not needsWorker:
             raise errors.ConfigError('component %s specifies a worker to run '
                               'on, but does not need a worker' % (name, ))
@@ -472,8 +474,10 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         if len(feeds) == 0:
             # we have an eater node with no feeds
             raise errors.ConfigError(
-                "Eater node %s with no <feed> nodes, is not allowed" % (name, ))
+                "Eater node %s with no <feed> nodes, is not allowed" % (
+                name, ))
         return [(name, feedId, alias) for feedId, alias in feeds]
+
 
 class PlanetConfigParser(FlumotionConfigParser):
     """
@@ -604,8 +608,8 @@ class ManagerConfigParser(FlumotionConfigParser):
     """
     I parse manager configuration out of a planet configuration file.
 
-    @ivar manager:    A L{ConfigEntryManager} containing options for the manager
-                      section, filled in at construction time.
+    @ivar manager:    A L{ConfigEntryManager} containing options for
+                      the manager section, filled in at construction time.
     """
     logCategory = 'config'
 

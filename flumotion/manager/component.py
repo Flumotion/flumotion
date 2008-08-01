@@ -255,7 +255,8 @@ class ComponentAvatar(base.ManagerAvatar):
         if self.clocking:
             self.heaven.masterClockAvailable(self.avatarId, self.clocking)
         else:
-            (port, ) = self.vishnu.reservePortsOnWorker(self.getWorkerName(), 1)
+            (port, ) = self.vishnu.reservePortsOnWorker(
+                self.getWorkerName(), 1)
             self.debug('provideMasterClock on port %d', port)
 
             d = self.mindCallRemote('provideMasterClock', port)
@@ -353,7 +354,8 @@ class ComponentAvatar(base.ManagerAvatar):
                          feeder name)
         @rtype: L{flumotion.common.common.fullFeedId}
         """
-        return common.fullFeedId(self.getParentName(), self.getName(), feedName)
+        return common.fullFeedId(self.getParentName(),
+                                 self.getName(), feedName)
 
     def getVirtualFeeds(self):
         """
@@ -451,7 +453,8 @@ class ComponentAvatar(base.ManagerAvatar):
 
     def perspective_removeKeycardId(self, bouncerName, keycardId):
         """
-        Remove a keycard on the given bouncer on behalf of a component's medium.
+        Remove a keycard on the given bouncer on behalf of a
+        component's medium.
 
         This is requested by a component that created the keycard.
 
@@ -558,7 +561,8 @@ class FeedMap(object, log.Loggable):
                 for feedId, eName in pairs:
                     feeder, fName = self._getFeederAvatar(eater, feedId)
                     if feeder:
-                        ffe[eater.getFullFeedId(eName)] = (eName, feeder, fName)
+                        ffe[eater.getFullFeedId(eName)] = (
+                            eName, feeder, fName)
                         eff.add(feeder.getFullFeedId(fName),
                                 (fName, eater, eName))
                     else:
@@ -713,7 +717,8 @@ class ComponentHeaven(base.ManagerHeaven):
 
         return toHost, toPort
 
-    def _connectFeederToEater(self, fromComp, fromFeed, toComp, toFeed, method):
+    def _connectFeederToEater(self, fromComp, fromFeed,
+                              toComp, toFeed, method):
         host, port = self.mapNetFeed(fromComp, toComp)
         if port:
             fullFeedId = toComp.getFullFeedId(toFeed)

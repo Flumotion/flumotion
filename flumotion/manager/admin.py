@@ -118,7 +118,8 @@ class AdminAvatar(base.ManagerAvatar):
         """
         self.debug('perspective_componentRestart(%r)' % componentState)
         d = self.perspective_componentStop(componentState)
-        d.addCallback(lambda *x: self.perspective_componentStart(componentState))
+        d.addCallback(lambda *x: self.perspective_componentStart(
+            componentState))
         return d
 
     # Generic interface to call into a component
@@ -362,7 +363,7 @@ class AdminAvatar(base.ManagerAvatar):
                                for this flow.
         @type  isClockMaster:  bool
         @param virtualFeeds:   List of (virtual feed, feeder name) pairs.
-                               See L{flumotion.manager.config.buildVirtualFeeds}
+            See L{flumotion.manager.config.buildVirtualFeeds}
         @type  virtualFeeds:   [(str, str)]
         """
         return self.vishnu.loadComponent(self.remoteIdentity, componentType,

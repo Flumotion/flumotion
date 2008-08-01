@@ -45,21 +45,22 @@ def is_raw(caps):
 class SingleDecodeBin(gst.Bin):
 
     __gsttemplates__ = (
-        gst.PadTemplate ("sinkpadtemplate",
-                         gst.PAD_SINK,
-                         gst.PAD_ALWAYS,
-                         gst.caps_new_any()),
-        gst.PadTemplate ("srcpadtemplate",
-                         gst.PAD_SRC,
-                         gst.PAD_SOMETIMES,
-                         gst.caps_new_any())
-        )
+        gst.PadTemplate("sinkpadtemplate",
+                        gst.PAD_SINK,
+                        gst.PAD_ALWAYS,
+                        gst.caps_new_any()),
+        gst.PadTemplate("srcpadtemplate",
+                        gst.PAD_SRC,
+                        gst.PAD_SOMETIMES,
+                        gst.caps_new_any()))
+
     def __init__(self, caps=None, uri=None, *args, **kwargs):
         gst.Bin.__init__(self, *args, **kwargs)
         if not caps:
             caps = gst.caps_new_any()
         self.caps = caps
-        self.typefind = gst.element_factory_make("typefind", "internal-typefind")
+        self.typefind = gst.element_factory_make(
+            "typefind", "internal-typefind")
         self.add(self.typefind)
 
         self.uri = uri
@@ -98,15 +99,19 @@ class SingleDecodeBin(gst.Bin):
         Returns the list of demuxers, decoders and parsers available, sorted
         by rank
         """
+
         def myfilter(fact):
-            if fact.get_rank() < 64 :
+            if fact.get_rank() < 64:
                 return False
             klass = fact.get_klass()
-            if not ("Demuxer" in klass or "Decoder" in klass or "Parse" in klass):
+            if not ("Demuxer" in klass or
+                    "Decoder" in klass or
+                    "Parse" in klass):
                 return False
             return True
         reg = gst.registry_get_default()
-        res = [x for x in reg.get_feature_list(gst.ElementFactory) if myfilter(x)]
+        res = [x for x in reg.get_feature_list(gst.ElementFactory)
+                     if myfilter(x)]
         res.sort(lambda a, b: int(b.get_rank() - a.get_rank()))
         return res
 
@@ -149,7 +154,9 @@ class SingleDecodeBin(gst.Bin):
                 else:
                     dynamic = True
             else:
-                self.log("Template %s is a request pad, ignoring" % pad.name_template)
+                self.log(
+                    "Template %s is a request pad, ignoring" %
+                    pad.name_template)
 
         if dynamic:
             self.debug("%s is a dynamic element" % element.get_name())
@@ -171,7 +178,8 @@ class SingleDecodeBin(gst.Bin):
         for factory in factories:
             element = factory.create()
             if not element:
-                self.warning("weren't able to create element from %r" % factory)
+                self.warning(
+                    "weren't able to create element from %r" % factory)
                 continue
 
             sinkpad = element.get_pad("sink")
@@ -287,7 +295,8 @@ class SingleDecodeBin(gst.Bin):
     def do_change_state(self, transition):
         self.debug("transition:%r" % transition)
         res = gst.Bin.do_change_state(self, transition)
-        if transition in [gst.STATE_CHANGE_PAUSED_TO_READY, gst.STATE_CHANGE_READY_TO_NULL]:
+        if transition in [gst.STATE_CHANGE_PAUSED_TO_READY,
+                          gst.STATE_CHANGE_READY_TO_NULL]:
             self._cleanUp()
         return res
 

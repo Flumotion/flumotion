@@ -21,13 +21,16 @@
 
 from flumotion.common import log
 from flumotion.common.messages import Result
-from flumotion.component.plugs.cortado.cortado_location import getCortadoFilename
+from flumotion.component.plugs.cortado.cortado_location import \
+     getCortadoFilename
 
 __version__ = "$Rev$"
 
+
 def checkCortado():
     """Check for cortado applet.
-    @returns: a result containing the filename to the jar or None if it cannot be found
+    @returns: a result containing the filename to the jar or None if it
+        cannot be found
     @rtype: L{flumotion.common.messages.Result}
     """
     log.debug('cortadocheck', 'Checking...')

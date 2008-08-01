@@ -36,7 +36,7 @@ class WizardTest(UITestCase):
     def _next(self):
         self.click('button_next')
 
-    def _checkPrevNext(self,can_prev, can_next):
+    def _checkPrevNext(self, can_prev, can_next):
         self.assertSensitive('button_prev', can_prev)
         self.assertSensitive('button_next', can_next)
 

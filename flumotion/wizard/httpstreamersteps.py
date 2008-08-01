@@ -336,10 +336,12 @@ class HTTPSpecificStep(ConsumerStep):
                     "Worker '%s' is missing GStreamer elements '%s'.",
                     len(elements))
                 message = messages.Warning(
-                    T_(f, self.worker, "', '".join(elements)), id='httpstreamer')
+                    T_(f, self.worker, "', '".join(elements)),
+                    id='httpstreamer')
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished(True)
-                return defer.fail(errors.FlumotionError('missing multifdsink element'))
+                return defer.fail(errors.FlumotionError(
+                    'missing multifdsink element'))
 
             self.wizard.clear_msg('httpstreamer')
 

@@ -23,9 +23,8 @@ from cStringIO import StringIO
 
 from flumotion.common import testsuite
 from flumotion.common.errors import ConfigError
-from flumotion.manager.config import ConfigEntryComponent, ConfigEntryManager, \
-     ManagerConfigParser, PlanetConfigParser
-
+from flumotion.manager.config import ConfigEntryComponent, \
+     ConfigEntryManager, ManagerConfigParser, PlanetConfigParser
 
 
 def flatten(seq):
@@ -88,12 +87,13 @@ class TestManagerConfigParser(testsuite.TestCase):
         self.assertEquals(config.bouncer.name, 'foobar')
 
     def testParsePlugs(self):
-        f = self._buildManager("""<plugs>
-                       <plug socket="flumotion.component.plugs.adminaction.AdminAction"
-                             type="adminactionfilelogger">
-                         <property name="logfile">/dev/stdout</property>
-                       </plug>
-                     </plugs>""")
+        f = self._buildManager(
+            """<plugs>
+  <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+          type="adminactionfilelogger">
+    <property name="logfile">/dev/stdout</property>
+  </plug>
+</plugs>""")
         config = ManagerConfigParser(f)
         self.failIf(flatten(config.plugs.values()))
         config.parseBouncerAndPlugs()
@@ -167,12 +167,13 @@ class TestPlanetConfigParser(testsuite.TestCase):
 
     def testParseFlow(self):
         f = self._buildFlow(
-            '<component name="audio" type="audiotest-producer" worker="worker">'
+            '<component name="audio" type="audiotest-producer" '
+            'worker="worker">'
             '  <clock-master>true</clock-master>'
             '</component>'
-            '<component name="video" type="videotest-producer" worker="worker">'
-            '</component>'
-            )
+            '<component name="video" type="videotest-producer" '
+            'worker="worker">'
+            '</component>')
         config = PlanetConfigParser(f)
         config.parse()
         self.failUnless(config.flows)

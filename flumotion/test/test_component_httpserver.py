@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_httpserver -*-
+# -*- test-case-name: flumotion.test.test_component_httpserver -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -219,7 +219,8 @@ class PlugTest(testsuite.TestCase):
     def _localPlug(self, plugname):
         return {
             PLUGTYPE:
-            [{'entries': {'default':{ 'module-name': 'flumotion.test.test_component_httpserver',
+            [{'entries': {'default':{
+            'module-name': 'flumotion.test.test_component_httpserver',
               'function-name': plugname,
               }}}]
             }
@@ -412,7 +413,7 @@ class TestDirectory(testsuite.TestCase):
         self.component = FakeComponent()
         # a directory resource
         self.resource = httpfile.File(self.path, self.component,
-            { 'video/x-flv': httpfile.FLVFile } )
+            {'video/x-flv': httpfile.FLVFile})
 
     def tearDown(self):
         os.system('rm -r %s' % self.path)

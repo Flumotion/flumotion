@@ -141,7 +141,8 @@ class OverlayStep(WorkerWizardStep):
                 message = messages.Warning(
                     T_(f, self.worker, "', '".join(elements)), id='overlay')
                 message.add(
-                    T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
+                    T_(
+                    N_("\n\nClick \"Forward\" to proceed without overlay.")))
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished()
                 self._setSensitive(False)

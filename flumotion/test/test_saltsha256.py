@@ -32,12 +32,16 @@ bouncerconf = {
     'name': 'testbouncer',
     'plugs': {},
     'properties': {
-        'data': "user:iamsalt:2f826124ada2b2cdf11f4fd427c9ca48de0ed49b41476266d8df08d2cf86120e"
-    }
-}
+        'data': ("user:"
+                 "iamsalt:"
+                 "2f826124ada2b2cdf11f4fd427c9ca48"
+                 "de0ed49b41476266d8df08d2cf86120e")}}
 
 # this is a type that should not be allowed
+
+
 class TestWrongKeycardClass(testsuite.TestCase):
+
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256(bouncerconf)
 

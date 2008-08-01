@@ -37,9 +37,9 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         def have_caps(tf, prob, caps):
             capsname = caps[0].get_name()
             # We should add appropriate parsers for any given format here. For
-            # some it's critical for this to work at all, for others it's needed
-            # for timestamps (thus for things like time-based burst-on-connect)
-            # Currently, we only handle ogg.
+            # some it's critical for this to work at all, for others
+            # it's needed for timestamps (thus for things like
+            # time-based burst-on-connect) Currently, we only handle ogg.
             parser = None
             if capsname == 'application/ogg':
                 parser = gst.element_factory_make('oggparse')
@@ -58,7 +58,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
                 parser.link(peer.get_parent())
 
         src = pipeline.get_by_name('src')
-        src.set_property('location',  properties['url'])
+        src.set_property('location', properties['url'])
 
         typefind = pipeline.get_by_name('tf')
         typefind.connect('have-type', have_caps)

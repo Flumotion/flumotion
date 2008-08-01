@@ -99,9 +99,11 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None,
             # set pipeline state to NULL so worker does not consume
             # unnecessary resources
             pipeline.set_state(gst.STATE_NULL)
-            resolution.errback(errors.GStreamerGstError(message.src, gerror, debug))
+            resolution.errback(errors.GStreamerGstError(
+                message.src, gerror, debug))
         elif t == gst.MESSAGE_EOS:
-            resolution.errback(errors.GStreamerError("Unexpected end of stream"))
+            resolution.errback(errors.GStreamerError(
+                "Unexpected end of stream"))
         else:
             log.debug('check', 'message: %s: %s:' % (
                 message.src.get_path_string(),
@@ -195,7 +197,7 @@ def check1394(mid):
                     # dv1394src was fixed after gst-plugins-good 0.10.2
                     # to distinguish NOT_FOUND and OPEN_READ
                     version = gstreamer.get_plugin_version('1394')
-                    if version >= (0,10,0,0) and version <= (0,10,2,0):
+                    if version >= (0, 10, 0, 0) and version <= (0, 10, 2, 0):
                         m = messages.Error(T_(
                             N_("Could not find or open the Firewire device. "
                                "Check the device node and its permissions.")))

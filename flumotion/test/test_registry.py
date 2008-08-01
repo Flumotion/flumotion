@@ -46,11 +46,11 @@ class TestRegistry(testsuite.TestCase):
         self.failUnless(common.strToBool('true'))
         self.failUnless(common.strToBool('1'))
         self.failUnless(common.strToBool('yes'))
-        self.failIf(common.strToBool('False') )
-        self.failIf(common.strToBool('false') )
-        self.failIf(common.strToBool('0') )
-        self.failIf(common.strToBool('no') )
-        self.failIf(common.strToBool('I am a monkey') )
+        self.failIf(common.strToBool('False'))
+        self.failIf(common.strToBool('false'))
+        self.failIf(common.strToBool('0'))
+        self.failIf(common.strToBool('no'))
+        self.failIf(common.strToBool('I am a monkey'))
 
     def testgetMTime(self):
         mtime = registry._getMTime(__file__)
@@ -61,7 +61,8 @@ class TestRegistry(testsuite.TestCase):
         self.failUnless(self.reg.isEmpty())
         self.reg.addFromString('<root></root>')
         self.failUnless(self.reg.isEmpty())
-        self.reg.addFromString('<registry><components></components></registry>')
+        self.reg.addFromString(
+            '<registry><components></components></registry>')
         self.failUnless(self.reg.isEmpty())
 
     def testParseComponents(self):
@@ -99,7 +100,8 @@ class TestRegistry(testsuite.TestCase):
   <components>
     <component type="component" base="/">
       <properties>
-        <property name="source" type="string" required="yes" multiple="yes" _description="a source property" />
+        <property name="source" type="string" required="yes"
+                  multiple="yes" _description="a source property" />
       </properties>
     </component>
   </components>
@@ -123,7 +125,8 @@ class TestRegistry(testsuite.TestCase):
   <components>
     <component type="component" base="/">
       <properties>
-        <property name="source" type="string" required="yes" multiple="no" _description="a source property" />
+        <property name="source" type="string" required="yes" multiple="no"
+                  _description="a source property" />
         <compound-property name="group" required="yes" multiple="yes"
                            _description="a group of properties">
           <property name="first" type="int" required="yes" multiple="no"
@@ -359,7 +362,8 @@ class TestRegistry(testsuite.TestCase):
         <entry type="test/test" location="loc" function="main"/>
       </entries>
       <properties>
-        <property name="c" type="int" _description="c property %lt;needs escaping&gt;"/>
+        <property name="c" type="int"
+                  _description="c property %lt;needs escaping&gt;"/>
       </properties>
     </component>
   </components>
@@ -393,8 +397,9 @@ class TestRegistry(testsuite.TestCase):
   </bundles>
 </registry>
 """
-        self._compareRegistryAfterDump(xml, target,
-                                       'testDumpWithEscapedPropertyDescription')
+        self._compareRegistryAfterDump(
+            xml, target,
+            'testDumpWithEscapedPropertyDescription')
 
     def testDumpWithCompoundProperties(self):
         xml = """
@@ -515,13 +520,17 @@ class TestComponentEntry(testsuite.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
-        self.entry = rec('filename', 'type', 'source', 'description', 'base',
-                         ['prop'], [self.file], {}, [], [], False, 100, [], [])
-        self.empty_entry = rec('filename', 'type', 'source', 'description', 'base',
-                               ['prop'], [], {}, [], [], True, 130, [], [])
-        self.multiple_entry = rec('filename', 'type', 'source', 'description', 'base', ['prop'],
-                                  [self.file, self.file], {}, [], [],
-                                  False, 100, [], [])
+        self.entry = rec(
+            'filename', 'type', 'source', 'description', 'base',
+            ['prop'], [self.file], {}, [], [], False, 100, [], [])
+        self.empty_entry = rec(
+            'filename', 'type', 'source', 'description', 'base',
+            ['prop'], [], {}, [], [], True, 130, [], [])
+        self.multiple_entry = rec(
+            'filename', 'type', 'source', 'description',
+            'base', ['prop'],
+            [self.file, self.file], {}, [], [],
+            False, 100, [], [])
 
     def testThings(self):
         self.assertEquals(self.entry.getType(), 'type')

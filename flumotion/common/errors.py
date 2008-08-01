@@ -310,7 +310,8 @@ class GStreamerError(pb.Error):
 
 
 class GStreamerGstError(GStreamerError):
-    """GStreamer-generated error with source, GError and debug string as args"""
+    """GStreamer-generated error with source, GError and
+    debug string as args"""
 
 
 class MissingElementError(GStreamerError):

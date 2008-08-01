@@ -121,17 +121,17 @@ class FeederClient:
         # Unknown, not supported
         # these are supported
         for key in (
-            'bytes-read-current',    # bytes read over current connection
-            'bytes-read-total',      # bytes read over all connections
-            'reconnects',            # number of connections made by this client
-            'last-connect',          # last client connection, in epoch seconds
-            'last-disconnect',       # last client disconnect, in epoch seconds
-            'last-activity',         # last time client read or connected
+            'bytes-read-current', # bytes read over current connection
+            'bytes-read-total',   # bytes read over all connections
+            'reconnects',         # number of connections made by this client
+            'last-connect',       # last client connection, in epoch seconds
+            'last-disconnect',    # last client disconnect, in epoch seconds
+            'last-activity',      # last time client read or connected
             ):
             self.uiState.addKey(key, 0)
         # these are possibly unsupported
         for key in (
-            'buffers-dropped-current', # buffers dropped over current connection
+            'buffers-dropped-current', # buffers dropped over current conn
             'buffers-dropped-total',   # buffers dropped over all connections
             ):
             self.uiState.addKey(key, None)

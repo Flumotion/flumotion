@@ -33,7 +33,8 @@ def list():
     """
     Returns a list of all add-on projects seen by Flumotion.
     """
-    projects = [n for n in sys.modules.keys() if n.startswith('flumotion.project')]
+    projects = [n for n in sys.modules.keys()
+                      if n.startswith('flumotion.project')]
     paths = flumotion.project.__path__
     modules = []
     for path in paths:

@@ -150,8 +150,9 @@ def _readConfig(workerFile, options):
     # general
     # command-line debug > environment debug > config file debug
     if not options.debug and cfg.fludebug \
-        and not os.environ.has_key('FLU_DEBUG'):
+        and not 'FLU_DEBUG' in os.environ:
         options.debug = cfg.fludebug
+
 
 def main(args):
     parser = _createParser()

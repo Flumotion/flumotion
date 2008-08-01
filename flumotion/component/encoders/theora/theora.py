@@ -63,8 +63,8 @@ class Theora(feedcomponent.ParseLaunchComponent):
                 self.addMessage(
                     messages.Warning(T_(N_(
                         "Your configuration uses 'bitrate' expressed in "
-                        "kbit/sec.  Please convert it to a value in bit/sec by "
-                        "multiplying the value by 1000.")), mid='bitrate'))
+                        "kbit/sec.  Please convert it to a value in bit/sec by"
+                        " multiplying the value by 1000.")), mid='bitrate'))
                 properties['bitrate'] *= 1000
 
         for p in props:

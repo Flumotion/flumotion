@@ -91,15 +91,15 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
 
         Subclasses should override to add additional information.
         """
-        return {
-            'id':        self.id,
-            'requester': self.requesterId,
-            'domain':    self.domain
-        }
+        return {'id': self.id,
+                'requester': self.requesterId,
+                'domain': self.domain}
 
     def __repr__(self):
-        return "<%s for requesterId %r in state %s>" % (self.__class__.__name__,
+        return "<%s for requesterId %r in state %s>" % (
+            self.__class__.__name__,
             self.requesterId, _statesEnum[self.state])
+
 
 class KeycardGeneric(Keycard, object):
     pass
@@ -182,7 +182,7 @@ class KeycardToken(Keycard, credentials.Token):
         return d
 
     def __repr__(self):
-        return "<%s %s token %s for path %s @%s for requesterId %r in state %s>" % (
+        return "<%s %s token %s for path %s @%s for reqId %r in state %s>" % (
             self.__class__.__name__, self.id, self.token, self.path,
             self.address, self.requesterId, _statesEnum[self.state])
 

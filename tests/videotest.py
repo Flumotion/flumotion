@@ -40,8 +40,9 @@ from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
 
 
-if gtk.pygtk_version < (2,3,96):
-    raise SystemExit, "PyGTK 2.3.96 or higher required"
+if gtk.pygtk_version < (2, 3, 96):
+    raise SystemExit("PyGTK 2.3.96 or higher required")
+
 
 def _debug(*args):
     log.debug('videotest', ' '.join(args))
@@ -201,22 +202,31 @@ class View(gobject.GObject):
         return gtk.FALSE
 
     ### callbacks
+
     def width_changed_cb(self, widget):
         if not self._width_timeout:
-            id = gobject.timeout_add(View.latency, self.view_width_timeout, widget)
+            id = gobject.timeout_add(View.latency,
+                                     self.view_width_timeout, widget)
             self._width_timeout = id
+
     def height_changed_cb(self, widget):
         if not self._height_timeout:
-            id = gobject.timeout_add(View.latency, self.view_height_timeout, widget)
+            id = gobject.timeout_add(View.latency,
+                                     self.view_height_timeout, widget)
             self._height_timeout = id
+
     def framerate_changed_cb(self, widget):
         if not self._framerate_timeout:
-            id = gobject.timeout_add(View.latency, self.view_framerate_timeout, widget)
+            id = gobject.timeout_add(View.latency,
+                                     self.view_framerate_timeout, widget)
             self._framerate_timeout = id
+
     def format_changed_cb(self, widget):
         if not self._format_timeout:
-            id = gobject.timeout_add(View.latency, self.view_format_timeout, widget)
+            id = gobject.timeout_add(View.latency,
+                                     self.view_format_timeout, widget)
             self._format_timeout = id
+
     def pattern_changed_cb(self, widget):
         index = widget.get_active()
         self.emit('pattern-changed', index)
@@ -237,29 +247,35 @@ class Model:
         return self._caps
 
     def set_width(self, width):
-        if not self._caps: return
+        if not self._caps:
+            return
         self._structure['width'] = width
         _debug("set_width, caps now %s" % self._caps)
         self._relink()
 
     def set_height(self, height):
-        if not self._caps: return
+        if not self._caps:
+            return
         self._structure['height'] = height
         _debug("set_height, caps now %s" % self._caps)
         self._relink()
 
     def set_framerate(self, framerate):
-        if not self._caps: return
+        if not self._caps:
+            return
         self._structure['framerate'] = framerate
         _debug("set_framerate,caps now %s" % self._caps)
         self._relink()
 
     # FIXME: use lookup table
     # FIXME: setting 'format' fourcc's doesn't work yet
+
     def set_format(self, format):
         print "SET FORMAT"
-        if not self._caps: return
-        if format > 2: return
+        if not self._caps:
+            return
+        if format > 2:
+            return
         if format == 0:
             # RGB
             self._structure.set_name('video/x-raw-rgb')
@@ -306,7 +322,8 @@ class Model:
             parent.set_state(gst.STATE_PAUSED)
             pad.unlink(peer)
             if not pad.link_filtered(peer, self._caps):
-                print "ERROR: could not link %s and %s with caps %s" % (pad, peer, self._caps)
+                print "ERROR: could not link %s and %s with caps %s" % (
+                    pad, peer, self._caps)
             if not parent.set_state(gst.STATE_PLAYING):
                 print "ERROR: could not set parent %s to playing" % parent
         _debug("gst caps of pad now %s" % pad.get_negotiated_caps())

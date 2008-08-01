@@ -114,7 +114,7 @@ class PorterMedium(component.BaseComponentMedium):
 class Porter(component.BaseComponent, log.Loggable):
     """
     The porter optionally sits in front of a set of streamer components.
-    The porter is what actually deals with incoming connections on a TCP socket.
+    The porter is what actually deals with incoming connections on a socket.
     It decides which streamer to direct the connection to, then passes the FD
     (along with some amount of already-read data) to the appropriate streamer.
     """
@@ -150,7 +150,7 @@ class Porter(component.BaseComponent, log.Loggable):
         @type  avatar: L{PorterAvatar}
         """
         self.debug("Registering porter path \"%s\" to %r" % (path, avatar))
-        if self._mappings.has_key(path):
+        if path in self._mappings:
             self.warning("Replacing existing mapping for path \"%s\"" % path)
 
         self._mappings[path] = avatar
@@ -165,20 +165,21 @@ class Porter(component.BaseComponent, log.Loggable):
         @param avatar: The avatar representing the streamer being deregistered
         @type  avatar: L{PorterAvatar}
         """
-        if self._mappings.has_key(path):
+        if path in self._mappings:
             if self._mappings[path] == avatar:
                 self.debug("Removing porter mapping for \"%s\"" % path)
                 del self._mappings[path]
             else:
-                self.warning("Mapping not removed: refers to a different avatar")
+                self.warning(
+                    "Mapping not removed: refers to a different avatar")
         else:
             self.warning("Mapping not removed: no mapping found")
 
     def registerPrefix(self, prefix, avatar):
         """
         Register a destination for all requests directed to anything beginning
-        with a specified prefix. Where there are multiple matching prefixes, the
-        longest is selected.
+        with a specified prefix. Where there are multiple matching prefixes,
+        the longest is selected.
 
         @param avatar: The avatar being registered
         @type  avatar: L{PorterAvatar}
@@ -207,14 +208,16 @@ class Porter(component.BaseComponent, log.Loggable):
             self.debug("Removing prefix destination from porter")
             del self._prefixes[prefix]
         else:
-            self.warning("Not removing prefix destination: expected avatar not found")
+            self.warning(
+                "Not removing prefix destination: expected avatar not found")
 
     def findPrefixMatch(self, path):
         found = None
         # TODO: Horribly inefficient. Replace with pathtree code.
         for prefix in self._prefixes.keys():
             self.log("Checking: %r, %r" % (prefix, path))
-            if (path.startswith(prefix) and (not found or len(found) < len(prefix))):
+            if (path.startswith(prefix) and
+                (not found or len(found) < len(prefix))):
                 found = prefix
         if found:
             return self._prefixes[found]
@@ -227,7 +230,7 @@ class Porter(component.BaseComponent, log.Loggable):
         @returns: The Avatar for this mapping, or None.
         """
 
-        if self._mappings.has_key(path):
+        if path in self._mappings:
             return self._mappings[path]
         else:
             return self.findPrefixMatch(path)
@@ -237,8 +240,8 @@ class Porter(component.BaseComponent, log.Loggable):
         """
         Generate a socket pathname in an appropriate location
         """
-        # Also see worker/worker.py:_getSocketPath(), and note that this suffers
-        # from the same potential race.
+        # Also see worker/worker.py:_getSocketPath(), and note that
+        # this suffers from the same potential race.
         import tempfile
         fd, name = tempfile.mkstemp('.%d' % os.getpid(), 'flumotion.porter.')
         os.close(fd)
@@ -260,13 +263,13 @@ class Porter(component.BaseComponent, log.Loggable):
         props = self.config['properties']
 
         self.fixRenamedProperties(props,
-            [('socket_path',        'socket-path')])
+            [('socket_path', 'socket-path')])
 
         # We can operate in two modes: explicitly configured (neccesary if you
         # want to handle connections from components in other managers), and
         # self-configured (which is sufficient for slaving only streamers
         # within this manager
-        if props.has_key('socket-path'):
+        if 'socket-path' in props:
             # Explicitly configured
             self._socketPath = props['socket-path']
             self._username = props['username']

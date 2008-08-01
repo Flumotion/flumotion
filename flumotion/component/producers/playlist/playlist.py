@@ -351,7 +351,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.playlistparser.parseData(data)
 
     def create_pipeline(self):
-        props = self.config['properties'];
+        props = self.config['properties']
 
         self._playlistfile = props.get('playlist', None)
         self._playlistdirectory = props.get('playlist-directory', None)

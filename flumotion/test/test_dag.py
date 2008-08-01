@@ -23,18 +23,19 @@ from flumotion.common import dag
 from flumotion.common import testsuite
 
 
-
-
 class TestDAG(testsuite.TestCase):
+
     def testSort(self):
-        nodes = ['a','b','c','d','e','f']
-        edges = [('a','f'),
-                 ('a','d'),
+        nodes = ['a', 'b',
+                 'c', 'd',
+                 'e', 'f']
+        edges = [('a', 'f'),
+                 ('a', 'd'),
                  ('f', 'e'),
-                 ('e','c'),
-                 ('d','b')]
-        orderings = [['a','f','e','c'],
-                     ['a','d','b']]
+                 ('e', 'c'),
+                 ('d', 'b')]
+        orderings = [['a', 'f', 'e', 'c'],
+                     ['a', 'd', 'b']]
         sorted = dag.topological_sort(nodes, edges)
 
         for order in orderings:
@@ -178,8 +179,10 @@ class TestDAG(testsuite.TestCase):
         # the example
         # even though multiple answers are possible, the preferred order
         # makes sure we get the one result we want
-        nodes = graph._sortPreferred([(1,0), (2,0), (3,0), (4,0), (5,0),
-            (6,0), (9,0), (8,0), (7,0)], clearState=False)
+        nodes = graph._sortPreferred([
+            (1, 0), (2, 0), (3, 0), (4, 0),
+            (5, 0), (6, 0), (9, 0), (8, 0),
+            (7, 0)], clearState=False)
         sorted = [node.object for node in nodes]
         self.assertEquals(sorted, [7, 9, 1, 4, 6, 5, 8, 2, 3])
 
@@ -203,11 +206,25 @@ class FakeDep:
     def __init__(self, name):
         self.name = name
 
-class FakeFeeder(FakeDep): pass
-class FakeEater(FakeDep): pass
-class FakeWorker(FakeDep): pass
-class FakeKid(FakeDep): pass
-class FakeComponent(FakeDep): pass
+
+class FakeFeeder(FakeDep):
+    pass
+
+
+class FakeEater(FakeDep):
+    pass
+
+
+class FakeWorker(FakeDep):
+    pass
+
+
+class FakeKid(FakeDep):
+    pass
+
+
+class FakeComponent(FakeDep):
+    pass
 
 (feeder, eater, worker, kid, component) = range(0, 5)
 
@@ -286,7 +303,8 @@ class TestPlanet(testsuite.TestCase):
         # all components depend on the european worker
         list = graph.getOffspringTyped(weu, worker, component)
         self.assertEquals(len(list), 4)
-        for c in [(cpr, component), (ccv, component), (ccs, component), (cte, component)]:
+        for c in [(cpr, component), (ccv, component),
+                  (ccs, component), (cte, component)]:
             self.failUnless(c in list)
 
         # only streamer and tester depend on the us worker

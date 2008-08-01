@@ -77,7 +77,7 @@ class WorkerList(gtk.HBox):
         vb.show()
         a = gtk.Alignment(0.5, 0.5)
         a.show()
-        vb.pack_start (a, True, False, 0)
+        vb.pack_start(a, True, False, 0)
         cell = gtk.CellRendererText()
         self._combobox.pack_start(cell, True)
         self._combobox.add_attribute(cell, 'text', 0)

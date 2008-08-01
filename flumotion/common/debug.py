@@ -114,7 +114,8 @@ def print_stack(handle=None):
             output.append('    Locals:\n')
         if line:
             output.append('    %s\n' % line.strip())
-        output.append('  File "%s", line %d, in %s\n' % (filename,lineno,name))
+        output.append('  File "%s", line %d, in %s\n' % (
+            filename, lineno, name))
         f = f.f_back
     output.reverse()
     if handle is None:

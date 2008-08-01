@@ -79,7 +79,7 @@ class FakeWorkerMind(FakeMind):
         self.avatarId = avatarId
 
     def remote_getPorts(self):
-        return (range(7600,7610), False)
+        return (range(7600, 7610), False)
 
     def remote_getFeedServerPort(self):
         return 7610

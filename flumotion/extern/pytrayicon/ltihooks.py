@@ -18,9 +18,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import os, ihooks
+import ihooks
+import os
+
 
 class LibtoolHooks(ihooks.Hooks):
+
     def get_suffixes(self):
         """Like normal get_suffixes, but adds .la suffixes to list"""
         ret = ihooks.Hooks.get_suffixes(self)

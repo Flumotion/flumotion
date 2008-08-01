@@ -37,9 +37,10 @@ def fractionFromValue(value):
     @returns: the fraction
     @rtype:   a two sized tuple with 2 integers
     """
+
     def _frac(num, denom=1):
         return int(num), int(denom)
-    
+
     if isinstance(value, basestring):
         noSlashes = value.count('/')
         if noSlashes == 0:

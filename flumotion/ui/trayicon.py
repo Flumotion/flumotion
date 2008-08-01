@@ -52,7 +52,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
 
     gsignal("quit")
 
-    def __init__ (self, window):
+    def __init__(self, window):
         """
         @type window: L{flumotion.admin.gtk.client.Window}
         """
@@ -153,8 +153,9 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
                     overallmood = mood
 
             moodname = moods.get(overallmood).name
-            self.debug("overall mood: %s %d" % (moodname,overallmood))
-            pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join(configure.imagedir, 'mood-%s.png' % moodname))
+            self.debug("overall mood: %s %d" % (moodname, overallmood))
+            pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join(
+                configure.imagedir, 'mood-%s.png' % moodname))
             scaled_buf = pixbuf.scale_simple(24, 24, gtk.gdk.INTERP_BILINEAR)
             self._tray_image.set_from_pixbuf(scaled_buf)
 

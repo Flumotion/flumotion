@@ -119,14 +119,16 @@ class ConversionStep(WorkerWizardStep):
 
         audio_producer = self.wizard.getAudioProducer()
         if audio_producer:
-            data.append(('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER))
+            data.append(('audio-encoder', self.audio,
+                         _PREFERRED_AUDIO_ENCODER))
         else:
             self.audio.hide()
             self.label_audio.hide()
 
         video_producer = self.wizard.getVideoProducer()
         if video_producer:
-            data.append(('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER))
+            data.append(('video-encoder', self.video,
+                         _PREFERRED_VIDEO_ENCODER))
         else:
             self.video.hide()
             self.label_video.hide()
@@ -160,7 +162,8 @@ class ConversionStep(WorkerWizardStep):
         d.addCallback(lambda x: self.wizard.taskFinished())
 
     def _addEntries(self, entries, ctype, combo, default_type):
-        self.debug('adding entries for ctype %s: %r with default_type %s', ctype, entries, default_type)
+        self.debug('adding entries for ctype %s: %r with default_type %s',
+                   ctype, entries, default_type)
         data = []
         for entry in entries:
             item = (N_(entry.description), entry)
@@ -205,7 +208,7 @@ class ConversionStep(WorkerWizardStep):
     def _loadStep(self, combo):
         entry = combo.get_selected()
         assert entry, 'combo %s has nothing selected' % (combo, )
-        
+
         def pluginLoaded(plugin, entry):
             if plugin is None:
                 self._createDummyModel(entry)
@@ -248,9 +251,10 @@ class ConversionStep(WorkerWizardStep):
         # '...' used while waiting for the query to be done
         if muxer_entry is None:
             return
-        self._populateCombos([('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER),
-                               ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER)],
-                              provides=muxer_entry.getAcceptedMediaTypes())
+        self._populateCombos(
+            [('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER),
+             ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER)],
+            provides=muxer_entry.getAcceptedMediaTypes())
 
     # Callbacks
 

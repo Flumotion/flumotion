@@ -312,14 +312,14 @@ class WizardSaver(object):
             self._audioProducer = self._videoProducer
 
     def _handleMuxers(self):
-        for muxerName, components in [('audio', [self._audioEncoder]), 
-                                      ('video', [self._videoEncoder]), 
-                                      ('audio-video', [self._audioEncoder, 
+        for muxerName, components in [('audio', [self._audioEncoder]),
+                                      ('video', [self._videoEncoder]),
+                                      ('audio-video', [self._audioEncoder,
                                                        self._videoEncoder])]:
-            muxer = self._getMuxer(muxerName) 
-            if muxer.feeders: 
-                self._flowComponents.append(muxer) 
-                for component in components: 
+            muxer = self._getMuxer(muxerName)
+            if muxer.feeders:
+                self._flowComponents.append(muxer)
+                for component in components:
                     component.link(muxer)
 
     def _resolveNameConflicts(self):

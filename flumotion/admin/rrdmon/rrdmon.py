@@ -137,7 +137,7 @@ class RRDMonitor(log.Loggable):
             freq = sourceGetSampleFrequency(source)
 
             # randomly offset the polling
-            offset = datetime.timedelta(seconds=r.randint(0,freq))
+            offset = datetime.timedelta(seconds=r.randint(0, freq))
 
             data = (str(sourceGetConnectionInfo(source)),
                     sourceGetComponentId(source),

@@ -62,8 +62,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self._feederFeedServer = {} # eaterAlias -> (fullFeedId, host, port) tuple
-                                    # for remote feeders
+        self._feederFeedServer = {} # eaterAlias -> (fullFeedId, host, port)
+                                    # tuple for remote feeders
         self._feederPendingConnections = {} # eaterAlias -> cancel thunk
         self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
                                     # for remote eaters
@@ -232,7 +232,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
     def remote_getMasterClockInfo(self):
         """
-        Return the clock master info created by a previous call to provideMasterClock.
+        Return the clock master info created by a previous call
+        to provideMasterClock.
 
         @returns: (ip, port, base_time)
         @rtype:   tuple of (str, int, long)
@@ -341,8 +342,9 @@ class ParseLaunchComponent(FeedComponent):
     def set_pipeline(self, pipeline):
         FeedComponent.set_pipeline(self, pipeline)
         if self.checkTimestamp or self.checkOffset:
-            watchElements = dict([(e.elementName + '-identity' , e)
-                                  for e in self.eaters.values()])
+            watchElements = dict([
+                (e.elementName + '-identity', e)
+                for e in self.eaters.values()])
             self.install_eater_continuity_watch(watchElements)
         self.configure_pipeline(self.pipeline, self.config['properties'])
 
@@ -424,7 +426,7 @@ class ParseLaunchComponent(FeedComponent):
         self.debug('Creating pipeline, template is %s', pipeline)
 
         if pipeline == '' and not self.eaters:
-            raise TypeError, "Need a pipeline or a eater"
+            raise TypeError("Need a pipeline or a eater")
 
         if pipeline == '':
             # code of dubious value
@@ -515,7 +517,8 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
 
     def get_muxer_string(self, properties):
         """
-        Return a gst-parse description of the muxer, which must be named 'muxer'
+        Return a gst-parse description of the muxer, which
+        must be named 'muxer'
         """
         raise errors.NotImplementedError("Implement in a subclass")
 
@@ -534,7 +537,7 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
                 if not ':' in feed:
                     feed = '%s:default' % feed
                 feeds.append(feed)
-            eaters = { 'default': [(x, 'default') for x in feeds] }
+            eaters = {'default': [(x, 'default') for x in feeds]}
 
         pipeline = ''
         for e in eaters:

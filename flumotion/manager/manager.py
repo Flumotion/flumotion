@@ -162,9 +162,11 @@ class ComponentMapper:
         self.avatar = None      # ComponentAvatar
         self.jobState = None    # ManagerJobState of a running component
 
+
 class Vishnu(log.Loggable):
     """
-    I am the toplevel manager object that knows about all heavens and factories.
+    I am the toplevel manager object that knows about all
+    heavens and factories.
 
     @cvar dispatcher:      dispatcher to create avatars
     @type dispatcher:      L{Dispatcher}
@@ -174,7 +176,8 @@ class Vishnu(log.Loggable):
     @type componentHeaven: L{component.ComponentHeaven}
     @cvar adminHeaven:     the admin heaven
     @type adminHeaven:     L{admin.AdminHeaven}
-    @cvar configDir:       the configuration directory for this Vishnu's manager
+    @cvar configDir:       the configuration directory for
+                           this Vishnu's manager
     @type configDir:       str
     """
 
@@ -308,7 +311,7 @@ class Vishnu(log.Loggable):
         @param identity: L{flumotion.common.identity.Identity}
         """
         socket = 'flumotion.component.plugs.adminaction.AdminAction'
-        if self.plugs.has_key(socket):
+        if socket in self.plugs:
             for plug in self.plugs[socket]:
                 plug.action(identity, message, args, kw)
 
@@ -335,7 +338,7 @@ class Vishnu(log.Loggable):
         """
 
         socket = 'flumotion.component.plugs.identity.IdentityProvider'
-        if self.plugs.has_key(socket):
+        if socket in self.plugs:
             for plug in self.plugs[socket]:
                 identity = plug.computeIdentity(keycard, remoteHost)
                 if identity:
@@ -477,7 +480,8 @@ class Vishnu(log.Loggable):
             if not workerId in componentsToStart:
                 componentsToStart[workerId] = []
             componentsToStart[workerId].append(c)
-        self.debug('_startComponents: componentsToStart %r' % componentsToStart)
+        self.debug('_startComponents: componentsToStart %r' %
+                   (componentsToStart, ))
 
         for workerId, componentStates in componentsToStart.items():
             self._workerCreateComponents(workerId, componentStates)

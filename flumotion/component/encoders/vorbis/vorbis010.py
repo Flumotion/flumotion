@@ -75,12 +75,14 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
             # now do necessary filtercaps
             rate = in_rate
             if self.bitrate > -1:
-                maxsamplerate = get_max_sample_rate(self.bitrate, self.channels)
+                maxsamplerate = get_max_sample_rate(
+                    self.bitrate, self.channels)
                 if in_rate > maxsamplerate:
                     rate = get_preferred_sample_rate(maxsamplerate)
                     self.debug(
-                        'rate %d > max rate %d (for %d kbit/sec), selecting rate %d instead' % (
-                            in_rate, maxsamplerate, self.bitrate, rate))
+                        'rate %d > max rate %d (for %d kbit/sec), '
+                        'selecting rate %d instead' % (
+                        in_rate, maxsamplerate, self.bitrate, rate))
 
             caps_str = 'audio/x-raw-float, rate=%d, channels=%d' % (rate,
                         self.channels)

@@ -115,9 +115,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
     def renderAuthenticated(self, _, request):
         # Now that we're authenticated (or authentication wasn't requested),
         # write the file (or appropriate other response) to the client.
-        # We override static.File to implement Range requests, and to get access
-        # to the transfer object to abort it later; the bulk of this is a direct
-        # copy of static.File.render, though.
+        # We override static.File to implement Range requests, and to get
+        # access to the transfer object to abort it later; the bulk of this
+        # is a direct copy of static.File.render, though.
         # self.restat()
         self.debug('renderAuthenticated request %r' % request)
 
@@ -214,8 +214,8 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
                 (first, last, fileSize))
             # Start sending from the requested position in the file
             if first:
-                # TODO: logs suggest this is called with negative values, figure
-                # out how
+                # TODO: logs suggest this is called with negative values,
+                # figure out how
                 self.debug("Request for range \"%s\" of file, seeking to "
                     "%d of total file size %d", ranges, first, fileSize)
                 f.seek(first)

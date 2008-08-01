@@ -41,10 +41,11 @@ class _SocketMaybeCloser(tcp._SocketCloser):
     keepSocketAlive = False
 
     def _closeSocket(self):
-        # We override this (from tcp._SocketCloser) so that we can close sockets
-        # properly in the normal case, but once we've passed our socket on via
-        # the FD-channel, we just close() it (not calling shutdown() which will
-        # close the TCP channel without closing the FD itself)
+        # We override this (from tcp._SocketCloser) so that we can close
+        # sockets properly in the normal case, but once we've passed our
+        # socket on via the FD-channel, we just close() it (not calling
+        # shutdown() which will close the TCP channel without closing
+        # the FD itself)
         if self.keepSocketAlive:
             try:
                 self.socket.close()
@@ -295,7 +296,8 @@ class FeedMedium(fpb.Referenceable):
         # to the remote so we can avoid cycles.
         self.setRemoteReference(None)
 
-        (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
+        (flowName, componentName, feedName) = common.parseFullFeedId(
+            fullFeedId)
         feedId = common.feedId(componentName, feedName)
 
         self.debug('firing deferred with feedId %s on fd %d', feedId,

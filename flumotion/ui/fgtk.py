@@ -58,15 +58,14 @@ class ProxyWidgetMapping:
     # as it is internally, eg failback to the real GType, by doing
     # this PyMapping_GetItemString will never set the error.
 
-    types = { 'GtkCheckButton': ProxyCheckButton,
-              'GtkComboBox': FProxyComboBox,
-              'GtkEntry': ProxyEntry,
-              'GtkRadioButton': ProxyRadioButton,
-              'GtkSpinButton': ProxySpinButton,
-              }
+    types = {'GtkCheckButton': ProxyCheckButton,
+             'GtkComboBox': FProxyComboBox,
+             'GtkEntry': ProxyEntry,
+             'GtkRadioButton': ProxyRadioButton,
+             'GtkSpinButton': ProxySpinButton}
 
     def __getitem__(self, name):
-        if self.types.has_key(name):
+        if name in self.types:
             return self.types[name]
         else:
             return gobject.type_from_name(name)

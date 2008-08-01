@@ -131,7 +131,8 @@ class ConsumptionStep(WizardStep):
         blockNext = True
         if ((disk and pany([disk_audio, disk_video, disk_audio_video])) or
             (http and pany([http_audio, http_video, http_audio_video])) or
-            (shout2 and pany([shout2_audio, shout2_video, shout2_audio_video]))):
+            (shout2 and pany([shout2_audio,
+                              shout2_video, shout2_audio_video]))):
             blockNext = False
         self.wizard.blockNext(blockNext)
 
@@ -288,7 +289,7 @@ class HTTPConsumptionStep(WorkerWizardStep):
     # Callbacks
 
     def on_has_client_limit_toggled(self, checkbutton):
-         self._verify()
+        self._verify()
 
     def on_has_bandwidth_limit_toggled(self, checkbutton):
-         self._verify()
+        self._verify()

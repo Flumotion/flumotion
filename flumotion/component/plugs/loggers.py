@@ -36,8 +36,8 @@ class Logger(base.ComponentPlug):
         """
         Handle a log event.
 
-        This dispatches a particular event type such as "http_session_completed"
-        to a method "event_http_session_completed".
+        This dispatches a particular event type such as
+        "http_session_completed" to a method "event_http_session_completed".
 
         Returns a Deferred (which will fire once the event handling has been
         completed), or None.

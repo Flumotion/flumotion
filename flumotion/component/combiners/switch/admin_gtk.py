@@ -38,7 +38,8 @@ class SwitchingNode(BaseAdminGtkNode):
         self.widget = gtk.Table(2, 1)
         self.radioButton = {}
         self.radioButton["backup"] = gtk.RadioButton(label="Backup")
-        self.radioButton["master"] = gtk.RadioButton(self.radioButton["backup"],
+        self.radioButton["master"] = gtk.RadioButton(
+            self.radioButton["backup"],
             label="Master")
         self.radioButtonHandlers = {}
         currentRow = 0
@@ -47,8 +48,9 @@ class SwitchingNode(BaseAdminGtkNode):
                 currentRow+1, yoptions=gtk.FILL, xpadding=6, ypadding=6)
             currentRow = currentRow + 1
             self.radioButton[eaterName].show()
-            self.radioButtonHandlers[eaterName] = self.radioButton[eaterName].connect("toggled",
-                self.cb_toggled, eaterName)
+            sigID = self.radioButton[eaterName].connect(
+                "toggled", self.cb_toggled, eaterName)
+            self.radioButtonHandlers[eaterName] = sigID
         self.widget.show()
 
     def cb_toggled(self, button, eaterName):

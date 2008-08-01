@@ -67,9 +67,11 @@ class WorkerClientFactory(ReconnectingFPBClientFactory):
         ReconnectingFPBClientFactory.clientConnectionFailed(self,
             connector, reason)
         # delay is now updated
-        self.debug("failed to connect, will try to reconnect in %f seconds" % self.delay)
+        self.debug("failed to connect, will try to reconnect in %f seconds" %
+                   self.delay)
 
     ### ReconnectingPBClientFactory methods
+
     def gotDeferredLogin(self, d):
         # the deferred from the login is now available
         # add some of our own to it
@@ -232,8 +234,9 @@ class WorkerMedium(medium.PingingMedium):
 
         @returns: None or Failure
         """
-        return self.brain.runCheck('flumotion.worker.checks.check', 'checkImport',
-                                   moduleName)
+        return self.brain.runCheck(
+            'flumotion.worker.checks.check', 'checkImport',
+            moduleName)
 
     def remote_runCheck(self, module, function, *args, **kwargs):
         """

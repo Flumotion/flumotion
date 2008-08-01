@@ -114,13 +114,16 @@ class TestPackagePath(testsuite.TestCase):
         self._assertions += 1
         try:
             if twisted.python.util.raises(exception, f, *args, **kwargs):
-                raise FailTest, '%s raised' % exception.__name__
+                raise FailTest(
+                    '%s raised' % exception.__name__)
         except FailTest, e:
             raise
         except:
             # import traceback; traceback.print_exc()
-            raise FailTest, '%s raised instead of %s' % (sys.exc_info()[0],
-                                                         exception.__name__)
+            raise FailTest(
+                '%s raised instead of %s' % (
+                sys.exc_info()[0],
+                exception.__name__))
 
     def testCurrent(self):
         packager = package.getPackager()

@@ -58,17 +58,18 @@ __version__ = "$Rev$"
 #
 # Besides control flow, the name of the step is also used to load up a glade
 # file describing the step's contents. The wizard will look for it as
-# WNAME-SNAME.glade, where WNAME is the name of the wizard and SNAME is the name
-# of the step. The widget taken will be the direct child of the first toplevel
-# window. Each widget in the glade file will be set as an attribute on the
-# WizardStep, e.g. bank_account_entry in the example above.
+# WNAME-SNAME.glade, where WNAME is the name of the wizard and SNAME is
+# the name of the step. The widget taken will be the direct child of the
+# first toplevel window. Each widget in the glade file will be set as an
+# attribute on the WizardStep, e.g. bank_account_entry in the example above.
 #
 # The "text" is shown above the widget created from the glade file. next_pages
-# is a list of possible next steps. Before the widget is shown, the is_available
-# method will be called on the steps listed in next_pages, and the names of
-# those steps that are actually available will be put in the available_pages
-# attribute on the current step. This is useful to allow early steps to show
-# if a later step is not available, perhaps by desensitizing an option.
+# is a list of possible next steps. Before the widget is shown, the
+# is_available method will be called on the steps listed in next_pages,
+# and the names of those steps that are actually available will be put in
+# the available_pages attribute on the current step. This is useful to
+# allow early steps to show if a later step is not available, perhaps by
+# desensitizing an option.
 #
 # Methods other than on_next and is_available are documented in the WizardStep
 # class.
@@ -195,7 +196,8 @@ class SimpleWizard(GladeWindow):
         try:
             page = self.pages[name]
         except KeyError:
-            raise AssertionError ('No page named %s in %r' % (name, self.pages))
+            raise AssertionError(
+                'No page named %s in %r' % (name, self.pages))
 
         w = self.widgets
         page.button_next = w['button_next']
@@ -233,7 +235,9 @@ class SimpleWizard(GladeWindow):
             button.set_sensitive(True)
             self.emit('finished')
         elif next_page == '*signaled*':
-            # page wants to do more stuff and will signal us next_page when done
+            # page wants to do more stuff and will signal us next_page
+            # when done
+
             def on_finished(page, next_page):
                 button.set_sensitive(True)
                 self.page.disconnect(self._finished_id)

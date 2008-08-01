@@ -81,9 +81,9 @@ class TestPadMonitor(testsuite.TestCase):
 
         def hasActivated():
             self.assertEquals(monitor.isActive(), True)
-            # Now, we don't send any more data, and after our 0.5 second timeout
-            # we should go inactive. Pass our test if that happens. Otherwise
-            # trial will time out.
+            # Now, we don't send any more data, and after our 0.5 second
+            # timeout we should go inactive. Pass our test if that happens.
+            # Otherwise trial will time out.
 
         monitor = padmonitor.PadMonitor(srcpad, "identity-source",
                                         lambda name: None,

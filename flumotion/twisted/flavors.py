@@ -333,7 +333,7 @@ class StateRemoteCache(pb.RemoteCache):
     def removeListener(self, listener):
         self._ensureListeners()
         if listener not in self._listeners:
-            raise KeyError, listener
+            raise KeyError(listener)
         del self._listeners[listener]
 
     # pb.RemoteCache methods

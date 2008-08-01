@@ -138,10 +138,12 @@ class BouncerPortal(log.Loggable):
                 keycard.avatarId = "admin-%06x" % self._adminCounter
                 self._adminCounter += 1
 
-            self.log('calling %r.requestAvatar(keycard=%r, mind=%r, ifaces=%r)',
-                     self.realm, keycard, mind, ifaces)
+            self.log(
+                'calling %r.requestAvatar(keycard=%r, mind=%r, ifaces=%r)',
+                self.realm, keycard, mind, ifaces)
 
-            return self.realm.requestAvatar(keycard.avatarId, keycard, mind, *ifaces)
+            return self.realm.requestAvatar(keycard.avatarId,
+                                            keycard, mind, *ifaces)
 
         if hasattr(keycard, 'address'):
             try:

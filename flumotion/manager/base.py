@@ -250,8 +250,8 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         for name in bundles:
             bundler = basket.getBundlerByName(name)
             if not bundler:
-                raise errors.NoBundleError('The bundle named "%s" was not found'
-                                           % (name, ))
+                raise errors.NoBundleError(
+                    'The bundle named "%s" was not found' % (name, ))
             zips[name] = bundler.bundle().getZip()
         return zips
 
@@ -378,7 +378,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @returns: True if an avatar with that id is registered
         @rtype:   bool
         """
-        return self.avatars.has_key(avatarId)
+        return avatarId in self.avatars
 
     def getAvatars(self):
         """

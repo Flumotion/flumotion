@@ -18,7 +18,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
-
+4
 """main interface for the cursor admin client"""
 
 import curses
@@ -45,7 +45,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
     logCategory = 'admintextview'
 
-    global_commands = [ 'startall', 'stopall', 'clearall', 'quit' ]
+    global_commands = ['startall', 'stopall', 'clearall', 'quit']
 
     LINES_BEFORE_COMPONENTS = 5
     LINES_AFTER_COMPONENTS = 6
@@ -84,24 +84,26 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.admin.connect('update', self.admin_update_cb)
 
     # show the whole text admin screen
+
     def show(self):
         self.initialised = True
-        self.stdscr.addstr(0,0, "Main Menu")
+        self.stdscr.addstr(0, 0, "Main Menu")
         self.show_components()
         self.display_status()
-        self.stdscr.move(self.lasty,0)
+        self.stdscr.move(self.lasty, 0)
         self.stdscr.clrtoeol()
-        self.stdscr.move(self.lasty+1,0)
+        self.stdscr.move(self.lasty+1, 0)
         self.stdscr.clrtoeol()
-        self.stdscr.addstr(self.lasty+1,0, "Prompt: %s" % self.inputText)
+        self.stdscr.addstr(self.lasty+1, 0, "Prompt: %s" % self.inputText)
         self.stdscr.refresh()
         #gobject.io_add_watch(0, gobject.IO_IN, self.keyboard_input_cb)
 
     # show the view of components and their mood
     # called from show
+
     def show_components(self):
         if self.initialised:
-            self.stdscr.addstr(2,0, "Components:")
+            self.stdscr.addstr(2, 0, "Components:")
             # get a dictionary of components
             names = self._components.keys()
             names.sort()
@@ -113,9 +115,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             # "press page down for next components" lines
             if len(names) > self.max_components_per_page:
                 if self._first_onscreen_component > 0:
-                    self.stdscr.move(cury,0)
+                    self.stdscr.move(cury, 0)
                     self.stdscr.clrtoeol()
-                    self.stdscr.addstr(cury,0,
+                    self.stdscr.addstr(cury, 0,
                         "Press page up to scroll up components list")
                     cury=cury+1
             cur_component = self._first_onscreen_component
@@ -123,9 +125,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 # check if too many components for screen height
                 if cury - self.LINES_BEFORE_COMPONENTS >= \
                         self.max_components_per_page:
-                    self.stdscr.move(cury,0)
+                    self.stdscr.move(cury, 0)
                     self.stdscr.clrtoeol()
-                    self.stdscr.addstr(cury,0,
+                    self.stdscr.addstr(cury, 0,
                         "Press page down to scroll down components list")
                     cury = cury + 1
                     break
@@ -133,10 +135,11 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 component = self._components[name]
                 mood = component.get('mood')
                 # clear current component line
-                self.stdscr.move(cury,0)
+                self.stdscr.move(cury, 0)
                 self.stdscr.clrtoeol()
                 # output component name and mood
-                self.stdscr.addstr(cury,0,"%s: %s" % (name, moods[mood].name))
+                self.stdscr.addstr(cury, 0, "%s: %s" % (
+                    name, moods[mood].name))
                 cury = cury + 1
                 cur_component = cur_component + 1
 
@@ -147,7 +150,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     def gotEntryCallback(self, result, name):
         entryPath, filename, methodName = result
         filepath = os.path.join(entryPath, filename)
-        self.debug('Got the UI for %s and it lives in %s' % (name,filepath))
+        self.debug('Got the UI for %s and it lives in %s' % (name, filepath))
         self.uidir = os.path.split(filepath)[0]
         #handle = open(filepath, "r")
         #data = handle.read()
@@ -250,7 +253,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 self.debug("silly")
 
         def compStateSet(state, key, value):
-            self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
+            self.log('stateSet: state %r, key %s, value %r' % (
+                state, key, value))
 
             if key == 'mood':
                 # this is needed so UIs load if they change to happy
@@ -362,7 +366,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         can_start = True
         for x in self._components.values():
             mood = moods.get(x.get('mood'))
-            can_stop = can_stop and (mood != moods.lost and mood != moods.sleeping)
+            can_stop = can_stop and (mood != moods.lost and
+                                     mood != moods.sleeping)
             can_start = can_start and (mood == moods.sleeping)
         can_clear = can_start and not can_stop
 
@@ -374,7 +379,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     self._component_start(c)
                 self.command_result = 'Attempting to start all components'
             else:
-                self.command_result = 'Components not all in state to be started'
+                self.command_result = (
+                    'Components not all in state to be started')
 
 
         elif string.lower(command) == 'stopall':
@@ -383,20 +389,23 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     self._component_stop(c)
                 self.command_result = 'Attempting to stop all components'
             else:
-                self.command_result = 'Components not all in state to be stopped'
+                self.command_result = (
+                    'Components not all in state to be stopped')
         elif string.lower(command) == 'clearall':
             if can_clear:
                 self.admin.cleanComponents()
                 self.command_result = 'Attempting to clear all components'
             else:
-                self.command_result = 'Components not all in state to be cleared'
+                self.command_result = (
+                    'Components not all in state to be cleared')
         else:
             command_split = command.split()
             # if at least 2 tokens in the command
             if len(command_split)>1:
                 # check if the first is a component name
                 for c in self._components.values():
-                    if string.lower(c.get('name')) == string.lower(command_split[0]):
+                    if string.lower(c.get('name')) == (
+                        string.lower(command_split[0])):
                         # bingo, we have a component
                         if string.lower(command_split[1]) == 'start':
                             # start component
@@ -410,8 +419,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                                 textui = self._comptextui[c.get('name')]
 
                                 if textui:
-                                    d = textui.runCommand(' '.join(command_split[1:]))
-                                    self.debug("textui runcommand defer: %r" % d)
+                                    d = textui.runCommand(
+                                        ' '.join(command_split[1:]))
+                                    self.debug(
+                                        "textui runcommand defer: %r" % d)
                                     # add a callback
                                     d.addCallback(self._runCommand_cb)
 
@@ -439,20 +450,29 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             can_start = True
             for x in self._components.values():
                 mood = moods.get(x.get('mood'))
-                can_stop = can_stop and (mood != moods.lost and mood != moods.sleeping)
+                can_stop = can_stop and (mood != moods.lost and
+                                         mood != moods.sleeping)
                 can_start = can_start and (mood == moods.sleeping)
             can_clear = can_start and not can_stop
 
             for command in self.global_commands:
-                command_ok = (command != 'startall' and command != 'stopall' and command != 'clearall')
-                command_ok = command_ok or (command == 'startall' and can_start)
-                command_ok = command_ok or (command == 'stopall' and can_stop)
-                command_ok = command_ok or (command == 'clearall' and can_clear)
+                command_ok = (command != 'startall' and
+                              command != 'stopall' and
+                              command != 'clearall')
+                command_ok = command_ok or (command == 'startall' and
+                                            can_start)
+                command_ok = command_ok or (command == 'stopall' and
+                                            can_stop)
+                command_ok = command_ok or (command == 'clearall' and
+                                            can_clear)
 
-                if command_ok and string.lower(command).startswith(string.lower(last_input)):
+                if (command_ok and string.lower(command).startswith(
+                    string.lower(last_input))):
                     available_commands.append(command)
         else:
-            available_commands = available_commands + self.get_available_commands_for_component(input_split[0], input)
+            available_commands = (available_commands +
+                                  self.get_available_commands_for_component(
+                input_split[0], input))
 
         return available_commands
 
@@ -461,7 +481,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         commands = []
         for c in self._components:
             if c == comp:
-                component_commands = [ 'start', 'stop' ]
+                component_commands = ['start', 'stop']
                 textui = None
                 try:
                     textui = self._comptextui[comp]
@@ -478,7 +498,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                         elif len(input_split) == 1:
                             commands.append(command)
                     if textui:
-                        self.debug("getting component commands from ui of %s" % comp)
+                        self.debug(
+                            "getting component commands from ui of %s" % comp)
                         comp_input = ' '.join(input_split[1:])
                         if input.endswith(' '):
                             comp_input = comp_input + ' '
@@ -486,11 +507,11 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
         return commands
 
-
-    def get_available_completions(self,input):
+    def get_available_completions(self, input):
         completions = self.get_available_commands(input)
 
-        # now if input has no spaces, add the names of each component that starts with input
+        # now if input has no spaces, add the names of each component that
+        # starts with input
         if len(input.split()) <= 1:
             for c in self._components:
                 if c.startswith(input):
@@ -503,19 +524,20 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         available_commands = ' '.join(availablecommands)
         #for command in availablecommands:
         #    available_commands = '%s %s' % (available_commands, command)
-        self.stdscr.move(self.lasty+2,0)
+        self.stdscr.move(self.lasty+2, 0)
         self.stdscr.clrtoeol()
 
         self.stdscr.addstr(self.lasty+2, 0,
             "Available Commands: %s" % available_commands)
         # display command results
-        self.stdscr.move(self.lasty+3,0)
+        self.stdscr.move(self.lasty+3, 0)
         self.stdscr.clrtoeol()
-        self.stdscr.move(self.lasty+4,0)
+        self.stdscr.move(self.lasty+4, 0)
         self.stdscr.clrtoeol()
 
         if self.command_result != "":
-            self.stdscr.addstr(self.lasty+4, 0, "Result: %s" % self.command_result)
+            self.stdscr.addstr(self.lasty+4,
+                               0, "Result: %s" % self.command_result)
         self.stdscr.clrtobot()
 
     ### admin model callbacks
@@ -573,7 +595,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 if len(input_split) > 1:
                     if not self.inputText.endswith(' '):
                         input_split.pop()
-                    self.inputText = ' '.join(input_split) + ' ' + available_commands[0]
+                    self.inputText = (
+                        ' '.join(input_split) + ' ' + available_commands[0])
                 else:
                     self.inputText = available_commands[0]
 
@@ -583,9 +606,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             # re-display status
             self.display_status()
             # clear the prompt line
-            self.stdscr.move(self.lasty+1,0)
+            self.stdscr.move(self.lasty+1, 0)
             self.stdscr.clrtoeol()
-            self.stdscr.addstr(self.lasty+1,0,'Prompt: ')
+            self.stdscr.addstr(self.lasty+1, 0, 'Prompt: ')
             self.stdscr.refresh()
             if len(self.nextcommands) > 0:
                 self.lastcommands = self.lastcommands + self.nextcommands
@@ -621,7 +644,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
         else:
             # too long
-            if len(self.inputText) == self.cols-2: return
+            if len(self.inputText) == self.cols-2:
+                return
             # add to input text
             if c<=256:
                 self.inputText = self.inputText + chr(c)
@@ -629,7 +653,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         # redisplay status
         self.display_status()
 
-        self.stdscr.move(self.lasty+1,0)
+        self.stdscr.move(self.lasty+1, 0)
         self.stdscr.clrtoeol()
 
         self.stdscr.addstr(self.lasty+1, 0, 'Prompt: %s' % self.inputText)
@@ -665,7 +689,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         try:
             result = method(*args, **kwargs)
         except TypeError:
-            msg = "component method %s did not accept *a %s and **kwa %s (or TypeError)" % (
+            msg = ("component method %s did not"
+                   " accept *a %s and **kwa %s (or TypeError)") % (
                 methodName, args, kwargs)
             self.debug(msg)
             raise errors.RemoteRunError(msg)

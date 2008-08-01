@@ -20,7 +20,8 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk
-from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdminGtkNode
+from flumotion.component.effects.colorbalance.admin_gtk import \
+     ColorbalanceAdminGtkNode
 
 __version__ = "$Rev$"
 

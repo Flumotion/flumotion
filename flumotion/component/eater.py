@@ -52,26 +52,24 @@ class Eater:
         self.uiState.set('eater-name', eaterName)
         # dict for the current connection
         connectionDict = {
-            "feed-id":                      None,
-            "time-timestamp-discont":       None,
-            "timestamp-timestamp-discont":  0.0,  # ts of buffer after discont,
-                                                  # in float seconds
-            "last-timestamp-discont":        0.0,
-            "total-timestamp-discont":       0.0,
-            "count-timestamp-discont":       0,
-            "time-offset-discont":           None,
-            "offset-offset-discont":         0,   # offset of buffer
-                                                  # after discont
-            "last-offset-discont":           0,
-            "total-offset-discont":          0,
-            "count-offset-discont":          0,
-
-         }
+            "feed-id": None,
+            "time-timestamp-discont": None,
+            "timestamp-timestamp-discont": 0.0,  # ts of buffer after discont,
+                                                 # in float seconds
+            "last-timestamp-discont": 0.0,
+            "total-timestamp-discont": 0.0,
+            "count-timestamp-discont": 0,
+            "time-offset-discont": None,
+            "offset-offset-discont": 0, # offset of buffer
+                                        # after discont
+            "last-offset-discont": 0,
+            "total-offset-discont": 0,
+            "count-offset-discont": 0}
         self.uiState.addDictKey('connection', connectionDict)
 
         for key in (
-            'last-connect',           # last client connection, in epoch seconds
-            'last-disconnect',        # last client disconnect, in epoch seconds
+            'last-connect',           # last client connection, in epoch sec
+            'last-disconnect',        # last client disconnect, in epoch sec
             'total-connections',      # number of connections by this client
             'count-timestamp-discont', # number of timestamp disconts seen
             'count-offset-discont',    # number of timestamp disconts seen
@@ -107,13 +105,13 @@ class Eater:
 
         self.uiState.setitem("connection", 'feed-id', feedId)
         self.uiState.setitem("connection", "count-timestamp-discont", 0)
-        self.uiState.setitem("connection", "time-timestamp-discont",  None)
-        self.uiState.setitem("connection", "last-timestamp-discont",  0.0)
+        self.uiState.setitem("connection", "time-timestamp-discont", None)
+        self.uiState.setitem("connection", "last-timestamp-discont", 0.0)
         self.uiState.setitem("connection", "total-timestamp-discont", 0.0)
-        self.uiState.setitem("connection", "count-offset-discont",    0)
-        self.uiState.setitem("connection", "time-offset-discont",     None)
-        self.uiState.setitem("connection", "last-offset-discont",     0)
-        self.uiState.setitem("connection", "total-offset-discont",    0)
+        self.uiState.setitem("connection", "count-offset-discont", 0)
+        self.uiState.setitem("connection", "time-offset-discont", None)
+        self.uiState.setitem("connection", "last-offset-discont", 0)
+        self.uiState.setitem("connection", "total-offset-discont", 0)
 
     def disconnected(self, when=None):
         """

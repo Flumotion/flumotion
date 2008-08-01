@@ -3,9 +3,12 @@ pygtk.require('2.0')
 
 import gobject
 
+
 class Foo(gobject.GObject):
-    __gproperties__ = {'frob':(bool, 'frob', 'frob foo', False,
-                               gobject.PARAM_READWRITE|gobject.PARAM_CONSTRUCT)}
+    __gproperties__ = {'frob': (
+        bool, 'frob', 'frob foo', False,
+        gobject.PARAM_READWRITE|gobject.PARAM_CONSTRUCT)}
+
     def __init__(self):
         gobject.GObject.__init__(self)
 

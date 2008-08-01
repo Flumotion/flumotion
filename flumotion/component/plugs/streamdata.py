@@ -48,8 +48,6 @@ class ExampleStreamDataProvider(StreamDataProvider):
         self.description = self.args['properties']['description']
 
     def getStreamData(self):
-        return {
-            'protocol': 'HTTP',
-            'description': self.description,
-            'url' : self.url
-            }
+        return {'protocol': 'HTTP',
+                'description': self.description,
+                'url': self.url}

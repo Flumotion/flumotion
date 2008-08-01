@@ -117,7 +117,7 @@ class DAG(log.Loggable):
         node = self._getNode(object, type)
         self.debug("Removing node (%r, %r)" % (object, type))
         # go through all the nodes and remove edges that end in this node
-        for somenodeobj,somenodetype in self._nodes:
+        for somenodeobj, somenodetype in self._nodes:
             somenode = self._nodes[(somenodeobj, somenodetype)]
             if node in somenode.children:
                 self.removeEdge(somenodeobj, object, somenodetype, type)
@@ -205,7 +205,8 @@ class DAG(log.Loggable):
         @param object: object to return children of.
         @param objtype: type of object (optional).
         @type objtype: Integer
-        @param types: a list of types of children that you want. None means all.
+        @param types: a list of types of children that you want.
+            None means all.
         @type types: list of Integers
 
         @rtype: list of objects
@@ -229,7 +230,7 @@ class DAG(log.Loggable):
         @rtype: list of (object, object)
         """
         self._assertExists(object, objtype)
-        node = self._getNode(object,objtype)
+        node = self._getNode(object, objtype)
 
         l = node.parents
         if types:
@@ -262,7 +263,8 @@ class DAG(log.Loggable):
         @param object: object to return children of.
         @param objtype: type of object (optional).
         @type objtype: Integer
-        @param types: a list of types of children that you want. None means all.
+        @param types: a list of types of children that you want.
+            None means all.
         @type types: list of Integers
 
         @rtype: list of (object,Integer)
@@ -443,7 +445,8 @@ class DAG(log.Loggable):
         for n in self._nodes.values():
             self._begin[n] = 0
             self._end[n] = 0
-            if list: assert (n.object, n.type) in list
+            if list:
+                assert (n.object, n.type) in list
         if list:
             self._hasZeroEnd = [self._nodes[(n[0], n[1])] for n in list]
         else:
@@ -521,7 +524,7 @@ def topological_sort(items, partial_order):
     graph = DAG()
     for v in items:
         graph.addNode(v)
-    for a,b in partial_order:
+    for a, b in partial_order:
         graph.addEdge(a, b)
 
     return [v for v, t in graph.sort()]

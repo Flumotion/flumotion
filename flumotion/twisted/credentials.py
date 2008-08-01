@@ -151,8 +151,8 @@ def cryptChallenge():
     I return some random data.
     """
     crap = ''
-    for x in range(random.randrange(15,25)):
-        crap = crap + chr(random.randint(65,90) + x - x) # pychecker madness
+    for x in range(random.randrange(15, 25)):
+        crap = crap + chr(random.randint(65, 90) + x - x) # pychecker madness
     crap = md5.new(crap).digest()
     return crap
 
@@ -305,8 +305,13 @@ class HTTPDigestChallenger(log.Loggable):
             self.username, ha1, self.nonce, self.cnonce,
             self.method, self.uri, self.ncvalue, self.qop)
 
-        self.debug("Attempting to check calculated response %s against provided response %r", expectedResponse, self.response)
-        self.debug("Username %s, nonce %s, method %s, uri %s, qop %s, cnonce %s, ncvalue %s", self.username, self.nonce, self.method, self.uri, self.qop, self.cnonce, self.ncvalue)
+        self.debug(
+            "Attempting to check calculated response %s against "
+            " provided response %r", expectedResponse, self.response)
+        self.debug("Username %s, nonce %s, method %s, uri %s, qop %s, "
+                   "cnonce %s, ncvalue %s", self.username, self.nonce,
+                   self.method, self.uri, self.qop, self.cnonce,
+                   self.ncvalue)
         self.debug("Using H(A1): %s", ha1)
 
         if not self.response:

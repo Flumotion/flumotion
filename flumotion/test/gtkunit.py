@@ -28,7 +28,7 @@ from twisted.internet import reactor
 from flumotion.common import testsuite
 
 _INTERVAL = 1 # in ms
-if os.environ.has_key('FLU_INTERVAL'):
+if 'FLU_INTERVAL' in os.environ:
     _INTERVAL = int(os.environ['FLU_INTERVAL'])
 
 

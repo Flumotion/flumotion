@@ -68,8 +68,7 @@ class FakeComponentAvatar(log.Loggable):
         self.componentState = (None, 'componentState_%s' % name)
         self.jobState = (None, 'jobState_%s' % name)
         self._clockmaster = clockMaster
-
-        gp = (lambda : dac(host=self._host))
+        gp = (lambda: dac(host=self._host))
         self.mind = dac(broker=dac(transport=dac(getPeer=gp)))
 
     def __repr__(self):

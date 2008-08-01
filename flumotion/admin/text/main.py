@@ -48,7 +48,8 @@ def _runInterface(options):
     stdscr.nodelay(1)
     stdscr.keypad(1)
 
-    reactor.addSystemEventTrigger('after','shutdown', cleanup_curses, stdscr)
+    reactor.addSystemEventTrigger('after',
+                                  'shutdown', cleanup_curses, stdscr)
 
 
     # first lets sort out logging in
@@ -68,7 +69,8 @@ def _runInterface(options):
                 pass
         if options.insecure:
             insecure = True
-        connection.connect_to_manager(stdscr, hostname, port, insecure, username, password)
+        connection.connect_to_manager(stdscr, hostname, port,
+                                      insecure, username, password)
 
     else:
         # do greeter

@@ -92,7 +92,8 @@ class TestComponentWrapper(testsuite.TestCase):
 
         pp.feed(pc)
         self.assertEquals(pc.cfg['source'], ['pp:default'])
-        self.assertEquals(pc.cfg['eater'], {'default': [('pp:default', 'default')]})
+        self.assertEquals(pc.cfg['eater'], {'default':
+                                            [('pp:default', 'default')]})
 
     def test_non_default_link(self):
         fwp = ComponentWrapper('firewire-producer', None, name='fwp')

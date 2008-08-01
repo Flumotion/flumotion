@@ -434,9 +434,12 @@ def do_stop(model, quit, avatarPath):
     return do_avatar_action(model, quit, avatarPath, ('stop', 'componentStop',
         (moods.sleeping, ), moods.can_stop))
 
+
 def do_start(model, quit, avatarPath):
-    return do_avatar_action(model, quit, avatarPath, ('start', 'componentStart',
+    return do_avatar_action(model, quit, avatarPath, (
+        'start', 'componentStart',
         (moods.happy, moods.sad), moods.can_start))
+
 
 def do_delete(model, quit, avatarPath):
     return do_avatar_action(model, quit, avatarPath, ('delete',

@@ -26,7 +26,7 @@ Component tab in the component UI
 import gettext
 import os
 import time
- 
+
 import gtk
 
 from flumotion.common.format import formatStorage, formatTime
@@ -53,7 +53,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self._debugging = None
         self._initialFluMask = ''
         self._initialGstMask = ''
-        
+
     def setDebugEnabled(self, enabled):
         BaseAdminGtkNode.setDebugEnabled(self, enabled)
         if self._debugging:
@@ -61,7 +61,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         self._initialFluMask = getDebug()
         self._initialGstMask = os.environ.get('GST_DEBUG', '')
-        
+
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('main-vbox')
         assert self.widget, "No component-widget in %s" % self.gladeFile

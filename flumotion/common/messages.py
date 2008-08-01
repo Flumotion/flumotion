@@ -110,12 +110,13 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
             warnings.warn('Please use the mid kwarg instead',
                 DeprecationWarning, stacklevel=3)
             mid = id
-            
+
         # FIXME: untranslated is a really poor choice of id
         self.id = mid or translatable.untranslated()
         self.priority = priority
         self.timestamp = timestamp or time.time()
-        # -1 is in __init__, -2 is in the subclass __init__, -3 is in the caller
+        # -1 is in __init__, -2 is in the subclass __init__,
+        # -3 is in the caller
         log.doLog(log.DEBUG, None, 'messages',
             'creating message %r', self, where=-3)
         self.add(translatable)

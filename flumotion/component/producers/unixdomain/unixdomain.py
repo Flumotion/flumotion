@@ -62,7 +62,8 @@ class UnixDomainProvider(feedcomponent.ParseLaunchComponent):
         self.currentTransport = None
 
     def setUnixTransport(self, transport):
-        self.debug("got transport %r [fd:%d]" % (transport, transport.fileno()))
+        self.debug("got transport %r [fd:%d]" % (
+            transport, transport.fileno()))
         self.currentTransport = transport
         # we should set that fd on the fdsrc now
 

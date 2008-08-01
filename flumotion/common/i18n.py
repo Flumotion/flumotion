@@ -124,7 +124,7 @@ class TranslatableSingular(Translatable, FancyEqMixin):
 
     def untranslated(self):
         if self.args:
-            result =  self.format % self.args
+            result = self.format % self.args
         else:
             result = self.format
         return result
@@ -153,7 +153,7 @@ class TranslatablePlural(Translatable, FancyEqMixin):
 
     def untranslated(self):
         if self.args:
-            result =  self.singular % self.args
+            result = self.singular % self.args
         else:
             result = self.singular
         return result

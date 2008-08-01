@@ -57,7 +57,9 @@ class AdminConfigTest(testsuite.TestCase):
                '</plugs>'
                '</admin>')
         parser = AdminConfig(('foo.bar', ), doc)
-        self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
+        self.failUnless(parser.plugs == {
+            'foo.bar': []},
+                        parser.plugs)
 
     def testUnknownPlug(self):
         doc = ('<admin>'

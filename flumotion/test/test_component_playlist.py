@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_httpstreamer -*-
+# -*- test-case-name: flumotion.test.test_component_httpstreamer -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -93,7 +93,7 @@ class TestPlaylist(testsuite.TestCase):
     def testAddSingleItem(self):
         self.playlist.addItem(None, 0, "file:///testuri", 0, 100, True, True)
 
-        self.assert_(self.playlist._itemsById.has_key(None))
+        self.assert_(None in self.playlist._itemsById)
         self.assertEquals(len(self.playlist._itemsById[None]), 1)
 
         self.checkItems(1)
@@ -103,19 +103,22 @@ class TestPlaylist(testsuite.TestCase):
         self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
         self.playlist.removeItems('id1')
 
-        self.assert_(not self.playlist._itemsById.has_key('id1'))
+        self.assert_(not 'id1' in self.playlist._itemsById)
 
         self.checkItems(0)
 
     def testAddRemoveMultipleItems(self):
-        self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
-        self.playlist.addItem('id1', 100, "file:///testuri2", 0, 100, True, True)
-        self.playlist.addItem('id2', 200, "file:///testuri2", 0, 100, True, True)
+        self.playlist.addItem('id1', 0, "file:///testuri",
+                              0, 100, True, True)
+        self.playlist.addItem('id1', 100, "file:///testuri2",
+                              0, 100, True, True)
+        self.playlist.addItem('id2', 200, "file:///testuri2",
+                              0, 100, True, True)
         self.checkItems(3)
 
         self.playlist.removeItems('id1')
-        self.assert_(not self.playlist._itemsById.has_key('id1'))
-        self.assert_(self.playlist._itemsById.has_key('id2'))
+        self.assert_(not 'id1' in self.playlist._itemsById)
+        self.assert_('id2' in self.playlist._itemsById)
         self.checkItems(1)
 
     def testAddOverlappingItems(self):
@@ -156,17 +159,22 @@ class TestPlaylist(testsuite.TestCase):
         self.assertEquals(second.duration, 25)
 
     def testAddRemoveRepeatedly(self):
-        self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
+        self.playlist.addItem('id1', 0, "file:///testuri",
+                              0, 100, True, True)
         self.checkItems(1)
-        self.playlist.addItem('id2', 100, "file:///testuri", 0, 100, True, True)
+        self.playlist.addItem('id2', 100, "file:///testuri",
+                              0, 100, True, True)
         self.checkItems(2)
 
         self.playlist.removeItems('id1')
         self.checkItems(1)
-        self.playlist.addItem('id1', 0, "file:///testuri", 0, 100, True, True)
+        self.playlist.addItem('id1', 0, "file:///testuri",
+                              0, 100, True, True)
         self.checkItems(2)
 
+
 class TestPlaylistXMLParser(testsuite.TestCase):
+
     def setUp(self):
         # plant a fake Discoverer class - we're _not_ testing its
         # functionality here
@@ -263,8 +271,10 @@ class TestPlaylistXMLParser(testsuite.TestCase):
     def testParseErrorInBlocking(self):
         self.xmlparser.blockDiscovery()
         self.xmlparser.parseFile(self.pl2.name)
-        self.failUnlessRaises(fxml.ParserError,self.xmlparser.parseFile,
-                              self.pl3.name)
+        self.failUnlessRaises(
+            fxml.ParserError,
+            self.xmlparser.parseFile,
+            self.pl3.name)
         self.xmlparser.unblockDiscovery()
 
         # no matter what happens block level should be 0 after a pair

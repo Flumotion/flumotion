@@ -43,7 +43,8 @@ class FixedRatePlug(RateController):
     def __init__(self, args):
         props = args['properties']
         self._rateBytesPerSec = int(props.get('rate', 128000) / 8)
-        # Peak level is 10 seconds of data; this is chosen entirely arbitrarily.
+        # Peak level is 10 seconds of data; this is chosen
+        # entirely arbitrarily.
         self._maxLevel = int(props.get('max-level',
             self._rateBytesPerSec * 8 * 10) / 8)
         self._initialLevel = int(props.get('initial-level', 0) / 8)
@@ -99,8 +100,9 @@ class TokenBucketConsumer(log.Loggable):
 
         self.consumer.registerProducer(self, 0)
 
-        self.info("Created TokenBucketConsumer with rate %d, initial level %d, "
-            "maximum level %d", fillRate, fillLevel, maxLevel)
+        self.info("Created TokenBucketConsumer with rate %d, "
+                  "initial level %d, maximum level %d",
+                  fillRate, fillLevel, maxLevel)
 
     def _dripAndTryWrite(self):
         """

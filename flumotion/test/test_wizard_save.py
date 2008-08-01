@@ -29,8 +29,10 @@ from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
 from flumotion.wizard.httpstreamersteps import HTTPStreamer
 from flumotion.component.encoders.vorbis.wizard_gtk import VorbisAudioEncoder
 from flumotion.component.encoders.theora.wizard_gtk import TheoraVideoEncoder
-from flumotion.component.producers.videotest.wizard_gtk import TestVideoProducer
-from flumotion.component.producers.audiotest.wizard_gtk import TestAudioProducer
+from flumotion.component.producers.videotest.wizard_gtk import \
+     TestVideoProducer
+from flumotion.component.producers.audiotest.wizard_gtk import \
+     TestAudioProducer
 from flumotion.wizard.configurationwriter import ConfigurationWriter
 from flumotion.wizard.models import Component, Plug, Porter, AudioProducer, \
      VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
@@ -327,7 +329,8 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'
@@ -423,7 +426,8 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'
@@ -558,7 +562,8 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'
@@ -646,7 +651,8 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'
@@ -768,7 +774,8 @@ class TestWizardSave(testsuite.TestCase):
              '      \n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'
@@ -908,7 +915,8 @@ class TestWizardSave(testsuite.TestCase):
              '      <property name="bandwidth-limit">123000000</property>\n'
              '      <property name="burst-on-connect">False</property>\n'
              '      <property name="porter-password">password</property>\n'
-             '      <property name="porter-socket-path">flu-XXXX.socket</property>\n'
+             '      <property name="porter-socket-path">flu-XXXX.socket'
+             '</property>\n'
              '      <property name="porter-username">username</property>\n'
              '      <property name="type">slave</property>\n'
              '    </component>\n'

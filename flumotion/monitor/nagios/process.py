@@ -39,7 +39,7 @@ class ProcessFactory:
             return ManagerProcess(pid)
         else:
             return Process(pid)
-            
+
 
 class Process:
     """
@@ -96,7 +96,9 @@ class WorkerProcess(Process):
 
         # FIXME: this assumes the worker being started with a given order of
         # arguments, the way the service scripts do; e.g.
-        # /usr/bin/python /usr/bin/flumotion-worker -D --daemonize-to /var/cache/flumotion --service-name default /etc/flumotion/workers/default.xml
+        # /usr/bin/python /usr/bin/flumotion-worker -D
+        # --daemonize-to /var/cache/flumotion
+        # --service-name default /etc/flumotion/workers/default.xml
         if self.cmdline[5].startswith('--service-name'):
             self.service = self.cmdline[6]
 
@@ -111,7 +113,9 @@ class ManagerProcess(Process):
 
         # FIXME: this assumes the worker being started with a given order of
         # arguments, the way the service scripts do; e.g.
-        # /usr/bin/python /usr/bin/flumotion-worker -D --daemonize-to /var/cache/flumotion --service-name default /etc/flumotion/workers/default.xml
+        # /usr/bin/python /usr/bin/flumotion-worker -D
+        # --daemonize-to /var/cache/flumotion
+        # --service-name default /etc/flumotion/workers/default.xml
         if self.cmdline[5].startswith('--service-name'):
             self.service = self.cmdline[6]
 
@@ -142,7 +146,7 @@ def getProcesses(prefix='flumotion'):
 
         p = factory.process(pid)
         if not p.cmd.startswith(prefix):
-            continue 
+            continue
 
         procs[pid] = p
 
@@ -180,8 +184,9 @@ def parseSize(size):
     suffix = size[-1]
 
     if suffix not in suffixes:
-        raise KeyError, 'suffix %c not in accepted list of suffixes %r' % (
-            suffix, suffixes)
+        raise KeyError(
+            'suffix %c not in accepted list of suffixes %r' % (
+            suffix, suffixes))
 
     i = suffixes.index(suffix)
     power = (len(suffixes) - i) * 3
@@ -189,9 +194,11 @@ def parseSize(size):
 
     return int(float(size[:-1]) * multiplier)
 
+
 class JobMultiple(util.LogCommand):
     name = 'multiple'
-    description = "Check for job processes for the same component under the same worker."
+    description = ("Check for job processes for the same component "
+                   "under the same worker.")
 
     def do(self, args):
         processes = getProcesses(prefix='flumotion')
@@ -265,7 +272,7 @@ class JobVSize(util.LogCommand):
 
         for process in processes.values():
             l.append((process.pid, process.vsize))
-        
+
         l.sort(key=lambda t: t[1])
         l.reverse()
 

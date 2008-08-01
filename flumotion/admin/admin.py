@@ -82,7 +82,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             # However, if we fail later on (e.g. manager shut down, and
             # hasn't yet been restarted), we want to keep trying to reconnect,
             # so we just log a message.
-            self.debug("Error connecting to %s: %s", connector.getDestination(),
+            self.debug("Error connecting to %s: %s",
+                       connector.getDestination(),
                 log.getFailureMessage(reason))
             if self.hasBeenConnected:
                 self.log("we've been connected before though, so going "
@@ -331,7 +332,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
                           self.connectionInfo.port))
         else:
             message = ("Unexpected failure.\nDebug information: %s"
-                       % log.getFailureMessage (failure))
+                       % log.getFailureMessage(failure))
         self.debug('emitting connection-failed')
         self.emit('connection-failed', message)
         self.debug('emitted connection-failed')

@@ -75,10 +75,9 @@ from gettext import gettext as _
 
 __version__ = "$Rev$"
 _headings = {
-    messages.ERROR:   _('Error'),
+    messages.ERROR: _('Error'),
     messages.WARNING: _('Warning'),
-    messages.INFO:    _('Note')
-}
+    messages.INFO: _('Note')}
 
 
 def err(x):

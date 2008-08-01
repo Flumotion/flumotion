@@ -24,7 +24,8 @@
 # starts with
 
 # usage:
-# gen-locale-xml.py [gettext domain] [project name] [one or more language codes]
+# gen-locale-xml.py [gettext domain] [project name] [one or
+#                                                    more language codes]
 
 import os
 import sys
@@ -49,7 +50,7 @@ def main(args):
                 % code)
             sys.exit(1)
         lang = code[:2]
-        if not codes.has_key(lang):
+        if not lang in codes:
             codes[lang] = []
         codes[lang].append(code)
 
@@ -59,12 +60,14 @@ def main(args):
     print
 
     for lang in codes.keys():
-        print "    <bundle name=\"%s-locale-%s\" under=\"localedatadir\" project=\"%s\">" % (
+        print ("    <bundle name=\"%s-locale-%s\" "
+               "under=\"localedatadir\" project=\"%s\">") % (
             domain, lang, project)
         print "      <directories>"
         print '        <directory name="locale">'
         for code in codes[lang]:
-            print "          <filename location=\"%s/LC_MESSAGES/%s.mo\" />" % (
+            print ("          <filename location"
+                   "=\"%s/LC_MESSAGES/%s.mo\" />") % (
                 code, domain)
         print "        </directory>"
         print "      </directories>"

@@ -20,7 +20,7 @@ class SlidingWindow:
         # Maintain the current average, and the max of our current average
         self.max = 0.0
         self.average = 0.0
-        self.windowSize = size;
+        self.windowSize = size
 
     def addValue(self, val):
         self._window[self._windowPtr] = val
@@ -154,7 +154,8 @@ class TheoraBench:
             return True # Ignore these, our sliding window isn't very smart
 
         self.data[0].append(processing_time * float(self.framerate) * 100.0)
-        self.data[1].append(self.window.average * float(self.framerate) * 100.0)
+        self.data[1].append(self.window.average * float(
+            self.framerate) * 100.0)
         self.data[2].append(self.window.max * float(self.framerate) * 100.0)
         print "This frame: %.2f: %.2f%%. Average: %.2f%%. Peak: %.2f%%" % (
                 processing_time,
@@ -164,8 +165,12 @@ class TheoraBench:
         return True
 
 if len(sys.argv) == 2:
-    framerates = [(30,1), (25,1), (25,2), (None, None)]
-    sizes = [(800, 600), (400,300), (None, None)] # Other useful sizes here
+    framerates = [(30, 1),
+                  (25, 1),
+                  (25, 2), (None, None)]
+    sizes = [(800, 600),
+             (400, 300),
+             (None, None)] # Other useful sizes here
     for framerate in framerates:
         for size in sizes:
             if framerate[1]:

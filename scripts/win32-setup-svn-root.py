@@ -3,6 +3,7 @@ import sys
 
 VERSION = '0.5.2'
 
+
 def process_template(input, output=None, vardict={}):
     if output is None and input.endswith('.in'):
         output = input[:-3]
@@ -20,5 +21,8 @@ vardict = {
      }
 
 process_template(os.path.join(svnroot, 'bin', 'flumotion-admin.in'),
-                 os.path.join(svnroot, 'bin', 'flumotion-admin.py'), vardict=vardict)
-process_template(os.path.join(svnroot, 'flumotion', 'configure', 'uninstalled.py.in'), vardict=vardict)
+                 os.path.join(svnroot, 'bin', 'flumotion-admin.py'),
+                 vardict=vardict)
+process_template(os.path.join(svnroot, 'flumotion',
+                              'configure', 'uninstalled.py.in'),
+                 vardict=vardict)

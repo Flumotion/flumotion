@@ -74,7 +74,8 @@ class ResultTest(testsuite.TestCase):
         self.assertEquals(mresult.value, "I did it")
         m = mresult.messages[0]
         self.assertEquals(m.level, messages.WARNING)
-        text = self.translator.translate(m, lang=["nl_NL",])
+        text = self.translator.translate(
+            m, lang=["nl_NL", ])
         self.assertEquals(text, "Waarschuwing")
 
     def testSerializeWithError(self):
@@ -86,7 +87,8 @@ class ResultTest(testsuite.TestCase):
         self.assertEquals(mresult.value, None)
         m = mresult.messages[0]
         self.assertEquals(m.level, messages.ERROR)
-        text = self.translator.translate(m, lang=["nl_NL",])
+        text = self.translator.translate(
+            m, lang=["nl_NL", ])
         self.assertEquals(text, "o jeetje")
 
 # test if appending and removing messages works across a PB connection
@@ -117,7 +119,7 @@ class TestRoot(testsuite.TestManagerRoot, log.Loggable):
 
     def remote_getEqualTranslatable(self):
         # return an instance of a new translatable object, but always equal
-        t =  T_(N_("Note"))
+        t = T_(N_("Note"))
         self.debug("remote_getTranslatable: returning %r" % t)
         return t
 

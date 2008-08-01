@@ -58,8 +58,10 @@ class TestFlexibleWithPassword(testsuite.TestCase):
         return d
 
     def testCredPlaintextWrong(self):
+
         def credPlaintextWrongErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         cred = tcredentials.UsernamePassword('user', 'wrong')
         d = self.checker.requestAvatarId(cred)
@@ -120,8 +122,10 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredPlaintextWrongPassword(self):
+
         def credPlaintextWrongPasswordErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         cred = CredPlaintext('user', 'tes')
         d = self.checker.requestAvatarId(cred)
@@ -129,8 +133,10 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredPlaintextWrongUser(self):
+
         def credPlaintextWrongUserErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         cred = CredPlaintext('wrong', 'test')
         d = self.checker.requestAvatarId(cred)
@@ -149,8 +155,10 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredCryptWrongSalt(self):
+
         def credCryptWrongSaltErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('test', 'aa')
         cred = CredCrypt('user', crypted)
@@ -159,8 +167,10 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredCryptWrongPassword(self):
+
         def credCryptWrongPasswordErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('wrong', 'qi')
         cred = CredCrypt('user', crypted)
@@ -169,8 +179,10 @@ class TestCryptCheckerAddUser(testsuite.TestCase):
         return d
 
     def testCredCryptWrongUser(self):
+
         def credCryptWrongUserErrback(failure):
-            self.assert_(isinstance(failure.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(failure.type(),
+                                    errors.NotAuthenticatedError))
             return True
         crypted = crypt.crypt('test', 'qi')
         cred = CredCrypt('wronguser', crypted)

@@ -109,7 +109,8 @@ class ConnectToExisting(WizardStep):
 
     def setup(self, state, available_pages):
         try:
-            oc_state = [(k, state[k]) for k in ('host', 'port', 'use_insecure')]
+            oc_state = [(k, state[k]) for k in (
+                'host', 'port', 'use_insecure')]
             self.open_connection.set_state(dict(oc_state))
         except KeyError:
             pass

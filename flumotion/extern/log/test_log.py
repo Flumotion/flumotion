@@ -163,7 +163,7 @@ class TestGetExceptionMessage(unittest.TestCase):
         self.func1()
 
     def func1(self):
-        raise TypeError, "I am in func1"
+        raise TypeError("I am in func1")
 
     def testLevel2(self):
         try:
@@ -207,15 +207,15 @@ class TestWriteMark(unittest.TestCase):
     def testWriteMarkInDebug(self):
         loggable = log.Loggable()
         log.setDebug("4")
-        log.addLogHandler(self.handler)        
+        log.addLogHandler(self.handler)
         marker = 'test'
         loggable.writeMarker(marker, log.DEBUG)
         self.assertEquals(self.message, marker)
-        
+
     def testWriteMarkInWarn(self):
         loggable = log.Loggable()
         log.setDebug("2")
-        log.addLogHandler(self.handler)        
+        log.addLogHandler(self.handler)
         marker = 'test'
         loggable.writeMarker(marker, log.WARN)
         self.assertEquals(self.message, marker)
@@ -223,7 +223,7 @@ class TestWriteMark(unittest.TestCase):
     def testWriteMarkInInfo(self):
         loggable = log.Loggable()
         log.setDebug("3")
-        log.addLogHandler(self.handler)        
+        log.addLogHandler(self.handler)
         marker = 'test'
         loggable.writeMarker(marker, log.INFO)
         self.assertEquals(self.message, marker)
@@ -231,7 +231,7 @@ class TestWriteMark(unittest.TestCase):
     def testWriteMarkInLog(self):
         loggable = log.Loggable()
         log.setDebug("5")
-        log.addLogHandler(self.handler)        
+        log.addLogHandler(self.handler)
         marker = 'test'
         loggable.writeMarker(marker, log.LOG)
         self.assertEquals(self.message, marker)
@@ -239,29 +239,31 @@ class TestWriteMark(unittest.TestCase):
     def testWriteMarkInError(self):
         loggable = log.Loggable()
         log.setDebug("4")
-        log.addLogHandler(self.handler)        
+        log.addLogHandler(self.handler)
         marker = 'test'
         self.assertRaises(SystemExit, loggable.writeMarker, marker, log.ERROR)
         self.assertEquals(self.message, marker)
 
+
 class TestLogNames(unittest.TestCase):
-    
+
     def testGetLevelNames(self):
-        self.assertEquals(['ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG'], log.getLevelNames())
-        
+        self.assertEquals(['ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG'],
+                          log.getLevelNames())
+
     def testGetLevelCode(self):
         self.assertEquals(1, log.getLevelInt('ERROR'))
         self.assertEquals(2, log.getLevelInt('WARN'))
         self.assertEquals(3, log.getLevelInt('INFO'))
         self.assertEquals(4, log.getLevelInt('DEBUG'))
         self.assertEquals(5, log.getLevelInt('LOG'))
-        
+
     def testGetLevelName(self):
         self.assertEquals('ERROR', log.getLevelName(1))
         self.assertEquals('WARN', log.getLevelName(2))
         self.assertEquals('INFO', log.getLevelName(3))
         self.assertEquals('DEBUG', log.getLevelName(4))
         self.assertEquals('LOG', log.getLevelName(5))
-                                        
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_httpserver -*-
+# -*- test-case-name: flumotion.test.test_component_httpserver -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -186,12 +186,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def do_check(self):
         props = self.config['properties']
         self.fixRenamedProperties(props, [
-            ('issuer',             'issuer-class'),
+            ('issuer', 'issuer-class'),
             ('porter_socket_path', 'porter-socket-path'),
-            ('porter_username',    'porter-username'),
-            ('porter_password',    'porter-password'),
-            ('mount_point',        'mount-point')
-            ])
+            ('porter_username', 'porter-username'),
+            ('porter_password', 'porter-password'),
+            ('mount_point', 'mount-point')])
 
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
@@ -247,7 +246,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 logFilter.addIPFilter(f)
             self._logfilter = logFilter
 
-        socket = 'flumotion.component.misc.httpserver.ratecontroller.RateController'
+        socket = ('flumotion.component.misc.'
+                  'httpserver.ratecontroller.RateController')
         plugs = self.plugs.get(socket, [])
         if plugs:
             # Rate controller factory plug; only one supported.
@@ -303,7 +303,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
                 m = messages.Error(T_(N_(
-                    "Network error: TCP port %d is not available."), self.port))
+                    "Network error: TCP port %d is not available."),
+                                      self.port))
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
@@ -504,18 +505,16 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             plug = self.plugs[socket][-1]
             return plug.getStreamData()
         else:
-            return {
-                'protocol': 'HTTP',
-                'description': self._description,
-                'url' : self.getUrl()
-                }
+            return {'protocol': 'HTTP',
+                    'description': self._description,
+                    'url': self.getUrl()}
 
     def getLoadData(self):
         """
         Return a tuple (deltaadded, deltaremoved, bytes_transferred,
-        current_clients, current_load) of our current bandwidth and user values.
-        The deltas and current_load are NOT currently implemented here, we set
-        them as zero.
+        current_clients, current_load) of our current bandwidth and
+        user values. The deltas and current_load are NOT currently
+        implemented here, we set them as zero.
         """
         bytesTransferred = self._total_bytes_written
         for request in self._connected_clients.values():

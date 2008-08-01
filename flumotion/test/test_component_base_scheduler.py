@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_component_base_scheduler -*-
+# -*- test-case-name: flumotion.test.test_component_base_scheduler -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -50,7 +50,7 @@ class SchedulerTest(testsuite.TestCase):
         self.assertEqual(content, event.content)
         self.assertEqual(rrule, event.rrule)
         self.assertEqual(exdates, event.exdates)
-                
+
     def setUp(self):
         self._scheduler = scheduler.Scheduler()
 
@@ -716,7 +716,7 @@ class ICalSchedulerTest(testsuite.TestCase):
         s._cancelScheduledCalls()
         self.failIf(len(events) != 1)
         event = events[0]
-        
+
         self.assertEquals(events[0].start, startExpected)
         self.assertEquals(events[0].end, endExpected)
         self.assertEquals(events[0].content, contentExpected)

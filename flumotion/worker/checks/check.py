@@ -74,7 +74,8 @@ def handleGStreamerDeviceError(failure, device, mid=None):
         if not m:
             m = messages.Error(T_(N_("Internal unhandled GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
-                    gerror.message, gerror.domain, gerror.code, debug), mid=mid)
+                    gerror.message, gerror.domain, gerror.code, debug),
+                               mid=mid)
     elif failure.check(errors.GStreamerError):
         m = messages.Error(T_(N_("Internal GStreamer error.")),
             debug=debugFailure(failure), mid=mid)
@@ -100,7 +101,7 @@ def errbackResult(failure, result, mid, device):
     """
     I am an errback to add to a do_element_check deferred, after your
     specific one.
-    
+
     I handle several generic cases, including some generic GStreamer errors.
 
     @param mid: the id to set on the message

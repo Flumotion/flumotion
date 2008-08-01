@@ -45,8 +45,8 @@ def _createParser():
  server. It takes its configuration from one or more planet configuration\
  files. The first file is mandatory, and contains base configuration \
  information for the manager. Zero or more additional configuration files\
- can be provided, these are used to configure flows that the manager should run\
- on available workers."
+ can be provided, these are used to configure flows that the manager should\
+ run on available workers."
 
     parser = OptionParser(usage=usagemessage, description=desc,
                           domain="flumotion-manager")
@@ -58,7 +58,8 @@ def _createParser():
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=None,
-                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
+                     help="port to listen on [default %d (ssl) or %d (tcp)]" %
+                     (defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      help="transport protocol to use (tcp/ssl) [default ssl]")
@@ -158,9 +159,10 @@ def main(args):
             log.debug('manager', 'Setting manager name to %s' % options.name)
         # environment debug > command-line debug > config file debug
         if not options.debug and cfg.manager.fludebug \
-            and not os.environ.has_key('FLU_DEBUG'):
+            and not 'FLU_DEBUG' in os.environ:
             options.debug = cfg.manager.fludebug
-            log.debug('manager', 'Setting debug level to config file value %s' %
+            log.debug('manager',
+                      'Setting debug level to config file value %s' %
                 options.debug)
 
     # set debug level as soon as we can after deciding

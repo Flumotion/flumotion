@@ -56,8 +56,7 @@ COLORS = {ERROR: 'RED',
           WARN: 'YELLOW',
           INFO: 'GREEN',
           DEBUG: 'BLUE',
-          LOG: 'CYAN'
-          }
+          LOG: 'CYAN'}
 
 _FORMATTED_LEVELS = []
 _LEVEL_NAMES = ['ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG']
@@ -66,7 +65,7 @@ def getLevelName(level):
     """
     Return the name of a log level.
     @param level: The level we want to know the name
-    @type level: int 
+    @type level: int
     @return: The name of the level
     @rtype: str
     """
@@ -88,7 +87,7 @@ def getLevelInt(levelName):
     @param levelName: The string value of the level name
     @type levelName: str
     @return: The value of the level name we are interested in.
-    @rtype: int 
+    @rtype: int
     """
     assert isinstance(levelName, str) and levelName in getLevelNames(), \
         "Bad debug level name"
@@ -142,7 +141,7 @@ def getCategoryLevel(category):
     if it wasn't registered yet.
     """
     global _categories
-    if not _categories.has_key(category):
+    if not category in _categories:
         registerCategory(category)
     return _categories[category]
 
@@ -304,8 +303,8 @@ def doLog(level, object, category, format, args, where=-1,
             try:
                 handler(level, object, category, file, line, message)
             except TypeError, e:
-                raise SystemError, "handler %r raised a TypeError: %s" % (
-                    handler, getExceptionMessage(e))
+                raise SystemError("handler %r raised a TypeError: %s" % (
+                    handler, getExceptionMessage(e)))
 
     if level > getCategoryLevel(category):
         return ret
@@ -321,7 +320,7 @@ def doLog(level, object, category, format, args, where=-1,
             try:
                 handler(level, object, category, filePath, line, message)
             except TypeError:
-                raise SystemError, "handler %r raised a TypeError" % handler
+                raise SystemError("handler %r raised a TypeError" % handler)
 
         return ret
 
@@ -451,7 +450,7 @@ def init(envVarName, enableColorOutput=False):
     else:
         _preformatLevels(None)
 
-    if os.environ.has_key(envVarName):
+    if envVarName in os.environ:
         # install a log handler that uses the value of the environment var
         setDebug(os.environ[envVarName])
     addLimitedLogHandler(stderrHandler)
@@ -514,7 +513,7 @@ def addLogHandler(func):
     """
 
     if not callable(func):
-        raise TypeError, "func must be callable"
+        raise TypeError("func must be callable")
 
     if func not in _log_handlers:
         _log_handlers.append(func)
@@ -532,7 +531,7 @@ def addLimitedLogHandler(func):
     @raises TypeError: TypeError if func is not a callable
     """
     if not callable(func):
-        raise TypeError, "func must be callable"
+        raise TypeError("func must be callable")
 
     if func not in _log_handlers_limited:
         _log_handlers_limited.append(func)
@@ -683,8 +682,11 @@ class Loggable:
         log.DEBUG, log.ERROR or log.LOG.
         @type  level: int
         """
-        logHandlers = {WARN:self.warning, INFO:self.info, DEBUG: self.debug,
-                       ERROR: self.error, LOG:self.log}
+        logHandlers = {WARN: self.warning,
+                       INFO: self.info,
+                       DEBUG: self.debug,
+                       ERROR: self.error,
+                       LOG: self.log}
         logHandler = logHandlers.get(level)
         if logHandler:
             logHandler('%s', marker)
@@ -849,7 +851,7 @@ def logTwisted():
     # we don't want logs for pb.Error types since they
     # are specifically raised to be handled on the other side
     observer = _getTheTwistedLogObserver()
-    observer.ignoreErrors([pb.Error,])
+    observer.ignoreErrors([pb.Error, ])
     tlog.startLoggingWithObserver(observer.emit, False)
 
     _initializedTwisted = True
@@ -870,12 +872,13 @@ class TwistedLogObserver(Loggable):
         method = log # by default, lowest level
         edm = eventDict['message']
         if not edm:
-            if eventDict['isError'] and eventDict.has_key('failure'):
+            if eventDict['isError'] and 'failure' in eventDict:
                 f = eventDict['failure']
                 for failureType in self._ignoreErrors:
                     r = f.check(failureType)
                     if r:
-                        self.debug("Failure of type %r, ignoring" % failureType)
+                        self.debug("Failure of type %r, ignoring" %
+                                   failureType)
                         return
 
                 self.log("Failure %r" % f)
@@ -889,7 +892,7 @@ class TwistedLogObserver(Loggable):
                 text = f.getTraceback()
                 safeprintf(sys.stderr, "\nTwisted traceback:\n")
                 safeprintf(sys.stderr, text + '\n')
-            elif eventDict.has_key('format'):
+            elif 'format' in eventDict:
                 text = eventDict['format'] % eventDict
             else:
                 # we don't know how to log this
@@ -897,9 +900,8 @@ class TwistedLogObserver(Loggable):
         else:
             text = ' '.join(map(str, edm))
 
-        fmtDict = { 'system': eventDict['system'],
-                    'text': text.replace("\n", "\n\t")
-                  }
+        fmtDict = {'system': eventDict['system'],
+                   'text': text.replace("\n", "\n\t")}
         msgStr = " [%(system)s] %(text)s\n" % fmtDict
         # because msgstr can contain %, as in a backtrace, make sure we
         # don't try to splice it

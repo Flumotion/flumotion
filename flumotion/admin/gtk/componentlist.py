@@ -49,8 +49,7 @@ MOODS_INFO = {
     moods.sleeping: _('Sleeping'),
     moods.waking: _('Waking'),
     moods.hungry: _('Hungry'),
-    moods.lost: _('Lost')
-    }
+    moods.lost: _('Lost')}
 
 (COL_MOOD,
  COL_NAME,
@@ -356,7 +355,7 @@ class ComponentList(log.Loggable, gobject.GObject):
                 return
         else:
             x, y = treeview.convert_widget_to_bin_window_coords(x, y)
-            path =  treeview.get_path_at_pos(x, y)
+            path = treeview.get_path_at_pos(x, y)
             if not path:
                 return
 
@@ -377,7 +376,8 @@ class ComponentList(log.Loggable, gobject.GObject):
         states = self.getSelectedStates()
 
         if not states:
-            self.debug('no component selected, emitting selection-changed None')
+            self.debug(
+                'no component selected, emitting selection-changed None')
             # Emit this in an idle, since popups will not be shown
             # before this has completed, and it might possibly take a long
             # time to finish all the callbacks connected to selection-changed

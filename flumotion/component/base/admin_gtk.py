@@ -75,7 +75,7 @@ class BaseAdminGtk(log.Loggable):
         d = admin.componentCallRemote(state, 'getUIState')
         d.addCallback(self.setUIState)
         d.addErrback(lambda failure: failure.trap(SleepingComponentError))
-        
+
     def setDebugEnabled(self, enabled):
         """Set if debug should be enabled.
         Not all pages are visible unless debugging is set to true

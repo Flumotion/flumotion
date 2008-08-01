@@ -55,7 +55,8 @@ class ColorbalanceAdminGtkNode(EffectAdminGtkNode):
             setattr(self, 'scale_%s' % lower, scale)
             setattr(self, 'spinbutton_%s' % lower, spinbutton)
             setattr(self, '%s_scale_change_id' % lower, scale_change_id)
-            setattr(self, '%s_spinbutton_change_id' % lower, spinbutton_change_id)
+            setattr(self, '%s_spinbutton_change_id' % lower,
+                    spinbutton_change_id)
 
     def cb_colorbalance_change(self, widget, label):
         value = widget.get_value()

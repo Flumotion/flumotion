@@ -125,7 +125,8 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         assert not isinstance(authenticator, keycards.Keycard)
         interfaces = []
         if self.perspectiveInterface:
-            self.debug('perspectiveInterface is %r' % self.perspectiveInterface)
+            self.debug('perspectiveInterface is %r' %
+                       self.perspectiveInterface)
             interfaces.append(self.perspectiveInterface)
         else:
             self.warning('No perspectiveInterface set on %r' % self)
@@ -153,9 +154,10 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         return d
 
     # we are a different kind of PB client, so warn
-    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
-        self.warning("you really want to use cbSendKeycard")
 
+    def _cbSendUsername(self, root, username, password,
+                        avatarId, client, interfaces):
+        self.warning("you really want to use cbSendKeycard")
 
     def _cbSendKeycard(self, root, authenticator, client, interfaces, count=0):
         self.log("_cbSendKeycard(root=%r, authenticator=%r, client=%r, "
@@ -163,10 +165,11 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
                  interfaces, count)
         count = count + 1
         d = root.callRemote("login", self.keycard, client, *interfaces)
-        return d.addCallback(self._cbLoginCallback, root, authenticator, client,
-            interfaces, count)
+        return d.addCallback(self._cbLoginCallback, root,
+                             authenticator, client, interfaces, count)
 
     # we can get either a keycard, None (?) or a remote reference
+
     def _cbLoginCallback(self, result, root, authenticator, client, interfaces,
         count):
         if count > 5:
@@ -185,10 +188,12 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
             self.log("FPBClientFactory(): requester needs to resend %r",
                      keycard)
             d = authenticator.respond(keycard)
+
             def _loginAgainCb(keycard):
                 d = root.callRemote("login", keycard, client, *interfaces)
-                return d.addCallback(self._cbLoginCallback, root, authenticator,
-                    client, interfaces, count)
+                return d.addCallback(self._cbLoginCallback, root,
+                                     authenticator, client,
+                                     interfaces, count)
             d.addCallback(_loginAgainCb)
             return d
 
@@ -366,7 +371,8 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
                 return pb.AsReferenceable(perspective, "perspective")
 
         # corresponds with FPBClientFactory._cbSendKeycard
-        self.log("remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces))
+        self.log("remote_login(keycard=%s, *interfaces=%r" % (
+            keycard, interfaces))
         interfaces = [freflect.namedAny(interface) for interface in interfaces]
         d = self.bouncerPortal.login(keycard, mind, *interfaces)
         d.addCallback(loginResponse)
@@ -468,7 +474,8 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         @param keycard: the keycard with the challenge to respond to
         @type  keycard: L{keycards.Keycard}
 
-        @rtype:   L{twisted.internet.defer.Deferred} firing a {keycards.Keycard}
+        @rtype:   L{twisted.internet.defer.Deferred} firing
+                  a {keycards.Keycard}
         @returns: a deferred firing the keycard with a response set
         """
         self.debug('responding to challenge on keycard %r' % keycard)
@@ -542,7 +549,8 @@ class Referenceable(pb.Referenceable, flog.Loggable):
             raise pb.NoSuchMethod("No such method: remote_%s" % (message, ))
 
         level = flog.DEBUG
-        if message == 'ping': level = flog.LOG
+        if message == 'ping':
+            level = flog.LOG
 
         debugClass = self.logCategory.upper()
         # all this malarkey is to avoid actually interpolating variables
@@ -599,10 +607,12 @@ class Avatar(pb.Avatar, flog.Loggable):
             args, kwargs):
         method = getattr(self, "perspective_%s" % message, None)
         if method is None:
-            raise pb.NoSuchMethod("No such method: perspective_%s" % (message, ))
+            raise pb.NoSuchMethod("No such method: perspective_%s" % (
+                message, ))
 
         level = flog.DEBUG
-        if message == 'ping': level = flog.LOG
+        if message == 'ping':
+            level = flog.LOG
         debugClass = self.logCategory.upper()
         startArgs = [self.remoteLogName, debugClass, message]
         format, debugArgs = flog.getFormatArgs(
@@ -653,7 +663,8 @@ class Avatar(pb.Avatar, flog.Loggable):
         tarzan = transport.getHost()
         jane = transport.getPeer()
         if tarzan and jane:
-            self.debug("PB client connection seen by me is from me %s to %s" % (
+            self.debug(
+                "PB client connection seen by me is from me %s to %s" % (
                 addressGetHost(tarzan),
                 addressGetHost(jane)))
         self.log('Client attached is mind %s', mind)

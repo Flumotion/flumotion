@@ -157,8 +157,10 @@ class Manager(util.LogCommand):
         def cb(result):
             self.debug('parse: cb: done')
             reactor.callLater(0, reactor.stop)
+
         def eb(failure):
-            self.debug('parse: eb: failure %s' % log.getFailureMessage(failure))
+            self.debug(
+                'parse: eb: failure %s' % log.getFailureMessage(failure))
             # Nagios exceptions have already got their feedback covered
             if not failure.check(util.NagiosException):
                 util.unknown(log.getFailureMessage(failure))

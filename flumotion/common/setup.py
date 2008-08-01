@@ -45,7 +45,7 @@ def setupPackagePath():
     from flumotion.configure import configure
 
     registryPaths = [configure.pythondir, ]
-    if os.environ.has_key('FLU_PROJECT_PATH'):
+    if 'FLU_PROJECT_PATH' in os.environ:
         paths = os.environ['FLU_PROJECT_PATH']
         registryPaths += paths.split(':')
 

@@ -283,7 +283,7 @@ class SelectProducersStep(WizardStep):
     def setAudioProducers(self, audioProducers):
         self.audio.prefill([(N_(vp.description), vp) for vp in audioProducers])
         self._updateWidgets()
-                
+
     # WizardStep
 
     def setup(self):
@@ -302,7 +302,7 @@ class SelectProducersStep(WizardStep):
 
     def getNext(self):
         return None
-    
+
     # Private API
 
     def _updateWidgets(self):

@@ -87,12 +87,14 @@ class Looper(feedcomponent.ParseLaunchComponent):
         # setup the properties
         self.bus = None
         self.videowidth = properties.get('width', 240)
-        self.videoheight = properties.get('height', int(576 * self.videowidth/720.))
+        self.videoheight = properties.get(
+            'height', int(576 * self.videowidth/720.))
         self.videoframerate = properties.get('framerate', (25, 2))
         self.filelocation = properties.get('location')
 
-        vstruct = gst.structure_from_string("video/x-raw-yuv,width=%(width)d,height=%(height)d" %
-                                            dict (width=self.videowidth, height=self.videoheight))
+        vstruct = gst.structure_from_string(
+            "video/x-raw-yuv,width=%(width)d,height=%(height)d" %
+            dict(width=self.videowidth, height=self.videoheight))
         vstruct['framerate'] = gst.Fraction(self.videoframerate[0],
                                             self.videoframerate[1])
 
@@ -108,12 +110,14 @@ class Looper(feedcomponent.ParseLaunchComponent):
             '       ! videorate name=videorate'
             '       ! videoscale'
             '       ! %(vcaps)s'
-            '       ! identity name=vident sync=true silent=true ! @feeder:video@'
+            '       ! identity name=vident sync=true silent=true'
+            '       ! @feeder:video@'
             '    demux. ! queue ! vorbisdec name=vorbisdec'
             '       ! identity name=audiolive single-segment=true silent=true'
             '       ! audioconvert'
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-            '       ! identity name=aident sync=true silent=true ! @feeder:audio@'
+            '       ! identity name=aident sync=true silent=true'
+            '       ! @feeder:audio@'
             % dict(location=self.filelocation, vcaps=vcaps))
 
         return template

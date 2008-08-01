@@ -23,13 +23,11 @@ from flumotion.common import connection
 from flumotion.common import testsuite
 
 
-
-
 class TestConnection(testsuite.TestCase):
+
     def assertParseEquals(self, _in, out, **kwargs):
-        self.assertEquals(str(connection.parsePBConnectionInfo(_in,
-                                                               **kwargs)),
-                          out)
+        self.assertEquals(str(connection.parsePBConnectionInfo(
+            _in, **kwargs)), out)
 
     def assertParseInvariant(self, string):
         self.assertParseEquals(string, string)

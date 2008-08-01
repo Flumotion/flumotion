@@ -37,4 +37,5 @@ class CursesStdIO:
     def doRead(self):
         """called when input is ready"""
 
-    def logPrefix(self): return 'CursesClient'
+    def logPrefix(self):
+        return 'CursesClient'

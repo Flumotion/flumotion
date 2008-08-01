@@ -28,10 +28,11 @@ from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
 
 
-
-
 # test all the keycards
+
+
 class TestKeycardUACPP(testsuite.TestCase):
+
     def testInit(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)

@@ -33,8 +33,8 @@ __version__ = "$Rev$"
 
 
 def connect_to_manager(stdscr, info):
-    stdscr.addstr(0,0,"Connecting to %s" %
-                  info)
+    stdscr.addstr(
+        0, 0, "Connecting to %s" % info)
     stdscr.clrtobot()
     stdscr.refresh()
 
@@ -45,7 +45,7 @@ def connect_to_manager(stdscr, info):
         print str
 
     def connected(model):
-        stdscr.addstr(0,0,"Connected")
+        stdscr.addstr(0, 0, "Connected")
         stdscr.clrtobot()
         stdscr.refresh()
 
@@ -68,7 +68,8 @@ def connect_to_manager(stdscr, info):
         #stdscr.addstr(0,0,"Connection refused")
         #stdscr.clrtobot()
         #stdscr.refresh()
-        reactor.addSystemEventTrigger('after','shutdown', outputError, "Connection Refused")
+        reactor.addSystemEventTrigger('after', 'shutdown',
+                                      outputError, "Connection Refused")
         reactor.callLater(0, reactor.stop)
 
     def failed(failure):
@@ -77,7 +78,10 @@ def connect_to_manager(stdscr, info):
         #stdscr.addstr(0,0,"Connection failed: %s" % message)
         #stdscr.clrtobot()
         #stdscr.refresh()
-        reactor.addSystemEventTrigger('after','shutdown', outputError, "Connection Failed: %s" % message)
+        reactor.addSystemEventTrigger(
+            'after',
+            'shutdown',
+            outputError, "Connection Failed: %s" % message)
         reactor.callLater(0, reactor.stop)
 
 

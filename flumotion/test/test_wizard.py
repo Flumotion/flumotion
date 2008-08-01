@@ -42,7 +42,8 @@ class WizardStepTest(testsuite.TestCase):
             self.assert_(hasattr(s, 'gladeFile'))
             self.assert_(hasattr(s, 'name'))
             if s.get_name() == 'Firewire':
-                s._queryCallback(dict(height=576, width=720, par=(59,54)))
+                s._queryCallback(dict(height=576, width=720,
+                                      par=(59, 54)))
             self.assertEqual(s.name, s.get_name())
 
             if s.get_name() != 'Summary':
@@ -52,7 +53,8 @@ class WizardStepTest(testsuite.TestCase):
     def testStepComponentProperties(self):
         for s in self.wizard.getSteps():
             if s.get_name() == 'Firewire':
-                s._queryCallback(dict(height=576, width=720, par=(59,54)))
+                s._queryCallback(dict(height=576, width=720,
+                                      par=(59, 54)))
             self.assert_(isinstance(s.get_component_properties(), dict))
 
 
@@ -63,7 +65,7 @@ class TestAdmin(admin.AdminModel):
     def workerRun(self, worker, module, function, *args, **kwargs):
         success = {
             ('localhost', 'flumotion.worker.checks.video', 'checkTVCard'):
-            {'height': 576, 'width': 720, 'par': (59,54)}}
+            {'height': 576, 'width': 720, 'par': (59, 54)}}
         failures = {}
 
         key = (worker, module, function)
@@ -91,8 +93,8 @@ class WizardSaveTest(testsuite.TestCase):
         self.wizard.run(False, self.workerHeavenState, True)
 
         config = self.wizard.getConfig()
-        self.assert_(config.has_key('video-producer'))
-        self.assert_(not config.has_key('audio-producer'))
+        self.assert_('video-producer' in config)
+        self.assert_(not 'audio-producer' in config)
         videoProducer = config['video-producer']
         self.failUnlessEqual(videoProducer.type, 'firewire')
 
@@ -100,7 +102,7 @@ class WizardSaveTest(testsuite.TestCase):
             ['video-producer:audio'])
         self.failUnlessEqual(config['video-overlay'].getEaters(),
             ['video-producer:video'])
-    testFirewireAudioAndVideo.skip = 'Maybe Andy\'s generator work broke this ?'
+    testFirewireAudioAndVideo.skip = 'Maybe Andys generator work broke this ?'
 
     def testAudioTestWorkers(self):
         source = self.wizard['Production']

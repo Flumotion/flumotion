@@ -63,7 +63,7 @@ class OnDemandStep(WorkerWizardStep):
     to configure an on demand configuration over HTTP
     """
     name = 'Demand'
-    title  = _('Demand')
+    title = _('Demand')
     sidebarName = _('On demand')
     section = _('Production')
     gladeFile = 'ondemand-wizard.glade'

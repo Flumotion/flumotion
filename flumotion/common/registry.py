@@ -296,9 +296,12 @@ class RegistryEntryBundleFilename:
     def getRelative(self):
         return self.relative
 
+
 class RegistryEntryProperty:
     "This class represents a <property> entry in the registry"
-    def __init__(self, name, type, description, required=False, multiple=False):
+
+    def __init__(self, name, type, description,
+                 required=False, multiple=False):
         self.name = name
         self.type = type
         self.description = description
@@ -538,16 +541,16 @@ class RegistryParser(fxml.Parser):
         #        properties[prop.getName()] = prop
 
         parsers = {
-            'source':          (self._parseSource, source.set),
-            'properties':      (self._parseProperties, properties.update),
-            'files':           (self._parseFiles, files.extend),
-            'entries':         (self._parseEntries, entries.update),
-            'eater':           (self._parseEater, eaters.append),
-            'feeder':          (self._parseFeeder, feeders.append),
+            'source': (self._parseSource, source.set),
+            'properties': (self._parseProperties, properties.update),
+            'files': (self._parseFiles, files.extend),
+            'entries': (self._parseEntries, entries.update),
+            'eater': (self._parseEater, eaters.append),
+            'feeder': (self._parseFeeder, feeders.append),
             'synchronization': (self._parseSynchronization,
                                 synchronization.set),
-            'sockets':         (self._parseSockets, sockets.extend),
-            'wizard':          (self._parseComponentWizard, wizards.append),
+            'sockets': (self._parseSockets, sockets.extend),
+            'wizard': (self._parseComponentWizard, wizards.append),
         }
         self.parseFromTable(node, parsers)
 
@@ -711,7 +714,8 @@ class RegistryParser(fxml.Parser):
 
     def _parseEater(self, node):
         # <eater name="..." [required="yes/no"] [multiple="yes/no"]/>
-        attrs = self.parseAttributes(node, ('name', ), ('required', 'multiple'))
+        attrs = self.parseAttributes(node, ('name', ),
+                                     ('required', 'multiple'))
         name, required, multiple = attrs
         # only required defaults to True
         required = common.strToBool(required or 'True')
@@ -733,7 +737,8 @@ class RegistryParser(fxml.Parser):
         return required, clock_priority
 
     def _parsePlugEntry(self, node):
-        attrs = self.parseAttributes(node, ('location', 'function'), ('type', ))
+        attrs = self.parseAttributes(node,
+                                     ('location', 'function'), ('type', ))
         location, function, entryType = attrs
         if not entryType:
             entryType = 'default'
@@ -776,11 +781,11 @@ class RegistryParser(fxml.Parser):
         wizards = []
 
         parsers = {
-            'entries':    (self._parsePlugEntries, entries.update),
+            'entries': (self._parsePlugEntries, entries.update),
             # backwards compatibility
-            'entry':      (self._parseDefaultPlugEntry, entries.update),
+            'entry': (self._parseDefaultPlugEntry, entries.update),
             'properties': (self._parseProperties, properties.update),
-            'wizard':     (self._parsePlugWizard, wizards.append),
+            'wizard': (self._parsePlugWizard, wizards.append),
             }
 
         self.parseFromTable(node, parsers)
@@ -867,7 +872,8 @@ class RegistryParser(fxml.Parser):
                                    directories.extend)}
         self.parseFromTable(node, parsers)
 
-        return RegistryEntryBundle(name, project, under, dependencies, directories)
+        return RegistryEntryBundle(name, project, under,
+                                   dependencies, directories)
 
     def _parseBundleDependency(self, node):
         name, = self.parseAttributes(node, ('name', ))
@@ -1397,7 +1403,8 @@ class ComponentRegistry(log.Loggable):
         """
         self.debug('path %s, prefix %s' % (path, prefix))
         if not os.path.exists(path):
-            self.warning("Cannot add non-existent path '%s' to registry" % path)
+            self.warning(
+                "Cannot add non-existent path '%s' to registry" % path)
             return False
         if not os.path.exists(os.path.join(path, prefix)):
             self.warning("Cannot add path '%s' to registry "
@@ -1570,7 +1577,7 @@ class ComponentRegistry(log.Loggable):
 
     def _getRegistryPathsFromEnviron(self):
         registryPaths = [configure.pythondir, ]
-        if os.environ.has_key('FLU_PROJECT_PATH'):
+        if 'FLU_PROJECT_PATH' in os.environ:
             paths = os.environ['FLU_PROJECT_PATH']
             registryPaths += paths.split(':')
         return registryPaths
@@ -1715,7 +1722,8 @@ def makeBundleFromLoadedModules(outfile, outreg, *prefixes):
                 nparts = len(modname.split('.'))
                 if '__init__' in modfilename:
                     nparts += 1
-                relpath = os.path.join(*modfilename.split(os.path.sep)[-nparts:])
+                relpath = os.path.join(*modfilename.split(
+                    os.path.sep)[-nparts:])
                 ret.add(modfilename, relpath)
         return ret
 

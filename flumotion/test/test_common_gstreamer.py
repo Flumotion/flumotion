@@ -34,19 +34,29 @@ class Factory(unittest.TestCase):
         hasync = gstreamer.element_factory_has_property('fakesrc', 'ync')
         self.failIf(hasync)
 
+
 class Caps(unittest.TestCase):
+
     def testCaps(self):
-        caps = gst.caps_from_string('video/x-raw-yuv,width=10,framerate=5.0;video/x-raw-rgb,width=15,framerate=10.0')
+        caps = gst.caps_from_string(
+            'video/x-raw-yuv,width=10,framerate=5.0;video/x-raw-rgb,'
+            'width=15,framerate=10.0')
         self.assertEquals(gstreamer.caps_repr(caps),
-            'video/x-raw-yuv, width=(int)10, framerate=(double)5; video/x-raw-rgb, width=(int)15, framerate=(double)10')
+            'video/x-raw-yuv, width=(int)10, '
+                          'framerate=(double)5; video/x-raw-rgb, '
+                          'width=(int)15, framerate=(double)10')
 
     def testCapsStreamheader(self):
         caps = gst.caps_from_string('application/ogg,streamheader=abcd')
         self.assertEquals(gstreamer.caps_repr(caps),
             'streamheader=<...>')
 
+
 class FakeComponent:
-    def debug(self, string): pass
+
+    def debug(self, string):
+        pass
+
 
 def run_it_a_little_while(p):
     p.set_state(gst.STATE_PLAYING)

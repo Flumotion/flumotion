@@ -74,8 +74,8 @@ class IEncoderPlugin(Interface):
 
 class IHTTPConsumerPlugin(Interface):
     """A http consumer plugin is how you extend the HTTP consumer page.
-    The main purpose of the plugin is to get a consumer model (eg, a http server)
-    specific for this plugin.
+    The main purpose of the plugin is to get a consumer model
+    (eg, a http server) specific for this plugin.
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """

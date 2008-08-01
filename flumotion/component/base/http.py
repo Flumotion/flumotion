@@ -132,7 +132,8 @@ class HTTPAuthentication(log.Loggable):
         self.component = component
         self._fdToKeycard = {}         # request fd -> Keycard
         self._idToKeycard = {}         # keycard id -> Keycard
-        self._fdToDurationCall = {}    # request fd -> IDelayedCall for duration
+        self._fdToDurationCall = {}    # request fd -> IDelayedCall
+                                       # for duration
         self._domain = None            # used for auth challenge and on keycard
         self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
         self.bouncerName = None
@@ -172,11 +173,11 @@ class HTTPAuthentication(log.Loggable):
                 self.scheduleKeepAlive()
 
         if tryingAgain:
-            self._keepAlive = reactor.callLater(self.KEYCARD_TRYAGAIN_INTERVAL,
-                                                timeout)
+            self._keepAlive = reactor.callLater(
+                self.KEYCARD_TRYAGAIN_INTERVAL, timeout)
         else:
-            self._keepAlive = reactor.callLater(self.KEYCARD_KEEPALIVE_INTERVAL,
-                                                timeout)
+            self._keepAlive = reactor.callLater(
+                self.KEYCARD_KEEPALIVE_INTERVAL, timeout)
 
     def stopKeepAlive(self):
         if self._keepAlive is not None:
@@ -213,7 +214,7 @@ class HTTPAuthentication(log.Loggable):
         elif issuerClass == 'HTTPGenericIssuer':
             self._issuer = HTTPGenericIssuer()
         else:
-            raise ValueError, "issuerClass %s not accepted" % issuerClass
+            raise ValueError("issuerClass %s not accepted" % issuerClass)
 
     def authenticate(self, request):
         """
@@ -271,15 +272,16 @@ class HTTPAuthentication(log.Loggable):
             cleanup(bouncerName, keycard)
 
     # public
+
     def cleanupAuth(self, fd):
-        if self.bouncerName and self._fdToKeycard.has_key(fd):
+        if self.bouncerName and fd in self._fdToKeycard:
             keycard = self._fdToKeycard[fd]
             del self._fdToKeycard[fd]
             del self._idToKeycard[keycard.id]
             self.debug('[fd %5d] asking bouncer %s to remove keycard id %s',
                        fd, self.bouncerName, keycard.id)
             self.doCleanupKeycard(self.bouncerName, keycard)
-        if self._fdToDurationCall.has_key(fd):
+        if fd in self._fdToDurationCall:
             self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()
             del self._fdToDurationCall[fd]
@@ -291,7 +293,7 @@ class HTTPAuthentication(log.Loggable):
         self.debug('[fd %5d] duration exceeded, expiring client' % fd)
 
         # we're called from a callLater, so we've already run; just delete
-        if self._fdToDurationCall.has_key(fd):
+        if fd in self._fdToDurationCall:
             del self._fdToDurationCall[fd]
 
         self.debug('[fd %5d] asking streamer to remove client' % fd)
@@ -306,7 +308,7 @@ class HTTPAuthentication(log.Loggable):
 
         self.debug('[fd %5d] expiring client' % fd)
 
-        if self._fdToDurationCall.has_key(fd):
+        if fd in self._fdToDurationCall:
             self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()
             del self._fdToDurationCall[fd]
@@ -354,15 +356,16 @@ class HTTPAuthentication(log.Loggable):
         return None
 
     def _authenticatedErrback(self, failure, request):
-        failure.trap(errors.UnknownComponentError, errors.NotAuthenticatedError)
+        failure.trap(errors.UnknownComponentError,
+                     errors.NotAuthenticatedError)
         self._handleUnauthorized(request, http.UNAUTHORIZED)
         return failure
 
     def _defaultErrback(self, failure, request):
         if failure.check(errors.UnknownComponentError,
                 errors.NotAuthenticatedError) is None:
-            # If something else went wrong, we want to disconnect the client and
-            # give them a 500 Internal Server Error.
+            # If something else went wrong, we want to disconnect the client
+            # and give them a 500 Internal Server Error.
             self._handleUnauthorized(request, http.INTERNAL_SERVER_ERROR)
         return failure
 
@@ -410,7 +413,8 @@ class LogFilter:
         try:
             net = struct.unpack(">I", socket.inet_pton(socket.AF_INET, net))[0]
         except socket.error:
-            raise errors.ConfigError("Failed to parse network address %s" % net)
+            raise errors.ConfigError(
+                "Failed to parse network address %s" % net)
         net = net & mask # just in case
 
         self.filters.append((net, mask))

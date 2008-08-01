@@ -29,7 +29,7 @@ class Rtsp(feedcomponent.ParseLaunchComponent):
         width = properties.get('width', 0)
         height = properties.get('height', 0)
         location = properties.get('location')
-        framerate = properties.get('framerate', (25,2))
+        framerate = properties.get('framerate', (25, 2))
         has_audio = properties.get('has-audio', True)
         if width > 0 and height > 0:
             scaling_template = (" videoscale method=1 ! "

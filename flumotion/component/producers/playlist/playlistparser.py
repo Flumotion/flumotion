@@ -124,7 +124,8 @@ class Playlist(object, log.Loggable):
             self._itemsById[piid] = [newitem]
 
         # prev starts strictly before the new item
-        # next starts after the new item, and ends after the end of the new item
+        # next starts after the new item, and ends after the
+        # end of the new item
         prev = next = None
         item = self.items
         while item:

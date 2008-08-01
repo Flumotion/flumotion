@@ -29,7 +29,7 @@ __version__ = "$Rev$"
 
 
 class DiskerAdminText(BaseAdminText):
-    commands = [ 'changefile' ]
+    commands = ['changefile']
     filename_change_defers = []
 
     def setup(self):

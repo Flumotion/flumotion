@@ -26,7 +26,7 @@ Eaters tab in the component UI
 import gettext
 import os
 import time
- 
+
 import gtk
 
 from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
@@ -208,26 +208,23 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self.treemodel.set(i, 0, eaterId, 1, state)
         w = StateWatcher(state,
             {
-                'fd':                    self._setEaterFD,
-                'eater-alias':            self._setEaterName,
-                'last-connect':           self._setEaterLastConnect,
+                'fd': self._setEaterFD,
+                'eater-alias': self._setEaterName,
+                'last-connect': self._setEaterLastConnect,
                 'count-timestamp-discont': self._setEaterCountTimestampDiscont,
                 'total-timestamp-discont': self._setEaterTotalTimestampDiscont,
-                'count-offset-discont':    self._setEaterCountOffsetDiscont,
-                'total-offset-discont':    self._setEaterTotalOffsetDiscont,
-                'total-connections':      self._setEaterTotalConnections,
+                'count-offset-discont': self._setEaterCountOffsetDiscont,
+                'total-offset-discont': self._setEaterTotalOffsetDiscont,
+                'total-connections': self._setEaterTotalConnections,
                 # need to have a setter for connection to be able to show
                 # it initially
-                'connection':            self._setEaterConnection,
+                'connection': self._setEaterConnection,
             },
             {},
             {},
-            setitemers={
-                'connection':           self._setEaterConnectionItem,
+            setitemers={'connection': self._setEaterConnectionItem,
             },
-            delitemers={
-            }
-        )
+            delitemers={})
         self.treemodel.set(i, 2, w)
 
     def setUIState(self, state):
@@ -264,10 +261,10 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             'offset-discont-offset-current',
             'timestamp-discont-count-current', 'offset-discont-count-current',
             'timestamp-discont-total-current', 'offset-discont-total-current',
-            'timestamp-discont-last-current',  'offset-discont-last-current',
-            'timestamp-discont-time-current',  'offset-discont-time-current',
-            'timestamp-discont-count-total',   'offset-discont-count-total',
-            'timestamp-discont-total',         'offset-discont-total',
+            'timestamp-discont-last-current', 'offset-discont-last-current',
+            'timestamp-discont-time-current', 'offset-discont-time-current',
+            'timestamp-discont-count-total', 'offset-discont-count-total',
+            'timestamp-discont-total', 'offset-discont-total',
             'connections-total',
             ):
             set_label(name)
@@ -281,7 +278,8 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         sel.connect('changed', sel_changed)
 
         # manage visibility of parts of the widget
-        self._table_connected = self.wtree.get_widget('table-current-connected')
+        self._table_connected = self.wtree.get_widget(
+            'table-current-connected')
         self._table_disconnected = self.wtree.get_widget(
             'table-current-disconnected')
         self._table_eater = self.wtree.get_widget('table-eater')

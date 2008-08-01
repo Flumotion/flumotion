@@ -38,7 +38,7 @@ def slashjoin(a, *p):
         if b.startswith('/'):
             path = b
         elif path == '' or path.endswith('/'):
-            path +=  b
+            path += b
         else:
             path += '/' + b
     return path
@@ -144,4 +144,3 @@ class CortadoWizardPlugin(object):
         return CortadoHTTPServer(streamer, audioProducer,
                                  videoProducer,
                                  mountPoint)
-    

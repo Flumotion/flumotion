@@ -57,7 +57,7 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
             struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
 
         # always set par
-        struct['pixel-aspect-ratio']= gst.Fraction(1,1)
+        struct['pixel-aspect-ratio']= gst.Fraction(1, 1)
         if 'pixel-aspect-ratio' in properties:
             par = properties['pixel-aspect-ratio']
             struct['pixel-aspect-ratio'] = gst.Fraction(par[0], par[1])
@@ -95,8 +95,8 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
                 self.addMessage(
                     messages.Warning(T_(N_(
                         "The 'drop-probability' property is specified, but "
-                        "it only works with GStreamer core newer than 0.10.12. "
-                        "You should update your version of GStreamer."))))
+                        "it only works with GStreamer core newer than 0.10.12."
+                        " You should update your version of GStreamer."))))
             else:
                 drop_probability = properties['drop-probability']
                 if drop_probability < 0.0 or drop_probability > 1.0:

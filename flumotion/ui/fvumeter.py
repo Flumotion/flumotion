@@ -30,43 +30,41 @@ __version__ = "$Rev$"
 # BS 6840-18:1996/IEC-268-18
 # and is inspired by JACK's meterbridge dpm_meters.c
 
+
 class FVUMeter(gtk.DrawingArea):
-    __gsignals__ = { 'expose-event' : 'override',
-                     'size-allocate': 'override',
-                     'size-request': 'override',
-                     'realize' : 'override'
-             }
+    __gsignals__ = {'expose-event': 'override',
+                    'size-allocate': 'override',
+                    'size-request': 'override',
+                    'realize': 'override'}
     __gproperties__ = {
-        'peak' : (gobject.TYPE_FLOAT,
-                  'peak volume level',
-                  'peak volume level in dB',
+        'peak': (gobject.TYPE_FLOAT,
+                 'peak volume level',
+                 'peak volume level in dB',
+                 -90.0,
+                 0,
+                 -90.0,
+                 gobject.PARAM_READWRITE),
+        'decay': (gobject.TYPE_FLOAT,
+                  'decay volume level',
+                  'decay volume level in dB',
                   -90.0,
                   0,
                   -90.0,
                   gobject.PARAM_READWRITE),
-        'decay' : (gobject.TYPE_FLOAT,
-                   'decay volume level',
-                   'decay volume level in dB',
-                   -90.0,
-                   0,
-                   -90.0,
-                   gobject.PARAM_READWRITE),
         'orange-threshold': (gobject.TYPE_FLOAT,
-                            'threshold for orange',
-                            'threshold for orange use in dB',
-                            -90.0,
-                            0,
-                            -10.0,
-                            gobject.PARAM_READWRITE),
+                             'threshold for orange',
+                             'threshold for orange use in dB',
+                             -90.0,
+                             0,
+                             -10.0,
+                             gobject.PARAM_READWRITE),
         'red-threshold': (gobject.TYPE_FLOAT,
-                         'threshold for red',
-                         'threshold for red use in dB',
-                         -90.0,
-                         0,
-                         -1.0,
-                         gobject.PARAM_READWRITE)
-
-    }
+                          'threshold for red',
+                          'threshold for red use in dB',
+                          -90.0,
+                          0,
+                          -1.0,
+                          gobject.PARAM_READWRITE)}
     green_gc = None
     orange_gc = None
     red_gc = None
@@ -114,7 +112,7 @@ class FVUMeter(gtk.DrawingArea):
         elif property.name == 'red-threshold':
             return self.red_threshold
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError('unknown property %s' % property.name)
 
     def do_set_property(self, property, value):
         if property.name == 'peak':
@@ -126,7 +124,7 @@ class FVUMeter(gtk.DrawingArea):
         elif property.name == 'red-threshold':
             self.red_threshold = value
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError('unknown property %s' % property.name)
 
         self.queue_draw()
 
@@ -142,12 +140,13 @@ class FVUMeter(gtk.DrawingArea):
     def do_realize(self):
         self.set_flags(self.flags() | gtk.REALIZED)
 
-        self.window = gdk.Window(self.get_parent_window(),
-                                 width=self.allocation.width,
-                                 height=self.allocation.height,
-                                 window_type=gdk.WINDOW_CHILD,
-                                 wclass=gdk.INPUT_OUTPUT,
-                                 event_mask=self.get_events() | gdk.EXPOSURE_MASK)
+        self.window = gdk.Window(
+            self.get_parent_window(),
+            width=self.allocation.width,
+            height=self.allocation.height,
+            window_type=gdk.WINDOW_CHILD,
+            wclass=gdk.INPUT_OUTPUT,
+            event_mask=self.get_events() | gdk.EXPOSURE_MASK)
 
         colormap = gtk.gdk.colormap_get_system()
         green = colormap.alloc_color(0, 65535, 0)
@@ -208,8 +207,8 @@ class FVUMeter(gtk.DrawingArea):
             ('-30', 0.30),
             ('-20', 0.50),
             ('-10', 0.75),
-            ( '-5', 0.875),
-            (  '0', 1.0),
+            ('-5', 0.875),
+            ('0', 1.0),
         ]
         for level, scale in scalers:
             # tick mark, 6 pixels high

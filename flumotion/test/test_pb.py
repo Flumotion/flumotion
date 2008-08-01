@@ -35,18 +35,19 @@ from flumotion.twisted import checkers, pb
 from flumotion.twisted import portal as fportal
 
 
-
 htpasswdcryptConf = {
-    'name':  'testbouncer',
+    'name': 'testbouncer',
     'plugs': {},
-    'properties': {'data': "user:qi1Lftt0GZC0o"}
-}
+    'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
 saltsha256Conf = {
-    'name':  'testbouncer',
+    'name': 'testbouncer',
     'plugs': {},
-    'properties': {'data': "user:iamsalt:2f826124ada2b2cdf11f4fd427c9ca48de0ed49b41476266d8df08d2cf86120e"}
-}
+    'properties': {
+    'data':
+    ("user:"
+     "iamsalt:"
+     "2f826124ada2b2cdf11f4fd427c9ca48de0ed49b41476266d8df08d2cf86120e")}}
 
 ### lots of fake objects to have fun with
 
@@ -85,17 +86,24 @@ class FakeAvatar(tpb.Avatar):
     def logout(self):
         self.loggedOut = True
 
+
 class FakeTRealm:
+
     def __init__(self):
         self.avatar = FakeAvatar()
+
     def requestAvatar(self, avatarId, mind, *ifaces):
         interface = ifaces[0]
-        assert interface == tpb.IPerspective, "interface is %r and not IPerspective" % interface
+        assert interface == tpb.IPerspective, (
+            "interface is %r and not IPerspective" % interface)
         self.avatar.loggedIn = True
         # we can return a deferred, or return directly
-        return defer.succeed((tpb.IPerspective, self.avatar, self.avatar.logout))
+        return defer.succeed((tpb.IPerspective,
+                              self.avatar, self.avatar.logout))
+
 
 class FakeFRealm(FakeTRealm):
+
     def requestAvatar(self, avatarId, keycard, mind, *interfaces):
         return FakeTRealm.requestAvatar(self, avatarId, mind, *interfaces)
 
@@ -112,7 +120,8 @@ class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
         # PB server creates a challenge
         self.challenge = tpb.challenge()
         # and a challenger to send to the client
-        self.challenger = tpb._PortalAuthChallenger(FakePortalWrapperPlaintext(),
+        self.challenger = tpb._PortalAuthChallenger(
+            FakePortalWrapperPlaintext(),
             'username', self.challenge)
 
     def testRightPassword(self):
@@ -127,7 +136,8 @@ class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
         d = self.challenger.remote_respond(response, None)
 
         def wrongPasswordErrback(wrongpasserror):
-            self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(wrongpasserror.type(),
+                                    errors.NotAuthenticatedError))
 
         d.addErrback(wrongPasswordErrback)
         return d
@@ -163,7 +173,8 @@ class Test_BouncerWrapper(testsuite.TestCase):
             'twisted.spread.pb.IPerspective')
 
         def uacppWrongPasswordErrback(wrongpasserror):
-            self.assert_(isinstance(wrongpasserror.type(), errors.NotAuthenticatedError))
+            self.assert_(isinstance(wrongpasserror.type(),
+                                    errors.NotAuthenticatedError))
 
         d.addErrback(uacppWrongPasswordErrback)
         return d
@@ -281,7 +292,8 @@ class TestAuthenticator(testsuite.TestCase):
         # not setting any useful auth info on the authenticator does not
         # allow us to issue a keycard
         a = pb.Authenticator(username="tarzan")
-        d = a.issue(["flumotion.common.keycards.KeycardUACPP",])
+        d = a.issue([
+            "flumotion.common.keycards.KeycardUACPP", ])
         d.addCallback(lambda r: self.failIf(r))
         return d
 
@@ -289,13 +301,15 @@ class TestAuthenticator(testsuite.TestCase):
         # our authenticator by default only does challenge-based keycards
         a = pb.Authenticator(username="tarzan", password="jane",
             address="localhost")
-        d = a.issue(["flumotion.common.keycards.KeycardUACPP",])
+        d = a.issue([
+            "flumotion.common.keycards.KeycardUACPP", ])
         d.addCallback(lambda r: self.failIf(r))
 
     def testIssueUACPCC(self):
         a = pb.Authenticator(username="tarzan", password="jane",
             address="localhost")
-        d = a.issue(["flumotion.common.keycards.KeycardUACPCC",])
+        d = a.issue([
+            "flumotion.common.keycards.KeycardUACPCC", ])
         d.addCallback(lambda r: self.failUnless(isinstance(r,
             keycards.KeycardUACPCC)))
         return d
@@ -349,7 +363,8 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
 
         def OkCallback(result):
             # make sure we really used challenge/response keycard
-            self.failUnless(isinstance(factory.keycard, keycards.KeycardUACPCC))
+            self.failUnless(isinstance(factory.keycard,
+                                       keycards.KeycardUACPCC))
             self.assert_(isinstance(result, tpb.RemoteReference))
             return self.clientDisconnect(factory, result)
 
@@ -366,8 +381,10 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
 
         log.debug("trial", "wait for result")
+
         def WrongPasswordErrback(failure):
-            self.failUnless(isinstance(factory.keycard, keycards.KeycardUACPCC))
+            self.failUnless(isinstance(factory.keycard,
+                                       keycards.KeycardUACPCC))
             # This is a CopiedFailure
             self.assert_(failure.check(
                 "flumotion.common.errors.NotAuthenticatedError"))
@@ -502,7 +519,8 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
 
         def OkCallback(result):
             # make sure we really used an SHA256 challenge/response keycard
-            self.failUnless(isinstance(factory.keycard, keycards.KeycardUASPCC))
+            self.failUnless(isinstance(factory.keycard,
+                                       keycards.KeycardUASPCC))
             self.assert_(isinstance(result, tpb.RemoteReference))
             return self.clientDisconnect(factory, result)
 
@@ -518,9 +536,11 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
 
         log.debug("trial", "wait for result")
+
         def WrongPasswordErrback(failure):
             # make sure we really used an SHA256 challenge/response keycard
-            self.failUnless(isinstance(factory.keycard, keycards.KeycardUASPCC))
+            self.failUnless(isinstance(factory.keycard,
+                                       keycards.KeycardUASPCC))
             # This is a CopiedFailure
             self.assert_(failure.check(
                 "flumotion.common.errors.NotAuthenticatedError"))
