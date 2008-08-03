@@ -1,5 +1,12 @@
 2008-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* misc/flu.unstable.stable.modules:
+	* misc/flu.unstable.unstable.modules:
+	  Update the others too.
+	  Might consider putting glib/gtk+/pygtk in unstable.unstable.
+
+2008-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* misc/flu.stable.stable.modules:
 	  Update.
 

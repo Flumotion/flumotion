@@ -1,87 +1,59 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
-<!-- stable Flumotion against stable dependencies -->
+
+<!-- unstable (trunk) Flumotion against unstable dependencies -->
+
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+
 <moduleset>
 
-  <cvsroot name="gnome.org"
-     root=":pserver:anonymous@anoncvs.gnome.org:/cvs/gnome"
-     password="" />
-  <cvsroot name="gstreamer.freedesktop.org"
-     root=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
-     password="" />
-  <svnroot name="svn.fluendo.com" default="yes"
-     href="https://svn.fluendo.com/svn"
-     password="" />
+  <!-- repositories -->
+  <repository type="svn" name="svn.gnome.org"
+              href="http://svn.gnome.org/svn/" />
+  <repository type="cvs" name="gstreamer.freedesktop.org"
+              cvsroot=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
+              password="" />
+  <repository type="svn" name="code.fluendo.com-flumotion" default="yes"
+              href="https://code.fluendo.com/flumotion/svn/"
+              password="" />
 
-<!-- not being used atm -->
-  <tarball id="python" version="2.3.3"
-           autogenargs="--enable-shared --with-pydebug">
-    <source  href="http://www.python.org/ftp/python/2.3.3/Python-2.3.3.tar.bz2"
-             size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
-  </tarball>
+  <repository type="tarball" name="gstreamer-src"
+              href="http://gstreamer.freedesktop.org/src/" />
 
-  <cvsmodule id="glib" cvsroot="gnome.org">
-<!--
-    <dependencies>
-      <dep package="gtk-doc" />
-    </dependencies>
--->
-  </cvsmodule>
+  <!-- modules -->
+  <autotools id="gstreamer" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" />
+  </autotools>
 
-  <cvsmodule id="pango" cvsroot="gnome.org" autogenargs="--with-qt=no">
-    <dependencies>
-      <dep package="glib" />
-    </dependencies>
-  </cvsmodule>
-
-  <cvsmodule id="gtk+" cvsroot="gnome.org">
-    <dependencies>
-      <dep package="glib" />
-      <dep package="pango" />
-<!--
-      <dep package="atk" />
-      <dep package="shared-mime-info" />
--->
-    </dependencies>
-  </cvsmodule>
-
-  <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
-             revision="BRANCH-GSTREAMER-0_8"
-             autogenargs="--disable-plugin-builddir --disable-tests --disable-docs-build"
-             >
-  </cvsmodule>
-
-  <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
-             revision="BRANCH-GSTREAMER-0_8"
-             autogenargs="--disable-tests --disable-docs-build"
-             >
+  <autotools id="gst-plugins-base" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" />
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org">
+  <autotools id="gst-plugins-good" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" />
     <dependencies>
-      <dep package="gtk+" />
+      <dep package="gst-plugins-base" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <cvsmodule id="gst-python"
-             revision="BRANCH-GSTREAMER-0_8"
-              cvsroot="gstreamer.freedesktop.org">
+  <autotools id="gst-python" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" />
     <dependencies>
       <dep package="gstreamer" />
-      <dep package="gst-plugins" />
-      <dep package="pygtk" />
+      <dep package="gst-plugins-base" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <svnmodule id="flumotion" svnroot="svn.fluendo.com"
-   module="flumotion/trunk" checkoutdir="flumotion">
+  <autotools id="flumotion">
+    <branch repo="code.fluendo.com-flumotion"
+            module="flumotion" revision="../trunk" />
     <dependencies>
+      <dep package="gst-plugins-good" />
       <dep package="gst-python" />
     </dependencies>
-  </svnmodule>
+  </autotools>
 
 </moduleset>
