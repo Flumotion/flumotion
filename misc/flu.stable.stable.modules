@@ -1,84 +1,66 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
+
 <!-- stable Flumotion against stable dependencies -->
+
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+
 <moduleset>
 
-  <cvsroot name="gnome.org"
-     root=":pserver:anonymous@anoncvs.gnome.org:/cvs/gnome"
-     password="" />
-  <cvsroot name="gstreamer.freedesktop.org"
-     root=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
-     password="" />
-  <svnroot name="svn.fluendo.com" default="yes"
-     href="https://svn.fluendo.com/svn"
-     password="" />
+  <!-- repositories -->
+  <repository type="svn" name="svn.gnome.org"
+              href="http://svn.gnome.org/svn/" />
+  <repository type="cvs" name="gstreamer.freedesktop.org"
+              cvsroot=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
+              password="" />
+  <repository type="svn" name="code.fluendo.com-flumotion" default="yes"
+              href="https://code.fluendo.com/flumotion/svn/"
+              password="" />
 
-<!-- not being used atm -->
-  <tarball id="python" version="2.3.3"
-           autogenargs="--enable-shared --with-pydebug">
-    <source  href="http://www.python.org/ftp/python/2.3.3/Python-2.3.3.tar.bz2"
-             size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
-  </tarball>
+  <repository type="tarball" name="gstreamer-src"
+              href="http://gstreamer.freedesktop.org/src/" />
 
-  <cvsmodule id="glib" cvsroot="gnome.org" revision="glib-2-6">
-<!--
-    <dependencies>
-      <dep package="gtk-doc" />
-    </dependencies>
--->
-  </cvsmodule>
+  <!-- modules -->
+  <autotools id="gstreamer" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" revision="RELEASE-0_10_20" />
+  </autotools>
 
-  <cvsmodule id="pango" cvsroot="gnome.org" revision="pango-1-8" autogenargs="--with-qt=no">
-    <dependencies>
-      <dep package="glib" />
-    </dependencies>
-  </cvsmodule>
-
-  <cvsmodule id="gtk+" cvsroot="gnome.org" revision="gtk-2-6">
-    <dependencies>
-      <dep package="glib" />
-      <dep package="pango" />
-<!--
-      <dep package="atk" />
-      <dep package="shared-mime-info" />
--->
-    </dependencies>
-  </cvsmodule>
-
-  <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
-             autogenargs="--disable-plugin-builddir --disable-tests --disable-docs-build"
-             revision="RELEASE-0_8_10">
-  </cvsmodule>
-
-  <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
-             autogenargs="--disable-tests --disable-docs-build"
-             revision="RELEASE-0_8_10">
+  <autotools id="gst-plugins-base" autogenargs="--disable-docs-build">
+    <branch repo="gstreamer.freedesktop.org" revision="RELEASE-0_10_20" />
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_6_2">
+<!-- use a tarball, because the common dir tagging problem screws us up -->
+  <autotools id="gst-plugins-good"
+             autogen-sh="configure" autogenargs="--disable-docs-build">
+  <branch module="gst-plugins-good/gst-plugins-good-0.10.9.tar.gz"
+          version="0.10.9" repo="gstreamer-src"
+          md5sum="a38d0e35e2ed66843c46de95ec8eb41c" size="3142317" />
     <dependencies>
-      <dep package="gtk+" />
+      <dep package="gst-plugins-base" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_1">
+  <autotools id="gst-python"
+             autogen-sh="configure" autogenargs="--disable-docs-build">
+  <branch module="gst-python/gst-python-0.10.12.tar.gz"
+          version="0.10.12" repo="gstreamer-src"
+          md5sum="e106a1ceaee49010232a54346b1f7a83" size="628460" />
     <dependencies>
       <dep package="gstreamer" />
-      <dep package="gst-plugins" />
-      <dep package="pygtk" />
+      <dep package="gst-plugins-base" />
     </dependencies>
-  </cvsmodule>
+  </autotools>
 
-  <svnmodule id="flumotion" svnroot="svn.fluendo.com"
-   module="flumotion/tags/flumotion-0.1.8" checkoutdir="flumotion">
+  <autotools id="flumotion">
+    <branch repo="code.fluendo.com-flumotion"
+            module="flumotion" revision="../tags/flumotion-0.5.2" />
     <dependencies>
+      <dep package="gst-plugins-good" />
       <dep package="gst-python" />
     </dependencies>
-  </svnmodule>
+  </autotools>
 
 </moduleset>

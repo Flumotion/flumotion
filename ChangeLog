@@ -1,3 +1,8 @@
+2008-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* misc/flu.stable.stable.modules:
+	  Update.
+
 2008-08-01  Johan Dahlin  <johan@flumotion.com>
 
 	* Makefile.am:
