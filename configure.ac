@@ -1,6 +1,18 @@
-AC_INIT(README)
+m4_define([flu_major_version], [0])
+m4_define([flu_minor_version], [5])
+m4_define([flu_micro_version], [2])
+m4_define([flu_extra_version], [1])
+m4_define([flu_version],
+          [flu_major_version.flu_minor_version.flu_micro_version])
 
-AS_VERSION(flumotion, FLUMOTION, 0, 5, 2, 1)
+AC_INIT(flumotion, [flu_version])
+AM_INIT_AUTOMAKE([-Wno-portability])
+
+AS_VERSION(flumotion, FLUMOTION,
+           [flu_major_version], 
+           [flu_minor_version], 
+           [flu_micro_version], 
+           [flu_extra_version])
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
 AC_SUBST_FILE(AUTHORS)
@@ -13,8 +25,6 @@ AC_SUBST(PYGST_010_REQ, 0.10.0)
 AC_SUBST(GST_010_REQ, 0.10.0.1)
 
 GST_010_SUPPORTED=true
-
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common")
