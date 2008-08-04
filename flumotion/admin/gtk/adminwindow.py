@@ -478,7 +478,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._trayicon = FluTrayIcon(self._window)
         self._trayicon.connect("quit", self._trayicon_quit_cb)
-        self._trayicon.set_tooltip(_('Not connected'))
+        self._trayicon.set_tooltip(_('Flumotion: Not connected'))
 
         self._componentList.connect('selection_changed',
             self._components_selection_changed_cb)
@@ -552,7 +552,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._runConfigurationWizardAction.set_sensitive(True)
 
     def _openConnection(self, info):
-        self._trayicon.set_tooltip(_("Connecting to %s:%s") % (
+        self._trayicon.set_tooltip(_("Flumotion: Connecting to %s:%s") % (
             info.host, info.port))
 
         def connected(model):
@@ -1133,7 +1133,8 @@ class AdminWindow(Loggable, GladeDelegate):
         # FIXME: have a method for this
         self._window.set_title(_('%s - Flumotion Administration') %
             self._adminModel.adminInfoStr())
-        self._trayicon.set_tooltip(self._adminModel.adminInfoStr())
+        self._trayicon.set_tooltip(_('Flumotion: %s') % (
+            self._adminModel.adminInfoStr(), ))
 
         self.emit('connected')
 

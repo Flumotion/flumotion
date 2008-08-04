@@ -1,5 +1,10 @@
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	Include Flumotion: in the tray message.
+
+2008-08-04  Johan Dahlin  <johan@flumotion.com>
+
 	* configure.ac: Avoid brackets around parameter to
 	AS_VERSION
 
