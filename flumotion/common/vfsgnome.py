@@ -62,11 +62,13 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
     """
     implements(IDirectory)
 
-    def __init__(self, path):
+    def __init__(self, path, name=None):
         import gnomevfs
-        fileInfo = gnomevfs.get_file_info(os.path.abspath(path))
         self.path = path
-        self.filename = fileInfo.name
+        if name is None:
+            fileInfo = gnomevfs.get_file_info(os.path.abspath(path))
+            name = fileInfo.name
+        self.filename = name
         self.iconNames = ['gnome-fs-directory']
 
     # IFile
@@ -84,9 +86,12 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
             fileInfos = gnomevfs.open_directory(self.path)
         except gnomevfs.AccessDeniedError:
             raise AccessDeniedError
+        if self.path != '/':
+            retval.append(GnomeVFSDirectory(os.path.dirname(self.path),
+                                            name='..'))
         for fileInfo in fileInfos:
             filename = fileInfo.name
-            if filename.startswith('.') and filename != '..':
+            if filename.startswith('.'):
                 continue
             if fileInfo.type == gnomevfs.FILE_TYPE_DIRECTORY:
                 obj = GnomeVFSDirectory(os.path.join(self.path,

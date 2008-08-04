@@ -34,6 +34,7 @@ import gtk
 from gtk import gdk
 from kiwi.ui.objectlist import ObjectList, Column
 from kiwi.utils import gsignal
+from zope.interface import implements
 
 from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
@@ -45,12 +46,12 @@ _ = gettext.gettext
 class _File(object):
 
     def __init__(self, fileInfo, icon):
-        self._fileinfo = fileInfo
+        self.original = fileInfo
         self.filename = fileInfo.filename
         self.icon = icon
 
     def getPath(self):
-        return self._fileInfo.getPath()
+        return self.original.getPath()
 
 
 class FileSelector(ObjectList):
@@ -81,11 +82,13 @@ class FileSelector(ObjectList):
         self._iconTheme = gtk.icon_theme_get_default()
 
     def _rowActivated(self, vfsFile):
-        print 'row activated', vfsFile
+        vfsFile = vfsFile.original
         if IDirectory.providedBy(vfsFile):
             self.setDirectory(vfsFile.getPath())
         elif IFile.providedBy(vfsFile):
             self.emit('selected', vfsFile)
+        else:
+            raise NotImplemented
 
     def _renderIcon(self, iconNames):
         iconInfo = self._iconTheme.choose_icon(iconNames,
@@ -158,8 +161,13 @@ class FileSelectorDialog(gtk.Dialog):
         self.add_button(gtk.STOCK_OPEN, gtk.RESPONSE_OK)
 
         self.selector = FileSelector(parent, adminModel)
+        self.selector.connect('selected',
+                              self._on_file_selector__selected)
         self.vbox.add(self.selector)
         self.selector.show()
+
+    def _on_file_selector__selected(self, selector, vfsfile):
+        self.response(gtk.RESPONSE_OK)
 
     def getFilename(self):
         """Returns the currently selected filename

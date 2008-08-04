@@ -1,5 +1,15 @@
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/vfs.py:
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	* flumotion/ui/fileselector.py:
+	Unbreak the fileselector. Make the GIO backend work as good
+	as the GnomeVFS one. Show '..' in the gnomevfs backend instead
+	of /. Fixes #1079.
+
+2008-08-04  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	Include Flumotion: in the tray message.
 

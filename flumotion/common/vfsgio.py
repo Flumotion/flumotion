@@ -46,14 +46,14 @@ class GIOFile(Copyable, RemoteCopy):
     """
     implements(IFile)
 
-    def __init__(self, parent, gfile):
+    def __init__(self, parent, gfileinfo):
         self.parent = parent
-        self.filename = gfile.name
+        self.filename = gfileinfo.get_name()
         self.iconNames = self._getIconNames()
 
     def _getIconNames(self):
         import gio
-        gFile = gio.File(self._filename)
+        gFile = gio.File(self.getPath())
         gFileInfo = gFile.query_info('standard::icon')
         gIcon = gFileInfo.get_icon()
         return gIcon.get_names()
@@ -61,7 +61,7 @@ class GIOFile(Copyable, RemoteCopy):
     # IFile
 
     def getPath(self):
-        return os.path.join(self.parent.get_path(), self.name)
+        return os.path.join(self.parent, self.filename)
 
 
 class GIODirectory(Copyable, RemoteCopy):
@@ -70,18 +70,19 @@ class GIODirectory(Copyable, RemoteCopy):
     """
     implements(IDirectory)
 
-    def __init__(self, path):
+    def __init__(self, path, name=None):
         import gio
-        gfile = gio.File(os.path.abspath(path))
-        self.path = path
-        self.filename = gfile.get_basename()
+        self.path = os.path.abspath(path)
+        gfile = gio.File(self.path)
+        if name is None:
+            name = gfile.get_basename()
+        self.filename = name
         self.iconNames = self._getIconNames(gfile)
 
     def _getIconNames(self, gFile):
         gFileInfo = gFile.query_info('standard::icon')
         gIcon = gFileInfo.get_icon()
         return gIcon.get_names()
-
 
     # IFile
 
@@ -96,20 +97,23 @@ class GIODirectory(Copyable, RemoteCopy):
         retval = []
         gfile = gio.File(os.path.abspath(self.path))
         try:
-            gfiles = gfile.enumerate_children('standard::*')
+            gfileinfos = gfile.enumerate_children('standard::*')
         except gobject.GError, e:
             if (e.domain == gio.ERROR and
                 e.code == gio.ERROR_PERMISSION_DENIED):
                 raise AccessDeniedError
             raise
-        for gfile in gfiles:
-            filename = gfile.get_basename()
+        if self.path != '/':
+            retval.append(GIODirectory(os.path.dirname(self.path), name='..'))
+        for gfileinfo in gfileinfos:
+            filename = gfileinfo.get_name()
             if filename.startswith('.') and filename != '..':
                 continue
-            if gfile.get_file_type() == gio.FILE_TYPE_DIRECTORY:
-                obj = GIODirectory(os.path.join(self.path, gfile.name))
+            if gfileinfo.get_file_type() == gio.FILE_TYPE_DIRECTORY:
+                obj = GIODirectory(os.path.join(self.path,
+                                                gfileinfo.get_name()))
             else:
-                obj = GIOFile(self.path, gfile)
+                obj = GIOFile(self.path, gfileinfo)
             retval.append(obj)
         log.info('vfsgio', 'returning %r' % (retval, ))
         return succeed(retval)
