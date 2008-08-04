@@ -1,5 +1,16 @@
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/message.py:
+	* flumotion/common/messages.py:
+	* flumotion/wizard/configurationwizard.py:
+	Add an api to disable the timestamps in the messageview.
+	Move getattr hacks to the Message class itself, add two
+	new methods to encapsulate them.
+	Disable timestamps for the messageview in the wizard.
+	Fixes #1088
+
+2008-08-04  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	Listen to key presses on the window and quite if control-w
 	is pressed. Fixes #1074

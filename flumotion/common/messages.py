@@ -134,6 +134,21 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
             'message %r: adding %r', (id(self), translatable.untranslated()),
              where=-2)
 
+    def getTimeStamp(self):
+        """Get the timestamp for the message
+        @returns: the timestamp or None
+        @rtype: int
+        """
+        # F0.4: timestamp was added in 0.4.2
+        return getattr(self, 'timestamp', None)
+
+    def getDescription(self):
+        """Get the description for the message
+        @returns: the description or None
+        @rtype: str
+        """
+        return getattr(self, 'description', None)
+
 pb.setUnjellyableForClass(Message, Message)
 
 # these are implemented as factory functions instead of classes because

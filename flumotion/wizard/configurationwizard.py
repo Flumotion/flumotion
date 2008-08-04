@@ -136,6 +136,8 @@ class ConfigurationWizard(SectionWizard):
         # Set the name of the toplevel window, this is used by the
         # ui unittest framework
         self.window1.set_name('ConfigurationWizard')
+        self.message_area.disableTimestamps()
+
         self._cursorWatch = gdk.Cursor(gdk.WATCH)
         self._tasks = []
         self._adminModel = None

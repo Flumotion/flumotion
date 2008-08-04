@@ -85,6 +85,18 @@ class MessagesView(gtk.VBox):
     def __init__(self):
         gtk.VBox.__init__(self)
 
+        self._disableTimestamps = False
+        self.active_button = None
+
+        self._createUI()
+        self.clear()
+
+        self._translator = Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        # FIXME: add locales as messages from domains come in
+        self._translator.addLocaleDir(configure.PACKAGE, localedir)
+
+    def _createUI(self):
         h1 = gtk.HBox()
         self.pack_start(h1, False, False, 0)
         self.label = gtk.Label()
@@ -94,6 +106,8 @@ class MessagesView(gtk.VBox):
         # button box holding the message icons at the top right
         h2 = gtk.HBox()
         h1.pack_end(h2, False, False, 0)
+        self.buttonbox = h2
+
         s = gtk.HSeparator()
         self.pack_start(s, False, False, 6)
         sw = gtk.ScrolledWindow()
@@ -116,18 +130,9 @@ class MessagesView(gtk.VBox):
         tv.connect('motion-notify-event',
                    self._on_textview___motion_notify_event)
         sw.add(tv)
-
-        self.active_button = None
-        self.buttonbox = h2
         self.textview = tv
 
         self.show_all()
-        self.clear()
-
-        self._translator = Translator()
-        localedir = os.path.join(configure.localedatadir, 'locale')
-        # FIXME: add locales as messages from domains come in
-        self._translator.addLocaleDir(configure.PACKAGE, localedir)
 
     def clear(self):
         """
@@ -182,6 +187,13 @@ class MessagesView(gtk.VBox):
                 self.active_button.set_active(True)
             break
 
+    def disableTimestamps(self):
+        """Disable timestamps for this MessageView,
+        it will make it easier to understand the error messages and
+        make it suitable for end users.
+        """
+        self._disableTimestamps = True
+
     # Private
 
     def _addMessageToBuffer(self, message):
@@ -189,10 +201,10 @@ class MessagesView(gtk.VBox):
         # applicable, instead of always showing the text
         text = self._translator.translate(message)
 
-        # F0.4: timestamp was added in 0.4.2
-        if hasattr(message, 'timestamp'):
+        timestamp = message.getTimeStamp()
+        if timestamp and not self._disableTimestamps:
             text += _("\nPosted on %s.\n") % time.strftime(
-                "%c", time.localtime(message.timestamp))
+                "%c", time.localtime(timestamp))
 
         if message.debug:
             text += "\n\n" + _("Debug information:\n") + message.debug + '\n'
@@ -206,7 +218,7 @@ class MessagesView(gtk.VBox):
         # if we have help information, add it to the end of the text view
         # FIXME: it probably looks nicer right after the message and
         # before the timestamp
-        description = getattr(message, 'description')
+        description = message.getDescription()
         if description:
             titer = textbuffer.get_end_iter()
             # we set the 'link' data field on tags to identify them
