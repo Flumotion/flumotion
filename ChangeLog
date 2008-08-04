@@ -1,7 +1,12 @@
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
+	* configure.ac: Avoid brackets around parameter to
+	AS_VERSION
+
+2008-08-04  Johan Dahlin  <johan@flumotion.com>
+
 	* configure.ac: Send in package and version to AC_INIT instead
-	of AM_INIT_AUTOMAKE. Add M4 defines for version components, 
+	of AM_INIT_AUTOMAKE. Add M4 defines for version components,
 	so we don't have to duplicate the numbers.
 	Add -Wno-portability, to avoid automake warnings when generating
 	Makefiles.

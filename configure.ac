@@ -1,18 +1,19 @@
+-*- mode: m4 -*-
+
 m4_define([flu_major_version], [0])
 m4_define([flu_minor_version], [5])
 m4_define([flu_micro_version], [2])
 m4_define([flu_extra_version], [1])
-m4_define([flu_version],
-          [flu_major_version.flu_minor_version.flu_micro_version])
+m4_define([flu_version], [flu_major_version.flu_minor_version.flu_micro_version])
 
 AC_INIT(flumotion, [flu_version])
 AM_INIT_AUTOMAKE([-Wno-portability])
 
 AS_VERSION(flumotion, FLUMOTION,
-           [flu_major_version], 
-           [flu_minor_version], 
-           [flu_micro_version], 
-           [flu_extra_version])
+           flu_major_version, 
+           flu_minor_version, 
+           flu_micro_version, 
+           flu_extra_version)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
 AC_SUBST_FILE(AUTHORS)
