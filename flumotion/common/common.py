@@ -291,6 +291,23 @@ def versionTupleToString(versionTuple):
     return ".".join([str(i) for i in versionTuple])
 
 
+def versionStringToTuple(versionString):
+    """
+    Converts a 3- or 4-number version string to a 4-tuple.
+
+    @since: 0.5.3
+
+    @type versionString: str
+
+    @rtype: tuple of int
+    """
+    t = tuple(map(int, versionString.split('.')))
+    if len(t) < 4:
+        t = t + (0, )
+
+    return t
+
+
 def _uniq(l, key=lambda x: x):
     """
     Filters out duplicate entries in a list.

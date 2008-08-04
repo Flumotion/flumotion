@@ -1,5 +1,17 @@
 2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  If we have versionTupleToString, we should have the reverse here
+	  too.
+	* flumotion/manager/manager.py:
+	  Use versionStringToTuple.
+	  Since version in the config is tied to the project, not core
+	  Flumotion, check if the given project actually exists, and
+	  then check the component's configured version against the project
+	  version.
+
+2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/common.mk:
 	  pep8-check the flumotion subdirectories, not cache and friends.
 

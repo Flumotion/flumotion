@@ -48,6 +48,7 @@ from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base, config
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
+from flumotion.project import project
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
 __version__ = "$Rev$"
@@ -381,16 +382,34 @@ class Vishnu(log.Loggable):
 
         self.clearMessage('loadComponent-%s' % avatarId)
 
-        # FIXME: don't use configure.versionTuple, get the appropriate
-        # version for conf['package']
-        if not common.checkVersionsCompat(conf.getConfigDict()['version'],
-                                          configure.versionTuple):
-            m = messages.Warning(T_(N_("This component is configured for "
-                "Flumotion version %s, but you are running version %s.\n"
-                "Please update the configuration of the component.\n"),
-                common.versionTupleToString(conf.getConfigDict()['version']),
-                configure.version))
+        configDict = conf.getConfigDict()
+        projectName = configDict['project']
+        versionTuple = configDict['version']
+
+        projectVersion = None
+        try:
+            projectVersion = project.get(projectName, 'version')
+        except errors.NoProjectError:
+            m = messages.Warning(T_(N_(
+                "This component is configured for Flumotion project '%s', "
+                "but that project is not installed.\n"),
+                    projectName))
             state.append('messages', m)
+
+        if projectVersion:
+            self.debug('project %s, version %r, project version %r' % (
+                projectName, versionTuple, projectVersion))
+            if not common.checkVersionsCompat(
+                    versionTuple,
+                    common.versionStringToTuple(projectVersion)):
+                m = messages.Warning(T_(N_(
+                    "This component is configured for "
+                    "Flumotion '%s' version %s, "
+                    "but you are running version %s.\n"
+                    "Please update the configuration of the component.\n"),
+                        projectName, common.versionTupleToString(versionTuple),
+                        projectVersion))
+                state.append('messages', m)
 
         # add to mapper
         m = ComponentMapper()
