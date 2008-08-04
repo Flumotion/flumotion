@@ -1,5 +1,11 @@
 2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/project/project.py:
+	  Allow getting variables from core flumotion, to avoid having
+	  to special-case code everywhere.
+
+2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/common.mk:
 	  set FLU_PROJECT_PATH when checking registry.
 

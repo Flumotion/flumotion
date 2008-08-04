@@ -23,6 +23,7 @@ import os
 import sys
 
 from flumotion.common import package, errors, log
+from flumotion.configure import configure
 
 import flumotion.project
 
@@ -53,6 +54,10 @@ def get(project, attribute, default=None):
     """
     log.debug('project', 'Getting attribute %s from project %s',
         attribute, project)
+
+    # short-circuit flumotion, the core project
+    if project == 'flumotion':
+        return getattr(configure, attribute, default)
 
     moduleName = "flumotion.project.%s" % project
     try:
