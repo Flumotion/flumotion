@@ -1,3 +1,8 @@
+2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/common.mk:
+	  set FLU_PROJECT_PATH when checking registry.
+
 2008-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* misc/flu.unstable.stable.modules:

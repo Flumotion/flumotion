@@ -6,7 +6,7 @@ check-docs:
 	@make check -C doc/reference
 
 check-local-registry:
-	$(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
+	$(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && export FLU_PROJECT_PATH=$(top_srcdir) && $(PYTHON) $(top_srcdir)/common/validate-registry.py"
 
 # this is a target for any directory containing CONFIG in its Makefile.am
 check-local-config:
