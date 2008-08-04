@@ -1,3 +1,9 @@
+2008-08-04  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Listen to key presses on the window and quite if control-w
+	is pressed. Fixes #1074
+
 2008-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

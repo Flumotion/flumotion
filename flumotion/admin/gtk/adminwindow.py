@@ -67,6 +67,8 @@ import sys
 
 import gobject
 import gtk
+from gtk import gdk
+from gtk import keysyms
 from kiwi.ui.delegates import GladeDelegate
 from kiwi.ui.dialogs import yesno
 from twisted.internet import defer, reactor
@@ -331,7 +333,10 @@ class AdminWindow(Loggable, GladeDelegate):
         del self.messages_view
 
         self._window.set_name("AdminWindow")
-        self._window.connect('delete-event', self._window_delete_event_cb)
+        self._window.connect('delete-event',
+                             self._window_delete_event_cb)
+        self._window.connect('key-press-event',
+                             self._window_key_press_event_cb)
 
         uimgr = gtk.UIManager()
         uimgr.connect('connect-proxy',
@@ -1398,6 +1403,12 @@ You can do remote component calls using:
 
     def _window_delete_event_cb(self, window, event):
         self._quit()
+
+    def _window_key_press_event_cb(self, window, event):
+        # This should be removed if we're going to support connecting
+        # to multiple managers in the same application (MDI/tabs)
+        if event.state == gdk.CONTROL_MASK and event.keyval == keysyms.w:
+            self._quit()
 
     def _trayicon_quit_cb(self, trayicon):
         self._quit()
