@@ -21,6 +21,9 @@
 
 import gettext
 
+import gtk
+
+from flumotion.ui.fileselector import FileSelectorDialog
 from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
@@ -59,7 +62,7 @@ class Disker(Consumer):
         self.size_unit = SIZE_KB
         self.time = 12
         self.time_unit = TIME_HOUR
-        self.properties.directory = ""
+        self.properties.directory = "/tmp"
 
     def _getRotationType(self):
         if self.has_time:
@@ -127,7 +130,7 @@ class DiskStep(ConsumerStep):
                         'size_unit',
                         'time_unit'])
 
-        self.add_proxy(self.model.properties,
+        self._proxy = self.add_proxy(self.model.properties,
                        ['directory',
                         'start_recording',
                         'size',
@@ -152,16 +155,37 @@ class DiskStep(ConsumerStep):
         self.time.set_sensitive(hasTime)
         self.time_unit.set_sensitive(hasTime)
 
+    def _select(self):
+
+        def response(fs, response):
+            fs.hide()
+            if response == gtk.RESPONSE_OK:
+                self.model.properties.directory = fs.getFilename()
+                self._proxy.update('directory')
+
+        def deleteEvent(fs, event):
+            pass
+        fs = FileSelectorDialog(self.wizard.window,
+                                self.wizard.getAdminModel())
+        fs.connect('response', response)
+        fs.connect('delete-event', deleteEvent)
+        fs.selector.setWorkerName(self.model.worker)
+        fs.setDirectory(self.model.properties.directory)
+        fs.show_all()
+
     # Callbacks
 
-    def on_has_time_toggled(self, radio):
+    def on_has_time__toggled(self, radio):
         self._updateRadio()
 
-    def on_has_size_toggled(self, radio):
+    def on_has_size__toggled(self, radio):
         self._updateRadio()
 
-    def on_rotate_toggled(self, check):
+    def on_rotate__toggled(self, check):
         self._updateRadio()
+
+    def on_select__clicked(self, check):
+        self._select()
 
 
 class DiskBothStep(DiskStep):

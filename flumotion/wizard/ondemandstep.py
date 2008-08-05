@@ -30,7 +30,6 @@ import gtk
 from flumotion.common import messages
 
 from flumotion.common.i18n import N_, gettexter
-from flumotion.common.vfs import registerVFSJelly
 from flumotion.ui.fileselector import FileSelectorDialog
 from flumotion.wizard.models import HTTPServer
 from flumotion.wizard.workerstep import WorkerWizardStep
@@ -87,7 +86,6 @@ class OnDemandStep(WorkerWizardStep):
                         'mount_point'])
 
         self.mount_point.set_text("/")
-        registerVFSJelly()
 
     def workerChanged(self, worker):
         self.model.worker = worker

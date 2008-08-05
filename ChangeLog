@@ -1,3 +1,17 @@
+2008-08-05  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/ui/fileselector.py:
+	Add a getDirectory method and use it from
+	the getFilename method. This will have
+
+	* flumotion/wizard/diskersteps.py:
+	Move the registerVFSJelly from here to the fileselector.
+
+	* data/glade/disker-wizard.glade:
+	* flumotion/wizard/ondemandstep.py:
+	Use the file selector for the disker.
+	Fixes #1054.
+
 2008-08-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/pep8.py (added):

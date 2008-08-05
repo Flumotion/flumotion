@@ -38,7 +38,7 @@ from zope.interface import implements
 
 from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
-from flumotion.common.vfs import listDirectory
+from flumotion.common.vfs import listDirectory, registerVFSJelly
 
 _ = gettext.gettext
 
@@ -80,6 +80,8 @@ class FileSelector(ObjectList):
         self._parent = parent
         self._workerName = None
         self._iconTheme = gtk.icon_theme_get_default()
+        self._path = None
+        registerVFSJelly()
 
     def _rowActivated(self, vfsFile):
         vfsFile = vfsFile.original
@@ -104,23 +106,36 @@ class FileSelector(ObjectList):
 
     # Callbacks
 
-    def _listingDoneCallback(self, vfsFile):
+    def _listingDoneCallback(self, vfsFile, path):
         d = vfsFile.getFiles()
-        d.addCallback(self._gotFilesCallback)
+        d.addCallback(self._gotFilesCallback, path)
         d.addErrback(self._accessDeniedErrback, vfsFile.getPath())
 
     def _accessDeniedErrback(self, failure, path):
         failure.trap(AccessDeniedError)
         self.showErrorMessage(failure, self._parent)
 
-    def _gotFilesCallback(self, vfsFiles):
+    def _gotFilesCallback(self, vfsFiles, path):
         vfsFiles.sort(cmp=lambda a, b: cmp(a.filename, b.filename))
         self._populateList(vfsFiles)
+        self._path = path
 
     def _on__row_activated(self, objectList, vfsFile):
         self._rowActivated(vfsFile)
 
     # Public API
+
+    def getDirectory(self):
+        """Get the currently selected directory from the file selector.
+        If there is no selected, the current path will be returned
+        @returns: the directory
+        @rtype: str
+        """
+        selected = self.get_selected()
+        if selected is None:
+            return self._path
+
+        return selected.getPath()
 
     def setDirectory(self, path):
         """Change directory of the file chooser
@@ -130,7 +145,7 @@ class FileSelector(ObjectList):
         d = self._adminModel.workerCallRemote(
             self._workerName,
             'listDirectory', path)
-        d.addCallback(self._listingDoneCallback)
+        d.addCallback(self._listingDoneCallback, path)
         d.addErrback(self._accessDeniedErrback, path)
         return d
 
@@ -161,12 +176,12 @@ class FileSelectorDialog(gtk.Dialog):
         self.add_button(gtk.STOCK_OPEN, gtk.RESPONSE_OK)
 
         self.selector = FileSelector(parent, adminModel)
-        self.selector.connect('selected',
-                              self._on_file_selector__selected)
+        self.selector.connect(
+            'selected', self._on_file_selector__selected)
         self.vbox.add(self.selector)
         self.selector.show()
 
-    def _on_file_selector__selected(self, selector, vfsfile):
+    def _on_file_selector__selected(self, selector, vfsFile):
         self.response(gtk.RESPONSE_OK)
 
     def getFilename(self):
@@ -174,8 +189,9 @@ class FileSelectorDialog(gtk.Dialog):
         @returns: the selected filename
         @rtype: str
         """
-        vfsFile = self.selector.get_selected()
-        return os.path.abspath(vfsFile.getPath())
+        # FIXME: This will change when we have multiple
+        #        modes for selecting a file/directory
+        return self.selector.getDirectory()
 
     def setDirectory(self, path):
         """Change directory of the file chooser
