@@ -24,6 +24,13 @@ from flumotion.common.log import safeprintf
 
 
 def get():
+    bindir = '@BINDIR@'
+    datadir = '@DATADIR@'
+    localstatedir = '@LOCALSTATEDIR@'
+    libdir = '@LIBDIR@'
+    sbindir = '@SBINDIR@'
+    sysconfdir = '@SYSCONFDIR@'
+
     if 'FLU_CACHE_DIR' in os.environ:
         cachedir = os.path.realpath(os.environ['FLU_CACHE_DIR'])
         daemondir = cachedir
@@ -33,17 +40,10 @@ def get():
         daemondir = homedir
     else:
         cachedir = os.path.join(
-            '@LOCALSTATEDIR@', 'cache', 'flumotion',
+            localstatedir, 'cache', 'flumotion',
             '.flumotion')
         daemondir = os.path.join(
-            '@LOCALSTATEDIR@', 'cache', 'flumotion')
-
-    bindir = '@BINDIR@'
-    datadir = '@DATADIR@'
-    localstatedir = '@LOCALSTATEDIR@'
-    libdir = '@LIBDIR@'
-    sbindir = '@SBINDIR@'
-    sysconfdir = '@SYSCONFDIR@'
+            localstatedir, 'cache', 'flumotion')
 
     return {
         'isinstalled': True,

@@ -1,5 +1,11 @@
 2008-08-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/configure/installed.py.in:
+	Use variables everywhere, to avoid using more than 79 characters
+	when building in buildbot.
+
+2008-08-05  Johan Dahlin  <johan@flumotion.com>
+
 	* Makefile.am:
 	dist misc/pep8.py
 
