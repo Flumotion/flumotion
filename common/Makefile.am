@@ -16,6 +16,7 @@ EXTRA_DIST = \
 	setup.m4		\
 	trial.mk		\
 	twisted-module.m4	\
+	pep8.py			\
 	validate-config.py	\
 	validate-registry.py	\
 	gen-locale-xml.py

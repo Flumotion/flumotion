@@ -1,3 +1,13 @@
+2008-08-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/pep8.py (added):
+	* misc/pep8.py (deleted):
+	* Makefile.am:
+	* common/Makefile.am:
+	  Used in other projects, so should go in common.
+	* common/common.mk:
+	  Don't check built .py files, check their .in counterparts in srcdir.
+
 2008-08-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/configure/installed.py.in:

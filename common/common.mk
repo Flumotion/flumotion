@@ -13,7 +13,8 @@ check-local-config:
 	for f in $(CONFIG); do $(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-config.py $(srcdir)/$$f"; done
 
 check-local-pep8:
-	find $(top_srcdir)/flumotion $(top_builddir)/flumotion -name \*.py | sort | uniq | xargs $(PYTHON) $(top_srcdir)/misc/pep8.py
+	find $(top_srcdir)/flumotion -name \*.py | sort | uniq | xargs $(PYTHON) $(top_srcdir)/common/pep8.py
+	find $(top_srcdir)/flumotion -name \*.py.in | sort | uniq | xargs $(PYTHON) $(top_srcdir)/common/pep8.py
 
 coverage:
 	@trial --temp-directory=_trial_coverage --coverage flumotion.test

@@ -17,7 +17,6 @@ EXTRA_DIST = \
 	LICENSE.Flumotion \
 	flumotion.spec \
 	flumotion.doap \
-	misc/pep8.py \
 	misc/pycheckerhelp.py \
 	intltool-extract.in \
 	intltool-merge.in \
