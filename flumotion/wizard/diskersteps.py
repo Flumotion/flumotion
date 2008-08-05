@@ -53,15 +53,13 @@ class Disker(Consumer):
 
     def __init__(self):
         super(Disker, self).__init__()
-        self.has_time = False
         self.has_size = False
-        self.time_unit = TIME_HOUR
+        self.has_time = False
+        self.size = 10
         self.size_unit = SIZE_KB
         self.time = 12
-        self.size = 10
+        self.time_unit = TIME_HOUR
         self.properties.directory = ""
-
-    # Component
 
     def _getRotationType(self):
         if self.has_time:
@@ -70,6 +68,8 @@ class Disker(Consumer):
             return 'size'
         else:
             return 'none'
+
+    # Component
 
     def getProperties(self):
         properties = super(Disker, self).getProperties()
@@ -99,11 +99,20 @@ class DiskStep(ConsumerStep):
 
     def setup(self):
         self.directory.data_type = str
-        self.start_recording.data_type = bool
-
+        self.has_size.data_type = bool
         self.has_time.data_type = bool
+        self.size.data_type = int
+        self.size_unit.data_type = long
+        self.start_recording.data_type = bool
         self.time.data_type = int
         self.time_unit.data_type = int
+
+        self.size_unit.prefill([
+            (_('kB'), SIZE_KB),
+            (_('MB'), SIZE_MB),
+            (_('GB'), SIZE_GB),
+            (_('TB'), SIZE_TB),
+             ])
         self.time_unit.prefill([
             (_('minute(s)'), TIME_MINUTE),
             (_('hour(s)'), TIME_HOUR),
@@ -111,28 +120,18 @@ class DiskStep(ConsumerStep):
             (_('week(s)'), TIME_WEEK)])
         self.time_unit.select(TIME_HOUR)
 
-        self.has_size.data_type = bool
-        self.size.data_type = int
-        self.size_unit.data_type = long
-        self.size_unit.prefill([
-            (_('kB'), SIZE_KB),
-            (_('MB'), SIZE_MB),
-            (_('GB'), SIZE_GB),
-            (_('TB'), SIZE_TB),
-             ])
-
         self.add_proxy(self.model,
-                       ['rotate',
-                        'has_size',
+                       ['has_size',
                         'has_time',
+                        'rotate',
                         'size_unit',
                         'time_unit'])
 
         self.add_proxy(self.model.properties,
-                       ['size',
-                        'time',
-                        'directory',
-                        'start_recording'])
+                       ['directory',
+                        'start_recording',
+                        'size',
+                        'time'])
 
     def workerChanged(self, worker):
         self.model.worker = worker
@@ -140,29 +139,29 @@ class DiskStep(ConsumerStep):
 
     # Private
 
-    def _update_radio(self):
+    def _updateRadio(self):
         rotate = self.rotate.get_active()
         self.has_size.set_sensitive(rotate)
         self.has_time.set_sensitive(rotate)
 
-        has_size = rotate and self.has_size.get_active()
-        self.size.set_sensitive(has_size)
-        self.size_unit.set_sensitive(has_size)
+        hasSize = rotate and self.has_size.get_active()
+        self.size.set_sensitive(hasSize)
+        self.size_unit.set_sensitive(hasSize)
 
-        has_time = rotate and self.has_time.get_active()
-        self.time.set_sensitive(has_time)
-        self.time_unit.set_sensitive(has_time)
+        hasTime = rotate and self.has_time.get_active()
+        self.time.set_sensitive(hasTime)
+        self.time_unit.set_sensitive(hasTime)
 
     # Callbacks
 
     def on_has_time_toggled(self, radio):
-        self._update_radio()
+        self._updateRadio()
 
     def on_has_size_toggled(self, radio):
-        self._update_radio()
+        self._updateRadio()
 
     def on_rotate_toggled(self, check):
-        self._update_radio()
+        self._updateRadio()
 
 
 class DiskBothStep(DiskStep):

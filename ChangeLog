@@ -1,3 +1,8 @@
+2008-08-05  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/wizard/diskersteps.py:
+	Capitalize, reorder
+
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/vfs.py:
