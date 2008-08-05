@@ -1,5 +1,13 @@
 2008-08-05  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/consumptionsteps.py
+	(ConsumptionStep.haveHTTP): New method
+	* flumotion/wizard/scenarios.py (LiveScenario.save):
+	Only set porters if we're adding a http stream.
+	Fixes #1107.
+
+2008-08-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/fileselector.py:
 	Add a getDirectory method and use it from
 	the getFilename method. This will have

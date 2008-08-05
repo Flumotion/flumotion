@@ -170,19 +170,22 @@ class LiveScenario(Scenario):
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
         consumptionStep = self.wizard.getStep('Consumption')
-        httpPorter = consumptionStep.getHTTPPorter()
-        existingPorter = self.wizard.getHTTPPorter()
-        if existingPorter is None:
-            self.wizard.setHTTPPorter(httpPorter)
-        elif existingPorter.properties.port == httpPorter.properties.port:
-            httpPorter = existingPorter
-            assert httpPorter.exists, httpPorter
-        saver.addPorter(httpPorter, 'http')
+        httpPorter = None
+        if consumptionStep.haveHTTP():
+            httpPorter = consumptionStep.getHTTPPorter()
+            existingPorter = self.wizard.getHTTPPorter()
+            if existingPorter is None:
+                self.wizard.setHTTPPorter(httpPorter)
+            elif existingPorter.properties.port == httpPorter.properties.port:
+                httpPorter = existingPorter
+                assert httpPorter.exists, httpPorter
+            saver.addPorter(httpPorter, 'http')
 
         for step in self._getConsumptionSteps():
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
-            consumer.setPorter(httpPorter)
+            if httpPorter is not None:
+                consumer.setPorter(httpPorter)
             saver.addConsumer(consumer, consumerType)
 
             for server in step.getServerConsumers():

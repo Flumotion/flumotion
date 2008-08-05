@@ -68,6 +68,13 @@ class ConsumptionStep(WizardStep):
     def getHTTPPorter(self):
         return self._httpPorter
 
+    def haveHTTP(self):
+        """If we have a http-streamer selected
+        @returns: if http-streamer will be included
+        @rtype: bool
+        """
+        return self.http.get_active()
+
     # WizardStep
 
     def activated(self):
