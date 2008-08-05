@@ -44,8 +44,7 @@ def listDirectory(path):
     if not _backends:
         raise AssertionError(
             "there are no vfs backends available")
-    backend = _backends[1]
-    print backend
+    backend = _backends[0]
     log.info('vfs', 'listing directory %s using %r' % (path, backend))
     return succeed(backend(path))
 
