@@ -1,5 +1,10 @@
 2008-08-05  Johan Dahlin  <johan@flumotion.com>
 
+	* Makefile.am:
+	dist misc/pep8.py
+
+2008-08-05  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/diskersteps.py:
 	Capitalize, reorder
 
