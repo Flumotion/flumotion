@@ -32,6 +32,7 @@ from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
+from flumotion.common import documentation
 from flumotion.common.format import strftime
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
@@ -59,13 +60,21 @@ the machine running the disker, as the ical scheduler does not
 understand arbitrary timezones.
 """
 
+HAS_ICALENDAR = False
+HAS_DATEUTIL = False
+
 try:
-    # icalendar and dateutil modules needed for scheduling recordings
     from icalendar import Calendar
-    from dateutil import rrule
-    HAS_ICAL = True
+    HAS_ICALENDAR = True
 except ImportError:
-    HAS_ICAL = False
+    pass
+try:
+    from dateutil import rrule
+    HAS_DATEUTIL = True
+except ImportError:
+    pass
+
+HAS_ICAL = HAS_ICALENDAR and HAS_DATEUTIL
 
 
 class DiskerMedium(feedcomponent.FeedComponentMedium):
@@ -327,12 +336,20 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.addMessage(m)
 
         elif icalfn:
-            warnStr = "An ical file has been specified for " \
-                      "scheduling but the necessary modules " \
-                      "dateutil and/or icalendar are not installed"
-            self.warning(warnStr)
-            m = messages.Warning(T_(N_(warnStr)), mid="error-parsing-ical")
-            self.addMessage(m)
+
+            def missingModule(moduleName):
+                m = messages.Error(T_(N_(
+                    "An iCal file has been specified for scheduling, "
+                    "but the '%s' module is not installed.\n"), moduleName),
+                    mid='error-python-%s' % moduleName)
+                documentation.messageAddPythonInstall(m, moduleName)
+                self.debug(m)
+                self.addMessage(m)
+
+            if not HAS_ICALENDAR:
+                missingModule('icalendar')
+            if not HAS_DATEUTIL:
+                missingModule('dateutil')
 
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)

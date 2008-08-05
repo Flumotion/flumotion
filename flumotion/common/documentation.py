@@ -29,6 +29,10 @@ from flumotion.common import common, errors
 from flumotion.common.i18n import getLL
 from flumotion.configure import configure
 
+from flumotion.common.i18n import N_, gettexter
+
+T_ = gettexter()
+
 
 def getMessageWebLink(message):
     """
@@ -81,3 +85,14 @@ def getWebLink(section, anchor, version=None, projectURL=None):
 
     return '%s/%s/%s/html/%s.html#%s' % (
         projectURL, getLL(), version, section, anchor)
+
+
+def messageAddPythonInstall(message, moduleName):
+    """
+    Add text and link on how to install the given python module to the
+    given message.
+    """
+    message.add(T_(N_("Please install the '%s' python module."), moduleName))
+    message.description = T_(N_("Learn how to install Python modules."))
+    message.section = 'appendix-installing-dependencies'
+    message.anchor = 'section-installing-python-modules'

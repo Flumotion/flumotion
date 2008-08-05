@@ -69,6 +69,7 @@ flumotion/common/componentui.py
 flumotion/common/config.py
 flumotion/common/connection.py
 flumotion/common/dag.py
+flumotion/common/documentation.py
 flumotion/common/debug.py
 flumotion/common/enum.py
 flumotion/common/errors.py

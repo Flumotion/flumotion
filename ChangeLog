@@ -1,3 +1,15 @@
+2008-08-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/documentation.py:
+	  Add a method to annotate a message with information on how to
+	  install a Python module, linking to the manual.
+	* flumotion/component/consumers/disker/disker.py:
+	  Use it.
+	* po/POTFILES.in:
+	  Add documentation.py for translation.
+	* po/nl.po:
+	  Translate these strings in Dutch so I can test.
+
 2008-08-05  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/wizard/consumptionsteps.py
