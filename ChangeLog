@@ -1,5 +1,11 @@
 2008-08-06  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/addformatwizard.py:
+	Set the title for this wizard to avoid duplicated title strings.
+	Fixes #1012
+
+2008-08-06  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/wizard.py:
 	Remove some internal validation checks which are no longer valid,
 	which makes the wizard behave properly even when you do extensive
