@@ -241,20 +241,12 @@ class SidebarSection(gtk.VBox):
                 button.hide()
 
     def push_header(self):
-        assert not self.buttons
-        assert not self.title.sensitive
         self.title.set_sensitive(True)
 
     def pop_header(self):
-        assert not self.buttons
-        # FIXME: This breaks when calling sidebar.remove_section(),
-        #        remove_section will have to update self._active or
-        #        preferably just rewrite the whole BEEP thing
-        #assert self.title.sensitive
         self.title.set_sensitive(False)
 
     def push_step(self, step_name, step_title):
-        assert self.title.sensitive
 
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
@@ -342,16 +334,13 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
             active_section.push_step(step_name, step_title)
         else:
             # new section
-            if self._sections[self._active + 1].name != section_name:
-                raise AssertionError(
-                    "Expected next section to be %r, but is %r" % (
-                    section_name, self._sections[self._active + 1].name))
-
             self._set_active(self._active + 1)
             self._top += 1
             self._sections[self._active].push_header()
 
     def pop(self):
+        if not self._top in self._sections:
+            return False
         top_section = self._sections[self._top]
         if top_section.buttons:
             top_section.pop_step()
