@@ -179,3 +179,4 @@ to verify if things work as they should.
 
 - multipart/jpeg stream (video only):
   gst-launch -v gnomevfssrc location=http://localhost:8802 ! multipartdemux ! jpegdec ! xvimagesink
+
