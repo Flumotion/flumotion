@@ -88,7 +88,7 @@
 	      <child>
 		<widget class="GtkEntry" id="path">
 		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">This is the directory which will be exported. All files in this and it's subdirectories will be accessible over http.</property>
+		  <property name="tooltip" translatable="yes">This is the directory which will be exported. All files in this and its subdirectories will be accessible over http.</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
 		  <property name="visibility">True</property>
