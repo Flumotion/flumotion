@@ -10,7 +10,7 @@
   <components>
     <component type="bouncer"
                base="flumotion/component/bouncers"
-               _description="Base bouncer component.">
+               _description="The base bouncer component.">
 <!--  FIXME: is this even usable on its own ? Or is this just so a plug can be  defined ? -->
 
       <source location="flumotion.component.bouncers.component" />

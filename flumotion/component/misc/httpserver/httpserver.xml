@@ -10,11 +10,11 @@
 
       <properties>
         <property name="rate" required="true" type="int"
-                  _description="The average rate to send all files at, in bits per second" />
+                  _description="The average rate to send all files at, in bits per second." />
         <property name="max-level" type="int"
-                  _description="The maximum amount of data to send at full rate at any given moment, in bits" /> <!-- TODO: Describe this better -->
+                  _description="The maximum amount of data to send at full rate at any given moment, in bits." /> <!-- TODO: Describe this better -->
         <property name="initial-level" type="int"
-                  _description="The initial amount of data that can be sent at full speed, in bits" />
+                  _description="The initial amount of data that can be sent at full speed, in bits." />
       </properties>
     </plug>
   </plugs>
@@ -42,38 +42,38 @@
          <!-- FIXME: the following comment is not valid anymore, right? -->
          <!-- Warning: mount_point of / is broken -->
         <property name="mount-point" type="string"
-		  _description="The mount point the stream can be accessed on" />
+		  _description="The mount point on which the stream can be accessed." />
         <property name="path" type="string"
           _description="The base path to map to the mount-point" />
 
         <property name="type" type="string"
-                  _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)" />
+                  _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
 
         <property name="hostname" type="string"
-                  _description="Server's host name to display" />
+                  _description="The server's host name to display." />
 
         <property name="description" type="string"
-                  _description="Description of the server" />
+                  _description="The description of the server." />
 
         <property name="bouncer" type="string"
-                  _description="Name of a bouncer in the atmosphere to authenticate against" />
+                  _description="The name of a bouncer in the atmosphere to authenticate against." />
         <property name="issuer-class" type="string"
-                  _description="Python class of the Keycard issuer to use" />
+                  _description="The Python class of the Keycard issuer to use." />
 
         <property name="ip-filter" type="string" multiple="yes"
-                  _description="IP network-address/prefix-length to filter out of logs" />
+                  _description="The IP network-address/prefix-length to filter out of logs." />
 
         <!-- If type is 'master' (default) -->
         <property name="port" type="int"
-                  _description="Port to listen on (if type is 'master')" />
+                  _description="The port to listen on (if type is 'master')." />
 
         <!-- If type is 'slave' -->
         <property name="porter-socket-path" type="string"
-                  _description="Path to the socket to communicate with the porter" />
+                  _description="The path to the socket to communicate with the porter." />
         <property name="porter-username" type="string"
-                  _description="Username to authenticate with to the porter" />
+                  _description="The username to authenticate to the porter." />
         <property name="porter-password" type="string"
-                  _description="Password to authenticate with to the porter" />
+                  _description="The password to authenticate to the porter" />
 
       </properties>
     </component>

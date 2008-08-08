@@ -2,7 +2,7 @@
   <components>
     <component type="preview-consumer"
                base="flumotion/component/consumers/preview"
-               _description="Play back an encoded feed (currently only video)">
+               _description="Play back an encoded feed (currently only video).">
       <source location="flumotion.component.consumers.preview.preview"/>
 
       <eater name="default"/>

@@ -1,5 +1,12 @@
 2008-08-08  Murray Cumming  <murrayc@murrayc.com>
 
+	* flumotion/component/*/*.xml: Minor grammar and spelling corrections 
+	for the descriptions, so they look nicer in the reference section of 
+	the documentation.
+	This time without the unicode character.
+
+2008-08-08  Murray Cumming  <murrayc@murrayc.com>
+
 	* flumotion/component/*/*.xml: Reverted my last commit, while I find 
 	out where I introduced a problematic unicode character.
 

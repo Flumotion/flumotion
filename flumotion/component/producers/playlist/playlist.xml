@@ -15,33 +15,36 @@
 
       <properties>
         <property name="audio" type="bool"
-                  _description="Output audio"/>
+                  _description="Whether to output audio."/>
         <property name="video" type="bool"
-                  _description="Output video"/>
+                  _description="Whether to output video."/>
 
         <property name="video-pattern" type="string"
-                  _description="Output video pattern for default video"/>
+                  _description="The output video pattern for default video."/>
         <property name="audio-wave" type="string"
-                  _description="Output audio wave for default audio"/>
+                  _description="The output audio wave for default audio."/>
 
         <property name="height" type="int"
-                  _description="Scaled output height of video" />
+                  _description="The scaled output height of video." />
         <property name="width" type="int"
-                  _description="Scaled output width of video" />
+                  _description="The scaled output width of video." />
         <property name="framerate" type="fraction"
-                  _description="Framerate to output" />
+                  _description="The frame rate to output." />
         <property name="samplerate" type="int"
-                  _description="Samplerate to output" />
+                  _description="The sample rate to output." />
         <property name="channels" type="int"
-                  _description="Audio channels to output" />
+                  _description="The number of audio channels to output." />
 
         <property name="playlist" type="string"
-                  _description="Location of the initial playlist file if any" />
+                  _description="The location of the initial playlist file, if any." />
+                  <!-- FIXME: Is this a local filepath, or a URI? murrayc -->
         <property name="playlist-directory" type="string"
-                  _description="Location of a directory to monitor for playlist files to add" />
+                  _description="The location of a directory to monitor for playlist files to add." />
+                  <!-- FIXME: Is this a local filepath, or a URI? murrayc -->
 
         <property name="base-directory" type="string"
-                  _description="Base directory for relative paths in playlist files" />
+                  _description="The base directory for relative paths in playlist files." />
+                  <!-- FIXME: Is this a local filepath, or a URI? murrayc -->
       </properties>
     </component>
   </components>

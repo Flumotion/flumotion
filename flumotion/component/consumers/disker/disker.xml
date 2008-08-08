@@ -22,28 +22,28 @@
 
       <properties>
         <property name="directory" type="string" required="yes"
-                  _description="Directory where to save the archives" />
+                  _description="The directory to which to save the archives." />
         <property name="rotate-type" type="string" required="no"
-                  _description="'size', 'time', or 'none' (default 'none')" />
+                  _description="'size', 'time', or 'none' (default 'none')." />
         <property name="size" type="long"
-                  _description="Maximum size of each file (in bytes)" />
+                  _description="The maximum size of each file (in bytes)." />
         <property name="time" type="long"
-                  _description="Maximum duration of each file (in seconds)" />
+                  _description="The maximum duration of each file (in seconds)." />
         <property name="start-recording" type="bool" required="no"
-                  _description="Whether to start recording when the component starts (defaults to True) "/>
+                  _description="Whether to start recording when the component starts (defaults to True)."/>
         <property name="symlink-to-last-recording" type="string" required="no"
-                  _description="If set, this symlink will be created and point to the latest finished recording." />
+                  _description="If set, this symlink will be created and will point to the latest finished recording." />
         <property name="symlink-to-current-recording" type="string"
                   required="no"
-                  _description="If set, this symlink will be created and point to the latest started recording." />
+                  _description="If set, this symlink will be created and will point to the latest started recording." />
         <property name="ical-schedule" type="string" required="no"
                   _description="If set, the given iCalendar schedule will be used to decide when to record.  Every event defined indicates a recording, and the event description will be used as the filename template. "/>
         <property name="filename" type="string" required="no" 
-                  _description="If set, the given template will be used to decide filenames for recordings.  The template will be expanded according to strftime(3)" />
+                  _description="If set, the given template will be used to decide filenames for recordings.  The template will be expanded according to strftime(3)." />
         <property name="react-to-stream-markers" type="bool" required="no"
-                  _description="Start/stop the disker when stream marker events are received" />
+                  _description="Whether to start/stop the disker when stream marker events are received." />
         <property name="stream-marker-filename-prefix" type="string"
-                  required="no" _description="Formatting template for program id (default '%03d.')" />
+                  required="no" _description="The formatting template for the program id (default '%03d.')." />
       </properties>
     </component>
   </components>

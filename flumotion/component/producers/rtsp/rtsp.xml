@@ -15,15 +15,15 @@
 
       <properties>
         <property name="width" type="int" required="false"
-                  _description="Width of the outgoing video" />
+                  _description="The width of the outgoing video." />
         <property name="height" type="int" required="false"
-                  _description="Height of the outgoing video" />
+                  _description="The height of the outgoing video." />
 	<property name="framerate" type="fraction" required="false"
-                  _description="Framerate of the outgoing video" />
+                  _description="The frame rate of the outgoing video." />
 	<property name="has-audio" type="bool" required="false"
-                  _description="Whether the stream ha audio" />
+                  _description="Whether the stream has audio." />
 	<property name="location" type="string" required="true"
-                  _description="URL of the RTSP stream" />
+                  _description="The URL of the RTSP stream." />
       </properties>
     </component>
   </components>
