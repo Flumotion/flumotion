@@ -26,14 +26,13 @@
 
       <properties>
         <property name="volume" type="float"
-                  _description="The volume of the test signal (0.0 - 1.0)." />
+                  _description="Volume of test signal (0.0 - 1.0)" />
         <property name="rate" type="int"
-                  _description="The Sample rate (in Hz)." />
+                  _description="Samplerate (in Hz)" />
         <property name="frequency" type="int"
-                  _description="The frequency of the test signal (in Hz)." />
+                  _description="Frequency of test signal (in Hz)" />
         <property name="drop-probability" type="float"
-                  _description="The fraction of buffers to drop (0.0 - 1.0)." />
-                  <!-- FIXME: What's this about? murrayc -->
+                  _description="Fraction of buffers to drop (0.0 - 1.0)" />
       </properties>
     </component>
 

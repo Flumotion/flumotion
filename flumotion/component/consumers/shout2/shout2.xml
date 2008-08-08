@@ -14,19 +14,19 @@
 
       <properties>
 	<property name="ip" type="string" required="no"
-		  _description="The IP address of the Icecast server." />
+		  _description="IP address of the Icecast server" />
 	<property name="port" type="int" required="no"
-		  _description="The port on which the Icecast server is listening." />
+		  _description="port on which the Icecast server is listening" />
 	<property name="password" type="string" required="no"
-                  _description="The password to authenticate to the the Icecast server." />
+                  _description="password to authenticate to the the Icecast server" />
 	<property name="mount-point" type="string" required="yes"
-                  _description="The mount point on which to publish the stream." />
+                  _description="mount point on which to publish the stream" />
 	<property name="short-name" type="string" required="no"
-                  _description="A short name for the stream." />
+                  _description="a short name for the stream" />
 	<property name="description" type="string" required="no"
-                  _description="A description for the stream." />
+                  _description="a description for the stream" />
 	<property name="url" type="string" required="no"
-                  _description="A URL to associate with the stream." />
+                  _description="a URL to associate with the stream" />
       </properties>
     </component>
   </components>

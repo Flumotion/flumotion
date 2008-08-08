@@ -3,7 +3,7 @@
   <components>
     <component type="pipeline-producer"
                base="flumotion/component/producers/pipeline"
-               _description="A generic GStreamer pipeline converter.">
+               _description="Generic GStreamer pipeline converter">
       <source location="flumotion.component.producers.pipeline.pipeline" />
       <feeder name="default" />
       <entries>
@@ -15,7 +15,7 @@
 
       <properties>
         <property name="pipeline" type="string" required="yes"
-                  _description="The partial GStreamer pipeline to use." />
+                  _description="Partial GStreamer pipeline to use" />
       </properties>
     </component>
   </components>

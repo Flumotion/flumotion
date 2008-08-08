@@ -23,32 +23,32 @@
 
       <properties>
         <property name="device" type="string" required="yes"
-                  _description="The path to the device node from which to capture." />
+                  _description="Path to device node to capture from" />
 
         <property name="mime" type="string"
-                  _description="The Mime type of video to produce (e.g. video/x-raw-yuv)." />
+                  _description="Mime type of video to produce (e.g. video/x-raw-yuv)" />
         <property name="format" type="string"
-                  _description="The Colorspace fourcc to capture in." />
+                  _description="Colorspace fourcc to capture in" />
 
         <property name="width" type="int"
-		  _description="The width of the video to capture." />
+		  _description="The width of the video to capture" />
         <property name="height" type="int"
-		  _description="The height of the video to capture." />
+		  _description="The height of the video to capture" />
         <property name="framerate" type="fraction"
-		  _description="The frame rate of the video to capture." />
+		  _description="The framerate of the video to capture" />
 
         <property name="element-factory" type="string" required="no"
-                  _description="The element factory from which to instantiate the capture element. Defaults to 'v4lsrc'" />
+                  _description="Element factory from which to instantiate the capture element, defaults to 'v4lsrc'" />
 
 <!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no"
-                  _description="The hue of the video (0-65535)" />
+                  _description="Hue of the video (0-65535)" />
         <property name="saturation" type="int" required="no"
-                  _description="The saturation of the video (0-65535)" />
+                  _description="Saturation of the video (0-65535)" />
         <property name="brightness" type="int" required="no"
-                  _description="The brightness of the video (0-65535)." />
+                  _description="Brightness of the video (0-65535)" />
         <property name="contrast" type="int" required="no"
-                  _description="The contrast of the video (0-65535)." />
+                  _description="Contrast of the video (0-65535)" />
       </properties>
     </component>
   </components>

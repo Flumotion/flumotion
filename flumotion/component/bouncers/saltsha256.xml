@@ -2,7 +2,7 @@
   <components>
     <component type="saltsha256-bouncer"
                base="flumotion/component/bouncers"
-               _description="A bouncer using salted sha256 passwords.">
+               _description="Bouncer using salted sha256 passwords.">
 
       <source location="flumotion.component.bouncers.saltsha256" />
 

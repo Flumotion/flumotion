@@ -2,7 +2,7 @@
   <components>
     <component type="firewire-producer"
                base="flumotion/component/producers/firewire"
-               _description="Produces feeds from a Firewire/DV device.">
+               _description="Produce feeds from a Firewire/DV device.">
       <source location="flumotion.component.producers.firewire.firewire" />
       <feeder name="audio" />
       <feeder name="video" />
@@ -25,17 +25,17 @@
 
       <properties>
         <property name="height" type="int"
-                  _description="The height to scale to." />
+                  _description="The height to scale to" />
         <property name="width" type="int"
-                  _description="The final width, including correction." />
+                  _description="The final width, including correction" />
         <property name="scaled-width" type="int"
-                  _description="The width to scale to before correcting." />
+                  _description="The width to scale to before correcting" />
         <property name="is-square" type="bool"
-                  _description="Whether to scale to a 1:1 pixel aspect ratio." />
+                  _description="Whether to scale to a 1:1 pixel aspect ratio" />
         <property name="framerate" type="fraction"
-                  _description="The framerate (in fps)."/>
+                  _description="The framerate (in fps) "/>
         <property name="guid" type="string"
-                  _description="The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)." />
+                  _description="The GUID of the device (a hexadecimal like 0xhhhhhhhhhhhhhhhh)" />
       </properties>
     </component>
   </components>

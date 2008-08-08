@@ -25,21 +25,21 @@
 
       <properties>
         <property name="height" type="int"
-                  _description="The height in pixels." />
+                  _description="Height in pixels" />
         <property name="width" type="int"
-                  _description="The width in pixels." />
+                  _description="Width in pixels" />
         <property name="framerate" type="fraction"
-                  _description="The video frame rate as numerator/denominator." />
+                  _description="Video framerate as numerator/denominator" />
 	<property name="pixel-aspect-ratio" type="fraction"
-		  _description="The video pixel aspect ratio as numerator/denominator." />
+		  _description="Video pixel aspect ratio as numerator/denominator" />
         <property name="format" type="string"
                   _description="Video format" />
         <property name="pattern" type="int"
-                  _description="Thhe test pattern to show (smpte/snow/black/...)." />
+                  _description="Test pattern to show (smpte/snow/black/...)" />
         <property name="drop-probability" type="float"
-                  _description="The fraction of buffers to drop (0.0 - 1.0)." />
+                  _description="Fraction of buffers to drop (0.0 - 1.0)" />
         <property name="overlay-timestamps" type="bool"
-                  _description="Whether to overlay buffer timestamps." />
+                  _description="Whether to overlay buffer timestamps" />
       </properties>
     </component>
   </components>

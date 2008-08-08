@@ -22,27 +22,25 @@
       </wizard>
       <properties>
         <property name="width" type="int" required="true"
-                  _description="The width of the cortado applet." />
+                  _description="width of the cortado applet" />
         <property name="height" type="int" required="true"
-                  _description="The height of the cortado applet." />
+                  _description="height of the cortado applet" />
         <property name="html-template" type="string"
-                  _description="A HTML template to use to serve the cortado applet." />
+                  _description="HTML template to use to serve the cortado applet" />
         <property name="index" type="string"
-                  _description="The name of the index file. The default is index.html." />
+                  _description="The name of the index file, default is index.html" />
         <property name="has-audio" type="bool" required="true"
-                  _description="Whether audio should be streamed." />
+                  _description="If audio should be streamed" />
         <property name="has-video" type="bool" required="true"
-                  _description="Whether video should be streamed." />
+                  _description="If video should be streamed" />
         <property name="stream-url" type="string" required="true"
-                  _description="The URL to the stream we are displaying." />
+                  _description="url to the stream we're displaying" />
         <property name="codebase" type="string" required="true"
-                  _description="The base URL used to fetch the cortado applet code." />
+                  _description="baserl used to fetch the cortado applet code" />
         <property name="buffer-size" type="int" required="true"
-                  _description="The size of the buffer in the cortado applet." />
-                  <!-- FIXME: What is this? murrayc -->
+                  _description="size of the buffer in cortado applet" />
         <property name="framerate" type="float" required="true"
-                  _description="The frame rate used in the cortado applet." />
-                  <!-- FIXME: Isn't this determined by the stream that it gets? murrayc -->
+                  _description="framerate used in the cortado applet" />
       </properties>
     </plug>
   </plugs>

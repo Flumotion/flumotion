@@ -10,11 +10,11 @@
       <feeder name="default" />
       <properties>
         <property name="bitrate" type="int"
-                  _description="The bit rate to encode at (in bps)." />
+                  _description="Bitrate to encode at (in bps)" />
         <property name="quality" type="float"
-                  _description="The quality to encode at (from -0.1 to 1.0).  This is only used if bitrate is not set." />
+                  _description="Quality to encode at (from -0.1 to 1.0).  Only used if bitrate is not set." />
         <property name="channels" type="int"
-                  _description="The number of audio channels to encode." />
+                  _description="The number of audio channels to encode" />
       </properties>
       <entries>
         <entry type="component" location="vorbis.py"

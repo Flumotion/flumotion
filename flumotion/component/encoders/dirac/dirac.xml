@@ -3,7 +3,7 @@
   <components>
 
     <component type="dirac-encoder" base="flumotion/component/encoders/dirac"
-               _description="Encodes a raw video feed using BBC's Dirac codec." >
+               _description="Encode a raw video feed using BBC's Dirac codec." >
       <source location="flumotion.component.encoders.dirac.dirac" />
       <eater name="default" />
       <feeder name="default" />
@@ -21,7 +21,7 @@
 
       <properties>
         <property name="bitrate" type="int"
-                  _description="The bit rate to encode at (in bps)." />
+                  _description="Bitrate to encode at (in bps)" />
       </properties>
     </component>
 

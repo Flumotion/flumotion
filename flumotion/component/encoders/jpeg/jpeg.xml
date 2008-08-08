@@ -15,9 +15,9 @@
       </entries>
       <properties>
         <property name="quality" type="int"
-                  _description="The quality of the JPEG encoding (from 0 to 100 %)." />
+                  _description="Quality of JPEG encoding (from 0 to 100 %)" />
         <property name="framerate" type="fraction"
-                  _description="The Frame rate at which to encode." />
+                  _description="Framerate to encode at" />
       </properties>
       <wizard _description="JPEG" type="video-encoder"
               feeder="default" eater="default">

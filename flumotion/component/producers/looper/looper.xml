@@ -20,13 +20,13 @@ looping continuously.">
 
       <properties>
         <property name="height" type="int"
-                  _description="The height to scale the video to." />
+                  _description="Height to scale the video to" />
         <property name="width" type="int"
-                  _description="The width to scale the video to." />
+                  _description="Width to scale the video to" />
         <property name="framerate" type="fraction"
                   _description="Framerate to output" />
         <property name="location" type="string" required="yes"
-                  _description="The location of the source file to loop." />
+                  _description="Location of the source file to loop" />
       </properties>
     </component>
   </components>

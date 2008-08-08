@@ -19,13 +19,13 @@
       </wizard>
       <properties>
         <property name="qmin" type="int"
-                  _description="The minimum JPEG quality (0-100 %. default: 10 %)." />
+                  _description="Minimum JPEG quality (0-100 %, default 10 %)" />
         <property name="qmax" type="int"
-                  _description="The maximum JPEG quality (0-100 %. default: 85 %)." />
+                  _description="Maximum JPEG quality (0-100 %, default 85 %)" />
         <property name="threshold" type="int"
-                  _description="The motion estimation threshold (0 - 10000000. default: 3000)."/>
+                  _description="Motion estimation threshold (0 - 10000000, default 3000) "/>
         <property name="keyframe" type="int"
-                  _description="How often a key frame should appear (in frames. default: 20)" />
+                  _description="How often should a keyframe appear (in frames, default 20" />
       </properties>
     </component>
 

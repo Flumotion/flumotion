@@ -13,7 +13,7 @@
 
       <properties>
         <property name="file" type="string" required="yes"
-                  _description="The path to an iCalendar file to use." />
+                  _description="Path to iCalendar file to use" />
       </properties>
     </component>
   </components>
