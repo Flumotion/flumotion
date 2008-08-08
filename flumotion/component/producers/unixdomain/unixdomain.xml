@@ -4,7 +4,7 @@
 
     <component type="unixdomain-producer"
                base="flumotion/component/producers/unixdomain"
-               _description="A producer that produces from a UNIX domain socket.  Mostly used for testing.">
+               _description="A producer that produces from a UNIX domain socket.  This is mostly used for testing.">
       <source location="flumotion.component.producers.unixdomain.unixdomain" />
       <feeder name="default" />
       <entries>
@@ -13,7 +13,7 @@
       </entries>
       <properties>
         <property name="path" type="string" required="yes"
-                  _description="path to the unix domain socket" />
+                  _description="The path to the unix domain socket." />
       </properties>
     </component>
 

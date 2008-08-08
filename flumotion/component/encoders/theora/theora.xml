@@ -3,7 +3,7 @@
   <components>
 
     <component type="theora-encoder" base="flumotion/component/encoders/theora"
-               _description="Encode a raw video feed using Xiph's Theora codec." >
+               _description="Encodes a raw video feed using Xiph's Theora codec." >
       <source location="flumotion.component.encoders.theora.theora" />
       <eater name="default" />
       <feeder name="default" />
@@ -21,19 +21,20 @@
 
       <properties>
         <property name="bitrate" type="int"
-                  _description="Bitrate to encode at (in bps)" />
+                  _description="The bit rate to encode at (in bps)." />
         <property name="quality" type="int"
-                  _description="Encoding quality (0-63, if not using bitrate)" />
+                  _description="The encoding quality (0-63, if not using bitrate)." />
         <property name="keyframe-mindistance" type="int"
-                  _description="Minimum distance between keyframes (in frames)" />
+                  _description="The minimum distance between key frames (in frames)." />
         <property name="keyframe-maxdistance" type="int"
-                  _description="Maximum distance between keyframes (in frames)" />
+                  _description="The maximum distance between key frames (in frames)." />
         <property name="quick-compress" type="bool"
-                  _description="Whether to use quick, lower-quality compression"/>
+                  _description="Whether to use quick, lower-quality compression."/>
         <property name="noise-sensitivity" type="int"
-                  _description="Noise sensitivity (defaults to 1)" />
+                  _description="The noise sensitivity (defaults to 1)" />
+                  <!-- FIXME: So what other values are possible? murrayc. -->
         <property name="sharpness" type="int"
-                  _description="Sharpness encoder parameter: 0, 1, or 2"/>
+                  _description="The sharpness encoder parameter: 0, 1, or 2."/>
       </properties>
     </component>
 

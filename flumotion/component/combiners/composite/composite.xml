@@ -16,16 +16,16 @@
 
       <properties>
         <compound-property name="input" multiple="yes"
-                           _description="Position, z-order and alpha properties of a single visual input.">
+                           _description="The position, z-order and alpha properties of a single visual input.">
           <property name="feeder-alias" type="string" required="yes"
                     _description="The alias of the feeder providing the input."
                     />
           <property name="position-left" type="int" />
           <property name="position-top" type="int" />
           <property name="z-order" type="int"
-                    _description="Non-negative integer specifying z-order of the input (with 0 meaning the input will be drawn below all others). Each input has to have a unique z-order value." />
+                    _description="A non-negative integer specifying the z-order of the input (with 0 meaning the input will be drawn below all others). Each input must have a unique z-order value." />
           <property name="alpha" type="float"
-                    _description="Transparency of the input, with full transparency at 0.0 to full opacity at 1.0." />
+                    _description="The transparency of the input, with full transparency at 0.0, to full opacity at 1.0." />
         </compound-property>
       </properties>
 

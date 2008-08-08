@@ -21,7 +21,7 @@
     </component>
     <component type="av-switch-combiner"
                base="flumotion/component/combiners/switch"
-	       _description="An audio/video switching component">
+	       _description="An audio/video switching component.">
       <source location="flumotion.component.combiners.switch.switch" />
       <eater name="video-master" />
       <eater name="video-backup" />
@@ -39,23 +39,23 @@
         <property name="ical-schedule" type="string" required="no"
                   _description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
 	<property name="video-width" type="int" required="no"
-		  _description="If set, the width of the outgoing video" />
+		  _description="If set, the width of the outgoing video." />
 	<property name="video-height" type="int" required="no"
-		  _description="If set, the height of the outgoing video" />
+		  _description="If set, the height of the outgoing video." />
 	<property name="video-framerate" type="fraction" required="no"
-		  _description="If set, the framerate of the outgoing video" />
+		  _description="If set, the framerate of the outgoing video." />
 	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no"
-		  _description="If set, the pixel aspect ratio of the outgoing video" />
+		  _description="If set, the pixel aspect ratio of the outgoing video." />
 	<property name="audio-samplerate" type="int" required="no"
-		  _description="If set, the samplerate of the outgoing audio" />
+		  _description="If set, the samplerate of the outgoing audio." />
 	<property name="audio-channels" type="int" required="no"
-		  _description="If set, the number of channels of the outgoing audio" />
+		  _description="If set, the number of channels of the outgoing audio." />
       </properties>
     </component>
     <component type="single-basic-watchdog-combiner"
                base="flumotion/component/combiners/switch"
-               _description="A basic single stream type watchdog component">
+               _description="A basic single stream type watchdog component.">
       <source location="flumotion.component.combiners.switch.basicwatchdog" />
       <eater name="master" />
       <eater name="backup" />
@@ -73,7 +73,7 @@
     </component>
     <component type="av-basic-watchdog-combiner"
                base="flumotion/component/combiners/switch"
-               _description="A basic audio/video watchdog component">
+               _description="A basic audio/video watchdog component.">
       <source location="flumotion.component.combiners.switch.basicwatchdog" />
       <eater name="video-master" />
       <eater name="video-backup" />
@@ -91,23 +91,24 @@
         <property name="ical-schedule" type="string" required="no"
                   _description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
 	<property name="video-width" type="int" required="no"
-		  _description="If set, the width of the outgoing video" />
+		  _description="If set, the width of the outgoing video." />
 	<property name="video-height" type="int" required="no"
-		  _description="If set, the height of the outgoing video" />
+		  _description="If set, the height of the outgoing video." />
 	<property name="video-framerate" type="fraction" required="no"
-		  _description="If set, the framerate of the outgoing video" />
+		  _description="If set, the framerate of the outgoing video." />
 	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no"
-		  _description="If set, the pixel aspect ratio of the outgoing video" />
+		  _description="If set, the pixel aspect ratio of the outgoing video." />
 	<property name="audio-samplerate" type="int" required="no"
-		  _description="If set, the samplerate of the outgoing audio" />
+		  _description="If set, the samplerate of the outgoing audio." />
 	<property name="audio-channels" type="int" required="no"
-		  _description="If set, the number of channels of the outgoing audio" />
+		  _description="If set, the number of channels of the outgoing audio." />
       </properties>
     </component>
     <component type="av-pattern-switch-combiner"
                base="flumotion/component/combiners/switch"
-               _description="An audio/video switching based on pattern component">
+               _description="An audio/video switching component based on a pattern.">
+               <!-- FIXME: This description doe not make much sense. murrayc. -->
       <source location="flumotion.component.combiners.switch.patternswitch" />
       <eater name="video-master" />
       <eater name="video-backup" />
@@ -125,19 +126,19 @@
         <property name="ical-schedule" type="string" required="no"
                   _description="If set, an iCalendar that decides when to switch.  The switcher will switch to the backup stream during any event scheduled in the iCalendar file." />
 	<property name="video-width" type="int" required="no"
-		  _description="If set, the width of the outgoing video" />
+		  _description="If set, the width of the outgoing video." />
 	<property name="video-height" type="int" required="no"
-		  _description="If set, the height of the outgoing video" />
+		  _description="If set, the height of the outgoing video." />
 	<property name="video-framerate" type="fraction" required="no"
-		  _description="If set, the framerate of the outgoing video" />
+		  _description="If set, the frame rate of the outgoing video." />
 	<property name="video-pixel-aspect-ratio" type="fraction"
 	          required="no"
-		  _description="If set, the pixel aspect ratio of the outgoing video" />
+		  _description="If set, the pixel aspect ratio of the outgoing video." />
 	<property name="audio-samplerate" type="int" required="no"
-		  _description="If set, the samplerate of the outgoing audio" />
+		  _description="If set, the sample rate of the outgoing audio." />
 	<property name="audio-channels" type="int" required="no"
-		  _description="If set, the number of channels of the outgoing audio" />
-	<property name="eater-with-stream-markers" type="string" required="yes"                   _description="Name of the eater that will have stream markers on which to switch (one of 'video-backup', 'video-master')" />
+		  _description="If set, the number of channels of the outgoing audio." />
+	<property name="eater-with-stream-markers" type="string" required="yes"                   _description="The name of the eater that will have stream markers on which to switch (one of 'video-backup', 'video-master')." />
       </properties>
     </component>
 

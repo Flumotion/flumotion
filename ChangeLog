@@ -1,3 +1,9 @@
+2008-08-08  Murray Cumming  <murrayc@murrayc.com>
+
+	* flumotion/component/*/*.xml: Minor grammar and spelling corrections 
+	for the descriptions, so they look nicer in the reference section of 
+	the documentation.
+
 2008-08-06  Murray Cummin  <murrayc@murrayc.com>
 
 	* data/glade/ondemand-wizard.glade: Corrected an it's to its.

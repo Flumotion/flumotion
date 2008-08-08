@@ -23,26 +23,26 @@
 
       <properties>
         <property name="device" type="string" required="yes"
-                  _description="Path to the device node" />
+                  _description="The path to the device node." />
         <property name="channel" type="string" required="no"
-                  _description="Input channel (TV/Composite1/S-Video/...)" />
+                  _description="The input channel (TV/Composite1/S-Video/...)." />
         <property name="signal" type="string" required="no"
-                  _description="Signal type (PAL/SECAM/NTSC/...)" />
+                  _description="The signal type (PAL/SECAM/NTSC/...)." />
         <property name="width" type="int"
-                  _description="Width of the produced video" />
+                  _description="The width of the produced video." />
         <property name="height" type="int"
-                  _description="Height of the produced video" />
+                  _description="The height of the produced video." />
         <property name="framerate" type="fraction"
-                  _description="Frame rate of the produced video" />
+                  _description="The frame rate of the produced video." />
 <!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no"
-                  _description="Hue of the video (0-65535)" />
+                  _description="The hue of the video (0-65535)." />
         <property name="saturation" type="int" required="no"
-                  _description="Saturation of the video (0-65535)" />
+                  _description="The saturation of the video (0-65535)." />
         <property name="brightness" type="int" required="no"
-                  _description="Brightness of the video (0-65535)" />
+                  _description="The brightness of the video (0-65535)." />
         <property name="contrast" type="int" required="no"
-                  _description="Contrast of the video (0-65535)" />
+                  _description="The contrast of the video (0-65535)." />
       </properties>
     </component>
   </components>

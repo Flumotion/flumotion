@@ -12,9 +12,9 @@
       </entries>
       <properties>
         <property name="host" type="string"
-                  _description="Host name or IP address of the GStreamer TCP server." />
+                  _description="The host name or IP address of the GStreamer TCP server." />
         <property name="port" type="int"
-                  _description="Port of the GStreamer TCP server." />
+                  _description="The port of the GStreamer TCP server." />
       </properties>
     </component>
 

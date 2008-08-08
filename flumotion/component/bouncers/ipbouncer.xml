@@ -14,11 +14,11 @@
                   _description="Whether to default to denying authentication.
 Defaults to True, which is equivalent to Apache's 'Order Allow,Deny'"/>
         <property name="allow" type="string" required="no" multiple="yes"
-                  _description="Match rule for allowing authentication. Match
-rules are IP blocks, e.g. 127.0.0.1/32."/>
+                  _description="A match rule for allowing authentication. Match
+rules are IP blocks, such as 127.0.0.1/32."/>
         <property name="deny" type="string" required="no" multiple="yes"
-                  _description="Match rule for denying authentication.
-Uses same syntax as allow rules."/>
+                  _description="A match rule for denying authentication.
+This uses the same syntax as the allow rules."/>
       </properties>
     </component>
   </components>

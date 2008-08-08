@@ -18,7 +18,7 @@
       </wizard>
       <properties>
         <property name="bitrate" type="int"
-                  _description="Bitrate to encode at (in bps)" />
+                  _description="The bit rate to encode at (in bps)." />
       </properties>
     </component>
 

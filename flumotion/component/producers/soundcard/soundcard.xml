@@ -2,7 +2,7 @@
   <components>
     <component type="soundcard-producer"
     	       base="flumotion/component/producers/soundcard"
-               _description="Capture a raw audio feed from a soundcard.">
+               _description="Captures a raw audio feed from a soundcard.">
       <source location="flumotion.component.producers.soundcard.soundcard" />
 
       <feeder name="default"/>
@@ -21,17 +21,17 @@
               feeder="default" />
       <properties>
         <property name="source-element" type="string"
-                  _description="The GStreamer element factory to use as source" />
+                  _description="The GStreamer element factory to use as the source." />
         <property name="device" type="string"
-                  _description="The device property to use for the source element" />
+                  _description="The device property to use for the the source element." />
         <property name="channels" type="int"
-                  _description="Number of channels to capture (default 2)" />
+                  _description="The Number of channels to capture (default 2)." />
         <property name="depth" type="int"
-                  _description="Bit depth to use (default 16)" />
+                  _description="The bit depth to use (default 16)." />
         <property name="rate" type="int"
-                  _description="Samplerate to capture at (in Hz, default 44100)" />
+                  _description="The Sample rate to capture at (in Hz. default: 44100)." />
         <property name="input-track" type="string"
-	          _description="The label of the input track to be used for recording (default is to use whatever is currently set)" />
+	          _description="The label of the input track to be used for recording (the default is to use whatever is currently set)." />
       </properties>
     </component>
   </components>

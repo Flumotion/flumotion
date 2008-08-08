@@ -14,7 +14,7 @@
 
       <properties>
         <property name="url" type="string" required="true"
-                  _description="URL of the Icecast stream to produce from" />
+                  _description="The URL of the Icecast stream from which to produce." />
       </properties>
     </component>
   </components>

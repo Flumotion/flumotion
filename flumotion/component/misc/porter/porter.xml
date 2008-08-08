@@ -13,21 +13,21 @@
 
       <properties>
         <property name="username" type="string"
-                  _description="username to authenticate to the porter" />
+                  _description="The username to authenticate to the porter." />
         <property name="password" type="string"
-                  _description="password to authenticate to the porter" />
+                  _description="The password to authenticate to the porter." />
         <property name="socket-path" type="string"
-                  _description="socket path to use to connect to the porter" />
+                  _description="The socket path to use to connect to the porter." />
         <property name="port" type="int"
-                  _description="network port for the porter to listen on" />
+                  _description="The network port for the porter to listen on." />
         <!-- when an admin asks, via getPorterDetails, what our port is, we will
              report this one. allows for e.g. iptables to redirect 80 -> 8800. -->
         <property name="iptables-port" type="int"
-                  _description="network port for the porter to report (useful when using iptables to redirect incoming 80 to 8800)" />
+                  _description="The network port for the porter to report (useful when using iptables to redirect incoming 80 to 8800)." />
         <property name="interface" type="string"
-                  _description="IP address or hostname associated with the interface we want to listen on" />
+                  _description="The IP address or hostname associated with the interface we want to listen on." />
         <property name="protocol" type="string"
-                  _description="porter protocol to use (defaults to flumotion.component.misc.porter.porter.HTTPPorterProtocol')" />
+                  _description="The porter protocol to use (defaults to flumotion.component.misc.porter.porter.HTTPPorterProtocol')." />
       </properties>
     </component>
   </components>

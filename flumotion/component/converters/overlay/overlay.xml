@@ -12,21 +12,21 @@
       </entries>
       <properties>
         <property name="show-text" type="bool"
-                  _description="Whether to show text" />
+                  _description="Whether to show text." />
         <property name="text" type="string"
                   _description="Text to show" />
 
         <property name="fluendo-logo" type="bool"
-                  _description="Whether to show a Fluendo logo" />
+                  _description="Whether to show a Fluendo logo." />
         <property name="cc-logo" type="bool"
-                  _description="Whether to show a Creative Commons logo" />
+                  _description="Whether to show a Creative Commons logo." />
         <property name="xiph-logo" type="bool"
-                  _description="Whether to show a Xiph logo" />
+                  _description="Whether to show a Xiph logo." />
 
         <property name="width" type="int" required="yes"
-                  _description="Width of the overlaid image" />
+                  _description="The width of the overlaid image." />
         <property name="height" type="int" required="yes"
-                  _description="Height of the overlaid image" />
+                  _description="The height of the overlaid image." />
       </properties>
     </component>
 
