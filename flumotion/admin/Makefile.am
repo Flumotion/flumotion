@@ -8,7 +8,7 @@ component_PYTHON = \
 	connections.py \
 	multi.py
 
-SUBDIRS = command gtk rrdmon text
+SUBDIRS = assistant command gtk rrdmon text
 
 TAGS_FILES = $(component_PYTHON)
 

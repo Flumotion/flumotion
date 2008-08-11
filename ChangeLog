@@ -1,5 +1,10 @@
 2008-08-11  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/Makefile.am (SUBDIRS): Add assistant here too,
+	this should fix distcheck.
+
+2008-08-11  Johan Dahlin  <johan@flumotion.com>
+
 	* data/glade/sectionwizard.glade:
 	* flumotion/admin/assistant/interfaces.py:
 	* flumotion/admin/gtk/Makefile.am:
