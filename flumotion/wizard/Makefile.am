@@ -5,7 +5,6 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/wizard
 flumotion_PYTHON =              \
         __init__.py             \
         basesteps.py            \
-        configurationwizard.py  \
         consumptionsteps.py     \
         conversionsteps.py      \
         diskersteps.py          \

@@ -1,5 +1,10 @@
 2008-08-11  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/Makefile.am (flumotion_PYTHON):
+	And remove configurationwizard.py from here.
+
+2008-08-11  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/admin/Makefile.am (SUBDIRS): Add assistant here too,
 	this should fix distcheck.
 
