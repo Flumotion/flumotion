@@ -1,5 +1,21 @@
 2008-08-11  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/sectionwizard.glade:
+	* flumotion/admin/assistant/interfaces.py:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/addformatassistant.py:
+	* flumotion/admin/gtk/addformatwizard.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/test/test_public_ui_api.py:
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/scenarios.py:
+	Rename configurationwizard and move it to f/admin/gtk.
+	Rename addformatwizard too.
+
+2008-08-11  Johan Dahlin  <johan@flumotion.com>
+
 	* configure.ac:
 	* flumotion/admin/assistant/Makefile.am:
 	* flumotion/admin/assistant/__init__.py:

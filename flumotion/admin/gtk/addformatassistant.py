@@ -23,7 +23,7 @@
 
 import gettext
 
-from flumotion.wizard.configurationwizard import ConfigurationWizard
+from flumotion.admin.gtk.configurationassistant import ConfigurationAssistant
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.scenarios import LiveScenario, SummaryStep
@@ -32,15 +32,15 @@ from flumotion.wizard.productionsteps import SelectProducersStep
 _ = gettext.gettext
 
 
-class AddFormatWizard(ConfigurationWizard):
+class AddFormatAssistant(ConfigurationAssistant):
 
     def __init__(self, parent=None):
         self._selectProducerStep = None
-        ConfigurationWizard.__init__(self, parent)
+        ConfigurationAssistant.__init__(self, parent)
         self.setScenario(LiveScenario(self))
         self.window.set_title(_("Flumotion: Adding a new encoding format"))
 
-    # ConfigurationWizard
+    # ConfigurationAssistant
 
     def addSteps(self):
         self._selectProducerStep = SelectProducersStep(self)

@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Scenarios for the ConfigurationWizard
+"""Scenarios for the ConfigurationAssistant
 
 This file contains the base classes, common steps
 and two basic scenarios for the configuration wizard.

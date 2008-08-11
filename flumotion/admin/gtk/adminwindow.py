@@ -128,7 +128,7 @@ MAIN_UI = """
       <separator name="sep-manage2"/>
       <menuitem action="AddFormat"/>
       <separator name="sep-manage3"/>
-      <menuitem action="RunConfigurationWizard"/>
+      <menuitem action="RunConfigurationAssistant"/>
     </menu>
     <menu action="Debug">
       <menuitem action="EnableDebugging"/>
@@ -149,7 +149,7 @@ MAIN_UI = """
     <toolitem action="StopComponent"/>
     <toolitem action="DeleteComponent"/>
     <separator name="sep-toolbar2"/>
-    <toolitem action="RunConfigurationWizard"/>
+    <toolitem action="RunConfigurationAssistant"/>
   </toolbar>
   <popup name="ComponentContextMenu">
     <menuitem action="StartComponent"/>
@@ -207,7 +207,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._planetState = None
         self._recentMenuID = None
         self._trayicon = None
-        self._configurationWizardIsRunning = False
+        self._configurationAssistantIsRunning = False
 
         self._createUI()
         self._appendRecentConnections()
@@ -390,10 +390,10 @@ class AdminWindow(Loggable, GladeDelegate):
              None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
-            ('RunConfigurationWizard', 'flumotion-wizard', _('Run _Wizard'),
-             None,
-             _('Run the configuration wizard'),
-             self._manage_run_wizard_cb),
+            ('RunConfigurationAssistant', 'flumotion-wizard',
+             _('Run _Assistant'), None,
+             _('Run the configuration assistant'),
+             self._manage_run_assistant_cb),
 
             # Debug
             ('Debug', None, _('_Debug')),
@@ -471,9 +471,9 @@ class AdminWindow(Loggable, GladeDelegate):
         assert self._clearAllAction
         self._addFormatAction = group.get_action("AddFormat")
         self._addFormatAction.set_sensitive(False)
-        self._runConfigurationWizardAction = (
-            group.get_action("RunConfigurationWizard"))
-        self._runConfigurationWizardAction.set_sensitive(False)
+        self._runConfigurationAssistantAction = (
+            group.get_action("RunConfigurationAssistant"))
+        self._runConfigurationAssistantAction.set_sensitive(False)
         self._killComponentAction = group.get_action("KillComponent")
         assert self._killComponentAction
 
@@ -550,7 +550,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel.connect('update', self._admin_update_cb)
 
         self._addFormatAction.set_sensitive(True)
-        self._runConfigurationWizardAction.set_sensitive(True)
+        self._runConfigurationAssistantAction.set_sensitive(True)
 
     def _openConnection(self, info):
         self._trayicon.set_tooltip(_("Flumotion: Connecting to %s:%s") % (
@@ -647,9 +647,9 @@ class AdminWindow(Loggable, GladeDelegate):
     def _clearLastStatusbarText(self):
         self._statusbar.pop('main')
 
-    def _wizardFinshed(self, wizard, configuration):
-        wizard.destroy()
-        self._configurationWizardIsRunning = False
+    def _assistantFinshed(self, assistant, configuration):
+        assistant.destroy()
+        self._configurationAssistantIsRunning = False
         self._dumpConfig(configuration)
         self._adminModel.loadConfiguration(configuration)
         self._clearMessages()
@@ -690,7 +690,7 @@ class AdminWindow(Loggable, GladeDelegate):
         porter.exists = True
         return porter
 
-    def _createComponentsByWizardType(self, componentClass, entries):
+    def _createComponentsByAssistantType(self, componentClass, entries):
 
         def _getComponents():
             for componentState in self._componentStates.values():
@@ -710,79 +710,80 @@ class AdminWindow(Loggable, GladeDelegate):
                 component.properties[key] = value
             yield component
 
-    def _runAddNewFormatWizard(self):
-        from flumotion.admin.gtk.addformatwizard import AddFormatWizard
-        addFormatWizard = AddFormatWizard(self._window)
+    def _runAddNewFormatAssistant(self):
+        from flumotion.admin.gtk.addformatassistant import AddFormatAssistant
+        addFormatAssistant = AddFormatAssistant(self._window)
 
         def cb(entries):
             entryDict = {}
             for entry in entries:
                 entryDict.setdefault(entry.type, []).append(entry)
 
-            audioProducers = self._createComponentsByWizardType(
+            audioProducers = self._createComponentsByAssistantType(
                     AudioProducer, entryDict['audio-producer'], )
-            videoProducers = self._createComponentsByWizardType(
+            videoProducers = self._createComponentsByAssistantType(
                     VideoProducer, entryDict['video-producer'])
-            addFormatWizard.setAudioProducers(audioProducers)
-            addFormatWizard.setVideoProducers(videoProducers)
-            self._runWizard(addFormatWizard)
+            addFormatAssistant.setAudioProducers(audioProducers)
+            addFormatAssistant.setVideoProducers(videoProducers)
+            self._runAssistant(addFormatAssistant)
 
         d = self._adminModel.getWizardEntries(
             wizardTypes=['audio-producer', 'video-producer'])
         d.addCallback(cb)
 
-    def _runConfigurationWizard(self):
-        from flumotion.wizard.configurationwizard import ConfigurationWizard
+    def _runConfigurationAssistant(self):
+        from flumotion.admin.gtk.configurationassistant import \
+             ConfigurationAssistant
 
-        def runWizard():
-            configurationWizard = ConfigurationWizard(self._window)
-            self._runWizard(configurationWizard)
-            self._configurationWizardIsRunning = True
+        def runAssistant():
+            configurationAssistant = ConfigurationAssistant(self._window)
+            self._runAssistant(configurationAssistant)
+            self._configurationAssistantIsRunning = True
 
         if not self._componentStates:
-            runWizard()
+            runAssistant()
             return
 
         for componentState in self._componentList.getComponentStates():
             if componentState.get('mood') == moods.lost.value:
                 self._error(
-                    _("Cannot run the configuration wizard since there "
+                    _("Cannot run the configuration assistant since there "
                       "is at least one component in the lost state"))
                 return
 
-        if yesno(_("Running the Configuration Wizard again will remove "
+        if yesno(_("Running the Configuration Assistant again will remove "
                    "all components from the current stream and create "
                    "a new one."),
                  parent=self._window,
                  buttons=((_("Keep the current stream"),
                            gtk.RESPONSE_NO),
-                          (_("Run the Wizard anyway"),
+                          (_("Run the Assistant anyway"),
                            gtk.RESPONSE_YES))) != gtk.RESPONSE_YES:
             return
 
         d = self._clearAllComponents()
-        d.addCallback(lambda unused: runWizard())
+        d.addCallback(lambda unused: runAssistant())
 
-    def _runWizard(self, wizard):
+    def _runAssistant(self, assistant):
         if self._adminModel is None:
             return
 
         workerHeavenState = self._adminModel.getWorkerHeavenState()
         if not workerHeavenState.get('names'):
             self._error(
-                _('The wizard cannot be run because no workers are '
+                _('The assistant cannot be run because no workers are '
                   'logged in.'))
             return
 
-        wizard.setExistingComponentNames(
+        assistant.setExistingComponentNames(
             self._componentList.getComponentNames())
-        wizard.setAdminModel(self._adminModel)
-        wizard.setWorkerHeavenState(workerHeavenState)
+        assistant.setAdminModel(self._adminModel)
+        assistant.setWorkerHeavenState(workerHeavenState)
         httpPorter = self._getHTTPPorter()
         if httpPorter:
-            wizard.setHTTPPorter(httpPorter)
-        wizard.connect('finished', self._wizard_finished_cb)
-        wizard.run(main=False)
+            assistant.setHTTPPorter(httpPorter)
+        assistant.connect('finished', self._assistant_finished_cb)
+        assistant.run(main=False)
 
     def _clearAdmin(self):
         if self._adminModel is None:
@@ -796,7 +797,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel = None
 
         self._addFormatAction.set_sensitive(False)
-        self._runConfigurationWizardAction.set_sensitive(False)
+        self._runConfigurationAssistantAction.set_sensitive(False)
 
     def _updateConnectionActions(self):
         self._openRecentAction.set_sensitive(hasRecentConnections())
@@ -830,7 +831,7 @@ class AdminWindow(Loggable, GladeDelegate):
         for state in self._componentList.getComponentStates():
             if state is None:
                 continue
-            # FIXME: Not correct, should expose wizard state from
+            # FIXME: Not correct, should expose assistant state from
             #        the registry.
             name = state.get('name')
             if 'producer' in name:
@@ -1146,12 +1147,12 @@ class AdminWindow(Loggable, GladeDelegate):
         self._updateComponentActions()
 
         if (not self._componentStates and
-            not self._configurationWizardIsRunning):
-            self.debug('no components detected, running wizard')
+            not self._configurationAssistantIsRunning):
+            self.debug('no components detected, running assistant')
             # ensure our window is shown
             self.show()
-            self._configurationWizardIsRunning = True
-            self._runConfigurationWizard()
+            self._configurationAssistantIsRunning = True
+            self._runConfigurationAssistant()
         else:
             self.show()
 
@@ -1400,8 +1401,8 @@ You can do remote component calls using:
     def _on_tool_button__leave(self, toolbutton):
         self._clearLastStatusbarText()
 
-    def _wizard_finished_cb(self, wizard, configuration):
-        self._wizardFinshed(wizard, configuration)
+    def _assistant_finished_cb(self, assistant, configuration):
+        self._assistantFinshed(assistant, configuration)
 
     def _window_delete_event_cb(self, window, event):
         self._quit()
@@ -1468,10 +1469,10 @@ You can do remote component calls using:
         self._clearAllComponents()
 
     def _manage_add_format_cb(self, action):
-        self._runAddNewFormatWizard()
+        self._runAddNewFormatAssistant()
 
-    def _manage_run_wizard_cb(self, action):
-        self._runConfigurationWizard()
+    def _manage_run_assistant_cb(self, action):
+        self._runConfigurationAssistant()
 
     def _debug_enable_cb(self, action):
         self.setDebugEnabled(action.get_active())

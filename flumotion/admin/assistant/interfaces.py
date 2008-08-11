@@ -38,7 +38,7 @@ class IProducerPlugin(Interface):
     def __call__(assistant):
         """Creates producer plugins
         @param assistant: the assistant
-        @type assistant: L{ConfigurationWizard}
+        @type assistant: L{ConfigurationAssistant}
         """
 
     def getProductionStep(type):
@@ -64,7 +64,7 @@ class IEncoderPlugin(Interface):
     def __call__(assistant):
         """Creates encoder plugins
         @param assistant: the assistant
-        @type assistant: L{ConfigurationWizard}
+        @type assistant: L{ConfigurationAssistant}
         """
 
     def getConversionStep():
@@ -85,7 +85,7 @@ class IHTTPConsumerPlugin(Interface):
     def __call__(assistant):
         """Creates http consumer plugins
         @param assistant: the assistant
-        @type assistant: L{ConfigurationWizard}
+        @type assistant: L{ConfigurationAssistant}
         """
 
     def workerChanged(worker):

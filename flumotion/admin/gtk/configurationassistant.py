@@ -127,15 +127,15 @@ class ScenarioStep(WizardStep):
             self._currentScenarioClass = scenarioClass
 
 
-class ConfigurationWizard(SectionWizard):
+class ConfigurationAssistant(SectionWizard):
     gsignal('finished', str)
 
     def __init__(self, parent=None):
         SectionWizard.__init__(self, parent)
-        self.connect('help-clicked', self._on_wizard__help_clicked)
+        self.connect('help-clicked', self._on_assistant__help_clicked)
         # Set the name of the toplevel window, this is used by the
         # ui unittest framework
-        self.window1.set_name('ConfigurationWizard')
+        self.window1.set_name('ConfigurationAssistant')
         self.message_area.disableTimestamps()
 
         self._cursorWatch = gdk.Cursor(gdk.WATCH)
@@ -198,25 +198,25 @@ class ConfigurationWizard(SectionWizard):
         self.addStepSection(ScenarioStep)
 
     def setScenario(self, scenario):
-        """Sets the current scenario of the wizard.
-        Normally called by ScenarioStep to tell the wizard the current scenario
-        just after creating it.
-        @param scenario: the scenario of the wizard
+        """Sets the current scenario of the assistant.
+        Normally called by ScenarioStep to tell the assistant the
+        current scenario just after creating it.
+        @param scenario: the scenario of the assistant
         @type scenario: a L{flumotion.wizard.scenarios.Scenario} subclass
         """
         scenario.setExistingComponentNames(self._existingComponentNames)
         self._scenario = scenario
 
     def getScenario(self):
-        """Fetches the currently set scenario of the wizard.
-        @returns scenario: the scenario of the wizard
+        """Fetches the currently set scenario of the assistant.
+        @returns scenario: the scenario of the assistant
         @rtype: a L{flumotion.wizard.scenarios.Scenario} subclass
         """
         return self._scenario
 
     def setWorkerHeavenState(self, workerHeavenState):
         """
-        Sets the worker heaven state of the wizard
+        Sets the worker heaven state of the assistant
         @param workerHeavenState: the worker heaven state
         @type workerHeavenState: L{WorkerComponentUIState}
         """
@@ -225,21 +225,21 @@ class ConfigurationWizard(SectionWizard):
 
     def setAdminModel(self, adminModel):
         """
-        Sets the admin model of the wizard
+        Sets the admin model of the assistant
         @param adminModel: the admin model
         @type adminModel: L{AdminModel}
         """
         self._adminModel = adminModel
 
     def getAdminModel(self):
-        """Gets the admin model of the wizard
+        """Gets the admin model of the assistant
         @returns adminModel: the admin model
         @rtype adminModel: L{AdminModel}
         """
         return self._adminModel
 
     def waitForTask(self, taskName):
-        """Instruct the wizard that we're waiting for a task
+        """Instruct the assistant that we're waiting for a task
         to be finished. This changes the cursor and prevents
         the user from continuing moving forward.
         Each call to this method should have another call
@@ -255,7 +255,7 @@ class ConfigurationWizard(SectionWizard):
         self._tasks.append(taskName)
 
     def taskFinished(self, blockNext=False):
-        """Instruct the wizard that a task was finished.
+        """Instruct the assistant that a task was finished.
         @param blockNext: if we should still next when done
         @type blockNext: boolean
         """
@@ -311,8 +311,8 @@ class ConfigurationWizard(SectionWizard):
         return productionStep.getVideoProducer()
 
     def setHTTPPorter(self, httpPorter):
-        """Sets the HTTP porter of the wizard.
-        If the http port set in the new wizard is identical to the old one,
+        """Sets the HTTP porter of the assistant.
+        If the http port set in the new assistant is identical to the old one,
         this porter will be reused
         @param httpPorter: the http porter
         @type httpPorter: L{flumotion.admin.assistant.models.Porter} instance
@@ -526,41 +526,41 @@ class ConfigurationWizard(SectionWizard):
         return d
 
     def getWizardEntry(self, componentType):
-        """Fetches a wizard bundle from a specific kind of component
-        @param componentType: the component type to get the wizard entry
+        """Fetches a assistant bundle from a specific kind of component
+        @param componentType: the component type to get the assistant entry
           bundle from.
         @type componentType: string
         @returns: a deferred returning either::
           - factory of the component
-          - noBundle error: if the component lacks a wizard bundle
+          - noBundle error: if the component lacks a assistant bundle
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.waitForTask('get wizard entry %s' % (componentType, ))
-        self.clear_msg('wizard-bundle')
+        self.waitForTask('get assistant entry %s' % (componentType, ))
+        self.clear_msg('assistant-bundle')
         d = self._adminModel.callRemote(
             'getEntryByType', componentType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 
     def getWizardPlugEntry(self, plugType):
-        """Fetches a wizard bundle from a specific kind of plug
-        @param plugType: the plug type to get the wizard entry
+        """Fetches a assistant bundle from a specific kind of plug
+        @param plugType: the plug type to get the assistant entry
           bundle from.
         @type plugType: string
         @returns: a deferred returning either::
           - factory of the plug
-          - noBundle error: if the plug lacks a wizard bundle
+          - noBundle error: if the plug lacks a assistant bundle
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.waitForTask('get wizard plug %s' % (plugType, ))
-        self.clear_msg('wizard-bundle')
+        self.waitForTask('get assistant plug %s' % (plugType, ))
+        self.clear_msg('assistant-bundle')
         d = self._adminModel.callRemote(
             'getPlugEntry', plugType, 'wizard')
         d.addCallback(self._gotEntryPoint)
         return d
 
     def getWizardEntries(self, wizardTypes=None, provides=None, accepts=None):
-        """Queries the manager for a list of wizard entries matching the
+        """Queries the manager for a list of assistant entries matching the
         query.
         @param wizardTypes: list of component types to fetch, is usually
                             something like ['video-producer'] or
@@ -582,7 +582,7 @@ class ConfigurationWizard(SectionWizard):
                                                  accepts=accepts)
 
     def setExistingComponentNames(self, componentNames):
-        """Tells the wizard about the existing components available, so
+        """Tells the assistant about the existing components available, so
         we can resolve naming conflicts when saving the configuration
         @param componentNames: existing component names
         @type componentNames: list of strings
@@ -613,7 +613,7 @@ class ConfigurationWizard(SectionWizard):
         filename = filename.replace('/', os.path.sep)
         modname = pathToModuleName(filename)
         d = self._adminModel.getBundledFunction(modname, procname)
-        self.clear_msg('wizard-bundle')
+        self.clear_msg('assistant-bundle')
         self.taskFinished()
         return d
 
@@ -650,5 +650,5 @@ class ConfigurationWizard(SectionWizard):
                 mid='worker-error')
             self.add_msg(msg)
 
-    def _on_wizard__help_clicked(self, wizard, section, anchor, version):
+    def _on_assistant__help_clicked(self, assistant, section, anchor, version):
         self._showHelpLink(section, anchor, version)

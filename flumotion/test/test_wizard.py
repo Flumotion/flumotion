@@ -27,13 +27,13 @@ from flumotion.common import testsuite
 
 from flumotion.admin import admin
 from flumotion.ui.wizard import WizardStep
-from flumotion.wizard.configurationwizard import ConfigurationWizard
+from flumotion.admin.gtk.configurationassistant import ConfigurationAssistant
 
 
 class WizardStepTest(testsuite.TestCase):
 
     def setUp(self):
-        self.wizard = ConfigurationWizard()
+        self.wizard = ConfigurationAssistant()
 
     def testLoadSteps(self):
         for s in self.wizard.getSteps():
@@ -82,7 +82,7 @@ class TestAdmin(admin.AdminModel):
 class WizardSaveTest(testsuite.TestCase):
 
     def setUp(self):
-        self.wizard = ConfigurationWizard()
+        self.wizard = ConfigurationAssistant()
         self.wizard.admin = TestAdmin('user', 'test')
         s = worker.ManagerWorkerHeavenState()
         s.set('names', ['localhost'])

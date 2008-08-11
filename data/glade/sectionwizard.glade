@@ -4,7 +4,7 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="window1">
-  <property name="title" translatable="yes">Flumotion Configuration Wizard</property>
+  <property name="title" translatable="yes">Flumotion Configuration Assistant</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
@@ -19,7 +19,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="on_wizard_delete_event" last_modification_time="Tue, 28 Sep 2004 13:32:05 GMT"/>
+  <signal name="delete_event" handler="on_assistant_delete_event" last_modification_time="Tue, 28 Sep 2004 13:32:05 GMT"/>
 
   <child>
     <widget class="GtkHBox" id="hbox_main">
