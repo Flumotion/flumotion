@@ -24,12 +24,12 @@ import os
 
 from zope.interface import implements
 
+from flumotion.admin.assistant.interfaces import IProducerPlugin
+from flumotion.admin.assistant.models import AudioProducer
 from flumotion.common.errors import RemoteRunFailure
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
 from flumotion.wizard.basesteps import AudioProducerStep
-from flumotion.wizard.interfaces import IProducerPlugin
-from flumotion.wizard.models import AudioProducer
 
 __version__ = "$Rev$"
 _ = gettext.gettext

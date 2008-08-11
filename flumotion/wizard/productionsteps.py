@@ -76,7 +76,7 @@ class LiveProductionStep(WizardStep):
     def getAudioProducer(self):
         """Returns the selected audio producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.AudioProducer}
+        @rtype: L{flumotion.admin.assistant.models.AudioProducer}
         """
         if self.has_audio.get_active():
             return self._audioProducer
@@ -84,7 +84,7 @@ class LiveProductionStep(WizardStep):
     def getVideoProducer(self):
         """Returns the selected video producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.VideoProducer}
+        @rtype: L{flumotion.admin.assistant.models.VideoProducer}
         """
         if self.has_video.get_active():
             return self._videoProducer
@@ -269,7 +269,7 @@ class SelectProducersStep(WizardStep):
     def getAudioProducer(self):
         """Returns the selected audio producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.AudioProducer}
+        @rtype: L{flumotion.admin.assistant.models.AudioProducer}
         """
         if self.has_audio.get_active():
             return self.audio.get_selected()
@@ -277,7 +277,7 @@ class SelectProducersStep(WizardStep):
     def getVideoProducer(self):
         """Returns the selected video producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.VideoProducer}
+        @rtype: L{flumotion.admin.assistant.models.VideoProducer}
         """
         if self.has_video.get_active():
             return self.video.get_selected()

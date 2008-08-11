@@ -29,8 +29,8 @@ __version__ = "$Rev: 6246 $"
 
 
 class ConfigurationWriter(XMLWriter):
-    """I am responsible for writing the state of a flow created by the wizard
-    into XML.
+    """I am responsible for writing the state of a flow created by the
+    configuration assistant into XML.
     I will try my best write pretty XML which can be editable by humans at a
     later point.
     """
@@ -86,11 +86,11 @@ class ConfigurationWriter(XMLWriter):
     def _writeComponent(self, component):
         # Do not write components which already exists in the flow,
         # This is used to create configuration snippets sent to the
-        # wizard which links to existing components
+        # asssistant which links to existing components
         if component.exists:
             return
 
-        # FIXME: when the wizard can be split among projects, "project"
+        # FIXME: when the assistant can be split among projects, "project"
         # and "version" should be taken from the relevant project
         attrs = [('name', component.name),
                  ('type', component.componentType),

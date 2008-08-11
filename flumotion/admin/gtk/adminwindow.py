@@ -75,6 +75,8 @@ from twisted.internet import defer, reactor
 from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
+from flumotion.admin.assistant.models import AudioProducer, Porter, \
+     VideoProducer
 from flumotion.admin.connections import getRecentConnections, \
      hasRecentConnections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
@@ -95,7 +97,6 @@ from flumotion.configure import configure
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
-from flumotion.wizard.models import AudioProducer, Porter, VideoProducer
 
 admin # pyflakes
 

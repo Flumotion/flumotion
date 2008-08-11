@@ -1,19 +1,63 @@
+2008-08-11  Johan Dahlin  <johan@flumotion.com>
+
+	* configure.ac:
+	* flumotion/admin/assistant/Makefile.am:
+	* flumotion/admin/assistant/__init__.py:
+	* flumotion/admin/assistant/configurationwriter.py:
+	* flumotion/admin/assistant/interfaces.py:
+	* flumotion/admin/assistant/models.py:
+	* flumotion/admin/assistant/save.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/component/encoders/dirac/wizard_gtk.py:
+	* flumotion/component/encoders/jpeg/wizard_gtk.py:
+	* flumotion/component/encoders/mulaw/wizard_gtk.py:
+	* flumotion/component/encoders/smoke/wizard_gtk.py:
+	* flumotion/component/encoders/speex/wizard_gtk.py:
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/component/encoders/vorbis/wizard_gtk.py:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/bttv/wizard_gtk.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/test/test_wizard_models.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/configurationwizard.py:
+	* flumotion/wizard/configurationwriter.py:
+	* flumotion/wizard/consumptionsteps.py:
+	* flumotion/wizard/conversionsteps.py:
+	* flumotion/wizard/diskersteps.py:
+	* flumotion/wizard/httpstreamersteps.py:
+	* flumotion/wizard/interfaces.py:
+	* flumotion/wizard/models.py:
+	* flumotion/wizard/ondemandstep.py:
+	* flumotion/wizard/overlaystep.py:
+	* flumotion/wizard/productionsteps.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/scenarios.py:
+	* flumotion/wizard/shout2steps.py:
+	Rename and move the non gtk parts of the configuration wizard to
+	admin/assistant.
+
 2008-08-08  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/*/*.xml: Minor grammar and spelling corrections 
-	for the descriptions, so they look nicer in the reference section of 
+	* flumotion/component/*/*.xml: Minor grammar and spelling corrections
+	for the descriptions, so they look nicer in the reference section of
 	the documentation.
 	This time without the unicode character.
 
 2008-08-08  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/*/*.xml: Reverted my last commit, while I find 
+	* flumotion/component/*/*.xml: Reverted my last commit, while I find
 	out where I introduced a problematic unicode character.
 
 2008-08-08  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/*/*.xml: Minor grammar and spelling corrections 
-	for the descriptions, so they look nicer in the reference section of 
+	* flumotion/component/*/*.xml: Minor grammar and spelling corrections
+	for the descriptions, so they look nicer in the reference section of
 	the documentation.
 
 2008-08-06  Murray Cummin  <murrayc@murrayc.com>

@@ -21,9 +21,9 @@
 
 import gettext
 
+from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.common.errors import NoBundleError
 from flumotion.common.i18n import N_
-from flumotion.wizard.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
@@ -67,14 +67,14 @@ class ConversionStep(WorkerWizardStep):
     def getVideoEncoder(self):
         """Returns the selected video encoder or None
         @returns: encoder or None
-        @rtype: L{flumotion.wizard.models.VideoEncoder}
+        @rtype: L{flumotion.admin.assistant.models.VideoEncoder}
         """
         return self._videoEncoder
 
     def getAudioEncoder(self):
         """Returns the selected audio encoder or None
         @returns: encoder or None
-        @rtype: L{flumotion.wizard.models.AudioEncoder}
+        @rtype: L{flumotion.admin.assistant.models.AudioEncoder}
         """
         return self._audioEncoder
 

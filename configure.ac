@@ -217,6 +217,7 @@ data/image/wizard/Makefile
 data/flumotion-admin.desktop
 flumotion/Makefile
 flumotion/admin/Makefile
+flumotion/admin/assistant/Makefile
 flumotion/admin/command/Makefile
 flumotion/admin/gtk/Makefile
 flumotion/admin/rrdmon/Makefile

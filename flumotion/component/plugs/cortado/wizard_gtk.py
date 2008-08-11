@@ -24,9 +24,9 @@
 
 from zope.interface import implements
 
+from flumotion.admin.assistant.interfaces import IHTTPConsumerPlugin
+from flumotion.admin.assistant.models import HTTPServer, HTTPPlug
 from flumotion.common.fraction import fractionAsFloat, fractionFromValue
-from flumotion.wizard.interfaces import IHTTPConsumerPlugin
-from flumotion.wizard.models import HTTPServer, HTTPPlug
 
 __version__ = "$Rev$"
 
@@ -95,10 +95,10 @@ class CortadoHTTPServer(HTTPServer):
         @param streamer: streamer
         @type  streamer: L{HTTPStreamer}
         @param audioProducer: audio producer
-        @type  audioProducer: L{flumotion.wizard.models.AudioProducer}
+        @type  audioProducer: L{flumotion.admin.assistant.models.AudioProducer}
            subclass or None
         @param videoProducer: video producer
-        @type  videoProducer: L{flumotion.wizard.models.VideoProducer}
+        @type  videoProducer: L{flumotion.admin.assistant.models.VideoProducer}
            subclass or None
         @param mountPoint:
         @type  mountPoint:

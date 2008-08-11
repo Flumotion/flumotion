@@ -23,6 +23,10 @@ import unittest
 
 from kiwi.python import Settable
 
+from flumotion.admin.assistant.configurationwriter import ConfigurationWriter
+from flumotion.admin.assistant.models import Component, Plug, Porter, \
+     AudioProducer, VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
+from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
@@ -33,11 +37,7 @@ from flumotion.component.producers.videotest.wizard_gtk import \
      TestVideoProducer
 from flumotion.component.producers.audiotest.wizard_gtk import \
      TestAudioProducer
-from flumotion.wizard.configurationwriter import ConfigurationWriter
-from flumotion.wizard.models import Component, Plug, Porter, AudioProducer, \
-     VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
 from flumotion.wizard.overlaystep import Overlay
-from flumotion.wizard.save import WizardSaver
 
 
 class TestXMLWriter(testsuite.TestCase):
@@ -212,7 +212,7 @@ class TestWizardSave(testsuite.TestCase):
         return producer
 
     def testDefaultStream(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         save.setFlowName('flow')
 
         save.setAudioProducer(self._createAudioProducer())
@@ -341,7 +341,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testMultiFeedProducer(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         save.setFlowName('flow')
 
         save.setAudioProducer(self._createAudioProducer(
@@ -438,7 +438,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testOggStream(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         save.setFlowName('flow')
 
         audioProducer = TestAudioProducer()
@@ -574,7 +574,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testAudioOnlyStream(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         porter = self._createPorter()
         save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
@@ -663,7 +663,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testFirewireStreamer(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         porter = self._createPorter()
         save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
@@ -786,7 +786,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testFirewireStreamerDifferentWorkers(self):
-        save = WizardSaver()
+        save = AssistantSaver()
         porter = self._createPorter()
         save.addPorter(porter, 'audio-video')
         save.setFlowName('flow')
@@ -927,7 +927,7 @@ class TestWizardSave(testsuite.TestCase):
             configuration)
 
     def testOndemand(self):
-        save = WizardSaver()
+        save = AssistantSaver()
 
         server = HTTPServer('ondemand-server-worker', '/mount-point/')
         save.addServerConsumer(server, 'ondemand')
@@ -952,7 +952,7 @@ class TestWizardSave(testsuite.TestCase):
 class TestNameConflicts(testsuite.TestCase):
 
     def setUp(self):
-        self.save = WizardSaver()
+        self.save = AssistantSaver()
 
     def _addServer(self, name):
         server = HTTPServer('ondemand-server-worker', '/mount-point/')

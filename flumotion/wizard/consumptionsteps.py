@@ -21,6 +21,7 @@
 
 import gettext
 
+from flumotion.admin.assistant.models import Porter
 from flumotion.common.python import any as pany
 from flumotion.configure import configure
 from flumotion.ui.wizard import WizardStep
@@ -28,7 +29,6 @@ from flumotion.wizard.httpstreamersteps import HTTPBothStep, HTTPAudioStep, \
      HTTPVideoStep
 from flumotion.wizard.diskersteps import DiskBothStep, DiskAudioStep, \
      DiskVideoStep
-from flumotion.wizard.models import Porter
 from flumotion.wizard.shout2steps import Shout2BothStep, Shout2AudioStep, \
      Shout2VideoStep
 from flumotion.wizard.workerstep import WorkerWizardStep

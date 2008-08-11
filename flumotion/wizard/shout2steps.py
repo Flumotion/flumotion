@@ -21,7 +21,7 @@
 
 import gettext
 
-from flumotion.wizard.models import Consumer
+from flumotion.admin.assistant.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"

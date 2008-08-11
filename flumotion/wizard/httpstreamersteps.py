@@ -42,9 +42,9 @@ from kiwi.utils import gsignal
 import gtk
 from twisted.internet import defer
 
+from flumotion.admin.assistant.models import Consumer
 from flumotion.common import errors, log, messages
 from flumotion.common.i18n import N_, gettexter, ngettext
-from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"

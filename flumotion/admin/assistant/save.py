@@ -21,15 +21,15 @@
 
 import gettext
 
-from flumotion.wizard.configurationwriter import ConfigurationWriter
-from flumotion.wizard.models import Muxer, AudioProducer, \
+from flumotion.admin.assistant.configurationwriter import ConfigurationWriter
+from flumotion.admin.assistant.models import Muxer, AudioProducer, \
      VideoProducer, AudioEncoder, VideoEncoder
 
 _ = gettext.gettext
 __version__ = "$Rev$"
 
 
-class WizardSaver(object):
+class AssistantSaver(object):
     """I am used to link components together and generate XML for them.
     To use me, add some components by some of the methods and then call
     my getXML() method to get the xml configuration.

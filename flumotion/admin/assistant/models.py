@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""model objects used by the wizard steps"""
+"""model objects used by the configuration assistant steps"""
 
 import random
 
@@ -386,10 +386,10 @@ class HTTPPlug(Plug):
         @param streamer: streamer
         @type  streamer: L{HTTPStreamer}
         @param audioProducer: audio producer
-        @type  audioProducer: L{flumotion.wizard.models.AudioProducer}
+        @type  audioProducer: L{flumotion.admin.assistant.models.AudioProducer}
           subclass or None
         @param videoProducer: video producer
-        @type  videoProducer: L{flumotion.wizard.models.VideoProducer}
+        @type  videoProducer: L{flumotion.admin.assistant.models.VideoProducer}
           subclass or None
         """
         super(HTTPPlug, self).__init__()

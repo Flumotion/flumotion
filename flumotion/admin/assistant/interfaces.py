@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-"""Flumotion interfaces used by the wizard
+"""Flumotion interfaces used by the configuration assistant
 """
 
 from zope.interface import Interface
@@ -28,17 +28,17 @@ __version__ = "$Rev$"
 
 
 class IProducerPlugin(Interface):
-    """A producer plugin is how you extend the production wizard page.
-    The main purpose of the plugin is to get a wizard step specific
+    """A producer plugin is how you extend the production assistant page.
+    The main purpose of the plugin is to get a assistant step specific
     to the plugin.
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """
 
-    def __call__(wizard):
+    def __call__(assistant):
         """Creates producer plugins
-        @param wizard: the wizard
-        @type wizard: L{ConfigurationWizard}
+        @param assistant: the assistant
+        @type assistant: L{ConfigurationWizard}
         """
 
     def getProductionStep(type):
@@ -48,28 +48,28 @@ class IProducerPlugin(Interface):
         same plugin.
         @param type: audio or video
         @type type: string
-        @returns: the wizard step
+        @returns: the assistant step
         @rtype: a L{WorkerWizardStep} subclass
         """
 
 
 class IEncoderPlugin(Interface):
-    """An encoder plugin is how you extend the encoding wizard page.
-    The main purpose of the plugin is to get a wizard step specific
+    """An encoder plugin is how you extend the encoding assistant page.
+    The main purpose of the plugin is to get a assistant step specific
     to the plugin.
     This entry point should be defined in the xml for the component
     under the entry type "wizard".
     """
 
-    def __call__(wizard):
+    def __call__(assistant):
         """Creates encoder plugins
-        @param wizard: the wizard
-        @type wizard: L{ConfigurationWizard}
+        @param assistant: the assistant
+        @type assistant: L{ConfigurationWizard}
         """
 
     def getConversionStep():
         """Asks the plugin for a step.
-        @returns: the wizard step
+        @returns: the assistant step
         @rtype: a L{WorkerWizardStep} subclass
         """
 
@@ -82,10 +82,10 @@ class IHTTPConsumerPlugin(Interface):
     under the entry type "wizard".
     """
 
-    def __call__(wizard):
+    def __call__(assistant):
         """Creates http consumer plugins
-        @param wizard: the wizard
-        @type wizard: L{ConfigurationWizard}
+        @param assistant: the assistant
+        @type assistant: L{ConfigurationWizard}
         """
 
     def workerChanged(worker):

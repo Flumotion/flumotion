@@ -297,7 +297,7 @@ class ConfigurationWizard(SectionWizard):
     def getAudioProducer(self):
         """Returns the selected audio producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.AudioProducer}
+        @rtype: L{flumotion.admin.assistant.models.AudioProducer}
         """
         productionStep = self.getStep('Production')
         return productionStep.getAudioProducer()
@@ -305,7 +305,7 @@ class ConfigurationWizard(SectionWizard):
     def getVideoProducer(self):
         """Returns the selected video producer or None
         @returns: producer or None
-        @rtype: L{flumotion.wizard.models.VideoProducer}
+        @rtype: L{flumotion.admin.assistant.models.VideoProducer}
         """
         productionStep = self.getStep('Production')
         return productionStep.getVideoProducer()
@@ -315,7 +315,7 @@ class ConfigurationWizard(SectionWizard):
         If the http port set in the new wizard is identical to the old one,
         this porter will be reused
         @param httpPorter: the http porter
-        @type httpPorter: L{flumotion.wizard.models.Porter} instance
+        @type httpPorter: L{flumotion.admin.assistant.models.Porter} instance
         """
         self._httpPorter = httpPorter
 

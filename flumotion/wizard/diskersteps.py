@@ -23,8 +23,8 @@ import gettext
 
 import gtk
 
+from flumotion.admin.assistant.models import Consumer
 from flumotion.ui.fileselector import FileSelectorDialog
-from flumotion.wizard.models import Consumer
 from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"

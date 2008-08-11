@@ -26,13 +26,13 @@ and two basic scenarios for the configuration wizard.
 """
 import gettext
 
+from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.ui.wizard import WizardStep
 from flumotion.wizard.basesteps import ConsumerStep
 from flumotion.wizard.consumptionsteps import ConsumptionStep
 from flumotion.wizard.conversionsteps import ConversionStep
 from flumotion.wizard.ondemandstep import OnDemandStep
 from flumotion.wizard.productionsteps import LiveProductionStep
-from flumotion.wizard.save import WizardSaver
 
 _ = gettext.gettext
 
@@ -104,9 +104,9 @@ class Scenario(object):
         """Returns a wizard saver that should be used to save the
         configuration generated to be created by this scenario.
         @returns: the wizard saver
-        @rtype: L{WizardSaver}
+        @rtype: L{AssistantSaver}
         """
-        saver = WizardSaver()
+        saver = AssistantSaver()
         saver.setFlowName(self._flowName)
         saver.setExistingComponentNames(self._existingComponentNames)
         return saver
@@ -128,7 +128,7 @@ class Scenario(object):
         """Save the content of the wizard
         Can be overridden in a subclass
         @returns: wizard saver
-        @rtype: L{WizardSaver}
+        @rtype: L{AssistantSaver}
         """
         raise NotImplementedError("%s.save" % (
             self.__class__.__name__, ))
