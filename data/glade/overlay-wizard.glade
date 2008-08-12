@@ -53,6 +53,7 @@
       <child>
 	<widget class="GtkCheckButton" id="show_logo">
 	  <property name="visible">True</property>
+	  <property name="tooltip" translatable="yes">Enable this to show a couple of logotypes in the bottom left corner of the video output.</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">Show _logos in bottom left corner</property>
 	  <property name="use_underline">True</property>
