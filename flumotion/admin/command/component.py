@@ -44,7 +44,7 @@ class Delete(common.AdminCommand):
                 "with 'component -i [component-id]'")
 
         p = self.parentCommand
-        d = self.getRootCommand().adminModel.callRemote('deleteComponent',
+        d = self.getRootCommand().medium.callRemote('deleteComponent',
             self.parentCommand.componentState)
 
         def cb(result):
@@ -90,7 +90,7 @@ Examples: getConfig, setFluDebug""" % common.ARGUMENTS_DESCRIPTION
             args = []
 
         p = self.parentCommand
-        d = self.getRootCommand().adminModel.componentCallRemote(
+        d = self.getRootCommand().medium.componentCallRemote(
             self.parentCommand.componentState, methodName, *args)
 
         def cb(result):
@@ -200,7 +200,7 @@ class Property(util.LogCommand):
                 "with 'component -i [component-id]'")
 
         # call our callback after connecting
-        d = self.getRootCommand().managerDeferred
+        d = self.getRootCommand().loginDeferred
         d.addCallback(self._callback)
         d.addErrback(self._errback)
 
@@ -210,7 +210,7 @@ class Property(util.LogCommand):
             self.uiState = uiState
 
         componentCommand = self.parentCommand
-        model = componentCommand.parentCommand.adminModel
+        model = componentCommand.parentCommand.medium
         d = model.componentCallRemote(
             componentCommand.componentState, 'getUIState')
         d.addCallback(getUIStateCb)
@@ -236,7 +236,7 @@ class Start(common.AdminCommand):
             self.stdout.write("Component is already happy.\n")
             return 0
 
-        d = self.getRootCommand().adminModel.callRemote('componentStart',
+        d = self.getRootCommand().medium.callRemote('componentStart',
             self.parentCommand.componentState)
 
         def cb(result):
@@ -269,7 +269,7 @@ class Stop(common.AdminCommand):
             self.stdout.write("Component is already sleeping.\n")
             return 0
 
-        d = self.getRootCommand().adminModel.callRemote('componentStop',
+        d = self.getRootCommand().medium.callRemote('componentStop',
             self.parentCommand.componentState)
 
         def cb(result):
@@ -313,10 +313,10 @@ class Component(util.LogCommand):
     def handleOptions(self, options):
         self.componentId = options.componentId
         # call our callback after connecting
-        self.getRootCommand().managerDeferred.addCallback(self._callback)
+        self.getRootCommand().loginDeferred.addCallback(self._callback)
 
     def _callback(self, result):
-        d = self.parentCommand.adminModel.callRemote('getPlanetState')
+        d = self.parentCommand.medium.callRemote('getPlanetState')
 
         def gotPlanetStateCb(result):
             self.planetState = result

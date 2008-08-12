@@ -118,7 +118,7 @@ class AdminCommand(util.LogCommand):
 
     def do(self, args):
         # call our callback after connecting
-        self.getRootCommand().managerDeferred.addCallback(self._callback, args)
+        self.getRootCommand().loginDeferred.addCallback(self._callback, args)
 
     def _callback(self, result, args):
         return self.doCallback(args)

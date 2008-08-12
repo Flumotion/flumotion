@@ -41,7 +41,7 @@ __version__ = "$Rev: 6562 $"
 # Because we run a reactor and use deferreds, the flow is slightly different
 # from the usual Command flow.
 
-# Nagios will first create a managerDeferred instance variable, which will
+# Nagios will first create a loginDeferred instance variable, which will
 # allow subcommands to hook into the connection and schedule callbacks.
 
 # Nagios will then parse the command line, allowing all subcommands to
@@ -58,8 +58,8 @@ class Command(util.LogCommand):
     usage = "%prog %command"
     description = "Run commands on Flumotion manager."
 
-    managerDeferred = None # deferred that fires upon connection
-    adminModel = None      # AdminModel connected to the manager
+    loginDeferred = None # deferred that fires upon connection
+    medium = None    # medium giving access over the connection
 
     subCommandClasses = [component.Component, manager.Manager, worker.Worker]
 
@@ -87,7 +87,7 @@ class Command(util.LogCommand):
 
     def parse(self, argv):
         # instantiated here so our subcommands can chain to it
-        self.managerDeferred = defer.Deferred()
+        self.loginDeferred = defer.Deferred()
 
         self.debug('parse: chain up')
         # chain up to parent first
@@ -128,8 +128,8 @@ class Command(util.LogCommand):
             reactor.callLater(0, reactor.stop)
             return
 
-        self.managerDeferred.addCallback(cb)
-        self.managerDeferred.addErrback(eb)
+        self.loginDeferred.addCallback(cb)
+        self.loginDeferred.addErrback(eb)
 
         # now run the reactor
         self.debug('parse: run the reactor')
@@ -162,33 +162,33 @@ class Command(util.LogCommand):
         # gratuitous changes
         try:
             # platform-3
-            self.adminModel = admin.AdminModel(connection.authenticator)
+            self.medium = admin.AdminModel(connection.authenticator)
             self.debug("code is platform-3")
         except TypeError:
             # trunk
-            self.adminModel = admin.AdminModel()
+            self.medium = admin.AdminModel()
             self.debug("code is trunk")
 
-        if hasattr(self.adminModel, 'connectToHost'):
+        if hasattr(self.medium, 'connectToHost'):
             # platform-3
-            d = self.adminModel.connectToHost(connection.host,
+            d = self.medium.connectToHost(connection.host,
                 connection.port, not connection.use_ssl)
         else:
-            d = self.adminModel.connectToManager(connection)
+            d = self.medium.connectToManager(connection)
 
         d.addCallback(self._connectedCb)
         d.addErrback(self._connectedEb)
 
     def _connectedCb(self, result):
         self.debug('Connected to manager.')
-        self.managerDeferred.callback(result)
+        self.loginDeferred.callback(result)
 
     def _connectedEb(self, failure):
         if failure.check(errors.ConnectionFailedError):
             sys.stderr.write("Unable to connect to manager.\n")
         if failure.check(errors.ConnectionRefusedError):
             sys.stderr.write("Manager refused connection.\n")
-        self.managerDeferred.errback(failure)
+        self.loginDeferred.errback(failure)
 
 
 def main(args):

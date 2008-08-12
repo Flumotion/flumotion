@@ -1,5 +1,15 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/command/common.py:
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/main.py:
+	* flumotion/admin/command/worker.py:
+	  managerDeferred->loginDeferred
+	  adminModel->medium
+	  More generic variable names for subclassing.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  Final renames.
 

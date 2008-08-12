@@ -71,7 +71,7 @@ checkImport s sys""" % common.ARGUMENTS_DESCRIPTION
             args = []
 
         p = self.parentCommand
-        d = self.getRootCommand().adminModel.callRemote(
+        d = self.getRootCommand().medium.callRemote(
             'workerCallRemote', workerName, methodName, *args)
 
         def cb(result):
@@ -147,7 +147,7 @@ flumotion.worker.checks.audio checkMixerTracks ssi alsasrc hw:0 2
 
         p = self.parentCommand
         workerName = p.options.name
-        d = self.getRootCommand().adminModel.callRemote(
+        d = self.getRootCommand().medium.callRemote(
             'workerCallRemote', workerName, 'runFunction',
             moduleName, methodName, *args)
 
@@ -219,10 +219,10 @@ class Worker(util.LogCommand):
 
     def handleOptions(self, options):
         # call our callback after connecting
-        self.getRootCommand().managerDeferred.addCallback(self._callback)
+        self.getRootCommand().loginDeferred.addCallback(self._callback)
 
     def _callback(self, result):
-        d = self.parentCommand.adminModel.callRemote('getWorkerHeavenState')
+        d = self.parentCommand.medium.callRemote('getWorkerHeavenState')
 
         def gotWorkerHeavenStateCb(result):
             self.workerHeavenState = result
