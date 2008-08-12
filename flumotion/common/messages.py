@@ -215,3 +215,63 @@ class Result(pb.Copyable, pb.RemoteCopy):
             self.failed = True
             self.value = None
 pb.setUnjellyableForClass(Result, Result)
+
+
+# F0.8: remove; only here to be able to receive platform-3 translatables
+# in trunk code, because they need to be in exactly the same module
+# this is a straight copy from flumotion.common.i18n for these two classes
+
+
+class TranslatableSingular(Translatable, FancyEqMixin):
+    """
+    I represent a translatable gettext msg in the singular form.
+    """
+
+    compareAttributes = ["domain", "format", "args"]
+
+    def __init__(self, domain, format, *args):
+        """
+        @param domain: the text domain for translations of this message
+        @param format: a format string
+        @param args:   any arguments to the format string
+        """
+        self.domain = domain
+        self.format = format
+        self.args = args
+
+    def untranslated(self):
+        if self.args:
+            result = self.format % self.args
+        else:
+            result = self.format
+        return result
+pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
+
+
+class TranslatablePlural(Translatable, FancyEqMixin):
+    """
+    I represent a translatable gettext msg in the plural form.
+    """
+
+    compareAttributes = ["domain", "singular", "plural", "count", "args"]
+
+    def __init__(self, domain, format, *args):
+        """
+        @param domain: the text domain for translations of this message
+        @param format: a (singular, plural, count) tuple
+        @param args:   any arguments to the format string
+        """
+        singular, plural, count = format
+        self.domain = domain
+        self.singular = singular
+        self.plural = plural
+        self.count = count
+        self.args = args
+
+    def untranslated(self):
+        if self.args:
+            result = self.singular % self.args
+        else:
+            result = self.singular
+        return result
+pb.setUnjellyableForClass(TranslatablePlural, TranslatablePlural)

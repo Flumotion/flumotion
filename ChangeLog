@@ -1,3 +1,9 @@
+2008-08-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
+	  Put back two translatable classes for compatibility reasons, so
+	  trunk code can connect to platform-3 managers.
+
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/command/common.py:
