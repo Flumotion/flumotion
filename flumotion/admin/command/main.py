@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 """
-main for flumotion-admin-command
+main for flumotion-command
 """
 
 import sys

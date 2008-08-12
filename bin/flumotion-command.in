@@ -25,7 +25,6 @@ import sys
 
 # Variable templates
 LIBDIR = '@LIBDIR@'
-# FIXME: rename ot main
 PROGRAM_PATH = 'flumotion.admin.command.main.main'
 NEEDS_GTK=False
 NEEDS_GST=False
