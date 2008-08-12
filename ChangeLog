@@ -1,5 +1,16 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/Makefile.am:
+	* configure.ac:
+	* flumotion.spec.in:
+	* flumotion/admin/command/Makefile.am:
+	* bin/flumotion-command.in (deleted):
+	* flumotion/admin/command/commands.py (deleted):
+	* flumotion/admin/command/main.py (deleted):
+	  Delete old flumotion-command.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin-command.in (added):
 	  Add main binary.
 

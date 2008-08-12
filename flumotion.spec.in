@@ -241,7 +241,7 @@ fi
 %{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
 %{_bindir}/flumotion-admin-text
-%{_bindir}/flumotion-command
+%{_bindir}/flumotion-admin-command
 %{_bindir}/flumotion-tester
 %{_bindir}/flumotion-job
 %{_bindir}/flumotion-inspect
