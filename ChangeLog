@@ -1,5 +1,11 @@
 2008-08-12  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/__init__.py:
+	Provide BW compat until we updated and rebuilt all
+	external packages.
+
+2008-08-12  Johan Dahlin  <johan@flumotion.com>
+
 	* data/glade/overlay-wizard.glade: Add a tooltip for the
 	show logo checkbutton. Fixes #1094
 

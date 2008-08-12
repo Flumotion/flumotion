@@ -20,3 +20,9 @@
 # Headers in this file shall remain intact.
 
 __version__ = "$Rev$"
+
+import sys
+
+# BW compat for external modules
+from flumotion.admin.assistant import models
+sys.modules['flumotion.wizard.models'] = models
