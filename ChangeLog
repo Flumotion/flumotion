@@ -1,5 +1,10 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin-command.in (added):
+	  Add main binary.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/Makefile.am:
 	* bin/flumotion-admin-command:
 	* configure.ac:
