@@ -1,5 +1,12 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin-command.in:
+	* flumotion/admin/command/main.py (added):
+	* flumotion/admin/command/mains.py (deleted):
+	  Rename module.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/Makefile.am:
 	* configure.ac:
 	* flumotion.spec.in:
