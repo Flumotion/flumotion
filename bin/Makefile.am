@@ -1,5 +1,6 @@
 bin_SCRIPTS = \
 	flumotion-admin \
+	flumotion-admin-command \
 	flumotion-admin-text \
 	flumotion-command \
 	flumotion-inspect \
