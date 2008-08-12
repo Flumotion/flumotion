@@ -1,5 +1,10 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	  Final renames.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-command.in:
 	* flumotion/admin/command/main.py:
 	  Final renames.
