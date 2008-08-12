@@ -1,5 +1,14 @@
 2008-08-12  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/wizard/conversionsteps.py:
+	Remember the muxer, audio and video encoders when switching
+	pages. The wizard steps are not persistent, so store
+	the persistent bits in the wizard itself instead.
+	Fixes #1095
+
+2008-08-12  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/wizard/__init__.py:
 	Provide BW compat until we updated and rebuilt all
 	external packages.

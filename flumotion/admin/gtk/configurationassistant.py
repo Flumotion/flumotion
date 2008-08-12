@@ -147,6 +147,9 @@ class ConfigurationAssistant(SectionWizard):
         self._stepWorkers = {}
         self._scenario = None
         self._existingComponentNames = []
+        self._videoEncoder = None
+        self._audioEncoder = None
+        self._muxerEntry = None
 
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
@@ -309,6 +312,46 @@ class ConfigurationAssistant(SectionWizard):
         """
         productionStep = self.getStep('Production')
         return productionStep.getVideoProducer()
+
+    def getVideoEncoder(self):
+        """Returns the selected video encoder or None
+        @returns: encoder or None
+        @rtype: L{flumotion.admin.assistant.models.VideoEncoder}
+        """
+        return self._videoEncoder
+
+    def getAudioEncoder(self):
+        """Returns the selected audio encoder or None
+        @returns: encoder or None
+        @rtype: L{flumotion.admin.assistant.models.AudioEncoder}
+        """
+        return self._audioEncoder
+
+    def setVideoEncoder(self, videoEncoder):
+        """Select a video encoder
+        @param videoEncoder: encoder or None
+        @type videoEncoder: L{flumotion.admin.assistant.models.VideoEncoder}
+        """
+        self._videoEncoder = videoEncoder
+
+    def setAudioEncoder(self, audioEncoder):
+        """Select a audio encoder
+        @param audioEncoder: encoder or None
+        @type audioEncoder: L{flumotion.admin.assistant.models.AudioEncoder}
+        """
+        self._audioEncoder = audioEncoder
+
+    def setMuxerEntry(self, muxerEntry):
+        """Select a muxer entry
+        @param audioEncoder: muxer entry
+        """
+        self._muxerEntry = muxerEntry
+
+    def getMuxerEntry(self):
+        """Returns the muxer entry
+        @returns: the muxer entry
+        """
+        return self._muxerEntry
 
     def setHTTPPorter(self, httpPorter):
         """Sets the HTTP porter of the assistant.

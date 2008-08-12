@@ -165,8 +165,8 @@ class LiveScenario(Scenario):
                 saver.setVideoOverlay(overlayStep.getOverlay())
 
         encodingStep = self.wizard.getStep('Encoding')
-        saver.setAudioEncoder(encodingStep.getAudioEncoder())
-        saver.setVideoEncoder(encodingStep.getVideoEncoder())
+        saver.setAudioEncoder(self.wizard.getAudioEncoder())
+        saver.setVideoEncoder(self.wizard.getVideoEncoder())
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
         consumptionStep = self.wizard.getStep('Consumption')
