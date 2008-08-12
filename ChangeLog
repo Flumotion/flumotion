@@ -1,5 +1,14 @@
 2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/Makefile.am:
+	* flumotion.spec.in:
+	* flumotion/admin/command/Makefile.am:
+	* bin/flumotion-command.in (added):
+	* bin/flumotion-admin-command.in (deleted):
+	  Rename.
+
+2008-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin-command.in:
 	* flumotion/admin/command/main.py (added):
 	* flumotion/admin/command/mains.py (deleted):

@@ -5,7 +5,7 @@ component_PYTHON = \
 	__init__.py \
 	common.py \
 	component.py \
-	mains.py \
+	main.py \
 	manager.py \
 	utils.py \
 	worker.py
