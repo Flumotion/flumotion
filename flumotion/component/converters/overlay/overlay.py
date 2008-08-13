@@ -63,17 +63,25 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         text = None
         if p.get('show-text', False):
             text = p.get('text', 'set the "text" property')
-        overflow = genimg.generate_overlay(self._filename,
-                                           text,
-                                           p.get('fluendo-logo', False),
-                                           p.get('cc-logo', False),
-                                           p.get('xiph-logo', False),
-                                           p['width'],
-                                           p['height'])
-        if overflow:
+        imagesOverflowed, textOverflowed = genimg.generateOverlay(
+            filename=self._filename,
+            text=text,
+            showFlumotion=p.get('fluendo-logo', False),
+            showCC=p.get('cc-logo', False),
+            showXiph=p.get('xiph-logo', False),
+            width=p['width'],
+            height=p['height'])
+
+        if textOverflowed:
             m = messages.Warning(
                 T_(N_("Overlayed text '%s' too wide for the video image."),
                    text), id = "text-too-wide")
+            self.addMessage(m)
+
+        if imagesOverflowed:
+            m = messages.Warning(
+                T_(N_("Overlayed logotypes too wide for the video image."),
+                   text), id = "image-too-wide")
             self.addMessage(m)
 
         source = self.get_element('source')

@@ -1,3 +1,11 @@
+2008-08-13  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/component/converters/overlay/genimg.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	Rewrite and simplify the overlay image routines. Add a new
+	error message when the logos overflow.
+	Fixes #1062
+
 2008-08-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
