@@ -26,8 +26,3 @@ import sys
 # BW compat for external modules
 from flumotion.admin.assistant import models
 sys.modules['flumotion.wizard.models'] = models
-
-from flumotion.admin.gtk import configurationassistant
-sys.modules['flumotion.wizard.configurationwizard'] = configurationassistant
-configurationassistant.ConfigurationWizard = \
-    configurationassistant.ConfigurationAssistant
