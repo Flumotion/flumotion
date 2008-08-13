@@ -1,5 +1,10 @@
 2008-08-13  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/wizard/__init__.py:
+	More backwards compatibility
+
+2008-08-13  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/converters/overlay/genimg.py:
 	* flumotion/component/converters/overlay/overlay.py:
 	Rewrite and simplify the overlay image routines. Add a new
