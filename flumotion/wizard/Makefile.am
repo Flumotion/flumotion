@@ -14,7 +14,6 @@ flumotion_PYTHON =              \
         productionsteps.py      \
         scenarios.py            \
         shout2steps.py          \
-        worker.py               \
         workerstep.py
 
 TAGS_FILES = $(flumotion_PYTHON)

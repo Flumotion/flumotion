@@ -14,7 +14,8 @@ component_PYTHON = 			\
 	greeter.py 			\
 	message.py 			\
 	main.py 			\
-	statusbar.py
+	statusbar.py			\
+	workerlist.py
 
 all-local:
 	if test -e videotest.pyc; then rm videotest.pyc; fi

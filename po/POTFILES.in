@@ -31,6 +31,9 @@ data/glade/summary-wizard.glade
 data/glade/videotest.glade
 data/glade/welcome-wizard.glade
 flumotion/admin/admin.py
+flumotion/admin/assistant/__init__.py
+flumotion/admin/assistant/models.py
+flumotion/admin/assistant/save.py
 flumotion/admin/command/commands.py
 flumotion/admin/command/__init__.py
 flumotion/admin/command/main.py
@@ -40,6 +43,7 @@ flumotion/admin/connections.py
 flumotion/admin/gtk/adminwindow.py
 flumotion/admin/gtk/componentview.py
 flumotion/admin/gtk/componentlist.py
+flumotion/admin/gtk/configurationassistant.py
 flumotion/admin/gtk/connections.py
 flumotion/admin/gtk/dialogs.py
 flumotion/admin/gtk/greeter.py
@@ -47,6 +51,7 @@ flumotion/admin/gtk/__init__.py
 flumotion/admin/gtk/main.py
 flumotion/admin/gtk/message.py
 flumotion/admin/gtk/statusbar.py
+flumotion/admin/gtk/workerlist.py
 flumotion/admin/__init__.py
 flumotion/admin/multi.py
 flumotion/admin/rrdmon/config.py
@@ -443,20 +448,16 @@ flumotion/ui/simplewizard.py
 flumotion/ui/trayicon.py
 flumotion/ui/wizard.py
 flumotion/wizard/basesteps.py
-flumotion/wizard/configurationwizard.py
 flumotion/wizard/consumptionsteps.py
 flumotion/wizard/conversionsteps.py
 flumotion/wizard/diskersteps.py
 flumotion/wizard/__init__.py
 flumotion/wizard/httpstreamersteps.py
-flumotion/wizard/models.py
 flumotion/wizard/ondemandstep.py
 flumotion/wizard/overlaystep.py
 flumotion/wizard/productionsteps.py
-flumotion/wizard/save.py
 flumotion/wizard/scenarios.py
 flumotion/wizard/shout2steps.py
-flumotion/wizard/worker.py
 flumotion/wizard/workerstep.py
 flumotion/worker/base.py
 flumotion/worker/checks/audio.py

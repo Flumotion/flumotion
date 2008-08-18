@@ -28,6 +28,7 @@ import gtk
 from gtk import gdk
 from twisted.internet import defer
 
+from flumotion.admin.gtk.workerlist import WorkerList
 from flumotion.common import errors, messages
 from flumotion.common.common import pathToModuleName
 from flumotion.common.documentation import getWebLink
@@ -36,7 +37,6 @@ from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
 from flumotion.ui.wizard import SectionWizard, WizardStep
 from flumotion.wizard.scenarios import LiveScenario, OnDemandScenario
-from flumotion.wizard.worker import WorkerList
 from flumotion.wizard.workerstep import WorkerWizardStep
 
 
