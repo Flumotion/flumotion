@@ -6,7 +6,8 @@ component_PYTHON =              \
         configurationwriter.py  \
         interfaces.py           \
         models.py               \
-        save.py
+        save.py			\
+        scenarios.py
 
 TAGS_FILES = $(component_PYTHON)
 
