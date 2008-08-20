@@ -29,7 +29,7 @@ from flumotion.common import common, errors, planet, log
 from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.admin import  admin
 
-from flumotion.monitor.nagios import util, process
+from flumotion.monitor.nagios import util, process, log as nlog
 
 __version__ = "$Rev$"
 
@@ -235,7 +235,7 @@ class Nagios(util.LogCommand):
     usage = "%prog %command"
     description = "Run Flumotion-related Nagios checks."
 
-    subCommandClasses = [Manager, process.ProcessCommand]
+    subCommandClasses = [Manager, process.ProcessCommand, nlog.Log]
 
     def addOptions(self):
         self.parser.add_option('-v', '--version',

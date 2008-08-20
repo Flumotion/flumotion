@@ -1,3 +1,11 @@
+2008-08-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/Makefile.am:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/log.py (added):
+	  Add implementation of flumotion-nagios log recent which can
+	  check if a given string was logged recently.
+
 2008-08-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/assistant/Makefile.am (component_PYTHON): 
