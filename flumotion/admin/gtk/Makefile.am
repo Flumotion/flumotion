@@ -1,26 +1,26 @@
 include $(top_srcdir)/common/python.mk
 
 componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
-component_PYTHON = 			\
-	__init__.py 			\
-	addformatassistant.py 		\
-	adminwindow.py 			\
-	basesteps.py 			\
-	connections.py 			\
+component_PYTHON =			\
+	__init__.py				\
+	addformatassistant.py	\
+	adminwindow.py			\
+	basesteps.py			\
+	connections.py			\
 	consumptionsteps.py		\
 	conversionsteps.py		\
-	componentlist.py 		\
-	componentview.py 		\
-	configurationassistant.py 	\
-	debugmarkerview.py 		\
-	dialogs.py 			\
+	componentlist.py		\
+	componentview.py		\
+	configurationassistant.py	\
+	debugmarkerview.py		\
+	dialogs.py				\
 	diskersteps.py			\
-	greeter.py 			\
-	httpstreamersteps.py		\
-	message.py 			\
-	main.py 			\
+	greeter.py				\
+	httpstreamersteps.py	\
+	message.py				\
+	main.py					\
 	ondemandstep.py			\
-	overlaysteps.py			\
+	overlaystep.py			\
 	productionsteps.py		\
 	shout2steps.py			\
 	statusbar.py			\
