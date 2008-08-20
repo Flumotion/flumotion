@@ -193,63 +193,88 @@
 	      <property name="above_child">False</property>
 
 	      <child>
-		<widget class="GtkHButtonBox" id="hbuttonbox2">
-		  <property name="border_width">12</property>
+		<widget class="GtkHBox" id="hbox5">
 		  <property name="visible">True</property>
-		  <property name="layout_style">GTK_BUTTONBOX_END</property>
-		  <property name="spacing">12</property>
+		  <property name="homogeneous">False</property>
+		  <property name="spacing">0</property>
 
 		  <child>
-		    <widget class="GtkButton" id="button_help">
+		    <widget class="GtkHButtonBox" id="hbuttonbox2">
+		      <property name="border_width">12</property>
 		      <property name="visible">True</property>
-		      <property name="can_focus">False</property>
-		      <property name="label">gtk-help</property>
-		      <property name="use_stock">True</property>
-		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_button_help_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
+		      <property name="layout_style">GTK_BUTTONBOX_START</property>
+		      <property name="spacing">0</property>
+
+		      <child>
+			<widget class="GtkButton" id="button_help">
+			  <property name="visible">True</property>
+			  <property name="can_default">True</property>
+			  <property name="can_focus">True</property>
+			  <property name="label">gtk-help</property>
+			  <property name="use_stock">True</property>
+			  <property name="relief">GTK_RELIEF_NORMAL</property>
+			  <property name="focus_on_click">True</property>
+              <signal name="clicked" handler="on_button_help_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
+            </widget>
+		      </child>
 		    </widget>
+		    <packing>
+		      <property name="padding">0</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
+		    </packing>
 		  </child>
 
 		  <child>
-		    <widget class="GtkButton" id="button_prev">
+		    <widget class="GtkHButtonBox" id="hbuttonbox2">
+		      <property name="border_width">12</property>
 		      <property name="visible">True</property>
-		      <property name="can_focus">True</property>
-		      <property name="label">gtk-go-back</property>
-		      <property name="use_stock">True</property>
-		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_button_prev_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
-		    </widget>
-		  </child>
+		      <property name="layout_style">GTK_BUTTONBOX_END</property>
+		      <property name="spacing">12</property>
 
-		  <child>
-		    <widget class="GtkButton" id="button_next">
-		      <property name="visible">True</property>
-		      <property name="can_default">True</property>
-		      <property name="has_default">True</property>
-		      <property name="can_focus">True</property>
-		      <property name="label">gtk-go-forward</property>
-		      <property name="use_stock">True</property>
-		      <property name="use_underline">True</property>
-		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_button_next_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:31 GMT"/>
-		    </widget>
-		  </child>
+		      <child>
+			<widget class="GtkButton" id="button_prev">
+			  <property name="visible">True</property>
+			  <property name="can_focus">True</property>
+			  <property name="label">gtk-go-back</property>
+			  <property name="use_stock">True</property>
+			  <property name="relief">GTK_RELIEF_NORMAL</property>
+			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_button_prev_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
+			</widget>
+		      </child>
 
-		  <child>
-		    <widget class="GtkButton" id="button_finish">
-		      <property name="visible">True</property>
-		      <property name="can_focus">False</property>
-		      <property name="label">F_inish</property>
-		      <property name="use_underline">True</property>
-		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_button_finish_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
-		    </widget>
-		  </child>
+		      <child>
+			<widget class="GtkButton" id="button_next">
+			  <property name="visible">True</property>
+			  <property name="can_default">True</property>
+			  <property name="has_default">True</property>
+			  <property name="can_focus">True</property>
+			  <property name="label">gtk-go-forward</property>
+			  <property name="use_stock">True</property>
+			  <property name="relief">GTK_RELIEF_NORMAL</property>
+			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_button_next_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:31 GMT"/>
+			</widget>
+		      </child>
 
+		      <child>
+			<widget class="GtkButton" id="button_finish">
+			  <property name="visible">True</property>
+			  <property name="label">F_inish</property>
+			  <property name="use_underline">True</property>
+			  <property name="relief">GTK_RELIEF_NORMAL</property>
+			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_button_finish_clicked" last_modification_time="Tue, 28 Sep 2004 14:07:27 GMT"/>
+			</widget>
+		      </child>
+		    </widget>
+		    <packing>
+		      <property name="padding">0</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
+		    </packing>
+		  </child>
 		</widget>
 	      </child>
 	    </widget>

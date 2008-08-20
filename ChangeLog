@@ -1,3 +1,8 @@
+2008-08-19  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/sectionwizard.glade:
+	Move help to the left side. Fixes #826
+
 2008-08-20  Murray Cumming  <murrayc@murrayc.com>
 
 	* flumotion/admin/gtk/configurationassistant.py:
@@ -5,7 +10,7 @@
 	* flumotion/component/producers/webcam/wizard_gtk.py:
 	* flumotion/wizard/conversionsteps.py:
 	* flumotion/wizard/productionsteps.py:
-	* flumotion/wizard/scenarios.py: Used the new docSection IDs 
+	* flumotion/wizard/scenarios.py: Used the new docSection IDs
 	for the online help.
 
 2008-08-18  Johan Dahlin  <johan@flumotion.com>
