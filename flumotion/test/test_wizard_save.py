@@ -30,14 +30,14 @@ from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
-from flumotion.wizard.httpstreamersteps import HTTPStreamer
+from flumotion.admin.gtk.httpstreamersteps import HTTPStreamer
 from flumotion.component.encoders.vorbis.wizard_gtk import VorbisAudioEncoder
 from flumotion.component.encoders.theora.wizard_gtk import TheoraVideoEncoder
 from flumotion.component.producers.videotest.wizard_gtk import \
      TestVideoProducer
 from flumotion.component.producers.audiotest.wizard_gtk import \
      TestAudioProducer
-from flumotion.wizard.overlaystep import Overlay
+from flumotion.admin.gtk.overlaystep import Overlay
 
 
 class TestXMLWriter(testsuite.TestCase):

@@ -27,7 +27,7 @@ from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IProducerPlugin
 from flumotion.admin.assistant.models import VideoProducer
-from flumotion.wizard.basesteps import VideoProducerStep
+from flumotion.admin.gtk.basesteps import VideoProducerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

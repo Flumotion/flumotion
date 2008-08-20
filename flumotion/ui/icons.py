@@ -55,7 +55,7 @@ def register_icons():
     gtk.window_set_default_icon_from_file(iconfile)
 
     _register_stock_icons([
-        ('flumotion-wizard', ['16x16/wizard.png',
+        ('flumotion.admin.gtk', ['16x16/wizard.png',
                               '24x24/wizard.png']),
         ('flumotion-play', ['16x16/play.png',
                               '24x24/play.png']),

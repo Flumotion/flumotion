@@ -25,13 +25,13 @@ from flumotion.admin.assistant.models import Porter
 from flumotion.common.python import any as pany
 from flumotion.configure import configure
 from flumotion.ui.wizard import WizardStep
-from flumotion.wizard.httpstreamersteps import HTTPBothStep, HTTPAudioStep, \
-     HTTPVideoStep
-from flumotion.wizard.diskersteps import DiskBothStep, DiskAudioStep, \
+from flumotion.admin.gtk.httpstreamersteps import HTTPBothStep, \
+     HTTPAudioStep, HTTPVideoStep
+from flumotion.admin.gtk.diskersteps import DiskBothStep, DiskAudioStep, \
      DiskVideoStep
-from flumotion.wizard.shout2steps import Shout2BothStep, Shout2AudioStep, \
+from flumotion.admin.gtk.shout2steps import Shout2BothStep, Shout2AudioStep, \
      Shout2VideoStep
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

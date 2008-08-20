@@ -16,7 +16,6 @@ SUBDIRS = \
 	tester \
 	twisted \
 	ui \
-	wizard \
 	worker
 
 flumotiondir = $(libdir)/flumotion/python/flumotion

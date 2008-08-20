@@ -38,7 +38,7 @@ from flumotion.admin.assistant.models import VideoProducer
 from flumotion.common import errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
-from flumotion.wizard.basesteps import VideoProducerStep
+from flumotion.admin.gtk.basesteps import VideoProducerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

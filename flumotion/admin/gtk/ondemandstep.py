@@ -30,9 +30,9 @@ import gtk
 from flumotion.common import messages
 
 from flumotion.admin.assistant.models import HTTPServer
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common.i18n import N_, gettexter
 from flumotion.ui.fileselector import FileSelectorDialog
-from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

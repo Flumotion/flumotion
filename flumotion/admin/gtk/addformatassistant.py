@@ -23,11 +23,11 @@
 
 import gettext
 
+from flumotion.admin.assistant.scenarios import LiveScenario, SummaryStep
 from flumotion.admin.gtk.configurationassistant import ConfigurationAssistant
-from flumotion.wizard.consumptionsteps import ConsumptionStep
-from flumotion.wizard.conversionsteps import ConversionStep
-from flumotion.wizard.scenarios import LiveScenario, SummaryStep
-from flumotion.wizard.productionsteps import SelectProducersStep
+from flumotion.admin.gtk.consumptionsteps import ConsumptionStep
+from flumotion.admin.gtk.conversionsteps import ConversionStep
+from flumotion.admin.gtk.productionsteps import SelectProducersStep
 
 _ = gettext.gettext
 

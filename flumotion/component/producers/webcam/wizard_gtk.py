@@ -36,7 +36,7 @@ from flumotion.common.messages import Info
 __pychecker__ = 'no-shadowbuiltin'
 from flumotion.common.python import sorted
 __pychecker__ = ''
-from flumotion.wizard.basesteps import VideoProducerStep
+from flumotion.admin.gtk.basesteps import VideoProducerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

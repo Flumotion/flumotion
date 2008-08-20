@@ -28,11 +28,11 @@ import gettext
 
 from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.ui.wizard import WizardStep
-from flumotion.wizard.basesteps import ConsumerStep
-from flumotion.wizard.consumptionsteps import ConsumptionStep
-from flumotion.wizard.conversionsteps import ConversionStep
-from flumotion.wizard.ondemandstep import OnDemandStep
-from flumotion.wizard.productionsteps import LiveProductionStep
+from flumotion.admin.gtk.basesteps import ConsumerStep
+from flumotion.admin.gtk.consumptionsteps import ConsumptionStep
+from flumotion.admin.gtk.conversionsteps import ConversionStep
+from flumotion.admin.gtk.ondemandstep import OnDemandStep
+from flumotion.admin.gtk.productionsteps import LiveProductionStep
 
 _ = gettext.gettext
 

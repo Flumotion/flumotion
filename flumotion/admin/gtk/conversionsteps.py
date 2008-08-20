@@ -24,7 +24,7 @@ import gettext
 from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.common.errors import NoBundleError
 from flumotion.common.i18n import N_
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

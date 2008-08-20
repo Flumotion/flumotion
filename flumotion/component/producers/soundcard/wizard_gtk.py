@@ -29,7 +29,7 @@ from flumotion.admin.assistant.models import AudioProducer
 from flumotion.common.errors import RemoteRunFailure
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
-from flumotion.wizard.basesteps import AudioProducerStep
+from flumotion.admin.gtk.basesteps import AudioProducerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

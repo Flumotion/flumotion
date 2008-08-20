@@ -35,8 +35,8 @@ __version__ = "$Rev$"
 
 # This file implements a generic wizard framework suitable for processes with
 # few steps. Processes with 5 or more steps should use something more like the
-# wizard in flumotion.wizard, because it has a history-sensitive navigation bar
-# as well. For simple processes, this wizard is sufficient.
+# wizard in flumotion.admin.gtk, because it has a history-sensitive
+# navigation bar as well. For simple processes, this wizard is sufficient.
 #
 # You will first have to define the steps in your wizard. They are defined by
 # subclassing WizardStep. You define the required class variables, the on_next

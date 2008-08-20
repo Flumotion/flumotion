@@ -28,6 +28,8 @@ import gtk
 from gtk import gdk
 from twisted.internet import defer
 
+from flumotion.admin.assistant.scenarios import LiveScenario, OnDemandScenario
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.admin.gtk.workerlist import WorkerList
 from flumotion.common import errors, messages
 from flumotion.common.common import pathToModuleName
@@ -36,8 +38,6 @@ from flumotion.common.i18n import N_, ngettext, gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
 from flumotion.ui.wizard import SectionWizard, WizardStep
-from flumotion.wizard.scenarios import LiveScenario, OnDemandScenario
-from flumotion.wizard.workerstep import WorkerWizardStep
 
 
 # pychecker doesn't like the auto-generated widget attrs
@@ -205,7 +205,8 @@ class ConfigurationAssistant(SectionWizard):
         Normally called by ScenarioStep to tell the assistant the
         current scenario just after creating it.
         @param scenario: the scenario of the assistant
-        @type scenario: a L{flumotion.wizard.scenarios.Scenario} subclass
+        @type scenario: a L{flumotion.admin.assistant.scenarios.Scenario}
+          subclass
         """
         scenario.setExistingComponentNames(self._existingComponentNames)
         self._scenario = scenario
@@ -213,7 +214,7 @@ class ConfigurationAssistant(SectionWizard):
     def getScenario(self):
         """Fetches the currently set scenario of the assistant.
         @returns scenario: the scenario of the assistant
-        @rtype: a L{flumotion.wizard.scenarios.Scenario} subclass
+        @rtype: a L{flumotion.admin.assistant.scenarios.Scenario} subclass
         """
         return self._scenario
 

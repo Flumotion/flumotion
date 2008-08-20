@@ -25,7 +25,7 @@ from flumotion.common import messages
 
 from flumotion.admin.assistant.models import VideoConverter
 from flumotion.common.i18n import N_, gettexter, ngettext
-from flumotion.wizard.workerstep import WorkerWizardStep
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 
 __version__ = "$Rev: 6228 $"
 T_ = gettexter()

@@ -126,7 +126,7 @@ class JobMedium(medium.BaseMedium):
     def remote_runFunction(self, moduleName, methodName, *args, **kwargs):
         """
         I am called on by the worker's JobAvatar to run a function,
-        normally on behalf of the flumotion wizard.
+        normally on behalf of the flumotion.admin.gtk.
 
         @param moduleName: name of the module containing the function
         @type  moduleName: str

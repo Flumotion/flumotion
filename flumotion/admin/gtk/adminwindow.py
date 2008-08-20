@@ -390,7 +390,7 @@ class AdminWindow(Loggable, GladeDelegate):
              None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
-            ('RunConfigurationAssistant', 'flumotion-wizard',
+            ('RunConfigurationAssistant', 'flumotion.admin.gtk',
              _('Run _Assistant'), None,
              _('Run the configuration assistant'),
              self._manage_run_assistant_cb),

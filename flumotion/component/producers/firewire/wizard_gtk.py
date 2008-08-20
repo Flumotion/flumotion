@@ -30,7 +30,7 @@ from flumotion.admin.assistant.models import AudioProducer, VideoProducer, \
      AudioEncoder, VideoEncoder, VideoConverter
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
-from flumotion.wizard.basesteps import AudioProducerStep, VideoProducerStep
+from flumotion.admin.gtk.basesteps import AudioProducerStep, VideoProducerStep
 
 __pychecker__ = 'no-returnvalues'
 __version__ = "$Rev$"

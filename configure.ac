@@ -283,7 +283,6 @@ flumotion/test/Makefile
 flumotion/tester/Makefile
 flumotion/twisted/Makefile
 flumotion/ui/Makefile
-flumotion/wizard/Makefile
 flumotion/worker/Makefile
 flumotion/worker/checks/Makefile
 conf/Makefile

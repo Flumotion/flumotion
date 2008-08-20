@@ -1,5 +1,30 @@
 2008-08-20  Johan Dahlin  <johan@flumotion.com>
 
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/admin/assistant/scenarios.py:
+	* flumotion/admin/gtk/addformatassistant.py:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/basesteps.py:
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/admin/gtk/consumptionsteps.py:
+	* flumotion/admin/gtk/conversionsteps.py:
+	* flumotion/admin/gtk/diskersteps.py:
+	* flumotion/admin/gtk/httpstreamersteps.py:
+	* flumotion/admin/gtk/ondemandstep.py:
+	* flumotion/admin/gtk/overlaystep.py:
+	* flumotion/admin/gtk/shout2steps.py:
+	* flumotion/component/encoders/*/wizard_gtk.py:
+	* flumotion/job/job.py:
+	* flumotion/test/test_wizard_save.py:
+	* flumotion/ui/icons.py:
+	* flumotion/ui/simplewizard.py:
+	* flumotion/wizard/*:
+	Move the rest of the files out of wizard/ and into
+	flumotion/admin
+
+2008-08-20  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/component/converters/overlay/overlay.py
 	(Overlay.configure_pipeline): Remove extra text argument which
 	shouldn't be sent in to the logotype warning

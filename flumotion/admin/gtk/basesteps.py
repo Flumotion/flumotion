@@ -21,8 +21,8 @@
 
 import gettext
 
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common import messages
-from flumotion.wizard.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -47,7 +47,7 @@ class VideoProducerStep(WorkerWizardStep):
     # WizardStep
 
     def getNext(self):
-        from flumotion.wizard.overlaystep import OverlayStep
+        from flumotion.admin.gtk.overlaystep import OverlayStep
         return OverlayStep(self.wizard, self.model)
 
 

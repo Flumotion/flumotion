@@ -43,9 +43,9 @@ import gtk
 from twisted.internet import defer
 
 from flumotion.admin.assistant.models import Consumer
+from flumotion.admin.gtk.basesteps import ConsumerStep
 from flumotion.common import errors, log, messages
 from flumotion.common.i18n import N_, gettexter, ngettext
-from flumotion.wizard.basesteps import ConsumerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

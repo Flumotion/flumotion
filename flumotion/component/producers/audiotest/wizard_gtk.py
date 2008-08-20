@@ -26,7 +26,7 @@ from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IProducerPlugin
 from flumotion.admin.assistant.models import AudioProducer
-from flumotion.wizard.basesteps import AudioProducerStep
+from flumotion.admin.gtk.basesteps import AudioProducerStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext

@@ -25,7 +25,7 @@ from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IEncoderPlugin
 from flumotion.admin.assistant.models import AudioEncoder
-from flumotion.wizard.basesteps import AudioEncoderStep
+from flumotion.admin.gtk.basesteps import AudioEncoderStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
