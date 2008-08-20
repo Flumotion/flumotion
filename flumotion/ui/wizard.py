@@ -675,7 +675,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         step = self.getCurrentStep()
         canGoBack = self.sidebar.canGoBack()
-        hasHelp = bool(step.docSection and step.docAnchor)
+        hasHelp = bool(step.docSection)
 
         self.button_help.set_sensitive(hasHelp)
         self.button_prev.set_sensitive(canGoBack)
