@@ -65,8 +65,8 @@ class WelcomeStep(WizardStep):
     section = _('Welcome')
     icon = 'wizard.png'
     gladeFile = 'welcome-wizard.glade'
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-welcome'
+    docSection = 'help-configuration-assistant-welcome'
+    docAnchor = ''
     docVersion = 'local'
 
     def getNext(self):

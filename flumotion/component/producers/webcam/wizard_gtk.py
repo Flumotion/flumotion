@@ -59,8 +59,8 @@ class WebcamStep(VideoProducerStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'video4linux'
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-webcam'
+    docSection = 'help-configuration-assistant-webcam'
+    docAnchor = ''
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)

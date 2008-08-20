@@ -48,8 +48,8 @@ class ConversionStep(WorkerWizardStep):
     title = _('Encoding')
     section = _('Conversion')
     gladeFile = 'encoding-wizard.glade'
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-encoders'
+    docSection = 'help-configuration-assistant-encoders'
+    docAnchor = ''
     docVersion = 'local'
 
     # Public API

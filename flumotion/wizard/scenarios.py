@@ -77,8 +77,8 @@ class SummaryStep(WizardStep):
     icon = 'summary.png'
     gladeFile = "summary-wizard.glade"
     lastStep = True
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-summary'
+    docSection = 'help-configuration-assistant-summary'
+    docAnchor = ''
     docVersion = 'local'
 
     # WizardStep

@@ -76,8 +76,8 @@ class SoundcardStep(AudioProducerStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'osssrc'
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-soundcard'
+    docSection = 'help-configuration-assistant-soundcard'
+    docAnchor = ''
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)

@@ -43,8 +43,8 @@ class LiveProductionStep(WizardStep):
     section = _('Production')
     icon = 'source.png'
     gladeFile = 'production-wizard.glade'
-    docSection = 'chapter-using-assistant'
-    docAnchor = 'figure-configure-assistant-production'
+    docSection = 'help-configuration-assistant-production'
+    docAnchor = ''
     docVersion = 'local'
 
     def __init__(self, wizard):
