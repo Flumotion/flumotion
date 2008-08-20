@@ -1,5 +1,11 @@
 2008-08-20  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/converters/overlay/overlay.py
+	(Overlay.configure_pipeline): Remove extra text argument which
+	shouldn't be sent in to the logotype warning
+
+2008-08-20  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/wizard.py (SectionWizard.updateButtons): Do not require
 	an anchor for the help button to be clickable
 

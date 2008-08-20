@@ -75,13 +75,13 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         if textOverflowed:
             m = messages.Warning(
                 T_(N_("Overlayed text '%s' too wide for the video image."),
-                   text), id = "text-too-wide")
+                   text), id="text-too-wide")
             self.addMessage(m)
 
         if imagesOverflowed:
             m = messages.Warning(
-                T_(N_("Overlayed logotypes too wide for the video image."),
-                   text), id = "image-too-wide")
+                T_(N_("Overlayed logotypes too wide for the video image.")),
+                id="image-too-wide")
             self.addMessage(m)
 
         source = self.get_element('source')
