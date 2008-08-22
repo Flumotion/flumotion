@@ -35,7 +35,6 @@ flumotion/admin/assistant/__init__.py
 flumotion/admin/assistant/models.py
 flumotion/admin/assistant/save.py
 flumotion/admin/assistant/scenarios.py
-flumotion/admin/command/commands.py
 flumotion/admin/command/__init__.py
 flumotion/admin/command/main.py
 flumotion/admin/command/utils.py

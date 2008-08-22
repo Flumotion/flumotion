@@ -1,3 +1,8 @@
+2008-08-22  Pedro Gracia  <pedro@flumotion.com>
+
+	* po/POTFILES.in:
+	Deleted "flumotion/admin/command/commands.py" entry. Removed in r7227.
+
 2008-08-22  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:
