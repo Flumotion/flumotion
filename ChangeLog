@@ -1,6 +1,16 @@
 2008-08-22  Johan Dahlin  <johan@flumotion.com>
 
-	* data/glade/welcome-wizard.glade: 
+	* data/glade/sectionwizard.glade:
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/common/registry.py:
+	* flumotion/manager/admin.py:
+	* flumotion/ui/wizard.py:
+	Add a component description to the wizard.
+	Fixes #1099
+
+2008-08-22  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/welcome-wizard.glade:
 	Replace the string in the initial step, Fixes #889
 	Patch by Murray Cumming.
 

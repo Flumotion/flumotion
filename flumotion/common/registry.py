@@ -60,7 +60,7 @@ def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 
-class RegistryEntryComponent:
+class RegistryEntryComponent(pb.Copyable, pb.RemoteCopy):
     """
     I represent a <component> entry in the registry
     """
@@ -171,6 +171,7 @@ class RegistryEntryComponent:
 
     def getSockets(self):
         return self.sockets
+pb.setUnjellyableForClass(RegistryEntryComponent, RegistryEntryComponent)
 
 
 class RegistryEntryPlug:

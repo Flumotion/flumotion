@@ -175,6 +175,7 @@ class ConfigurationAssistant(SectionWizard):
         else:
             self._workerList.hide()
 
+        self._fetchDescription(step)
         self._setupWorker(step, self._workerList.getWorker())
 
     def prepareNextStep(self, step):
@@ -674,6 +675,18 @@ class ConfigurationAssistant(SectionWizard):
 
         url = getWebLink(section, anchor, version=version)
         webbrowser.open(url)
+
+    def _fetchDescription(self, step):
+        if not hasattr(step, 'model'):
+            self.setStepDescription('')
+            return
+
+        def gotComponentEntry(entry):
+            self.setStepDescription(entry.description)
+
+        d = self._adminModel.callRemote(
+            'getComponentEntry', step.model.componentType)
+        d.addCallback(gotComponentEntry)
 
     # Callbacks
 

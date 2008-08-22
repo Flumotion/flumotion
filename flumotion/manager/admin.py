@@ -445,6 +445,20 @@ class AdminAvatar(base.ManagerAvatar):
 
         return retval
 
+    def perspective_getComponentEntry(self, componentType):
+        """Fetches a ComponentRegistryEntry given a componentType
+        @param componentType: component type
+        @type componentType: string
+        @returns: the component
+        @rtype: L{ComponentRegistryEntry}
+        """
+        try:
+            componentRegistryEntry = registry.getRegistry().getComponent(
+                componentType)
+        except KeyError:
+            return None
+        return componentRegistryEntry
+
 
 class AdminHeaven(base.ManagerHeaven):
     """

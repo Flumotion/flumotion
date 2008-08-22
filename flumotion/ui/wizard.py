@@ -627,6 +627,15 @@ class SectionWizard(GladeWindow, log.Loggable):
         """
         self.sidebar.prepareNextStep(self.sidebar.getCurrentStep())
 
+    def setStepDescription(self, description):
+        """Sets the steps description.
+        This is usually a sentence describing a component.
+        @param description: the description
+        @type description: string
+        """
+        self.label_description.set_markup(
+            '<i>%s</i>' % escape(description or ''))
+
     def blockNext(self, block):
         if self.button_finish.get_property('sensitive'):
             return
@@ -717,6 +726,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)
         self.hbuttonbox2.modify_bg(gtk.STATE_NORMAL, bg)
         self.label_title.modify_fg(gtk.STATE_NORMAL, fg)
+        self.label_description.modify_fg(gtk.STATE_NORMAL, fg)
 
     def on_window_destroy(self, window):
         self.emit('destroy')
