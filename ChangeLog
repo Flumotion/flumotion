@@ -1,3 +1,9 @@
+2008-08-22  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/admin-wizard.glade:
+	* data/glade/welcome-wizard.glade:
+	wizard -> assistant
+
 2008-08-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/Makefile.am:
@@ -6,10 +12,10 @@
 	  Add implementation of flumotion-nagios log recent which can
 	  check if a given string was logged recently.
 
-2008-08-20  Johan Dahlin  <johan@gnome.org>
+2008-08-20  Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/admin/assistant/Makefile.am (component_PYTHON): 
-	* flumotion/admin/gtk/Makefile.am (component_PYTHON): 
+	* flumotion/admin/assistant/Makefile.am (component_PYTHON):
+	* flumotion/admin/gtk/Makefile.am (component_PYTHON):
 	Add new files
 
 2008-08-20  Johan Dahlin  <johan@flumotion.com>
