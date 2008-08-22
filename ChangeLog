@@ -1,5 +1,11 @@
 2008-08-22  Johan Dahlin  <johan@flumotion.com>
 
+	* data/glade/welcome-wizard.glade: 
+	Replace the string in the initial step, Fixes #889
+	Patch by Murray Cumming.
+
+2008-08-22  Johan Dahlin  <johan@flumotion.com>
+
 	* data/glade/admin-wizard.glade:
 	* data/glade/welcome-wizard.glade:
 	wizard -> assistant

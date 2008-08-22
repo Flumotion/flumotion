@@ -23,7 +23,7 @@
       <property name="visible">True</property>
       <property name="label" translatable="yes">Welcome to the Flumotion configuration assistant.
 
-This assistant will guide you through the required steps to help you configure your streaming media server.</property>
+This assistant helps to create a Flumotion configuration for simple scenarios such as live streaming of a single camera or free on-demand streaming of pre-existing video files. The assistant should help you to become familiar with Flumotion and can be useful to generate fragments of configuration files for more complex Flumotion systems. </property>
       <property name="use_underline">False</property>
       <property name="use_markup">False</property>
       <property name="justify">GTK_JUSTIFY_LEFT</property>
