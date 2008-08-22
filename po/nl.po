@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.5.1\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-08-22 17:36+0200\n"
+"POT-Creation-Date: 2008-08-05 19:04+0200\n"
 "PO-Revision-Date: 2008-04-08 03:00+0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
@@ -22,8 +22,7 @@ msgid "Flumotion Administration"
 msgstr "Flumotion Administratie"
 
 #: ../data/glade/admin-wizard.glade.h:1 ../data/glade/sectionwizard.glade.h:1
-#, fuzzy
-msgid "Flumotion Configuration Assistant"
+msgid "Flumotion Configuration Wizard"
 msgstr "Flumotion Configuratie Wizard"
 
 #: ../data/glade/admin-wizard.glade.h:2
@@ -151,10 +150,6 @@ msgstr "_Kies locatie:"
 msgid "_Rotate entry every:"
 msgstr "_Roteer opslag elke"
 
-#: ../data/glade/disker-wizard.glade.h:4
-msgid "_Select"
-msgstr ""
-
 #: ../data/glade/encoding-wizard.glade.h:1 ../data/glade/videotest.glade.h:2
 msgid "F_ormat:"
 msgstr "F_ormaat:"
@@ -271,7 +266,7 @@ msgstr ""
 
 #: ../data/glade/ondemand-wizard.glade.h:4
 msgid ""
-"This is the directory which will be exported. All files in this and its "
+"This is the directory which will be exported. All files in this and it's "
 "subdirectories will be accessible over http."
 msgstr ""
 
@@ -300,16 +295,10 @@ msgid "_Secure connection via SSL"
 msgstr "V_eilige verbinding via SSL"
 
 #: ../data/glade/overlay-wizard.glade.h:1
-msgid ""
-"Enable this to show a couple of logotypes in the bottom left corner of the "
-"video output."
-msgstr ""
-
-#: ../data/glade/overlay-wizard.glade.h:2
 msgid "Show _logos in bottom left corner"
 msgstr "Toon _logos in de linkeronderhoek"
 
-#: ../data/glade/overlay-wizard.glade.h:3
+#: ../data/glade/overlay-wizard.glade.h:2
 msgid "Show _text in upper left corner:"
 msgstr "Toon t_ekst in the rechterbovenhoek:"
 
@@ -406,314 +395,275 @@ msgstr "_Breedte:"
 
 #: ../data/glade/welcome-wizard.glade.h:1
 msgid ""
-"Welcome to the Flumotion configuration assistant.\n"
+"Welcome to the Flumotion configuration wizard.\n"
 "\n"
-"This assistant helps to create a Flumotion configuration for simple "
-"scenarios such as live streaming of a single camera or free on-demand "
-"streaming of pre-existing video files. The assistant should help you to "
-"become familiar with Flumotion and can be useful to generate fragments of "
-"configuration files for more complex Flumotion systems. "
+"This wizard will guide you through the required steps to help you configure "
+"your streaming media server."
 msgstr ""
+"Welkom bij de Flumotion configuratiewizard.\n"
+"\n"
+"Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
+"configuratie van uw streaming media server."
 
 #: ../flumotion/admin/admin.py:447
 msgid "Internal error in component."
 msgstr "Interne fout in component."
 
-#: ../flumotion/admin/assistant/scenarios.py:42
-msgid "Content License"
-msgstr "Inhoudslicensie"
-
-#: ../flumotion/admin/assistant/scenarios.py:43
-msgid "License"
-msgstr "Licensie"
-
-#: ../flumotion/admin/assistant/scenarios.py:61
-msgid "Creative Commons"
-msgstr "Creative Commons"
-
-#: ../flumotion/admin/assistant/scenarios.py:62
-msgid "Commercial"
-msgstr ""
-
-#: ../flumotion/admin/assistant/scenarios.py:75
-#: ../flumotion/admin/assistant/scenarios.py:76
-msgid "Summary"
-msgstr "Samenvatting"
-
-#: ../flumotion/admin/assistant/scenarios.py:138
-msgid "Set up a live stream"
-msgstr ""
-
-#: ../flumotion/admin/assistant/scenarios.py:140
-msgid ""
-"Allows you to create a live stream from a device or a file.\n"
-"        "
-msgstr ""
-
-#: ../flumotion/admin/assistant/scenarios.py:214
-msgid "Stream files on demand"
-msgstr ""
-
-#: ../flumotion/admin/assistant/scenarios.py:215
-msgid "Allows you to serve a collection of files from disk."
-msgstr ""
-
-#: ../flumotion/admin/gtk/adminwindow.py:285
+#: ../flumotion/admin/gtk/adminwindow.py:284
 #, python-format
 msgid "Worker %s logged in."
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:290
+#: ../flumotion/admin/gtk/adminwindow.py:289
 #, python-format
 msgid "Worker %s logged out."
 msgstr ""
 
 #. Connection
-#: ../flumotion/admin/gtk/adminwindow.py:352
+#: ../flumotion/admin/gtk/adminwindow.py:351
 msgid "_Connection"
 msgstr "_Verbinding"
 
-#: ../flumotion/admin/gtk/adminwindow.py:353
+#: ../flumotion/admin/gtk/adminwindow.py:352
 msgid "_Open Recent Connection..."
 msgstr "_Recente verbinding openen..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:354
+#: ../flumotion/admin/gtk/adminwindow.py:353
 #, fuzzy
 msgid "Connect to a recently used connection"
 msgstr "_Recente verbinding openen"
 
-#: ../flumotion/admin/gtk/adminwindow.py:356
+#: ../flumotion/admin/gtk/adminwindow.py:355
 #, fuzzy
 msgid "Connect to _running manager..."
 msgstr "Verbinden met een _actieve manager"
 
-#: ../flumotion/admin/gtk/adminwindow.py:357
+#: ../flumotion/admin/gtk/adminwindow.py:356
 #, fuzzy
 msgid "Connect to an previously used connection"
 msgstr "_Recente verbinding openen"
 
-#: ../flumotion/admin/gtk/adminwindow.py:359
+#: ../flumotion/admin/gtk/adminwindow.py:358
 msgid "_Import Configuration..."
 msgstr "Configuratie Invoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:360
+#: ../flumotion/admin/gtk/adminwindow.py:359
 #, fuzzy
 msgid "Import configuration from a file"
 msgstr "Configuratie invoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:362
+#: ../flumotion/admin/gtk/adminwindow.py:361
 msgid "_Export Configuration..."
 msgstr "Configuratie Uitvoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:363
+#: ../flumotion/admin/gtk/adminwindow.py:362
 #, fuzzy
 msgid "Export current configuration to a file"
 msgstr "Configuratie uitvoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:365
+#: ../flumotion/admin/gtk/adminwindow.py:364
 msgid "_Quit"
 msgstr "_Afsluiten"
 
-#: ../flumotion/admin/gtk/adminwindow.py:366
+#: ../flumotion/admin/gtk/adminwindow.py:365
 msgid "Quit the application and disconnect from the manager"
 msgstr ""
 
 #. Manage
-#: ../flumotion/admin/gtk/adminwindow.py:370
+#: ../flumotion/admin/gtk/adminwindow.py:369
 msgid "_Manage"
 msgstr "_Beheren"
 
-#: ../flumotion/admin/gtk/adminwindow.py:371
+#: ../flumotion/admin/gtk/adminwindow.py:370
 #, fuzzy
 msgid "_Start Component(s)"
 msgstr "S_tart Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:372
+#: ../flumotion/admin/gtk/adminwindow.py:371
 #, fuzzy
 msgid "Start the selected component(s)"
 msgstr "S_tart Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:374
+#: ../flumotion/admin/gtk/adminwindow.py:373
 #, fuzzy
 msgid "St_op Component(s)"
 msgstr "St_op Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:375
+#: ../flumotion/admin/gtk/adminwindow.py:374
 #, fuzzy
 msgid "Stop the selected component(s)"
 msgstr "Kon component niet instellen."
 
-#: ../flumotion/admin/gtk/adminwindow.py:377
+#: ../flumotion/admin/gtk/adminwindow.py:376
 #, fuzzy
 msgid "_Delete Component(s)"
 msgstr "_Wis Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:378
+#: ../flumotion/admin/gtk/adminwindow.py:377
 #, fuzzy
 msgid "Delete the selected component(s)"
 msgstr "S_tart Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:380
+#: ../flumotion/admin/gtk/adminwindow.py:379
 msgid "Start _All"
 msgstr "Start _Alles"
 
-#: ../flumotion/admin/gtk/adminwindow.py:381
+#: ../flumotion/admin/gtk/adminwindow.py:380
 #, fuzzy
 msgid "Start all components"
 msgstr "S_tart Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:383
+#: ../flumotion/admin/gtk/adminwindow.py:382
 msgid "Stop A_ll"
 msgstr "Stop A_lles"
 
-#: ../flumotion/admin/gtk/adminwindow.py:384
+#: ../flumotion/admin/gtk/adminwindow.py:383
 #, fuzzy
 msgid "Stop all components"
 msgstr "St_op Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:386
+#: ../flumotion/admin/gtk/adminwindow.py:385
 msgid "_Clear All"
 msgstr "Wis _Alles"
 
-#: ../flumotion/admin/gtk/adminwindow.py:387
+#: ../flumotion/admin/gtk/adminwindow.py:386
 #, fuzzy
 msgid "Remove all components"
 msgstr "Geen UI voor component %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:389
+#: ../flumotion/admin/gtk/adminwindow.py:388
 msgid "Add new encoding _format..."
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:391
+#: ../flumotion/admin/gtk/adminwindow.py:390
 msgid "Add a new format to the current stream"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:394
-msgid "Run _Assistant"
-msgstr ""
+#: ../flumotion/admin/gtk/adminwindow.py:392
+msgid "Run _Wizard"
+msgstr "_Wizard Uitvoeren"
 
-#: ../flumotion/admin/gtk/adminwindow.py:395
+#: ../flumotion/admin/gtk/adminwindow.py:394
 #, fuzzy
-msgid "Run the configuration assistant"
+msgid "Run the configuration wizard"
 msgstr "Flumotion Configuratie Wizard"
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:399
+#: ../flumotion/admin/gtk/adminwindow.py:398
 msgid "_Debug"
 msgstr "_Debug"
 
 #. Help
-#: ../flumotion/admin/gtk/adminwindow.py:402
+#: ../flumotion/admin/gtk/adminwindow.py:401
 msgid "_Help"
 msgstr "_Help"
 
-#: ../flumotion/admin/gtk/adminwindow.py:403
+#: ../flumotion/admin/gtk/adminwindow.py:402
 #, fuzzy
 msgid "_Contents"
 msgstr "Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:404
+#: ../flumotion/admin/gtk/adminwindow.py:403
 #, fuzzy
 msgid "Open the flumotion manual"
 msgstr "Verbinden met Flumotion manager"
 
-#: ../flumotion/admin/gtk/adminwindow.py:406
+#: ../flumotion/admin/gtk/adminwindow.py:405
 msgid "_About"
 msgstr "I_nfo"
 
-#: ../flumotion/admin/gtk/adminwindow.py:407
+#: ../flumotion/admin/gtk/adminwindow.py:406
 msgid "Displays an about dialog"
 msgstr ""
 
 #. Only in context menu
-#: ../flumotion/admin/gtk/adminwindow.py:411
+#: ../flumotion/admin/gtk/adminwindow.py:410
 #, fuzzy
 msgid "_Kill Component"
 msgstr "Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:412
+#: ../flumotion/admin/gtk/adminwindow.py:411
 #, fuzzy
 msgid "Kills the currently selected component"
 msgstr "S_tart Component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:417
+#: ../flumotion/admin/gtk/adminwindow.py:416
 msgid "Enable _Debugging"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:418
+#: ../flumotion/admin/gtk/adminwindow.py:417
 msgid "Enable debugging in the admin interface"
 msgstr ""
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:428
+#: ../flumotion/admin/gtk/adminwindow.py:427
 msgid "Start _Shell"
 msgstr "_Shell Opstarten"
 
-#: ../flumotion/admin/gtk/adminwindow.py:429
+#: ../flumotion/admin/gtk/adminwindow.py:428
 msgid "Start an interactive debugging shell"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:432
+#: ../flumotion/admin/gtk/adminwindow.py:431
 #, fuzzy
 msgid "Dump configuration"
 msgstr "Configuratie invoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:433
+#: ../flumotion/admin/gtk/adminwindow.py:432
 #, fuzzy
 msgid "Dumps the current manager configuration"
 msgstr "Configuratie uitvoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:436
+#: ../flumotion/admin/gtk/adminwindow.py:435
 msgid "Write debug marker..."
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:437
+#: ../flumotion/admin/gtk/adminwindow.py:436
 msgid "Writes a debug marker to all the logs"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:482
+#: ../flumotion/admin/gtk/adminwindow.py:481
 #, fuzzy
 msgid "Flumotion: Not connected"
 msgstr "Niet verbonden"
 
-#: ../flumotion/admin/gtk/adminwindow.py:556
+#: ../flumotion/admin/gtk/adminwindow.py:555
 #, fuzzy, python-format
 msgid "Flumotion: Connecting to %s:%s"
 msgstr "Aan het verbinden met %(host)s:%(port)s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:605
+#: ../flumotion/admin/gtk/adminwindow.py:604
 #, fuzzy, python-format
 msgid "Connect to the manager on %s"
 msgstr "Verbinden met Flumotion manager"
 
-#: ../flumotion/admin/gtk/adminwindow.py:750
+#: ../flumotion/admin/gtk/adminwindow.py:748
 msgid ""
-"Cannot run the configuration assistant since there is at least one component "
-"in the lost state"
+"Cannot run the configuration wizard since there is at least one component in "
+"the lost state"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:754
+#: ../flumotion/admin/gtk/adminwindow.py:752
 msgid ""
-"Running the Configuration Assistant again will remove all components from "
-"the current stream and create a new one."
+"Running the Configuration Wizard again will remove all components from the "
+"current stream and create a new one."
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:758
+#: ../flumotion/admin/gtk/adminwindow.py:756
 msgid "Keep the current stream"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:760
+#: ../flumotion/admin/gtk/adminwindow.py:758
 #, fuzzy
-msgid "Run the Assistant anyway"
+msgid "Run the Wizard anyway"
 msgstr "_Wizard Uitvoeren"
 
-#: ../flumotion/admin/gtk/adminwindow.py:774
-#, fuzzy
-msgid "The assistant cannot be run because no workers are logged in."
+#: ../flumotion/admin/gtk/adminwindow.py:772
+msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
-#: ../flumotion/admin/gtk/adminwindow.py:923
+#: ../flumotion/admin/gtk/adminwindow.py:921
 msgid ""
 "Some component(s) are still busy and cannot be removed.\n"
 "Try again later."
@@ -721,23 +671,23 @@ msgstr ""
 
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a component name like "audio-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:990
-#: ../flumotion/admin/gtk/adminwindow.py:1018
+#: ../flumotion/admin/gtk/adminwindow.py:988
+#: ../flumotion/admin/gtk/adminwindow.py:1016
 #, fuzzy, python-format
 msgid "%s component %s"
 msgstr "Geen UI voor component %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:997
+#: ../flumotion/admin/gtk/adminwindow.py:995
 #, fuzzy, python-format
 msgid "Failed to %(action)s component %(name)s."
 msgstr "%s van component %s mislukt"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1005
+#: ../flumotion/admin/gtk/adminwindow.py:1003
 #, fuzzy, python-format
 msgid "%s components."
 msgstr "Geen UI voor component %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1012
+#: ../flumotion/admin/gtk/adminwindow.py:1010
 #, fuzzy, python-format
 msgid "Failed to %s some components."
 msgstr "%s van component %s mislukt"
@@ -745,83 +695,83 @@ msgstr "%s van component %s mislukt"
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a list of component names, like
 #. "audio-producer, video-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1022
+#: ../flumotion/admin/gtk/adminwindow.py:1020
 #, fuzzy, python-format
 msgid "%s components %s"
 msgstr "Geen UI voor component %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1109
+#: ../flumotion/admin/gtk/adminwindow.py:1107
 #, fuzzy, python-format
 msgid "Component %s is sad. "
 msgstr "Component %s is triestig"
 
 #. FIXME: have a method for this
-#: ../flumotion/admin/gtk/adminwindow.py:1136
+#: ../flumotion/admin/gtk/adminwindow.py:1134
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administratie"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1138
+#: ../flumotion/admin/gtk/adminwindow.py:1136
 #, fuzzy, python-format
 msgid "Flumotion: %s"
 msgstr "Flumotion:"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1172
+#: ../flumotion/admin/gtk/adminwindow.py:1170
 msgid "Reconnecting ..."
 msgstr "Aan het herverbinden..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1173
+#: ../flumotion/admin/gtk/adminwindow.py:1171
 #, python-format
 msgid "Lost connection to manager %s, reconnecting ..."
 msgstr "Verbinding verbroken met manager %s, herverbinden ..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1196
+#: ../flumotion/admin/gtk/adminwindow.py:1194
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Verbinding met manager op %s werd geweigerd."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1198
+#: ../flumotion/admin/gtk/adminwindow.py:1196
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1207
+#: ../flumotion/admin/gtk/adminwindow.py:1205
 #: ../flumotion/admin/gtk/dialogs.py:184
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Verbinding met manager op %s mislukt (%s)."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1209
+#: ../flumotion/admin/gtk/adminwindow.py:1207
 #, fuzzy, python-format
 msgid "Connection to %s failed"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1245
+#: ../flumotion/admin/gtk/adminwindow.py:1243
 msgid "Import Configuration..."
 msgstr "Configuratie invoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1248
+#: ../flumotion/admin/gtk/adminwindow.py:1246
 msgid "Import"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:1252
+#: ../flumotion/admin/gtk/adminwindow.py:1250
 #, fuzzy
 msgid "Flumotion XML Configuration files"
 msgstr "Flumotion Configuratie Wizard"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1256
+#: ../flumotion/admin/gtk/adminwindow.py:1254
 msgid "All files"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:1272
+#: ../flumotion/admin/gtk/adminwindow.py:1270
 msgid "Export Configuration..."
 msgstr "Configuratie uitvoeren..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1275
+#: ../flumotion/admin/gtk/adminwindow.py:1273
 msgid "Export"
 msgstr ""
 
-#: ../flumotion/admin/gtk/adminwindow.py:1289
+#: ../flumotion/admin/gtk/adminwindow.py:1287
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -829,36 +779,28 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1362
+#: ../flumotion/admin/gtk/adminwindow.py:1360
 msgid "Cannot find a program to display the flumotion manual."
 msgstr ""
 
-#: ../flumotion/admin/gtk/basesteps.py:32
-#: ../flumotion/admin/gtk/basesteps.py:40
-#: ../flumotion/admin/gtk/ondemandstep.py:68
-#: ../flumotion/admin/gtk/overlaystep.py:71
-#: ../flumotion/admin/gtk/productionsteps.py:42
-#: ../flumotion/admin/gtk/productionsteps.py:43
-#: ../flumotion/admin/gtk/productionsteps.py:238
-#: ../flumotion/admin/gtk/productionsteps.py:239
-msgid "Production"
-msgstr "Productie"
+#: ../flumotion/admin/gtk/componentview.py:126
+#, python-format
+msgid "Loading UI for %s..."
+msgstr "UI aan het laden voor %s ..."
 
-#: ../flumotion/admin/gtk/basesteps.py:55
-#: ../flumotion/admin/gtk/basesteps.py:67
-#: ../flumotion/admin/gtk/conversionsteps.py:49
-#: ../flumotion/component/encoders/jpeg/wizard_gtk.py:61
-#: ../flumotion/component/encoders/mulaw/wizard_gtk.py:43
-#: ../flumotion/component/encoders/smoke/wizard_gtk.py:43
-msgid "Conversion"
-msgstr "Conversie"
+#: ../flumotion/admin/gtk/componentview.py:306
+msgid "This component has a UI bug."
+msgstr "De component heeft een bug in de gebruikersinterface."
 
-#: ../flumotion/admin/gtk/basesteps.py:80
-#: ../flumotion/admin/gtk/consumptionsteps.py:52
-#: ../flumotion/admin/gtk/consumptionsteps.py:53
-#: ../flumotion/admin/gtk/consumptionsteps.py:255
-msgid "Consumption"
-msgstr "Consumptie"
+#: ../flumotion/admin/gtk/componentview.py:322
+#, fuzzy, python-format
+msgid "Component '%s' is still sleeping."
+msgstr "Component %s slaapt nog steeds"
+
+#: ../flumotion/admin/gtk/componentview.py:329
+#, fuzzy, python-format
+msgid "Component '%s' has a UI bug."
+msgstr "De component heeft een bug in de gebruikersinterface."
 
 #: ../flumotion/admin/gtk/componentlist.py:47
 msgid "Sad"
@@ -906,108 +848,6 @@ msgstr "[willekeurige worker]"
 msgid "Component is %s"
 msgstr "Component is %s"
 
-#: ../flumotion/admin/gtk/componentview.py:126
-#, python-format
-msgid "Loading UI for %s..."
-msgstr "UI aan het laden voor %s ..."
-
-#: ../flumotion/admin/gtk/componentview.py:306
-msgid "This component has a UI bug."
-msgstr "De component heeft een bug in de gebruikersinterface."
-
-#: ../flumotion/admin/gtk/componentview.py:322
-#, fuzzy, python-format
-msgid "Component '%s' is still sleeping."
-msgstr "Component %s slaapt nog steeds"
-
-#: ../flumotion/admin/gtk/componentview.py:329
-#, fuzzy, python-format
-msgid "Component '%s' has a UI bug."
-msgstr "De component heeft een bug in de gebruikersinterface."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:64
-#: ../flumotion/admin/gtk/configurationassistant.py:65
-msgid "Welcome"
-msgstr "Welkom"
-
-#: ../flumotion/admin/gtk/configurationassistant.py:78
-#: ../flumotion/admin/gtk/configurationassistant.py:79
-msgid "Scenario"
-msgstr ""
-
-#: ../flumotion/admin/gtk/configurationassistant.py:416
-#: ../flumotion/admin/gtk/httpstreamersteps.py:342
-#: ../flumotion/admin/gtk/overlaystep.py:139
-#, python-format
-msgid "Worker '%s' is missing GStreamer element '%s'."
-msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] "Worker '%s' mist het GStreamer-element '%s'."
-msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:421
-msgid ""
-"\n"
-"Please install the necessary GStreamer plug-ins that provide these elements "
-"and restart the worker."
-msgstr ""
-"\n"
-"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
-"en de worker te herstarten."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:424
-#: ../flumotion/admin/gtk/configurationassistant.py:486
-msgid ""
-"\n"
-"\n"
-"You will not be able to go forward using this worker."
-msgstr ""
-"\n"
-"\n"
-"U kan niet verder gaan."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:478
-#: ../flumotion/admin/gtk/httpstreamersteps.py:320
-#: ../flumotion/admin/gtk/ondemandstep.py:111
-#: ../flumotion/admin/gtk/overlaystep.py:117
-#, python-format
-msgid "Worker '%s' cannot import module '%s'."
-msgstr "Werker '%s' kan module '%s' niet importeren."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:481
-#: ../flumotion/admin/gtk/overlaystep.py:120
-#, python-format
-msgid ""
-"\n"
-"This module is part of '%s'."
-msgstr ""
-"\n"
-"Deze module maakt deel uit van '%s'."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:484
-#: ../flumotion/admin/gtk/httpstreamersteps.py:324
-#: ../flumotion/admin/gtk/ondemandstep.py:115
-#: ../flumotion/admin/gtk/overlaystep.py:123
-#, python-format
-msgid ""
-"\n"
-"The project's homepage is %s"
-msgstr ""
-"\n"
-"De thuispagina van het project is %s"
-
-#: ../flumotion/admin/gtk/configurationassistant.py:531
-#: ../flumotion/admin/gtk/configurationassistant.py:559
-msgid "Internal error: could not run check code on worker."
-msgstr "Interne fout: kon check-code niet uitvoeren op worker."
-
-#: ../flumotion/admin/gtk/configurationassistant.py:704
-msgid ""
-"All workers have logged out.\n"
-"Make sure your Flumotion network is running properly and try again."
-msgstr ""
-"Alle workers zijn afgemeld.\n"
-"Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
-
 #: ../flumotion/admin/gtk/connections.py:52
 msgid "Hostname"
 msgstr "Netwerknaam"
@@ -1015,15 +855,6 @@ msgstr "Netwerknaam"
 #: ../flumotion/admin/gtk/connections.py:53
 msgid "Last used"
 msgstr "Laatst gebruikt"
-
-#: ../flumotion/admin/gtk/consumptionsteps.py:254
-#, fuzzy
-msgid "HTTP Streaming"
-msgstr "HTTP Streamer (enkel audio)"
-
-#: ../flumotion/admin/gtk/conversionsteps.py:48
-msgid "Encoding"
-msgstr "Encodering"
 
 #: ../flumotion/admin/gtk/dialogs.py:127
 msgid "About Flumotion"
@@ -1069,63 +900,6 @@ msgstr ""
 #, fuzzy
 msgid "You cannot connect twice to the same manager. Try disconnecting first."
 msgstr "Verbinding verbroken met manager, herverbinden ..."
-
-#: ../flumotion/admin/gtk/diskersteps.py:114
-msgid "kB"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:115
-msgid "MB"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:116
-msgid "GB"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:117
-msgid "TB"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:120
-msgid "minute(s)"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:121
-msgid "hour(s)"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:122
-msgid "day(s)"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:123
-msgid "week(s)"
-msgstr ""
-
-#: ../flumotion/admin/gtk/diskersteps.py:193
-#, fuzzy
-msgid "Disk (audio and video)"
-msgstr "Schijf (audio & video)"
-
-#: ../flumotion/admin/gtk/diskersteps.py:194
-msgid "Disk audio/video"
-msgstr "Schijf audio/video"
-
-#: ../flumotion/admin/gtk/diskersteps.py:204
-msgid "Disk (audio only)"
-msgstr "Schijf (enkel audio)"
-
-#: ../flumotion/admin/gtk/diskersteps.py:205
-msgid "Disk audio"
-msgstr "Schijf audio"
-
-#: ../flumotion/admin/gtk/diskersteps.py:215
-msgid "Disk (video only)"
-msgstr "Schijf (enkel video)"
-
-#: ../flumotion/admin/gtk/diskersteps.py:216
-msgid "Disk video"
-msgstr "Schijf video"
 
 #: ../flumotion/admin/gtk/greeter.py:49
 msgid "Connect to Flumotion manager"
@@ -1226,41 +1000,6 @@ msgstr ""
 "\n"
 "<i>%s</i>\n"
 
-#: ../flumotion/admin/gtk/httpstreamersteps.py:322
-#: ../flumotion/admin/gtk/ondemandstep.py:113
-#, python-format
-msgid ""
-"\n"
-"This module is part of the '%s'."
-msgstr ""
-"\n"
-"Deze module maakt deel uit van '%s'."
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:387
-#, fuzzy
-msgid "HTTP Streamer (audio and video)"
-msgstr "HTTP Streamer (audio & video)"
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:388
-msgid "HTTP audio/video"
-msgstr "HTTP audio/video"
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:398
-msgid "HTTP Streamer (audio only)"
-msgstr "HTTP Streamer (enkel audio)"
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:399
-msgid "HTTP audio"
-msgstr "HTTP audio"
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:409
-msgid "HTTP Streamer (video only)"
-msgstr "HTTP Streamer (enkel video)"
-
-#: ../flumotion/admin/gtk/httpstreamersteps.py:410
-msgid "HTTP video"
-msgstr "HTTP video"
-
 #: ../flumotion/admin/gtk/main.py:52
 #, fuzzy, python-format
 msgid ""
@@ -1303,86 +1042,12 @@ msgstr "Debug-informatie:\n"
 msgid "Message"
 msgstr "Bericht"
 
-#: ../flumotion/admin/gtk/ondemandstep.py:66
-msgid "Demand"
-msgstr ""
-
-#: ../flumotion/admin/gtk/ondemandstep.py:67
-msgid "On demand"
-msgstr ""
-
-#: ../flumotion/admin/gtk/ondemandstep.py:124
-#, python-format
-msgid "Directory '%s' does not exist, or is not readable on worker '%s'."
-msgstr ""
-
-#: ../flumotion/admin/gtk/overlaystep.py:44
-#, fuzzy
-msgid "Flumotion"
-msgstr "Flumotion:"
-
-#: ../flumotion/admin/gtk/overlaystep.py:70
-msgid "Overlay"
-msgstr "Overlay"
-
-#: ../flumotion/admin/gtk/overlaystep.py:126
-#: ../flumotion/admin/gtk/overlaystep.py:146
-msgid ""
-"\n"
-"\n"
-"Click \"Forward\" to proceed without overlay."
-msgstr ""
-"\n"
-"\n"
-"Klik \"Volgende\" om verder te gaan zonder transparante overleg."
-
-#: ../flumotion/admin/gtk/productionsteps.py:138
-#: ../flumotion/admin/gtk/productionsteps.py:305
-#, fuzzy
-msgid "Select this if you want to stream video"
-msgstr "Als je video wil streamen"
-
-#: ../flumotion/admin/gtk/productionsteps.py:140
-#: ../flumotion/admin/gtk/productionsteps.py:307
-#, fuzzy
-msgid "Select this if you want to stream audio"
-msgstr "Als je audio wil streamen"
-
-#: ../flumotion/admin/gtk/shout2steps.py:83
-#, fuzzy
-msgid "Icecast streamer (audio and video)"
-msgstr "Icecast Streamer (audio & video)"
-
-#: ../flumotion/admin/gtk/shout2steps.py:84
-msgid "Icecast audio/video"
-msgstr "Icecast audio/video"
-
-#: ../flumotion/admin/gtk/shout2steps.py:94
-msgid "Icecast streamer (audio only)"
-msgstr "Icecast Streamer (enkel audio)"
-
-#: ../flumotion/admin/gtk/shout2steps.py:95
-msgid "Icecast audio"
-msgstr "Icecast audio"
-
-#: ../flumotion/admin/gtk/shout2steps.py:105
-msgid "Icecast streamer (video only)"
-msgstr "Icecast Streamer (enkel video)"
-
-#: ../flumotion/admin/gtk/shout2steps.py:106
-msgid "Icecast video"
-msgstr "Icecast video"
-
-#: ../flumotion/admin/gtk/workerlist.py:72
-msgid "Worker:"
-msgstr "Worker:"
-
-#: ../flumotion/common/documentation.py:95
+#: ../flumotion/common/documentation.py:94
 #, python-format
 msgid "Please install the '%s' python module."
 msgstr "Gelieve de '%s'-pythonmodule te installeren."
 
-#: ../flumotion/common/documentation.py:96
+#: ../flumotion/common/documentation.py:95
 msgid "Learn how to install Python modules."
 msgstr "Leer hoe Python-modules te installeren."
 
@@ -1825,16 +1490,16 @@ msgstr ""
 msgid "Error writing to file %s.  Maybe disk is full."
 msgstr ""
 
-#: ../flumotion/component/consumers/disker/disker.py:342
+#: ../flumotion/component/consumers/disker/disker.py:341
 #, python-format
 msgid ""
 "An iCal file has been specified for scheduling, but the '%s' module is not "
 "installed.\n"
 msgstr ""
-"Een iCal-bestand is gespecifieerd voor de planning van opnames, maar de '%s'-"
-"pythonmodule is niet geïnstalleerd.\n"
+"Een iCal-bestand is gespecifieerd voor de planning van opnames, maar de "
+"'%s'-pythonmodule is niet geïnstalleerd.\n"
 
-#: ../flumotion/component/consumers/disker/disker.py:426
+#: ../flumotion/component/consumers/disker/disker.py:425
 #, python-format
 msgid "Failed expanding filename prefix: %r <-- %r."
 msgstr ""
@@ -1937,16 +1602,12 @@ msgstr ""
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
 
-#: ../flumotion/component/converters/overlay/overlay.py:77
+#: ../flumotion/component/converters/overlay/overlay.py:75
 #, python-format
 msgid "Overlayed text '%s' too wide for the video image."
 msgstr ""
 
-#: ../flumotion/component/converters/overlay/overlay.py:83
-msgid "Overlayed logotypes too wide for the video image."
-msgstr ""
-
-#: ../flumotion/component/converters/overlay/overlay.py:92
+#: ../flumotion/component/converters/overlay/overlay.py:84
 msgid ""
 "The 'videomixer' GStreamer element has a bug in this version (0.10.7). You "
 "may see many errors in the debug output, but it should work correctly anyway."
@@ -2031,19 +1692,19 @@ msgid "_Allow increasing the volume"
 msgstr "_Sta toe het volume te verhogen"
 
 #: ../flumotion/component/encoders/dirac/dirac.xml.h:1
+#: ../flumotion/component/encoders/speex/speex.xml.h:1
+#: ../flumotion/component/encoders/theora/theora.xml.h:1
+#: ../flumotion/component/encoders/vorbis/vorbis.xml.h:2
+msgid "Bitrate to encode at (in bps)"
+msgstr ""
+
+#: ../flumotion/component/encoders/dirac/dirac.xml.h:2
 #: ../flumotion/component/encoders/dirac/wizard_gtk.py:47
 msgid "Dirac"
 msgstr ""
 
-#: ../flumotion/component/encoders/dirac/dirac.xml.h:2
-msgid "Encodes a raw video feed using BBC's Dirac codec."
-msgstr ""
-
 #: ../flumotion/component/encoders/dirac/dirac.xml.h:3
-#: ../flumotion/component/encoders/speex/speex.xml.h:3
-#: ../flumotion/component/encoders/theora/theora.xml.h:2
-#: ../flumotion/component/encoders/vorbis/vorbis.xml.h:2
-msgid "The bit rate to encode at (in bps)."
+msgid "Encode a raw video feed using BBC's Dirac codec."
 msgstr ""
 
 #: ../flumotion/component/encoders/dirac/wizard_gtk.py:46
@@ -2056,16 +1717,16 @@ msgid "Encodes raw video feed to JPEG frames."
 msgstr ""
 
 #: ../flumotion/component/encoders/jpeg/jpeg.xml.h:2
-msgid "JPEG"
+msgid "Framerate to encode at"
 msgstr ""
 
 #: ../flumotion/component/encoders/jpeg/jpeg.xml.h:3
-msgid "The Frame rate at which to encode."
+msgid "JPEG"
 msgstr ""
 
 #: ../flumotion/component/encoders/jpeg/jpeg.xml.h:5
 #, no-c-format
-msgid "The quality of the JPEG encoding (from 0 to 100 %)."
+msgid "Quality of JPEG encoding (from 0 to 100 %)"
 msgstr ""
 
 #: ../flumotion/component/encoders/jpeg/wizard.glade.h:1
@@ -2087,6 +1748,14 @@ msgstr "beelden/seconde"
 #, fuzzy
 msgid "JPEG encoder"
 msgstr "Theora encoder"
+
+#: ../flumotion/component/encoders/jpeg/wizard_gtk.py:61
+#: ../flumotion/component/encoders/mulaw/wizard_gtk.py:43
+#: ../flumotion/component/encoders/smoke/wizard_gtk.py:43
+#: ../flumotion/wizard/basesteps.py:55 ../flumotion/wizard/basesteps.py:67
+#: ../flumotion/wizard/conversionsteps.py:49
+msgid "Conversion"
+msgstr "Conversie"
 
 #: ../flumotion/component/encoders/mulaw/mulaw.xml.h:1
 msgid "Encodes raw audio to mu-law."
@@ -2110,26 +1779,26 @@ msgid "An encoder using JPEG frames and delta frames."
 msgstr ""
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:2
-msgid "How often a key frame should appear (in frames. default: 20)"
+msgid "How often should a keyframe appear (in frames, default 20"
 msgstr ""
 
-#: ../flumotion/component/encoders/smoke/smoke.xml.h:3
-#: ../flumotion/component/encoders/smoke/wizard_gtk.py:42
-msgid "Smoke"
-msgstr ""
-
-#: ../flumotion/component/encoders/smoke/smoke.xml.h:5
+#: ../flumotion/component/encoders/smoke/smoke.xml.h:4
 #, no-c-format
-msgid "The maximum JPEG quality (0-100 %. default: 85 %)."
+msgid "Maximum JPEG quality (0-100 %, default 85 %)"
+msgstr ""
+
+#: ../flumotion/component/encoders/smoke/smoke.xml.h:6
+#, no-c-format
+msgid "Minimum JPEG quality (0-100 %, default 10 %)"
 msgstr ""
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:7
-#, no-c-format
-msgid "The minimum JPEG quality (0-100 %. default: 10 %)."
+msgid "Motion estimation threshold (0 - 10000000, default 3000) "
 msgstr ""
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:8
-msgid "The motion estimation threshold (0 - 10000000. default: 3000)."
+#: ../flumotion/component/encoders/smoke/wizard_gtk.py:42
+msgid "Smoke"
 msgstr ""
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:1
@@ -2156,11 +1825,11 @@ msgstr "beelden"
 msgid "Smoke encoder"
 msgstr ""
 
-#: ../flumotion/component/encoders/speex/speex.xml.h:1
+#: ../flumotion/component/encoders/speex/speex.xml.h:2
 msgid "Encodes a raw audio feed using the Speex speech codec."
 msgstr ""
 
-#: ../flumotion/component/encoders/speex/speex.xml.h:2
+#: ../flumotion/component/encoders/speex/speex.xml.h:3
 #: ../flumotion/component/encoders/speex/wizard_gtk.py:51
 msgid "Speex"
 msgstr ""
@@ -2175,38 +1844,37 @@ msgid ""
 "to a value in bit/sec by multiplying the value by 1000."
 msgstr ""
 
-#: ../flumotion/component/encoders/theora/theora.xml.h:1
-msgid "Encodes a raw video feed using Xiph's Theora codec."
+#: ../flumotion/component/encoders/theora/theora.xml.h:2
+msgid "Encode a raw video feed using Xiph's Theora codec."
 msgstr ""
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:3
-msgid "The encoding quality (0-63, if not using bitrate)."
+msgid "Encoding quality (0-63, if not using bitrate)"
 msgstr ""
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:4
-msgid "The maximum distance between key frames (in frames)."
+msgid "Maximum distance between keyframes (in frames)"
 msgstr ""
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:5
-msgid "The minimum distance between key frames (in frames)."
+msgid "Minimum distance between keyframes (in frames)"
 msgstr ""
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:6
-msgid "The noise sensitivity (defaults to 1)"
+msgid "Noise sensitivity (defaults to 1)"
 msgstr ""
 
-#. FIXME: So what other values are possible? murrayc.
+#: ../flumotion/component/encoders/theora/theora.xml.h:7
+msgid "Sharpness encoder parameter: 0, 1, or 2"
+msgstr ""
+
 #: ../flumotion/component/encoders/theora/theora.xml.h:8
-msgid "The sharpness encoder parameter: 0, 1, or 2."
-msgstr ""
-
-#: ../flumotion/component/encoders/theora/theora.xml.h:9
 #: ../flumotion/component/encoders/theora/wizard_gtk.py:86
 msgid "Theora"
 msgstr ""
 
-#: ../flumotion/component/encoders/theora/theora.xml.h:10
-msgid "Whether to use quick, lower-quality compression."
+#: ../flumotion/component/encoders/theora/theora.xml.h:9
+msgid "Whether to use quick, lower-quality compression"
 msgstr ""
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:3
@@ -2245,13 +1913,12 @@ msgid "An audio encoder that encodes to Vorbis."
 msgstr ""
 
 #: ../flumotion/component/encoders/vorbis/vorbis.xml.h:3
-msgid "The number of audio channels to encode."
+msgid ""
+"Quality to encode at (from -0.1 to 1.0).  Only used if bitrate is not set."
 msgstr ""
 
 #: ../flumotion/component/encoders/vorbis/vorbis.xml.h:4
-msgid ""
-"The quality to encode at (from -0.1 to 1.0).  This is only used if bitrate "
-"is not set."
+msgid "The number of audio channels to encode"
 msgstr ""
 
 #: ../flumotion/component/encoders/vorbis/vorbis.xml.h:5
@@ -2356,11 +2023,11 @@ msgid "Multipart"
 msgstr ""
 
 #: ../flumotion/component/muxers/muxers.xml.h:2
-msgid "Muxes encode feeds into a Multipart feed."
+msgid "Muxes encoded feeds into a Multipart feed."
 msgstr ""
 
 #: ../flumotion/component/muxers/muxers.xml.h:3
-msgid "Muxes encode feeds into an Ogg feed."
+msgid "Muxes encoded feeds into an Ogg feed."
 msgstr ""
 
 #: ../flumotion/component/muxers/muxers.xml.h:4
@@ -2368,48 +2035,47 @@ msgid "Ogg"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:1
-msgid "A HTML template to use to serve the cortado applet."
+msgid "HTML template to use to serve the cortado applet"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:2
-msgid "Publish embedded Java player page"
+msgid "If audio should be streamed"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:3
-msgid "The URL to the stream we are displaying."
+msgid "If video should be streamed"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:4
-msgid "The base URL used to fetch the cortado applet code."
+msgid "Publish embedded Java player page"
 msgstr ""
 
-#. FIXME: What is this? murrayc
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:5
+msgid "The name of the index file, default is index.html"
+msgstr ""
+
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:6
-msgid "The frame rate used in the cortado applet."
+msgid "baserl used to fetch the cortado applet code"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:7
-msgid "The height of the cortado applet."
+msgid "framerate used in the cortado applet"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:8
-msgid "The name of the index file. The default is index.html."
+msgid "height of the cortado applet"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:9
-msgid "The size of the buffer in the cortado applet."
+msgid "size of the buffer in cortado applet"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:10
-msgid "The width of the cortado applet."
+msgid "url to the stream we're displaying"
 msgstr ""
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:11
-msgid "Whether audio should be streamed."
-msgstr ""
-
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:12
-msgid "Whether video should be streamed."
+msgid "width of the cortado applet"
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/admin_gtk.py:94
@@ -2440,30 +2106,30 @@ msgid "_Wave form:"
 msgstr "_Golfvorm:"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:1
-msgid "Produces a test signal."
+#: ../flumotion/component/producers/videotest/videotest.xml.h:1
+msgid "Fraction of buffers to drop (0.0 - 1.0)"
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:2
+msgid "Frequency of test signal (in Hz)"
+msgstr ""
+
+#: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
+msgid "Produces a test signal."
+msgstr ""
+
+#: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
+#, fuzzy
+msgid "Samplerate (in Hz)"
+msgstr "_Samplesnelheid:"
+
+#: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
 #, fuzzy
 msgid "Test audio producer"
 msgstr "Test-audiobron"
 
-#: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
-#, fuzzy
-msgid "The Sample rate (in Hz)."
-msgstr "_Samplesnelheid:"
-
-#: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
-#: ../flumotion/component/producers/videotest/videotest.xml.h:3
-msgid "The fraction of buffers to drop (0.0 - 1.0)."
-msgstr ""
-
-#: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
-msgid "The frequency of the test signal (in Hz)."
-msgstr ""
-
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:6
-msgid "The volume of the test signal (0.0 - 1.0)."
+msgid "Volume of test signal (0.0 - 1.0)"
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:1
@@ -2491,51 +2157,53 @@ msgid "A producer that captures a raw video feed from a TV card."
 msgstr ""
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:2
+#: ../flumotion/component/producers/webcam/webcam.xml.h:1
+msgid "Brightness of the video (0-65535)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:3
+#: ../flumotion/component/producers/webcam/webcam.xml.h:3
+msgid "Contrast of the video (0-65535)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:4
+msgid "Frame rate of the produced video"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:5
+msgid "Height of the produced video"
+msgstr ""
+
+#. FIXME: get these into an effect namespace ?
+#: ../flumotion/component/producers/bttv/bttv.xml.h:7
+#: ../flumotion/component/producers/webcam/webcam.xml.h:6
+msgid "Hue of the video (0-65535)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:8
+msgid "Input channel (TV/Composite1/S-Video/...)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:9
+msgid "Path to the device node"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:10
+#: ../flumotion/component/producers/webcam/webcam.xml.h:10
+msgid "Saturation of the video (0-65535)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:11
+msgid "Signal type (PAL/SECAM/NTSC/...)"
+msgstr ""
+
+#: ../flumotion/component/producers/bttv/bttv.xml.h:12
 #, fuzzy
 msgid "TV card"
 msgstr "TV-kaart"
 
-#: ../flumotion/component/producers/bttv/bttv.xml.h:3
-#: ../flumotion/component/producers/webcam/webcam.xml.h:4
-msgid "The brightness of the video (0-65535)."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:4
-#: ../flumotion/component/producers/webcam/webcam.xml.h:5
-msgid "The contrast of the video (0-65535)."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:5
-msgid "The frame rate of the produced video."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:6
-msgid "The height of the produced video."
-msgstr ""
-
-#. FIXME: get these into an effect namespace ?
-#: ../flumotion/component/producers/bttv/bttv.xml.h:8
-msgid "The hue of the video (0-65535)."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:9
-msgid "The input channel (TV/Composite1/S-Video/...)."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:10
-msgid "The path to the device node."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:11
-msgid "The saturation of the video (0-65535)."
-msgstr ""
-
-#: ../flumotion/component/producers/bttv/bttv.xml.h:12
-msgid "The signal type (PAL/SECAM/NTSC/...)."
-msgstr ""
-
 #: ../flumotion/component/producers/bttv/bttv.xml.h:13
-msgid "The width of the produced video."
+msgid "Width of the produced video"
 msgstr ""
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:1
@@ -2630,32 +2298,31 @@ msgstr "Vuurdraad"
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:3
 #, fuzzy
-msgid "Produces feeds from a Firewire/DV device."
+msgid "Produce feeds from a Firewire/DV device."
 msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:4
-msgid "The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)."
+msgid "The GUID of the device (a hexadecimal like 0xhhhhhhhhhhhhhhhh)"
 msgstr ""
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:5
-msgid "The final width, including correction."
+msgid "The final width, including correction"
 msgstr ""
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:6
-#, fuzzy
-msgid "The framerate (in fps)."
-msgstr "_Samplesnelheid:"
+msgid "The framerate (in fps) "
+msgstr ""
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:7
-msgid "The height to scale to."
+msgid "The height to scale to"
 msgstr ""
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:8
-msgid "The width to scale to before correcting."
+msgid "The width to scale to before correcting"
 msgstr ""
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:9
-msgid "Whether to scale to a 1:1 pixel aspect ratio."
+msgid "Whether to scale to a 1:1 pixel aspect ratio"
 msgstr ""
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:1
@@ -2819,38 +2486,38 @@ msgstr ""
 "andere programma te stoppen en opnieuw te proberen."
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:1
-msgid "Captures a raw audio feed from a soundcard."
+msgid "Bit depth to use (default 16)"
 msgstr ""
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:2
+msgid "Capture a raw audio feed from a soundcard."
+msgstr ""
+
+#: ../flumotion/component/producers/soundcard/soundcard.xml.h:3
+msgid "Number of channels to capture (default 2)"
+msgstr ""
+
+#: ../flumotion/component/producers/soundcard/soundcard.xml.h:4
+msgid "Samplerate to capture at (in Hz, default 44100)"
+msgstr ""
+
+#: ../flumotion/component/producers/soundcard/soundcard.xml.h:5
 #, fuzzy
 msgid "Sound card"
 msgstr "Geluidskaart"
 
-#: ../flumotion/component/producers/soundcard/soundcard.xml.h:3
-msgid "The GStreamer element factory to use as the source."
-msgstr ""
-
-#: ../flumotion/component/producers/soundcard/soundcard.xml.h:4
-msgid "The Number of channels to capture (default 2)."
-msgstr ""
-
-#: ../flumotion/component/producers/soundcard/soundcard.xml.h:5
-msgid "The Sample rate to capture at (in Hz. default: 44100)."
-msgstr ""
-
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:6
-msgid "The bit depth to use (default 16)."
+msgid "The GStreamer element factory to use as source"
 msgstr ""
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:7
-msgid "The device property to use for the the source element."
+msgid "The device property to use for the source element"
 msgstr ""
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:8
 msgid ""
-"The label of the input track to be used for recording (the default is to use "
-"whatever is currently set)."
+"The label of the input track to be used for recording (default is to use "
+"whatever is currently set)"
 msgstr ""
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:1
@@ -2932,42 +2599,42 @@ msgstr "Patroon:"
 msgid "Pattern"
 msgstr "Patroon"
 
-#: ../flumotion/component/producers/videotest/videotest.xml.h:1
+#: ../flumotion/component/producers/videotest/videotest.xml.h:2
+msgid "Height in pixels"
+msgstr ""
+
+#: ../flumotion/component/producers/videotest/videotest.xml.h:3
 msgid "Produces a raw video feed with a test signal."
 msgstr ""
 
-#: ../flumotion/component/producers/videotest/videotest.xml.h:2
+#: ../flumotion/component/producers/videotest/videotest.xml.h:4
+msgid "Test pattern to show (smpte/snow/black/...)"
+msgstr ""
+
+#: ../flumotion/component/producers/videotest/videotest.xml.h:5
 #, fuzzy
 msgid "Test video producer"
 msgstr "Test-videobron"
 
-#: ../flumotion/component/producers/videotest/videotest.xml.h:4
-msgid "The height in pixels."
-msgstr ""
-
-#: ../flumotion/component/producers/videotest/videotest.xml.h:5
-msgid "The video frame rate as numerator/denominator."
-msgstr ""
-
 #: ../flumotion/component/producers/videotest/videotest.xml.h:6
-msgid "The video pixel aspect ratio as numerator/denominator."
-msgstr ""
-
-#: ../flumotion/component/producers/videotest/videotest.xml.h:7
-msgid "The width in pixels."
-msgstr ""
-
-#: ../flumotion/component/producers/videotest/videotest.xml.h:8
-msgid "Thhe test pattern to show (smpte/snow/black/...)."
-msgstr ""
-
-#: ../flumotion/component/producers/videotest/videotest.xml.h:9
 #, fuzzy
 msgid "Video format"
 msgstr "Enkel video"
 
+#: ../flumotion/component/producers/videotest/videotest.xml.h:7
+msgid "Video framerate as numerator/denominator"
+msgstr ""
+
+#: ../flumotion/component/producers/videotest/videotest.xml.h:8
+msgid "Video pixel aspect ratio as numerator/denominator"
+msgstr ""
+
+#: ../flumotion/component/producers/videotest/videotest.xml.h:9
+msgid "Whether to overlay buffer timestamps"
+msgstr ""
+
 #: ../flumotion/component/producers/videotest/videotest.xml.h:10
-msgid "Whether to overlay buffer timestamps."
+msgid "Width in pixels"
 msgstr ""
 
 #: ../flumotion/component/producers/videotest/wizard.glade.h:6
@@ -2978,47 +2645,38 @@ msgstr ""
 msgid "Test Video Producer"
 msgstr "Test-videobron"
 
-#: ../flumotion/component/producers/webcam/webcam.xml.h:1
-msgid "Produces a raw video feed from a webcam."
-msgstr ""
-
 #: ../flumotion/component/producers/webcam/webcam.xml.h:2
-msgid "The Colorspace fourcc to capture in."
+msgid "Colorspace fourcc to capture in"
 msgstr ""
 
-#: ../flumotion/component/producers/webcam/webcam.xml.h:3
-msgid "The Mime type of video to produce (e.g. video/x-raw-yuv)."
-msgstr ""
-
-#: ../flumotion/component/producers/webcam/webcam.xml.h:6
+#: ../flumotion/component/producers/webcam/webcam.xml.h:4
 msgid ""
-"The element factory from which to instantiate the capture element. Defaults "
-"to 'v4lsrc'"
+"Element factory from which to instantiate the capture element, defaults to "
+"'v4lsrc'"
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:7
-msgid "The frame rate of the video to capture."
+msgid "Mime type of video to produce (e.g. video/x-raw-yuv)"
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:8
-msgid "The height of the video to capture."
+msgid "Path to device node to capture from"
 msgstr ""
 
-#. FIXME: get these into an effect namespace ?
-#: ../flumotion/component/producers/webcam/webcam.xml.h:10
-msgid "The hue of the video (0-65535)"
+#: ../flumotion/component/producers/webcam/webcam.xml.h:9
+msgid "Produces a raw video feed from a webcam."
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:11
-msgid "The path to the device node from which to capture."
+msgid "The framerate of the video to capture"
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:12
-msgid "The saturation of the video (0-65535)"
+msgid "The height of the video to capture"
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:13
-msgid "The width of the video to capture."
+msgid "The width of the video to capture"
 msgstr ""
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:14
@@ -3189,9 +2847,322 @@ msgstr "Er is iets echt mis. "
 msgid "But does %s know what ?"
 msgstr "Maar weet %s wat ?"
 
-#: ../flumotion/ui/fileselector.py:173
+#: ../flumotion/ui/fileselector.py:158
 msgid "Select a folder..."
 msgstr ""
+
+#: ../flumotion/wizard/basesteps.py:32 ../flumotion/wizard/basesteps.py:40
+#: ../flumotion/wizard/ondemandstep.py:69
+#: ../flumotion/wizard/overlaystep.py:71
+#: ../flumotion/wizard/productionsteps.py:42
+#: ../flumotion/wizard/productionsteps.py:43
+#: ../flumotion/wizard/productionsteps.py:238
+#: ../flumotion/wizard/productionsteps.py:239
+msgid "Production"
+msgstr "Productie"
+
+#: ../flumotion/wizard/basesteps.py:80
+#: ../flumotion/wizard/consumptionsteps.py:52
+#: ../flumotion/wizard/consumptionsteps.py:53
+#: ../flumotion/wizard/consumptionsteps.py:248
+msgid "Consumption"
+msgstr "Consumptie"
+
+#: ../flumotion/wizard/configurationwizard.py:64
+#: ../flumotion/wizard/configurationwizard.py:65
+msgid "Welcome"
+msgstr "Welkom"
+
+#: ../flumotion/wizard/configurationwizard.py:78
+#: ../flumotion/wizard/configurationwizard.py:79
+msgid "Scenario"
+msgstr ""
+
+#: ../flumotion/wizard/configurationwizard.py:371
+#: ../flumotion/wizard/httpstreamersteps.py:342
+#: ../flumotion/wizard/overlaystep.py:139
+#, python-format
+msgid "Worker '%s' is missing GStreamer element '%s'."
+msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
+msgstr[0] "Worker '%s' mist het GStreamer-element '%s'."
+msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
+
+#: ../flumotion/wizard/configurationwizard.py:376
+msgid ""
+"\n"
+"Please install the necessary GStreamer plug-ins that provide these elements "
+"and restart the worker."
+msgstr ""
+"\n"
+"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
+"en de worker te herstarten."
+
+#: ../flumotion/wizard/configurationwizard.py:379
+#: ../flumotion/wizard/configurationwizard.py:441
+msgid ""
+"\n"
+"\n"
+"You will not be able to go forward using this worker."
+msgstr ""
+"\n"
+"\n"
+"U kan niet verder gaan."
+
+#: ../flumotion/wizard/configurationwizard.py:433
+#: ../flumotion/wizard/httpstreamersteps.py:320
+#: ../flumotion/wizard/ondemandstep.py:113
+#: ../flumotion/wizard/overlaystep.py:117
+#, python-format
+msgid "Worker '%s' cannot import module '%s'."
+msgstr "Werker '%s' kan module '%s' niet importeren."
+
+#: ../flumotion/wizard/configurationwizard.py:436
+#: ../flumotion/wizard/overlaystep.py:120
+#, python-format
+msgid ""
+"\n"
+"This module is part of '%s'."
+msgstr ""
+"\n"
+"Deze module maakt deel uit van '%s'."
+
+#: ../flumotion/wizard/configurationwizard.py:439
+#: ../flumotion/wizard/httpstreamersteps.py:324
+#: ../flumotion/wizard/ondemandstep.py:117
+#: ../flumotion/wizard/overlaystep.py:123
+#, python-format
+msgid ""
+"\n"
+"The project's homepage is %s"
+msgstr ""
+"\n"
+"De thuispagina van het project is %s"
+
+#: ../flumotion/wizard/configurationwizard.py:486
+#: ../flumotion/wizard/configurationwizard.py:514
+msgid "Internal error: could not run check code on worker."
+msgstr "Interne fout: kon check-code niet uitvoeren op worker."
+
+#: ../flumotion/wizard/configurationwizard.py:647
+msgid ""
+"All workers have logged out.\n"
+"Make sure your Flumotion network is running properly and try again."
+msgstr ""
+"Alle workers zijn afgemeld.\n"
+"Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
+
+#: ../flumotion/wizard/consumptionsteps.py:247
+#, fuzzy
+msgid "HTTP Streaming"
+msgstr "HTTP Streamer (enkel audio)"
+
+#: ../flumotion/wizard/conversionsteps.py:48
+msgid "Encoding"
+msgstr "Encodering"
+
+#: ../flumotion/wizard/diskersteps.py:111
+msgid "kB"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:112
+msgid "MB"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:113
+msgid "GB"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:114
+msgid "TB"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:117
+msgid "minute(s)"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:118
+msgid "hour(s)"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:119
+msgid "day(s)"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:120
+msgid "week(s)"
+msgstr ""
+
+#: ../flumotion/wizard/diskersteps.py:169
+#, fuzzy
+msgid "Disk (audio and video)"
+msgstr "Schijf (audio & video)"
+
+#: ../flumotion/wizard/diskersteps.py:170
+msgid "Disk audio/video"
+msgstr "Schijf audio/video"
+
+#: ../flumotion/wizard/diskersteps.py:180
+msgid "Disk (audio only)"
+msgstr "Schijf (enkel audio)"
+
+#: ../flumotion/wizard/diskersteps.py:181
+msgid "Disk audio"
+msgstr "Schijf audio"
+
+#: ../flumotion/wizard/diskersteps.py:191
+msgid "Disk (video only)"
+msgstr "Schijf (enkel video)"
+
+#: ../flumotion/wizard/diskersteps.py:192
+msgid "Disk video"
+msgstr "Schijf video"
+
+#: ../flumotion/wizard/httpstreamersteps.py:322
+#: ../flumotion/wizard/ondemandstep.py:115
+#, python-format
+msgid ""
+"\n"
+"This module is part of the '%s'."
+msgstr ""
+"\n"
+"Deze module maakt deel uit van '%s'."
+
+#: ../flumotion/wizard/httpstreamersteps.py:387
+#, fuzzy
+msgid "HTTP Streamer (audio and video)"
+msgstr "HTTP Streamer (audio & video)"
+
+#: ../flumotion/wizard/httpstreamersteps.py:388
+msgid "HTTP audio/video"
+msgstr "HTTP audio/video"
+
+#: ../flumotion/wizard/httpstreamersteps.py:398
+msgid "HTTP Streamer (audio only)"
+msgstr "HTTP Streamer (enkel audio)"
+
+#: ../flumotion/wizard/httpstreamersteps.py:399
+msgid "HTTP audio"
+msgstr "HTTP audio"
+
+#: ../flumotion/wizard/httpstreamersteps.py:409
+msgid "HTTP Streamer (video only)"
+msgstr "HTTP Streamer (enkel video)"
+
+#: ../flumotion/wizard/httpstreamersteps.py:410
+msgid "HTTP video"
+msgstr "HTTP video"
+
+#: ../flumotion/wizard/ondemandstep.py:67
+msgid "Demand"
+msgstr ""
+
+#: ../flumotion/wizard/ondemandstep.py:68
+msgid "On demand"
+msgstr ""
+
+#: ../flumotion/wizard/ondemandstep.py:126
+#, python-format
+msgid "Directory '%s' does not exist, or is not readable on worker '%s'."
+msgstr ""
+
+#: ../flumotion/wizard/overlaystep.py:44
+#, fuzzy
+msgid "Flumotion"
+msgstr "Flumotion:"
+
+#: ../flumotion/wizard/overlaystep.py:70
+msgid "Overlay"
+msgstr "Overlay"
+
+#: ../flumotion/wizard/overlaystep.py:126
+#: ../flumotion/wizard/overlaystep.py:146
+msgid ""
+"\n"
+"\n"
+"Click \"Forward\" to proceed without overlay."
+msgstr ""
+"\n"
+"\n"
+"Klik \"Volgende\" om verder te gaan zonder transparante overleg."
+
+#: ../flumotion/wizard/productionsteps.py:138
+#: ../flumotion/wizard/productionsteps.py:305
+#, fuzzy
+msgid "Select this if you want to stream video"
+msgstr "Als je video wil streamen"
+
+#: ../flumotion/wizard/productionsteps.py:140
+#: ../flumotion/wizard/productionsteps.py:307
+#, fuzzy
+msgid "Select this if you want to stream audio"
+msgstr "Als je audio wil streamen"
+
+#: ../flumotion/wizard/scenarios.py:42
+msgid "Content License"
+msgstr "Inhoudslicensie"
+
+#: ../flumotion/wizard/scenarios.py:43
+msgid "License"
+msgstr "Licensie"
+
+#: ../flumotion/wizard/scenarios.py:61
+msgid "Creative Commons"
+msgstr "Creative Commons"
+
+#: ../flumotion/wizard/scenarios.py:62
+msgid "Commercial"
+msgstr ""
+
+#: ../flumotion/wizard/scenarios.py:75 ../flumotion/wizard/scenarios.py:76
+msgid "Summary"
+msgstr "Samenvatting"
+
+#: ../flumotion/wizard/scenarios.py:138
+msgid "Set up a live stream"
+msgstr ""
+
+#: ../flumotion/wizard/scenarios.py:140
+msgid ""
+"Allows you to create a live stream from a device or a file.\n"
+"        "
+msgstr ""
+
+#: ../flumotion/wizard/scenarios.py:211
+msgid "Stream files on demand"
+msgstr ""
+
+#: ../flumotion/wizard/scenarios.py:212
+msgid "Allows you to serve a collection of files from disk."
+msgstr ""
+
+#: ../flumotion/wizard/shout2steps.py:83
+#, fuzzy
+msgid "Icecast streamer (audio and video)"
+msgstr "Icecast Streamer (audio & video)"
+
+#: ../flumotion/wizard/shout2steps.py:84
+msgid "Icecast audio/video"
+msgstr "Icecast audio/video"
+
+#: ../flumotion/wizard/shout2steps.py:94
+msgid "Icecast streamer (audio only)"
+msgstr "Icecast Streamer (enkel audio)"
+
+#: ../flumotion/wizard/shout2steps.py:95
+msgid "Icecast audio"
+msgstr "Icecast audio"
+
+#: ../flumotion/wizard/shout2steps.py:105
+msgid "Icecast streamer (video only)"
+msgstr "Icecast Streamer (enkel video)"
+
+#: ../flumotion/wizard/shout2steps.py:106
+msgid "Icecast video"
+msgstr "Icecast video"
+
+#: ../flumotion/wizard/worker.py:72
+msgid "Worker:"
+msgstr "Worker:"
 
 #: ../flumotion/worker/checks/audio.py:86
 #: ../flumotion/worker/checks/check.py:54
@@ -3295,20 +3266,6 @@ msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr ""
-
-#~ msgid ""
-#~ "Welcome to the Flumotion configuration wizard.\n"
-#~ "\n"
-#~ "This wizard will guide you through the required steps to help you "
-#~ "configure your streaming media server."
-#~ msgstr ""
-#~ "Welkom bij de Flumotion configuratiewizard.\n"
-#~ "\n"
-#~ "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
-#~ "configuratie van uw streaming media server."
-
-#~ msgid "Run _Wizard"
-#~ msgstr "_Wizard Uitvoeren"
 
 #~ msgid "Soundcard"
 #~ msgstr "Geluidskaart"
