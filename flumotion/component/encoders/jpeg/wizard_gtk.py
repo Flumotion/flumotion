@@ -56,7 +56,7 @@ class JPEGVideoEncoder(VideoEncoder):
 
 class JPEGStep(VideoEncoderStep):
     name = 'JPEG encoder'
-    title = _('JPEG encoder')
+    title = _('JPEG Encoder')
     sidebarName = 'JPEG'
     section = _('Conversion')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),

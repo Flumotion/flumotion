@@ -38,7 +38,7 @@ class MulawAudioEncoder(AudioEncoder):
 
 class MulawStep(AudioEncoderStep):
     name = 'MulawEncoder'
-    title = _('Mulaw encoder')
+    title = _('Mulaw Encoder')
     sidebarName = _('Mulaw')
     section = _('Conversion')
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),

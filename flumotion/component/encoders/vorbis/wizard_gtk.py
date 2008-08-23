@@ -58,7 +58,7 @@ class VorbisAudioEncoder(AudioEncoder):
 
 class VorbisStep(AudioEncoderStep):
     name = 'Vorbis encoder'
-    title = _('Vorbis encoder')
+    title = _('Vorbis Encoder')
     sidebarName = _('Vorbis')
     icon = 'xiphfish.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),

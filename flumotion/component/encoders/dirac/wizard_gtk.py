@@ -43,7 +43,7 @@ class DiracVideoEncoder(VideoEncoder):
 
 class DiracStep(VideoEncoderStep):
     name = 'Dirac encoder'
-    title = _('Dirac encoder')
+    title = _('Dirac Encoder')
     sidebarName = _('Dirac')
     icon = 'xiphfish.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),

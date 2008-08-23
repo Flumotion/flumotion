@@ -44,7 +44,7 @@ __version__ = "$Rev$"
 #
 # class FirstStep(WizardStep):
 #     name = 'first-step'
-#     title = 'First step'
+#     title = 'First Step'
 #     text = 'Please fill in your bank details below.'
 #     next_pages = ['second-step']
 #

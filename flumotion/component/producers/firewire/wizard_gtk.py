@@ -224,7 +224,7 @@ class _FireWireCommon:
 
 class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
     name = 'Firewire'
-    title = _('Firewire')
+    title = _('Firewire Video')
     docSection = 'help-configuration-assistant-producer-video-firewire'
     docAnchor = ''
     docVersion = 'local'
@@ -236,7 +236,7 @@ class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
 
 class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
     name = 'Firewire audio'
-    title = _('Firewire audio')
+    title = _('Firewire Audio')
     docSection = 'help-configuration-assistant-producer-audio-firewire'
     docAnchor = ''
     docVersion = 'local'

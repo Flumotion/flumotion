@@ -190,8 +190,8 @@ class DiskStep(ConsumerStep):
 
 class DiskBothStep(DiskStep):
     name = 'Disk (audio & video)'
-    title = _('Disk (audio and video)')
-    sidebarName = _('Disk audio/video')
+    title = _('Disk (Audio and Video)')
+    sidebarName = _('Disk Audio/Video')
 
     # ConsumerStep
 
@@ -201,8 +201,8 @@ class DiskBothStep(DiskStep):
 
 class DiskAudioStep(DiskStep):
     name = 'Disk (audio only)'
-    title = _('Disk (audio only)')
-    sidebarName = _('Disk audio')
+    title = _('Disk (Audio Only)')
+    sidebarName = _('Disk Audio')
 
     # ConsumerStep
 
@@ -212,8 +212,8 @@ class DiskAudioStep(DiskStep):
 
 class DiskVideoStep(DiskStep):
     name = 'Disk (video only)'
-    title = _('Disk (video only)')
-    sidebarName = _('Disk video')
+    title = _('Disk (Video Only)')
+    sidebarName = _('Disk Video')
 
     # ConsumerStep
 

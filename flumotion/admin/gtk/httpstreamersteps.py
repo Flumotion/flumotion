@@ -384,8 +384,8 @@ class HTTPSpecificStep(ConsumerStep):
 
 class HTTPBothStep(HTTPSpecificStep):
     name = 'HTTPStreamerBoth'
-    title = _('HTTP Streamer (audio and video)')
-    sidebarName = _('HTTP audio/video')
+    title = _('HTTP Streamer (Audio and Video)')
+    sidebarName = _('HTTP Audio/Video')
     docSection = 'help-configuration-assistant-http-streaming-audio-video'
     docAnchor = ''
     docVersion = 'local'
@@ -398,8 +398,8 @@ class HTTPBothStep(HTTPSpecificStep):
 
 class HTTPAudioStep(HTTPSpecificStep):
     name = 'HTTPStreamerAudio'
-    title = _('HTTP Streamer (audio only)')
-    sidebarName = _('HTTP audio')
+    title = _('HTTP Streamer (Audio Only)')
+    sidebarName = _('HTTP Audio')
 
     # ConsumerStep
 
@@ -409,8 +409,8 @@ class HTTPAudioStep(HTTPSpecificStep):
 
 class HTTPVideoStep(HTTPSpecificStep):
     name = 'HTTPStreamerVideo'
-    title = _('HTTP Streamer (video only)')
-    sidebarName = _('HTTP video')
+    title = _('HTTP Streamer (Video Only)')
+    sidebarName = _('HTTP Video')
 
     # ConsumerStep
 

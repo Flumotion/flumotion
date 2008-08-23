@@ -46,7 +46,7 @@ _ = gettext.gettext
 
 class Initial(WizardStep):
     name = 'initial'
-    title = _('Connect to Flumotion manager')
+    title = _('Connect to Flumotion Manager')
     text = (_('Flumotion Admin needs to connect to a Flumotion manager.\n') +
             _('Choose an option from the list and click "Forward" to begin.'))
     connect_to_existing = None
@@ -100,7 +100,7 @@ class Initial(WizardStep):
 
 class ConnectToExisting(WizardStep):
     name = 'connect_to_existing'
-    title = _('Host information')
+    title = _('Host Information')
     text = _('Please enter the address where the manager is running.')
     next_pages = ['authenticate']
     open_connection = None
@@ -165,7 +165,7 @@ class Authenticate(WizardStep):
 
 class LoadConnection(WizardStep):
     name = 'load_connection'
-    title = _('Recent connections')
+    title = _('Recent Connections')
     text = _('Please choose a connection from the box below.')
     connections = None
     next_pages = []
@@ -190,7 +190,7 @@ class LoadConnection(WizardStep):
 
 class StartNew(WizardStep):
     name = 'start_new'
-    title = _('Start a new manager and worker')
+    title = _('Start a New Manager and Worker')
     text = _("""This will start a new manager and worker for you.
 
 The manager and worker will run under your user account.
@@ -268,7 +268,7 @@ This mode is only useful for testing Flumotion.
 
 class StartNewError(WizardStep):
     name = 'start_new_error'
-    title = _('Failed to start')
+    title = _('Failed to Start')
     text = ""
     start_worker_check = None
     next_pages = []
@@ -290,7 +290,7 @@ class StartNewError(WizardStep):
 
 class StartNewSuccess(WizardStep):
     name = 'start_new_success'
-    title = _('Started manager and worker')
+    title = _('Started Manager and Worker')
     start_worker_check = None
     text = ''
     next_pages = []
