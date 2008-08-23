@@ -1,3 +1,8 @@
+2008-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/service/main.py:
+	  make it clear that condrestart is available.
+
 2008-08-23  Murray Cumming  <murrayc@murrayc.com>
 
 	* flumotion/admin/gtk/dialogs.py:

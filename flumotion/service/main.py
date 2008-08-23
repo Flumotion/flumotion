@@ -69,7 +69,8 @@ def main(args):
     try:
         command = args[1]
     except IndexError:
-        print "Usage: flumotion {list|start|stop|restart|status|clean} [which]"
+        print "Usage: flumotion " \
+            "{list|start|stop|restart|condrestart|status|clean} [which]"
         sys.exit(0)
 
     if command == "list":
