@@ -225,6 +225,9 @@ class _FireWireCommon:
 class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
     name = 'Firewire'
     title = _('Firewire')
+    docSection = 'help-configuration-assistant-producer-video-firewire'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
@@ -234,6 +237,9 @@ class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
 class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
     name = 'Firewire audio'
     title = _('Firewire audio')
+    docSection = 'help-configuration-assistant-producer-audio-firewire'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)

@@ -64,6 +64,9 @@ class VorbisStep(AudioEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'vorbis'
+    docSection = 'help-configuration-assistant-encoder-vorbis'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

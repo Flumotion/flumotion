@@ -51,6 +51,9 @@ class SpeexStep(AudioEncoderStep):
     sidebarName = _('Speex')
     componentType = 'speex'
     icon = 'xiphfish.png'
+    docSection = 'help-configuration-assistant-encoder-speex'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

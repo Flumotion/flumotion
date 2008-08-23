@@ -49,6 +49,9 @@ class DiracStep(VideoEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'dirac'
+    docSection = 'help-configuration-assistant-encoder-dirac'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

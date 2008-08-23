@@ -44,6 +44,9 @@ class SmokeStep(VideoEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'smoke'
+    docSection = 'help-configuration-assistant-encoder-smoke'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

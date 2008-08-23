@@ -63,6 +63,9 @@ class TVCardStep(VideoProducerStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'bttv'
+    docSection = 'help-configuration-assistant-producer-video-tvcard'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)

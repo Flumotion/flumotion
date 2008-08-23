@@ -49,6 +49,9 @@ class TestVideoProducerStep(VideoProducerStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'videotestsrc'
+    docSection = 'help-configuration-assistant-producer-video-test'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

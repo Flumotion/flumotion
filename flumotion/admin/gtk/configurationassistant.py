@@ -79,6 +79,9 @@ class ScenarioStep(WizardStep):
     section = _('Scenario')
     icon = 'wizard.png'
     gladeFile = 'scenario-wizard.glade'
+    docSection = 'help-configuration-assistant-scenario'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

@@ -44,6 +44,9 @@ class MulawStep(AudioEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'mulaw-encoder'
+    docSection = 'help-configuration-assistant-encoder-mulaw'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

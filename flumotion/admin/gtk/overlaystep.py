@@ -72,6 +72,9 @@ class OverlayStep(WorkerWizardStep):
     gladeFile = 'overlay-wizard.glade'
     icon = 'overlay.png'
     componentType = 'overlay'
+    docSection = 'help-configuration-assistant-overlay'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard, video_producer):
         self.model = Overlay(video_producer)

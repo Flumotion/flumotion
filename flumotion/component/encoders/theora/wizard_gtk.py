@@ -88,6 +88,9 @@ class TheoraStep(VideoEncoderStep):
                               'wizard.glade')
     componentType = 'theora'
     icon = 'xiphfish.png'
+    docSection = 'help-configuration-assistant-encoder-theora'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

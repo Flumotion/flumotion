@@ -62,6 +62,9 @@ class JPEGStep(VideoEncoderStep):
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
     componentType = 'jpeg'
+    docSection = 'help-configuration-assistant-encoder-jpeg'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

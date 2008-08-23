@@ -67,6 +67,9 @@ class OnDemandStep(WorkerWizardStep):
     sidebarName = _('On demand')
     section = _('Production')
     gladeFile = 'ondemand-wizard.glade'
+    docSection = 'help-configuration-assistant-ondemand'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard):
         self.model = OnDemand()

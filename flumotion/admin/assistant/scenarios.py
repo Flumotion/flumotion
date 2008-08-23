@@ -43,6 +43,9 @@ class LicenseStep(WizardStep):
     section = _('License')
     icon = 'licenses.png'
     gladeFile = "license-wizard.glade"
+    docSection = 'help-configuration-assistant-license'
+    docAnchor = ''
+    docVersion = 'local'
 
     # Public API
 

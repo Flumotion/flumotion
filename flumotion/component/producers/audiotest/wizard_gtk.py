@@ -47,6 +47,9 @@ class TestAudioProducerStep(AudioProducerStep):
     icon = 'soundcard.png'
     gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'wizard.glade')
+    docSection = 'help-configuration-assistant-producer-audio-test'
+    docAnchor = ''
+    docVersion = 'local'
 
     # WizardStep
 

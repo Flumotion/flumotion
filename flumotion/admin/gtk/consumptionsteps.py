@@ -53,6 +53,9 @@ class ConsumptionStep(WizardStep):
     section = _('Consumption')
     icon = 'consumption.png'
     gladeFile = 'consumption-wizard.glade'
+    docSection = 'help-configuration-assistant-consumption'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard):
         self._httpCommon = HTTPCommon()
@@ -255,6 +258,9 @@ class HTTPConsumptionStep(WorkerWizardStep):
     section = _('Consumption')
     icon = 'consumption.png'
     gladeFile = 'http-wizard.glade'
+    docSection = 'help-configuration-assistant-http-streaming'
+    docAnchor = ''
+    docVersion = 'local'
 
     def __init__(self, wizard):
         consumptionStep = wizard.getStep('Consumption')

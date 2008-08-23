@@ -386,6 +386,9 @@ class HTTPBothStep(HTTPSpecificStep):
     name = 'HTTPStreamerBoth'
     title = _('HTTP Streamer (audio and video)')
     sidebarName = _('HTTP audio/video')
+    docSection = 'help-configuration-assistant-http-streaming-audio-video'
+    docAnchor = ''
+    docVersion = 'local'
 
     # ConsumerStep
 
